@@ -1,0 +1,9 @@
+# Core dependencies for circuit discovery (node + edge pruning).
+# Tested with torch 2.7+ / transformers 4.52+. The GPT-2 node model uses
+# transformers.masking_utils, so transformers >= 4.52 is required.
+torch>=2.7
+transformers>=4.52
+datasets>=2.14
+pyarrow>=12.0      # backs `datasets` (HF) — load_from_disk
+tqdm>=4.65
+numpy>=1.24
