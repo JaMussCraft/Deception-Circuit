@@ -43,13 +43,6 @@ pip install -r requirements.txt
 Requires `torch >= 2.7` and `transformers >= 4.52` (the GPT-2 node model uses
 `transformers.masking_utils`).
 
-On a Compute Canada / SLURM cluster the dependencies come from modules + a venv:
-
-```bash
-module load StdEnv/2023 python-build-bundle/2025a gcc arrow
-source /path/to/project_env/bin/activate
-```
-
 ## Quick start
 
 ```bash
