@@ -134,7 +134,7 @@ def _optimize_gates(model, task, full_model, train_dl, val_dl, device, tokenizer
     start = time.time()
     pbar = tqdm(range(num_epochs), desc=f"{phase_label} pruning")
     for epoch in pbar:
-        ep_loss = ep_kl = ep_sp = 0.0
+        ep_loss = ep_kl = ep_task = ep_sp = 0.0
         for bi, batch in enumerate(train_dl):
             batch = _to_device(batch, device)
             optimizer.zero_grad()
@@ -158,12 +158,14 @@ def _optimize_gates(model, task, full_model, train_dl, val_dl, device, tokenizer
 
             ep_loss += float(loss)
             ep_kl += float(kl_loss)
+            ep_task += float(task_loss)
             ep_sp += float(sp_loss)
             step += 1
 
         scheduler.step()
         n = len(train_dl)
         pbar.set_postfix(L=f"{ep_loss / n:.3f}", KL=f"{ep_kl / n:.3f}",
+                         Task=f"{ep_task / n:.3f}",
                          Sp=f"{ep_sp / n:.3f}",
                          LR=f"{scheduler.get_last_lr()[0]:.2e}")
 
