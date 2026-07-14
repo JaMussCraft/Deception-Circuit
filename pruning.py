@@ -129,6 +129,11 @@ def _optimize_gates(model, task, full_model, train_dl, val_dl, device, tokenizer
 
     cached = _maybe_cache_logits(adapter, task, full_model, train_dl, device)
 
+    history = {
+        "epochs": [], "loss": [], "kl": [], "task": [], "sparsity": [], "lr": [],
+        "evals": [],
+    }
+
     model.train()
     step = 0
     start = time.time()
@@ -164,17 +169,30 @@ def _optimize_gates(model, task, full_model, train_dl, val_dl, device, tokenizer
 
         scheduler.step()
         n = len(train_dl)
-        pbar.set_postfix(L=f"{ep_loss / n:.3f}", KL=f"{ep_kl / n:.3f}",
-                         T=f"{ep_task / n:.3f}",
-                         Sp=f"{ep_sp / n:.3f}",
-                         LR=f"{scheduler.get_last_lr()[0]:.2e}")
+        mean_loss, mean_kl = ep_loss / n, ep_kl / n
+        mean_task, mean_sp = ep_task / n, ep_sp / n
+        cur_lr = scheduler.get_last_lr()[0]
+        pbar.set_postfix(L=f"{mean_loss:.3f}", KL=f"{mean_kl:.3f}",
+                         T=f"{mean_task:.3f}",
+                         Sp=f"{mean_sp:.3f}",
+                         LR=f"{cur_lr:.2e}")
+
+        history["epochs"].append(epoch + 1)
+        history["loss"].append(mean_loss)
+        history["kl"].append(mean_kl)
+        history["task"].append(mean_task)
+        history["sparsity"].append(mean_sp)
+        history["lr"].append(cur_lr)
 
         if epoch == 0:
             tracker.snap(f"{phase_label} epoch 1 (fwd+bwd+optim)")
         if eval_every and (epoch + 1) % eval_every == 0:
             model.eval()
-            task.evaluate(model, f"{phase_label} Ep {epoch + 1}", full_model,
-                          val_dl, device, tokenizer, state)
+            metrics = task.evaluate(
+                model, f"{phase_label} Ep {epoch + 1}", full_model,
+                val_dl, device, tokenizer, state)
+            if isinstance(metrics, dict):
+                history["evals"].append({"epoch": epoch + 1, **metrics})
             model.train()
 
     print(f"{phase_label} pruning time: {time.time() - start:.1f}s")
@@ -183,6 +201,8 @@ def _optimize_gates(model, task, full_model, train_dl, val_dl, device, tokenizer
     if cached is not None:
         del cached
         torch.cuda.empty_cache()
+
+    return history
 
 
 # ==============================================================================
@@ -196,7 +216,7 @@ def run_node_pruning(adapter, task, full_model, train_dl, val_dl, device, tokeni
     print("=" * 70)
 
     model = adapter.build_node_model(node_cfg, device)
-    _optimize_gates(
+    history = _optimize_gates(
         model, task, full_model, train_dl, val_dl, device, tokenizer,
         num_epochs=args.node_epochs, lr=args.lr,
         lambda_sparsity=args.node_lambda_sparsity,
@@ -206,7 +226,7 @@ def run_node_pruning(adapter, task, full_model, train_dl, val_dl, device, tokeni
 
     adapter.finalize_node_model(model, node_cfg)
     node_stats = analyze_and_finalize_circuit(model)
-    return model, node_stats
+    return model, node_stats, history
 
 
 # ==============================================================================
@@ -220,11 +240,11 @@ def run_edge_pruning(adapter, task, full_model, active_heads, active_mlps,
     print("=" * 70)
 
     model = adapter.build_edge_model(active_heads, active_mlps, edge_cfg, device)
-    _optimize_gates(
+    history = _optimize_gates(
         model, task, full_model, train_dl, val_dl, device, tokenizer,
         num_epochs=args.edge_epochs, lr=args.lr,
         lambda_sparsity=args.edge_lambda_sparsity,
         state=state, adapter=adapter, tracker=tracker,
         phase_label="Edge", clip_grad=False,
     )
-    return model
+    return model, history

@@ -30,6 +30,8 @@ from tasks import get_task, list_tasks
 from pruning import GPUMemoryTracker, run_node_pruning, run_edge_pruning
 from analysis import (extract_active_nodes, save_active_nodes, load_active_nodes,
                       count_dense_edges, analyze_edge_circuit)
+from run_io import (make_run_dir, tee_stdout_stderr, save_history,
+                    plot_phase_history)
 
 
 # ==============================================================================
@@ -50,7 +52,8 @@ def build_parser():
     g.add_argument("--skip-node-pruning", action="store_true",
                    help="Load active nodes from --node-checkpoint instead of training them.")
     g.add_argument("--node-checkpoint", default=None,
-                   help="Path to save/load the active-node spec (default: <output-dir>/active_nodes.json).")
+                   help="Path to save/load the active-node spec "
+                        "(default: <run-dir>/active_nodes.json).")
 
     g = p.add_argument_group("granularities (node pruning)")
     for name in GRANULARITIES:
@@ -79,8 +82,8 @@ def build_parser():
     g.add_argument("--data-dir", default="./data/datasets",
                    help="Root holding <task>/ subfolders (ioi, gp, gt).")
     g.add_argument("--output-dir", default=None,
-                   help="Where to write active_nodes.json and results.json "
-                        "(default: outputs/<model>_<task>).")
+                   help="Run directory for logs/plots/JSONs "
+                        "(default: outputs/<model>_<task>/<hp-slug>_<timestamp>).")
     g.add_argument("--seed", type=int, default=42)
     g.add_argument("--hf-token", default=None,
                    help="HuggingFace token for gated Llama models "
@@ -109,12 +112,6 @@ def resolve_args(args):
             setattr(node_cfg, f"lambda_{name}", lv)
 
     edge_cfg = EdgeConfig()
-
-    if args.output_dir is None:
-        args.output_dir = os.path.join("outputs", f"{args.model}_{args.task}")
-    if args.node_checkpoint is None:
-        args.node_checkpoint = os.path.join(args.output_dir, "active_nodes.json")
-
     return node_cfg, edge_cfg
 
 
@@ -231,17 +228,24 @@ def main():
         sys.exit(0)
 
     node_cfg, edge_cfg = resolve_args(args)
+    make_run_dir(args, node_cfg, edge_cfg)
 
+    with tee_stdout_stderr(os.path.join(args.output_dir, "train.log")):
+        _run_training(args, task, node_cfg, edge_cfg)
+
+
+def _run_training(args, task, node_cfg, edge_cfg):
     torch.manual_seed(args.seed)
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    os.makedirs(args.output_dir, exist_ok=True)
     tracker = GPUMemoryTracker()
+    run_history = {}
 
     if torch.cuda.is_available():
         gpu = torch.cuda.get_device_properties(0)
         print(f"\nGPU: {gpu.name} | {gpu.total_memory / 1024 ** 3:.1f} GB")
     print(f"Model: {args.model} ({MODEL_REGISTRY[args.model][0]})  |  Task: {task.display_name}")
     print(f"Edge pruning: {'ON' if args.edge_pruning else 'OFF'}  |  seed: {args.seed}")
+    print(f"Output dir: {args.output_dir}")
 
     adapter = ModelAdapter(args.model, hf_token=resolve_hf_token(args))
     args.shuffle_train = not adapter.cache_target_logits  # cached path needs stable order
@@ -263,9 +267,11 @@ def main():
     if args.skip_node_pruning and os.path.exists(args.node_checkpoint):
         active_heads, active_mlps = load_active_nodes(args.node_checkpoint)
     else:
-        node_model, node_stats = run_node_pruning(
+        node_model, node_stats, node_hist = run_node_pruning(
             adapter, task, full_model, train_dl, val_dl, device, tokenizer,
             node_cfg, args, state, tracker)
+        run_history["node"] = node_hist
+        plot_phase_history(node_hist, args.output_dir, "Node")
         active_heads, active_mlps = extract_active_nodes(node_model)
         save_active_nodes(active_heads, active_mlps, args.node_checkpoint)
 
@@ -290,13 +296,19 @@ def main():
     edge_stats = None
     edge_eval = None
     if args.edge_pruning:
-        edge_model = run_edge_pruning(
+        edge_model, edge_hist = run_edge_pruning(
             adapter, task, full_model, active_heads, active_mlps,
             train_dl, val_dl, device, tokenizer, edge_cfg, args, state, tracker)
+        run_history["edge"] = edge_hist
+        plot_phase_history(edge_hist, args.output_dir, "Edge")
         edge_stats = analyze_edge_circuit(edge_model, verbose=False)
         edge_model.eval()
         edge_eval = task.evaluate(edge_model, "Edge-Pruned Circuit", full_model,
                                   test_dl, device, tokenizer, state)
+
+    if run_history:
+        hist_path = save_history(run_history, args.output_dir)
+        print(f"\nSaved training history to {hist_path}")
 
     # ----- Reports --------------------------------------------------------
     _print_node_report(node_stats)
@@ -335,6 +347,7 @@ def main():
     with open(results_path, "w") as f:
         json.dump(results, f, indent=2, default=str)
     print(f"\nSaved results to {results_path}")
+    print(f"Run artifacts in {args.output_dir}")
 
     tracker.print_report()
 
