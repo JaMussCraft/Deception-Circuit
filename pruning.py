@@ -165,7 +165,7 @@ def _optimize_gates(model, task, full_model, train_dl, val_dl, device, tokenizer
         scheduler.step()
         n = len(train_dl)
         pbar.set_postfix(L=f"{ep_loss / n:.3f}", KL=f"{ep_kl / n:.3f}",
-                         Task=f"{ep_task / n:.3f}",
+                         T=f"{ep_task / n:.3f}",
                          Sp=f"{ep_sp / n:.3f}",
                          LR=f"{scheduler.get_last_lr()[0]:.2e}")
 
