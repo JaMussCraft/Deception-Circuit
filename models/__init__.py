@@ -161,3 +161,11 @@ class ModelAdapter:
     def num_heads(model):
         c = model.config
         return getattr(c, "num_attention_heads", None) or c.n_head
+
+    @staticmethod
+    def num_key_value_groups(model):
+        """Query heads per KV head (1 for MHA, >1 for GQA)."""
+        c = model.config
+        n_heads = getattr(c, "num_attention_heads", None) or c.n_head
+        n_kv = getattr(c, "num_key_value_heads", None) or n_heads
+        return n_heads // n_kv

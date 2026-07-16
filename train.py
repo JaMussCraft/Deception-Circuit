@@ -290,6 +290,7 @@ def _run_training(args, task, node_cfg, edge_cfg):
         active_heads, active_mlps,
         num_layers=adapter.num_layers(full_model),
         num_heads_per_layer=adapter.num_heads(full_model),
+        num_key_value_groups=adapter.num_key_value_groups(full_model),
         verbose=False)
 
     # ----- Phase 2: edge pruning ------------------------------------------

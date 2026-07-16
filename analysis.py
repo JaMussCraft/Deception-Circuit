@@ -576,26 +576,43 @@ def count_dense_edges(
     active_mlps: Set[int],
     num_layers: int = 12,
     num_heads_per_layer: int = 12,
+    num_key_value_groups: int = 1,
     verbose: bool = True,
 ) -> dict:
     """
     Count edges assuming dense connections between all surviving nodes.
     Mirrors the logic in edgepercent.py.
 
+    Under grouped query attention (GQA), K and V edges are shared across the
+    query heads in a KV group: k_proj/v_proj read a single residual mixture per
+    KV head, so K/V edges are counted once per KV head (not per query head).
+    ``num_key_value_groups`` = num_query_heads // num_kv_heads (1 for MHA).
+
     Returns dict with total/category edge counts for both full and pruned models.
     """
     total_components_per_layer = num_heads_per_layer + 1  # heads + MLP
+    num_kv_heads_per_layer = num_heads_per_layer // num_key_value_groups
 
     # -- Full model edges --
     full_output_edges = num_layers * total_components_per_layer
-    full_mlp_edges, full_qkv_edges = 0, 0
+    full_mlp_edges, full_q_edges, full_kv_edges = 0, 0, 0
     for j in range(1, num_layers):
         n = j * total_components_per_layer
         full_mlp_edges += n
-        full_qkv_edges += num_heads_per_layer * 3 * n
+        full_q_edges += num_heads_per_layer * n            # Q: per query head
+        full_kv_edges += num_kv_heads_per_layer * 2 * n    # K+V: per KV head
 
-    total_full_original = full_output_edges + full_mlp_edges + full_qkv_edges
-    total_full_extra = 1 + num_layers + num_layers * num_heads_per_layer * 6
+    total_full_original = (
+        full_output_edges + full_mlp_edges + full_q_edges + full_kv_edges
+    )
+    # Extra (embedding + same-layer) edges. Per query head: emb->Q plus the
+    # same-layer/internal edges (4 total); per KV head: emb->K and emb->V (2).
+    total_full_extra = (
+        1
+        + num_layers
+        + num_layers * num_heads_per_layer * 4
+        + num_layers * num_kv_heads_per_layer * 2
+    )
     total_full = total_full_original + total_full_extra
 
     # -- Pruned model edges (dense between survivors) --
@@ -603,6 +620,10 @@ def count_dense_edges(
     #   "Original" edges: inter-layer connections (sources before layer j)
     #   "Extra" edges: embedding→output, MLP internal, head internal (same-layer)
     head_counts = {l: len(active_heads.get(l, [])) for l in range(num_layers)}
+    kv_counts = {
+        l: len({h // num_key_value_groups for h in active_heads.get(l, [])})
+        for l in range(num_layers)
+    }
 
     # Cumulative active sources before each layer
     src_before = {}
@@ -622,15 +643,23 @@ def count_dense_edges(
     for j in range(num_layers):
         n = src_before[j]
         nh = head_counts[j]
+        nkv = kv_counts[j]
         if j in active_mlps:
             rem_mlp += n
-        rem_q += nh * n
-        rem_k += nh * n
-        rem_v += nh * n
+        rem_q += nh * n          # Q: per query head
+        rem_k += nkv * n         # K: per KV head
+        rem_v += nkv * n         # V: per KV head
 
     total_rem_original = rem_output + rem_mlp + rem_q + rem_k + rem_v
 
-    rem_extra = 1 + len(active_mlps) + sum(head_counts.values()) * 6
+    total_active_heads = sum(head_counts.values())
+    total_active_kv = sum(kv_counts.values())
+    rem_extra = (
+        1
+        + len(active_mlps)
+        + total_active_heads * 4
+        + total_active_kv * 2
+    )
     total_rem = total_rem_original + rem_extra
 
     result = {

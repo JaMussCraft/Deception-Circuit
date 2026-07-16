@@ -186,13 +186,22 @@ class EdgePrunableLlama(nn.Module):
 
         for l in range(self.num_layers):
             n_src = len(self.src_idx_before_layer[l])
-            for h in self.active_heads.get(l, []):
-                if n_src > 0:
-                    key = f"L{l}_H{h}"
-                    self.attn_q_gates[key] = HardConcreteGate(n_src)
-                    self.attn_k_gates[key] = HardConcreteGate(n_src)
-                    self.attn_v_gates[key] = HardConcreteGate(n_src)
-                    total_edges += 3 * n_src
+            active_heads_l = self.active_heads.get(l, [])
+            if n_src > 0:
+                # Q gates are per query head.
+                for h in active_heads_l:
+                    self.attn_q_gates[f"L{l}_H{h}"] = HardConcreteGate(n_src)
+                    total_edges += n_src
+                # K/V gates are shared per KV head (GQA): create one for each
+                # KV head that has at least one active query head in its group.
+                active_kv_heads = sorted(
+                    {h // self.num_key_value_groups for h in active_heads_l}
+                )
+                for kv_h in active_kv_heads:
+                    kv_key = f"L{l}_KV{kv_h}"
+                    self.attn_k_gates[kv_key] = HardConcreteGate(n_src)
+                    self.attn_v_gates[kv_key] = HardConcreteGate(n_src)
+                    total_edges += 2 * n_src
 
             if l in self.active_mlps:
                 n_src_mlp = len(self.src_idx_through_attn[l])
@@ -314,37 +323,56 @@ class EdgePrunableLlama(nn.Module):
             if src_before and active_heads_l:
                 delta_stack = torch.stack([deltas[s] for s in src_before])
 
+            # ------------------------------------------------------------
+            # Shared K/V per active KV head (GQA-faithful): k_proj/v_proj are
+            # applied ONCE per KV head to ONE gated residual mixture, and the
+            # resulting K/V are reused by every active query head in the group.
+            # ------------------------------------------------------------
+            K_by_kv, V_by_kv = {}, {}
+            active_kv_heads = sorted({h // NKVG for h in active_heads_l})
+            for kv_h in active_kv_heads:
+                kv_key = f"L{l}_KV{kv_h}"
+
+                if src_before:
+                    kg = self.attn_k_gates[kv_key]().to(dtype).view(-1, 1, 1, 1)
+                    vg = self.attn_v_gates[kv_key]().to(dtype).view(-1, 1, 1, 1)
+                    k_in = corrupted_residual + (kg * delta_stack).sum(0)
+                    v_in = corrupted_residual + (vg * delta_stack).sum(0)
+                else:
+                    k_in = v_in = corrupted_residual
+
+                k_ln = layer.input_layernorm(k_in)
+                v_ln = layer.input_layernorm(v_in)
+
+                w_k = attn.k_proj.weight[kv_h * HD : (kv_h + 1) * HD, :]   # [HD, H]
+                w_v = attn.v_proj.weight[kv_h * HD : (kv_h + 1) * HD, :]   # [HD, H]
+
+                K = F.linear(k_ln, w_k)      # [B, S, HD]
+                V = F.linear(v_ln, w_v)      # [B, S, HD]
+
+                K = _apply_rope(K, cos, sin)
+                K_by_kv[kv_h] = K
+                V_by_kv[kv_h] = V
+
             for h in active_heads_l:
                 key = f"L{l}_H{h}"
                 kv_h = h // NKVG  # corresponding KV head index
 
                 if src_before:
                     qg = self.attn_q_gates[key]().to(dtype).view(-1, 1, 1, 1)
-                    kg = self.attn_k_gates[key]().to(dtype).view(-1, 1, 1, 1)
-                    vg = self.attn_v_gates[key]().to(dtype).view(-1, 1, 1, 1)
-
                     q_in = corrupted_residual + (qg * delta_stack).sum(0)
-                    k_in = corrupted_residual + (kg * delta_stack).sum(0)
-                    v_in = corrupted_residual + (vg * delta_stack).sum(0)
                 else:
-                    q_in = k_in = v_in = corrupted_residual
+                    q_in = corrupted_residual
 
-                # Per-head Q / K / V via sliced projection weights
+                # Per-head Q via sliced projection weights
                 q_ln = layer.input_layernorm(q_in)
-                k_ln = layer.input_layernorm(k_in)
-                v_ln = layer.input_layernorm(v_in)
-
                 w_q = attn.q_proj.weight[h * HD : (h + 1) * HD, :]         # [HD, H]
-                w_k = attn.k_proj.weight[kv_h * HD : (kv_h + 1) * HD, :]   # [HD, H]
-                w_v = attn.v_proj.weight[kv_h * HD : (kv_h + 1) * HD, :]   # [HD, H]
-
                 Q = F.linear(q_ln, w_q)      # [B, S, HD]
-                K = F.linear(k_ln, w_k)      # [B, S, HD]
-                V = F.linear(v_ln, w_v)      # [B, S, HD]
-
-                # Apply RoPE
                 Q = _apply_rope(Q, cos, sin)
-                K = _apply_rope(K, cos, sin)
+
+                # Shared K/V for this query head's KV group
+                K = K_by_kv[kv_h]
+                V = V_by_kv[kv_h]
 
                 scores = (Q @ K.transpose(-2, -1)) / math.sqrt(HD)
                 scores = scores + per_head_mask
