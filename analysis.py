@@ -588,86 +588,92 @@ def count_dense_edges(
     KV head, so K/V edges are counted once per KV head (not per query head).
     ``num_key_value_groups`` = num_query_heads // num_kv_heads (1 for MHA).
 
+    Edge counts are exact: ``dense_total`` equals ``EdgePrunable*.total_edges``
+    for the same surviving nodes (with output edges included), and ``full_total``
+    is the same count for a fully dense model. Edges are split for reporting into:
+      * "original": inter-layer edges (sources in strictly earlier layers) plus
+        every surviving node -> output.
+      * "extra": embedding-sourced edges (emb -> Q/K/V/MLP/output) and same-layer
+        head -> MLP edges.
+
     Returns dict with total/category edge counts for both full and pruned models.
     """
-    total_components_per_layer = num_heads_per_layer + 1  # heads + MLP
     num_kv_heads_per_layer = num_heads_per_layer // num_key_value_groups
 
-    # -- Full model edges --
-    full_output_edges = num_layers * total_components_per_layer
-    full_mlp_edges, full_q_edges, full_kv_edges = 0, 0, 0
-    for j in range(1, num_layers):
-        n = j * total_components_per_layer
-        full_mlp_edges += n
-        full_q_edges += num_heads_per_layer * n            # Q: per query head
-        full_kv_edges += num_kv_heads_per_layer * 2 * n    # K+V: per KV head
+    def _tally(head_counts, kv_counts, mlp_set):
+        total_heads = sum(head_counts.values())
+        total_kv = sum(kv_counts.values())
+        total_mlps = len(mlp_set)
 
-    total_full_original = (
-        full_output_edges + full_mlp_edges + full_q_edges + full_kv_edges
+        # Cumulative active sources (heads + mlps) strictly before each layer.
+        src_before = {}
+        cum = 0
+        for l in range(num_layers):
+            src_before[l] = cum
+            cum += head_counts.get(l, 0)
+            if l in mlp_set:
+                cum += 1
+
+        # Inter-layer edges (sources in earlier layers only; no emb, no same-layer).
+        q = k = v = mlp = 0
+        for l in range(num_layers):
+            n = src_before[l]
+            q += head_counts.get(l, 0) * n     # Q: per query head
+            k += kv_counts.get(l, 0) * n       # K: per KV head
+            v += kv_counts.get(l, 0) * n       # V: per KV head
+            if l in mlp_set:
+                mlp += n
+
+        output = total_heads + total_mlps      # every surviving node -> output
+        original = output + mlp + q + k + v
+
+        # Extra: embedding source + same-layer head -> MLP.
+        same_layer_mlp = sum(head_counts.get(l, 0) for l in mlp_set)
+        extra = (
+            1                 # emb -> output
+            + total_mlps      # emb -> each MLP
+            + same_layer_mlp  # same-layer heads -> MLP
+            + total_heads     # emb -> Q  (per query head)
+            + total_kv        # emb -> K  (per KV head)
+            + total_kv        # emb -> V  (per KV head)
+        )
+        return {
+            "total": original + extra,
+            "original": original,
+            "extra": extra,
+            "output": output,
+            "mlp": mlp,
+            "q": q,
+            "k": k,
+            "v": v,
+        }
+
+    # -- Full (fully dense) model --
+    full = _tally(
+        {l: num_heads_per_layer for l in range(num_layers)},
+        {l: num_kv_heads_per_layer for l in range(num_layers)},
+        set(range(num_layers)),
     )
-    # Extra (embedding + same-layer) edges. Per query head: emb->Q plus the
-    # same-layer/internal edges (4 total); per KV head: emb->K and emb->V (2).
-    total_full_extra = (
-        1
-        + num_layers
-        + num_layers * num_heads_per_layer * 4
-        + num_layers * num_kv_heads_per_layer * 2
-    )
-    total_full = total_full_original + total_full_extra
 
     # -- Pruned model edges (dense between survivors) --
-    # Matches edgepercent.py convention:
-    #   "Original" edges: inter-layer connections (sources before layer j)
-    #   "Extra" edges: embedding→output, MLP internal, head internal (same-layer)
     head_counts = {l: len(active_heads.get(l, [])) for l in range(num_layers)}
     kv_counts = {
         l: len({h // num_key_value_groups for h in active_heads.get(l, [])})
         for l in range(num_layers)
     }
+    dense = _tally(head_counts, kv_counts, set(active_mlps))
 
-    # Cumulative active sources before each layer
-    src_before = {}
-    cum = 0
-    for i in range(num_layers):
-        src_before[i] = cum
-        if i in active_mlps:
-            cum += 1
-        cum += head_counts[i]
-
-    # Count per category
-    rem_out_heads = sum(head_counts.values())
-    rem_out_mlps = len(active_mlps)
-    rem_output = rem_out_heads + rem_out_mlps
-
-    rem_mlp, rem_q, rem_k, rem_v = 0, 0, 0, 0
-    for j in range(num_layers):
-        n = src_before[j]
-        nh = head_counts[j]
-        nkv = kv_counts[j]
-        if j in active_mlps:
-            rem_mlp += n
-        rem_q += nh * n          # Q: per query head
-        rem_k += nkv * n         # K: per KV head
-        rem_v += nkv * n         # V: per KV head
-
-    total_rem_original = rem_output + rem_mlp + rem_q + rem_k + rem_v
-
-    total_active_heads = sum(head_counts.values())
-    total_active_kv = sum(kv_counts.values())
-    rem_extra = (
-        1
-        + len(active_mlps)
-        + total_active_heads * 4
-        + total_active_kv * 2
-    )
-    total_rem = total_rem_original + rem_extra
+    total_full = full["total"]
+    total_rem = dense["total"]
+    rem_output, rem_mlp = dense["output"], dense["mlp"]
+    rem_q, rem_k, rem_v, rem_extra = dense["q"], dense["k"], dense["v"], dense["extra"]
 
     result = {
         "full_total": total_full,
-        "full_original": total_full_original,
-        "full_extra": total_full_extra,
+        "full_original": full["original"],
+        "full_extra": full["extra"],
         "dense_total": total_rem,
-        "dense_original": total_rem_original,
+        "dense_original": dense["original"],
         "dense_extra": rem_extra,
         "dense_output": rem_output,
         "dense_mlp": rem_mlp,
