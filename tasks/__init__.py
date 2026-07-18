@@ -83,10 +83,13 @@ def get_task(name: str) -> Task:
         elif name == "gt":
             from tasks.gt import GTTask
             _TASKS[name] = GTTask
+        elif name == "std":
+            from tasks.std import STDTask
+            _TASKS[name] = STDTask
         else:
             raise ValueError(f"Unknown task {name!r}. Choose from {list_tasks()}.")
     return _TASKS[name]()
 
 
 def list_tasks():
-    return ["ioi", "gp", "gt"]
+    return ["ioi", "gp", "gt", "std"]

@@ -108,6 +108,9 @@ _HYPERPARAMS = {
     ("llama", "gp"): dict(node_epochs=500, edge_epochs=300, batch_size=64,
                           max_seq_length=64, lr=3e-1,
                           train_samples=100000, val_samples=10000, test_samples=10000),
+    ("llama", "std"): dict(node_epochs=500, edge_epochs=300, batch_size=16,
+                           max_seq_length=80, lr=3e-2,
+                           train_samples=200, val_samples=200, test_samples=1000),
 }
 
 

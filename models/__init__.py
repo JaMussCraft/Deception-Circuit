@@ -12,12 +12,13 @@ training loops in pruning.py stay model-agnostic:
     a second large forward pass each step),
   * reporting layer / head counts for dense-edge accounting.
 
-The four CLI model names map to a HuggingFace id + a family:
+The CLI model names map to a HuggingFace id + a family:
 
-    gpt2     -> gpt2                      (gpt2)
-    gpt2-xl  -> gpt2-xl                   (gpt2)
-    llama-1b -> meta-llama/Llama-3.2-1B   (llama)
-    llama-8b -> meta-llama/Llama-3.1-8B   (llama)
+    gpt2              -> gpt2                               (gpt2)
+    gpt2-xl           -> gpt2-xl                            (gpt2)
+    llama-1b          -> meta-llama/Llama-3.2-1B            (llama)
+    llama-8b          -> meta-llama/Llama-3.1-8B            (llama)
+    llama-8b-instruct -> meta-llama/Llama-3.1-8B-Instruct   (llama)
 """
 
 import torch
@@ -31,6 +32,7 @@ MODEL_REGISTRY = {
     "gpt2-xl":  ("gpt2-xl",                 "gpt2"),
     "llama-1b": ("meta-llama/Llama-3.2-1B", "llama"),
     "llama-8b": ("meta-llama/Llama-3.1-8B", "llama"),
+    "llama-8b-instruct": ("meta-llama/Llama-3.1-8B-Instruct", "llama"),
 }
 
 # HardConcreteGate parameter name patterns — used to select trainable gate

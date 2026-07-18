@@ -8,8 +8,9 @@ model and task:
     python train.py --model llama-1b --task gp  --no-edge-pruning
     python train.py --model gpt2-xl  --task gt  --lambda-attention-heads 0.5
 
-Models : gpt2, gpt2-xl, llama-1b, llama-8b
-Tasks  : ioi, gp, gt          (gt is GPT-2 only)
+Models : gpt2, gpt2-xl, llama-1b, llama-8b, llama-8b-instruct
+Tasks  : ioi, gp, gt, std     (gt is GPT-2 only; std is Llama-only, built for
+                               llama-8b-instruct via dataset/build_std_dataset.py)
 
 Edge pruning, the prunable granularities, and every sparsity coefficient
 (`lambda_*`) are controlled by flags; see `python train.py --help`.
@@ -88,6 +89,19 @@ def build_parser():
     g.add_argument("--hf-token", default=None,
                    help="HuggingFace token for gated Llama models "
                         "(falls back to ../hf_tokken.txt or HF_TOKEN env var).")
+
+    g = p.add_argument_group("std task")
+    g.add_argument("--std-variant", default="azaria", choices=["azaria", "neutral"],
+                   help="Which prebuilt STD dataset to load "
+                        "(<data-dir>/std_<variant>).")
+    g.add_argument("--std-runtime-filter", action="store_true",
+                   help="Re-filter STD val/test for deceptive behavior with the "
+                        "current full model (splits are already prefiltered by "
+                        "dataset/build_std_dataset.py).")
+    g.add_argument("--std-margin-loss", type=float, default=None,
+                   help="Margin for the STD task loss and runtime filter. "
+                        "Default: the build-time margin_thresh stored in the "
+                        "dataset's dataset_config.json.")
     return p
 
 
