@@ -137,6 +137,57 @@ def margin_summary(margins):
     }
 
 
+def plot_margin_distributions(split_behaviors, margin_thresh, out_path,
+                              only_passed=False):
+    """One PDF: a panel per split, overlaid clean/corrupt margin histograms with
+    the margin threshold marked. Colors are fixed per stream across panels.
+    only_passed=True restricts to examples that survived the behavioral filter."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    if only_passed:
+        split_behaviors = {split: [b for b in behaviors if b.get("passed")]
+                           for split, behaviors in split_behaviors.items()}
+
+    streams = [("clean_margin", "clean", "#2a78d6"),
+               ("corrupt_margin", "corrupt", "#008300")]
+    all_margins = [b[k] for behaviors in split_behaviors.values()
+                   for b in behaviors for k, _, _ in streams]
+    if not all_margins:
+        print(f"No {'passing ' if only_passed else ''}examples to plot — "
+              f"skipping {out_path}")
+        return
+    bins = np.linspace(min(all_margins), max(all_margins), 41)
+
+    # Shared bins/x-axis for shape comparison; per-panel y so small splits stay
+    # readable next to the 5x-larger test split.
+    fig, axes = plt.subplots(1, len(split_behaviors),
+                             figsize=(4.5 * len(split_behaviors), 3.5),
+                             sharex=True)
+    for ax, (split, behaviors) in zip(np.atleast_1d(axes), split_behaviors.items()):
+        for key, label, color in streams:
+            ax.hist([b[key] for b in behaviors], bins=bins, histtype="stepfilled",
+                    alpha=0.35, facecolor=color, edgecolor=color,
+                    linewidth=1.5, label=label)
+        ax.axvline(0, color="#888888", linewidth=1)
+        ax.axvline(margin_thresh, color="#555555", linewidth=1, linestyle="--")
+        ax.set_title(f"{split} (n={len(behaviors)})", fontsize=10)
+        ax.set_xlabel("logit margin (target − distractor)")
+        ax.grid(axis="y", alpha=0.25)
+        for side in ("top", "right"):
+            ax.spines[side].set_visible(False)
+        ax.set_ylabel("examples")
+    np.atleast_1d(axes)[0].legend(frameon=False, fontsize=9)
+    subset = "filter survivors only" if only_passed else "all generated examples"
+    fig.suptitle(f"STD margin distributions — {subset} "
+                 f"(dashed line: margin_thresh={margin_thresh})", fontsize=11)
+    fig.savefig(out_path, bbox_inches="tight")
+    plt.close(fig)
+    print(f"Saved margin distribution plot to {out_path}")
+
+
 def pass_rate_by(records, behaviors, key_fn):
     """Pass-rate per group: {group: {"passed": int, "total": int, "rate": float}}."""
     grouped = defaultdict(lambda: [0, 0])
@@ -276,6 +327,7 @@ def main():
     final_splits = {}
     report = {"margin_thresh": args.margin_thresh, "splits": {}}
     all_records, all_behaviors = [], []
+    split_behaviors = {}
     total_unexpected = Counter()
 
     for split, raw in raw_splits.items():
@@ -286,6 +338,7 @@ def main():
         total_unexpected.update(unexpected)
         all_records.extend(raw)
         all_behaviors.extend(behaviors)
+        split_behaviors[split] = behaviors
 
         # Attach margins to the surviving records before saving.
         margins = {id(rec): b for rec, b in zip(raw, behaviors)}
@@ -359,6 +412,17 @@ def main():
     with open(report_path, "w") as f:
         json.dump(report, f, indent=2)
     print(f"\nSaved filter report to {report_path}")
+
+    try:
+        plot_margin_distributions(
+            split_behaviors, args.margin_thresh,
+            os.path.join(args.output_dir, "margin_distributions.pdf"))
+        plot_margin_distributions(
+            split_behaviors, args.margin_thresh,
+            os.path.join(args.output_dir, "margin_distributions_filtered.pdf"),
+            only_passed=True)
+    except ImportError as e:
+        print(f"Skipping margin distribution plots (matplotlib unavailable: {e})")
 
     # ----- Sample pairs for manual inspection ---------------------------------
     print("\n" + "=" * 70)
