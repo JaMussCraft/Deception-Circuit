@@ -29,8 +29,8 @@ from config import (NodePruningConfig, EdgeConfig, GRANULARITIES,
 from models import ModelAdapter, MODEL_REGISTRY, list_models
 from tasks import get_task, list_tasks
 from pruning import GPUMemoryTracker, run_node_pruning, run_edge_pruning
-from analysis import (extract_active_nodes, save_active_nodes, load_active_nodes,
-                      count_dense_edges, analyze_edge_circuit)
+from analysis import (extract_active_nodes, extract_node_masks, save_active_nodes,
+                      load_active_nodes, count_dense_edges, analyze_edge_circuit)
 from run_io import (make_run_dir, tee_stdout_stderr, save_history,
                     plot_phase_history)
 
@@ -287,7 +287,9 @@ def _run_training(args, task, node_cfg, edge_cfg):
         run_history["node"] = node_hist
         plot_phase_history(node_hist, args.output_dir, "Node")
         active_heads, active_mlps = extract_active_nodes(node_model)
-        save_active_nodes(active_heads, active_mlps, args.node_checkpoint)
+        node_masks = extract_node_masks(node_model)
+        save_active_nodes(active_heads, active_mlps, args.node_checkpoint,
+                          masks=node_masks)
 
         node_model.eval()
         node_eval = task.evaluate(node_model, "Node-Pruned Circuit", full_model,

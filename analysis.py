@@ -497,6 +497,19 @@ def analyze_and_finalize_circuit(model: nn.Module, verbose: bool = True):
 # NODE EXTRACTION
 # ==============================================================================
 
+def _locate_layers(node_pruned_model):
+    if hasattr(node_pruned_model, 'transformer'):
+        return node_pruned_model.transformer.h
+    if hasattr(node_pruned_model, 'model') and hasattr(node_pruned_model.model, 'layers'):
+        return node_pruned_model.model.layers
+    raise ValueError("Cannot locate transformer layers in the model")
+
+
+def _gate_binary_list(gate) -> List[int]:
+    """Hard 0/1 mask for a HardConcreteGate (expects eval / final mode)."""
+    return [int(v > 0.5) for v in gate().detach().cpu().view(-1).tolist()]
+
+
 def extract_active_nodes(node_pruned_model) -> Tuple[Dict[int, List[int]], Set[int]]:
     """
     Extract active attention heads and MLP blocks from a node-pruned model
@@ -510,14 +523,7 @@ def extract_active_nodes(node_pruned_model) -> Tuple[Dict[int, List[int]], Set[i
 
     active_heads = {}
     active_mlps = set()
-
-    # Determine which module list holds the blocks
-    if hasattr(node_pruned_model, 'transformer'):
-        layers = node_pruned_model.transformer.h
-    elif hasattr(node_pruned_model, 'model') and hasattr(node_pruned_model.model, 'layers'):
-        layers = node_pruned_model.model.layers
-    else:
-        raise ValueError("Cannot locate transformer layers in the model")
+    layers = _locate_layers(node_pruned_model)
 
     with torch.no_grad():
         for l, block in enumerate(layers):
@@ -542,17 +548,80 @@ def extract_active_nodes(node_pruned_model) -> Tuple[Dict[int, List[int]], Set[i
     return active_heads, active_mlps
 
 
-def save_active_nodes(active_heads, active_mlps, path):
+def extract_node_masks(node_pruned_model) -> dict:
+    """
+    Extract post-finalize binary 0/1 masks for every node gate that exists.
+
+    Keys are omitted when the corresponding gate module was never created.
+    Per-layer vector gates use full width (including zeros), keyed by layer
+    string (same convention as active_heads in active_nodes.json).
+    """
+    node_pruned_model.eval()
+    layers = _locate_layers(node_pruned_model)
+    masks = {}
+
+    with torch.no_grad():
+        if getattr(node_pruned_model, 'embedding_gate', None) is not None:
+            masks['embedding'] = _gate_binary_list(node_pruned_model.embedding_gate)[0]
+
+        layer_gates = getattr(node_pruned_model, 'layer_gates', None)
+        if layer_gates is not None:
+            masks['layers'] = [
+                _gate_binary_list(g)[0] if g is not None else 1 for g in layer_gates
+            ]
+
+        attention_blocks, mlp_blocks = [], []
+        have_attn_block = have_mlp_block = False
+        attention_heads, attention_neurons = {}, {}
+        mlp_hidden, mlp_output = {}, {}
+
+        for l, block in enumerate(layers):
+            key = str(l)
+            if getattr(block, 'attention_block_gate', None) is not None:
+                have_attn_block = True
+                attention_blocks.append(_gate_binary_list(block.attention_block_gate)[0])
+            if getattr(block, 'mlp_block_gate', None) is not None:
+                have_mlp_block = True
+                mlp_blocks.append(_gate_binary_list(block.mlp_block_gate)[0])
+
+            attn = block.attn
+            if getattr(attn, 'head_gates', None) is not None:
+                attention_heads[key] = _gate_binary_list(attn.head_gates)
+            if getattr(attn, 'neuron_gates', None) is not None:
+                attention_neurons[key] = _gate_binary_list(attn.neuron_gates)
+
+            mlp = block.mlp
+            if getattr(mlp, 'hidden_gates', None) is not None:
+                mlp_hidden[key] = _gate_binary_list(mlp.hidden_gates)
+            if getattr(mlp, 'output_gates', None) is not None:
+                mlp_output[key] = _gate_binary_list(mlp.output_gates)
+
+        if have_attn_block:
+            masks['attention_blocks'] = attention_blocks
+        if have_mlp_block:
+            masks['mlp_blocks'] = mlp_blocks
+        if attention_heads:
+            masks['attention_heads'] = attention_heads
+        if attention_neurons:
+            masks['attention_neurons'] = attention_neurons
+        if mlp_hidden:
+            masks['mlp_hidden'] = mlp_hidden
+        if mlp_output:
+            masks['mlp_output'] = mlp_output
+
+    return masks
+
+
+def save_active_nodes(active_heads, active_mlps, path, masks=None):
     os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+    payload = {
+        "active_heads": {str(k): v for k, v in active_heads.items()},
+        "active_mlps": sorted(active_mlps),
+    }
+    if masks is not None:
+        payload["masks"] = masks
     with open(path, "w") as f:
-        json.dump(
-            {
-                "active_heads": {str(k): v for k, v in active_heads.items()},
-                "active_mlps": sorted(active_mlps),
-            },
-            f,
-            indent=2,
-        )
+        json.dump(payload, f, indent=2)
     print(f"Saved active nodes to {path}")
 
 

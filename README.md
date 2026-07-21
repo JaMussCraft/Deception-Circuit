@@ -112,8 +112,9 @@ them from the CLI.
 
 Each run writes to `--output-dir` (default `outputs/<model>_<task>/`):
 
-- `active_nodes.json` — the discovered surviving heads/MLPs (reusable via
-  `--skip-node-pruning`).
+- `active_nodes.json` — surviving heads/MLPs for edge pruning (`--skip-node-pruning`),
+  plus a `masks` object with post-finalize binary 0/1 gates at every node
+  granularity (for later node-circuit evaluation without re-running training).
 - `results.json` — baseline / node / edge fidelity metrics, dense- and
   active-edge counts, and the per-granularity node summary.
 
