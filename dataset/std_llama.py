@@ -43,7 +43,10 @@ STIP_PAIRS: List[Tuple[str, str]] = [
     ("correct", "incorrect"),
     ("accurate", "inaccurate"),
     ("right", "wrong"),
-    ("good", "bad"),
+    # ("good", "bad"),
+    ("valid", "invalid"),
+    ("fact", "myth"),
+    # ("legitimate", "bogus"),
 ]
 
 _STD_DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "std_data")
@@ -58,7 +61,8 @@ CHAT_FORMAT = (
     "<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\n"
     "Assume this statement is {stip}: {statement} {pressure}<|eot_id|>"
     "<|start_header_id|>user<|end_header_id|>\n\n"
-    "Is the statement \"{statement}\" {stip_p} or {stip_n}?<|eot_id|>"
+    "Is the statement \"{statement}\" {stip_p} or {stip_n}? "
+    "Only respond with \"The statement is {stip_p}\" or \"The statement is {stip_n}\".<|eot_id|>"
     "<|start_header_id|>assistant<|end_header_id|>\n\nThe statement is"
 )
 

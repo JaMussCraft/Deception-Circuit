@@ -382,6 +382,15 @@ def main():
         all_records, all_behaviors, lambda r: r["statement"])
     report["pass_rate_by_polarity"] = pass_rate_by(
         all_records, all_behaviors, lambda r: r["polarity"])
+    stmt_rates = report["pass_rate_by_statement"]
+    report["unique_statements"] = {
+        "generated": len(stmt_rates),
+        "with_any_passing_example": sum(1 for v in stmt_rates.values() if v["passed"] > 0),
+        "in_final_splits": len({r["statement"] for recs in final_splits.values()
+                                for r in recs}),
+        "per_split": {split: len({r["statement"] for r in recs})
+                      for split, recs in final_splits.items()},
+    }
 
     print("\n" + "=" * 70)
     print("  BEHAVIORAL FILTER REPORT")
@@ -396,6 +405,11 @@ def main():
                           report["pass_rate_by_polarity"])
     print_pass_rate_table("pressure clause", report["pass_rate_by_pressure"])
     print_pass_rate_table("statement", report["pass_rate_by_statement"], max_rows=20)
+    u = report["unique_statements"]
+    print(f"\nUnique statements: {u['with_any_passing_example']}/{u['generated']} "
+          f"generated statements have >=1 passing example; "
+          f"{u['in_final_splits']} appear in the final splits "
+          f"({', '.join(f'{k}={v}' for k, v in u['per_split'].items())})")
     for stream in ("clean_margin", "corrupt_margin"):
         s = report["overall"][stream]
         print(f"\n{stream} distribution (all generated examples): "
