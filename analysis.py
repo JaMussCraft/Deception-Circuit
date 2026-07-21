@@ -366,10 +366,13 @@ def analyze_and_finalize_circuit(model: nn.Module, verbose: bool = True):
                         print(f"  🔧 Layer {i}: Both attention and MLP blocks pruned → Pruning entire layer")
 
         # --- 3. STATISTICS GATHERING (POST-ENFORCEMENT) ---
-        if (hasattr(model, 'embedding_gate') and model.embedding_gate is not None and 
-            (model.embedding_gate() > 0.5).item()):
+        if getattr(model, 'embedding_gate', None) is None:
+            embedding_gate_status = "N/A"
+        elif (model.embedding_gate() > 0.5).item():
             granularity_stats['embedding']['active'] = 1
-        embedding_gate_status = "Active" if granularity_stats['embedding']['active'] > 0 else "Pruned"
+            embedding_gate_status = "Active"
+        else:
+            embedding_gate_status = "Pruned"
         
         granularity_stats['layer_level']['active'] = int(sum(layer_gates_status))
 
