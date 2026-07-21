@@ -137,6 +137,17 @@ def _optimize_gates(model, task, full_model, train_dl, val_dl, device, tokenizer
     model.train()
     step = 0
     start = time.time()
+
+    # Val eval of the initialized gates before any training updates.
+    if eval_every:
+        model.eval()
+        metrics = task.evaluate(
+            model, f"{phase_label} Ep 0", full_model,
+            val_dl, device, tokenizer, state)
+        if isinstance(metrics, dict):
+            history["evals"].append({"epoch": 0, **metrics})
+        model.train()
+
     pbar = tqdm(range(num_epochs), desc=f"{phase_label} pruning")
     for epoch in pbar:
         ep_loss = ep_kl = ep_task = ep_sp = 0.0
