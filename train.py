@@ -273,6 +273,8 @@ def _run_training(args, task, node_cfg, edge_cfg):
         tokenizer, args.family, full_model, device, args, state)
 
     print("\n--- Baseline evaluation (full model) ---")
+    # Pass None for the faithfulness reference to avoid a second forward; evaluate()
+    # reports self-faithfulness (KL=0, Exact Match=1) in that case.
     baseline = task.evaluate(full_model, "Full Model", None, test_dl, device, tokenizer, state)
 
     # ----- Phase 1: node pruning ------------------------------------------

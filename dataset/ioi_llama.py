@@ -379,8 +379,13 @@ def run_evaluation(
 
     avg_accuracy = total_accuracy / valid_samples if valid_samples > 0 else 0
     avg_logit_diff = total_logit_diff / valid_samples if valid_samples > 0 else 0
-    avg_kl = total_kl / valid_samples if valid_samples > 0 else 0
-    exact_match_rate = total_exact_match / valid_samples if valid_samples > 0 else 0
+    if full_model_for_faithfulness:
+        avg_kl = total_kl / valid_samples if valid_samples > 0 else 0
+        exact_match_rate = total_exact_match / valid_samples if valid_samples > 0 else 0
+    else:
+        # No reference model: report self-faithfulness without a second forward.
+        avg_kl = 0.0
+        exact_match_rate = 1.0
 
     if verbose:
         print(f"\nProcessed {valid_samples} valid samples.")
@@ -388,9 +393,8 @@ def run_evaluation(
         print(f"{model_name} Evaluation Summary:")
         print(f"  - Accuracy:              {avg_accuracy:.4f}")
         print(f"  - Logit Difference:      {avg_logit_diff:.4f}")
-        if full_model_for_faithfulness:
-            print(f"  - Faithfulness (KL Div): {avg_kl:.4f}")
-            print(f"  - Exact Match Rate:      {exact_match_rate:.4f}")
+        print(f"  - Faithfulness (KL Div): {avg_kl:.4f}")
+        print(f"  - Exact Match Rate:      {exact_match_rate:.4f}")
         print("=" * 50)
 
     return {

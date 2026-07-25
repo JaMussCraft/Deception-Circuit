@@ -260,8 +260,13 @@ def run_evaluation(
     # Calculate final averages
     accuracy /= total_samples
     logit_difference /= total_samples
-    kl_divergence /= total_samples
-    exact_match /= total_samples
+    if full_model_for_faithfulness:
+        kl_divergence /= total_samples
+        exact_match /= total_samples
+    else:
+        # No reference model: report self-faithfulness without a second forward.
+        kl_divergence = 0.0
+        exact_match = 1.0
 
     if verbose:
         print(f"\nProcessed {total_samples} valid samples.")
@@ -269,9 +274,8 @@ def run_evaluation(
         print(f"{model_name} Evaluation Summary:")
         print(f"  - Accuracy:              {accuracy:.4f}")
         print(f"  - Logit Difference:      {logit_difference:.4f}")
-        if full_model_for_faithfulness:
-            print(f"  - KL Divergence:         {kl_divergence:.4f}")
-            print(f"  - Exact Match:           {exact_match:.4f}")
+        print(f"  - KL Divergence:         {kl_divergence:.4f}")
+        print(f"  - Exact Match:           {exact_match:.4f}")
         print("="*50)
 
     return {

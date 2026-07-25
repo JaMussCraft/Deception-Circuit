@@ -246,14 +246,17 @@ def run_evaluation(model_to_eval, model_name: str, full_model_for_faithfulness: 
 
     avg_pd = sum(all_prob_diffs) / len(all_prob_diffs) if all_prob_diffs else 0
     avg_cs = sum(all_cutoff_sharpness) / len(all_cutoff_sharpness) if all_cutoff_sharpness else 0
-    avg_kl = sum(all_kl_divs) / len(all_kl_divs) if all_kl_divs else 0
+    if full_model_for_faithfulness:
+        avg_kl = sum(all_kl_divs) / len(all_kl_divs) if all_kl_divs else 0
+    else:
+        # No reference model: report self-faithfulness without a second forward.
+        avg_kl = 0.0
 
     if verbose:
         print(f"\nProcessed {valid_samples} valid samples.")
         print("\n" + "="*50)
         print(f"{model_name} Evaluation Summary (Re-Normalized):")
-        if full_model_for_faithfulness:
-            print(f"  - Faithfulness (Windowed KL Div): {avg_kl:.4f}")
+        print(f"  - Faithfulness (Windowed KL Div): {avg_kl:.4f}")
         print(f"  - Performance (Prob Diff):         {avg_pd:.4f}")
         print(f"  - Performance (Cutoff Sharpness):  {avg_cs:.4f}")
         print(f"  - Accuracy:                         {accuracy / n:.4f}" if n > 0 else "  - Accuracy:                         N/A")
