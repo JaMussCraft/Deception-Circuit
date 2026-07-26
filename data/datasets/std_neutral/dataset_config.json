@@ -1,0 +1,37 @@
+{
+  "task": "std",
+  "statement_source": "neutral",
+  "model": "meta-llama/Llama-3.1-8B-Instruct",
+  "margin_thresh": 0.7,
+  "max_seq_length": 90,
+  "max_statement_tokens": 12,
+  "stip_pairs": [
+    [
+      "true",
+      "false"
+    ],
+    [
+      "correct",
+      "incorrect"
+    ],
+    [
+      "accurate",
+      "inaccurate"
+    ],
+    [
+      "right",
+      "wrong"
+    ],
+    [
+      "good",
+      "bad"
+    ]
+  ],
+  "overgen_factor": 4,
+  "seed": 42,
+  "train_samples": 100,
+  "val_samples": 100,
+  "test_samples": 100,
+  "filtered": true,
+  "created": "2026-07-20"
+}
