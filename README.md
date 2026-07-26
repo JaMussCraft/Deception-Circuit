@@ -64,8 +64,29 @@ python train.py --model llama-1b --task ioi --hf-token hf_xxx
 python train.py --model gpt2-xl --task gt
 
 # Fast smoke test
-python train.py --model gpt2 --task ioi --node-epochs 2 --edge-epochs 2 \
+python train.py --model gpt2 --task gp --node-epochs 12 --edge-epochs 2 \
   --train-samples 64 --val-samples 32 --test-samples 64 --batch-size 16
+python train.py --model llama-8b --task ioi --node-epochs 12 --no-edge-pruning \
+  --train-samples 64 --val-samples 32 --test-samples 64
+
+# Trying to get Llama 3.2 8B on IOI to work
+python train.py --model llama-8b --task ioi # nope with 0.95 default lambda sparsity
+python train.py --model llama-8b --task ioi --node-lambda-sparsity 0.7 # ...
+python train.py --model llama-8b --task ioi --node-lambda-sparsity 0.5 # ...
+python train.py --model llama-8b --task ioi --node-lambda-sparsity 0.3 # ...
+python train.py --model llama-8b --task ioi --node-lambda-sparsity 0.7 --edge-lambda-sparsity 0.7 # ...
+
+# STD data generation
+python dataset/build_std_dataset.py --statement-source azaria --max-seq-length 90 --train-samples 100 --val-samples 100 --test-samples 100 --margin-thresh 0 # quick test
+python dataset/build_std_dataset.py --statement-source neutral --max-seq-length 90 --train-samples 100 --val-samples 100 --test-samples 100 --margin-thresh 0
+python dataset/build_std_dataset.py --statement-source azaria --max-seq-length 90 --margin-thresh 0.7 --overgen-factor 60
+
+# Testing out new STD task
+python train.py --model llama-8b-instruct --task std --node-lambda-sparsity 0.7 --edge-lambda-sparsity 0.7
+python train.py --model llama-8b-instruct --task std --node-lambda-sparsity 0.7 --no-edge-pruning
+python train.py --model llama-8b-instruct --task std --skip-node-pruning --node-checkpoint outputs/llama-8b-instruct_std/nls0.7_els0.7_260721-063553/active_nodes.json --edge-lambda-sparsity 0.3 # rerun only for edge pruning
+
+
 ```
 
 ## Controlling granularities
