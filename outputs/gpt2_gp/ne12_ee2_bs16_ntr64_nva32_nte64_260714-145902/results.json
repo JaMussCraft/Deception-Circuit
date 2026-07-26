@@ -1,0 +1,76 @@
+{
+  "model": "gpt2",
+  "task": "gp",
+  "family": "gpt2",
+  "edge_pruning": true,
+  "seed": 42,
+  "baseline": {
+    "accuracy": 1.0,
+    "logit_diff": 3.4587461222773013,
+    "kl_div": 0.0,
+    "exact_match": 1.0
+  },
+  "node_eval": {
+    "accuracy": 1.0,
+    "logit_diff": 5.573381175165591,
+    "kl_div": 0.08346323865344343,
+    "exact_match": 1.0
+  },
+  "edge_eval": {
+    "accuracy": 1.0,
+    "logit_diff": 4.818948662799338,
+    "kl_div": 0.04368291914705997,
+    "exact_match": 1.0
+  },
+  "dense_edges": {
+    "full_total": 32779,
+    "full_original": 31902,
+    "full_extra": 877,
+    "dense_total": 25118,
+    "dense_original": 24355,
+    "dense_extra": 763,
+    "dense_output": 137,
+    "dense_mlp": 779,
+    "dense_q": 7813,
+    "dense_k": 7813,
+    "dense_v": 7813
+  },
+  "edge_stats": {
+    "total_edges": 24868,
+    "active_edges": 24868
+  },
+  "node_granularity": {
+    "embedding": {
+      "total": 1,
+      "active": 1
+    },
+    "layer_level": {
+      "total": 12,
+      "active": 12
+    },
+    "attention_blocks": {
+      "total": 12,
+      "active": 12
+    },
+    "mlp_blocks": {
+      "total": 12,
+      "active": 12
+    },
+    "attention_heads": {
+      "total": 144,
+      "active": 125
+    },
+    "attention_neurons": {
+      "total": 9216,
+      "active": 7832
+    },
+    "mlp_hidden": {
+      "total": 36864,
+      "active": 36100
+    },
+    "mlp_output": {
+      "total": 9216,
+      "active": 9049
+    }
+  }
+}
