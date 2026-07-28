@@ -143,18 +143,93 @@ The console prints the per-granularity node report, dense-edge accounting, the
 edge-pruning summary, a fidelity comparison table, the end-to-end edge
 compression, and a GPU memory map.
 
+## Evaluating a discovered circuit
+
+`train.py` evaluates the node-pruned circuit once, in-process, right after
+pruning. `evaluate_circuit.py` rebuilds it later from `active_nodes.json`
+(the `masks` object) and asks three questions:
+
+| evaluation | question |
+|------------|----------|
+| `sanity`   | Does the saved mask reproduce the numbers the run reported? |
+| `knockout` | Is the circuit *necessary* — does removing it stop the behaviour, and what does that cost on unrelated text? |
+| `null`     | Does a size-matched **random** circuit do just as well? |
+
+```bash
+# Validate the circuit, build all 50 random circuits, estimate the runtime.
+# Seconds on a login node; loads no model and never touches CUDA.
+python evaluate_circuit.py outputs/llama-8b-instruct_std/nls0.7_noedge_260721-151636 --dry-run
+
+# Reproduce the in-run numbers only
+python evaluate_circuit.py <run_dir> --evals sanity --strict
+
+# Everything (~1.5-2 h on one A100)
+sbatch scripts/evaluate_circuit.sbatch <run_dir>
+
+# Check the conclusions against ablation-scheme sensitivity
+sbatch scripts/evaluate_circuit.sbatch <run_dir> --ablation mean
+```
+
+**`--ablation` means different things in different evaluations.** `sanity` and
+`null` fill the *complement* of a ~1%-of-model circuit, so `zero`/`mean` there
+means "zero/mean-ablate ~99% of the model" — the standard, much harsher
+faithfulness measure. `knockout` fills the circuit itself. Only `interchange`
+(the corrupted stream, i.e. the reference the gates were trained against) can
+reproduce the in-run numbers. The log banners this on every invocation.
+
+**The random circuits are size-matched exactly**: same blocks, same per-layer
+head and neuron counts at every granularity, drawn from a `(seed, index)`
+stream so sample *k* is reproducible independent of loop order — which is what
+lets `--null-start/--null-count` shard the null across an sbatch array without
+changing a single number. They are not serialised; `random_circuits.json`
+records the seed and counts, and the set is exactly regenerable.
+
+Useful knobs: `--evals`, `--n-random`, `--test-samples`, `--wikitext-blocks`,
+`--skip-wikitext`, `--eval-batch-size`, `--reference shared` (drops the second
+copy of the weights — the prunable model's ungated single-stream path *is* the
+full model), `--knockout-granularity`, `--mean-source`, `--strict`. See
+`python evaluate_circuit.py --help`.
+
+Results land in `<run_dir>/evaluations/<ablation>/`:
+
+```
+evaluations/
+  index.json                    scheme -> {last_run, headline numbers}
+  interchange/
+    evaluation.log              appended, one banner per invocation
+    summary.json                resolved CLI, circuit counts, verification block
+    sanity.json  knockout.json  null.json
+    random_circuits.json        seed + counts, NOT the masks
+    plots/null_distribution.pdf  plots/wikitext_null.pdf
+```
+
+## Tests
+
+```bash
+pytest tests/ -q          # CPU only, no downloads, ~20 s
+```
+
+`tests/test_evaluation.py` covers the mask loader, the ablation hooks and the
+random-circuit sampler on a 2-layer random Llama (plus the real saved circuit's
+geometry when a run directory is present). `tests/test_end_to_end.py` drives the
+real `evaluate_circuit.py` CLI over a synthetic run directory, faking only the
+model loader, the tokenizer and the corpus.
+
 ## Repository layout
 
 ```
-train.py        Unified CLI: parse flags -> node phase -> edge phase -> report
-config.py       NodePruningConfig / EdgeConfig + per-(model, task) defaults
-pruning.py      Shared node/edge training loops + GPU memory tracker
-analysis.py     Node circuit finalisation + edge analysis / dense-edge counting
-l0.py           Hard-Concrete L0 gate
-models/         Model registry + ModelAdapter, and the prunable model classes
-                (gpt2_node, gpt2_edge, llama_node, llama_edge)
-tasks/          Task interface + ioi / gp / gt (objective, data, evaluation)
-dataset/        Vendored dataset builders & task-specific evaluation
+train.py            Unified CLI: parse flags -> node phase -> edge phase -> report
+evaluate_circuit.py Rebuild a saved circuit and evaluate it (sanity/knockout/null)
+config.py           NodePruningConfig / EdgeConfig + per-(model, task) defaults
+pruning.py          Shared node/edge training loops + GPU memory tracker
+analysis.py         Node circuit finalisation, mask save/load, edge analysis
+l0.py               Hard-Concrete L0 gate
+models/             Model registry + ModelAdapter, and the prunable model classes
+                    (gpt2_node, gpt2_edge, llama_node, llama_edge)
+tasks/              Task interface + ioi / gp / gt / std (objective, data, eval)
+dataset/            Vendored dataset builders & task-specific evaluation
+evaluation/         Circuit evaluations + their shared context, masks, ablation
+                    schemes, metrics, wikitext harness and reporting
 ```
 
 ## How it fits together

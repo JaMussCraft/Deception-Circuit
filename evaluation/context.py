@@ -121,7 +121,7 @@ def resolve_train_args(run_config: dict, cli):
         args.test_samples = cli.test_samples
 
     if args.task == "std":
-        if "std_variant" in run_config:
+        if run_config.get("std_variant"):
             args.std_variant = run_config["std_variant"]
             if getattr(cli, "std_variant", None) and cli.std_variant != args.std_variant:
                 print(f"  --std-variant {cli.std_variant} overrides the recorded "
@@ -137,9 +137,9 @@ def resolve_train_args(run_config: dict, cli):
             # every single time.
             print(f"\n  !! --std-variant is not recorded in this run's "
                   f"config.json; defaulting to '{args.std_variant}'.")
-            print(f"     If the run was trained on std_neutral, every number "
-                  f"below is against the WRONG dataset.")
-            print(f"     Pass --std-variant explicitly to be sure.\n")
+            print("     If the run was trained on std_neutral, every number "
+                  "below is against the WRONG dataset.")
+            print("     Pass --std-variant explicitly to be sure.\n")
 
     node_cfg = NodePruningConfig(**run_config["node_config"])
     return args, node_cfg

@@ -188,7 +188,7 @@ def dry_run(ctx) -> int:
     knock = count_masks(ctx.knockout_masks)
     ablated = sum(ctx.counts[k]["active"] for k in ("attention_neurons", "mlp_hidden",
                                                     "mlp_output") if k in ctx.counts)
-    print(f"\n  complement verified: knockout ∧ circuit = 0, knockout ∪ circuit = 1")
+    print("\n  complement verified: knockout ∧ circuit = 0, knockout ∪ circuit = 1")
     print(f"  fine units ablated: {ablated:,}")
     for key in ("attention_neurons", "mlp_hidden", "mlp_output"):
         if key in knock:
