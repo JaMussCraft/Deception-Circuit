@@ -67,11 +67,20 @@ def _fmt_num(v) -> str:
 
 
 def resolved_run_config(args, node_cfg, edge_cfg) -> dict:
-    """Full resolved config for config.json (and slug comparison)."""
+    """Full resolved config for config.json (and slug comparison).
+
+    The std_* fields matter beyond bookkeeping: without std_variant recorded,
+    a run trained on std_neutral is indistinguishable from one trained on
+    std_azaria, and anything that reloads the run later (evaluate_circuit.py)
+    would silently evaluate it against the wrong dataset.
+    """
     return {
         "model": args.model,
         "task": args.task,
         "family": args.family,
+        "std_variant": getattr(args, "std_variant", None),
+        "std_runtime_filter": getattr(args, "std_runtime_filter", None),
+        "std_margin_loss": getattr(args, "std_margin_loss", None),
         "edge_pruning": args.edge_pruning,
         "skip_node_pruning": args.skip_node_pruning,
         "seed": args.seed,
