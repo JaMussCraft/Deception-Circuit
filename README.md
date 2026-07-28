@@ -165,6 +165,7 @@ python evaluate_circuit.py <run_dir> --evals sanity --strict
 
 # Everything (~1.5-2 h on one A100)
 sbatch scripts/evaluate_circuit.sbatch <run_dir>
+python evaluate_circuit.py outputs/llama-8b-instruct_std/nls0.7_noedge_260721-151636
 
 # Check the conclusions against ablation-scheme sensitivity
 sbatch scripts/evaluate_circuit.sbatch <run_dir> --ablation mean

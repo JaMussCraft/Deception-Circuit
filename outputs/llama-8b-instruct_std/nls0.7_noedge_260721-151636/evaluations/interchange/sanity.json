@@ -1,0 +1,323 @@
+{
+  "batch_size": 11,
+  "n": 1000,
+  "ablation": "interchange",
+  "rows": {
+    "full_open": {
+      "accuracy": 1.0,
+      "logit_diff": 1.799,
+      "kl_div": 0.0,
+      "exact_match": 1.0,
+      "n": 1000
+    },
+    "discovered": {
+      "accuracy": 0.925,
+      "logit_diff": 1.667125,
+      "kl_div": 0.13436530429124832,
+      "exact_match": 0.925,
+      "n": 1000,
+      "argmax": {
+        "top": [
+          {
+            "id": 2144,
+            "token": " fact",
+            "count": 115,
+            "frac": 0.115
+          },
+          {
+            "id": 15465,
+            "token": " incorrect",
+            "count": 114,
+            "frac": 0.114
+          },
+          {
+            "id": 13687,
+            "token": " accurate",
+            "count": 108,
+            "frac": 0.108
+          },
+          {
+            "id": 4495,
+            "token": " correct",
+            "count": 104,
+            "frac": 0.104
+          },
+          {
+            "id": 1314,
+            "token": " right",
+            "count": 97,
+            "frac": 0.097
+          },
+          {
+            "id": 837,
+            "token": " true",
+            "count": 88,
+            "frac": 0.088
+          },
+          {
+            "id": 5076,
+            "token": " wrong",
+            "count": 87,
+            "frac": 0.087
+          },
+          {
+            "id": 50504,
+            "token": " inaccurate",
+            "count": 86,
+            "frac": 0.086
+          },
+          {
+            "id": 905,
+            "token": " false",
+            "count": 80,
+            "frac": 0.08
+          },
+          {
+            "id": 2764,
+            "token": " valid",
+            "count": 48,
+            "frac": 0.048
+          },
+          {
+            "id": 8482,
+            "token": " invalid",
+            "count": 40,
+            "frac": 0.04
+          },
+          {
+            "id": 21849,
+            "token": " myth",
+            "count": 33,
+            "frac": 0.033
+          }
+        ],
+        "n_distinct": 12,
+        "target_frac": 0.925,
+        "distractor_frac": 0.075,
+        "other_frac": 0.0
+      }
+    },
+    "discovered_repo": {
+      "accuracy": 0.925,
+      "logit_diff": 1.667125,
+      "kl_div": 0.13450883781909942,
+      "exact_match": 0.925
+    },
+    "empty": {
+      "accuracy": 0.0,
+      "logit_diff": -1.8345,
+      "kl_div": 1.2745421237945556,
+      "exact_match": 0.0,
+      "n": 1000,
+      "argmax": {
+        "top": [
+          {
+            "id": 4495,
+            "token": " correct",
+            "count": 115,
+            "frac": 0.115
+          },
+          {
+            "id": 15465,
+            "token": " incorrect",
+            "count": 103,
+            "frac": 0.103
+          },
+          {
+            "id": 13687,
+            "token": " accurate",
+            "count": 97,
+            "frac": 0.097
+          },
+          {
+            "id": 50504,
+            "token": " inaccurate",
+            "count": 97,
+            "frac": 0.097
+          },
+          {
+            "id": 5076,
+            "token": " wrong",
+            "count": 95,
+            "frac": 0.095
+          },
+          {
+            "id": 837,
+            "token": " true",
+            "count": 90,
+            "frac": 0.09
+          },
+          {
+            "id": 1314,
+            "token": " right",
+            "count": 89,
+            "frac": 0.089
+          },
+          {
+            "id": 21849,
+            "token": " myth",
+            "count": 78,
+            "frac": 0.078
+          },
+          {
+            "id": 905,
+            "token": " false",
+            "count": 78,
+            "frac": 0.078
+          },
+          {
+            "id": 2144,
+            "token": " fact",
+            "count": 70,
+            "frac": 0.07
+          },
+          {
+            "id": 8482,
+            "token": " invalid",
+            "count": 46,
+            "frac": 0.046
+          },
+          {
+            "id": 2764,
+            "token": " valid",
+            "count": 42,
+            "frac": 0.042
+          }
+        ],
+        "n_distinct": 12,
+        "target_frac": 0.0,
+        "distractor_frac": 1.0,
+        "other_frac": 0.0
+      }
+    }
+  },
+  "reference": {
+    "node_eval": {
+      "accuracy": 0.924,
+      "logit_diff": 1.668,
+      "kl_div": 0.13395980858802795,
+      "exact_match": 0.924
+    },
+    "baseline": {
+      "accuracy": 1.0,
+      "logit_diff": 1.7955,
+      "kl_div": 0.0,
+      "exact_match": 1.0
+    }
+  },
+  "cross_check": {
+    "ran": true,
+    "ok": false,
+    "max_delta": 0.0001435335278510974,
+    "per_metric": {
+      "accuracy": {
+        "generic": 0.925,
+        "repo": 0.925,
+        "delta": 0.0,
+        "tolerance": 1e-06,
+        "pass": true
+      },
+      "exact_match": {
+        "generic": 0.925,
+        "repo": 0.925,
+        "delta": 0.0,
+        "tolerance": 1e-06,
+        "pass": true
+      },
+      "logit_diff": {
+        "generic": 1.667125,
+        "repo": 1.667125,
+        "delta": 0.0,
+        "tolerance": 0.0001,
+        "pass": true
+      },
+      "kl_div": {
+        "generic": 0.13436530429124832,
+        "repo": 0.13450883781909942,
+        "delta": 0.0001435335278510974,
+        "tolerance": 0.0001,
+        "pass": false
+      }
+    }
+  },
+  "all_open": {
+    "ok": true,
+    "kl_div": 0.0,
+    "exact_match": 1.0,
+    "tolerances": {
+      "kl_div": 0.0001,
+      "exact_match_min": 0.999
+    }
+  },
+  "delta": {
+    "ok": true,
+    "max_delta": 0.0010000000000000009,
+    "rows": [
+      {
+        "metric": "accuracy",
+        "label": "Accuracy",
+        "expected": 0.924,
+        "observed": 0.925,
+        "delta": 0.0010000000000000009,
+        "tolerance": 0.002,
+        "pass": true
+      },
+      {
+        "metric": "logit_diff",
+        "label": "Logit Diff",
+        "expected": 1.668,
+        "observed": 1.667125,
+        "delta": -0.0008749999999999591,
+        "tolerance": 0.01,
+        "pass": true
+      },
+      {
+        "metric": "kl_div",
+        "label": "KL Div",
+        "expected": 0.13395980858802795,
+        "observed": 0.13436530429124832,
+        "delta": 0.00040549570322037654,
+        "tolerance": 0.005,
+        "pass": true
+      },
+      {
+        "metric": "exact_match",
+        "label": "Exact Match",
+        "expected": 0.924,
+        "observed": 0.925,
+        "delta": 0.0010000000000000009,
+        "tolerance": 0.002,
+        "pass": true
+      }
+    ]
+  },
+  "headline": {
+    "accuracy": 0.925,
+    "logit_diff": 1.667125,
+    "kl_div": 0.13436530429124832,
+    "exact_match": 0.925
+  },
+  "verification": {
+    "masks_roundtrip": true,
+    "all_open_equals_full": true,
+    "generic_vs_task_evaluate_max_delta": 0.0001435335278510974,
+    "reference_numbers": {
+      "source": "results.json:node_eval",
+      "expected": {
+        "accuracy": 0.924,
+        "logit_diff": 1.668,
+        "kl_div": 0.13395980858802795,
+        "exact_match": 0.924
+      },
+      "observed": {
+        "accuracy": 0.925,
+        "logit_diff": 1.667125,
+        "kl_div": 0.13436530429124832,
+        "exact_match": 0.925
+      },
+      "max_delta": 0.0010000000000000009,
+      "ok": true
+    }
+  },
+  "seconds": 181.6
+}
