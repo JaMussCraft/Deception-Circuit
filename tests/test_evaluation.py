@@ -194,6 +194,20 @@ def test_t2_all_open_matches_plain_model():
         f"maxdiff {(got - ref).abs().max().item():.3e}"
 
 
+def test_t2_single_stream_path_is_the_ungated_full_model():
+    """No corrupted stream means no gating at all — the vanilla HF path. This is
+    what `--reference shared` uses instead of a second 15 GB model."""
+    plain, pruned = build_pair(attn_implementation="eager")
+    ids, _, mask = batch()
+    apply_node_masks(pruned, M.zeros_like(random_masks_for(pruned, seed=2)))
+
+    with torch.no_grad():
+        got = pruned(input_ids=ids, attention_mask=mask, use_cache=False).logits
+        ref = plain(input_ids=ids, attention_mask=mask, use_cache=False).logits
+
+    assert torch.equal(got, ref), f"maxdiff {(got - ref).abs().max().item():.3e}"
+
+
 def test_t2_all_open_matches_plain_model_with_padding():
     plain, pruned = build_pair(attn_implementation="eager")
     ids, corrupt, mask = batch(pad=3)

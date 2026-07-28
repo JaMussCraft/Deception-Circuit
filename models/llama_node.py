@@ -428,10 +428,14 @@ class PrunableLlamaDecoderLayer(nn.Module):
             hidden_states = self.post_attention_layernorm(hidden_states)
             hidden_states = residual + self.mlp(hidden_states)  # single-stream
 
-            outputs = (hidden_states,)
+            # transformers >= 4.53's LlamaModel.forward assigns the layer's
+            # return value straight to `hidden_states`, so the single-stream
+            # path has to hand back a bare tensor. (train.py never reaches this
+            # branch — it always passes a corrupted stream — but the circuit
+            # evaluator's `--reference shared` mode does.)
             if output_attentions:
-                outputs += (weights,)
-            return outputs
+                return hidden_states, weights
+            return hidden_states
 
         # --- Dual-stream pruning mode ---
         clean_states = hidden_states
