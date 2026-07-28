@@ -113,14 +113,9 @@ def metric_table(rows, metric_columns, title=None, label_width=34) -> None:
         print(f"  {label:<{label_width}}{cells}")
 
 
-def delta_table(observed: dict, expected: dict, tolerances: dict,
-                metric_columns, title="VERSUS THE IN-RUN NODE EVALUATION") -> dict:
-    """Compare against results.json. Returns {"ok", "max_delta", "rows"}."""
-    banner(title)
-    print(f"\n  {'Metric':<20} {'expected':>12} {'observed':>12} "
-          f"{'delta':>12} {'tol':>10}   status")
-    print("  " + "-" * 74)
-
+def compute_delta(observed: dict, expected: dict, tolerances: dict,
+                  metric_columns) -> dict:
+    """Compare two metric dicts. Returns {"ok", "max_delta", "rows"}."""
     rows, ok, max_delta = [], True, 0.0
     for key, label in metric_columns:
         if key not in expected or key not in observed:
@@ -131,16 +126,25 @@ def delta_table(observed: dict, expected: dict, tolerances: dict,
         passed = tol is None or abs(delta) <= tol
         ok = ok and passed
         max_delta = max(max_delta, abs(delta))
-        rows.append({"metric": key, "expected": exp, "observed": obs,
-                     "delta": delta, "tolerance": tol, "pass": bool(passed)})
-        tol_s = f"{tol:.4f}" if tol is not None else "—"
-        print(f"  {label:<20} {exp:>12.4f} {obs:>12.4f} {delta:>+12.4f} "
-              f"{tol_s:>10}   {'PASS' if passed else 'FAIL'}")
-
-    print("  " + "-" * 74)
-    print(f"  {'ALL' if ok else 'SOME'} metrics within tolerance "
-          f"(max |delta| {max_delta:.4f})")
+        rows.append({"metric": key, "label": label, "expected": exp,
+                     "observed": obs, "delta": delta, "tolerance": tol,
+                     "pass": bool(passed)})
     return {"ok": bool(ok), "max_delta": max_delta, "rows": rows}
+
+
+def delta_table(delta: dict, title="VERSUS THE IN-RUN NODE EVALUATION") -> None:
+    banner(title)
+    print(f"\n  {'Metric':<20} {'expected':>12} {'observed':>12} "
+          f"{'delta':>12} {'tol':>10}   status")
+    print("  " + "-" * 74)
+    for row in delta["rows"]:
+        tol_s = f"{row['tolerance']:.4f}" if row["tolerance"] is not None else "—"
+        print(f"  {row['label']:<20} {row['expected']:>12.4f} "
+              f"{row['observed']:>12.4f} {row['delta']:>+12.4f} "
+              f"{tol_s:>10}   {'PASS' if row['pass'] else 'FAIL'}")
+    print("  " + "-" * 74)
+    print(f"  {'ALL' if delta['ok'] else 'SOME'} metrics within tolerance "
+          f"(max |delta| {delta['max_delta']:.4f})")
 
 
 def argmax_table(argmax: dict, title="ARGMAX DISTRIBUTION AT THE PREDICTION POSITION") -> None:

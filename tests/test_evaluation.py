@@ -23,54 +23,28 @@ import os
 import numpy as np
 import pytest
 import torch
-from transformers import LlamaConfig, LlamaForCausalLM
 
 from analysis import (apply_node_masks, assert_masks_equal, extract_node_masks,
                       open_all_gates)
 from config import NodePruningConfig
 from evaluation import ablation as abl
 from evaluation import masks as M
-from models.llama_node import (ABLATION_SITES, PrunableLlamaForCausalLM,
-                               _ablation_ref, apply_pruning_wrappers,
+from models.llama_node import (ABLATION_SITES, _ablation_ref,
                                clear_ablation_hook, install_ablation_hook)
+from tests.helpers import TINY, build_tiny_pair
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REFERENCE_RUN = os.path.join(
     REPO_ROOT, "outputs", "llama-8b-instruct_std", "nls0.7_noedge_260721-151636")
 
-NUM_HEADS = 4
-HEAD_DIM = 16
-N_LAYERS = 2
-HIDDEN = 64
-INTERMEDIATE = 128
-VOCAB = 101
+NUM_HEADS = TINY["heads"]
+HEAD_DIM = TINY["head_dim"]
+N_LAYERS = TINY["layers"]
+HIDDEN = TINY["hidden"]
+INTERMEDIATE = TINY["intermediate"]
+VOCAB = TINY["vocab"]
 
-
-def tiny_config(num_hidden_layers=N_LAYERS, attn_implementation=None):
-    return LlamaConfig(
-        hidden_size=HIDDEN,
-        num_hidden_layers=num_hidden_layers,
-        num_attention_heads=NUM_HEADS,
-        num_key_value_heads=2,
-        intermediate_size=INTERMEDIATE,
-        vocab_size=VOCAB,
-        max_position_embeddings=128,
-        attn_implementation=attn_implementation,
-    )
-
-
-def build_pair(node_cfg=None, num_hidden_layers=N_LAYERS, seed=0,
-               attn_implementation=None):
-    """(plain LlamaForCausalLM, prunable model with identical weights)."""
-    cfg = tiny_config(num_hidden_layers, attn_implementation)
-    torch.manual_seed(seed)
-    plain = LlamaForCausalLM(cfg).eval()
-
-    pruned = PrunableLlamaForCausalLM(cfg)
-    pruned.load_state_dict(plain.state_dict())
-    apply_pruning_wrappers(pruned, node_cfg or NodePruningConfig())
-    pruned.eval()
-    return plain, pruned
+build_pair = build_tiny_pair
 
 
 def batch(bs=2, seq=8, seed=1, pad=0):
