@@ -31,9 +31,40 @@ class Task:
         ("exact_match", "Exact Match"),
     ]
 
+    # Which direction counts as better, for anything that ranks one circuit
+    # against another (see evaluation/null.py).
+    metric_better = {
+        "accuracy": "higher",
+        "logit_diff": "higher",
+        "exact_match": "higher",
+        "kl_div": "lower",
+        "prob_diff": "higher",
+        "cutoff_sharpness": "higher",
+    }
+
     # ---- capability ----------------------------------------------------
     def supports_family(self, family: str) -> bool:
         return True
+
+    def pred_spec(self, batch):
+        """Where the task's answer is read, and what it is read against.
+
+        Optional. Return None when the task has no single next-token prediction
+        position; the circuit evaluator then falls back to `evaluate()` and
+        skips the reference-logit cache and the argmax distribution.
+
+        Otherwise return
+
+            {"pred_pos":    LongTensor[B]  position whose logits hold the answer
+             "target":      LongTensor[B]  the correct / expected next token
+             "distractor":  LongTensor[B]  the token it competes against
+             "target_pos":     optional LongTensor[B], defaults to pred_pos
+             "distractor_pos": optional LongTensor[B], defaults to pred_pos}
+
+        The two optional positions exist for tasks (e.g. IOI) that read the two
+        competing logits at different positions.
+        """
+        return None
 
     # ---- per-run state (e.g. GT digit-token map) -----------------------
     def prepare(self, tokenizer, device) -> dict:

@@ -170,9 +170,12 @@ class _Tee:
 
 
 @contextmanager
-def tee_stdout_stderr(log_path: str):
-    """Mirror stdout and stderr to a log file for the duration of the block."""
-    log_f = open(log_path, "w", buffering=1)
+def tee_stdout_stderr(log_path: str, mode: str = "w"):
+    """Mirror stdout and stderr to a log file for the duration of the block.
+
+    mode="a" appends, for logs that accumulate one banner per invocation.
+    """
+    log_f = open(log_path, mode, buffering=1)
     old_out, old_err = sys.stdout, sys.stderr
     sys.stdout = _Tee(old_out, log_f)
     sys.stderr = _Tee(old_err, log_f)

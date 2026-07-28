@@ -69,6 +69,13 @@ class STDTask(Task):
         task_loss = F.relu(state["margin"] - (lg - lb)).mean()
         return kl_loss, task_loss
 
+    def pred_spec(self, batch):
+        # The prompt ends with "...The statement is"; the answer is the next
+        # token, read at prefix_length - 1 (the real, unpadded length).
+        return {"pred_pos": batch["prefix_length"] - 1,
+                "target": batch["target_token"],
+                "distractor": batch["distractor_token"]}
+
     def evaluate(self, model, name, full_model, loader, device, tokenizer, state):
         return self._run_evaluation(model, name, full_model, loader, device,
                                     tokenizer=tokenizer)
