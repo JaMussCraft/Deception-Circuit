@@ -1,0 +1,414 @@
+
+GPU: NVIDIA A40 | 44.4 GB
+Model: gpt2 (gpt2)  |  Task: GP (Gendered Pronoun)
+Edge pruning: ON  |  seed: 42
+Output dir: outputs/gpt2_gp/ne12_ee2_bs16_ntr64_nva32_nte64_260714-145902
+
+Loading weights:   0%|          | 0/148 [00:00<?, ?it/s]
+Loading weights: 100%|##########| 148/148 [00:00<00:00, 51872.40it/s]
+  [GPU] Full model loaded: alloc 0.46 GB | reserved 0.52 GB | peak 0.46 GB
+Attempting to load dataset from: ./data/datasets/gp
+Successfully loaded train split with 150 samples
+Loaded 64 samples
+Attempting to load dataset from: ./data/datasets/gp
+Successfully loaded validation split with 150 samples
+Loaded 32 samples
+Attempting to load dataset from: ./data/datasets/gp
+Successfully loaded test split with 378 samples
+Loaded 64 samples
+Filtering 32 samples for base model correctness...
+Processed 32 valid samples from 32 total
+
+Checking model predictions:   0%|          | 0/2 [00:00<?, ?it/s]
+Checking model predictions:  50%|#####     | 1/2 [00:00<00:00,  5.74it/s]
+Checking model predictions: 100%|##########| 2/2 [00:00<00:00, 10.34it/s]
+  -> Retained: 19/32 (59.38%)
+Filtering 64 samples for base model correctness...
+Processed 64 valid samples from 64 total
+
+Checking model predictions:   0%|          | 0/4 [00:00<?, ?it/s]
+Checking model predictions: 100%|##########| 4/4 [00:00<00:00, 57.54it/s]
+  -> Retained: 46/64 (71.88%)
+Processed 64 valid samples from 64 total
+Processed 19 valid samples from 19 total
+Processed 46 valid samples from 46 total
+
+--- Baseline evaluation (full model) ---
+
+==================================================
+  EVALUATING: Full Model
+==================================================
+
+Evaluating Full Model:   0%|          | 0/3 [00:00<?, ?it/s]
+Acc: 1.000, LD: 3.365: : 16it [00:00, 909.45it/s]           
+Acc: 1.000, LD: 3.452: : 32it [00:00, 913.54it/s]
+Acc: 1.000, LD: 3.459: : 46it [00:00, 906.38it/s]
+Acc: 1.000, LD: 3.459: : 46it [00:00, 902.39it/s]
+
+Processed 46 valid samples.
+
+==================================================
+Full Model Evaluation Summary:
+  - Accuracy:              1.0000
+  - Logit Difference:      3.4587
+==================================================
+
+======================================================================
+  PHASE 1: NODE PRUNING (GP (Gendered Pronoun))
+======================================================================
+
+Loading weights:   0%|          | 0/148 [00:00<?, ?it/s]
+Loading weights: 100%|##########| 148/148 [00:00<00:00, 18124.29it/s]
+GPT-2 model successfully adapted for pruning with block-level gates.
+Trainable gate parameters: 55,465 / 124,495,273 (0.0446%)
+  [GPU] Node model loaded: alloc 0.94 GB | reserved 1.00 GB | peak 0.94 GB
+
+Node pruning:   0%|          | 0/12 [00:00<?, ?it/s][transformers] `use_return_dict` is deprecated! Use `return_dict` instead!
+/projects/beto/swong2/Alignment/Deception-Circuit/pruning.py:164: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  ep_loss += float(loss)
+
+Node pruning:   0%|          | 0/12 [00:00<?, ?it/s, KL=0.625, L=0.097, LR=2.95e-01, Sp=0.001, T=1.283]  [GPU] Node epoch 1 (fwd+bwd+optim): alloc 1.14 GB | reserved 2.10 GB | peak 2.03 GB
+
+Node pruning:   8%|8         | 1/12 [00:00<00:09,  1.13it/s, KL=0.625, L=0.097, LR=2.95e-01, Sp=0.001, T=1.283]
+Node pruning:   8%|8         | 1/12 [00:01<00:09,  1.13it/s, KL=0.151, L=0.029, LR=2.80e-01, Sp=0.005, T=0.320]
+Node pruning:  17%|#6        | 2/12 [00:01<00:05,  1.69it/s, KL=0.151, L=0.029, LR=2.80e-01, Sp=0.005, T=0.320]
+Node pruning:  17%|#6        | 2/12 [00:01<00:05,  1.69it/s, KL=0.607, L=0.090, LR=2.56e-01, Sp=0.009, T=1.010]
+Node pruning:  25%|##5       | 3/12 [00:01<00:04,  2.01it/s, KL=0.607, L=0.090, LR=2.56e-01, Sp=0.009, T=1.010]
+Node pruning:  25%|##5       | 3/12 [00:02<00:04,  2.01it/s, KL=0.151, L=0.031, LR=2.25e-01, Sp=0.013, T=0.212]
+Node pruning:  33%|###3      | 4/12 [00:02<00:03,  2.19it/s, KL=0.151, L=0.031, LR=2.25e-01, Sp=0.013, T=0.212]
+Node pruning:  33%|###3      | 4/12 [00:02<00:03,  2.19it/s, KL=0.106, L=0.027, LR=1.89e-01, Sp=0.017, T=0.100]
+Node pruning:  42%|####1     | 5/12 [00:02<00:03,  2.33it/s, KL=0.106, L=0.027, LR=1.89e-01, Sp=0.017, T=0.100]
+Node pruning:  42%|####1     | 5/12 [00:02<00:03,  2.33it/s, KL=0.098, L=0.028, LR=1.50e-01, Sp=0.021, T=0.065]
+Node pruning:  50%|#####     | 6/12 [00:02<00:02,  2.42it/s, KL=0.098, L=0.028, LR=1.50e-01, Sp=0.021, T=0.065]
+Node pruning:  50%|#####     | 6/12 [00:03<00:02,  2.42it/s, KL=0.128, L=0.033, LR=1.11e-01, Sp=0.025, T=0.055]
+Node pruning:  58%|#####8    | 7/12 [00:03<00:02,  2.48it/s, KL=0.128, L=0.033, LR=1.11e-01, Sp=0.025, T=0.055]
+Node pruning:  58%|#####8    | 7/12 [00:03<00:02,  2.48it/s, KL=0.146, L=0.043, LR=7.51e-02, Sp=0.029, T=0.164]
+Node pruning:  67%|######6   | 8/12 [00:03<00:01,  2.47it/s, KL=0.146, L=0.043, LR=7.51e-02, Sp=0.029, T=0.164]
+Node pruning:  67%|######6   | 8/12 [00:03<00:01,  2.47it/s, KL=0.150, L=0.039, LR=4.40e-02, Sp=0.033, T=0.007]
+Node pruning:  75%|#######5  | 9/12 [00:03<00:01,  2.51it/s, KL=0.150, L=0.039, LR=4.40e-02, Sp=0.033, T=0.007]
+Node pruning:  75%|#######5  | 9/12 [00:04<00:01,  2.51it/s, KL=0.205, L=0.053, LR=2.02e-02, Sp=0.036, T=0.157]
+==================================================
+  EVALUATING: Node Ep 10
+==================================================
+
+
+Evaluating Node Ep 10:   0%|          | 0/2 [00:00<?, ?it/s][A
+
+Acc: 1.000, LD: 5.563: : 16it [00:00, 290.11it/s]           [A
+
+Acc: 1.000, LD: 5.595: : 19it [00:00, 195.48it/s][A
+Acc: 1.000, LD: 5.595: : 19it [00:00, 194.81it/s]
+
+Processed 19 valid samples.
+
+==================================================
+Node Ep 10 Evaluation Summary:
+  - Accuracy:              1.0000
+  - Logit Difference:      5.5952
+  - KL Divergence:         0.1348
+  - Exact Match:           0.9474
+==================================================
+
+Node pruning:  83%|########3 | 10/12 [00:04<00:00,  2.35it/s, KL=0.205, L=0.053, LR=2.02e-02, Sp=0.036, T=0.157]
+Node pruning:  83%|########3 | 10/12 [00:04<00:00,  2.35it/s, KL=0.121, L=0.046, LR=5.21e-03, Sp=0.040, T=0.025]
+Node pruning:  92%|#########1| 11/12 [00:04<00:00,  2.21it/s, KL=0.121, L=0.046, LR=5.21e-03, Sp=0.040, T=0.025]
+Node pruning:  92%|#########1| 11/12 [00:05<00:00,  2.21it/s, KL=0.191, L=0.052, LR=1.00e-04, Sp=0.044, T=0.003]
+Node pruning: 100%|##########| 12/12 [00:05<00:00,  2.21it/s, KL=0.191, L=0.052, LR=1.00e-04, Sp=0.044, T=0.003]
+Node pruning: 100%|##########| 12/12 [00:05<00:00,  2.21it/s, KL=0.191, L=0.052, LR=1.00e-04, Sp=0.044, T=0.003]
+Node pruning time: 5.4s
+  [GPU] Node pruning done: alloc 1.14 GB | reserved 2.10 GB | peak 2.03 GB
+
+================================================================================
+  ANALYZING AND FINALIZING THE DISCOVERED CIRCUIT (PEDANTIC MODE)
+================================================================================
+
+--- Setting final circuit mode to: True ---
+    Updated 73 HardConcreteGate modules.
+
+📍 PRUNABLE PARAMETER BREAKDOWN:
+  - Layers: 12
+  - Attention params per layer: 2,362,368
+  - MLP params per layer: 4,722,432
+  - Total per layer: 7,084,800
+  - TOTAL PRUNABLE: 85,017,600
+  Layer 0 Attention: 755/768 neurons → 2,322,393 params
+  Layer 0 MLP: 3012/3072 hidden, 754/768 output → 4,588,030 params
+  Layer 0 TOTAL: 6,910,423 params
+  Layer 1 Attention: 696/768 neurons → 2,140,968 params
+  Layer 1 MLP: 3015/3072 hidden, 757/768 output → 4,601,647 params
+  Layer 1 TOTAL: 6,742,615 params
+  Layer 2 Attention: 634/768 neurons → 1,950,318 params
+  Layer 2 MLP: 2995/3072 hidden, 751/768 output → 4,553,151 params
+  Layer 2 TOTAL: 6,503,469 params
+  Layer 3 Attention: 745/768 neurons → 2,291,643 params
+  Layer 3 MLP: 2997/3072 hidden, 752/768 output → 4,559,189 params
+  Layer 3 TOTAL: 6,850,832 params
+  Layer 4 Attention: 633/768 neurons → 1,947,243 params
+  Layer 4 MLP: 3016/3072 hidden, 758/768 output → 4,606,190 params
+  Layer 4 TOTAL: 6,553,433 params
+  Layer 5 Attention: 746/768 neurons → 2,294,718 params
+  Layer 5 MLP: 3005/3072 hidden, 758/768 output → 4,589,393 params
+  Layer 5 TOTAL: 6,884,111 params
+  Layer 6 Attention: 685/768 neurons → 2,107,143 params
+  Layer 6 MLP: 3016/3072 hidden, 751/768 output → 4,585,071 params
+  Layer 6 TOTAL: 6,692,214 params
+  Layer 7 Attention: 506/768 neurons → 1,556,718 params
+  Layer 7 MLP: 3000/3072 hidden, 763/768 output → 4,596,763 params
+  Layer 7 TOTAL: 6,153,481 params
+  Layer 8 Attention: 496/768 neurons → 1,525,968 params
+  Layer 8 MLP: 3009/3072 hidden, 750/768 output → 4,571,421 params
+  Layer 8 TOTAL: 6,097,389 params
+  Layer 9 Attention: 688/768 neurons → 2,116,368 params
+  Layer 9 MLP: 3025/3072 hidden, 753/768 output → 4,604,803 params
+  Layer 9 TOTAL: 6,721,171 params
+  Layer 10 Attention: 622/768 neurons → 1,913,418 params
+  Layer 10 MLP: 2996/3072 hidden, 751/768 output → 4,554,671 params
+  Layer 10 TOTAL: 6,468,089 params
+  Layer 11 Attention: 626/768 neurons → 1,925,718 params
+  Layer 11 MLP: 3014/3072 hidden, 751/768 output → 4,582,031 params
+  Layer 11 TOTAL: 6,507,749 params
+
+================================================================================
+  PRUNABLE PARAMETER COMPRESSION ANALYSIS
+================================================================================
+Total prunable parameters: 85,017,600
+Active prunable parameters: 79,084,976
+Pruned parameters: 5,932,624
+Compression ratio: 1.08x
+Parameter reduction: 7.0%
+
+📍 MODEL BREAKDOWN:
+  - Total model parameters: 124,495,273
+  - Fixed parameters (embeddings, norms, etc.): 39,477,673 (31.7%)
+  - Prunable parameters: 85,017,600 (68.3%)
+  - Active prunable parameters: 79,084,976 (63.5%)
+
+🎯 EFFECTIVE MODEL COMPRESSION:
+  - Effective model size: 118,562,649 parameters
+  - Overall compression: 1.05x
+  - Overall reduction: 4.8%
+
+================================================================================
+  HIERARCHICAL PRUNING REPORT (Consistency Enforced)
+================================================================================
+
+📍 GLOBAL COMPONENTS:
+  - Embedding Gate: Active
+
+📍 LAYER-LEVEL PRUNING:
+  - Active Layers: 12/12 (100.0%)
+
+📍 DETAILED LAYER REPORT:
+Layer  | Status   | Attn Block  | MLP Block  | Attn Heads   | Attn Neurons    | MLP Hidden      | MLP Output     
+-----------------------------------------------------------------------------------------------------------------
+0      | Active   | Active      | Active     | 12/12        | 755/768         | 3012/3072       | 754/768        
+1      | Active   | Active      | Active     | 11/12        | 696/768         | 3015/3072       | 757/768        
+2      | Active   | Active      | Active     | 10/12        | 634/768         | 2995/3072       | 751/768        
+3      | Active   | Active      | Active     | 12/12        | 745/768         | 2997/3072       | 752/768        
+4      | Active   | Active      | Active     | 10/12        | 633/768         | 3016/3072       | 758/768        
+5      | Active   | Active      | Active     | 12/12        | 746/768         | 3005/3072       | 758/768        
+6      | Active   | Active      | Active     | 11/12        | 685/768         | 3016/3072       | 751/768        
+7      | Active   | Active      | Active     | 8/12         | 506/768         | 3000/3072       | 763/768        
+8      | Active   | Active      | Active     | 8/12         | 496/768         | 3009/3072       | 750/768        
+9      | Active   | Active      | Active     | 11/12        | 688/768         | 3025/3072       | 753/768        
+10     | Active   | Active      | Active     | 10/12        | 622/768         | 2996/3072       | 751/768        
+11     | Active   | Active      | Active     | 10/12        | 626/768         | 3014/3072       | 751/768        
+
+================================================================================
+  PRUNING SUMMARY BY GRANULARITY
+================================================================================
+
+Embedding:
+  - Active: 1 / 1  (100.0%)
+  - Pruned: 0 (0.0%)
+
+Layer Level:
+  - Active: 12 / 12  (100.0%)
+  - Pruned: 0 (0.0%)
+
+Attention Blocks:
+  - Active: 12 / 12  (100.0%)
+  - Pruned: 0 (0.0%)
+
+Mlp Blocks:
+  - Active: 12 / 12  (100.0%)
+  - Pruned: 0 (0.0%)
+
+Attention Heads:
+  - Active: 125 / 144  (86.8%)
+  - Pruned: 19 (13.2%)
+
+Attention Neurons:
+  - Active: 7,832 / 9,216  (85.0%)
+  - Pruned: 1,384 (15.0%)
+
+Mlp Hidden:
+  - Active: 36,100 / 36,864  (97.9%)
+  - Pruned: 764 (2.1%)
+
+Mlp Output:
+  - Active: 9,049 / 9,216  (98.2%)
+  - Pruned: 167 (1.8%)
+
+🎯 PRUNABLE PARAMETER BOTTOM LINE:
+  - Circuit uses 79,084,976 out of 85,017,600 prunable parameters
+  - Prunable compression: 1.1x
+  - Prunable reduction: 7.0%
+================================================================================
+
+✅ Model remains in 'Final Circuit Mode' for evaluation.
+Saved active nodes to outputs/gpt2_gp/ne12_ee2_bs16_ntr64_nva32_nte64_260714-145902/active_nodes.json
+
+==================================================
+  EVALUATING: Node-Pruned Circuit
+==================================================
+
+Evaluating Node-Pruned Circuit:   0%|          | 0/3 [00:00<?, ?it/s]
+Acc: 1.000, LD: 5.288: : 16it [00:00, 338.81it/s]                    
+Acc: 1.000, LD: 5.530: : 32it [00:00, 343.92it/s]
+Acc: 1.000, LD: 5.530: : 46it [00:00, 339.04it/s]
+Acc: 1.000, LD: 5.573: : 46it [00:00, 339.04it/s]
+Acc: 1.000, LD: 5.573: : 46it [00:00, 338.05it/s]
+
+Processed 46 valid samples.
+
+==================================================
+Node-Pruned Circuit Evaluation Summary:
+  - Accuracy:              1.0000
+  - Logit Difference:      5.5734
+  - KL Divergence:         0.0835
+  - Exact Match:           1.0000
+==================================================
+  [GPU] Node model freed: alloc 0.48 GB | reserved 0.54 GB | peak 2.03 GB
+
+Active nodes: 125 heads + 12 MLPs + 1 embedding
+
+======================================================================
+  PHASE 2: EDGE PRUNING (GP (Gendered Pronoun))
+======================================================================
+
+Loading weights:   0%|          | 0/148 [00:00<?, ?it/s]
+Loading weights: 100%|##########| 148/148 [00:00<00:00, 19146.17it/s]
+Edge pruning: 24868 edge gates across 138 source nodes
+Trainable gate parameters: 24,868 / 124,464,676 (0.0200%)
+  [GPU] Edge model loaded: alloc 0.95 GB | reserved 1.04 GB | peak 0.95 GB
+
+Edge pruning:   0%|          | 0/2 [00:00<?, ?it/s]
+Edge pruning:   0%|          | 0/2 [00:03<?, ?it/s, KL=0.141, L=0.024, LR=1.50e-01, Sp=0.003, T=0.274]  [GPU] Edge epoch 1 (fwd+bwd+optim): alloc 1.14 GB | reserved 6.58 GB | peak 5.22 GB
+
+Edge pruning:  50%|#####     | 1/2 [00:03<00:03,  3.94s/it, KL=0.141, L=0.024, LR=1.50e-01, Sp=0.003, T=0.274]
+Edge pruning:  50%|#####     | 1/2 [00:07<00:03,  3.94s/it, KL=0.091, L=0.024, LR=1.00e-04, Sp=0.011, T=0.186]
+Edge pruning: 100%|##########| 2/2 [00:07<00:00,  3.91s/it, KL=0.091, L=0.024, LR=1.00e-04, Sp=0.011, T=0.186]
+Edge pruning: 100%|##########| 2/2 [00:07<00:00,  3.92s/it, KL=0.091, L=0.024, LR=1.00e-04, Sp=0.011, T=0.186]
+Edge pruning time: 7.8s
+  [GPU] Edge pruning done: alloc 1.14 GB | reserved 6.58 GB | peak 5.22 GB
+Edge circuit final mode = True (388 gates)
+
+==================================================
+  EVALUATING: Edge-Pruned Circuit
+==================================================
+
+Evaluating Edge-Pruned Circuit:   0%|          | 0/3 [00:00<?, ?it/s]
+Evaluating Edge-Pruned Circuit: 16it [00:00, 52.46it/s]              
+Acc: 1.000, LD: 4.581: : 16it [00:00, 52.46it/s]       
+Acc: 1.000, LD: 4.581: : 32it [00:00, 54.08it/s]
+Acc: 1.000, LD: 4.791: : 32it [00:00, 54.08it/s]
+Acc: 1.000, LD: 4.791: : 46it [00:00, 54.17it/s]
+Acc: 1.000, LD: 4.819: : 46it [00:00, 54.17it/s]
+Acc: 1.000, LD: 4.819: : 46it [00:00, 53.94it/s]
+
+Processed 46 valid samples.
+
+==================================================
+Edge-Pruned Circuit Evaluation Summary:
+  - Accuracy:              1.0000
+  - Logit Difference:      4.8189
+  - KL Divergence:         0.0437
+  - Exact Match:           1.0000
+==================================================
+
+Saved training history to outputs/gpt2_gp/ne12_ee2_bs16_ntr64_nva32_nte64_260714-145902/history.json
+
+====================================================================================
+  NODE PRUNING — GRANULARITY SUMMARY
+====================================================================================
+
+Granularity                Active      Total   Pruned %
+------------------------------------------------------
+  layer_level                  12         12       0.0%
+  attention_blocks             12         12       0.0%
+  mlp_blocks                   12         12       0.0%
+  attention_heads             125        144      13.2%
+  attention_neurons         7,832      9,216      15.0%
+  mlp_hidden               36,100     36,864       2.1%
+  mlp_output                9,049      9,216       1.8%
+  embedding                     1          1       0.0%
+
+  Prunable-parameter reduction: 7.0% (1.08x)
+
+====================================================================================
+  DENSE EDGES (between surviving nodes, before edge pruning)
+====================================================================================
+
+  Full-model edges:     32,779
+  Dense edges:          25,118  (76.63% of full)
+  Categories — output 137 | mlp 779 | q 7,813 | k 7,813 | v 7,813
+
+====================================================================================
+  EDGE PRUNING — SUMMARY
+====================================================================================
+
+  Category             Active      Total    Kept %
+  -----------------------------------------------
+  Q Edges               7,938      7,938    100.0%
+  K Edges               7,938      7,938    100.0%
+  V Edges               7,938      7,938    100.0%
+  Mlp Edges               916        916    100.0%
+  Output Edges            138        138    100.0%
+  -----------------------------------------------
+  TOTAL                24,868     24,868    100.0%
+
+  Edge compression: 1.00x   vs full model: 24,868/32,779 (75.87%)
+
+====================================================================================
+  FIDELITY COMPARISON
+====================================================================================
+
+  Model                           Accuracy    Logit Diff        KL Div   Exact Match
+  ----------------------------------------------------------------------------------
+  Baseline (Full Model)             1.0000        3.4587        0.0000        1.0000
+  Node-Pruned Circuit               1.0000        5.5734        0.0835        1.0000
+  Edge-Pruned Circuit               1.0000        4.8189        0.0437        1.0000
+
+====================================================================================
+  END-TO-END EDGE COMPRESSION
+====================================================================================
+
+  Full model:            32,779  (100.0%)
+  After node pruning:    25,118  (76.6%)
+  After edge pruning:    24,868  (75.9%)
+
+  Overall edge compression: 1.32x
+
+Saved results to outputs/gpt2_gp/ne12_ee2_bs16_ntr64_nva32_nte64_260714-145902/results.json
+Run artifacts in outputs/gpt2_gp/ne12_ee2_bs16_ntr64_nva32_nte64_260714-145902
+
+==========================================================================================
+  GPU MEMORY MAP
+==========================================================================================
+Step                                     Alloc (GB)      Delta   Reserved       Peak
+------------------------------------------------------------------------------------------
+Full model loaded                             0.464     +0.464      0.518      0.464
+Node model loaded                             0.940     +0.476      0.996      0.940
+Node epoch 1 (fwd+bwd+optim)                  1.141     +0.200      2.098      2.027
+Node pruning done                             1.141     +0.000      2.104      2.027
+Node model freed                              0.481     -0.660      0.537      2.027
+Edge model loaded                             0.947     +0.466      1.035      0.947
+Edge epoch 1 (fwd+bwd+optim)                  1.140     +0.192      6.580      5.223
+Edge pruning done                             1.140     +0.000      6.580      5.223
+------------------------------------------------------------------------------------------
+  Node pruning peak: 2.027 GB
+  Edge pruning peak: 5.223 GB
+  Overall peak:      5.223 GB / 44.4 GB (11.8%)
+==========================================================================================

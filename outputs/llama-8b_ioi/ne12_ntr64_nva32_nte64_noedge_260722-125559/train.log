@@ -1,0 +1,482 @@
+
+GPU: NVIDIA A40 | 44.4 GB
+Model: llama-8b (meta-llama/Llama-3.1-8B)  |  Task: IOI (Indirect Object Identification)
+Edge pruning: OFF  |  seed: 42
+Output dir: outputs/llama-8b_ioi/ne12_ntr64_nva32_nte64_noedge_260722-125559
+
+Downloading bytes:           |  0.00B            
+
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B            [A
+
+
+Fetching 4 files:   0%|          | 0/4 [00:00<?, ?it/s][A[A
+Fetching 4 files: 100%|##########| 4/4 [00:00<00:00, 2904.14it/s]
+
+Download complete: :           |  0.00B            
+
+Reconstruction complete: |          |  0.00B /  0.00B                         [A
+Download complete: :           |  0.00B            
+
+Reconstruction complete: |          |  0.00B /  0.00B            
+
+Loading weights:   0%|          | 0/291 [00:00<?, ?it/s]
+Loading weights: 100%|##########| 291/291 [00:00<00:00, 46181.94it/s]
+  [GPU] Full model loaded: alloc 14.96 GB | reserved 15.08 GB | peak 14.96 GB
+Filtered 820 single-token names from 1928 total names
+Generated 64 IOI samples
+Filtered 820 single-token names from 1928 total names
+Generated 32 IOI samples
+Filtered 820 single-token names from 1928 total names
+Generated 64 IOI samples
+Filtering 32 samples for base model correctness...
+Processed 32 valid samples from 32 total
+
+Checking model predictions:   0%|          | 0/2 [00:00<?, ?it/s]
+Checking model predictions:  50%|#####     | 1/2 [00:01<00:01,  1.15s/it]
+Checking model predictions: 100%|##########| 2/2 [00:01<00:00,  1.68it/s]
+Checking model predictions: 100%|##########| 2/2 [00:01<00:00,  1.47it/s]
+  -> Retained: 32/32 (100.00%)
+Filtering 64 samples for base model correctness...
+Processed 64 valid samples from 64 total
+
+Checking model predictions:   0%|          | 0/4 [00:00<?, ?it/s]
+Checking model predictions:  25%|##5       | 1/4 [00:00<00:00,  4.46it/s]
+Checking model predictions:  50%|#####     | 2/4 [00:00<00:00,  4.82it/s]
+Checking model predictions:  75%|#######5  | 3/4 [00:00<00:00,  4.99it/s]
+Checking model predictions: 100%|##########| 4/4 [00:00<00:00,  5.10it/s]
+Checking model predictions: 100%|##########| 4/4 [00:00<00:00,  4.99it/s]
+  -> Retained: 64/64 (100.00%)
+Processed 64 valid samples from 64 total
+Processed 32 valid samples from 32 total
+Processed 64 valid samples from 64 total
+
+--- Baseline evaluation (full model) ---
+
+==================================================
+  EVALUATING: Full Model
+==================================================
+
+Evaluating Full Model:   0%|          | 0/4 [00:00<?, ?it/s]
+Evaluating Full Model:  25%|##5       | 1/4 [00:00<00:00,  5.25it/s]
+Evaluating Full Model:  50%|#####     | 2/4 [00:00<00:00,  5.22it/s]
+Evaluating Full Model:  75%|#######5  | 3/4 [00:00<00:00,  5.23it/s]
+Evaluating Full Model: 100%|##########| 4/4 [00:00<00:00,  5.23it/s]
+                                                                    
+Processed 64 valid samples.
+
+==================================================
+Full Model Evaluation Summary:
+  - Accuracy:              1.0000
+  - Logit Difference:      5.8101
+==================================================
+
+======================================================================
+  PHASE 1: NODE PRUNING (IOI (Indirect Object Identification))
+======================================================================
+
+Downloading bytes:           |  0.00B            
+
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B            [A
+
+
+Fetching 4 files:   0%|          | 0/4 [00:00<?, ?it/s][A[A
+Fetching 4 files: 100%|##########| 4/4 [00:00<00:00, 2458.20it/s]
+
+Download complete: :           |  0.00B            
+
+Reconstruction complete: |          |  0.00B /  0.00B                         [A
+Download complete: :           |  0.00B            
+
+Reconstruction complete: |          |  0.00B /  0.00B            
+
+Loading weights:   0%|          | 0/291 [00:00<?, ?it/s]
+Loading weights: 100%|##########| 291/291 [00:00<00:00, 44368.84it/s]
+Llama model successfully adapted for pruning with block-level gates.
+Trainable gate parameters: 721,984 / 8,030,983,232 (0.0090%)
+  [GPU] Node model loaded: alloc 29.93 GB | reserved 30.17 GB | peak 29.93 GB
+Pre-caching reference-model logits for the training set...
+
+Caching:   0%|          | 0/4 [00:00<?, ?it/s]
+Caching:  50%|#####     | 2/4 [00:00<00:00,  8.19it/s]
+Caching:  75%|#######5  | 3/4 [00:00<00:00,  6.81it/s]
+Caching: 100%|##########| 4/4 [00:00<00:00,  6.26it/s]
+Caching: 100%|##########| 4/4 [00:00<00:00,  6.58it/s]
+
+==================================================
+  EVALUATING: Node Ep 0
+==================================================
+
+Evaluating Node Ep 0:   0%|          | 0/2 [00:00<?, ?it/s][transformers] `use_return_dict` is deprecated! Use `return_dict` instead!
+
+Evaluating Node Ep 0:  50%|#####     | 1/2 [00:00<00:00,  1.08it/s]
+Evaluating Node Ep 0: 100%|##########| 2/2 [00:01<00:00,  1.37it/s]
+                                                                   
+Processed 32 valid samples.
+
+==================================================
+Node Ep 0 Evaluation Summary:
+  - Accuracy:              1.0000
+  - Logit Difference:      5.9727
+  - Faithfulness (KL Div): 0.0000
+  - Exact Match Rate:      1.0000
+==================================================
+
+Node pruning:   0%|          | 0/12 [00:00<?, ?it/s]/projects/beto/swong2/Alignment/Deception-Circuit/pruning.py:175: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  ep_loss += float(loss)
+
+Node pruning:   0%|          | 0/12 [00:03<?, ?it/s, KL=0.584, L=0.509, LR=2.95e-02, Sp=0.285, T=4.190]  [GPU] Node epoch 1 (fwd+bwd+optim): alloc 31.17 GB | reserved 40.63 GB | peak 39.80 GB
+
+Node pruning:   8%|8         | 1/12 [00:03<00:38,  3.48s/it, KL=0.584, L=0.509, LR=2.95e-02, Sp=0.285, T=4.190]
+Node pruning:   8%|8         | 1/12 [00:06<00:38,  3.48s/it, KL=0.350, L=1.139, LR=2.80e-02, Sp=1.045, T=2.583]
+Node pruning:  17%|#6        | 2/12 [00:06<00:31,  3.15s/it, KL=0.350, L=1.139, LR=2.80e-02, Sp=1.045, T=2.583]
+Node pruning:  17%|#6        | 2/12 [00:09<00:31,  3.15s/it, KL=0.420, L=1.906, LR=2.56e-02, Sp=1.805, T=3.411]
+Node pruning:  25%|##5       | 3/12 [00:09<00:27,  3.06s/it, KL=0.420, L=1.906, LR=2.56e-02, Sp=1.805, T=3.411]
+Node pruning:  25%|##5       | 3/12 [00:12<00:27,  3.06s/it, KL=0.314, L=2.566, LR=2.25e-02, Sp=2.564, T=2.280]
+Node pruning:  33%|###3      | 4/12 [00:12<00:24,  3.00s/it, KL=0.314, L=2.566, LR=2.25e-02, Sp=2.564, T=2.280]
+Node pruning:  33%|###3      | 4/12 [00:15<00:24,  3.00s/it, KL=0.336, L=3.276, LR=1.89e-02, Sp=3.324, T=2.031]
+Node pruning:  42%|####1     | 5/12 [00:15<00:20,  2.98s/it, KL=0.336, L=3.276, LR=1.89e-02, Sp=3.324, T=2.031]
+Node pruning:  42%|####1     | 5/12 [00:18<00:20,  2.98s/it, KL=0.311, L=3.980, LR=1.50e-02, Sp=4.083, T=1.699]
+Node pruning:  50%|#####     | 6/12 [00:18<00:17,  2.97s/it, KL=0.311, L=3.980, LR=1.50e-02, Sp=4.083, T=1.699]
+Node pruning:  50%|#####     | 6/12 [00:21<00:17,  2.97s/it, KL=0.251, L=4.684, LR=1.12e-02, Sp=4.843, T=1.416]
+Node pruning:  58%|#####8    | 7/12 [00:21<00:14,  2.95s/it, KL=0.251, L=4.684, LR=1.12e-02, Sp=4.843, T=1.416]
+Node pruning:  58%|#####8    | 7/12 [00:24<00:14,  2.95s/it, KL=0.290, L=5.444, LR=7.58e-03, Sp=5.602, T=2.154]
+Node pruning:  67%|######6   | 8/12 [00:24<00:12,  3.02s/it, KL=0.290, L=5.444, LR=7.58e-03, Sp=5.602, T=2.154]
+Node pruning:  67%|######6   | 8/12 [00:27<00:12,  3.02s/it, KL=0.187, L=6.094, LR=4.48e-03, Sp=6.361, T=0.831]
+Node pruning:  75%|#######5  | 9/12 [00:27<00:09,  3.05s/it, KL=0.187, L=6.094, LR=4.48e-03, Sp=6.361, T=0.831]
+Node pruning:  75%|#######5  | 9/12 [00:30<00:09,  3.05s/it, KL=0.731, L=6.983, LR=2.10e-03, Sp=7.120, T=3.640]
+==================================================
+  EVALUATING: Node Ep 10
+==================================================
+
+
+Evaluating Node Ep 10:   0%|          | 0/2 [00:00<?, ?it/s][A
+
+Evaluating Node Ep 10:  50%|#####     | 1/2 [00:00<00:00,  1.72it/s][A
+
+Evaluating Node Ep 10: 100%|##########| 2/2 [00:01<00:00,  1.71it/s][A
+
+                                                                    [A
+Processed 32 valid samples.
+
+==================================================
+Node Ep 10 Evaluation Summary:
+  - Accuracy:              1.0000
+  - Logit Difference:      5.9727
+  - Faithfulness (KL Div): 0.0000
+  - Exact Match Rate:      1.0000
+==================================================
+
+Node pruning:  83%|########3 | 10/12 [00:31<00:06,  3.44s/it, KL=0.731, L=6.983, LR=2.10e-03, Sp=7.120, T=3.640]
+Node pruning:  83%|########3 | 10/12 [00:34<00:06,  3.44s/it, KL=0.917, L=7.759, LR=6.09e-04, Sp=7.880, T=4.557]
+Node pruning:  92%|#########1| 11/12 [00:34<00:03,  3.28s/it, KL=0.917, L=7.759, LR=6.09e-04, Sp=7.880, T=4.557]
+Node pruning:  92%|#########1| 11/12 [00:37<00:03,  3.28s/it, KL=1.084, L=8.513, LR=1.00e-04, Sp=8.639, T=5.025]
+Node pruning: 100%|##########| 12/12 [00:37<00:00,  3.18s/it, KL=1.084, L=8.513, LR=1.00e-04, Sp=8.639, T=5.025]
+Node pruning: 100%|##########| 12/12 [00:37<00:00,  3.13s/it, KL=1.084, L=8.513, LR=1.00e-04, Sp=8.639, T=5.025]
+Node pruning time: 39.0s
+  [GPU] Node pruning done: alloc 31.17 GB | reserved 40.63 GB | peak 39.80 GB
+
+================================================================================
+  ANALYZING AND FINALIZING THE DISCOVERED CIRCUIT (PEDANTIC MODE)
+================================================================================
+
+--- Setting final circuit mode to: True ---
+    Updated 192 HardConcreteGate modules.
+
+📍 PRUNABLE PARAMETER BREAKDOWN:
+  - Layers: 32
+  - Attention params per layer: 41,943,040
+  - MLP params per layer: 176,160,768
+  - Total per layer: 218,103,808
+  - TOTAL PRUNABLE: 6,979,321,856
+  Layer 0 Attention: 4096/4096 neurons → 67,125,248 params
+  Layer 0 MLP: 14336/14336 hidden, 4096/4096 output → 117,458,944 params
+  Layer 0 TOTAL: 184,584,192 params
+  Layer 1 Attention: 4096/4096 neurons → 67,125,248 params
+  Layer 1 MLP: 14336/14336 hidden, 4096/4096 output → 117,458,944 params
+  Layer 1 TOTAL: 184,584,192 params
+  Layer 2 Attention: 4096/4096 neurons → 67,125,248 params
+  Layer 2 MLP: 14336/14336 hidden, 4096/4096 output → 117,458,944 params
+  Layer 2 TOTAL: 184,584,192 params
+  Layer 3 Attention: 4096/4096 neurons → 67,125,248 params
+  Layer 3 MLP: 14336/14336 hidden, 4096/4096 output → 117,458,944 params
+  Layer 3 TOTAL: 184,584,192 params
+  Layer 4 Attention: 4096/4096 neurons → 67,125,248 params
+  Layer 4 MLP: 14336/14336 hidden, 4096/4096 output → 117,458,944 params
+  Layer 4 TOTAL: 184,584,192 params
+  Layer 5 Attention: 4096/4096 neurons → 67,125,248 params
+  Layer 5 MLP: 14336/14336 hidden, 4096/4096 output → 117,458,944 params
+  Layer 5 TOTAL: 184,584,192 params
+  Layer 6 Attention: 4096/4096 neurons → 67,125,248 params
+  Layer 6 MLP: 14336/14336 hidden, 4096/4096 output → 117,458,944 params
+  Layer 6 TOTAL: 184,584,192 params
+  Layer 7 Attention: 4096/4096 neurons → 67,125,248 params
+  Layer 7 MLP: 14336/14336 hidden, 4096/4096 output → 117,458,944 params
+  Layer 7 TOTAL: 184,584,192 params
+  Layer 8 Attention: 4096/4096 neurons → 67,125,248 params
+  Layer 8 MLP: 14336/14336 hidden, 4096/4096 output → 117,458,944 params
+  Layer 8 TOTAL: 184,584,192 params
+  Layer 9 Attention: 4096/4096 neurons → 67,125,248 params
+  Layer 9 MLP: 14336/14336 hidden, 4096/4096 output → 117,458,944 params
+  Layer 9 TOTAL: 184,584,192 params
+  Layer 10 Attention: 4096/4096 neurons → 67,125,248 params
+  Layer 10 MLP: 14336/14336 hidden, 4096/4096 output → 117,458,944 params
+  Layer 10 TOTAL: 184,584,192 params
+  Layer 11 Attention: 4096/4096 neurons → 67,125,248 params
+  Layer 11 MLP: 14336/14336 hidden, 4096/4096 output → 117,458,944 params
+  Layer 11 TOTAL: 184,584,192 params
+  Layer 12 Attention: 4096/4096 neurons → 67,125,248 params
+  Layer 12 MLP: 14336/14336 hidden, 4096/4096 output → 117,458,944 params
+  Layer 12 TOTAL: 184,584,192 params
+  Layer 13 Attention: 4096/4096 neurons → 67,125,248 params
+  Layer 13 MLP: 14336/14336 hidden, 4096/4096 output → 117,458,944 params
+  Layer 13 TOTAL: 184,584,192 params
+  Layer 14 Attention: 4096/4096 neurons → 67,125,248 params
+  Layer 14 MLP: 14336/14336 hidden, 4096/4096 output → 117,458,944 params
+  Layer 14 TOTAL: 184,584,192 params
+  Layer 15 Attention: 4096/4096 neurons → 67,125,248 params
+  Layer 15 MLP: 14336/14336 hidden, 4096/4096 output → 117,458,944 params
+  Layer 15 TOTAL: 184,584,192 params
+  Layer 16 Attention: 4096/4096 neurons → 67,125,248 params
+  Layer 16 MLP: 14336/14336 hidden, 4096/4096 output → 117,458,944 params
+  Layer 16 TOTAL: 184,584,192 params
+  Layer 17 Attention: 4096/4096 neurons → 67,125,248 params
+  Layer 17 MLP: 14336/14336 hidden, 4096/4096 output → 117,458,944 params
+  Layer 17 TOTAL: 184,584,192 params
+  Layer 18 Attention: 4096/4096 neurons → 67,125,248 params
+  Layer 18 MLP: 14336/14336 hidden, 4096/4096 output → 117,458,944 params
+  Layer 18 TOTAL: 184,584,192 params
+  Layer 19 Attention: 4096/4096 neurons → 67,125,248 params
+  Layer 19 MLP: 14336/14336 hidden, 4096/4096 output → 117,458,944 params
+  Layer 19 TOTAL: 184,584,192 params
+  Layer 20 Attention: 4096/4096 neurons → 67,125,248 params
+  Layer 20 MLP: 14336/14336 hidden, 4096/4096 output → 117,458,944 params
+  Layer 20 TOTAL: 184,584,192 params
+  Layer 21 Attention: 4096/4096 neurons → 67,125,248 params
+  Layer 21 MLP: 14336/14336 hidden, 4096/4096 output → 117,458,944 params
+  Layer 21 TOTAL: 184,584,192 params
+  Layer 22 Attention: 4096/4096 neurons → 67,125,248 params
+  Layer 22 MLP: 14336/14336 hidden, 4096/4096 output → 117,458,944 params
+  Layer 22 TOTAL: 184,584,192 params
+  Layer 23 Attention: 4096/4096 neurons → 67,125,248 params
+  Layer 23 MLP: 14336/14336 hidden, 4096/4096 output → 117,458,944 params
+  Layer 23 TOTAL: 184,584,192 params
+  Layer 24 Attention: 4096/4096 neurons → 67,125,248 params
+  Layer 24 MLP: 14336/14336 hidden, 4096/4096 output → 117,458,944 params
+  Layer 24 TOTAL: 184,584,192 params
+  Layer 25 Attention: 4096/4096 neurons → 67,125,248 params
+  Layer 25 MLP: 14336/14336 hidden, 4096/4096 output → 117,458,944 params
+  Layer 25 TOTAL: 184,584,192 params
+  Layer 26 Attention: 4096/4096 neurons → 67,125,248 params
+  Layer 26 MLP: 14336/14336 hidden, 4096/4096 output → 117,458,944 params
+  Layer 26 TOTAL: 184,584,192 params
+  Layer 27 Attention: 4096/4096 neurons → 67,125,248 params
+  Layer 27 MLP: 14336/14336 hidden, 4096/4096 output → 117,458,944 params
+  Layer 27 TOTAL: 184,584,192 params
+  Layer 28 Attention: 4096/4096 neurons → 67,125,248 params
+  Layer 28 MLP: 14336/14336 hidden, 4096/4096 output → 117,458,944 params
+  Layer 28 TOTAL: 184,584,192 params
+  Layer 29 Attention: 4096/4096 neurons → 67,125,248 params
+  Layer 29 MLP: 14336/14336 hidden, 4096/4096 output → 117,458,944 params
+  Layer 29 TOTAL: 184,584,192 params
+  Layer 30 Attention: 4096/4096 neurons → 67,125,248 params
+  Layer 30 MLP: 14336/14336 hidden, 4096/4096 output → 117,458,944 params
+  Layer 30 TOTAL: 184,584,192 params
+  Layer 31 Attention: 4096/4096 neurons → 67,125,248 params
+  Layer 31 MLP: 14336/14336 hidden, 4096/4096 output → 117,458,944 params
+  Layer 31 TOTAL: 184,584,192 params
+
+================================================================================
+  PRUNABLE PARAMETER COMPRESSION ANALYSIS
+================================================================================
+Total prunable parameters: 6,979,321,856
+Active prunable parameters: 5,906,694,144
+Pruned parameters: 1,072,627,712
+Compression ratio: 1.18x
+Parameter reduction: 15.4%
+
+📍 MODEL BREAKDOWN:
+  - Total model parameters: 8,030,983,232
+  - Fixed parameters (embeddings, norms, etc.): 1,051,661,376 (13.1%)
+  - Prunable parameters: 6,979,321,856 (86.9%)
+  - Active prunable parameters: 5,906,694,144 (73.5%)
+
+🎯 EFFECTIVE MODEL COMPRESSION:
+  - Effective model size: 6,958,355,520 parameters
+  - Overall compression: 1.15x
+  - Overall reduction: 13.4%
+
+================================================================================
+  HIERARCHICAL PRUNING REPORT (Consistency Enforced)
+================================================================================
+
+📍 GLOBAL COMPONENTS:
+  - Embedding Gate: N/A
+
+📍 LAYER-LEVEL PRUNING:
+  - Active Layers: 32/32 (100.0%)
+
+📍 DETAILED LAYER REPORT:
+Layer  | Status   | Attn Block  | MLP Block  | Attn Heads   | Attn Neurons    | MLP Hidden      | MLP Output     
+-----------------------------------------------------------------------------------------------------------------
+0      | Active   | Active      | Active     | 32/32        | 4096/4096       | 14336/14336     | 4096/4096      
+1      | Active   | Active      | Active     | 32/32        | 4096/4096       | 14336/14336     | 4096/4096      
+2      | Active   | Active      | Active     | 32/32        | 4096/4096       | 14336/14336     | 4096/4096      
+3      | Active   | Active      | Active     | 32/32        | 4096/4096       | 14336/14336     | 4096/4096      
+4      | Active   | Active      | Active     | 32/32        | 4096/4096       | 14336/14336     | 4096/4096      
+5      | Active   | Active      | Active     | 32/32        | 4096/4096       | 14336/14336     | 4096/4096      
+6      | Active   | Active      | Active     | 32/32        | 4096/4096       | 14336/14336     | 4096/4096      
+7      | Active   | Active      | Active     | 32/32        | 4096/4096       | 14336/14336     | 4096/4096      
+8      | Active   | Active      | Active     | 32/32        | 4096/4096       | 14336/14336     | 4096/4096      
+9      | Active   | Active      | Active     | 32/32        | 4096/4096       | 14336/14336     | 4096/4096      
+10     | Active   | Active      | Active     | 32/32        | 4096/4096       | 14336/14336     | 4096/4096      
+11     | Active   | Active      | Active     | 32/32        | 4096/4096       | 14336/14336     | 4096/4096      
+12     | Active   | Active      | Active     | 32/32        | 4096/4096       | 14336/14336     | 4096/4096      
+13     | Active   | Active      | Active     | 32/32        | 4096/4096       | 14336/14336     | 4096/4096      
+14     | Active   | Active      | Active     | 32/32        | 4096/4096       | 14336/14336     | 4096/4096      
+15     | Active   | Active      | Active     | 32/32        | 4096/4096       | 14336/14336     | 4096/4096      
+16     | Active   | Active      | Active     | 32/32        | 4096/4096       | 14336/14336     | 4096/4096      
+17     | Active   | Active      | Active     | 32/32        | 4096/4096       | 14336/14336     | 4096/4096      
+18     | Active   | Active      | Active     | 32/32        | 4096/4096       | 14336/14336     | 4096/4096      
+19     | Active   | Active      | Active     | 32/32        | 4096/4096       | 14336/14336     | 4096/4096      
+20     | Active   | Active      | Active     | 32/32        | 4096/4096       | 14336/14336     | 4096/4096      
+21     | Active   | Active      | Active     | 32/32        | 4096/4096       | 14336/14336     | 4096/4096      
+22     | Active   | Active      | Active     | 32/32        | 4096/4096       | 14336/14336     | 4096/4096      
+23     | Active   | Active      | Active     | 32/32        | 4096/4096       | 14336/14336     | 4096/4096      
+24     | Active   | Active      | Active     | 32/32        | 4096/4096       | 14336/14336     | 4096/4096      
+25     | Active   | Active      | Active     | 32/32        | 4096/4096       | 14336/14336     | 4096/4096      
+26     | Active   | Active      | Active     | 32/32        | 4096/4096       | 14336/14336     | 4096/4096      
+27     | Active   | Active      | Active     | 32/32        | 4096/4096       | 14336/14336     | 4096/4096      
+28     | Active   | Active      | Active     | 32/32        | 4096/4096       | 14336/14336     | 4096/4096      
+29     | Active   | Active      | Active     | 32/32        | 4096/4096       | 14336/14336     | 4096/4096      
+30     | Active   | Active      | Active     | 32/32        | 4096/4096       | 14336/14336     | 4096/4096      
+31     | Active   | Active      | Active     | 32/32        | 4096/4096       | 14336/14336     | 4096/4096      
+
+================================================================================
+  PRUNING SUMMARY BY GRANULARITY
+================================================================================
+
+Embedding:
+  - Active: 0 / 1  (0.0%)
+  - Pruned: 1 (100.0%)
+
+Layer Level:
+  - Active: 32 / 32  (100.0%)
+  - Pruned: 0 (0.0%)
+
+Attention Blocks:
+  - Active: 32 / 32  (100.0%)
+  - Pruned: 0 (0.0%)
+
+Mlp Blocks:
+  - Active: 32 / 32  (100.0%)
+  - Pruned: 0 (0.0%)
+
+Attention Heads:
+  - Active: 1,024 / 1,024  (100.0%)
+  - Pruned: 0 (0.0%)
+
+Attention Neurons:
+  - Active: 131,072 / 131,072  (100.0%)
+  - Pruned: 0 (0.0%)
+
+Mlp Hidden:
+  - Active: 458,752 / 458,752  (100.0%)
+  - Pruned: 0 (0.0%)
+
+Mlp Output:
+  - Active: 131,072 / 131,072  (100.0%)
+  - Pruned: 0 (0.0%)
+
+🎯 PRUNABLE PARAMETER BOTTOM LINE:
+  - Circuit uses 5,906,694,144 out of 6,979,321,856 prunable parameters
+  - Prunable compression: 1.2x
+  - Prunable reduction: 15.4%
+================================================================================
+
+✅ Model remains in 'Final Circuit Mode' for evaluation.
+Saved active nodes to outputs/llama-8b_ioi/ne12_ntr64_nva32_nte64_noedge_260722-125559/active_nodes.json
+
+==================================================
+  EVALUATING: Node-Pruned Circuit
+==================================================
+
+Evaluating Node-Pruned Circuit:   0%|          | 0/4 [00:00<?, ?it/s]
+Evaluating Node-Pruned Circuit:  25%|##5       | 1/4 [00:00<00:01,  1.68it/s]
+Evaluating Node-Pruned Circuit:  50%|#####     | 2/4 [00:01<00:01,  1.70it/s]
+Evaluating Node-Pruned Circuit:  75%|#######5  | 3/4 [00:01<00:00,  1.70it/s]
+Evaluating Node-Pruned Circuit: 100%|##########| 4/4 [00:02<00:00,  1.71it/s]
+                                                                             
+Processed 64 valid samples.
+
+==================================================
+Node-Pruned Circuit Evaluation Summary:
+  - Accuracy:              1.0000
+  - Logit Difference:      5.8101
+  - Faithfulness (KL Div): 0.0000
+  - Exact Match Rate:      1.0000
+==================================================
+  [GPU] Node model freed: alloc 14.97 GB | reserved 15.13 GB | peak 39.80 GB
+
+Active nodes: 1024 heads + 32 MLPs + 1 embedding
+
+Saved training history to outputs/llama-8b_ioi/ne12_ntr64_nva32_nte64_noedge_260722-125559/history.json
+
+====================================================================================
+  NODE PRUNING — GRANULARITY SUMMARY
+====================================================================================
+
+Granularity                Active      Total   Pruned %
+------------------------------------------------------
+  layer_level                  32         32       0.0%
+  attention_blocks             32         32       0.0%
+  mlp_blocks                   32         32       0.0%
+  attention_heads           1,024      1,024       0.0%
+  attention_neurons       131,072    131,072       0.0%
+  mlp_hidden              458,752    458,752       0.0%
+  mlp_output              131,072    131,072       0.0%
+  embedding                     0          1     100.0%
+
+  Prunable-parameter reduction: 15.4% (1.18x)
+
+====================================================================================
+  DENSE EDGES (between surviving nodes, before edge pruning)
+====================================================================================
+
+  Full-model edges:    805,681
+  Dense edges:         805,681  (100.00% of full)
+  Categories — output 1,056 | mlp 16,368 | q 523,776 | k 130,944 | v 130,944
+
+====================================================================================
+  FIDELITY COMPARISON
+====================================================================================
+
+  Model                           Accuracy    Logit Diff        KL Div   Exact Match
+  ----------------------------------------------------------------------------------
+  Baseline (Full Model)             1.0000        5.8101        0.0000        1.0000
+  Node-Pruned Circuit               1.0000        5.8101        0.0000        1.0000
+
+====================================================================================
+  END-TO-END EDGE COMPRESSION
+====================================================================================
+
+  Full model:           805,681  (100.0%)
+  After node pruning:   805,681  (100.0%)
+
+Saved results to outputs/llama-8b_ioi/ne12_ntr64_nva32_nte64_noedge_260722-125559/results.json
+Run artifacts in outputs/llama-8b_ioi/ne12_ntr64_nva32_nte64_noedge_260722-125559
+
+==========================================================================================
+  GPU MEMORY MAP
+==========================================================================================
+Step                                     Alloc (GB)      Delta   Reserved       Peak
+------------------------------------------------------------------------------------------
+Full model loaded                            14.958    +14.958     15.084     14.958
+Node model loaded                            29.926    +14.968     30.166     29.926
+Node epoch 1 (fwd+bwd+optim)                 31.165     +1.239     40.635     39.797
+Node pruning done                            31.165     +0.000     40.635     39.797
+Node model freed                             14.973    -16.192     15.131     39.797
+------------------------------------------------------------------------------------------
+  Node pruning peak: 39.797 GB
+  Overall peak:      39.797 GB / 44.4 GB (89.6%)
+==========================================================================================
