@@ -615,6 +615,188 @@ def extract_node_masks(node_pruned_model) -> dict:
     return masks
 
 
+# ==============================================================================
+# NODE MASK LOADING (the inverse of extract_node_masks)
+# ==============================================================================
+
+# log_alpha magnitude that pins a gate hard open / hard closed. The eval-mode
+# gate is `sigmoid(log_alpha) * 1.2 - 0.1 > 0.5`, i.e. `log_alpha > 0` strictly,
+# so ±GATE_BIG reproduces a trained gate exactly — and matches the -1e6 that
+# analyze_and_finalize_circuit already writes when it enforces the hierarchy.
+GATE_BIG = 1e6
+
+
+def _mask_slots(model):
+    """Every node gate in the model, in `extract_node_masks`' traversal order.
+
+    Returns [(key, index, gate)] where `index` locates the gate's entry inside
+    masks[key]: None for the scalar 'embedding', an int for the list-valued keys
+    ('layers', 'attention_blocks', 'mlp_blocks'), and the layer string for the
+    per-layer dict keys. Keeping the two traversals identical is what makes
+    apply_node_masks and extract_node_masks exact inverses.
+    """
+    slots = []
+
+    if getattr(model, 'embedding_gate', None) is not None:
+        slots.append(('embedding', None, model.embedding_gate))
+
+    layer_gates = getattr(model, 'layer_gates', None)
+    if layer_gates is not None:
+        for i, g in enumerate(layer_gates):
+            if g is not None:
+                slots.append(('layers', i, g))
+
+    n_attn_block = n_mlp_block = 0
+    for l, block in enumerate(_locate_layers(model)):
+        key = str(l)
+        if getattr(block, 'attention_block_gate', None) is not None:
+            slots.append(('attention_blocks', n_attn_block, block.attention_block_gate))
+            n_attn_block += 1
+        if getattr(block, 'mlp_block_gate', None) is not None:
+            slots.append(('mlp_blocks', n_mlp_block, block.mlp_block_gate))
+            n_mlp_block += 1
+
+        attn, mlp = block.attn, block.mlp
+        if getattr(attn, 'head_gates', None) is not None:
+            slots.append(('attention_heads', key, attn.head_gates))
+        if getattr(attn, 'neuron_gates', None) is not None:
+            slots.append(('attention_neurons', key, attn.neuron_gates))
+        if getattr(mlp, 'hidden_gates', None) is not None:
+            slots.append(('mlp_hidden', key, mlp.hidden_gates))
+        if getattr(mlp, 'output_gates', None) is not None:
+            slots.append(('mlp_output', key, mlp.output_gates))
+
+    return slots
+
+
+def _mask_entry(masks, key, index):
+    if index is None:
+        return masks[key]
+    try:
+        return masks[key][index]
+    except (KeyError, IndexError, TypeError):
+        raise ValueError(
+            f"masks[{key!r}] has no entry {index!r} — the saved masks do not "
+            f"describe this model's gate layout.")
+
+
+def _set_gates_final_mode(model, enabled=True):
+    """set_final_circuit_mode without the per-call print (this runs ~100x)."""
+    for module in model.modules():
+        if isinstance(module, HardConcreteGate):
+            module.final_mode = enabled
+
+
+def apply_node_masks(model, masks: dict, *, strict: bool = True,
+                     big: float = GATE_BIG) -> dict:
+    """Pin every node gate of `model` to the binary mask in `masks`.
+
+    `masks` is the object written by `extract_node_masks` (and stored under the
+    "masks" key of active_nodes.json). Accepts python lists or numpy arrays.
+
+    The key check is bidirectional on purpose. The reverse direction is the
+    load-bearing one: if the model has, say, mlp_output gates and `masks` lacks
+    that key, those gates keep their uniform(2.5, 3.5) init — wide open — and
+    you would silently evaluate a far larger circuit than the one you loaded.
+
+    Leaves the model in eval + final-circuit mode. Returns
+    {granularity: {"active": int, "total": int}}.
+    """
+    slots = _mask_slots(model)
+    model_keys = {k for k, _, _ in slots}
+    mask_keys = set(masks)
+
+    if strict and model_keys != mask_keys:
+        missing = sorted(model_keys - mask_keys)
+        extra = sorted(mask_keys - model_keys)
+        raise ValueError(
+            "saved masks do not match the model's gate layout"
+            + (f"\n  gates with no mask (would stay OPEN): {missing}" if missing else "")
+            + (f"\n  masks with no gate: {extra}" if extra else "")
+            + "\n  Build the model with NodePruningConfig(**config.json['node_config']).")
+
+    counts = {}
+    with torch.no_grad():
+        for key, index, gate in slots:
+            if key not in masks:
+                continue                      # strict=False: leave the gate as-is
+            t = torch.as_tensor(_mask_entry(masks, key, index)).reshape(-1)
+
+            n = gate.log_alpha.numel()
+            if t.numel() != n:
+                raise ValueError(
+                    f"masks[{key!r}] entry {index!r} has {t.numel()} values but "
+                    f"the gate has {n}")
+            if not bool(((t == 0) | (t == 1)).all()):
+                raise ValueError(
+                    f"masks[{key!r}] entry {index!r} is not binary (values must "
+                    f"be 0 or 1)")
+
+            gate.log_alpha.data.copy_(torch.where(t.bool(), big, -big))
+
+            slot = counts.setdefault(key, {"active": 0, "total": 0})
+            slot["active"] += int(t.sum())
+            slot["total"] += n
+
+    model.eval()
+    _set_gates_final_mode(model, True)
+    return counts
+
+
+def open_all_gates(model, big: float = GATE_BIG) -> None:
+    """Pin every HardConcreteGate wide open.
+
+    With all gates open the dual-stream forward is bit-identical to the plain
+    HuggingFace model, so this is both the "full model" anchor row and the
+    harness's strongest self-test.
+    """
+    with torch.no_grad():
+        for module in model.modules():
+            if isinstance(module, HardConcreteGate):
+                module.log_alpha.data.fill_(big)
+    model.eval()
+    _set_gates_final_mode(model, True)
+
+
+def assert_masks_equal(a: dict, b: dict, max_report: int = 10) -> None:
+    """Raise AssertionError unless two mask objects are element-wise identical."""
+    if set(a) != set(b):
+        raise AssertionError(
+            f"mask keys differ: only in first {sorted(set(a) - set(b))}, "
+            f"only in second {sorted(set(b) - set(a))}")
+
+    problems = []
+    for key in sorted(a):
+        va, vb = a[key], b[key]
+        if isinstance(va, dict) or isinstance(vb, dict):
+            if not isinstance(va, dict) or not isinstance(vb, dict):
+                problems.append(f"{key}: type mismatch ({type(va).__name__} vs {type(vb).__name__})")
+                continue
+            if set(va) != set(vb):
+                problems.append(f"{key}: layer keys differ")
+                continue
+            entries = [(f"{key}[{k}]", va[k], vb[k]) for k in sorted(va, key=int)]
+        else:
+            entries = [(key, va, vb)]
+
+        for label, x, y in entries:
+            tx = torch.as_tensor(x).reshape(-1)
+            ty = torch.as_tensor(y).reshape(-1)
+            if tx.numel() != ty.numel():
+                problems.append(f"{label}: length {tx.numel()} vs {ty.numel()}")
+            elif not bool(torch.equal(tx.long(), ty.long())):
+                n_diff = int((tx.long() != ty.long()).sum())
+                problems.append(f"{label}: {n_diff} of {tx.numel()} entries differ")
+            if len(problems) >= max_report:
+                break
+        if len(problems) >= max_report:
+            problems.append("... (truncated)")
+            break
+
+    if problems:
+        raise AssertionError("masks differ:\n  " + "\n  ".join(problems))
+
+
 def save_active_nodes(active_heads, active_mlps, path, masks=None):
     os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
     payload = {

@@ -82,6 +82,68 @@ class PruningConfig:
 
 
 # ==============================================================================
+# ABLATION HOOK
+# ==============================================================================
+# Every gate below mixes the clean stream against a *reference* tensor taken
+# from the corrupted stream:
+#
+#     out = gate * clean + (1 - gate) * reference
+#
+# Interchange ablation is that reference verbatim. Zero / mean ablation swap the
+# reference for a constant, which is the only reason this indirection exists.
+# With no hook installed `_ablation_ref` returns the very same object it was
+# given, so training is bit-identical to before the hook existed.
+#
+# The one thing that must not be gotten wrong: substitute the *mixing reference*
+# only, never the tensor that propagates the corrupted stream (corr_attn_out
+# into o_proj, corrupted_act into down_proj, corrupted_states into the corrupted
+# residual). Every call site therefore binds a fresh local.
+#
+# Under zero/mean ablation nothing downstream reads the corrupted stream, so
+# roughly 35-40% of every forward is dead compute. That is left in place
+# deliberately: skipping it would mean threading a `skip_corrupted_stream` mode
+# through all four forwards — refactoring the exact path that has to stay
+# bit-identical for training — to save a minority of a single evaluation pass.
+
+ABLATION_SITES = ("attn_head", "attn_neuron", "attn_block",
+                  "mlp_hidden", "mlp_output", "mlp_block", "layer")
+
+
+def _ablation_ref(module, corrupted, site):
+    """The mixing reference for `site`: the corrupted tensor, or the hook's."""
+    hook = getattr(module, "_ablation_hook", None)
+    return corrupted if hook is None else hook(module, corrupted, site)
+
+
+def _gated_modules(model):
+    return (m for m in model.modules()
+            if isinstance(m, (PrunableLlamaAttention, PrunableLlamaMLP,
+                              PrunableLlamaDecoderLayer)))
+
+
+def install_ablation_hook(model, hook) -> int:
+    """Install `hook(module, corrupted, site) -> tensor` on every gated module.
+
+    Set via object.__setattr__ so a hook that happens to be an nn.Module is not
+    registered as a submodule (which would drag its buffers into the state dict
+    and its parameters into any optimizer built from model.parameters()).
+
+    Returns the number of modules the hook was installed on.
+    """
+    n = 0
+    for module in _gated_modules(model):
+        object.__setattr__(module, "_ablation_hook", hook)
+        n += 1
+    return n
+
+
+def clear_ablation_hook(model) -> None:
+    """Restore interchange ablation (the reference is the corrupted tensor)."""
+    for module in _gated_modules(model):
+        object.__setattr__(module, "_ablation_hook", None)
+
+
+# ==============================================================================
 # PRUNABLE LLAMA ATTENTION
 # ==============================================================================
 
@@ -188,12 +250,14 @@ class PrunableLlamaAttention(nn.Module):
         if self.head_gates is not None or self.neuron_gates is not None:
             if self.head_gates is not None:
                 head_gate = self.head_gates().to(clean_attn_out.dtype).view(1, 1, self.num_heads, 1)
-                gated_output = head_gate * gated_output + (1 - head_gate) * corr_attn_out
+                ref = _ablation_ref(self, corr_attn_out, "attn_head")
+                gated_output = head_gate * gated_output + (1 - head_gate) * ref
 
             if self.neuron_gates is not None:
                 neuron_gate = self.neuron_gates().to(gated_output.dtype).view(1, 1, self.num_heads, self.head_dim)
                 # Mix with corrupted stream (consistent with all other gate types)
-                gated_output = neuron_gate * gated_output + (1 - neuron_gate) * corr_attn_out
+                ref = _ablation_ref(self, corr_attn_out, "attn_neuron")
+                gated_output = neuron_gate * gated_output + (1 - neuron_gate) * ref
 
         # Flatten heads: [batch, seq_len, hidden_size]
         gated_output = gated_output.reshape(bsz, seq_len, -1).contiguous()
@@ -262,7 +326,8 @@ class PrunableLlamaMLP(nn.Module):
         gated_act = clean_act
         if self.hidden_gates is not None:
             gate = self.hidden_gates().to(clean_act.dtype).view(1, 1, -1)
-            gated_act = gate * clean_act + (1 - gate) * corrupted_act
+            ref = _ablation_ref(self, corrupted_act, "mlp_hidden")
+            gated_act = gate * clean_act + (1 - gate) * ref
 
         clean_output = mlp.down_proj(gated_act)
         corrupted_output = mlp.down_proj(corrupted_act)
@@ -270,7 +335,8 @@ class PrunableLlamaMLP(nn.Module):
         gated_output = clean_output
         if self.output_gates is not None:
             gate = self.output_gates().to(clean_output.dtype).view(1, 1, -1)
-            gated_output = gate * clean_output + (1 - gate) * corrupted_output
+            ref = _ablation_ref(self, corrupted_output, "mlp_output")
+            gated_output = gate * clean_output + (1 - gate) * ref
 
         return gated_output, corrupted_output
 
@@ -380,7 +446,8 @@ class PrunableLlamaDecoderLayer(nn.Module):
 
         if self.attention_block_gate is not None:
             gate = self.attention_block_gate().to(attn_output.dtype)
-            attn_output = gate * attn_output + (1 - gate) * corrupted_attn_output
+            ref = _ablation_ref(self, corrupted_attn_output, "attn_block")
+            attn_output = gate * attn_output + (1 - gate) * ref
 
         clean_states = clean_states + attn_output
         corrupted_states = corrupted_states + corrupted_attn_output
@@ -394,7 +461,8 @@ class PrunableLlamaDecoderLayer(nn.Module):
 
         if self.mlp_block_gate is not None:
             gate = self.mlp_block_gate().to(mlp_output.dtype)
-            mlp_output = gate * mlp_output + (1 - gate) * corrupted_mlp_output
+            ref = _ablation_ref(self, corrupted_mlp_output, "mlp_block")
+            mlp_output = gate * mlp_output + (1 - gate) * ref
 
         final_clean = clean_states + mlp_output
         final_corrupted = corrupted_states + corrupted_mlp_output
@@ -414,10 +482,44 @@ class PrunableLlamaDecoderLayer(nn.Module):
 # PRUNABLE LLAMA FOR CAUSAL LM
 # ==============================================================================
 
+def apply_pruning_wrappers(model, pruning_config: PruningConfig):
+    """Wrap an already-loaded Llama model's decoder layers with pruning gates.
+
+    Split out of `from_pretrained_with_pruning` so a tiny model built directly
+    from a LlamaConfig (i.e. the CPU tests) goes through exactly this code path
+    rather than a second copy of it.
+    """
+    # NO EMBEDDING GATE - completely removed to avoid training interference
+    # Always uses clean embeddings (equivalent to gate = 1.0)
+
+    # Replace each decoder layer with our prunable wrapper
+    prunable_layers = nn.ModuleList([
+        PrunableLlamaDecoderLayer(layer, model.config, pruning_config)
+        for layer in model.model.layers
+    ])
+    model.model.layers = prunable_layers
+
+    # Tag layer identity once, so anything hooking a gate (e.g. a mean-ablation
+    # bank) can tell which layer's activation it is being handed.
+    for i, layer in enumerate(prunable_layers):
+        layer.layer_idx = layer.attn.layer_idx = layer.mlp.layer_idx = i
+
+    # Layer-level gates
+    if pruning_config.prune_full_layers:
+        model.layer_gates = nn.ModuleList([
+            HardConcreteGate(1) for _ in range(len(model.model.layers))
+        ])
+    else:
+        model.layer_gates = None
+
+    model.pruning_config = pruning_config
+    return model
+
+
 class PrunableLlamaForCausalLM(LlamaForCausalLM):
     """
     Extends LlamaForCausalLM with circuit discovery pruning capabilities.
-    
+
     Supports dual-stream forward pass (clean + corrupted inputs) for
     discovering minimal circuits via differentiable pruning.
     """
@@ -426,26 +528,7 @@ class PrunableLlamaForCausalLM(LlamaForCausalLM):
     def from_pretrained_with_pruning(cls, model_name: str, pruning_config: PruningConfig, **kwargs):
         """Load a pretrained Llama model and wrap it with pruning gates."""
         model = cls.from_pretrained(model_name, **kwargs)
-
-        # NO EMBEDDING GATE - completely removed to avoid training interference
-        # Always uses clean embeddings (equivalent to gate = 1.0)
-
-        # Replace each decoder layer with our prunable wrapper
-        prunable_layers = nn.ModuleList([
-            PrunableLlamaDecoderLayer(layer, model.config, pruning_config)
-            for layer in model.model.layers
-        ])
-        model.model.layers = prunable_layers
-
-        # Layer-level gates
-        if pruning_config.prune_full_layers:
-            model.layer_gates = nn.ModuleList([
-                HardConcreteGate(1) for _ in range(len(model.model.layers))
-            ])
-        else:
-            model.layer_gates = None
-
-        model.pruning_config = pruning_config
+        apply_pruning_wrappers(model, pruning_config)
         print("Llama model successfully adapted for pruning with block-level gates.")
         return model
 
@@ -588,7 +671,8 @@ class PrunableLlamaForCausalLM(LlamaForCausalLM):
             # Apply layer-level gate
             if self.layer_gates is not None:
                 layer_gate = self.layer_gates[i]().to(hidden_states_clean.dtype)
-                hidden_states_clean = layer_gate * hidden_states_clean + (1 - layer_gate) * hidden_states_corrupted
+                ref = _ablation_ref(layer, hidden_states_corrupted, "layer")
+                hidden_states_clean = layer_gate * hidden_states_clean + (1 - layer_gate) * ref
 
             if output_attentions:
                 all_self_attns = all_self_attns + (attn_outputs[1],)
