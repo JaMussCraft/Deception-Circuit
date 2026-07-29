@@ -1,0 +1,293 @@
+####################################################################################
+# 2026-07-29 08:31:55  evaluate_circuit.py outputs/llama-8b-instruct_std/nls0.7_noedge_260721-151636 --ablation mean --mean-source clean
+####################################################################################
+
+====================================================================================
+  CIRCUIT EVALUATION
+====================================================================================
+  run dir                      outputs/llama-8b-instruct_std/nls0.7_noedge_260721-151636
+  model / task                 llama-8b-instruct / std
+  device                       cuda
+  reference                    separate
+  evaluations                  sanity, knockout, null
+  test samples                 1000
+  output dir                   outputs/llama-8b-instruct_std/nls0.7_noedge_260721-151636/evaluations/mean
+
+====================================================================================
+  ABLATION SCHEME: mean
+====================================================================================
+
+  Ablated nodes are replaced by their mean activation.
+
+  Read the three evaluations differently under this scheme:
+    sanity / null  fill the COMPLEMENT of a ~0.7%-of-model circuit, i.e.
+                   they mean-ablate ~99.3% of the model. That is the
+                   standard (much harsher) faithfulness measure, and it
+                   will not reproduce the in-run interchange numbers.
+    knockout       fills the circuit itself — ~0.7% of the model.
+
+====================================================================================
+  DISCOVERED CIRCUIT
+====================================================================================
+
+  Granularity                Active        Total    Kept %
+  --------------------------------------------------------
+  attention_blocks                6           32   18.750%
+  mlp_blocks                      5           32   15.625%
+  attention_heads                38        1,024    3.711%
+  attention_neurons           1,868      131,072    1.425%
+  mlp_hidden                  5,792      458,752    1.263%
+  mlp_output                  2,980      131,072    2.274%
+  --------------------------------------------------------
+  TOTAL                      10,689      721,984    1.481%
+
+  Geometry: 32 layers x 32 heads x 128 dims, hidden 4096, intermediate 14336
+
+------------------------------------------------------------------------------------
+  PER-LAYER COUNTS
+------------------------------------------------------------------------------------
+
+  Layer        attention_heads   attention_neurons          mlp_hidden          mlp_output
+  ----------------------------------------------------------------------------------------
+  0                          0                   0               1,173                 631
+  2                          0                   0               1,206                 448
+  4                          0                   0               1,091                 450
+  6                          0                   0               1,216                 482
+  7                          5                 258                   0                   0
+  8                          8                 378                   0                   0
+  12                         5                 228                   0                   0
+  13                         8                 370                   0                   0
+  15                         6                 303                   0                   0
+  17                         6                 331                   0                   0
+  31                         0                   0               1,106                 969
+  ----------------------------------------------------------------------------------------
+  TOTAL                     38               1,868               5,792               2,980
+Mean bank (task) (clean prompts):   0%|          | 0/91 [00:00<?, ?it/s][transformers] `use_return_dict` is deprecated! Use `return_dict` instead!
+  Reference-logit cache: (1000, 128256) torch.bfloat16 on cuda:0 (0.24 GB)       
+[transformers] Ignoring clean_up_tokenization_spaces=True for BPE tokenizer TokenizersBackend. The clean_up_tokenization post-processing step is designed for WordPiece tokenizers and is destructive for BPE (it strips spaces before punctuation). Set clean_up_tokenization_spaces=False to suppress this warning, or set clean_up_tokenization_spaces_for_bpe_even_though_it_will_corrupt_output=True to force cleanup anyway.
+
+==================================================
+  EVALUATING: Node-Pruned Circuit (repo path)
+==================================================
+                                                                                           
+Processed 1000 valid samples.
+
+==================================================
+Node-Pruned Circuit (repo path) Evaluation Summary:
+  - Accuracy:              0.4970
+  - Logit Difference:      0.0595
+  - KL Divergence:         12.3750
+  - Exact Match:           0.0000
+==================================================
+                                                              
+====================================================================================
+  EVAL 1 — SANITY CHECK  (n=1000, batch size 11)
+====================================================================================
+
+  Model                                   Accuracy    Logit Diff        KL Div   Exact Match
+  ------------------------------------------------------------------------------------------
+  full model (all gates open)               1.0000        1.7955        0.0000        1.0000
+  discovered circuit                        0.4970        0.0595       12.3763        0.0000
+  discovered circuit (repo path)            0.4970        0.0595       12.3750        0.0000
+  empty circuit (all gates closed)          0.4910        0.0266        8.0194        0.0000
+
+
+  Model                                   Accuracy    Logit Diff        KL Div   Exact Match
+  ------------------------------------------------------------------------------------------
+  in-run baseline (full model)              1.0000        1.7955        0.0000        1.0000
+
+====================================================================================
+  VERSUS THE IN-RUN NODE EVALUATION
+====================================================================================
+
+  Metric                   expected     observed        delta        tol   status
+  --------------------------------------------------------------------------
+  Accuracy                   0.9240       0.4970      -0.4270     0.0020   FAIL
+  Logit Diff                 1.6680       0.0595      -1.6085     0.0100   FAIL
+  KL Div                     0.1340      12.3763     +12.2423     0.0050   FAIL
+  Exact Match                0.9240       0.0000      -0.9240     0.0020   FAIL
+  --------------------------------------------------------------------------
+  SOME metrics within tolerance (max |delta| 12.2423)
+
+------------------------------------------------------------------------------------
+  GENERIC EVALUATOR vs task.evaluate
+------------------------------------------------------------------------------------
+
+  accuracy       generic     0.497000   repo     0.497000   |delta| 0.00e+00   PASS
+  exact_match    generic     0.000000   repo     0.000000   |delta| 0.00e+00   PASS
+  logit_diff     generic     0.059547   repo     0.059547   |delta| 0.00e+00   PASS
+  kl_div         generic    12.376295   repo    12.374969   |delta| 1.33e-03   FAIL
+
+  DISAGREEMENT (max |delta| 1.33e-03)
+
+  All gates open vs the full model: KL 0.00e+00, exact match 1.0000  PASS
+
+  Empty circuit: accuracy 0.4910, logit diff +0.0266. This is NOT the corrupt model —
+  there is no embedding gate, so the residual stream still starts from the clean
+  prompt. It is the floor eval 3's null distribution should be read against.
+
+------------------------------------------------------------------------------------
+  ARGMAX DISTRIBUTION — EMPTY CIRCUIT
+------------------------------------------------------------------------------------
+
+  distinct tokens: 1   target 0.000 | distractor 0.000 | other 1.000
+
+     count     frac  token
+  --------------------------------------------------
+     1,000    1.000  ' '
+  Loading wikitext-2 (test): 64 blocks x 512 tokens                
+[transformers] Token indices sequence length is longer than the specified maximum sequence length for this model (289076 > 131072). Running this sequence through the model will result in indexing errors
+                                                                                          
+====================================================================================
+  EVAL 2 — NECESSITY  (10,640 fine units ablated)
+====================================================================================
+
+  Model                                   Accuracy    Logit Diff        KL Div   Exact Match
+  ------------------------------------------------------------------------------------------
+  discovered circuit                        0.4970        0.0604       12.3763        0.0000
+  knockout (finest)                         0.3830       -0.6474        1.1682        0.3930
+
+  The knockout model's residual stream is the CLEAN stream everywhere; the
+  reference only supplies replacement values for the ablated units. It touches
+  1.48% of the fine units — if that barely dents behaviour, that is the
+  finding, not a bug.
+
+------------------------------------------------------------------------------------
+  ARGMAX DISTRIBUTION — KNOCKOUT
+------------------------------------------------------------------------------------
+
+  distinct tokens: 12   target 0.393 | distractor 0.607 | other 0.000
+
+     count     frac  token
+  --------------------------------------------------
+       181    0.181  ' accurate'
+       147    0.147  ' fact'
+       144    0.144  ' wrong'
+       120    0.120  ' incorrect'
+        98    0.098  ' correct'
+        85    0.085  ' true'
+        83    0.083  ' false'
+        59    0.059  ' valid'
+        40    0.040  ' right'
+        29    0.029  ' invalid'
+        13    0.013  ' inaccurate'
+         1    0.001  ' myth'
+
+====================================================================================
+  COLLATERAL DAMAGE ON WIKITEXT (64 x 512 tokens)
+====================================================================================
+
+  Configuration                 KL/token     ± SEM   ppl full   ppl abl.    ratio
+  -------------------------------------------------------------------------------
+  all gates open (floor)         0.00066   0.00001     10.217     10.220   1.0003
+  circuit knockout               0.66855   0.00402     10.217     19.303   1.8893
+  random knockouts (mean)        0.28943         —          —          —   1.2940
+  -------------------------------------------------------------------------------
+  all-open floor: KL 6.639e-04, ppl ratio 1.000321  FAIL
+  tokens scored: 32,768
+
+------------------------------------------------------------------------------------
+  VERSUS SIZE-MATCHED RANDOM KNOCKOUTS
+------------------------------------------------------------------------------------
+
+  KL per token       circuit    0.66855   null    0.28943 ± 0.02780   pct   0.0   p 1.0000   z -13.64
+  perplexity ratio   circuit    1.88928   null    1.29404 ± 0.04254   pct   0.0   p 1.0000   z -13.99
+
+  'better' here means LESS damage, so a low percentile means the circuit's
+  knockout costs MORE than a random one of the same size — which, for a
+  necessity claim, is the direction you want.
+  Wrote outputs/llama-8b-instruct_std/nls0.7_noedge_260721-151636/evaluations/mean/plots/wikitext_null.pdf
+                                                                            
+====================================================================================
+  EVAL 3 — RANDOM-CIRCUIT NULL (alloc uniform, seed 0)
+====================================================================================
+
+  50 size-matched random circuits
+
+  Metric          discovered      mean       std       min       p50       p95       max    pct       p       z
+  -------------------------------------------------------------------------------------------------------------
+  Accuracy            0.4970    0.4922    0.0083    0.4550    0.4910    0.5030    0.5030  78.0%  0.2353    0.58
+  Logit Diff          0.0604    0.0270    0.0052    0.0150    0.0275    0.0361    0.0368 100.0%  0.0196    6.40
+  KL Div             12.3763    7.7910    0.3559    7.0948    7.7611    8.3720    8.4373   0.0%  1.0000  -12.89
+  Exact Match         0.0000    0.0000    0.0000    0.0000    0.0000    0.0000    0.0000   0.0%  1.0000     nan
+  -------------------------------------------------------------------------------------------------------------
+  pct = the discovered circuit's percentile in the null (direction-aware);
+  p = Monte-Carlo p-value (#random at least as good + 1) / (n + 1);
+  z = (discovered - mean) / std, signed so positive is better.
+
+====================================================================================
+  ANCHORS
+====================================================================================
+
+  Model                                   Accuracy    Logit Diff        KL Div   Exact Match
+  ------------------------------------------------------------------------------------------
+  full model (all gates open)               1.0000        1.7989        0.0009        1.0000
+  discovered circuit                        0.4970        0.0604       12.3763        0.0000
+  empty circuit (all gates closed)          0.4910        0.0266        8.0194        0.0000
+  best random circuit                       0.5030        0.0368        7.0948        0.0000
+  mean random circuit                       0.4922        0.0270        7.7910        0.0000
+
+------------------------------------------------------------------------------------
+  VERDICT
+------------------------------------------------------------------------------------
+
+  Accuracy       fail  — discovered 0.4970 beats 78.0% of the null (best random 0.5030, p=0.2353, z=+0.58)
+  Logit Diff     PASS  — discovered 0.0604 beats 100.0% of the null (best random 0.0368, p=0.0196, z=+6.40)
+  KL Div         fail  — discovered 12.3763 beats 0.0% of the null (best random 7.0948, p=1.0000, z=-12.89)
+  Exact Match    fail  — discovered 0.0000 beats 0.0% of the null (best random 0.0000, p=1.0000, z=+nan)
+
+  Pass bar: faithfulness above the 95th percentile of the null.
+  Read it against the anchors above — if the empty circuit already
+  scores near the null's mean, the bar is weak evidence on its own.
+
+------------------------------------------------------------------------------------
+  PER-LAYER COUNTS — DISCOVERED
+------------------------------------------------------------------------------------
+
+  Layer        attention_heads   attention_neurons          mlp_hidden          mlp_output
+  ----------------------------------------------------------------------------------------
+  0                          0                   0               1,173                 631
+  2                          0                   0               1,206                 448
+  4                          0                   0               1,091                 450
+  6                          0                   0               1,216                 482
+  7                          5                 258                   0                   0
+  8                          8                 378                   0                   0
+  12                         5                 228                   0                   0
+  13                         8                 370                   0                   0
+  15                         6                 303                   0                   0
+  17                         6                 331                   0                   0
+  31                         0                   0               1,106                 969
+  ----------------------------------------------------------------------------------------
+  TOTAL                     38               1,868               5,792               2,980
+
+------------------------------------------------------------------------------------
+  PER-LAYER COUNTS — RANDOM CIRCUIT 0 (identical by construction)
+------------------------------------------------------------------------------------
+
+  Layer        attention_heads   attention_neurons          mlp_hidden          mlp_output
+  ----------------------------------------------------------------------------------------
+  0                          0                   0               1,173                 631
+  2                          0                   0               1,206                 448
+  4                          0                   0               1,091                 450
+  6                          0                   0               1,216                 482
+  7                          5                 258                   0                   0
+  8                          8                 378                   0                   0
+  12                         5                 228                   0                   0
+  13                         8                 370                   0                   0
+  15                         6                 303                   0                   0
+  17                         6                 331                   0                   0
+  31                         0                   0               1,106                 969
+  ----------------------------------------------------------------------------------------
+  TOTAL                     38               1,868               5,792               2,980
+  Wrote outputs/llama-8b-instruct_std/nls0.7_noedge_260721-151636/evaluations/mean/plots/null_distribution.pdf
+
+====================================================================================
+  DONE
+====================================================================================
+
+  Results in outputs/llama-8b-instruct_std/nls0.7_noedge_260721-151636/evaluations/mean
+
+  3 check(s) FAILED:
+    - sanity: the generic evaluator disagrees with task.evaluate (max delta 1.33e-03)
+    - sanity: the reloaded circuit does not reproduce results.json:node_eval within tolerance
+    - knockout: the all-gates-open wikitext floor is not zero (KL 6.639e-04, ppl ratio 1.000321)
