@@ -22,5 +22,53 @@
       "kl_div": 100.0,
       "exact_match": 100.0
     }
+  },
+  "zero": {
+    "last_run": "2026-07-29T07:02:14",
+    "evals": [
+      "sanity",
+      "knockout",
+      "null"
+    ],
+    "sanity": {
+      "accuracy": 0.611,
+      "logit_diff": 3.0089215545654295,
+      "kl_div": 11.37873021697998,
+      "exact_match": 0.0
+    },
+    "knockout": {
+      "task_accuracy": 0.503,
+      "wikitext_kl": 1.2510968814603984
+    },
+    "null": {
+      "accuracy": 100.0,
+      "logit_diff": 100.0,
+      "kl_div": 96.0,
+      "exact_match": 0.0
+    }
+  },
+  "mean": {
+    "last_run": "2026-07-29T07:04:02",
+    "evals": [
+      "sanity",
+      "knockout",
+      "null"
+    ],
+    "sanity": {
+      "accuracy": 0.497,
+      "logit_diff": 0.05784375,
+      "kl_div": 12.376720741271972,
+      "exact_match": 0.0
+    },
+    "knockout": {
+      "task_accuracy": 0.376,
+      "wikitext_kl": 0.6685598383191973
+    },
+    "null": {
+      "accuracy": 80.0,
+      "logit_diff": 100.0,
+      "kl_div": 0.0,
+      "exact_match": 0.0
+    }
   }
 }

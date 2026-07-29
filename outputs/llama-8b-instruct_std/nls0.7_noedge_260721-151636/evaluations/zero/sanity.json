@@ -1,0 +1,257 @@
+{
+  "batch_size": 11,
+  "n": 1000,
+  "ablation": "zero",
+  "rows": {
+    "full_open": {
+      "accuracy": 1.0,
+      "logit_diff": 1.7955,
+      "kl_div": 0.0,
+      "exact_match": 1.0,
+      "n": 1000
+    },
+    "discovered": {
+      "accuracy": 0.611,
+      "logit_diff": 3.0089215545654295,
+      "kl_div": 11.37873021697998,
+      "exact_match": 0.0,
+      "n": 1000,
+      "argmax": {
+        "top": [
+          {
+            "id": 90241,
+            "token": "VILLE",
+            "count": 416,
+            "frac": 0.416
+          },
+          {
+            "id": 10207,
+            "token": "::$",
+            "count": 166,
+            "frac": 0.166
+          },
+          {
+            "id": 49865,
+            "token": "yg",
+            "count": 131,
+            "frac": 0.131
+          },
+          {
+            "id": 93245,
+            "token": "_vlog",
+            "count": 57,
+            "frac": 0.057
+          },
+          {
+            "id": 33855,
+            "token": "Overlay",
+            "count": 46,
+            "frac": 0.046
+          },
+          {
+            "id": 116708,
+            "token": " \u7530",
+            "count": 40,
+            "frac": 0.04
+          },
+          {
+            "id": 5042,
+            "token": " simply",
+            "count": 31,
+            "frac": 0.031
+          },
+          {
+            "id": 569,
+            "token": "ard",
+            "count": 20,
+            "frac": 0.02
+          },
+          {
+            "id": 56615,
+            "token": " rst",
+            "count": 15,
+            "frac": 0.015
+          },
+          {
+            "id": 74376,
+            "token": "ilig",
+            "count": 14,
+            "frac": 0.014
+          },
+          {
+            "id": 29384,
+            "token": "owski",
+            "count": 10,
+            "frac": 0.01
+          },
+          {
+            "id": 28740,
+            "token": "\ufffd",
+            "count": 8,
+            "frac": 0.008
+          }
+        ],
+        "n_distinct": 34,
+        "target_frac": 0.0,
+        "distractor_frac": 0.0,
+        "other_frac": 1.0
+      }
+    },
+    "discovered_repo": {
+      "accuracy": 0.611,
+      "logit_diff": 3.0089215545654295,
+      "kl_div": 11.38003125,
+      "exact_match": 0.0
+    },
+    "empty": {
+      "accuracy": 0.493,
+      "logit_diff": -0.0564052734375,
+      "kl_div": 11.59193350982666,
+      "exact_match": 0.0,
+      "n": 1000,
+      "argmax": {
+        "top": [
+          {
+            "id": 51782,
+            "token": "otope",
+            "count": 1000,
+            "frac": 1.0
+          }
+        ],
+        "n_distinct": 1,
+        "target_frac": 0.0,
+        "distractor_frac": 0.0,
+        "other_frac": 1.0
+      }
+    }
+  },
+  "reference": {
+    "node_eval": {
+      "accuracy": 0.924,
+      "logit_diff": 1.668,
+      "kl_div": 0.13395980858802795,
+      "exact_match": 0.924
+    },
+    "baseline": {
+      "accuracy": 1.0,
+      "logit_diff": 1.7955,
+      "kl_div": 0.0,
+      "exact_match": 1.0
+    }
+  },
+  "cross_check": {
+    "ran": true,
+    "ok": false,
+    "max_delta": 0.0013010330200202702,
+    "per_metric": {
+      "accuracy": {
+        "generic": 0.611,
+        "repo": 0.611,
+        "delta": 0.0,
+        "tolerance": 1e-06,
+        "pass": true
+      },
+      "exact_match": {
+        "generic": 0.0,
+        "repo": 0.0,
+        "delta": 0.0,
+        "tolerance": 1e-06,
+        "pass": true
+      },
+      "logit_diff": {
+        "generic": 3.0089215545654295,
+        "repo": 3.0089215545654295,
+        "delta": 0.0,
+        "tolerance": 0.0001,
+        "pass": true
+      },
+      "kl_div": {
+        "generic": 11.37873021697998,
+        "repo": 11.38003125,
+        "delta": 0.0013010330200202702,
+        "tolerance": 0.0001,
+        "pass": false
+      }
+    }
+  },
+  "all_open": {
+    "ok": true,
+    "kl_div": 0.0,
+    "exact_match": 1.0,
+    "tolerances": {
+      "kl_div": 0.0001,
+      "exact_match_min": 0.999
+    }
+  },
+  "delta": {
+    "ok": false,
+    "max_delta": 11.244770408391952,
+    "rows": [
+      {
+        "metric": "accuracy",
+        "label": "Accuracy",
+        "expected": 0.924,
+        "observed": 0.611,
+        "delta": -0.31300000000000006,
+        "tolerance": 0.002,
+        "pass": false
+      },
+      {
+        "metric": "logit_diff",
+        "label": "Logit Diff",
+        "expected": 1.668,
+        "observed": 3.0089215545654295,
+        "delta": 1.3409215545654296,
+        "tolerance": 0.01,
+        "pass": false
+      },
+      {
+        "metric": "kl_div",
+        "label": "KL Div",
+        "expected": 0.13395980858802795,
+        "observed": 11.37873021697998,
+        "delta": 11.244770408391952,
+        "tolerance": 0.005,
+        "pass": false
+      },
+      {
+        "metric": "exact_match",
+        "label": "Exact Match",
+        "expected": 0.924,
+        "observed": 0.0,
+        "delta": -0.924,
+        "tolerance": 0.002,
+        "pass": false
+      }
+    ]
+  },
+  "headline": {
+    "accuracy": 0.611,
+    "logit_diff": 3.0089215545654295,
+    "kl_div": 11.37873021697998,
+    "exact_match": 0.0
+  },
+  "verification": {
+    "masks_roundtrip": true,
+    "all_open_equals_full": true,
+    "generic_vs_task_evaluate_max_delta": 0.0013010330200202702,
+    "reference_numbers": {
+      "source": "results.json:node_eval",
+      "expected": {
+        "accuracy": 0.924,
+        "logit_diff": 1.668,
+        "kl_div": 0.13395980858802795,
+        "exact_match": 0.924
+      },
+      "observed": {
+        "accuracy": 0.611,
+        "logit_diff": 3.0089215545654295,
+        "kl_div": 11.37873021697998,
+        "exact_match": 0.0
+      },
+      "max_delta": 11.244770408391952,
+      "ok": false
+    }
+  },
+  "seconds": 172.5
+}

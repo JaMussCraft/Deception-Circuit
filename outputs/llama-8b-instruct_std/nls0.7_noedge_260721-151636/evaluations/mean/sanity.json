@@ -1,0 +1,191 @@
+{
+  "batch_size": 11,
+  "n": 1000,
+  "ablation": "mean",
+  "rows": {
+    "full_open": {
+      "accuracy": 1.0,
+      "logit_diff": 1.7955,
+      "kl_div": 0.0,
+      "exact_match": 1.0,
+      "n": 1000
+    },
+    "discovered": {
+      "accuracy": 0.497,
+      "logit_diff": 0.05784375,
+      "kl_div": 12.376720741271972,
+      "exact_match": 0.0,
+      "n": 1000,
+      "argmax": {
+        "top": [
+          {
+            "id": 220,
+            "token": " ",
+            "count": 1000,
+            "frac": 1.0
+          }
+        ],
+        "n_distinct": 1,
+        "target_frac": 0.0,
+        "distractor_frac": 0.0,
+        "other_frac": 1.0
+      }
+    },
+    "discovered_repo": {
+      "accuracy": 0.497,
+      "logit_diff": 0.05784375,
+      "kl_div": 12.37346875,
+      "exact_match": 0.0
+    },
+    "empty": {
+      "accuracy": 0.491,
+      "logit_diff": 0.026875,
+      "kl_div": 8.008690605163574,
+      "exact_match": 0.0,
+      "n": 1000,
+      "argmax": {
+        "top": [
+          {
+            "id": 220,
+            "token": " ",
+            "count": 1000,
+            "frac": 1.0
+          }
+        ],
+        "n_distinct": 1,
+        "target_frac": 0.0,
+        "distractor_frac": 0.0,
+        "other_frac": 1.0
+      }
+    }
+  },
+  "reference": {
+    "node_eval": {
+      "accuracy": 0.924,
+      "logit_diff": 1.668,
+      "kl_div": 0.13395980858802795,
+      "exact_match": 0.924
+    },
+    "baseline": {
+      "accuracy": 1.0,
+      "logit_diff": 1.7955,
+      "kl_div": 0.0,
+      "exact_match": 1.0
+    }
+  },
+  "cross_check": {
+    "ran": true,
+    "ok": false,
+    "max_delta": 0.0032519912719717325,
+    "per_metric": {
+      "accuracy": {
+        "generic": 0.497,
+        "repo": 0.497,
+        "delta": 0.0,
+        "tolerance": 1e-06,
+        "pass": true
+      },
+      "exact_match": {
+        "generic": 0.0,
+        "repo": 0.0,
+        "delta": 0.0,
+        "tolerance": 1e-06,
+        "pass": true
+      },
+      "logit_diff": {
+        "generic": 0.05784375,
+        "repo": 0.05784375,
+        "delta": 0.0,
+        "tolerance": 0.0001,
+        "pass": true
+      },
+      "kl_div": {
+        "generic": 12.376720741271972,
+        "repo": 12.37346875,
+        "delta": 0.0032519912719717325,
+        "tolerance": 0.0001,
+        "pass": false
+      }
+    }
+  },
+  "all_open": {
+    "ok": true,
+    "kl_div": 0.0,
+    "exact_match": 1.0,
+    "tolerances": {
+      "kl_div": 0.0001,
+      "exact_match_min": 0.999
+    }
+  },
+  "delta": {
+    "ok": false,
+    "max_delta": 12.242760932683945,
+    "rows": [
+      {
+        "metric": "accuracy",
+        "label": "Accuracy",
+        "expected": 0.924,
+        "observed": 0.497,
+        "delta": -0.42700000000000005,
+        "tolerance": 0.002,
+        "pass": false
+      },
+      {
+        "metric": "logit_diff",
+        "label": "Logit Diff",
+        "expected": 1.668,
+        "observed": 0.05784375,
+        "delta": -1.61015625,
+        "tolerance": 0.01,
+        "pass": false
+      },
+      {
+        "metric": "kl_div",
+        "label": "KL Div",
+        "expected": 0.13395980858802795,
+        "observed": 12.376720741271972,
+        "delta": 12.242760932683945,
+        "tolerance": 0.005,
+        "pass": false
+      },
+      {
+        "metric": "exact_match",
+        "label": "Exact Match",
+        "expected": 0.924,
+        "observed": 0.0,
+        "delta": -0.924,
+        "tolerance": 0.002,
+        "pass": false
+      }
+    ]
+  },
+  "headline": {
+    "accuracy": 0.497,
+    "logit_diff": 0.05784375,
+    "kl_div": 12.376720741271972,
+    "exact_match": 0.0
+  },
+  "verification": {
+    "masks_roundtrip": true,
+    "all_open_equals_full": true,
+    "generic_vs_task_evaluate_max_delta": 0.0032519912719717325,
+    "reference_numbers": {
+      "source": "results.json:node_eval",
+      "expected": {
+        "accuracy": 0.924,
+        "logit_diff": 1.668,
+        "kl_div": 0.13395980858802795,
+        "exact_match": 0.924
+      },
+      "observed": {
+        "accuracy": 0.497,
+        "logit_diff": 0.05784375,
+        "kl_div": 12.376720741271972,
+        "exact_match": 0.0
+      },
+      "max_delta": 12.242760932683945,
+      "ok": false
+    }
+  },
+  "seconds": 255.6
+}
