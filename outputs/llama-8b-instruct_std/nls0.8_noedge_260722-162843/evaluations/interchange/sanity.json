@@ -1,0 +1,323 @@
+{
+  "batch_size": 10,
+  "n": 1000,
+  "ablation": "interchange",
+  "rows": {
+    "full_open": {
+      "accuracy": 1.0,
+      "logit_diff": 1.7955,
+      "kl_div": 0.0,
+      "exact_match": 1.0,
+      "n": 1000
+    },
+    "discovered": {
+      "accuracy": 0.517,
+      "logit_diff": 0.243875,
+      "kl_div": 0.4181425567269325,
+      "exact_match": 0.529,
+      "n": 1000,
+      "argmax": {
+        "top": [
+          {
+            "id": 13687,
+            "token": " accurate",
+            "count": 177,
+            "frac": 0.177
+          },
+          {
+            "id": 4495,
+            "token": " correct",
+            "count": 156,
+            "frac": 0.156
+          },
+          {
+            "id": 837,
+            "token": " true",
+            "count": 129,
+            "frac": 0.129
+          },
+          {
+            "id": 1314,
+            "token": " right",
+            "count": 119,
+            "frac": 0.119
+          },
+          {
+            "id": 2144,
+            "token": " fact",
+            "count": 89,
+            "frac": 0.089
+          },
+          {
+            "id": 5076,
+            "token": " wrong",
+            "count": 65,
+            "frac": 0.065
+          },
+          {
+            "id": 15465,
+            "token": " incorrect",
+            "count": 62,
+            "frac": 0.062
+          },
+          {
+            "id": 21849,
+            "token": " myth",
+            "count": 59,
+            "frac": 0.059
+          },
+          {
+            "id": 2764,
+            "token": " valid",
+            "count": 52,
+            "frac": 0.052
+          },
+          {
+            "id": 905,
+            "token": " false",
+            "count": 39,
+            "frac": 0.039
+          },
+          {
+            "id": 8482,
+            "token": " invalid",
+            "count": 36,
+            "frac": 0.036
+          },
+          {
+            "id": 50504,
+            "token": " inaccurate",
+            "count": 17,
+            "frac": 0.017
+          }
+        ],
+        "n_distinct": 12,
+        "target_frac": 0.529,
+        "distractor_frac": 0.471,
+        "other_frac": 0.0
+      }
+    },
+    "discovered_repo": {
+      "accuracy": 0.517,
+      "logit_diff": 0.243875,
+      "kl_div": 0.41800299839675426,
+      "exact_match": 0.529
+    },
+    "empty": {
+      "accuracy": 0.0,
+      "logit_diff": -1.831,
+      "kl_div": 1.2699472227096558,
+      "exact_match": 0.0,
+      "n": 1000,
+      "argmax": {
+        "top": [
+          {
+            "id": 4495,
+            "token": " correct",
+            "count": 115,
+            "frac": 0.115
+          },
+          {
+            "id": 15465,
+            "token": " incorrect",
+            "count": 103,
+            "frac": 0.103
+          },
+          {
+            "id": 13687,
+            "token": " accurate",
+            "count": 97,
+            "frac": 0.097
+          },
+          {
+            "id": 50504,
+            "token": " inaccurate",
+            "count": 97,
+            "frac": 0.097
+          },
+          {
+            "id": 5076,
+            "token": " wrong",
+            "count": 95,
+            "frac": 0.095
+          },
+          {
+            "id": 837,
+            "token": " true",
+            "count": 90,
+            "frac": 0.09
+          },
+          {
+            "id": 1314,
+            "token": " right",
+            "count": 89,
+            "frac": 0.089
+          },
+          {
+            "id": 21849,
+            "token": " myth",
+            "count": 78,
+            "frac": 0.078
+          },
+          {
+            "id": 905,
+            "token": " false",
+            "count": 78,
+            "frac": 0.078
+          },
+          {
+            "id": 2144,
+            "token": " fact",
+            "count": 70,
+            "frac": 0.07
+          },
+          {
+            "id": 8482,
+            "token": " invalid",
+            "count": 46,
+            "frac": 0.046
+          },
+          {
+            "id": 2764,
+            "token": " valid",
+            "count": 42,
+            "frac": 0.042
+          }
+        ],
+        "n_distinct": 12,
+        "target_frac": 0.0,
+        "distractor_frac": 1.0,
+        "other_frac": 0.0
+      }
+    }
+  },
+  "reference": {
+    "node_eval": {
+      "accuracy": 0.517,
+      "logit_diff": 0.24425,
+      "kl_div": 0.41773185098171234,
+      "exact_match": 0.529
+    },
+    "baseline": {
+      "accuracy": 1.0,
+      "logit_diff": 1.793625,
+      "kl_div": 0.0,
+      "exact_match": 1.0
+    }
+  },
+  "cross_check": {
+    "ran": true,
+    "ok": false,
+    "max_delta": 0.0001395583301782577,
+    "per_metric": {
+      "accuracy": {
+        "generic": 0.517,
+        "repo": 0.517,
+        "delta": 0.0,
+        "tolerance": 1e-06,
+        "pass": true
+      },
+      "exact_match": {
+        "generic": 0.529,
+        "repo": 0.529,
+        "delta": 0.0,
+        "tolerance": 1e-06,
+        "pass": true
+      },
+      "logit_diff": {
+        "generic": 0.243875,
+        "repo": 0.243875,
+        "delta": 0.0,
+        "tolerance": 0.0001,
+        "pass": true
+      },
+      "kl_div": {
+        "generic": 0.4181425567269325,
+        "repo": 0.41800299839675426,
+        "delta": 0.0001395583301782577,
+        "tolerance": 0.0001,
+        "pass": false
+      }
+    }
+  },
+  "all_open": {
+    "ok": true,
+    "kl_div": 0.0,
+    "exact_match": 1.0,
+    "tolerances": {
+      "kl_div": 0.0001,
+      "exact_match_min": 0.999
+    }
+  },
+  "delta": {
+    "ok": true,
+    "max_delta": 0.00041070574522017456,
+    "rows": [
+      {
+        "metric": "accuracy",
+        "label": "Accuracy",
+        "expected": 0.517,
+        "observed": 0.517,
+        "delta": 0.0,
+        "tolerance": 0.002,
+        "pass": true
+      },
+      {
+        "metric": "logit_diff",
+        "label": "Logit Diff",
+        "expected": 0.24425,
+        "observed": 0.243875,
+        "delta": -0.00037499999999998646,
+        "tolerance": 0.01,
+        "pass": true
+      },
+      {
+        "metric": "kl_div",
+        "label": "KL Div",
+        "expected": 0.41773185098171234,
+        "observed": 0.4181425567269325,
+        "delta": 0.00041070574522017456,
+        "tolerance": 0.005,
+        "pass": true
+      },
+      {
+        "metric": "exact_match",
+        "label": "Exact Match",
+        "expected": 0.529,
+        "observed": 0.529,
+        "delta": 0.0,
+        "tolerance": 0.002,
+        "pass": true
+      }
+    ]
+  },
+  "headline": {
+    "accuracy": 0.517,
+    "logit_diff": 0.243875,
+    "kl_div": 0.4181425567269325,
+    "exact_match": 0.529
+  },
+  "verification": {
+    "masks_roundtrip": true,
+    "all_open_equals_full": true,
+    "generic_vs_task_evaluate_max_delta": 0.0001395583301782577,
+    "reference_numbers": {
+      "source": "results.json:node_eval",
+      "expected": {
+        "accuracy": 0.517,
+        "logit_diff": 0.24425,
+        "kl_div": 0.41773185098171234,
+        "exact_match": 0.529
+      },
+      "observed": {
+        "accuracy": 0.517,
+        "logit_diff": 0.243875,
+        "kl_div": 0.4181425567269325,
+        "exact_match": 0.529
+      },
+      "max_delta": 0.00041070574522017456,
+      "ok": true
+    }
+  },
+  "seconds": 192.7
+}
