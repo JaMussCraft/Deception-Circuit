@@ -10,8 +10,10 @@ how the result is analysed:
   * Phase 2 (edge pruning) trains edge gates between the surviving nodes.
 
 The objective each step is
-    loss = (1 - lambda_sp) * (kl + task) + lambda_sp * sparsity
+    loss = (1 - lambda_sp) * (w_faith * kl + task) + lambda_sp * sparsity
 where (kl, task) come from the Task and `sparsity` from the model's gates.
+`w_faith` in [0, 1] (--faithfulness-weight) down-weights faithfulness to the
+full model's output distribution relative to the task loss.
 The Task and ModelAdapter abstract away every task/model-specific detail.
 """
 
@@ -114,12 +116,14 @@ def _to_device(batch, device):
 
 def _optimize_gates(model, task, full_model, train_dl, val_dl, device, tokenizer,
                     *, num_epochs, lr, lambda_sparsity, state, adapter, tracker,
-                    phase_label, clip_grad, eval_every=10):
+                    phase_label, clip_grad, faithfulness_weight=1.0, eval_every=10):
     gate_params = [p for p in model.parameters() if p.requires_grad]
     total_params = sum(p.numel() for p in model.parameters())
     print(f"Trainable gate parameters: {sum(p.numel() for p in gate_params):,} / "
           f"{total_params:,} "
           f"({sum(p.numel() for p in gate_params) / total_params * 100:.4f}%)")
+    print(f"lambda_sparsity: {lambda_sparsity}  |  "
+          f"faithfulness weight: {faithfulness_weight}")
 
     optimizer = AdamW(gate_params, lr=lr)
     scheduler = CosineAnnealingLR(optimizer, T_max=num_epochs, eta_min=1e-4)
@@ -166,7 +170,9 @@ def _optimize_gates(model, task, full_model, train_dl, val_dl, device, tokenizer
                 circuit_out.logits, target_logits, batch, state, device)
             sp_loss = model.get_sparsity_loss(step=step)["total_sparsity"]
 
-            loss = (1 - lambda_sparsity) * (kl_loss + task_loss) + lambda_sparsity * sp_loss
+            loss = ((1 - lambda_sparsity)
+                    * (faithfulness_weight * kl_loss + task_loss)
+                    + lambda_sparsity * sp_loss)
             loss.backward()
             if clip_grad:
                 torch.nn.utils.clip_grad_norm_(gate_params, max_norm=1.0)
@@ -231,6 +237,7 @@ def run_node_pruning(adapter, task, full_model, train_dl, val_dl, device, tokeni
         model, task, full_model, train_dl, val_dl, device, tokenizer,
         num_epochs=args.node_epochs, lr=args.lr,
         lambda_sparsity=args.node_lambda_sparsity,
+        faithfulness_weight=getattr(args, "faithfulness_weight", 1.0),
         state=state, adapter=adapter, tracker=tracker,
         phase_label="Node", clip_grad=True,
     )
@@ -255,6 +262,7 @@ def run_edge_pruning(adapter, task, full_model, active_heads, active_mlps,
         model, task, full_model, train_dl, val_dl, device, tokenizer,
         num_epochs=args.edge_epochs, lr=args.lr,
         lambda_sparsity=args.edge_lambda_sparsity,
+        faithfulness_weight=getattr(args, "faithfulness_weight", 1.0),
         state=state, adapter=adapter, tracker=tracker,
         phase_label="Edge", clip_grad=False,
     )

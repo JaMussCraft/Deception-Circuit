@@ -43,6 +43,7 @@ _HP_ABBREV = {
     "test_samples": "nte",
     "node_lambda_sparsity": "nls",
     "edge_lambda_sparsity": "els",
+    "faithfulness_weight": "fw",
     "seed": "seed",
 }
 
@@ -94,6 +95,7 @@ def resolved_run_config(args, node_cfg, edge_cfg) -> dict:
         "test_samples": args.test_samples,
         "node_lambda_sparsity": args.node_lambda_sparsity,
         "edge_lambda_sparsity": args.edge_lambda_sparsity,
+        "faithfulness_weight": getattr(args, "faithfulness_weight", 1.0),
         "data_dir": args.data_dir,
         "node_config": asdict(node_cfg) if is_dataclass(node_cfg) else dict(node_cfg),
         "edge_config": asdict(edge_cfg) if is_dataclass(edge_cfg) else dict(edge_cfg),
@@ -116,6 +118,9 @@ def build_run_slug(args, node_cfg, max_len: int = 90) -> str:
                 parts.append(f"{abbr}{_fmt_num(val)}")
         elif key == "edge_lambda_sparsity":
             if val != DEFAULT_EDGE_LAMBDA_SPARSITY:
+                parts.append(f"{abbr}{_fmt_num(val)}")
+        elif key == "faithfulness_weight":
+            if val != 1.0:
                 parts.append(f"{abbr}{_fmt_num(val)}")
         elif key == "seed":
             if val != 42:

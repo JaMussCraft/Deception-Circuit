@@ -7,6 +7,7 @@ model and task:
     python train.py --model gpt2     --task ioi
     python train.py --model llama-1b --task gp  --no-edge-pruning
     python train.py --model gpt2-xl  --task gt  --lambda-attention-heads 0.5
+    python train.py --model llama-8b-instruct --task std --faithfulness-weight 0.3
 
 Models : gpt2, gpt2-xl, llama-1b, llama-8b, llama-8b-instruct
 Tasks  : ioi, gp, gt, std     (gt is GPT-2 only; std is Llama-only, built for
@@ -70,6 +71,13 @@ def build_parser():
                    help="Phase-1 sparsity-vs-fidelity trade-off (the node pruning lambda).")
     g.add_argument("--edge-lambda-sparsity", type=float, default=DEFAULT_EDGE_LAMBDA_SPARSITY,
                    help="Phase-2 sparsity-vs-fidelity trade-off (the edge pruning lambda).")
+    g.add_argument("--faithfulness-weight", type=float, default=1.0,
+                   help="Scalar in [0, 1] weighting the KL (faithfulness-to-full-model) "
+                        "term against the task loss, in both phases: "
+                        "(1 - lambda_sp) * (w * kl + task) + lambda_sp * sparsity. "
+                        "Lower values let the circuit drift from the full model's "
+                        "next-token distribution, which can reduce entanglement with "
+                        "general language-modeling components.")
     g.add_argument("--node-epochs", type=int, default=None)
     g.add_argument("--edge-epochs", type=int, default=None)
     g.add_argument("--lr", type=float, default=None)
@@ -108,6 +116,10 @@ def build_parser():
 def resolve_args(args):
     """Fill in family-specific defaults and apply CLI overrides."""
     args.family = MODEL_REGISTRY[args.model][1]
+
+    if not 0.0 <= args.faithfulness_weight <= 1.0:
+        raise SystemExit(
+            f"--faithfulness-weight must be in [0, 1], got {args.faithfulness_weight}")
 
     # Training hyperparameters: use the (family, task) defaults where unset.
     hp = default_hyperparams(args.family, args.task)
