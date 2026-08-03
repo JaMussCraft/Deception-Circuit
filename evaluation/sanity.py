@@ -10,6 +10,11 @@ Four rows on the task's test set, at the run's own batch size:
 
 Then a delta table against `results.json["node_eval"]`.
 
+`--sanity-granularity coarse` swaps the two discovered-circuit rows for the same
+circuit with every fine gate held open — the block/head selection on its own.
+That is a larger circuit than the run found, so the reproduction table is
+dropped; everything else (cross-check, all-open anchor, empty floor) still runs.
+
 The generic-vs-repo cross-check is the load-bearing one: agreeing to 1e-4 on the
 same circuit validates the mask loader, the generic evaluator, and the reference
 cache in a single assertion. Everything downstream — 50 random circuits, 52
@@ -56,6 +61,8 @@ class SanityEvaluation(Evaluation):
         loader = ctx.test_loader
         hook = ctx.hook_for("task")
         ref_cache = ctx.ensure_ref_cache()
+        coarse = ctx.sanity_granularity == "coarse"
+        label = "coarse-only circuit" if coarse else "discovered circuit"
         rows = {}
 
         with ctx.all_gates_open():
@@ -63,11 +70,11 @@ class SanityEvaluation(Evaluation):
                 ctx, loader, hook=hook, ref_cache=ref_cache,
                 desc="full model (all gates open)")
 
-        rows["discovered"] = evaluate_pred_position(
-            ctx, loader, hook=hook, ref_cache=ref_cache,
-            collect_argmax=True, desc="discovered circuit")
-
-        rows["discovered_repo"] = self._repo_path(ctx, loader, hook)
+        with ctx.circuit(ctx.sanity_masks, verify=ctx.cli.verify):
+            rows["discovered"] = evaluate_pred_position(
+                ctx, loader, hook=hook, ref_cache=ref_cache,
+                collect_argmax=True, desc=label)
+            rows["discovered_repo"] = self._repo_path(ctx, loader, hook, label)
 
         with ctx.circuit(zeros_like(ctx.circuit_masks)):
             rows["empty"] = evaluate_pred_position(
@@ -78,6 +85,9 @@ class SanityEvaluation(Evaluation):
             "batch_size": loader.batch_size,
             "n": rows["discovered"]["n"],
             "ablation": ctx.cli.ablation,
+            "granularity": ctx.sanity_granularity,
+            "counts": ctx.sanity_counts,
+            "label": label,
             "rows": rows,
             "reference": {"node_eval": reference_numbers(ctx),
                           "baseline": baseline_numbers(ctx)},
@@ -85,7 +95,9 @@ class SanityEvaluation(Evaluation):
         payload["cross_check"] = self._cross_check(ctx, rows)
         payload["all_open"] = self._check_all_open(ctx, rows["full_open"])
 
-        expected = payload["reference"]["node_eval"]
+        # The coarse-only circuit is strictly larger than the one the run
+        # discovered, so results.json:node_eval is not a target it should hit.
+        expected = None if coarse else payload["reference"]["node_eval"]
         payload["delta"] = report.compute_delta(
             rows["discovered"], expected, REPRODUCTION_TOLERANCES,
             ctx.task.metric_columns) if expected else None
@@ -100,6 +112,7 @@ class SanityEvaluation(Evaluation):
             "masks_roundtrip": bool(ctx.cli.verify),
             "all_open_equals_full": payload["all_open"]["ok"],
             "generic_vs_task_evaluate_max_delta": payload["cross_check"].get("max_delta"),
+            "granularity": ctx.sanity_granularity,
             "reference_numbers": {
                 "source": "results.json:node_eval",
                 "expected": expected,
@@ -111,7 +124,7 @@ class SanityEvaluation(Evaluation):
         return payload
 
     # ------------------------------------------------------------------
-    def _repo_path(self, ctx, loader, hook):
+    def _repo_path(self, ctx, loader, hook, label="discovered circuit"):
         """task.evaluate — the exact call train.py made after pruning."""
         if ctx.reference_model is None:
             print("\n  Skipping the repo-path row: --reference shared has no "
@@ -120,7 +133,7 @@ class SanityEvaluation(Evaluation):
             return None
         with ablation_hook(ctx.node_model, hook):
             result = ctx.task.evaluate(
-                ctx.node_model, "Node-Pruned Circuit (repo path)",
+                ctx.node_model, f"{label} (repo path)",
                 ctx.reference_model, loader, ctx.device, ctx.tokenizer, ctx.state)
         # `outputs` is a per-sample record list; it belongs in results.json, not
         # in an evaluation payload.
@@ -167,13 +180,21 @@ class SanityEvaluation(Evaluation):
     def report(self, payload, ctx) -> None:
         cols = ctx.task.metric_columns
         rows = payload["rows"]
+        label = payload.get("label", "discovered circuit")
         report.metric_table(
             [("full model (all gates open)", rows["full_open"]),
-             ("discovered circuit", rows["discovered"]),
-             ("discovered circuit (repo path)", rows["discovered_repo"]),
+             (label, rows["discovered"]),
+             (f"{label} (repo path)", rows["discovered_repo"]),
              ("empty circuit (all gates closed)", rows["empty"])],
             cols, title=f"EVAL 1 — SANITY CHECK  (n={payload['n']}, "
                         f"batch size {payload['batch_size']})")
+
+        if payload.get("granularity") == "coarse":
+            print("\n  --sanity-granularity coarse: only the block and head "
+                  "gates were loaded;\n  every attention neuron and MLP unit "
+                  "beneath a live head/block is held open.")
+            report.counts_table(payload["counts"], ctx.geometry,
+                                title="SANITY CIRCUIT — COARSE GATES ONLY")
 
         baseline = payload["reference"]["baseline"]
         if baseline:
@@ -182,6 +203,11 @@ class SanityEvaluation(Evaluation):
 
         if payload["delta"] is not None:
             report.delta_table(payload["delta"])
+        elif payload.get("granularity") == "coarse":
+            print("\n  No reproduction check: the coarse-only circuit is a "
+                  "strictly larger circuit\n  than the one the run discovered, "
+                  "so results.json:node_eval is not its target.\n  Re-run "
+                  "without --sanity-granularity coarse to reproduce the run.")
         else:
             print("\n  results.json has no node_eval — nothing to reproduce "
                   "against (was the run --skip-node-pruning?).")

@@ -24,9 +24,9 @@ from torch.utils.data import DataLoader
 from analysis import apply_node_masks, open_all_gates
 from config import NodePruningConfig
 from evaluation.ablation import ABLATION_SCHEMES, collect_mean_bank, make_hook
-from evaluation.masks import (assert_complement, count_masks, knockout_masks,
-                              load_circuit_masks, sample_random_mask_set,
-                              validate_hierarchy)
+from evaluation.masks import (assert_complement, coarsen_masks, count_masks,
+                              knockout_masks, load_circuit_masks,
+                              sample_random_mask_set, validate_hierarchy)
 from models import MODEL_REGISTRY, ModelAdapter
 from tasks import get_task
 
@@ -167,6 +167,17 @@ class EvalContext:
         self.circuit_masks = circuit_masks
         self.counts = count_masks(circuit_masks)
         self.knockout_masks = knockout_masks(circuit_masks, cli.knockout_granularity)
+
+        # What the sanity eval loads. Under --sanity-granularity coarse this is a
+        # strictly larger circuit than the discovered one, so it does not — and
+        # should not — reproduce results.json; sanity.py says so rather than
+        # reporting a failed check.
+        self.sanity_granularity = getattr(cli, "sanity_granularity", "all")
+        self.sanity_masks = (
+            coarsen_masks(circuit_masks, head_dim=geometry["head_dim"])
+            if self.sanity_granularity == "coarse" else circuit_masks)
+        self.sanity_counts = count_masks(self.sanity_masks)
+
         self.random_indices = []
         self.random_masks = []
 
@@ -357,6 +368,10 @@ def build_context(cli) -> EvalContext:
     ctx = EvalContext(cli, run_dir, run_config, train_args, node_cfg, task,
                       circuit, geometry)
     assert_complement(circuit, ctx.knockout_masks)
+    if ctx.sanity_granularity != "all":
+        validate_hierarchy(ctx.sanity_masks, num_heads=geometry["num_heads"],
+                           head_dim=geometry["head_dim"],
+                           label="coarse-only circuit")
 
     n = cli.null_count if cli.null_count is not None else cli.n_random
     ctx.random_indices = list(range(cli.null_start, cli.null_start + n))

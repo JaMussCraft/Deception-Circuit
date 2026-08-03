@@ -327,6 +327,42 @@ def test_other_ablation_schemes_run(tiny_run, monkeypatch, scheme):
     assert scheme in index
 
 
+def test_sanity_granularity_coarse(tiny_run, monkeypatch):
+    """--sanity-granularity coarse evaluates a strictly larger circuit, keeps
+    every self-check, and drops the reproduction comparison."""
+    results = json.loads((tiny_run / "results.json").read_text())
+    results["node_eval"] = {"accuracy": 0.123, "logit_diff": 9.9,
+                            "kl_div": 0.0, "exact_match": 0.1}
+    (tiny_run / "results.json").write_text(json.dumps(results))
+
+    # The same bogus node_eval makes the default granularity exit 1 (above), so
+    # a clean exit here is only possible because the check was dropped.
+    assert run_cli(monkeypatch, tiny_run, "--evals", "sanity", "--strict",
+                   "--sanity-granularity", "coarse") == 0
+
+    sanity = read_json(tiny_run, "interchange", "sanity.json")
+    assert sanity["granularity"] == "coarse"
+    assert sanity["delta"] is None
+    assert sanity["all_open"]["ok"], sanity["all_open"]
+    assert sanity["cross_check"]["ok"], sanity["cross_check"]
+
+    counts, summary = sanity["counts"], read_json(tiny_run, "interchange", "summary.json")
+    discovered = summary["circuit"]["counts"]
+    assert summary["sanity_circuit"]["granularity"] == "coarse"
+    for key in ("attention_blocks", "mlp_blocks", "attention_heads"):
+        assert counts[key] == discovered[key], key
+    for key in ("attention_neurons", "mlp_hidden", "mlp_output"):
+        assert counts[key]["active"] > discovered[key]["active"], key
+
+
+def test_sanity_granularity_defaults_to_all(tiny_run, monkeypatch):
+    run_cli(monkeypatch, tiny_run, "--evals", "sanity", "--n-random", "1")
+    sanity = read_json(tiny_run, "interchange", "sanity.json")
+    assert sanity["granularity"] == "all"
+    assert sanity["counts"] == read_json(
+        tiny_run, "interchange", "summary.json")["circuit"]["counts"]
+
+
 def test_shared_reference_matches_separate(tiny_run, monkeypatch):
     run_cli(monkeypatch, tiny_run, "--evals", "sanity", "--n-random", "1")
     separate = read_json(tiny_run, "interchange", "sanity.json")["rows"]["discovered"]

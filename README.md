@@ -85,6 +85,8 @@ python dataset/build_std_dataset.py --statement-source azaria --max-seq-length 9
 python train.py --model llama-8b-instruct --task std --node-lambda-sparsity 0.7 --edge-lambda-sparsity 0.7
 python train.py --model llama-8b-instruct --task std --node-lambda-sparsity 0.7 --no-edge-pruning
 python train.py --model llama-8b-instruct --task std --skip-node-pruning --node-checkpoint outputs/llama-8b-instruct_std/nls0.7_els0.7_260721-063553/active_nodes.json --edge-lambda-sparsity 0.3 # rerun only for edge pruning
+python train.py --model llama-8b-instruct --task std --node-lambda-sparsity 0.7 --edge-lambda-sparsity 0.7 --no-prune-attention-neurons --no-prune-mlp-hidden --no-prune-mlp-output
+
 
 
 ```
@@ -163,9 +165,17 @@ python evaluate_circuit.py outputs/llama-8b-instruct_std/nls0.7_noedge_260721-15
 # Reproduce the in-run numbers only
 python evaluate_circuit.py <run_dir> --evals sanity --strict
 
+# What are the head/block choices worth on their own? Loads only the coarse
+# gates and holds every attention neuron and MLP unit under them open.
+python evaluate_circuit.py <run_dir> --evals sanity --sanity-granularity coarse
+
 # Everything (~1.5-2 h on one A100)
 sbatch scripts/evaluate_circuit.sbatch <run_dir>
-python evaluate_circuit.py outputs/llama-8b-instruct_std/nls0.7_noedge_260721-151636
+python evaluate_circuit.py outputs/llama-8b-instruct_std/nls0.7_noedge_260721-151636 --ablation zero
+python evaluate_circuit.py outputs/llama-8b-instruct_std/nls0.7_noedge_260721-151636 --evals knockout --knockout-granularity all
+python evaluate_circuit.py outputs/llama-8b-instruct_std/nls0.7_noedge_260721-151636 --evals null --null-alloc perhead
+
+python evaluate_circuit.py outputs/llama-8b-instruct_std/nls0.8_noedge_260722-162843
 
 # Check the conclusions against ablation-scheme sensitivity
 sbatch scripts/evaluate_circuit.sbatch <run_dir> --ablation mean
@@ -188,7 +198,8 @@ records the seed and counts, and the set is exactly regenerable.
 Useful knobs: `--evals`, `--n-random`, `--test-samples`, `--wikitext-blocks`,
 `--skip-wikitext`, `--eval-batch-size`, `--reference shared` (drops the second
 copy of the weights — the prunable model's ungated single-stream path *is* the
-full model), `--knockout-granularity`, `--mean-source`, `--strict`. See
+full model), `--sanity-granularity`, `--knockout-granularity`, `--mean-source`,
+`--strict`. See
 `python evaluate_circuit.py --help`.
 
 Results land in `<run_dir>/evaluations/<ablation>/`:

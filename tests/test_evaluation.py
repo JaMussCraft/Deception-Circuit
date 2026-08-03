@@ -627,6 +627,45 @@ def test_t8_knockout_rejects_an_unknown_granularity(reference_circuit):
         M.knockout_masks(reference_circuit, "coarse")
 
 
+def test_t8_coarsen_opens_every_fine_gate_under_a_live_parent(reference_circuit):
+    coarse = M.coarsen_masks(reference_circuit, head_dim=128)
+    M.validate_hierarchy(coarse, num_heads=32, head_dim=128, label="coarse")
+
+    src, got = M.count_masks(reference_circuit), M.count_masks(coarse)
+    # Coarse gates are untouched.
+    for key in ("attention_blocks", "mlp_blocks", "attention_heads"):
+        assert got[key] == src[key], key
+    # Fine gates are exactly "all of the units under an open parent".
+    assert got["attention_neurons"]["active"] == 38 * 128
+    assert got["mlp_hidden"]["active"] == src["mlp_blocks"]["active"] * 14336
+    assert got["mlp_output"]["active"] == src["mlp_blocks"]["active"] * 4096
+    # And it is a superset of the discovered circuit.
+    for key in M.FINEST_KEYS:
+        for layer, vec in reference_circuit[key].items():
+            assert (np.asarray(coarse[key][layer]) >= np.asarray(vec)).all(), (key, layer)
+
+
+def test_t8_coarsen_leaves_dead_heads_and_closed_blocks_empty(reference_circuit):
+    coarse = M.coarsen_masks(reference_circuit, head_dim=128)
+    heads = np.asarray(reference_circuit["attention_heads"]["14"])
+    neurons = np.asarray(coarse["attention_neurons"]["14"]).reshape(32, 128)
+    assert (neurons.sum(axis=1) == heads.astype(int) * 128).all()
+
+    blocks = np.asarray(reference_circuit["mlp_blocks"])
+    for layer in reference_circuit["mlp_hidden"]:
+        expected = 14336 if blocks[int(layer)] else 0
+        assert int(np.asarray(coarse["mlp_hidden"][layer]).sum()) == expected, layer
+
+
+def test_t8_coarsen_is_loadable_onto_a_model():
+    _, pruned = build_pair()
+    m = random_masks_for(pruned, seed=41)
+    head_dim = pruned.config.hidden_size // pruned.config.num_attention_heads
+    coarse = M.coarsen_masks(m, head_dim=head_dim)
+    apply_node_masks(pruned, coarse)
+    assert_masks_equal(M.as_lists(coarse), extract_node_masks(pruned))
+
+
 def test_t8_empty_and_full_masks():
     _, pruned = build_pair()
     m = random_masks_for(pruned, seed=40)

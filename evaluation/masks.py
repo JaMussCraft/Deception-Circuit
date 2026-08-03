@@ -229,6 +229,59 @@ def knockout_masks(circuit_masks: dict, granularity: str = "finest") -> dict:
     return _map_masks(circuit_masks, fn)
 
 
+def coarsen_masks(circuit_masks: dict, *, head_dim: int) -> dict:
+    """The circuit at coarse granularity only.
+
+    Blocks and heads are exactly as discovered; every fine gate
+    (attention_neurons / mlp_hidden / mlp_output) is held wide open. This asks
+    what the run's *head- and block-level* selection is worth on its own, with
+    the within-head and within-MLP selection discarded.
+
+    Fine gates are opened only underneath a parent the circuit left open. A live
+    neuron beneath a dead head is behaviourally inert — head and neuron gates AND
+    together — but would trip `validate_hierarchy`, so it stays at 0 and the
+    result is a well-formed circuit rather than a special case.
+    """
+    heads = circuit_masks.get("attention_heads")
+    layers = circuit_masks.get("layers")
+    mlp_blocks = circuit_masks.get("mlp_blocks")
+
+    out = {}
+    for key in SCALAR_KEYS + BLOCK_KEYS + ("attention_heads",):
+        if key in circuit_masks:
+            value = circuit_masks[key]
+            if isinstance(value, dict):
+                out[key] = {k: np.asarray(v, dtype=np.uint8).copy() for k, v in value.items()}
+            elif np.isscalar(value):
+                out[key] = int(value)
+            else:
+                out[key] = np.asarray(value, dtype=np.uint8).copy()
+
+    if "attention_neurons" in circuit_masks:
+        out["attention_neurons"] = {}
+        for key, vec in circuit_masks["attention_neurons"].items():
+            size = int(np.asarray(vec).size)
+            if heads is not None and key in heads:
+                head_mask = np.asarray(heads[key], dtype=np.uint8)
+                out["attention_neurons"][key] = np.repeat(head_mask, head_dim)[:size]
+            else:
+                out["attention_neurons"][key] = np.ones(size, dtype=np.uint8)
+
+    for name in ("mlp_hidden", "mlp_output"):
+        if name not in circuit_masks:
+            continue
+        out[name] = {}
+        for key, vec in circuit_masks[name].items():
+            l = int(key)
+            open_ = ((layers is None or bool(np.asarray(layers)[l]))
+                     and (mlp_blocks is None or bool(np.asarray(mlp_blocks)[l])))
+            size = int(np.asarray(vec).size)
+            out[name][key] = (np.ones(size, dtype=np.uint8) if open_
+                              else np.zeros(size, dtype=np.uint8))
+
+    return out
+
+
 def assert_complement(circuit_masks: dict, knock_masks: dict,
                       keys=FINEST_KEYS) -> None:
     """`knockout AND circuit == 0` and `knockout OR circuit == 1` at `keys`."""

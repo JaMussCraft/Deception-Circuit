@@ -68,6 +68,11 @@ def build_parser():
                         "reproduce the in-run numbers.")
     g.add_argument("--mean-source", default="pooled", choices=["pooled", "clean", "corrupt"],
                    help="Which prompt stream(s) enter the mean bank under --ablation mean.")
+    g.add_argument("--sanity-granularity", default="all", choices=["all", "coarse"],
+                   help="Which gates the sanity eval loads. 'all' is the "
+                        "discovered circuit; 'coarse' loads only the block and "
+                        "head gates and holds every fine gate (attention "
+                        "neurons, MLP hidden/output) open.")
     g.add_argument("--knockout-granularity", default="finest", choices=["finest", "all"],
                    help="'finest' complements only the fine gates and leaves the "
                         "coarse ones open; 'all' complements every granularity.")
@@ -184,6 +189,10 @@ def dry_run(ctx) -> int:
     report.counts_table(ctx.counts, ctx.geometry)
     report.per_layer_table(ctx.counts)
 
+    if ctx.sanity_granularity == "coarse":
+        report.counts_table(ctx.sanity_counts, ctx.geometry,
+                            title="SANITY CIRCUIT — COARSE GATES ONLY")
+
     report.banner("KNOCKOUT (%s)" % cli.knockout_granularity)
     knock = count_masks(ctx.knockout_masks)
     ablated = sum(ctx.counts[k]["active"] for k in ("attention_neurons", "mlp_hidden",
@@ -239,6 +248,8 @@ def circuit_summary(ctx) -> dict:
         "geometry": ctx.geometry,
         "cli": {k: v for k, v in sorted(vars(ctx.cli).items())},
         "circuit": {"counts": ctx.counts},
+        "sanity_circuit": {"granularity": ctx.sanity_granularity,
+                           "counts": ctx.sanity_counts},
         "knockout": {"granularity": ctx.cli.knockout_granularity,
                      "counts": count_masks(ctx.knockout_masks)},
         "reference_numbers": {"source": "results.json:node_eval",
