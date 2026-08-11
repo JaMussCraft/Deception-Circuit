@@ -9,17 +9,13 @@
 #   sbatch scripts/evaluate_circuit.sbatch <run_dir> --ablation mean
 #   sbatch scripts/evaluate_circuit.sbatch <run_dir> --evals sanity --strict
 #
-# Loads two copies of Llama-3.1-8B-Instruct (~33-35 GB peak) and runs ~100
-# evaluations; the full set takes about 1.5-2 h on one A100. Check the plan
-# first with `python evaluate_circuit.py <run_dir> --dry-run` on the login node
-# — it validates the circuit, the random set and the walltime in seconds.
 #
 #SBATCH --job-name=eval-circuit
 #SBATCH --account=beto-delta-gpu
-#SBATCH --partition=gpuA100x4
+#SBATCH --partition=gpuA40x4
 #SBATCH --nodes=1
 #SBATCH --gpus-per-node=1
-#SBATCH --cpus-per-task=8
+#SBATCH --cpus-per-task=1
 #SBATCH --mem=64G
 #SBATCH --time=04:00:00
 #SBATCH --output=logs/evaluate_circuit_%j.out
@@ -34,5 +30,7 @@ if [ "$#" -lt 1 ]; then
 fi
 
 # Activate your environment here if needed, e.g.:
+set +u
 source ~/.bashrc && conda activate mgnp
+set -u
 python evaluate_circuit.py "$@"

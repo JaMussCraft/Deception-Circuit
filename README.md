@@ -86,7 +86,7 @@ python train.py --model llama-8b-instruct --task std --node-lambda-sparsity 0.7 
 python train.py --model llama-8b-instruct --task std --node-lambda-sparsity 0.7 --no-edge-pruning
 python train.py --model llama-8b-instruct --task std --skip-node-pruning --node-checkpoint outputs/llama-8b-instruct_std/nls0.7_els0.7_260721-063553/active_nodes.json --edge-lambda-sparsity 0.3 # rerun only for edge pruning
 python train.py --model llama-8b-instruct --task std --node-lambda-sparsity 0.7 --edge-lambda-sparsity 0.7 --no-prune-attention-neurons --no-prune-mlp-hidden --no-prune-mlp-output
-
+python train.py --model llama-8b-instruct --task std --node-lambda-sparsity 0.4 --no-edge-pruning --faithfulness-weight 0.5
 
 
 ```
@@ -174,6 +174,7 @@ sbatch scripts/evaluate_circuit.sbatch <run_dir>
 python evaluate_circuit.py outputs/llama-8b-instruct_std/nls0.7_noedge_260721-151636 --ablation zero
 python evaluate_circuit.py outputs/llama-8b-instruct_std/nls0.7_noedge_260721-151636 --evals knockout --knockout-granularity all
 python evaluate_circuit.py outputs/llama-8b-instruct_std/nls0.7_noedge_260721-151636 --evals null --null-alloc perhead
+python evaluate_circuit.py outputs/llama-8b-instruct_std/nls0.7_noedge_260721-151636 --evals sanity --sanity-granularity coarse
 
 python evaluate_circuit.py outputs/llama-8b-instruct_std/nls0.8_noedge_260722-162843
 
