@@ -82,6 +82,11 @@ def resolved_run_config(args, node_cfg, edge_cfg) -> dict:
         "std_variant": getattr(args, "std_variant", None),
         "std_runtime_filter": getattr(args, "std_runtime_filter", None),
         "std_margin_loss": getattr(args, "std_margin_loss", None),
+        # Same reasoning for far/sdr/ser: a run trained on <task>_honest is
+        # otherwise indistinguishable from one trained on <task>.
+        "deception_condition": getattr(args, "deception_condition", None),
+        "deception_runtime_filter": getattr(args, "deception_runtime_filter", None),
+        "deception_margin_loss": getattr(args, "deception_margin_loss", None),
         "edge_pruning": args.edge_pruning,
         "skip_node_pruning": args.skip_node_pruning,
         "seed": args.seed,
@@ -125,6 +130,13 @@ def build_run_slug(args, node_cfg, max_len: int = 90) -> str:
         elif key == "seed":
             if val != 42:
                 parts.append(f"{abbr}{_fmt_num(val)}")
+
+    # far/sdr/ser train BOTH conditions with otherwise identical flags, so
+    # without this the deceptive run and its honest twin land in the same
+    # directory name and are told apart only by opening config.json — and
+    # mixing them up inverts Δ = C_deceptive − C_honest.
+    if getattr(args, "deception_condition", "deceptive") == "honest":
+        parts.append("honest")
 
     if not args.edge_pruning:
         parts.append("noedge")

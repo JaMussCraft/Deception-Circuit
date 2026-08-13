@@ -10,8 +10,12 @@ model and task:
     python train.py --model llama-8b-instruct --task std --faithfulness-weight 0.3
 
 Models : gpt2, gpt2-xl, llama-1b, llama-8b, llama-8b-instruct
-Tasks  : ioi, gp, gt, std     (gt is GPT-2 only; std is Llama-only, built for
-                               llama-8b-instruct via dataset/build_std_dataset.py)
+Tasks  : ioi, gp, gt, std, far, sdr, ser
+         (gt is GPT-2 only. std/far/sdr/ser are Llama-only, built for
+          llama-8b-instruct via dataset/build_std_dataset.py and
+          dataset/build_deception_dataset.py. far/sdr/ser are the three
+          deception mechanisms — fabrication, omission, pragmatic distortion —
+          and each has an honest twin: --deception-condition honest.)
 
 Edge pruning, the prunable granularities, and every sparsity coefficient
 (`lambda_*`) are controlled by flags; see `python train.py --help`.
@@ -110,6 +114,21 @@ def build_parser():
                    help="Margin for the STD task loss and runtime filter. "
                         "Default: the build-time margin_thresh stored in the "
                         "dataset's dataset_config.json.")
+
+    g = p.add_argument_group("deception-mechanism tasks (far / sdr / ser)")
+    g.add_argument("--deception-condition", default="deceptive",
+                   choices=["deceptive", "honest"],
+                   help="Which built dataset to load: <data-dir>/<task> or "
+                        "<data-dir>/<task>_honest. The comparison unit is "
+                        "Δ = C_deceptive − C_honest, so both are trained.")
+    g.add_argument("--deception-runtime-filter", action="store_true",
+                   help="Re-filter val/test for the expected behavior with the "
+                        "current full model (splits are already prefiltered by "
+                        "dataset/build_deception_dataset.py).")
+    g.add_argument("--deception-margin-loss", type=float, default=None,
+                   help="Margin for the task loss and runtime filter. Default: "
+                        "the build-time margin_thresh stored in the dataset's "
+                        "dataset_config.json.")
     return p
 
 

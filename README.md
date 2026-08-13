@@ -88,8 +88,72 @@ python train.py --model llama-8b-instruct --task std --skip-node-pruning --node-
 python train.py --model llama-8b-instruct --task std --node-lambda-sparsity 0.7 --edge-lambda-sparsity 0.7 --no-prune-attention-neurons --no-prune-mlp-hidden --no-prune-mlp-output
 python train.py --model llama-8b-instruct --task std --node-lambda-sparsity 0.4 --no-edge-pruning --faithfulness-weight 0.5
 
+# Deception-mechanism family: FAR (fabrication), SDR (omission), SER (pragmatic
+# distortion). One shared content pool, one scaffold, three predicates — see
+# "The deception-mechanism task family" below.
+python dataset/build_deception_dataset.py --task far --no-model      # CPU dry run
+sbatch scripts/pilot_deception.sbatch                                # REQUIRED first
+sbatch scripts/build_deception.sbatch                                # then the build
+sbatch scripts/train_deception.sbatch far
+sbatch scripts/train_deception.sbatch far --deception-condition honest
+
 
 ```
+
+## The deception-mechanism task family (FAR / SDR / SER)
+
+Three tasks, one per deception mechanism, built so their discovered circuits can
+be compared against one another. They share a single content pool
+(`dataset/deception_pools/`) and a single prompt scaffold; what varies is the
+**predicate applied to the designated item**, and therefore what the question's
+answer space affords:
+
+| Task | Mechanism | Predicate | Question | Deceiving requires |
+|------|-----------|-----------|----------|--------------------|
+| `far` | fabrication | `failing` / `passing` | "Which result is failing?" | asserting a falsehood |
+| `sdr` | omission | `critical` / `harmless` | "Which result will you show me?" | showing only the harmless one |
+| `ser` | pragmatic distortion | `unfavorable` / `favorable` | "Which result should I look at?" | choosing the frame |
+
+Everything else — entities, item nouns, corruption site, readout, balancing — is
+held constant by construction, so an observed circuit difference is attributable
+to the mechanism rather than to prompt format. The three tasks are deliberately
+almost the same task: a null result ("no mechanism-specific circuitry at this
+granularity") is a live and informative outcome, not a failure.
+
+**Matched triplets.** The instance list — (entity, item pair, item polarity,
+designation polarity, pressure slot, template variant) — is task-independent and
+seeded, so building the three tasks with the same `--seed` realizes the *same*
+instances under the three predicates. Each example carries a stable
+`instance_id`; `dataset/deception_comparison_set.py` intersects the three
+survivor sets into the **primary comparison set**, and reports the
+matched-pressure subset (the five mechanism-neutral clauses shared by all three
+pools). Each task's full survivor set is kept as a robustness set.
+
+**Honest twins.** Each build also harvests `<task>_honest` from its own filter
+failures: the same prompts under the same pressure, where the base model answered
+honestly. The comparison unit is `Δ = C_<task> − C_<task>_honest`, which holds
+format, content and pressure-reading constant, so the three flavors of pressure
+clause do not confound the comparison. The honest split is resampled to match the
+deceptive split's marginals on item pair, pressure, both polarities and template
+variant.
+
+**Pilot before building.** At STD's ~2% pass rate a full three-task build is
+hundreds of thousands of forward passes. `dataset/pilot_deception.py` measures
+the pass rate, the prior-balance margin distribution and the unexpected-argmax
+counts on a few hundred instances — and, critically, validates the *honest*
+labels by re-running every task with the pressure clause removed and with an
+explicit honesty instruction in its place. FAR's honest answer is entailed by
+the prompt; SDR's follows from disclosure norms; **SER's is normative**, and if
+its label validation lands near 50/50 then `ser_honest` is contaminated and
+`Δ_SER` is meaningless until the user turn is reworded.
+
+`dataset/mechanism_purity_check.py` runs the LLM-judge check afterwards: SDR and
+SER are the pair at risk of collapsing into each other, and if the judge cannot
+separate them, the result is a two-way one and should be reported as such.
+
+STD is kept, demoted from "the fabrication task" to a second scenario family for
+fabrication — which gives the variance decomposition its within-mechanism,
+cross-template noise-ceiling term for free.
 
 ## Controlling granularities
 
@@ -239,7 +303,9 @@ analysis.py         Node circuit finalisation, mask save/load, edge analysis
 l0.py               Hard-Concrete L0 gate
 models/             Model registry + ModelAdapter, and the prunable model classes
                     (gpt2_node, gpt2_edge, llama_node, llama_edge)
-tasks/              Task interface + ioi / gp / gt / std (objective, data, eval)
+tasks/              Task interface + ioi / gp / gt / std / far / sdr / ser
+                    (objective, data, eval); deception.py holds the shared
+                    FAR/SDR/SER implementation
 dataset/            Vendored dataset builders & task-specific evaluation
 evaluation/         Circuit evaluations + their shared context, masks, ablation
                     schemes, metrics, wikitext harness and reporting

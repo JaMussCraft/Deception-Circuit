@@ -40,6 +40,8 @@ _RUN_CONFIG_KEYS = (
     "node_lambda_sparsity", "edge_lambda_sparsity", "data_dir",
     # Recorded only by runs trained after the std_variant fix; see below.
     "std_variant", "std_runtime_filter", "std_margin_loss",
+    # far / sdr / ser: which of <task> and <task>_honest the run was trained on.
+    "deception_condition", "deception_runtime_filter", "deception_margin_loss",
 )
 
 
@@ -114,6 +116,7 @@ def resolve_train_args(run_config: dict, cli):
     # Evaluation never re-filters the splits: the run was trained against the
     # prebuilt ones, and a runtime filter would change what "the test set" means.
     args.std_runtime_filter = False
+    args.deception_runtime_filter = False
 
     if getattr(cli, "data_dir", None):
         args.data_dir = cli.data_dir
@@ -140,6 +143,14 @@ def resolve_train_args(run_config: dict, cli):
             print("     If the run was trained on std_neutral, every number "
                   "below is against the WRONG dataset.")
             print("     Pass --std-variant explicitly to be sure.\n")
+
+    if args.task in ("far", "sdr", "ser") and not run_config.get("deception_condition"):
+        # Same failure mode as std_variant: evaluating a deceptive-condition run
+        # against <task>_honest silently reports the wrong numbers.
+        print(f"\n  !! --deception-condition is not recorded in this run's "
+              f"config.json; defaulting to '{args.deception_condition}'.")
+        print("     If the run was trained on the honest twin, every number "
+              "below is against the WRONG dataset.\n")
 
     node_cfg = NodePruningConfig(**run_config["node_config"])
     return args, node_cfg

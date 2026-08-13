@@ -111,6 +111,19 @@ _HYPERPARAMS = {
     ("llama", "std"): dict(node_epochs=500, edge_epochs=300, batch_size=10,
                            max_seq_length=90, lr=3e-2,
                            train_samples=200, val_samples=200, test_samples=1000),
+    # Deception-mechanism family. Identical hyperparameters across the three
+    # tasks on purpose: a circuit difference between mechanisms must not be a
+    # difference in how hard each was trained. max_seq_length matches the
+    # build-time budget in dataset/deception_common.py (MAX_SEQ_LENGTH).
+    ("llama", "far"): dict(node_epochs=500, edge_epochs=300, batch_size=10,
+                           max_seq_length=96, lr=3e-2,
+                           train_samples=200, val_samples=200, test_samples=1000),
+    ("llama", "sdr"): dict(node_epochs=500, edge_epochs=300, batch_size=10,
+                           max_seq_length=96, lr=3e-2,
+                           train_samples=200, val_samples=200, test_samples=1000),
+    ("llama", "ser"): dict(node_epochs=500, edge_epochs=300, batch_size=10,
+                           max_seq_length=96, lr=3e-2,
+                           train_samples=200, val_samples=200, test_samples=1000),
 }
 
 

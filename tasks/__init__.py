@@ -117,10 +117,24 @@ def get_task(name: str) -> Task:
         elif name == "std":
             from tasks.std import STDTask
             _TASKS[name] = STDTask
+        elif name == "far":
+            from tasks.far import FARTask
+            _TASKS[name] = FARTask
+        elif name == "sdr":
+            from tasks.sdr import SDRTask
+            _TASKS[name] = SDRTask
+        elif name == "ser":
+            from tasks.ser import SERTask
+            _TASKS[name] = SERTask
         else:
             raise ValueError(f"Unknown task {name!r}. Choose from {list_tasks()}.")
     return _TASKS[name]()
 
 
 def list_tasks():
-    return ["ioi", "gp", "gt", "std"]
+    return ["ioi", "gp", "gt", "std", "far", "sdr", "ser"]
+
+
+#: The deception-mechanism family: one task per mechanism, built from one shared
+#: content pool so their circuits can be compared (see dataset/deception_common.py).
+DECEPTION_TASKS = ["far", "sdr", "ser"]
