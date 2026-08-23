@@ -1,0 +1,28 @@
+{
+  "task": "sdr",
+  "mechanism": "omission",
+  "condition": "deceptive",
+  "model": "meta-llama/Llama-3.1-8B-Instruct",
+  "margin_thresh": 0.7,
+  "prior_eps": 0.5,
+  "max_seq_length": 128,
+  "designation_words": [
+    "damaging",
+    "harmless"
+  ],
+  "template_variants": [
+    "audit",
+    "lab"
+  ],
+  "n_entities": 72,
+  "n_item_pairs": 41,
+  "n_pressures": 25,
+  "match_length_distribution": false,
+  "overgen_factor": 140,
+  "seed": 42,
+  "train_samples": 200,
+  "val_samples": 200,
+  "test_samples": 1000,
+  "filtered": true,
+  "created": "2026-08-18"
+}

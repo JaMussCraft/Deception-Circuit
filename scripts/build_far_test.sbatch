@@ -17,14 +17,14 @@
 # The same --seed in all three builds is what makes the triplets matched; the
 # honest twins are harvested in the same pass, so no second sweep is needed.
 #
-#SBATCH --job-name=build-deception
+#SBATCH --job-name=build-far-test
 #SBATCH --account=beto-delta-gpu
 #SBATCH --partition=gpuA40x4
 #SBATCH --nodes=1
 #SBATCH --gpus-per-node=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=64G
-#SBATCH --time=05:00:00
+#SBATCH --time=00:30:00
 #SBATCH --output=logs/build_deception_%j.out
 
 set -euo pipefail
@@ -38,9 +38,9 @@ set -u
 SEED=${SEED:-42}
 OVERGEN=${OVERGEN:-6}
 
-for TASK in far sdr ser; do
+for TASK in far; do
   python dataset/build_deception_dataset.py \
-    --task "$TASK" --seed "$SEED" --overgen-factor "$OVERGEN"
+    --task "$TASK" --seed "$SEED" --overgen-factor "$OVERGEN" --output-dir data/datasets/far_test
 done
 
 # The intersection is only complete once all three exist.

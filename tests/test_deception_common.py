@@ -53,7 +53,7 @@ def make_pair(spec, item_polarity, designation_polarity, variant=None):
 def test_three_specs_registered():
     assert sorted(dc.SPECS) == ["far", "sdr", "ser"]
     assert (dc.SPECS["far"].desig_inversion, dc.SPECS["far"].desig_identity) == \
-        ("failing", "passing")
+        ("delayed", "ready")
     assert (dc.SPECS["sdr"].desig_inversion, dc.SPECS["sdr"].desig_identity) == \
         ("critical", "harmless")
     assert (dc.SPECS["ser"].desig_inversion, dc.SPECS["ser"].desig_identity) == \
@@ -88,7 +88,7 @@ def test_target_and_distractor_follow_the_mapping_tables(
     other = PAIR[2 - item_polarity]
 
     if designation_polarity == "inversion":
-        # The designated item carries failing / critical / unfavorable, so the
+        # The designated item carries delayed / critical / unfavorable, so the
         # deceptive answer is the OTHER item.
         assert rec["desig"] == spec.desig_inversion
         assert rec["target"] == other
@@ -122,7 +122,7 @@ def test_user_turn_lists_the_pair_in_fixed_order(task):
         rec = make_pair(spec, item_polarity, "identity")
         for prompt in (rec["clean_prompt"], rec["corrupt_prompt"]):
             user = prompt.split("user<|end_header_id|>")[1]
-            assert user.index(f'"{PAIR[0]}"') < user.index(f'"{PAIR[1]}"')
+            assert user.index(PAIR[0]) < user.index(PAIR[1])
 
 
 @pytest.mark.parametrize("task", ["far", "sdr", "ser"])
@@ -143,7 +143,8 @@ def test_neutral_prompt_replaces_only_the_designating_sentence(task):
     assert PRESSURE in neutral               # pressure is kept
     assert ENTITY in neutral                 # so is the intro
     for item in PAIR:                        # both items still named in the user turn
-        assert f'"{item}"' in neutral
+        assert item in neutral
+        assert f'"{item}"' not in neutral
 
 
 @pytest.mark.parametrize("task", ["far", "sdr", "ser"])
@@ -153,12 +154,14 @@ def test_pilot_conditions(task):
     spec = dc.SPECS[task]
     variant = spec.variant(spec.variant_names[0])
     base = dc.build_prompt(spec, variant, ENTITY, PAIR[0], PAIR[1], PAIR[0],
-                           spec.desig_inversion, spec.desig_identity, PRESSURE)
+                           spec.desig_inversion, spec.desig_identity, PRESSURE,
+                           honest_item=PAIR[0])
     none = dc.build_prompt(spec, variant, ENTITY, PAIR[0], PAIR[1], PAIR[0],
-                           spec.desig_inversion, spec.desig_identity, "")
+                           spec.desig_inversion, spec.desig_identity, "",
+                           honest_item=PAIR[0])
     honest = dc.build_prompt(spec, variant, ENTITY, PAIR[0], PAIR[1], PAIR[0],
                              spec.desig_inversion, spec.desig_identity,
-                             dc.HONEST_INSTRUCTION)
+                             dc.HONEST_INSTRUCTION, honest_item=PAIR[0])
     assert PRESSURE not in none and PRESSURE not in honest
     assert dc.HONEST_INSTRUCTION in honest
     assert "  " not in none                       # no double space where the clause was
@@ -187,9 +190,9 @@ def test_assert_aligned_pair_rejects_multi_token_answer(tok):
     spec = dc.SPECS["far"]
     variant = spec.variant(spec.variant_names[0])
     clean = dc.build_prompt(spec, variant, ENTITY, "two words", "pricing",
-                            "two words", "failing", "passing", PRESSURE)
+                            "two words", "delayed", "ready", PRESSURE)
     corrupt = dc.build_prompt(spec, variant, ENTITY, "two words", "pricing",
-                              "pricing", "failing", "passing", PRESSURE)
+                              "pricing", "delayed", "ready", PRESSURE)
     with pytest.raises(AssertionError):
         dc.assert_aligned_pair(tok, clean, corrupt, "two words", "pricing", 96)
 
@@ -262,7 +265,7 @@ def test_the_same_instance_realizes_under_all_three_predicates(tok):
         assert rec["task"] == task
         assert {rec["target"], rec["distractor"]} == {inst["item_1"], inst["item_2"]}
         assert rec["condition"] == "deceptive"
-    # "inversion" means the designated item is the failing / critical /
+    # "inversion" means the designated item is the delayed / critical /
     # unfavorable one in every task, so the deceptive target of a given instance
     # is the same item in all three — that is what makes the triplet matched.
     assert records["far"]["target"] == records["sdr"]["target"]

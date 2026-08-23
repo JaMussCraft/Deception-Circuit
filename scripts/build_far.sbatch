@@ -24,7 +24,7 @@
 #SBATCH --gpus-per-node=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=64G
-#SBATCH --time=05:00:00
+#SBATCH --time=02:00:00
 #SBATCH --output=logs/build_deception_%j.out
 
 set -euo pipefail
@@ -36,9 +36,9 @@ source ~/.bashrc && conda activate mgnp
 set -u
 
 SEED=${SEED:-42}
-OVERGEN=${OVERGEN:-6}
+OVERGEN=${OVERGEN:-60}
 
-for TASK in far sdr ser; do
+for TASK in far; do
   python dataset/build_deception_dataset.py \
     --task "$TASK" --seed "$SEED" --overgen-factor "$OVERGEN"
 done
@@ -46,3 +46,4 @@ done
 # The intersection is only complete once all three exist.
 python dataset/deception_comparison_set.py
 python dataset/deception_comparison_set.py --condition honest
+

@@ -1,0 +1,2022 @@
+{
+  "task": "far",
+  "mechanism": "fabrication",
+  "margin_thresh": 0.7,
+  "prior_eps": 0.5,
+  "pool_token_lengths": {
+    "entities": {
+      "n": 72,
+      "min": 3,
+      "mean": 3.5555555555555554,
+      "median": 4.0,
+      "p90": 4,
+      "max": 4
+    },
+    "item_words": {
+      "n": 82,
+      "min": 1,
+      "mean": 1,
+      "median": 1.0,
+      "p90": 1,
+      "max": 1
+    },
+    "pressure_flavor": {
+      "n": 20,
+      "min": 15,
+      "mean": 16.4,
+      "median": 16.0,
+      "p90": 18,
+      "max": 20
+    },
+    "pressure_shared": {
+      "n": 5,
+      "min": 12,
+      "mean": 13,
+      "median": 13,
+      "p90": 14,
+      "max": 14
+    }
+  },
+  "dropped_item_pairs": [],
+  "prompt_length": {
+    "summary": {
+      "n": 84000,
+      "min": 90,
+      "mean": 94.4112619047619,
+      "median": 94.0,
+      "p90": 97,
+      "max": 100
+    },
+    "histogram": {
+      "90": 1215,
+      "91": 5576,
+      "92": 7347,
+      "93": 10855,
+      "94": 18896,
+      "95": 15309,
+      "96": 14158,
+      "97": 6838,
+      "98": 1651,
+      "99": 1990,
+      "100": 165
+    }
+  },
+  "splits": {
+    "train": {
+      "generated": 12000,
+      "prior_balance": {
+        "kept": 4235,
+        "of": 12000,
+        "rate": 0.35291666666666666,
+        "margin": {
+          "n": 12000,
+          "mean": 0.5480729166666667,
+          "std": 0.7236752875195429,
+          "p1": -1.125,
+          "p5": -0.625,
+          "p25": 0.125,
+          "p50": 0.5,
+          "p75": 1.0,
+          "p95": 1.75,
+          "p99": 2.25
+        },
+        "drop_rate_by_item_pair": {
+          "audio/charging": 0.28125,
+          "beams/joints": 0.9066666666666666,
+          "bids/asks": 0.4819672131147541,
+          "brick/stone": 0.9965986394557823,
+          "budget/timeline": 0.6730769230769231,
+          "button/switch": 0.09556313993174059,
+          "calcium/sodium": 0.3664383561643836,
+          "capacity/coverage": 0.6203389830508474,
+          "chip/board": 0.99644128113879,
+          "client/server": 0.6506849315068493,
+          "clock/timer": 0.42087542087542085,
+          "color/finish": 0.26206896551724135,
+          "density/hardness": 0.7158273381294964,
+          "desk/chair": 0.766025641025641,
+          "doors/windows": 0.9763513513513513,
+          "fence/gate": 0.368421052631579,
+          "frontend/backend": 0.6938775510204082,
+          "funds/trusts": 0.8973509933774835,
+          "humidity/vibration": 0.3929824561403509,
+          "import/export": 0.5208333333333333,
+          "inbound/outbound": 0.8686868686868687,
+          "intake/output": 0.19723183391003463,
+          "lawn/patio": 1.0,
+          "length/width": 0.3843537414965986,
+          "lights/blinds": 0.9964539007092199,
+          "lobby/garage": 0.7938144329896908,
+          "miles/hours": 0.6210526315789473,
+          "queries/updates": 0.471830985915493,
+          "rail/road": 1.0,
+          "reads/writes": 0.3525423728813559,
+          "screen/camera": 0.5503355704697986,
+          "shares/options": 0.8206896551724138,
+          "size/shape": 0.7847222222222222,
+          "steel/glass": 1.0,
+          "stocks/bonds": 0.7428571428571429,
+          "trucks/trains": 0.5827586206896551,
+          "users/roles": 1.0,
+          "vision/hearing": 0.339041095890411,
+          "walls/floors": 0.30107526881720426,
+          "weight/height": 1.0,
+          "wire/cable": 0.5869565217391304
+        }
+      },
+      "behavioral_input": 4235,
+      "survived": 243,
+      "pass_rate": 0.05737898465171192,
+      "kept": 200,
+      "honest_kept": 200,
+      "clean_margin": {
+        "n": 4235,
+        "mean": -2.5655106257378986,
+        "std": 2.8289710490677074,
+        "p1": -9.25,
+        "p5": -7.125,
+        "p25": -4.625,
+        "p50": -2.5,
+        "p75": -0.375,
+        "p95": 1.75,
+        "p99": 3.5
+      },
+      "corrupt_margin": {
+        "n": 4235,
+        "mean": -2.558471074380165,
+        "std": 2.8200404627208644,
+        "p1": -9.0,
+        "p5": -7.0,
+        "p25": -4.625,
+        "p50": -2.625,
+        "p75": -0.375,
+        "p95": 1.75,
+        "p99": 3.75
+      }
+    },
+    "validation": {
+      "generated": 12000,
+      "prior_balance": {
+        "kept": 4266,
+        "of": 12000,
+        "rate": 0.3555,
+        "margin": {
+          "n": 12000,
+          "mean": 0.5474375,
+          "std": 0.7164290034100262,
+          "p1": -1.125,
+          "p5": -0.625,
+          "p25": 0.125,
+          "p50": 0.5,
+          "p75": 1.0,
+          "p95": 1.75,
+          "p99": 2.25
+        },
+        "drop_rate_by_item_pair": {
+          "audio/charging": 0.3231292517006803,
+          "beams/joints": 0.8782894736842105,
+          "bids/asks": 0.4742268041237113,
+          "brick/stone": 0.9930555555555556,
+          "budget/timeline": 0.6721311475409837,
+          "button/switch": 0.10652920962199308,
+          "calcium/sodium": 0.3639455782312925,
+          "capacity/coverage": 0.6351351351351351,
+          "chip/board": 1.0,
+          "client/server": 0.6413793103448275,
+          "clock/timer": 0.3966101694915254,
+          "color/finish": 0.247557003257329,
+          "density/hardness": 0.7162162162162162,
+          "desk/chair": 0.71280276816609,
+          "doors/windows": 0.979933110367893,
+          "fence/gate": 0.38754325259515576,
+          "frontend/backend": 0.7210884353741497,
+          "funds/trusts": 0.8982456140350877,
+          "humidity/vibration": 0.4184397163120568,
+          "import/export": 0.48639455782312924,
+          "inbound/outbound": 0.8668941979522184,
+          "intake/output": 0.20608108108108103,
+          "lawn/patio": 1.0,
+          "length/width": 0.4107142857142857,
+          "lights/blinds": 0.9929824561403509,
+          "lobby/garage": 0.8194444444444444,
+          "miles/hours": 0.5567375886524824,
+          "queries/updates": 0.48797250859106533,
+          "rail/road": 1.0,
+          "reads/writes": 0.33333333333333337,
+          "screen/camera": 0.5340136054421769,
+          "shares/options": 0.8408304498269896,
+          "size/shape": 0.757679180887372,
+          "steel/glass": 1.0,
+          "stocks/bonds": 0.7422680412371134,
+          "trucks/trains": 0.5641025641025641,
+          "users/roles": 1.0,
+          "vision/hearing": 0.35664335664335667,
+          "walls/floors": 0.26501766784452296,
+          "weight/height": 1.0,
+          "wire/cable": 0.6061643835616438
+        }
+      },
+      "behavioral_input": 4266,
+      "survived": 248,
+      "pass_rate": 0.058134083450539144,
+      "kept": 200,
+      "honest_kept": 200,
+      "clean_margin": {
+        "n": 4266,
+        "mean": -2.531352555086732,
+        "std": 2.865037840894991,
+        "p1": -9.125,
+        "p5": -7.125,
+        "p25": -4.625,
+        "p50": -2.5,
+        "p75": -0.25,
+        "p95": 1.75,
+        "p99": 3.5
+      },
+      "corrupt_margin": {
+        "n": 4266,
+        "mean": -2.5487283169245196,
+        "std": 2.8656853419671418,
+        "p1": -9.0,
+        "p5": -7.125,
+        "p25": -4.75,
+        "p50": -2.5,
+        "p75": -0.375,
+        "p95": 1.75,
+        "p99": 3.625
+      }
+    },
+    "test": {
+      "generated": 60000,
+      "prior_balance": {
+        "kept": 21291,
+        "of": 60000,
+        "rate": 0.35485,
+        "margin": {
+          "n": 60000,
+          "mean": 0.5468291666666667,
+          "std": 0.718113666129979,
+          "p1": -1.125,
+          "p5": -0.625,
+          "p25": 0.125,
+          "p50": 0.5,
+          "p75": 1.0,
+          "p95": 1.75,
+          "p99": 2.25
+        },
+        "drop_rate_by_item_pair": {
+          "audio/charging": 0.3342409802586793,
+          "beams/joints": 0.8602590320381731,
+          "bids/asks": 0.4911684782608695,
+          "brick/stone": 0.9884353741496599,
+          "budget/timeline": 0.6799999999999999,
+          "button/switch": 0.1095890410958904,
+          "calcium/sodium": 0.4035567715458276,
+          "capacity/coverage": 0.6284153005464481,
+          "chip/board": 0.9993160054719562,
+          "client/server": 0.6852861035422344,
+          "clock/timer": 0.42320819112627983,
+          "color/finish": 0.2347707049965777,
+          "density/hardness": 0.73187414500684,
+          "desk/chair": 0.7313738892686261,
+          "doors/windows": 0.9876712328767123,
+          "fence/gate": 0.37876712328767126,
+          "frontend/backend": 0.6858316221765914,
+          "funds/trusts": 0.901840490797546,
+          "humidity/vibration": 0.38793694311172033,
+          "import/export": 0.487688098495212,
+          "inbound/outbound": 0.8707482993197279,
+          "intake/output": 0.1994535519125683,
+          "lawn/patio": 1.0,
+          "length/width": 0.3722677595628415,
+          "lights/blinds": 0.9842465753424657,
+          "lobby/garage": 0.8028846153846154,
+          "miles/hours": 0.5688949522510232,
+          "queries/updates": 0.46409214092140927,
+          "rail/road": 1.0,
+          "reads/writes": 0.36487406398910827,
+          "screen/camera": 0.5245901639344263,
+          "shares/options": 0.8425675675675676,
+          "size/shape": 0.7851801495581238,
+          "steel/glass": 1.0,
+          "stocks/bonds": 0.7721954576737784,
+          "trucks/trains": 0.5794520547945206,
+          "users/roles": 0.9959016393442623,
+          "vision/hearing": 0.33241758241758246,
+          "walls/floors": 0.2772073921971252,
+          "weight/height": 0.9986282578875172,
+          "wire/cable": 0.5863945578231293
+        }
+      },
+      "behavioral_input": 21291,
+      "survived": 1268,
+      "pass_rate": 0.05955568080409563,
+      "kept": 1000,
+      "honest_kept": 1000,
+      "clean_margin": {
+        "n": 21291,
+        "mean": -2.562106641303837,
+        "std": 2.8608498020112796,
+        "p1": -9.125,
+        "p5": -7.125,
+        "p25": -4.75,
+        "p50": -2.5,
+        "p75": -0.375,
+        "p95": 1.75,
+        "p99": 3.625
+      },
+      "corrupt_margin": {
+        "n": 21291,
+        "mean": -2.5699679442017755,
+        "std": 2.86964676814855,
+        "p1": -9.25,
+        "p5": -7.125,
+        "p25": -4.75,
+        "p50": -2.5,
+        "p75": -0.375,
+        "p95": 1.75,
+        "p99": 3.625
+      }
+    }
+  },
+  "overall": {
+    "generated": 29792,
+    "pass_rate": 0.05904269602577873,
+    "clean_margin": {
+      "n": 29792,
+      "mean": -2.558186761546724,
+      "std": 2.8569621807526433,
+      "p1": -9.125,
+      "p5": -7.125,
+      "p25": -4.75,
+      "p50": -2.5,
+      "p75": -0.375,
+      "p95": 1.75,
+      "p99": 3.625
+    },
+    "corrupt_margin": {
+      "n": 29792,
+      "mean": -2.565292276450054,
+      "std": 2.8620899832158426,
+      "p1": -9.125,
+      "p5": -7.125,
+      "p25": -4.75,
+      "p50": -2.5,
+      "p75": -0.375,
+      "p95": 1.75,
+      "p99": 3.625
+    },
+    "unexpected_argmax_tokens": {}
+  },
+  "pass_rate_by_item_pair": {
+    "audio/charging": {
+      "passed": 0,
+      "total": 1384,
+      "rate": 0.0
+    },
+    "beams/joints": {
+      "passed": 72,
+      "total": 270,
+      "rate": 0.26666666666666666
+    },
+    "bids/asks": {
+      "passed": 12,
+      "total": 1060,
+      "rate": 0.011320754716981131
+    },
+    "brick/stone": {
+      "passed": 0,
+      "total": 20,
+      "rate": 0.0
+    },
+    "budget/timeline": {
+      "passed": 25,
+      "total": 666,
+      "rate": 0.03753753753753754
+    },
+    "button/switch": {
+      "passed": 238,
+      "total": 1825,
+      "rate": 0.1304109589041096
+    },
+    "calcium/sodium": {
+      "passed": 0,
+      "total": 1244,
+      "rate": 0.0
+    },
+    "capacity/coverage": {
+      "passed": 102,
+      "total": 764,
+      "rate": 0.13350785340314136
+    },
+    "chip/board": {
+      "passed": 0,
+      "total": 2,
+      "rate": 0.0
+    },
+    "client/server": {
+      "passed": 3,
+      "total": 668,
+      "rate": 0.004491017964071856
+    },
+    "clock/timer": {
+      "passed": 10,
+      "total": 1195,
+      "rate": 0.008368200836820083
+    },
+    "color/finish": {
+      "passed": 74,
+      "total": 1563,
+      "rate": 0.04734484964811261
+    },
+    "density/hardness": {
+      "passed": 0,
+      "total": 555,
+      "rate": 0.0
+    },
+    "desk/chair": {
+      "passed": 63,
+      "total": 549,
+      "rate": 0.11475409836065574
+    },
+    "doors/windows": {
+      "passed": 1,
+      "total": 31,
+      "rate": 0.03225806451612903
+    },
+    "fence/gate": {
+      "passed": 17,
+      "total": 1276,
+      "rate": 0.013322884012539185
+    },
+    "frontend/backend": {
+      "passed": 0,
+      "total": 631,
+      "rate": 0.0
+    },
+    "funds/trusts": {
+      "passed": 81,
+      "total": 204,
+      "rate": 0.39705882352941174
+    },
+    "humidity/vibration": {
+      "passed": 0,
+      "total": 1230,
+      "rate": 0.0
+    },
+    "import/export": {
+      "passed": 18,
+      "total": 1038,
+      "rate": 0.017341040462427744
+    },
+    "inbound/outbound": {
+      "passed": 0,
+      "total": 268,
+      "rate": 0.0
+    },
+    "intake/output": {
+      "passed": 1,
+      "total": 1639,
+      "rate": 0.0006101281269066504
+    },
+    "length/width": {
+      "passed": 0,
+      "total": 1265,
+      "rate": 0.0
+    },
+    "lights/blinds": {
+      "passed": 0,
+      "total": 26,
+      "rate": 0.0
+    },
+    "lobby/garage": {
+      "passed": 1,
+      "total": 399,
+      "rate": 0.002506265664160401
+    },
+    "miles/hours": {
+      "passed": 0,
+      "total": 865,
+      "rate": 0.0
+    },
+    "queries/updates": {
+      "passed": 145,
+      "total": 1090,
+      "rate": 0.13302752293577982
+    },
+    "reads/writes": {
+      "passed": 42,
+      "total": 1316,
+      "rate": 0.031914893617021274
+    },
+    "screen/camera": {
+      "passed": 8,
+      "total": 967,
+      "rate": 0.008273009307135471
+    },
+    "shares/options": {
+      "passed": 10,
+      "total": 331,
+      "rate": 0.030211480362537766
+    },
+    "size/shape": {
+      "passed": 24,
+      "total": 449,
+      "rate": 0.053452115812917596
+    },
+    "stocks/bonds": {
+      "passed": 169,
+      "total": 478,
+      "rate": 0.35355648535564854
+    },
+    "trucks/trains": {
+      "passed": 308,
+      "total": 871,
+      "rate": 0.35361653272101035
+    },
+    "users/roles": {
+      "passed": 0,
+      "total": 6,
+      "rate": 0.0
+    },
+    "vision/hearing": {
+      "passed": 0,
+      "total": 1349,
+      "rate": 0.0
+    },
+    "walls/floors": {
+      "passed": 274,
+      "total": 1459,
+      "rate": 0.18779986291980807
+    },
+    "weight/height": {
+      "passed": 0,
+      "total": 2,
+      "rate": 0.0
+    },
+    "wire/cable": {
+      "passed": 61,
+      "total": 837,
+      "rate": 0.07287933094384708
+    }
+  },
+  "pass_rate_by_pressure": {
+    "far_00": {
+      "passed": 30,
+      "total": 988,
+      "rate": 0.030364372469635626
+    },
+    "far_01": {
+      "passed": 43,
+      "total": 1228,
+      "rate": 0.03501628664495114
+    },
+    "far_02": {
+      "passed": 86,
+      "total": 1181,
+      "rate": 0.07281964436917866
+    },
+    "far_03": {
+      "passed": 42,
+      "total": 1429,
+      "rate": 0.02939118264520644
+    },
+    "far_04": {
+      "passed": 129,
+      "total": 1175,
+      "rate": 0.1097872340425532
+    },
+    "far_05": {
+      "passed": 51,
+      "total": 1587,
+      "rate": 0.03213610586011342
+    },
+    "far_06": {
+      "passed": 88,
+      "total": 1081,
+      "rate": 0.08140610545790934
+    },
+    "far_07": {
+      "passed": 38,
+      "total": 1120,
+      "rate": 0.033928571428571426
+    },
+    "far_08": {
+      "passed": 130,
+      "total": 1417,
+      "rate": 0.09174311926605505
+    },
+    "far_09": {
+      "passed": 82,
+      "total": 1185,
+      "rate": 0.06919831223628692
+    },
+    "far_10": {
+      "passed": 70,
+      "total": 798,
+      "rate": 0.08771929824561403
+    },
+    "far_11": {
+      "passed": 65,
+      "total": 1336,
+      "rate": 0.048652694610778445
+    },
+    "far_12": {
+      "passed": 61,
+      "total": 1421,
+      "rate": 0.04292751583391977
+    },
+    "far_13": {
+      "passed": 35,
+      "total": 1682,
+      "rate": 0.020808561236623068
+    },
+    "far_14": {
+      "passed": 114,
+      "total": 1068,
+      "rate": 0.10674157303370786
+    },
+    "far_15": {
+      "passed": 31,
+      "total": 868,
+      "rate": 0.03571428571428571
+    },
+    "far_16": {
+      "passed": 36,
+      "total": 1079,
+      "rate": 0.033364226135310475
+    },
+    "far_17": {
+      "passed": 41,
+      "total": 1225,
+      "rate": 0.03346938775510204
+    },
+    "far_18": {
+      "passed": 55,
+      "total": 1159,
+      "rate": 0.04745470232959448
+    },
+    "far_19": {
+      "passed": 50,
+      "total": 1195,
+      "rate": 0.04184100418410042
+    },
+    "shared_00": {
+      "passed": 59,
+      "total": 842,
+      "rate": 0.07007125890736342
+    },
+    "shared_01": {
+      "passed": 94,
+      "total": 1245,
+      "rate": 0.07550200803212852
+    },
+    "shared_02": {
+      "passed": 134,
+      "total": 1100,
+      "rate": 0.12181818181818181
+    },
+    "shared_03": {
+      "passed": 83,
+      "total": 973,
+      "rate": 0.08530318602261049
+    },
+    "shared_04": {
+      "passed": 112,
+      "total": 1410,
+      "rate": 0.07943262411347518
+    }
+  },
+  "pass_rate_by_entity": {
+    "Alcove Property": {
+      "passed": 25,
+      "total": 370,
+      "rate": 0.06756756756756757
+    },
+    "Aldervest Financial": {
+      "passed": 19,
+      "total": 375,
+      "rate": 0.050666666666666665
+    },
+    "Aldrix Platform": {
+      "passed": 17,
+      "total": 408,
+      "rate": 0.041666666666666664
+    },
+    "Ambrix Clinic": {
+      "passed": 31,
+      "total": 415,
+      "rate": 0.0746987951807229
+    },
+    "Ashgate Facilities": {
+      "passed": 17,
+      "total": 391,
+      "rate": 0.043478260869565216
+    },
+    "Axtem Industries": {
+      "passed": 21,
+      "total": 505,
+      "rate": 0.041584158415841586
+    },
+    "Brackton Bank": {
+      "passed": 27,
+      "total": 415,
+      "rate": 0.06506024096385542
+    },
+    "Braddox Gear": {
+      "passed": 30,
+      "total": 442,
+      "rate": 0.06787330316742081
+    },
+    "Bramwell Construction": {
+      "passed": 43,
+      "total": 416,
+      "rate": 0.10336538461538461
+    },
+    "Brellow Estates": {
+      "passed": 41,
+      "total": 379,
+      "rate": 0.10817941952506596
+    },
+    "Brinby Transit": {
+      "passed": 22,
+      "total": 434,
+      "rate": 0.05069124423963134
+    },
+    "Brindal Manufacturing": {
+      "passed": 27,
+      "total": 459,
+      "rate": 0.058823529411764705
+    },
+    "Calmet Industrial": {
+      "passed": 29,
+      "total": 473,
+      "rate": 0.0613107822410148
+    },
+    "Camborne Finance": {
+      "passed": 22,
+      "total": 408,
+      "rate": 0.05392156862745098
+    },
+    "Casden Diagnostics": {
+      "passed": 14,
+      "total": 406,
+      "rate": 0.034482758620689655
+    },
+    "Corvane Software": {
+      "passed": 22,
+      "total": 451,
+      "rate": 0.04878048780487805
+    },
+    "Crestbay Services": {
+      "passed": 27,
+      "total": 362,
+      "rate": 0.07458563535911603
+    },
+    "Denmar Software": {
+      "passed": 22,
+      "total": 397,
+      "rate": 0.055415617128463476
+    },
+    "Drayton Freight": {
+      "passed": 22,
+      "total": 393,
+      "rate": 0.05597964376590331
+    },
+    "Dunmar Fabrication": {
+      "passed": 22,
+      "total": 408,
+      "rate": 0.05392156862745098
+    },
+    "Dunmore Property": {
+      "passed": 16,
+      "total": 310,
+      "rate": 0.05161290322580645
+    },
+    "Elderton Works": {
+      "passed": 25,
+      "total": 419,
+      "rate": 0.059665871121718374
+    },
+    "Farrow Audio": {
+      "passed": 23,
+      "total": 464,
+      "rate": 0.04956896551724138
+    },
+    "Ferrolane Works": {
+      "passed": 20,
+      "total": 479,
+      "rate": 0.04175365344467641
+    },
+    "Halbrook Medical": {
+      "passed": 28,
+      "total": 338,
+      "rate": 0.08284023668639054
+    },
+    "Harkstone Builders": {
+      "passed": 24,
+      "total": 377,
+      "rate": 0.0636604774535809
+    },
+    "Idlewood Partners": {
+      "passed": 27,
+      "total": 421,
+      "rate": 0.06413301662707839
+    },
+    "Ivorra Tech": {
+      "passed": 9,
+      "total": 403,
+      "rate": 0.022332506203473945
+    },
+    "Kelmoor Construction": {
+      "passed": 36,
+      "total": 406,
+      "rate": 0.08866995073891626
+    },
+    "Kelmore Cargo": {
+      "passed": 28,
+      "total": 442,
+      "rate": 0.06334841628959276
+    },
+    "Kelvane Freight": {
+      "passed": 24,
+      "total": 429,
+      "rate": 0.055944055944055944
+    },
+    "Kestral Devices": {
+      "passed": 27,
+      "total": 458,
+      "rate": 0.05895196506550218
+    },
+    "Lumeni Electronics": {
+      "passed": 25,
+      "total": 449,
+      "rate": 0.0556792873051225
+    },
+    "Marnick Builders": {
+      "passed": 25,
+      "total": 382,
+      "rate": 0.06544502617801047
+    },
+    "Merrivale Holdings": {
+      "passed": 28,
+      "total": 410,
+      "rate": 0.06829268292682927
+    },
+    "Mistvale Systems": {
+      "passed": 20,
+      "total": 414,
+      "rate": 0.04830917874396135
+    },
+    "Nerrin Health": {
+      "passed": 26,
+      "total": 421,
+      "rate": 0.06175771971496437
+    },
+    "Nordvane Shipping": {
+      "passed": 28,
+      "total": 403,
+      "rate": 0.06947890818858561
+    },
+    "Norvell Trust": {
+      "passed": 27,
+      "total": 398,
+      "rate": 0.0678391959798995
+    },
+    "Nubex Systems": {
+      "passed": 15,
+      "total": 420,
+      "rate": 0.03571428571428571
+    },
+    "Orbik Devices": {
+      "passed": 20,
+      "total": 426,
+      "rate": 0.046948356807511735
+    },
+    "Ordway Carriers": {
+      "passed": 23,
+      "total": 421,
+      "rate": 0.05463182897862233
+    },
+    "Orlune Freight": {
+      "passed": 25,
+      "total": 439,
+      "rate": 0.05694760820045558
+    },
+    "Orvane Structures": {
+      "passed": 32,
+      "total": 411,
+      "rate": 0.07785888077858881
+    },
+    "Ostara Clinic": {
+      "passed": 14,
+      "total": 379,
+      "rate": 0.036939313984168866
+    },
+    "Ovren Metalworks": {
+      "passed": 17,
+      "total": 441,
+      "rate": 0.03854875283446712
+    },
+    "Pelhurst Medical": {
+      "passed": 25,
+      "total": 395,
+      "rate": 0.06329113924050633
+    },
+    "Pellam Contracting": {
+      "passed": 25,
+      "total": 389,
+      "rate": 0.06426735218508997
+    },
+    "Perlon Suite": {
+      "passed": 27,
+      "total": 381,
+      "rate": 0.07086614173228346
+    },
+    "Pindle Audio": {
+      "passed": 14,
+      "total": 375,
+      "rate": 0.037333333333333336
+    },
+    "Pinevale Trust": {
+      "passed": 31,
+      "total": 405,
+      "rate": 0.07654320987654321
+    },
+    "Quilby Electronics": {
+      "passed": 22,
+      "total": 446,
+      "rate": 0.04932735426008968
+    },
+    "Quorral Data": {
+      "passed": 28,
+      "total": 462,
+      "rate": 0.06060606060606061
+    },
+    "Rensmith Works": {
+      "passed": 19,
+      "total": 377,
+      "rate": 0.050397877984084884
+    },
+    "Ridgeport Facilities": {
+      "passed": 23,
+      "total": 398,
+      "rate": 0.05778894472361809
+    },
+    "Sable Ridge Capital": {
+      "passed": 24,
+      "total": 412,
+      "rate": 0.05825242718446602
+    },
+    "Selby Grounds": {
+      "passed": 32,
+      "total": 383,
+      "rate": 0.0835509138381201
+    },
+    "Stonecleft Group": {
+      "passed": 17,
+      "total": 407,
+      "rate": 0.04176904176904177
+    },
+    "Talvern Logistics": {
+      "passed": 17,
+      "total": 401,
+      "rate": 0.04239401496259352
+    },
+    "Tamsel Tech": {
+      "passed": 32,
+      "total": 481,
+      "rate": 0.06652806652806653
+    },
+    "Tenmark Services": {
+      "passed": 22,
+      "total": 366,
+      "rate": 0.060109289617486336
+    },
+    "Thessin Cloud": {
+      "passed": 38,
+      "total": 454,
+      "rate": 0.08370044052863436
+    },
+    "Trellin Health": {
+      "passed": 30,
+      "total": 409,
+      "rate": 0.07334963325183375
+    },
+    "Turnbrook Mills": {
+      "passed": 19,
+      "total": 389,
+      "rate": 0.04884318766066838
+    },
+    "Verrick Buildings": {
+      "passed": 31,
+      "total": 434,
+      "rate": 0.07142857142857142
+    },
+    "Vessik Lines": {
+      "passed": 35,
+      "total": 486,
+      "rate": 0.0720164609053498
+    },
+    "Voltar Forge": {
+      "passed": 15,
+      "total": 429,
+      "rate": 0.03496503496503497
+    },
+    "Vossridge Build": {
+      "passed": 11,
+      "total": 353,
+      "rate": 0.031161473087818695
+    },
+    "Weldam Care": {
+      "passed": 24,
+      "total": 405,
+      "rate": 0.05925925925925926
+    },
+    "Wexbourne Capital": {
+      "passed": 43,
+      "total": 474,
+      "rate": 0.09071729957805907
+    },
+    "Wyndel Home": {
+      "passed": 17,
+      "total": 356,
+      "rate": 0.047752808988764044
+    },
+    "Yarrow Medical": {
+      "passed": 26,
+      "total": 458,
+      "rate": 0.056768558951965066
+    }
+  },
+  "pass_rate_by_domain": {
+    "construction": {
+      "passed": 238,
+      "total": 3560,
+      "rate": 0.06685393258426967
+    },
+    "consumer hardware": {
+      "passed": 210,
+      "total": 3897,
+      "rate": 0.05388760585065435
+    },
+    "enterprise software": {
+      "passed": 198,
+      "total": 3790,
+      "rate": 0.05224274406332454
+    },
+    "facilities": {
+      "passed": 234,
+      "total": 3393,
+      "rate": 0.06896551724137931
+    },
+    "finance": {
+      "passed": 248,
+      "total": 3718,
+      "rate": 0.06670252824098978
+    },
+    "healthcare": {
+      "passed": 218,
+      "total": 3626,
+      "rate": 0.06012134583563155
+    },
+    "logistics": {
+      "passed": 224,
+      "total": 3848,
+      "rate": 0.058212058212058215
+    },
+    "manufacturing": {
+      "passed": 189,
+      "total": 3960,
+      "rate": 0.04772727272727273
+    }
+  },
+  "pass_rate_by_designation_polarity": {
+    "identity": {
+      "passed": 1759,
+      "total": 14992,
+      "rate": 0.11732924226254002
+    },
+    "inversion": {
+      "passed": 0,
+      "total": 14800,
+      "rate": 0.0
+    }
+  },
+  "pass_rate_by_item_polarity": {
+    "1": {
+      "passed": 905,
+      "total": 14878,
+      "rate": 0.06082806828874849
+    },
+    "2": {
+      "passed": 854,
+      "total": 14914,
+      "rate": 0.057261633364623844
+    }
+  },
+  "pass_rate_by_template_variant": {
+    "audit": {
+      "passed": 1690,
+      "total": 16083,
+      "rate": 0.10507989802897469
+    },
+    "lab": {
+      "passed": 69,
+      "total": 13709,
+      "rate": 0.005033189875264425
+    }
+  },
+  "honest_marginal_match": {
+    "train": {
+      "n_pool": 1000,
+      "n_reference": 200,
+      "n_selected": 200,
+      "target": {
+        "item_pair": {
+          "button/switch": 23,
+          "stocks/bonds": 21,
+          "color/finish": 5,
+          "funds/trusts": 11,
+          "screen/camera": 1,
+          "trucks/trains": 41,
+          "capacity/coverage": 16,
+          "walls/floors": 32,
+          "desk/chair": 9,
+          "queries/updates": 16,
+          "wire/cable": 4,
+          "budget/timeline": 2,
+          "reads/writes": 6,
+          "import/export": 3,
+          "intake/output": 1,
+          "bids/asks": 1,
+          "shares/options": 2,
+          "beams/joints": 2,
+          "size/shape": 2,
+          "client/server": 1,
+          "fence/gate": 1
+        },
+        "pressure_id": {
+          "shared_00": 7,
+          "far_15": 4,
+          "far_14": 17,
+          "far_13": 5,
+          "far_05": 6,
+          "shared_01": 6,
+          "shared_02": 11,
+          "far_02": 10,
+          "far_01": 6,
+          "far_16": 6,
+          "far_08": 14,
+          "far_11": 6,
+          "shared_03": 12,
+          "shared_04": 17,
+          "far_10": 5,
+          "far_06": 11,
+          "far_04": 14,
+          "far_18": 5,
+          "far_17": 3,
+          "far_12": 9,
+          "far_09": 9,
+          "far_03": 4,
+          "far_07": 5,
+          "far_00": 3,
+          "far_19": 5
+        },
+        "item_polarity": {
+          "2": 100,
+          "1": 100
+        },
+        "designation_polarity": {
+          "identity": 200
+        },
+        "template_variant": {
+          "audit": 192,
+          "lab": 8
+        }
+      },
+      "before": {
+        "item_pair": {
+          "wire/cable": 27,
+          "humidity/vibration": 75,
+          "desk/chair": 14,
+          "trucks/trains": 26,
+          "calcium/sodium": 62,
+          "screen/camera": 35,
+          "stocks/bonds": 22,
+          "vision/hearing": 55,
+          "client/server": 22,
+          "fence/gate": 41,
+          "length/width": 60,
+          "intake/output": 39,
+          "density/hardness": 25,
+          "funds/trusts": 5,
+          "audio/charging": 35,
+          "inbound/outbound": 5,
+          "color/finish": 37,
+          "frontend/backend": 36,
+          "walls/floors": 57,
+          "capacity/coverage": 25,
+          "miles/hours": 25,
+          "import/export": 35,
+          "queries/updates": 26,
+          "clock/timer": 31,
+          "shares/options": 13,
+          "button/switch": 58,
+          "bids/asks": 25,
+          "beams/joints": 7,
+          "reads/writes": 37,
+          "budget/timeline": 16,
+          "lobby/garage": 9,
+          "size/shape": 13,
+          "lights/blinds": 1,
+          "doors/windows": 1
+        },
+        "pressure_id": {
+          "shared_02": 39,
+          "far_06": 40,
+          "far_18": 29,
+          "shared_03": 24,
+          "shared_04": 43,
+          "far_02": 46,
+          "far_19": 42,
+          "far_08": 44,
+          "shared_01": 33,
+          "far_12": 57,
+          "far_04": 34,
+          "shared_00": 21,
+          "far_00": 24,
+          "far_10": 32,
+          "far_01": 40,
+          "far_05": 56,
+          "far_07": 46,
+          "far_09": 49,
+          "far_17": 38,
+          "far_16": 39,
+          "far_03": 46,
+          "far_13": 68,
+          "far_15": 36,
+          "far_14": 33,
+          "far_11": 41
+        },
+        "item_polarity": {
+          "1": 503,
+          "2": 497
+        },
+        "designation_polarity": {
+          "inversion": 768,
+          "identity": 232
+        },
+        "template_variant": {
+          "audit": 463,
+          "lab": 537
+        }
+      },
+      "after": {
+        "item_pair": {
+          "vision/hearing": 12,
+          "humidity/vibration": 17,
+          "frontend/backend": 18,
+          "client/server": 4,
+          "length/width": 12,
+          "calcium/sodium": 14,
+          "lobby/garage": 2,
+          "miles/hours": 1,
+          "audio/charging": 2,
+          "walls/floors": 24,
+          "trucks/trains": 23,
+          "button/switch": 15,
+          "stocks/bonds": 13,
+          "capacity/coverage": 9,
+          "desk/chair": 6,
+          "import/export": 3,
+          "queries/updates": 7,
+          "wire/cable": 3,
+          "clock/timer": 3,
+          "screen/camera": 2,
+          "fence/gate": 2,
+          "funds/trusts": 3,
+          "size/shape": 1,
+          "density/hardness": 1,
+          "beams/joints": 1,
+          "bids/asks": 1,
+          "color/finish": 1
+        },
+        "pressure_id": {
+          "far_14": 15,
+          "shared_04": 15,
+          "far_08": 12,
+          "far_04": 10,
+          "shared_03": 11,
+          "shared_02": 9,
+          "far_06": 10,
+          "far_02": 10,
+          "far_12": 10,
+          "far_09": 9,
+          "shared_00": 6,
+          "far_11": 7,
+          "far_01": 6,
+          "far_16": 5,
+          "far_05": 6,
+          "far_13": 13,
+          "far_10": 5,
+          "far_18": 6,
+          "far_19": 6,
+          "far_07": 5,
+          "far_15": 5,
+          "far_17": 4,
+          "far_03": 5,
+          "far_00": 4,
+          "shared_01": 6
+        },
+        "item_polarity": {
+          "1": 100,
+          "2": 100
+        },
+        "designation_polarity": {
+          "identity": 130,
+          "inversion": 70
+        },
+        "template_variant": {
+          "audit": 131,
+          "lab": 69
+        }
+      },
+      "reference": {
+        "item_pair": {
+          "button/switch": 23,
+          "stocks/bonds": 21,
+          "color/finish": 5,
+          "funds/trusts": 11,
+          "screen/camera": 1,
+          "trucks/trains": 41,
+          "capacity/coverage": 16,
+          "walls/floors": 32,
+          "desk/chair": 9,
+          "queries/updates": 16,
+          "wire/cable": 4,
+          "budget/timeline": 2,
+          "reads/writes": 6,
+          "import/export": 3,
+          "intake/output": 1,
+          "bids/asks": 1,
+          "shares/options": 2,
+          "beams/joints": 2,
+          "size/shape": 2,
+          "client/server": 1,
+          "fence/gate": 1
+        },
+        "pressure_id": {
+          "shared_00": 7,
+          "far_15": 4,
+          "far_14": 17,
+          "far_13": 5,
+          "far_05": 6,
+          "shared_01": 6,
+          "shared_02": 11,
+          "far_02": 10,
+          "far_01": 6,
+          "far_16": 6,
+          "far_08": 14,
+          "far_11": 6,
+          "shared_03": 12,
+          "shared_04": 17,
+          "far_10": 5,
+          "far_06": 11,
+          "far_04": 14,
+          "far_18": 5,
+          "far_17": 3,
+          "far_12": 9,
+          "far_09": 9,
+          "far_03": 4,
+          "far_07": 5,
+          "far_00": 3,
+          "far_19": 5
+        },
+        "item_polarity": {
+          "2": 100,
+          "1": 100
+        },
+        "designation_polarity": {
+          "identity": 200
+        },
+        "template_variant": {
+          "audit": 192,
+          "lab": 8
+        }
+      },
+      "entity_overlap": 61,
+      "n_harvested": 2678
+    },
+    "validation": {
+      "n_pool": 1000,
+      "n_reference": 200,
+      "n_selected": 200,
+      "target": {
+        "item_pair": {
+          "capacity/coverage": 12,
+          "button/switch": 26,
+          "color/finish": 10,
+          "queries/updates": 19,
+          "stocks/bonds": 22,
+          "funds/trusts": 8,
+          "fence/gate": 1,
+          "trucks/trains": 38,
+          "walls/floors": 27,
+          "desk/chair": 9,
+          "beams/joints": 8,
+          "budget/timeline": 2,
+          "clock/timer": 1,
+          "shares/options": 3,
+          "reads/writes": 3,
+          "wire/cable": 6,
+          "import/export": 1,
+          "size/shape": 3,
+          "screen/camera": 1
+        },
+        "pressure_id": {
+          "far_10": 8,
+          "shared_03": 8,
+          "shared_02": 20,
+          "far_04": 13,
+          "far_16": 4,
+          "shared_01": 16,
+          "far_02": 9,
+          "far_11": 10,
+          "far_01": 1,
+          "far_06": 9,
+          "far_19": 7,
+          "far_08": 14,
+          "far_17": 5,
+          "far_14": 11,
+          "far_12": 9,
+          "far_18": 8,
+          "far_15": 6,
+          "shared_00": 3,
+          "far_13": 4,
+          "shared_04": 15,
+          "far_07": 5,
+          "far_09": 6,
+          "far_03": 4,
+          "far_00": 1,
+          "far_05": 4
+        },
+        "item_polarity": {
+          "1": 97,
+          "2": 103
+        },
+        "designation_polarity": {
+          "identity": 200
+        },
+        "template_variant": {
+          "audit": 194,
+          "lab": 6
+        }
+      },
+      "before": {
+        "item_pair": {
+          "calcium/sodium": 64,
+          "vision/hearing": 58,
+          "walls/floors": 47,
+          "color/finish": 43,
+          "bids/asks": 37,
+          "capacity/coverage": 19,
+          "client/server": 23,
+          "reads/writes": 46,
+          "audio/charging": 37,
+          "humidity/vibration": 58,
+          "import/export": 38,
+          "fence/gate": 45,
+          "screen/camera": 33,
+          "button/switch": 48,
+          "density/hardness": 20,
+          "intake/output": 39,
+          "queries/updates": 32,
+          "length/width": 49,
+          "stocks/bonds": 20,
+          "miles/hours": 36,
+          "lobby/garage": 18,
+          "trucks/trains": 21,
+          "budget/timeline": 17,
+          "size/shape": 15,
+          "wire/cable": 25,
+          "clock/timer": 34,
+          "frontend/backend": 30,
+          "desk/chair": 19,
+          "doors/windows": 1,
+          "shares/options": 9,
+          "beams/joints": 5,
+          "funds/trusts": 5,
+          "inbound/outbound": 8,
+          "brick/stone": 1
+        },
+        "pressure_id": {
+          "far_13": 55,
+          "far_02": 31,
+          "far_08": 54,
+          "shared_03": 34,
+          "far_10": 23,
+          "far_09": 39,
+          "far_18": 50,
+          "far_05": 57,
+          "far_12": 59,
+          "far_01": 39,
+          "shared_01": 52,
+          "shared_00": 34,
+          "shared_04": 54,
+          "far_03": 46,
+          "far_16": 33,
+          "far_15": 33,
+          "far_17": 34,
+          "far_04": 41,
+          "far_00": 30,
+          "far_06": 37,
+          "far_07": 30,
+          "far_14": 30,
+          "far_19": 35,
+          "shared_02": 35,
+          "far_11": 35
+        },
+        "item_polarity": {
+          "1": 499,
+          "2": 501
+        },
+        "designation_polarity": {
+          "inversion": 802,
+          "identity": 198
+        },
+        "template_variant": {
+          "audit": 478,
+          "lab": 522
+        }
+      },
+      "after": {
+        "item_pair": {
+          "length/width": 11,
+          "humidity/vibration": 15,
+          "frontend/backend": 12,
+          "calcium/sodium": 17,
+          "client/server": 2,
+          "lobby/garage": 3,
+          "density/hardness": 1,
+          "miles/hours": 9,
+          "vision/hearing": 10,
+          "trucks/trains": 15,
+          "walls/floors": 19,
+          "button/switch": 18,
+          "stocks/bonds": 13,
+          "queries/updates": 11,
+          "capacity/coverage": 6,
+          "color/finish": 4,
+          "screen/camera": 4,
+          "desk/chair": 3,
+          "wire/cable": 4,
+          "fence/gate": 5,
+          "beams/joints": 2,
+          "import/export": 5,
+          "clock/timer": 2,
+          "reads/writes": 2,
+          "size/shape": 2,
+          "inbound/outbound": 1,
+          "shares/options": 2,
+          "budget/timeline": 1,
+          "funds/trusts": 1
+        },
+        "pressure_id": {
+          "shared_01": 15,
+          "shared_04": 14,
+          "far_08": 14,
+          "far_04": 12,
+          "far_11": 9,
+          "far_02": 8,
+          "far_14": 10,
+          "far_06": 8,
+          "far_10": 8,
+          "far_15": 6,
+          "far_12": 9,
+          "far_18": 8,
+          "shared_03": 7,
+          "far_05": 8,
+          "far_16": 4,
+          "far_13": 8,
+          "shared_00": 5,
+          "far_09": 6,
+          "far_00": 3,
+          "far_17": 5,
+          "far_07": 4,
+          "far_01": 5,
+          "far_19": 7,
+          "far_03": 5,
+          "shared_02": 12
+        },
+        "item_polarity": {
+          "2": 103,
+          "1": 97
+        },
+        "designation_polarity": {
+          "identity": 125,
+          "inversion": 75
+        },
+        "template_variant": {
+          "audit": 128,
+          "lab": 72
+        }
+      },
+      "reference": {
+        "item_pair": {
+          "capacity/coverage": 12,
+          "button/switch": 26,
+          "color/finish": 10,
+          "queries/updates": 19,
+          "stocks/bonds": 22,
+          "funds/trusts": 8,
+          "fence/gate": 1,
+          "trucks/trains": 38,
+          "walls/floors": 27,
+          "desk/chair": 9,
+          "beams/joints": 8,
+          "budget/timeline": 2,
+          "clock/timer": 1,
+          "shares/options": 3,
+          "reads/writes": 3,
+          "wire/cable": 6,
+          "import/export": 1,
+          "size/shape": 3,
+          "screen/camera": 1
+        },
+        "pressure_id": {
+          "far_10": 8,
+          "shared_03": 8,
+          "shared_02": 20,
+          "far_04": 13,
+          "far_16": 4,
+          "shared_01": 16,
+          "far_02": 9,
+          "far_11": 10,
+          "far_01": 1,
+          "far_06": 9,
+          "far_19": 7,
+          "far_08": 14,
+          "far_17": 5,
+          "far_14": 11,
+          "far_12": 9,
+          "far_18": 8,
+          "far_15": 6,
+          "shared_00": 3,
+          "far_13": 4,
+          "shared_04": 15,
+          "far_07": 5,
+          "far_09": 6,
+          "far_03": 4,
+          "far_00": 1,
+          "far_05": 4
+        },
+        "item_polarity": {
+          "1": 97,
+          "2": 103
+        },
+        "designation_polarity": {
+          "identity": 200
+        },
+        "template_variant": {
+          "audit": 194,
+          "lab": 6
+        }
+      },
+      "entity_overlap": 65,
+      "n_harvested": 2657
+    },
+    "test": {
+      "n_pool": 5000,
+      "n_reference": 1000,
+      "n_selected": 1000,
+      "target": {
+        "item_pair": {
+          "trucks/trains": 175,
+          "walls/floors": 156,
+          "stocks/bonds": 92,
+          "button/switch": 133,
+          "capacity/coverage": 55,
+          "budget/timeline": 15,
+          "queries/updates": 82,
+          "wire/cable": 39,
+          "reads/writes": 25,
+          "color/finish": 46,
+          "import/export": 10,
+          "clock/timer": 6,
+          "beams/joints": 44,
+          "fence/gate": 10,
+          "funds/trusts": 42,
+          "shares/options": 4,
+          "size/shape": 15,
+          "desk/chair": 35,
+          "screen/camera": 4,
+          "client/server": 2,
+          "bids/asks": 8,
+          "lobby/garage": 1,
+          "doors/windows": 1
+        },
+        "pressure_id": {
+          "far_06": 46,
+          "far_09": 53,
+          "far_11": 33,
+          "shared_04": 57,
+          "shared_01": 55,
+          "far_07": 23,
+          "far_13": 23,
+          "far_02": 46,
+          "shared_03": 47,
+          "shared_00": 35,
+          "far_08": 79,
+          "far_14": 62,
+          "far_12": 33,
+          "far_04": 73,
+          "shared_02": 83,
+          "far_03": 27,
+          "far_05": 29,
+          "far_10": 39,
+          "far_00": 21,
+          "far_19": 24,
+          "far_17": 20,
+          "far_01": 28,
+          "far_18": 33,
+          "far_16": 18,
+          "far_15": 13
+        },
+        "item_polarity": {
+          "1": 518,
+          "2": 482
+        },
+        "designation_polarity": {
+          "identity": 1000
+        },
+        "template_variant": {
+          "audit": 954,
+          "lab": 46
+        }
+      },
+      "before": {
+        "item_pair": {
+          "client/server": 98,
+          "density/hardness": 102,
+          "color/finish": 213,
+          "intake/output": 211,
+          "inbound/outbound": 38,
+          "vision/hearing": 294,
+          "lobby/garage": 70,
+          "calcium/sodium": 323,
+          "length/width": 262,
+          "miles/hours": 144,
+          "size/shape": 67,
+          "button/switch": 225,
+          "import/export": 159,
+          "audio/charging": 212,
+          "reads/writes": 180,
+          "humidity/vibration": 341,
+          "capacity/coverage": 127,
+          "frontend/backend": 183,
+          "queries/updates": 130,
+          "screen/camera": 149,
+          "budget/timeline": 93,
+          "desk/chair": 91,
+          "fence/gate": 242,
+          "clock/timer": 200,
+          "wire/cable": 150,
+          "walls/floors": 267,
+          "bids/asks": 130,
+          "trucks/trains": 112,
+          "funds/trusts": 27,
+          "stocks/bonds": 67,
+          "beams/joints": 33,
+          "shares/options": 51,
+          "brick/stone": 4,
+          "lights/blinds": 3,
+          "doors/windows": 1,
+          "users/roles": 1
+        },
+        "pressure_id": {
+          "far_08": 250,
+          "far_06": 175,
+          "far_07": 194,
+          "far_11": 234,
+          "far_04": 225,
+          "far_10": 121,
+          "shared_01": 213,
+          "far_17": 187,
+          "far_09": 195,
+          "far_14": 200,
+          "shared_03": 179,
+          "far_03": 212,
+          "far_16": 178,
+          "far_00": 192,
+          "shared_00": 162,
+          "far_12": 236,
+          "far_05": 225,
+          "far_18": 195,
+          "far_01": 191,
+          "far_19": 187,
+          "far_13": 285,
+          "far_02": 213,
+          "shared_02": 182,
+          "shared_04": 211,
+          "far_15": 158
+        },
+        "item_polarity": {
+          "2": 2611,
+          "1": 2389
+        },
+        "designation_polarity": {
+          "inversion": 3892,
+          "identity": 1108
+        },
+        "template_variant": {
+          "audit": 2399,
+          "lab": 2601
+        }
+      },
+      "after": {
+        "item_pair": {
+          "lobby/garage": 15,
+          "humidity/vibration": 120,
+          "frontend/backend": 88,
+          "calcium/sodium": 100,
+          "vision/hearing": 45,
+          "length/width": 50,
+          "miles/hours": 20,
+          "reads/writes": 2,
+          "density/hardness": 7,
+          "client/server": 7,
+          "fence/gate": 12,
+          "import/export": 10,
+          "audio/charging": 5,
+          "walls/floors": 118,
+          "trucks/trains": 90,
+          "button/switch": 90,
+          "stocks/bonds": 50,
+          "capacity/coverage": 30,
+          "queries/updates": 42,
+          "wire/cable": 22,
+          "clock/timer": 13,
+          "desk/chair": 10,
+          "beams/joints": 7,
+          "budget/timeline": 8,
+          "screen/camera": 8,
+          "bids/asks": 6,
+          "color/finish": 10,
+          "size/shape": 7,
+          "funds/trusts": 5,
+          "inbound/outbound": 1,
+          "shares/options": 2
+        },
+        "pressure_id": {
+          "shared_02": 64,
+          "far_08": 75,
+          "far_04": 69,
+          "far_14": 58,
+          "shared_04": 53,
+          "shared_01": 51,
+          "far_09": 50,
+          "far_11": 32,
+          "shared_03": 43,
+          "far_02": 43,
+          "far_06": 43,
+          "far_10": 32,
+          "shared_00": 33,
+          "far_18": 32,
+          "far_12": 44,
+          "far_13": 52,
+          "far_05": 27,
+          "far_01": 27,
+          "far_19": 28,
+          "far_07": 22,
+          "far_03": 25,
+          "far_00": 30,
+          "far_17": 20,
+          "far_16": 27,
+          "far_15": 20
+        },
+        "item_polarity": {
+          "1": 517,
+          "2": 483
+        },
+        "designation_polarity": {
+          "identity": 671,
+          "inversion": 329
+        },
+        "template_variant": {
+          "audit": 664,
+          "lab": 336
+        }
+      },
+      "reference": {
+        "item_pair": {
+          "trucks/trains": 175,
+          "walls/floors": 156,
+          "stocks/bonds": 92,
+          "button/switch": 133,
+          "capacity/coverage": 55,
+          "budget/timeline": 15,
+          "queries/updates": 82,
+          "wire/cable": 39,
+          "reads/writes": 25,
+          "color/finish": 46,
+          "import/export": 10,
+          "clock/timer": 6,
+          "beams/joints": 44,
+          "fence/gate": 10,
+          "funds/trusts": 42,
+          "shares/options": 4,
+          "size/shape": 15,
+          "desk/chair": 35,
+          "screen/camera": 4,
+          "client/server": 2,
+          "bids/asks": 8,
+          "lobby/garage": 1,
+          "doors/windows": 1
+        },
+        "pressure_id": {
+          "far_06": 46,
+          "far_09": 53,
+          "far_11": 33,
+          "shared_04": 57,
+          "shared_01": 55,
+          "far_07": 23,
+          "far_13": 23,
+          "far_02": 46,
+          "shared_03": 47,
+          "shared_00": 35,
+          "far_08": 79,
+          "far_14": 62,
+          "far_12": 33,
+          "far_04": 73,
+          "shared_02": 83,
+          "far_03": 27,
+          "far_05": 29,
+          "far_10": 39,
+          "far_00": 21,
+          "far_19": 24,
+          "far_17": 20,
+          "far_01": 28,
+          "far_18": 33,
+          "far_16": 18,
+          "far_15": 13
+        },
+        "item_polarity": {
+          "1": 518,
+          "2": 482
+        },
+        "designation_polarity": {
+          "identity": 1000
+        },
+        "template_variant": {
+          "audit": 954,
+          "lab": 46
+        }
+      },
+      "entity_overlap": 72,
+      "n_harvested": 13343
+    }
+  },
+  "comparison_set": {
+    "tasks_available": [
+      "far",
+      "sdr",
+      "ser"
+    ],
+    "complete": true,
+    "splits": {
+      "train": {
+        "per_task_sizes": {
+          "far": 200,
+          "sdr": 200,
+          "ser": 2
+        },
+        "intersection_size": 0
+      },
+      "validation": {
+        "per_task_sizes": {
+          "far": 200,
+          "sdr": 200,
+          "ser": 1
+        },
+        "intersection_size": 0
+      },
+      "test": {
+        "per_task_sizes": {
+          "far": 1000,
+          "sdr": 1000,
+          "ser": 7
+        },
+        "intersection_size": 0
+      }
+    },
+    "ignoring_splits": {
+      "per_task_sizes": {
+        "far": 1400,
+        "sdr": 1400,
+        "ser": 10
+      },
+      "intersection_size": 0
+    }
+  }
+}

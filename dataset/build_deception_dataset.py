@@ -73,7 +73,7 @@ def build_parser():
                         "before filtering. STD needed 60 at a ~2%% pass rate; "
                         "set it from the pilot's measured pass rate.")
     p.add_argument("--max-seq-length", type=int, default=dc.MAX_SEQ_LENGTH)
-    p.add_argument("--margin-thresh", type=float, default=1.0,
+    p.add_argument("--margin-thresh", type=float, default=0.7,
                    help="Minimum logit margin required in both streams; "
                         "persisted to dataset_config.json.")
     p.add_argument("--prior-eps", type=float, default=0.5,
@@ -282,6 +282,9 @@ def main(argv=None):
     from transformers import AutoTokenizer
     hf_token = resolve_hf_token(args)
     tokenizer = AutoTokenizer.from_pretrained(args.model, token=hf_token)
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
+        tokenizer.pad_token_id = tokenizer.eos_token_id
 
     print("=" * 70)
     print(f"  BUILDING {spec.display_name} — mechanism: {spec.mechanism}")

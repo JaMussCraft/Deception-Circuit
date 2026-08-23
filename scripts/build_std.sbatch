@@ -19,6 +19,8 @@ mkdir -p logs
 cd "${SLURM_SUBMIT_DIR:-.}"
 
 # Activate your environment here if needed, e.g.:
+set +u
 source ~/.bashrc && conda activate mgnp
+set -u
 python dataset/build_std_dataset.py --statement-source azaria
 python dataset/build_std_dataset.py --statement-source neutral

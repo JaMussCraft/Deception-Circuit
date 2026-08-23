@@ -17,15 +17,15 @@
 # The same --seed in all three builds is what makes the triplets matched; the
 # honest twins are harvested in the same pass, so no second sweep is needed.
 #
-#SBATCH --job-name=build-deception
+#SBATCH --job-name=build-ser-test
 #SBATCH --account=beto-delta-gpu
 #SBATCH --partition=gpuA40x4
 #SBATCH --nodes=1
 #SBATCH --gpus-per-node=1
 #SBATCH --cpus-per-task=1
-#SBATCH --mem=64G
-#SBATCH --time=05:00:00
-#SBATCH --output=logs/build_deception_%j.out
+#SBATCH --mem=32G
+#SBATCH --time=00:30:00
+#SBATCH --output=logs/build_ser_test%j.out
 
 set -euo pipefail
 mkdir -p logs
@@ -38,7 +38,7 @@ set -u
 SEED=${SEED:-42}
 OVERGEN=${OVERGEN:-6}
 
-for TASK in far sdr ser; do
+for TASK in ser; do
   python dataset/build_deception_dataset.py \
     --task "$TASK" --seed "$SEED" --overgen-factor "$OVERGEN"
 done
