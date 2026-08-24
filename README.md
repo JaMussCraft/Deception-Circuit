@@ -213,13 +213,14 @@ compression, and a GPU memory map.
 
 `train.py` evaluates the node-pruned circuit once, in-process, right after
 pruning. `evaluate_circuit.py` rebuilds it later from `active_nodes.json`
-(the `masks` object) and asks three questions:
+(the `masks` object) and asks four questions:
 
 | evaluation | question |
 |------------|----------|
 | `sanity`   | Does the saved mask reproduce the numbers the run reported? |
 | `knockout` | Is the circuit *necessary* — does removing it stop the behaviour, and what does that cost on unrelated text? |
 | `null`     | Does a size-matched **random** circuit do just as well? |
+| `pressure` | Does the behaviour need the pressure clause, or is the circuit just reading the last sentence of the system prompt? |
 
 ```bash
 # Validate the circuit, build all 50 random circuits, estimate the runtime.
@@ -246,6 +247,22 @@ python evaluate_circuit.py outputs/llama-8b-instruct_std/nls0.8_noedge_260722-16
 sbatch scripts/evaluate_circuit.sbatch <run_dir> --ablation mean
 ```
 
+`knockout` also re-runs its three configurations on an **honest-instructed**
+variant of the same prompts, and emits open generations on wikitext for the
+full model, the knockout and the circuit alone (`--gen-examples`,
+`--gen-new-tokens`). Read the `full` column of those generations first: fluent
+wikitext there is what says the generation loop itself is sound.
+
+**Under a prompt variant the metrics read backwards.** `pressure` and the
+honest-instruction section of `knockout` rebuild the prompts with the pressure
+clause dropped or replaced, and keep the labels exactly as they were — the
+deceptive answer stays the "target". A model that stops being deceptive once
+the pressure is gone therefore shows *falling* accuracy and a *negative* logit
+diff, and that is the result the control is looking for. `pressure` reports
+accuracy and logit diff only: the full model under a variant is a different
+distribution, so a KL column there would invite a cross-variant comparison
+nothing supports.
+
 **`--ablation` means different things in different evaluations.** `sanity` and
 `null` fill the *complement* of a ~1%-of-model circuit, so `zero`/`mean` there
 means "zero/mean-ablate ~99% of the model" — the standard, much harsher
@@ -260,14 +277,60 @@ lets `--null-start/--null-count` shard the null across an sbatch array without
 changing a single number. They are not serialised; `random_circuits.json`
 records the seed and counts, and the set is exactly regenerable.
 
+### More than one circuit, more than one task
+
+Bind circuits to names and the same CLI evaluates any expression over them
+against any set of tasks — one process, one model load:
+
+```bash
+# Faithfulness matrix: three mechanism circuits x their three tasks.
+python evaluate_circuit.py \
+    --circuit far=outputs/llama-8b-instruct_far/<run_dir> \
+    --circuit sdr=outputs/llama-8b-instruct_sdr/<run_dir> \
+    --circuit ser=outputs/llama-8b-instruct_ser/<run_dir> \
+    --task far --task sdr --task ser --suite-name mechanism-matrix
+
+# Is the shared core sufficient on its own?
+python evaluate_circuit.py --circuit far=... --circuit sdr=... --circuit ser=... \
+    --expr 'shared=far & sdr & ser' --task far --task sdr --task ser
+
+# Specificity asymmetry: the exclusive family, six circuits x three tasks.
+python evaluate_circuit.py --circuit far=... --circuit sdr=... --circuit ser=... \
+    --xor far,sdr,ser --task far --task sdr --task ser
+```
+
+Expressions take `|` union, `&` intersection, `\` (or `-`) difference and
+parentheses — quote them, since every one of those characters means something
+to the shell as well. `--all-pairs-delta` is shorthand for every ordered
+`X\Y`.
+
+**Set membership has two readings, and both are computed.**
+`--compose-granularity leaf` composes the finest gates (attention neurons, MLP
+units); `head` composes heads and MLP blocks. Two circuits can share every head
+and almost no neuron, so the default `both` evaluates each expression twice, as
+separate cells suffixed `__leaf` and `__head`. Coarse gates are re-derived
+bottom-up from whatever the composition leaves open, so a composed circuit is
+always hierarchy-valid.
+
+`--task NAME` inherits the model and data directory from the bound circuits and
+uses that task's default hyperparameters; `--task-from <run_dir>` inherits an
+existing run's dataset arguments instead. `sanity` has nothing to compare
+against on a cell whose circuit was not trained on that task, or on a composed
+circuit, so it skips itself there with the reason recorded.
+
+`--dry-run` prints the resolved circuits, the tasks, the cell grid and a
+per-stage runtime estimate without loading a model — worth doing before every
+suite, since the grid is a product and a cell is not cheap.
+
 Useful knobs: `--evals`, `--n-random`, `--test-samples`, `--wikitext-blocks`,
 `--skip-wikitext`, `--eval-batch-size`, `--reference shared` (drops the second
 copy of the weights — the prunable model's ungated single-stream path *is* the
 full model), `--sanity-granularity`, `--knockout-granularity`, `--mean-source`,
-`--strict`. See
+`--gen-examples`, `--gen-new-tokens`, `--compose-granularity`, `--suite-name`,
+`--output-dir`, `--strict`. See
 `python evaluate_circuit.py --help`.
 
-Results land in `<run_dir>/evaluations/<ablation>/`:
+A single circuit on its own task lands in `<run_dir>/evaluations/<ablation>/`:
 
 ```
 evaluations/
@@ -275,10 +338,26 @@ evaluations/
   interchange/
     evaluation.log              appended, one banner per invocation
     summary.json                resolved CLI, circuit counts, verification block
-    sanity.json  knockout.json  null.json
+    sanity.json  knockout.json  null.json  pressure.json
     random_circuits.json        seed + counts, NOT the masks
     plots/null_distribution.pdf  plots/wikitext_null.pdf
 ```
+
+Anything else — more than one circuit, any composed circuit, any task that is
+not the circuit's own, or an explicit `--suite-name` — writes a suite and
+leaves the run directories alone:
+
+```
+outputs/_suites/<suite-name>/
+  suite.json    the spec and its provenance: circuits, tasks, geometry
+  suite.log     tee'd stdout/stderr
+  matrix.json   circuit x task x eval -> headline metrics
+  matrix.csv    the same, one row per (cell, eval, metric), for the 3x3 / 3x6 tables
+  cells/<circuit-label>/<task-label>/<ablation>/   exactly the tree above
+```
+
+The per-cell body is the same code either way, so a suite cell's JSON is
+byte-comparable with a legacy run's.
 
 ## Tests
 
@@ -290,13 +369,19 @@ pytest tests/ -q          # CPU only, no downloads, ~20 s
 random-circuit sampler on a 2-layer random Llama (plus the real saved circuit's
 geometry when a run directory is present). `tests/test_end_to_end.py` drives the
 real `evaluate_circuit.py` CLI over a synthetic run directory, faking only the
-model loader, the tokenizer and the corpus.
+model loader, the tokenizer and the corpus. `tests/test_algebra.py` covers the
+set operations and the bottom-up coarse re-derivation, `tests/test_variants.py`
+the prompt rebuilds and their token-alignment invariants,
+`tests/test_generation.py` the greedy loop (which cannot use a KV cache — the
+corrupted stream carries no `past_key_value`), and `tests/test_suite_layout.py`
+the legacy-vs-suite layout decision and the matrix files.
 
 ## Repository layout
 
 ```
 train.py            Unified CLI: parse flags -> node phase -> edge phase -> report
-evaluate_circuit.py Rebuild a saved circuit and evaluate it (sanity/knockout/null)
+evaluate_circuit.py Rebuild saved circuits (or expressions over them) and
+                    evaluate them on one or more tasks
 config.py           NodePruningConfig / EdgeConfig + per-(model, task) defaults
 pruning.py          Shared node/edge training loops + GPU memory tracker
 analysis.py         Node circuit finalisation, mask save/load, edge analysis
