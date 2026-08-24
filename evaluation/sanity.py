@@ -55,7 +55,7 @@ ALL_OPEN_TOLERANCES = {"kl_div": 1e-4, "exact_match_min": 0.999}
 class SanityEvaluation(Evaluation):
     name = "sanity"
     display_name = "Sanity check — reproduce the in-run numbers"
-    requires = ("pred_spec",)
+    requires = ("pred_spec", "home_run")
 
     def run(self, ctx) -> dict:
         loader = ctx.test_loader

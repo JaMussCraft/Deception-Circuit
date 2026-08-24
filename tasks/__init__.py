@@ -76,6 +76,20 @@ class Task:
         run_evaluation for use in `evaluate`. `state` comes from `prepare`."""
         raise NotImplementedError
 
+    def build_variant_dataloader(self, variant, tokenizer, args, state):
+        """A test dataloader over a prompt variant, or None if unsupported.
+
+        `variant` is one of `evaluation.variants.PROMPT_VARIANTS`. The variant
+        rebuilds the test prompts with the pressure clause removed or replaced,
+        keeping the labels as they are — see evaluation/variants.py for why the
+        metrics read backwards under a variant.
+
+        Returning None is the honest answer for tasks with no pressure clause
+        (IOI, GP, GT); the evaluations that use this hook then skip their
+        variant sections with a recorded reason instead of failing.
+        """
+        return None
+
     # ---- input plumbing ------------------------------------------------
     def model_inputs(self, batch) -> dict:
         return dict(

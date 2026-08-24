@@ -64,6 +64,22 @@ class DeceptionTask(Task):
         test_dl = DataLoader(make(test), batch_size=bs, shuffle=False)
         return train_dl, val_dl, test_dl
 
+    def build_variant_dataloader(self, variant, tokenizer, args, state):
+        from dataset.deception_common import (DeceptionDatasetLlama,
+                                              load_or_generate_deception_data)
+        from evaluation import variants
+
+        if variant not in variants.PROMPT_VARIANTS:
+            return None
+        records = load_or_generate_deception_data(
+            self.dataset_dir(args), "test", args.test_samples)
+        records = variants.deception_records(self.name, records, variant,
+                                             tokenizer, args.max_seq_length)
+        return variants.loader(
+            DeceptionDatasetLlama(records, tokenizer,
+                                  max_length=args.max_seq_length),
+            args.batch_size)
+
     def compute_objective(self, circuit_logits, target_logits, batch, state, device):
         bs = circuit_logits.size(0)
         total_kl = 0.0

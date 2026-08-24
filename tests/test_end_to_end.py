@@ -26,6 +26,7 @@ from torch.utils.data import DataLoader, Dataset
 
 import evaluate_circuit
 from config import NodePruningConfig
+from evaluation import list_evaluations
 from tasks import Task
 from tests.helpers import TINY, build_tiny_pair
 
@@ -264,11 +265,27 @@ def test_full_run_interchange(tiny_run, monkeypatch):
     assert len(knock["wikitext"]["null"]["rows"]) == 5
     assert knock["task"]["knockout"]["argmax"]["n_distinct"] >= 1
 
+    # The tiny task has no pressure clause, so the honest-instruction section
+    # records why it stood down instead of failing the run.
+    assert "skipped" in knock["honest"]
+    gen = knock["generation"]
+    assert "skipped" not in gen
+    assert len(gen["examples"]) == 3
+    for example in gen["examples"]:
+        assert set(example["continuations"]) == {"full", "knockout",
+                                                 "circuit_only"}
+
     summary = read_json(tiny_run, "interchange", "summary.json")
     assert summary["verification"]["all_open_equals_full"] is True
     assert summary["failures"] == []
     index = read_json(tiny_run, "index.json")
-    assert set(index["interchange"]["evals"]) == {"sanity", "knockout", "null"}
+    assert set(index["interchange"]["evals"]) == set(list_evaluations())
+
+    # The tiny task has no pressure clause, so eval 4 must skip itself with a
+    # recorded reason rather than failing the run.
+    assert "pressure" in summary["skipped"]
+    assert not os.path.exists(os.path.join(
+        str(tiny_run), "evaluations", "interchange", "pressure.json"))
 
     assert os.path.exists(os.path.join(
         str(tiny_run), "evaluations", "interchange", "plots",
