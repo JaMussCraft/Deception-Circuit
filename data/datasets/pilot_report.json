@@ -1,0 +1,342 @@
+{
+  "n_instances": 1000,
+  "model": "meta-llama/Llama-3.1-8B-Instruct",
+  "margin_thresh": 0.7,
+  "prior_eps": 0.5,
+  "seed": 42,
+  "tasks": {
+    "ser": {
+      "mechanism": "pragmatic_distortion",
+      "prompt_length": {
+        "median": 109.0,
+        "max": 114
+      },
+      "prior_balance": {
+        "kept": 241,
+        "of": 1000,
+        "rate": 0.241,
+        "margin": {
+          "n": 1000,
+          "mean": 1.11125,
+          "std": 0.9267205282608129,
+          "p1": -0.5,
+          "p5": -0.25,
+          "p25": 0.375,
+          "p50": 1.0,
+          "p75": 1.625,
+          "p95": 2.75,
+          "p99": 3.625
+        },
+        "keep_rate_by_item_pair": {
+          "audio/charging": {
+            "passed": 12,
+            "total": 19,
+            "rate": 0.631578947368421
+          },
+          "beams/joints": {
+            "passed": 0,
+            "total": 27,
+            "rate": 0.0
+          },
+          "bids/asks": {
+            "passed": 10,
+            "total": 24,
+            "rate": 0.4166666666666667
+          },
+          "brick/stone": {
+            "passed": 0,
+            "total": 28,
+            "rate": 0.0
+          },
+          "budget/timeline": {
+            "passed": 10,
+            "total": 34,
+            "rate": 0.29411764705882354
+          },
+          "button/switch": {
+            "passed": 24,
+            "total": 28,
+            "rate": 0.8571428571428571
+          },
+          "calcium/sodium": {
+            "passed": 4,
+            "total": 27,
+            "rate": 0.14814814814814814
+          },
+          "capacity/coverage": {
+            "passed": 27,
+            "total": 31,
+            "rate": 0.8709677419354839
+          },
+          "chip/board": {
+            "passed": 0,
+            "total": 22,
+            "rate": 0.0
+          },
+          "client/server": {
+            "passed": 3,
+            "total": 22,
+            "rate": 0.13636363636363635
+          },
+          "clock/timer": {
+            "passed": 10,
+            "total": 22,
+            "rate": 0.45454545454545453
+          },
+          "color/finish": {
+            "passed": 15,
+            "total": 22,
+            "rate": 0.6818181818181818
+          },
+          "density/hardness": {
+            "passed": 0,
+            "total": 11,
+            "rate": 0.0
+          },
+          "desk/chair": {
+            "passed": 3,
+            "total": 29,
+            "rate": 0.10344827586206896
+          },
+          "doors/windows": {
+            "passed": 3,
+            "total": 25,
+            "rate": 0.12
+          },
+          "fence/gate": {
+            "passed": 11,
+            "total": 28,
+            "rate": 0.39285714285714285
+          },
+          "frontend/backend": {
+            "passed": 5,
+            "total": 24,
+            "rate": 0.20833333333333334
+          },
+          "funds/trusts": {
+            "passed": 3,
+            "total": 26,
+            "rate": 0.11538461538461539
+          },
+          "humidity/vibration": {
+            "passed": 2,
+            "total": 20,
+            "rate": 0.1
+          },
+          "import/export": {
+            "passed": 17,
+            "total": 25,
+            "rate": 0.68
+          },
+          "inbound/outbound": {
+            "passed": 0,
+            "total": 28,
+            "rate": 0.0
+          },
+          "intake/output": {
+            "passed": 17,
+            "total": 30,
+            "rate": 0.5666666666666667
+          },
+          "lawn/patio": {
+            "passed": 0,
+            "total": 31,
+            "rate": 0.0
+          },
+          "length/width": {
+            "passed": 0,
+            "total": 25,
+            "rate": 0.0
+          },
+          "lights/blinds": {
+            "passed": 0,
+            "total": 19,
+            "rate": 0.0
+          },
+          "lobby/garage": {
+            "passed": 0,
+            "total": 29,
+            "rate": 0.0
+          },
+          "miles/hours": {
+            "passed": 9,
+            "total": 18,
+            "rate": 0.5
+          },
+          "queries/updates": {
+            "passed": 22,
+            "total": 25,
+            "rate": 0.88
+          },
+          "rail/road": {
+            "passed": 0,
+            "total": 31,
+            "rate": 0.0
+          },
+          "reads/writes": {
+            "passed": 13,
+            "total": 24,
+            "rate": 0.5416666666666666
+          },
+          "screen/camera": {
+            "passed": 18,
+            "total": 25,
+            "rate": 0.72
+          },
+          "shares/options": {
+            "passed": 0,
+            "total": 26,
+            "rate": 0.0
+          },
+          "size/shape": {
+            "passed": 0,
+            "total": 23,
+            "rate": 0.0
+          },
+          "steel/glass": {
+            "passed": 0,
+            "total": 17,
+            "rate": 0.0
+          },
+          "stocks/bonds": {
+            "passed": 2,
+            "total": 23,
+            "rate": 0.08695652173913043
+          },
+          "trucks/trains": {
+            "passed": 0,
+            "total": 19,
+            "rate": 0.0
+          },
+          "users/roles": {
+            "passed": 0,
+            "total": 26,
+            "rate": 0.0
+          },
+          "vision/hearing": {
+            "passed": 0,
+            "total": 24,
+            "rate": 0.0
+          },
+          "walls/floors": {
+            "passed": 0,
+            "total": 19,
+            "rate": 0.0
+          },
+          "weight/height": {
+            "passed": 0,
+            "total": 25,
+            "rate": 0.0
+          },
+          "wire/cable": {
+            "passed": 1,
+            "total": 19,
+            "rate": 0.05263157894736842
+          }
+        }
+      },
+      "behavioral": {
+        "kept": 3,
+        "of": 241,
+        "pass_rate": 0.012448132780082987,
+        "clean_margin": {
+          "n": 241,
+          "mean": -1.2837136929460582,
+          "std": 1.8418661058972683,
+          "p1": -5.75,
+          "p5": -3.75,
+          "p25": -2.5,
+          "p50": -1.5,
+          "p75": -0.125,
+          "p95": 2.25,
+          "p99": 3.25
+        },
+        "corrupt_margin": {
+          "n": 241,
+          "mean": -1.4216804979253113,
+          "std": 1.8164329921389537,
+          "p1": -5.375,
+          "p5": -4.125,
+          "p25": -2.75,
+          "p50": -1.625,
+          "p75": -0.25,
+          "p95": 1.625,
+          "p99": 3.125
+        },
+        "unexpected_argmax_tokens": {}
+      },
+      "honest_twins_available": 130,
+      "label_validation": {
+        "pressure_kept": {
+          "n": 1000,
+          "n_skipped_over_length": 0,
+          "honest_fraction": 0.758,
+          "deceptive_fraction": 0.242,
+          "other_fraction": 0.0,
+          "margin_honest_minus_deceptive": {
+            "n": 1000,
+            "mean": 1.4315,
+            "std": 1.8848395820334418,
+            "p1": -2.625,
+            "p5": -1.5,
+            "p25": 0.0,
+            "p50": 1.375,
+            "p75": 2.75,
+            "p95": 4.5,
+            "p99": 6.25
+          },
+          "other_tokens": {}
+        },
+        "no_pressure": {
+          "n": 1000,
+          "n_skipped_over_length": 0,
+          "honest_fraction": 0.825,
+          "deceptive_fraction": 0.175,
+          "other_fraction": 0.0,
+          "margin_honest_minus_deceptive": {
+            "n": 1000,
+            "mean": 1.7115,
+            "std": 1.6875422957662425,
+            "p1": -1.75,
+            "p5": -1.0,
+            "p25": 0.625,
+            "p50": 1.75,
+            "p75": 2.875,
+            "p95": 4.625,
+            "p99": 5.875
+          },
+          "other_tokens": {}
+        },
+        "honest_instruction": {
+          "n": 1000,
+          "n_skipped_over_length": 0,
+          "honest_fraction": 0.853,
+          "deceptive_fraction": 0.147,
+          "other_fraction": 0.0,
+          "margin_honest_minus_deceptive": {
+            "n": 1000,
+            "mean": 1.5535,
+            "std": 1.477079127873656,
+            "p1": -1.75,
+            "p5": -0.875,
+            "p25": 0.5,
+            "p50": 1.625,
+            "p75": 2.5,
+            "p95": 4.0,
+            "p99": 5.0
+          },
+          "other_tokens": {}
+        }
+      }
+    }
+  },
+  "comparison_set": {
+    "per_task_sizes": {
+      "ser": 3
+    },
+    "intersection_size": 3
+  },
+  "implied_overgen_factor": {
+    "ser": 80.33333333333334
+  }
+}
