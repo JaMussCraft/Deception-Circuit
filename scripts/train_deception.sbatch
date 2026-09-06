@@ -21,7 +21,7 @@
 #SBATCH --gpus-per-node=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=64G
-#SBATCH --time=06:00:00
+#SBATCH --time=04:00:00
 #SBATCH --output=logs/train_deception_%j.out
 
 set -euo pipefail

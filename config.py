@@ -105,7 +105,7 @@ _HYPERPARAMS = {
     ("llama", "ioi"): dict(node_epochs=500, edge_epochs=300, batch_size=16,
                            max_seq_length=64, lr=3e-2,
                            train_samples=200, val_samples=200, test_samples=1000),
-    ("llama", "gp"): dict(node_epochs=500, edge_epochs=300, batch_size=64,
+    ("llama", "gp"): dict(node_epochs=500, edge_epochs=300, batch_size=16,
                           max_seq_length=64, lr=3e-1,
                           train_samples=100000, val_samples=10000, test_samples=10000),
     ("llama", "std"): dict(node_epochs=500, edge_epochs=300, batch_size=10,
@@ -115,14 +115,14 @@ _HYPERPARAMS = {
     # tasks on purpose: a circuit difference between mechanisms must not be a
     # difference in how hard each was trained. max_seq_length matches the
     # build-time budget in dataset/deception_common.py (MAX_SEQ_LENGTH).
-    ("llama", "far"): dict(node_epochs=500, edge_epochs=300, batch_size=10,
-                           max_seq_length=96, lr=3e-2,
+    ("llama", "far"): dict(node_epochs=500, edge_epochs=300, batch_size=7,
+                           max_seq_length=120, lr=3e-2,
                            train_samples=200, val_samples=200, test_samples=1000),
-    ("llama", "sdr"): dict(node_epochs=500, edge_epochs=300, batch_size=10,
-                           max_seq_length=96, lr=3e-2,
+    ("llama", "sdr"): dict(node_epochs=500, edge_epochs=300, batch_size=7,
+                           max_seq_length=120, lr=3e-2,
                            train_samples=200, val_samples=200, test_samples=1000),
-    ("llama", "ser"): dict(node_epochs=500, edge_epochs=300, batch_size=10,
-                           max_seq_length=96, lr=3e-2,
+    ("llama", "ser"): dict(node_epochs=500, edge_epochs=300, batch_size=7,
+                           max_seq_length=120, lr=3e-2,
                            train_samples=200, val_samples=200, test_samples=1000),
 }
 
