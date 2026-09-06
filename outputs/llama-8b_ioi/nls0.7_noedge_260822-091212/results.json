@@ -1,0 +1,68 @@
+{
+  "model": "llama-8b",
+  "task": "ioi",
+  "family": "llama",
+  "edge_pruning": false,
+  "seed": 42,
+  "baseline": {
+    "accuracy": 1.0,
+    "logit_diff": 5.722253503503503,
+    "kl_div": 0.0,
+    "exact_match": 1.0
+  },
+  "node_eval": {
+    "accuracy": 0.30930930930930933,
+    "logit_diff": -2.2119502314814814,
+    "kl_div": 1.6189420621793669,
+    "exact_match": 0.34534534534534533
+  },
+  "edge_eval": null,
+  "dense_edges": {
+    "full_total": 805681,
+    "full_original": 803088,
+    "full_extra": 2593,
+    "dense_total": 2150,
+    "dense_original": 2056,
+    "dense_extra": 94,
+    "dense_output": 52,
+    "dense_mlp": 257,
+    "dense_q": 969,
+    "dense_k": 389,
+    "dense_v": 389
+  },
+  "edge_stats": null,
+  "node_granularity": {
+    "embedding": {
+      "total": 1,
+      "active": 0
+    },
+    "layer_level": {
+      "total": 32,
+      "active": 32
+    },
+    "attention_blocks": {
+      "total": 32,
+      "active": 7
+    },
+    "mlp_blocks": {
+      "total": 32,
+      "active": 18
+    },
+    "attention_heads": {
+      "total": 1024,
+      "active": 34
+    },
+    "attention_neurons": {
+      "total": 131072,
+      "active": 3507
+    },
+    "mlp_hidden": {
+      "total": 458752,
+      "active": 35923
+    },
+    "mlp_output": {
+      "total": 131072,
+      "active": 22478
+    }
+  }
+}
