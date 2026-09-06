@@ -1,0 +1,397 @@
+{
+  "batch_size": 10,
+  "n": 1000,
+  "ablation": "interchange",
+  "granularity": "all",
+  "counts": {
+    "attention_blocks": {
+      "active": 8,
+      "total": 32,
+      "per_layer": {
+        "6": 1,
+        "7": 1,
+        "8": 1,
+        "10": 1,
+        "13": 1,
+        "14": 1,
+        "15": 1,
+        "17": 1
+      }
+    },
+    "mlp_blocks": {
+      "active": 3,
+      "total": 32,
+      "per_layer": {
+        "0": 1,
+        "2": 1,
+        "31": 1
+      }
+    },
+    "attention_heads": {
+      "active": 45,
+      "total": 1024,
+      "per_layer": {
+        "6": 3,
+        "7": 4,
+        "8": 7,
+        "10": 7,
+        "13": 9,
+        "14": 4,
+        "15": 6,
+        "17": 5
+      }
+    },
+    "attention_neurons": {
+      "active": 2203,
+      "total": 131072,
+      "per_layer": {
+        "6": 144,
+        "7": 206,
+        "8": 340,
+        "10": 304,
+        "13": 391,
+        "14": 213,
+        "15": 309,
+        "17": 296
+      }
+    },
+    "mlp_hidden": {
+      "active": 4369,
+      "total": 458752,
+      "per_layer": {
+        "0": 1564,
+        "2": 1735,
+        "31": 1070
+      }
+    },
+    "mlp_output": {
+      "active": 2166,
+      "total": 131072,
+      "per_layer": {
+        "0": 673,
+        "2": 546,
+        "31": 947
+      }
+    }
+  },
+  "label": "discovered circuit",
+  "rows": {
+    "full_open": {
+      "accuracy": 1.0,
+      "logit_diff": 1.793625,
+      "kl_div": 0.0,
+      "exact_match": 1.0,
+      "n": 1000
+    },
+    "discovered": {
+      "accuracy": 0.994,
+      "logit_diff": 2.763125,
+      "kl_div": 0.17016223266720773,
+      "exact_match": 0.995,
+      "n": 1000,
+      "argmax": {
+        "top": [
+          {
+            "id": 15465,
+            "token": " incorrect",
+            "count": 115,
+            "frac": 0.115
+          },
+          {
+            "id": 4495,
+            "token": " correct",
+            "count": 103,
+            "frac": 0.103
+          },
+          {
+            "id": 13687,
+            "token": " accurate",
+            "count": 99,
+            "frac": 0.099
+          },
+          {
+            "id": 50504,
+            "token": " inaccurate",
+            "count": 95,
+            "frac": 0.095
+          },
+          {
+            "id": 1314,
+            "token": " right",
+            "count": 94,
+            "frac": 0.094
+          },
+          {
+            "id": 905,
+            "token": " false",
+            "count": 90,
+            "frac": 0.09
+          },
+          {
+            "id": 5076,
+            "token": " wrong",
+            "count": 90,
+            "frac": 0.09
+          },
+          {
+            "id": 2144,
+            "token": " fact",
+            "count": 80,
+            "frac": 0.08
+          },
+          {
+            "id": 837,
+            "token": " true",
+            "count": 78,
+            "frac": 0.078
+          },
+          {
+            "id": 21849,
+            "token": " myth",
+            "count": 68,
+            "frac": 0.068
+          },
+          {
+            "id": 2764,
+            "token": " valid",
+            "count": 46,
+            "frac": 0.046
+          },
+          {
+            "id": 8482,
+            "token": " invalid",
+            "count": 42,
+            "frac": 0.042
+          }
+        ],
+        "n_distinct": 12,
+        "target_frac": 0.995,
+        "distractor_frac": 0.005,
+        "other_frac": 0.0
+      }
+    },
+    "discovered_repo": {
+      "accuracy": 0.994,
+      "logit_diff": 2.763125,
+      "kl_div": 0.1701689977645874,
+      "exact_match": 0.995
+    },
+    "empty": {
+      "accuracy": 0.0,
+      "logit_diff": -1.828875,
+      "kl_div": 1.2671147089004517,
+      "exact_match": 0.0,
+      "n": 1000,
+      "argmax": {
+        "top": [
+          {
+            "id": 4495,
+            "token": " correct",
+            "count": 115,
+            "frac": 0.115
+          },
+          {
+            "id": 15465,
+            "token": " incorrect",
+            "count": 103,
+            "frac": 0.103
+          },
+          {
+            "id": 13687,
+            "token": " accurate",
+            "count": 97,
+            "frac": 0.097
+          },
+          {
+            "id": 50504,
+            "token": " inaccurate",
+            "count": 97,
+            "frac": 0.097
+          },
+          {
+            "id": 5076,
+            "token": " wrong",
+            "count": 95,
+            "frac": 0.095
+          },
+          {
+            "id": 837,
+            "token": " true",
+            "count": 90,
+            "frac": 0.09
+          },
+          {
+            "id": 1314,
+            "token": " right",
+            "count": 89,
+            "frac": 0.089
+          },
+          {
+            "id": 21849,
+            "token": " myth",
+            "count": 78,
+            "frac": 0.078
+          },
+          {
+            "id": 905,
+            "token": " false",
+            "count": 78,
+            "frac": 0.078
+          },
+          {
+            "id": 2144,
+            "token": " fact",
+            "count": 70,
+            "frac": 0.07
+          },
+          {
+            "id": 8482,
+            "token": " invalid",
+            "count": 46,
+            "frac": 0.046
+          },
+          {
+            "id": 2764,
+            "token": " valid",
+            "count": 42,
+            "frac": 0.042
+          }
+        ],
+        "n_distinct": 12,
+        "target_frac": 0.0,
+        "distractor_frac": 1.0,
+        "other_frac": 0.0
+      }
+    }
+  },
+  "reference": {
+    "node_eval": {
+      "accuracy": 0.994,
+      "logit_diff": 2.763125,
+      "kl_div": 0.1701689977645874,
+      "exact_match": 0.995
+    },
+    "baseline": {
+      "accuracy": 1.0,
+      "logit_diff": 1.793625,
+      "kl_div": 0.0,
+      "exact_match": 1.0
+    }
+  },
+  "cross_check": {
+    "ran": true,
+    "ok": true,
+    "max_delta": 6.765097379679563e-06,
+    "per_metric": {
+      "accuracy": {
+        "generic": 0.994,
+        "repo": 0.994,
+        "delta": 0.0,
+        "tolerance": 1e-06,
+        "pass": true
+      },
+      "exact_match": {
+        "generic": 0.995,
+        "repo": 0.995,
+        "delta": 0.0,
+        "tolerance": 1e-06,
+        "pass": true
+      },
+      "logit_diff": {
+        "generic": 2.763125,
+        "repo": 2.763125,
+        "delta": 0.0,
+        "tolerance": 0.0001,
+        "pass": true
+      },
+      "kl_div": {
+        "generic": 0.17016223266720773,
+        "repo": 0.1701689977645874,
+        "delta": 6.765097379679563e-06,
+        "tolerance": 0.0001,
+        "pass": true
+      }
+    }
+  },
+  "all_open": {
+    "ok": true,
+    "kl_div": 0.0,
+    "exact_match": 1.0,
+    "tolerances": {
+      "kl_div": 0.0001,
+      "exact_match_min": 0.999
+    }
+  },
+  "delta": {
+    "ok": true,
+    "max_delta": 6.765097379679563e-06,
+    "rows": [
+      {
+        "metric": "accuracy",
+        "label": "Accuracy",
+        "expected": 0.994,
+        "observed": 0.994,
+        "delta": 0.0,
+        "tolerance": 0.002,
+        "pass": true
+      },
+      {
+        "metric": "logit_diff",
+        "label": "Logit Diff",
+        "expected": 2.763125,
+        "observed": 2.763125,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "pass": true
+      },
+      {
+        "metric": "kl_div",
+        "label": "KL Div",
+        "expected": 0.1701689977645874,
+        "observed": 0.17016223266720773,
+        "delta": -6.765097379679563e-06,
+        "tolerance": 0.005,
+        "pass": true
+      },
+      {
+        "metric": "exact_match",
+        "label": "Exact Match",
+        "expected": 0.995,
+        "observed": 0.995,
+        "delta": 0.0,
+        "tolerance": 0.002,
+        "pass": true
+      }
+    ]
+  },
+  "headline": {
+    "accuracy": 0.994,
+    "logit_diff": 2.763125,
+    "kl_div": 0.17016223266720773,
+    "exact_match": 0.995
+  },
+  "verification": {
+    "masks_roundtrip": true,
+    "all_open_equals_full": true,
+    "generic_vs_task_evaluate_max_delta": 6.765097379679563e-06,
+    "granularity": "all",
+    "reference_numbers": {
+      "source": "results.json:node_eval",
+      "expected": {
+        "accuracy": 0.994,
+        "logit_diff": 2.763125,
+        "kl_div": 0.1701689977645874,
+        "exact_match": 0.995
+      },
+      "observed": {
+        "accuracy": 0.994,
+        "logit_diff": 2.763125,
+        "kl_div": 0.17016223266720773,
+        "exact_match": 0.995
+      },
+      "max_delta": 6.765097379679563e-06,
+      "ok": true
+    }
+  },
+  "seconds": 192.8
+}

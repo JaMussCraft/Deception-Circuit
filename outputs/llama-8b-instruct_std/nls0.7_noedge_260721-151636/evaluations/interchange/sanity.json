@@ -2,19 +2,92 @@
   "batch_size": 11,
   "n": 1000,
   "ablation": "interchange",
+  "granularity": "all",
+  "counts": {
+    "attention_blocks": {
+      "active": 6,
+      "total": 32,
+      "per_layer": {
+        "7": 1,
+        "8": 1,
+        "12": 1,
+        "13": 1,
+        "15": 1,
+        "17": 1
+      }
+    },
+    "mlp_blocks": {
+      "active": 5,
+      "total": 32,
+      "per_layer": {
+        "0": 1,
+        "2": 1,
+        "4": 1,
+        "6": 1,
+        "31": 1
+      }
+    },
+    "attention_heads": {
+      "active": 38,
+      "total": 1024,
+      "per_layer": {
+        "7": 5,
+        "8": 8,
+        "12": 5,
+        "13": 8,
+        "15": 6,
+        "17": 6
+      }
+    },
+    "attention_neurons": {
+      "active": 1868,
+      "total": 131072,
+      "per_layer": {
+        "7": 258,
+        "8": 378,
+        "12": 228,
+        "13": 370,
+        "15": 303,
+        "17": 331
+      }
+    },
+    "mlp_hidden": {
+      "active": 5792,
+      "total": 458752,
+      "per_layer": {
+        "0": 1173,
+        "2": 1206,
+        "4": 1091,
+        "6": 1216,
+        "31": 1106
+      }
+    },
+    "mlp_output": {
+      "active": 2980,
+      "total": 131072,
+      "per_layer": {
+        "0": 631,
+        "2": 448,
+        "4": 450,
+        "6": 482,
+        "31": 969
+      }
+    }
+  },
+  "label": "discovered circuit",
   "rows": {
     "full_open": {
       "accuracy": 1.0,
-      "logit_diff": 1.799,
+      "logit_diff": 1.7955,
       "kl_div": 0.0,
       "exact_match": 1.0,
       "n": 1000
     },
     "discovered": {
-      "accuracy": 0.925,
-      "logit_diff": 1.667125,
-      "kl_div": 0.13436530429124832,
-      "exact_match": 0.925,
+      "accuracy": 0.924,
+      "logit_diff": 1.668,
+      "kl_div": 0.13384852713346482,
+      "exact_match": 0.924,
       "n": 1000,
       "argmax": {
         "top": [
@@ -33,8 +106,8 @@
           {
             "id": 13687,
             "token": " accurate",
-            "count": 108,
-            "frac": 0.108
+            "count": 109,
+            "frac": 0.109
           },
           {
             "id": 4495,
@@ -45,44 +118,44 @@
           {
             "id": 1314,
             "token": " right",
-            "count": 97,
-            "frac": 0.097
+            "count": 96,
+            "frac": 0.096
           },
           {
             "id": 837,
             "token": " true",
-            "count": 88,
-            "frac": 0.088
+            "count": 90,
+            "frac": 0.09
           },
           {
             "id": 5076,
             "token": " wrong",
-            "count": 87,
-            "frac": 0.087
+            "count": 88,
+            "frac": 0.088
           },
           {
             "id": 50504,
             "token": " inaccurate",
-            "count": 86,
-            "frac": 0.086
+            "count": 85,
+            "frac": 0.085
           },
           {
             "id": 905,
             "token": " false",
-            "count": 80,
-            "frac": 0.08
+            "count": 78,
+            "frac": 0.078
           },
           {
             "id": 2764,
             "token": " valid",
-            "count": 48,
-            "frac": 0.048
+            "count": 47,
+            "frac": 0.047
           },
           {
             "id": 8482,
             "token": " invalid",
-            "count": 40,
-            "frac": 0.04
+            "count": 41,
+            "frac": 0.041
           },
           {
             "id": 21849,
@@ -92,21 +165,21 @@
           }
         ],
         "n_distinct": 12,
-        "target_frac": 0.925,
-        "distractor_frac": 0.075,
+        "target_frac": 0.924,
+        "distractor_frac": 0.076,
         "other_frac": 0.0
       }
     },
     "discovered_repo": {
-      "accuracy": 0.925,
-      "logit_diff": 1.667125,
-      "kl_div": 0.13450883781909942,
-      "exact_match": 0.925
+      "accuracy": 0.924,
+      "logit_diff": 1.668,
+      "kl_div": 0.13395980858802795,
+      "exact_match": 0.924
     },
     "empty": {
       "accuracy": 0.0,
-      "logit_diff": -1.8345,
-      "kl_div": 1.2745421237945556,
+      "logit_diff": -1.82925,
+      "kl_div": 1.2689780044555663,
       "exact_match": 0.0,
       "n": 1000,
       "argmax": {
@@ -208,33 +281,33 @@
   "cross_check": {
     "ran": true,
     "ok": false,
-    "max_delta": 0.0001435335278510974,
+    "max_delta": 0.00011128145456312799,
     "per_metric": {
       "accuracy": {
-        "generic": 0.925,
-        "repo": 0.925,
+        "generic": 0.924,
+        "repo": 0.924,
         "delta": 0.0,
         "tolerance": 1e-06,
         "pass": true
       },
       "exact_match": {
-        "generic": 0.925,
-        "repo": 0.925,
+        "generic": 0.924,
+        "repo": 0.924,
         "delta": 0.0,
         "tolerance": 1e-06,
         "pass": true
       },
       "logit_diff": {
-        "generic": 1.667125,
-        "repo": 1.667125,
+        "generic": 1.668,
+        "repo": 1.668,
         "delta": 0.0,
         "tolerance": 0.0001,
         "pass": true
       },
       "kl_div": {
-        "generic": 0.13436530429124832,
-        "repo": 0.13450883781909942,
-        "delta": 0.0001435335278510974,
+        "generic": 0.13384852713346482,
+        "repo": 0.13395980858802795,
+        "delta": 0.00011128145456312799,
         "tolerance": 0.0001,
         "pass": false
       }
@@ -251,14 +324,14 @@
   },
   "delta": {
     "ok": true,
-    "max_delta": 0.0010000000000000009,
+    "max_delta": 0.00011128145456312799,
     "rows": [
       {
         "metric": "accuracy",
         "label": "Accuracy",
         "expected": 0.924,
-        "observed": 0.925,
-        "delta": 0.0010000000000000009,
+        "observed": 0.924,
+        "delta": 0.0,
         "tolerance": 0.002,
         "pass": true
       },
@@ -266,8 +339,8 @@
         "metric": "logit_diff",
         "label": "Logit Diff",
         "expected": 1.668,
-        "observed": 1.667125,
-        "delta": -0.0008749999999999591,
+        "observed": 1.668,
+        "delta": 0.0,
         "tolerance": 0.01,
         "pass": true
       },
@@ -275,8 +348,8 @@
         "metric": "kl_div",
         "label": "KL Div",
         "expected": 0.13395980858802795,
-        "observed": 0.13436530429124832,
-        "delta": 0.00040549570322037654,
+        "observed": 0.13384852713346482,
+        "delta": -0.00011128145456312799,
         "tolerance": 0.005,
         "pass": true
       },
@@ -284,23 +357,24 @@
         "metric": "exact_match",
         "label": "Exact Match",
         "expected": 0.924,
-        "observed": 0.925,
-        "delta": 0.0010000000000000009,
+        "observed": 0.924,
+        "delta": 0.0,
         "tolerance": 0.002,
         "pass": true
       }
     ]
   },
   "headline": {
-    "accuracy": 0.925,
-    "logit_diff": 1.667125,
-    "kl_div": 0.13436530429124832,
-    "exact_match": 0.925
+    "accuracy": 0.924,
+    "logit_diff": 1.668,
+    "kl_div": 0.13384852713346482,
+    "exact_match": 0.924
   },
   "verification": {
     "masks_roundtrip": true,
     "all_open_equals_full": true,
-    "generic_vs_task_evaluate_max_delta": 0.0001435335278510974,
+    "generic_vs_task_evaluate_max_delta": 0.00011128145456312799,
+    "granularity": "all",
     "reference_numbers": {
       "source": "results.json:node_eval",
       "expected": {
@@ -310,14 +384,14 @@
         "exact_match": 0.924
       },
       "observed": {
-        "accuracy": 0.925,
-        "logit_diff": 1.667125,
-        "kl_div": 0.13436530429124832,
-        "exact_match": 0.925
+        "accuracy": 0.924,
+        "logit_diff": 1.668,
+        "kl_div": 0.13384852713346482,
+        "exact_match": 0.924
       },
-      "max_delta": 0.0010000000000000009,
+      "max_delta": 0.00011128145456312799,
       "ok": true
     }
   },
-  "seconds": 181.6
+  "seconds": 177.8
 }

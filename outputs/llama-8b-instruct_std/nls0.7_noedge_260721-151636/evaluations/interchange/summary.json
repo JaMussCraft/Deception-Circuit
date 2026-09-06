@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "created": "2026-07-28T16:52:01",
-  "run_dir": "/root/Deception-Circuit/outputs/llama-8b-instruct_std/nls0.7_noedge_260721-151636",
+  "created": "2026-08-24T14:29:11",
+  "run_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_std/nls0.7_noedge_260721-151636",
   "ablation": "interchange",
   "model": "llama-8b-instruct",
   "task": "std",
@@ -40,6 +40,9 @@
   },
   "cli": {
     "ablation": "interchange",
+    "all_pairs_delta": false,
+    "circuit": null,
+    "compose_granularity": "both",
     "data_dir": null,
     "device": "cuda",
     "dry_run": false,
@@ -47,10 +50,15 @@
     "evals": [
       "sanity",
       "knockout",
-      "null"
+      "null",
+      "pressure"
     ],
+    "expr": null,
+    "gen_examples": 3,
+    "gen_new_tokens": 48,
     "hf_token": null,
     "knockout_granularity": "finest",
+    "legacy": true,
     "mean_source": "pooled",
     "n_random": 50,
     "null_alloc": "uniform",
@@ -61,18 +69,97 @@
     "ref_cache_device": "cuda",
     "reference": "separate",
     "run_dir": "outputs/llama-8b-instruct_std/nls0.7_noedge_260721-151636",
+    "sanity_granularity": "all",
     "save_null_masks": false,
     "skip_wikitext": false,
     "std_variant": null,
     "strict": false,
+    "suite_name": null,
+    "task": null,
+    "task_from": null,
     "test_samples": null,
     "verify": true,
     "wikitext_batch_size": 4,
     "wikitext_block_size": 512,
     "wikitext_blocks": 64,
-    "wikitext_seed": 0
+    "wikitext_seed": 0,
+    "xor": null
   },
   "circuit": {
+    "counts": {
+      "attention_blocks": {
+        "active": 6,
+        "total": 32,
+        "per_layer": {
+          "7": 1,
+          "8": 1,
+          "12": 1,
+          "13": 1,
+          "15": 1,
+          "17": 1
+        }
+      },
+      "mlp_blocks": {
+        "active": 5,
+        "total": 32,
+        "per_layer": {
+          "0": 1,
+          "2": 1,
+          "4": 1,
+          "6": 1,
+          "31": 1
+        }
+      },
+      "attention_heads": {
+        "active": 38,
+        "total": 1024,
+        "per_layer": {
+          "7": 5,
+          "8": 8,
+          "12": 5,
+          "13": 8,
+          "15": 6,
+          "17": 6
+        }
+      },
+      "attention_neurons": {
+        "active": 1868,
+        "total": 131072,
+        "per_layer": {
+          "7": 258,
+          "8": 378,
+          "12": 228,
+          "13": 370,
+          "15": 303,
+          "17": 331
+        }
+      },
+      "mlp_hidden": {
+        "active": 5792,
+        "total": 458752,
+        "per_layer": {
+          "0": 1173,
+          "2": 1206,
+          "4": 1091,
+          "6": 1216,
+          "31": 1106
+        }
+      },
+      "mlp_output": {
+        "active": 2980,
+        "total": 131072,
+        "per_layer": {
+          "0": 631,
+          "2": 448,
+          "4": 450,
+          "6": 482,
+          "31": 969
+        }
+      }
+    }
+  },
+  "sanity_circuit": {
+    "granularity": "all",
     "counts": {
       "attention_blocks": {
         "active": 6,
@@ -396,7 +483,8 @@
   "verification": {
     "masks_roundtrip": true,
     "all_open_equals_full": true,
-    "generic_vs_task_evaluate_max_delta": 0.0001435335278510974,
+    "generic_vs_task_evaluate_max_delta": 0.00011128145456312799,
+    "granularity": "all",
     "reference_numbers": {
       "source": "results.json:node_eval",
       "expected": {
@@ -406,12 +494,12 @@
         "exact_match": 0.924
       },
       "observed": {
-        "accuracy": 0.925,
-        "logit_diff": 1.667125,
-        "kl_div": 0.13436530429124832,
-        "exact_match": 0.925
+        "accuracy": 0.924,
+        "logit_diff": 1.668,
+        "kl_div": 0.13384852713346482,
+        "exact_match": 0.924
       },
-      "max_delta": 0.0010000000000000009,
+      "max_delta": 0.00011128145456312799,
       "ok": true
     },
     "knockout_is_exact_complement": true,
@@ -419,7 +507,7 @@
     "null_circuits_size_matched": true
   },
   "failures": [
-    "sanity: the generic evaluator disagrees with task.evaluate (max delta 1.44e-04)",
-    "knockout: the all-gates-open wikitext floor is not zero (KL 6.729e-04, ppl ratio 1.000121)"
+    "sanity: the generic evaluator disagrees with task.evaluate (max delta 1.11e-04)",
+    "knockout: the all-gates-open wikitext floor is not zero (KL 6.639e-04, ppl ratio 1.000321)"
   ]
 }
