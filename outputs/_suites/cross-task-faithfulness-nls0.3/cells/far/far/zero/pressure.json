@@ -1,0 +1,550 @@
+{
+  "ablation": "zero",
+  "label_convention": "Labels are unchanged from the trained test set: `target` is the DECEPTIVE answer and `distractor` the honest one. Under a prompt variant, accuracy therefore reads as 'still gives the deceptive answer' and logit_diff as logit(deceptive) - logit(honest). The desired result is accuracy FALLING and logit_diff going NEGATIVE.",
+  "variant_descriptions": {
+    "with_pressure": "the test set as trained \u2014 the pressure clause is present",
+    "no_pressure": "the pressure clause deleted, nothing in its place",
+    "honest_instruction": "the pressure clause replaced by an explicit instruction to answer honestly"
+  },
+  "metrics": [
+    "accuracy",
+    "logit_diff"
+  ],
+  "variants": {
+    "with_pressure": {
+      "full": {
+        "accuracy": 1.0,
+        "logit_diff": 2.150875,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 28788,
+              "token": " trains",
+              "count": 92,
+              "frac": 0.092
+            },
+            {
+              "id": 27861,
+              "token": " trucks",
+              "count": 83,
+              "frac": 0.083
+            },
+            {
+              "id": 27035,
+              "token": " floors",
+              "count": 78,
+              "frac": 0.078
+            },
+            {
+              "id": 14620,
+              "token": " walls",
+              "count": 78,
+              "frac": 0.078
+            },
+            {
+              "id": 3215,
+              "token": " button",
+              "count": 72,
+              "frac": 0.072
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 61,
+              "frac": 0.061
+            },
+            {
+              "id": 27460,
+              "token": " bonds",
+              "count": 47,
+              "frac": 0.047
+            },
+            {
+              "id": 20126,
+              "token": " queries",
+              "count": 46,
+              "frac": 0.046
+            },
+            {
+              "id": 23301,
+              "token": " stocks",
+              "count": 45,
+              "frac": 0.045
+            },
+            {
+              "id": 9013,
+              "token": " updates",
+              "count": 36,
+              "frac": 0.036
+            },
+            {
+              "id": 8824,
+              "token": " capacity",
+              "count": 28,
+              "frac": 0.028
+            },
+            {
+              "id": 10401,
+              "token": " coverage",
+              "count": 27,
+              "frac": 0.027
+            }
+          ],
+          "n_distinct": 42,
+          "target_frac": 1.0,
+          "distractor_frac": 0.0,
+          "other_frac": 0.0
+        }
+      },
+      "circuit": {
+        "accuracy": 0.481,
+        "logit_diff": -0.048186992168426514,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 18036,
+              "token": " tear",
+              "count": 514,
+              "frac": 0.514
+            },
+            {
+              "id": 90306,
+              "token": " ActionTypes",
+              "count": 304,
+              "frac": 0.304
+            },
+            {
+              "id": 31364,
+              "token": ".jet",
+              "count": 53,
+              "frac": 0.053
+            },
+            {
+              "id": 20800,
+              "token": "447",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 18225,
+              "token": "dit",
+              "count": 23,
+              "frac": 0.023
+            },
+            {
+              "id": 109980,
+              "token": "IIIK",
+              "count": 14,
+              "frac": 0.014
+            },
+            {
+              "id": 87183,
+              "token": "wij",
+              "count": 9,
+              "frac": 0.009
+            },
+            {
+              "id": 111390,
+              "token": "\u03b1\u03b9\u03b4",
+              "count": 7,
+              "frac": 0.007
+            },
+            {
+              "id": 96015,
+              "token": " queryInterface",
+              "count": 7,
+              "frac": 0.007
+            },
+            {
+              "id": 85128,
+              "token": "elts",
+              "count": 6,
+              "frac": 0.006
+            },
+            {
+              "id": 67278,
+              "token": "weetalert",
+              "count": 6,
+              "frac": 0.006
+            },
+            {
+              "id": 57820,
+              "token": "SCII",
+              "count": 5,
+              "frac": 0.005
+            }
+          ],
+          "n_distinct": 22,
+          "target_frac": 0.0,
+          "distractor_frac": 0.0,
+          "other_frac": 1.0
+        }
+      }
+    },
+    "no_pressure": {
+      "full": {
+        "accuracy": 0.058,
+        "logit_diff": -2.026875,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 28788,
+              "token": " trains",
+              "count": 94,
+              "frac": 0.094
+            },
+            {
+              "id": 27861,
+              "token": " trucks",
+              "count": 81,
+              "frac": 0.081
+            },
+            {
+              "id": 14620,
+              "token": " walls",
+              "count": 78,
+              "frac": 0.078
+            },
+            {
+              "id": 9013,
+              "token": " updates",
+              "count": 78,
+              "frac": 0.078
+            },
+            {
+              "id": 27035,
+              "token": " floors",
+              "count": 78,
+              "frac": 0.078
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 72,
+              "frac": 0.072
+            },
+            {
+              "id": 3215,
+              "token": " button",
+              "count": 61,
+              "frac": 0.061
+            },
+            {
+              "id": 23301,
+              "token": " stocks",
+              "count": 47,
+              "frac": 0.047
+            },
+            {
+              "id": 27460,
+              "token": " bonds",
+              "count": 45,
+              "frac": 0.045
+            },
+            {
+              "id": 10401,
+              "token": " coverage",
+              "count": 28,
+              "frac": 0.028
+            },
+            {
+              "id": 8824,
+              "token": " capacity",
+              "count": 27,
+              "frac": 0.027
+            },
+            {
+              "id": 35358,
+              "token": " joints",
+              "count": 26,
+              "frac": 0.026
+            }
+          ],
+          "n_distinct": 42,
+          "target_frac": 0.061,
+          "distractor_frac": 0.939,
+          "other_frac": 0.0
+        }
+      },
+      "circuit": {
+        "accuracy": 0.472,
+        "logit_diff": -0.047757614135742185,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 18036,
+              "token": " tear",
+              "count": 522,
+              "frac": 0.522
+            },
+            {
+              "id": 90306,
+              "token": " ActionTypes",
+              "count": 281,
+              "frac": 0.281
+            },
+            {
+              "id": 31364,
+              "token": ".jet",
+              "count": 54,
+              "frac": 0.054
+            },
+            {
+              "id": 18225,
+              "token": "dit",
+              "count": 24,
+              "frac": 0.024
+            },
+            {
+              "id": 20800,
+              "token": "447",
+              "count": 23,
+              "frac": 0.023
+            },
+            {
+              "id": 31358,
+              "token": ".twig",
+              "count": 16,
+              "frac": 0.016
+            },
+            {
+              "id": 7362,
+              "token": " foreign",
+              "count": 15,
+              "frac": 0.015
+            },
+            {
+              "id": 87183,
+              "token": "wij",
+              "count": 11,
+              "frac": 0.011
+            },
+            {
+              "id": 111390,
+              "token": "\u03b1\u03b9\u03b4",
+              "count": 10,
+              "frac": 0.01
+            },
+            {
+              "id": 85128,
+              "token": "elts",
+              "count": 10,
+              "frac": 0.01
+            },
+            {
+              "id": 109980,
+              "token": "IIIK",
+              "count": 9,
+              "frac": 0.009
+            },
+            {
+              "id": 36605,
+              "token": "halten",
+              "count": 7,
+              "frac": 0.007
+            }
+          ],
+          "n_distinct": 19,
+          "target_frac": 0.0,
+          "distractor_frac": 0.0,
+          "other_frac": 1.0
+        }
+      }
+    },
+    "honest_instruction": {
+      "full": {
+        "accuracy": 0.106,
+        "logit_diff": -1.41575,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 28788,
+              "token": " trains",
+              "count": 125,
+              "frac": 0.125
+            },
+            {
+              "id": 9013,
+              "token": " updates",
+              "count": 81,
+              "frac": 0.081
+            },
+            {
+              "id": 14620,
+              "token": " walls",
+              "count": 79,
+              "frac": 0.079
+            },
+            {
+              "id": 27035,
+              "token": " floors",
+              "count": 77,
+              "frac": 0.077
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 72,
+              "frac": 0.072
+            },
+            {
+              "id": 3215,
+              "token": " button",
+              "count": 61,
+              "frac": 0.061
+            },
+            {
+              "id": 27861,
+              "token": " trucks",
+              "count": 50,
+              "frac": 0.05
+            },
+            {
+              "id": 23301,
+              "token": " stocks",
+              "count": 46,
+              "frac": 0.046
+            },
+            {
+              "id": 27460,
+              "token": " bonds",
+              "count": 46,
+              "frac": 0.046
+            },
+            {
+              "id": 6381,
+              "token": " finish",
+              "count": 32,
+              "frac": 0.032
+            },
+            {
+              "id": 35358,
+              "token": " joints",
+              "count": 32,
+              "frac": 0.032
+            },
+            {
+              "id": 10401,
+              "token": " coverage",
+              "count": 28,
+              "frac": 0.028
+            }
+          ],
+          "n_distinct": 40,
+          "target_frac": 0.112,
+          "distractor_frac": 0.888,
+          "other_frac": 0.0
+        }
+      },
+      "circuit": {
+        "accuracy": 0.468,
+        "logit_diff": -0.05510006332397461,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 18036,
+              "token": " tear",
+              "count": 474,
+              "frac": 0.474
+            },
+            {
+              "id": 90306,
+              "token": " ActionTypes",
+              "count": 334,
+              "frac": 0.334
+            },
+            {
+              "id": 31364,
+              "token": ".jet",
+              "count": 52,
+              "frac": 0.052
+            },
+            {
+              "id": 18225,
+              "token": "dit",
+              "count": 24,
+              "frac": 0.024
+            },
+            {
+              "id": 7362,
+              "token": " foreign",
+              "count": 20,
+              "frac": 0.02
+            },
+            {
+              "id": 20800,
+              "token": "447",
+              "count": 17,
+              "frac": 0.017
+            },
+            {
+              "id": 111390,
+              "token": "\u03b1\u03b9\u03b4",
+              "count": 16,
+              "frac": 0.016
+            },
+            {
+              "id": 31358,
+              "token": ".twig",
+              "count": 11,
+              "frac": 0.011
+            },
+            {
+              "id": 109980,
+              "token": "IIIK",
+              "count": 8,
+              "frac": 0.008
+            },
+            {
+              "id": 87183,
+              "token": "wij",
+              "count": 7,
+              "frac": 0.007
+            },
+            {
+              "id": 85128,
+              "token": "elts",
+              "count": 7,
+              "frac": 0.007
+            },
+            {
+              "id": 96015,
+              "token": " queryInterface",
+              "count": 7,
+              "frac": 0.007
+            }
+          ],
+          "n_distinct": 21,
+          "target_frac": 0.0,
+          "distractor_frac": 0.0,
+          "other_frac": 1.0
+        }
+      }
+    }
+  },
+  "skipped": {},
+  "headline": {
+    "circuit_logit_diff_with_pressure": -0.048186992168426514,
+    "circuit_logit_diff_honest_instruction": -0.05510006332397461,
+    "delta": -0.006913071155548095
+  },
+  "seconds": 263.1
+}

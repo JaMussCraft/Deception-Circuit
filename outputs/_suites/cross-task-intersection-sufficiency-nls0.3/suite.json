@@ -1,0 +1,183 @@
+{
+  "schema_version": 1,
+  "created": "2026-08-24T15:14:54",
+  "root": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_suites/cross-task-intersection-sufficiency-nls0.3",
+  "argv": [
+    "evaluate_circuit.py",
+    "--circuit",
+    "far=outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+    "--circuit",
+    "sdr=outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+    "--circuit",
+    "ser=outputs/llama-8b-instruct_ser/nls0.3_noedge_260823-080655",
+    "--expr",
+    "shared=far & sdr & ser",
+    "--task-from",
+    "outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+    "--task-from",
+    "outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+    "--task-from",
+    "outputs/llama-8b-instruct_ser/nls0.3_noedge_260823-080655",
+    "--suite-name",
+    "cross-task-intersection-sufficiency-nls0.3"
+  ],
+  "ablation": "interchange",
+  "evals": [
+    "sanity",
+    "knockout",
+    "null",
+    "pressure"
+  ],
+  "model": "llama-8b-instruct",
+  "geometry": {
+    "num_heads": 32,
+    "head_dim": 128,
+    "intermediate_size": 14336,
+    "hidden_size": 4096,
+    "num_layers": 32
+  },
+  "compose_granularity": "both",
+  "membership_convention": {
+    "leaf": "attention_neurons / mlp_hidden / mlp_output",
+    "head": "attention_heads + mlp_blocks",
+    "embedding": "not a set member; the OR of the operands' gates",
+    "coarse_gates": "re-derived bottom-up from the fine gates"
+  },
+  "circuits": [
+    {
+      "label": "shared__leaf",
+      "kind": "leaf",
+      "expr": "far & sdr & ser",
+      "operands": {
+        "far": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+        "sdr": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+        "ser": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_ser/nls0.3_noedge_260823-080655"
+      },
+      "home_run_dir": null,
+      "counts": {
+        "attention_neurons": 883,
+        "mlp_hidden": 138,
+        "mlp_output": 115,
+        "attention_heads": 22,
+        "attention_blocks": 7,
+        "mlp_blocks": 1
+      }
+    },
+    {
+      "label": "shared__head",
+      "kind": "head",
+      "expr": "far & sdr & ser",
+      "operands": {
+        "far": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+        "sdr": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+        "ser": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_ser/nls0.3_noedge_260823-080655"
+      },
+      "home_run_dir": null,
+      "counts": {
+        "attention_heads": 22,
+        "mlp_blocks": 1,
+        "attention_neurons": 2396,
+        "mlp_hidden": 3279,
+        "mlp_output": 1444,
+        "attention_blocks": 7
+      }
+    }
+  ],
+  "tasks": [
+    {
+      "label": "far",
+      "task": "far",
+      "home_run_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "dataset": {
+        "data_dir": "./data/datasets",
+        "std_variant": "azaria",
+        "deception_condition": "deceptive",
+        "test_samples": 1000
+      }
+    },
+    {
+      "label": "sdr",
+      "task": "sdr",
+      "home_run_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "dataset": {
+        "data_dir": "./data/datasets",
+        "std_variant": "azaria",
+        "deception_condition": "deceptive",
+        "test_samples": 1000
+      }
+    },
+    {
+      "label": "ser",
+      "task": "ser",
+      "home_run_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_ser/nls0.3_noedge_260823-080655",
+      "dataset": {
+        "data_dir": "./data/datasets",
+        "std_variant": "azaria",
+        "deception_condition": "deceptive",
+        "test_samples": 1000
+      }
+    }
+  ],
+  "cli": {
+    "ablation": "interchange",
+    "all_pairs_delta": false,
+    "circuit": [
+      "far=outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "sdr=outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "ser=outputs/llama-8b-instruct_ser/nls0.3_noedge_260823-080655"
+    ],
+    "compose_granularity": "both",
+    "data_dir": null,
+    "device": "cuda",
+    "dry_run": false,
+    "eval_batch_size": 32,
+    "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+    ],
+    "expr": [
+      "shared=far & sdr & ser"
+    ],
+    "gen_examples": 3,
+    "gen_new_tokens": 48,
+    "hf_token": null,
+    "knockout_granularity": "finest",
+    "legacy": false,
+    "mean_source": "pooled",
+    "n_random": 50,
+    "null_alloc": "uniform",
+    "null_count": null,
+    "null_seed": 0,
+    "null_start": 0,
+    "output_dir": null,
+    "ref_cache_device": "cuda",
+    "reference": "separate",
+    "run_dir": null,
+    "sanity_granularity": "all",
+    "save_null_masks": false,
+    "skip_wikitext": false,
+    "std_variant": null,
+    "strict": false,
+    "suite_name": "cross-task-intersection-sufficiency-nls0.3",
+    "task": null,
+    "task_from": [
+      "outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "outputs/llama-8b-instruct_ser/nls0.3_noedge_260823-080655"
+    ],
+    "test_samples": null,
+    "verify": true,
+    "wikitext_batch_size": 4,
+    "wikitext_block_size": 512,
+    "wikitext_blocks": 64,
+    "wikitext_seed": 0,
+    "xor": null
+  },
+  "versions": {
+    "mask_algorithm": 1,
+    "numpy": "2.5.1",
+    "python": "3.12.13"
+  }
+}

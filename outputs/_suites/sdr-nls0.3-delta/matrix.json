@@ -1,0 +1,85 @@
+{
+  "created": "2026-08-25T11:12:29",
+  "cells": [
+    {
+      "circuit": "delta_sdr__leaf",
+      "circuit_kind": "leaf",
+      "expr": "sdrD-sdrH",
+      "task": "sdr",
+      "ablation": "interchange",
+      "out_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_suites/sdr-nls0.3-delta/cells/delta_sdr__leaf/sdr/interchange",
+      "counts": {
+        "attention_neurons": 2019,
+        "mlp_hidden": 3463,
+        "mlp_output": 1875,
+        "attention_heads": 68,
+        "attention_blocks": 13,
+        "mlp_blocks": 3
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.075,
+          "wikitext_kl": 0.6589056733064353,
+          "honest_accuracy_drop": -0.16
+        },
+        "null": {
+          "accuracy": 0.0,
+          "logit_diff": 22.0,
+          "kl_div": 20.0,
+          "exact_match": 0.0
+        },
+        "pressure": {
+          "circuit_logit_diff_with_pressure": -1.783875,
+          "circuit_logit_diff_honest_instruction": 1.549125,
+          "delta": 3.333
+        }
+      },
+      "skipped": {
+        "sanity": "circuit 'delta_sdr__leaf' is composed (sdrD-sdrH), so there is no run whose results.json it could reproduce"
+      },
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.639e-04, ppl ratio 1.000321)"
+      ]
+    },
+    {
+      "circuit": "delta_sdr__head",
+      "circuit_kind": "head",
+      "expr": "sdrD-sdrH",
+      "task": "sdr",
+      "ablation": "interchange",
+      "out_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_suites/sdr-nls0.3-delta/cells/delta_sdr__head/sdr/interchange",
+      "counts": {
+        "attention_heads": 17,
+        "mlp_blocks": 1,
+        "attention_neurons": 890,
+        "mlp_hidden": 1209,
+        "mlp_output": 1186,
+        "attention_blocks": 8
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.643,
+          "wikitext_kl": 0.5744406841695309,
+          "honest_accuracy_drop": -0.017999999999999988
+        },
+        "null": {
+          "accuracy": 0.0,
+          "logit_diff": 100.0,
+          "kl_div": 100.0,
+          "exact_match": 0.0
+        },
+        "pressure": {
+          "circuit_logit_diff_with_pressure": -1.7825,
+          "circuit_logit_diff_honest_instruction": 1.5525,
+          "delta": 3.335
+        }
+      },
+      "skipped": {
+        "sanity": "circuit 'delta_sdr__head' is composed (sdrD-sdrH), so there is no run whose results.json it could reproduce"
+      },
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.639e-04, ppl ratio 1.000321)"
+      ]
+    }
+  ]
+}

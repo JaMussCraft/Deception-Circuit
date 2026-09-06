@@ -1,0 +1,743 @@
+{
+  "granularity": "finest",
+  "ablation": "mean",
+  "counts": {
+    "ablated_fine_units": 11251,
+    "total_fine_units": 720896
+  },
+  "task": {
+    "circuit": {
+      "accuracy": 0.3333333333333333,
+      "logit_diff": -0.5592447916666666,
+      "kl_div": 9.840339660644531,
+      "exact_match": 0.0,
+      "n": 24,
+      "argmax": {
+        "top": [
+          {
+            "id": 220,
+            "token": " ",
+            "count": 24,
+            "frac": 1.0
+          }
+        ],
+        "n_distinct": 1,
+        "target_frac": 0.0,
+        "distractor_frac": 0.0,
+        "other_frac": 1.0
+      }
+    },
+    "knockout": {
+      "accuracy": 0.5,
+      "logit_diff": 0.21354166666666666,
+      "kl_div": 1.5547351837158203,
+      "exact_match": 0.125,
+      "n": 24,
+      "argmax": {
+        "top": [
+          {
+            "id": 279,
+            "token": " the",
+            "count": 19,
+            "frac": 0.7916666666666666
+          },
+          {
+            "id": 16181,
+            "token": " reads",
+            "count": 4,
+            "frac": 0.16666666666666666
+          },
+          {
+            "id": 23468,
+            "token": " charging",
+            "count": 1,
+            "frac": 0.041666666666666664
+          }
+        ],
+        "n_distinct": 3,
+        "target_frac": 0.125,
+        "distractor_frac": 0.08333333333333333,
+        "other_frac": 0.7916666666666666
+      }
+    }
+  },
+  "wikitext": {
+    "blocks": 64,
+    "block_size": 512,
+    "pairing_seed": 0,
+    "discovered": {
+      "kl_per_token": 0.7108550774864852,
+      "kl_sem": 0.004450837183502108,
+      "ppl_ablated": 20.13987677135839,
+      "ppl_full": 10.217077516243679,
+      "ppl_ratio": 1.971197413285638,
+      "n_tokens": 32768
+    },
+    "floor": {
+      "kl_per_token": 0.0006639252571858378,
+      "kl_sem": 1.035102609332883e-05,
+      "ppl_ablated": 10.220362054980498,
+      "ppl_full": 10.217077516243679,
+      "ppl_ratio": 1.0003214753662775,
+      "n_tokens": 32768
+    },
+    "floor_ok": false,
+    "null": {
+      "rows": [
+        {
+          "index": 0,
+          "kl_per_token": 0.305431816726923,
+          "kl_sem": 0.0019482084359243202,
+          "ppl_ablated": 13.41165403612936,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.3126702831418051,
+          "n_tokens": 32768
+        },
+        {
+          "index": 1,
+          "kl_per_token": 0.34154448995832354,
+          "kl_sem": 0.002159654938083929,
+          "ppl_ablated": 13.833362647827649,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.3539451595463183,
+          "n_tokens": 32768
+        },
+        {
+          "index": 2,
+          "kl_per_token": 0.36154108750633895,
+          "kl_sem": 0.0022046521958409247,
+          "ppl_ablated": 14.304242528855942,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.4000326909641492,
+          "n_tokens": 32768
+        },
+        {
+          "index": 3,
+          "kl_per_token": 0.3238006919855252,
+          "kl_sem": 0.002267951859421589,
+          "ppl_ablated": 13.615654112740279,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.332636861283802,
+          "n_tokens": 32768
+        },
+        {
+          "index": 4,
+          "kl_per_token": 0.3337279255501926,
+          "kl_sem": 0.002182313338186436,
+          "ppl_ablated": 13.821980108024169,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.3528310895213642,
+          "n_tokens": 32768
+        },
+        {
+          "index": 5,
+          "kl_per_token": 0.38248330110218376,
+          "kl_sem": 0.0024219970530117356,
+          "ppl_ablated": 14.752898165531066,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.4439450167698238,
+          "n_tokens": 32768
+        },
+        {
+          "index": 6,
+          "kl_per_token": 0.2980043110437691,
+          "kl_sem": 0.0019361193321757013,
+          "ppl_ablated": 13.412557676012945,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.3127587272083348,
+          "n_tokens": 32768
+        },
+        {
+          "index": 7,
+          "kl_per_token": 0.4367369972169399,
+          "kl_sem": 0.003054212083644423,
+          "ppl_ablated": 15.398355610538111,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.5071193877169815,
+          "n_tokens": 32768
+        },
+        {
+          "index": 8,
+          "kl_per_token": 0.35632030153647065,
+          "kl_sem": 0.002252301383958957,
+          "ppl_ablated": 14.235604301232716,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.3933147006666202,
+          "n_tokens": 32768
+        },
+        {
+          "index": 9,
+          "kl_per_token": 0.3171587580582127,
+          "kl_sem": 0.002097432792250127,
+          "ppl_ablated": 13.517152221049683,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.3229959545241154,
+          "n_tokens": 32768
+        },
+        {
+          "index": 10,
+          "kl_per_token": 0.35738110973034054,
+          "kl_sem": 0.002235082275786851,
+          "ppl_ablated": 13.808539527730677,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.351515588070766,
+          "n_tokens": 32768
+        },
+        {
+          "index": 11,
+          "kl_per_token": 0.2869762689806521,
+          "kl_sem": 0.0019327724591861862,
+          "ppl_ablated": 13.201756951393973,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.292126533287536,
+          "n_tokens": 32768
+        },
+        {
+          "index": 12,
+          "kl_per_token": 0.32337590062525123,
+          "kl_sem": 0.002018903853457653,
+          "ppl_ablated": 13.708477836234202,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.341722015364932,
+          "n_tokens": 32768
+        },
+        {
+          "index": 13,
+          "kl_per_token": 0.40444032312370837,
+          "kl_sem": 0.0031399102155097113,
+          "ppl_ablated": 15.112308826594859,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.4791224596826704,
+          "n_tokens": 32768
+        },
+        {
+          "index": 14,
+          "kl_per_token": 0.35574431042186916,
+          "kl_sem": 0.0020831617596587916,
+          "ppl_ablated": 14.253301868785988,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.395046856219432,
+          "n_tokens": 32768
+        },
+        {
+          "index": 15,
+          "kl_per_token": 0.3412587159546092,
+          "kl_sem": 0.0021569108636671185,
+          "ppl_ablated": 13.985851669583534,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.368870075356485,
+          "n_tokens": 32768
+        },
+        {
+          "index": 16,
+          "kl_per_token": 0.3454476981423795,
+          "kl_sem": 0.002099549358203681,
+          "ppl_ablated": 14.012925789253854,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.3715199641947833,
+          "n_tokens": 32768
+        },
+        {
+          "index": 17,
+          "kl_per_token": 0.3377163428813219,
+          "kl_sem": 0.0021020438129169604,
+          "ppl_ablated": 13.95285135412132,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.365640158052858,
+          "n_tokens": 32768
+        },
+        {
+          "index": 18,
+          "kl_per_token": 0.3065045360708609,
+          "kl_sem": 0.0018656952100774011,
+          "ppl_ablated": 13.442305715627715,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.3156703268871544,
+          "n_tokens": 32768
+        },
+        {
+          "index": 19,
+          "kl_per_token": 0.3346854862757027,
+          "kl_sem": 0.0022069118966764256,
+          "ppl_ablated": 13.758732079821705,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.3466406668587283,
+          "n_tokens": 32768
+        },
+        {
+          "index": 20,
+          "kl_per_token": 0.3325766255147755,
+          "kl_sem": 0.0023570074573776617,
+          "ppl_ablated": 13.767634520351788,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.3475119963084587,
+          "n_tokens": 32768
+        },
+        {
+          "index": 21,
+          "kl_per_token": 0.32273383426945657,
+          "kl_sem": 0.0018707994381002672,
+          "ppl_ablated": 13.69509051452731,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.3404117266169404,
+          "n_tokens": 32768
+        },
+        {
+          "index": 22,
+          "kl_per_token": 0.3591120835626498,
+          "kl_sem": 0.002554912703977867,
+          "ppl_ablated": 13.827612716512917,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.3533823830277307,
+          "n_tokens": 32768
+        },
+        {
+          "index": 23,
+          "kl_per_token": 0.399851978989318,
+          "kl_sem": 0.0027893082986338398,
+          "ppl_ablated": 14.664504482340483,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.435293454417473,
+          "n_tokens": 32768
+        },
+        {
+          "index": 24,
+          "kl_per_token": 0.3843978215008974,
+          "kl_sem": 0.0028161122212692342,
+          "ppl_ablated": 14.942683686297999,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.462520340336196,
+          "n_tokens": 32768
+        },
+        {
+          "index": 25,
+          "kl_per_token": 0.40126961120404303,
+          "kl_sem": 0.002694051335974095,
+          "ppl_ablated": 15.039591908679395,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.4720052661603686,
+          "n_tokens": 32768
+        },
+        {
+          "index": 26,
+          "kl_per_token": 0.3140517625724897,
+          "kl_sem": 0.0022319317528458876,
+          "ppl_ablated": 13.398855167006147,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.3114175893942177,
+          "n_tokens": 32768
+        },
+        {
+          "index": 27,
+          "kl_per_token": 0.37420298205688596,
+          "kl_sem": 0.002338571179203767,
+          "ppl_ablated": 14.721754688491831,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.440896838169855,
+          "n_tokens": 32768
+        },
+        {
+          "index": 28,
+          "kl_per_token": 0.31833723944146186,
+          "kl_sem": 0.0020112630069377734,
+          "ppl_ablated": 13.594229727861102,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.330539942194648,
+          "n_tokens": 32768
+        },
+        {
+          "index": 29,
+          "kl_per_token": 0.33577851217705756,
+          "kl_sem": 0.0022232783080605592,
+          "ppl_ablated": 13.884909001235032,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.3589902767361832,
+          "n_tokens": 32768
+        },
+        {
+          "index": 30,
+          "kl_per_token": 0.35570909967646,
+          "kl_sem": 0.0020864743640435185,
+          "ppl_ablated": 14.17963811903779,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.387836991203621,
+          "n_tokens": 32768
+        },
+        {
+          "index": 31,
+          "kl_per_token": 0.33021999814081937,
+          "kl_sem": 0.0017907911408765575,
+          "ppl_ablated": 13.853753732530468,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.3559409440228871,
+          "n_tokens": 32768
+        },
+        {
+          "index": 32,
+          "kl_per_token": 0.4171322926413268,
+          "kl_sem": 0.0025133331858354425,
+          "ppl_ablated": 15.36323941053206,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.5036823774809114,
+          "n_tokens": 32768
+        },
+        {
+          "index": 33,
+          "kl_per_token": 0.3184509347192943,
+          "kl_sem": 0.0018309087587518758,
+          "ppl_ablated": 13.778336670567978,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.348559472966943,
+          "n_tokens": 32768
+        },
+        {
+          "index": 34,
+          "kl_per_token": 0.3060530071379617,
+          "kl_sem": 0.0019328937175567724,
+          "ppl_ablated": 13.46033509061648,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.3174349582076177,
+          "n_tokens": 32768
+        },
+        {
+          "index": 35,
+          "kl_per_token": 0.3880305828060955,
+          "kl_sem": 0.0024858802452558154,
+          "ppl_ablated": 14.67154041846086,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.4359820991017471,
+          "n_tokens": 32768
+        },
+        {
+          "index": 36,
+          "kl_per_token": 0.35913852811791,
+          "kl_sem": 0.0022142699671400413,
+          "ppl_ablated": 14.035410551327024,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.373720668069,
+          "n_tokens": 32768
+        },
+        {
+          "index": 37,
+          "kl_per_token": 0.36209632514510304,
+          "kl_sem": 0.002312151771945191,
+          "ppl_ablated": 14.063105633215377,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.3764313337994227,
+          "n_tokens": 32768
+        },
+        {
+          "index": 38,
+          "kl_per_token": 0.31265363737475127,
+          "kl_sem": 0.0018863269942419392,
+          "ppl_ablated": 13.624092019421205,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.3334627243221817,
+          "n_tokens": 32768
+        },
+        {
+          "index": 39,
+          "kl_per_token": 0.3422004799358547,
+          "kl_sem": 0.0021109153180162554,
+          "ppl_ablated": 13.92543920451934,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.3629571844179416,
+          "n_tokens": 32768
+        },
+        {
+          "index": 40,
+          "kl_per_token": 0.3471177520696074,
+          "kl_sem": 0.002135685675110732,
+          "ppl_ablated": 14.156846634718038,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.3856062667833042,
+          "n_tokens": 32768
+        },
+        {
+          "index": 41,
+          "kl_per_token": 0.326570579665713,
+          "kl_sem": 0.002071916819519291,
+          "ppl_ablated": 13.589911723776064,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.3301173160495323,
+          "n_tokens": 32768
+        },
+        {
+          "index": 42,
+          "kl_per_token": 0.34202897280920297,
+          "kl_sem": 0.0023434843764398314,
+          "ppl_ablated": 13.869066781813702,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.3574397140242782,
+          "n_tokens": 32768
+        },
+        {
+          "index": 43,
+          "kl_per_token": 0.313622145797126,
+          "kl_sem": 0.0019060008067133757,
+          "ppl_ablated": 13.757056885921918,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.3464767066756793,
+          "n_tokens": 32768
+        },
+        {
+          "index": 44,
+          "kl_per_token": 0.31944851123262197,
+          "kl_sem": 0.0021864999852316816,
+          "ppl_ablated": 13.598249357760904,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.330933364863059,
+          "n_tokens": 32768
+        },
+        {
+          "index": 45,
+          "kl_per_token": 0.34539774723816663,
+          "kl_sem": 0.0023333874473828193,
+          "ppl_ablated": 13.800720914410284,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.3507503385845054,
+          "n_tokens": 32768
+        },
+        {
+          "index": 46,
+          "kl_per_token": 0.36462985223624855,
+          "kl_sem": 0.0023534896416074207,
+          "ppl_ablated": 14.122606888438469,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.382255039759223,
+          "n_tokens": 32768
+        },
+        {
+          "index": 47,
+          "kl_per_token": 0.3482201562728733,
+          "kl_sem": 0.002070013562948391,
+          "ppl_ablated": 13.881796946022664,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.3586856832545913,
+          "n_tokens": 32768
+        },
+        {
+          "index": 48,
+          "kl_per_token": 0.31846279953606427,
+          "kl_sem": 0.0020715561666559685,
+          "ppl_ablated": 13.642079930512777,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.3352232973493485,
+          "n_tokens": 32768
+        },
+        {
+          "index": 49,
+          "kl_per_token": 0.36022674513515085,
+          "kl_sem": 0.0024395591570522206,
+          "ppl_ablated": 13.883430611268354,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.3588455788062392,
+          "n_tokens": 32768
+        }
+      ],
+      "stats": {
+        "kl_per_token": {
+          "n": 50,
+          "better": "lower",
+          "mean": 0.3454000594373792,
+          "std": 0.03204117392493796,
+          "min": 0.2869762689806521,
+          "max": 0.4367369972169399,
+          "p5": 0.3057113524118904,
+          "p50": 0.34178673138376325,
+          "p95": 0.4030135027598589,
+          "best": 0.2869762689806521,
+          "discovered": 0.7108550774864852,
+          "percentile": 0.0,
+          "p_value": 1.0,
+          "z": -11.405793648673678,
+          "passes_95th": false
+        },
+        "ppl_ratio": {
+          "n": 50,
+          "better": "lower",
+          "mean": 1.3709087277684555,
+          "std": 0.051137054401371944,
+          "min": 1.292126533287536,
+          "max": 1.5071193877169815,
+          "p5": 1.3127100829717435,
+          "p50": 1.3566903290235826,
+          "p95": 1.4759197225976346,
+          "best": 1.292126533287536,
+          "discovered": 1.971197413285638,
+          "percentile": 0.0,
+          "p_value": 1.0,
+          "z": -11.738820167574563,
+          "passes_95th": false
+        }
+      }
+    },
+    "verification": {
+      "wikitext_floor_is_zero": false
+    }
+  },
+  "honest": {
+    "variant": "honest_instruction",
+    "description": "the pressure clause replaced by an explicit instruction to answer honestly",
+    "label_convention": "Labels are unchanged from the trained test set: `target` is the DECEPTIVE answer and `distractor` the honest one. Under a prompt variant, accuracy therefore reads as 'still gives the deceptive answer' and logit_diff as logit(deceptive) - logit(honest). The desired result is accuracy FALLING and logit_diff going NEGATIVE.",
+    "rows": {
+      "full": {
+        "accuracy": 0.625,
+        "logit_diff": 0.5104166666666666,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 24,
+        "argmax": {
+          "top": [
+            {
+              "id": 9198,
+              "token": " timer",
+              "count": 9,
+              "frac": 0.375
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 5,
+              "frac": 0.20833333333333334
+            },
+            {
+              "id": 14238,
+              "token": " writes",
+              "count": 5,
+              "frac": 0.20833333333333334
+            },
+            {
+              "id": 27460,
+              "token": " bonds",
+              "count": 2,
+              "frac": 0.08333333333333333
+            },
+            {
+              "id": 14994,
+              "token": " cable",
+              "count": 2,
+              "frac": 0.08333333333333333
+            },
+            {
+              "id": 23468,
+              "token": " charging",
+              "count": 1,
+              "frac": 0.041666666666666664
+            }
+          ],
+          "n_distinct": 6,
+          "target_frac": 0.625,
+          "distractor_frac": 0.375,
+          "other_frac": 0.0
+        }
+      },
+      "circuit": {
+        "accuracy": 0.3333333333333333,
+        "logit_diff": -0.5611979166666666,
+        "kl_div": 9.561692555745443,
+        "exact_match": 0.0,
+        "n": 24,
+        "argmax": {
+          "top": [
+            {
+              "id": 220,
+              "token": " ",
+              "count": 24,
+              "frac": 1.0
+            }
+          ],
+          "n_distinct": 1,
+          "target_frac": 0.0,
+          "distractor_frac": 0.0,
+          "other_frac": 1.0
+        }
+      },
+      "knockout": {
+        "accuracy": 0.4583333333333333,
+        "logit_diff": 0.10677083333333333,
+        "kl_div": 1.746869405110677,
+        "exact_match": 0.041666666666666664,
+        "n": 24,
+        "argmax": {
+          "top": [
+            {
+              "id": 279,
+              "token": " the",
+              "count": 23,
+              "frac": 0.9583333333333334
+            },
+            {
+              "id": 23468,
+              "token": " charging",
+              "count": 1,
+              "frac": 0.041666666666666664
+            }
+          ],
+          "n_distinct": 2,
+          "target_frac": 0.041666666666666664,
+          "distractor_frac": 0.0,
+          "other_frac": 0.9583333333333334
+        }
+      }
+    },
+    "headline": {
+      "full_accuracy": 0.625,
+      "knockout_accuracy": 0.4583333333333333,
+      "full_minus_knockout": 0.16666666666666669
+    }
+  },
+  "generation": {
+    "source": "wikitext-2 (test), the same blocks as the collateral-damage measurement, truncated to BOS + context",
+    "n_examples": 3,
+    "prompt_tokens": 25,
+    "new_tokens": 48,
+    "decoding": "greedy, no KV cache (the corrupted stream cannot carry one)",
+    "pairing_seed": 0,
+    "ablation": "mean",
+    "configs": [
+      "full",
+      "knockout",
+      "circuit_only"
+    ],
+    "examples": [
+      {
+        "index": 0,
+        "prompt": "<|begin_of_text|> = Robert Boulter = \n\n\n\n\n Robert Boulter is an English film , television and theatre actor . He had a",
+        "continuations": {
+          "full": " starring role in the 2007 film \" The Bank Job \" , and has appeared in the BBC television series \" Luther \" and \" Ripper Street \" . == Early life == Boulter was born in London , England . == Career",
+          "knockout": " long and successful career in the early 20th century , and is best known for his work in the 1920s and 1930s . He was a regular on the stage and in the early years of the 20th",
+          "circuit_only": "                                                "
+        }
+      },
+      {
+        "index": 1,
+        "prompt": "<|begin_of_text|> as \" horribly menacing \" in the role , and he received critical reviews in The Herald , and Evening Standard . He appeared",
+        "continuations": {
+          "full": " in the 2007 film \" The Golden Compass \" as a minor character , and in the 2008 film \" The Chronicles of Narnia : Prince Caspian \" as a Centaur . He also appeared in the 200",
+          "knockout": " in the 2006 film \" The Departed \" as a \" minor \" role . He also appeared in the 2007 film \" The Bourne Ultimatum \" as a \" minor \" role . He also appeared in the ",
+          "circuit_only": "                                                "
+        }
+      },
+      {
+        "index": 2,
+        "prompt": "<|begin_of_text|> to the stage as William . \" \n\n\n Boulter starred in two films in 2008 , Daylight Robbery",
+        "continuations": {
+          "full": " and The Children . In 2009 , he appeared in the film The Boat That Rocked . In 2010 , he appeared in the film The Kid Who Would Be King . In 2011 , he appeared in the film The",
+          "knockout": " and The Other One . He also had a small part in the 2009 film \" The Boat That Rocked \" . He also had a part in the 2009 film \" The Boat That Rocked \" . He also had a",
+          "circuit_only": "                                                "
+        }
+      }
+    ]
+  },
+  "headline": {
+    "task_accuracy": 0.5,
+    "wikitext_kl": 0.7108550774864852,
+    "honest_accuracy_drop": 0.16666666666666669
+  },
+  "verification": {
+    "knockout_is_exact_complement": true,
+    "wikitext_floor_is_zero": false
+  },
+  "seconds": 695.4
+}

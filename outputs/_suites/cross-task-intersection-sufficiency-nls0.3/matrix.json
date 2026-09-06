@@ -1,0 +1,245 @@
+{
+  "created": "2026-08-24T21:13:59",
+  "cells": [
+    {
+      "circuit": "shared__leaf",
+      "circuit_kind": "leaf",
+      "expr": "far & sdr & ser",
+      "task": "far",
+      "ablation": "interchange",
+      "out_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_suites/cross-task-intersection-sufficiency-nls0.3/cells/shared__leaf/far/interchange",
+      "counts": {
+        "attention_neurons": 883,
+        "mlp_hidden": 138,
+        "mlp_output": 115,
+        "attention_heads": 22,
+        "attention_blocks": 7,
+        "mlp_blocks": 1
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.007,
+          "wikitext_kl": 0.07478872014326043,
+          "honest_accuracy_drop": -0.683
+        },
+        "null": {
+          "accuracy": 0.0,
+          "logit_diff": 100.0,
+          "kl_div": 100.0,
+          "exact_match": 0.0
+        },
+        "pressure": {
+          "circuit_logit_diff_with_pressure": -2.12325,
+          "circuit_logit_diff_honest_instruction": 1.38075,
+          "delta": 3.504
+        }
+      },
+      "skipped": {
+        "sanity": "circuit 'shared__leaf' is composed (far & sdr & ser), so there is no run whose results.json it could reproduce"
+      },
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.639e-04, ppl ratio 1.000321)"
+      ]
+    },
+    {
+      "circuit": "shared__head",
+      "circuit_kind": "head",
+      "expr": "far & sdr & ser",
+      "task": "far",
+      "ablation": "interchange",
+      "out_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_suites/cross-task-intersection-sufficiency-nls0.3/cells/shared__head/far/interchange",
+      "counts": {
+        "attention_heads": 22,
+        "mlp_blocks": 1,
+        "attention_neurons": 2396,
+        "mlp_hidden": 3279,
+        "mlp_output": 1444,
+        "attention_blocks": 7
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.0,
+          "wikitext_kl": 1.4585315929725766,
+          "honest_accuracy_drop": -0.751
+        },
+        "null": {
+          "accuracy": 0.0,
+          "logit_diff": 100.0,
+          "kl_div": 100.0,
+          "exact_match": 0.0
+        },
+        "pressure": {
+          "circuit_logit_diff_with_pressure": -1.872125,
+          "circuit_logit_diff_honest_instruction": 1.6515,
+          "delta": 3.523625
+        }
+      },
+      "skipped": {
+        "sanity": "circuit 'shared__head' is composed (far & sdr & ser), so there is no run whose results.json it could reproduce"
+      },
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.639e-04, ppl ratio 1.000321)"
+      ]
+    },
+    {
+      "circuit": "shared__leaf",
+      "circuit_kind": "leaf",
+      "expr": "far & sdr & ser",
+      "task": "sdr",
+      "ablation": "interchange",
+      "out_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_suites/cross-task-intersection-sufficiency-nls0.3/cells/shared__leaf/sdr/interchange",
+      "counts": {
+        "attention_neurons": 883,
+        "mlp_hidden": 138,
+        "mlp_output": 115,
+        "attention_heads": 22,
+        "attention_blocks": 7,
+        "mlp_blocks": 1
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.035,
+          "wikitext_kl": 0.07478872014326043,
+          "honest_accuracy_drop": -0.44100000000000006
+        },
+        "null": {
+          "accuracy": 0.0,
+          "logit_diff": 100.0,
+          "kl_div": 100.0,
+          "exact_match": 0.0
+        },
+        "pressure": {
+          "circuit_logit_diff_with_pressure": -1.78175,
+          "circuit_logit_diff_honest_instruction": 1.551,
+          "delta": 3.33275
+        }
+      },
+      "skipped": {
+        "sanity": "circuit 'shared__leaf' is composed (far & sdr & ser), so there is no run whose results.json it could reproduce"
+      },
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.639e-04, ppl ratio 1.000321)"
+      ]
+    },
+    {
+      "circuit": "shared__head",
+      "circuit_kind": "head",
+      "expr": "far & sdr & ser",
+      "task": "sdr",
+      "ablation": "interchange",
+      "out_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_suites/cross-task-intersection-sufficiency-nls0.3/cells/shared__head/sdr/interchange",
+      "counts": {
+        "attention_heads": 22,
+        "mlp_blocks": 1,
+        "attention_neurons": 2396,
+        "mlp_hidden": 3279,
+        "mlp_output": 1444,
+        "attention_blocks": 7
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.0,
+          "wikitext_kl": 1.4585315929725766,
+          "honest_accuracy_drop": -0.51
+        },
+        "null": {
+          "accuracy": 0.0,
+          "logit_diff": 100.0,
+          "kl_div": 100.0,
+          "exact_match": 0.0
+        },
+        "pressure": {
+          "circuit_logit_diff_with_pressure": -1.743375,
+          "circuit_logit_diff_honest_instruction": 1.572375,
+          "delta": 3.31575
+        }
+      },
+      "skipped": {
+        "sanity": "circuit 'shared__head' is composed (far & sdr & ser), so there is no run whose results.json it could reproduce"
+      },
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.639e-04, ppl ratio 1.000321)"
+      ]
+    },
+    {
+      "circuit": "shared__leaf",
+      "circuit_kind": "leaf",
+      "expr": "far & sdr & ser",
+      "task": "ser",
+      "ablation": "interchange",
+      "out_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_suites/cross-task-intersection-sufficiency-nls0.3/cells/shared__leaf/ser/interchange",
+      "counts": {
+        "attention_neurons": 883,
+        "mlp_hidden": 138,
+        "mlp_output": 115,
+        "attention_heads": 22,
+        "attention_blocks": 7,
+        "mlp_blocks": 1
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.034,
+          "wikitext_kl": 0.07478872014326043,
+          "honest_accuracy_drop": 0.055999999999999994
+        },
+        "null": {
+          "accuracy": 0.0,
+          "logit_diff": 100.0,
+          "kl_div": 100.0,
+          "exact_match": 0.0
+        },
+        "pressure": {
+          "circuit_logit_diff_with_pressure": -1.395,
+          "circuit_logit_diff_honest_instruction": -0.261,
+          "delta": 1.134
+        }
+      },
+      "skipped": {
+        "sanity": "circuit 'shared__leaf' is composed (far & sdr & ser), so there is no run whose results.json it could reproduce"
+      },
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.639e-04, ppl ratio 1.000321)"
+      ]
+    },
+    {
+      "circuit": "shared__head",
+      "circuit_kind": "head",
+      "expr": "far & sdr & ser",
+      "task": "ser",
+      "ablation": "interchange",
+      "out_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_suites/cross-task-intersection-sufficiency-nls0.3/cells/shared__head/ser/interchange",
+      "counts": {
+        "attention_heads": 22,
+        "mlp_blocks": 1,
+        "attention_neurons": 2396,
+        "mlp_hidden": 3279,
+        "mlp_output": 1444,
+        "attention_blocks": 7
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.0,
+          "wikitext_kl": 1.4585315929725766,
+          "honest_accuracy_drop": 0.05299999999999999
+        },
+        "null": {
+          "accuracy": 0.0,
+          "logit_diff": 100.0,
+          "kl_div": 100.0,
+          "exact_match": 0.0
+        },
+        "pressure": {
+          "circuit_logit_diff_with_pressure": -1.228,
+          "circuit_logit_diff_honest_instruction": -0.09375,
+          "delta": 1.13425
+        }
+      },
+      "skipped": {
+        "sanity": "circuit 'shared__head' is composed (far & sdr & ser), so there is no run whose results.json it could reproduce"
+      },
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.639e-04, ppl ratio 1.000321)"
+      ]
+    }
+  ]
+}

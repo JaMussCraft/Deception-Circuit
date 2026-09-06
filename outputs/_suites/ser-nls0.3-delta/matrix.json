@@ -1,0 +1,86 @@
+{
+  "created": "2026-08-25T09:36:34",
+  "cells": [
+    {
+      "circuit": "delta_ser__leaf",
+      "circuit_kind": "leaf",
+      "expr": "serD-serH",
+      "task": "ser",
+      "ablation": "interchange",
+      "out_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_suites/ser-nls0.3-delta/cells/delta_ser__leaf/ser/interchange",
+      "counts": {
+        "attention_neurons": 1209,
+        "mlp_hidden": 1005,
+        "mlp_output": 713,
+        "attention_heads": 41,
+        "attention_blocks": 10,
+        "mlp_blocks": 2
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.5833333333333334,
+          "wikitext_kl": 0.29517840570770204,
+          "honest_accuracy_drop": 0.08333333333333337
+        },
+        "null": {
+          "accuracy": 0.0,
+          "logit_diff": 100.0,
+          "kl_div": 100.0,
+          "exact_match": 0.0
+        },
+        "pressure": {
+          "circuit_logit_diff_with_pressure": -1.3697916666666667,
+          "circuit_logit_diff_honest_instruction": -0.057291666666666664,
+          "delta": 1.3125
+        }
+      },
+      "skipped": {
+        "sanity": "circuit 'delta_ser__leaf' is composed (serD-serH), so there is no run whose results.json it could reproduce"
+      },
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.639e-04, ppl ratio 1.000321)"
+      ]
+    },
+    {
+      "circuit": "delta_ser__head",
+      "circuit_kind": "head",
+      "expr": "serD-serH",
+      "task": "ser",
+      "ablation": "interchange",
+      "out_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_suites/ser-nls0.3-delta/cells/delta_ser__head/ser/interchange",
+      "counts": {
+        "attention_heads": 10,
+        "mlp_blocks": 0,
+        "attention_neurons": 699,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_blocks": 6
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.5833333333333334,
+          "wikitext_kl": 0.026975586013577413,
+          "honest_accuracy_drop": 0.0
+        },
+        "null": {
+          "accuracy": 0.0,
+          "logit_diff": 68.0,
+          "kl_div": 100.0,
+          "exact_match": 0.0
+        },
+        "pressure": {
+          "circuit_logit_diff_with_pressure": -1.3802083333333333,
+          "circuit_logit_diff_honest_instruction": -0.057291666666666664,
+          "delta": 1.3229166666666665
+        }
+      },
+      "skipped": {
+        "sanity": "circuit 'delta_ser__head' is composed (serD-serH), so there is no run whose results.json it could reproduce"
+      },
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.639e-04, ppl ratio 1.000321)",
+        "null: 50 random circuits did not load with the discovered circuit's gate counts"
+      ]
+    }
+  ]
+}

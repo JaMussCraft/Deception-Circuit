@@ -1,0 +1,550 @@
+{
+  "ablation": "interchange",
+  "label_convention": "Labels are unchanged from the trained test set: `target` is the DECEPTIVE answer and `distractor` the honest one. Under a prompt variant, accuracy therefore reads as 'still gives the deceptive answer' and logit_diff as logit(deceptive) - logit(honest). The desired result is accuracy FALLING and logit_diff going NEGATIVE.",
+  "variant_descriptions": {
+    "with_pressure": "the test set as trained \u2014 the pressure clause is present",
+    "no_pressure": "the pressure clause deleted, nothing in its place",
+    "honest_instruction": "the pressure clause replaced by an explicit instruction to answer honestly"
+  },
+  "metrics": [
+    "accuracy",
+    "logit_diff"
+  ],
+  "variants": {
+    "with_pressure": {
+      "full": {
+        "accuracy": 1.0,
+        "logit_diff": 2.150875,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 28788,
+              "token": " trains",
+              "count": 92,
+              "frac": 0.092
+            },
+            {
+              "id": 27861,
+              "token": " trucks",
+              "count": 83,
+              "frac": 0.083
+            },
+            {
+              "id": 27035,
+              "token": " floors",
+              "count": 78,
+              "frac": 0.078
+            },
+            {
+              "id": 14620,
+              "token": " walls",
+              "count": 78,
+              "frac": 0.078
+            },
+            {
+              "id": 3215,
+              "token": " button",
+              "count": 72,
+              "frac": 0.072
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 61,
+              "frac": 0.061
+            },
+            {
+              "id": 27460,
+              "token": " bonds",
+              "count": 47,
+              "frac": 0.047
+            },
+            {
+              "id": 20126,
+              "token": " queries",
+              "count": 46,
+              "frac": 0.046
+            },
+            {
+              "id": 23301,
+              "token": " stocks",
+              "count": 45,
+              "frac": 0.045
+            },
+            {
+              "id": 9013,
+              "token": " updates",
+              "count": 36,
+              "frac": 0.036
+            },
+            {
+              "id": 8824,
+              "token": " capacity",
+              "count": 28,
+              "frac": 0.028
+            },
+            {
+              "id": 10401,
+              "token": " coverage",
+              "count": 27,
+              "frac": 0.027
+            }
+          ],
+          "n_distinct": 42,
+          "target_frac": 1.0,
+          "distractor_frac": 0.0,
+          "other_frac": 0.0
+        }
+      },
+      "circuit": {
+        "accuracy": 0.0,
+        "logit_diff": -2.125125,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 27861,
+              "token": " trucks",
+              "count": 92,
+              "frac": 0.092
+            },
+            {
+              "id": 28788,
+              "token": " trains",
+              "count": 83,
+              "frac": 0.083
+            },
+            {
+              "id": 14620,
+              "token": " walls",
+              "count": 78,
+              "frac": 0.078
+            },
+            {
+              "id": 27035,
+              "token": " floors",
+              "count": 78,
+              "frac": 0.078
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 72,
+              "frac": 0.072
+            },
+            {
+              "id": 3215,
+              "token": " button",
+              "count": 61,
+              "frac": 0.061
+            },
+            {
+              "id": 23301,
+              "token": " stocks",
+              "count": 47,
+              "frac": 0.047
+            },
+            {
+              "id": 9013,
+              "token": " updates",
+              "count": 46,
+              "frac": 0.046
+            },
+            {
+              "id": 27460,
+              "token": " bonds",
+              "count": 45,
+              "frac": 0.045
+            },
+            {
+              "id": 20126,
+              "token": " queries",
+              "count": 36,
+              "frac": 0.036
+            },
+            {
+              "id": 10401,
+              "token": " coverage",
+              "count": 28,
+              "frac": 0.028
+            },
+            {
+              "id": 8824,
+              "token": " capacity",
+              "count": 27,
+              "frac": 0.027
+            }
+          ],
+          "n_distinct": 42,
+          "target_frac": 0.0,
+          "distractor_frac": 1.0,
+          "other_frac": 0.0
+        }
+      }
+    },
+    "no_pressure": {
+      "full": {
+        "accuracy": 0.058,
+        "logit_diff": -2.026875,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 28788,
+              "token": " trains",
+              "count": 94,
+              "frac": 0.094
+            },
+            {
+              "id": 27861,
+              "token": " trucks",
+              "count": 81,
+              "frac": 0.081
+            },
+            {
+              "id": 14620,
+              "token": " walls",
+              "count": 78,
+              "frac": 0.078
+            },
+            {
+              "id": 9013,
+              "token": " updates",
+              "count": 78,
+              "frac": 0.078
+            },
+            {
+              "id": 27035,
+              "token": " floors",
+              "count": 78,
+              "frac": 0.078
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 72,
+              "frac": 0.072
+            },
+            {
+              "id": 3215,
+              "token": " button",
+              "count": 61,
+              "frac": 0.061
+            },
+            {
+              "id": 23301,
+              "token": " stocks",
+              "count": 47,
+              "frac": 0.047
+            },
+            {
+              "id": 27460,
+              "token": " bonds",
+              "count": 45,
+              "frac": 0.045
+            },
+            {
+              "id": 10401,
+              "token": " coverage",
+              "count": 28,
+              "frac": 0.028
+            },
+            {
+              "id": 8824,
+              "token": " capacity",
+              "count": 27,
+              "frac": 0.027
+            },
+            {
+              "id": 35358,
+              "token": " joints",
+              "count": 26,
+              "frac": 0.026
+            }
+          ],
+          "n_distinct": 42,
+          "target_frac": 0.061,
+          "distractor_frac": 0.939,
+          "other_frac": 0.0
+        }
+      },
+      "circuit": {
+        "accuracy": 0.931,
+        "logit_diff": 1.980875,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 28788,
+              "token": " trains",
+              "count": 100,
+              "frac": 0.1
+            },
+            {
+              "id": 9013,
+              "token": " updates",
+              "count": 79,
+              "frac": 0.079
+            },
+            {
+              "id": 27035,
+              "token": " floors",
+              "count": 78,
+              "frac": 0.078
+            },
+            {
+              "id": 14620,
+              "token": " walls",
+              "count": 78,
+              "frac": 0.078
+            },
+            {
+              "id": 27861,
+              "token": " trucks",
+              "count": 75,
+              "frac": 0.075
+            },
+            {
+              "id": 3215,
+              "token": " button",
+              "count": 72,
+              "frac": 0.072
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 61,
+              "frac": 0.061
+            },
+            {
+              "id": 27460,
+              "token": " bonds",
+              "count": 47,
+              "frac": 0.047
+            },
+            {
+              "id": 23301,
+              "token": " stocks",
+              "count": 45,
+              "frac": 0.045
+            },
+            {
+              "id": 8824,
+              "token": " capacity",
+              "count": 28,
+              "frac": 0.028
+            },
+            {
+              "id": 35358,
+              "token": " joints",
+              "count": 28,
+              "frac": 0.028
+            },
+            {
+              "id": 10401,
+              "token": " coverage",
+              "count": 27,
+              "frac": 0.027
+            }
+          ],
+          "n_distinct": 42,
+          "target_frac": 0.934,
+          "distractor_frac": 0.066,
+          "other_frac": 0.0
+        }
+      }
+    },
+    "honest_instruction": {
+      "full": {
+        "accuracy": 0.106,
+        "logit_diff": -1.41575,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 28788,
+              "token": " trains",
+              "count": 125,
+              "frac": 0.125
+            },
+            {
+              "id": 9013,
+              "token": " updates",
+              "count": 81,
+              "frac": 0.081
+            },
+            {
+              "id": 14620,
+              "token": " walls",
+              "count": 79,
+              "frac": 0.079
+            },
+            {
+              "id": 27035,
+              "token": " floors",
+              "count": 77,
+              "frac": 0.077
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 72,
+              "frac": 0.072
+            },
+            {
+              "id": 3215,
+              "token": " button",
+              "count": 61,
+              "frac": 0.061
+            },
+            {
+              "id": 27861,
+              "token": " trucks",
+              "count": 50,
+              "frac": 0.05
+            },
+            {
+              "id": 23301,
+              "token": " stocks",
+              "count": 46,
+              "frac": 0.046
+            },
+            {
+              "id": 27460,
+              "token": " bonds",
+              "count": 46,
+              "frac": 0.046
+            },
+            {
+              "id": 6381,
+              "token": " finish",
+              "count": 32,
+              "frac": 0.032
+            },
+            {
+              "id": 35358,
+              "token": " joints",
+              "count": 32,
+              "frac": 0.032
+            },
+            {
+              "id": 10401,
+              "token": " coverage",
+              "count": 28,
+              "frac": 0.028
+            }
+          ],
+          "n_distinct": 40,
+          "target_frac": 0.112,
+          "distractor_frac": 0.888,
+          "other_frac": 0.0
+        }
+      },
+      "circuit": {
+        "accuracy": 0.857,
+        "logit_diff": 1.379375,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 28788,
+              "token": " trains",
+              "count": 122,
+              "frac": 0.122
+            },
+            {
+              "id": 14620,
+              "token": " walls",
+              "count": 83,
+              "frac": 0.083
+            },
+            {
+              "id": 9013,
+              "token": " updates",
+              "count": 82,
+              "frac": 0.082
+            },
+            {
+              "id": 27035,
+              "token": " floors",
+              "count": 73,
+              "frac": 0.073
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 72,
+              "frac": 0.072
+            },
+            {
+              "id": 3215,
+              "token": " button",
+              "count": 61,
+              "frac": 0.061
+            },
+            {
+              "id": 27861,
+              "token": " trucks",
+              "count": 53,
+              "frac": 0.053
+            },
+            {
+              "id": 27460,
+              "token": " bonds",
+              "count": 47,
+              "frac": 0.047
+            },
+            {
+              "id": 23301,
+              "token": " stocks",
+              "count": 45,
+              "frac": 0.045
+            },
+            {
+              "id": 35358,
+              "token": " joints",
+              "count": 34,
+              "frac": 0.034
+            },
+            {
+              "id": 8824,
+              "token": " capacity",
+              "count": 28,
+              "frac": 0.028
+            },
+            {
+              "id": 6381,
+              "token": " finish",
+              "count": 28,
+              "frac": 0.028
+            }
+          ],
+          "n_distinct": 40,
+          "target_frac": 0.872,
+          "distractor_frac": 0.128,
+          "other_frac": 0.0
+        }
+      }
+    }
+  },
+  "skipped": {},
+  "headline": {
+    "circuit_logit_diff_with_pressure": -2.125125,
+    "circuit_logit_diff_honest_instruction": 1.379375,
+    "delta": 3.5045
+  },
+  "seconds": 266.8
+}

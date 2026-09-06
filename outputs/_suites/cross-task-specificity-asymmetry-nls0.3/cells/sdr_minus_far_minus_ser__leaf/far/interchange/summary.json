@@ -1,0 +1,553 @@
+{
+  "schema_version": 1,
+  "created": "2026-08-27T16:15:40",
+  "run_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+  "ablation": "interchange",
+  "model": "llama-8b-instruct",
+  "task": "far",
+  "metric_columns": [
+    [
+      "accuracy",
+      "Accuracy"
+    ],
+    [
+      "logit_diff",
+      "Logit Diff"
+    ],
+    [
+      "kl_div",
+      "KL Div"
+    ],
+    [
+      "exact_match",
+      "Exact Match"
+    ]
+  ],
+  "metric_better": {
+    "accuracy": "higher",
+    "logit_diff": "higher",
+    "exact_match": "higher",
+    "kl_div": "lower",
+    "prob_diff": "higher",
+    "cutoff_sharpness": "higher"
+  },
+  "geometry": {
+    "num_heads": 32,
+    "head_dim": 128,
+    "intermediate_size": 14336,
+    "hidden_size": 4096,
+    "num_layers": 32
+  },
+  "cli": {
+    "ablation": "interchange",
+    "all_pairs_delta": false,
+    "circuit": [
+      "far=outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "sdr=outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "ser=outputs/llama-8b-instruct_ser/nls0.3_noedge_260823-080655"
+    ],
+    "compose_granularity": "both",
+    "data_dir": null,
+    "device": "cuda",
+    "dry_run": false,
+    "eval_batch_size": 32,
+    "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+    ],
+    "expr": null,
+    "gen_examples": 3,
+    "gen_new_tokens": 48,
+    "hf_token": null,
+    "knockout_granularity": "finest",
+    "legacy": false,
+    "mean_source": "pooled",
+    "n_random": 50,
+    "null_alloc": "uniform",
+    "null_count": null,
+    "null_seed": 0,
+    "null_start": 0,
+    "output_dir": null,
+    "ref_cache_device": "cuda",
+    "reference": "separate",
+    "run_dir": null,
+    "sanity_granularity": "all",
+    "save_null_masks": false,
+    "skip_wikitext": false,
+    "std_variant": null,
+    "strict": false,
+    "suite_name": "cross-task-specificity-asymmetry-nls0.3",
+    "task": null,
+    "task_from": [
+      "outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "outputs/llama-8b-instruct_ser/nls0.3_noedge_260823-080655"
+    ],
+    "test_samples": null,
+    "verify": true,
+    "wikitext_batch_size": 4,
+    "wikitext_block_size": 512,
+    "wikitext_blocks": 64,
+    "wikitext_seed": 0,
+    "xor": "far,sdr,ser"
+  },
+  "circuit": {
+    "counts": {
+      "attention_neurons": {
+        "active": 2778,
+        "total": 131072,
+        "per_layer": {
+          "4": 195,
+          "5": 244,
+          "8": 229,
+          "9": 255,
+          "10": 215,
+          "11": 308,
+          "12": 193,
+          "13": 280,
+          "14": 268,
+          "15": 101,
+          "17": 30,
+          "24": 176,
+          "27": 284
+        }
+      },
+      "mlp_hidden": {
+        "active": 3565,
+        "total": 458752,
+        "per_layer": {
+          "0": 1066,
+          "14": 1707,
+          "31": 792
+        }
+      },
+      "mlp_output": {
+        "active": 1702,
+        "total": 131072,
+        "per_layer": {
+          "0": 202,
+          "14": 585,
+          "31": 915
+        }
+      },
+      "attention_heads": {
+        "active": 68,
+        "total": 1024,
+        "per_layer": {
+          "4": 2,
+          "5": 5,
+          "8": 8,
+          "9": 7,
+          "10": 5,
+          "11": 5,
+          "12": 5,
+          "13": 6,
+          "14": 7,
+          "15": 4,
+          "17": 3,
+          "24": 7,
+          "27": 4
+        }
+      },
+      "attention_blocks": {
+        "active": 13,
+        "total": 32,
+        "per_layer": {
+          "4": 1,
+          "5": 1,
+          "8": 1,
+          "9": 1,
+          "10": 1,
+          "11": 1,
+          "12": 1,
+          "13": 1,
+          "14": 1,
+          "15": 1,
+          "17": 1,
+          "24": 1,
+          "27": 1
+        }
+      },
+      "mlp_blocks": {
+        "active": 3,
+        "total": 32,
+        "per_layer": {
+          "0": 1,
+          "14": 1,
+          "31": 1
+        }
+      }
+    }
+  },
+  "sanity_circuit": {
+    "granularity": "all",
+    "counts": {
+      "attention_neurons": {
+        "active": 2778,
+        "total": 131072,
+        "per_layer": {
+          "4": 195,
+          "5": 244,
+          "8": 229,
+          "9": 255,
+          "10": 215,
+          "11": 308,
+          "12": 193,
+          "13": 280,
+          "14": 268,
+          "15": 101,
+          "17": 30,
+          "24": 176,
+          "27": 284
+        }
+      },
+      "mlp_hidden": {
+        "active": 3565,
+        "total": 458752,
+        "per_layer": {
+          "0": 1066,
+          "14": 1707,
+          "31": 792
+        }
+      },
+      "mlp_output": {
+        "active": 1702,
+        "total": 131072,
+        "per_layer": {
+          "0": 202,
+          "14": 585,
+          "31": 915
+        }
+      },
+      "attention_heads": {
+        "active": 68,
+        "total": 1024,
+        "per_layer": {
+          "4": 2,
+          "5": 5,
+          "8": 8,
+          "9": 7,
+          "10": 5,
+          "11": 5,
+          "12": 5,
+          "13": 6,
+          "14": 7,
+          "15": 4,
+          "17": 3,
+          "24": 7,
+          "27": 4
+        }
+      },
+      "attention_blocks": {
+        "active": 13,
+        "total": 32,
+        "per_layer": {
+          "4": 1,
+          "5": 1,
+          "8": 1,
+          "9": 1,
+          "10": 1,
+          "11": 1,
+          "12": 1,
+          "13": 1,
+          "14": 1,
+          "15": 1,
+          "17": 1,
+          "24": 1,
+          "27": 1
+        }
+      },
+      "mlp_blocks": {
+        "active": 3,
+        "total": 32,
+        "per_layer": {
+          "0": 1,
+          "14": 1,
+          "31": 1
+        }
+      }
+    }
+  },
+  "knockout": {
+    "granularity": "finest",
+    "counts": {
+      "attention_neurons": {
+        "active": 128294,
+        "total": 131072,
+        "per_layer": {
+          "0": 4096,
+          "1": 4096,
+          "2": 4096,
+          "3": 4096,
+          "4": 3901,
+          "5": 3852,
+          "6": 4096,
+          "7": 4096,
+          "8": 3867,
+          "9": 3841,
+          "10": 3881,
+          "11": 3788,
+          "12": 3903,
+          "13": 3816,
+          "14": 3828,
+          "15": 3995,
+          "16": 4096,
+          "17": 4066,
+          "18": 4096,
+          "19": 4096,
+          "20": 4096,
+          "21": 4096,
+          "22": 4096,
+          "23": 4096,
+          "24": 3920,
+          "25": 4096,
+          "26": 4096,
+          "27": 3812,
+          "28": 4096,
+          "29": 4096,
+          "30": 4096,
+          "31": 4096
+        }
+      },
+      "mlp_hidden": {
+        "active": 455187,
+        "total": 458752,
+        "per_layer": {
+          "0": 13270,
+          "1": 14336,
+          "2": 14336,
+          "3": 14336,
+          "4": 14336,
+          "5": 14336,
+          "6": 14336,
+          "7": 14336,
+          "8": 14336,
+          "9": 14336,
+          "10": 14336,
+          "11": 14336,
+          "12": 14336,
+          "13": 14336,
+          "14": 12629,
+          "15": 14336,
+          "16": 14336,
+          "17": 14336,
+          "18": 14336,
+          "19": 14336,
+          "20": 14336,
+          "21": 14336,
+          "22": 14336,
+          "23": 14336,
+          "24": 14336,
+          "25": 14336,
+          "26": 14336,
+          "27": 14336,
+          "28": 14336,
+          "29": 14336,
+          "30": 14336,
+          "31": 13544
+        }
+      },
+      "mlp_output": {
+        "active": 129370,
+        "total": 131072,
+        "per_layer": {
+          "0": 3894,
+          "1": 4096,
+          "2": 4096,
+          "3": 4096,
+          "4": 4096,
+          "5": 4096,
+          "6": 4096,
+          "7": 4096,
+          "8": 4096,
+          "9": 4096,
+          "10": 4096,
+          "11": 4096,
+          "12": 4096,
+          "13": 4096,
+          "14": 3511,
+          "15": 4096,
+          "16": 4096,
+          "17": 4096,
+          "18": 4096,
+          "19": 4096,
+          "20": 4096,
+          "21": 4096,
+          "22": 4096,
+          "23": 4096,
+          "24": 4096,
+          "25": 4096,
+          "26": 4096,
+          "27": 4096,
+          "28": 4096,
+          "29": 4096,
+          "30": 4096,
+          "31": 3181
+        }
+      },
+      "attention_heads": {
+        "active": 1024,
+        "total": 1024,
+        "per_layer": {
+          "0": 32,
+          "1": 32,
+          "2": 32,
+          "3": 32,
+          "4": 32,
+          "5": 32,
+          "6": 32,
+          "7": 32,
+          "8": 32,
+          "9": 32,
+          "10": 32,
+          "11": 32,
+          "12": 32,
+          "13": 32,
+          "14": 32,
+          "15": 32,
+          "16": 32,
+          "17": 32,
+          "18": 32,
+          "19": 32,
+          "20": 32,
+          "21": 32,
+          "22": 32,
+          "23": 32,
+          "24": 32,
+          "25": 32,
+          "26": 32,
+          "27": 32,
+          "28": 32,
+          "29": 32,
+          "30": 32,
+          "31": 32
+        }
+      },
+      "attention_blocks": {
+        "active": 32,
+        "total": 32,
+        "per_layer": {
+          "0": 1,
+          "1": 1,
+          "2": 1,
+          "3": 1,
+          "4": 1,
+          "5": 1,
+          "6": 1,
+          "7": 1,
+          "8": 1,
+          "9": 1,
+          "10": 1,
+          "11": 1,
+          "12": 1,
+          "13": 1,
+          "14": 1,
+          "15": 1,
+          "16": 1,
+          "17": 1,
+          "18": 1,
+          "19": 1,
+          "20": 1,
+          "21": 1,
+          "22": 1,
+          "23": 1,
+          "24": 1,
+          "25": 1,
+          "26": 1,
+          "27": 1,
+          "28": 1,
+          "29": 1,
+          "30": 1,
+          "31": 1
+        }
+      },
+      "mlp_blocks": {
+        "active": 32,
+        "total": 32,
+        "per_layer": {
+          "0": 1,
+          "1": 1,
+          "2": 1,
+          "3": 1,
+          "4": 1,
+          "5": 1,
+          "6": 1,
+          "7": 1,
+          "8": 1,
+          "9": 1,
+          "10": 1,
+          "11": 1,
+          "12": 1,
+          "13": 1,
+          "14": 1,
+          "15": 1,
+          "16": 1,
+          "17": 1,
+          "18": 1,
+          "19": 1,
+          "20": 1,
+          "21": 1,
+          "22": 1,
+          "23": 1,
+          "24": 1,
+          "25": 1,
+          "26": 1,
+          "27": 1,
+          "28": 1,
+          "29": 1,
+          "30": 1,
+          "31": 1
+        }
+      }
+    }
+  },
+  "reference_numbers": {
+    "source": "results.json:node_eval",
+    "node_eval": null,
+    "baseline": null
+  },
+  "verification": {
+    "masks_roundtrip": true,
+    "knockout_is_exact_complement": true,
+    "wikitext_floor_is_zero": false,
+    "null_circuits_size_matched": true
+  },
+  "circuit_spec": {
+    "label": "sdr_minus_far_minus_ser__leaf",
+    "kind": "leaf",
+    "expr": "sdr\\far\\ser",
+    "operands": {
+      "sdr": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "far": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "ser": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_ser/nls0.3_noedge_260823-080655"
+    },
+    "home_run_dir": null,
+    "counts": {
+      "attention_neurons": 2778,
+      "mlp_hidden": 3565,
+      "mlp_output": 1702,
+      "attention_heads": 68,
+      "attention_blocks": 13,
+      "mlp_blocks": 3
+    }
+  },
+  "task_spec": {
+    "label": "far",
+    "task": "far",
+    "home_run_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+    "dataset": {
+      "data_dir": "./data/datasets",
+      "std_variant": "azaria",
+      "deception_condition": "deceptive",
+      "test_samples": 1000
+    }
+  },
+  "failures": [
+    "knockout: the all-gates-open wikitext floor is not zero (KL 6.639e-04, ppl ratio 1.000321)"
+  ],
+  "skipped": {
+    "sanity": "circuit 'sdr_minus_far_minus_ser__leaf' is composed (sdr\\far\\ser), so there is no run whose results.json it could reproduce"
+  }
+}

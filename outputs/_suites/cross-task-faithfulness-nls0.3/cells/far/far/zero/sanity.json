@@ -1,0 +1,331 @@
+{
+  "batch_size": 7,
+  "n": 1000,
+  "ablation": "zero",
+  "granularity": "all",
+  "counts": {
+    "attention_blocks": {
+      "active": 10,
+      "total": 32,
+      "per_layer": {
+        "7": 1,
+        "8": 1,
+        "9": 1,
+        "12": 1,
+        "13": 1,
+        "14": 1,
+        "15": 1,
+        "17": 1,
+        "22": 1,
+        "24": 1
+      }
+    },
+    "mlp_blocks": {
+      "active": 1,
+      "total": 32,
+      "per_layer": {
+        "0": 1
+      }
+    },
+    "attention_heads": {
+      "active": 48,
+      "total": 1024,
+      "per_layer": {
+        "7": 5,
+        "8": 5,
+        "9": 5,
+        "12": 7,
+        "13": 5,
+        "14": 4,
+        "15": 3,
+        "17": 3,
+        "22": 3,
+        "24": 8
+      }
+    },
+    "attention_neurons": {
+      "active": 3289,
+      "total": 131072,
+      "per_layer": {
+        "7": 314,
+        "8": 330,
+        "9": 322,
+        "12": 422,
+        "13": 287,
+        "14": 319,
+        "15": 289,
+        "17": 264,
+        "22": 253,
+        "24": 489
+      }
+    },
+    "mlp_hidden": {
+      "active": 1319,
+      "total": 458752,
+      "per_layer": {
+        "0": 1319
+      }
+    },
+    "mlp_output": {
+      "active": 828,
+      "total": 131072,
+      "per_layer": {
+        "0": 828
+      }
+    }
+  },
+  "label": "discovered circuit",
+  "rows": {
+    "full_open": {
+      "accuracy": 1.0,
+      "logit_diff": 2.14175,
+      "kl_div": 0.0,
+      "exact_match": 1.0,
+      "n": 1000
+    },
+    "discovered": {
+      "accuracy": 0.481,
+      "logit_diff": -0.04891714477539062,
+      "kl_div": 12.931097755432129,
+      "exact_match": 0.0,
+      "n": 1000,
+      "argmax": {
+        "top": [
+          {
+            "id": 18036,
+            "token": " tear",
+            "count": 513,
+            "frac": 0.513
+          },
+          {
+            "id": 90306,
+            "token": " ActionTypes",
+            "count": 305,
+            "frac": 0.305
+          },
+          {
+            "id": 31364,
+            "token": ".jet",
+            "count": 52,
+            "frac": 0.052
+          },
+          {
+            "id": 20800,
+            "token": "447",
+            "count": 36,
+            "frac": 0.036
+          },
+          {
+            "id": 18225,
+            "token": "dit",
+            "count": 23,
+            "frac": 0.023
+          },
+          {
+            "id": 109980,
+            "token": "IIIK",
+            "count": 13,
+            "frac": 0.013
+          },
+          {
+            "id": 87183,
+            "token": "wij",
+            "count": 9,
+            "frac": 0.009
+          },
+          {
+            "id": 111390,
+            "token": "\u03b1\u03b9\u03b4",
+            "count": 8,
+            "frac": 0.008
+          },
+          {
+            "id": 67278,
+            "token": "weetalert",
+            "count": 7,
+            "frac": 0.007
+          },
+          {
+            "id": 96015,
+            "token": " queryInterface",
+            "count": 7,
+            "frac": 0.007
+          },
+          {
+            "id": 57820,
+            "token": "SCII",
+            "count": 6,
+            "frac": 0.006
+          },
+          {
+            "id": 85128,
+            "token": "elts",
+            "count": 5,
+            "frac": 0.005
+          }
+        ],
+        "n_distinct": 23,
+        "target_frac": 0.0,
+        "distractor_frac": 0.0,
+        "other_frac": 1.0
+      }
+    },
+    "discovered_repo": {
+      "accuracy": 0.481,
+      "logit_diff": -0.04891714477539062,
+      "kl_div": 12.930375,
+      "exact_match": 0.0
+    },
+    "empty": {
+      "accuracy": 0.478,
+      "logit_diff": -0.1535068359375,
+      "kl_div": 12.7491923828125,
+      "exact_match": 0.0,
+      "n": 1000,
+      "argmax": {
+        "top": [
+          {
+            "id": 51782,
+            "token": "otope",
+            "count": 1000,
+            "frac": 1.0
+          }
+        ],
+        "n_distinct": 1,
+        "target_frac": 0.0,
+        "distractor_frac": 0.0,
+        "other_frac": 1.0
+      }
+    }
+  },
+  "reference": {
+    "node_eval": {
+      "accuracy": 0.969,
+      "logit_diff": 2.24125,
+      "kl_div": 0.07816236853599548,
+      "exact_match": 0.973
+    },
+    "baseline": {
+      "accuracy": 1.0,
+      "logit_diff": 2.14175,
+      "kl_div": 0.0,
+      "exact_match": 1.0
+    }
+  },
+  "cross_check": {
+    "ran": true,
+    "ok": false,
+    "max_delta": 0.0007227554321289631,
+    "per_metric": {
+      "accuracy": {
+        "generic": 0.481,
+        "repo": 0.481,
+        "delta": 0.0,
+        "tolerance": 1e-06,
+        "pass": true
+      },
+      "exact_match": {
+        "generic": 0.0,
+        "repo": 0.0,
+        "delta": 0.0,
+        "tolerance": 1e-06,
+        "pass": true
+      },
+      "logit_diff": {
+        "generic": -0.04891714477539062,
+        "repo": -0.04891714477539062,
+        "delta": 0.0,
+        "tolerance": 0.0001,
+        "pass": true
+      },
+      "kl_div": {
+        "generic": 12.931097755432129,
+        "repo": 12.930375,
+        "delta": 0.0007227554321289631,
+        "tolerance": 0.0001,
+        "pass": false
+      }
+    }
+  },
+  "all_open": {
+    "ok": true,
+    "kl_div": 0.0,
+    "exact_match": 1.0,
+    "tolerances": {
+      "kl_div": 0.0001,
+      "exact_match_min": 0.999
+    }
+  },
+  "delta": {
+    "ok": false,
+    "max_delta": 12.852935386896133,
+    "rows": [
+      {
+        "metric": "accuracy",
+        "label": "Accuracy",
+        "expected": 0.969,
+        "observed": 0.481,
+        "delta": -0.488,
+        "tolerance": 0.002,
+        "pass": false
+      },
+      {
+        "metric": "logit_diff",
+        "label": "Logit Diff",
+        "expected": 2.24125,
+        "observed": -0.04891714477539062,
+        "delta": -2.2901671447753906,
+        "tolerance": 0.01,
+        "pass": false
+      },
+      {
+        "metric": "kl_div",
+        "label": "KL Div",
+        "expected": 0.07816236853599548,
+        "observed": 12.931097755432129,
+        "delta": 12.852935386896133,
+        "tolerance": 0.005,
+        "pass": false
+      },
+      {
+        "metric": "exact_match",
+        "label": "Exact Match",
+        "expected": 0.973,
+        "observed": 0.0,
+        "delta": -0.973,
+        "tolerance": 0.002,
+        "pass": false
+      }
+    ]
+  },
+  "headline": {
+    "accuracy": 0.481,
+    "logit_diff": -0.04891714477539062,
+    "kl_div": 12.931097755432129,
+    "exact_match": 0.0
+  },
+  "verification": {
+    "masks_roundtrip": true,
+    "all_open_equals_full": true,
+    "generic_vs_task_evaluate_max_delta": 0.0007227554321289631,
+    "granularity": "all",
+    "reference_numbers": {
+      "source": "results.json:node_eval",
+      "expected": {
+        "accuracy": 0.969,
+        "logit_diff": 2.24125,
+        "kl_div": 0.07816236853599548,
+        "exact_match": 0.973
+      },
+      "observed": {
+        "accuracy": 0.481,
+        "logit_diff": -0.04891714477539062,
+        "kl_div": 12.931097755432129,
+        "exact_match": 0.0
+      },
+      "max_delta": 12.852935386896133,
+      "ok": false
+    }
+  },
+  "seconds": 231.9
+}

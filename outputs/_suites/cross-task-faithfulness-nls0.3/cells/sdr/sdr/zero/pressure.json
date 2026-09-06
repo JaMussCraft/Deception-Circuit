@@ -1,0 +1,550 @@
+{
+  "ablation": "zero",
+  "label_convention": "Labels are unchanged from the trained test set: `target` is the DECEPTIVE answer and `distractor` the honest one. Under a prompt variant, accuracy therefore reads as 'still gives the deceptive answer' and logit_diff as logit(deceptive) - logit(honest). The desired result is accuracy FALLING and logit_diff going NEGATIVE.",
+  "variant_descriptions": {
+    "with_pressure": "the test set as trained \u2014 the pressure clause is present",
+    "no_pressure": "the pressure clause deleted, nothing in its place",
+    "honest_instruction": "the pressure clause replaced by an explicit instruction to answer honestly"
+  },
+  "metrics": [
+    "accuracy",
+    "logit_diff"
+  ],
+  "variants": {
+    "with_pressure": {
+      "full": {
+        "accuracy": 1.0,
+        "logit_diff": 1.7635,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 35719,
+              "token": " calcium",
+              "count": 92,
+              "frac": 0.092
+            },
+            {
+              "id": 39695,
+              "token": " sodium",
+              "count": 92,
+              "frac": 0.092
+            },
+            {
+              "id": 3215,
+              "token": " button",
+              "count": 63,
+              "frac": 0.063
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 55,
+              "frac": 0.055
+            },
+            {
+              "id": 18618,
+              "token": " gate",
+              "count": 47,
+              "frac": 0.047
+            },
+            {
+              "id": 25675,
+              "token": " fence",
+              "count": 42,
+              "frac": 0.042
+            },
+            {
+              "id": 2673,
+              "token": " height",
+              "count": 36,
+              "frac": 0.036
+            },
+            {
+              "id": 1179,
+              "token": " import",
+              "count": 33,
+              "frac": 0.033
+            },
+            {
+              "id": 2612,
+              "token": " output",
+              "count": 32,
+              "frac": 0.032
+            },
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 30,
+              "frac": 0.03
+            },
+            {
+              "id": 7637,
+              "token": " export",
+              "count": 30,
+              "frac": 0.03
+            },
+            {
+              "id": 4785,
+              "token": " weight",
+              "count": 29,
+              "frac": 0.029
+            }
+          ],
+          "n_distinct": 52,
+          "target_frac": 1.0,
+          "distractor_frac": 0.0,
+          "other_frac": 0.0
+        }
+      },
+      "circuit": {
+        "accuracy": 0.489,
+        "logit_diff": -0.01648281478881836,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 120905,
+              "token": "\u0435\u043d\u0443",
+              "count": 489,
+              "frac": 0.489
+            },
+            {
+              "id": 65030,
+              "token": "aleb",
+              "count": 187,
+              "frac": 0.187
+            },
+            {
+              "id": 57998,
+              "token": "ongyang",
+              "count": 123,
+              "frac": 0.123
+            },
+            {
+              "id": 111538,
+              "token": " kalk",
+              "count": 85,
+              "frac": 0.085
+            },
+            {
+              "id": 23709,
+              "token": " trap",
+              "count": 59,
+              "frac": 0.059
+            },
+            {
+              "id": 22288,
+              "token": "itr",
+              "count": 17,
+              "frac": 0.017
+            },
+            {
+              "id": 91243,
+              "token": "pcf",
+              "count": 8,
+              "frac": 0.008
+            },
+            {
+              "id": 28000,
+              "token": "oji",
+              "count": 3,
+              "frac": 0.003
+            },
+            {
+              "id": 111504,
+              "token": " Sokol",
+              "count": 3,
+              "frac": 0.003
+            },
+            {
+              "id": 123669,
+              "token": " teb",
+              "count": 3,
+              "frac": 0.003
+            },
+            {
+              "id": 8977,
+              "token": "uer",
+              "count": 3,
+              "frac": 0.003
+            },
+            {
+              "id": 42598,
+              "token": "prox",
+              "count": 3,
+              "frac": 0.003
+            }
+          ],
+          "n_distinct": 23,
+          "target_frac": 0.0,
+          "distractor_frac": 0.0,
+          "other_frac": 1.0
+        }
+      }
+    },
+    "no_pressure": {
+      "full": {
+        "accuracy": 0.169,
+        "logit_diff": -2.60575,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 39695,
+              "token": " sodium",
+              "count": 134,
+              "frac": 0.134
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 107,
+              "frac": 0.107
+            },
+            {
+              "id": 18618,
+              "token": " gate",
+              "count": 62,
+              "frac": 0.062
+            },
+            {
+              "id": 35719,
+              "token": " calcium",
+              "count": 50,
+              "frac": 0.05
+            },
+            {
+              "id": 7637,
+              "token": " export",
+              "count": 40,
+              "frac": 0.04
+            },
+            {
+              "id": 2612,
+              "token": " output",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 4785,
+              "token": " weight",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 9198,
+              "token": " timer",
+              "count": 36,
+              "frac": 0.036
+            },
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 31,
+              "frac": 0.031
+            },
+            {
+              "id": 4207,
+              "token": " hours",
+              "count": 28,
+              "frac": 0.028
+            },
+            {
+              "id": 2673,
+              "token": " height",
+              "count": 28,
+              "frac": 0.028
+            },
+            {
+              "id": 25675,
+              "token": " fence",
+              "count": 27,
+              "frac": 0.027
+            }
+          ],
+          "n_distinct": 51,
+          "target_frac": 0.17,
+          "distractor_frac": 0.83,
+          "other_frac": 0.0
+        }
+      },
+      "circuit": {
+        "accuracy": 0.484,
+        "logit_diff": -0.013125354766845704,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 120905,
+              "token": "\u0435\u043d\u0443",
+              "count": 398,
+              "frac": 0.398
+            },
+            {
+              "id": 65030,
+              "token": "aleb",
+              "count": 175,
+              "frac": 0.175
+            },
+            {
+              "id": 23709,
+              "token": " trap",
+              "count": 129,
+              "frac": 0.129
+            },
+            {
+              "id": 57998,
+              "token": "ongyang",
+              "count": 113,
+              "frac": 0.113
+            },
+            {
+              "id": 111538,
+              "token": " kalk",
+              "count": 62,
+              "frac": 0.062
+            },
+            {
+              "id": 22288,
+              "token": "itr",
+              "count": 56,
+              "frac": 0.056
+            },
+            {
+              "id": 45660,
+              "token": " traps",
+              "count": 15,
+              "frac": 0.015
+            },
+            {
+              "id": 26014,
+              "token": "irable",
+              "count": 7,
+              "frac": 0.007
+            },
+            {
+              "id": 91243,
+              "token": "pcf",
+              "count": 6,
+              "frac": 0.006
+            },
+            {
+              "id": 8977,
+              "token": "uer",
+              "count": 6,
+              "frac": 0.006
+            },
+            {
+              "id": 113853,
+              "token": " \u95a2",
+              "count": 5,
+              "frac": 0.005
+            },
+            {
+              "id": 57014,
+              "token": "trap",
+              "count": 5,
+              "frac": 0.005
+            }
+          ],
+          "n_distinct": 23,
+          "target_frac": 0.0,
+          "distractor_frac": 0.0,
+          "other_frac": 1.0
+        }
+      }
+    },
+    "honest_instruction": {
+      "full": {
+        "accuracy": 0.231,
+        "logit_diff": -1.627875,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 39695,
+              "token": " sodium",
+              "count": 150,
+              "frac": 0.15
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 111,
+              "frac": 0.111
+            },
+            {
+              "id": 18618,
+              "token": " gate",
+              "count": 70,
+              "frac": 0.07
+            },
+            {
+              "id": 4785,
+              "token": " weight",
+              "count": 43,
+              "frac": 0.043
+            },
+            {
+              "id": 7637,
+              "token": " export",
+              "count": 39,
+              "frac": 0.039
+            },
+            {
+              "id": 2612,
+              "token": " output",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 9198,
+              "token": " timer",
+              "count": 35,
+              "frac": 0.035
+            },
+            {
+              "id": 35719,
+              "token": " calcium",
+              "count": 34,
+              "frac": 0.034
+            },
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 29,
+              "frac": 0.029
+            },
+            {
+              "id": 4207,
+              "token": " hours",
+              "count": 28,
+              "frac": 0.028
+            },
+            {
+              "id": 2430,
+              "token": " width",
+              "count": 28,
+              "frac": 0.028
+            },
+            {
+              "id": 1179,
+              "token": " import",
+              "count": 24,
+              "frac": 0.024
+            }
+          ],
+          "n_distinct": 51,
+          "target_frac": 0.238,
+          "distractor_frac": 0.762,
+          "other_frac": 0.0
+        }
+      },
+      "circuit": {
+        "accuracy": 0.493,
+        "logit_diff": -0.008070213317871094,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 120905,
+              "token": "\u0435\u043d\u0443",
+              "count": 416,
+              "frac": 0.416
+            },
+            {
+              "id": 65030,
+              "token": "aleb",
+              "count": 192,
+              "frac": 0.192
+            },
+            {
+              "id": 57998,
+              "token": "ongyang",
+              "count": 151,
+              "frac": 0.151
+            },
+            {
+              "id": 111538,
+              "token": " kalk",
+              "count": 98,
+              "frac": 0.098
+            },
+            {
+              "id": 23709,
+              "token": " trap",
+              "count": 58,
+              "frac": 0.058
+            },
+            {
+              "id": 22288,
+              "token": "itr",
+              "count": 38,
+              "frac": 0.038
+            },
+            {
+              "id": 6491,
+              "token": "ito",
+              "count": 7,
+              "frac": 0.007
+            },
+            {
+              "id": 111504,
+              "token": " Sokol",
+              "count": 6,
+              "frac": 0.006
+            },
+            {
+              "id": 91243,
+              "token": "pcf",
+              "count": 6,
+              "frac": 0.006
+            },
+            {
+              "id": 42598,
+              "token": "prox",
+              "count": 5,
+              "frac": 0.005
+            },
+            {
+              "id": 8977,
+              "token": "uer",
+              "count": 5,
+              "frac": 0.005
+            },
+            {
+              "id": 45660,
+              "token": " traps",
+              "count": 4,
+              "frac": 0.004
+            }
+          ],
+          "n_distinct": 20,
+          "target_frac": 0.0,
+          "distractor_frac": 0.0,
+          "other_frac": 1.0
+        }
+      }
+    }
+  },
+  "skipped": {},
+  "headline": {
+    "circuit_logit_diff_with_pressure": -0.01648281478881836,
+    "circuit_logit_diff_honest_instruction": -0.008070213317871094,
+    "delta": 0.008412601470947266
+  },
+  "seconds": 263.5
+}

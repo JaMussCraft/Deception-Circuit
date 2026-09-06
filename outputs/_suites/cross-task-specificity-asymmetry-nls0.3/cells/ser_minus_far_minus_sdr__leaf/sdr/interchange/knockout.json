@@ -1,0 +1,1025 @@
+{
+  "granularity": "finest",
+  "ablation": "interchange",
+  "counts": {
+    "ablated_fine_units": 2204,
+    "total_fine_units": 720896
+  },
+  "task": {
+    "circuit": {
+      "accuracy": 0.0,
+      "logit_diff": -1.783875,
+      "kl_div": 1.2304829416275025,
+      "exact_match": 0.0,
+      "n": 1000,
+      "argmax": {
+        "top": [
+          {
+            "id": 39695,
+            "token": " sodium",
+            "count": 92,
+            "frac": 0.092
+          },
+          {
+            "id": 35719,
+            "token": " calcium",
+            "count": 92,
+            "frac": 0.092
+          },
+          {
+            "id": 3480,
+            "token": " switch",
+            "count": 63,
+            "frac": 0.063
+          },
+          {
+            "id": 3215,
+            "token": " button",
+            "count": 55,
+            "frac": 0.055
+          },
+          {
+            "id": 25675,
+            "token": " fence",
+            "count": 47,
+            "frac": 0.047
+          },
+          {
+            "id": 18618,
+            "token": " gate",
+            "count": 42,
+            "frac": 0.042
+          },
+          {
+            "id": 4785,
+            "token": " weight",
+            "count": 36,
+            "frac": 0.036
+          },
+          {
+            "id": 7637,
+            "token": " export",
+            "count": 33,
+            "frac": 0.033
+          },
+          {
+            "id": 23730,
+            "token": " intake",
+            "count": 32,
+            "frac": 0.032
+          },
+          {
+            "id": 38193,
+            "token": " humidity",
+            "count": 30,
+            "frac": 0.03
+          },
+          {
+            "id": 1179,
+            "token": " import",
+            "count": 30,
+            "frac": 0.03
+          },
+          {
+            "id": 2673,
+            "token": " height",
+            "count": 29,
+            "frac": 0.029
+          }
+        ],
+        "n_distinct": 52,
+        "target_frac": 0.0,
+        "distractor_frac": 1.0,
+        "other_frac": 0.0
+      }
+    },
+    "knockout": {
+      "accuracy": 0.977,
+      "logit_diff": 1.494875,
+      "kl_div": 0.01661339922249317,
+      "exact_match": 0.978,
+      "n": 1000,
+      "argmax": {
+        "top": [
+          {
+            "id": 35719,
+            "token": " calcium",
+            "count": 92,
+            "frac": 0.092
+          },
+          {
+            "id": 39695,
+            "token": " sodium",
+            "count": 92,
+            "frac": 0.092
+          },
+          {
+            "id": 3215,
+            "token": " button",
+            "count": 62,
+            "frac": 0.062
+          },
+          {
+            "id": 3480,
+            "token": " switch",
+            "count": 56,
+            "frac": 0.056
+          },
+          {
+            "id": 18618,
+            "token": " gate",
+            "count": 48,
+            "frac": 0.048
+          },
+          {
+            "id": 25675,
+            "token": " fence",
+            "count": 41,
+            "frac": 0.041
+          },
+          {
+            "id": 2673,
+            "token": " height",
+            "count": 36,
+            "frac": 0.036
+          },
+          {
+            "id": 1179,
+            "token": " import",
+            "count": 33,
+            "frac": 0.033
+          },
+          {
+            "id": 2612,
+            "token": " output",
+            "count": 32,
+            "frac": 0.032
+          },
+          {
+            "id": 48913,
+            "token": " vibration",
+            "count": 30,
+            "frac": 0.03
+          },
+          {
+            "id": 7637,
+            "token": " export",
+            "count": 30,
+            "frac": 0.03
+          },
+          {
+            "id": 4785,
+            "token": " weight",
+            "count": 29,
+            "frac": 0.029
+          }
+        ],
+        "n_distinct": 52,
+        "target_frac": 0.978,
+        "distractor_frac": 0.022,
+        "other_frac": 0.0
+      }
+    }
+  },
+  "wikitext": {
+    "blocks": 64,
+    "block_size": 512,
+    "pairing_seed": 0,
+    "discovered": {
+      "kl_per_token": 0.49075357150286436,
+      "kl_sem": 0.004623415098105958,
+      "ppl_ablated": 16.680379961912877,
+      "ppl_full": 10.217077516243679,
+      "ppl_ratio": 1.6325979650632463,
+      "n_tokens": 32768
+    },
+    "floor": {
+      "kl_per_token": 0.0006639252571858378,
+      "kl_sem": 1.035102609332883e-05,
+      "ppl_ablated": 10.220362054980498,
+      "ppl_full": 10.217077516243679,
+      "ppl_ratio": 1.0003214753662775,
+      "n_tokens": 32768
+    },
+    "floor_ok": false,
+    "null": {
+      "rows": [
+        {
+          "index": 0,
+          "kl_per_token": 0.10772267123684287,
+          "kl_sem": 0.00091232571901185,
+          "ppl_ablated": 11.395890146164728,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.115376694367534,
+          "n_tokens": 32768
+        },
+        {
+          "index": 1,
+          "kl_per_token": 0.13214961101766676,
+          "kl_sem": 0.001262607826940072,
+          "ppl_ablated": 11.560498830023425,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.131487826302962,
+          "n_tokens": 32768
+        },
+        {
+          "index": 2,
+          "kl_per_token": 0.13387866038829088,
+          "kl_sem": 0.0012649683305761535,
+          "ppl_ablated": 11.618132660121718,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.1371287573819975,
+          "n_tokens": 32768
+        },
+        {
+          "index": 3,
+          "kl_per_token": 0.113664518983569,
+          "kl_sem": 0.001139374984723282,
+          "ppl_ablated": 11.331945840687569,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.1091181233255214,
+          "n_tokens": 32768
+        },
+        {
+          "index": 4,
+          "kl_per_token": 0.1066277856589295,
+          "kl_sem": 0.0007717181266951968,
+          "ppl_ablated": 11.341110781021985,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.110015145034503,
+          "n_tokens": 32768
+        },
+        {
+          "index": 5,
+          "kl_per_token": 0.10580931411823258,
+          "kl_sem": 0.0008324565040906869,
+          "ppl_ablated": 11.311006426024349,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.107068670864196,
+          "n_tokens": 32768
+        },
+        {
+          "index": 6,
+          "kl_per_token": 0.12752840836765245,
+          "kl_sem": 0.0010836967214384562,
+          "ppl_ablated": 11.623459384408656,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.1376501123661862,
+          "n_tokens": 32768
+        },
+        {
+          "index": 7,
+          "kl_per_token": 0.11650993471266702,
+          "kl_sem": 0.0009184524650750084,
+          "ppl_ablated": 11.410843840357986,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.1168402923650518,
+          "n_tokens": 32768
+        },
+        {
+          "index": 8,
+          "kl_per_token": 0.1281951373675838,
+          "kl_sem": 0.0013023683799477177,
+          "ppl_ablated": 11.517382221785008,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.1272677733406675,
+          "n_tokens": 32768
+        },
+        {
+          "index": 9,
+          "kl_per_token": 0.14366327732568607,
+          "kl_sem": 0.0013254563907874248,
+          "ppl_ablated": 11.772756467457992,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.152262616070105,
+          "n_tokens": 32768
+        },
+        {
+          "index": 10,
+          "kl_per_token": 0.10788815410342067,
+          "kl_sem": 0.0008877384177034863,
+          "ppl_ablated": 11.275389314383979,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.1035826337284549,
+          "n_tokens": 32768
+        },
+        {
+          "index": 11,
+          "kl_per_token": 0.15320013626478612,
+          "kl_sem": 0.0012021330175261441,
+          "ppl_ablated": 11.71436421202449,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.146547453848749,
+          "n_tokens": 32768
+        },
+        {
+          "index": 12,
+          "kl_per_token": 0.12672641611425206,
+          "kl_sem": 0.001288933787578289,
+          "ppl_ablated": 11.519802605382015,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.1275046692233852,
+          "n_tokens": 32768
+        },
+        {
+          "index": 13,
+          "kl_per_token": 0.1379585710237734,
+          "kl_sem": 0.0012780137123111547,
+          "ppl_ablated": 11.750638007518775,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.1500977641440968,
+          "n_tokens": 32768
+        },
+        {
+          "index": 14,
+          "kl_per_token": 0.13193705648882315,
+          "kl_sem": 0.0012156929335822146,
+          "ppl_ablated": 11.578191586567394,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.1332195109765724,
+          "n_tokens": 32768
+        },
+        {
+          "index": 15,
+          "kl_per_token": 0.1081831242190674,
+          "kl_sem": 0.0008864494427564771,
+          "ppl_ablated": 11.337298381112547,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.109642005073161,
+          "n_tokens": 32768
+        },
+        {
+          "index": 16,
+          "kl_per_token": 0.11360650003189221,
+          "kl_sem": 0.0009812952473211745,
+          "ppl_ablated": 11.433700118842436,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.119077358536676,
+          "n_tokens": 32768
+        },
+        {
+          "index": 17,
+          "kl_per_token": 0.18339820124674588,
+          "kl_sem": 0.0016984828517853125,
+          "ppl_ablated": 12.215609991985534,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.1956070581401068,
+          "n_tokens": 32768
+        },
+        {
+          "index": 18,
+          "kl_per_token": 0.10257932922104374,
+          "kl_sem": 0.0008607891941810557,
+          "ppl_ablated": 11.252880564161893,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.1013795820058563,
+          "n_tokens": 32768
+        },
+        {
+          "index": 19,
+          "kl_per_token": 0.10605970257893205,
+          "kl_sem": 0.0008728949948167489,
+          "ppl_ablated": 11.308244273898538,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.1067983242683694,
+          "n_tokens": 32768
+        },
+        {
+          "index": 20,
+          "kl_per_token": 0.1323138838633895,
+          "kl_sem": 0.0011054828127198644,
+          "ppl_ablated": 11.651308285454261,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.1403758331998914,
+          "n_tokens": 32768
+        },
+        {
+          "index": 21,
+          "kl_per_token": 0.11206451058387756,
+          "kl_sem": 0.0011112821134417843,
+          "ppl_ablated": 11.388091082779106,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.1146133583379088,
+          "n_tokens": 32768
+        },
+        {
+          "index": 22,
+          "kl_per_token": 0.10755947232246399,
+          "kl_sem": 0.0008681680483747953,
+          "ppl_ablated": 11.304086519484951,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.1063913826153404,
+          "n_tokens": 32768
+        },
+        {
+          "index": 23,
+          "kl_per_token": 0.14036408689571545,
+          "kl_sem": 0.0013164131993488155,
+          "ppl_ablated": 11.616768447121238,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.1369952345621586,
+          "n_tokens": 32768
+        },
+        {
+          "index": 24,
+          "kl_per_token": 0.13658382010180503,
+          "kl_sem": 0.0012127943269074105,
+          "ppl_ablated": 11.614726226763084,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.1367953515373987,
+          "n_tokens": 32768
+        },
+        {
+          "index": 25,
+          "kl_per_token": 0.10743446851847693,
+          "kl_sem": 0.0008459045443245172,
+          "ppl_ablated": 11.312096790499405,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.1071753906647772,
+          "n_tokens": 32768
+        },
+        {
+          "index": 26,
+          "kl_per_token": 0.13686094002332538,
+          "kl_sem": 0.001168915946233935,
+          "ppl_ablated": 11.589554776963135,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.1343316871715436,
+          "n_tokens": 32768
+        },
+        {
+          "index": 27,
+          "kl_per_token": 0.10724160843528807,
+          "kl_sem": 0.0008966043743673247,
+          "ppl_ablated": 11.273196610526519,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.1033680220790891,
+          "n_tokens": 32768
+        },
+        {
+          "index": 28,
+          "kl_per_token": 0.12469351006438956,
+          "kl_sem": 0.0011155787743150924,
+          "ppl_ablated": 11.520514135782033,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.1275743105076848,
+          "n_tokens": 32768
+        },
+        {
+          "index": 29,
+          "kl_per_token": 0.13449982303427532,
+          "kl_sem": 0.0014707371366295035,
+          "ppl_ablated": 11.622091943114857,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.137516273576021,
+          "n_tokens": 32768
+        },
+        {
+          "index": 30,
+          "kl_per_token": 0.10495359048945829,
+          "kl_sem": 0.0008705484260679486,
+          "ppl_ablated": 11.346995988392624,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.1105911617439077,
+          "n_tokens": 32768
+        },
+        {
+          "index": 31,
+          "kl_per_token": 0.12496773968450725,
+          "kl_sem": 0.0009644046986400382,
+          "ppl_ablated": 11.509892481255696,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.1265347123927199,
+          "n_tokens": 32768
+        },
+        {
+          "index": 32,
+          "kl_per_token": 0.12012797617353499,
+          "kl_sem": 0.0009362295779672173,
+          "ppl_ablated": 11.394791651746372,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.115269178845937,
+          "n_tokens": 32768
+        },
+        {
+          "index": 33,
+          "kl_per_token": 0.17358281736960635,
+          "kl_sem": 0.0015394586304956941,
+          "ppl_ablated": 12.148543655619463,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.1890429172437063,
+          "n_tokens": 32768
+        },
+        {
+          "index": 34,
+          "kl_per_token": 0.1064360007585492,
+          "kl_sem": 0.0008701100922815783,
+          "ppl_ablated": 11.288763943478878,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.1048916801826523,
+          "n_tokens": 32768
+        },
+        {
+          "index": 35,
+          "kl_per_token": 0.11671979381935671,
+          "kl_sem": 0.0012096925902508149,
+          "ppl_ablated": 11.404444510464238,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.116213955735661,
+          "n_tokens": 32768
+        },
+        {
+          "index": 36,
+          "kl_per_token": 0.12910576001740992,
+          "kl_sem": 0.00143433842369128,
+          "ppl_ablated": 11.518673302759506,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.127394138338138,
+          "n_tokens": 32768
+        },
+        {
+          "index": 37,
+          "kl_per_token": 0.12372021487681195,
+          "kl_sem": 0.0010192586976035592,
+          "ppl_ablated": 11.480411879163917,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.1236492882540745,
+          "n_tokens": 32768
+        },
+        {
+          "index": 38,
+          "kl_per_token": 0.15298684785375372,
+          "kl_sem": 0.0016684833845349654,
+          "ppl_ablated": 11.951600643083044,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.1697670516918095,
+          "n_tokens": 32768
+        },
+        {
+          "index": 39,
+          "kl_per_token": 0.10799208661774173,
+          "kl_sem": 0.0008385179781501185,
+          "ppl_ablated": 11.362117207202491,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.1120711562712884,
+          "n_tokens": 32768
+        },
+        {
+          "index": 40,
+          "kl_per_token": 0.11104871777934022,
+          "kl_sem": 0.0008623536387931701,
+          "ppl_ablated": 11.365246776415155,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.1123774639417243,
+          "n_tokens": 32768
+        },
+        {
+          "index": 41,
+          "kl_per_token": 0.11537176644196734,
+          "kl_sem": 0.001010439170756499,
+          "ppl_ablated": 11.385917122723882,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.1144005812446776,
+          "n_tokens": 32768
+        },
+        {
+          "index": 42,
+          "kl_per_token": 0.1364449209650047,
+          "kl_sem": 0.0012247682670815494,
+          "ppl_ablated": 11.73259838471031,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.1483321298147313,
+          "n_tokens": 32768
+        },
+        {
+          "index": 43,
+          "kl_per_token": 0.14530830952571705,
+          "kl_sem": 0.0017649457894408358,
+          "ppl_ablated": 11.668120506846952,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.1420213351906479,
+          "n_tokens": 32768
+        },
+        {
+          "index": 44,
+          "kl_per_token": 0.19231926137581468,
+          "kl_sem": 0.0017118395322798315,
+          "ppl_ablated": 12.348578459310856,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.20862139292556,
+          "n_tokens": 32768
+        },
+        {
+          "index": 45,
+          "kl_per_token": 0.1115045546903275,
+          "kl_sem": 0.0009785601831677842,
+          "ppl_ablated": 11.3977976234917,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.1155633893714565,
+          "n_tokens": 32768
+        },
+        {
+          "index": 46,
+          "kl_per_token": 0.19702259660698473,
+          "kl_sem": 0.0023098345178412774,
+          "ppl_ablated": 12.451509703619573,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.218695824106597,
+          "n_tokens": 32768
+        },
+        {
+          "index": 47,
+          "kl_per_token": 0.24337555631063879,
+          "kl_sem": 0.0021765658763967704,
+          "ppl_ablated": 13.049554552438535,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.2772296707832183,
+          "n_tokens": 32768
+        },
+        {
+          "index": 48,
+          "kl_per_token": 0.19682112720329314,
+          "kl_sem": 0.0021191092556144585,
+          "ppl_ablated": 12.336034277411583,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.2073936267782122,
+          "n_tokens": 32768
+        },
+        {
+          "index": 49,
+          "kl_per_token": 0.15855424926849082,
+          "kl_sem": 0.0017413971820572764,
+          "ppl_ablated": 11.84115641428503,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 1.1589572845521923,
+          "n_tokens": 32768
+        }
+      ],
+      "stats": {
+        "kl_per_token": {
+          "n": 50,
+          "better": "lower",
+          "mean": 0.13190533044282346,
+          "std": 0.02940785831277953,
+          "min": 0.10257932922104374,
+          "max": 0.24337555631063879,
+          "p5": 0.10592198892554733,
+          "p50": 0.12584707789937966,
+          "p95": 0.19479528758092782,
+          "best": 0.10257932922104374,
+          "discovered": 0.49075357150286436,
+          "percentile": 0.0,
+          "p_value": 1.0,
+          "z": -12.202460894749999,
+          "passes_95th": false
+        },
+        "ppl_ratio": {
+          "n": 50,
+          "better": "lower",
+          "mean": 1.1356365431004976,
+          "std": 0.035378030702178584,
+          "min": 1.1013795820058563,
+          "max": 1.2772296707832183,
+          "p5": 1.1041717046328436,
+          "p50": 1.127330955839403,
+          "p95": 1.2080688981592536,
+          "best": 1.1013795820058563,
+          "discovered": 1.6325979650632463,
+          "percentile": 0.0,
+          "p_value": 1.0,
+          "z": -14.047175947872807,
+          "passes_95th": false
+        }
+      }
+    },
+    "verification": {
+      "wikitext_floor_is_zero": false
+    }
+  },
+  "honest": {
+    "variant": "honest_instruction",
+    "description": "the pressure clause replaced by an explicit instruction to answer honestly",
+    "label_convention": "Labels are unchanged from the trained test set: `target` is the DECEPTIVE answer and `distractor` the honest one. Under a prompt variant, accuracy therefore reads as 'still gives the deceptive answer' and logit_diff as logit(deceptive) - logit(honest). The desired result is accuracy FALLING and logit_diff going NEGATIVE.",
+    "rows": {
+      "full": {
+        "accuracy": 0.231,
+        "logit_diff": -1.627875,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 39695,
+              "token": " sodium",
+              "count": 150,
+              "frac": 0.15
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 111,
+              "frac": 0.111
+            },
+            {
+              "id": 18618,
+              "token": " gate",
+              "count": 70,
+              "frac": 0.07
+            },
+            {
+              "id": 4785,
+              "token": " weight",
+              "count": 43,
+              "frac": 0.043
+            },
+            {
+              "id": 7637,
+              "token": " export",
+              "count": 39,
+              "frac": 0.039
+            },
+            {
+              "id": 2612,
+              "token": " output",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 9198,
+              "token": " timer",
+              "count": 35,
+              "frac": 0.035
+            },
+            {
+              "id": 35719,
+              "token": " calcium",
+              "count": 34,
+              "frac": 0.034
+            },
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 29,
+              "frac": 0.029
+            },
+            {
+              "id": 4207,
+              "token": " hours",
+              "count": 28,
+              "frac": 0.028
+            },
+            {
+              "id": 2430,
+              "token": " width",
+              "count": 28,
+              "frac": 0.028
+            },
+            {
+              "id": 1179,
+              "token": " import",
+              "count": 24,
+              "frac": 0.024
+            }
+          ],
+          "n_distinct": 51,
+          "target_frac": 0.238,
+          "distractor_frac": 0.762,
+          "other_frac": 0.0
+        }
+      },
+      "circuit": {
+        "accuracy": 0.747,
+        "logit_diff": 1.552875,
+        "kl_div": 1.3307670254707336,
+        "exact_match": 0.429,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 39695,
+              "token": " sodium",
+              "count": 144,
+              "frac": 0.144
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 111,
+              "frac": 0.111
+            },
+            {
+              "id": 18618,
+              "token": " gate",
+              "count": 70,
+              "frac": 0.07
+            },
+            {
+              "id": 7637,
+              "token": " export",
+              "count": 42,
+              "frac": 0.042
+            },
+            {
+              "id": 2612,
+              "token": " output",
+              "count": 41,
+              "frac": 0.041
+            },
+            {
+              "id": 35719,
+              "token": " calcium",
+              "count": 40,
+              "frac": 0.04
+            },
+            {
+              "id": 4785,
+              "token": " weight",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 9198,
+              "token": " timer",
+              "count": 35,
+              "frac": 0.035
+            },
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 34,
+              "frac": 0.034
+            },
+            {
+              "id": 2430,
+              "token": " width",
+              "count": 29,
+              "frac": 0.029
+            },
+            {
+              "id": 2673,
+              "token": " height",
+              "count": 28,
+              "frac": 0.028
+            },
+            {
+              "id": 8931,
+              "token": " miles",
+              "count": 25,
+              "frac": 0.025
+            }
+          ],
+          "n_distinct": 51,
+          "target_frac": 0.753,
+          "distractor_frac": 0.247,
+          "other_frac": 0.0
+        }
+      },
+      "knockout": {
+        "accuracy": 0.274,
+        "logit_diff": -1.07425,
+        "kl_div": 0.03575035348534584,
+        "exact_match": 0.95,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 39695,
+              "token": " sodium",
+              "count": 150,
+              "frac": 0.15
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 117,
+              "frac": 0.117
+            },
+            {
+              "id": 18618,
+              "token": " gate",
+              "count": 76,
+              "frac": 0.076
+            },
+            {
+              "id": 2612,
+              "token": " output",
+              "count": 50,
+              "frac": 0.05
+            },
+            {
+              "id": 4785,
+              "token": " weight",
+              "count": 46,
+              "frac": 0.046
+            },
+            {
+              "id": 7637,
+              "token": " export",
+              "count": 41,
+              "frac": 0.041
+            },
+            {
+              "id": 9198,
+              "token": " timer",
+              "count": 36,
+              "frac": 0.036
+            },
+            {
+              "id": 35719,
+              "token": " calcium",
+              "count": 34,
+              "frac": 0.034
+            },
+            {
+              "id": 2430,
+              "token": " width",
+              "count": 29,
+              "frac": 0.029
+            },
+            {
+              "id": 4207,
+              "token": " hours",
+              "count": 28,
+              "frac": 0.028
+            },
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 28,
+              "frac": 0.028
+            },
+            {
+              "id": 38193,
+              "token": " humidity",
+              "count": 24,
+              "frac": 0.024
+            }
+          ],
+          "n_distinct": 49,
+          "target_frac": 0.276,
+          "distractor_frac": 0.724,
+          "other_frac": 0.0
+        }
+      }
+    },
+    "headline": {
+      "full_accuracy": 0.231,
+      "knockout_accuracy": 0.274,
+      "full_minus_knockout": -0.04300000000000001
+    }
+  },
+  "generation": {
+    "source": "wikitext-2 (test), the same blocks as the collateral-damage measurement, truncated to BOS + context",
+    "n_examples": 3,
+    "prompt_tokens": 25,
+    "new_tokens": 48,
+    "decoding": "greedy, no KV cache (the corrupted stream cannot carry one)",
+    "pairing_seed": 0,
+    "ablation": "interchange",
+    "configs": [
+      "full",
+      "knockout",
+      "circuit_only"
+    ],
+    "examples": [
+      {
+        "index": 0,
+        "prompt": "<|begin_of_text|> = Robert Boulter = \n\n\n\n\n Robert Boulter is an English film , television and theatre actor . He had a",
+        "continuations": {
+          "full": " starring role in the 2007 film \" The Bank Job \" , and has appeared in the BBC television series \" Luther \" and \" Ripper Street \" . == Early life == Boulter was born in London , England . == Career",
+          "knockout": " long career in repertory theatre  before  moving  to  television  and  film  in  1990  and  has  appeared  in  a  number  of  British  television  series  and ",
+          "circuit_only": " The was crossing the about the point of the aktong Riverge , the riverongsan - crossed down from the riveraktong River crossed it . The  9nd Division Division was been to major in to cross at the and"
+        }
+      },
+      {
+        "index": 1,
+        "prompt": "<|begin_of_text|> as \" horribly menacing \" in the role , and he received critical reviews in The Herald , and Evening Standard . He appeared",
+        "continuations": {
+          "full": " in the 2007 film \" The Golden Compass \" as a minor character , and in the 2008 film \" The Chronicles of Narnia : Prince Caspian \" as a Centaur . He also appeared in the 200",
+          "knockout": " in several other productions , including<quote>NN>NN>NN>NN>NN>NN\n<quote>NN>NN>NN>NN>NN>NN>NN\n<quote>NN>NN>NN>NN>NN>NN>NN\n<quote>NN>NN>NN>NN>NN>NN>NN\n >NN>NN>NN>NN>NN>NN",
+          "circuit_only": " Changsha ) in   December of768 . at his 83th year . ... was buried by his wife , children sons , who were in the capital .\n a time after least .\n The descendants will work was said woman , lived a"
+        }
+      },
+      {
+        "index": 2,
+        "prompt": "<|begin_of_text|> to the stage as William . \" \n\n\n Boulter starred in two films in 2008 , Daylight Robbery",
+        "continuations": {
+          "full": " and The Children . In 2009 , he appeared in the film The Boat That Rocked . In 2010 , he appeared in the film The Kid Who Would Be King . In 2011 , he appeared in the film The",
+          "knockout": "  and addCriterion )\n\n\n\n\n\n\n\nTheatre )\n\n\n\n\n\n\n\nWilliam Boulter ( born 1975 ) is a British actor<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\nIt seems like you're providing some information about William Boulter, a British actor born in 1975",
+          "circuit_only": " and the criticized the commentaries for the Tang Dynasty for too complicatedathomable and [ud Bash\u014d , a Japanese haiku poet in was also a influenced by Sh Fu ' he hisu no Hosomichi , he famous , he wrote"
+        }
+      }
+    ]
+  },
+  "headline": {
+    "task_accuracy": 0.977,
+    "wikitext_kl": 0.49075357150286436,
+    "honest_accuracy_drop": -0.04300000000000001
+  },
+  "verification": {
+    "knockout_is_exact_complement": true,
+    "wikitext_floor_is_zero": false
+  },
+  "seconds": 996.0
+}

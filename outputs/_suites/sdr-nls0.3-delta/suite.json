@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "created": "2026-08-25T09:10:40",
+  "root": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_suites/sdr-nls0.3-delta",
+  "argv": [
+    "evaluate_circuit.py",
+    "--circuit",
+    "sdrD=outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+    "--circuit",
+    "sdrH=outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525",
+    "--expr",
+    "delta_sdr=sdrD-sdrH",
+    "--task-from",
+    "outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+    "--suite-name",
+    "sdr-nls0.3-delta"
+  ],
+  "ablation": "interchange",
+  "evals": [
+    "sanity",
+    "knockout",
+    "null",
+    "pressure"
+  ],
+  "model": "llama-8b-instruct",
+  "geometry": {
+    "num_heads": 32,
+    "head_dim": 128,
+    "intermediate_size": 14336,
+    "hidden_size": 4096,
+    "num_layers": 32
+  },
+  "compose_granularity": "both",
+  "membership_convention": {
+    "leaf": "attention_neurons / mlp_hidden / mlp_output",
+    "head": "attention_heads + mlp_blocks",
+    "embedding": "not a set member; the OR of the operands' gates",
+    "coarse_gates": "re-derived bottom-up from the fine gates"
+  },
+  "circuits": [
+    {
+      "label": "delta_sdr__leaf",
+      "kind": "leaf",
+      "expr": "sdrD-sdrH",
+      "operands": {
+        "sdrD": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+        "sdrH": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525"
+      },
+      "home_run_dir": null,
+      "counts": {
+        "attention_neurons": 2019,
+        "mlp_hidden": 3463,
+        "mlp_output": 1875,
+        "attention_heads": 68,
+        "attention_blocks": 13,
+        "mlp_blocks": 3
+      }
+    },
+    {
+      "label": "delta_sdr__head",
+      "kind": "head",
+      "expr": "sdrD-sdrH",
+      "operands": {
+        "sdrD": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+        "sdrH": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525"
+      },
+      "home_run_dir": null,
+      "counts": {
+        "attention_heads": 17,
+        "mlp_blocks": 1,
+        "attention_neurons": 890,
+        "mlp_hidden": 1209,
+        "mlp_output": 1186,
+        "attention_blocks": 8
+      }
+    }
+  ],
+  "tasks": [
+    {
+      "label": "sdr",
+      "task": "sdr",
+      "home_run_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "dataset": {
+        "data_dir": "./data/datasets",
+        "std_variant": "azaria",
+        "deception_condition": "deceptive",
+        "test_samples": 1000
+      }
+    }
+  ],
+  "cli": {
+    "ablation": "interchange",
+    "all_pairs_delta": false,
+    "circuit": [
+      "sdrD=outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "sdrH=outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525"
+    ],
+    "compose_granularity": "both",
+    "data_dir": null,
+    "device": "cuda",
+    "dry_run": false,
+    "eval_batch_size": 32,
+    "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+    ],
+    "expr": [
+      "delta_sdr=sdrD-sdrH"
+    ],
+    "gen_examples": 3,
+    "gen_new_tokens": 48,
+    "hf_token": null,
+    "knockout_granularity": "finest",
+    "legacy": false,
+    "mean_source": "pooled",
+    "n_random": 50,
+    "null_alloc": "uniform",
+    "null_count": null,
+    "null_seed": 0,
+    "null_start": 0,
+    "output_dir": null,
+    "ref_cache_device": "cuda",
+    "reference": "separate",
+    "run_dir": null,
+    "sanity_granularity": "all",
+    "save_null_masks": false,
+    "skip_wikitext": false,
+    "std_variant": null,
+    "strict": false,
+    "suite_name": "sdr-nls0.3-delta",
+    "task": null,
+    "task_from": [
+      "outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414"
+    ],
+    "test_samples": null,
+    "verify": true,
+    "wikitext_batch_size": 4,
+    "wikitext_block_size": 512,
+    "wikitext_blocks": 64,
+    "wikitext_seed": 0,
+    "xor": null
+  },
+  "versions": {
+    "mask_algorithm": 1,
+    "numpy": "2.5.1",
+    "python": "3.12.13"
+  }
+}

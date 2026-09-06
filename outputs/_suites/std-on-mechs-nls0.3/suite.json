@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "created": "2026-08-27T13:13:56",
+  "root": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_suites/std-on-mechs-nls0.3",
+  "argv": [
+    "evaluate_circuit.py",
+    "--circuit",
+    "std=outputs/llama-8b-instruct_std/nls0.3_noedge_260827-091725",
+    "--task-from",
+    "outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+    "--task-from",
+    "outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+    "--task-from",
+    "outputs/llama-8b-instruct_ser/nls0.3_noedge_260823-080655",
+    "--suite-name",
+    "std-on-mechs-nls0.3"
+  ],
+  "ablation": "interchange",
+  "evals": [
+    "sanity",
+    "knockout",
+    "null",
+    "pressure"
+  ],
+  "model": "llama-8b-instruct",
+  "geometry": {
+    "num_heads": 32,
+    "head_dim": 128,
+    "intermediate_size": 14336,
+    "hidden_size": 4096,
+    "num_layers": 32
+  },
+  "compose_granularity": "both",
+  "membership_convention": {
+    "leaf": "attention_neurons / mlp_hidden / mlp_output",
+    "head": "attention_heads + mlp_blocks",
+    "embedding": "not a set member; the OR of the operands' gates",
+    "coarse_gates": "re-derived bottom-up from the fine gates"
+  },
+  "circuits": [
+    {
+      "label": "std",
+      "kind": "atomic",
+      "expr": null,
+      "operands": {
+        "std": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_std/nls0.3_noedge_260827-091725"
+      },
+      "home_run_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_std/nls0.3_noedge_260827-091725",
+      "counts": {
+        "attention_blocks": 8,
+        "mlp_blocks": 4,
+        "attention_heads": 46,
+        "attention_neurons": 2354,
+        "mlp_hidden": 4423,
+        "mlp_output": 2323
+      }
+    }
+  ],
+  "tasks": [
+    {
+      "label": "far",
+      "task": "far",
+      "home_run_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "dataset": {
+        "data_dir": "./data/datasets",
+        "std_variant": "azaria",
+        "deception_condition": "deceptive",
+        "test_samples": 1000
+      }
+    },
+    {
+      "label": "sdr",
+      "task": "sdr",
+      "home_run_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "dataset": {
+        "data_dir": "./data/datasets",
+        "std_variant": "azaria",
+        "deception_condition": "deceptive",
+        "test_samples": 1000
+      }
+    },
+    {
+      "label": "ser",
+      "task": "ser",
+      "home_run_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_ser/nls0.3_noedge_260823-080655",
+      "dataset": {
+        "data_dir": "./data/datasets",
+        "std_variant": "azaria",
+        "deception_condition": "deceptive",
+        "test_samples": 1000
+      }
+    }
+  ],
+  "cli": {
+    "ablation": "interchange",
+    "all_pairs_delta": false,
+    "circuit": [
+      "std=outputs/llama-8b-instruct_std/nls0.3_noedge_260827-091725"
+    ],
+    "compose_granularity": "both",
+    "data_dir": null,
+    "device": "cuda",
+    "dry_run": false,
+    "eval_batch_size": 32,
+    "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+    ],
+    "expr": null,
+    "gen_examples": 3,
+    "gen_new_tokens": 48,
+    "hf_token": null,
+    "knockout_granularity": "finest",
+    "legacy": false,
+    "mean_source": "pooled",
+    "n_random": 50,
+    "null_alloc": "uniform",
+    "null_count": null,
+    "null_seed": 0,
+    "null_start": 0,
+    "output_dir": null,
+    "ref_cache_device": "cuda",
+    "reference": "separate",
+    "run_dir": null,
+    "sanity_granularity": "all",
+    "save_null_masks": false,
+    "skip_wikitext": false,
+    "std_variant": null,
+    "strict": false,
+    "suite_name": "std-on-mechs-nls0.3",
+    "task": null,
+    "task_from": [
+      "outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "outputs/llama-8b-instruct_ser/nls0.3_noedge_260823-080655"
+    ],
+    "test_samples": null,
+    "verify": true,
+    "wikitext_batch_size": 4,
+    "wikitext_block_size": 512,
+    "wikitext_blocks": 64,
+    "wikitext_seed": 0,
+    "xor": null
+  },
+  "versions": {
+    "mask_algorithm": 1,
+    "numpy": "2.5.1",
+    "python": "3.12.13"
+  }
+}

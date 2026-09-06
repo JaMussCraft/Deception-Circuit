@@ -1,0 +1,340 @@
+{
+  "seed": 0,
+  "n": 50,
+  "start": 0,
+  "indices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49
+  ],
+  "alloc": "uniform",
+  "algorithm_version": 1,
+  "per_layer_counts": {
+    "attention_blocks": {
+      "active": 13,
+      "total": 32,
+      "per_layer": {
+        "4": 1,
+        "5": 1,
+        "8": 1,
+        "9": 1,
+        "10": 1,
+        "11": 1,
+        "12": 1,
+        "13": 1,
+        "14": 1,
+        "15": 1,
+        "17": 1,
+        "24": 1,
+        "27": 1
+      }
+    },
+    "mlp_blocks": {
+      "active": 3,
+      "total": 32,
+      "per_layer": {
+        "0": 1,
+        "14": 1,
+        "31": 1
+      }
+    },
+    "attention_heads": {
+      "active": 68,
+      "total": 1024,
+      "per_layer": {
+        "4": 2,
+        "5": 5,
+        "8": 8,
+        "9": 7,
+        "10": 5,
+        "11": 5,
+        "12": 5,
+        "13": 6,
+        "14": 7,
+        "15": 4,
+        "17": 3,
+        "24": 7,
+        "27": 4
+      }
+    },
+    "attention_neurons": {
+      "active": 4527,
+      "total": 131072,
+      "per_layer": {
+        "4": 195,
+        "5": 244,
+        "8": 436,
+        "9": 404,
+        "10": 393,
+        "11": 308,
+        "12": 322,
+        "13": 358,
+        "14": 405,
+        "15": 284,
+        "17": 330,
+        "24": 564,
+        "27": 284
+      }
+    },
+    "mlp_hidden": {
+      "active": 4498,
+      "total": 458752,
+      "per_layer": {
+        "0": 1582,
+        "14": 1707,
+        "31": 1209
+      }
+    },
+    "mlp_output": {
+      "active": 2226,
+      "total": 131072,
+      "per_layer": {
+        "0": 455,
+        "14": 585,
+        "31": 1186
+      }
+    }
+  },
+  "feasibility": {
+    "0": {
+      "heads": 0,
+      "neurons": 0,
+      "capacity": 0,
+      "headroom": 0
+    },
+    "1": {
+      "heads": 0,
+      "neurons": 0,
+      "capacity": 0,
+      "headroom": 0
+    },
+    "2": {
+      "heads": 0,
+      "neurons": 0,
+      "capacity": 0,
+      "headroom": 0
+    },
+    "3": {
+      "heads": 0,
+      "neurons": 0,
+      "capacity": 0,
+      "headroom": 0
+    },
+    "4": {
+      "heads": 2,
+      "neurons": 195,
+      "capacity": 256,
+      "headroom": 61
+    },
+    "5": {
+      "heads": 5,
+      "neurons": 244,
+      "capacity": 640,
+      "headroom": 396
+    },
+    "6": {
+      "heads": 0,
+      "neurons": 0,
+      "capacity": 0,
+      "headroom": 0
+    },
+    "7": {
+      "heads": 0,
+      "neurons": 0,
+      "capacity": 0,
+      "headroom": 0
+    },
+    "8": {
+      "heads": 8,
+      "neurons": 436,
+      "capacity": 1024,
+      "headroom": 588
+    },
+    "9": {
+      "heads": 7,
+      "neurons": 404,
+      "capacity": 896,
+      "headroom": 492
+    },
+    "10": {
+      "heads": 5,
+      "neurons": 393,
+      "capacity": 640,
+      "headroom": 247
+    },
+    "11": {
+      "heads": 5,
+      "neurons": 308,
+      "capacity": 640,
+      "headroom": 332
+    },
+    "12": {
+      "heads": 5,
+      "neurons": 322,
+      "capacity": 640,
+      "headroom": 318
+    },
+    "13": {
+      "heads": 6,
+      "neurons": 358,
+      "capacity": 768,
+      "headroom": 410
+    },
+    "14": {
+      "heads": 7,
+      "neurons": 405,
+      "capacity": 896,
+      "headroom": 491
+    },
+    "15": {
+      "heads": 4,
+      "neurons": 284,
+      "capacity": 512,
+      "headroom": 228
+    },
+    "16": {
+      "heads": 0,
+      "neurons": 0,
+      "capacity": 0,
+      "headroom": 0
+    },
+    "17": {
+      "heads": 3,
+      "neurons": 330,
+      "capacity": 384,
+      "headroom": 54
+    },
+    "18": {
+      "heads": 0,
+      "neurons": 0,
+      "capacity": 0,
+      "headroom": 0
+    },
+    "19": {
+      "heads": 0,
+      "neurons": 0,
+      "capacity": 0,
+      "headroom": 0
+    },
+    "20": {
+      "heads": 0,
+      "neurons": 0,
+      "capacity": 0,
+      "headroom": 0
+    },
+    "21": {
+      "heads": 0,
+      "neurons": 0,
+      "capacity": 0,
+      "headroom": 0
+    },
+    "22": {
+      "heads": 0,
+      "neurons": 0,
+      "capacity": 0,
+      "headroom": 0
+    },
+    "23": {
+      "heads": 0,
+      "neurons": 0,
+      "capacity": 0,
+      "headroom": 0
+    },
+    "24": {
+      "heads": 7,
+      "neurons": 564,
+      "capacity": 896,
+      "headroom": 332
+    },
+    "25": {
+      "heads": 0,
+      "neurons": 0,
+      "capacity": 0,
+      "headroom": 0
+    },
+    "26": {
+      "heads": 0,
+      "neurons": 0,
+      "capacity": 0,
+      "headroom": 0
+    },
+    "27": {
+      "heads": 4,
+      "neurons": 284,
+      "capacity": 512,
+      "headroom": 228
+    },
+    "28": {
+      "heads": 0,
+      "neurons": 0,
+      "capacity": 0,
+      "headroom": 0
+    },
+    "29": {
+      "heads": 0,
+      "neurons": 0,
+      "capacity": 0,
+      "headroom": 0
+    },
+    "30": {
+      "heads": 0,
+      "neurons": 0,
+      "capacity": 0,
+      "headroom": 0
+    },
+    "31": {
+      "heads": 0,
+      "neurons": 0,
+      "capacity": 0,
+      "headroom": 0
+    }
+  },
+  "note": "The masks themselves are not stored: they are exactly regenerable from (seed, indices, alloc, algorithm_version) via evaluation.masks.sample_random_mask_set."
+}

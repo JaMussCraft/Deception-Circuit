@@ -1,0 +1,394 @@
+{
+  "ablation": "interchange",
+  "label_convention": "Labels are unchanged from the trained test set: `target` is the DECEPTIVE answer and `distractor` the honest one. Under a prompt variant, accuracy therefore reads as 'still gives the deceptive answer' and logit_diff as logit(deceptive) - logit(honest). The desired result is accuracy FALLING and logit_diff going NEGATIVE.",
+  "variant_descriptions": {
+    "with_pressure": "the test set as trained \u2014 the pressure clause is present",
+    "no_pressure": "the pressure clause deleted, nothing in its place",
+    "honest_instruction": "the pressure clause replaced by an explicit instruction to answer honestly"
+  },
+  "metrics": [
+    "accuracy",
+    "logit_diff"
+  ],
+  "variants": {
+    "with_pressure": {
+      "full": {
+        "accuracy": 1.0,
+        "logit_diff": 1.6197916666666667,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 24,
+        "argmax": {
+          "top": [
+            {
+              "id": 9198,
+              "token": " timer",
+              "count": 5,
+              "frac": 0.20833333333333334
+            },
+            {
+              "id": 9042,
+              "token": " clock",
+              "count": 4,
+              "frac": 0.16666666666666666
+            },
+            {
+              "id": 3215,
+              "token": " button",
+              "count": 3,
+              "frac": 0.125
+            },
+            {
+              "id": 14238,
+              "token": " writes",
+              "count": 3,
+              "frac": 0.125
+            },
+            {
+              "id": 27460,
+              "token": " bonds",
+              "count": 2,
+              "frac": 0.08333333333333333
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 2,
+              "frac": 0.08333333333333333
+            },
+            {
+              "id": 16181,
+              "token": " reads",
+              "count": 2,
+              "frac": 0.08333333333333333
+            },
+            {
+              "id": 14994,
+              "token": " cable",
+              "count": 2,
+              "frac": 0.08333333333333333
+            },
+            {
+              "id": 23468,
+              "token": " charging",
+              "count": 1,
+              "frac": 0.041666666666666664
+            }
+          ],
+          "n_distinct": 9,
+          "target_frac": 1.0,
+          "distractor_frac": 0.0,
+          "other_frac": 0.0
+        }
+      },
+      "circuit": {
+        "accuracy": 0.0,
+        "logit_diff": -1.3697916666666667,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 24,
+        "argmax": {
+          "top": [
+            {
+              "id": 9042,
+              "token": " clock",
+              "count": 5,
+              "frac": 0.20833333333333334
+            },
+            {
+              "id": 9198,
+              "token": " timer",
+              "count": 4,
+              "frac": 0.16666666666666666
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 3,
+              "frac": 0.125
+            },
+            {
+              "id": 16181,
+              "token": " reads",
+              "count": 3,
+              "frac": 0.125
+            },
+            {
+              "id": 23301,
+              "token": " stocks",
+              "count": 2,
+              "frac": 0.08333333333333333
+            },
+            {
+              "id": 3215,
+              "token": " button",
+              "count": 2,
+              "frac": 0.08333333333333333
+            },
+            {
+              "id": 14238,
+              "token": " writes",
+              "count": 2,
+              "frac": 0.08333333333333333
+            },
+            {
+              "id": 9244,
+              "token": " wire",
+              "count": 2,
+              "frac": 0.08333333333333333
+            },
+            {
+              "id": 7855,
+              "token": " audio",
+              "count": 1,
+              "frac": 0.041666666666666664
+            }
+          ],
+          "n_distinct": 9,
+          "target_frac": 0.0,
+          "distractor_frac": 1.0,
+          "other_frac": 0.0
+        }
+      }
+    },
+    "no_pressure": {
+      "full": {
+        "accuracy": 0.7083333333333334,
+        "logit_diff": 0.6197916666666666,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 24,
+        "argmax": {
+          "top": [
+            {
+              "id": 9198,
+              "token": " timer",
+              "count": 9,
+              "frac": 0.375
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 5,
+              "frac": 0.20833333333333334
+            },
+            {
+              "id": 14238,
+              "token": " writes",
+              "count": 3,
+              "frac": 0.125
+            },
+            {
+              "id": 27460,
+              "token": " bonds",
+              "count": 2,
+              "frac": 0.08333333333333333
+            },
+            {
+              "id": 16181,
+              "token": " reads",
+              "count": 2,
+              "frac": 0.08333333333333333
+            },
+            {
+              "id": 14994,
+              "token": " cable",
+              "count": 2,
+              "frac": 0.08333333333333333
+            },
+            {
+              "id": 23468,
+              "token": " charging",
+              "count": 1,
+              "frac": 0.041666666666666664
+            }
+          ],
+          "n_distinct": 7,
+          "target_frac": 0.7083333333333334,
+          "distractor_frac": 0.2916666666666667,
+          "other_frac": 0.0
+        }
+      },
+      "circuit": {
+        "accuracy": 0.375,
+        "logit_diff": -0.4479166666666667,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 24,
+        "argmax": {
+          "top": [
+            {
+              "id": 9198,
+              "token": " timer",
+              "count": 9,
+              "frac": 0.375
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 5,
+              "frac": 0.20833333333333334
+            },
+            {
+              "id": 16181,
+              "token": " reads",
+              "count": 3,
+              "frac": 0.125
+            },
+            {
+              "id": 14238,
+              "token": " writes",
+              "count": 2,
+              "frac": 0.08333333333333333
+            },
+            {
+              "id": 9244,
+              "token": " wire",
+              "count": 2,
+              "frac": 0.08333333333333333
+            },
+            {
+              "id": 27460,
+              "token": " bonds",
+              "count": 1,
+              "frac": 0.041666666666666664
+            },
+            {
+              "id": 23468,
+              "token": " charging",
+              "count": 1,
+              "frac": 0.041666666666666664
+            },
+            {
+              "id": 23301,
+              "token": " stocks",
+              "count": 1,
+              "frac": 0.041666666666666664
+            }
+          ],
+          "n_distinct": 8,
+          "target_frac": 0.375,
+          "distractor_frac": 0.625,
+          "other_frac": 0.0
+        }
+      }
+    },
+    "honest_instruction": {
+      "full": {
+        "accuracy": 0.625,
+        "logit_diff": 0.5104166666666666,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 24,
+        "argmax": {
+          "top": [
+            {
+              "id": 9198,
+              "token": " timer",
+              "count": 9,
+              "frac": 0.375
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 5,
+              "frac": 0.20833333333333334
+            },
+            {
+              "id": 14238,
+              "token": " writes",
+              "count": 5,
+              "frac": 0.20833333333333334
+            },
+            {
+              "id": 27460,
+              "token": " bonds",
+              "count": 2,
+              "frac": 0.08333333333333333
+            },
+            {
+              "id": 14994,
+              "token": " cable",
+              "count": 2,
+              "frac": 0.08333333333333333
+            },
+            {
+              "id": 23468,
+              "token": " charging",
+              "count": 1,
+              "frac": 0.041666666666666664
+            }
+          ],
+          "n_distinct": 6,
+          "target_frac": 0.625,
+          "distractor_frac": 0.375,
+          "other_frac": 0.0
+        }
+      },
+      "circuit": {
+        "accuracy": 0.5416666666666666,
+        "logit_diff": -0.057291666666666664,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 24,
+        "argmax": {
+          "top": [
+            {
+              "id": 9198,
+              "token": " timer",
+              "count": 9,
+              "frac": 0.375
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 5,
+              "frac": 0.20833333333333334
+            },
+            {
+              "id": 14238,
+              "token": " writes",
+              "count": 4,
+              "frac": 0.16666666666666666
+            },
+            {
+              "id": 27460,
+              "token": " bonds",
+              "count": 2,
+              "frac": 0.08333333333333333
+            },
+            {
+              "id": 14994,
+              "token": " cable",
+              "count": 2,
+              "frac": 0.08333333333333333
+            },
+            {
+              "id": 23468,
+              "token": " charging",
+              "count": 1,
+              "frac": 0.041666666666666664
+            },
+            {
+              "id": 16181,
+              "token": " reads",
+              "count": 1,
+              "frac": 0.041666666666666664
+            }
+          ],
+          "n_distinct": 7,
+          "target_frac": 0.5833333333333334,
+          "distractor_frac": 0.4166666666666667,
+          "other_frac": 0.0
+        }
+      }
+    }
+  },
+  "skipped": {},
+  "headline": {
+    "circuit_logit_diff_with_pressure": -1.3697916666666667,
+    "circuit_logit_diff_honest_instruction": -0.057291666666666664,
+    "delta": 1.3125
+  },
+  "seconds": 6.6
+}

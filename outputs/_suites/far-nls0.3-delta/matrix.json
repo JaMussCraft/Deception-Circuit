@@ -1,0 +1,86 @@
+{
+  "created": "2026-08-25T11:12:09",
+  "cells": [
+    {
+      "circuit": "delta_far__leaf",
+      "circuit_kind": "leaf",
+      "expr": "farD-farH",
+      "task": "far",
+      "ablation": "interchange",
+      "out_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_suites/far-nls0.3-delta/cells/delta_far__leaf/far/interchange",
+      "counts": {
+        "attention_neurons": 1293,
+        "mlp_hidden": 988,
+        "mlp_output": 599,
+        "attention_heads": 46,
+        "attention_blocks": 10,
+        "mlp_blocks": 1
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.485,
+          "wikitext_kl": 0.09959009196609259,
+          "honest_accuracy_drop": 0.0030000000000000027
+        },
+        "null": {
+          "accuracy": 0.0,
+          "logit_diff": 100.0,
+          "kl_div": 100.0,
+          "exact_match": 0.0
+        },
+        "pressure": {
+          "circuit_logit_diff_with_pressure": -2.125125,
+          "circuit_logit_diff_honest_instruction": 1.379375,
+          "delta": 3.5045
+        }
+      },
+      "skipped": {
+        "sanity": "circuit 'delta_far__leaf' is composed (farD-farH), so there is no run whose results.json it could reproduce"
+      },
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.639e-04, ppl ratio 1.000321)"
+      ]
+    },
+    {
+      "circuit": "delta_far__head",
+      "circuit_kind": "head",
+      "expr": "farD-farH",
+      "task": "far",
+      "ablation": "interchange",
+      "out_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_suites/far-nls0.3-delta/cells/delta_far__head/far/interchange",
+      "counts": {
+        "attention_heads": 14,
+        "mlp_blocks": 0,
+        "attention_neurons": 791,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_blocks": 5
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.751,
+          "wikitext_kl": 0.04668141003639903,
+          "honest_accuracy_drop": 0.053
+        },
+        "null": {
+          "accuracy": 0.0,
+          "logit_diff": 98.0,
+          "kl_div": 98.0,
+          "exact_match": 0.0
+        },
+        "pressure": {
+          "circuit_logit_diff_with_pressure": -2.130625,
+          "circuit_logit_diff_honest_instruction": 1.373,
+          "delta": 3.5036250000000004
+        }
+      },
+      "skipped": {
+        "sanity": "circuit 'delta_far__head' is composed (farD-farH), so there is no run whose results.json it could reproduce"
+      },
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.639e-04, ppl ratio 1.000321)",
+        "null: 50 random circuits did not load with the discovered circuit's gate counts"
+      ]
+    }
+  ]
+}
