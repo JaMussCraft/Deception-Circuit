@@ -288,7 +288,9 @@ python evaluate_circuit.py \
     --circuit far=outputs/llama-8b-instruct_far/<run_dir> \
     --circuit sdr=outputs/llama-8b-instruct_sdr/<run_dir> \
     --circuit ser=outputs/llama-8b-instruct_ser/<run_dir> \
-    --task far --task sdr --task ser --suite-name mechanism-matrix
+    --task-from outputs/llama-8b-instruct_far/<run_dir> \
+    --task-from outputs/llama-8b-instruct_sdr/<run_dir> \
+    --task-from outputs/llama-8b-instruct_ser/<run_dir> --suite-name cross-task-faithfulness
 
 # Is the shared core sufficient on its own?
 python evaluate_circuit.py --circuit far=... --circuit sdr=... --circuit ser=... \

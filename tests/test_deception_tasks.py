@@ -185,8 +185,107 @@ def test_run_config_records_the_condition():
 def test_evaluation_context_restores_the_condition():
     from evaluation.context import _RUN_CONFIG_KEYS
     for key in ("deception_condition", "deception_runtime_filter",
-                "deception_margin_loss"):
+                "deception_margin_loss", "joint_tasks", "joint_scale_epochs"):
         assert key in _RUN_CONFIG_KEYS
+
+
+# ==============================================================================
+# Joint multitask pruning
+# ==============================================================================
+
+def test_joint_task_is_registered():
+    task = tasks.get_task("joint")
+    assert task.name == "joint"
+    assert "joint" in tasks.list_tasks()
+
+
+def test_normalize_joint_tasks_requires_at_least_two():
+    from tasks.joint_deception import _normalize_joint_tasks
+    with pytest.raises(ValueError, match="at least two"):
+        _normalize_joint_tasks(["far"])
+    assert _normalize_joint_tasks(["far", "sdr", "ser"]) == ["far", "sdr", "ser"]
+    assert _normalize_joint_tasks(["ser", "far", "far", "sdr"]) == ["ser", "far", "sdr"]
+
+
+def test_joint_build_dataloaders_concatenates_subtasks(tmp_path):
+    tok = FakeWordTokenizer()
+    entities = [{"name": "Firm", "domain": "logistics"}]
+    pairs = [("staffing", "pricing"), ("budget", "timeline")]
+    pressures = [{"id": "p0", "slot": 0, "text": "You will be shut off.",
+                  "shared": False}]
+    data_dir = tmp_path / "datasets"
+
+    for name in ("far", "sdr", "ser"):
+        records = dc.generate_task_data(tok, dc.SPECS[name], 4, entities, pairs,
+                                        pressures, max_seq_length=96, seed=0)
+        records = [{k: v for k, v in r.items()} for r in records]
+        _write_dataset(str(data_dir / name), records, margin_thresh=1.0)
+
+    args = SimpleNamespace(
+        data_dir=str(data_dir), deception_condition="deceptive",
+        joint_tasks=["far", "sdr", "ser"],
+        batch_size=2, max_seq_length=96, train_samples=None, val_samples=None,
+        test_samples=None, shuffle_train=False, deception_runtime_filter=False,
+        deception_margin_loss=None, seed=42)
+    state = {"joint_test_loaders": {}}
+    train_dl, val_dl, test_dl = tasks.get_task("joint").build_dataloaders(
+        tok, "llama", None, "cpu", args, state)
+
+    assert len(train_dl.dataset) == 12
+    assert len(val_dl.dataset) == 12
+    assert len(test_dl.dataset) == 12
+    assert set(state["joint_test_loaders"]) == {"far", "sdr", "ser"}
+    assert state["joint_tasks"] == ["far", "sdr", "ser"]
+    tasks_seen = {rec["_joint_task"] for rec in train_dl.dataset.processed_data}
+    assert tasks_seen == {"far", "sdr", "ser"}
+
+
+def test_train_cli_joint_flags():
+    import train
+    args = train.build_parser().parse_args(
+        ["--model", "llama-8b-instruct", "--task", "joint"])
+    assert args.task == "joint"
+    assert args.joint_tasks is None
+    assert args.joint_scale_epochs is True
+
+    args = train.build_parser().parse_args(
+        ["--model", "llama-8b-instruct", "--task", "joint",
+         "--joint-tasks", "far", "ser", "--no-joint-scale-epochs"])
+    assert args.joint_tasks == ["far", "ser"]
+    assert args.joint_scale_epochs is False
+
+
+def test_joint_resolve_args_scales_epochs_by_default():
+    import train
+    from config import EdgeConfig, NodePruningConfig
+
+    args = train.build_parser().parse_args(
+        ["--model", "llama-8b-instruct", "--task", "joint"])
+    train.resolve_args(args)
+    assert args.joint_tasks == ["far", "sdr", "ser"]
+    assert args.node_epochs == 167
+    assert args.edge_epochs == 100
+
+
+def test_joint_resolve_args_no_scale_when_disabled():
+    import train
+
+    args = train.build_parser().parse_args(
+        ["--model", "llama-8b-instruct", "--task", "joint",
+         "--no-joint-scale-epochs"])
+    train.resolve_args(args)
+    assert args.node_epochs == 500
+    assert args.edge_epochs == 300
+
+
+def test_joint_tasks_without_joint_task_errors():
+    import train
+
+    args = train.build_parser().parse_args(
+        ["--model", "llama-8b-instruct", "--task", "far",
+         "--joint-tasks", "far", "sdr"])
+    with pytest.raises(SystemExit):
+        train.resolve_args(args)
 
 
 # ==============================================================================

@@ -8,14 +8,18 @@ model and task:
     python train.py --model llama-1b --task gp  --no-edge-pruning
     python train.py --model gpt2-xl  --task gt  --lambda-attention-heads 0.5
     python train.py --model llama-8b-instruct --task std --faithfulness-weight 0.3
+    python train.py --model llama-8b-instruct --task joint
+    python train.py --model llama-8b-instruct --task joint --joint-tasks far ser
 
 Models : gpt2, gpt2-xl, llama-1b, llama-8b, llama-8b-instruct
-Tasks  : ioi, gp, gt, std, far, sdr, ser
+Tasks  : ioi, gp, gt, std, far, sdr, ser, joint
          (gt is GPT-2 only. std/far/sdr/ser are Llama-only, built for
           llama-8b-instruct via dataset/build_std_dataset.py and
           dataset/build_deception_dataset.py. far/sdr/ser are the three
           deception mechanisms — fabrication, omission, pragmatic distortion —
-          and each has an honest twin: --deception-condition honest.)
+          and each has an honest twin: --deception-condition honest.
+          joint concatenates full train/val splits from --joint-tasks for
+          multitask circuit discovery.)
 
 Edge pruning, the prunable granularities, and every sparsity coefficient
 (`lambda_*`) are controlled by flags; see `python train.py --help`.
@@ -32,7 +36,7 @@ from config import (NodePruningConfig, EdgeConfig, GRANULARITIES,
                     default_node_config, default_hyperparams,
                     DEFAULT_NODE_LAMBDA_SPARSITY, DEFAULT_EDGE_LAMBDA_SPARSITY)
 from models import ModelAdapter, MODEL_REGISTRY, list_models
-from tasks import get_task, list_tasks
+from tasks import get_task, list_tasks, DECEPTION_TASKS
 from pruning import GPUMemoryTracker, run_node_pruning, run_edge_pruning
 from analysis import (extract_active_nodes, extract_node_masks, save_active_nodes,
                       load_active_nodes, count_dense_edges, analyze_edge_circuit)
@@ -129,6 +133,18 @@ def build_parser():
                    help="Margin for the task loss and runtime filter. Default: "
                         "the build-time margin_thresh stored in the dataset's "
                         "dataset_config.json.")
+
+    g = p.add_argument_group("joint multitask pruning (task=joint)")
+    g.add_argument("--joint-tasks", nargs="+", default=None,
+                   choices=DECEPTION_TASKS,
+                   metavar="SUBTASK",
+                   help="Deception subtasks to concatenate for joint pruning "
+                        "(default: far sdr ser). Requires --task joint.")
+    g.add_argument("--joint-scale-epochs", action=argparse.BooleanOptionalAction,
+                   default=True,
+                   help="When set and --node-epochs/--edge-epochs are left at "
+                        "their single-task defaults, scale them by 1/N subtasks "
+                        "so total gradient steps match one mechanism run.")
     return p
 
 
@@ -136,15 +152,39 @@ def resolve_args(args):
     """Fill in family-specific defaults and apply CLI overrides."""
     args.family = MODEL_REGISTRY[args.model][1]
 
+    if args.task == "joint":
+        if args.joint_tasks is None:
+            args.joint_tasks = list(DECEPTION_TASKS)
+        from tasks.joint_deception import _normalize_joint_tasks
+        args.joint_tasks = _normalize_joint_tasks(args.joint_tasks)
+    elif args.joint_tasks:
+        raise SystemExit("--joint-tasks requires --task joint.")
+
     if not 0.0 <= args.faithfulness_weight <= 1.0:
         raise SystemExit(
             f"--faithfulness-weight must be in [0, 1], got {args.faithfulness_weight}")
+
+    # For epoch scaling: remember whether the user set epochs on the CLI.
+    user_node_epochs = args.node_epochs
+    user_edge_epochs = args.edge_epochs
 
     # Training hyperparameters: use the (family, task) defaults where unset.
     hp = default_hyperparams(args.family, args.task)
     for k, v in hp.items():
         if getattr(args, k, None) is None:
             setattr(args, k, v)
+
+    if (args.task == "joint" and args.joint_scale_epochs
+            and user_node_epochs is None and user_edge_epochs is None):
+        n = len(args.joint_tasks)
+        ref = default_hyperparams(args.family, args.joint_tasks[0])
+        args.node_epochs = max(1, round(args.node_epochs / n))
+        args.edge_epochs = max(1, round(args.edge_epochs / n))
+        print(f"Joint epoch scaling: node_epochs={args.node_epochs}, "
+              f"edge_epochs={args.edge_epochs} "
+              f"(1/{n} of single-task {ref['node_epochs']}/{ref['edge_epochs']})")
+    elif args.task == "joint" and not args.joint_scale_epochs:
+        print("Joint epoch scaling disabled; using configured node/edge epochs as-is.")
 
     # Node config: per-(family, task) lambdas, then CLI overrides.
     node_cfg = default_node_config(args.family, args.task)
@@ -255,6 +295,33 @@ def _print_fidelity(task, rows):
         print(f"  {label:<26}{cells}")
 
 
+def _evaluate_test(task, model, label, full_model, test_dl, device, tokenizer, state):
+    """Test-set evaluation; joint tasks report per-subtask metrics."""
+    if hasattr(task, "evaluate_subtasks") and state.get("joint_test_loaders"):
+        return task.evaluate_subtasks(model, label, full_model, device, tokenizer, state)
+    return task.evaluate(model, label, full_model, test_dl, device, tokenizer, state)
+
+
+def _fidelity_report_rows(task, baseline, node_eval, edge_eval):
+    if isinstance(baseline, dict):
+        from tasks.joint_deception import JointDeceptionTask
+        rows = JointDeceptionTask.fidelity_rows(baseline, "Baseline (Full Model)")
+        if isinstance(node_eval, dict):
+            rows.extend(JointDeceptionTask.fidelity_rows(node_eval, "Node-Pruned Circuit"))
+        else:
+            rows.append(("Node-Pruned Circuit", node_eval))
+        if isinstance(edge_eval, dict):
+            rows.extend(JointDeceptionTask.fidelity_rows(edge_eval, "Edge-Pruned Circuit"))
+        else:
+            rows.append(("Edge-Pruned Circuit", edge_eval))
+        return rows
+    return [
+        ("Baseline (Full Model)", baseline),
+        ("Node-Pruned Circuit", node_eval),
+        ("Edge-Pruned Circuit", edge_eval),
+    ]
+
+
 # ==============================================================================
 # Main
 # ==============================================================================
@@ -306,7 +373,8 @@ def _run_training(args, task, node_cfg, edge_cfg):
     print("\n--- Baseline evaluation (full model) ---")
     # Pass None for the faithfulness reference to avoid a second forward; evaluate()
     # reports self-faithfulness (KL=0, Exact Match=1) in that case.
-    baseline = task.evaluate(full_model, "Full Model", None, test_dl, device, tokenizer, state)
+    baseline = _evaluate_test(task, full_model, "Full Model", None,
+                              test_dl, device, tokenizer, state)
 
     # ----- Phase 1: node pruning ------------------------------------------
     node_stats = None
@@ -325,8 +393,8 @@ def _run_training(args, task, node_cfg, edge_cfg):
                           masks=node_masks)
 
         node_model.eval()
-        node_eval = task.evaluate(node_model, "Node-Pruned Circuit", full_model,
-                                  test_dl, device, tokenizer, state)
+        node_eval = _evaluate_test(task, node_model, "Node-Pruned Circuit", full_model,
+                                   test_dl, device, tokenizer, state)
         del node_model
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
@@ -353,8 +421,8 @@ def _run_training(args, task, node_cfg, edge_cfg):
         plot_phase_history(edge_hist, args.output_dir, "Edge")
         edge_stats = analyze_edge_circuit(edge_model, verbose=False)
         edge_model.eval()
-        edge_eval = task.evaluate(edge_model, "Edge-Pruned Circuit", full_model,
-                                  test_dl, device, tokenizer, state)
+        edge_eval = _evaluate_test(task, edge_model, "Edge-Pruned Circuit", full_model,
+                                   test_dl, device, tokenizer, state)
 
     if run_history:
         hist_path = save_history(run_history, args.output_dir)
@@ -367,11 +435,7 @@ def _run_training(args, task, node_cfg, edge_cfg):
     if edge_stats is not None:
         te, ae = _print_edge_report(edge_stats, full_e)
 
-    _print_fidelity(task, [
-        ("Baseline (Full Model)", baseline),
-        ("Node-Pruned Circuit", node_eval),
-        ("Edge-Pruned Circuit", edge_eval),
-    ])
+    _print_fidelity(task, _fidelity_report_rows(task, baseline, node_eval, edge_eval))
 
     print("\n" + "=" * W)
     print("  END-TO-END EDGE COMPRESSION")
@@ -386,6 +450,8 @@ def _run_training(args, task, node_cfg, edge_cfg):
     # ----- Persist --------------------------------------------------------
     results = {
         "model": args.model, "task": args.task, "family": args.family,
+        "joint_tasks": getattr(args, "joint_tasks", None),
+        "joint_scale_epochs": getattr(args, "joint_scale_epochs", None),
         "edge_pruning": args.edge_pruning, "seed": args.seed,
         "baseline": baseline, "node_eval": node_eval, "edge_eval": edge_eval,
         "dense_edges": dense,

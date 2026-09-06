@@ -140,13 +140,16 @@ def get_task(name: str) -> Task:
         elif name == "ser":
             from tasks.ser import SERTask
             _TASKS[name] = SERTask
+        elif name == "joint":
+            from tasks.joint_deception import JointDeceptionTask
+            _TASKS[name] = JointDeceptionTask
         else:
             raise ValueError(f"Unknown task {name!r}. Choose from {list_tasks()}.")
     return _TASKS[name]()
 
 
 def list_tasks():
-    return ["ioi", "gp", "gt", "std", "far", "sdr", "ser"]
+    return ["ioi", "gp", "gt", "std", "far", "sdr", "ser", "joint"]
 
 
 #: The deception-mechanism family: one task per mechanism, built from one shared

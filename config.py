@@ -124,6 +124,12 @@ _HYPERPARAMS = {
     ("llama", "ser"): dict(node_epochs=500, edge_epochs=300, batch_size=7,
                            max_seq_length=120, lr=3e-2,
                            train_samples=200, val_samples=200, test_samples=1000),
+    # Joint FAR+SDR+SER: same per-subtask sample counts as far/sdr/ser; epoch
+    # scaling to match single-task gradient budget is applied in train.resolve_args
+    # when --joint-scale-epochs is set (default).
+    ("llama", "joint"): dict(node_epochs=500, edge_epochs=300, batch_size=30, # need to use H200...
+                             max_seq_length=120, lr=3e-2,
+                             train_samples=200, val_samples=200, test_samples=1000),
 }
 
 

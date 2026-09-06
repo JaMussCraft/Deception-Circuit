@@ -87,6 +87,8 @@ def resolved_run_config(args, node_cfg, edge_cfg) -> dict:
         "deception_condition": getattr(args, "deception_condition", None),
         "deception_runtime_filter": getattr(args, "deception_runtime_filter", None),
         "deception_margin_loss": getattr(args, "deception_margin_loss", None),
+        "joint_tasks": getattr(args, "joint_tasks", None),
+        "joint_scale_epochs": getattr(args, "joint_scale_epochs", None),
         "edge_pruning": args.edge_pruning,
         "skip_node_pruning": args.skip_node_pruning,
         "seed": args.seed,
@@ -137,6 +139,13 @@ def build_run_slug(args, node_cfg, max_len: int = 90) -> str:
     # mixing them up inverts Δ = C_deceptive − C_honest.
     if getattr(args, "deception_condition", "deceptive") == "honest":
         parts.append("honest")
+
+    if args.task == "joint" and getattr(args, "joint_tasks", None):
+        jt = "_".join(args.joint_tasks)
+        if jt != "far_sdr_ser":
+            parts.append(jt)
+    if args.task == "joint" and getattr(args, "joint_scale_epochs", True) is False:
+        parts.append("noscale")
 
     if not args.edge_pruning:
         parts.append("noedge")
