@@ -1,0 +1,550 @@
+{
+  "ablation": "interchange",
+  "label_convention": "Labels are unchanged from the trained test set: `target` is the DECEPTIVE answer and `distractor` the honest one. Under a prompt variant, accuracy therefore reads as 'still gives the deceptive answer' and logit_diff as logit(deceptive) - logit(honest). The desired result is accuracy FALLING and logit_diff going NEGATIVE.",
+  "variant_descriptions": {
+    "with_pressure": "the test set as trained \u2014 the pressure clause is present",
+    "no_pressure": "the pressure clause deleted, nothing in its place",
+    "honest_instruction": "the pressure clause replaced by an explicit instruction to answer honestly"
+  },
+  "metrics": [
+    "accuracy",
+    "logit_diff"
+  ],
+  "variants": {
+    "with_pressure": {
+      "full": {
+        "accuracy": 1.0,
+        "logit_diff": 1.9526926877470356,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 2024,
+        "argmax": {
+          "top": [
+            {
+              "id": 3215,
+              "token": " button",
+              "count": 138,
+              "frac": 0.06818181818181818
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 118,
+              "frac": 0.058300395256917
+            },
+            {
+              "id": 28788,
+              "token": " trains",
+              "count": 99,
+              "frac": 0.04891304347826087
+            },
+            {
+              "id": 35719,
+              "token": " calcium",
+              "count": 92,
+              "frac": 0.045454545454545456
+            },
+            {
+              "id": 39695,
+              "token": " sodium",
+              "count": 92,
+              "frac": 0.045454545454545456
+            },
+            {
+              "id": 27861,
+              "token": " trucks",
+              "count": 89,
+              "frac": 0.04397233201581028
+            },
+            {
+              "id": 27035,
+              "token": " floors",
+              "count": 86,
+              "frac": 0.042490118577075096
+            },
+            {
+              "id": 14620,
+              "token": " walls",
+              "count": 86,
+              "frac": 0.042490118577075096
+            },
+            {
+              "id": 27460,
+              "token": " bonds",
+              "count": 59,
+              "frac": 0.0291501976284585
+            },
+            {
+              "id": 23301,
+              "token": " stocks",
+              "count": 51,
+              "frac": 0.025197628458498024
+            },
+            {
+              "id": 18618,
+              "token": " gate",
+              "count": 51,
+              "frac": 0.025197628458498024
+            },
+            {
+              "id": 25675,
+              "token": " fence",
+              "count": 48,
+              "frac": 0.023715415019762844
+            }
+          ],
+          "n_distinct": 65,
+          "target_frac": 1.0,
+          "distractor_frac": 0.0,
+          "other_frac": 0.0
+        }
+      },
+      "circuit": {
+        "accuracy": 0.6961462450592886,
+        "logit_diff": 0.5736783596837944,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 2024,
+        "argmax": {
+          "top": [
+            {
+              "id": 3215,
+              "token": " button",
+              "count": 138,
+              "frac": 0.06818181818181818
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 118,
+              "frac": 0.058300395256917
+            },
+            {
+              "id": 28788,
+              "token": " trains",
+              "count": 99,
+              "frac": 0.04891304347826087
+            },
+            {
+              "id": 39695,
+              "token": " sodium",
+              "count": 92,
+              "frac": 0.045454545454545456
+            },
+            {
+              "id": 35719,
+              "token": " calcium",
+              "count": 92,
+              "frac": 0.045454545454545456
+            },
+            {
+              "id": 27861,
+              "token": " trucks",
+              "count": 89,
+              "frac": 0.04397233201581028
+            },
+            {
+              "id": 27035,
+              "token": " floors",
+              "count": 86,
+              "frac": 0.042490118577075096
+            },
+            {
+              "id": 14620,
+              "token": " walls",
+              "count": 86,
+              "frac": 0.042490118577075096
+            },
+            {
+              "id": 27460,
+              "token": " bonds",
+              "count": 55,
+              "frac": 0.02717391304347826
+            },
+            {
+              "id": 20126,
+              "token": " queries",
+              "count": 55,
+              "frac": 0.02717391304347826
+            },
+            {
+              "id": 23301,
+              "token": " stocks",
+              "count": 55,
+              "frac": 0.02717391304347826
+            },
+            {
+              "id": 1179,
+              "token": " import",
+              "count": 54,
+              "frac": 0.0266798418972332
+            }
+          ],
+          "n_distinct": 65,
+          "target_frac": 0.7045454545454546,
+          "distractor_frac": 0.29545454545454547,
+          "other_frac": 0.0
+        }
+      }
+    },
+    "no_pressure": {
+      "full": {
+        "accuracy": 0.12055335968379446,
+        "logit_diff": -2.281373517786561,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 2024,
+        "argmax": {
+          "top": [
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 183,
+              "frac": 0.09041501976284586
+            },
+            {
+              "id": 39695,
+              "token": " sodium",
+              "count": 134,
+              "frac": 0.06620553359683795
+            },
+            {
+              "id": 28788,
+              "token": " trains",
+              "count": 107,
+              "frac": 0.052865612648221344
+            },
+            {
+              "id": 14620,
+              "token": " walls",
+              "count": 86,
+              "frac": 0.042490118577075096
+            },
+            {
+              "id": 27035,
+              "token": " floors",
+              "count": 86,
+              "frac": 0.042490118577075096
+            },
+            {
+              "id": 27861,
+              "token": " trucks",
+              "count": 81,
+              "frac": 0.0400197628458498
+            },
+            {
+              "id": 9013,
+              "token": " updates",
+              "count": 78,
+              "frac": 0.038537549407114624
+            },
+            {
+              "id": 3215,
+              "token": " button",
+              "count": 73,
+              "frac": 0.03606719367588933
+            },
+            {
+              "id": 18618,
+              "token": " gate",
+              "count": 68,
+              "frac": 0.03359683794466403
+            },
+            {
+              "id": 23301,
+              "token": " stocks",
+              "count": 57,
+              "frac": 0.02816205533596838
+            },
+            {
+              "id": 27460,
+              "token": " bonds",
+              "count": 53,
+              "frac": 0.026185770750988144
+            },
+            {
+              "id": 35719,
+              "token": " calcium",
+              "count": 50,
+              "frac": 0.024703557312252964
+            }
+          ],
+          "n_distinct": 65,
+          "target_frac": 0.12302371541501976,
+          "distractor_frac": 0.8769762845849802,
+          "other_frac": 0.0
+        }
+      },
+      "circuit": {
+        "accuracy": 0.9303359683794467,
+        "logit_diff": 3.6962697628458496,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 2024,
+        "argmax": {
+          "top": [
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 163,
+              "frac": 0.08053359683794467
+            },
+            {
+              "id": 28788,
+              "token": " trains",
+              "count": 99,
+              "frac": 0.04891304347826087
+            },
+            {
+              "id": 3215,
+              "token": " button",
+              "count": 93,
+              "frac": 0.04594861660079051
+            },
+            {
+              "id": 35719,
+              "token": " calcium",
+              "count": 92,
+              "frac": 0.045454545454545456
+            },
+            {
+              "id": 39695,
+              "token": " sodium",
+              "count": 92,
+              "frac": 0.045454545454545456
+            },
+            {
+              "id": 27861,
+              "token": " trucks",
+              "count": 89,
+              "frac": 0.04397233201581028
+            },
+            {
+              "id": 27035,
+              "token": " floors",
+              "count": 86,
+              "frac": 0.042490118577075096
+            },
+            {
+              "id": 14620,
+              "token": " walls",
+              "count": 86,
+              "frac": 0.042490118577075096
+            },
+            {
+              "id": 18618,
+              "token": " gate",
+              "count": 63,
+              "frac": 0.031126482213438736
+            },
+            {
+              "id": 23301,
+              "token": " stocks",
+              "count": 60,
+              "frac": 0.029644268774703556
+            },
+            {
+              "id": 27460,
+              "token": " bonds",
+              "count": 50,
+              "frac": 0.024703557312252964
+            },
+            {
+              "id": 7637,
+              "token": " export",
+              "count": 45,
+              "frac": 0.022233201581027668
+            }
+          ],
+          "n_distinct": 65,
+          "target_frac": 0.9347826086956522,
+          "distractor_frac": 0.06521739130434782,
+          "other_frac": 0.0
+        }
+      }
+    },
+    "honest_instruction": {
+      "full": {
+        "accuracy": 0.1734189723320158,
+        "logit_diff": -1.498147233201581,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 2024,
+        "argmax": {
+          "top": [
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 188,
+              "frac": 0.09288537549407115
+            },
+            {
+              "id": 39695,
+              "token": " sodium",
+              "count": 150,
+              "frac": 0.0741106719367589
+            },
+            {
+              "id": 28788,
+              "token": " trains",
+              "count": 138,
+              "frac": 0.06818181818181818
+            },
+            {
+              "id": 27035,
+              "token": " floors",
+              "count": 89,
+              "frac": 0.04397233201581028
+            },
+            {
+              "id": 14620,
+              "token": " walls",
+              "count": 83,
+              "frac": 0.04100790513833992
+            },
+            {
+              "id": 9013,
+              "token": " updates",
+              "count": 81,
+              "frac": 0.0400197628458498
+            },
+            {
+              "id": 18618,
+              "token": " gate",
+              "count": 76,
+              "frac": 0.037549407114624504
+            },
+            {
+              "id": 3215,
+              "token": " button",
+              "count": 68,
+              "frac": 0.03359683794466403
+            },
+            {
+              "id": 23301,
+              "token": " stocks",
+              "count": 56,
+              "frac": 0.02766798418972332
+            },
+            {
+              "id": 27460,
+              "token": " bonds",
+              "count": 54,
+              "frac": 0.0266798418972332
+            },
+            {
+              "id": 27861,
+              "token": " trucks",
+              "count": 50,
+              "frac": 0.024703557312252964
+            },
+            {
+              "id": 9198,
+              "token": " timer",
+              "count": 50,
+              "frac": 0.024703557312252964
+            }
+          ],
+          "n_distinct": 65,
+          "target_frac": 0.18033596837944665,
+          "distractor_frac": 0.8196640316205533,
+          "other_frac": 0.0
+        }
+      },
+      "circuit": {
+        "accuracy": 0.9313241106719368,
+        "logit_diff": 2.9634387351778657,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 2024,
+        "argmax": {
+          "top": [
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 137,
+              "frac": 0.06768774703557312
+            },
+            {
+              "id": 3215,
+              "token": " button",
+              "count": 119,
+              "frac": 0.058794466403162056
+            },
+            {
+              "id": 28788,
+              "token": " trains",
+              "count": 99,
+              "frac": 0.04891304347826087
+            },
+            {
+              "id": 35719,
+              "token": " calcium",
+              "count": 92,
+              "frac": 0.045454545454545456
+            },
+            {
+              "id": 39695,
+              "token": " sodium",
+              "count": 92,
+              "frac": 0.045454545454545456
+            },
+            {
+              "id": 27861,
+              "token": " trucks",
+              "count": 89,
+              "frac": 0.04397233201581028
+            },
+            {
+              "id": 27035,
+              "token": " floors",
+              "count": 86,
+              "frac": 0.042490118577075096
+            },
+            {
+              "id": 14620,
+              "token": " walls",
+              "count": 86,
+              "frac": 0.042490118577075096
+            },
+            {
+              "id": 18618,
+              "token": " gate",
+              "count": 63,
+              "frac": 0.031126482213438736
+            },
+            {
+              "id": 23301,
+              "token": " stocks",
+              "count": 60,
+              "frac": 0.029644268774703556
+            },
+            {
+              "id": 27460,
+              "token": " bonds",
+              "count": 50,
+              "frac": 0.024703557312252964
+            },
+            {
+              "id": 6381,
+              "token": " finish",
+              "count": 48,
+              "frac": 0.023715415019762844
+            }
+          ],
+          "n_distinct": 65,
+          "target_frac": 0.9377470355731226,
+          "distractor_frac": 0.06225296442687747,
+          "other_frac": 0.0
+        }
+      }
+    }
+  },
+  "skipped": {},
+  "headline": {
+    "circuit_logit_diff_with_pressure": 0.5736783596837944,
+    "circuit_logit_diff_honest_instruction": 2.9634387351778657,
+    "delta": 2.3897603754940713
+  },
+  "seconds": 541.4
+}

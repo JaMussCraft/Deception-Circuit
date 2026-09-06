@@ -1,0 +1,33 @@
+{
+  "interchange": {
+    "last_run": "2026-08-27T15:14:47",
+    "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+    ],
+    "sanity": {
+      "accuracy": 0.9397233201581028,
+      "logit_diff": 1.8035449604743083,
+      "kl_div": 0.1440853980690123,
+      "exact_match": 0.942193675889328
+    },
+    "knockout": {
+      "task_accuracy": 0.0004940711462450593,
+      "wikitext_kl": 0.9826124240644276,
+      "honest_accuracy_drop": -0.6259881422924902
+    },
+    "null": {
+      "accuracy": 100.0,
+      "logit_diff": 100.0,
+      "kl_div": 100.0,
+      "exact_match": 100.0
+    },
+    "pressure": {
+      "circuit_logit_diff_with_pressure": 1.8043478260869565,
+      "circuit_logit_diff_honest_instruction": 3.0658349802371543,
+      "delta": 1.2614871541501977
+    }
+  }
+}

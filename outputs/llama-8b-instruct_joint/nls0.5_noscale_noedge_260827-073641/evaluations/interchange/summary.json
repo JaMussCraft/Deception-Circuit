@@ -1,0 +1,515 @@
+{
+  "schema_version": 1,
+  "created": "2026-08-27T13:15:58",
+  "run_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_joint/nls0.5_noscale_noedge_260827-073641",
+  "ablation": "interchange",
+  "model": "llama-8b-instruct",
+  "task": "joint",
+  "metric_columns": [
+    [
+      "accuracy",
+      "Accuracy"
+    ],
+    [
+      "logit_diff",
+      "Logit Diff"
+    ],
+    [
+      "kl_div",
+      "KL Div"
+    ],
+    [
+      "exact_match",
+      "Exact Match"
+    ]
+  ],
+  "metric_better": {
+    "accuracy": "higher",
+    "logit_diff": "higher",
+    "exact_match": "higher",
+    "kl_div": "lower",
+    "prob_diff": "higher",
+    "cutoff_sharpness": "higher"
+  },
+  "geometry": {
+    "num_heads": 32,
+    "head_dim": 128,
+    "intermediate_size": 14336,
+    "hidden_size": 4096,
+    "num_layers": 32
+  },
+  "cli": {
+    "ablation": "interchange",
+    "all_pairs_delta": false,
+    "circuit": null,
+    "compose_granularity": "both",
+    "data_dir": null,
+    "device": "cuda",
+    "dry_run": false,
+    "eval_batch_size": 32,
+    "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+    ],
+    "expr": null,
+    "gen_examples": 3,
+    "gen_new_tokens": 48,
+    "hf_token": null,
+    "knockout_granularity": "finest",
+    "legacy": true,
+    "mean_source": "pooled",
+    "n_random": 50,
+    "null_alloc": "uniform",
+    "null_count": null,
+    "null_seed": 0,
+    "null_start": 0,
+    "output_dir": "outputs/llama-8b-instruct_joint/nls0.5_noscale_noedge_260827-073641/evaluations",
+    "ref_cache_device": "cuda",
+    "reference": "separate",
+    "run_dir": "outputs/llama-8b-instruct_joint/nls0.5_noscale_noedge_260827-073641",
+    "sanity_granularity": "all",
+    "save_null_masks": false,
+    "skip_wikitext": false,
+    "std_variant": null,
+    "strict": false,
+    "suite_name": null,
+    "task": null,
+    "task_from": null,
+    "test_samples": null,
+    "verify": true,
+    "wikitext_batch_size": 4,
+    "wikitext_block_size": 512,
+    "wikitext_blocks": 64,
+    "wikitext_seed": 0,
+    "xor": null
+  },
+  "circuit": {
+    "counts": {
+      "attention_blocks": {
+        "active": 13,
+        "total": 32,
+        "per_layer": {
+          "4": 1,
+          "7": 1,
+          "8": 1,
+          "9": 1,
+          "10": 1,
+          "11": 1,
+          "12": 1,
+          "13": 1,
+          "14": 1,
+          "15": 1,
+          "17": 1,
+          "24": 1,
+          "30": 1
+        }
+      },
+      "mlp_blocks": {
+        "active": 1,
+        "total": 32,
+        "per_layer": {
+          "0": 1
+        }
+      },
+      "attention_heads": {
+        "active": 79,
+        "total": 1024,
+        "per_layer": {
+          "4": 2,
+          "7": 8,
+          "8": 7,
+          "9": 7,
+          "10": 5,
+          "11": 6,
+          "12": 6,
+          "13": 8,
+          "14": 11,
+          "15": 4,
+          "17": 4,
+          "24": 7,
+          "30": 4
+        }
+      },
+      "attention_neurons": {
+        "active": 5406,
+        "total": 131072,
+        "per_layer": {
+          "4": 198,
+          "7": 482,
+          "8": 472,
+          "9": 469,
+          "10": 380,
+          "11": 361,
+          "12": 379,
+          "13": 444,
+          "14": 589,
+          "15": 327,
+          "17": 385,
+          "24": 521,
+          "30": 399
+        }
+      },
+      "mlp_hidden": {
+        "active": 1886,
+        "total": 458752,
+        "per_layer": {
+          "0": 1886
+        }
+      },
+      "mlp_output": {
+        "active": 698,
+        "total": 131072,
+        "per_layer": {
+          "0": 698
+        }
+      }
+    }
+  },
+  "sanity_circuit": {
+    "granularity": "all",
+    "counts": {
+      "attention_blocks": {
+        "active": 13,
+        "total": 32,
+        "per_layer": {
+          "4": 1,
+          "7": 1,
+          "8": 1,
+          "9": 1,
+          "10": 1,
+          "11": 1,
+          "12": 1,
+          "13": 1,
+          "14": 1,
+          "15": 1,
+          "17": 1,
+          "24": 1,
+          "30": 1
+        }
+      },
+      "mlp_blocks": {
+        "active": 1,
+        "total": 32,
+        "per_layer": {
+          "0": 1
+        }
+      },
+      "attention_heads": {
+        "active": 79,
+        "total": 1024,
+        "per_layer": {
+          "4": 2,
+          "7": 8,
+          "8": 7,
+          "9": 7,
+          "10": 5,
+          "11": 6,
+          "12": 6,
+          "13": 8,
+          "14": 11,
+          "15": 4,
+          "17": 4,
+          "24": 7,
+          "30": 4
+        }
+      },
+      "attention_neurons": {
+        "active": 5406,
+        "total": 131072,
+        "per_layer": {
+          "4": 198,
+          "7": 482,
+          "8": 472,
+          "9": 469,
+          "10": 380,
+          "11": 361,
+          "12": 379,
+          "13": 444,
+          "14": 589,
+          "15": 327,
+          "17": 385,
+          "24": 521,
+          "30": 399
+        }
+      },
+      "mlp_hidden": {
+        "active": 1886,
+        "total": 458752,
+        "per_layer": {
+          "0": 1886
+        }
+      },
+      "mlp_output": {
+        "active": 698,
+        "total": 131072,
+        "per_layer": {
+          "0": 698
+        }
+      }
+    }
+  },
+  "knockout": {
+    "granularity": "finest",
+    "counts": {
+      "attention_blocks": {
+        "active": 32,
+        "total": 32,
+        "per_layer": {
+          "0": 1,
+          "1": 1,
+          "2": 1,
+          "3": 1,
+          "4": 1,
+          "5": 1,
+          "6": 1,
+          "7": 1,
+          "8": 1,
+          "9": 1,
+          "10": 1,
+          "11": 1,
+          "12": 1,
+          "13": 1,
+          "14": 1,
+          "15": 1,
+          "16": 1,
+          "17": 1,
+          "18": 1,
+          "19": 1,
+          "20": 1,
+          "21": 1,
+          "22": 1,
+          "23": 1,
+          "24": 1,
+          "25": 1,
+          "26": 1,
+          "27": 1,
+          "28": 1,
+          "29": 1,
+          "30": 1,
+          "31": 1
+        }
+      },
+      "mlp_blocks": {
+        "active": 32,
+        "total": 32,
+        "per_layer": {
+          "0": 1,
+          "1": 1,
+          "2": 1,
+          "3": 1,
+          "4": 1,
+          "5": 1,
+          "6": 1,
+          "7": 1,
+          "8": 1,
+          "9": 1,
+          "10": 1,
+          "11": 1,
+          "12": 1,
+          "13": 1,
+          "14": 1,
+          "15": 1,
+          "16": 1,
+          "17": 1,
+          "18": 1,
+          "19": 1,
+          "20": 1,
+          "21": 1,
+          "22": 1,
+          "23": 1,
+          "24": 1,
+          "25": 1,
+          "26": 1,
+          "27": 1,
+          "28": 1,
+          "29": 1,
+          "30": 1,
+          "31": 1
+        }
+      },
+      "attention_heads": {
+        "active": 1024,
+        "total": 1024,
+        "per_layer": {
+          "0": 32,
+          "1": 32,
+          "2": 32,
+          "3": 32,
+          "4": 32,
+          "5": 32,
+          "6": 32,
+          "7": 32,
+          "8": 32,
+          "9": 32,
+          "10": 32,
+          "11": 32,
+          "12": 32,
+          "13": 32,
+          "14": 32,
+          "15": 32,
+          "16": 32,
+          "17": 32,
+          "18": 32,
+          "19": 32,
+          "20": 32,
+          "21": 32,
+          "22": 32,
+          "23": 32,
+          "24": 32,
+          "25": 32,
+          "26": 32,
+          "27": 32,
+          "28": 32,
+          "29": 32,
+          "30": 32,
+          "31": 32
+        }
+      },
+      "attention_neurons": {
+        "active": 125666,
+        "total": 131072,
+        "per_layer": {
+          "0": 4096,
+          "1": 4096,
+          "2": 4096,
+          "3": 4096,
+          "4": 3898,
+          "5": 4096,
+          "6": 4096,
+          "7": 3614,
+          "8": 3624,
+          "9": 3627,
+          "10": 3716,
+          "11": 3735,
+          "12": 3717,
+          "13": 3652,
+          "14": 3507,
+          "15": 3769,
+          "16": 4096,
+          "17": 3711,
+          "18": 4096,
+          "19": 4096,
+          "20": 4096,
+          "21": 4096,
+          "22": 4096,
+          "23": 4096,
+          "24": 3575,
+          "25": 4096,
+          "26": 4096,
+          "27": 4096,
+          "28": 4096,
+          "29": 4096,
+          "30": 3697,
+          "31": 4096
+        }
+      },
+      "mlp_hidden": {
+        "active": 456866,
+        "total": 458752,
+        "per_layer": {
+          "0": 12450,
+          "1": 14336,
+          "2": 14336,
+          "3": 14336,
+          "4": 14336,
+          "5": 14336,
+          "6": 14336,
+          "7": 14336,
+          "8": 14336,
+          "9": 14336,
+          "10": 14336,
+          "11": 14336,
+          "12": 14336,
+          "13": 14336,
+          "14": 14336,
+          "15": 14336,
+          "16": 14336,
+          "17": 14336,
+          "18": 14336,
+          "19": 14336,
+          "20": 14336,
+          "21": 14336,
+          "22": 14336,
+          "23": 14336,
+          "24": 14336,
+          "25": 14336,
+          "26": 14336,
+          "27": 14336,
+          "28": 14336,
+          "29": 14336,
+          "30": 14336,
+          "31": 14336
+        }
+      },
+      "mlp_output": {
+        "active": 130374,
+        "total": 131072,
+        "per_layer": {
+          "0": 3398,
+          "1": 4096,
+          "2": 4096,
+          "3": 4096,
+          "4": 4096,
+          "5": 4096,
+          "6": 4096,
+          "7": 4096,
+          "8": 4096,
+          "9": 4096,
+          "10": 4096,
+          "11": 4096,
+          "12": 4096,
+          "13": 4096,
+          "14": 4096,
+          "15": 4096,
+          "16": 4096,
+          "17": 4096,
+          "18": 4096,
+          "19": 4096,
+          "20": 4096,
+          "21": 4096,
+          "22": 4096,
+          "23": 4096,
+          "24": 4096,
+          "25": 4096,
+          "26": 4096,
+          "27": 4096,
+          "28": 4096,
+          "29": 4096,
+          "30": 4096,
+          "31": 4096
+        }
+      }
+    }
+  },
+  "reference_numbers": {
+    "source": "results.json:node_eval",
+    "node_eval": {},
+    "baseline": {}
+  },
+  "verification": {
+    "masks_roundtrip": true,
+    "all_open_equals_full": true,
+    "generic_vs_task_evaluate_max_delta": 1.5354733693268008e-05,
+    "granularity": "all",
+    "reference_numbers": {
+      "source": "results.json:node_eval",
+      "expected": {},
+      "observed": {
+        "accuracy": 0.9397233201581028,
+        "logit_diff": 1.8035449604743083,
+        "kl_div": 0.1440853980690123,
+        "exact_match": 0.942193675889328
+      },
+      "max_delta": null,
+      "ok": null
+    },
+    "knockout_is_exact_complement": true,
+    "wikitext_floor_is_zero": false,
+    "null_circuits_size_matched": true
+  },
+  "failures": [
+    "knockout: the all-gates-open wikitext floor is not zero (KL 6.639e-04, ppl ratio 1.000321)"
+  ]
+}

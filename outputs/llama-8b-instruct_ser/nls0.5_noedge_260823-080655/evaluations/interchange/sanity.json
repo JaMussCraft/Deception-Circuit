@@ -1,0 +1,397 @@
+{
+  "batch_size": 7,
+  "n": 1000,
+  "ablation": "interchange",
+  "granularity": "all",
+  "counts": {
+    "attention_blocks": {
+      "active": 10,
+      "total": 32,
+      "per_layer": {
+        "4": 1,
+        "8": 1,
+        "10": 1,
+        "12": 1,
+        "13": 1,
+        "14": 1,
+        "15": 1,
+        "17": 1,
+        "22": 1,
+        "24": 1
+      }
+    },
+    "mlp_blocks": {
+      "active": 1,
+      "total": 32,
+      "per_layer": {
+        "0": 1
+      }
+    },
+    "attention_heads": {
+      "active": 39,
+      "total": 1024,
+      "per_layer": {
+        "4": 2,
+        "8": 5,
+        "10": 3,
+        "12": 5,
+        "13": 5,
+        "14": 4,
+        "15": 3,
+        "17": 3,
+        "22": 4,
+        "24": 5
+      }
+    },
+    "attention_neurons": {
+      "active": 2718,
+      "total": 131072,
+      "per_layer": {
+        "4": 148,
+        "8": 284,
+        "10": 181,
+        "12": 341,
+        "13": 304,
+        "14": 301,
+        "15": 277,
+        "17": 266,
+        "22": 291,
+        "24": 325
+      }
+    },
+    "mlp_hidden": {
+      "active": 1159,
+      "total": 458752,
+      "per_layer": {
+        "0": 1159
+      }
+    },
+    "mlp_output": {
+      "active": 496,
+      "total": 131072,
+      "per_layer": {
+        "0": 496
+      }
+    }
+  },
+  "label": "discovered circuit",
+  "rows": {
+    "full_open": {
+      "accuracy": 1.0,
+      "logit_diff": 1.402875,
+      "kl_div": 0.0,
+      "exact_match": 1.0,
+      "n": 1000
+    },
+    "discovered": {
+      "accuracy": 0.989,
+      "logit_diff": 1.2625,
+      "kl_div": 0.03052709849178791,
+      "exact_match": 0.991,
+      "n": 1000,
+      "argmax": {
+        "top": [
+          {
+            "id": 9042,
+            "token": " clock",
+            "count": 156,
+            "frac": 0.156
+          },
+          {
+            "id": 9198,
+            "token": " timer",
+            "count": 155,
+            "frac": 0.155
+          },
+          {
+            "id": 16181,
+            "token": " reads",
+            "count": 107,
+            "frac": 0.107
+          },
+          {
+            "id": 14238,
+            "token": " writes",
+            "count": 100,
+            "frac": 0.1
+          },
+          {
+            "id": 27460,
+            "token": " bonds",
+            "count": 61,
+            "frac": 0.061
+          },
+          {
+            "id": 23301,
+            "token": " stocks",
+            "count": 58,
+            "frac": 0.058
+          },
+          {
+            "id": 3480,
+            "token": " switch",
+            "count": 57,
+            "frac": 0.057
+          },
+          {
+            "id": 3215,
+            "token": " button",
+            "count": 55,
+            "frac": 0.055
+          },
+          {
+            "id": 9244,
+            "token": " wire",
+            "count": 30,
+            "frac": 0.03
+          },
+          {
+            "id": 44599,
+            "token": " bids",
+            "count": 29,
+            "frac": 0.029
+          },
+          {
+            "id": 14994,
+            "token": " cable",
+            "count": 28,
+            "frac": 0.028
+          },
+          {
+            "id": 17501,
+            "token": " asks",
+            "count": 28,
+            "frac": 0.028
+          }
+        ],
+        "n_distinct": 27,
+        "target_frac": 0.991,
+        "distractor_frac": 0.009,
+        "other_frac": 0.0
+      }
+    },
+    "discovered_repo": {
+      "accuracy": 0.989,
+      "logit_diff": 1.2625,
+      "kl_div": 0.030481356799602507,
+      "exact_match": 0.991
+    },
+    "empty": {
+      "accuracy": 0.0,
+      "logit_diff": -1.389,
+      "kl_div": 0.8094889583587647,
+      "exact_match": 0.0,
+      "n": 1000,
+      "argmax": {
+        "top": [
+          {
+            "id": 9198,
+            "token": " timer",
+            "count": 156,
+            "frac": 0.156
+          },
+          {
+            "id": 9042,
+            "token": " clock",
+            "count": 155,
+            "frac": 0.155
+          },
+          {
+            "id": 14238,
+            "token": " writes",
+            "count": 107,
+            "frac": 0.107
+          },
+          {
+            "id": 16181,
+            "token": " reads",
+            "count": 100,
+            "frac": 0.1
+          },
+          {
+            "id": 23301,
+            "token": " stocks",
+            "count": 61,
+            "frac": 0.061
+          },
+          {
+            "id": 27460,
+            "token": " bonds",
+            "count": 58,
+            "frac": 0.058
+          },
+          {
+            "id": 3215,
+            "token": " button",
+            "count": 57,
+            "frac": 0.057
+          },
+          {
+            "id": 3480,
+            "token": " switch",
+            "count": 55,
+            "frac": 0.055
+          },
+          {
+            "id": 14994,
+            "token": " cable",
+            "count": 31,
+            "frac": 0.031
+          },
+          {
+            "id": 17501,
+            "token": " asks",
+            "count": 29,
+            "frac": 0.029
+          },
+          {
+            "id": 44599,
+            "token": " bids",
+            "count": 28,
+            "frac": 0.028
+          },
+          {
+            "id": 9244,
+            "token": " wire",
+            "count": 27,
+            "frac": 0.027
+          }
+        ],
+        "n_distinct": 26,
+        "target_frac": 0.0,
+        "distractor_frac": 1.0,
+        "other_frac": 0.0
+      }
+    }
+  },
+  "reference": {
+    "node_eval": {
+      "accuracy": 0.989,
+      "logit_diff": 1.2625,
+      "kl_div": 0.030481356799602507,
+      "exact_match": 0.991
+    },
+    "baseline": {
+      "accuracy": 1.0,
+      "logit_diff": 1.402875,
+      "kl_div": 0.0,
+      "exact_match": 1.0
+    }
+  },
+  "cross_check": {
+    "ran": true,
+    "ok": true,
+    "max_delta": 4.5741692185404664e-05,
+    "per_metric": {
+      "accuracy": {
+        "generic": 0.989,
+        "repo": 0.989,
+        "delta": 0.0,
+        "tolerance": 1e-06,
+        "pass": true
+      },
+      "exact_match": {
+        "generic": 0.991,
+        "repo": 0.991,
+        "delta": 0.0,
+        "tolerance": 1e-06,
+        "pass": true
+      },
+      "logit_diff": {
+        "generic": 1.2625,
+        "repo": 1.2625,
+        "delta": 0.0,
+        "tolerance": 0.0001,
+        "pass": true
+      },
+      "kl_div": {
+        "generic": 0.03052709849178791,
+        "repo": 0.030481356799602507,
+        "delta": 4.5741692185404664e-05,
+        "tolerance": 0.0001,
+        "pass": true
+      }
+    }
+  },
+  "all_open": {
+    "ok": true,
+    "kl_div": 0.0,
+    "exact_match": 1.0,
+    "tolerances": {
+      "kl_div": 0.0001,
+      "exact_match_min": 0.999
+    }
+  },
+  "delta": {
+    "ok": true,
+    "max_delta": 4.5741692185404664e-05,
+    "rows": [
+      {
+        "metric": "accuracy",
+        "label": "Accuracy",
+        "expected": 0.989,
+        "observed": 0.989,
+        "delta": 0.0,
+        "tolerance": 0.002,
+        "pass": true
+      },
+      {
+        "metric": "logit_diff",
+        "label": "Logit Diff",
+        "expected": 1.2625,
+        "observed": 1.2625,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "pass": true
+      },
+      {
+        "metric": "kl_div",
+        "label": "KL Div",
+        "expected": 0.030481356799602507,
+        "observed": 0.03052709849178791,
+        "delta": 4.5741692185404664e-05,
+        "tolerance": 0.005,
+        "pass": true
+      },
+      {
+        "metric": "exact_match",
+        "label": "Exact Match",
+        "expected": 0.991,
+        "observed": 0.991,
+        "delta": 0.0,
+        "tolerance": 0.002,
+        "pass": true
+      }
+    ]
+  },
+  "headline": {
+    "accuracy": 0.989,
+    "logit_diff": 1.2625,
+    "kl_div": 0.03052709849178791,
+    "exact_match": 0.991
+  },
+  "verification": {
+    "masks_roundtrip": true,
+    "all_open_equals_full": true,
+    "generic_vs_task_evaluate_max_delta": 4.5741692185404664e-05,
+    "granularity": "all",
+    "reference_numbers": {
+      "source": "results.json:node_eval",
+      "expected": {
+        "accuracy": 0.989,
+        "logit_diff": 1.2625,
+        "kl_div": 0.030481356799602507,
+        "exact_match": 0.991
+      },
+      "observed": {
+        "accuracy": 0.989,
+        "logit_diff": 1.2625,
+        "kl_div": 0.03052709849178791,
+        "exact_match": 0.991
+      },
+      "max_delta": 4.5741692185404664e-05,
+      "ok": true
+    }
+  },
+  "seconds": 236.7
+}

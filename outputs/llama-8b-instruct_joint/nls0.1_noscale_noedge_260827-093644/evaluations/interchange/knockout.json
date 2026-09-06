@@ -1,0 +1,1025 @@
+{
+  "granularity": "finest",
+  "ablation": "interchange",
+  "counts": {
+    "ablated_fine_units": 25645,
+    "total_fine_units": 720896
+  },
+  "task": {
+    "circuit": {
+      "accuracy": 0.9901185770750988,
+      "logit_diff": 2.683917984189723,
+      "kl_div": 0.08922697530080208,
+      "exact_match": 0.9906126482213439,
+      "n": 2024,
+      "argmax": {
+        "top": [
+          {
+            "id": 3215,
+            "token": " button",
+            "count": 138,
+            "frac": 0.06818181818181818
+          },
+          {
+            "id": 3480,
+            "token": " switch",
+            "count": 118,
+            "frac": 0.058300395256917
+          },
+          {
+            "id": 28788,
+            "token": " trains",
+            "count": 99,
+            "frac": 0.04891304347826087
+          },
+          {
+            "id": 35719,
+            "token": " calcium",
+            "count": 92,
+            "frac": 0.045454545454545456
+          },
+          {
+            "id": 39695,
+            "token": " sodium",
+            "count": 92,
+            "frac": 0.045454545454545456
+          },
+          {
+            "id": 27861,
+            "token": " trucks",
+            "count": 89,
+            "frac": 0.04397233201581028
+          },
+          {
+            "id": 14620,
+            "token": " walls",
+            "count": 89,
+            "frac": 0.04397233201581028
+          },
+          {
+            "id": 27035,
+            "token": " floors",
+            "count": 83,
+            "frac": 0.04100790513833992
+          },
+          {
+            "id": 27460,
+            "token": " bonds",
+            "count": 59,
+            "frac": 0.0291501976284585
+          },
+          {
+            "id": 23301,
+            "token": " stocks",
+            "count": 51,
+            "frac": 0.025197628458498024
+          },
+          {
+            "id": 18618,
+            "token": " gate",
+            "count": 51,
+            "frac": 0.025197628458498024
+          },
+          {
+            "id": 25675,
+            "token": " fence",
+            "count": 48,
+            "frac": 0.023715415019762844
+          }
+        ],
+        "n_distinct": 65,
+        "target_frac": 0.9906126482213439,
+        "distractor_frac": 0.009387351778656126,
+        "other_frac": 0.0
+      }
+    },
+    "knockout": {
+      "accuracy": 0.0,
+      "logit_diff": -1.967175148221344,
+      "kl_div": 1.403616503764518,
+      "exact_match": 0.0,
+      "n": 2024,
+      "argmax": {
+        "top": [
+          {
+            "id": 3480,
+            "token": " switch",
+            "count": 138,
+            "frac": 0.06818181818181818
+          },
+          {
+            "id": 3215,
+            "token": " button",
+            "count": 118,
+            "frac": 0.058300395256917
+          },
+          {
+            "id": 27861,
+            "token": " trucks",
+            "count": 99,
+            "frac": 0.04891304347826087
+          },
+          {
+            "id": 39695,
+            "token": " sodium",
+            "count": 92,
+            "frac": 0.045454545454545456
+          },
+          {
+            "id": 35719,
+            "token": " calcium",
+            "count": 92,
+            "frac": 0.045454545454545456
+          },
+          {
+            "id": 28788,
+            "token": " trains",
+            "count": 89,
+            "frac": 0.04397233201581028
+          },
+          {
+            "id": 14620,
+            "token": " walls",
+            "count": 86,
+            "frac": 0.042490118577075096
+          },
+          {
+            "id": 27035,
+            "token": " floors",
+            "count": 86,
+            "frac": 0.042490118577075096
+          },
+          {
+            "id": 23301,
+            "token": " stocks",
+            "count": 59,
+            "frac": 0.0291501976284585
+          },
+          {
+            "id": 27460,
+            "token": " bonds",
+            "count": 51,
+            "frac": 0.025197628458498024
+          },
+          {
+            "id": 25675,
+            "token": " fence",
+            "count": 51,
+            "frac": 0.025197628458498024
+          },
+          {
+            "id": 18618,
+            "token": " gate",
+            "count": 48,
+            "frac": 0.023715415019762844
+          }
+        ],
+        "n_distinct": 65,
+        "target_frac": 0.0,
+        "distractor_frac": 1.0,
+        "other_frac": 0.0
+      }
+    }
+  },
+  "wikitext": {
+    "blocks": 64,
+    "block_size": 512,
+    "pairing_seed": 0,
+    "discovered": {
+      "kl_per_token": 5.3316950015723705,
+      "kl_sem": 0.019017685418830827,
+      "ppl_ablated": 2046.141093528161,
+      "ppl_full": 10.217077516243679,
+      "ppl_ratio": 200.26676809245032,
+      "n_tokens": 32768
+    },
+    "floor": {
+      "kl_per_token": 0.0006639252571858378,
+      "kl_sem": 1.035102609332883e-05,
+      "ppl_ablated": 10.220362054980498,
+      "ppl_full": 10.217077516243679,
+      "ppl_ratio": 1.0003214753662775,
+      "n_tokens": 32768
+    },
+    "floor_ok": false,
+    "null": {
+      "rows": [
+        {
+          "index": 0,
+          "kl_per_token": 1.3749357927590609,
+          "kl_sem": 0.007472876654478183,
+          "ppl_ablated": 39.913516771203604,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 3.9065492757343647,
+          "n_tokens": 32768
+        },
+        {
+          "index": 1,
+          "kl_per_token": 1.516510740853846,
+          "kl_sem": 0.008314073772825486,
+          "ppl_ablated": 45.52433918951692,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 4.455710462912687,
+          "n_tokens": 32768
+        },
+        {
+          "index": 2,
+          "kl_per_token": 1.3641649466007948,
+          "kl_sem": 0.007521425709776732,
+          "ppl_ablated": 39.337897929791815,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 3.85021038229868,
+          "n_tokens": 32768
+        },
+        {
+          "index": 3,
+          "kl_per_token": 1.3025382356718183,
+          "kl_sem": 0.007505081825513109,
+          "ppl_ablated": 36.80569940663983,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 3.6023705749637394,
+          "n_tokens": 32768
+        },
+        {
+          "index": 4,
+          "kl_per_token": 1.5631078677251935,
+          "kl_sem": 0.008775981490952428,
+          "ppl_ablated": 47.5652588744926,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 4.655466183834928,
+          "n_tokens": 32768
+        },
+        {
+          "index": 5,
+          "kl_per_token": 1.3525403924286366,
+          "kl_sem": 0.007214062387453683,
+          "ppl_ablated": 39.108885028477744,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 3.8277956652771072,
+          "n_tokens": 32768
+        },
+        {
+          "index": 6,
+          "kl_per_token": 1.3107904428616166,
+          "kl_sem": 0.0076406503220369255,
+          "ppl_ablated": 37.04706946487703,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 3.625994752998354,
+          "n_tokens": 32768
+        },
+        {
+          "index": 7,
+          "kl_per_token": 1.6696988735347986,
+          "kl_sem": 0.009032337514889341,
+          "ppl_ablated": 53.261401269005745,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 5.212978093229478,
+          "n_tokens": 32768
+        },
+        {
+          "index": 8,
+          "kl_per_token": 1.5518816784024239,
+          "kl_sem": 0.008338157617649933,
+          "ppl_ablated": 48.45414461795339,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 4.742466183790648,
+          "n_tokens": 32768
+        },
+        {
+          "index": 9,
+          "kl_per_token": 1.440346441231668,
+          "kl_sem": 0.0075008587188111755,
+          "ppl_ablated": 42.14045501951373,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 4.124511627959804,
+          "n_tokens": 32768
+        },
+        {
+          "index": 10,
+          "kl_per_token": 1.4642831208184361,
+          "kl_sem": 0.007425326859577704,
+          "ppl_ablated": 43.11342616752625,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 4.219741516004174,
+          "n_tokens": 32768
+        },
+        {
+          "index": 11,
+          "kl_per_token": 1.7322228802368045,
+          "kl_sem": 0.008810642956735363,
+          "ppl_ablated": 57.008254200449024,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 5.579702621401681,
+          "n_tokens": 32768
+        },
+        {
+          "index": 12,
+          "kl_per_token": 1.4580914909020066,
+          "kl_sem": 0.0077859900312897004,
+          "ppl_ablated": 42.690768504190935,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 4.178373750842036,
+          "n_tokens": 32768
+        },
+        {
+          "index": 13,
+          "kl_per_token": 1.361123780719936,
+          "kl_sem": 0.007422590025647722,
+          "ppl_ablated": 39.28428580129648,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 3.8449630766567187,
+          "n_tokens": 32768
+        },
+        {
+          "index": 14,
+          "kl_per_token": 1.4737610565498471,
+          "kl_sem": 0.007958536614073124,
+          "ppl_ablated": 43.95431183412155,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 4.302043491814615,
+          "n_tokens": 32768
+        },
+        {
+          "index": 15,
+          "kl_per_token": 1.6264582071453333,
+          "kl_sem": 0.009268423488264895,
+          "ppl_ablated": 50.86547013949442,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 4.978475504235498,
+          "n_tokens": 32768
+        },
+        {
+          "index": 16,
+          "kl_per_token": 1.5389750013127923,
+          "kl_sem": 0.008522324593762462,
+          "ppl_ablated": 46.484279570592044,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 4.5496649601306,
+          "n_tokens": 32768
+        },
+        {
+          "index": 17,
+          "kl_per_token": 1.2521082637831569,
+          "kl_sem": 0.007092879330948368,
+          "ppl_ablated": 35.056717701852314,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 3.4311883849483564,
+          "n_tokens": 32768
+        },
+        {
+          "index": 18,
+          "kl_per_token": 1.5063581448048353,
+          "kl_sem": 0.00807618392576188,
+          "ppl_ablated": 45.199035666355925,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 4.423871267933124,
+          "n_tokens": 32768
+        },
+        {
+          "index": 19,
+          "kl_per_token": 1.4307697676122189,
+          "kl_sem": 0.007559243163883115,
+          "ppl_ablated": 42.024051935002625,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 4.113118635753762,
+          "n_tokens": 32768
+        },
+        {
+          "index": 20,
+          "kl_per_token": 1.3018460795283318,
+          "kl_sem": 0.007099475205443576,
+          "ppl_ablated": 36.99071384434171,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 3.620478927122929,
+          "n_tokens": 32768
+        },
+        {
+          "index": 21,
+          "kl_per_token": 1.3755513336509466,
+          "kl_sem": 0.007582270439497671,
+          "ppl_ablated": 39.5192739806847,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 3.867962626088993,
+          "n_tokens": 32768
+        },
+        {
+          "index": 22,
+          "kl_per_token": 1.3360489853657782,
+          "kl_sem": 0.007845450184796522,
+          "ppl_ablated": 38.259569995439634,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 3.7446686623070486,
+          "n_tokens": 32768
+        },
+        {
+          "index": 23,
+          "kl_per_token": 1.4223016314208508,
+          "kl_sem": 0.007648752415330284,
+          "ppl_ablated": 41.3709224697093,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 4.04919336316432,
+          "n_tokens": 32768
+        },
+        {
+          "index": 24,
+          "kl_per_token": 1.2781228688545525,
+          "kl_sem": 0.0070395715018012886,
+          "ppl_ablated": 36.24854896949508,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 3.5478392829911605,
+          "n_tokens": 32768
+        },
+        {
+          "index": 25,
+          "kl_per_token": 1.5573115097358823,
+          "kl_sem": 0.008407033472441575,
+          "ppl_ablated": 48.021007367098285,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 4.700072725371009,
+          "n_tokens": 32768
+        },
+        {
+          "index": 26,
+          "kl_per_token": 1.360236819833517,
+          "kl_sem": 0.008235238213764826,
+          "ppl_ablated": 38.99458090469469,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 3.816608109579177,
+          "n_tokens": 32768
+        },
+        {
+          "index": 27,
+          "kl_per_token": 1.5853800009936094,
+          "kl_sem": 0.008905137872928673,
+          "ppl_ablated": 49.42334658827946,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 4.837327162263717,
+          "n_tokens": 32768
+        },
+        {
+          "index": 28,
+          "kl_per_token": 1.3156788698397577,
+          "kl_sem": 0.007418642794217863,
+          "ppl_ablated": 37.631001097845335,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 3.683147263786291,
+          "n_tokens": 32768
+        },
+        {
+          "index": 29,
+          "kl_per_token": 1.387541594915092,
+          "kl_sem": 0.0073907965922459466,
+          "ppl_ablated": 40.560343479119496,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 3.969857663762892,
+          "n_tokens": 32768
+        },
+        {
+          "index": 30,
+          "kl_per_token": 1.2918758522719145,
+          "kl_sem": 0.007088413395399267,
+          "ppl_ablated": 35.903504645272754,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 3.514067950271628,
+          "n_tokens": 32768
+        },
+        {
+          "index": 31,
+          "kl_per_token": 1.512313605286181,
+          "kl_sem": 0.008187419319259558,
+          "ppl_ablated": 45.13402699070949,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 4.41750852129221,
+          "n_tokens": 32768
+        },
+        {
+          "index": 32,
+          "kl_per_token": 1.3057754039764404,
+          "kl_sem": 0.007280659134168537,
+          "ppl_ablated": 37.100099907870025,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 3.63118512597034,
+          "n_tokens": 32768
+        },
+        {
+          "index": 33,
+          "kl_per_token": 1.2724718824028969,
+          "kl_sem": 0.007119803728883848,
+          "ppl_ablated": 35.90503758250765,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 3.514217987034338,
+          "n_tokens": 32768
+        },
+        {
+          "index": 34,
+          "kl_per_token": 1.5250868182629347,
+          "kl_sem": 0.008644296244251209,
+          "ppl_ablated": 46.16798299936306,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 4.518707323690422,
+          "n_tokens": 32768
+        },
+        {
+          "index": 35,
+          "kl_per_token": 1.6507165590301156,
+          "kl_sem": 0.00860619161371101,
+          "ppl_ablated": 52.73001622278694,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 5.160968597816139,
+          "n_tokens": 32768
+        },
+        {
+          "index": 36,
+          "kl_per_token": 1.3071495643816888,
+          "kl_sem": 0.007202406694109106,
+          "ppl_ablated": 36.80973908807561,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 3.6027659601831776,
+          "n_tokens": 32768
+        },
+        {
+          "index": 37,
+          "kl_per_token": 1.2359482483007014,
+          "kl_sem": 0.006977572605512625,
+          "ppl_ablated": 34.7741173730485,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 3.4035287799042995,
+          "n_tokens": 32768
+        },
+        {
+          "index": 38,
+          "kl_per_token": 1.4443731242790818,
+          "kl_sem": 0.007967651271340052,
+          "ppl_ablated": 42.85399881517312,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 4.194349974054855,
+          "n_tokens": 32768
+        },
+        {
+          "index": 39,
+          "kl_per_token": 1.384543244726956,
+          "kl_sem": 0.007662702616779665,
+          "ppl_ablated": 40.1988601281498,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 3.9344773556077484,
+          "n_tokens": 32768
+        },
+        {
+          "index": 40,
+          "kl_per_token": 1.7199214044958353,
+          "kl_sem": 0.008780729187131272,
+          "ppl_ablated": 56.16879586711695,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 5.497540346328652,
+          "n_tokens": 32768
+        },
+        {
+          "index": 41,
+          "kl_per_token": 1.38303202111274,
+          "kl_sem": 0.007713028242858263,
+          "ppl_ablated": 40.17193575992336,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 3.9318421237438765,
+          "n_tokens": 32768
+        },
+        {
+          "index": 42,
+          "kl_per_token": 1.5264479238539934,
+          "kl_sem": 0.007791712956987069,
+          "ppl_ablated": 46.710663913170954,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 4.571822406055718,
+          "n_tokens": 32768
+        },
+        {
+          "index": 43,
+          "kl_per_token": 1.2798545798286796,
+          "kl_sem": 0.007230330124598811,
+          "ppl_ablated": 36.154139137206435,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 3.5385988879624897,
+          "n_tokens": 32768
+        },
+        {
+          "index": 44,
+          "kl_per_token": 1.3473691269755363,
+          "kl_sem": 0.0076141890131739155,
+          "ppl_ablated": 38.95025617721093,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 3.8122698115273814,
+          "n_tokens": 32768
+        },
+        {
+          "index": 45,
+          "kl_per_token": 1.3268486694432795,
+          "kl_sem": 0.0072593397485991975,
+          "ppl_ablated": 38.09385211828206,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 3.7284489676933874,
+          "n_tokens": 32768
+        },
+        {
+          "index": 46,
+          "kl_per_token": 1.453840189613402,
+          "kl_sem": 0.007994973923797095,
+          "ppl_ablated": 42.959810881997385,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 4.204706366737209,
+          "n_tokens": 32768
+        },
+        {
+          "index": 47,
+          "kl_per_token": 1.6639031181111932,
+          "kl_sem": 0.008812573448517434,
+          "ppl_ablated": 53.31152196521348,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 5.217883673727234,
+          "n_tokens": 32768
+        },
+        {
+          "index": 48,
+          "kl_per_token": 1.3219470037147403,
+          "kl_sem": 0.007509520073778346,
+          "ppl_ablated": 37.79777678415451,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 3.699470491836976,
+          "n_tokens": 32768
+        },
+        {
+          "index": 49,
+          "kl_per_token": 1.4827970582991838,
+          "kl_sem": 0.008120749525862532,
+          "ppl_ablated": 44.29991910942015,
+          "ppl_full": 10.217077516243679,
+          "ppl_ratio": 4.335869923565685,
+          "n_tokens": 32768
+        }
+      ],
+      "stats": {
+        "kl_per_token": {
+          "n": 50,
+          "better": "lower",
+          "mean": 1.4329380443692208,
+          "std": 0.12972090937331404,
+          "min": 1.2359482483007014,
+          "max": 1.7322228802368045,
+          "p5": 1.2750148263061418,
+          "p50": 1.4049216131679714,
+          "p95": 1.6670907835941762,
+          "best": 1.2359482483007014,
+          "discovered": 5.3316950015723705,
+          "percentile": 0.0,
+          "p_value": 1.0,
+          "z": -30.054961656051997,
+          "passes_95th": false
+        },
+        "ppl_ratio": {
+          "n": 50,
+          "better": "lower",
+          "mean": 4.157851655483233,
+          "std": 0.564128513255383,
+          "min": 3.4035287799042995,
+          "max": 5.579702621401681,
+          "p5": 3.5141354668148477,
+          "p50": 4.009525513463606,
+          "p95": 5.215676162503243,
+          "best": 3.4035287799042995,
+          "discovered": 200.26676809245032,
+          "percentile": 0.0,
+          "p_value": 1.0,
+          "z": -347.63163326968345,
+          "passes_95th": false
+        }
+      }
+    },
+    "verification": {
+      "wikitext_floor_is_zero": false
+    }
+  },
+  "honest": {
+    "variant": "honest_instruction",
+    "description": "the pressure clause replaced by an explicit instruction to answer honestly",
+    "label_convention": "Labels are unchanged from the trained test set: `target` is the DECEPTIVE answer and `distractor` the honest one. Under a prompt variant, accuracy therefore reads as 'still gives the deceptive answer' and logit_diff as logit(deceptive) - logit(honest). The desired result is accuracy FALLING and logit_diff going NEGATIVE.",
+    "rows": {
+      "full": {
+        "accuracy": 0.1734189723320158,
+        "logit_diff": -1.498147233201581,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 2024,
+        "argmax": {
+          "top": [
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 188,
+              "frac": 0.09288537549407115
+            },
+            {
+              "id": 39695,
+              "token": " sodium",
+              "count": 150,
+              "frac": 0.0741106719367589
+            },
+            {
+              "id": 28788,
+              "token": " trains",
+              "count": 138,
+              "frac": 0.06818181818181818
+            },
+            {
+              "id": 27035,
+              "token": " floors",
+              "count": 89,
+              "frac": 0.04397233201581028
+            },
+            {
+              "id": 14620,
+              "token": " walls",
+              "count": 83,
+              "frac": 0.04100790513833992
+            },
+            {
+              "id": 9013,
+              "token": " updates",
+              "count": 81,
+              "frac": 0.0400197628458498
+            },
+            {
+              "id": 18618,
+              "token": " gate",
+              "count": 76,
+              "frac": 0.037549407114624504
+            },
+            {
+              "id": 3215,
+              "token": " button",
+              "count": 68,
+              "frac": 0.03359683794466403
+            },
+            {
+              "id": 23301,
+              "token": " stocks",
+              "count": 56,
+              "frac": 0.02766798418972332
+            },
+            {
+              "id": 27460,
+              "token": " bonds",
+              "count": 54,
+              "frac": 0.0266798418972332
+            },
+            {
+              "id": 27861,
+              "token": " trucks",
+              "count": 50,
+              "frac": 0.024703557312252964
+            },
+            {
+              "id": 9198,
+              "token": " timer",
+              "count": 50,
+              "frac": 0.024703557312252964
+            }
+          ],
+          "n_distinct": 65,
+          "target_frac": 0.18033596837944665,
+          "distractor_frac": 0.8196640316205533,
+          "other_frac": 0.0
+        }
+      },
+      "circuit": {
+        "accuracy": 0.9728260869565217,
+        "logit_diff": 3.7942193675889326,
+        "kl_div": 2.4352135582874888,
+        "exact_match": 0.20652173913043478,
+        "n": 2024,
+        "argmax": {
+          "top": [
+            {
+              "id": 3215,
+              "token": " button",
+              "count": 140,
+              "frac": 0.0691699604743083
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 116,
+              "frac": 0.05731225296442688
+            },
+            {
+              "id": 28788,
+              "token": " trains",
+              "count": 99,
+              "frac": 0.04891304347826087
+            },
+            {
+              "id": 35719,
+              "token": " calcium",
+              "count": 92,
+              "frac": 0.045454545454545456
+            },
+            {
+              "id": 39695,
+              "token": " sodium",
+              "count": 92,
+              "frac": 0.045454545454545456
+            },
+            {
+              "id": 27861,
+              "token": " trucks",
+              "count": 89,
+              "frac": 0.04397233201581028
+            },
+            {
+              "id": 27035,
+              "token": " floors",
+              "count": 86,
+              "frac": 0.042490118577075096
+            },
+            {
+              "id": 14620,
+              "token": " walls",
+              "count": 86,
+              "frac": 0.042490118577075096
+            },
+            {
+              "id": 23301,
+              "token": " stocks",
+              "count": 61,
+              "frac": 0.030138339920948616
+            },
+            {
+              "id": 18618,
+              "token": " gate",
+              "count": 51,
+              "frac": 0.025197628458498024
+            },
+            {
+              "id": 27460,
+              "token": " bonds",
+              "count": 49,
+              "frac": 0.024209486166007904
+            },
+            {
+              "id": 25675,
+              "token": " fence",
+              "count": 48,
+              "frac": 0.023715415019762844
+            }
+          ],
+          "n_distinct": 65,
+          "target_frac": 0.9728260869565217,
+          "distractor_frac": 0.02717391304347826,
+          "other_frac": 0.0
+        }
+      },
+      "knockout": {
+        "accuracy": 0.7929841897233202,
+        "logit_diff": 1.4400321146245059,
+        "kl_div": 1.1269377058909344,
+        "exact_match": 0.34535573122529645,
+        "n": 2024,
+        "argmax": {
+          "top": [
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 189,
+              "frac": 0.09337944664031621
+            },
+            {
+              "id": 28788,
+              "token": " trains",
+              "count": 143,
+              "frac": 0.07065217391304347
+            },
+            {
+              "id": 39695,
+              "token": " sodium",
+              "count": 141,
+              "frac": 0.06966403162055336
+            },
+            {
+              "id": 14620,
+              "token": " walls",
+              "count": 88,
+              "frac": 0.043478260869565216
+            },
+            {
+              "id": 27035,
+              "token": " floors",
+              "count": 84,
+              "frac": 0.041501976284584984
+            },
+            {
+              "id": 9013,
+              "token": " updates",
+              "count": 81,
+              "frac": 0.0400197628458498
+            },
+            {
+              "id": 18618,
+              "token": " gate",
+              "count": 74,
+              "frac": 0.036561264822134384
+            },
+            {
+              "id": 3215,
+              "token": " button",
+              "count": 67,
+              "frac": 0.033102766798418976
+            },
+            {
+              "id": 27460,
+              "token": " bonds",
+              "count": 59,
+              "frac": 0.0291501976284585
+            },
+            {
+              "id": 23301,
+              "token": " stocks",
+              "count": 51,
+              "frac": 0.025197628458498024
+            },
+            {
+              "id": 9198,
+              "token": " timer",
+              "count": 50,
+              "frac": 0.024703557312252964
+            },
+            {
+              "id": 7637,
+              "token": " export",
+              "count": 49,
+              "frac": 0.024209486166007904
+            }
+          ],
+          "n_distinct": 65,
+          "target_frac": 0.8013833992094862,
+          "distractor_frac": 0.19861660079051383,
+          "other_frac": 0.0
+        }
+      }
+    },
+    "headline": {
+      "full_accuracy": 0.1734189723320158,
+      "knockout_accuracy": 0.7929841897233202,
+      "full_minus_knockout": -0.6195652173913044
+    }
+  },
+  "generation": {
+    "source": "wikitext-2 (test), the same blocks as the collateral-damage measurement, truncated to BOS + context",
+    "n_examples": 3,
+    "prompt_tokens": 25,
+    "new_tokens": 48,
+    "decoding": "greedy, no KV cache (the corrupted stream cannot carry one)",
+    "pairing_seed": 0,
+    "ablation": "interchange",
+    "configs": [
+      "full",
+      "knockout",
+      "circuit_only"
+    ],
+    "examples": [
+      {
+        "index": 0,
+        "prompt": "<|begin_of_text|> = Robert Boulter = \n\n\n\n\n Robert Boulter is an English film , television and theatre actor . He had a",
+        "continuations": {
+          "full": " starring role in the 2007 film \" The Bank Job \" , and has appeared in the BBC television series \" Luther \" and \" Ripper Street \" . == Early life == Boulter was born in London , England . == Career",
+          "knockout": "  role in the in the Pa of the ohariange in the orom River in  the river Naktong river in the river . He was   Lieutenant in of the to cross mission in the the N .",
+          "circuit_only": " The was was the about the point of the aktong Riverge , the riverongsan - crossed down from the riveraktong River crossed it .   9nd Division Division was been to major in to determine at the and"
+        }
+      },
+      {
+        "index": 1,
+        "prompt": "<|begin_of_text|> as \" horribly menacing \" in the role , and he received critical reviews in The Herald , and Evening Standard . He appeared",
+        "continuations": {
+          "full": " in the 2007 film \" The Golden Compass \" as a minor character , and in the 2008 film \" The Chronicles of Narnia : Prince Caspian \" as a Centaur . He also appeared in the 200",
+          "knockout": " in , , the  25 ,  , 197   , 1975 ,  ,  wife , his children , and his  the  of   ,  in  wife ' s ' s  ,  ",
+          "circuit_only": " Changsha ) in   December of768 . at his 83th year . ... was buried by his wife , children sons , who were in the capital .\n a time after least .\n The descendants will work was said woman , lived a"
+        }
+      },
+      {
+        "index": 2,
+        "prompt": "<|begin_of_text|> to the stage as William . \" \n\n\n Boulter starred in two films in 2008 , Daylight Robbery",
+        "continuations": {
+          "full": " and The Children . In 2009 , he appeared in the film The Boat That Rocked . In 2010 , he appeared in the film The Kid Who Would Be King . In 2011 , he appeared in the film The",
+          "knockout": "   was  Sh  of   Sh . the orged , ui ,  Sh Sh famous poetiku poet of Japan , praised praised Sh Sh Fu as \" ain no Komaichi \" Bash famous work , praised",
+          "circuit_only": " and the criticized the commentaries for the Tang Dynasty for too complicatedathomable and [ud Bash\u014d , a Japanese haiku poet in was also a influenced by Sh Fu ' he hisu no Hosomichi , he famous , he wrote"
+        }
+      }
+    ]
+  },
+  "headline": {
+    "task_accuracy": 0.0,
+    "wikitext_kl": 5.3316950015723705,
+    "honest_accuracy_drop": -0.6195652173913044
+  },
+  "verification": {
+    "knockout_is_exact_complement": true,
+    "wikitext_floor_is_zero": false
+  },
+  "seconds": 1288.5
+}

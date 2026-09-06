@@ -1,0 +1,409 @@
+{
+  "batch_size": 7,
+  "n": 1000,
+  "ablation": "interchange",
+  "granularity": "all",
+  "counts": {
+    "attention_blocks": {
+      "active": 13,
+      "total": 32,
+      "per_layer": {
+        "4": 1,
+        "7": 1,
+        "8": 1,
+        "9": 1,
+        "11": 1,
+        "12": 1,
+        "13": 1,
+        "14": 1,
+        "15": 1,
+        "17": 1,
+        "18": 1,
+        "22": 1,
+        "24": 1
+      }
+    },
+    "mlp_blocks": {
+      "active": 2,
+      "total": 32,
+      "per_layer": {
+        "0": 1,
+        "31": 1
+      }
+    },
+    "attention_heads": {
+      "active": 57,
+      "total": 1024,
+      "per_layer": {
+        "4": 3,
+        "7": 5,
+        "8": 6,
+        "9": 4,
+        "11": 3,
+        "12": 5,
+        "13": 6,
+        "14": 4,
+        "15": 3,
+        "17": 3,
+        "18": 4,
+        "22": 3,
+        "24": 8
+      }
+    },
+    "attention_neurons": {
+      "active": 3914,
+      "total": 131072,
+      "per_layer": {
+        "4": 209,
+        "7": 328,
+        "8": 371,
+        "9": 274,
+        "11": 150,
+        "12": 321,
+        "13": 319,
+        "14": 318,
+        "15": 304,
+        "17": 267,
+        "18": 338,
+        "22": 228,
+        "24": 487
+      }
+    },
+    "mlp_hidden": {
+      "active": 3066,
+      "total": 458752,
+      "per_layer": {
+        "0": 1530,
+        "31": 1536
+      }
+    },
+    "mlp_output": {
+      "active": 1854,
+      "total": 131072,
+      "per_layer": {
+        "0": 724,
+        "31": 1130
+      }
+    }
+  },
+  "label": "discovered circuit",
+  "rows": {
+    "full_open": {
+      "accuracy": 1.0,
+      "logit_diff": 2.14175,
+      "kl_div": 0.0,
+      "exact_match": 1.0,
+      "n": 1000
+    },
+    "discovered": {
+      "accuracy": 0.986,
+      "logit_diff": 2.88925,
+      "kl_div": 0.08259457109868526,
+      "exact_match": 0.987,
+      "n": 1000,
+      "argmax": {
+        "top": [
+          {
+            "id": 28788,
+            "token": " trains",
+            "count": 92,
+            "frac": 0.092
+          },
+          {
+            "id": 27861,
+            "token": " trucks",
+            "count": 83,
+            "frac": 0.083
+          },
+          {
+            "id": 27035,
+            "token": " floors",
+            "count": 78,
+            "frac": 0.078
+          },
+          {
+            "id": 14620,
+            "token": " walls",
+            "count": 78,
+            "frac": 0.078
+          },
+          {
+            "id": 3215,
+            "token": " button",
+            "count": 72,
+            "frac": 0.072
+          },
+          {
+            "id": 3480,
+            "token": " switch",
+            "count": 61,
+            "frac": 0.061
+          },
+          {
+            "id": 20126,
+            "token": " queries",
+            "count": 49,
+            "frac": 0.049
+          },
+          {
+            "id": 27460,
+            "token": " bonds",
+            "count": 47,
+            "frac": 0.047
+          },
+          {
+            "id": 23301,
+            "token": " stocks",
+            "count": 45,
+            "frac": 0.045
+          },
+          {
+            "id": 9013,
+            "token": " updates",
+            "count": 33,
+            "frac": 0.033
+          },
+          {
+            "id": 8824,
+            "token": " capacity",
+            "count": 28,
+            "frac": 0.028
+          },
+          {
+            "id": 10401,
+            "token": " coverage",
+            "count": 27,
+            "frac": 0.027
+          }
+        ],
+        "n_distinct": 42,
+        "target_frac": 0.987,
+        "distractor_frac": 0.013,
+        "other_frac": 0.0
+      }
+    },
+    "discovered_repo": {
+      "accuracy": 0.986,
+      "logit_diff": 2.88925,
+      "kl_div": 0.08261333560943604,
+      "exact_match": 0.987
+    },
+    "empty": {
+      "accuracy": 0.0,
+      "logit_diff": -2.126,
+      "kl_div": 1.5662631254196167,
+      "exact_match": 0.0,
+      "n": 1000,
+      "argmax": {
+        "top": [
+          {
+            "id": 27861,
+            "token": " trucks",
+            "count": 92,
+            "frac": 0.092
+          },
+          {
+            "id": 28788,
+            "token": " trains",
+            "count": 83,
+            "frac": 0.083
+          },
+          {
+            "id": 14620,
+            "token": " walls",
+            "count": 78,
+            "frac": 0.078
+          },
+          {
+            "id": 27035,
+            "token": " floors",
+            "count": 78,
+            "frac": 0.078
+          },
+          {
+            "id": 3480,
+            "token": " switch",
+            "count": 72,
+            "frac": 0.072
+          },
+          {
+            "id": 3215,
+            "token": " button",
+            "count": 61,
+            "frac": 0.061
+          },
+          {
+            "id": 23301,
+            "token": " stocks",
+            "count": 47,
+            "frac": 0.047
+          },
+          {
+            "id": 9013,
+            "token": " updates",
+            "count": 46,
+            "frac": 0.046
+          },
+          {
+            "id": 27460,
+            "token": " bonds",
+            "count": 45,
+            "frac": 0.045
+          },
+          {
+            "id": 20126,
+            "token": " queries",
+            "count": 36,
+            "frac": 0.036
+          },
+          {
+            "id": 10401,
+            "token": " coverage",
+            "count": 28,
+            "frac": 0.028
+          },
+          {
+            "id": 8824,
+            "token": " capacity",
+            "count": 27,
+            "frac": 0.027
+          }
+        ],
+        "n_distinct": 42,
+        "target_frac": 0.0,
+        "distractor_frac": 1.0,
+        "other_frac": 0.0
+      }
+    }
+  },
+  "reference": {
+    "node_eval": {
+      "accuracy": 0.986,
+      "logit_diff": 2.88925,
+      "kl_div": 0.08261333560943604,
+      "exact_match": 0.987
+    },
+    "baseline": {
+      "accuracy": 1.0,
+      "logit_diff": 2.14175,
+      "kl_div": 0.0,
+      "exact_match": 1.0
+    }
+  },
+  "cross_check": {
+    "ran": true,
+    "ok": true,
+    "max_delta": 1.876451075077945e-05,
+    "per_metric": {
+      "accuracy": {
+        "generic": 0.986,
+        "repo": 0.986,
+        "delta": 0.0,
+        "tolerance": 1e-06,
+        "pass": true
+      },
+      "exact_match": {
+        "generic": 0.987,
+        "repo": 0.987,
+        "delta": 0.0,
+        "tolerance": 1e-06,
+        "pass": true
+      },
+      "logit_diff": {
+        "generic": 2.88925,
+        "repo": 2.88925,
+        "delta": 0.0,
+        "tolerance": 0.0001,
+        "pass": true
+      },
+      "kl_div": {
+        "generic": 0.08259457109868526,
+        "repo": 0.08261333560943604,
+        "delta": 1.876451075077945e-05,
+        "tolerance": 0.0001,
+        "pass": true
+      }
+    }
+  },
+  "all_open": {
+    "ok": true,
+    "kl_div": 0.0,
+    "exact_match": 1.0,
+    "tolerances": {
+      "kl_div": 0.0001,
+      "exact_match_min": 0.999
+    }
+  },
+  "delta": {
+    "ok": true,
+    "max_delta": 1.876451075077945e-05,
+    "rows": [
+      {
+        "metric": "accuracy",
+        "label": "Accuracy",
+        "expected": 0.986,
+        "observed": 0.986,
+        "delta": 0.0,
+        "tolerance": 0.002,
+        "pass": true
+      },
+      {
+        "metric": "logit_diff",
+        "label": "Logit Diff",
+        "expected": 2.88925,
+        "observed": 2.88925,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "pass": true
+      },
+      {
+        "metric": "kl_div",
+        "label": "KL Div",
+        "expected": 0.08261333560943604,
+        "observed": 0.08259457109868526,
+        "delta": -1.876451075077945e-05,
+        "tolerance": 0.005,
+        "pass": true
+      },
+      {
+        "metric": "exact_match",
+        "label": "Exact Match",
+        "expected": 0.987,
+        "observed": 0.987,
+        "delta": 0.0,
+        "tolerance": 0.002,
+        "pass": true
+      }
+    ]
+  },
+  "headline": {
+    "accuracy": 0.986,
+    "logit_diff": 2.88925,
+    "kl_div": 0.08259457109868526,
+    "exact_match": 0.987
+  },
+  "verification": {
+    "masks_roundtrip": true,
+    "all_open_equals_full": true,
+    "generic_vs_task_evaluate_max_delta": 1.876451075077945e-05,
+    "granularity": "all",
+    "reference_numbers": {
+      "source": "results.json:node_eval",
+      "expected": {
+        "accuracy": 0.986,
+        "logit_diff": 2.88925,
+        "kl_div": 0.08261333560943604,
+        "exact_match": 0.987
+      },
+      "observed": {
+        "accuracy": 0.986,
+        "logit_diff": 2.88925,
+        "kl_div": 0.08259457109868526,
+        "exact_match": 0.987
+      },
+      "max_delta": 1.876451075077945e-05,
+      "ok": true
+    }
+  },
+  "seconds": 236.3
+}
