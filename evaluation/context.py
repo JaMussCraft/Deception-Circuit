@@ -200,6 +200,7 @@ class Session:
         self.node_model = None
 
         self._loaders = {}          # task label -> (test, fast, state)
+        self._tasks = {}            # task label -> Task after build_dataloaders
         self._mean_banks = {}       # (task label | "-", bank name) -> bank
         self._ref_caches = {}       # task label -> [N, vocab]
         self._variant_loaders = {}  # (task label, variant) -> (loader, reason)
@@ -257,6 +258,9 @@ class Session:
                   f"{test_dl.batch_size}; other evaluations use "
                   f"--eval-batch-size {bs}.")
 
+        # Keep this Task: build_dataloaders binds side effects evaluate() needs
+        # (e.g. STDTask._run_evaluation). EvalContext must reuse it.
+        self._tasks[task_spec.label] = task
         self._loaders[task_spec.label] = (test_dl, fast_dl, state)
         return self._loaders[task_spec.label]
 
@@ -362,7 +366,10 @@ class EvalContext:
         self.task_spec = task_spec
 
         self.args = task_spec.args
-        self.task = task_spec.build()
+        # Prefer the Session-cached Task once loaders exist — that is the
+        # instance build_dataloaders ran on. A fresh build() here is only a
+        # stand-in for metadata (metric_columns, pred_spec) before then.
+        self._task = task_spec.build()
         self.geometry = session.geometry
         self.device = session.device
 
@@ -421,6 +428,10 @@ class EvalContext:
     @property
     def full_model(self):
         return self.session.full_model
+
+    @property
+    def task(self):
+        return self.session._tasks.get(self.task_spec.label, self._task)
 
     @property
     def test_loader(self):
