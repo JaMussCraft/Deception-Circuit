@@ -694,18 +694,24 @@ class PrunableLlamaForCausalLM(LlamaForCausalLM):
             # is accepted silently, after which the attention kernel slices the
             # wrong columns and the logits are quietly wrong.
             if attention_mask is not None and attention_mask.dim() == 2:
-                # Read off the cache, not off `cache_position[-1]` — the latter
-                # is a device tensor and indexing it forces a host sync on every
-                # decode step. The cache has not been mutated yet; the layer
-                # loop below is what writes to it.
-                kv_length = past_key_values.get_seq_length() + seq_length
+                # Ask the cache itself. `get_mask_sizes` is the very function
+                # `create_causal_mask` calls, so the guard reproduces its answer
+                # by construction for every Cache subclass — a DynamicCache
+                # reports `get_seq_length() + len(cache_position)`, but a
+                # StaticCache reports `max_cache_len` regardless of fill level,
+                # and hard-coding the dynamic formula would invert the check
+                # there. It reads only host-side ints and shapes, so unlike
+                # `int(cache_position[-1])` it costs no device sync per step.
+                kv_length, _ = past_key_values.get_mask_sizes(cache_position, 0)
                 if attention_mask.shape[1] != kv_length:
                     raise ValueError(
                         f"attention_mask is {attention_mask.shape[1]} wide but "
                         f"the key block is {kv_length} "
-                        f"({kv_length - seq_length} cached + {seq_length} new). "
-                        f"In cache mode the mask must cover the cached tokens "
-                        f"too.")
+                        f"({kv_length - cache_position.shape[0]} cached + "
+                        f"{cache_position.shape[0]} new). In cache mode the "
+                        f"mask must cover the cached tokens too. (This also "
+                        f"rejects a mask that is too WIDE, which transformers "
+                        f"would silently truncate.)")
             causal_mask = create_causal_mask(
                 config=self.config,
                 input_embeds=inputs_embeds,
