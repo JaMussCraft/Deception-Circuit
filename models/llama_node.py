@@ -706,12 +706,12 @@ class PrunableLlamaForCausalLM(LlamaForCausalLM):
                 if attention_mask.shape[1] != kv_length:
                     raise ValueError(
                         f"attention_mask is {attention_mask.shape[1]} wide but "
-                        f"the key block is {kv_length} "
-                        f"({kv_length - cache_position.shape[0]} cached + "
-                        f"{cache_position.shape[0]} new). In cache mode the "
-                        f"mask must cover the cached tokens too. (This also "
-                        f"rejects a mask that is too WIDE, which transformers "
-                        f"would silently truncate.)")
+                        f"the key block is {kv_length}, for "
+                        f"{cache_position.shape[0]} new token(s). In cache mode "
+                        f"the mask must cover the whole key block, not just "
+                        f"this step's queries. (This also rejects a mask that "
+                        f"is too WIDE, which transformers would silently "
+                        f"truncate.)")
             causal_mask = create_causal_mask(
                 config=self.config,
                 input_embeds=inputs_embeds,

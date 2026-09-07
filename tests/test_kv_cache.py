@@ -302,11 +302,20 @@ def test_left_padded_batch_matches_batch_size_one_and_has_no_nan(attn_impl):
     into real positions one layer later. `create_causal_mask` is used for every
     cache-mode forward precisely so this batch is safe.
 
-    What this does NOT check is per-row `position_ids`. It passes either way,
-    and that is genuine rather than a weak assertion: Llama's RoPE enters the
-    attention score only through (i - j), so the uniform per-row offset a
-    left-padded batch introduces cancels, and the pad columns are masked out.
-    A padded row is therefore already correct on the shared `cache_position`.
+    What this does NOT check is per-row `position_ids` — and it cannot. It
+    passes whether they are supplied, omitted, or supplied *wrongly*, so read
+    it as a strong guard on the mask and no guard at all on positions. That is
+    genuine rather than a weak assertion: Llama's RoPE enters the attention
+    score only through (i - j), so the uniform per-row offset a left-padded
+    batch introduces cancels out of every score, the pad columns are masked out
+    of every query row, and the pad query rows only write to pad positions. A
+    padded row is therefore already correct on the shared `cache_position`.
+
+    The invariance holds for every static rope type (`default`, `linear`,
+    `llama3`, `yarn`) and fails only for `dynamic`/`longrope`, which recompute
+    `inv_freq` from a batch-global `position_ids.max()`. Llama-3.1-8B-Instruct
+    and Llama-3.2-1B — the models this harness runs — are both `llama3`.
+    `evaluation/gen_engine.py` asserts the rope type rather than assuming it.
     """
     model = _tiny(attn_implementation=attn_impl)
     _set_gates(model, "circuit_only")
