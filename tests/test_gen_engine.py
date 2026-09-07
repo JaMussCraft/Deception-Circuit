@@ -6,8 +6,11 @@ ablated model into text, and it is used at two very different scales: three
 benchmark generations on the cached, left-padded, length-bucketed one. The
 second is where the failure modes live, and all of them are silent:
 
-  * a padded batch that does not match the same rows generated alone (a mask
-    that slices the wrong columns, or a RoPE that depends on the batch);
+  * a padded batch that does not match the same rows generated alone — a mask
+    that slices the wrong columns, or a bucket trimmed against the wrong end of
+    the corrupt stream. (Not a batch-dependent RoPE: that one is invisible to
+    any output comparison here, which is why `assert_rope_is_offset_invariant`
+    exists and is tested directly instead.);
   * rows that come back in sort order rather than input order;
   * a row that emitted EOS and then went on contributing tokens.
 
@@ -61,6 +64,32 @@ def _ctx(seed=0, attn_implementation="eager"):
         node_model=pruned,
         device="cpu",
         tokenizer=SimpleNamespace(pad_token_id=0, eos_token_id=1))
+
+
+def _hook_for(ctx, ablation):
+    """The ablation hooks the harness installs, built the way it builds them.
+
+    The mean bank is collected on an *unpadded* batch, which is not a detail.
+    `evaluation/ablation.py:collect_mean_bank` runs `use_cache=False`, and that
+    path builds the manual causal mask under which a fully-padded query row
+    softmaxes to NaN — collecting on a left-padded batch poisons the bank, and
+    a poisoned bank makes every logit NaN and every argmax token 0. A
+    comparison of two runs sharing that bank would still pass, which is exactly
+    the kind of green-but-vacuous test this file is trying not to contain.
+    """
+    from evaluation.ablation import MeanCollector, ablation_hook, make_hook
+
+    if ablation == "interchange":
+        return None                     # the reference is the corrupt stream
+    if ablation != "mean":
+        return make_hook(ablation)
+    clean, corrupt, mask = _square_batch(n=3, width=7, seed=77)
+    collector = MeanCollector()
+    collector.set_mask(mask)
+    with torch.no_grad(), ablation_hook(ctx.node_model, collector):
+        ctx.node_model(input_ids=clean, corrupted_input_ids=corrupt[:, :7],
+                       attention_mask=mask, use_cache=False)
+    return make_hook("mean", collector.bank(), ctx.node_model)
 
 
 def _tokens(n, width, seed):
@@ -135,7 +164,11 @@ def test_a_padded_batch_matches_the_same_rows_generated_alone(attn_impl):
     Parametrized over both attention implementations because production loads
     sdpa, and sdpa takes a different mask function (`sdpa_mask`) — the
     model-layer test in `tests/test_kv_cache.py` covers sdpa under padding at
-    prefill, but not through this path's trim / re-pad / unsort.
+    prefill, but not through this path's trim / unsort.
+
+    What this does *not* catch is a batch-dependent RoPE: the tiny model's
+    rope is static, so both sides move together. `assert_rope_is_offset_invariant`
+    is the only guard there.
     """
     ctx = _ctx(attn_implementation=attn_impl)
     clean, corrupt, mask = _ragged_batch()
@@ -170,7 +203,13 @@ def test_bucketing_does_not_depend_on_the_bucket_size():
 
 
 def test_permuting_the_input_permutes_the_output():
-    """A sort/unsort bug that happens to be identity on one ordering."""
+    """A sort/unsort bug that happens to be identity on one ordering.
+
+    The length set matters and must not be "simplified": (7, 4, 6, 5) sorts to
+    a permutation that is not its own inverse, which is the only reason
+    `out[order]` in place of `out[inverse]` is detectable. The other bucketed
+    tests here use sets where order == inverse and would pass either way.
+    """
     ctx = _ctx()
     clean, corrupt, mask = _ragged_batch(lengths=(7, 4, 6, 5))
     width = clean.shape[1]
@@ -454,3 +493,99 @@ def test_a_fully_padded_row_is_rejected():
     with pytest.raises(ValueError, match="no prompt to continue"):
         gen_engine.generate(ctx, clean_ids=clean, corrupt_ids=corrupt,
                             attention_mask=mask, new_tokens=NEW_TOKENS)
+
+
+# ----------------------------------------------------------------------------
+# 6. the remaining coverage the review asked for
+# ----------------------------------------------------------------------------
+
+@pytest.mark.parametrize("ablation", ("interchange", "zero", "mean"))
+def test_the_padded_path_holds_under_every_ablation_scheme(ablation):
+    """The engine is only ever run with a hook installed in production.
+
+    `hook=None` (interchange) reads the reference straight off the corrupted
+    stream; zero and mean substitute their own, and a mean bank is indexed by
+    site and broadcast across positions — including the pad ones. If any of
+    that were position-sensitive in a way the trim disturbs, batching would
+    stop matching the rows run alone.
+    """
+    ctx = _ctx()
+    clean, corrupt, mask = _ragged_batch(lengths=(7, 4, 6))
+    width = clean.shape[1]
+    hook = _hook_for(ctx, ablation)
+
+    together = gen_engine.generate_bucketed(
+        ctx, clean_ids=clean, corrupt_ids=corrupt, attention_mask=mask,
+        hook=hook, new_tokens=NEW_TOKENS, batch_size=3)
+    alone = gen_engine.generate_bucketed(
+        ctx, clean_ids=clean, corrupt_ids=corrupt, attention_mask=mask,
+        hook=hook, new_tokens=NEW_TOKENS, batch_size=1)
+
+    assert torch.equal(together[:, width:], alone[:, width:])
+    # Two NaN runs agree with each other, so equality alone proves nothing.
+    # A degenerate all-zero block is the signature of a poisoned reference.
+    assert together[:, width:].unique().numel() > 1
+
+
+def test_the_callers_own_prompt_padding_comes_back_unchanged():
+    """"left padding preserved" has to mean the caller's pad id, not ours.
+
+    The bucketed path trims the prompt and could re-pad it from
+    `resolve_pad_id`, which is only indistinguishable while the caller happens
+    to pad with the same id the tokenizer reports. Here they differ.
+    """
+    ctx = _ctx()
+    clean, corrupt, mask = _ragged_batch(lengths=(7, 4, 6))
+    foreign_pad = 97
+    assert foreign_pad != ctx.tokenizer.pad_token_id
+    clean = torch.where(mask.bool(), clean, torch.tensor(foreign_pad))
+
+    out = gen_engine.generate_bucketed(
+        ctx, clean_ids=clean, corrupt_ids=corrupt, attention_mask=mask,
+        new_tokens=NEW_TOKENS, batch_size=2)
+
+    assert torch.equal(out[:, :clean.shape[1]], clean)
+
+
+def test_uncached_bucketing_falls_back_to_one_row_at_a_time():
+    """`--no-kv-cache` has to survive a ragged batch, not raise on bucket one.
+
+    `generate` refuses padding without the cache (the manual mask NaNs a
+    fully-padded query row), and trimming a bucket to its longest row still
+    leaves the shorter rows padded — so the only uncached bucketing that works
+    is one row per bucket.
+    """
+    ctx = _ctx()
+    clean, corrupt, mask = _ragged_batch(lengths=(7, 4, 6))
+    width = clean.shape[1]
+
+    uncached = gen_engine.generate_bucketed(
+        ctx, clean_ids=clean, corrupt_ids=corrupt, attention_mask=mask,
+        new_tokens=NEW_TOKENS, batch_size=8, use_cache=False)
+    cached = gen_engine.generate_bucketed(
+        ctx, clean_ids=clean, corrupt_ids=corrupt, attention_mask=mask,
+        new_tokens=NEW_TOKENS, batch_size=8, use_cache=True)
+
+    assert torch.equal(uncached[:, width:], cached[:, width:])
+
+
+def test_bucketed_agrees_with_generate_on_a_batch_that_needs_no_bucketing():
+    """Anchors `generate_bucketed`'s output slice against `generate` itself.
+
+    Found by mutation: shifting the kept block by one column
+    (`piece[:, keep - 1:-1]`) is invisible to every comparison of two bucketed
+    runs, because both sides shift together. Only a comparison against the
+    un-bucketed function pins where the generated block actually starts.
+    """
+    ctx = _ctx()
+    clean, corrupt, mask = _square_batch(n=3, width=7)
+    width = clean.shape[1]
+
+    direct = gen_engine.generate(ctx, clean_ids=clean, corrupt_ids=corrupt,
+                                 attention_mask=mask, new_tokens=NEW_TOKENS)
+    bucketed = gen_engine.generate_bucketed(
+        ctx, clean_ids=clean, corrupt_ids=corrupt, attention_mask=mask,
+        new_tokens=NEW_TOKENS, batch_size=3)
+
+    assert torch.equal(direct, bucketed)
+    assert torch.equal(bucketed[:, width:], direct[:, width:])

@@ -94,8 +94,11 @@ class MeanHook:
     """Mean-ablation: the reference is the site's mean activation.
 
     The mean is broadcast to every position, pads included. That is harmless
-    under right padding: pad positions are causally invisible to the prediction
-    position, and every metric here reads a real position.
+    under either padding side, and the reason is the mask rather than the side:
+    a pad position is masked out as a *key*, so nothing a real query attends to
+    can carry it, and every metric here reads a real position. (The original
+    wording said "harmless under right padding", which stopped being the whole
+    story once `evaluation/gen_engine.py` began left-padding its batches.)
     """
 
     def __init__(self, bank: dict):

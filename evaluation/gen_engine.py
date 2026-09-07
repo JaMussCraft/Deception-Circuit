@@ -167,7 +167,11 @@ def generate(ctx, *, clean_ids, corrupt_ids, attention_mask, position_ids=None,
         raise ValueError(
             f"corrupt_ids is {tuple(corrupt_ids.shape)} but the corrupt "
             f"stream advances one token per decode step, so it must be at "
-            f"least ({n}, {width + new_tokens}).")
+            f"least ({n}, {width + new_tokens}) — as long as the clean stream "
+            f"ever gets. (The final column is never actually read, since the "
+            f"last step's token is not fed back; the requirement is stated in "
+            f"terms of the final length because that is the property callers "
+            f"can check.)")
 
     require_left_padding(attention_mask)
 
@@ -294,15 +298,6 @@ def _pad_right(ids, target, pad_id):
     return torch.cat([ids, filler], dim=1)
 
 
-def _pad_left(ids, target, pad_id):
-    missing = target - ids.shape[1]
-    if missing <= 0:
-        return ids
-    filler = torch.full((ids.shape[0], missing), pad_id, dtype=ids.dtype,
-                        device=ids.device)
-    return torch.cat([filler, ids], dim=1)
-
-
 def generate_bucketed(ctx, *, clean_ids, corrupt_ids, attention_mask,
                       hook=None, new_tokens, eos_ids=(), batch_size=8,
                       use_cache=True, desc="") -> torch.LongTensor:
@@ -323,8 +318,16 @@ def generate_bucketed(ctx, *, clean_ids, corrupt_ids, attention_mask,
     # columns are the leading ones, so a right-padded batch would be mangled
     # before `generate` ever saw it.
     require_left_padding(attention_mask)
-    pad_id = resolve_pad_id(ctx.tokenizer, eos_ids)
     lengths = attention_mask.sum(dim=1)
+
+    if not use_cache and batch_size > 1 and int(lengths.min()) != width:
+        # Trimming a bucket to its longest row still leaves the shorter rows
+        # padded, and `generate` refuses padding without the cache. Falling
+        # back to one row at a time is what makes `--no-kv-cache` an escape
+        # hatch that actually works on a ragged benchmark batch instead of
+        # raising on the first bucket; it is a debug path, so the cost of
+        # O(n^2) per row is the point rather than a regression.
+        batch_size = 1
     # `stable` so equal-length rows keep their input order, which makes the
     # bucket contents reproducible rather than sort-implementation-defined.
     order = torch.argsort(lengths, descending=True, stable=True)
@@ -346,9 +349,15 @@ def generate_bucketed(ctx, *, clean_ids, corrupt_ids, attention_mask,
             attention_mask=attention_mask[rows][:, cut:],
             hook=hook, new_tokens=new_tokens, eos_ids=eos_ids,
             use_cache=use_cache)
-        pieces.append(_pad_left(piece, width + new_tokens, pad_id))
+        # Only the generated block is kept. Re-padding the trimmed prompt back
+        # out would fill those columns with *this* module's pad id rather than
+        # the caller's, which is a difference the docstring's "left padding
+        # preserved" promise would quietly break — and one that a fixture whose
+        # two pad ids coincide would never notice.
+        pieces.append(piece[:, keep:])
 
-    out = torch.cat(pieces, dim=0)
+    generated = torch.cat(pieces, dim=0)
     inverse = torch.empty_like(order)
     inverse[order] = torch.arange(n, device=order.device)
-    return out[inverse.to(out.device)]
+    generated = generated[inverse.to(generated.device)]
+    return torch.cat([clean_ids.to(generated.device), generated], dim=1)
