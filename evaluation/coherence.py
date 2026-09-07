@@ -26,14 +26,18 @@ constant here.
 **The mask is the subtle part.** `gen_engine.generate` returns a fixed-width
 block; where each row actually stopped is not in the tensor's shape. The
 natural-looking reconstruction, `ids != pad_id`, is wrong on the model this
-harness targets: Llama-3.1-8B-Instruct's tokenizer has no pad token, so
-`resolve_pad_id` falls back to `<|eot_id|>` — which is also the first EOS. Every
-stopped row then ends `... <|eot_id|> <|eot_id|> <|eot_id|>`, and a `!= pad_id`
-mask silently drops the real EOS, which is a scored token. `completion_mask`
-below decides it from `eos_ids` instead, which is correct whatever `pad_id` is.
+harness targets. `models/__init__.py:75-77` sets `pad_token = eos_token` when
+loading a Llama tokenizer, so on Llama-3.1-8B-Instruct `pad_id` is 128009
+`<|eot_id|>` — the usual stop token for an instruct chat turn. A `!= pad_id`
+mask would therefore drop the real EOS on essentially every stopped row, and
+that EOS is a token the model genuinely predicted. `completion_mask` below
+does not read `pad_id` at all; it decides from `eos_ids`, which is correct
+whatever the pad id happens to be.
 """
 
 from __future__ import annotations
+
+import math
 
 import torch
 from tqdm import tqdm
@@ -54,6 +58,11 @@ def completion_mask(ids, prompt_mask, gen_start, eos_ids=()) -> torch.Tensor:
     Workstream D/E's benchmark callers need this too — it is the only way to
     recover per-row stop positions from what `gen_engine.generate` returns.
     """
+    if prompt_mask.shape[1] != gen_start:
+        raise ValueError(
+            f"prompt_mask is {prompt_mask.shape[1]} wide but gen_start is "
+            f"{gen_start}: it must cover the prompt and only the prompt. "
+            f"(A full-width mask would produce a result wider than ids.)")
     generated = ids[:, gen_start:]
     if len(eos_ids):
         eos = torch.as_tensor(sorted({int(e) for e in eos_ids}),
@@ -81,8 +90,18 @@ def distinct_n(ids, mask=None, n: int = 2):
     The pooled figure is token-weighted — `sum(unique) / sum(total)` over rows,
     not the mean of the per-row ratios. The two disagree whenever rows have
     unequal length, which is always.
+
+    Pooled is deliberately **within-row**: a bigram appearing in every row is
+    counted once per row, so three identical rows pool to 1.0. That is the
+    right reading for the failure this metric exists to catch, which is
+    repetition inside one generation. It is blind to the other kind — an
+    ablation that emits the same fluent sentence for all 200 prompts also
+    scores 1.0 — so `corpus` is returned alongside it: the same ratio over the
+    concatenation of every row's n-grams, which collapses under exactly that
+    mode collapse. The report should show both.
     """
     per_row, uniq_total, gram_total = [], 0, 0
+    corpus_grams, corpus_total = set(), 0
     for row in range(ids.shape[0]):
         tokens = ids[row]
         if mask is not None:
@@ -95,8 +114,11 @@ def distinct_n(ids, mask=None, n: int = 2):
         per_row.append(len(set(grams)) / len(grams))
         uniq_total += len(set(grams))
         gram_total += len(grams)
+        corpus_grams.update(grams)
+        corpus_total += len(grams)
     pooled = (uniq_total / gram_total) if gram_total else None
-    return pooled, per_row
+    corpus = (len(corpus_grams) / corpus_total) if corpus_total else None
+    return pooled, per_row, corpus
 
 
 def reference_cross_entropy(ctx, ids, attention_mask, gen_start, *,
@@ -113,6 +135,13 @@ def reference_cross_entropy(ctx, ids, attention_mask, gen_start, *,
     (verified directly: no NaN under eager or sdpa, and a padded row's logits
     match the same row run unpadded to ~2e-7). Do not add a guard against it.
 
+    `attention_mask` must be a **completion mask** — the output of
+    `completion_mask` above, not the mask the generation was run with extended
+    with ones. Scoring the post-EOS padding as if the model had written it
+    inflates `n_tokens` and collapses distinct-n toward the very "looping"
+    signature these two metrics were paired to disambiguate. `coherence_metrics`
+    builds it for you; prefer that entry point.
+
     Returns `(pooled_nll, per_row_nll, per_row_tokens)`. The pooled figure is
     **token-weighted** — total NLL over total scored tokens — not the mean of
     the row means.
@@ -126,6 +155,24 @@ def reference_cross_entropy(ctx, ids, attention_mask, gen_start, *,
         raise ValueError(
             f"attention_mask {tuple(attention_mask.shape)} must match ids "
             f"{tuple(ids.shape)}.")
+    if ids.shape[0] and gen_start >= ids.shape[1]:
+        raise ValueError(
+            f"gen_start {gen_start} leaves nothing to score in a sequence of "
+            f"{ids.shape[1]}. Every row out of gen_engine.generate has at "
+            f"least one generated token, so this is a caller bug rather than "
+            f"a config that produced nothing.")
+    if ids.shape[0] and not bool(attention_mask[:, gen_start:].any(dim=1).all()):
+        raise ValueError(
+            "some row has no scored generated tokens. `completion_mask` always "
+            "keeps at least the position at gen_start, so an all-zero "
+            "generated mask means the mask was not built from it.")
+
+    # Left-padded rows are batched here on the same offset-invariance argument
+    # `evaluation/gen_engine.py` relies on, so it is asserted on the same
+    # terms. Chunks are cut in input order rather than by length, which under a
+    # batch-dependent RoPE would make the result depend on `batch_size`.
+    from evaluation.gen_engine import assert_rope_is_offset_invariant
+    assert_rope_is_offset_invariant(ctx.node_model.config)
 
     device = ctx.device
     row_nll, row_tokens = [], []
@@ -142,7 +189,12 @@ def reference_cross_entropy(ctx, ids, attention_mask, gen_start, *,
         nll = -logp.gather(-1, target.unsqueeze(-1)).squeeze(-1)
         keep = chunk_mask[:, gen_start:].bool()
         counts = keep.sum(dim=1)
-        row_nll.extend(((nll * keep).sum(dim=1)).cpu().tolist())
+        # `where`, not `nll * keep`: a NaN at a masked-out position survives
+        # multiplication by False and would poison the row's whole sum. Logits
+        # are finite on this single-stream path even for a fully-padded row —
+        # measured, not assumed — so this is defence in depth, and free.
+        row_nll.extend(torch.where(keep, nll, torch.zeros_like(nll))
+                       .sum(dim=1).cpu().tolist())
         row_tokens.extend(counts.cpu().tolist())
 
     total_tokens = sum(row_tokens)
@@ -151,28 +203,60 @@ def reference_cross_entropy(ctx, ids, attention_mask, gen_start, *,
     return pooled, means, row_tokens
 
 
-def coherence_metrics(ctx, ids, attention_mask, gen_start, *, n: int = 2,
-                      batch_size: int = 1, desc: str = "") -> dict:
-    """`{ref_nll, ref_ppl, distinct_2, n_tokens}` plus the per-sample values.
+def coherence_metrics(ctx, ids, prompt_mask, gen_start, *, eos_ids=(),
+                      n: int = 2, batch_size: int = 1, desc: str = "") -> dict:
+    """`{ref_nll, ref_ppl, distinct_n, n, n_tokens}` plus the per-sample values.
+
+    Takes the **prompt** mask that generation was run with, plus `eos_ids`, and
+    builds the completion mask itself. That is deliberate: the natural mistake
+    for a caller is to reuse the generation mask extended with ones, which
+    scores every post-EOS pad as if the model had written it — `n_tokens`
+    inflates and distinct-n collapses toward the "looping" signature these two
+    metrics exist to disambiguate. Making the correct mask the only reachable
+    one is cheaper than documenting the trap.
 
     `n_tokens` is the total number of scored generated tokens across all rows,
     which is what the pooled `ref_nll` is weighted by — a config whose rows all
     stopped after two tokens has a small `n_tokens`, and the report should say
     so rather than presenting its NLL as comparable.
+
+    The key is `distinct_n` with `n` reported alongside, not `distinct_2`. The
+    plan names the latter, but a key that changes with a parameter makes a
+    reader keyed on the literal string lose the column silently instead of
+    failing.
     """
+    mask = completion_mask(ids, prompt_mask, gen_start, eos_ids)
     pooled_nll, per_row_nll, per_row_tokens = reference_cross_entropy(
-        ctx, ids, attention_mask, gen_start, batch_size=batch_size, desc=desc)
-    pooled_distinct, per_row_distinct = distinct_n(
-        ids[:, gen_start:], attention_mask[:, gen_start:], n=n)
+        ctx, ids, mask, gen_start, batch_size=batch_size, desc=desc)
+    pooled_distinct, per_row_distinct, corpus_distinct = distinct_n(
+        ids[:, gen_start:], mask[:, gen_start:], n=n)
     return {
         "ref_nll": pooled_nll,
-        "ref_ppl": None if pooled_nll is None else float(torch.exp(
-            torch.tensor(pooled_nll))),
-        f"distinct_{n}": pooled_distinct,
+        "ref_ppl": _perplexity(pooled_nll),
+        "distinct_n": pooled_distinct,
+        "distinct_n_corpus": corpus_distinct,
+        "n": n,
         "n_tokens": int(sum(per_row_tokens)),
         "per_sample": {
             "ref_nll": per_row_nll,
-            f"distinct_{n}": per_row_distinct,
+            "distinct_n": per_row_distinct,
             "n_tokens": [int(t) for t in per_row_tokens],
         },
     }
+
+
+def _perplexity(nll):
+    """`exp(nll)`, or None where it does not fit.
+
+    Computed in float64 via `math.exp` rather than a float32 tensor: the tensor
+    form saturates to `inf` above an NLL of ~88.7, and `json.dumps` writes that
+    as a bare `Infinity`, which is not valid JSON and is rejected by strict
+    readers. An NLL that large means a spectacularly broken ablation, but the
+    report should still be loadable when it happens.
+    """
+    if nll is None:
+        return None
+    try:
+        return math.exp(nll)
+    except OverflowError:
+        return None
