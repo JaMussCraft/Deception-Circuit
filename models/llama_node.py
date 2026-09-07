@@ -613,13 +613,36 @@ class PrunableLlamaForCausalLM(LlamaForCausalLM):
         hidden_states_clean = inputs_embeds
         hidden_states_corrupted = corrupted_inputs_embeds.clone()
 
-        # Handle cache. The two streams need *distinct* Cache objects: they share
-        # one `original_attention` per layer, so a single object would append
-        # corrupt K/V onto the clean entry under the same `layer_idx`.
+        # Handle cache.
+        #
+        # The guards below key off *cache presence*, not off `use_cache`. A cache
+        # handed in with `use_cache=False` is still threaded to the layers and
+        # still selects the `create_causal_mask` branch, so gating the checks on
+        # `use_cache` alone would let a half-supplied pair through silently and
+        # read the wrong columns out of the mask.
+        cache_supplied = (past_key_values is not None
+                          or corrupted_past_key_values is not None)
+        if cache_supplied and not use_cache:
+            raise ValueError(
+                "a KV cache was supplied with use_cache=False. The cache is "
+                "used and mutated regardless, so this is never what the caller "
+                "meant — pass use_cache=True, or pass no cache.")
+
         if use_cache:
+            # Both or neither. The output carries only the clean cache, so a
+            # caller who supplies one and lets the other be allocated would get
+            # a fresh corrupt cache on the next call and desync immediately.
+            if (past_key_values is None) != (corrupted_past_key_values is None):
+                raise ValueError(
+                    "supply both past_key_values and corrupted_past_key_values "
+                    "or neither: the dual-stream forward returns only the clean "
+                    "cache, so the corrupt one cannot be recovered from the "
+                    "output and must be held by the caller.")
             if past_key_values is None:
+                # Both streams need *distinct* Cache objects: they share one
+                # `original_attention` per layer, so a single object would append
+                # corrupt K/V onto the clean entry under the same `layer_idx`.
                 past_key_values = DynamicCache()
-            if corrupted_past_key_values is None:
                 corrupted_past_key_values = DynamicCache()
             if corrupted_past_key_values is past_key_values:
                 raise ValueError(
@@ -665,6 +688,20 @@ class PrunableLlamaForCausalLM(LlamaForCausalLM):
         # dropped `LlamaModel._update_causal_mask` — it is *newer* transformers
         # that lacks it, not older.)
         if past_key_values is not None:
+            # `create_causal_mask` wants a 2D mask over the *whole* key block —
+            # cache included — not just this step's query block. A width of
+            # `seq_length` on a decode step is the natural-looking mistake and
+            # is accepted silently, after which the attention kernel slices the
+            # wrong columns and the logits are quietly wrong.
+            if attention_mask is not None and attention_mask.dim() == 2:
+                kv_length = int(cache_position[-1]) + 1
+                if attention_mask.shape[1] != kv_length:
+                    raise ValueError(
+                        f"attention_mask is {attention_mask.shape[1]} wide but "
+                        f"the key block is {kv_length} "
+                        f"({kv_length - seq_length} cached + {seq_length} new). "
+                        f"In cache mode the mask must cover the cached tokens "
+                        f"too.")
             causal_mask = create_causal_mask(
                 config=self.config,
                 input_embeds=inputs_embeds,

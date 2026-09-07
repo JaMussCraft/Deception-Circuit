@@ -24,10 +24,19 @@ could have gone wrong:
    layer. The generation engine left-pads, so this is the failure the mask
    rewrite exists to prevent.
 
-Everything runs on a tiny CPU model with `attn_implementation="eager"`: a
-random-init vocab-101 model has near-ties in its logits, and eager attention
-keeps the reduction order identical between the cached and uncached paths so a
-token-for-token comparison is a real signal rather than a coin flip.
+Everything runs on a tiny CPU model. Where a comparison is token-for-token the
+default is `attn_implementation="eager"`: a random-init vocab-101 model has
+near-ties in its logits, and eager keeps the reduction order identical between
+the cached and uncached paths so the comparison is signal rather than a coin
+flip. sdpa — what production actually loads, and a different mask function and
+kernel — is parametrized in alongside it.
+
+A note on the NaN in (3): the arithmetic NaN is eager-specific, because the
+manual mask's `float('-inf')` row reaches an explicit softmax there. Under sdpa
+a fully-masked row is absorbed by the kernel and comes out as zeros instead.
+The mask is wrong on both; only eager announces it. That is the argument for
+`create_causal_mask` rather than a narrower patch: the silent path is the
+dangerous one.
 """
 
 from __future__ import annotations
@@ -42,13 +51,23 @@ from evaluation.ablation import ablation_hook, make_hook
 ABLATIONS = ("interchange", "zero", "mean")
 CONFIGS = ("full", "knockout", "circuit_only")
 
+#: Production loads Llama with sdpa; the tests default to eager because a
+#: random-init vocab-101 model has near-ties and eager keeps the reduction order
+#: identical between the cached and uncached paths, so a token-for-token
+#: comparison is signal rather than a coin flip. sdpa takes a *different* mask
+#: function (`sdpa_mask`, which returns a bool mask or None via the is_causal
+#: skip) and a different kernel, so it is covered explicitly wherever the
+#: comparison tolerates it.
+ATTN_IMPLS = ("eager", "sdpa")
+
 
 # ----------------------------------------------------------------------------
 # helpers
 # ----------------------------------------------------------------------------
 
-def _tiny(seed=0):
-    plain, pruned = build_tiny_pair(seed=seed, attn_implementation="eager")
+def _tiny(seed=0, attn_implementation="eager"):
+    plain, pruned = build_tiny_pair(seed=seed,
+                                    attn_implementation=attn_implementation)
     pruned.set_final_circuit_mode(False)
     return pruned
 
@@ -126,10 +145,11 @@ def _generate_cached(model, clean0, corrupt, new_tokens, hook):
 # 1. cached generation == uncached generation
 # ----------------------------------------------------------------------------
 
+@pytest.mark.parametrize("attn_impl", ATTN_IMPLS)
 @pytest.mark.parametrize("ablation", ABLATIONS)
 @pytest.mark.parametrize("config", CONFIGS)
-def test_cached_generation_matches_uncached(ablation, config):
-    model = _tiny()
+def test_cached_generation_matches_uncached(ablation, config, attn_impl):
+    model = _tiny(attn_implementation=attn_impl)
     _set_gates(model, config)
 
     torch.manual_seed(3)
@@ -144,13 +164,15 @@ def test_cached_generation_matches_uncached(ablation, config):
     fast = _generate_cached(model, clean0, corrupt, N, hook)
 
     assert torch.equal(slow, fast), (
-        f"{ablation}/{config}: cached decode diverged from the full re-forward\n"
+        f"{ablation}/{config}/{attn_impl}: cached decode diverged from the "
+        f"full re-forward\n"
         f"  uncached {slow.tolist()}\n  cached   {fast.tolist()}")
 
 
-def test_cached_prefill_logits_match_uncached():
+@pytest.mark.parametrize("attn_impl", ATTN_IMPLS)
+def test_cached_prefill_logits_match_uncached(attn_impl):
     """Prefill alone — the allclose companion to the argmax comparison above."""
-    model = _tiny()
+    model = _tiny(attn_implementation=attn_impl)
     _set_gates(model, "circuit_only")
 
     torch.manual_seed(11)
@@ -262,7 +284,8 @@ def test_uncached_logits_are_bit_identical_to_the_pre_change_fixture():
 # 3. left padding
 # ----------------------------------------------------------------------------
 
-def test_left_padded_batch_matches_batch_size_one_and_has_no_nan():
+@pytest.mark.parametrize("attn_impl", ATTN_IMPLS)
+def test_left_padded_batch_matches_batch_size_one_and_has_no_nan(attn_impl):
     """Left padding is what generation needs and what the old mask broke.
 
     Under the manual construction a fully-padded query row is all `-inf`,
@@ -270,7 +293,7 @@ def test_left_padded_batch_matches_batch_size_one_and_has_no_nan():
     into real positions one layer later. `create_causal_mask` is used for every
     cache-mode forward precisely so this batch is safe.
     """
-    model = _tiny()
+    model = _tiny(attn_implementation=attn_impl)
     _set_gates(model, "circuit_only")
 
     torch.manual_seed(17)
@@ -310,3 +333,138 @@ def test_left_padded_batch_matches_batch_size_one_and_has_no_nan():
             f"row {row} last-position logits differ between the left-padded "
             f"batch and batch size 1 by "
             f"{(batched[row, -1] - alone[0, -1]).abs().max().item():.3e}")
+
+
+# ----------------------------------------------------------------------------
+# 4. the guards on cache presence
+# ----------------------------------------------------------------------------
+
+def test_multi_step_decode_on_a_left_padded_batch():
+    """The generation engine's actual shape: left padding *and* a growing cache.
+
+    The prefill test above covers the mask at step 0. This covers every step
+    after it, where the query block is one token and the key block is the whole
+    cache — the case the manual mask could never have handled.
+    """
+    model = _tiny()
+    _set_gates(model, "circuit_only")
+
+    torch.manual_seed(23)
+    short, long, steps = 3, 6, 5
+    a = torch.randint(1, 101, (1, long))
+    b = torch.randint(1, 101, (1, short))
+    corr_a = torch.randint(1, 101, (1, long + steps))
+    corr_b = torch.randint(1, 101, (1, short + steps))
+
+    pad = 0
+    gap = long - short
+    ids = torch.cat([a, torch.cat([torch.full((1, gap), pad), b], 1)], 0)
+    corrupt = torch.cat([corr_a[:, :long],
+                         torch.cat([torch.full((1, gap), pad),
+                                    corr_b[:, :short]], 1)], 0)
+    mask = torch.ones(2, long, dtype=torch.long)
+    mask[1, :gap] = 0
+
+    clean_cache, corrupt_cache = DynamicCache(), DynamicCache()
+    step_clean, step_corrupt, cur_mask = ids, corrupt, mask
+    batched = []
+    with torch.no_grad():
+        for step in range(steps):
+            out = model(input_ids=step_clean, corrupted_input_ids=step_corrupt,
+                        attention_mask=cur_mask,
+                        past_key_values=clean_cache,
+                        corrupted_past_key_values=corrupt_cache,
+                        use_cache=True)
+            assert not torch.isnan(out.logits).any(), \
+                f"NaN at decode step {step} of a left-padded batch"
+            nxt = out.logits[:, -1].float().argmax(dim=-1, keepdim=True)
+            batched.append(nxt)
+            step_clean = nxt
+            step_corrupt = torch.stack(
+                [corr_a[0, long + step], corr_b[0, short + step]]).view(2, 1)
+            # The mask grows by one real column per step, for both rows.
+            cur_mask = torch.cat(
+                [cur_mask, torch.ones(2, 1, dtype=torch.long)], dim=1)
+    batched = torch.cat(batched, dim=1)
+
+    # The same two rows, decoded alone with no padding at all.
+    alone = []
+    for ids_1, corr_1, plen in ((a, corr_a, long), (b, corr_b, short)):
+        cc, xc = DynamicCache(), DynamicCache()
+        sc, sx = ids_1, corr_1[:, :plen]
+        m = torch.ones(1, plen, dtype=torch.long)
+        got = []
+        with torch.no_grad():
+            for step in range(steps):
+                out = model(input_ids=sc, corrupted_input_ids=sx,
+                            attention_mask=m,
+                            past_key_values=cc, corrupted_past_key_values=xc,
+                            use_cache=True)
+                nxt = out.logits[:, -1].float().argmax(dim=-1, keepdim=True)
+                got.append(nxt)
+                sc = nxt
+                sx = corr_1[:, plen + step:plen + step + 1]
+                m = torch.cat([m, torch.ones(1, 1, dtype=torch.long)], dim=1)
+        alone.append(torch.cat(got, dim=1))
+    alone = torch.cat(alone, dim=0)
+
+    assert torch.equal(batched, alone), (
+        f"left-padded batch decode != batch size 1\n"
+        f"  batched {batched.tolist()}\n  alone   {alone.tolist()}")
+
+
+def test_a_cache_supplied_with_use_cache_false_is_rejected():
+    """The cache is threaded and mutated regardless of the use_cache flag.
+
+    Letting this through means the corrupt stream runs with no cache while the
+    clean stream runs with one — silently wrong logits, and a clean cache that
+    has quietly grown a token.
+    """
+    model = _tiny()
+    _set_gates(model, "full")
+    torch.manual_seed(29)
+    ids = torch.randint(1, 101, (1, 4))
+    corrupt = torch.randint(1, 101, (1, 4))
+    mask = torch.ones(1, 4, dtype=torch.long)
+
+    for kwargs in ({"past_key_values": DynamicCache()},
+                   {"corrupted_past_key_values": DynamicCache()}):
+        with pytest.raises(ValueError, match="use_cache=False"):
+            model(input_ids=ids, corrupted_input_ids=corrupt,
+                  attention_mask=mask, use_cache=False, **kwargs)
+
+
+def test_half_supplied_caches_are_rejected():
+    """Only the clean cache is returned, so the corrupt one must be the caller's."""
+    model = _tiny()
+    _set_gates(model, "full")
+    torch.manual_seed(31)
+    ids = torch.randint(1, 101, (1, 4))
+    corrupt = torch.randint(1, 101, (1, 4))
+    mask = torch.ones(1, 4, dtype=torch.long)
+
+    for kwargs in ({"past_key_values": DynamicCache()},
+                   {"corrupted_past_key_values": DynamicCache()}):
+        with pytest.raises(ValueError, match="both past_key_values and"):
+            model(input_ids=ids, corrupted_input_ids=corrupt,
+                  attention_mask=mask, use_cache=True, **kwargs)
+
+
+def test_a_mask_that_does_not_cover_the_cache_is_rejected():
+    """`create_causal_mask` accepts a too-narrow mask and reads wrong columns."""
+    model = _tiny()
+    _set_gates(model, "full")
+    torch.manual_seed(37)
+    ids = torch.randint(1, 101, (1, 4))
+    corrupt = torch.randint(1, 101, (1, 4))
+    cc, xc = DynamicCache(), DynamicCache()
+    with torch.no_grad():
+        model(input_ids=ids, corrupted_input_ids=corrupt,
+              attention_mask=torch.ones(1, 4, dtype=torch.long),
+              past_key_values=cc, corrupted_past_key_values=xc, use_cache=True)
+
+    # A decode step whose mask covers only the new token, not the 4 cached ones.
+    with pytest.raises(ValueError, match="the key block is 5"):
+        model(input_ids=ids[:, :1], corrupted_input_ids=corrupt[:, :1],
+              attention_mask=torch.ones(1, 1, dtype=torch.long),
+              past_key_values=cc, corrupted_past_key_values=xc, use_cache=True)
