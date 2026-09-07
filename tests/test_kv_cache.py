@@ -492,3 +492,40 @@ def test_a_mask_that_does_not_cover_the_cache_is_rejected():
         model(input_ids=ids[:, :1], corrupted_input_ids=corrupt[:, :1],
               attention_mask=torch.ones(1, 1, dtype=torch.long),
               past_key_values=cc, corrupted_past_key_values=xc, use_cache=True)
+
+
+# ----------------------------------------------------------------------------
+# 6. the production loop agrees with the oracle above
+# ----------------------------------------------------------------------------
+
+def test_gen_engine_matches_the_hand_written_cached_loop():
+    """`evaluation/gen_engine.py` is the loop the harness actually runs.
+
+    `_generate_cached` above stays as an independent oracle rather than being
+    replaced by an import: it was written against the model's interface, so a
+    change to `gen_engine` that quietly alters what is fed to the model — a
+    misaligned corrupt slice, a mask that stops growing, a position that stops
+    advancing — shows up as a disagreement here instead of moving both sides
+    together.
+    """
+    from types import SimpleNamespace
+
+    from evaluation import gen_engine
+
+    model = _tiny()
+    _set_gates(model, "circuit_only")
+    torch.manual_seed(3)
+    clean0 = torch.randint(2, 101, (2, 6))
+    corrupt = torch.randint(2, 101, (2, 6 + 8))
+    hook = _hook_for(model, "interchange", clean0, corrupt[:, :6],
+                     torch.ones_like(clean0))
+
+    oracle = _generate_cached(model, clean0, corrupt, 8, hook)
+    ctx = SimpleNamespace(node_model=model, device="cpu",
+                          tokenizer=SimpleNamespace(pad_token_id=0,
+                                                    eos_token_id=1))
+    engine = gen_engine.generate(ctx, clean_ids=clean0, corrupt_ids=corrupt,
+                                 attention_mask=torch.ones_like(clean0),
+                                 hook=hook, new_tokens=8)
+
+    assert torch.equal(oracle, engine)

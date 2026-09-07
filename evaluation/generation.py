@@ -10,12 +10,14 @@ check for that.
 
 Two constraints shape the loop, and both are load-bearing:
 
-* **No KV cache.** `models/llama_node.py:PrunableLlamaAttention.forward` sets
-  `corrupted_kwargs['past_key_value'] = None`, so the corrupted stream cannot
-  carry a cache. Incremental decoding would therefore run the two streams at
-  different lengths and silently compare the wrong positions. The whole
-  sequence is re-forwarded at every step with `use_cache=False`. That is
-  O(n^2) and slow; with 3 prompts x 48 tokens it is also under a minute.
+* **No KV cache here.** The corrupted stream *can* carry one now
+  (`evaluation/gen_engine.py`, and `models/llama_node.py` gives it its own
+  `Cache`), but these samples do not use it. Three prompts x 48 tokens is under
+  a minute either way, and the uncached forward is the one every other number
+  in this harness is produced on, so running it here keeps the coherence check
+  on the same code path as the measurements it is vouching for.
+  `tests/test_generation.py` pins the full-sequence re-forward; the cached path
+  is pinned separately in `tests/test_kv_cache.py`.
 
 * **The corrupted stream must not be the clean stream.** Under `--ablation
   interchange` the ablated units are filled from the corrupted stream, so
@@ -29,9 +31,8 @@ Two constraints shape the loop, and both are load-bearing:
 from __future__ import annotations
 
 import torch
-from tqdm import tqdm
 
-from evaluation.ablation import ablation_hook
+from evaluation.gen_engine import generate
 from evaluation.wikitext import load_wikitext_blocks, pair_blocks
 
 #: Tokens of context each sample is primed with, after the forced BOS. Long
@@ -97,7 +98,8 @@ def generation_examples(ctx, n_examples: int, new_tokens: int) -> dict:
         "n_examples": n,
         "prompt_tokens": prompt_len,
         "new_tokens": new_tokens,
-        "decoding": "greedy, no KV cache (the corrupted stream cannot carry one)",
+        "decoding": "greedy, no KV cache (cheap at this size, and the same "
+                    "forward every other measurement here runs)",
         "pairing_seed": ctx.cli.wikitext_seed,
         "ablation": ctx.cli.ablation,
         "configs": list(CONFIG_ORDER),
@@ -106,20 +108,23 @@ def generation_examples(ctx, n_examples: int, new_tokens: int) -> dict:
 
 
 def _generate(ctx, clean0, corrupt, new_tokens, hook, desc):
-    """Greedy decode, re-forwarding the whole sequence at every step."""
-    clean = clean0.to(ctx.device)
-    corrupt = corrupt.to(ctx.device)
-    with torch.no_grad(), ablation_hook(ctx.node_model, hook):
-        for _ in tqdm(range(new_tokens), desc=desc, leave=False):
-            length = clean.shape[1]
-            logits = ctx.node_model(
-                input_ids=clean,
-                corrupted_input_ids=corrupt[:, :length],
-                attention_mask=torch.ones_like(clean),
-                use_cache=False).logits
-            nxt = logits[:, -1].float().argmax(dim=-1, keepdim=True)
-            clean = torch.cat([clean, nxt], dim=1)
-    return clean.cpu()
+    """Greedy decode, re-forwarding the whole sequence at every step.
+
+    `eos_ids=()` on purpose: a wikitext continuation has no natural stopping
+    point, and the sample is meant to be read for fluency across its whole
+    length rather than truncated at the first end-of-text an ablated model
+    happens to emit.
+    """
+    return generate(
+        ctx,
+        clean_ids=clean0,
+        corrupt_ids=corrupt,
+        attention_mask=torch.ones_like(clean0),
+        hook=hook,
+        new_tokens=new_tokens,
+        eos_ids=(),
+        use_cache=False,
+        desc=desc).cpu()
 
 
 def report_generations(payload, report) -> None:
