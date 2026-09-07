@@ -117,6 +117,17 @@ def require_left_padding(attention_mask) -> None:
             "generation requires LEFT padding, but this attention_mask has a "
             "1 after a 0 in some row. A right-padded batch generates from a "
             "pad position and is silently wrong rather than an error.")
+    if not bool(attention_mask.any(dim=1).all()):
+        # Checked empirically on the tiny model: an all-pad row does *not*
+        # produce NaN on this path under either eager or sdpa (the cache
+        # branch's mask uses finfo.min, and sdpa_mask unmasks a fully-masked
+        # row outright). It produces plausible-looking tokens conditioned on
+        # nothing — which is the reason to reject it. A prompt that tokenised
+        # to nothing is a caller bug, and its generation would otherwise be
+        # scored by the judge as if it were a real one.
+        raise ValueError(
+            "every row needs at least one non-pad token; a fully-padded row "
+            "has no prompt to continue.")
 
 
 def generate(ctx, *, clean_ids, corrupt_ids, attention_mask, position_ids=None,

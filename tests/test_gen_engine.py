@@ -124,14 +124,20 @@ def test_cached_generation_matches_the_uncached_loop(attn_impl):
 # 2. left padding and bucketing
 # ----------------------------------------------------------------------------
 
-def test_a_padded_batch_matches_the_same_rows_generated_alone():
+@pytest.mark.parametrize("attn_impl", ("eager", "sdpa"))
+def test_a_padded_batch_matches_the_same_rows_generated_alone(attn_impl):
     """The whole point of the left-padded path: batching changes nothing.
 
     Batch size 1 trims each row back to its own width, so the reference has no
     padding at all — which is what makes this a test of the padding rather than
     a comparison of two padded runs.
+
+    Parametrized over both attention implementations because production loads
+    sdpa, and sdpa takes a different mask function (`sdpa_mask`) — the
+    model-layer test in `tests/test_kv_cache.py` covers sdpa under padding at
+    prefill, but not through this path's trim / re-pad / unsort.
     """
-    ctx = _ctx()
+    ctx = _ctx(attn_implementation=attn_impl)
     clean, corrupt, mask = _ragged_batch()
 
     together = gen_engine.generate_bucketed(
@@ -437,3 +443,14 @@ def test_positions_and_mask_advance_one_step_at_a_time():
     last = prefill["positions"][:, -1]
     assert torch.equal(last, mask.sum(dim=1) - 1)
     assert last[0] != last[1]
+
+
+def test_a_fully_padded_row_is_rejected():
+    """A prompt that tokenised to nothing has no position to generate from."""
+    ctx = _ctx()
+    clean, corrupt, mask = _square_batch()
+    mask = mask.clone()
+    mask[1] = 0
+    with pytest.raises(ValueError, match="no prompt to continue"):
+        gen_engine.generate(ctx, clean_ids=clean, corrupt_ids=corrupt,
+                            attention_mask=mask, new_tokens=NEW_TOKENS)
