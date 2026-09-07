@@ -694,7 +694,11 @@ class PrunableLlamaForCausalLM(LlamaForCausalLM):
             # is accepted silently, after which the attention kernel slices the
             # wrong columns and the logits are quietly wrong.
             if attention_mask is not None and attention_mask.dim() == 2:
-                kv_length = int(cache_position[-1]) + 1
+                # Read off the cache, not off `cache_position[-1]` — the latter
+                # is a device tensor and indexing it forces a host sync on every
+                # decode step. The cache has not been mutated yet; the layer
+                # loop below is what writes to it.
+                kv_length = past_key_values.get_seq_length() + seq_length
                 if attention_mask.shape[1] != kv_length:
                     raise ValueError(
                         f"attention_mask is {attention_mask.shape[1]} wide but "

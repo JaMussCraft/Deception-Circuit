@@ -254,6 +254,13 @@ def test_uncached_logits_are_bit_identical_to_the_pre_change_fixture():
     `tests/fixtures/prechange_logits.pt` was captured from the implementation
     that had no corrupt cache and no `create_causal_mask` branch. Training and
     all four shipped evaluations run on this path, so it must not move at all.
+
+    The fixture was recorded on a login-node CPU under `torch.set_num_threads(1)`
+    (conftest.py sets that, and the thread count changes the reduction order —
+    at the default count the same code differs in the last ulp). So if this ever
+    fails on different hardware, suspect kernel selection before suspecting the
+    mask edit. The discriminating check is to replay these six cases against
+    `f5c3a7b`'s `models/llama_node.py`, pulled out with `git show`.
     """
     ref = torch.load("tests/fixtures/prechange_logits.pt")
     inputs = ref["_inputs"]
