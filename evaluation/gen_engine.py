@@ -97,6 +97,28 @@ def resolve_pad_id(tokenizer, eos_ids=()) -> int:
     return int(eos) if eos is not None else 0
 
 
+def require_left_padding(attention_mask) -> None:
+    """Refuse a right-padded batch. It is silently wrong, not loudly wrong.
+
+    Generation reads the next token from the *last* column, which for a
+    right-padded row is a pad; and `generate_bucketed` trims a bucket's leading
+    columns, which under right padding are real tokens. Neither raises, neither
+    produces NaN, and the result is fluent-looking text with nothing to do with
+    the prompt — invisible to an LLM judge, which would read it as the ablation
+    having destroyed the model.
+
+    The rest of this harness is *right*-padded (`dataset/std_llama.py` pads to
+    max_length with the tokenizer's default side, and the tasks read their
+    prediction at an index counted from the left), so a caller reusing a
+    task-shaped batch here is the expected mistake, not an exotic one.
+    """
+    if not bool((attention_mask.diff(dim=1) >= 0).all()):
+        raise ValueError(
+            "generation requires LEFT padding, but this attention_mask has a "
+            "1 after a 0 in some row. A right-padded batch generates from a "
+            "pad position and is silently wrong rather than an error.")
+
+
 def generate(ctx, *, clean_ids, corrupt_ids, attention_mask, position_ids=None,
              hook=None, new_tokens, eos_ids=(), use_cache=True,
              desc="") -> torch.LongTensor:
@@ -136,6 +158,8 @@ def generate(ctx, *, clean_ids, corrupt_ids, attention_mask, position_ids=None,
             f"stream advances one token per decode step, so it must be at "
             f"least ({n}, {width + new_tokens}).")
 
+    require_left_padding(attention_mask)
+
     clean = clean_ids.to(device)
     corrupt = corrupt_ids.to(device)
     mask = attention_mask.to(device)
@@ -144,6 +168,11 @@ def generate(ctx, *, clean_ids, corrupt_ids, attention_mask, position_ids=None,
                           dtype=clean.dtype, device=device)
 
     if not use_cache:
+        if position_ids is not None:
+            raise ValueError(
+                "position_ids is not honoured on the uncached path, which "
+                "re-forwards the whole sequence and lets the model derive its "
+                "own positions. Passing it would be silently ignored.")
         if not bool(mask.all()):
             raise ValueError(
                 "use_cache=False cannot be used with a padded batch: the "
@@ -279,6 +308,10 @@ def generate_bucketed(ctx, *, clean_ids, corrupt_ids, attention_mask,
     out, input row order, left padding preserved.
     """
     n, width = clean_ids.shape
+    # Checked here as well as in `generate`: `cut` below assumes the pad
+    # columns are the leading ones, so a right-padded batch would be mangled
+    # before `generate` ever saw it.
+    require_left_padding(attention_mask)
     pad_id = resolve_pad_id(ctx.tokenizer, eos_ids)
     lengths = attention_mask.sum(dim=1)
     # `stable` so equal-length rows keep their input order, which makes the

@@ -32,11 +32,31 @@ from tests.helpers import TINY, build_tiny_pair
 NEW_TOKENS = 5
 
 
+def _mix_gates(model):
+    """Close every other gate.
+
+    This is not decoration. Every gate computes
+    `out = gate * clean + (1 - gate) * reference`, and a freshly built model's
+    gates all sit at 1.0 — under which the corrupted stream contributes exactly
+    nothing and the dual-stream model degenerates to a single stream. A test
+    written on an all-open model cannot see a misaligned corrupt slice at all:
+    feed it a completely different `corrupt_ids` and the output does not move.
+    Half the gates closed makes the corrupt stream load-bearing, which is what
+    `test_the_corrupt_stream_is_load_bearing` then pins.
+    """
+    gates = [m for m in model.modules() if hasattr(m, "log_alpha")]
+    assert gates, "the tiny model has no gates; the fixture is not testing what it claims"
+    with torch.no_grad():
+        for i, gate in enumerate(gates):
+            gate.log_alpha.fill_(10.0 if i % 2 else -10.0)
+
+
 def _ctx(seed=0, attn_implementation="eager"):
     """The three attributes `gen_engine` actually reads off an EvalContext."""
     _, pruned = build_tiny_pair(seed=seed,
                                 attn_implementation=attn_implementation)
     pruned.set_final_circuit_mode(False)
+    _mix_gates(pruned)
     return SimpleNamespace(
         node_model=pruned,
         device="cpu",
@@ -296,3 +316,124 @@ def test_the_pad_id_falls_back_to_eos_when_there_is_no_pad_token():
     assert gen_engine.resolve_pad_id(
         SimpleNamespace(pad_token_id=None, eos_token_id=None),
         eos_ids=(9, 4)) == 9
+
+
+def test_the_corrupt_stream_is_load_bearing_in_these_fixtures():
+    """Guards every other test in this file.
+
+    If the gates were all open the corrupted stream would be inert, and the
+    assertions about bucket trimming and corrupt-slice alignment would pass
+    against an engine that fed the corrupt stream complete garbage.
+    """
+    ctx = _ctx()
+    clean, corrupt, mask = _square_batch()
+    other = _tokens(*corrupt.shape, seed=999)
+
+    a = gen_engine.generate(ctx, clean_ids=clean, corrupt_ids=corrupt,
+                            attention_mask=mask, new_tokens=NEW_TOKENS)
+    b = gen_engine.generate(ctx, clean_ids=clean, corrupt_ids=other,
+                            attention_mask=mask, new_tokens=NEW_TOKENS)
+
+    width = clean.shape[1]
+    assert not torch.equal(a[:, width:], b[:, width:])
+
+
+def test_a_right_padded_batch_is_rejected():
+    """The pad columns must be the leading ones, in both entry points.
+
+    A right-padded batch generates from a pad position, and the bucketed path
+    trims real tokens off the front of every row. Both produce fluent-looking
+    text with no error, which is the worst failure mode available here: the
+    only downstream check is an LLM judge, which cannot tell it from a model
+    the ablation genuinely broke.
+    """
+    ctx = _ctx()
+    clean, corrupt, _ = _square_batch()
+    mask = torch.ones_like(clean)
+    mask[1, -2:] = 0                             # right padding
+
+    for call in (gen_engine.generate, gen_engine.generate_bucketed):
+        with pytest.raises(ValueError, match="LEFT padding"):
+            call(ctx, clean_ids=clean, corrupt_ids=corrupt,
+                 attention_mask=mask, new_tokens=NEW_TOKENS)
+
+
+def test_position_ids_are_not_silently_ignored_uncached():
+    ctx = _ctx()
+    clean, corrupt, mask = _square_batch()
+    with pytest.raises(ValueError, match="position_ids"):
+        gen_engine.generate(ctx, clean_ids=clean, corrupt_ids=corrupt,
+                            attention_mask=mask, new_tokens=NEW_TOKENS,
+                            position_ids=(mask.cumsum(-1) - 1).clamp(min=0),
+                            use_cache=False)
+
+
+# ----------------------------------------------------------------------------
+# 5. what the model is fed, rather than what it returns
+# ----------------------------------------------------------------------------
+
+class _Spy:
+    """Records the kwargs of every dual-stream forward the engine performs."""
+
+    def __init__(self, model):
+        self.calls = []
+        self.handle = model.register_forward_pre_hook(self, with_kwargs=True)
+
+    def __call__(self, module, args, kwargs):
+        pos = kwargs.get("position_ids")
+        self.calls.append({
+            "input_width": kwargs["input_ids"].shape[1],
+            "mask_width": kwargs["attention_mask"].shape[1],
+            "positions": None if pos is None else pos.clone(),
+            "corrupt": kwargs["corrupted_input_ids"].clone(),
+        })
+        return None
+
+
+def test_positions_and_mask_advance_one_step_at_a_time():
+    """Pins the decode step against the model's inputs, not its outputs.
+
+    Token equality cannot see this. Freezing `step_pos` at the last prompt
+    position perturbs the tiny model's logits by ~2e-3 against top-1 margins of
+    2e-3..6e-2, so every output-comparison test in this file still passes —
+    while on a real model over hundreds of tokens it would wreck the
+    generation. A wrong mask width has a loud backstop (`models/llama_node.py`
+    raises); a wrong position has none, so it is asserted here directly.
+    """
+    ctx = _ctx()
+    clean, corrupt, mask = _ragged_batch(lengths=(6, 4))
+    width, n = clean.shape[1], clean.shape[0]
+
+    spy = _Spy(ctx.node_model)
+    try:
+        gen_engine.generate(ctx, clean_ids=clean, corrupt_ids=corrupt,
+                            attention_mask=mask, new_tokens=NEW_TOKENS)
+    finally:
+        spy.handle.remove()
+
+    assert len(spy.calls) == NEW_TOKENS
+
+    prefill = spy.calls[0]
+    assert prefill["input_width"] == width
+    assert prefill["mask_width"] == width
+    # Left padding puts every row's first real token at position 0.
+    expected = (mask.cumsum(-1) - 1).clamp(min=0)
+    assert torch.equal(prefill["positions"], expected)
+    assert torch.equal(prefill["corrupt"], corrupt[:, :width])
+
+    for step, call in enumerate(spy.calls[1:]):
+        assert call["input_width"] == 1, "decode must feed one token, not the sequence"
+        # The mask covers the whole key block — cache included — and grows by
+        # exactly one column per step.
+        assert call["mask_width"] == width + step + 1
+        assert torch.equal(call["positions"],
+                           expected[:, -1:] + (step + 1)), \
+            "positions must advance one per decode step, per row"
+        # The corrupt stream is consumed in lockstep, one token per step.
+        assert torch.equal(call["corrupt"],
+                           corrupt[:, width + step:width + step + 1])
+    # And the positions really are per-row: the shorter prompt ends at a
+    # smaller position than the longer one, which is what left padding means.
+    last = prefill["positions"][:, -1]
+    assert torch.equal(last, mask.sum(dim=1) - 1)
+    assert last[0] != last[1]
