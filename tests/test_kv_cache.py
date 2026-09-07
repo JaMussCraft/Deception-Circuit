@@ -41,6 +41,8 @@ dangerous one.
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 import torch
 from transformers.cache_utils import DynamicCache
@@ -262,7 +264,7 @@ def test_uncached_logits_are_bit_identical_to_the_pre_change_fixture():
     mask edit. The discriminating check is to replay these six cases against
     `f5c3a7b`'s `models/llama_node.py`, pulled out with `git show`.
     """
-    ref = torch.load("tests/fixtures/prechange_logits.pt")
+    ref = torch.load(Path(__file__).parent / "fixtures" / "prechange_logits.pt")
     inputs = ref["_inputs"]
     ids, corrupt = inputs["ids"], inputs["corrupt"]
     masks = dict(inputs["masks"])
@@ -299,6 +301,12 @@ def test_left_padded_batch_matches_batch_size_one_and_has_no_nan(attn_impl):
     softmax returns NaN, and the `0 * NaN` in the gate mixture leaks that NaN
     into real positions one layer later. `create_causal_mask` is used for every
     cache-mode forward precisely so this batch is safe.
+
+    What this does NOT check is per-row `position_ids`. It passes either way,
+    and that is genuine rather than a weak assertion: Llama's RoPE enters the
+    attention score only through (i - j), so the uniform per-row offset a
+    left-padded batch introduces cancels, and the pad columns are masked out.
+    A padded row is therefore already correct on the shared `cache_position`.
     """
     model = _tiny(attn_implementation=attn_impl)
     _set_gates(model, "circuit_only")
