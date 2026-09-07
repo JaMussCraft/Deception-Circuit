@@ -633,7 +633,10 @@ def test_run_evaluation_scores_the_clean_stream(tok):
             return self
 
         def __call__(self, input_ids=None, corrupted_input_ids=None,
-                     attention_mask=None):
+                     attention_mask=None, use_cache=None):
+            # `use_cache` is accepted and ignored: run_evaluation now passes
+            # `use_cache=False` explicitly so the dual-stream forward never
+            # allocates a throwaway KV cache.
             return self.m(input_ids=input_ids, attention_mask=attention_mask)
 
     out = dc.run_evaluation(Wrapper(model), "test", None, loader, "cpu",

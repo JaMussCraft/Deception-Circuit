@@ -444,7 +444,8 @@ def run_evaluation(
             outputs = model_to_eval(
                 input_ids=input_ids,
                 corrupted_input_ids=corr_input_ids,
-                attention_mask=attention_mask
+                attention_mask=attention_mask,
+                use_cache=False
             )
             logits = outputs.logits
 

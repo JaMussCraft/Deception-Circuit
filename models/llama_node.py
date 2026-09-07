@@ -37,6 +37,7 @@ from transformers.models.llama.modeling_llama import (
 )
 from transformers.modeling_outputs import CausalLMOutputWithPast
 from transformers.cache_utils import Cache, DynamicCache
+from transformers.masking_utils import create_causal_mask
 
 from l0 import HardConcreteGate
 
@@ -215,15 +216,23 @@ class PrunableLlamaAttention(nn.Module):
         self,
         clean_states: torch.Tensor,
         corrupted_states: Optional[torch.Tensor] = None,
+        corrupted_past_key_values: Optional[Cache] = None,
         **kwargs,
     ):
         """
         Forward pass supporting both standard (single-stream) and dual-stream modes.
-        
+
         When corrupted_states is None (standard HuggingFace forward):
             Returns: (output, attn_weights)
         When corrupted_states is provided (dual-stream pruning):
             Returns: (gated_output, attn_weights), corrupted_output
+
+        `corrupted_past_key_values` must be a *distinct* Cache object from the
+        clean stream's. Both streams call the same `original_attention`, so a
+        shared cache would concatenate corrupt K/V onto the clean entry under
+        the same `layer_idx`. It is None whenever `use_cache=False`, which is
+        how training and the single-position evaluations run — in that mode
+        this method is bit-identical to the pre-cache implementation.
         """
         # --- Standard single-stream mode (called by HuggingFace's LlamaModel.forward) ---
         if corrupted_states is None:
@@ -234,9 +243,9 @@ class PrunableLlamaAttention(nn.Module):
         # --- Dual-stream pruning mode ---
         # Get pre-o_proj outputs using the original module's computation
         clean_attn_out, clean_weights = self._forward_attention_pre_oproj(clean_states, **kwargs)
-        
+
         corrupted_kwargs = dict(kwargs)
-        corrupted_kwargs['past_key_value'] = None
+        corrupted_kwargs['past_key_values'] = corrupted_past_key_values
         corr_attn_out, _ = self._forward_attention_pre_oproj(corrupted_states, **corrupted_kwargs)
 
         # Reshape to [batch, seq_len, num_heads, head_dim] for per-head gating
@@ -393,7 +402,8 @@ class PrunableLlamaDecoderLayer(nn.Module):
         corrupted_states: Optional[torch.Tensor] = None,
         attention_mask: Optional[torch.Tensor] = None,
         position_ids: Optional[torch.LongTensor] = None,
-        past_key_value: Optional[Cache] = None,
+        past_key_values: Optional[Cache] = None,
+        corrupted_past_key_values: Optional[Cache] = None,
         output_attentions: Optional[bool] = False,
         use_cache: Optional[bool] = False,
         cache_position: Optional[torch.LongTensor] = None,
@@ -402,7 +412,7 @@ class PrunableLlamaDecoderLayer(nn.Module):
     ):
         """
         Forward pass supporting both standard (single-stream) and dual-stream modes.
-        
+
         When corrupted_states is None (standard HuggingFace forward):
             Returns: tuple matching LlamaDecoderLayer output format
         When corrupted_states is provided (dual-stream pruning):
@@ -412,7 +422,7 @@ class PrunableLlamaDecoderLayer(nn.Module):
         attn_kwargs = dict(
             attention_mask=attention_mask,
             position_embeddings=position_embeddings,
-            past_key_value=past_key_value,
+            past_key_values=past_key_values,
             cache_position=cache_position,
             output_attentions=output_attentions,
         )
@@ -444,7 +454,9 @@ class PrunableLlamaDecoderLayer(nn.Module):
         ln_corrupted = self.input_layernorm(corrupted_states)
 
         attn_outputs, corrupted_attn_output = self.attn(
-            ln_clean, ln_corrupted, **attn_kwargs
+            ln_clean, ln_corrupted,
+            corrupted_past_key_values=corrupted_past_key_values,
+            **attn_kwargs
         )
         attn_output = attn_outputs[0]
 
@@ -543,6 +555,7 @@ class PrunableLlamaForCausalLM(LlamaForCausalLM):
         attention_mask: Optional[torch.Tensor] = None,
         position_ids: Optional[torch.LongTensor] = None,
         past_key_values: Optional[Cache] = None,
+        corrupted_past_key_values: Optional[Cache] = None,
         inputs_embeds: Optional[torch.FloatTensor] = None,
         corrupted_inputs_embeds: Optional[torch.FloatTensor] = None,
         use_cache: Optional[bool] = None,
@@ -600,12 +613,28 @@ class PrunableLlamaForCausalLM(LlamaForCausalLM):
         hidden_states_clean = inputs_embeds
         hidden_states_corrupted = corrupted_inputs_embeds.clone()
 
-        # Handle cache
-        return_legacy_cache = False
+        # Handle cache. The two streams need *distinct* Cache objects: they share
+        # one `original_attention` per layer, so a single object would append
+        # corrupt K/V onto the clean entry under the same `layer_idx`.
         if use_cache:
             if past_key_values is None:
-                return_legacy_cache = True
                 past_key_values = DynamicCache()
+            if corrupted_past_key_values is None:
+                corrupted_past_key_values = DynamicCache()
+            if corrupted_past_key_values is past_key_values:
+                raise ValueError(
+                    "past_key_values and corrupted_past_key_values must be "
+                    "distinct Cache objects — the two streams write to the same "
+                    "layer_idx.")
+            # `cache_position` and `position_embeddings` below are computed once
+            # and shared by both streams, so the two caches must be in lockstep.
+            clean_len = past_key_values.get_seq_length()
+            corrupt_len = corrupted_past_key_values.get_seq_length()
+            if clean_len != corrupt_len:
+                raise ValueError(
+                    f"clean and corrupted caches are out of step "
+                    f"({clean_len} vs {corrupt_len} tokens); both streams share "
+                    f"one cache_position and one set of rotary embeddings.")
 
         # Compute position IDs and cache position
         if cache_position is None:
@@ -616,9 +645,35 @@ class PrunableLlamaForCausalLM(LlamaForCausalLM):
         if position_ids is None:
             position_ids = cache_position.unsqueeze(0)
 
-        # Create causal mask
-        # Note: Using manual causal mask creation for compatibility across transformers versions
-        if hasattr(self.model, '_update_causal_mask'):
+        # Create causal mask.
+        #
+        # Two paths, and the split is deliberate:
+        #
+        # * Cache mode (`past_key_values is not None`, prefill included) uses
+        #   transformers' own `create_causal_mask`, the same helper
+        #   `LlamaModel.forward` calls. It is the only one that is correct when
+        #   the cache already holds tokens (the query block is shorter than the
+        #   key block) and the only one that is safe under *left* padding: the
+        #   manual construction below builds `where(mask, 0.0, -inf)`, so a
+        #   fully-padded query row softmaxes to NaN and `0 * NaN = NaN` leaks
+        #   that row into real positions at the next layer.
+        # * `use_cache=False` keeps the manual construction verbatim, so every
+        #   number the training run and the four single-position evaluations
+        #   ever produced stays bit-identical.
+        #
+        # (The old `hasattr` probe below is dead on transformers >= 4.54, which
+        # dropped `LlamaModel._update_causal_mask` — it is *newer* transformers
+        # that lacks it, not older.)
+        if past_key_values is not None:
+            causal_mask = create_causal_mask(
+                config=self.config,
+                input_embeds=inputs_embeds,
+                attention_mask=attention_mask,
+                cache_position=cache_position,
+                past_key_values=past_key_values,
+                position_ids=position_ids,
+            )
+        elif hasattr(self.model, '_update_causal_mask'):
             causal_mask = self.model._update_causal_mask(
                 attention_mask, inputs_embeds, cache_position, past_key_values, output_attentions
             )
@@ -667,7 +722,8 @@ class PrunableLlamaForCausalLM(LlamaForCausalLM):
                 hidden_states_corrupted,
                 attention_mask=causal_mask,
                 position_embeddings=position_embeddings,
-                past_key_value=past_key_values,
+                past_key_values=past_key_values,
+                corrupted_past_key_values=corrupted_past_key_values,
                 cache_position=cache_position,
                 output_attentions=output_attentions,
             )

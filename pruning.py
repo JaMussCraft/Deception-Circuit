@@ -159,7 +159,7 @@ def _optimize_gates(model, task, full_model, train_dl, val_dl, device, tokenizer
             batch = _to_device(batch, device)
             optimizer.zero_grad()
 
-            circuit_out = model(**task.model_inputs(batch))
+            circuit_out = model(**task.model_inputs(batch), use_cache=False)
             if cached is not None:
                 target_logits = cached[bi]
             else:

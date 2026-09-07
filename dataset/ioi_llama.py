@@ -306,6 +306,7 @@ def run_evaluation(
                 input_ids=batch['input_ids'],
                 attention_mask=batch['attention_mask'],
                 corrupted_input_ids=batch.get('corrupted_input_ids'),
+                use_cache=False,
             )
 
             batch_size = outputs.logits.size(0)
