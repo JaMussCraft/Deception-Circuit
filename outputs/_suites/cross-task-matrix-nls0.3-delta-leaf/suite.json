@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "created": "2026-08-25T09:14:54",
+  "created": "2026-09-06T16:30:03",
   "root": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_suites/cross-task-matrix-nls0.3-delta-leaf",
   "argv": [
     "evaluate_circuit.py",
@@ -31,9 +31,11 @@
     "--compose-granularity",
     "leaf",
     "--suite-name",
-    "cross-task-matrix-nls0.3-delta-leaf"
+    "cross-task-matrix-nls0.3-delta-leaf",
+    "--ablation",
+    "zero"
   ],
-  "ablation": "interchange",
+  "ablation": "zero",
   "evals": [
     "sanity",
     "knockout",
@@ -147,7 +149,7 @@
     }
   ],
   "cli": {
-    "ablation": "interchange",
+    "ablation": "zero",
     "all_pairs_delta": false,
     "circuit": [
       "farD=outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",

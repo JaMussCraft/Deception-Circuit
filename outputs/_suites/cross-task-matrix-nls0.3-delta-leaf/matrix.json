@@ -1,13 +1,13 @@
 {
-  "created": "2026-08-25T15:58:18",
+  "created": "2026-09-06T23:00:52",
   "cells": [
     {
       "circuit": "delta_far__leaf",
       "circuit_kind": "leaf",
       "expr": "farD-farH",
       "task": "far",
-      "ablation": "interchange",
-      "out_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_suites/cross-task-matrix-nls0.3-delta-leaf/cells/delta_far__leaf/far/interchange",
+      "ablation": "zero",
+      "out_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_suites/cross-task-matrix-nls0.3-delta-leaf/cells/delta_far__leaf/far/zero",
       "counts": {
         "attention_neurons": 1293,
         "mlp_hidden": 988,
@@ -18,20 +18,20 @@
       },
       "headlines": {
         "knockout": {
-          "task_accuracy": 0.485,
-          "wikitext_kl": 0.09959009196609259,
-          "honest_accuracy_drop": 0.0030000000000000027
+          "task_accuracy": 0.607,
+          "wikitext_kl": 0.058574933384079486,
+          "honest_accuracy_drop": -0.15400000000000003
         },
         "null": {
-          "accuracy": 0.0,
-          "logit_diff": 100.0,
-          "kl_div": 100.0,
+          "accuracy": 48.0,
+          "logit_diff": 6.0,
+          "kl_div": 66.0,
           "exact_match": 0.0
         },
         "pressure": {
-          "circuit_logit_diff_with_pressure": -2.125125,
-          "circuit_logit_diff_honest_instruction": 1.379375,
-          "delta": 3.5045
+          "circuit_logit_diff_with_pressure": -0.07671841430664063,
+          "circuit_logit_diff_honest_instruction": -0.07616132736206055,
+          "delta": 0.0005570869445800791
         }
       },
       "skipped": {
@@ -46,8 +46,8 @@
       "circuit_kind": "leaf",
       "expr": "sdrD-sdrH",
       "task": "far",
-      "ablation": "interchange",
-      "out_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_suites/cross-task-matrix-nls0.3-delta-leaf/cells/delta_sdr__leaf/far/interchange",
+      "ablation": "zero",
+      "out_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_suites/cross-task-matrix-nls0.3-delta-leaf/cells/delta_sdr__leaf/far/zero",
       "counts": {
         "attention_neurons": 2019,
         "mlp_hidden": 3463,
@@ -58,20 +58,20 @@
       },
       "headlines": {
         "knockout": {
-          "task_accuracy": 0.722,
-          "wikitext_kl": 0.6589056733064353,
-          "honest_accuracy_drop": -0.599
+          "task_accuracy": 0.931,
+          "wikitext_kl": 0.40112170041538775,
+          "honest_accuracy_drop": -0.46399999999999997
         },
         "null": {
-          "accuracy": 0.0,
-          "logit_diff": 62.0,
-          "kl_div": 82.0,
+          "accuracy": 14.0,
+          "logit_diff": 90.0,
+          "kl_div": 42.0,
           "exact_match": 0.0
         },
         "pressure": {
-          "circuit_logit_diff_with_pressure": -2.130625,
-          "circuit_logit_diff_honest_instruction": 1.373375,
-          "delta": 3.5040000000000004
+          "circuit_logit_diff_with_pressure": 0.06982920837402344,
+          "circuit_logit_diff_honest_instruction": 0.05862849426269531,
+          "delta": -0.011200714111328128
         }
       },
       "skipped": {
@@ -86,8 +86,8 @@
       "circuit_kind": "leaf",
       "expr": "serD-serH",
       "task": "far",
-      "ablation": "interchange",
-      "out_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_suites/cross-task-matrix-nls0.3-delta-leaf/cells/delta_ser__leaf/far/interchange",
+      "ablation": "zero",
+      "out_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_suites/cross-task-matrix-nls0.3-delta-leaf/cells/delta_ser__leaf/far/zero",
       "counts": {
         "attention_neurons": 1209,
         "mlp_hidden": 1005,
@@ -98,20 +98,20 @@
       },
       "headlines": {
         "knockout": {
-          "task_accuracy": 0.201,
-          "wikitext_kl": 0.29517840570770204,
-          "honest_accuracy_drop": -0.522
+          "task_accuracy": 0.596,
+          "wikitext_kl": 0.28011457971297204,
+          "honest_accuracy_drop": -0.28500000000000003
         },
         "null": {
-          "accuracy": 0.0,
-          "logit_diff": 100.0,
-          "kl_div": 100.0,
+          "accuracy": 16.0,
+          "logit_diff": 30.0,
+          "kl_div": 32.0,
           "exact_match": 0.0
         },
         "pressure": {
-          "circuit_logit_diff_with_pressure": -2.127,
-          "circuit_logit_diff_honest_instruction": 1.37725,
-          "delta": 3.50425
+          "circuit_logit_diff_with_pressure": -0.04911212158203125,
+          "circuit_logit_diff_honest_instruction": -0.04654153442382813,
+          "delta": 0.0025705871582031234
         }
       },
       "skipped": {
@@ -126,8 +126,8 @@
       "circuit_kind": "leaf",
       "expr": "farD-farH",
       "task": "sdr",
-      "ablation": "interchange",
-      "out_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_suites/cross-task-matrix-nls0.3-delta-leaf/cells/delta_far__leaf/sdr/interchange",
+      "ablation": "zero",
+      "out_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_suites/cross-task-matrix-nls0.3-delta-leaf/cells/delta_far__leaf/sdr/zero",
       "counts": {
         "attention_neurons": 1293,
         "mlp_hidden": 988,
@@ -138,20 +138,20 @@
       },
       "headlines": {
         "knockout": {
-          "task_accuracy": 0.879,
-          "wikitext_kl": 0.09959009196609259,
-          "honest_accuracy_drop": -0.048000000000000015
+          "task_accuracy": 0.593,
+          "wikitext_kl": 0.058574933384079486,
+          "honest_accuracy_drop": 0.02400000000000002
         },
         "null": {
-          "accuracy": 0.0,
-          "logit_diff": 82.0,
-          "kl_div": 48.0,
+          "accuracy": 58.0,
+          "logit_diff": 18.0,
+          "kl_div": 50.0,
           "exact_match": 0.0
         },
         "pressure": {
-          "circuit_logit_diff_with_pressure": -1.783,
-          "circuit_logit_diff_honest_instruction": 1.55225,
-          "delta": 3.33525
+          "circuit_logit_diff_with_pressure": -0.06507142639160156,
+          "circuit_logit_diff_honest_instruction": -0.06283734130859375,
+          "delta": 0.0022340850830078057
         }
       },
       "skipped": {
@@ -166,8 +166,8 @@
       "circuit_kind": "leaf",
       "expr": "sdrD-sdrH",
       "task": "sdr",
-      "ablation": "interchange",
-      "out_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_suites/cross-task-matrix-nls0.3-delta-leaf/cells/delta_sdr__leaf/sdr/interchange",
+      "ablation": "zero",
+      "out_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_suites/cross-task-matrix-nls0.3-delta-leaf/cells/delta_sdr__leaf/sdr/zero",
       "counts": {
         "attention_neurons": 2019,
         "mlp_hidden": 3463,
@@ -178,60 +178,60 @@
       },
       "headlines": {
         "knockout": {
-          "task_accuracy": 0.075,
-          "wikitext_kl": 0.6589056733064353,
-          "honest_accuracy_drop": -0.16
+          "task_accuracy": 0.307,
+          "wikitext_kl": 0.40112170041538775,
+          "honest_accuracy_drop": 0.11100000000000002
         },
         "null": {
-          "accuracy": 0.0,
-          "logit_diff": 22.0,
-          "kl_div": 20.0,
-          "exact_match": 0.0
-        },
-        "pressure": {
-          "circuit_logit_diff_with_pressure": -1.783875,
-          "circuit_logit_diff_honest_instruction": 1.549125,
-          "delta": 3.333
-        }
-      },
-      "skipped": {
-        "sanity": "circuit 'delta_sdr__leaf' is composed (sdrD-sdrH), so there is no run whose results.json it could reproduce"
-      },
-      "failures": [
-        "knockout: the all-gates-open wikitext floor is not zero (KL 6.639e-04, ppl ratio 1.000321)"
-      ]
-    },
-    {
-      "circuit": "delta_ser__leaf",
-      "circuit_kind": "leaf",
-      "expr": "serD-serH",
-      "task": "sdr",
-      "ablation": "interchange",
-      "out_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_suites/cross-task-matrix-nls0.3-delta-leaf/cells/delta_ser__leaf/sdr/interchange",
-      "counts": {
-        "attention_neurons": 1209,
-        "mlp_hidden": 1005,
-        "mlp_output": 713,
-        "attention_heads": 41,
-        "attention_blocks": 10,
-        "mlp_blocks": 2
-      },
-      "headlines": {
-        "knockout": {
-          "task_accuracy": 0.578,
-          "wikitext_kl": 0.29517840570770204,
-          "honest_accuracy_drop": -0.218
-        },
-        "null": {
-          "accuracy": 0.0,
-          "logit_diff": 92.0,
+          "accuracy": 78.0,
+          "logit_diff": 96.0,
           "kl_div": 80.0,
           "exact_match": 0.0
         },
         "pressure": {
-          "circuit_logit_diff_with_pressure": -1.78275,
-          "circuit_logit_diff_honest_instruction": 1.550875,
-          "delta": 3.333625
+          "circuit_logit_diff_with_pressure": 0.07634048271179199,
+          "circuit_logit_diff_honest_instruction": 0.07363849353790283,
+          "delta": -0.002701989173889155
+        }
+      },
+      "skipped": {
+        "sanity": "circuit 'delta_sdr__leaf' is composed (sdrD-sdrH), so there is no run whose results.json it could reproduce"
+      },
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.639e-04, ppl ratio 1.000321)"
+      ]
+    },
+    {
+      "circuit": "delta_ser__leaf",
+      "circuit_kind": "leaf",
+      "expr": "serD-serH",
+      "task": "sdr",
+      "ablation": "zero",
+      "out_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_suites/cross-task-matrix-nls0.3-delta-leaf/cells/delta_ser__leaf/sdr/zero",
+      "counts": {
+        "attention_neurons": 1209,
+        "mlp_hidden": 1005,
+        "mlp_output": 713,
+        "attention_heads": 41,
+        "attention_blocks": 10,
+        "mlp_blocks": 2
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.736,
+          "wikitext_kl": 0.28011457971297204,
+          "honest_accuracy_drop": -0.20099999999999998
+        },
+        "null": {
+          "accuracy": 34.0,
+          "logit_diff": 26.0,
+          "kl_div": 20.0,
+          "exact_match": 0.0
+        },
+        "pressure": {
+          "circuit_logit_diff_with_pressure": -0.045410209655761716,
+          "circuit_logit_diff_honest_instruction": -0.045849090576171876,
+          "delta": -0.0004388809204101604
         }
       },
       "skipped": {
@@ -246,8 +246,8 @@
       "circuit_kind": "leaf",
       "expr": "farD-farH",
       "task": "ser",
-      "ablation": "interchange",
-      "out_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_suites/cross-task-matrix-nls0.3-delta-leaf/cells/delta_far__leaf/ser/interchange",
+      "ablation": "zero",
+      "out_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_suites/cross-task-matrix-nls0.3-delta-leaf/cells/delta_far__leaf/ser/zero",
       "counts": {
         "attention_neurons": 1293,
         "mlp_hidden": 988,
@@ -258,20 +258,20 @@
       },
       "headlines": {
         "knockout": {
-          "task_accuracy": 0.7083333333333334,
-          "wikitext_kl": 0.09959009196609259,
-          "honest_accuracy_drop": 0.04166666666666663
+          "task_accuracy": 0.7916666666666666,
+          "wikitext_kl": 0.058574933384079486,
+          "honest_accuracy_drop": -0.08333333333333337
         },
         "null": {
-          "accuracy": 0.0,
-          "logit_diff": 94.0,
-          "kl_div": 94.0,
+          "accuracy": 8.0,
+          "logit_diff": 34.0,
+          "kl_div": 96.0,
           "exact_match": 0.0
         },
         "pressure": {
-          "circuit_logit_diff_with_pressure": -1.375,
-          "circuit_logit_diff_honest_instruction": -0.052083333333333336,
-          "delta": 1.3229166666666667
+          "circuit_logit_diff_with_pressure": -0.18405659993489584,
+          "circuit_logit_diff_honest_instruction": -0.17360941569010416,
+          "delta": 0.010447184244791685
         }
       },
       "skipped": {
@@ -286,8 +286,8 @@
       "circuit_kind": "leaf",
       "expr": "sdrD-sdrH",
       "task": "ser",
-      "ablation": "interchange",
-      "out_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_suites/cross-task-matrix-nls0.3-delta-leaf/cells/delta_sdr__leaf/ser/interchange",
+      "ablation": "zero",
+      "out_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_suites/cross-task-matrix-nls0.3-delta-leaf/cells/delta_sdr__leaf/ser/zero",
       "counts": {
         "attention_neurons": 2019,
         "mlp_hidden": 3463,
@@ -298,20 +298,20 @@
       },
       "headlines": {
         "knockout": {
-          "task_accuracy": 0.625,
-          "wikitext_kl": 0.6589056733064353,
-          "honest_accuracy_drop": 0.0
+          "task_accuracy": 0.8333333333333334,
+          "wikitext_kl": 0.40112170041538775,
+          "honest_accuracy_drop": -0.04166666666666663
         },
         "null": {
-          "accuracy": 0.0,
-          "logit_diff": 100.0,
-          "kl_div": 100.0,
+          "accuracy": 30.0,
+          "logit_diff": 34.0,
+          "kl_div": 32.0,
           "exact_match": 0.0
         },
         "pressure": {
-          "circuit_logit_diff_with_pressure": -1.3697916666666667,
-          "circuit_logit_diff_honest_instruction": -0.06770833333333333,
-          "delta": 1.3020833333333335
+          "circuit_logit_diff_with_pressure": -0.23713175455729166,
+          "circuit_logit_diff_honest_instruction": -0.2679443359375,
+          "delta": -0.030812581380208343
         }
       },
       "skipped": {
@@ -326,8 +326,8 @@
       "circuit_kind": "leaf",
       "expr": "serD-serH",
       "task": "ser",
-      "ablation": "interchange",
-      "out_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_suites/cross-task-matrix-nls0.3-delta-leaf/cells/delta_ser__leaf/ser/interchange",
+      "ablation": "zero",
+      "out_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_suites/cross-task-matrix-nls0.3-delta-leaf/cells/delta_ser__leaf/ser/zero",
       "counts": {
         "attention_neurons": 1209,
         "mlp_hidden": 1005,
@@ -338,20 +338,20 @@
       },
       "headlines": {
         "knockout": {
-          "task_accuracy": 0.5833333333333334,
-          "wikitext_kl": 0.29517840570770204,
-          "honest_accuracy_drop": 0.08333333333333337
+          "task_accuracy": 0.7916666666666666,
+          "wikitext_kl": 0.28011457971297204,
+          "honest_accuracy_drop": -0.16666666666666663
         },
         "null": {
           "accuracy": 0.0,
-          "logit_diff": 100.0,
-          "kl_div": 100.0,
+          "logit_diff": 6.0,
+          "kl_div": 30.0,
           "exact_match": 0.0
         },
         "pressure": {
-          "circuit_logit_diff_with_pressure": -1.3697916666666667,
-          "circuit_logit_diff_honest_instruction": -0.057291666666666664,
-          "delta": 1.3125
+          "circuit_logit_diff_with_pressure": -0.6727498372395834,
+          "circuit_logit_diff_honest_instruction": -0.678802490234375,
+          "delta": -0.00605265299479163
         }
       },
       "skipped": {
