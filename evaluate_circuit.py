@@ -148,6 +148,11 @@ def build_parser():
                    help="Seed for the fixed block derangement (reused by every "
                         "configuration, so no pairing noise enters the null).")
 
+    g = p.add_argument_group("deception benchmarks (EVAL 5)")
+    g.add_argument("--benchmark-repo-root", default=None,
+                   help="Directory holding the sibling benchmark checkouts "
+                        "(mask/, liars-bench/). Default: this repo's parent.")
+
     g = p.add_argument_group("models & data")
     g.add_argument("--reference", default="separate", choices=["separate", "shared"],
                    help="'shared' drops the second copy of the weights and uses the "
