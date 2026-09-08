@@ -254,12 +254,42 @@ class JudgeClient(object):
         return JudgeResult(error=last, model=request.model,
                            provider=request.provider)
 
+    async def _aclose_clients(self):
+        """Close this call's AsyncOpenAI clients from inside their own loop.
+
+        Dropping the reference instead is not enough. An unclosed client is
+        collected whenever the GC next runs, and openai's
+        `AsyncHttpxClientWrapper.__del__` reacts by scheduling `aclose()` on
+        *whatever loop is running at that moment* -- which, since `_run_sync`
+        builds a loop per call, is the next `run()`'s loop, not the one that
+        owns the sockets. The close then dies on `Event loop is closed` inside
+        an orphan task, and asyncio logs the whole traceback. Awaiting the
+        close here, while the owning loop is still alive, is the only point at
+        which it can succeed.
+        """
+        clients, self._clients = list(self._clients.values()), {}
+        for client in clients:
+            close = getattr(client, "close", None)
+            if close is None:
+                continue
+            try:
+                await close()
+            except Exception:                   # noqa: BLE001 -- see below
+                # A failed close costs nothing: the results are already in
+                # hand, and the client is being discarded either way. Raising
+                # here would throw away a whole dataset of paid-for verdicts
+                # over a socket teardown.
+                pass
+
     async def _run(self, requests):
         semaphore = asyncio.Semaphore(self.concurrency)
-        # gather preserves input order, which is what lets the caller zip the
-        # results straight back onto its items.
-        return await asyncio.gather(*[self._one(r, semaphore)
-                                      for r in requests])
+        try:
+            # gather preserves input order, which is what lets the caller zip
+            # the results straight back onto its items.
+            return await asyncio.gather(*[self._one(r, semaphore)
+                                          for r in requests])
+        finally:
+            await self._aclose_clients()
 
     def run(self, requests):
         """-> list[JudgeResult], one per request, in input order.
@@ -279,6 +309,10 @@ class JudgeClient(object):
             # calls run() once per (dataset, config), so a cached client would
             # raise "Event loop is closed" on every request from the second
             # call onward -- six retries each, and a whole dataset `unparsed`.
+            # `_run` has normally emptied this already; clearing again covers
+            # the path where the loop never started (a KeyboardInterrupt, or a
+            # coroutine that could not be scheduled), and dropping a client
+            # matters less than closing it -- see `_aclose_clients`.
             self._clients.clear()
         out = [None] * len(requests)
         for (index, _), result in zip(live, results):
@@ -295,7 +329,15 @@ def _run_sync(coro):
     context that already owns a running loop."""
     try:
         asyncio.get_running_loop()
+        nested = True
     except RuntimeError:
+        nested = False
+    if not nested:
+        # Deliberately outside the `except` above. Running the loop while that
+        # RuntimeError is still being handled chains it onto every exception
+        # raised inside the loop, so unrelated tracebacks arrive decorated with
+        # a "no running event loop" frame pointing at this line -- which sends
+        # a reader of the log looking for a bug here rather than at the raise.
         return asyncio.run(coro)
     import threading
     box = {}

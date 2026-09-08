@@ -444,6 +444,159 @@ def test_missing_key_names_the_variable(monkeypatch):
         client._client("openai")
 
 
+# The judge client owns an AsyncOpenAI per provider per `run()`, and `run()`
+# builds a fresh event loop each time. An AsyncOpenAI that is dropped rather
+# than closed is collected whenever the GC next fires; openai's
+# `AsyncHttpxClientWrapper.__del__` then schedules its `aclose()` on whatever
+# loop is running *then*, which is a later `run()`'s loop and not the one
+# holding the sockets. That close fails with "Event loop is closed" inside an
+# orphan task and asyncio logs the traceback -- ~120 of them in
+# `outputs/eval5_delta_far/suite.log`. Both tests below pin the fix: the
+# clients are closed inside the loop that opened them.
+
+
+class _FakeCompletions(object):
+    """A real class, not a SimpleNamespace: `adapt_kwargs` introspects
+    `type(client.chat.completions).create`, and only catches TypeError and
+    ValueError, so a namespace's AttributeError would surface as a judge
+    error rather than as the thing under test."""
+
+    async def create(self, model=None, messages=None, **kwargs):
+        message = SimpleNamespace(content="VERDICT")
+        return SimpleNamespace(choices=[SimpleNamespace(message=message)])
+
+
+class _FakeAsyncOpenAI(object):
+    """Records the loop it was built on and the loop its close ran on."""
+
+    def __init__(self, log, **kwargs):
+        self.log = log
+        self.chat = SimpleNamespace(completions=_FakeCompletions())
+        self.opened_on = id(asyncio.get_running_loop())
+        self.closed_on = None
+        log.append(self)
+
+    async def close(self):
+        self.closed_on = id(asyncio.get_running_loop())
+
+
+def _install_fake_openai(monkeypatch):
+    """`_client` does `from openai import AsyncOpenAI` at call time, so a
+    module in sys.modules is the whole seam."""
+    import sys
+    import types
+
+    log = []
+    module = types.ModuleType("openai")
+    module.AsyncOpenAI = lambda **kwargs: _FakeAsyncOpenAI(log, **kwargs)
+    monkeypatch.setitem(sys.modules, "openai", module)
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
+    return log
+
+
+def test_each_run_closes_its_client_on_its_own_loop(monkeypatch):
+    """Dropping the client instead of closing it defers the close to the GC,
+    which runs it on a *different* loop and raises Event loop is closed."""
+    log = _install_fake_openai(monkeypatch)
+    client = judge_mod.JudgeClient(verbose=False)
+
+    # Distinct content per run: JudgeCache holds entries in memory even with
+    # cache_path=None, so repeating a request would be a hit and never reach
+    # the client at all.
+    for i in range(3):
+        assert client.run([_request(content="run-%d" % i)])[0].text == "VERDICT"
+
+    assert len(log) == 3, "expected one client per run(), got %d" % len(log)
+    for fake in log:
+        assert fake.closed_on is not None, (
+            "a judge client was discarded without being closed; its aclose "
+            "will be scheduled by the GC on a later run()'s loop")
+        assert fake.closed_on == fake.opened_on, (
+            "the client was closed on a different loop than it opened on")
+    assert client._clients == {}
+
+
+def test_no_event_loop_is_closed_noise_across_consecutive_runs(caplog):
+    """The symptom itself, against a real openai client and a real socket.
+
+    The GC step in the middle stands in for a collection landing inside the
+    next run()'s loop -- which is what the chained traceback in suite.log
+    shows happened there. "Task exception was never retrieved" reaches the
+    log through the asyncio logger, not stderr, hence caplog.
+    """
+    openai = pytest.importorskip("openai")
+    try:
+        openai.AsyncOpenAI(api_key="sk-test", base_url="http://127.0.0.1:1/v1")
+    except Exception as exc:                    # noqa: BLE001 -- env, not code
+        # The login-node python pairs openai 1.3.5 with an httpx that dropped
+        # `proxies`, so no client can be built there at all. That environment
+        # cannot judge in the first place; the unit test above still covers
+        # the close on it.
+        pytest.skip("the installed openai cannot build a client: %s" % (exc,))
+    import gc
+    import http.server
+    import logging
+    import threading
+
+    class Handler(http.server.BaseHTTPRequestHandler):
+        protocol_version = "HTTP/1.1"          # keep-alive: the pool holds it
+        def do_POST(self):
+            self.rfile.read(int(self.headers.get("Content-Length", 0)))
+            body = json.dumps({
+                "id": "x", "object": "chat.completion", "created": 0,
+                "model": "m",
+                "choices": [{"index": 0, "finish_reason": "stop",
+                             "message": {"role": "assistant",
+                                         "content": "VERDICT"}}]}).encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+        def log_message(self, *args):
+            pass
+
+    try:
+        server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    except OSError as exc:                      # no loopback bind in the sandbox
+        pytest.skip("cannot bind a local server: %s" % (exc,))
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+
+    async def collect():
+        gc.collect()                            # a GC inside a live loop
+        await asyncio.sleep(0.05)
+
+    previous = judge_mod.BASE_URLS["openai"]
+    key = os.environ.get("OPENAI_API_KEY")
+    judge_mod.BASE_URLS["openai"] = "http://127.0.0.1:%d/v1" % (
+        server.server_address[1],)
+    os.environ["OPENAI_API_KEY"] = "sk-test"
+    try:
+        client = judge_mod.JudgeClient(concurrency=4, max_retries=2,
+                                       verbose=False)
+        with caplog.at_level(logging.ERROR, logger="asyncio"):
+            for cycle in range(3):
+                results = client.run([_request(content="c%d-%d" % (cycle, i))
+                                      for i in range(4)])
+                assert [r.text for r in results] == ["VERDICT"] * 4
+                judge_mod._run_sync(collect())
+            gc.collect()                        # run any Task finalizers
+    finally:
+        judge_mod.BASE_URLS["openai"] = previous
+        if key is None:
+            os.environ.pop("OPENAI_API_KEY", None)
+        else:
+            os.environ["OPENAI_API_KEY"] = key
+        server.shutdown()
+        server.server_close()
+
+    noise = [r.getMessage() for r in caplog.records
+             if "Event loop is closed" in r.getMessage()
+             or "never retrieved" in r.getMessage()]
+    assert not noise, "asyncio logged %d event-loop errors:\n%s" % (
+        len(noise), "\n".join(noise[:2]))
+
+
 def test_judge_request_prompt_text_is_auditable():
     """The judge prompt is the part of a judged eval a reader most needs to be
     able to check, so it is stored verbatim rather than summarised."""
