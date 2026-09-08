@@ -21,12 +21,18 @@ because these are files from another repository.
 import ast
 import json
 import os
+import re
 
 from . import sources
 
 
 class NotebookConstantMissing(LookupError):
     pass
+
+
+# `name`, `name.attr`, `name[0]` and chains of those -- nothing that could turn
+# into a format-spec conversion or an arbitrary expression.
+_SAFE_PLACEHOLDER = re.compile(r"^[A-Za-z_]\w*(?:\.[A-Za-z_]\w*|\[\d+\])*$")
 
 
 def _cell_sources(path):
@@ -74,11 +80,25 @@ def _fstring_to_format(node):
             parts.append(value.value)
         elif isinstance(value, ast.FormattedValue):
             expression = value.value
-            while isinstance(expression, ast.Call) and expression.args:
-                expression = expression.args[0]      # unwrap str(...)
-            if not isinstance(expression, ast.Name):
+            # Unwrap an explicit str(x) only. Unwrapping any call would turn
+            # f"{fmt(x, y)}" into "{x}", quietly changing what gets spliced in.
+            while (isinstance(expression, ast.Call)
+                   and isinstance(expression.func, ast.Name)
+                   and expression.func.id == "str"
+                   and len(expression.args) == 1):
+                expression = expression.args[0]
+            if isinstance(expression, ast.Name):
+                parts.append("{%s}" % expression.id)
+            elif isinstance(expression, (ast.Attribute, ast.Subscript)):
+                # str.format resolves `.attr` and `[index]` on its arguments,
+                # so `{dataset.options[0]}` survives as a usable placeholder.
+                # LB's open-ended rubric needs exactly that.
+                rendered = ast.unparse(expression)
+                if not _SAFE_PLACEHOLDER.match(rendered):
+                    raise ValueError("unsupported f-string placeholder")
+                parts.append("{%s}" % rendered)
+            else:
                 raise ValueError("f-string interpolates a non-name")
-            parts.append("{%s}" % expression.id)
         else:
             raise ValueError("unsupported f-string part")
     return "".join(parts)
@@ -104,7 +124,8 @@ def literal_from_notebook(path, name, contains=None):
                     result = _fstring_to_format(value)
                 else:
                     result = ast.literal_eval(value)
-            except ValueError:
+            except (ValueError, TypeError, SyntaxError, MemoryError,
+                    RecursionError):
                 continue        # a computed assignment; keep looking
             if contains is not None and contains not in str(result):
                 continue

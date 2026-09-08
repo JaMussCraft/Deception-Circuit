@@ -83,14 +83,19 @@ class Sandbagging(Benchmark):
     new_tokens = 1024
 
     def load(self, ctx, cli):
+        # The cap is per pool, not per source config: applied inside _items it
+        # would return four times it (bio + chem + cyber + mmlu), which is not
+        # what the same flag means to the other adapters.
         limit = getattr(cli, "benchmark_pool_size", None)
-        items = []
+        deceptive = []
         for config in WMDP_CONFIGS:
             frame = sources.hf_config("cais/wmdp", config)
-            items.extend(self._items(frame, config, base.DECEPTIVE, limit))
+            deceptive.extend(self._items(frame, config, base.DECEPTIVE, limit))
         frame = sources.hf_config("cais/mmlu", "all")
-        items.extend(self._items(frame, "mmlu", base.HONEST, limit))
-        return items
+        honest = self._items(frame, "mmlu", base.HONEST, limit)
+        if limit:
+            deceptive, honest = deceptive[:limit], honest[:limit]
+        return deceptive + honest
 
     def _items(self, frame, source, condition, limit):
         items = []

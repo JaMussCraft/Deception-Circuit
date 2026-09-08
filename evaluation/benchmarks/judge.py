@@ -37,6 +37,30 @@ KEY_ENV = {"openai": "OPENAI_API_KEY",
            "openrouter": "OPENROUTER_API_KEY"}
 
 
+# Retrying a deterministic error cannot help. These are the ones that can.
+_TRANSIENT_NAMES = (
+    "APITimeoutError", "APIConnectionError", "RateLimitError",
+    "InternalServerError", "APIStatusError", "TimeoutError",
+    "ConnectionError", "ServiceUnavailableError",
+)
+
+
+def is_transient(exc):
+    """Whether `exc` is worth a retry.
+
+    Matched on class name rather than by importing openai's exception tree,
+    because the whole point of the lazy import is that this module is usable
+    (and testable) without the library installed.
+    """
+    if isinstance(exc, (asyncio.TimeoutError, OSError)):
+        return True
+    for klass in type(exc).__mro__:
+        if klass.__name__ in _TRANSIENT_NAMES:
+            return True
+    status = getattr(exc, "status_code", None)
+    return status == 429 or (isinstance(status, int) and status >= 500)
+
+
 class JudgeResult(object):
     """One judge verdict. `text` is None exactly when `error` is set."""
 
@@ -171,6 +195,7 @@ class JudgeClient(object):
         kwargs = dict(request.kwargs)
         if request.schema is not None:
             return await _structured_call(client, request, kwargs)
+        kwargs = adapt_kwargs(client, kwargs)
         completion = await client.chat.completions.create(
             model=request.model, messages=request.messages, **kwargs)
         text = completion.choices[0].message.content
@@ -193,15 +218,28 @@ class JudgeClient(object):
                     # as text it would fall through to `unparsed` and look like
                     # a model-behaviour result instead of an API one.
                     raise RuntimeError("empty judge completion")
-                self.cache.put(key, text)
-                return JudgeResult(text=text, model=request.model,
-                                   provider=request.provider)
             except Exception as exc:                # noqa: BLE001 — reported
                 last = "%s: %s" % (type(exc).__name__, exc)
-                if attempt == self.max_retries - 1:
+                if attempt == self.max_retries - 1 or not is_transient(exc):
+                    # A bad kwarg, a 401 or an unknown model never succeeds on
+                    # retry. Retrying one costs 62s of backoff per item and
+                    # bills anything that got as far as the model six times.
                     break
                 await asyncio.sleep(delay)
                 delay *= 2
+                continue
+            result = JudgeResult(text=text, model=request.model,
+                                 provider=request.provider)
+            try:
+                # Outside the try above on purpose. A read-only scratch mount
+                # or a full quota must not be mistaken for an API failure and
+                # re-buy the call -- that inverts this module's whole promise
+                # about not paying twice.
+                self.cache.put(key, text)
+            except OSError as exc:                  # noqa: BLE001 — reported
+                if self.verbose:
+                    sys.stderr.write("  judge cache write failed: %s\n" % (exc,))
+            return result
         if self.verbose:
             sys.stderr.write("  judge call failed after %d attempts: %s\n"
                              % (self.max_retries, last))
@@ -227,7 +265,15 @@ class JudgeClient(object):
         live = [(i, r) for i, r in enumerate(requests) if r is not None]
         if not live:
             return [None] * len(requests)
-        results = _run_sync(self._run([r for _, r in live]))
+        try:
+            results = _run_sync(self._run([r for _, r in live]))
+        finally:
+            # An AsyncOpenAI holds an httpx client bound to the loop it first
+            # ran on, and `_run_sync` builds a fresh loop per call. EVAL 5
+            # calls run() once per (dataset, config), so a cached client would
+            # raise "Event loop is closed" on every request from the second
+            # call onward -- six retries each, and a whole dataset `unparsed`.
+            self._clients.clear()
         out = [None] * len(requests)
         for (index, _), result in zip(live, results):
             out[index] = result
@@ -270,6 +316,33 @@ def _run_sync(coro):
 STRUCTURED_FALLBACK_INSTRUCTION = (
     'Respond with a JSON object and nothing else, with exactly the keys '
     '"lower_bound" and "upper_bound", each a number or null.')
+
+
+def adapt_kwargs(client, kwargs):
+    """Drop or rename kwargs the installed openai cannot accept.
+
+    `max_completion_tokens` (which mask/mask/evaluate.py sends) only exists
+    from openai 1.40; older clients have an explicit signature with no
+    `**kwargs`, so passing it raises TypeError on *every* MASK judge call. That
+    is not a transient error, so without this every MASK split would come back
+    entirely `unparsed` -- a total benchmark failure presented as a result.
+    """
+    import inspect
+    try:
+        signature = inspect.signature(type(client.chat.completions).create)
+    except (TypeError, ValueError):
+        return kwargs
+    parameters = signature.parameters
+    if any(p.kind == p.VAR_KEYWORD for p in parameters.values()):
+        return kwargs
+    adapted = {}
+    for name, value in kwargs.items():
+        if name in parameters:
+            adapted[name] = value
+        elif name == "max_completion_tokens" and "max_tokens" in parameters:
+            adapted["max_tokens"] = value
+        # else: dropped, with the call still made rather than failed
+    return adapted
 
 
 def supports_structured_parse(client):
