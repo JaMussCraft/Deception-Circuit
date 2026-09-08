@@ -37,7 +37,7 @@ from transformers.models.llama.modeling_llama import (
 )
 from transformers.modeling_outputs import CausalLMOutputWithPast
 from transformers.cache_utils import Cache, DynamicCache
-from transformers.masking_utils import create_causal_mask
+from ._compat import cache_kv_length, create_causal_mask
 
 from l0 import HardConcreteGate
 
@@ -702,7 +702,7 @@ class PrunableLlamaForCausalLM(LlamaForCausalLM):
                 # and hard-coding the dynamic formula would invert the check
                 # there. It reads only host-side ints and shapes, so unlike
                 # `int(cache_position[-1])` it costs no device sync per step.
-                kv_length, _ = past_key_values.get_mask_sizes(cache_position, 0)
+                kv_length = cache_kv_length(past_key_values, cache_position)
                 if attention_mask.shape[1] != kv_length:
                     raise ValueError(
                         f"attention_mask is {attention_mask.shape[1]} wide but "
@@ -714,7 +714,7 @@ class PrunableLlamaForCausalLM(LlamaForCausalLM):
                         f"truncate.)")
             causal_mask = create_causal_mask(
                 config=self.config,
-                input_embeds=inputs_embeds,
+                inputs_embeds=inputs_embeds,
                 attention_mask=attention_mask,
                 cache_position=cache_position,
                 past_key_values=past_key_values,

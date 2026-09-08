@@ -24,7 +24,7 @@ from transformers import GPT2LMHeadModel, GPT2Config
 from transformers.models.gpt2.modeling_gpt2 import (
     GPT2Attention, GPT2MLP, GPT2Block, GPT2Model,
 )
-from transformers.masking_utils import create_causal_mask
+from ._compat import create_causal_mask
 from transformers.modeling_outputs import CausalLMOutputWithCrossAttentions
 from transformers.cache_utils import Cache, DynamicCache
 
@@ -484,7 +484,7 @@ class PrunableGPT2LMHeadModel(GPT2LMHeadModel):
             config=self.config,
             inputs_embeds=inputs_embeds,
             attention_mask=attention_mask,
-            # cache_position=cache_position,
+            cache_position=cache_position,
             past_key_values=None,
             position_ids=position_ids,
         )
