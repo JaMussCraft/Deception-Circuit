@@ -159,6 +159,7 @@ def make_cli(**overrides):
         benchmark_new_tokens=NEW_TOKENS, benchmark_belief_tokens=3,
         benchmark_gen_batch_size=4, benchmark_ref_pool="honest",
         benchmark_n_random=1, no_kv_cache=False, judge_concurrency=2,
+        benchmark_screen_seed=0, benchmark_screen_budget=0,
         ablation="interchange", wikitext_seed=0, knockout_granularity="finest",
         output_dir=None)
     for key, value in overrides.items():
@@ -443,7 +444,11 @@ def _run_screen(ctx, bench, dataset="fake"):
 def test_the_screen_selects_only_items_the_full_model_is_deceptive_on():
     ctx = make_ctx(make_cli(benchmark_n_per_dataset=3))
     screen = _run_screen(ctx, FakeBench(make_items(20), _even_are_deceptive))
-    assert [i.item_id for i in screen.items] == ["i0", "i2", "i4"]
+    # Ids, not positions: the screen walks a seeded *shuffle* of the candidates,
+    # so which three come back depends on the seed and asserting ["i0","i2",
+    # "i4"] would be asserting the load order the shuffle exists to remove.
+    assert len(screen.items) == 3
+    assert all(int(i.item_id[1:]) % 2 == 0 for i in screen.items)
     assert all(i.condition == base.DECEPTIVE for i in screen.items)
     assert all(row["label"] == base.DECEPTIVE for row in screen.full_rows)
     # ...and the honest ones become the reference pool, not the eval set.
@@ -458,33 +463,50 @@ def test_the_screen_stops_early_instead_of_walking_the_whole_pool():
     assert screen.stats["early_stopped"] is True
 
 
-def test_the_screen_stops_at_its_budget_rather_than_walking_5245_rows_for_a_pool():
-    """The walk is driven by whichever pool fills last.
+def test_the_screen_walks_the_whole_pool_for_its_reference_bank_by_default():
+    """The plan is explicit: "if honest bycatch from the screen is < N, keep
+    screening until the honest bank reaches N (or the pool ends). Do not
+    silently pair against a handful of honest items."
 
-    On a benchmark where the full model is deceptive nearly always, the
-    *honest* pool is the bottleneck, and without a ceiling the screen keeps
-    generating 512-token completions until it has as many honest items as
-    deceptive ones — all 5245 rows of harm-pressure, hours of GPU, to widen a
-    reference pool that works fine cycled. Being short is reported, not
-    silently accepted.
+    So the default must be unbounded. An earlier version capped every run at
+    10x the target on its own initiative, which is the opposite of what the
+    plan asks and would have quietly thinned the reference pool on exactly the
+    benchmarks where it matters most.
     """
     def rarely_honest(item, response):
         index = int(item.item_id[1:])
         return (base.HONEST, "rare") if index % 20 == 19 else (base.DECEPTIVE, "usual")
 
     ctx = make_ctx(make_cli(benchmark_n_per_dataset=3))
-    screen = _run_screen(ctx, FakeBench(make_items(400), rarely_honest))
+    screen = _run_screen(ctx, FakeBench(make_items(60), rarely_honest))
+    # It kept going until the honest bank was full, well past the 3 x 10 = 30
+    # that the old self-imposed cap would have allowed.
+    assert len(screen.pool_items) >= 3, "the reference pool was left short"
+    assert screen.stats["pool_short"] is False
+    assert screen.stats["screened"] > 30
 
-    budget = 3 * B.SCREEN_MAX_FACTOR
-    assert screen.stats["budget"] == budget
-    assert screen.stats["screened"] <= budget + 6, \
-        "the screen blew past its budget chasing the reference pool"
+
+def test_the_screen_budget_bounds_that_walk_when_it_is_asked_to():
+    """...and the bound is opt-in, reported, and actually stops the walk."""
+    def rarely_honest(item, response):
+        index = int(item.item_id[1:])
+        return (base.HONEST, "rare") if index % 20 == 19 else (base.DECEPTIVE, "usual")
+
+    ctx = make_ctx(make_cli(benchmark_n_per_dataset=3,
+                            benchmark_screen_budget=24))
+    screen = _run_screen(ctx, FakeBench(make_items(400), rarely_honest))
+    assert screen.stats["budget"] == 24
+    assert screen.stats["screened"] <= 24 + 6, \
+        "the budget did not stop the walk"
     assert screen.stats["screened"] < 400
-    assert screen.stats["pool_short"] is True
-    # Short, so it is cycled -- and that is stated rather than left implicit.
-    assert 0 < len(screen.pool_items) < 3
-    assert screen.partner_reused is True
+    # `pool_short` must say exactly whether the pool came up short — asserting
+    # it True unconditionally would depend on how many honest rows the shuffle
+    # happened to put inside the budget.
+    assert screen.stats["pool_short"] == (len(screen.pool_items) < 3)
+    assert screen.partner_reused == (len(screen.pool_items) < 3)
     assert len(screen.partner_index) == 3
+    # And the empirical rate the plan asks to be logged is there.
+    assert 0.0 < screen.stats["full_model_deception_rate"] <= 1.0
 
 
 def test_the_full_row_is_the_screens_own_tokens_not_a_second_pass():
@@ -504,7 +526,8 @@ def test_the_full_row_is_the_screens_own_tokens_not_a_second_pass():
 
     def spy(ctx_, **kwargs):
         out = original(ctx_, **kwargs)
-        captured.append((kwargs["desc"], kwargs["clean_ids"].shape[1], out))
+        captured.append((kwargs["desc"], kwargs["clean_ids"].shape[1], out,
+                         kwargs["clean_ids"], kwargs["clean_mask"]))
         return out
 
     B.generate_under = spy
@@ -514,11 +537,25 @@ def test_the_full_row_is_the_screens_own_tokens_not_a_second_pass():
         B.generate_under = original
 
     passes = [c for c in captured if "screen" in c[0]]
-    assert len(passes) == 1, "expected one screening chunk, got %d" % len(passes)
-    _, width, out = passes[0]
-    # i0, i2, i4 are the deceptive ones, so rows 0/2/4 of the screening batch.
-    expected = out[[0, 2, 4], width:]
-    assert torch.equal(screen.full_ids[:, screen.prompt_width:], expected), \
+    assert passes, "no screening pass ran"
+    # Which rows were selected, and from which chunk, depends on the seeded
+    # shuffle — so find each item by matching its prompt tokens rather than
+    # assuming a position.
+    blocks = []
+    for index in range(len(screen.items)):
+        want = screen.clean_ids[index][screen.clean_mask[index].bool()].tolist()
+        found = None
+        for _, width, out, chunk_ids, chunk_mask in passes:
+            for row in range(chunk_ids.shape[0]):
+                if chunk_ids[row][chunk_mask[row].bool()].tolist() == want:
+                    found = out[row, width:]
+                    break
+            if found is not None:
+                break
+        assert found is not None, "item %d is not in any screening batch" % index
+        blocks.append(found)
+    assert torch.equal(screen.full_ids[:, screen.prompt_width:],
+                       torch.stack(blocks)), \
         "the `full` row is not the screen's own generated tokens"
     # The prompt columns *are* re-encoded, to the evaluation set's own width.
     assert torch.equal(screen.full_ids[:, :screen.prompt_width], screen.clean_ids)
@@ -532,12 +569,15 @@ def test_the_full_row_is_the_screens_own_tokens_not_a_second_pass():
     # re-buckets the batch, and a different reduction order can flip an argmax
     # on a near-tie, which is exactly how `full` and its own label would drift
     # apart on a real model.
-    descs = [c[0] for c in captured]
-    assert descs == ["fake: screen (full model)"], \
-        "an extra generation pass ran: %r" % (descs,)
-    # One pass, total. The reference pool needs none of its own here: its items
-    # were judged in the same screening chunk, so their full-model responses
-    # already exist.
+    # Screening chunks only. The count varies with the shuffle, but no pass
+    # over the evaluation set may follow them: that would be the rerun this
+    # test exists to forbid, and it is the only place the difference shows,
+    # since greedy decoding under all-gates-open would reproduce the same
+    # tokens. (The reference pool needs no pass of its own here -- its items
+    # were judged in the same chunks, so their responses already exist.)
+    descs = set(c[0] for c in captured)
+    assert descs == {"fake: screen (full model)"}, \
+        "an extra generation pass ran: %r" % (sorted(descs),)
 
 
 def test_an_item_with_no_agreed_belief_is_dropped_rather_than_scored():
@@ -673,7 +713,9 @@ def test_a_benchmark_with_honest_twins_pairs_each_item_with_its_own_twin():
     screen = _run_screen(ctx, FakeBench(items, _even_are_deceptive,
                                         condition_kind="prompt", twins=twins))
     assert screen.pairing == "twin"
-    assert screen.partner_ids == ["i0~honest", "i2~honest"]
+    # Each item draws its OWN twin -- the minimal pair -- whichever items the
+    # seeded shuffle happened to select.
+    assert screen.partner_ids == ["%s~honest" % i.item_id for i in screen.items]
 
 
 def test_without_twins_the_pool_is_deranged_so_no_item_references_itself():

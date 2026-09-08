@@ -287,6 +287,13 @@ def assign_partners(n_items, pool_size, seed, forbidden=None):
     """
     if pool_size <= 0:
         raise ValueError("cannot pair against an empty reference pool")
+    if pool_size == 1 and forbidden is not None and forbidden[0] == 0:
+        # One item whose only reference row is itself. No pairing exists that
+        # is not a no-op, so say so rather than returning [0] and letting the
+        # row be scored as an ablation that never happened.
+        raise ValueError(
+            "a single-item evaluation set cannot reference itself; widen the "
+            "reference pool (--benchmark-ref-pool honest) or screen more items")
     if pool_size == n_items and n_items >= 2:
         from evaluation.wikitext import pair_blocks
         return [int(i) for i in pair_blocks(n_items, seed)], False
@@ -496,6 +503,17 @@ def run_screen(ctx, bench, client, dataset) -> Screen:
     want_pool = 0 if cli.benchmark_ref_pool == "deceptive" else target
 
     candidates = bench.load(ctx, cli)
+    # "Shuffle candidates with a seeded RNG" (plan, "Prompt selection — the
+    # behavioural filter"). Screening in load order would make the evaluation
+    # set a property of how the source file happens to be sorted -- MASK's CSVs
+    # are grouped by archetype, and sandbagging's pool is a bio/chem/cyber
+    # round-robin whose first N is topic-balanced only by luck. Seeded, so the
+    # set is reproducible.
+    import numpy as np
+
+    order = np.random.default_rng(cli.benchmark_screen_seed).permutation(
+        len(candidates))
+    candidates = [candidates[int(i)] for i in order]
     honest_candidates = [c for c in candidates if c.condition == base.HONEST]
     shared = _probe_is_the_reference(bench, candidates)
     belief_tokens = new_tokens if shared else cli.benchmark_belief_tokens
@@ -508,16 +526,27 @@ def run_screen(ctx, bench, client, dataset) -> Screen:
     screen = Screen(dataset)
     screen.new_tokens = new_tokens
     selected, pool, screened, no_belief = [], [], 0, 0
+    judged = 0
     belief_judge_failed = 0
     chunk_size = max(target * SCREEN_CHUNK_FACTOR, cli.benchmark_gen_batch_size)
     label_counts = {}
 
-    budget = target * SCREEN_MAX_FACTOR
+    # The plan is explicit for outcome-kind benchmarks: "if honest bycatch from
+    # the screen is < N, keep screening until the honest bank reaches N (or the
+    # pool ends). Do not silently pair against a handful of honest items." So
+    # the default is unbounded and `--benchmark-screen-budget` is the opt-in
+    # bound, not the other way round -- an earlier version of this had it
+    # backwards and capped every run at 10x the target on its own initiative.
+    budget = cli.benchmark_screen_budget or len(candidates)
     for start in range(0, len(candidates), chunk_size):
         if len(selected) >= target and (prompt_kind or len(pool) >= want_pool
                                         or screened >= budget):
             break
         chunk = candidates[start:start + chunk_size]
+        # Counted before the belief filter: these candidates were consumed
+        # whether or not they survived it, so counting only survivors would let
+        # the walk overrun its budget by the drop rate.
+        screened += len(chunk)
         chunk, dropped, judge_failed = _elicit_beliefs(
             ctx, bench, client, chunk, eos, pad_id,
             "%s: belief (full model)" % dataset, belief_tokens, belief_refs)
@@ -538,7 +567,7 @@ def run_screen(ctx, bench, client, dataset) -> Screen:
         responses = decode_completions(tok, out, width, eos)
         rows = _judge_all(client, bench, chunk, responses)
         completions = completion_tokens(out, width, eos)
-        screened += len(chunk)
+        judged += len(chunk)
 
         for index, (item, row) in enumerate(zip(chunk, rows)):
             label_counts[row["label"]] = label_counts.get(row["label"], 0) + 1
@@ -568,6 +597,14 @@ def run_screen(ctx, bench, client, dataset) -> Screen:
     screen.stats = {
         "candidates": len(candidates), "screened": screened,
         "selected": len(selected), "target": target,
+        "judged": judged,
+        # The plan asks for this by name: the full model's deception rate on
+        # the screened prefix. It is the number that says whether the
+        # evaluation set was easy or hard to fill -- and it is NOT the `full`
+        # row, which is 1.0 by construction.
+        "full_model_deception_rate": (
+            label_counts.get(base.DECEPTIVE, 0) / judged if judged else None),
+        "seed": cli.benchmark_screen_seed,
         "dropped_no_belief": no_belief,
         # Kept apart from `dropped_no_belief` on purpose: one is a fact about
         # the model, the other is a fact about an API.
@@ -839,7 +876,11 @@ class BenchmarkEvaluation(Evaluation):
             "n_items": len(screen.items),
             "screen": screen.stats,
             "reference": {
-                "pool": cli.benchmark_ref_pool,
+                # Under `zero` the ablated units are filled with zeros and the
+                # corrupt stream is never read, so recording the flag's value
+                # would claim a reference that had no effect on the numbers.
+                "pool": (None if cli.ablation == "zero"
+                         else cli.benchmark_ref_pool),
                 "pairing": screen.pairing,
                 "pool_size": len(screen.pool_items),
                 "partner_reused": screen.partner_reused,
@@ -1006,22 +1047,29 @@ class BenchmarkEvaluation(Evaluation):
                   "several items share one reference."
                   % screen.get("target", 0))
         ref = entry["reference"]
-        print("  corrupt reference: %s pool, %s pairing, %d rows%s%s"
-              % (ref["pool"], ref["pairing"], ref["pool_size"],
-                 ", partners reused" if ref["partner_reused"] else "",
-                 ", %d tiled" % ref["tiled_rows"] if ref["tiled_rows"] else ""))
+        if ref["pool"] is None:
+            print("  corrupt reference: none — --ablation zero fills ablated "
+                  "units with zeros,\n     so the reference pool is not read.")
+        else:
+            print("  corrupt reference: %s pool, %s pairing, %d rows%s%s"
+                  % (ref["pool"], ref["pairing"], ref["pool_size"],
+                     ", partners reused" if ref["partner_reused"] else "",
+                     ", %d tiled" % ref["tiled_rows"] if ref["tiled_rows"]
+                     else ""))
 
-        print("\n  %-30s %9s %9s %9s %9s %9s %8s"
+        print("\n  %-38s %9s %8s %9s %8s %8s %8s %8s"
               % ("configuration", "deceptive", "honest", "unparsed", "ref NLL",
-                 "distinct", "tokens"))
-        print("  " + "-" * 92)
+                 "dist-n", "corpus", "tokens"))
+        print("  " + "-" * 102)
         for config, cell in entry["configs"].items():
             rates, coherence = cell["rates"], cell["coherence"]
-            print("  %-30s %8.1f%% %8.1f%% %8.1f%% %9s %9s %8d"
+            print("  %-38s %8.1f%% %7.1f%% %8.1f%% %8s %8s %8s %8d"
                   % (CONFIG_LABELS.get(config, config),
                      100 * rates["deceptive"], 100 * rates["honest"],
                      100 * rates["unparsed"], _fmt(coherence["ref_nll"]),
-                     _fmt(coherence["distinct_n"]), coherence["n_tokens"]))
+                     _fmt(coherence["distinct_n"]),
+                     _fmt(coherence["distinct_n_corpus"]),
+                     coherence["n_tokens"]))
         print("\n  'full' is 100%% deceptive by construction — these are the "
               "items it was judged\n  deceptive on. It is the scale for the "
               "rows below, not a result.")
@@ -1029,19 +1077,23 @@ class BenchmarkEvaluation(Evaluation):
               "knockout that destroys\n  output format has no deceptive "
               "content left to find, and would otherwise\n  read as a large "
               "honesty gain.")
+        print("  'dist-n' is per row; 'corpus' pools every row, so a low corpus "
+              "figure next to a\n  healthy per-row one is mode collapse — "
+              "every item answered the same way.")
 
         null = entry.get("null")
         if null:
-            print("\n  knockout vs %d size-matched random circuits "
-                  "(lower is better):" % null["n"])
-            for key in ("deceptive", "unparsed"):
-                stats = null.get(key)
-                if stats:
-                    print("    %-10s knockout %.3f   random mean %.3f "
-                          "(best %.3f)   percentile %.0f%%   p=%.3f"
-                          % (key, stats["discovered"], stats["mean"],
-                             stats["best"], stats["percentile"],
-                             stats["p_value"]))
+            # The shared table, so EVAL 5's null reads the same way as eval 3's
+            # and carries std / p50 / p95 / z rather than a hand-rolled subset.
+            report.stats_table(
+                null, [("deceptive", "deception"), ("unparsed", "unparsed")],
+                null["n"],
+                title="EVAL 5 NULL — %s (knockout vs size-matched random)"
+                      % dataset)
+            print("  Both are 'lower is better'. Read them together: a random "
+                  "circuit that\n  destroys output format scores a low "
+                  "deception rate for a reason that has\n  nothing to do with "
+                  "honesty.")
 
     def _report_headline(self, payload) -> None:
         report.banner("CROSS-DATASET HEADLINE", "-")

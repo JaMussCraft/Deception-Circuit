@@ -204,6 +204,17 @@ def build_parser():
                    choices=["honest", "deceptive", "pooled"],
                    help="Which pool the corrupted stream is drawn from under "
                         "--ablation interchange.")
+    g.add_argument("--benchmark-screen-seed", type=int, default=0,
+                   help="Seed for the candidate shuffle the screen walks. "
+                        "Screening in load order would make the evaluation set "
+                        "a property of how the source file is sorted.")
+    g.add_argument("--benchmark-screen-budget", type=int, default=0,
+                   help="Stop screening after this many candidates even if the "
+                        "reference pool is still short (0 = walk the pool, "
+                        "which is what the plan asks for). A bound worth "
+                        "setting on the large Liars' Bench scenarios, where "
+                        "filling the honest bank can cost hours; a pool cut "
+                        "short is reported, never silent.")
     g.add_argument("--benchmark-n-random", type=int, default=5,
                    help="Size-matched random circuits in EVAL 5's null. Far "
                         "below --n-random on purpose: generation is orders of "
@@ -333,9 +344,14 @@ def estimate_runtime(session, ctx) -> dict:
     if cli.ablation == "mean":
         stages.append(("mean bank", 2 * test_pass))
 
-    stages = [(label, seconds * n_cells) for label, seconds in stages]
-    stages.insert(0, ("model load", SEC_MODEL_LOAD))
-    return {"stages": stages, "total_seconds": sum(s for _, s in stages),
+    # A stage may carry a floor as a third element; those that do not are
+    # equally expensive either way.
+    stages = [(label, row[0] * n_cells, (row[1] if len(row) > 1 else row[0]) * n_cells)
+              for label, *row in ((st[0], *st[1:]) for st in stages)]
+    stages.insert(0, ("model load", SEC_MODEL_LOAD, SEC_MODEL_LOAD))
+    return {"stages": stages,
+            "total_seconds": sum(s[1] for s in stages),
+            "total_seconds_floor": sum(s[2] for s in stages),
             "cells": n_cells}
 
 
@@ -364,7 +380,8 @@ def benchmark_stages(cli):
         # of candidates. Estimating the budget for a 191-row benchmark claimed
         # five times the work that exists.
         pool = _pool_size(bench, cli)
-        screened = min(n * SCREEN_MAX_FACTOR, pool) if pool else n * SCREEN_MAX_FACTOR
+        budget = cli.benchmark_screen_budget or pool or n * SCREEN_MAX_FACTOR
+        screened = min(budget, pool) if pool else budget
         per_pass = n * tokens * SEC_PER_GEN_TOKEN_ROW
 
         probes = _probe_count(bench, cli)
@@ -374,9 +391,19 @@ def benchmark_stages(cli):
                              else cli.benchmark_belief_tokens)
             stages.append(
                 (f"eval 5 {dataset}: belief ({probes} probe(s))",
-                 screened * probes * belief_tokens * SEC_PER_GEN_TOKEN_ROW))
-        stages.append((f"eval 5 {dataset}: screen (<= {screened} items)",
-                       screened * tokens * SEC_PER_GEN_TOKEN_ROW))
+                 screened * probes * belief_tokens * SEC_PER_GEN_TOKEN_ROW,
+                 n * probes * belief_tokens * SEC_PER_GEN_TOKEN_ROW))
+        # The screen stops as soon as it has `n` deceptive items -- and for a
+        # prompt-kind benchmark that is the only thing it waits for, since its
+        # honest bank comes from twins rather than screening bycatch. How fast
+        # that happens is the full model's deception rate, which is exactly
+        # what this evaluation is measuring, so it cannot be known here. Both
+        # ends are printed rather than picking one and being wrong: the floor
+        # assumes every candidate is deceptive, the ceiling assumes the walk
+        # runs out of pool.
+        stages.append((f"eval 5 {dataset}: screen ({n}-{screened} items)",
+                       screened * tokens * SEC_PER_GEN_TOKEN_ROW,
+                       n * tokens * SEC_PER_GEN_TOKEN_ROW))
         stages.append((f"eval 5 {dataset}: reference pool", per_pass))
         # `full` reuses the screen's own tokens rather than generating again.
         stages.append((f"eval 5 {dataset}: {n_configs - 1} ablated configs",
@@ -580,11 +607,25 @@ def dry_run(session) -> int:
     est = estimate_runtime(session, ctx)
     report.banner("ESTIMATED RUNTIME (1x A100, very rough)")
     print()
-    for label, seconds in est["stages"]:
-        print(f"  {label:<40} {seconds / 60:>8.1f} min")
+    ranged = est["total_seconds_floor"] != est["total_seconds"]
+    for label, seconds, floor in est["stages"]:
+        if floor != seconds:
+            print(f"  {label:<40} {floor / 60:>8.1f} - {seconds / 60:.1f} min")
+        else:
+            print(f"  {label:<40} {seconds / 60:>8.1f} min")
     print("  " + "-" * 50)
-    print(f"  {'TOTAL':<40} {est['total_seconds'] / 60:>8.1f} min "
-          f"({est['cells']} cell(s))")
+    if ranged:
+        print(f"  {'TOTAL':<40} {est['total_seconds_floor'] / 60:>8.1f} - "
+              f"{est['total_seconds'] / 60:.1f} min ({est['cells']} cell(s))")
+        print("\n  The range is the screen: it stops as soon as it has "
+              "--benchmark-n-per-dataset\n  items the full model is deceptive "
+              "on, so the floor assumes every candidate\n  is deceptive and "
+              "the ceiling assumes it walks the whole pool. Which end you\n  "
+              "land on IS the full model's deception rate, which is what this "
+              "evaluation\n  measures — so size the job against the ceiling.")
+    else:
+        print(f"  {'TOTAL':<40} {est['total_seconds'] / 60:>8.1f} min "
+              f"({est['cells']} cell(s))")
     print("\n  Nothing was written. Drop --dry-run to run it.")
     return 0
 
