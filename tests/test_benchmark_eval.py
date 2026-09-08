@@ -161,6 +161,11 @@ def make_cli(**overrides):
         benchmark_n_random=1, no_kv_cache=False, judge_concurrency=2,
         benchmark_screen_seed=0, benchmark_screen_budget=0,
         benchmark_coherence_batch_size=None,
+        benchmark_screen_cache=None, benchmark_refresh_screen=False,
+        no_benchmark_screen_cache=True,
+        benchmark_repo_root=None,
+        mask_judge_model=None, mask_numeric_judge_model=None,
+        lb_judge_model=None, lb_harm_judge_model=None,
         ablation="interchange", wikitext_seed=0, knockout_granularity="finest",
         output_dir=None)
     for key, value in overrides.items():

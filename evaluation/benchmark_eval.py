@@ -477,6 +477,48 @@ def _elicit_beliefs(ctx, bench, client, items, eos, pad_id, desc,
     return kept, dropped, judge_failed
 
 
+def cached_screen(ctx, bench, client, dataset) -> Screen:
+    """`run_screen`, but read from and written to the on-disk screen cache.
+
+    The screen is circuit-independent by construction, so this is the one part
+    of EVAL 5 that never has to be repaid — see `evaluation/screen_cache.py`
+    for the key and for why the device is in it. A miss, an unreadable file or
+    a failed write all degrade to "screen normally": the cache is an
+    optimisation and must never be able to fail an evaluation.
+    """
+    from evaluation import screen_cache
+
+    cli = ctx.cli
+    if getattr(cli, "no_benchmark_screen_cache", False):
+        screen = run_screen(ctx, bench, client, dataset)
+        screen.cache_provenance = {"hit": False, "reason": "cache disabled"}
+        return screen
+
+    stamp = screen_cache.device_stamp()
+    key = screen_cache.build_key(cli, dataset, bench, bench.load(ctx, cli),
+                                 ctx.args.model, device=stamp["device"])
+    if getattr(cli, "benchmark_refresh_screen", False):
+        provenance = {"hit": False, "reason": "--benchmark-refresh-screen"}
+    else:
+        screen, provenance = screen_cache.load(cli, dataset, key)
+        if screen is not None:
+            print("  %s: screen reused from cache (made %s on %s)"
+                  % (dataset, provenance.get("created_at", "?"),
+                     provenance.get("device", "?")))
+            screen.cache_provenance = provenance
+            return screen
+        for near in provenance.pop("near", [])[:1]:
+            print("  %s: nearest cached screen differs in: %s"
+                  % (dataset, ", ".join(near["differs"]) or "nothing"))
+
+    screen = run_screen(ctx, bench, client, dataset)
+    written = screen_cache.save(cli, dataset, key, screen)
+    provenance = dict(provenance)
+    provenance["written"] = written
+    screen.cache_provenance = provenance
+    return screen
+
+
 def run_screen(ctx, bench, client, dataset) -> Screen:
     """Walk the candidate pool until the evaluation set and reference pool fill.
 
@@ -806,6 +848,10 @@ class BenchmarkEvaluation(Evaluation):
 
     def run(self, ctx) -> dict:
         cli = ctx.cli
+        # Where each dataset's screen came from — disk or a fresh pass. A
+        # reader of benchmarks.json has to be able to tell whether `full`'s
+        # tokens were reused from a cache, and on what hardware they were made.
+        self._screen_cache = {}
         client = JudgeClient(cache_path=judge_cache_path(ctx),
                              concurrency=cli.judge_concurrency)
         payload = {
@@ -833,6 +879,7 @@ class BenchmarkEvaluation(Evaluation):
             payload["datasets"][dataset] = entry
 
         payload["judge"] = client.stats()
+        payload["screen_cache"] = self._screen_cache
         payload["headline"] = {
             dataset: entry["configs"]["knockout"]["rates"]["deceptive"]
             for dataset, entry in payload["datasets"].items()
@@ -852,8 +899,9 @@ class BenchmarkEvaluation(Evaluation):
         if hasattr(bench, "bind"):
             bench.bind(cli)
 
-        screen = ctx.session.screen_for(dataset, run_screen, ctx, bench, client,
-                                        dataset)
+        screen = ctx.session.screen_for(dataset, cached_screen, ctx, bench,
+                                        client, dataset)
+        self._screen_cache[dataset] = getattr(screen, "cache_provenance", {})
         eos = eos_ids_for(ctx.node_model)
         pad_id = resolve_pad_id(ctx.tokenizer, eos)
 

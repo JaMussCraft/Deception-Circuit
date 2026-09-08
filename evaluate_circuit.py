@@ -228,6 +228,20 @@ def build_parser():
                         "below --n-random on purpose: generation is orders of "
                         "magnitude more expensive than a single-position "
                         "readout.")
+    g.add_argument("--benchmark-screen-cache", default=None,
+                   help="Directory holding cached screening passes (default: "
+                        "outputs/_screens). The screen runs under all gates "
+                        "open, so it does not depend on the circuit and never "
+                        "has to be repaid -- at n=100 it is ~79%% of EVAL 5's "
+                        "ceiling. The GPU is part of the cache key: `full` "
+                        "reuses the screen's own tokens, so a screen made on "
+                        "another device would put 'which GPU' inside the very "
+                        "delta this evaluation measures.")
+    g.add_argument("--benchmark-refresh-screen", action="store_true",
+                   help="Screen even if a cached screen matches, and overwrite "
+                        "it.")
+    g.add_argument("--no-benchmark-screen-cache", action="store_true",
+                   help="Neither read nor write the screen cache.")
     g.add_argument("--no-kv-cache", action="store_true",
                    help="Debug: force the O(n^2) full-sequence re-forward "
                         "instead of the dual-stream KV cache.")
@@ -348,7 +362,7 @@ def estimate_runtime(session, ctx) -> dict:
     if "pressure" in cli.evals:
         stages.append(("eval 4 (pressure clause)", 6 * test_pass))
     if "benchmarks" in cli.evals:
-        stages.extend(benchmark_stages(cli))
+        stages.extend(benchmark_stages(cli, session.base_args.model))
     if cli.ablation == "mean":
         stages.append(("mean bank", 2 * test_pass))
 
@@ -363,7 +377,7 @@ def estimate_runtime(session, ctx) -> dict:
             "cells": n_cells}
 
 
-def benchmark_stages(cli):
+def benchmark_stages(cli, model=None):
     """EVAL 5's rough cost, per dataset: the screen plus one pass per config.
 
     The screen's cost is a *worst case* — it walks the candidate pool until it
@@ -372,6 +386,7 @@ def benchmark_stages(cli):
     generating, so this assumes the pool is exhausted and says so.
     """
     from evaluation.benchmarks import get_benchmark
+    from evaluation import screen_cache
 
     n = cli.benchmark_n_per_dataset
     n_configs = 4 + cli.benchmark_n_random          # full/knockout/circuit/empty
@@ -392,6 +407,21 @@ def benchmark_stages(cli):
         screened = min(budget, pool) if pool else budget
         per_pass = n * tokens * SEC_PER_GEN_TOKEN_ROW
 
+        # A cached screen makes the screen, the belief pass and the reference
+        # pool free — they are circuit-independent and already on disk. This
+        # cannot be asserted from a login node, which has no GPU and so cannot
+        # build a key containing the device, so it is folded into the *floor*
+        # and never the ceiling: the estimate exists to stop a job being killed
+        # at the walltime, and a predicted hit that does not happen is exactly
+        # the way it would fail at that job.
+        cached = bool(model) and not cli.no_benchmark_screen_cache and \
+            not cli.benchmark_refresh_screen and bool(
+                screen_cache.cached_on_devices(
+                    cli, dataset,
+                    screen_cache.build_key(cli, dataset, bench,
+                                           _items_for(bench, cli), model)))
+        free = 0.0 if cached else None
+
         probes = _probe_count(bench, cli)
         if probes:
             # Belief runs over every *screened* candidate, not just survivors.
@@ -400,7 +430,8 @@ def benchmark_stages(cli):
             stages.append(
                 (f"eval 5 {dataset}: belief ({probes} probe(s))",
                  screened * probes * belief_tokens * SEC_PER_GEN_TOKEN_ROW,
-                 n * probes * belief_tokens * SEC_PER_GEN_TOKEN_ROW))
+                 free if free is not None
+                 else n * probes * belief_tokens * SEC_PER_GEN_TOKEN_ROW))
         # The screen stops as soon as it has `n` deceptive items -- and for a
         # prompt-kind benchmark that is the only thing it waits for, since its
         # honest bank comes from twins rather than screening bycatch. How fast
@@ -409,10 +440,13 @@ def benchmark_stages(cli):
         # ends are printed rather than picking one and being wrong: the floor
         # assumes every candidate is deceptive, the ceiling assumes the walk
         # runs out of pool.
-        stages.append((f"eval 5 {dataset}: screen ({n}-{screened} items)",
+        stages.append((f"eval 5 {dataset}: screen ({n}-{screened} items)"
+                       + (" [cached]" if cached else ""),
                        screened * tokens * SEC_PER_GEN_TOKEN_ROW,
-                       n * tokens * SEC_PER_GEN_TOKEN_ROW))
-        stages.append((f"eval 5 {dataset}: reference pool", per_pass))
+                       free if free is not None
+                       else n * tokens * SEC_PER_GEN_TOKEN_ROW))
+        stages.append((f"eval 5 {dataset}: reference pool", per_pass,
+                       0.0 if cached else per_pass))
         # `full` reuses the screen's own tokens rather than generating again.
         stages.append((f"eval 5 {dataset}: {n_configs - 1} ablated configs",
                        (n_configs - 1) * per_pass))
@@ -529,6 +563,43 @@ def benchmark_plan(cli) -> None:
     print(f"\n  Corrupt reference: --benchmark-ref-pool "
           f"{cli.benchmark_ref_pool}. Random null: "
           f"{cli.benchmark_n_random} circuit(s).")
+    _screen_cache_plan(cli, datasets)
+
+
+def _screen_cache_plan(cli, datasets) -> None:
+    """What the screen cache already holds for this configuration.
+
+    The screen is ~79% of EVAL 5's ceiling and is the one part that never has
+    to be repaid, so "is it already on disk, and from which GPU" is the single
+    most useful line in the dry run for deciding what to submit.
+    """
+    from evaluation.benchmarks import get_benchmark
+    from evaluation import screen_cache
+
+    print()
+    if cli.no_benchmark_screen_cache:
+        print("  Screen cache: disabled (--no-benchmark-screen-cache).")
+        return
+    if cli.benchmark_refresh_screen:
+        print("  Screen cache: --benchmark-refresh-screen; every screen will "
+              "be recomputed and overwritten.")
+        return
+    # No model name here: the plan runs before the session is built, and the
+    # key would differ from the real one anyway. Report per dataset what is on
+    # disk and let the caller match it against the GPU they intend to use.
+    root = cli.benchmark_screen_cache or screen_cache.DEFAULT_CACHE_DIR
+    print(f"  Screen cache: {root}")
+    for dataset in datasets:
+        directory = screen_cache.cache_dir_for(cli, dataset)
+        try:
+            sidecars = [n for n in os.listdir(directory) if n.endswith(".json")]
+        except OSError:
+            sidecars = []
+        print(f"    {dataset:<34} {len(sidecars)} cached screen(s)")
+    print("  The GPU is part of the key, because `full` reuses the screen's "
+          "own tokens:\n  a screen made on another device would put 'which "
+          "GPU' inside the delta this\n  evaluation measures. Switching "
+          "hardware is a miss, and the screen is repaid.")
 
 
 def dry_run(session) -> int:
