@@ -41,13 +41,17 @@ dangerous one.
 
 from __future__ import annotations
 
+import sys
+import warnings
 from pathlib import Path
 
 import pytest
 import torch
+from transformers import LlamaForCausalLM
 from transformers.cache_utils import DynamicCache
 
-from tests.helpers import build_tiny_pair
+from config import NodePruningConfig
+from tests.helpers import build_tiny_pair, tiny_config
 from evaluation.ablation import ablation_hook, make_hook
 
 ABLATIONS = ("interchange", "zero", "mean")
@@ -250,19 +254,38 @@ def test_out_of_step_caches_are_rejected():
 # 2. the use_cache=False path has not moved
 # ----------------------------------------------------------------------------
 
-def test_uncached_logits_are_bit_identical_to_the_pre_change_fixture():
+def test_the_mask_edit_did_not_move_the_uncached_path():
     """The regression guard on the causal-mask edit.
 
     `tests/fixtures/prechange_logits.pt` was captured from the implementation
     that had no corrupt cache and no `create_causal_mask` branch. Training and
     all four shipped evaluations run on this path, so it must not move at all.
 
-    The fixture was recorded on a login-node CPU under `torch.set_num_threads(1)`
-    (conftest.py sets that, and the thread count changes the reduction order —
-    at the default count the same code differs in the last ulp). So if this ever
-    fails on different hardware, suspect kernel selection before suspecting the
-    mask edit. The discriminating check is to replay these six cases against
-    `f5c3a7b`'s `models/llama_node.py`, pulled out with `git show`.
+    The fixture was recorded on a login-node CPU (transformers 4.57.3, torch
+    2.8.0) under `torch.set_num_threads(1)` — conftest.py sets that, and the
+    thread count changes the reduction order. It therefore pins two different
+    things at once, and they came apart when the job environment moved:
+
+    * that the mask edit did not change the uncached path — a property of the
+      code, true in any environment;
+    * that these exact floats come back — a property of the code *and* the
+      kernels underneath it.
+
+    Under conda `mgnp` (transformers 5.13, torch 2.11) the second is false:
+    `open/none` and `closed_ish/none` differ in the last ulp (1.788e-07). Only
+    the `attention_mask=None` cases move, which is the signature of SDPA
+    kernel selection on the no-mask path rather than of anything in this repo.
+
+    So the test now does what its previous docstring only recommended: on a
+    mismatch it replays the six cases against `f5c3a7b`'s `models/llama_node.py`
+    — the implementation the fixture was captured from, before the corrupt
+    cache and the `create_causal_mask` branch existed — pulled out with
+    `git show` and run in-process. If the pre-change code produces the same
+    mismatch, the environment moved and the edit is exonerated. If it does not,
+    the edit moved the uncached path and that is a regression.
+
+    A stale fixture cannot hide a regression this way, and a regression cannot
+    hide behind a stale fixture.
     """
     ref = torch.load(Path(__file__).parent / "fixtures" / "prechange_logits.pt")
     inputs = ref["_inputs"]
@@ -270,23 +293,91 @@ def test_uncached_logits_are_bit_identical_to_the_pre_change_fixture():
     masks = dict(inputs["masks"])
     masks["none"] = None
 
-    _, pruned = build_tiny_pair(seed=0)
-    pruned.set_final_circuit_mode(False)
-    gates = [m for m in pruned.modules() if hasattr(m, "log_alpha")]
+    def replay(module):
+        """The six cases, against whichever llama_node module is handed in."""
+        cfg = tiny_config()
+        torch.manual_seed(0)
+        plain = LlamaForCausalLM(cfg).eval()
+        pruned = module.PrunableLlamaForCausalLM(cfg)
+        pruned.load_state_dict(plain.state_dict())
+        module.apply_pruning_wrappers(pruned, NodePruningConfig())
+        pruned.eval()
+        pruned.set_final_circuit_mode(False)
+        gates = [m for m in pruned.modules() if hasattr(m, "log_alpha")]
 
-    for name, alpha in (("open", None), ("closed_ish", -2.0)):
-        if alpha is not None:
-            for gate in gates:
+        out = {}
+        for name, alpha in (("open", None), ("closed_ish", -2.0)):
+            if alpha is not None:
+                for gate in gates:
+                    with torch.no_grad():
+                        gate.log_alpha.fill_(alpha)
+            for mask_name, mask in masks.items():
                 with torch.no_grad():
-                    gate.log_alpha.fill_(alpha)
-        for mask_name, mask in masks.items():
-            with torch.no_grad():
-                got = pruned(input_ids=ids, corrupted_input_ids=corrupt,
-                             attention_mask=mask, use_cache=False).logits
-            expected = ref[f"{name}/{mask_name}"]
-            assert torch.equal(got, expected), (
-                f"{name}/{mask_name} moved: max diff "
-                f"{(got - expected).abs().max().item():.3e}")
+                    out[f"{name}/{mask_name}"] = pruned(
+                        input_ids=ids, corrupted_input_ids=corrupt,
+                        attention_mask=mask, use_cache=False).logits
+        return out
+
+    import models.llama_node
+    got = replay(models.llama_node)
+
+    drifted = {k: v for k, v in got.items() if not torch.equal(v, ref[k])}
+    if not drifted:
+        return
+
+    # Something moved. Ask the pre-change code, in this environment, whether it
+    # moved too. `_load_prechange_module` raises rather than skipping: an
+    # unanswerable question must not read as a pass.
+    old = replay(_load_prechange_module())
+    still_wrong = {k for k in drifted if not torch.equal(got[k], old[k])}
+    assert not still_wrong, (
+        "the mask edit moved the uncached path, which training and all four "
+        "shipped evaluations run on. Cases: "
+        + ", ".join(f"{k} (max diff "
+                    f"{(got[k] - old[k]).abs().max().item():.3e})"
+                    for k in sorted(still_wrong)))
+
+    # Pre-change code drifts identically, so this is the environment, not us.
+    warnings.warn(
+        "prechange_logits.pt was recorded under transformers 4.57.3 / torch "
+        "2.8.0 and this environment reproduces it only to within "
+        + max(f"{(got[k] - ref[k]).abs().max().item():.3e}" for k in drifted)
+        + " on " + ", ".join(sorted(drifted))
+        + ". The pre-change implementation drifts by the same amount here, so "
+        "the mask edit is exonerated; results are not bit-reproducible across "
+        "the two environments.", RuntimeWarning)
+
+
+def _load_prechange_module():
+    """`f5c3a7b:models/llama_node.py`, imported under its own module name.
+
+    That commit is the last one before the dual-stream cache and the
+    `create_causal_mask` branch, so it is the reference for "did the edit move
+    the uncached path". It is read from git rather than vendored so it cannot
+    drift out of agreement with the history it claims to be.
+    """
+    import importlib.util
+    import subprocess
+    import tempfile
+
+    repo = Path(__file__).resolve().parent.parent
+    source = subprocess.run(
+        ["git", "-C", str(repo), "show", "f5c3a7b:models/llama_node.py"],
+        capture_output=True, text=True, check=True).stdout
+
+    with tempfile.TemporaryDirectory() as tmp:
+        path = Path(tmp) / "prechange_llama_node.py"
+        path.write_text(source)
+        spec = importlib.util.spec_from_file_location("prechange_llama_node", path)
+        module = importlib.util.module_from_spec(spec)
+        # Registered so dataclasses/typing inside it resolve, removed after so
+        # the rest of the suite never sees a second llama_node.
+        sys.modules["prechange_llama_node"] = module
+        try:
+            spec.loader.exec_module(module)
+        finally:
+            sys.modules.pop("prechange_llama_node", None)
+    return module
 
 
 # ----------------------------------------------------------------------------
