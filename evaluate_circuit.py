@@ -45,6 +45,7 @@ as it always has; anything else writes a suite under `outputs/_suites/<name>/`.
 
 import argparse
 import os
+import re
 import sys
 
 from evaluation import default_evaluations, list_evaluations
@@ -837,18 +838,30 @@ def check_judges_answer(cli) -> None:
     # client-construction TypeError -- an SDK that cannot make any call at all
     # -- as transient.
     TRANSIENT = ("timeout", "timed out", "connection", "econnreset",
-                 "temporarily unavailable", "502", "503", "504",
-                 "rate limit", "overloaded")
+                 "temporarily unavailable", "rate limit", "overloaded")
+    #: Status codes that clear on their own. Matched against the code the SDK
+    #: reports, NEVER as a bare substring: "502" occurs inside the model slug
+    #: `claude-3.7-sonnet-20250219` (2025-02-19), which is how a hard 404 was
+    #: once waved through as a transient 502 -- the exact false pass this gate
+    #: exists to prevent.
+    #: 429 belongs here: a rate limit does clear on its own. The quota/credit
+    #: test below is what separates it from an exhausted account, which
+    #: arrives with the same status code and never clears.
+    TRANSIENT_CODES = {"408", "425", "429", "500", "502", "503", "504"}
     dead = []
     for (dataset, request), result in zip(probes, results):
         if result is not None and result.ok:
             continue
         error = str(getattr(result, "error", "no response"))
         lowered = error.lower()
-        transient = (any(word in lowered for word in TRANSIENT)
-                     # A 429 is a rate limit unless it is really a bill.
-                     and not any(word in lowered for word in
-                                 ("quota", "credit", "billing")))
+        codes = set(re.findall(r"error code:\s*(\d{3})", lowered))
+        transient = bool((any(word in lowered for word in TRANSIENT)
+                          or (codes and codes <= TRANSIENT_CODES))
+                         # A 429 is a rate limit unless it is really a bill.
+                         and not any(word in lowered for word in
+                                     ("quota", "credit", "billing"))
+                         # A code we know is permanent settles it outright.
+                         and not (codes - TRANSIENT_CODES))
         if transient:
             print("  !! %s did not answer (%s). Continuing: this reads as a "
                   "transient condition, and the run retries."

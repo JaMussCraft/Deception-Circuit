@@ -1263,9 +1263,33 @@ def test_a_transient_network_blip_does_not_stop_the_run(monkeypatch, capsys):
 def test_a_plain_rate_limit_is_transient_but_a_quota_429_is_not(monkeypatch,
                                                                 capsys):
     """Both arrive as 429. Only one of them is going to clear on its own."""
-    _judge_gate(monkeypatch, "RateLimitError: rate limit exceeded, retry soon")
+    _judge_gate(monkeypatch,
+                "RateLimitError: Error code: 429 - rate limit exceeded")
     assert "transient" in capsys.readouterr().out
 
     with pytest.raises(SystemExit):
+        _judge_gate(monkeypatch, "RateLimitError: Error code: 429 - "
+                                 "insufficient_quota, no credits remaining")
+
+
+def test_a_status_code_is_not_matched_as_a_bare_substring(monkeypatch):
+    """The exact string that defeated the first version of this classifier.
+
+    `502` occurs inside the model slug's own date — claude-3.7-sonnet-2025
+    **02**19 — so a bare substring test read a hard 404 as a transient HTTP
+    502 and let the run proceed against a model OpenRouter had retired. The
+    job would then have generated for hours and labelled nothing, which is the
+    precise failure this gate exists to prevent.
+    """
+    with pytest.raises(SystemExit):
         _judge_gate(monkeypatch,
-                    "RateLimitError: rate limit — insufficient_quota")
+                    "NotFoundError: Error code: 404 - {'error': {'message': "
+                    "'No endpoints found for "
+                    "anthropic/claude-3.7-sonnet-20250219.', 'code': 404}}")
+
+
+def test_a_genuine_5xx_is_still_transient(monkeypatch, capsys):
+    """Tightening the match must not make every server error fatal."""
+    _judge_gate(monkeypatch,
+                "InternalServerError: Error code: 503 - upstream unavailable")
+    assert "transient" in capsys.readouterr().out
