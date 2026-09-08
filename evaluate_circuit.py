@@ -814,7 +814,12 @@ def check_judges_answer(cli) -> None:
         probes.append((dataset, JudgeRequest(
             spec["provider"], spec["model"],
             [{"role": "user", "content": "Reply with the single word: ok"}],
-            kwargs={"max_completion_tokens": 5})))
+            # Generous on purpose. A reasoning model (MASK's numerical judge is
+            # o3-mini) spends its budget thinking before it emits anything, so
+            # a tight cap returns an empty completion and the probe reports a
+            # dead judge that is in fact perfectly healthy. The probe is one
+            # call; the tokens are worth less than the false alarm.
+            kwargs={"max_completion_tokens": 256})))
     if not probes:
         return
 
