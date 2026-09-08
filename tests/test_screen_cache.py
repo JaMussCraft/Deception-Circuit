@@ -757,3 +757,88 @@ def test_a_blob_carrying_no_screen_is_a_miss_not_a_hit(tmp_path):
     torch.save({"key": key, "screen": None}, path)
     back, provenance = screen_cache.load(cli, "fake", key)
     assert back is None and provenance["hit"] is False
+
+
+# ==============================================================================
+# A FINGERPRINT THAT CANNOT BE COMPUTED
+# ==============================================================================
+
+def test_two_numpy_arrays_differing_only_in_the_middle_do_not_collide():
+    """`repr` elides an ndarray's middle past 1000 elements, so two different
+    arrays sharing a head and tail rendered identically. The only collision
+    class here that yields a wrong *hit* rather than a needless miss."""
+    numpy = pytest.importorskip("numpy")
+    from evaluation.benchmarks import base as bb
+
+    def item(values):
+        return bb.BenchmarkItem("x", [{"role": "user", "content": "hi"}],
+                                meta={"scores": values})
+
+    one = numpy.arange(1200)
+    two = numpy.arange(1200)
+    two[600] = -1
+    assert repr(one) == repr(two), "numpy stopped truncating; test is moot"
+    assert screen_cache.candidate_fingerprint(None, [item(one)]) != \
+        screen_cache.candidate_fingerprint(None, [item(two)])
+
+
+def test_a_zero_dim_numpy_scalar_is_left_to_its_own_repr():
+    """The `ndim` guard: arrays are converted because truncation is the hazard,
+    0-d scalars fall through untouched.
+
+    Asserted as "unchanged by `_stable_repr`" rather than as "differs from the
+    plain int", because whether it differs is a numpy-version property, not a
+    property of this code: `repr(np.int64(5))` is `'np.int64(5)'` under numpy
+    2.5 and `'5'` under 1.26, and this repo runs both (2.5.1 under `mgnp`,
+    1.26.4 on the login node). The earlier form of this test asserted the numpy
+    2 behaviour and failed on the login node.
+    """
+    numpy = pytest.importorskip("numpy")
+
+    scalar = numpy.int64(5)
+    assert screen_cache._stable_repr(scalar) == repr(scalar)
+
+
+def test_a_list_and_a_tuple_of_the_same_items_are_deliberately_alike():
+    """Parquet and JSON disagree about which one to hand back, and every
+    consumer of a meta value iterates it, so the container type cannot change
+    how an item is judged."""
+    assert screen_cache._stable_repr([1, 2]) == screen_cache._stable_repr((1, 2))
+
+
+def test_an_uncomputable_fingerprint_refuses_rather_than_degrading(tmp_path):
+    """Two *different* unfingerprintable inputs would share any sentinel, and
+    the dataset name is already in the key — so the same dataset failing twice
+    the same way would key identically and reuse the wrong screen. Refusing to
+    build a key is the only answer that is both non-raising and non-colliding.
+    """
+    cli = cache_cli(tmp_path)
+
+    class Cyclic(FakeBench):
+        pass
+
+    cyclic = {}
+    cyclic["self"] = cyclic
+    from evaluation.benchmarks import base as bb
+    item = bb.BenchmarkItem("x", [{"role": "user", "content": "hi"}],
+                            meta=cyclic)
+
+    with pytest.raises(screen_cache.Unfingerprintable):
+        screen_cache.build_key(cli, "fake", Cyclic([item], _even_are_deceptive),
+                               [item], "m", device="G")
+
+
+def test_the_run_survives_a_dataset_it_cannot_fingerprint(tmp_path,
+                                                          monkeypatch):
+    cli = cache_cli(tmp_path, benchmark_n_per_dataset=2)
+    monkeypatch.setattr(
+        screen_cache, "candidate_fingerprint",
+        lambda bench, items: (_ for _ in ()).throw(TypeError("nope")))
+
+    bench = FakeBench(make_items(20), _even_are_deceptive)
+    screen = _cached_screen(make_ctx(cli), bench)
+
+    assert len(screen.items) == 2
+    assert screen.cache_provenance["hit"] is False
+    assert "unfingerprintable" in screen.cache_provenance["reason"]
+    assert not os.path.exists(str(tmp_path / "screens" / "fake"))

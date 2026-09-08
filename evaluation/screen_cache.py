@@ -149,6 +149,23 @@ def _source_fingerprint(bench, cli) -> str:
     return digest.hexdigest()[:16]
 
 
+def _fingerprint_or_refuse(fn, *args):
+    """Run a fingerprint, converting ANY failure into a refusal to cache.
+
+    Closing raise-classes one at a time does not scale: a `TypeError` from
+    sorting mixed keys and a `RecursionError` from a cyclic structure are the
+    first two, and neither was foreseen. What holds structurally is that
+    nothing here may propagate out of `cached_screen` -- and that a
+    fingerprint which could not be computed must not be replaced by one that
+    two different inputs could share.
+    """
+    # `Exception` covers `RecursionError` too -- it subclasses `RuntimeError`.
+    try:
+        return fn(*args)
+    except Exception as error:                              # noqa: BLE001
+        raise Unfingerprintable("%s: %s" % (type(error).__name__, error))
+
+
 def _judge_models(bench, cli):
     """The judges whose verdicts a screen's labels would carry."""
     hook = getattr(bench, "judge_models", None)
@@ -197,7 +214,28 @@ def _stable_repr(value) -> str:
     if isinstance(value, (list, tuple)):
         # Order is meaningful in a sequence -- `messages` is one -- so this
         # normalises the elements without reordering them.
+        #
+        # A list and a tuple of the same items render alike, deliberately.
+        # Every consumer of a `meta` value iterates it, so the container type
+        # cannot change how an item is judged, while parquet and JSON disagree
+        # about which one to hand back -- distinguishing them would force
+        # re-screens over a difference nothing reads.
         return "[%s]" % ", ".join(_stable_repr(v) for v in value)
+    # An ndarray's `repr` elides its middle past 1000 elements, so two
+    # different arrays sharing a head and tail render identically. That is the
+    # only collision here that yields a wrong *hit* rather than a needless
+    # miss, and it is invisible when it happens. `ndim` guards the conversion
+    # so 0-d numpy scalars keep falling through to `repr` untouched. Whether
+    # that makes `np.int64(5)` differ from `5` is a numpy-version property and
+    # not something this code decides -- `repr` is 'np.int64(5)' under numpy
+    # 2.5 and '5' under 1.26, and this repo runs both. Either way it is a miss
+    # rather than a wrong hit, which is the direction that matters.
+    tolist = getattr(value, "tolist", None)
+    if callable(tolist) and getattr(value, "ndim", 0):
+        try:
+            return _stable_repr(tolist())
+        except Exception:                                   # noqa: BLE001
+            pass
     return repr(value)
 
 
@@ -261,6 +299,23 @@ def device_stamp(cli=None) -> dict:
             "transformers": transformers.__version__}
 
 
+class Unfingerprintable(Exception):
+    """The candidates or the rubric could not be reduced to a hash.
+
+    Raised only by `build_key`, and caught by `cached_screen`, which then
+    screens normally with the cache switched off for that dataset.
+
+    Not degraded to a marker value, which was the tempting move: a marker
+    cannot collide with a real fingerprint, but two *different* unfingerprint-
+    able candidate sets would produce the SAME marker, and the dataset name is
+    already in the key -- so the same dataset failing twice for the same reason
+    would key identically and hand the second run the first one's screen. A
+    cache that cannot fail an evaluation must also not answer when it does not
+    know; those are different properties and only one of them is served by a
+    sentinel.
+    """
+
+
 def build_key(cli, dataset, bench, items, model, device=None) -> dict:
     """The full cache key, as a dict so a miss can be explained field by field.
 
@@ -284,8 +339,10 @@ def build_key(cli, dataset, bench, items, model, device=None) -> dict:
            # a tuple here would differ from its own round trip and every
            # comparison against a sidecar would report a spurious difference.
            "judges": list(_judge_models(bench, cli)),
-           "candidates": candidate_fingerprint(bench, items),
-           "adapter_source": _source_fingerprint(bench, cli)}
+           "candidates": _fingerprint_or_refuse(
+               candidate_fingerprint, bench, items),
+           "adapter_source": _fingerprint_or_refuse(
+               _source_fingerprint, bench, cli)}
     for flag in KEYED_FLAGS:
         key[flag] = getattr(cli, flag, None)
     return key

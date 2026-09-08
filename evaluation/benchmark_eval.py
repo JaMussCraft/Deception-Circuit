@@ -494,9 +494,19 @@ def cached_screen(ctx, bench, client, dataset) -> Screen:
         screen.cache_provenance = {"hit": False, "reason": "cache disabled"}
         return screen
 
-    stamp = screen_cache.device_stamp()
-    key = screen_cache.build_key(cli, dataset, bench, bench.load(ctx, cli),
-                                 ctx.args.model, device=stamp["device"])
+    stamp = screen_cache.device_stamp(cli)
+    try:
+        key = screen_cache.build_key(cli, dataset, bench, bench.load(ctx, cli),
+                                     ctx.args.model, device=stamp["device"])
+    except screen_cache.Unfingerprintable as error:
+        # No key means no safe way to tell this screen from a different one,
+        # so the cache sits this dataset out entirely. Screening still happens;
+        # the run is exactly what it would have been before the cache existed.
+        print("  WARNING: %s: screen cache disabled -- %s" % (dataset, error))
+        screen = run_screen(ctx, bench, client, dataset)
+        screen.cache_provenance = {"hit": False,
+                                   "reason": "unfingerprintable: %s" % error}
+        return screen
     if getattr(cli, "benchmark_refresh_screen", False):
         provenance = {"hit": False, "reason": "--benchmark-refresh-screen"}
     else:
