@@ -299,8 +299,13 @@ class MaskSplit(Benchmark):
     def rubric_sources(self, cli):
         """MASK's judge prompts and its numeric parse rules, both imported at
         runtime from the `mask/` checkout rather than copied in here."""
+        # `sources.repo_path` rather than `_mask_dir`, which calls
+        # `require_dir` and raises when the checkout is absent. Raising here
+        # would make "MASK with no checkout" fingerprint identically to "MASK
+        # with rubric_sources deleted", so the `<missing>` marker -- written
+        # for exactly the absent-checkout case -- would never fire.
         try:
-            directory = _mask_dir(cli)
+            directory = sources.repo_path(cli, "mask", "mask")
         except Exception:                                   # noqa: BLE001
             return ()
         return (os.path.join(directory, "prompts", "evaluation_prompts.py"),

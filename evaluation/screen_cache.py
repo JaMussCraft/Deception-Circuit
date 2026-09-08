@@ -99,7 +99,7 @@ KEYED_FLAGS = (
 # `candidate_fingerprint` and the rubric files through `_source_fingerprint`.
 
 
-def _source_fingerprint(bench, cli=None) -> str:
+def _source_fingerprint(bench, cli) -> str:
     """Hash the adapter's own source, `base.py`, and its external rubric files.
 
     The candidate fingerprint below catches changed *data*. It cannot catch a
@@ -175,6 +175,32 @@ def _rubric_paths(bench, cli):
         return ()
 
 
+def _stable_repr(value) -> str:
+    """A repr that does not depend on dict ordering, at any depth.
+
+    A dict coming back from JSON, a DataFrame or a parquet read can carry its
+    keys in a different order with nothing having changed, and hashing that
+    order would force a re-screen for no reason.
+
+    Keys are ordered by their own `repr`, never by `<`. `sorted(meta.items())`
+    raises `TypeError` on a dict mixing key types — and it would raise straight
+    out of `candidate_fingerprint`, through `build_key`, and out of
+    `cached_screen`, which is the one thing this module promises it cannot do.
+    No adapter produces such a dict today; the guard is here because "cannot
+    fail an evaluation" has to hold against the code as it will be, not only as
+    it is.
+    """
+    if isinstance(value, dict):
+        pairs = sorted(((repr(k), _stable_repr(v)) for k, v in value.items()),
+                       key=lambda kv: kv[0])
+        return "{%s}" % ", ".join("%s: %s" % kv for kv in pairs)
+    if isinstance(value, (list, tuple)):
+        # Order is meaningful in a sequence -- `messages` is one -- so this
+        # normalises the elements without reordering them.
+        return "[%s]" % ", ".join(_stable_repr(v) for v in value)
+    return repr(value)
+
+
 def candidate_fingerprint(bench, items) -> str:
     """Hash every field of every candidate that can change how it is judged.
 
@@ -197,13 +223,12 @@ def candidate_fingerprint(bench, items) -> str:
     for item in items:
         digest.update(repr(getattr(item, "item_id", None)).encode("utf-8"))
         digest.update(repr(getattr(item, "condition", None)).encode("utf-8"))
-        digest.update(repr(getattr(item, "messages", None)).encode("utf-8"))
-        digest.update(repr(getattr(item, "belief", None)).encode("utf-8"))
-        meta = getattr(item, "meta", None)
-        # Sorted: a dict that round-trips through JSON or a DataFrame can come
-        # back with its keys in another order without anything having changed.
-        digest.update(repr(sorted(meta.items()) if isinstance(meta, dict)
-                           else meta).encode("utf-8"))
+        digest.update(_stable_repr(getattr(item, "messages", None))
+                      .encode("utf-8"))
+        digest.update(_stable_repr(getattr(item, "belief", None))
+                      .encode("utf-8"))
+        digest.update(_stable_repr(getattr(item, "meta", None))
+                      .encode("utf-8"))
     return digest.hexdigest()[:16]
 
 
@@ -362,6 +387,9 @@ def load(cli, dataset, key):
         # A hash collision, or a file written by a version whose key fields
         # differed. Recompute rather than trust the filename.
         return None, {"hit": False, "reason": "key mismatch", "path": path}
+    if blob.get("screen") is None:
+        return None, {"hit": False, "reason": "no screen in the blob",
+                      "path": path}
     provenance = {"hit": True, "path": path,
                   "created_at": blob.get("created_at")}
     provenance.update(blob.get("stamp", {}))

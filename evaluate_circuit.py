@@ -236,7 +236,10 @@ def build_parser():
                         "ceiling. The GPU is part of the cache key: `full` "
                         "reuses the screen's own tokens, so a screen made on "
                         "another device would put 'which GPU' inside the very "
-                        "delta this evaluation measures.")
+                        "delta this evaluation measures. Cached screens are "
+                        "pickles, loaded with weights_only=False, so point "
+                        "this at a directory you control rather than at a "
+                        "group-writable scratch space.")
     g.add_argument("--benchmark-refresh-screen", action="store_true",
                    help="Screen even if a cached screen matches, and overwrite "
                         "it.")
@@ -259,9 +262,15 @@ def build_parser():
                    help="Override Liars' Bench's main judge.")
     g.add_argument("--lb-harm-judge-model", default=None,
                    help="Override Liars' Bench's harm-pressure claim judge.")
-    # The adapters already read these three through getattr(cli, ...), which
-    # returns None for an undefined flag -- so before they were declared here,
-    # passing one was a silent no-op rather than an error.
+    # The adapters read the first two through getattr(cli, ...), which returns
+    # None for an undefined flag -- so before they were declared here, passing
+    # one was a silent no-op rather than an error.
+    #
+    # --benchmark-belief-model is NOT one of them: `benchmarks/__init__.py`
+    # constructs MaskSplit(split) without it, so `belief_model` is always
+    # DEFAULT_BELIEF_MODEL and the flag parses and does nothing. Left declared
+    # and documented as inert rather than quietly removed, since the MASK
+    # metrics it would select are a real thing a reader may come looking for.
     g.add_argument("--benchmark-pool-size", type=int, default=None,
                    help="Cap each condition pool at N items per benchmark, for "
                         "cheap smoke runs. The sandbagging deceptive pool is "

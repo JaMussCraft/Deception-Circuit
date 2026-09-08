@@ -933,7 +933,15 @@ class BenchmarkEvaluation(Evaluation):
 
         screen = ctx.session.screen_for(dataset, cached_screen, ctx, bench,
                                         client, dataset)
-        self._screen_cache[dataset] = getattr(screen, "cache_provenance", {})
+        # `screen_for` memoises, so in a suite only the first cell to reach a
+        # dataset actually built or loaded it. Reporting the same provenance
+        # for every cell would read as though each one wrote the cache.
+        provenance = dict(getattr(screen, "cache_provenance", {}))
+        if getattr(screen, "_provenance_reported", False):
+            provenance = {"hit": provenance.get("hit"),
+                          "reused_within_process": True}
+        screen._provenance_reported = True
+        self._screen_cache[dataset] = provenance
         eos = eos_ids_for(ctx.node_model)
         pad_id = resolve_pad_id(ctx.tokenizer, eos)
 

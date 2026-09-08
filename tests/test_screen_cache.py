@@ -116,14 +116,27 @@ def test_a_changed_condition_changes_the_key(tmp_path):
         screen_cache.key_hash(a_key(cli, items=flipped))
 
 
-def test_two_adapters_do_not_share_a_source_fingerprint():
+def test_the_adapter_source_is_hashed_not_merely_its_name(monkeypatch):
     """A rubric change relabels the same generations, and no data hash sees it,
-    so the adapter's source stands in for its parse and judge rules."""
+    so the adapter's source stands in for its parse and judge rules.
+
+    Two different adapters would differ even if only their module *names* were
+    hashed, so comparing two adapters proves nothing. This edits the source of
+    one adapter instead.
+    """
     from evaluation.benchmarks import get_benchmark
 
-    one = screen_cache._source_fingerprint(get_benchmark("sandbagging"))
-    two = screen_cache._source_fingerprint(get_benchmark("mask:known_facts"))
-    assert one != two
+    bench = get_benchmark("sandbagging")
+    cli = make_cli(benchmark_repo_root=None)
+    before = screen_cache._source_fingerprint(bench, cli)
+
+    import inspect
+
+    real = inspect.getsource
+    monkeypatch.setattr(
+        inspect, "getsource",
+        lambda obj: real(obj) + "\n# a rule changed\n")
+    assert screen_cache._source_fingerprint(bench, cli) != before
 
 
 # ==============================================================================
@@ -156,6 +169,16 @@ def test_a_saved_screen_comes_back_field_for_field(tmp_path):
     assert back.pool_refs == screen.pool_refs
     assert [r["label"] for r in back.full_rows] == \
         [r["label"] for r in screen.full_rows]
+    # The rest of what `_run_dataset` reads off a Screen. Omitting these left
+    # the round trip asserting on a subset while reading as though it covered
+    # the object.
+    assert back.partner_ids == screen.partner_ids
+    assert [i.item_id for i in back.pool_items] == \
+        [i.item_id for i in screen.pool_items]
+    assert back.prompt_width == screen.prompt_width
+    assert back.new_tokens == screen.new_tokens
+    assert back.partner_reused == screen.partner_reused
+    assert back.dataset == screen.dataset
 
 
 def test_saving_leaves_no_temporary_file_behind(tmp_path):
@@ -641,3 +664,96 @@ def test_the_key_survives_its_own_json_round_trip(tmp_path):
     screen_cache.save(cli, "fake", key, B.Screen("fake"))
     near = screen_cache.describe_misses(cli, "fake", key)
     assert near and near[0]["differs"] == [], near[0]["differs"]
+
+
+def test_every_benchmark_flag_is_either_keyed_or_deliberately_not(monkeypatch):
+    """The omission test. `test_every_keyed_flag_changes_the_hash` proves each
+    listed field is load-bearing, but it structurally cannot notice a flag that
+    was never listed — which is exactly how `--lb-belief-templates` reached
+    review unkeyed.
+
+    Anything added to the EVAL 5 argument group must therefore be classified
+    here, deliberately, by someone who has thought about whether it changes the
+    screen.
+    """
+    import evaluate_circuit as E
+
+    # Flags that cannot change a screen's contents, with the reason. Adding a
+    # name here is a claim; check it before you make it.
+    NOT_KEYED = {
+        # Judges are keyed through `Benchmark.judge_models`, by what would
+        # actually be billed, rather than through these flags -- see the note
+        # in screen_cache.KEYED_FLAGS.
+        "mask_judge_model", "mask_numeric_judge_model",
+        "lb_judge_model", "lb_harm_judge_model",
+        # A path. What matters about a checkout is its content, hashed as both
+        # candidates and rubric files.
+        "benchmark_repo_root",
+        # Which datasets to run, not what any one screen contains.
+        "benchmarks",
+        # Configuration-side only: these shape the ablated passes, not the
+        # screen, which runs with every gate open.
+        "benchmark_n_random", "benchmark_coherence_batch_size",
+        # The cache's own controls.
+        "benchmark_screen_cache", "benchmark_refresh_screen",
+        "no_benchmark_screen_cache",
+        # Judge plumbing and dry runs: no effect on a generated screen.
+        "judge_dry_run", "judge_concurrency",
+        # Read by no adapter; see the note on --benchmark-belief-model.
+        "benchmark_belief_model",
+    }
+
+    group = [g for g in E.build_parser()._action_groups
+             if "benchmarks (EVAL 5)" in (g.title or "")]
+    assert group, "could not find the EVAL 5 argument group"
+    dests = {a.dest for a in group[0]._group_actions} - {"help"}
+    assert dests, "the EVAL 5 group has no flags; this test would pass vacuously"
+
+    unclassified = dests - set(screen_cache.KEYED_FLAGS) - NOT_KEYED
+    assert not unclassified, (
+        "these EVAL 5 flags are neither in screen_cache.KEYED_FLAGS nor listed "
+        "as deliberately unkeyed: %s. Decide which, in screen_cache.py, rather "
+        "than leaving a flag able to change the screen without changing the "
+        "key." % sorted(unclassified))
+
+
+def test_a_meta_dict_with_mixed_key_types_does_not_take_the_run_down():
+    """`sorted(meta.items())` raised TypeError straight out of
+    `candidate_fingerprint`, through `build_key` and out of `cached_screen` --
+    the one thing this module promises it cannot do."""
+    from evaluation.benchmarks import base as bb
+
+    item = bb.BenchmarkItem("x", [{"role": "user", "content": "hi"}],
+                            meta={"a": 1, 2: "b", None: 3})
+    assert screen_cache.candidate_fingerprint(None, [item])
+
+
+def test_a_nested_dict_reordering_does_not_force_a_re_screen(tmp_path):
+    cli = cache_cli(tmp_path)
+    one = [i.replace(meta={"outer": {"a": 1, "b": 2}}) for i in make_items(3)]
+    two = [i.replace(meta={"outer": {"b": 2, "a": 1}}) for i in make_items(3)]
+    assert screen_cache.key_hash(a_key(cli, items=one)) == \
+        screen_cache.key_hash(a_key(cli, items=two))
+
+
+def test_message_order_is_still_significant(tmp_path):
+    """Normalising dict order must not normalise *sequence* order: `messages`
+    is a conversation, and swapping two turns is a different prompt."""
+    cli = cache_cli(tmp_path)
+    turns = [{"role": "user", "content": "one"},
+             {"role": "assistant", "content": "two"},
+             {"role": "user", "content": "three"}]
+    one = [make_items(1)[0].replace(messages=turns)]
+    two = [make_items(1)[0].replace(messages=[turns[2], turns[1], turns[0]])]
+    assert screen_cache.key_hash(a_key(cli, items=one)) != \
+        screen_cache.key_hash(a_key(cli, items=two))
+
+
+def test_a_blob_carrying_no_screen_is_a_miss_not_a_hit(tmp_path):
+    cli = cache_cli(tmp_path)
+    key = a_key(cli)
+    path, _ = screen_cache.paths_for(cli, "fake", key)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    torch.save({"key": key, "screen": None}, path)
+    back, provenance = screen_cache.load(cli, "fake", key)
+    assert back is None and provenance["hit"] is False
