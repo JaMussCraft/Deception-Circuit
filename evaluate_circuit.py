@@ -51,6 +51,8 @@ from evaluation import default_evaluations, list_evaluations
 from evaluation import report
 from evaluation import suite
 from evaluation.ablation import ABLATION_SCHEMES
+from evaluation.benchmark_eval import SCREEN_MAX_FACTOR
+from evaluation.benchmarks.base import DECEPTIVE
 from evaluation.benchmarks import (DEFAULT_BENCHMARKS, GROUPS, expand,
                                    list_benchmarks, list_choices, required_keys)
 from evaluation.context import build_session
@@ -63,8 +65,17 @@ SEC_MODEL_LOAD = 200.0
 SEC_PER_1000_TEST = 55.0
 SEC_PER_WIKITEXT_CONFIG = 13.0
 #: Seconds per generated token per row at --benchmark-gen-batch-size 8, dual
-#: stream with the KV cache. EVAL 5 is dominated by this and nothing else.
-SEC_PER_GEN_TOKEN_ROW = 0.0075
+#: stream with the KV cache. Measured on an A40 in job 21880374 (the sandbagging
+#: smoke test): one 8-row bucket decoded 1024 tokens in 126 s, i.e. 6.95 it/s
+#: for the bucket. Per row that is 126 / (1024 * 8).
+SEC_PER_GEN_TOKEN_ROW = 126.0 / (1024 * 8)
+
+#: Seconds per scored token per row for the coherence forward. Also measured in
+#: job 21880374: 2.91 s for one 8-row batch over ~1220 tokens. It is a single
+#: teacher-forced forward rather than one per token, hence ~50x cheaper than
+#: decoding -- but not free, and there is one per configuration, so leaving it
+#: out understated a 9-config dataset by several minutes.
+SEC_PER_COHERENCE_TOKEN_ROW = 2.91 / (1220 * 8)
 
 
 # ==============================================================================
@@ -340,16 +351,84 @@ def benchmark_stages(cli):
 
     n = cli.benchmark_n_per_dataset
     n_configs = 4 + cli.benchmark_n_random          # full/knockout/circuit/empty
+    # The screen judges in chunks and stops when both pools fill; how many
+    # candidates that takes is not knowable without generating, so this assumes
+    # it runs to its own budget. Stated as the worst case rather than a guess,
+    # because the failure this estimate exists to prevent is a job killed at
+    # the walltime with nothing written.
     stages = []
     for dataset in expand(cli.benchmarks):
-        tokens = get_benchmark(dataset).new_tokens or cli.benchmark_new_tokens
+        bench = get_benchmark(dataset)
+        tokens = bench.new_tokens or cli.benchmark_new_tokens
+        # The screen stops at whichever comes first: its budget, or running out
+        # of candidates. Estimating the budget for a 191-row benchmark claimed
+        # five times the work that exists.
+        pool = _pool_size(bench, cli)
+        screened = min(n * SCREEN_MAX_FACTOR, pool) if pool else n * SCREEN_MAX_FACTOR
         per_pass = n * tokens * SEC_PER_GEN_TOKEN_ROW
-        # screen + reference pool, then every configuration but `full` (which
-        # reuses the screen's own tokens rather than generating again).
-        stages.append((f"eval 5 {dataset}: screen + reference", 2 * per_pass))
+
+        probes = _probe_count(bench, cli)
+        if probes:
+            # Belief runs over every *screened* candidate, not just survivors.
+            belief_tokens = (tokens if probes == 1
+                             else cli.benchmark_belief_tokens)
+            stages.append(
+                (f"eval 5 {dataset}: belief ({probes} probe(s))",
+                 screened * probes * belief_tokens * SEC_PER_GEN_TOKEN_ROW))
+        stages.append((f"eval 5 {dataset}: screen (<= {screened} items)",
+                       screened * tokens * SEC_PER_GEN_TOKEN_ROW))
+        stages.append((f"eval 5 {dataset}: reference pool", per_pass))
+        # `full` reuses the screen's own tokens rather than generating again.
         stages.append((f"eval 5 {dataset}: {n_configs - 1} ablated configs",
                        (n_configs - 1) * per_pass))
+        # One teacher-forced reference forward per config, over prompt +
+        # generation. Cheaper than decoding by roughly the token count, since
+        # it is a single forward rather than one per token.
+        # ~1.3x `tokens` to stand for prompt + generation, which is what the
+        # reference forward actually scores.
+        stages.append((f"eval 5 {dataset}: coherence x {n_configs}",
+                       n_configs * n * tokens * 1.3 *
+                       SEC_PER_COHERENCE_TOKEN_ROW))
     return stages
+
+
+#: dataset -> loaded items, so --dry-run's plan table and its runtime estimate
+#: read the adapters once between them rather than twice each.
+_POOL_CACHE = {}
+
+
+def _items_for(bench, cli):
+    if bench.name not in _POOL_CACHE:
+        try:
+            _POOL_CACHE[bench.name] = bench.load(None, cli)
+        except Exception:                                  # noqa: BLE001
+            _POOL_CACHE[bench.name] = None
+    return _POOL_CACHE[bench.name]
+
+
+def _pool_size(bench, cli):
+    """Screenable candidates: for a prompt-kind benchmark, the deceptive half."""
+    items = _items_for(bench, cli)
+    if items is None:
+        return 0
+    return len([i for i in items if bench.condition_kind != "prompt"
+                or i.condition == DECEPTIVE])
+
+
+def _probe_count(bench, cli):
+    """How many belief probes an adapter asks per item, or 0 if it asks none.
+
+    Read off a real item so it reflects the adapter rather than a guess; a
+    dataset whose checkout is missing contributes 0 and the estimate omits the
+    row rather than inventing one.
+    """
+    items = _items_for(bench, cli)
+    if not items:
+        return 0
+    try:
+        return len(bench.belief_request(items[0]) or [])
+    except Exception:                                      # noqa: BLE001
+        return 0
 
 
 def benchmark_plan(cli) -> None:
@@ -364,17 +443,25 @@ def benchmark_plan(cli) -> None:
     thin = []
     for dataset in datasets:
         bench = get_benchmark(dataset)
+        if hasattr(bench, "bind"):
+            # Without this the column prints the adapter's default judge even
+            # under --mask-judge-model / --lb-judge-model, i.e. misreports
+            # which model is about to be billed.
+            bench.bind(cli)
         spec = bench.judge_spec()
         # The candidate pool, loaded for real: prompts are model-independent,
         # so this needs no GPU and no key. A dataset whose checkout is missing
         # reports that rather than taking the whole dry run down with it --
         # the point of --dry-run is to find out what is wrong, not to stop at
         # the first thing.
-        try:
-            pool = len(bench.load(None, cli))
-        except Exception as exc:                           # noqa: BLE001
-            pool = f"! {type(exc).__name__}"
+        # For a prompt-kind benchmark `load()` returns both conditions and the
+        # screen walks only the deceptive half; counting both would roughly
+        # double sandbagging's apparent pool and let the thin-cell warning use
+        # a number no run can reach.
+        if _items_for(bench, cli) is None:
+            pool = "unavailable"
         else:
+            pool = _pool_size(bench, cli)
             if pool < cli.benchmark_n_per_dataset:
                 thin.append((dataset, pool))
         print(f"  {dataset:<34} {bench.condition_kind:<9} "

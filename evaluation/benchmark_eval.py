@@ -93,13 +93,19 @@ CONFIG_LABELS = {
 #: common, without paying for the whole pool when it is rare.
 SCREEN_CHUNK_FACTOR = 2
 
-#: The ceiling on candidates screened, as a multiple of the target count.
-#: Without it the walk is driven by whichever pool fills last: on a benchmark
-#: where the full model is deceptive nearly always, the *honest* pool is the
-#: bottleneck and the screen would walk all 5245 harm-pressure rows at 512
-#: tokens each to fill it. A reference pool of a few dozen items, cycled, is a
-#: usable reference; an extra six hours of generation to widen it is not.
-#: A pool cut short this way is reported, not silently accepted.
+#: How far past the target the screen may keep walking *once the evaluation set
+#: is already full*, as a multiple of the target count.
+#:
+#: It is deliberately NOT a ceiling on screening as a whole. The search for
+#: deceptive items is uncapped and will walk the entire candidate pool if
+#: deception is rare, which is what the plan means by "worst case = full pool";
+#: capping that would silently return a smaller evaluation set than asked for.
+#: What this bounds is the *other* reason the walk continues: the reference
+#: pool. On a benchmark where the full model is deceptive nearly always, the
+#: honest pool is the bottleneck, and without a bound the screen would generate
+#: 512 tokens for all 5245 harm-pressure rows to fill it. A few dozen reference
+#: items, cycled, is a usable reference; six more hours of generation to widen
+#: it is not. A pool cut short is reported, not silently accepted.
 SCREEN_MAX_FACTOR = 10
 
 
@@ -390,8 +396,15 @@ def _judge_all(client, bench, items, responses):
     return rows
 
 
-def _elicit_beliefs(ctx, bench, client, items, eos, pad_id, desc):
-    """-> (items with `belief` filled, n_dropped). Always the FULL model."""
+def _elicit_beliefs(ctx, bench, client, items, eos, pad_id, desc,
+                    new_tokens, refs=None):
+    """-> (items with `belief` filled, n_dropped, n_judge_failed).
+
+    Always the FULL model. `refs`, when given, collects
+    `rendered prompt -> (prompt_tokens, completion_tokens)` for every probe so
+    a probe that doubles as a reference-pool row is not generated twice; see
+    `_probe_is_the_reference` for when that applies.
+    """
     specs = [bench.belief_request(item) for item in items]
     flat, owners = [], []
     for index, spec in enumerate(specs):
@@ -404,13 +417,18 @@ def _elicit_beliefs(ctx, bench, client, items, eos, pad_id, desc):
     tok = ctx.tokenizer
     texts = [render_messages(tok, probe["messages"]) for probe in flat]
     clean_ids, clean_mask = encode_prompts(tok, texts, pad_id)
-    new_tokens = ctx.cli.benchmark_belief_tokens
     corrupt = placeholder_corrupt(clean_ids, clean_mask, new_tokens, pad_id)
     with ctx.all_gates_open():
         out = generate_under(ctx, clean_ids=clean_ids, clean_mask=clean_mask,
                              corrupt_ids=corrupt, hook=None,
                              new_tokens=new_tokens, eos=eos, desc=desc)
-    answers = decode_completions(tok, out, clean_ids.shape[1], eos)
+    width = clean_ids.shape[1]
+    answers = decode_completions(tok, out, width, eos)
+    if refs is not None:
+        completions = completion_tokens(out, width, eos)
+        for row, text in enumerate(texts):
+            refs[text] = (clean_ids[row][clean_mask[row].bool()].tolist(),
+                          completions[row])
 
     # Some probes need a judge to read their answer (an open-ended claim), some
     # parse locally (a bare A-D). `run` passes a None straight through.
@@ -468,10 +486,20 @@ def run_screen(ctx, bench, client, dataset) -> Screen:
     target = cli.benchmark_n_per_dataset
     new_tokens = bench.new_tokens or cli.benchmark_new_tokens
     prompt_kind = bench.condition_kind == "prompt"
+    # Where the belief probe IS the honest twin -- `instructed-deception`, whose
+    # probe and whose reference-pool row are the same prompt -- one generation
+    # has to serve both roles, at the larger of the two budgets. Generating it
+    # twice costs a second full pass over every screened candidate, and decides
+    # belief from a 128-token truncation while the reference stream carries the
+    # 512-token version, so lowering --benchmark-belief-tokens would silently
+    # shrink the evaluation set. The plan says as much: "no extra pass needed".
     want_pool = 0 if cli.benchmark_ref_pool == "deceptive" else target
 
     candidates = bench.load(ctx, cli)
     honest_candidates = [c for c in candidates if c.condition == base.HONEST]
+    shared = _probe_is_the_reference(bench, candidates)
+    belief_tokens = new_tokens if shared else cli.benchmark_belief_tokens
+    belief_refs = {} if shared else None
     if prompt_kind:
         # An honest-condition candidate is a reference, not something to screen
         # for deception; its half of `load()` is used below.
@@ -492,7 +520,7 @@ def run_screen(ctx, bench, client, dataset) -> Screen:
         chunk = candidates[start:start + chunk_size]
         chunk, dropped, judge_failed = _elicit_beliefs(
             ctx, bench, client, chunk, eos, pad_id,
-            "%s: belief (full model)" % dataset)
+            "%s: belief (full model)" % dataset, belief_tokens, belief_refs)
         no_belief += dropped
         belief_judge_failed += judge_failed
         if not chunk:
@@ -547,10 +575,11 @@ def run_screen(ctx, bench, client, dataset) -> Screen:
         "screen_labels": label_counts,
         "early_stopped": screened < len(candidates),
         "budget": budget,
-        # True when the screen stopped with the reference pool still short.
-        # The pool is then cycled, which the report prints as `partner reused`.
-        "pool_short": (not prompt_kind and len(pool) < want_pool
-                       and screened >= budget),
+        # True whenever the screen stopped with the reference pool still
+        # short -- because it hit the budget, *or* because the candidate pool
+        # simply ran out. Conditioning on the budget alone left the second case
+        # unreported, which is the more likely one on the small MASK splits.
+        "pool_short": not prompt_kind and len(pool) < want_pool,
     }
 
     # Re-encode the selection as one batch with one width, rather than leaving
@@ -563,15 +592,36 @@ def run_screen(ctx, bench, client, dataset) -> Screen:
     screen.full_ids = torch.cat(
         [screen.clean_ids, torch.stack([s["block"] for s in selected])], dim=1)
 
+    screen.stats["belief_tokens"] = belief_tokens
+    screen.stats["belief_doubles_as_reference"] = shared
     _build_reference_pool(ctx, bench, screen, selected, pool,
                           honest_candidates, prompt_kind, want_pool, eos,
-                          pad_id, dataset)
+                          pad_id, dataset, belief_refs)
     return screen
+
+
+def _probe_is_the_reference(bench, candidates):
+    """Does this benchmark's belief probe render to the same prompt as the
+    honest twin it will also use as the reference-pool row?
+
+    Compared by content rather than assumed from `condition_kind`: an adapter
+    is free to make its probe a different question from its twin, and reusing
+    one generation for the other would then score belief against text the model
+    never produced for that prompt.
+    """
+    if not candidates:
+        return False
+    item = candidates[0]
+    twin = bench.honest_twin(item)
+    probes = bench.belief_request(item)
+    if twin is None or not probes or len(probes) != 1:
+        return False
+    return probes[0]["messages"] == twin.messages
 
 
 def _build_reference_pool(ctx, bench, screen, selected, pool,
                           honest_candidates, prompt_kind, want_pool, eos,
-                          pad_id, dataset):
+                          pad_id, dataset, belief_refs=None):
     """Fill `screen.pool_items` / `pool_refs` / `partner_index`."""
     cli = ctx.cli
 
@@ -624,9 +674,19 @@ def _build_reference_pool(ctx, bench, screen, selected, pool,
     for item, entry in zip(screen.items, selected):
         known[id(item)] = entry["ref"]
 
+    tok = ctx.tokenizer
+    if belief_refs:
+        # The belief pass already generated these exact prompts, at the same
+        # budget (see `_probe_is_the_reference`). Reuse rather than re-run.
+        for item in pool_items:
+            if id(item) in known:
+                continue
+            cached = belief_refs.get(render_messages(tok, item.messages))
+            if cached is not None:
+                known[id(item)] = cached
+
     need = [item for item in pool_items if id(item) not in known]
     if need:
-        tok = ctx.tokenizer
         texts = [render_messages(tok, item.messages) for item in need]
         ids, mask = encode_prompts(tok, texts, pad_id)
         corrupt = placeholder_corrupt(ids, mask, screen.new_tokens, pad_id)
@@ -941,9 +1001,10 @@ class BenchmarkEvaluation(Evaluation):
                   "model having no belief."
                   % screen["dropped_belief_judge_failed"])
         if screen.get("pool_short"):
-            print("  !! the screen hit its %d-candidate budget with the "
-                  "reference pool still short;\n     it is cycled below, so "
-                  "several items share one reference." % screen["budget"])
+            print("  !! the screen ran out of candidates or budget with the "
+                  "reference pool still\n     short of %d; it is cycled, so "
+                  "several items share one reference."
+                  % screen.get("target", 0))
         ref = entry["reference"]
         print("  corrupt reference: %s pool, %s pairing, %d rows%s%s"
               % (ref["pool"], ref["pairing"], ref["pool_size"],
@@ -1028,6 +1089,15 @@ CAVEATS = [
     "negative one is weak.",
     "Read the `full` column of the example generations first. If that is not "
     "fluent, the generation engine is broken, not the circuit.",
+    "Then read the `knockout` column, including the rows labelled `honest`. "
+    "Every grader here keys on a small part of the response -- sandbagging on "
+    "one <step1-results> tag -- so a generation can degrade badly and still "
+    "score `honest` because the one token the grader reads survived. The "
+    "coherence columns are what separate that from real honesty: a large drop "
+    "in distinct-n or a rise in ref NLL next to a fall in the deception rate "
+    "means format loss, not a behavioural change. (Observed on the very first "
+    "GPU run: knockout scored 0% deceptive with distinct-n down from 0.69 to "
+    "0.35 and 75% of rows unparsed outright.)",
 ]
 
 

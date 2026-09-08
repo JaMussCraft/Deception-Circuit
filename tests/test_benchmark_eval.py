@@ -621,7 +621,7 @@ def test_a_failed_belief_judge_is_counted_apart_from_having_no_belief():
     bench = NeedsBeliefJudge(make_items(6), _even_are_deceptive)
     items, dropped, judge_failed = B._elicit_beliefs(
         ctx, bench, Flaky(cache_path=None, verbose=False), bench._items,
-        B.eos_ids_for(ctx.node_model), PAD, "belief")
+        B.eos_ids_for(ctx.node_model), PAD, "belief", NEW_TOKENS)
 
     assert items == []
     assert judge_failed == 6, "judge failures were not counted"
