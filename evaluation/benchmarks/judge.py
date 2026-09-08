@@ -38,9 +38,15 @@ KEY_ENV = {"openai": "OPENAI_API_KEY",
 
 
 # Retrying a deterministic error cannot help. These are the ones that can.
+# Deliberately NOT "APIStatusError": it is the base of openai's entire status
+# tree, so listing it makes BadRequestError, AuthenticationError,
+# PermissionDeniedError and NotFoundError all retryable. Those are
+# deterministic -- a malformed request fails identically on every attempt --
+# and retrying them burns the budget that the genuinely transient failures
+# need. Status errors are classified by code instead, below.
 _TRANSIENT_NAMES = (
     "APITimeoutError", "APIConnectionError", "RateLimitError",
-    "InternalServerError", "APIStatusError", "TimeoutError",
+    "InternalServerError", "TimeoutError",
     "ConnectionError", "ServiceUnavailableError",
 )
 

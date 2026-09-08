@@ -1444,3 +1444,67 @@ def test_judge_cache_write_failure_is_caught_not_propagated(monkeypatch):
     monkeypatch.setattr(client.cache, "put", exploding_put)
     out = client.run([_request(content="a")])
     assert out[0].text == "A"
+
+
+# ----------------------------------------------------------------------------
+# retry classification
+#
+# `is_transient` decides what the judge spends its retry budget on. It had no
+# tests at all, and was classifying every HTTP status error as retryable
+# because openai's BadRequestError, AuthenticationError, PermissionDeniedError
+# and NotFoundError all inherit from APIStatusError.
+# ----------------------------------------------------------------------------
+
+def _openai_errors():
+    openai = pytest.importorskip("openai")
+    httpx = pytest.importorskip("httpx")
+    request = httpx.Request("POST", "https://api.openai.com/v1/chat/completions")
+
+    def status(code, klass, message="x"):
+        return klass(message, response=httpx.Response(code, request=request), body=None)
+
+    return openai, httpx, request, status
+
+
+def test_deterministic_client_errors_are_not_retried():
+    """A 400 fails identically every time; retrying it starves the real failures."""
+    openai, httpx, request, status = _openai_errors()
+    for code, klass in (
+        (400, openai.BadRequestError),
+        (401, openai.AuthenticationError),
+        (403, openai.PermissionDeniedError),
+        (404, openai.NotFoundError),
+    ):
+        exc = status(code, klass)
+        assert not judge_mod.is_transient(exc), (
+            f"{klass.__name__} ({code}) would be retried; it inherits from "
+            f"APIStatusError, which must not be listed as transient")
+
+
+def test_transient_failures_are_still_retried():
+    openai, httpx, request, status = _openai_errors()
+    assert judge_mod.is_transient(openai.APITimeoutError(request))
+    assert judge_mod.is_transient(openai.APIConnectionError(request=request))
+    assert judge_mod.is_transient(status(429, openai.RateLimitError))
+    assert judge_mod.is_transient(status(500, openai.InternalServerError))
+
+
+def test_server_side_status_codes_are_classified_by_number():
+    """A status error with no recognised class name still retries on 5xx."""
+    class UnknownStatusError(Exception):
+        def __init__(self, status_code):
+            self.status_code = status_code
+
+    assert judge_mod.is_transient(UnknownStatusError(503))
+    assert judge_mod.is_transient(UnknownStatusError(429))
+    assert not judge_mod.is_transient(UnknownStatusError(422))
+
+
+def test_a_plain_exception_is_not_retried():
+    assert not judge_mod.is_transient(ValueError("malformed schema"))
+    assert not judge_mod.is_transient(KeyError("missing column"))
+
+
+def test_socket_level_failures_are_retried():
+    assert judge_mod.is_transient(asyncio.TimeoutError())
+    assert judge_mod.is_transient(OSError("connection reset by peer"))
