@@ -301,11 +301,20 @@ def _run_sync(coro):
     box = {}
 
     def target():
-        box["value"] = asyncio.run(coro)
+        # The exception has to be carried out by hand. Letting it escape the
+        # thread leaves `box` empty, and the `box["value"]` below then raises
+        # KeyError -- which replaces the real failure (a bad key, an unreachable
+        # host) with a traceback that says nothing about it.
+        try:
+            box["value"] = asyncio.run(coro)
+        except BaseException as exc:              # noqa: BLE001 - re-raised below
+            box["error"] = exc
 
     thread = threading.Thread(target=target)
     thread.start()
     thread.join()
+    if "error" in box:
+        raise box["error"]
     return box["value"]
 
 

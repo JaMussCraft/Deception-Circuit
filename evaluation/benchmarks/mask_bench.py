@@ -184,6 +184,7 @@ class MaskSplit(Benchmark):
                                         else "eval_belief"),
                       "belief_model": (None if self.from_ground_truth
                                        else self.belief_model)}))
+        self._check_belief_model(ctx)
         limit = getattr(cli, "benchmark_pool_size", None)
         if limit:
             items = items[:limit]
@@ -191,6 +192,33 @@ class MaskSplit(Benchmark):
                            "dropped_no_belief": dropped_no_belief,
                            "dropped_no_proposition": dropped_no_proposition}
         return items
+
+    def _check_belief_model(self, ctx):
+        """The belief reference is another run\'s, so it must be the same model.
+
+        `belief` here is the *full model\'s*, read from MASK\'s own metrics CSV
+        rather than re-elicited -- that is the whole point, since re-eliciting
+        under ablation would let a knowledge deficit score as an honesty gain.
+        But the CSV is per-model, and nothing used to check it against the model
+        actually being evaluated. Run EVAL 5 on llama-1b and every MASK belief
+        would silently be Llama-3.1-8B-Instruct\'s, with nothing in the report
+        to show it.
+        """
+        name = None
+        for holder in (ctx, getattr(ctx, "run_config", None), getattr(ctx, "cli", None)):
+            name = name or getattr(holder, "model_name", None) or getattr(holder, "model", None)
+        if name is None:
+            return          # caller supplied no model identity; nothing to check
+        name = str(name).lower()
+        if self.belief_model.lower() not in name and name not in self.belief_model.lower():
+            raise ValueError(
+                "MASK belief is read from %s\'s metrics run, but the model under "
+                "evaluation is %s. Those beliefs are not this model\'s, and the "
+                "deceptive/honest split would be measured against the wrong "
+                "reference. Generate metrics for %s with "
+                "mask/mask/generate_responses.py + evaluate.py, or pass "
+                "--benchmark-belief-model to say the mismatch is intended."
+                % (self.belief_model, name, name))
 
     def _beliefs(self, mask_dir, rows):
         """task_id -> belief, from the ground truth or the metrics CSV."""

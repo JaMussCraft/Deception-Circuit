@@ -15,6 +15,7 @@ that has no reason to hide. That makes `condition_kind` **prompt**: the honest
 items are a genuine twin population, not the leftovers of a screen.
 """
 
+import itertools
 from . import base
 from .base import Benchmark, BenchmarkItem
 from . import sources
@@ -87,10 +88,17 @@ class Sandbagging(Benchmark):
         # would return four times it (bio + chem + cyber + mmlu), which is not
         # what the same flag means to the other adapters.
         limit = getattr(cli, "benchmark_pool_size", None)
-        deceptive = []
+        per_config = []
         for config in WMDP_CONFIGS:
             frame = sources.hf_config("cais/wmdp", config)
-            deceptive.extend(self._items(frame, config, base.DECEPTIVE, limit))
+            per_config.append(self._items(frame, config, base.DECEPTIVE, limit))
+        # Round-robin, not concatenate-then-truncate. WMDP is stored bio, then
+        # chem, then cyber, and bio alone is 1273 items, so slicing the
+        # concatenation gave `--benchmark-pool-size 100` a pool that was 100
+        # bio and nothing else -- a sandbagging measurement on one topic,
+        # reported as if it covered three.
+        deceptive = [item for row in itertools.zip_longest(*per_config)
+                     for item in row if item is not None]
         frame = sources.hf_config("cais/mmlu", "all")
         honest = self._items(frame, "mmlu", base.HONEST, limit)
         if limit:

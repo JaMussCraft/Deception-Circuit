@@ -212,8 +212,20 @@ class Benchmark(object):
         `load()` alone is ambiguous: sandbagging returns both pools, so
         partitioning `load()` by `condition` yields an honest bank, while
         Liars\' Bench `instructed-deception` returns only the lie-instructed
-        rows and the same partition yields an empty one. Rather than leave that
-        to a caller\'s reading of `condition_kind`, the twin is asked for.
+        rows and the same partition yields an empty one.
+
+        **The contract, stated so a caller can rely on it:** `None` means
+        "no per-item twin -- take the honest bank by partitioning `load()` on
+        `condition`". A `BenchmarkItem` means "this item\'s honest counterpart
+        is not in `load()`; here it is".
+
+        `Sandbagging` returns None and is right to: a WMDP question has no MMLU
+        counterpart, so its honest bank really is the other half of `load()`.
+        `instructed-deception` returns a twin because its `load()` is
+        lie-instructed rows only. An earlier version of this docstring implied
+        the method removed the caller\'s branch entirely, which it does not --
+        it replaces a branch on `condition_kind` with a branch on the return
+        value, which is the one that cannot go stale.
         """
         return None
 

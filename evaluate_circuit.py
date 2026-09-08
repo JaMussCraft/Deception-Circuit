@@ -152,6 +152,22 @@ def build_parser():
     g.add_argument("--benchmark-repo-root", default=None,
                    help="Directory holding the sibling benchmark checkouts "
                         "(mask/, liars-bench/). Default: this repo's parent.")
+    # The adapters already read these three through getattr(cli, ...), which
+    # returns None for an undefined flag -- so before they were declared here,
+    # passing one was a silent no-op rather than an error.
+    g.add_argument("--benchmark-pool-size", type=int, default=None,
+                   help="Cap each condition pool at N items per benchmark, for "
+                        "cheap smoke runs. The sandbagging deceptive pool is "
+                        "drawn round-robin across WMDP bio/chem/cyber, so a "
+                        "small cap stays topic-balanced.")
+    g.add_argument("--benchmark-belief-model", default=None,
+                   help="Model whose MASK metrics run supplies the belief "
+                        "reference. Defaults to the model under evaluation; "
+                        "set it explicitly to accept a deliberate mismatch.")
+    g.add_argument("--lb-belief-templates", type=int, default=None,
+                   help="Cap the number of Liars' Bench closed-form belief "
+                        "probes per item (minimum 2, since belief is only "
+                        "believed when the probes agree).")
 
     g = p.add_argument_group("models & data")
     g.add_argument("--reference", default="separate", choices=["separate", "shared"],
