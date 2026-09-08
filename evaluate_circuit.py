@@ -366,15 +366,33 @@ def estimate_runtime(session, ctx) -> dict:
     if cli.ablation == "mean":
         stages.append(("mean bank", 2 * test_pass))
 
-    # A stage may carry a floor as a third element; those that do not are
-    # equally expensive either way.
-    stages = [(label, row[0] * n_cells, (row[1] if len(row) > 1 else row[0]) * n_cells)
-              for label, *row in ((st[0], *st[1:]) for st in stages)]
+    stages = scale_stages(stages, n_cells)
     stages.insert(0, ("model load", SEC_MODEL_LOAD, SEC_MODEL_LOAD))
     return {"stages": stages,
             "total_seconds": sum(s[1] for s in stages),
             "total_seconds_floor": sum(s[2] for s in stages),
             "cells": n_cells}
+
+
+def scale_stages(stages, n_cells):
+    """Multiply each stage by the cell count — except the ones that run once.
+
+    A stage is `(label, seconds)`, `(label, seconds, floor)`, or
+    `(label, seconds, floor, once)`. `once` marks work that happens once per
+    process rather than once per cell: EVAL 5's screen, belief pass and
+    reference pool are memoised by `Session.screen_for` and now cached to disk,
+    so scaling them by the cell count claimed a 3x3 suite would screen nine
+    times when it screens once — an overestimate of hours on exactly the suites
+    that most need to be sized against a walltime.
+    """
+    scaled = []
+    for stage in stages:
+        label, rest = stage[0], list(stage[1:])
+        ceiling = rest[0]
+        floor = rest[1] if len(rest) > 1 else rest[0]
+        mult = 1 if (len(rest) > 2 and rest[2]) else n_cells
+        scaled.append((label, ceiling * mult, floor * mult))
+    return scaled
 
 
 def benchmark_stages(cli, model=None):
@@ -431,7 +449,8 @@ def benchmark_stages(cli, model=None):
                 (f"eval 5 {dataset}: belief ({probes} probe(s))",
                  screened * probes * belief_tokens * SEC_PER_GEN_TOKEN_ROW,
                  free if free is not None
-                 else n * probes * belief_tokens * SEC_PER_GEN_TOKEN_ROW))
+                 else n * probes * belief_tokens * SEC_PER_GEN_TOKEN_ROW,
+                 True))
         # The screen stops as soon as it has `n` deceptive items -- and for a
         # prompt-kind benchmark that is the only thing it waits for, since its
         # honest bank comes from twins rather than screening bycatch. How fast
@@ -444,9 +463,10 @@ def benchmark_stages(cli, model=None):
                        + (" [cached]" if cached else ""),
                        screened * tokens * SEC_PER_GEN_TOKEN_ROW,
                        free if free is not None
-                       else n * tokens * SEC_PER_GEN_TOKEN_ROW))
+                       else n * tokens * SEC_PER_GEN_TOKEN_ROW,
+                       True))
         stages.append((f"eval 5 {dataset}: reference pool", per_pass,
-                       0.0 if cached else per_pass))
+                       0.0 if cached else per_pass, True))
         # `full` reuses the screen's own tokens rather than generating again.
         stages.append((f"eval 5 {dataset}: {n_configs - 1} ablated configs",
                        (n_configs - 1) * per_pass))

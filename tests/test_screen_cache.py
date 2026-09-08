@@ -222,8 +222,11 @@ def test_a_configuration_change_is_not_reported_as_merely_a_device_change(
     other = cache_cli(tmp_path, benchmark_gen_batch_size=32)
     assert screen_cache.cached_on_devices(other, "fake",
                                           a_key(other, device=None)) == []
+    # Any of them, not near[0]: `describe_misses` reports the directory in
+    # name order, so asserting on the first entry would depend on how the hash
+    # happened to sort against whatever else is cached alongside it.
     near = screen_cache.describe_misses(other, "fake", a_key(other))
-    assert "benchmark_gen_batch_size" in near[0]["differs"]
+    assert any("benchmark_gen_batch_size" in n["differs"] for n in near)
 
 
 def test_a_corrupt_cache_file_is_a_miss_not_a_crash(tmp_path):
@@ -351,3 +354,43 @@ def test_a_changed_target_does_not_reuse_the_smaller_screen(tmp_path,
                            bench)
     assert spy.calls == 2
     assert len(small.items) == 2 and len(large.items) == 4
+
+
+# ==============================================================================
+# WHAT THE ESTIMATE CHARGES FOR A SCREEN
+# ==============================================================================
+
+def test_a_memoised_stage_is_not_charged_once_per_cell():
+    """`Session.screen_for` computes a dataset's screen once per process, and
+    the disk cache now makes even that once per *campaign*. Charging it per
+    cell overstated a 3x3 suite by eight extra screens — on the eleven-dataset
+    configuration that is a claim of ~700 GPU-hours that do not exist."""
+    import evaluate_circuit as E
+
+    stages = E.scale_stages([("per cell", 10.0),
+                             ("screen", 100.0, 50.0, True)], n_cells=9)
+    assert stages[0] == ("per cell", 90.0, 90.0)
+    assert stages[1] == ("screen", 100.0, 50.0)
+
+
+def test_a_stage_without_a_floor_is_equally_expensive_either_way():
+    import evaluate_circuit as E
+
+    assert E.scale_stages([("flat", 7.0)], n_cells=3) == [("flat", 21.0, 21.0)]
+
+
+def test_the_screen_belief_and_pool_stages_are_the_once_per_process_ones():
+    """Guards the marking itself: dropping the `True` from any of the three
+    silently restores the per-cell overcharge."""
+    import evaluate_circuit as E
+
+    cli = make_cli(benchmarks=["mask:known_facts"], benchmark_n_per_dataset=4,
+                   benchmark_n_random=1, evals=["benchmarks"])
+    once, per_cell = [], []
+    for stage in E.benchmark_stages(cli):
+        (once if len(stage) > 3 and stage[3] else per_cell).append(stage[0])
+    assert any("screen" in label for label in once)
+    assert any("reference pool" in label for label in once)
+    assert not any("screen" in label for label in per_cell)
+    assert any("ablated configs" in label for label in per_cell)
+    assert any("coherence" in label for label in per_cell)
