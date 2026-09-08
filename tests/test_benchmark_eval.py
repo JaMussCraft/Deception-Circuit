@@ -387,6 +387,39 @@ def test_a_short_pool_cycles_and_says_so():
     assert reused is True, "a reused partner is a thinner reference than it looks"
 
 
+def test_an_item_is_never_handed_its_own_row_when_it_is_in_the_pool():
+    """`--benchmark-ref-pool pooled` appends the evaluation set to its own
+    reference pool, so `assign_partners` takes the cycle branch and can hand
+    item i the pool row that *is* item i. That row's interchange ablation
+    becomes `gate*clean + (1 - gate)*clean` == clean -- no intervention at
+    all, scored as though there had been one, and it counts as "still
+    deceptive". Measured before the fix: 92 of 200 seeds produced at least one
+    such row at N=100 with a 40-item honest pool.
+    """
+    for n, honest in ((100, 40), (20, 5)):
+        forbidden = [honest + i for i in range(n)]
+        for seed in range(50):
+            indices, _ = B.assign_partners(n, honest + n, seed,
+                                           forbidden=forbidden)
+            assert len(indices) == n
+            assert all(indices[i] != forbidden[i] for i in range(n)), \
+                "seed %d paired an item with itself" % seed
+
+
+def test_the_unfixed_pairing_really_would_have_self_paired():
+    """Guards the test above from becoming vacuous.
+
+    If `assign_partners` were ever changed so self-pairing could not arise in
+    the first place, the assertions above would pass for the wrong reason and
+    stop protecting anything.
+    """
+    hits = sum(1 for seed in range(200)
+               if any(B.assign_partners(100, 140, seed)[0][i] == 40 + i
+                      for i in range(100)))
+    assert hits > 0, ("no seed self-pairs without `forbidden`, so the test "
+                      "above is no longer testing anything")
+
+
 def test_pairing_against_an_empty_pool_is_refused():
     with pytest.raises(ValueError, match="empty reference pool"):
         B.assign_partners(3, 0, seed=0)
@@ -557,6 +590,42 @@ def test_belief_is_elicited_from_the_full_model_never_the_ablated_one():
     assert seen, "no generation happened"
     assert all(value >= 10.0 for value in seen), \
         "a screening pass ran with a gate closed; belief is not the full model's"
+
+
+def test_a_failed_belief_judge_is_counted_apart_from_having_no_belief():
+    """One is a fact about the model, the other is a fact about an API.
+
+    Collapsed together, an OpenRouter blip midway through a belief pass
+    silently shrinks the evaluation set and is reported as "the model had no
+    belief on these items".
+    """
+    from evaluation.benchmarks.judge import JudgeClient, JudgeResult
+
+    class NeedsBeliefJudge(FakeBench):
+        def belief_request(self, item):
+            return [{"name": "p", "messages": item.messages}]
+
+        def belief_judge_request(self, item, probe_name, response):
+            from evaluation.benchmarks.base import JudgeRequest
+            return JudgeRequest("openai", "m", [{"role": "user", "content": "b"}])
+
+        def parse_belief(self, item, probes):
+            return probes[0]["judge_text"]      # None when the call failed
+
+    class Flaky(JudgeClient):
+        def run(self, requests):
+            return [JudgeResult(error="429 rate limited") if r is not None
+                    else None for r in requests]
+
+    ctx = make_ctx(make_cli(benchmark_n_per_dataset=2))
+    bench = NeedsBeliefJudge(make_items(6), _even_are_deceptive)
+    items, dropped, judge_failed = B._elicit_beliefs(
+        ctx, bench, Flaky(cache_path=None, verbose=False), bench._items,
+        B.eos_ids_for(ctx.node_model), PAD, "belief")
+
+    assert items == []
+    assert judge_failed == 6, "judge failures were not counted"
+    assert dropped == 0, "an API outage was recorded as the model having no belief"
 
 
 def test_a_failed_judge_call_is_unparsed_and_never_honest():
@@ -877,6 +946,33 @@ def test_a_missing_api_key_is_caught_before_a_model_is_ever_loaded(monkeypatch):
                                      "benchmarks", "--benchmarks",
                                      "mask:known_facts"])
     with pytest.raises(SystemExit, match="OPENAI_API_KEY"):
+        evaluate_circuit.main()
+
+
+def test_dry_run_does_not_require_an_api_key(monkeypatch):
+    """Plan step 3: --dry-run runs on a login node with no key exported.
+
+    It *prints* which keys are missing, which it cannot do if a missing key is
+    what stopped it -- so gating the check on --judge-dry-run alone made that
+    whole block unreachable.
+    """
+    import evaluate_circuit
+
+    def boom(cli):
+        raise AssertionError("the key check ran under --dry-run")
+
+    class Reached(Exception):
+        pass
+
+    monkeypatch.setattr(evaluate_circuit, "check_benchmark_keys", boom)
+    monkeypatch.setattr(evaluate_circuit, "build_session",
+                        lambda cli: (_ for _ in ()).throw(Reached()))
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    monkeypatch.setattr("sys.argv",
+                        ["evaluate_circuit.py", "r", "--evals", "benchmarks",
+                         "--dry-run", "--benchmarks", "mask:known_facts"])
+    # Reaching build_session is the proof: the key check was skipped.
+    with pytest.raises(Reached):
         evaluate_circuit.main()
 
 

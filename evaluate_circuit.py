@@ -537,8 +537,12 @@ def check_benchmark_keys(cli) -> None:
 
 def main():
     cli = resolve_cli(build_parser().parse_args())
-    if "benchmarks" in cli.evals and not cli.judge_dry_run:
-        # Before build_session: a missing key must cost zero GPU time.
+    if "benchmarks" in cli.evals and not (cli.judge_dry_run or cli.dry_run):
+        # Before build_session: a missing key must cost zero GPU time. Neither
+        # --dry-run nor --judge-dry-run spends anything, and --dry-run's whole
+        # job is to be runnable on a login node where no key is exported --
+        # it *prints* which keys are missing, which it cannot do if a missing
+        # key is what stopped it.
         check_benchmark_keys(cli)
     session = build_session(cli)
     if cli.dry_run:

@@ -264,13 +264,20 @@ def placeholder_corrupt(clean_ids, clean_mask, new_tokens, pad_id):
     return stream
 
 
-def assign_partners(n_items, pool_size, seed):
+def assign_partners(n_items, pool_size, seed, forbidden=None):
     """-> (indices, reused): which reference-pool row each item is paired with.
 
-    A derangement when the pool is the evaluation set's own size, so no item
-    draws itself and interchange never becomes a no-op; a seeded cycle
-    otherwise. `reused` says some pool row serves more than one item — a
-    thinner reference than the pool size suggests, so the report prints it.
+    `forbidden[i]`, when given, is the one pool index item `i` must not draw —
+    its own row, where the evaluation set is part of the pool. An item that
+    references itself makes an interchange ablation a no-op for that row:
+    `out = gate*clean + (1 - gate)*clean` is `clean` whatever the gate says, so
+    the row is scored as if it had never been ablated. Nothing raises and the
+    text looks fine, which is why it is repaired here rather than documented.
+
+    A derangement when the pool is the evaluation set's own size; a seeded
+    cycle otherwise, with self-assignments swapped out. `reused` says some pool
+    row serves more than one item — a thinner reference than the pool size
+    suggests, so the report prints it.
     """
     if pool_size <= 0:
         raise ValueError("cannot pair against an empty reference pool")
@@ -280,8 +287,22 @@ def assign_partners(n_items, pool_size, seed):
     import numpy as np
 
     order = np.random.default_rng(seed).permutation(pool_size)
-    return ([int(order[i % pool_size]) for i in range(n_items)],
-            n_items > pool_size)
+    indices = [int(order[i % pool_size]) for i in range(n_items)]
+    for i in range(n_items):
+        if forbidden is None or indices[i] != forbidden[i]:
+            continue
+        # Swap with any row whose partner is not the one `i` may not have.
+        # `forbidden` is injective (each item forbids its own distinct pool
+        # row), so the reverse direction of the swap is legal automatically.
+        for j in range(n_items):
+            if j != i and indices[j] != forbidden[i]:
+                indices[i], indices[j] = indices[j], indices[i]
+                break
+        else:
+            raise ValueError(
+                "every row in the reference pool is some item's own; no "
+                "self-free pairing exists for %d items" % (n_items,))
+    return indices, n_items > pool_size
 
 
 # ==============================================================================
@@ -378,7 +399,7 @@ def _elicit_beliefs(ctx, bench, client, items, eos, pad_id, desc):
             flat.append(probe)
             owners.append(index)
     if not flat:
-        return list(items), 0
+        return list(items), 0, 0
 
     tok = ctx.tokenizer
     texts = [render_messages(tok, probe["messages"]) for probe in flat]
@@ -398,23 +419,37 @@ def _elicit_beliefs(ctx, bench, client, items, eos, pad_id, desc):
         for probe, owner, answer in zip(flat, owners, answers)])
 
     per_item = [[] for _ in items]
+    failed = [False] * len(items)
     for probe, owner, answer, result in zip(flat, owners, answers, results):
+        ok = result is None or result.ok
+        if not ok:
+            # An API failure is not evidence about the model's belief. Left
+            # unrecorded it collapses into `parse_belief` returning None and
+            # the item is dropped as "the model had no belief here" -- so an
+            # OpenRouter blip silently shrinks the evaluation set and is
+            # reported as a property of the model. `_judge_all` already
+            # refuses to make this mistake on the response side.
+            failed[owner] = True
         per_item[owner].append({
             "name": probe["name"], "response": answer,
-            "judge_text": result.text if (result and result.ok) else None})
+            "judge_text": result.text if (result and result.ok) else None,
+            "judge_error": result.error if (result and not result.ok) else None})
 
-    kept, dropped = [], 0
-    for item, probes in zip(items, per_item):
+    kept, dropped, judge_failed = [], 0, 0
+    for item, probes, had_failure in zip(items, per_item, failed):
         if not probes:
             kept.append(item)
             continue
         belief = bench.parse_belief(item, probes)
         if belief is None:
-            dropped += 1
+            if had_failure:
+                judge_failed += 1
+            else:
+                dropped += 1
             continue
         kept.append(item.replace(belief=belief,
                                  meta=dict(item.meta, belief_probes=probes)))
-    return kept, dropped
+    return kept, dropped, judge_failed
 
 
 def run_screen(ctx, bench, client, dataset) -> Screen:
@@ -445,6 +480,7 @@ def run_screen(ctx, bench, client, dataset) -> Screen:
     screen = Screen(dataset)
     screen.new_tokens = new_tokens
     selected, pool, screened, no_belief = [], [], 0, 0
+    belief_judge_failed = 0
     chunk_size = max(target * SCREEN_CHUNK_FACTOR, cli.benchmark_gen_batch_size)
     label_counts = {}
 
@@ -454,10 +490,11 @@ def run_screen(ctx, bench, client, dataset) -> Screen:
                                         or screened >= budget):
             break
         chunk = candidates[start:start + chunk_size]
-        chunk, dropped = _elicit_beliefs(
+        chunk, dropped, judge_failed = _elicit_beliefs(
             ctx, bench, client, chunk, eos, pad_id,
             "%s: belief (full model)" % dataset)
         no_belief += dropped
+        belief_judge_failed += judge_failed
         if not chunk:
             continue
 
@@ -503,7 +540,11 @@ def run_screen(ctx, bench, client, dataset) -> Screen:
     screen.stats = {
         "candidates": len(candidates), "screened": screened,
         "selected": len(selected), "target": target,
-        "dropped_no_belief": no_belief, "screen_labels": label_counts,
+        "dropped_no_belief": no_belief,
+        # Kept apart from `dropped_no_belief` on purpose: one is a fact about
+        # the model, the other is a fact about an API.
+        "dropped_belief_judge_failed": belief_judge_failed,
+        "screen_labels": label_counts,
         "early_stopped": screened < len(candidates),
         "budget": budget,
         # True when the screen stopped with the reference pool still short.
@@ -541,7 +582,8 @@ def _build_reference_pool(ctx, bench, screen, selected, pool,
         screen.pool_refs = [s["ref"] for s in selected]
         screen.pairing = "derangement"
         screen.partner_index, screen.partner_reused = assign_partners(
-            len(screen.items), len(screen.pool_items), cli.wikitext_seed)
+            len(screen.items), len(screen.pool_items), cli.wikitext_seed,
+            forbidden=list(range(len(screen.items))))
         return
 
     twins = [bench.honest_twin(item) for item in screen.items]
@@ -554,9 +596,16 @@ def _build_reference_pool(ctx, bench, screen, selected, pool,
     else:
         pool_items, pairing = [p["item"] for p in pool], "derangement"
 
+    # Where the evaluation set is part of its own reference pool, remember
+    # where each item landed so it cannot be handed back to itself below.
+    forbidden = None
     if cli.benchmark_ref_pool == "pooled":
+        forbidden = [len(pool_items) + i for i in range(len(screen.items))]
         pool_items = list(pool_items) + list(screen.items)
-        pairing = "derangement"
+        # Not a derangement: the pool is larger than the evaluation set, so
+        # `assign_partners` takes its cycle branch. Calling it one in the JSON
+        # would misdescribe how the references were drawn.
+        pairing = "cycle"
 
     if not pool_items:
         raise RuntimeError(
@@ -599,7 +648,8 @@ def _build_reference_pool(ctx, bench, screen, selected, pool,
         screen.partner_reused = False
     else:
         screen.partner_index, screen.partner_reused = assign_partners(
-            len(screen.items), len(pool_items), cli.wikitext_seed)
+            len(screen.items), len(pool_items), cli.wikitext_seed,
+            forbidden=forbidden)
 
 
 # ==============================================================================
@@ -885,6 +935,11 @@ class BenchmarkEvaluation(Evaluation):
               % (screen["screened"], screen["candidates"],
                  " (early stop)" if screen["early_stopped"] else "",
                  screen["selected"], screen["dropped_no_belief"]))
+        if screen.get("dropped_belief_judge_failed"):
+            print("  !! %d further items were dropped because their belief "
+                  "judge call FAILED;\n     that is an API outcome, not the "
+                  "model having no belief."
+                  % screen["dropped_belief_judge_failed"])
         if screen.get("pool_short"):
             print("  !! the screen hit its %d-candidate budget with the "
                   "reference pool still short;\n     it is cycled below, so "
