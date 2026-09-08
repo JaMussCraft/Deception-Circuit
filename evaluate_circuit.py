@@ -610,12 +610,19 @@ def _screen_cache_plan(cli, datasets) -> None:
     root = cli.benchmark_screen_cache or screen_cache.DEFAULT_CACHE_DIR
     print(f"  Screen cache: {root}")
     for dataset in datasets:
-        directory = screen_cache.cache_dir_for(cli, dataset)
-        try:
-            sidecars = [n for n in os.listdir(directory) if n.endswith(".json")]
-        except OSError:
-            sidecars = []
-        print(f"    {dataset:<34} {len(sidecars)} cached screen(s)")
+        # Screens that match THIS configuration in every field but the device,
+        # not every file in the directory: "3 cached screen(s)" that are three
+        # other configurations will all miss, and reporting them as cached is
+        # worse than reporting nothing.
+        bench = get_benchmark(dataset)
+        if hasattr(bench, "bind"):
+            bench.bind(cli)
+        key = screen_cache.build_key(cli, dataset, bench,
+                                     _items_for(bench, cli), None)
+        devices = screen_cache.cached_on_devices(cli, dataset, key)
+        print(f"    {dataset:<34} "
+              + (", ".join(sorted(set(devices))) if devices
+                 else "nothing cached for this configuration"))
     print("  The GPU is part of the key, because `full` reuses the screen's "
           "own tokens:\n  a screen made on another device would put 'which "
           "GPU' inside the delta this\n  evaluation measures. Switching "

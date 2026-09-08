@@ -205,6 +205,11 @@ class _LiarsBench(Benchmark):
         except Exception:                                   # noqa: BLE001
             return ()
 
+    def judge_models(self, cli):
+        """Both, unconditionally: which of the two a scenario reaches for
+        depends on the response, so a screen's labels can depend on either."""
+        return (self.judge_model, self.harm_judge_model)
+
     def bind(self, cli):
         self._cli = cli
         self.judge_model = getattr(cli, "lb_judge_model", None) or self.judge_model

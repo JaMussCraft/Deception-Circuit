@@ -278,6 +278,12 @@ class MaskSplit(Benchmark):
                 "schema": "numerical_range" if self.numerical else None,
                 "source": "mask/mask/evaluate.py"}
 
+    def judge_models(self, cli):
+        """Only the archetype's own judge. A split is numerical or it is not,
+        and the other model is never billed — keying on both would discard
+        every binary split's screen when `--mask-numeric-judge-model` moved."""
+        return (self.numerical_model if self.numerical else self.binary_model,)
+
     def bind(self, cli):
         """Load the MASK modules once, and apply any judge-model override."""
         if self._prompts is None:

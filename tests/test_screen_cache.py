@@ -47,13 +47,8 @@ def a_key(cli, bench=None, items=None, device="TEST-GPU"):
     ("benchmark_screen_seed", 12345),
     ("benchmark_screen_budget", 400),
     ("benchmark_gen_batch_size", 32),
-    ("benchmark_repo_root", "/somewhere/else"),
     ("no_kv_cache", True),
     ("wikitext_seed", 7),
-    ("mask_judge_model", "gpt-4o-mini"),
-    ("mask_numeric_judge_model", "gpt-4o"),
-    ("lb_judge_model", "claude-x"),
-    ("lb_harm_judge_model", "claude-y"),
     ("lb_belief_templates", 2),
     ("benchmark_pool_size", 25),
 ])
@@ -523,3 +518,126 @@ def test_the_judged_adapters_actually_declare_their_external_rubrics():
 
     # sandbagging grades locally and has no external rubric to declare.
     assert get_benchmark("sandbagging").rubric_sources(cli) == ()
+
+
+# ==============================================================================
+# WHAT THE KEY DELIBERATELY DOES AND DOES NOT CARRY
+# ==============================================================================
+
+def test_the_effective_judge_is_keyed_even_though_the_flags_are_not(tmp_path):
+    """Labels come from the judge that ran, so a different judge is a
+    different evaluation set."""
+    cli = cache_cli(tmp_path)
+
+    class Judged(FakeBench):
+        def __init__(self, model):
+            super().__init__(make_items(4), _even_are_deceptive)
+            self.model = model
+
+        def judge_models(self, cli):
+            return (self.model,)
+
+    one = a_key(cli, bench=Judged("gpt-4o"))
+    two = a_key(cli, bench=Judged("gpt-4o-mini"))
+    assert screen_cache.key_hash(one) != screen_cache.key_hash(two)
+
+
+def test_a_judge_flag_does_not_invalidate_a_dataset_that_has_no_judge(tmp_path):
+    """Keying on the raw flags meant `--mask-judge-model` discarded the
+    sandbagging screen, which is graded locally and never calls a judge — hours
+    of GPU time thrown away over a flag the dataset does not read."""
+    plain = cache_cli(tmp_path)
+    moved = cache_cli(tmp_path, mask_judge_model="gpt-4o-mini")
+    local = FakeBench(make_items(4), _even_are_deceptive)   # judge_models -> ()
+    assert screen_cache.key_hash(a_key(plain, bench=local)) == \
+        screen_cache.key_hash(a_key(moved, bench=local))
+
+
+def test_the_library_versions_are_keyed(tmp_path, monkeypatch):
+    """This project runs transformers 4.57.3 on the login node and 5.13 under
+    `mgnp`, with shims between them. Same argument as the device."""
+    cli = cache_cli(tmp_path)
+    before = screen_cache.key_hash(a_key(cli))
+    monkeypatch.setattr(screen_cache, "device_stamp",
+                        lambda cli=None: {"device": "TEST-GPU",
+                                          "torch": "9.9.9",
+                                          "transformers": "9.9.9"})
+    assert screen_cache.key_hash(a_key(cli)) != before
+
+
+def test_the_device_is_taken_from_the_cli_not_from_cuda_availability():
+    """`--device cpu` on a GPU node must not stamp the idle GPU's name; that is
+    the one way this field can be wrong in the direction of a false hit."""
+    from types import SimpleNamespace
+
+    assert screen_cache.device_stamp(SimpleNamespace(device="cpu"))["device"] \
+        == "cpu"
+
+
+# ==============================================================================
+# A SCREEN SHAPED BY A JUDGE OUTAGE IS NOT CACHED
+# ==============================================================================
+
+def _damaged(**kwargs):
+    screen = B.Screen("fake")
+    screen.full_rows = kwargs.get("rows", [{"label": base.DECEPTIVE,
+                                            "raw": "even"}])
+    screen.stats = kwargs.get("stats", {})
+    return screen
+
+
+def test_a_screen_whose_labels_came_from_a_dead_judge_is_not_cached():
+    """`run_screen` succeeds as long as some item came back deceptive, so an
+    API outage yields a short, biased evaluation set rather than an error.
+    Caching it would freeze one bad afternoon onto disk for every later job."""
+    screen = _damaged(rows=[{"label": base.DECEPTIVE, "raw": "even"},
+                            {"label": base.UNPARSED, "raw": "judge-failed"}])
+    assert "never answered" in B._screen_is_judge_damaged(screen)
+
+
+def test_a_belief_judge_outage_also_blocks_the_cache():
+    screen = _damaged(stats={"dropped_belief_judge_failed": 3})
+    assert "belief judge" in B._screen_is_judge_damaged(screen)
+
+
+def test_a_genuinely_unparsed_response_does_not_block_the_cache():
+    """`label_counts` cannot tell an outage from a response that truly could
+    not be parsed; only `raw` can, which is why the guard reads it."""
+    screen = _damaged(rows=[{"label": base.UNPARSED, "raw": "ambiguous"}],
+                      stats={"dropped_belief_judge_failed": 0})
+    assert B._screen_is_judge_damaged(screen) == ""
+
+
+def test_the_run_continues_on_a_screen_it_refuses_to_cache(tmp_path,
+                                                           monkeypatch):
+    """Only the save is refused. Failing the run would be worse than the
+    behaviour before the cache existed."""
+    cli = cache_cli(tmp_path, benchmark_n_per_dataset=2)
+
+    real = B.run_screen
+
+    def damaged(ctx, bench, client, dataset):
+        screen = real(ctx, bench, client, dataset)
+        screen.full_rows[0]["raw"] = "judge-failed"
+        return screen
+
+    monkeypatch.setattr(B, "run_screen", damaged)
+    bench = FakeBench(make_items(20), _even_are_deceptive)
+    screen = _cached_screen(make_ctx(cli), bench)
+
+    assert len(screen.items) == 2
+    assert screen.cache_provenance["written"]["saved"] is False
+    assert not os.path.exists(str(tmp_path / "screens" / "fake"))
+
+
+def test_the_key_survives_its_own_json_round_trip(tmp_path):
+    """The `.pt` is pickled and the sidecar is JSON, and misses are diagnosed
+    by comparing against the sidecar. Any field whose type JSON does not
+    preserve — a tuple, a set — differs from its own round trip, so every
+    comparison reports a spurious difference and the dry run can never see a
+    cached screen. Caught exactly this with `judges` as a tuple."""
+    cli = cache_cli(tmp_path)
+    key = a_key(cli, device="NVIDIA A40")
+    screen_cache.save(cli, "fake", key, B.Screen("fake"))
+    near = screen_cache.describe_misses(cli, "fake", key)
+    assert near and near[0]["differs"] == [], near[0]["differs"]

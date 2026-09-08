@@ -39,7 +39,9 @@ killing a job whose results were about to be written.
 import hashlib
 import json
 import os
+import socket
 import time
+import uuid
 
 import torch
 
@@ -66,15 +68,8 @@ KEYED_FLAGS = (
     "benchmark_screen_seed",
     "benchmark_screen_budget",
     "benchmark_gen_batch_size",
-    "benchmark_repo_root",
     "no_kv_cache",
     "wikitext_seed",
-    # The screen's labels come from these, so a different judge is a different
-    # evaluation set even with every generation identical.
-    "mask_judge_model",
-    "mask_numeric_judge_model",
-    "lb_judge_model",
-    "lb_harm_judge_model",
     # Read inside `belief_request` DURING the screen, not at load time: it
     # changes how many probes each item gets, so it changes which items
     # survive the "probes must agree" rule and therefore the evaluation set.
@@ -88,6 +83,20 @@ KEYED_FLAGS = (
     # evaluation.
     "benchmark_pool_size",
 )
+
+# NOT keyed, deliberately:
+#
+# `--mask-judge-model` and the other three judge flags. The screen's labels do
+# depend on the judge, but keying on the raw flags made `--mask-judge-model`
+# invalidate every Liars' Bench screen and the sandbagging screen -- which is
+# graded locally and has no judge at all -- discarding hours of GPU time over a
+# flag those datasets never read. `Benchmark.judge_models(cli)` reports the
+# judges that would actually be billed, post-`bind`, and that is keyed instead.
+#
+# `--benchmark-repo-root`. It is a path, so two identical checkouts in
+# different places would miss. What actually matters about a checkout is its
+# content, and that is hashed twice over: the candidates through
+# `candidate_fingerprint` and the rubric files through `_source_fingerprint`.
 
 
 def _source_fingerprint(bench, cli=None) -> str:
@@ -140,6 +149,19 @@ def _source_fingerprint(bench, cli=None) -> str:
     return digest.hexdigest()[:16]
 
 
+def _judge_models(bench, cli):
+    """The judges whose verdicts a screen's labels would carry."""
+    hook = getattr(bench, "judge_models", None)
+    if hook is None:
+        return []
+    try:
+        return sorted(str(m) for m in hook(cli))
+    except Exception:                                       # noqa: BLE001
+        # An adapter that cannot say will say so when it tries to judge; a key
+        # must not be the thing that takes a run down.
+        return []
+
+
 def _rubric_paths(bench, cli):
     hook = getattr(bench, "rubric_sources", None)
     if hook is None:
@@ -185,14 +207,29 @@ def candidate_fingerprint(bench, items) -> str:
     return digest.hexdigest()[:16]
 
 
-def device_stamp() -> dict:
-    """What generated a screen. `device` is in the key; the rest is provenance."""
+def device_stamp(cli=None) -> dict:
+    """What generated a screen. All three fields are in the key.
+
+    The device is decided from `cli.device` rather than from "is CUDA
+    available", because `--device cpu` on a GPU node would otherwise stamp a
+    CPU-generated screen with the name of the idle A100 next to it — the one
+    way this field can be silently wrong, and it is wrong in the direction of
+    a false hit.
+    """
     import transformers
 
-    name = "cpu"
-    if torch.cuda.is_available():
+    requested = str(getattr(cli, "device", None) or
+                    ("cuda" if torch.cuda.is_available() else "cpu"))
+    name = requested
+    if requested.startswith("cuda"):
+        index = 0
+        if ":" in requested:
+            try:
+                index = int(requested.split(":", 1)[1])
+            except ValueError:
+                index = 0
         try:
-            name = torch.cuda.get_device_name(0)
+            name = torch.cuda.get_device_name(index)
         except Exception:                                   # noqa: BLE001
             name = "cuda-unknown"
     return {"device": name, "torch": torch.__version__,
@@ -207,9 +244,21 @@ def build_key(cli, dataset, bench, items, model, device=None) -> dict:
     the key on a login node with no GPU and leave it None, which never matches
     a real screen: a dry run must not be able to claim a hit it cannot verify.
     """
+    stamp = device_stamp(cli)
     key = {"version": CACHE_VERSION, "dataset": dataset,
            "model": model,
            "device": device,
+           # Same argument as the device, and this project actively runs two:
+           # transformers 4.57.3 on the login node and 5.13 in the `mgnp`
+           # sbatch environment, with shims between them in `models/_compat.py`
+           # and a known one-ulp difference. A screen made under one and
+           # ablated configs generated under the other would put "which
+           # transformers" inside the measured delta.
+           "torch": stamp["torch"], "transformers": stamp["transformers"],
+           # A list, not a tuple: the sidecar is JSON, which has no tuples, so
+           # a tuple here would differ from its own round trip and every
+           # comparison against a sidecar would report a spurious difference.
+           "judges": list(_judge_models(bench, cli)),
            "candidates": candidate_fingerprint(bench, items),
            "adapter_source": _source_fingerprint(bench, cli)}
     for flag in KEYED_FLAGS:
@@ -249,7 +298,7 @@ def describe_misses(cli, dataset, key, limit=3):
     except OSError:
         return []
     reports = []
-    for name in names[:limit]:
+    for name in names:
         try:
             with open(os.path.join(directory, name)) as handle:
                 other = json.load(handle)
@@ -265,7 +314,11 @@ def describe_misses(cli, dataset, key, limit=3):
                          if key.get(field) != other.get(field))
         reports.append({"file": name, "differs": differs, "stamp": stamp,
                         "key": other, "created_at": created})
-    return reports
+    # Nearest first, by how many fields differ. Name order is hash order, i.e.
+    # arbitrary, so "the nearest cached screen differs in ..." was naming
+    # whichever file happened to sort first once more than one was cached.
+    reports.sort(key=lambda r: (len(r["differs"]), r["file"]))
+    return reports[:limit]
 
 
 def cached_on_devices(cli, dataset, key):
@@ -328,14 +381,22 @@ def save(cli, dataset, key, screen) -> dict:
     created = time.strftime("%Y-%m-%dT%H:%M:%S")
     try:
         os.makedirs(os.path.dirname(path), exist_ok=True)
-        tmp = "%s.tmp.%d" % (path, os.getpid())
+        # PID-unique is not enough: two sbatch jobs on different compute
+        # nodes can hold the same PID and write the same temp path on a shared
+        # filesystem, interleave inside `torch.save`, and both rename a corrupt
+        # file over the good one. `load` would treat that as a miss rather than
+        # returning wrong data, but it would discard a finished screen, which
+        # is the whole thing this feature exists to keep.
+        unique = "%s.%d.%s" % (socket.gethostname(), os.getpid(),
+                               uuid.uuid4().hex[:8])
+        tmp = "%s.tmp.%s" % (path, unique)
         torch.save({"key": key, "screen": screen, "stamp": stamp,
                     "created_at": created}, tmp)
         os.replace(tmp, path)
         side = dict(key)
         side["_stamp"] = stamp
         side["_created_at"] = created
-        tmp_side = "%s.tmp.%d" % (sidecar, os.getpid())
+        tmp_side = "%s.tmp.%s" % (sidecar, unique)
         with open(tmp_side, "w") as handle:
             json.dump(side, handle, indent=2, sort_keys=True, default=repr)
         os.replace(tmp_side, sidecar)

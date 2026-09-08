@@ -512,11 +512,43 @@ def cached_screen(ctx, bench, client, dataset) -> Screen:
                   % (dataset, ", ".join(near["differs"]) or "nothing"))
 
     screen = run_screen(ctx, bench, client, dataset)
-    written = screen_cache.save(cli, dataset, key, screen)
     provenance = dict(provenance)
-    provenance["written"] = written
+    refusal = _screen_is_judge_damaged(screen)
+    if refusal:
+        # A screen built while the judge API was failing is a short, biased
+        # evaluation set. `run_screen` succeeds as long as *some* item came
+        # back deceptive, so an outage does not stop the run -- but caching
+        # that set would freeze one bad afternoon onto disk and hand it to
+        # every later job with these flags. The run continues on the screen it
+        # has, which is the same thing it would have done before the cache
+        # existed; only the save is refused.
+        print("  WARNING: %s: not caching this screen -- %s" % (dataset,
+                                                                refusal))
+        provenance["written"] = {"saved": False, "reason": refusal}
+    else:
+        provenance["written"] = screen_cache.save(cli, dataset, key, screen)
     screen.cache_provenance = provenance
     return screen
+
+
+def _screen_is_judge_damaged(screen):
+    """-> a reason string if a judge outage shaped this screen, else "".
+
+    `label_counts` cannot answer this: a judge that never replied and a
+    response that genuinely could not be parsed both land in `unparsed`. Only
+    `raw` separates them, which is why `_judge_all` writes "judge-failed"
+    there rather than leaving the rubric to guess.
+    """
+    failed = sum(1 for row in screen.full_rows
+                 if row.get("raw") == "judge-failed")
+    if failed:
+        return "%d of %d selected items were labelled by a judge that never " \
+               "answered" % (failed, len(screen.full_rows))
+    dropped = screen.stats.get("dropped_belief_judge_failed") or 0
+    if dropped:
+        return "%d candidates were dropped because the belief judge " \
+               "failed" % dropped
+    return ""
 
 
 def run_screen(ctx, bench, client, dataset) -> Screen:

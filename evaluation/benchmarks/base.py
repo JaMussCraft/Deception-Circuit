@@ -295,6 +295,22 @@ class Benchmark(object):
         """
         return ()
 
+    def judge_models(self, cli):
+        """-> every judge model this adapter could actually bill, post-`bind`.
+
+        The screen cache keys on this rather than on the raw `--*-judge-model`
+        flags. Keying on the flags meant `--mask-judge-model` invalidated every
+        Liars' Bench screen and the sandbagging screen — which has no judge at
+        all — discarding hours of GPU time over a flag those datasets never
+        read. What a screen's labels depend on is the judge that ran, so that
+        is what the key should carry.
+
+        Default: the single judge `judge_spec` reports, or nothing. Adapters
+        that can reach for a second judge override this.
+        """
+        spec = self.judge_spec()
+        return (spec["model"],) if spec else ()
+
     def judge_request(self, item, response):
         """-> JudgeRequest, or None when the grader is local (sandbagging) or
         when the response can be resolved without asking."""
