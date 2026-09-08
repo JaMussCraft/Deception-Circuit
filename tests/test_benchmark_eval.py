@@ -492,6 +492,19 @@ def test_the_full_row_is_the_screens_own_tokens_not_a_second_pass():
     assert screen.full_ids.shape[1] == screen.prompt_width + NEW_TOKENS
     # And the labels carried over are the screen's, item for item.
     assert [r["label"] for r in screen.full_rows] == [base.DECEPTIVE] * 3
+    # No third pass over the evaluation set. Regenerating it would produce the
+    # *same* tokens here -- greedy decoding under all-gates-open is
+    # deterministic -- so the token comparison above cannot see the difference,
+    # and only the call count can. It is not merely a cost claim: a rerun
+    # re-buckets the batch, and a different reduction order can flip an argmax
+    # on a near-tie, which is exactly how `full` and its own label would drift
+    # apart on a real model.
+    descs = [c[0] for c in captured]
+    assert descs == ["fake: screen (full model)"], \
+        "an extra generation pass ran: %r" % (descs,)
+    # One pass, total. The reference pool needs none of its own here: its items
+    # were judged in the same screening chunk, so their full-model responses
+    # already exist.
 
 
 def test_an_item_with_no_agreed_belief_is_dropped_rather_than_scored():
@@ -638,7 +651,8 @@ def test_the_benchmark_mean_bank_is_collected_on_unpadded_batches_only():
     """
     ctx = make_ctx(make_cli(benchmark_n_per_dataset=6))
     screen = _run_screen(ctx, FakeBench(make_items(30), _even_are_deceptive))
-    n = B.register_mean_bank(ctx, screen, "fake", PAD)
+    eos = B.eos_ids_for(ctx.node_model)
+    n = B.register_mean_bank(ctx, screen, "fake", PAD, eos)
     batches = ctx.session.banks["benchmark:fake"]
     assert n == len(batches) and batches
     for batch in batches:
@@ -655,6 +669,59 @@ def test_the_benchmark_mean_bank_is_collected_on_unpadded_batches_only():
     assert len(widths) > 1, \
         "every batch came out the same width; the fixture is not ragged and " \
         "this test cannot see whether grouping happened"
+
+    # Every row must be prompt *plus* the full model's own completion. EVAL 5
+    # ablates at every position of the generation, so a bank collected over
+    # prompt tokens alone fills hundreds of generated positions with a mean
+    # taken somewhere else entirely.
+    prompt_lengths = set(int(m.sum()) for m in screen.clean_mask)
+    assert all(width > max(prompt_lengths) for width in widths), \
+        "the mean bank covers prompt positions only"
+    completions = B.completion_tokens(screen.full_ids, screen.prompt_width, eos)
+    expected = sorted(int(m.sum()) + len(c)
+                      for m, c in zip(screen.clean_mask, completions))
+    got = sorted(w for b in batches for w in [b["input_ids"].shape[1]] * b["input_ids"].shape[0])
+    assert got == expected
+
+
+def test_a_benchmark_bank_flows_through_the_real_session_and_is_finite():
+    """The registered batches actually reach `collect_mean_bank`.
+
+    Every other test here uses a `FakeSession`, so the real
+    `register_stream_batches` -> `mean_bank` -> `collect_mean_bank` path was
+    covered nowhere -- and it is the path where a padded batch turns the whole
+    bank to NaN. A NaN bank is invisible in a comparison of two configurations
+    that share it: both come out as token 0 and they agree perfectly.
+    """
+    from evaluation.context import Session
+
+    ctx = make_ctx(make_cli(benchmark_n_per_dataset=4, ablation="mean"))
+    ctx.cli.mean_source = "pooled"
+    screen = _run_screen(ctx, FakeBench(make_items(20), _even_are_deceptive))
+
+    session = Session.__new__(Session)
+    session._bank_batches, session._mean_banks = {}, {}
+    session.node_model, session.device, session.cli = ctx.node_model, "cpu", ctx.cli
+    ctx.session = session
+
+    eos = B.eos_ids_for(ctx.node_model)
+    B.register_mean_bank(ctx, screen, "fake", PAD, eos)
+    bank = session.mean_bank(ctx, "benchmark:fake")
+
+    assert bank, "the benchmark bank came back empty"
+
+    def check(node, path=""):
+        seen = 0
+        if isinstance(node, dict):
+            for key, value in node.items():
+                seen += check(value, "%s/%s" % (path, key))
+        elif torch.is_tensor(node):
+            assert torch.isfinite(node).all(), \
+                "site %s is NaN: the bank was collected on a padded batch" % path
+            seen = 1
+        return seen
+
+    assert check(bank) > 0, "the bank holds no tensors to check"
 
 
 def test_only_benchmark_banks_may_be_registered_from_outside():

@@ -606,19 +606,29 @@ def _build_reference_pool(ctx, bench, screen, selected, pool,
 # THE MEAN BANK
 # ==============================================================================
 
-def register_mean_bank(ctx, screen, dataset, pad_id):
+def register_mean_bank(ctx, screen, dataset, pad_id, eos):
     """Stream batches for `--ablation mean`, under the name `benchmark:<ds>`.
 
-    `collect_mean_bank` forwards with `use_cache=False`, which goes through
-    `llama_node.py`'s manual causal mask — under which a fully-padded query row
-    softmaxes to NaN and poisons the whole bank (every subsequent argmax
-    becomes token 0). So these batches are grouped by *exact* length and are
-    unpadded by construction, rather than reusing the left-padded evaluation
-    batch.
+    Two properties, both load-bearing:
+
+    **Prompt *and* response.** A site's mean has to be taken over the positions
+    the ablation will fill, and EVAL 5 ablates at every position of a
+    512-1024-token generation. A bank collected over prompt tokens alone would
+    fill hundreds of generated positions with a mean computed somewhere else
+    entirely — so each row here is the item's prompt followed by the full
+    model's own completion for it.
+
+    **Unpadded.** `collect_mean_bank` forwards with `use_cache=False`, which
+    goes through `llama_node.py`'s manual causal mask — under which a
+    fully-padded query row softmaxes to NaN and poisons the whole bank (every
+    subsequent argmax becomes token 0). So these batches are grouped by *exact*
+    length rather than reusing the left-padded evaluation batch.
     """
+    completions = completion_tokens(screen.full_ids, screen.prompt_width, eos)
     groups = {}
     for index in range(len(screen.items)):
-        clean = screen.clean_ids[index][screen.clean_mask[index].bool()].tolist()
+        prompt = screen.clean_ids[index][screen.clean_mask[index].bool()].tolist()
+        clean = prompt + list(completions[index])
         partner = screen.partners[index]
         corrupt, _ = pack_reference(partner[0], partner[1], len(clean), pad_id)
         groups.setdefault(len(clean), []).append((clean, corrupt))
@@ -703,7 +713,7 @@ class BenchmarkEvaluation(Evaluation):
         n_batches = 0
         bank_name = "task"
         if cli.ablation == "mean":
-            n_batches = register_mean_bank(ctx, screen, dataset, pad_id)
+            n_batches = register_mean_bank(ctx, screen, dataset, pad_id, eos)
             bank_name = "benchmark:%s" % dataset
         hook = ctx.hook_for(bank_name)
 
@@ -978,6 +988,11 @@ def judge_cache_path(ctx) -> str:
     paid once if the cache sits above the cell.
     """
     root = getattr(ctx.cli, "output_dir", None)
+    if not root and not getattr(ctx.cli, "legacy", True):
+        # A suite writes cells three levels down; the cache belongs at the
+        # suite root, or every cell re-buys the same verdicts.
+        from evaluation import suite
+        root = suite.suite_root(ctx.cli, ctx.session.base_run_dir)
     return os.path.join(root or ctx.out_dir, "judge_cache.jsonl")
 
 
