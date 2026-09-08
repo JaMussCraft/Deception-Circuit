@@ -1,6 +1,16 @@
 # Core dependencies for circuit discovery (node + edge pruning).
-# Tested with torch 2.7+ / transformers 4.52+. The GPT-2 node model uses
-# transformers.masking_utils, so transformers >= 4.52 is required.
+#
+# Verified on the two environments this project actually runs in:
+#
+#   login node base   python 3.9.18   torch 2.8.0    transformers 4.57.3
+#   conda mgnp        python 3.12.13  torch 2.11.0   transformers 5.13.0
+#
+# Those are two different transformers generations. `create_causal_mask` and
+# `Cache.get_mask_sizes` changed signature between them, and models/_compat.py
+# dispatches on whichever is installed — so keep the range wide rather than
+# pinning one. Run the test suite under both before changing either model.
+#
+# The node models use transformers.masking_utils, so >= 4.52 is required.
 torch>=2.7
 transformers>=4.52
 datasets>=2.14
@@ -8,3 +18,12 @@ pyarrow>=12.0      # backs `datasets` (HF) — load_from_disk
 tqdm>=4.65
 numpy>=1.24
 matplotlib>=3.7
+pandas>=1.5        # benchmark adapters read the MASK/Liars' Bench tables
+huggingface-hub    # snapshot_download(local_files_only=True) in the adapters
+
+# EVAL 5 (deception-benchmark knockout) only. The judge degrades gracefully on
+# older clients, but `max_completion_tokens` and structured parse need 1.40+.
+openai>=1.40
+
+# Tests.
+pytest
