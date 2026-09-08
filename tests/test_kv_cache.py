@@ -331,13 +331,31 @@ def test_the_mask_edit_did_not_move_the_uncached_path():
     old = replay(_load_prechange_module())
     still_wrong = {k for k in drifted if not torch.equal(got[k], old[k])}
     assert not still_wrong, (
-        "the mask edit moved the uncached path, which training and all four "
-        "shipped evaluations run on. Cases: "
+        "the uncached path moved, and the f5c3a7b snapshot (models/llama_node.py "
+        "and l0.py at that commit) does not move with it -- so the cause is in "
+        "this working tree, not the environment. Training and all four shipped "
+        "evaluations run on this path. Cases: "
         + ", ".join(f"{k} (max diff "
                     f"{(got[k] - old[k]).abs().max().item():.3e})"
                     for k in sorted(still_wrong)))
 
-    # Pre-change code drifts identically, so this is the environment, not us.
+    # Pre-change code drifts identically. That rules out the mask edit, but not
+    # everything: the replayed module gets the *current* `config`, so a change
+    # there moves both replays alike and cancels out of the old-vs-new
+    # comparison. Bound the magnitude as a second net. Kernel selection moves
+    # the last ulp of a float32 logit -- the observed drift is 1.8e-07 on
+    # logits of order 1e-1. A 0.1% change to every gate value, by contrast,
+    # moves them 2.6e-03. 1e-5 sits two orders above the first and two below
+    # the second, so "the environment" cannot be used to explain away a real
+    # numerical change.
+    worst = max((got[k] - ref[k]).abs().max().item() for k in drifted)
+    assert worst < 1e-5, (
+        f"the uncached path moved by {worst:.3e}, which is far too large to be "
+        f"kernel selection, and the pre-change implementation moves with it -- "
+        f"so the cause is shared by both and is upstream of models/llama_node.py "
+        f"(l0.py, config.py, or the installed transformers). Cases: "
+        + ", ".join(sorted(drifted)))
+
     warnings.warn(
         "prechange_logits.pt was recorded under transformers 4.57.3 / torch "
         "2.8.0 and this environment reproduces it only to within "
@@ -361,22 +379,39 @@ def _load_prechange_module():
     import tempfile
 
     repo = Path(__file__).resolve().parent.parent
-    source = subprocess.run(
-        ["git", "-C", str(repo), "show", "f5c3a7b:models/llama_node.py"],
-        capture_output=True, text=True, check=True).stdout
+
+    def at_f5c3a7b(path):
+        return subprocess.run(["git", "-C", str(repo), "show", f"f5c3a7b:{path}"],
+                              capture_output=True, text=True, check=True).stdout
+
+    def load(name, path, source):
+        spec = importlib.util.spec_from_file_location(name, path)
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[name] = module
+        spec.loader.exec_module(module)
+        return module
 
     with tempfile.TemporaryDirectory() as tmp:
-        path = Path(tmp) / "prechange_llama_node.py"
-        path.write_text(source)
-        spec = importlib.util.spec_from_file_location("prechange_llama_node", path)
-        module = importlib.util.module_from_spec(spec)
-        # Registered so dataclasses/typing inside it resolve, removed after so
-        # the rest of the suite never sees a second llama_node.
-        sys.modules["prechange_llama_node"] = module
+        tmp = Path(tmp)
+        for relpath, filename in (("l0.py", "l0.py"),
+                                  ("models/llama_node.py", "prechange_llama_node.py")):
+            (tmp / filename).write_text(at_f5c3a7b(relpath))
+
+        # `l0` is pinned to the same commit, not taken from the working tree.
+        # Without this the replay imports the *current* HardConcreteGate, and a
+        # regression in the gate would move old and new together -- the guard
+        # would call it environment drift and pass. Verified: a 0.1% change to
+        # the gate's eval-mode return does defeat the unpinned version.
+        saved = sys.modules.get("l0")
         try:
-            spec.loader.exec_module(module)
+            load("l0", tmp / "l0.py", None)
+            module = load("prechange_llama_node", tmp / "prechange_llama_node.py", None)
         finally:
             sys.modules.pop("prechange_llama_node", None)
+            if saved is not None:
+                sys.modules["l0"] = saved
+            else:
+                sys.modules.pop("l0", None)
     return module
 
 
