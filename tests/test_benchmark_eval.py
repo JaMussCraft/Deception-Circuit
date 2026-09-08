@@ -125,9 +125,17 @@ class FakeBench:
 
 
 def make_items(n, prefix="i", condition=None):
+    """Prompts of deliberately *varying* length.
+
+    Uniform lengths would leave several properties untestable: left padding
+    never appears, and grouping the mean bank by exact length becomes
+    indistinguishable from not grouping at all.
+    """
     return [base.BenchmarkItem(
         item_id="%s%d" % (prefix, i),
-        messages=[{"role": "user", "content": "question %d please answer" % i}],
+        messages=[{"role": "user",
+                   "content": "question %d %s" % (i, " ".join(
+                       ["word%d" % k for k in range(1 + i % 4)]))}],
         condition=condition) for i in range(n)]
 
 
@@ -417,25 +425,73 @@ def test_the_screen_stops_early_instead_of_walking_the_whole_pool():
     assert screen.stats["early_stopped"] is True
 
 
-def test_the_full_row_is_the_screens_own_tokens_not_a_second_pass():
-    """`full`'s label was computed from `full`'s text, by construction.
+def test_the_screen_stops_at_its_budget_rather_than_walking_5245_rows_for_a_pool():
+    """The walk is driven by whichever pool fills last.
 
-    If the full configuration were regenerated on the re-encoded batch, its
-    printed text could differ from the text its label came from — the eval set
-    would then be defined by a pass that is not the one shown.
+    On a benchmark where the full model is deceptive nearly always, the
+    *honest* pool is the bottleneck, and without a ceiling the screen keeps
+    generating 512-token completions until it has as many honest items as
+    deceptive ones — all 5245 rows of harm-pressure, hours of GPU, to widen a
+    reference pool that works fine cycled. Being short is reported, not
+    silently accepted.
+    """
+    def rarely_honest(item, response):
+        index = int(item.item_id[1:])
+        return (base.HONEST, "rare") if index % 20 == 19 else (base.DECEPTIVE, "usual")
+
+    ctx = make_ctx(make_cli(benchmark_n_per_dataset=3))
+    screen = _run_screen(ctx, FakeBench(make_items(400), rarely_honest))
+
+    budget = 3 * B.SCREEN_MAX_FACTOR
+    assert screen.stats["budget"] == budget
+    assert screen.stats["screened"] <= budget + 6, \
+        "the screen blew past its budget chasing the reference pool"
+    assert screen.stats["screened"] < 400
+    assert screen.stats["pool_short"] is True
+    # Short, so it is cycled -- and that is stated rather than left implicit.
+    assert 0 < len(screen.pool_items) < 3
+    assert screen.partner_reused is True
+    assert len(screen.partner_index) == 3
+
+
+def test_the_full_row_is_the_screens_own_tokens_not_a_second_pass():
+    """`full`'s text is byte-identical to the pass that selected the items.
+
+    Asserted on the *tokens*, not on the labels: a label rule that keys on the
+    item rather than the response cannot see a changed generation at all, so a
+    label-only version of this test passes against a `full` row that was
+    regenerated, reordered or replaced outright. (Measured — that is exactly
+    what the first version of this test did.)
     """
     ctx = make_ctx(make_cli(benchmark_n_per_dataset=3))
     bench = FakeBench(make_items(12), _even_are_deceptive)
-    screen = _run_screen(ctx, bench)
-    eos = B.eos_ids_for(ctx.node_model)
-    texts = B.decode_completions(ctx.tokenizer, screen.full_ids,
-                                 screen.prompt_width, eos)
-    for item, text, row in zip(screen.items, texts, screen.full_rows):
-        assert bench.parse_judgement(item, text)[0] == row["label"]
-    # The prompt columns are the re-encoded batch; the generated block is not.
-    assert torch.equal(screen.full_ids[:, :screen.prompt_width],
-                       screen.clean_ids)
+
+    captured = []
+    original = B.generate_under
+
+    def spy(ctx_, **kwargs):
+        out = original(ctx_, **kwargs)
+        captured.append((kwargs["desc"], kwargs["clean_ids"].shape[1], out))
+        return out
+
+    B.generate_under = spy
+    try:
+        screen = _run_screen(ctx, bench)
+    finally:
+        B.generate_under = original
+
+    passes = [c for c in captured if "screen" in c[0]]
+    assert len(passes) == 1, "expected one screening chunk, got %d" % len(passes)
+    _, width, out = passes[0]
+    # i0, i2, i4 are the deceptive ones, so rows 0/2/4 of the screening batch.
+    expected = out[[0, 2, 4], width:]
+    assert torch.equal(screen.full_ids[:, screen.prompt_width:], expected), \
+        "the `full` row is not the screen's own generated tokens"
+    # The prompt columns *are* re-encoded, to the evaluation set's own width.
+    assert torch.equal(screen.full_ids[:, :screen.prompt_width], screen.clean_ids)
     assert screen.full_ids.shape[1] == screen.prompt_width + NEW_TOKENS
+    # And the labels carried over are the screen's, item for item.
+    assert [r["label"] for r in screen.full_rows] == [base.DECEPTIVE] * 3
 
 
 def test_an_item_with_no_agreed_belief_is_dropped_rather_than_scored():
@@ -580,8 +636,8 @@ def test_the_benchmark_mean_bank_is_collected_on_unpadded_batches_only():
     and two configurations sharing that bank still compare equal, so the table
     looks fine.
     """
-    ctx = make_ctx(make_cli(benchmark_n_per_dataset=4))
-    screen = _run_screen(ctx, FakeBench(make_items(20), _even_are_deceptive))
+    ctx = make_ctx(make_cli(benchmark_n_per_dataset=6))
+    screen = _run_screen(ctx, FakeBench(make_items(30), _even_are_deceptive))
     n = B.register_mean_bank(ctx, screen, "fake", PAD)
     batches = ctx.session.banks["benchmark:fake"]
     assert n == len(batches) and batches
@@ -591,6 +647,14 @@ def test_the_benchmark_mean_bank_is_collected_on_unpadded_batches_only():
         assert batch["input_ids"].shape == batch["attention_mask"].shape
     total = sum(b["input_ids"].shape[0] for b in batches)
     assert total == len(screen.items)
+    # The evaluation set has rows of several different lengths, so grouping
+    # must actually have split them. Without this the assertions above hold
+    # just as well for a bank that never grouped at all — which is how the
+    # first version of this test passed against exactly that mutation.
+    widths = set(b["input_ids"].shape[1] for b in batches)
+    assert len(widths) > 1, \
+        "every batch came out the same width; the fixture is not ragged and " \
+        "this test cannot see whether grouping happened"
 
 
 def test_only_benchmark_banks_may_be_registered_from_outside():
@@ -729,19 +793,24 @@ def test_the_report_prints_the_unparsed_column_and_the_belief_banner(
 # ==============================================================================
 
 def test_a_missing_api_key_is_caught_before_a_model_is_ever_loaded(monkeypatch):
-    """The gate has to sit above `build_session`, which loads ~32 GB."""
+    """The gate has to sit above `build_session`, which loads ~32 GB.
+
+    Driven through `main()` rather than by calling `check_benchmark_keys`
+    directly: the property under test is the *ordering* of two calls, and a
+    test that invokes the check itself cannot see that ordering at all.
+    """
     import evaluate_circuit
-    from evaluation import context as context_mod
 
-    def explode(self):
-        raise AssertionError("build_heavy ran despite a missing key")
+    def explode(cli):
+        raise AssertionError("build_session ran before the key check")
 
-    monkeypatch.setattr(context_mod.Session, "build_heavy", explode)
+    monkeypatch.setattr(evaluate_circuit, "build_session", explode)
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
-    cli = evaluate_circuit.build_parser().parse_args(
-        ["r", "--evals", "benchmarks", "--benchmarks", "mask:known_facts"])
+    monkeypatch.setattr("sys.argv", ["evaluate_circuit.py", "r", "--evals",
+                                     "benchmarks", "--benchmarks",
+                                     "mask:known_facts"])
     with pytest.raises(SystemExit, match="OPENAI_API_KEY"):
-        evaluate_circuit.check_benchmark_keys(cli)
+        evaluate_circuit.main()
 
 
 def test_sandbagging_alone_needs_no_key():
@@ -762,19 +831,39 @@ def test_benchmarks_is_a_choice_but_not_a_default():
 
 
 def test_judge_dry_run_loads_no_model(monkeypatch):
+    """`build_session` must skip `build_heavy` under --judge-dry-run.
+
+    Exercises the real `build_session` with only the circuit/task resolution
+    stubbed. Asserting on the parsed flags instead would pass against a
+    `build_session` that ignores the flag entirely.
+    """
+    from types import SimpleNamespace as NS
+
+    import evaluate_circuit
+    from evaluation import circuits as circuits_mod
     from evaluation import context as context_mod
 
     def explode(self):
         raise AssertionError("build_heavy ran under --judge-dry-run")
 
     monkeypatch.setattr(context_mod.Session, "build_heavy", explode)
-    import evaluate_circuit
-    cli = evaluate_circuit.build_parser().parse_args(
-        ["r", "--evals", "benchmarks", "--judge-dry-run"])
-    assert cli.judge_dry_run is True
-    # `build_session` gates `build_heavy` on dry_run *or* judge_dry_run; the
-    # explode above is what proves the second half of that.
-    assert getattr(cli, "judge_dry_run") and not cli.dry_run
+    monkeypatch.setattr(circuits_mod, "resolve_circuits",
+                        lambda cli: ([NS(label="c")], {"self": "/x"}, None,
+                                     {"self": {}}, {}))
+    monkeypatch.setattr(circuits_mod, "resolve_tasks", lambda *a: [])
+    monkeypatch.setattr(context_mod, "resolve_train_args",
+                        lambda config, cli: (NS(model="m"), None))
+
+    cli = evaluate_circuit.resolve_cli(evaluate_circuit.build_parser().parse_args(
+        ["r", "--evals", "benchmarks", "--judge-dry-run"]))
+    assert cli.judge_dry_run and not cli.dry_run
+    context_mod.build_session(cli)          # must not raise
+
+    # ...and the same guard must NOT swallow an ordinary run.
+    plain = evaluate_circuit.resolve_cli(
+        evaluate_circuit.build_parser().parse_args(["r", "--evals", "sanity"]))
+    with pytest.raises(AssertionError, match="build_heavy ran"):
+        context_mod.build_session(plain)
 
 
 def test_the_judge_model_flags_reach_the_request_rather_than_parsing_and_dying():

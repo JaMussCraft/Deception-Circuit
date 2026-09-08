@@ -93,6 +93,15 @@ CONFIG_LABELS = {
 #: common, without paying for the whole pool when it is rare.
 SCREEN_CHUNK_FACTOR = 2
 
+#: The ceiling on candidates screened, as a multiple of the target count.
+#: Without it the walk is driven by whichever pool fills last: on a benchmark
+#: where the full model is deceptive nearly always, the *honest* pool is the
+#: bottleneck and the screen would walk all 5245 harm-pressure rows at 512
+#: tokens each to fill it. A reference pool of a few dozen items, cycled, is a
+#: usable reference; an extra six hours of generation to widen it is not.
+#: A pool cut short this way is reported, not silently accepted.
+SCREEN_MAX_FACTOR = 10
+
 
 # ==============================================================================
 # PROMPT RENDERING
@@ -439,8 +448,10 @@ def run_screen(ctx, bench, client, dataset) -> Screen:
     chunk_size = max(target * SCREEN_CHUNK_FACTOR, cli.benchmark_gen_batch_size)
     label_counts = {}
 
+    budget = target * SCREEN_MAX_FACTOR
     for start in range(0, len(candidates), chunk_size):
-        if len(selected) >= target and (prompt_kind or len(pool) >= want_pool):
+        if len(selected) >= target and (prompt_kind or len(pool) >= want_pool
+                                        or screened >= budget):
             break
         chunk = candidates[start:start + chunk_size]
         chunk, dropped = _elicit_beliefs(
@@ -494,6 +505,11 @@ def run_screen(ctx, bench, client, dataset) -> Screen:
         "selected": len(selected), "target": target,
         "dropped_no_belief": no_belief, "screen_labels": label_counts,
         "early_stopped": screened < len(candidates),
+        "budget": budget,
+        # True when the screen stopped with the reference pool still short.
+        # The pool is then cycled, which the report prints as `partner reused`.
+        "pool_short": (not prompt_kind and len(pool) < want_pool
+                       and screened >= budget),
     }
 
     # Re-encode the selection as one batch with one width, rather than leaving
@@ -859,6 +875,10 @@ class BenchmarkEvaluation(Evaluation):
               % (screen["screened"], screen["candidates"],
                  " (early stop)" if screen["early_stopped"] else "",
                  screen["selected"], screen["dropped_no_belief"]))
+        if screen.get("pool_short"):
+            print("  !! the screen hit its %d-candidate budget with the "
+                  "reference pool still short;\n     it is cycled below, so "
+                  "several items share one reference." % screen["budget"])
         ref = entry["reference"]
         print("  corrupt reference: %s pool, %s pairing, %d rows%s%s"
               % (ref["pool"], ref["pairing"], ref["pool_size"],
