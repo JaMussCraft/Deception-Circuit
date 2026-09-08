@@ -276,6 +276,25 @@ class Benchmark(object):
         with a local grader returns None."""
         return None
 
+    def rubric_sources(self, cli):
+        """-> paths of files OUTSIDE this repo that define how this adapter
+        judges: judge prompts, parse rules, control templates.
+
+        The screen cache hashes an adapter's own module so that an edited
+        rubric invalidates the screens it labelled. That is not enough for the
+        adapters whose rubric lives in a sibling checkout — MASK reads its
+        judge prompts from `mask/prompts/evaluation_prompts.py` and its
+        numeric rules from `mask/metric.py`, and Liars' Bench lifts its
+        rubrics out of the notebooks in `liars-bench/src/`. A `git pull` there
+        changes how responses are judged while nothing in this repo moves, so
+        the cached `full` rows would carry the old rubric's labels while every
+        ablated configuration is judged under the new one, and the difference
+        between them would be partly a rubric change.
+
+        Adapters with a local grader (sandbagging) have nothing to declare.
+        """
+        return ()
+
     def judge_request(self, item, response):
         """-> JudgeRequest, or None when the grader is local (sandbagging) or
         when the response can be resolved without asking."""

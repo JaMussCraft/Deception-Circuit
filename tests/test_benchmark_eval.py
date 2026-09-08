@@ -166,6 +166,7 @@ def make_cli(**overrides):
         benchmark_repo_root=None,
         mask_judge_model=None, mask_numeric_judge_model=None,
         lb_judge_model=None, lb_harm_judge_model=None,
+        lb_belief_templates=None, benchmark_pool_size=None,
         ablation="interchange", wikitext_seed=0, knockout_granularity="finest",
         output_dir=None)
     for key, value in overrides.items():

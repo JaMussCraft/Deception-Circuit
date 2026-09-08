@@ -290,6 +290,16 @@ class MaskSplit(Benchmark):
                                 or self.numerical_model)
         return self
 
+    def rubric_sources(self, cli):
+        """MASK's judge prompts and its numeric parse rules, both imported at
+        runtime from the `mask/` checkout rather than copied in here."""
+        try:
+            directory = _mask_dir(cli)
+        except Exception:                                   # noqa: BLE001
+            return ()
+        return (os.path.join(directory, "prompts", "evaluation_prompts.py"),
+                os.path.join(directory, "metric.py"))
+
     def judge_request(self, item, response):
         prompts = self._prompts
         if prompts is None:

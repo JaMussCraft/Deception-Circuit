@@ -182,6 +182,29 @@ class _LiarsBench(Benchmark):
         self.judge_model = JUDGE_SONNET
         self.harm_judge_model = JUDGE_HAIKU
 
+    #: The notebook each subclass lifts its rubrics and control templates out
+    #: of, as path parts under `liars-bench/src/`. Declared per scenario
+    #: rather than listing all three on the base, so an edit to one notebook
+    #: does not invalidate the screens of scenarios that never read it.
+    notebook = None
+
+    def rubric_sources(self, cli):
+        """The upstream notebook this scenario's rubric is read out of.
+
+        `notebook.py` refuses to copy these constants into this repo because
+        "a copy is one upstream edit away from silently judging with a stale
+        rubric, and the drift is undetectable from the results". A screen
+        cache keyed without them would reintroduce exactly that drift one
+        layer up: cached `full` labels from the old rubric, live `knockout`
+        labels from the new one.
+        """
+        if not self.notebook:
+            return ()
+        try:
+            return (_notebook(cli, *self.notebook),)
+        except Exception:                                   # noqa: BLE001
+            return ()
+
     def bind(self, cli):
         self._cli = cli
         self.judge_model = getattr(cli, "lb_judge_model", None) or self.judge_model
@@ -269,6 +292,7 @@ class InstructedDeception(_LiarsBench):
     """
 
     scenario = "instructed-deception"
+    notebook = ("instruct-dishonesty", "instruct_dishonesty.ipynb")
     display_name = "Liars' Bench / instructed deception"
     condition_kind = "prompt"
     requires_key = "OPENROUTER_API_KEY"
@@ -513,6 +537,7 @@ class HarmPressureChoice(_HarmPressure):
     """
 
     scenario = "harm-pressure-choice"
+    notebook = ("harm-refusal", "harm-refusal.ipynb")
     display_name = "Liars' Bench / harm pressure (choice)"
     requires_key = None
 
@@ -548,6 +573,7 @@ class HarmPressureKnowledgeReport(_HarmPressure):
     """
 
     scenario = "harm-pressure-knowledge-report"
+    notebook = ("harm-refusal", "harm-refusal.ipynb")
     display_name = "Liars' Bench / harm pressure (knowledge report)"
     requires_key = "OPENROUTER_API_KEY"
 
@@ -646,6 +672,7 @@ class ConvincingGame(_LiarsBench):
     """
 
     scenario = "convincing-game"
+    notebook = ("convince_me", "convince_me.ipynb")
     display_name = "Liars' Bench / convincing game"
     requires_key = "OPENROUTER_API_KEY"
 

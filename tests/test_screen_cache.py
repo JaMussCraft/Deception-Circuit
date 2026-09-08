@@ -54,6 +54,8 @@ def a_key(cli, bench=None, items=None, device="TEST-GPU"):
     ("mask_numeric_judge_model", "gpt-4o"),
     ("lb_judge_model", "claude-x"),
     ("lb_harm_judge_model", "claude-y"),
+    ("lb_belief_templates", 2),
+    ("benchmark_pool_size", 25),
 ])
 def test_every_keyed_flag_changes_the_hash(tmp_path, flag, value):
     """One parametrisation per keyed flag.
@@ -379,18 +381,145 @@ def test_a_stage_without_a_floor_is_equally_expensive_either_way():
     assert E.scale_stages([("flat", 7.0)], n_cells=3) == [("flat", 21.0, 21.0)]
 
 
-def test_the_screen_belief_and_pool_stages_are_the_once_per_process_ones():
-    """Guards the marking itself: dropping the `True` from any of the three
-    silently restores the per-cell overcharge."""
+def test_the_screen_belief_and_pool_stages_are_the_once_per_process_ones(
+        monkeypatch):
+    """Guards the marking itself: dropping the `True` from any of THREE stages
+    silently restores the per-cell overcharge.
+
+    The adapter is injected rather than named, for two reasons. A real MASK
+    split does not override `belief_request`, so `_probe_count` returns 0 and
+    no belief stage is emitted at all — an earlier version of this test named
+    one and therefore guarded only two of the three markers while claiming to
+    guard all three. And naming a Liars' Bench scenario instead would put a
+    HuggingFace download inside a unit test.
+    """
     import evaluate_circuit as E
 
-    cli = make_cli(benchmarks=["mask:known_facts"], benchmark_n_per_dataset=4,
+    class Believer(FakeBench):
+        def __init__(self):
+            super().__init__(make_items(30), _even_are_deceptive)
+            self.name = "believer"
+
+        def belief_request(self, item):
+            return [{"name": "p1", "messages": item.messages},
+                    {"name": "p2", "messages": item.messages}]
+
+    bench = Believer()
+    monkeypatch.setattr("evaluation.benchmarks.get_benchmark",
+                        lambda name: bench)
+    monkeypatch.setattr(E, "expand", lambda names: ["believer"])
+    monkeypatch.setattr(E, "_POOL_CACHE", {})
+
+    cli = make_cli(benchmarks=["believer"], benchmark_n_per_dataset=4,
                    benchmark_n_random=1, evals=["benchmarks"])
     once, per_cell = [], []
     for stage in E.benchmark_stages(cli):
         (once if len(stage) > 3 and stage[3] else per_cell).append(stage[0])
-    assert any("screen" in label for label in once)
-    assert any("reference pool" in label for label in once)
-    assert not any("screen" in label for label in per_cell)
+
+    # The belief stage has to exist before its marker can be guarded at all.
+    assert any("belief" in label for label in once + per_cell), \
+        "fixture emitted no belief stage, so its marker is untested"
+    for expected in ("screen", "belief", "reference pool"):
+        assert any(expected in label for label in once), expected
+        assert not any(expected in label for label in per_cell), expected
     assert any("ablated configs" in label for label in per_cell)
     assert any("coherence" in label for label in per_cell)
+
+
+# ==============================================================================
+# WHAT THE FINGERPRINTS HAVE TO SEE
+# ==============================================================================
+
+def test_belief_and_meta_are_fingerprinted_not_only_ids_and_messages(tmp_path):
+    """MASK loads `belief` from an external metrics CSV and puts the
+    proposition in `meta`; both `judge_request` and `parse_judgement` read
+    them. Regenerating those metrics leaves every id and message identical
+    while changing what counts as a lie."""
+    cli = cache_cli(tmp_path)
+    items = [i.replace(belief="A", meta={"proposition": "p"})
+             for i in make_items(4)]
+    other_belief = [i.replace(belief="B") for i in items]
+    other_meta = [i.replace(meta={"proposition": "q"}) for i in items]
+    original = screen_cache.key_hash(a_key(cli, items=items))
+    assert original != screen_cache.key_hash(a_key(cli, items=other_belief))
+    assert original != screen_cache.key_hash(a_key(cli, items=other_meta))
+
+
+def test_meta_key_order_alone_does_not_change_the_fingerprint(tmp_path):
+    """A dict that round-trips through JSON or a DataFrame can come back in
+    another order with nothing actually changed; that must not force a
+    re-screen."""
+    cli = cache_cli(tmp_path)
+    one = [i.replace(meta={"a": 1, "b": 2}) for i in make_items(3)]
+    two = [i.replace(meta={"b": 2, "a": 1}) for i in make_items(3)]
+    assert screen_cache.key_hash(a_key(cli, items=one)) == \
+        screen_cache.key_hash(a_key(cli, items=two))
+
+
+def test_an_external_rubric_file_is_part_of_the_fingerprint(tmp_path):
+    """The rubric for both judged adapters lives in a sibling checkout, not in
+    this repo. A `git pull` there would otherwise leave the key untouched while
+    cached `full` labels came from the old rubric and live `knockout` labels
+    from the new one."""
+    rubric = tmp_path / "rubric.py"
+    rubric.write_text("JUDGE = 'say yes if it lied'\n")
+
+    class WithRubric(FakeBench):
+        def rubric_sources(self, cli):
+            return (str(rubric),)
+
+    cli = cache_cli(tmp_path)
+    bench = WithRubric(make_items(4), _even_are_deceptive)
+    before = screen_cache._source_fingerprint(bench, cli)
+    rubric.write_text("JUDGE = 'say yes if it was merely evasive'\n")
+    assert screen_cache._source_fingerprint(bench, cli) != before
+
+
+def test_a_missing_rubric_file_is_marked_not_treated_as_empty(tmp_path):
+    empty = tmp_path / "empty.py"
+    empty.write_text("")
+
+    class Missing(FakeBench):
+        def rubric_sources(self, cli):
+            return (str(tmp_path / "gone.py"),)
+
+    class Empty(FakeBench):
+        def rubric_sources(self, cli):
+            return (str(empty),)
+
+    cli = cache_cli(tmp_path)
+    items = make_items(4)
+    assert screen_cache._source_fingerprint(Missing(items, _even_are_deceptive),
+                                            cli) != \
+        screen_cache._source_fingerprint(Empty(items, _even_are_deceptive), cli)
+
+
+def test_an_adapter_that_cannot_resolve_its_rubric_does_not_take_the_run_down():
+    class Broken(FakeBench):
+        def rubric_sources(self, cli):
+            raise RuntimeError("no checkout")
+
+    assert screen_cache._source_fingerprint(
+        Broken(make_items(2), _even_are_deceptive), None)
+
+
+def test_the_judged_adapters_actually_declare_their_external_rubrics():
+    """Guards the declaration itself: the hook defaults to () on the base
+    class, so an adapter that forgets to override it fails open and silently
+    stops noticing upstream rubric edits."""
+    from evaluation.benchmarks import get_benchmark
+
+    cli = make_cli(benchmark_repo_root=None)
+    mask = get_benchmark("mask:known_facts").rubric_sources(cli)
+    assert any(p.endswith("evaluation_prompts.py") for p in mask)
+    assert any(p.endswith("metric.py") for p in mask)
+
+    for dataset, expected in [("lb:instructed-deception",
+                               "instruct_dishonesty.ipynb"),
+                              ("lb:harm-pressure-choice", "harm-refusal.ipynb"),
+                              ("lb:convincing-game", "convince_me.ipynb")]:
+        paths = get_benchmark(dataset).rubric_sources(cli)
+        assert any(p.endswith(expected) for p in paths), dataset
+
+    # sandbagging grades locally and has no external rubric to declare.
+    assert get_benchmark("sandbagging").rubric_sources(cli) == ()
