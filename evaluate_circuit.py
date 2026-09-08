@@ -11,6 +11,9 @@ under the "masks" key. This rebuilds it from there and asks:
                instruction do the same thing the knockout does?
   3. null      does a size-matched random circuit do just as well?
   4. pressure  does the behaviour survive dropping the pressure clause?
+  5. benchmarks  does knocking it out stop the model being deceptive on
+               external benchmarks it was never pruned on? (opt in with
+               --evals benchmarks; generates for hours and calls paid judges)
 
 Circuits and tasks are independent: any expression over saved circuits can be
 evaluated against any number of tasks, in one process with one model load.
@@ -44,10 +47,12 @@ import argparse
 import os
 import sys
 
-from evaluation import list_evaluations
+from evaluation import default_evaluations, list_evaluations
 from evaluation import report
 from evaluation import suite
 from evaluation.ablation import ABLATION_SCHEMES
+from evaluation.benchmarks import (DEFAULT_BENCHMARKS, GROUPS, expand,
+                                   list_benchmarks, list_choices, required_keys)
 from evaluation.context import build_session
 from evaluation.masks import count_masks
 
@@ -57,6 +62,9 @@ from evaluation.masks import count_masks
 SEC_MODEL_LOAD = 200.0
 SEC_PER_1000_TEST = 55.0
 SEC_PER_WIKITEXT_CONFIG = 13.0
+#: Seconds per generated token per row at --benchmark-gen-batch-size 8, dual
+#: stream with the KV cache. EVAL 5 is dominated by this and nothing else.
+SEC_PER_GEN_TOKEN_ROW = 0.0075
 
 
 # ==============================================================================
@@ -101,8 +109,11 @@ def build_parser():
                         "circuit's own task.")
 
     g = p.add_argument_group("what to run")
-    g.add_argument("--evals", nargs="+", default=list_evaluations(),
-                   choices=list_evaluations(), help="Which evaluations to run.")
+    g.add_argument("--evals", nargs="+", default=default_evaluations(),
+                   choices=list_evaluations(),
+                   help="Which evaluations to run. 'benchmarks' (EVAL 5) is a "
+                        "choice but not a default: it generates for hours and "
+                        "calls paid judge APIs, so it is asked for by name.")
     g.add_argument("--ablation", default="interchange", choices=list(ABLATION_SCHEMES),
                    help="What fills an ablated node. Only 'interchange' can "
                         "reproduce the in-run numbers.")
@@ -149,9 +160,61 @@ def build_parser():
                         "configuration, so no pairing noise enters the null).")
 
     g = p.add_argument_group("deception benchmarks (EVAL 5)")
+    g.add_argument("--benchmarks", nargs="+", default=list(DEFAULT_BENCHMARKS),
+                   choices=list_choices(), metavar="NAME",
+                   help="Datasets to run: %s. The group names %s expand to "
+                        "their members."
+                        % (", ".join(list_benchmarks()),
+                           ", ".join(sorted(GROUPS))))
     g.add_argument("--benchmark-repo-root", default=None,
                    help="Directory holding the sibling benchmark checkouts "
                         "(mask/, liars-bench/). Default: this repo's parent.")
+    g.add_argument("--benchmark-n-per-dataset", type=int, default=100,
+                   help="Items per dataset the full model must be judged "
+                        "deceptive on. Screening stops as soon as this many "
+                        "are found.")
+    g.add_argument("--benchmark-new-tokens", type=int, default=512,
+                   help="Greedy tokens per generation. A benchmark whose "
+                        "answer sits behind a CoT scaffold overrides this "
+                        "(sandbagging asks for 1024).")
+    g.add_argument("--benchmark-belief-tokens", type=int, default=128,
+                   help="Greedy tokens per belief probe. Probes are "
+                        "closed-form (a letter, a short claim), so spending "
+                        "the full generation budget on them multiplies the "
+                        "belief pass for nothing.")
+    g.add_argument("--benchmark-gen-batch-size", type=int, default=8,
+                   help="Rows per generation bucket. The plan's flag list says "
+                        "32; its own A40 sizing paragraph assumes 8, and 8 is "
+                        "what the arithmetic supports -- two KV caches at "
+                        "256 KB/token/row plus ~32 GB of weights under "
+                        "--reference separate leaves ~12 GB, which 32 rows x "
+                        "1500 tokens exhausts.")
+    g.add_argument("--benchmark-ref-pool", default="honest",
+                   choices=["honest", "deceptive", "pooled"],
+                   help="Which pool the corrupted stream is drawn from under "
+                        "--ablation interchange.")
+    g.add_argument("--benchmark-n-random", type=int, default=5,
+                   help="Size-matched random circuits in EVAL 5's null. Far "
+                        "below --n-random on purpose: generation is orders of "
+                        "magnitude more expensive than a single-position "
+                        "readout.")
+    g.add_argument("--no-kv-cache", action="store_true",
+                   help="Debug: force the O(n^2) full-sequence re-forward "
+                        "instead of the dual-stream KV cache.")
+    g.add_argument("--judge-dry-run", action="store_true",
+                   help="Print one judge prompt per selected benchmark and "
+                        "exit. No model, no CUDA, no API key, no spend.")
+    g.add_argument("--judge-concurrency", type=int, default=8,
+                   help="In-flight judge calls.")
+    g.add_argument("--mask-judge-model", default=None,
+                   help="Override MASK's binary judge (default: the model "
+                        "mask/mask/evaluate.py uses).")
+    g.add_argument("--mask-numeric-judge-model", default=None,
+                   help="Override MASK's numerical-archetype judge.")
+    g.add_argument("--lb-judge-model", default=None,
+                   help="Override Liars' Bench's main judge.")
+    g.add_argument("--lb-harm-judge-model", default=None,
+                   help="Override Liars' Bench's harm-pressure claim judge.")
     # The adapters already read these three through getattr(cli, ...), which
     # returns None for an undefined flag -- so before they were declared here,
     # passing one was a silent no-op rather than an error.
@@ -254,6 +317,8 @@ def estimate_runtime(session, ctx) -> dict:
                            3 * cli.gen_examples * cli.gen_new_tokens * 0.35))
     if "pressure" in cli.evals:
         stages.append(("eval 4 (pressure clause)", 6 * test_pass))
+    if "benchmarks" in cli.evals:
+        stages.extend(benchmark_stages(cli))
     if cli.ablation == "mean":
         stages.append(("mean bank", 2 * test_pass))
 
@@ -261,6 +326,87 @@ def estimate_runtime(session, ctx) -> dict:
     stages.insert(0, ("model load", SEC_MODEL_LOAD))
     return {"stages": stages, "total_seconds": sum(s for _, s in stages),
             "cells": n_cells}
+
+
+def benchmark_stages(cli):
+    """EVAL 5's rough cost, per dataset: the screen plus one pass per config.
+
+    The screen's cost is a *worst case* — it walks the candidate pool until it
+    finds `--benchmark-n-per-dataset` items the full model is deceptive on, and
+    stops early when deception is common. There is no way to know which without
+    generating, so this assumes the pool is exhausted and says so.
+    """
+    from evaluation.benchmarks import get_benchmark
+
+    n = cli.benchmark_n_per_dataset
+    n_configs = 4 + cli.benchmark_n_random          # full/knockout/circuit/empty
+    stages = []
+    for dataset in expand(cli.benchmarks):
+        tokens = get_benchmark(dataset).new_tokens or cli.benchmark_new_tokens
+        per_pass = n * tokens * SEC_PER_GEN_TOKEN_ROW
+        # screen + reference pool, then every configuration but `full` (which
+        # reuses the screen's own tokens rather than generating again).
+        stages.append((f"eval 5 {dataset}: screen + reference", 2 * per_pass))
+        stages.append((f"eval 5 {dataset}: {n_configs - 1} ablated configs",
+                       (n_configs - 1) * per_pass))
+    return stages
+
+
+def benchmark_plan(cli) -> None:
+    """The --dry-run benchmark section: what would run, and what it needs."""
+    from evaluation.benchmarks import get_benchmark
+
+    datasets = expand(cli.benchmarks)
+    report.banner(f"DECEPTION BENCHMARKS (EVAL 5) — {len(datasets)} dataset(s)")
+    print()
+    print(f"  {'dataset':<34} {'condition':<9} {'tokens':>6} {'pool':>8}  judge")
+    print("  " + "-" * 100)
+    thin = []
+    for dataset in datasets:
+        bench = get_benchmark(dataset)
+        spec = bench.judge_spec()
+        # The candidate pool, loaded for real: prompts are model-independent,
+        # so this needs no GPU and no key. A dataset whose checkout is missing
+        # reports that rather than taking the whole dry run down with it --
+        # the point of --dry-run is to find out what is wrong, not to stop at
+        # the first thing.
+        try:
+            pool = len(bench.load(None, cli))
+        except Exception as exc:                           # noqa: BLE001
+            pool = f"! {type(exc).__name__}"
+        else:
+            if pool < cli.benchmark_n_per_dataset:
+                thin.append((dataset, pool))
+        print(f"  {dataset:<34} {bench.condition_kind:<9} "
+              f"{bench.new_tokens or cli.benchmark_new_tokens:>6} {pool:>8}  "
+              + (f"{spec['provider']}/{spec['model']}" if spec
+                 else "local grader, no API call"))
+    if thin:
+        print()
+        for dataset, pool in thin:
+            print(f"  !! {dataset}: only {pool} candidates for a target of "
+                  f"{cli.benchmark_n_per_dataset}, and the screen keeps only "
+                  f"the ones\n     the full model is deceptive on — so this "
+                  f"cell will be thinner still.")
+
+    keys = required_keys(cli.benchmarks)
+    print()
+    if keys:
+        for key, users in sorted(keys.items()):
+            present = "set" if os.environ.get(key) else "NOT SET"
+            print(f"  {key:<22} {present:<8} needed by {', '.join(users)}")
+    else:
+        print("  No API key needed: every selected dataset grades locally.")
+
+    print(f"\n  Target {cli.benchmark_n_per_dataset} items per dataset, drawn "
+          f"by screening the candidate pool\n  in load order until that many "
+          f"come back judged deceptive under the FULL model. The pool\n  "
+          f"column is therefore an upper bound: the exact post-screen count "
+          f"and the\n  judge-call total are only known after the generation "
+          f"pass.")
+    print(f"\n  Corrupt reference: --benchmark-ref-pool "
+          f"{cli.benchmark_ref_pool}. Random null: "
+          f"{cli.benchmark_n_random} circuit(s).")
 
 
 def dry_run(session) -> int:
@@ -341,6 +487,9 @@ def dry_run(session) -> int:
                                title="PER-LAYER COUNTS — random circuit "
                                      f"{ctx.random_indices[0]} (must match above)")
 
+    if "benchmarks" in cli.evals:
+        benchmark_plan(cli)
+
     est = estimate_runtime(session, ctx)
     report.banner("ESTIMATED RUNTIME (1x A100, very rough)")
     print()
@@ -364,11 +513,39 @@ def _emptiness(spec) -> str:
 # MAIN
 # ==============================================================================
 
+def check_benchmark_keys(cli) -> None:
+    """Fail before the model loads if a selected benchmark cannot be judged.
+
+    EVAL 5 judges inline, so the alternative is discovering a missing key after
+    an hour of generation with nothing labelled and nothing to resume from. The
+    check is deliberately here rather than in the evaluation: it has to run
+    before `build_session`, which loads ~32 GB of weights.
+    """
+    missing = {key: users for key, users in required_keys(cli.benchmarks).items()
+               if not os.environ.get(key)}
+    if not missing:
+        return
+    lines = ["EVAL 5 needs API key(s) that are not set:"]
+    for key, users in sorted(missing.items()):
+        lines.append(f"  {key}  — required by {', '.join(users)}")
+    lines.append("")
+    lines.append("Set them, or drop those datasets with --benchmarks. "
+                 "'--benchmarks sandbagging'")
+    lines.append("grades locally and needs no key at all.")
+    raise SystemExit("\n".join(lines))
+
+
 def main():
     cli = resolve_cli(build_parser().parse_args())
+    if "benchmarks" in cli.evals and not cli.judge_dry_run:
+        # Before build_session: a missing key must cost zero GPU time.
+        check_benchmark_keys(cli)
     session = build_session(cli)
     if cli.dry_run:
         return dry_run(session)
+    if cli.judge_dry_run:
+        from evaluation.benchmark_eval import judge_dry_run
+        return judge_dry_run(session)
     return suite.run(session)
 
 

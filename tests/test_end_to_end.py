@@ -26,7 +26,7 @@ from torch.utils.data import DataLoader, Dataset
 
 import evaluate_circuit
 from config import NodePruningConfig
-from evaluation import list_evaluations
+from evaluation import default_evaluations
 from tasks import Task
 from tests.helpers import TINY, build_tiny_pair
 
@@ -279,7 +279,9 @@ def test_full_run_interchange(tiny_run, monkeypatch):
     assert summary["verification"]["all_open_equals_full"] is True
     assert summary["failures"] == []
     index = read_json(tiny_run, "index.json")
-    assert set(index["interchange"]["evals"]) == set(list_evaluations())
+    # The defaults, not every choice: `benchmarks` is opt-in (it needs API
+    # keys and hours of generation), so a bare invocation must not have run it.
+    assert set(index["interchange"]["evals"]) == set(default_evaluations())
 
     # The tiny task has no pressure clause, so eval 4 must skip itself with a
     # recorded reason rather than failing the run.

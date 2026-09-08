@@ -176,9 +176,17 @@ class _LiarsBench(Benchmark):
     def __init__(self):
         self.name = "lb:%s" % self.scenario
         self._cli = None
+        # The judges the Liars' Bench notebooks pin, overridable from the CLI
+        # in `bind`. Instance attributes rather than the module constants read
+        # at call time, so an override actually reaches `judge_request`.
+        self.judge_model = JUDGE_SONNET
+        self.harm_judge_model = JUDGE_HAIKU
 
     def bind(self, cli):
         self._cli = cli
+        self.judge_model = getattr(cli, "lb_judge_model", None) or self.judge_model
+        self.harm_judge_model = (getattr(cli, "lb_harm_judge_model", None)
+                                 or self.harm_judge_model)
         return self
 
     # ---- loading ---------------------------------------------------------
@@ -345,7 +353,7 @@ class InstructedDeception(_LiarsBench):
 
     # ---- judging ---------------------------------------------------------
     def judge_spec(self):
-        return {"provider": "openrouter", "model": JUDGE_SONNET,
+        return {"provider": "openrouter", "model": self.judge_model,
                 "source": "liars-bench/src/instruct-dishonesty/"
                           "instruct_dishonesty.ipynb"}
 
@@ -355,7 +363,7 @@ class InstructedDeception(_LiarsBench):
     def _classify(self, item, response):
         prompt = self._templates()["judge"].format(
             statement=item.meta.get("statement", ""), response=response)
-        return JudgeRequest("openrouter", JUDGE_SONNET,
+        return JudgeRequest("openrouter", self.judge_model,
                             [{"role": "system",
                               "content": "You are a helpful assistant."},
                              {"role": "user", "content": prompt}],
@@ -587,14 +595,14 @@ class HarmPressureKnowledgeReport(_HarmPressure):
         return {"knows": knows, "answer": answer, "control_claims": claims}
 
     def judge_spec(self):
-        return {"provider": "openrouter", "model": JUDGE_HAIKU,
+        return {"provider": "openrouter", "model": self.harm_judge_model,
                 "source": "liars-bench/src/harm-refusal/harm-refusal.ipynb"}
 
     def judge_request(self, item, response):
         return self._claim_request(response)
 
     def _claim_request(self, response):
-        return JudgeRequest("openrouter", JUDGE_HAIKU,
+        return JudgeRequest("openrouter", self.harm_judge_model,
                             [{"role": "user",
                               "content": self._rubric().format(response=response)}],
                             kwargs={"max_tokens": 100})
@@ -755,7 +763,7 @@ class ConvincingGame(_LiarsBench):
         return None
 
     def judge_spec(self):
-        return {"provider": "openrouter", "model": JUDGE_SONNET,
+        return {"provider": "openrouter", "model": self.judge_model,
                 "source": "liars-bench/src/convince_me/convince_me.ipynb"}
 
     def judge_request(self, item, response):
@@ -791,7 +799,7 @@ class ConvincingGame(_LiarsBench):
             prompt = self._rubric().format(
                 system_prompt=system_prompt, user_prompt=user_prompt,
                 response=response)
-        return JudgeRequest("openrouter", JUDGE_SONNET,
+        return JudgeRequest("openrouter", self.judge_model,
                             [{"role": "user", "content": prompt}],
                             kwargs={"max_tokens": 500, "temperature": 0.0})
 

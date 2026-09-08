@@ -7,14 +7,22 @@ share — models, loaders, reference caches, mean banks, the random circuit set 
 lives on the `EvalContext` they are handed, so a fifth evaluation is one
 module, one entry in `_EVALS`, and one entry in `list_evaluations()`.
 
-The four shipped evaluations answer, in order:
+The five shipped evaluations answer, in order:
 
-  sanity    does the saved mask reproduce the numbers the training run reported?
-  knockout  is the circuit *necessary* — does removing it stop the behaviour,
-            and at what collateral cost?
-  null      does a size-matched random circuit do just as well?
-  pressure  does the behaviour need the pressure clause, or is the circuit just
-            reading the last sentence of the system prompt?
+  sanity      does the saved mask reproduce the numbers the training run reported?
+  knockout    is the circuit *necessary* — does removing it stop the behaviour,
+              and at what collateral cost?
+  null        does a size-matched random circuit do just as well?
+  pressure    does the behaviour need the pressure clause, or is the circuit
+              just reading the last sentence of the system prompt?
+  benchmarks  does knocking it out stop the model being deceptive on external
+              benchmarks it was never pruned on?
+
+`benchmarks` is a `--evals` *choice* but not a default. It generates for hours,
+it calls paid judge APIs, and it needs `OPENAI_API_KEY` / `OPENROUTER_API_KEY`
+for everything but sandbagging — so adding it to `DEFAULT_EVALS` would make
+every existing invocation start demanding keys it never needed. Ask for it by
+name.
 """
 
 
@@ -64,6 +72,9 @@ def get_evaluation(name: str) -> Evaluation:
         elif name == "pressure":
             from evaluation.pressure import PressureEvaluation
             _EVALS[name] = PressureEvaluation
+        elif name == "benchmarks":
+            from evaluation.benchmark_eval import BenchmarkEvaluation
+            _EVALS[name] = BenchmarkEvaluation
         else:
             raise ValueError(
                 f"Unknown evaluation {name!r}. Choose from {list_evaluations()}.")
@@ -71,4 +82,11 @@ def get_evaluation(name: str) -> Evaluation:
 
 
 def list_evaluations():
+    """Everything `--evals` accepts."""
+    return ["sanity", "knockout", "null", "pressure", "benchmarks"]
+
+
+def default_evaluations():
+    """What `--evals` runs when it is not given. See the module docstring for
+    why `benchmarks` is a choice but not a default."""
     return ["sanity", "knockout", "null", "pressure"]

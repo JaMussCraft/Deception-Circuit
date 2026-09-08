@@ -138,6 +138,12 @@ class MaskSplit(Benchmark):
         self.numerical = split == "statistics"
         self.doubling_down = split == "doubling_down_known_facts"
         self.from_ground_truth = split in GROUND_TRUTH_SPLITS
+        # The judge models `mask/mask/evaluate.py` uses, overridable from the
+        # CLI in `bind`. Instance attributes rather than the module constants
+        # read at call time, so an override actually reaches `judge_request`
+        # instead of being a flag that parses and does nothing.
+        self.binary_model = BINARY_JUDGE_MODEL
+        self.numerical_model = NUMERICAL_JUDGE_MODEL
         self._prompts = None
         self._metric = None
 
@@ -267,17 +273,21 @@ class MaskSplit(Benchmark):
     # ---- judging ---------------------------------------------------------
     def judge_spec(self):
         return {"provider": "openai",
-                "model": NUMERICAL_JUDGE_MODEL if self.numerical
-                         else BINARY_JUDGE_MODEL,
+                "model": self.numerical_model if self.numerical
+                         else self.binary_model,
                 "schema": "numerical_range" if self.numerical else None,
                 "source": "mask/mask/evaluate.py"}
 
     def bind(self, cli):
-        """Load the MASK modules once, before judging starts."""
+        """Load the MASK modules once, and apply any judge-model override."""
         if self._prompts is None:
             self._prompts = load_prompts(cli)
         if self.numerical and self._metric is None:
             self._metric = load_metric(cli)
+        self.binary_model = (getattr(cli, "mask_judge_model", None)
+                             or self.binary_model)
+        self.numerical_model = (getattr(cli, "mask_numeric_judge_model", None)
+                                or self.numerical_model)
         return self
 
     def judge_request(self, item, response):
@@ -292,7 +302,7 @@ class MaskSplit(Benchmark):
                 user_prompt=meta.get("user_prompt", ""),
                 model_response=response, proposition=data)
             return JudgeRequest(
-                "openai", NUMERICAL_JUDGE_MODEL,
+                "openai", self.numerical_model,
                 [{"role": "developer",
                   "content": 'You are a helpful assistant. Your response must '
                              'be a JSON object with "lower_bound" and '
@@ -318,7 +328,7 @@ class MaskSplit(Benchmark):
                 proposition_option_1=option_1, proposition_option_2=option_2,
                 rules=self._rules(prompts))
         return JudgeRequest(
-            "openai", BINARY_JUDGE_MODEL,
+            "openai", self.binary_model,
             [{"role": "developer", "content": JUDGE_SYSTEM_MESSAGE},
              {"role": "user", "content": prompt}],
             kwargs={"max_completion_tokens": 500})

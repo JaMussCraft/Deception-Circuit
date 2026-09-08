@@ -205,6 +205,8 @@ class Session:
         self._ref_caches = {}       # task label -> [N, vocab]
         self._variant_loaders = {}  # (task label, variant) -> (loader, reason)
         self._random_sets = {}      # circuit label -> (indices, masks)
+        self._bank_batches = {}     # bank name -> stream batches (EVAL 5)
+        self._screens = {}          # benchmark dataset -> Screen (EVAL 5)
         self._wikitext_blocks = None
         self._current_masks = None
 
@@ -302,8 +304,40 @@ class Session:
         return result
 
     # ---- per-task caches -------------------------------------------------
+    def register_stream_batches(self, name, batches) -> None:
+        """Supply the prompts a named mean bank is collected over.
+
+        `task` and `wikitext` build their own batches below from state the
+        Session already owns. A benchmark bank cannot: its prompts are the
+        evaluation set EVAL 5 selects by generating and judging, which does not
+        exist until the screen has run. So the evaluation hands them over and
+        `mean_bank` looks them up, rather than `mean_bank` growing a back
+        reference into an evaluation module.
+        """
+        if not str(name).startswith("benchmark:"):
+            raise ValueError(
+                f"only benchmark:* banks are registered from outside; got "
+                f"{name!r}")
+        self._bank_batches[name] = batches
+
+    def screen_for(self, dataset, builder, *args):
+        """EVAL 5's per-dataset screen, built once per process.
+
+        The screen (evaluation set, reference pool, full-model generations and
+        their labels) depends on the model and the benchmark, never on which
+        circuit is loaded — every pass in it runs with all gates open. A 3x3
+        suite would otherwise regenerate and re-judge the same hours of text
+        nine times.
+        """
+        if dataset not in self._screens:
+            self._screens[dataset] = builder(*args)
+        return self._screens[dataset]
+
     def mean_bank(self, ctx, name="task"):
-        key = ("-", name) if name == "wikitext" else (ctx.task_spec.label, name)
+        # A benchmark bank is keyed globally, like wikitext: its prompt
+        # distribution is the benchmark's, not the circuit task's.
+        key = ((ctx.task_spec.label, name)
+               if name == "task" else ("-", name))
         if key in self._mean_banks:
             return self._mean_banks[key]
         if name == "task":
@@ -313,6 +347,9 @@ class Session:
             from evaluation.wikitext import wikitext_stream_batches
             batches = wikitext_stream_batches(ctx)
             desc = "Mean bank (wikitext)"
+        elif name in self._bank_batches:
+            batches = self._bank_batches[name]
+            desc = f"Mean bank ({name})"
         else:
             raise ValueError(f"unknown mean bank {name!r}")
         bank = collect_mean_bank(self.node_model, batches, device=self.device,
@@ -645,7 +682,10 @@ def build_session(cli) -> Session:
 
     session = Session(cli, base_run_dir, base_config, base_args, node_cfg,
                       geometry, circuits, tasks)
-    if not cli.dry_run:
+    # --judge-dry-run is the same deal as --dry-run: it only builds judge
+    # prompts, which is pure string work in the adapters, so it must not pay
+    # for a tokenizer or 32 GB of weights either.
+    if not (cli.dry_run or getattr(cli, "judge_dry_run", False)):
         session.build_heavy()
     return session
 
