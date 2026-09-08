@@ -914,23 +914,49 @@ class BenchmarkEvaluation(Evaluation):
             "caveats": CAVEATS,
             "datasets": {},
         }
+        failures = {}
         for dataset in expand(cli.benchmarks):
             started = time.time()
-            entry = self._run_dataset(ctx, dataset, client)
+            try:
+                entry = self._run_dataset(ctx, dataset, client)
+            except Exception as error:                      # noqa: BLE001
+                # One dataset must not discard the ones already finished.
+                # `benchmarks.json` is written after the whole loop, so before
+                # this a judge outage on dataset 2 threw away dataset 1's
+                # completed generations -- which is exactly what happened on
+                # job 21882184: sandbagging ran to completion, every config and
+                # its coherence, and was lost when mask:continuations found the
+                # OpenAI account out of credits an hour and a half in.
+                failures[dataset] = "%s: %s" % (type(error).__name__, error)
+                print("  !! %s failed, continuing with the rest: %s"
+                      % (dataset, error))
+                payload["datasets"][dataset] = {
+                    "error": failures[dataset],
+                    "seconds": round(time.time() - started, 1)}
+                continue
             entry["seconds"] = round(time.time() - started, 1)
             payload["datasets"][dataset] = entry
+
+        payload["failed_datasets"] = failures
+        if failures and len(failures) == len(payload["datasets"]):
+            # Nothing survived, so there is no partial result to preserve and
+            # a silent empty report would be worse than the traceback.
+            raise RuntimeError(
+                "every selected benchmark failed:\n  "
+                + "\n  ".join("%s -> %s" % kv for kv in sorted(failures.items())))
 
         payload["judge"] = client.stats()
         payload["screen_cache"] = self._screen_cache
         payload["headline"] = {
             dataset: entry["configs"]["knockout"]["rates"]["deceptive"]
             for dataset, entry in payload["datasets"].items()
-            if "knockout" in entry["configs"]}
+            if "configs" in entry and "knockout" in entry["configs"]}
         payload["verification"] = {
             "benchmark_belief_from_full_model": True,
             "benchmark_full_row_is_the_screen": all(
                 entry["full_row_is_screen"]
-                for entry in payload["datasets"].values()),
+                for entry in payload["datasets"].values()
+                if "error" not in entry),
         }
         return payload
 

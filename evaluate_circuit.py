@@ -251,6 +251,12 @@ def build_parser():
     g.add_argument("--judge-dry-run", action="store_true",
                    help="Print one judge prompt per selected benchmark and "
                         "exit. No model, no CUDA, no API key, no spend.")
+    g.add_argument("--skip-judge-check", action="store_true",
+                   help="Do not spend one judge call per judge verifying the "
+                        "account works before the model loads. The check "
+                        "exists because a key can be set and still be out of "
+                        "credits, which is otherwise discovered an hour into "
+                        "generation.")
     g.add_argument("--judge-concurrency", type=int, default=8,
                    help="In-flight judge calls.")
     g.add_argument("--mask-judge-model", default=None,
@@ -778,6 +784,83 @@ def check_benchmark_keys(cli) -> None:
     raise SystemExit("\n".join(lines))
 
 
+def check_judges_answer(cli) -> None:
+    """Spend one judge call per distinct judge, before the model loads.
+
+    `check_benchmark_keys` proves a key is *set*. It cannot prove the key still
+    works, and the difference is not academic: job 21882184 ran for 1h39m,
+    finished sandbagging entirely, and then discovered that the OpenAI account
+    had no credits left -- every MASK judge call returning 429
+    `credit_balance_exhausted`, all 132 candidates labelled `unparsed`, and the
+    dataset raising "the full model was not judged deceptive on any of them".
+
+    A few cents here buys back that hour. Failures that are clearly about the
+    account rather than the network are fatal; anything else is a warning,
+    because a transient blip at startup should not stop a job that retries.
+    """
+    from evaluation.benchmarks import get_benchmark
+    from evaluation.benchmarks.base import JudgeRequest
+    from evaluation.benchmarks.judge import JudgeClient
+
+    seen, probes = set(), []
+    for dataset in expand(cli.benchmarks):
+        bench = get_benchmark(dataset)
+        if hasattr(bench, "bind"):
+            bench.bind(cli)
+        spec = bench.judge_spec()
+        if not spec or (spec["provider"], spec["model"]) in seen:
+            continue
+        seen.add((spec["provider"], spec["model"]))
+        probes.append((dataset, JudgeRequest(
+            spec["provider"], spec["model"],
+            [{"role": "user", "content": "Reply with the single word: ok"}],
+            kwargs={"max_completion_tokens": 5})))
+    if not probes:
+        return
+
+    print("  Checking %d judge(s) answer before loading the model..."
+          % len(probes))
+    # No cache: a cached "ok" from an earlier run would defeat the point.
+    client = JudgeClient(cache_path=None, concurrency=len(probes),
+                         max_retries=1, verbose=False)
+    results = client.run([p[1] for p in probes])
+    # Fatal unless the failure looks like weather. The gate exists to refuse
+    # GPU hours that cannot produce a label, so the default has to be "stop":
+    # a false stop costs one resubmission, a false pass costs the hour and a
+    # half that job 21882184 spent before finding the account empty. An
+    # earlier version of this had it the other way round and classified a
+    # client-construction TypeError -- an SDK that cannot make any call at all
+    # -- as transient.
+    TRANSIENT = ("timeout", "timed out", "connection", "econnreset",
+                 "temporarily unavailable", "502", "503", "504",
+                 "rate limit", "overloaded")
+    dead = []
+    for (dataset, request), result in zip(probes, results):
+        if result is not None and result.ok:
+            continue
+        error = str(getattr(result, "error", "no response"))
+        lowered = error.lower()
+        transient = (any(word in lowered for word in TRANSIENT)
+                     # A 429 is a rate limit unless it is really a bill.
+                     and not any(word in lowered for word in
+                                 ("quota", "credit", "billing")))
+        if transient:
+            print("  !! %s did not answer (%s). Continuing: this reads as a "
+                  "transient condition, and the run retries."
+                  % (request.model, error))
+        else:
+            dead.append("  %s (%s) — %s" % (request.model, dataset, error))
+    if dead:
+        raise SystemExit("\n".join(
+            ["EVAL 5's judge(s) rejected a test call, so nothing would be "
+             "labelled:"] + dead
+            + ["", "Check the account's credit and the key's validity, and "
+               "that the judge SDK works in this environment. Or run",
+               "'--benchmarks sandbagging', which grades locally and needs "
+               "no judge at all.",
+               "--skip-judge-check bypasses this if you know better."]))
+
+
 def main():
     cli = resolve_cli(build_parser().parse_args())
     if "benchmarks" in cli.evals and not (cli.judge_dry_run or cli.dry_run):
@@ -787,6 +870,8 @@ def main():
         # it *prints* which keys are missing, which it cannot do if a missing
         # key is what stopped it.
         check_benchmark_keys(cli)
+        if not cli.skip_judge_check:
+            check_judges_answer(cli)
     session = build_session(cli)
     if cli.dry_run:
         return dry_run(session)

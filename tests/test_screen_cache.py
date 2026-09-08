@@ -698,7 +698,7 @@ def test_every_benchmark_flag_is_either_keyed_or_deliberately_not(monkeypatch):
         "benchmark_screen_cache", "benchmark_refresh_screen",
         "no_benchmark_screen_cache",
         # Judge plumbing and dry runs: no effect on a generated screen.
-        "judge_dry_run", "judge_concurrency",
+        "judge_dry_run", "judge_concurrency", "skip_judge_check",
         # Read by no adapter; see the note on --benchmark-belief-model.
         "benchmark_belief_model",
     }

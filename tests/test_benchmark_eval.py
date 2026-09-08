@@ -1136,3 +1136,136 @@ def test_the_judge_cache_sits_above_the_cell_directory():
     ctx.cli.output_dir = None
     assert B.judge_cache_path(ctx) == os.path.join(ctx.out_dir,
                                                    "judge_cache.jsonl")
+
+
+# ==============================================================================
+# ONE DATASET'S FAILURE MUST NOT DISCARD THE OTHERS
+# ==============================================================================
+
+def _two_dataset_ctx(monkeypatch, tmp_path, failing):
+    """A run over two datasets where `failing` raises inside its screen."""
+    cli = make_cli(benchmark_n_per_dataset=3, benchmark_n_random=1,
+                   benchmarks=["good", "bad"], output_dir=str(tmp_path))
+    ctx = make_ctx(cli)
+    ctx.circuit_masks, ctx.knockout_masks = 3.0, -3.0
+    ctx.random_masks, ctx.random_indices = [0.0], [7]
+    monkeypatch.setattr(B, "expand", lambda names: ["good", "bad"])
+    monkeypatch.setattr(B, "zeros_like", lambda masks: -10.0)
+    monkeypatch.setattr(B, "knockout_masks", lambda masks, granularity: masks)
+
+    class Bench(FakeBench):
+        def __init__(self, name):
+            super().__init__(make_items(20), _even_are_deceptive)
+            self.name = name
+
+        def parse_judgement(self, item, response, judge_text=None):
+            if self.name == failing:
+                raise RuntimeError("the judge account is empty")
+            return _even_are_deceptive(item, response)
+
+    monkeypatch.setattr(B, "get_benchmark", lambda name: Bench(name))
+    return ctx
+
+
+def test_a_dataset_that_fails_does_not_discard_the_ones_already_finished(
+        monkeypatch, tmp_path):
+    """What job 21882184 cost: sandbagging ran to completion — every config and
+    its coherence — and was thrown away when the next dataset found the OpenAI
+    account out of credits, because `benchmarks.json` is written only after the
+    whole loop."""
+    ctx = _two_dataset_ctx(monkeypatch, tmp_path, failing="bad")
+    payload = B.BenchmarkEvaluation().run(ctx)
+
+    assert "configs" in payload["datasets"]["good"]
+    assert payload["datasets"]["good"]["configs"]["full"]["rates"]["deceptive"] \
+        == 1.0
+    assert "the judge account is empty" in payload["datasets"]["bad"]["error"]
+    assert "bad" in payload["failed_datasets"]
+    assert "good" not in payload["failed_datasets"]
+    # The aggregates must not trip over the failed entry.
+    assert set(payload["headline"]) == {"good"}
+    assert payload["verification"]["benchmark_full_row_is_the_screen"] is True
+
+
+def test_every_dataset_failing_still_raises(monkeypatch, tmp_path):
+    """Nothing survived, so there is no partial result to preserve and a
+    silently empty report would be worse than the traceback."""
+    ctx = _two_dataset_ctx(monkeypatch, tmp_path, failing=None)
+
+    class AllBad(FakeBench):
+        def __init__(self, name):
+            super().__init__(make_items(20), _even_are_deceptive)
+            self.name = name
+
+        def parse_judgement(self, item, response, judge_text=None):
+            raise RuntimeError("everything is down")
+
+    monkeypatch.setattr(B, "get_benchmark", lambda name: AllBad(name))
+    with pytest.raises(RuntimeError, match="every selected benchmark failed"):
+        B.BenchmarkEvaluation().run(ctx)
+
+
+# ==============================================================================
+# THE PRE-FLIGHT JUDGE CHECK
+# ==============================================================================
+
+def _judge_gate(monkeypatch, error):
+    """Run `check_judges_answer` with one judge whose probe returns `error`."""
+    import evaluate_circuit as E
+    from evaluation.benchmarks import judge as judge_mod
+
+    class Bench(FakeBench):
+        def __init__(self):
+            super().__init__([], _even_are_deceptive)
+            self.name = "fake"
+
+        def judge_spec(self):
+            return {"provider": "openai", "model": "gpt-4o"}
+
+    monkeypatch.setattr(E, "expand", lambda names: ["fake"])
+    monkeypatch.setattr("evaluation.benchmarks.get_benchmark",
+                        lambda name: Bench())
+
+    class Result:
+        ok = False
+
+    result = Result()
+    result.error = error
+    monkeypatch.setattr(judge_mod.JudgeClient, "run",
+                        lambda self, requests: [result])
+    return E.check_judges_answer(make_cli(benchmarks=["fake"]))
+
+
+def test_an_exhausted_account_stops_the_run_before_the_model_loads(monkeypatch):
+    """The whole point: this is the error job 21882184 discovered 1h39m in,
+    after finishing an entire dataset that was then discarded."""
+    with pytest.raises(SystemExit, match="rejected a test call"):
+        _judge_gate(monkeypatch,
+                    "RateLimitError: 429 - You have no credits remaining")
+
+
+def test_a_broken_sdk_stops_the_run_too(monkeypatch):
+    """Fatal-by-default. An SDK that cannot construct a client will never
+    label anything, and an earlier version of this classified it as transient
+    because it did not match an account-error word list."""
+    with pytest.raises(SystemExit):
+        _judge_gate(monkeypatch,
+                    "TypeError: __init__() got an unexpected keyword "
+                    "argument 'proxies'")
+
+
+def test_a_transient_network_blip_does_not_stop_the_run(monkeypatch, capsys):
+    """A false stop costs one resubmission; the run itself retries."""
+    _judge_gate(monkeypatch, "APIConnectionError: connection reset by peer")
+    assert "transient" in capsys.readouterr().out
+
+
+def test_a_plain_rate_limit_is_transient_but_a_quota_429_is_not(monkeypatch,
+                                                                capsys):
+    """Both arrive as 429. Only one of them is going to clear on its own."""
+    _judge_gate(monkeypatch, "RateLimitError: rate limit exceeded, retry soon")
+    assert "transient" in capsys.readouterr().out
+
+    with pytest.raises(SystemExit):
+        _judge_gate(monkeypatch,
+                    "RateLimitError: rate limit — insufficient_quota")
