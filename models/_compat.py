@@ -80,6 +80,12 @@ def create_causal_mask(*, config, inputs_embeds, attention_mask, cache_position,
     (5.13 removed it). See the module docstring for why dropping it is safe.
     """
     embeds_kw, wants_cache_position = _mask_plan(_create_causal_mask)
+    # `position_ids` is forwarded but has no effect on either version for the
+    # way this repo calls it: transformers reads it only to detect packed
+    # sequences, and gates that on `attention_mask is None and past_key_values
+    # is None`, which never holds here. A mutation battery confirmed nulling it
+    # changes nothing on 4.57 or 5.13. It is passed anyway so the call stays
+    # honest about its arguments.
     kwargs = {
         "config": config,
         embeds_kw: inputs_embeds,
