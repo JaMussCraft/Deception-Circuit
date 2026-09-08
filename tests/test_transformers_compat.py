@@ -190,6 +190,25 @@ def test_the_broadcast_bug_is_what_this_guards_against():
         bool(kv_length != 10)
 
 
+class CacheTensorLength:
+    """A cache that reports its width as a 0-d tensor.
+
+    `StaticCache` layers return tensors rather than ints to avoid graph breaks
+    under compile, so the coercion in `cache_kv_length` is not hypothetical:
+    without it a tensor width reaches the caller's mask-width comparison, which
+    is the shape of the original bug.
+    """
+
+    def get_mask_sizes(self, query_length, layer_idx):
+        return torch.tensor(7 + query_length), 0
+
+
+def test_a_tensor_kv_length_is_coerced_to_an_int():
+    got = _compat.cache_kv_length(CacheTensorLength(), torch.arange(3))
+    assert got == 10
+    assert isinstance(got, int), "a tensor width leaks into the mask-width guard"
+
+
 def test_a_single_step_decode_is_dispatched_the_same_way():
     # The decode path calls this with one new token per step.
     assert _compat.cache_kv_length(Cache5x(seen_tokens=11), torch.arange(11, 12)) == 12
