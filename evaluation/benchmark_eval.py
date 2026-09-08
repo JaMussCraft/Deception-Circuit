@@ -934,7 +934,7 @@ class BenchmarkEvaluation(Evaluation):
 
         coherence = coherence_metrics(
             ctx, ids, screen.clean_mask, screen.prompt_width, eos_ids=eos,
-            batch_size=ctx.cli.benchmark_gen_batch_size,
+            batch_size=coherence_batch_size(ctx.cli),
             desc="%s: coherence (%s)" % (dataset, config))
 
         counts = dict((label, 0) for label in base.LABELS)
@@ -1155,6 +1155,33 @@ CAVEATS = [
 
 def _fmt(value):
     return "--" if value is None else "%.3f" % value
+
+
+def coherence_batch_size(cli) -> int:
+    """Rows per coherence forward — deliberately NOT the generation batch size.
+
+    `reference_cross_entropy` materialises `logits[:, gen_start-1:-1].float()`
+    and its `log_softmax`, two float32 tensors of `batch x generated x 128256`,
+    on top of the model's own full-sequence logits. It is the largest transient
+    in EVAL 5 and it is not the thing the generation batch size was tuned for.
+
+    Measured across all eleven adapters with the real tokenizer, the worst case
+    is **sandbagging**, not the multi-turn benchmarks: its longest prompt is
+    2501 tokens *and* it generates 1024, giving 15.6 GB at batch 8 — 47.6 GB of
+    an A40's 48 GB once ~32 GB of weights are resident under `--reference
+    separate`. Every MASK split is 5.8-6.2 GB (their longest prompt, 438
+    tokens, is shorter than sandbagging's *median* of 657), and the heaviest
+    Liars' Bench scenario is 8.5 GB.
+
+    Job 21880374 ran batch 8 on sandbagging without trouble, but with only 8
+    selected items it never assembled a batch around the long tail — so that
+    run is not evidence for the ceiling. A quarter of the generation batch puts
+    the worst case near 3.9 GB for a few minutes of extra wall time.
+    """
+    explicit = getattr(cli, "benchmark_coherence_batch_size", None)
+    if explicit:
+        return max(1, int(explicit))
+    return max(1, int(cli.benchmark_gen_batch_size) // 4)
 
 
 def judge_cache_path(ctx) -> str:

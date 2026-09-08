@@ -200,6 +200,14 @@ def build_parser():
                         "256 KB/token/row plus ~32 GB of weights under "
                         "--reference separate leaves ~12 GB, which 32 rows x "
                         "1500 tokens exhausts.")
+    g.add_argument("--benchmark-coherence-batch-size", type=int, default=None,
+                   help="Rows per coherence forward (default: a quarter of "
+                        "--benchmark-gen-batch-size, min 1). Decoupled because "
+                        "it is the tightest allocation in EVAL 5: the forward "
+                        "materialises a float32 log_softmax over a 128k vocab, "
+                        "so at batch 8 sandbagging's longest prompt needs "
+                        "~15.6 GB on top of ~32 GB of weights under "
+                        "--reference separate -- 47.6 of an A40's 48 GB.")
     g.add_argument("--benchmark-ref-pool", default="honest",
                    choices=["honest", "deceptive", "pooled"],
                    help="Which pool the corrupted stream is drawn from under "

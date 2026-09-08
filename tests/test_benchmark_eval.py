@@ -160,6 +160,7 @@ def make_cli(**overrides):
         benchmark_gen_batch_size=4, benchmark_ref_pool="honest",
         benchmark_n_random=1, no_kv_cache=False, judge_concurrency=2,
         benchmark_screen_seed=0, benchmark_screen_budget=0,
+        benchmark_coherence_batch_size=None,
         ablation="interchange", wikitext_seed=0, knockout_granularity="finest",
         output_dir=None)
     for key, value in overrides.items():
@@ -1094,6 +1095,31 @@ def test_the_judge_model_flags_reach_the_request_rather_than_parsing_and_dying()
     lb.bind(cli)
     assert lb.judge_model == "lb-test"
     assert lb.judge_spec()["model"] == "lb-test"
+
+
+def test_coherence_does_not_inherit_the_generation_batch_size():
+    """The largest transient in EVAL 5, and it is not what the generation batch
+    size was tuned for.
+
+    `reference_cross_entropy` materialises two float32 `batch x generated x
+    128256` tensors. Measured over all eleven adapters with the real tokenizer,
+    the worst case is sandbagging -- longest prompt 2501 tokens AND 1024
+    generated -- at 15.6 GB for batch 8, i.e. 47.6 GB of an A40's 48 once the
+    weights are resident. Not the multi-turn benchmarks: every MASK split is
+    5.8-6.2 GB, and doubling_down's longest prompt (438) is shorter than
+    sandbagging's median (657).
+    """
+    from types import SimpleNamespace as NS
+    assert B.coherence_batch_size(NS(benchmark_gen_batch_size=8,
+                                     benchmark_coherence_batch_size=None)) == 2
+    assert B.coherence_batch_size(NS(benchmark_gen_batch_size=32,
+                                     benchmark_coherence_batch_size=None)) == 8
+    # Never zero, however small the generation batch.
+    assert B.coherence_batch_size(NS(benchmark_gen_batch_size=1,
+                                     benchmark_coherence_batch_size=None)) == 1
+    # An explicit value wins.
+    assert B.coherence_batch_size(NS(benchmark_gen_batch_size=8,
+                                     benchmark_coherence_batch_size=16)) == 16
 
 
 def test_the_judge_cache_sits_above_the_cell_directory():
