@@ -363,6 +363,7 @@ def test_strict_flags_a_bad_reproduction(tiny_run, monkeypatch):
 def test_other_ablation_schemes_run(tiny_run, monkeypatch, scheme):
     code = run_cli(monkeypatch, tiny_run, "--ablation", scheme,
                    "--evals", "sanity", "knockout", "--n-random", "2",
+                   "--knockout-null-count", "1",
                    "--wikitext-blocks", "4", "--wikitext-block-size", "16",
                    "--wikitext-batch-size", "2")
     assert code == 0
@@ -375,6 +376,10 @@ def test_other_ablation_schemes_run(tiny_run, monkeypatch, scheme):
 
     knock = read_json(tiny_run, scheme, "knockout.json")
     assert knock["wikitext"]["floor_ok"], knock["wikitext"]["floor"]
+    # --knockout-null-count reaches the loop: 1 of the 2 drawn circuits, while
+    # the wikitext null still uses both.
+    assert knock["task"]["null"]["n"] == 1
+    assert len(knock["wikitext"]["null"]["rows"]) == 2
 
     index = read_json(tiny_run, "index.json")
     assert scheme in index
