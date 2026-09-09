@@ -391,7 +391,10 @@ def estimate_runtime(session, ctx) -> dict:
             stages.append((f"eval 2 ({cli.gen_examples} generation examples)",
                            3 * cli.gen_examples * cli.gen_new_tokens * 0.35))
     if "pressure" in cli.evals:
-        stages.append(("eval 4 (pressure clause)", 6 * test_pass))
+        # 3 configs (full / circuit / empty) x 3 variants, plus a live
+        # full-model reference pass per variant now that KL/exact-match are
+        # reported (use_reference=True, ref_cache=None).
+        stages.append(("eval 4 (pressure clause)", 9 * test_pass + 3 * test_pass))
     if "benchmarks" in cli.evals:
         stages.extend(benchmark_stages(cli, session.base_args.model))
     if cli.ablation == "mean":

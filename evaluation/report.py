@@ -104,13 +104,14 @@ def metric_table(rows, metric_columns, title=None, label_width=34) -> None:
     print("  " + "-" * (len(header) - 2))
     for label, m in rows:
         if m is None:
-            print(f"  {label:<{label_width}}" + "".join(f"{'—':>14}" for _ in metric_columns))
+            print(f"  {label[:label_width]:<{label_width}}"
+                  + "".join(f"{'—':>14}" for _ in metric_columns))
             continue
         cells = ""
         for key, _ in metric_columns:
             v = m.get(key)
             cells += f"{v:>14.4f}" if isinstance(v, (int, float)) else f"{'—':>14}"
-        print(f"  {label:<{label_width}}{cells}")
+        print(f"  {label[:label_width]:<{label_width}}{cells}")
 
 
 def compute_delta(observed: dict, expected: dict, tolerances: dict,
@@ -134,15 +135,16 @@ def compute_delta(observed: dict, expected: dict, tolerances: dict,
 
 def delta_table(delta: dict, title="VERSUS THE IN-RUN NODE EVALUATION") -> None:
     banner(title)
-    print(f"\n  {'Metric':<20} {'expected':>12} {'observed':>12} "
-          f"{'delta':>12} {'tol':>10}   status")
-    print("  " + "-" * 74)
+    header = (f"  {'Metric':<20} {'expected':>12} {'observed':>12} "
+             f"{'delta':>12} {'tol':>10}   status")
+    print("\n" + header)
+    print("  " + "-" * (len(header) - 2))
     for row in delta["rows"]:
         tol_s = f"{row['tolerance']:.4f}" if row["tolerance"] is not None else "—"
         print(f"  {row['label']:<20} {row['expected']:>12.4f} "
               f"{row['observed']:>12.4f} {row['delta']:>+12.4f} "
               f"{tol_s:>10}   {'PASS' if row['pass'] else 'FAIL'}")
-    print("  " + "-" * 74)
+    print("  " + "-" * (len(header) - 2))
     print(f"  {'ALL' if delta['ok'] else 'SOME'} metrics within tolerance "
           f"(max |delta| {delta['max_delta']:.4f})")
 

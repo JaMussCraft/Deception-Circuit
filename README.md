@@ -272,9 +272,13 @@ clause dropped or replaced, and keep the labels exactly as they were — the
 deceptive answer stays the "target". A model that stops being deceptive once
 the pressure is gone therefore shows *falling* accuracy and a *negative* logit
 diff, and that is the result the control is looking for. `pressure` reports
-accuracy and logit diff only: the full model under a variant is a different
-distribution, so a KL column there would invite a cross-variant comparison
-nothing supports.
+all four metrics — accuracy, logit diff, KL, and exact match — against a live
+full-model reference taken on *that variant's* prompts, not the with-pressure
+cache. That per-variant live reference is what makes KL/exact-match
+meaningful here: the full-model row reads KL 0 / exact match 1 within each
+variant by construction, and the circuit and empty-circuit rows report how far
+they sit from the full model *under that variant*, not a distance across
+variants.
 
 **`--ablation` means different things in different evaluations.** `sanity` and
 `null` fill the *complement* of a ~1%-of-model circuit, so `zero`/`mean` there

@@ -11,22 +11,26 @@ prediction position:
   no_pressure         the clause deleted, nothing in its place
   honest_instruction  the clause replaced by "answer honestly ..."
 
-Two configurations per variant: the full model (every gate open) and the intact
-circuit. There is no knockout row — the question here is what the *behaviour*
-does when the prompt stops asking for it, not what removing the circuit costs.
+Three configurations per variant: the full model (every gate open), the intact
+circuit, and the empty circuit (every gate closed). There is no knockout row —
+the question here is what the *behaviour* does when the prompt stops asking
+for it, not what removing the circuit costs.
 
     THE METRICS READ BACKWARDS. Labels are not rebuilt with the prompts, so
     `target` is still the deceptive answer word. Accuracy means "still gives
     the deceptive answer", and the result you want is accuracy FALLING and
     logit_diff going NEGATIVE relative to the with_pressure anchor.
 
-Only accuracy and logit_diff are reported. KL and exact-match are omitted on
-purpose: both are defined against the full model on the *same* batch, and the
-full model under a variant is a different distribution from the full model
-under pressure, so a "KL" column here would invite exactly the cross-variant
-comparison it cannot support. The argmax distribution is collected instead —
-if accuracy falls it says whether the model switched to the honest answer or
-simply stopped answering.
+KL and exact-match are reported against a live full-model reference taken on
+*this variant's* prompts (`use_reference=True, ref_cache=None`, the same
+pattern knockout.py's `_variant_side` uses) — not the with-pressure cache,
+which would belong to a different prompt distribution. That per-variant live
+reference is what makes the columns meaningful: the `full` row reads KL 0 /
+exact-match 1 *within* each variant by construction, and `circuit` / `empty`
+report how far the circuit — and the empty circuit — sit from the full model
+UNDER THAT VARIANT, not a distance across variants. The argmax distribution is
+collected too — if accuracy falls it says whether the model switched to the
+honest answer or simply stopped answering.
 
 Under `--ablation mean` the mean bank is the one collected on the with-pressure
 prompt distribution and is reused for the variants. The replacement values are
@@ -40,17 +44,22 @@ from __future__ import annotations
 from evaluation import Evaluation
 from evaluation import report
 from evaluation import variants
+from evaluation.masks import zeros_like
 from evaluation.metrics import evaluate_pred_position
 
 #: with_pressure first: it is the anchor every other row is read against.
 VARIANT_ORDER = ("with_pressure",) + variants.PROMPT_VARIANTS
 
-#: The two metrics this evaluation defines. See the module docstring for why
-#: KL and exact-match are not here.
-METRIC_COLUMNS = (("accuracy", "accuracy"), ("logit_diff", "logit diff"))
+#: The four metrics this evaluation reports. See the module docstring for why
+#: KL / exact-match are meaningful here (a per-variant live reference).
+METRIC_COLUMNS = (("accuracy", "accuracy"), ("logit_diff", "logit diff"),
+                  ("kl_div", "KL div"), ("exact_match", "exact match"))
+
+CONFIG_ORDER = ("full", "circuit", "empty")
 
 CONFIG_LABELS = {"full": "full model (all gates open)",
-                 "circuit": "discovered circuit"}
+                 "circuit": "discovered circuit",
+                 "empty": "empty circuit (all gates closed)"}
 
 
 class PressureEvaluation(Evaluation):
@@ -64,7 +73,7 @@ class PressureEvaluation(Evaluation):
             "label_convention": variants.LABEL_CONVENTION,
             "variant_descriptions": {v: variants.VARIANT_DESCRIPTIONS[v]
                                      for v in VARIANT_ORDER},
-            "metrics": ["accuracy", "logit_diff"],
+            "metrics": [k for k, _ in METRIC_COLUMNS],
             "variants": {},
             "skipped": {},
         }
@@ -78,15 +87,22 @@ class PressureEvaluation(Evaluation):
                 continue
 
             rows = {}
-            # use_reference=False: no full-model forward is needed for accuracy
-            # or logit_diff, and the cached reference logits belong to the
-            # with-pressure prompts, so they would be wrong here anyway.
-            common = dict(use_reference=False, collect_argmax=True)
+            # use_reference=True, ref_cache=None: a live full-model forward on
+            # THIS variant's prompts, the same pattern knockout.py's
+            # _variant_side uses. The with-pressure cache belongs to a
+            # different prompt distribution, so it is never reused here, even
+            # for the with_pressure variant itself — one live reference per
+            # variant, uniformly.
+            common = dict(use_reference=True, ref_cache=None, collect_argmax=True)
             with ctx.all_gates_open():
                 rows["full"] = evaluate_pred_position(
-                    ctx, loader, desc=f"{variant}: full model", **common)
+                    ctx, loader, hook=hook, desc=f"{variant}: full model", **common)
             rows["circuit"] = evaluate_pred_position(
                 ctx, loader, hook=hook, desc=f"{variant}: circuit", **common)
+            with ctx.circuit(zeros_like(ctx.circuit_masks)):
+                rows["empty"] = evaluate_pred_position(
+                    ctx, loader, hook=hook, desc=f"{variant}: empty circuit",
+                    **common)
             payload["variants"][variant] = rows
 
         payload["headline"] = self._headline(payload)
@@ -122,9 +138,9 @@ class PressureEvaluation(Evaluation):
             if got is None:
                 rows.append((f"{variant} — skipped", None))
                 continue
-            for config in ("full", "circuit"):
+            for config in CONFIG_ORDER:
                 rows.append((f"{variant} / {CONFIG_LABELS[config]}", got[config]))
-        report.metric_table(rows, METRIC_COLUMNS,
+        report.metric_table(rows, METRIC_COLUMNS, label_width=52,
                             title="EVAL 4 — PRESSURE-CLAUSE ABLATION")
 
         print("\n  Labels are NOT rebuilt with the prompts: 'accuracy' is the "
@@ -133,6 +149,12 @@ class PressureEvaluation(Evaluation):
               "accuracy and a negative logit diff are the result you\n  want — a "
               "circuit whose numbers do not move when the pressure is removed "
               "was\n  not reading the pressure.")
+        print("\n  KL and exact match are against a LIVE full-model forward on "
+              "THIS variant's\n  prompts, not the with-pressure reference, so "
+              "the all-gates-open row must come\n  out at KL 0 and exact match "
+              "1 within every variant — the columns measure how\n  far the "
+              "circuit, and the empty circuit, sit from the full model UNDER "
+              "THAT\n  VARIANT, not a distance across variants.")
         if payload["ablation"] == "mean":
             print("\n  --ablation mean: the mean bank was collected on the "
                   "with-pressure prompts and\n  reused for the variants, so the "
@@ -156,7 +178,11 @@ class PressureEvaluation(Evaluation):
 
         for variant in VARIANT_ORDER:
             got = payload["variants"].get(variant)
-            if got and "argmax" in got["circuit"]:
-                report.argmax_table(
-                    got["circuit"]["argmax"],
-                    title=f"ARGMAX DISTRIBUTION — {variant.upper()} / CIRCUIT")
+            if got is None:
+                continue
+            for config in CONFIG_ORDER:
+                if "argmax" in got[config]:
+                    report.argmax_table(
+                        got[config]["argmax"],
+                        title=f"ARGMAX DISTRIBUTION — {variant.upper()} / "
+                              f"{config.upper()}")

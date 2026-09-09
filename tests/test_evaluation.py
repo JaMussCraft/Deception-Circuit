@@ -33,6 +33,8 @@ from evaluation import ablation as abl
 from evaluation import knockout as K
 from evaluation import masks as M
 from evaluation import metrics
+from evaluation import pressure as P
+from evaluation import report
 from evaluation import variants
 from models.llama_node import (ABLATION_SITES, _ablation_ref,
                                clear_ablation_hook, install_ablation_hook)
@@ -1038,3 +1040,101 @@ def test_t9_variant_side_records_why_it_stood_down():
     assert section == {"variant": "no_pressure",
                        "skipped": "the tiny task cannot build 'no_pressure' "
                                   "prompts"}
+
+
+# ==============================================================================
+# WORKSTREAM G — eval 4 (pressure clause), the full/circuit/empty rows
+# ==============================================================================
+
+class PressureContext(VariantContext):
+    """VariantContext plus what `PressureEvaluation.run` needs on top: an
+    `ablation` scheme on `cli` and a `fast_loader` for the with_pressure
+    anchor (VariantContext only builds `variant_loader` entries)."""
+
+    def __init__(self, model, variants_available=variants.PROMPT_VARIANTS):
+        super().__init__(model, variants_available=variants_available)
+        self.cli.ablation = "interchange"
+        self.fast_loader = torch.utils.data.DataLoader(
+            ExcerptDataset(list(pred_loader(n=4, bs=4).dataset), "with_pressure"),
+            batch_size=2, shuffle=False)
+
+
+def test_g_pressure_run_has_full_circuit_empty_rows_per_variant():
+    """The real `PressureEvaluation.run` on the tiny model: three rows per
+    variant, all four metrics on each, and a live per-variant reference so the
+    all-gates-open row reads back as the reference exactly."""
+    _, pruned = build_pair()
+    ctx = PressureContext(pruned)
+    payload = P.PressureEvaluation().run(ctx)
+
+    assert payload["metrics"] == ["accuracy", "logit_diff", "kl_div", "exact_match"]
+    assert not payload["skipped"]
+
+    for variant in P.VARIANT_ORDER:
+        rows = payload["variants"][variant]
+        assert list(rows) == ["full", "circuit", "empty"]
+        for config in P.CONFIG_ORDER:
+            m = rows[config]
+            for key in ("accuracy", "logit_diff", "kl_div", "exact_match", "n",
+                       "argmax"):
+                assert key in m, (variant, config, key)
+        # The live reference on this variant's prompts IS the full-model
+        # config under all-gates-open, so it must read back exactly.
+        assert rows["full"]["exact_match"] == 1.0
+        assert rows["full"]["kl_div"] < 1e-6
+
+
+def test_g_pressure_report_prints_aligned_rows_and_every_argmax_table(capsys):
+    """`report()` prints one aligned line per (variant, config) row — labels
+    truncated to `label_width=52` so the numeric columns cannot ragged — and
+    one argmax table per (variant, config), not just per variant."""
+    _, pruned = build_pair()
+    ctx = PressureContext(pruned)
+    ev = P.PressureEvaluation()
+    payload = ev.run(ctx)
+    ev.report(payload, ctx)
+    out = capsys.readouterr().out
+    lines = out.splitlines()
+
+    data_lines = [l for l in lines
+                 if any(l.startswith(f"  {v} / ") for v in P.VARIANT_ORDER)]
+    assert len(data_lines) == len(P.VARIANT_ORDER) * len(P.CONFIG_ORDER)
+    expected_len = 2 + 52 + 4 * 14
+    assert {len(l) for l in data_lines} == {expected_len}
+
+    argmax_titles = [l for l in lines if "ARGMAX DISTRIBUTION — " in l]
+    assert len(argmax_titles) == len(P.VARIANT_ORDER) * len(P.CONFIG_ORDER)
+    for variant in P.VARIANT_ORDER:
+        for config in P.CONFIG_ORDER:
+            assert any(f"{variant.upper()} / {config.upper()}" in l
+                      for l in argmax_titles)
+
+    assert "KL and exact match are against a LIVE full-model forward" in out
+
+
+# ==============================================================================
+# WORKSTREAM G — report.py: metric_table truncation, delta_table underline
+# ==============================================================================
+
+def test_g_metric_table_truncates_long_labels_on_metric_and_none_rows(capsys):
+    long_label = "x" * 40 + "END"
+    rows = [(long_label, {"a": 1.0}), (long_label, None)]
+    report.metric_table(rows, [("a", "A")], label_width=10)
+    lines = [l for l in capsys.readouterr().out.splitlines() if "xxxxxxxxxx" in l]
+    assert len(lines) == 2
+    for line in lines:
+        # "  " + 10-char (truncated) label immediately followed by the first
+        # right-justified cell — "END" must not appear, since the label was
+        # cut to 10 chars.
+        assert line[2:12] == long_label[:10]
+        assert "END" not in line
+
+
+def test_g_delta_table_underline_matches_the_header_width(capsys):
+    delta = report.compute_delta({"a": 1.0}, {"a": 1.0}, {"a": 1e-6},
+                                 [("a", "A")])
+    report.delta_table(delta)
+    lines = capsys.readouterr().out.splitlines()
+    header_idx = next(i for i, l in enumerate(lines) if l.strip().startswith("Metric"))
+    header, underline = lines[header_idx], lines[header_idx + 1]
+    assert underline == "  " + "-" * (len(header) - 2)
