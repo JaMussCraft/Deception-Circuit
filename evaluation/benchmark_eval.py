@@ -455,10 +455,22 @@ def _elicit_beliefs(ctx, bench, client, items, eos, pad_id, desc,
             # reported as a property of the model. `_judge_all` already
             # refuses to make this mistake on the response side.
             failed[owner] = True
-        per_item[owner].append({
-            "name": probe["name"], "response": answer,
+        # Everything the adapter put on the probe travels with it, minus the
+        # prompt itself. `parse_belief` is handed these dicts and nothing else,
+        # so a key dropped here is a key the adapter cannot read back: Liars'
+        # Bench declares `answer_prefix`/`answer_suffix` on two of its three
+        # choice templates ("<final_answer>", "Final Answer: "), and rebuilding
+        # the dict from a fixed field list silently replaced them with "".
+        # `extract_choice` then parsed from the top of a reasoning preamble
+        # instead of from the delimiter, returned None, and `_consistent_choice`
+        # -- which requires every probe to agree -- dropped the item. Every
+        # candidate in both harm-pressure scenarios was discarded that way.
+        carried = {k: v for k, v in probe.items() if k != "messages"}
+        carried.update({
+            "response": answer,
             "judge_text": result.text if (result and result.ok) else None,
             "judge_error": result.error if (result and not result.ok) else None})
+        per_item[owner].append(carried)
 
     kept, dropped, judge_failed = [], 0, 0
     for item, probes, had_failure in zip(items, per_item, failed):
@@ -623,8 +635,16 @@ def run_screen(ctx, bench, client, dataset) -> Screen:
     # backwards and capped every run at 10x the target on its own initiative.
     budget = cli.benchmark_screen_budget or len(candidates)
     for start in range(0, len(candidates), chunk_size):
-        if len(selected) >= target and (prompt_kind or len(pool) >= want_pool
-                                        or screened >= budget):
+        # The budget is a hard ceiling on screening work, checked on its own.
+        # It used to hang off `len(selected) >= target`, which meant it bound
+        # only the pool-filling tail and never the search for deceptive items
+        # -- so a dataset that found none walked its entire pool regardless.
+        # That is the case where a bound matters most: two Liars' Bench
+        # scenarios screened 4601 and 5245 candidates under `--budget 300` and
+        # took 13.6 h between them.
+        if screened >= budget:
+            break
+        if len(selected) >= target and (prompt_kind or len(pool) >= want_pool):
             break
         chunk = candidates[start:start + chunk_size]
         # Counted before the belief filter: these candidates were consumed
@@ -1136,6 +1156,15 @@ class BenchmarkEvaluation(Evaluation):
         report.kv("judge cache", payload["judge"]["cache_path"])
 
         for dataset, entry in payload["datasets"].items():
+            if "error" in entry:
+                # `run` isolates a failing dataset so the finished ones survive;
+                # printing has to honour the same contract. Reaching into an
+                # error entry for `display_name` raised KeyError here and, as
+                # `report` runs before the payload is written, discarded a whole
+                # completed run over a banner.
+                report.banner("%s — FAILED" % dataset, "-")
+                print("\n  %s\n" % entry["error"])
+                continue
             self._report_dataset(dataset, entry)
         self._report_headline(payload)
         self._report_examples(payload)
@@ -1225,6 +1254,8 @@ class BenchmarkEvaluation(Evaluation):
               % ("dataset", "knockout", "circuit only", "empty", "n"))
         print("  " + "-" * 82)
         for dataset, entry in payload["datasets"].items():
+            if "error" in entry:
+                continue                      # no configs were ever run
             configs = entry["configs"]
             print("  %-36s %10.1f%% %10.1f%% %10.1f%% %8d"
                   % (dataset,

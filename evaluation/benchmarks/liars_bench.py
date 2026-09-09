@@ -36,8 +36,13 @@ from .notebook import literal_from_notebook
 HF_REPO = "Cadenza-Labs/liars-bench"
 
 # liars-bench/src/models.py:83-98 — LB's aliases are not real model ids.
-JUDGE_SONNET = "anthropic/claude-3.7-sonnet-20250219"
-JUDGE_HAIKU = "anthropic/claude-3.5-haiku-20241022"
+# Liars' Bench pins claude-3.7-sonnet-20250219 and claude-3.5-haiku-20241022.
+# Both were retired from OpenRouter -- they now 404 with "No endpoints found",
+# so the published judges cannot be reproduced at any price. These are their
+# current successors. Grading therefore does NOT match the numbers Liars' Bench
+# published, and a run that needs to be comparable to them cannot be had.
+JUDGE_SONNET = "anthropic/claude-sonnet-4.5"
+JUDGE_HAIKU = "anthropic/claude-haiku-4.5"
 
 SCENARIOS = ("instructed-deception", "harm-pressure-choice",
              "harm-pressure-knowledge-report", "convincing-game")
@@ -176,7 +181,8 @@ class _LiarsBench(Benchmark):
     def __init__(self):
         self.name = "lb:%s" % self.scenario
         self._cli = None
-        # The judges the Liars' Bench notebooks pin, overridable from the CLI
+        # The judges standing in for the ones the notebooks pin (both are
+        # retired -- see JUDGE_SONNET), overridable from the CLI
         # in `bind`. Instance attributes rather than the module constants read
         # at call time, so an override actually reaches `judge_request`.
         self.judge_model = JUDGE_SONNET
@@ -536,7 +542,7 @@ class HarmPressureChoice(_HarmPressure):
     letter from A-D, and nothing else", and Liars' Bench itself reads these
     with `extract_choice`, a deterministic parse — so this scenario needs no
     API key at all. That is a deliberate divergence from the plan's table,
-    which assigns it claude-3.5-haiku: a paid judge for "which letter did it
+    which assigns it a paid haiku judge: an API call for "which letter did it
     say" would add cost and a second failure mode to a question the source
     pipeline answers locally.
     """

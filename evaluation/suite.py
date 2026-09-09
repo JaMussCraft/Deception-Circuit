@@ -35,6 +35,7 @@ import json
 import os
 import sys
 import time
+import traceback
 
 from evaluation import get_evaluation, report
 from evaluation.context import SCHEMA_VERSION, baseline_numbers, reference_numbers
@@ -153,6 +154,29 @@ def update_index(ctx, headlines: dict) -> str:
 # ONE CELL
 # ==============================================================================
 
+def report_and_write(evaluation, payload, ctx, name) -> str:
+    """Print an evaluation's results, then persist them. -> the path written.
+
+    Reporting and plotting are presentation. They run before the write only so
+    the output reads in order, and nothing they do is worth losing the payload
+    over: a KeyError in a banner once discarded 13.6 h of finished GPU work
+    because the write came afterwards. The payload is written whatever happens
+    here, and the traceback still prints so the display bug is not hidden.
+    """
+    try:
+        evaluation.report(payload, ctx)
+        for path in evaluation.plots(payload, ctx):
+            if path:
+                print(f"  Wrote {path}")
+    except Exception:                           # noqa: BLE001 -- see above
+        print(f"\n  !! reporting '{name}' raised; the results were still "
+              f"computed and are being written.")
+        traceback.print_exc()
+    out = os.path.join(ctx.out_dir, f"{name}.json")
+    write_json(out, payload)
+    return out
+
+
 def run_cell(ctx, *, legacy: bool) -> dict:
     """Run every requested evaluation for one (circuit, task) cell.
 
@@ -201,11 +225,7 @@ def run_cell(ctx, *, legacy: bool) -> dict:
         started = time.time()
         payload = evaluation.run(ctx)
         payload["seconds"] = round(time.time() - started, 1)
-        evaluation.report(payload, ctx)
-        for path in evaluation.plots(payload, ctx):
-            if path:
-                print(f"  Wrote {path}")
-        write_json(os.path.join(ctx.out_dir, f"{name}.json"), payload)
+        report_and_write(evaluation, payload, ctx, name)
         headlines[name] = payload.get("headline", {})
         summary["verification"].update(payload.get("verification", {}))
 

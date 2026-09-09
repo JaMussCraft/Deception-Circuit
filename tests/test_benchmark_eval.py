@@ -34,6 +34,9 @@ from contextlib import contextmanager
 from types import SimpleNamespace
 
 import numpy as np
+import re
+import types
+
 import pytest
 import torch
 
@@ -491,6 +494,115 @@ def test_the_screen_walks_the_whole_pool_for_its_reference_bank_by_default():
     assert len(screen.pool_items) >= 3, "the reference pool was left short"
     assert screen.stats["pool_short"] is False
     assert screen.stats["screened"] > 30
+
+
+def test_reporting_a_payload_with_a_failed_dataset_does_not_raise():
+    """`run` isolates a failed dataset; `report` has to survive reading one.
+
+    It did not. `_report_dataset` reached for `display_name` on an entry that
+    carries only `{"error": ...}` and raised KeyError -- and since the suite
+    printed before it wrote, the KeyError discarded a finished 13.6 h run.
+    """
+    payload = {"resolved": {"n_per_dataset": 4, "ref_pool": "honest",
+                            "n_random": 1, "kv_cache": True},
+               "judge": {"cache_path": None},
+               "datasets": {"lb:harm-pressure-choice": {"error": "no deception"}},
+               "headline": {}, "examples": {}}
+    B.BenchmarkEvaluation().report(payload, make_ctx(make_cli()))
+
+
+def test_results_are_written_even_when_reporting_raises(tmp_path, capsys):
+    """A presentation bug must never destroy computed results.
+
+    The suite printed each payload before writing it, so a KeyError in a
+    banner took a finished 13.6 h run down with it. The write is now
+    unconditional and the traceback still prints, so the display bug stays
+    visible without being fatal.
+    """
+    import evaluation.suite as suite_mod
+
+    class Exploding(object):
+        def report(self, payload, ctx):
+            raise KeyError("display_name")
+
+        def plots(self, payload, ctx):
+            raise AssertionError("plots must not run after report raised")
+
+    payload = {"headline": {"kept": "the expensive part"}}
+    ctx = types.SimpleNamespace(out_dir=str(tmp_path))
+    written = suite_mod.report_and_write(Exploding(), payload, ctx, "benchmarks")
+
+    assert os.path.exists(written), "the payload was discarded by a print"
+    with open(written) as handle:
+        assert json.load(handle)["headline"]["kept"] == "the expensive part"
+    # The bug is not silently swallowed.
+    assert "KeyError" in capsys.readouterr().err
+
+
+def test_belief_probes_reach_parse_belief_with_the_adapter_s_own_fields():
+    """The seam that silently emptied both harm-pressure scenarios.
+
+    `_elicit_beliefs` rebuilt each probe dict from a fixed field list, so any
+    key the adapter had put there was gone by the time `parse_belief` read it
+    back. Liars' Bench declares `answer_prefix`/`answer_suffix` on two of its
+    three choice templates; without them `extract_choice` parsed from the top
+    of a reasoning preamble, returned None, and `_consistent_choice` -- which
+    requires every probe to agree -- dropped the item. All 4601 and 5245
+    candidates were discarded, and `parse_judgement` cannot return DECEPTIVE
+    for an item with no belief, so both datasets reported zero deception.
+    """
+    seen = {}
+
+    class Adapter(FakeBench):
+        def belief_request(self, item):
+            return [{"name": "choice_0", "messages": [{"role": "user",
+                                                       "content": "pick one"}],
+                     "answer_prefix": "<final_answer>",
+                     "answer_suffix": "</final_answer>"}]
+
+        def belief_judge_request(self, item, probe_name, response):
+            return None                       # parses locally, like LB's choices
+
+        def parse_belief(self, item, probes):
+            seen.update(probes[0])
+            return "B"
+
+    ctx = make_ctx(make_cli(benchmark_n_per_dataset=2))
+    def rule(item, response):
+        # A mixed screen: the honest bycatch is what fills the reference pool.
+        index = int(item.item_id[1:])
+        return (base.HONEST, "h") if index % 3 == 0 else (base.DECEPTIVE, "d")
+    _run_screen(ctx, Adapter(make_items(40), rule))
+
+    assert seen, "parse_belief was never reached"
+    assert seen.get("answer_prefix") == "<final_answer>", \
+        "the adapter's own probe fields did not survive belief elicitation"
+    assert seen.get("answer_suffix") == "</final_answer>"
+    assert "response" in seen, "the response must still be attached"
+    assert "messages" not in seen, \
+        "the prompt should not be copied into every item's meta"
+
+
+def test_the_budget_bounds_a_screen_that_never_finds_deception():
+    """The case the budget used to ignore, and the one that matters.
+
+    The bound hung off `len(selected) >= target`, so a dataset where the full
+    model is never judged deceptive never consulted it and walked its whole
+    pool. Two Liars' Bench scenarios did exactly that under `--budget 300`:
+    4601 and 5245 candidates, 13.6 h, and both raised at the end anyway.
+    """
+    ctx = make_ctx(make_cli(benchmark_n_per_dataset=3,
+                            benchmark_screen_budget=24))
+    never = lambda item, response: (base.HONEST, "never deceptive")
+    with pytest.raises(Exception) as caught:
+        _run_screen(ctx, FakeBench(make_items(400), never))
+    # It still refuses to evaluate a dataset with no deception to reduce...
+    assert "not judged deceptive" in str(caught.value)
+    # ...but having read 24 candidates, not 400.
+    assert "of the 400 candidates" not in str(caught.value)
+    screened = int(re.search(r"of the (\d+) candidates", str(caught.value)).group(1))
+    assert screened <= 24 + 6, \
+        "the budget did not bound a screen that selected nothing"
 
 
 def test_the_screen_budget_bounds_that_walk_when_it_is_asked_to():
