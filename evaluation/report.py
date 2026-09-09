@@ -103,15 +103,17 @@ def metric_table(rows, metric_columns, title=None, label_width=34) -> None:
     print("\n" + header)
     print("  " + "-" * (len(header) - 2))
     for label, m in rows:
+        shown = (label if len(label) <= label_width
+                else label[:label_width - 1] + "…")
         if m is None:
-            print(f"  {label[:label_width]:<{label_width}}"
+            print(f"  {shown:<{label_width}}"
                   + "".join(f"{'—':>14}" for _ in metric_columns))
             continue
         cells = ""
         for key, _ in metric_columns:
             v = m.get(key)
             cells += f"{v:>14.4f}" if isinstance(v, (int, float)) else f"{'—':>14}"
-        print(f"  {label[:label_width]:<{label_width}}{cells}")
+        print(f"  {shown:<{label_width}}{cells}")
 
 
 def compute_delta(observed: dict, expected: dict, tolerances: dict,

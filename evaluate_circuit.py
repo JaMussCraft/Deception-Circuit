@@ -167,10 +167,10 @@ def build_parser():
                    help="Random circuits eval 2 puts through the knockout "
                         "complement on the TASK side. Capped at the number "
                         "actually drawn, which is --n-random or, when sharded, "
-                        "--null-count (default: all of them). This is a second "
-                        "task pass per circuit, so at the default it roughly "
-                        "doubles eval 2's runtime; set it lower to trade null "
-                        "resolution for walltime.")
+                        "--null-count (default: all of them). At the defaults "
+                        "this adds one test pass per random circuit (50 at "
+                        "--n-random 50) on top of eval 2's own ~14 passes; "
+                        "set it lower to trade null resolution for walltime.")
 
     g = p.add_argument_group("wikitext reference stream")
     g.add_argument("--skip-wikitext", action="store_true")
@@ -386,7 +386,8 @@ def estimate_runtime(session, ctx) -> dict:
             stages.append((f"eval 2 (task null, {n_task_null} knockouts)",
                            n_task_null * test_pass))
         stages.append((f"eval 2 (prompt variants, {len(KNOCKOUT_VARIANTS)} x 3 "
-                       f"passes)", len(KNOCKOUT_VARIANTS) * 3 * test_pass))
+                       f"configs, live reference)",
+                       len(KNOCKOUT_VARIANTS) * 6 * test_pass))
         if cli.gen_examples:
             stages.append((f"eval 2 ({cli.gen_examples} generation examples)",
                            3 * cli.gen_examples * cli.gen_new_tokens * 0.35))
@@ -750,15 +751,17 @@ def dry_run(session) -> int:
     est = estimate_runtime(session, ctx)
     report.banner("ESTIMATED RUNTIME (1x A100, very rough)")
     print()
+    label_width = max([len(label) for label, _, _ in est["stages"]]
+                      + [len("TOTAL"), 40]) + 1
     ranged = est["total_seconds_floor"] != est["total_seconds"]
     for label, seconds, floor in est["stages"]:
         if floor != seconds:
-            print(f"  {label:<40} {floor / 60:>8.1f} - {seconds / 60:.1f} min")
+            print(f"  {label:<{label_width}} {floor / 60:>8.1f} - {seconds / 60:.1f} min")
         else:
-            print(f"  {label:<40} {seconds / 60:>8.1f} min")
-    print("  " + "-" * 50)
+            print(f"  {label:<{label_width}} {seconds / 60:>8.1f} min")
+    print("  " + "-" * (label_width + 10))
     if ranged:
-        print(f"  {'TOTAL':<40} {est['total_seconds_floor'] / 60:>8.1f} - "
+        print(f"  {'TOTAL':<{label_width}} {est['total_seconds_floor'] / 60:>8.1f} - "
               f"{est['total_seconds'] / 60:.1f} min ({est['cells']} cell(s))")
         print("\n  The range is the screen: it stops as soon as it has "
               "--benchmark-n-per-dataset\n  items the full model is deceptive "
@@ -767,7 +770,7 @@ def dry_run(session) -> int:
               "land on IS the full model's deception rate, which is what this "
               "evaluation\n  measures — so size the job against the ceiling.")
     else:
-        print(f"  {'TOTAL':<40} {est['total_seconds'] / 60:>8.1f} min "
+        print(f"  {'TOTAL':<{label_width}} {est['total_seconds'] / 60:>8.1f} min "
               f"({est['cells']} cell(s))")
     print("\n  Nothing was written. Drop --dry-run to run it.")
     return 0

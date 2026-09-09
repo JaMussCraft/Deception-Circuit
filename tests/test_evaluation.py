@@ -1009,6 +1009,10 @@ def test_t9_variant_side_runs_three_configurations_and_audits_them(variant):
     # all-gates-open row is the reference and must come out exact.
     assert section["rows"]["full"]["exact_match"] == 1.0
     assert section["rows"]["full"]["kl_div"] < 1e-6
+    # ... and a gate-contaminated live reference (one that quietly used the
+    # ablated forward instead) would show up here as a zero KL on the
+    # knockout row too, so a positive value is the gate's caught.
+    assert section["rows"]["knockout"]["kl_div"] > 0
 
     head = section["headline"]
     assert head["full_minus_knockout"] == pytest.approx(
@@ -1082,6 +1086,10 @@ def test_g_pressure_run_has_full_circuit_empty_rows_per_variant():
         # config under all-gates-open, so it must read back exactly.
         assert rows["full"]["exact_match"] == 1.0
         assert rows["full"]["kl_div"] < 1e-6
+        # ... and a gate-contaminated live reference (one that quietly used
+        # the empty-circuit forward instead) would show up here as a zero KL
+        # on the empty row too, so a positive value is the gate's caught.
+        assert rows["empty"]["kl_div"] > 0
 
 
 def test_g_pressure_report_prints_aligned_rows_and_every_argmax_table(capsys):
@@ -1120,14 +1128,26 @@ def test_g_metric_table_truncates_long_labels_on_metric_and_none_rows(capsys):
     long_label = "x" * 40 + "END"
     rows = [(long_label, {"a": 1.0}), (long_label, None)]
     report.metric_table(rows, [("a", "A")], label_width=10)
-    lines = [l for l in capsys.readouterr().out.splitlines() if "xxxxxxxxxx" in l]
+    lines = [l for l in capsys.readouterr().out.splitlines() if "xxxxxxxxx" in l]
     assert len(lines) == 2
     for line in lines:
-        # "  " + 10-char (truncated) label immediately followed by the first
-        # right-justified cell — "END" must not appear, since the label was
-        # cut to 10 chars.
-        assert line[2:12] == long_label[:10]
+        # "  " + 9 x's + an ellipsis, immediately followed by the first
+        # right-justified cell — "END" must not appear, and the ellipsis
+        # marks the label as visibly cut rather than silently collapsed.
+        assert line[2:12] == long_label[:9] + "…"
         assert "END" not in line
+
+
+def test_g_metric_table_does_not_ellipsize_a_label_that_fits_exactly(capsys):
+    # The longest real eval-4 row label (see pressure.py's CONFIG_LABELS),
+    # which report() calls with label_width=54 — it must fit without an
+    # ellipsis, since finding R11 requires the ellipsis only on a genuine cut.
+    label = "honest_instruction / empty circuit (all gates closed)"
+    assert len(label) <= 54
+    report.metric_table([(label, {"a": 1.0})], [("a", "A")], label_width=54)
+    out = capsys.readouterr().out
+    assert label in out
+    assert "…" not in out
 
 
 def test_g_delta_table_underline_matches_the_header_width(capsys):

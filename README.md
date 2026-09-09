@@ -264,7 +264,11 @@ percentile.
 The **flip audit** records, per example, whether the argmax at the prediction
 position stayed on the deceptive answer, flipped to the honest one, or left the
 two-way readout altogether; the counts go in the log and `per_example` /
-`flip_summary` in `knockout.json`, for offline pattern analysis.
+`flip_summary` in `knockout.json`, for offline pattern analysis. The audit
+reads the argmax token at that single position, which can land on a
+formatting token instead of either answer word, so a large
+`n_full_not_deceptive` / `other` count means the argmax fell off both answer
+tokens, not that the model turned honest.
 
 **Under a prompt variant the metrics read backwards.** `pressure` and the
 prompt-variant sections of `knockout` rebuild the prompts with the pressure

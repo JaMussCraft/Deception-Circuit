@@ -183,7 +183,7 @@ def prompt_excerpts(loader, chars: int = EXCERPT_CHARS):
     dataset = getattr(loader, "dataset", None)
     indices = None
     # --test-samples does NOT produce a Subset — it truncates the record list
-    # while loading (dataset/std_llama.py:load_std_dataset), so loader position
+    # while loading (dataset/std_llama.py:load_or_generate_std_data), so loader position
     # i is dataset position i. This branch is here for any future loader that
     # does wrap a Subset, where position i is dataset position indices[i].
     if dataset is not None and hasattr(dataset, "indices") and hasattr(dataset, "dataset"):
