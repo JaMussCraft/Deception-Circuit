@@ -74,13 +74,21 @@ def build_ref_cache(ctx, loader) -> torch.Tensor:
 
 def evaluate_pred_position(ctx, loader, *, model=None, hook=None,
                            ref_cache=None, use_reference=True,
-                           collect_argmax=False, top_k=12,
-                           desc="Evaluating") -> dict:
+                           collect_argmax=False, collect_per_example=False,
+                           top_k=12, desc="Evaluating") -> dict:
     """The four fidelity metrics (and optionally the argmax distribution).
 
     `hook` is the ablation hook to install for the circuit's forward passes;
     the reference model is never hooked (under `--reference shared` it takes the
     single-stream path, where no gate — and so no hook — is reached).
+
+    `collect_per_example` additionally returns `out["per_example"]`: one row per
+    sample, in loader order, holding the argmax token this configuration picked,
+    the reference's argmax (the full model's, whether it came from the cache or
+    a live forward; None when there is no reference) and the two tokens the
+    readout is between. It is what turns an aggregate accuracy drop into a
+    per-example flip audit, and it is opt-in because it is a list as long as the
+    test set.
     """
     model = model if model is not None else ctx.node_model
     task, device = ctx.task, ctx.device
@@ -98,6 +106,7 @@ def evaluate_pred_position(ctx, loader, *, model=None, hook=None,
     total_kl = 0.0
     counter = Counter()
     n_target = n_distractor = 0
+    per_example = [] if collect_per_example else None
 
     with torch.no_grad(), ablation_hook(model, hook):
         for batch in tqdm(loader, desc=desc, leave=False):
@@ -121,6 +130,7 @@ def evaluate_pred_position(ctx, loader, *, model=None, hook=None,
             pred = logits[idx, pos].float()
             argmax = pred.argmax(dim=-1)
 
+            ref_argmax = None
             if have_reference:
                 if ref_cache is not None:
                     ref = ref_cache[n:n + bsz].to(device).float()
@@ -132,12 +142,23 @@ def evaluate_pred_position(ctx, loader, *, model=None, hook=None,
                 total_kl += float(F.kl_div(
                     F.log_softmax(pred, dim=-1), F.log_softmax(ref, dim=-1),
                     reduction="sum", log_target=True))
-                n_exact += int((argmax == ref.argmax(dim=-1)).sum())
+                ref_argmax = ref.argmax(dim=-1)
+                n_exact += int((argmax == ref_argmax).sum())
 
             if collect_argmax:
                 counter.update(argmax.tolist())
                 n_target += int((argmax == target).sum())
                 n_distractor += int((argmax == distractor).sum())
+
+            if collect_per_example:
+                ref_ids = (ref_argmax.tolist() if ref_argmax is not None
+                           else [None] * bsz)
+                per_example.extend(
+                    {"index": n + i, "argmax_id": a, "ref_argmax_id": r,
+                     "target_id": t, "distractor_id": d}
+                    for i, (a, r, t, d) in enumerate(zip(
+                        argmax.tolist(), ref_ids, target.tolist(),
+                        distractor.tolist())))
 
             n += bsz
 
@@ -151,6 +172,8 @@ def evaluate_pred_position(ctx, loader, *, model=None, hook=None,
     if collect_argmax:
         out["argmax"] = argmax_summary(counter, ctx.tokenizer, n, top_k,
                                        n_target, n_distractor)
+    if collect_per_example:
+        out["per_example"] = per_example
     return out
 
 
@@ -165,17 +188,21 @@ _FALLBACK_ANNOUNCED = set()
 
 
 def evaluate_task_metrics(ctx, loader, *, hook=None, ref_cache=None,
-                          collect_argmax=False, desc="Evaluating") -> dict:
+                          collect_argmax=False, collect_per_example=False,
+                          desc="Evaluating") -> dict:
     """The four metrics, however this task can produce them.
 
     Tasks that implement `pred_spec` go through the generic evaluator and get
-    the reference cache and the argmax distribution for free. Tasks that do not
-    (GT, today) fall back to `Task.evaluate` — correct, but a full-model forward
-    per circuit and no argmax histogram.
+    the reference cache, the argmax distribution and the per-example readout for
+    free. Tasks that do not (GT, today) fall back to `Task.evaluate` — correct,
+    but a full-model forward per circuit, no argmax histogram and no
+    per-example rows.
     """
     if ctx.has_pred_spec:
         return evaluate_pred_position(ctx, loader, hook=hook, ref_cache=ref_cache,
-                                      collect_argmax=collect_argmax, desc=desc)
+                                      collect_argmax=collect_argmax,
+                                      collect_per_example=collect_per_example,
+                                      desc=desc)
 
     if collect_argmax and ctx.task.name not in _FALLBACK_ANNOUNCED:
         _FALLBACK_ANNOUNCED.add(ctx.task.name)

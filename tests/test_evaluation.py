@@ -17,8 +17,10 @@ The load-bearing ones:
 
 from __future__ import annotations
 
+import contextlib
 import json
 import os
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
@@ -28,9 +30,12 @@ from analysis import (apply_node_masks, assert_masks_equal, extract_node_masks,
                       open_all_gates)
 from config import NodePruningConfig
 from evaluation import ablation as abl
+from evaluation import knockout as K
 from evaluation import masks as M
+from evaluation import metrics
 from models.llama_node import (ABLATION_SITES, _ablation_ref,
                                clear_ablation_hook, install_ablation_hook)
+from tasks import Task
 from tests.helpers import TINY, build_tiny_pair
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -682,3 +687,233 @@ def test_t8_load_rejects_a_run_without_masks(tmp_path):
     path.write_text(json.dumps({"active_heads": {}, "active_mlps": []}))
     with pytest.raises(ValueError, match="no 'masks' key"):
         M.load_circuit_masks(str(tmp_path))
+
+
+# ==============================================================================
+# T9 — eval 2's per-example flip audit and task-side null
+# ==============================================================================
+
+def audit_row(index, argmax, ref, target=10, distractor=20):
+    return {"index": index, "argmax_id": argmax, "ref_argmax_id": ref,
+            "target_id": target, "distractor_id": distractor}
+
+
+def test_t9_flip_audit_splits_stayed_flipped_and_other():
+    rows = [
+        audit_row(0, argmax=10, ref=10),        # deceptive -> deceptive
+        audit_row(1, argmax=20, ref=10),        # deceptive -> honest
+        audit_row(2, argmax=99, ref=10),        # deceptive -> neither
+        audit_row(3, argmax=20, ref=20),        # full model was already honest
+        audit_row(4, argmax=10, ref=99),        # full model left the readout
+    ]
+    per_example, summary = K.flip_audit(rows)
+
+    assert [r["status"] for r in per_example] == [
+        "stayed_deceptive", "flipped_honest", "other", "other", "other"]
+    assert summary["n_stayed_deceptive"] == 1
+    assert summary["n_flipped_honest"] == 1
+    assert summary["n_other"] == 3
+    # Rows 3 and 4 are 'other' because the FULL model was not deceptive; row 2
+    # is 'other' because the knockout left the readout. Only the first two count.
+    assert summary["n_full_not_deceptive"] == 2
+    assert summary["stayed_ids"] == [0]
+    assert summary["flipped_ids"] == [1]
+
+
+def test_t9_flip_audit_reads_a_missing_reference_as_other():
+    """No reference means no observed full-model choice — never a guessed one."""
+    _, summary = K.flip_audit([audit_row(0, argmax=10, ref=None),
+                               audit_row(1, argmax=20, ref=None)])
+    assert summary["n_stayed_deceptive"] == 0 and summary["n_flipped_honest"] == 0
+    assert summary["n_other"] == 2 and summary["n_full_not_deceptive"] == 2
+
+
+def test_t9_flip_audit_carries_prompt_excerpts_and_ids():
+    per_example, _ = K.flip_audit([audit_row(1, argmax=10, ref=10)],
+                                  excerpts=["prompt zero", "prompt one"])
+    assert per_example[0] == {
+        "example_id": 1, "prompt_excerpt": "prompt one",
+        "full_choice": "deceptive", "knockout_choice": "deceptive",
+        "full_token_id": 10, "knockout_token_id": 10,
+        "status": "stayed_deceptive"}
+
+
+def test_t9_flip_audit_passes_none_through():
+    assert K.flip_audit(None) == (None, None)
+
+
+def test_t9_resolve_null_count_defaults_to_every_drawn_circuit():
+    assert K.resolve_null_count(SimpleNamespace(knockout_null_count=None), 50) == 50
+    assert K.resolve_null_count(SimpleNamespace(), 50) == 50
+
+
+def test_t9_resolve_null_count_is_capped_by_the_drawn_set():
+    cli = SimpleNamespace(knockout_null_count=100)
+    assert K.resolve_null_count(cli, 50) == 50
+    assert K.resolve_null_count(cli, 0) == 0
+    assert K.resolve_null_count(SimpleNamespace(knockout_null_count=3), 50) == 3
+    assert K.resolve_null_count(SimpleNamespace(knockout_null_count=0), 50) == 0
+
+
+def test_t9_log_excerpts_are_grouped_by_status_and_single_lined():
+    per_example, _ = K.flip_audit(
+        [audit_row(0, argmax=10, ref=10), audit_row(1, argmax=20, ref=10),
+         audit_row(2, argmax=99, ref=10), audit_row(3, argmax=10, ref=10)],
+        excerpts=["stayed\n  one", "flipped one", "other one", None])
+    grouped = K.KnockoutEvaluation._excerpts_by_status(
+        {"per_example": per_example})
+
+    # Newlines collapsed, so one example is one log line; 'other' is not shown,
+    # and example 3's missing excerpt drops out rather than printing "None".
+    assert grouped == {"stayed_deceptive": [(0, "stayed one")],
+                       "flipped_honest": [(1, "flipped one")]}
+
+
+class NullContext:
+    """Only the EvalContext surface `_task_null` touches."""
+
+    def __init__(self, n_random, knockout_null_count=None):
+        self.random_indices = list(range(100, 100 + n_random))
+        self.random_masks = [{"seed": i} for i in range(n_random)]
+        self.cli = SimpleNamespace(knockout_null_count=knockout_null_count,
+                                   knockout_granularity="finest")
+        self.task = Task()
+        self.loaded = []
+
+    @contextlib.contextmanager
+    def circuit(self, masks, verify=False):
+        self.loaded.append(masks)
+        yield None
+
+
+def test_t9_task_null_evaluates_the_capped_number_of_circuits(monkeypatch):
+    monkeypatch.setattr(K, "knockout_masks", lambda masks, granularity: masks)
+    monkeypatch.setattr(K, "evaluate_task_metrics",
+                        lambda ctx, loader, **kw: {"accuracy": 0.5,
+                                                   "logit_diff": 1.0})
+    ctx = NullContext(n_random=5, knockout_null_count=3)
+    null = K.KnockoutEvaluation()._task_null(ctx, None, None, None,
+                                             {"accuracy": 0.9, "logit_diff": 2.0})
+
+    assert null["n"] == 3
+    # The first three of the drawn set, carrying the drawn index so the rows
+    # join to the wikitext null's rows offline.
+    assert [r["index"] for r in null["rows"]] == [100, 101, 102]
+    assert ctx.loaded == ctx.random_masks[:3]
+    assert null["stats"]["accuracy"]["n"] == 3
+
+
+def test_t9_task_null_is_empty_and_silent_without_random_circuits(monkeypatch):
+    monkeypatch.setattr(K, "evaluate_task_metrics",
+                        lambda *a, **kw: pytest.fail("evaluated with no circuits"))
+    null = K.KnockoutEvaluation()._task_null(NullContext(n_random=0), None, None,
+                                             None, {"accuracy": 0.9})
+    assert null == {"n": 0, "granularity": "finest", "rows": [], "stats": {}}
+
+
+def test_t9_prompt_excerpts_keeps_only_the_tail():
+    dataset = SimpleNamespace(processed_data=[{"clean_prompt": "a" * 500}])
+    got = K.prompt_excerpts(SimpleNamespace(dataset=dataset), chars=200)
+    assert got == ["a" * 200]
+
+
+def test_t9_prompt_excerpts_follows_a_subset_and_tolerates_missing_prompts():
+    records = [{"clean_prompt": f"prompt {i}"} for i in range(4)]
+    records[2] = {}                       # a dataset without the prompt field
+    subset = SimpleNamespace(dataset=SimpleNamespace(processed_data=records),
+                             indices=[2, 3])
+    assert K.prompt_excerpts(SimpleNamespace(dataset=subset)) == [None, "prompt 3"]
+    # A dataset with no processed_data at all degrades to ids, not a crash.
+    assert K.prompt_excerpts(SimpleNamespace(dataset=SimpleNamespace())) is None
+
+
+# ---- the per-example rows the audit consumes, off a real forward -------------
+
+class PredTask(Task):
+    """A pred_spec task over the tiny model: the answer is at the last position."""
+
+    name = "predtask"
+
+    def pred_spec(self, batch):
+        return {"pred_pos": batch["prefix_length"] - 1,
+                "target": batch["target_token"],
+                "distractor": batch["distractor_token"]}
+
+
+class MetricsContext:
+    """Only the EvalContext surface `evaluate_pred_position` touches."""
+
+    def __init__(self, model):
+        self.node_model = model
+        self.task = PredTask()
+        self.device = "cpu"
+        self.tokenizer = None
+        self.reference_model = None
+        # 'shared' means the prunable model with no corrupted stream IS the
+        # ungated full model, so the tiny pair needs no second copy.
+        self.cli = SimpleNamespace(reference="shared", ref_cache_device="cpu")
+
+    def reference_logits(self, input_ids, attention_mask):
+        with torch.no_grad():
+            return self.node_model(input_ids=input_ids,
+                                   attention_mask=attention_mask,
+                                   use_cache=False).logits
+
+
+def pred_loader(n=6, seq=8, bs=2, seed=3):
+    g = torch.Generator().manual_seed(seed)
+    rows = [{
+        "input_ids": torch.randint(0, VOCAB, (seq,), generator=g),
+        "corrupted_input_ids": torch.randint(0, VOCAB, (seq,), generator=g),
+        "attention_mask": torch.ones(seq, dtype=torch.long),
+        "prefix_length": torch.tensor(seq),
+        "target_token": torch.randint(0, VOCAB, (), generator=g),
+        "distractor_token": torch.randint(0, VOCAB, (), generator=g),
+    } for _ in range(n)]
+    return torch.utils.data.DataLoader(rows, batch_size=bs, shuffle=False)
+
+
+def test_t9_collect_per_example_returns_one_row_per_sample_in_loader_order():
+    _, pruned = build_pair()
+    out = metrics.evaluate_pred_position(MetricsContext(pruned),
+                                         pred_loader(n=6, bs=2),
+                                         collect_per_example=True)
+
+    rows = out["per_example"]
+    assert len(rows) == out["n"] == 6
+    assert [r["index"] for r in rows] == list(range(6))
+    for row in rows:
+        for key in ("argmax_id", "ref_argmax_id", "target_id", "distractor_id"):
+            assert isinstance(row[key], int), key
+
+
+def test_t9_per_example_reference_argmax_matches_the_reference_cache():
+    """The audit's 'full model' column is the same tensor exact_match uses."""
+    _, pruned = build_pair()
+    ctx = MetricsContext(pruned)
+    loader = pred_loader(n=4, bs=2)
+
+    cache = metrics.build_ref_cache(ctx, loader)
+    out = metrics.evaluate_pred_position(ctx, loader, ref_cache=cache,
+                                         collect_per_example=True)
+    expected = cache.float().argmax(dim=-1).tolist()
+    assert [r["ref_argmax_id"] for r in out["per_example"]] == expected
+    # With all gates open the circuit IS the reference, so every example also
+    # reads back as the full model's own choice.
+    assert [r["argmax_id"] for r in out["per_example"]] == expected
+    assert out["exact_match"] == 1.0
+
+
+def test_t9_per_example_reference_is_none_without_a_reference():
+    _, pruned = build_pair()
+    out = metrics.evaluate_pred_position(MetricsContext(pruned),
+                                         pred_loader(n=4, bs=2),
+                                         use_reference=False,
+                                         collect_per_example=True)
+    assert all(r["ref_argmax_id"] is None for r in out["per_example"])
+
+
+def test_t9_per_example_is_absent_unless_asked_for():
+    _, pruned = build_pair()
+    out = metrics.evaluate_pred_position(MetricsContext(pruned), pred_loader())
+    assert "per_example" not in out

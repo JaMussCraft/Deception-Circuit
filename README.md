@@ -247,14 +247,24 @@ python evaluate_circuit.py outputs/llama-8b-instruct_std/nls0.8_noedge_260722-16
 sbatch scripts/evaluate_circuit.sbatch <run_dir> --ablation mean
 ```
 
-`knockout` also re-runs its three configurations on an **honest-instructed**
-variant of the same prompts, and emits open generations on wikitext for the
-full model, the knockout and the circuit alone (`--gen-examples`,
-`--gen-new-tokens`). Read the `full` column of those generations first: fluent
-wikitext there is what says the generation loop itself is sound.
+`knockout` also re-runs its three configurations on two variants of the same
+prompts — **honest-instructed** and **no-pressure** — and emits open generations
+on wikitext for the full model, the knockout and the circuit alone
+(`--gen-examples`, `--gen-new-tokens`). Read the `full` column of those
+generations first: fluent wikitext there is what says the generation loop itself
+is sound. Two more sections sit next to the wikitext null. The **task-side
+null** puts the same random circuits through the same complement and evaluates
+them on the task under pressure (`--knockout-null-count`, capped at
+`--n-random`), which is what says whether knocking out *any* circuit of this
+size stops the deception just as well; note that `pct` and `z` there follow
+`Task.metric_better`, so the necessity direction is a *low* accuracy percentile.
+The **flip audit** records, per example, whether the argmax at the prediction
+position stayed on the deceptive answer, flipped to the honest one, or left the
+two-way readout altogether; the counts go in the log and `per_example` /
+`flip_summary` in `knockout.json`, for offline pattern analysis.
 
 **Under a prompt variant the metrics read backwards.** `pressure` and the
-honest-instruction section of `knockout` rebuild the prompts with the pressure
+prompt-variant sections of `knockout` rebuild the prompts with the pressure
 clause dropped or replaced, and keep the labels exactly as they were — the
 deceptive answer stays the "target". A model that stops being deceptive once
 the pressure is gone therefore shows *falling* accuracy and a *negative* logit

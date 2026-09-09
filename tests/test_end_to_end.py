@@ -264,9 +264,43 @@ def test_full_run_interchange(tiny_run, monkeypatch):
     assert abs(knock["wikitext"]["floor"]["ppl_ratio"] - 1.0) < 1e-6
     assert len(knock["wikitext"]["null"]["rows"]) == 5
     assert knock["task"]["knockout"]["argmax"]["n_distinct"] >= 1
+    # The per-example rows are a payload section of their own, not a 1000-row
+    # list smuggled inside the metrics dict.
+    assert "per_example" not in knock["task"]["knockout"]
 
-    # The tiny task has no pressure clause, so the honest-instruction section
-    # records why it stood down instead of failing the run.
+    # The task-side null: the same 5 random circuits, put through the same
+    # complement and scored on the task rather than on wikitext.
+    task_null = knock["task"]["null"]
+    assert task_null["n"] == 5 and len(task_null["rows"]) == 5
+    assert [r["index"] for r in task_null["rows"]] == \
+        [r["index"] for r in knock["wikitext"]["null"]["rows"]]
+    for key in ("accuracy", "logit_diff", "kl_div", "exact_match"):
+        assert 0.0 <= task_null["stats"][key]["percentile"] <= 100.0
+
+    # The flip audit: one row per test example, a three-way status, and counts
+    # that add up to the test set.
+    per_example = knock["task"]["per_example"]
+    assert len(per_example) == N_SAMPLES
+    assert [r["example_id"] for r in per_example] == list(range(N_SAMPLES))
+    assert all(r["status"] in {"stayed_deceptive", "flipped_honest", "other"}
+               for r in per_example)
+    # TinyDataset carries processed_data but no clean_prompt, so the excerpt
+    # degrades to None rather than failing the run.
+    assert all(r["prompt_excerpt"] is None for r in per_example)
+    flips = knock["task"]["flip_summary"]
+    assert (flips["n_stayed_deceptive"] + flips["n_flipped_honest"]
+            + flips["n_other"]) == N_SAMPLES
+    assert flips["n_full_not_deceptive"] <= flips["n_other"]
+    assert len(flips["stayed_ids"]) == flips["n_stayed_deceptive"]
+    assert len(flips["flipped_ids"]) == flips["n_flipped_honest"]
+
+    # The tiny task has no pressure clause, so both prompt-variant sections
+    # record why they stood down instead of failing the run.
+    assert set(knock["variants"]) == {"honest_instruction", "no_pressure"}
+    assert all("skipped" in v for v in knock["variants"].values())
+    # `honest` is kept as an alias of the honest-instruction variant so readers
+    # written against the old layout still find their section.
+    assert knock["honest"] == knock["variants"]["honest_instruction"]
     assert "skipped" in knock["honest"]
     gen = knock["generation"]
     assert "skipped" not in gen

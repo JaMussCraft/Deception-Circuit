@@ -23,15 +23,29 @@ anchors: the all-gates-open floor (which must come out at KL 0) and the same 50
 random circuits eval 3 uses, put through the same complement, so the two nulls
 are paired.
 
-Two sections follow it:
+Four sections follow it:
 
-* **Honest-instruction knockout.** The same knockout re-run on the same prompts
-  with the pressure clause replaced by an instruction to answer honestly. If the
-  circuit is the deception mechanism, the behaviour should already be gone
-  before the knockout touches it, and the knockout should have little left to
-  take. Note that the labels are NOT rebuilt with the prompts — see
-  evaluation/variants.py — so "accuracy" there means "still gives the deceptive
-  answer" and the number you want is a low one.
+* **The task-side null.** The same random circuits, put through the same
+  complement and evaluated on the task test set under pressure. The wikitext
+  null says what a random knockout of this size costs elsewhere; this one says
+  whether knocking out *any* circuit of this size stops the deception just as
+  well. A necessity claim needs both.
+
+* **The flip audit.** Every test example is a behavioural-filter survivor, so
+  the full model is deceptive on all of them. Per example the readout is the
+  argmax token at the prediction position, which lands on the deceptive answer,
+  the honest answer, or neither — so each example either stayed deceptive,
+  flipped honest, or left the binary readout entirely. The counts go in the log
+  and the full lists in `knockout.json`, for offline pattern analysis.
+
+* **Prompt-variant knockouts.** The same three configurations re-run on the
+  same prompts with the pressure clause replaced by an instruction to answer
+  honestly, and then with the clause deleted outright. If the circuit is the
+  deception mechanism, the behaviour should already be gone before the knockout
+  touches it, and the knockout should have little left to take. Note that the
+  labels are NOT rebuilt with the prompts — see evaluation/variants.py — so
+  "accuracy" there means "still gives the deceptive answer" and the number you
+  want is a low one.
 
 * **Open generation.** Three greedy wikitext continuations under the full model,
   the knockout, and the circuit alone. Per-token KL says how much the
@@ -47,12 +61,137 @@ from evaluation import Evaluation
 from evaluation import report
 from evaluation import variants
 from evaluation.masks import knockout_masks, ones_like
-from evaluation.metrics import evaluate_task_metrics, summarize_null
+from evaluation.metrics import (evaluate_task_metrics, summarize_metrics,
+                                summarize_null)
 from evaluation.wikitext import collateral_damage
 
 # The all-open floor runs the identical harness with nothing ablated, so any
 # non-zero KL is harness error, not collateral damage.
 FLOOR_TOLERANCES = {"kl_per_token": 1e-4, "ppl_ratio_delta": 1e-4}
+
+#: Prompt variants this evaluation re-runs, in render order.
+VARIANTS = ("honest_instruction", "no_pressure")
+
+VARIANT_TITLES = {
+    "honest_instruction": "KNOCKOUT UNDER AN HONEST INSTRUCTION",
+    "no_pressure": "KNOCKOUT WITH THE PRESSURE CLAUSE DELETED",
+}
+
+#: How much of a prompt the flip audit keeps. The pressure clause and the
+#: question both live at the end, and 1000 full prompts would dwarf every other
+#: number in knockout.json.
+EXCERPT_CHARS = 200
+
+#: Verbatim excerpts printed per group in the log. The rest live in the JSON.
+LOG_EXCERPTS = 3
+
+
+def resolve_null_count(cli, n_random: int) -> int:
+    """How many random circuits the task-side null evaluates.
+
+    `--knockout-null-count` defaults to "all of them" and is capped at the
+    number actually drawn, so `--null-start` / `--null-count` sharding and
+    `--n-random 0` both stay coherent without the caller checking.
+    """
+    requested = getattr(cli, "knockout_null_count", None)
+    if requested is None:
+        return n_random
+    return max(0, min(int(requested), n_random))
+
+
+def _choice(token_id, target_id, distractor_id) -> str:
+    """Which of the two answers a token is, or `other`.
+
+    A None token (no reference was available, so the full model's argmax is
+    unknown) reads as `other`: the audit refuses to guess a choice it did not
+    observe rather than quietly filing it under either group.
+    """
+    if token_id is None:
+        return "other"
+    if token_id == target_id:
+        return "deceptive"
+    if token_id == distractor_id:
+        return "honest"
+    return "other"
+
+
+def flip_audit(rows, excerpts=None):
+    """(per_example, flip_summary) from `evaluate_pred_position` rows.
+
+    `rows` is the knockout pass's `per_example` list, whose `ref_argmax_id` is
+    the FULL model's argmax on the same prompt (the reference cache holds the
+    full model's logits; with no cache the evaluator takes a live full-model
+    forward). So one pass carries both sides of the comparison.
+
+    `n_other` is deliberately not split between the two interesting groups, and
+    `n_full_not_deceptive` says how much of it is the full model having never
+    been deceptive here rather than a knockout that left the A/B readout.
+    """
+    if rows is None:
+        return None, None
+
+    per_example, stayed, flipped = [], [], []
+    n_other = n_full_not_deceptive = 0
+    for row in rows:
+        target_id, distractor_id = row["target_id"], row["distractor_id"]
+        full = _choice(row["ref_argmax_id"], target_id, distractor_id)
+        knocked = _choice(row["argmax_id"], target_id, distractor_id)
+        if full == "deceptive" and knocked == "deceptive":
+            status = "stayed_deceptive"
+            stayed.append(row["index"])
+        elif full == "deceptive" and knocked == "honest":
+            status = "flipped_honest"
+            flipped.append(row["index"])
+        else:
+            status = "other"
+            n_other += 1
+            n_full_not_deceptive += int(full != "deceptive")
+        per_example.append({
+            "example_id": row["index"],
+            "prompt_excerpt": (excerpts[row["index"]]
+                               if excerpts is not None else None),
+            "full_choice": full,
+            "knockout_choice": knocked,
+            "full_token_id": row["ref_argmax_id"],
+            "knockout_token_id": row["argmax_id"],
+            "status": status,
+        })
+
+    summary = {
+        "n_stayed_deceptive": len(stayed),
+        "n_flipped_honest": len(flipped),
+        "n_other": n_other,
+        "n_full_not_deceptive": n_full_not_deceptive,
+        "stayed_ids": stayed,
+        "flipped_ids": flipped,
+    }
+    return per_example, summary
+
+
+def prompt_excerpts(loader, chars: int = EXCERPT_CHARS):
+    """The tail of each example's clean prompt, in loader order, or None.
+
+    Only the tail: the pressure clause and the question live at the end, which
+    is what an offline reader of `flipped_ids` wants to look at. Returns None
+    when the dataset does not carry `processed_data` (the synthetic task in the
+    end-to-end test does not), so the audit degrades to ids rather than failing.
+    """
+    dataset = getattr(loader, "dataset", None)
+    indices = None
+    # --test-samples wraps the dataset in a Subset; loader position i is then
+    # dataset position indices[i], not i.
+    if dataset is not None and hasattr(dataset, "indices") and hasattr(dataset, "dataset"):
+        dataset, indices = dataset.dataset, list(dataset.indices)
+    records = getattr(dataset, "processed_data", None)
+    if records is None:
+        return None
+    if indices is None:
+        indices = range(len(records))
+    out = []
+    for i in indices:
+        prompt = records[i].get("clean_prompt")
+        out.append(None if prompt is None else prompt[-chars:])
+    return out
 
 
 class KnockoutEvaluation(Evaluation):
@@ -73,7 +212,11 @@ class KnockoutEvaluation(Evaluation):
         payload["task"] = self._task_side(ctx)
         payload["wikitext"] = (None if ctx.cli.skip_wikitext
                                else self._wikitext_side(ctx))
-        payload["honest"] = self._honest_side(ctx)
+        payload["variants"] = {variant: self._variant_side(ctx, variant)
+                               for variant in VARIANTS}
+        # Kept as an alias: knockout.json readers written against the
+        # honest-only layout still find their section where it was.
+        payload["honest"] = payload["variants"]["honest_instruction"]
         payload["generation"] = self._generation_side(ctx)
         payload["headline"] = {
             "task_accuracy": payload["task"]["knockout"]["accuracy"],
@@ -103,36 +246,96 @@ class KnockoutEvaluation(Evaluation):
         intact = evaluate_task_metrics(ctx, loader, desc="discovered circuit",
                                        **common)
         with ctx.circuit(ctx.knockout_masks, verify=ctx.cli.verify):
-            knocked = evaluate_task_metrics(ctx, loader, desc="knockout", **common)
-        return {"circuit": intact, "knockout": knocked}
+            knocked = evaluate_task_metrics(ctx, loader, desc="knockout",
+                                            collect_per_example=ctx.has_pred_spec,
+                                            **common)
 
-    def _honest_side(self, ctx):
-        """The same three configurations on the honest-instruction prompts."""
-        loader, reason = ctx.variant_loader("honest_instruction")
+        per_example, flip_summary, reason = self._flip_audit(ctx, loader, knocked)
+        return {
+            "circuit": intact,
+            "knockout": knocked,
+            "per_example": per_example,
+            "flip_summary": flip_summary,
+            "flip_audit_reason": reason,
+            "null": self._task_null(ctx, loader, hook, ref_cache, knocked),
+        }
+
+    def _flip_audit(self, ctx, loader, knocked):
+        """(per_example, flip_summary, reason) for one knockout pass.
+
+        The rows are popped off the metrics dict: they are a payload section of
+        their own, and leaving them inside `knockout` would write the whole list
+        into knockout.json twice.
+        """
+        rows = knocked.pop("per_example", None)
+        if rows is None:
+            return None, None, (f"{ctx.task.name} does not implement pred_spec, "
+                                f"so there is no per-example argmax readout")
+        per_example, summary = flip_audit(rows, prompt_excerpts(loader))
+        return per_example, summary, ""
+
+    def _task_null(self, ctx, loader, hook, ref_cache, knocked):
+        """The wikitext null's twin: the same random knockouts, on the task.
+
+        Deliberately cheap — no argmax histogram and no per-example rows, since
+        nothing reads them for the null. `verify` is off for the same reason it
+        is in eval 3: the masks came from the same sampler the null already
+        size-checks.
+        """
+        count = resolve_null_count(ctx.cli, len(ctx.random_masks))
+        rows = []
+        for i in range(count):
+            index, masks = ctx.random_indices[i], ctx.random_masks[i]
+            with ctx.circuit(knockout_masks(masks,
+                                            ctx.cli.knockout_granularity)):
+                metrics = evaluate_task_metrics(
+                    ctx, loader, hook=hook, ref_cache=ref_cache,
+                    desc=f"random knockout {i + 1}/{count}")
+            rows.append({"index": index,
+                         **{k: metrics[k] for k, _ in ctx.task.metric_columns
+                            if k in metrics}})
+
+        stats = (summarize_metrics(rows, knocked, ctx.task.metric_columns,
+                                   ctx.task.metric_better) if rows else {})
+        return {"n": len(rows), "granularity": ctx.cli.knockout_granularity,
+                "rows": rows, "stats": stats}
+
+    def _variant_side(self, ctx, variant):
+        """The same three configurations on one prompt variant's prompts."""
+        loader, reason = ctx.variant_loader(variant)
         if loader is None:
-            print(f"\n  Honest-instruction knockout skipped: {reason}")
-            return {"skipped": reason}
+            print(f"\n  {variant} knockout skipped: {reason}")
+            return {"variant": variant, "skipped": reason}
 
         # ref_cache is deliberately NOT ctx.ensure_ref_cache(): that cache holds
         # the full model's logits on the WITH-PRESSURE prompts. Passing None
         # makes evaluate_pred_position take a live full-model forward on this
-        # batch, which is the only reference the KL column here can mean.
+        # batch, which is the only reference the KL column here can mean — and
+        # it is also what makes `ref_argmax_id` the full model's choice on the
+        # variant prompt, so the flip audit works here unchanged.
         common = dict(hook=ctx.hook_for("task"), ref_cache=None,
                       collect_argmax=True)
         with ctx.all_gates_open():
-            full = evaluate_task_metrics(ctx, loader, desc="honest: full model",
-                                         **common)
-        circuit = evaluate_task_metrics(ctx, loader, desc="honest: circuit",
+            full = evaluate_task_metrics(ctx, loader,
+                                         desc=f"{variant}: full model", **common)
+        circuit = evaluate_task_metrics(ctx, loader, desc=f"{variant}: circuit",
                                         **common)
         with ctx.circuit(ctx.knockout_masks, verify=ctx.cli.verify):
-            knocked = evaluate_task_metrics(ctx, loader, desc="honest: knockout",
+            knocked = evaluate_task_metrics(ctx, loader,
+                                            desc=f"{variant}: knockout",
+                                            collect_per_example=ctx.has_pred_spec,
                                             **common)
 
+        per_example, flip_summary, flip_reason = self._flip_audit(
+            ctx, loader, knocked)
         return {
-            "variant": "honest_instruction",
-            "description": variants.VARIANT_DESCRIPTIONS["honest_instruction"],
+            "variant": variant,
+            "description": variants.VARIANT_DESCRIPTIONS[variant],
             "label_convention": variants.LABEL_CONVENTION,
             "rows": {"full": full, "circuit": circuit, "knockout": knocked},
+            "per_example": per_example,
+            "flip_summary": flip_summary,
+            "flip_audit_reason": flip_reason,
             "headline": {
                 "full_accuracy": full["accuracy"],
                 "knockout_accuracy": knocked["accuracy"],
@@ -219,8 +422,11 @@ class KnockoutEvaluation(Evaluation):
             report.argmax_table(task["knockout"]["argmax"],
                                 title="ARGMAX DISTRIBUTION — KNOCKOUT")
 
+        self._report_flip_audit(task, "FLIP AUDIT — UNDER PRESSURE")
         self._report_wikitext(payload, ctx)
-        self._report_honest(payload, ctx)
+        self._report_task_null(payload, ctx)
+        for variant in VARIANTS:
+            self._report_variant(payload, ctx, variant)
         self._report_generation(payload, ctx)
 
     # ------------------------------------------------------------------
@@ -270,23 +476,79 @@ class KnockoutEvaluation(Evaluation):
                   "same size — which, for a\n  necessity claim, is the direction "
                   "you want.")
 
-    def _report_honest(self, payload, ctx) -> None:
-        honest = payload["honest"]
-        if honest is None:
+    def _report_task_null(self, payload, ctx) -> None:
+        null = payload["task"]["null"]
+        if not null["stats"]:
             return
-        if "skipped" in honest:
-            print(f"\n  Honest-instruction knockout skipped: {honest['skipped']}")
+        report.stats_table(
+            null["stats"], ctx.task.metric_columns, null["n"],
+            title=f"VERSUS SIZE-MATCHED RANDOM KNOCKOUTS — TASK "
+                  f"({null['granularity']})")
+        print("\n  READ THE DIRECTION BACKWARDS HERE. `pct` and `z` follow "
+              "Task.metric_better,\n  which says higher accuracy is better — "
+              "but the circuit's knockout is meant to\n  STOP the deception, so "
+              "the necessity result is a LOW accuracy percentile: the\n  "
+              "circuit's knockout leaves less deceptive behaviour than a random "
+              "knockout of\n  the same size. A high percentile says any circuit "
+              "of this size would have done\n  as well, or better.")
+
+    def _report_flip_audit(self, section, title, note="") -> None:
+        summary = section.get("flip_summary")
+        if summary is None:
+            reason = section.get("flip_audit_reason") or "no per-example readout"
+            print(f"\n  Flip audit skipped: {reason}.")
             return
 
-        rows = honest["rows"]
+        report.banner(title, "-")
+        print(f"\n  stayed deceptive  {summary['n_stayed_deceptive']:>6}")
+        print(f"  flipped honest    {summary['n_flipped_honest']:>6}")
+        print(f"  other             {summary['n_other']:>6}   "
+              f"(of which {summary['n_full_not_deceptive']} the full model was "
+              f"not deceptive on)")
+        print("\n  'other' is every example that left the two-way readout: the "
+              "argmax token is\n  neither the deceptive nor the honest answer. "
+              "It is reported separately so it\n  cannot inflate either group.")
+        if note:
+            print(f"\n  {note}")
+
+        excerpts = self._excerpts_by_status(section)
+        for status, label in (("stayed_deceptive", "STAYED DECEPTIVE"),
+                              ("flipped_honest", "FLIPPED HONEST")):
+            shown = excerpts[status][:LOG_EXCERPTS]
+            if not shown:
+                continue
+            print(f"\n  {label} (first {len(shown)} of "
+                  f"{len(excerpts[status])}; the full lists are in "
+                  f"knockout.json)")
+            for example_id, excerpt in shown:
+                print(f"    [{example_id}] {excerpt}")
+
+    @staticmethod
+    def _excerpts_by_status(section):
+        out = {"stayed_deceptive": [], "flipped_honest": []}
+        for row in section.get("per_example") or []:
+            if row["status"] in out and row["prompt_excerpt"]:
+                out[row["status"]].append(
+                    (row["example_id"], " ".join(row["prompt_excerpt"].split())))
+        return out
+
+    def _report_variant(self, payload, ctx, variant) -> None:
+        section = (payload.get("variants") or {}).get(variant)
+        if section is None:
+            return
+        if "skipped" in section:
+            print(f"\n  {variant} knockout skipped: {section['skipped']}")
+            return
+
+        rows = section["rows"]
         report.metric_table(
             [("full model (all gates open)", rows["full"]),
              ("discovered circuit", rows["circuit"]),
              (f"knockout ({payload['granularity']})", rows["knockout"])],
             ctx.task.metric_columns,
-            title="KNOCKOUT UNDER AN HONEST INSTRUCTION")
+            title=VARIANT_TITLES[variant])
 
-        print(f"\n  Prompts: {honest['description']}.")
+        print(f"\n  Prompts: {section['description']}.")
         print("\n  Labels are NOT rebuilt with the prompts: 'accuracy' is the "
               "rate at which the\n  model still gives the DECEPTIVE answer, so "
               "here a LOW number is the good one\n  and the knockout has less "
@@ -295,15 +557,23 @@ class KnockoutEvaluation(Evaluation):
               "prompts, not the cached\n  with-pressure reference, so the "
               "all-gates-open row must come out at KL 0 and\n  exact match 1.")
 
-        head = honest["headline"]
-        print(f"\n  HEADLINE  deceptive-answer rate under the honest "
-              f"instruction: full model {head['full_accuracy']:.4f}, "
+        head = section["headline"]
+        print(f"\n  HEADLINE  deceptive-answer rate under '{variant}': "
+              f"full model {head['full_accuracy']:.4f}, "
               f"knockout {head['knockout_accuracy']:.4f}  "
               f"(drop {head['full_minus_knockout']:+.4f})")
 
         if "argmax" in rows["knockout"]:
-            report.argmax_table(rows["knockout"]["argmax"],
-                                title="ARGMAX DISTRIBUTION — HONEST / KNOCKOUT")
+            report.argmax_table(
+                rows["knockout"]["argmax"],
+                title=f"ARGMAX DISTRIBUTION — {variant.upper()} / KNOCKOUT")
+
+        self._report_flip_audit(
+            section, f"FLIP AUDIT — {variant.upper()}",
+            note=("'full model' here is the full model on THESE variant "
+                  "prompts, not on the\n  with-pressure ones, so a large "
+                  "'other' count with most of it in\n  n_full_not_deceptive is "
+                  "the variant already having removed the behaviour."))
 
     def _report_generation(self, payload, ctx) -> None:
         gen = payload["generation"]

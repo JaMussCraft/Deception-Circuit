@@ -57,6 +57,8 @@ from evaluation.benchmarks.base import DECEPTIVE
 from evaluation.benchmarks import (DEFAULT_BENCHMARKS, GROUPS, expand,
                                    list_benchmarks, list_choices, required_keys)
 from evaluation.context import build_session
+from evaluation.knockout import VARIANTS as KNOCKOUT_VARIANTS
+from evaluation.knockout import resolve_null_count
 from evaluation.masks import count_masks
 
 # Rough costs, calibrated on 1x A100 with Llama-3.1-8B-Instruct and 90-token STD
@@ -161,6 +163,13 @@ def build_parser():
                    help="Samples in this shard (default: --n-random).")
     g.add_argument("--save-null-masks", action="store_true",
                    help="Also write the random circuits as a packed npz.")
+    g.add_argument("--knockout-null-count", type=int, default=None,
+                   help="Random circuits eval 2 puts through the knockout "
+                        "complement on the TASK side, capped at --n-random "
+                        "(default: all of them). This is a second task pass per "
+                        "circuit, so at the default it roughly doubles eval 2's "
+                        "runtime; set it lower to trade null resolution for "
+                        "walltime.")
 
     g = p.add_argument_group("wikitext reference stream")
     g.add_argument("--skip-wikitext", action="store_true")
@@ -371,7 +380,12 @@ def estimate_runtime(session, ctx) -> dict:
                            n_configs * SEC_PER_WIKITEXT_CONFIG *
                            (cli.wikitext_blocks / 64.0) *
                            (cli.wikitext_block_size / 512.0)))
-        stages.append(("eval 2 (honest variant)", 3 * test_pass))
+        n_task_null = resolve_null_count(cli, n_random)
+        if n_task_null:
+            stages.append((f"eval 2 (task null, {n_task_null} knockouts)",
+                           n_task_null * test_pass))
+        stages.append((f"eval 2 (prompt variants, {len(KNOCKOUT_VARIANTS)} x 3 "
+                       f"passes)", len(KNOCKOUT_VARIANTS) * 3 * test_pass))
         if cli.gen_examples:
             stages.append((f"eval 2 ({cli.gen_examples} generation examples)",
                            3 * cli.gen_examples * cli.gen_new_tokens * 0.35))
