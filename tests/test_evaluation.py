@@ -1086,7 +1086,7 @@ def test_g_pressure_run_has_full_circuit_empty_rows_per_variant():
 
 def test_g_pressure_report_prints_aligned_rows_and_every_argmax_table(capsys):
     """`report()` prints one aligned line per (variant, config) row — labels
-    truncated to `label_width=52` so the numeric columns cannot ragged — and
+    truncated to `label_width=54` so the numeric columns cannot ragged — and
     one argmax table per (variant, config), not just per variant."""
     _, pruned = build_pair()
     ctx = PressureContext(pruned)
@@ -1099,7 +1099,7 @@ def test_g_pressure_report_prints_aligned_rows_and_every_argmax_table(capsys):
     data_lines = [l for l in lines
                  if any(l.startswith(f"  {v} / ") for v in P.VARIANT_ORDER)]
     assert len(data_lines) == len(P.VARIANT_ORDER) * len(P.CONFIG_ORDER)
-    expected_len = 2 + 52 + 4 * 14
+    expected_len = 2 + 54 + 4 * 14
     assert {len(l) for l in data_lines} == {expected_len}
 
     argmax_titles = [l for l in lines if "ARGMAX DISTRIBUTION — " in l]

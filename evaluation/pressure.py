@@ -140,7 +140,7 @@ class PressureEvaluation(Evaluation):
                 continue
             for config in CONFIG_ORDER:
                 rows.append((f"{variant} / {CONFIG_LABELS[config]}", got[config]))
-        report.metric_table(rows, METRIC_COLUMNS, label_width=52,
+        report.metric_table(rows, METRIC_COLUMNS, label_width=54,
                             title="EVAL 4 — PRESSURE-CLAUSE ABLATION")
 
         print("\n  Labels are NOT rebuilt with the prompts: 'accuracy' is the "
