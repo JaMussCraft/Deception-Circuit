@@ -100,14 +100,15 @@ def resolve_null_count(cli, n_random: int) -> int:
 
 
 def _choice(token_id, target_id, distractor_id) -> str:
-    """Which of the two answers a token is, or `other`.
+    """Which of the two answers a token is: `deceptive`, `honest` or `other`.
 
-    A None token (no reference was available, so the full model's argmax is
-    unknown) reads as `other`: the audit refuses to guess a choice it did not
-    observe rather than quietly filing it under either group.
+    A None token means nothing was observed — there was no reference, so the
+    full model's argmax is not known here. That is `unknown`, not `other`: the
+    audit distinguishes "the model picked a third token" from "nobody looked",
+    so an absent reference cannot be counted as evidence about the model.
     """
     if token_id is None:
-        return "other"
+        return "unknown"
     if token_id == target_id:
         return "deceptive"
     if token_id == distractor_id:
@@ -123,15 +124,14 @@ def flip_audit(rows, excerpts=None):
     full model's logits; with no cache the evaluator takes a live full-model
     forward). So one pass carries both sides of the comparison.
 
-    `n_other` is deliberately not split between the two interesting groups, and
-    `n_full_not_deceptive` says how much of it is the full model having never
-    been deceptive here rather than a knockout that left the A/B readout.
+    `n_other` is deliberately not split between the two interesting groups.
+    `n_full_not_deceptive` and `n_full_unknown` say how much of it is the full
+    model having been observed not to be deceptive here, and how much is a
+    full-model choice that was never observed at all, rather than a knockout
+    that left the A/B readout.
     """
-    if rows is None:
-        return None, None
-
     per_example, stayed, flipped = [], [], []
-    n_other = n_full_not_deceptive = 0
+    n_other = n_full_not_deceptive = n_full_unknown = 0
     for row in rows:
         target_id, distractor_id = row["target_id"], row["distractor_id"]
         full = _choice(row["ref_argmax_id"], target_id, distractor_id)
@@ -145,7 +145,8 @@ def flip_audit(rows, excerpts=None):
         else:
             status = "other"
             n_other += 1
-            n_full_not_deceptive += int(full != "deceptive")
+            n_full_unknown += int(full == "unknown")
+            n_full_not_deceptive += int(full in ("honest", "other"))
         per_example.append({
             "example_id": row["index"],
             "prompt_excerpt": (excerpts[row["index"]]
@@ -162,6 +163,7 @@ def flip_audit(rows, excerpts=None):
         "n_flipped_honest": len(flipped),
         "n_other": n_other,
         "n_full_not_deceptive": n_full_not_deceptive,
+        "n_full_unknown": n_full_unknown,
         "stayed_ids": stayed,
         "flipped_ids": flipped,
     }
@@ -173,13 +175,17 @@ def prompt_excerpts(loader, chars: int = EXCERPT_CHARS):
 
     Only the tail: the pressure clause and the question live at the end, which
     is what an offline reader of `flipped_ids` wants to look at. Returns None
-    when the dataset does not carry `processed_data` (the synthetic task in the
-    end-to-end test does not), so the audit degrades to ids rather than failing.
+    when the dataset does not carry `processed_data`, and an entry is None when
+    a record has no `clean_prompt` (the synthetic task in the end-to-end test
+    has the former and not the latter), so the audit degrades to bare example
+    ids rather than failing.
     """
     dataset = getattr(loader, "dataset", None)
     indices = None
-    # --test-samples wraps the dataset in a Subset; loader position i is then
-    # dataset position indices[i], not i.
+    # --test-samples does NOT produce a Subset — it truncates the record list
+    # while loading (dataset/std_llama.py:load_std_dataset), so loader position
+    # i is dataset position i. This branch is here for any future loader that
+    # does wrap a Subset, where position i is dataset position indices[i].
     if dataset is not None and hasattr(dataset, "indices") and hasattr(dataset, "dataset"):
         dataset, indices = dataset.dataset, list(dataset.indices)
     records = getattr(dataset, "processed_data", None)
@@ -215,8 +221,12 @@ class KnockoutEvaluation(Evaluation):
         payload["variants"] = {variant: self._variant_side(ctx, variant)
                                for variant in VARIANTS}
         # Kept as an alias: knockout.json readers written against the
-        # honest-only layout still find their section where it was.
-        payload["honest"] = payload["variants"]["honest_instruction"]
+        # honest-only layout still find their section where it was. The
+        # per-example lists are dropped from the copy — they can be a thousand
+        # rows each, and they already live once under `variants`.
+        payload["honest"] = {
+            k: v for k, v in payload["variants"]["honest_instruction"].items()
+            if k not in ("per_example", "flip_summary")}
         payload["generation"] = self._generation_side(ctx)
         payload["headline"] = {
             "task_accuracy": payload["task"]["knockout"]["accuracy"],
@@ -271,8 +281,7 @@ class KnockoutEvaluation(Evaluation):
         if rows is None:
             return None, None, (f"{ctx.task.name} does not implement pred_spec, "
                                 f"so there is no per-example argmax readout")
-        per_example, summary = flip_audit(rows, prompt_excerpts(loader))
-        return per_example, summary, ""
+        return (*flip_audit(rows, prompt_excerpts(loader)), "")
 
     def _task_null(self, ctx, loader, hook, ref_cache, knocked):
         """The wikitext null's twin: the same random knockouts, on the task.
@@ -484,13 +493,21 @@ class KnockoutEvaluation(Evaluation):
             null["stats"], ctx.task.metric_columns, null["n"],
             title=f"VERSUS SIZE-MATCHED RANDOM KNOCKOUTS — TASK "
                   f"({null['granularity']})")
-        print("\n  READ THE DIRECTION BACKWARDS HERE. `pct` and `z` follow "
-              "Task.metric_better,\n  which says higher accuracy is better — "
-              "but the circuit's knockout is meant to\n  STOP the deception, so "
-              "the necessity result is a LOW accuracy percentile: the\n  "
-              "circuit's knockout leaves less deceptive behaviour than a random "
-              "knockout of\n  the same size. A high percentile says any circuit "
-              "of this size would have done\n  as well, or better.")
+        print("\n  READ EVERY COLUMN BACKWARDS HERE. `pct` and `z` follow "
+              "Task.metric_better,\n  which is written for a circuit that "
+              "should REPRODUCE the full model. This\n  knockout is meant to "
+              "BREAK it, so on all four metrics the necessity result is\n  a "
+              "LOW percentile:\n"
+              "    accuracy, logit diff   low pct = less deceptive behaviour "
+              "survives the\n"
+              "                           circuit's knockout than a random "
+              "one's\n"
+              "    KL div, exact match    low pct = the circuit's knockout "
+              "moved the prediction\n"
+              "                           further from the full model's than a "
+              "random one did\n"
+              "  A high percentile on any of them says a random circuit of this "
+              "size would have\n  done the job as well, or better.")
 
     def _report_flip_audit(self, section, title, note="") -> None:
         summary = section.get("flip_summary")
@@ -504,7 +521,9 @@ class KnockoutEvaluation(Evaluation):
         print(f"  flipped honest    {summary['n_flipped_honest']:>6}")
         print(f"  other             {summary['n_other']:>6}   "
               f"(of which {summary['n_full_not_deceptive']} the full model was "
-              f"not deceptive on)")
+              f"observed not to be\n"
+              f"                             deceptive on, and "
+              f"{summary['n_full_unknown']} where it was never read)")
         print("\n  'other' is every example that left the two-way readout: the "
               "argmax token is\n  neither the deceptive nor the honest answer. "
               "It is reported separately so it\n  cannot inflate either group.")

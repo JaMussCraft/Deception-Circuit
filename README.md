@@ -254,10 +254,13 @@ on wikitext for the full model, the knockout and the circuit alone
 generations first: fluent wikitext there is what says the generation loop itself
 is sound. Two more sections sit next to the wikitext null. The **task-side
 null** puts the same random circuits through the same complement and evaluates
-them on the task under pressure (`--knockout-null-count`, capped at
-`--n-random`), which is what says whether knocking out *any* circuit of this
-size stops the deception just as well; note that `pct` and `z` there follow
-`Task.metric_better`, so the necessity direction is a *low* accuracy percentile.
+them on the task under pressure (`--knockout-null-count`, capped at the number
+of circuits actually drawn — `--n-random`, or `--null-count` when sharded),
+which is what says whether knocking out *any* circuit of this size stops the
+deception just as well; note that `pct` and `z` there follow
+`Task.metric_better`, which is written for a circuit that should reproduce the
+full model, so on all four metrics the necessity direction is a *low*
+percentile.
 The **flip audit** records, per example, whether the argmax at the prediction
 position stayed on the deceptive answer, flipped to the honest one, or left the
 two-way readout altogether; the counts go in the log and `per_example` /

@@ -165,11 +165,12 @@ def build_parser():
                    help="Also write the random circuits as a packed npz.")
     g.add_argument("--knockout-null-count", type=int, default=None,
                    help="Random circuits eval 2 puts through the knockout "
-                        "complement on the TASK side, capped at --n-random "
-                        "(default: all of them). This is a second task pass per "
-                        "circuit, so at the default it roughly doubles eval 2's "
-                        "runtime; set it lower to trade null resolution for "
-                        "walltime.")
+                        "complement on the TASK side. Capped at the number "
+                        "actually drawn, which is --n-random or, when sharded, "
+                        "--null-count (default: all of them). This is a second "
+                        "task pass per circuit, so at the default it roughly "
+                        "doubles eval 2's runtime; set it lower to trade null "
+                        "resolution for walltime.")
 
     g = p.add_argument_group("wikitext reference stream")
     g.add_argument("--skip-wikitext", action="store_true")

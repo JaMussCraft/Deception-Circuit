@@ -299,8 +299,13 @@ def test_full_run_interchange(tiny_run, monkeypatch):
     assert set(knock["variants"]) == {"honest_instruction", "no_pressure"}
     assert all("skipped" in v for v in knock["variants"].values())
     # `honest` is kept as an alias of the honest-instruction variant so readers
-    # written against the old layout still find their section.
-    assert knock["honest"] == knock["variants"]["honest_instruction"]
+    # written against the old layout still find their section — minus the
+    # per-example lists, which would otherwise be serialised twice.
+    honest_variant = knock["variants"]["honest_instruction"]
+    assert "per_example" not in knock["honest"]
+    assert "flip_summary" not in knock["honest"]
+    assert knock["honest"] == {k: v for k, v in honest_variant.items()
+                               if k not in ("per_example", "flip_summary")}
     assert "skipped" in knock["honest"]
     gen = knock["generation"]
     assert "skipped" not in gen

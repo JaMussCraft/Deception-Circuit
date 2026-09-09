@@ -33,6 +33,7 @@ from evaluation import ablation as abl
 from evaluation import knockout as K
 from evaluation import masks as M
 from evaluation import metrics
+from evaluation import variants
 from models.llama_node import (ABLATION_SITES, _ablation_ref,
                                clear_ablation_hook, install_ablation_hook)
 from tasks import Task
@@ -713,19 +714,28 @@ def test_t9_flip_audit_splits_stayed_flipped_and_other():
     assert summary["n_stayed_deceptive"] == 1
     assert summary["n_flipped_honest"] == 1
     assert summary["n_other"] == 3
-    # Rows 3 and 4 are 'other' because the FULL model was not deceptive; row 2
-    # is 'other' because the knockout left the readout. Only the first two count.
+    # Rows 3 and 4 are 'other' because the FULL model was observed not to be
+    # deceptive; row 2 is 'other' because the knockout left the readout.
     assert summary["n_full_not_deceptive"] == 2
+    assert summary["n_full_unknown"] == 0
     assert summary["stayed_ids"] == [0]
     assert summary["flipped_ids"] == [1]
 
 
-def test_t9_flip_audit_reads_a_missing_reference_as_other():
-    """No reference means no observed full-model choice — never a guessed one."""
-    _, summary = K.flip_audit([audit_row(0, argmax=10, ref=None),
-                               audit_row(1, argmax=20, ref=None)])
+def test_t9_flip_audit_does_not_read_a_missing_reference_as_evidence():
+    """No reference means the full model's choice is UNKNOWN, not 'not deceptive'.
+
+    Counting an unobserved row as evidence that the full model was already
+    honest would turn a missing reference into a finding.
+    """
+    per_example, summary = K.flip_audit([audit_row(0, argmax=10, ref=None),
+                                         audit_row(1, argmax=20, ref=None)])
+    assert [r["full_choice"] for r in per_example] == ["unknown", "unknown"]
+    assert [r["status"] for r in per_example] == ["other", "other"]
     assert summary["n_stayed_deceptive"] == 0 and summary["n_flipped_honest"] == 0
-    assert summary["n_other"] == 2 and summary["n_full_not_deceptive"] == 2
+    assert summary["n_other"] == 2
+    assert summary["n_full_unknown"] == 2
+    assert summary["n_full_not_deceptive"] == 0
 
 
 def test_t9_flip_audit_carries_prompt_excerpts_and_ids():
@@ -736,10 +746,6 @@ def test_t9_flip_audit_carries_prompt_excerpts_and_ids():
         "full_choice": "deceptive", "knockout_choice": "deceptive",
         "full_token_id": 10, "knockout_token_id": 10,
         "status": "stayed_deceptive"}
-
-
-def test_t9_flip_audit_passes_none_through():
-    assert K.flip_audit(None) == (None, None)
 
 
 def test_t9_resolve_null_count_defaults_to_every_drawn_circuit():
@@ -917,3 +923,118 @@ def test_t9_per_example_is_absent_unless_asked_for():
     _, pruned = build_pair()
     out = metrics.evaluate_pred_position(MetricsContext(pruned), pred_loader())
     assert "per_example" not in out
+
+
+# ---- the variant sections, actually executed --------------------------------
+
+class ExcerptDataset(torch.utils.data.Dataset):
+    """A pred_spec dataset that also carries `processed_data.clean_prompt`,
+    so `prompt_excerpts` runs for real rather than degrading to None."""
+
+    def __init__(self, rows, variant):
+        self.rows = rows
+        self.processed_data = [
+            {"clean_prompt": f"scenario {i} under {variant}. Which do you pick?"}
+            for i in range(len(rows))]
+
+    def __len__(self):
+        return len(self.rows)
+
+    def __getitem__(self, i):
+        return self.rows[i]
+
+
+class VariantContext(MetricsContext):
+    """MetricsContext plus the gate plumbing `_variant_side` needs."""
+
+    def __init__(self, model, variants_available=K.VARIANTS):
+        super().__init__(model)
+        self.has_pred_spec = True
+        self.cli.verify = False
+        self.circuit_masks = random_masks_for(model, seed=7)
+        self.knockout_masks = M.knockout_masks(self.circuit_masks, "finest")
+        apply_node_masks(model, self.circuit_masks)
+        self.loaders = {
+            v: torch.utils.data.DataLoader(
+                ExcerptDataset(list(pred_loader(n=4, bs=4).dataset), v),
+                batch_size=2, shuffle=False)
+            for v in variants_available}
+
+    def variant_loader(self, variant):
+        loader = self.loaders.get(variant)
+        if loader is None:
+            return None, f"the tiny task cannot build '{variant}' prompts"
+        return loader, ""
+
+    def hook_for(self, bank_name="task"):
+        return None                      # interchange installs no hook
+
+    @contextlib.contextmanager
+    def all_gates_open(self):
+        open_all_gates(self.node_model)
+        try:
+            yield self.node_model
+        finally:
+            apply_node_masks(self.node_model, self.circuit_masks)
+
+    @contextlib.contextmanager
+    def circuit(self, masks, verify=False):
+        apply_node_masks(self.node_model, masks)
+        try:
+            yield self.node_model
+        finally:
+            apply_node_masks(self.node_model, self.circuit_masks)
+
+
+@pytest.mark.parametrize("variant", K.VARIANTS)
+def test_t9_variant_side_runs_three_configurations_and_audits_them(variant):
+    """The real `_variant_side`, both variants, on the tiny model.
+
+    The end-to-end task has no pressure clause, so both variants skip there and
+    this path — the live full-model reference, the per-example collection under
+    a variant, the flip audit off it — is otherwise never executed.
+    """
+    _, pruned = build_pair()
+    ctx = VariantContext(pruned)
+    section = K.KnockoutEvaluation()._variant_side(ctx, variant)
+
+    assert section["variant"] == variant
+    assert section["description"] == variants.VARIANT_DESCRIPTIONS[variant]
+    assert section["label_convention"] == variants.LABEL_CONVENTION
+    assert set(section["rows"]) == {"full", "circuit", "knockout"}
+
+    # KL is against a LIVE full-model forward on these prompts, so the
+    # all-gates-open row is the reference and must come out exact.
+    assert section["rows"]["full"]["exact_match"] == 1.0
+    assert section["rows"]["full"]["kl_div"] < 1e-6
+
+    head = section["headline"]
+    assert head["full_minus_knockout"] == pytest.approx(
+        head["full_accuracy"] - head["knockout_accuracy"])
+
+    # The audit ran off the knockout pass, and its rows did not stay behind in
+    # the metrics dict.
+    assert "per_example" not in section["rows"]["knockout"]
+    per_example = section["per_example"]
+    assert len(per_example) == section["rows"]["knockout"]["n"] == 4
+    assert [r["example_id"] for r in per_example] == [0, 1, 2, 3]
+    for row in per_example:
+        assert row["status"] in {"stayed_deceptive", "flipped_honest", "other"}
+        # The live reference is available here, so no choice is unobserved.
+        assert row["full_choice"] in {"deceptive", "honest", "other"}
+        assert variant in row["prompt_excerpt"]
+
+    flips = section["flip_summary"]
+    assert (flips["n_stayed_deceptive"] + flips["n_flipped_honest"]
+            + flips["n_other"]) == 4
+    assert flips["n_full_unknown"] == 0
+    assert section["flip_audit_reason"] == ""
+
+
+def test_t9_variant_side_records_why_it_stood_down():
+    _, pruned = build_pair()
+    ctx = VariantContext(pruned, variants_available=())
+    section = K.KnockoutEvaluation()._variant_side(ctx, "no_pressure")
+    assert section == {"variant": "no_pressure",
+                       "skipped": "the tiny task cannot build 'no_pressure' "
+                                  "prompts"}
