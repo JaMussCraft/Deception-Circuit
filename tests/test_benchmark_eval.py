@@ -868,6 +868,54 @@ def test_a_screen_that_finds_nothing_says_why_its_rows_were_unparsed(capsys):
     assert printed.count("unparsed (") == B.UNPARSED_SAMPLES
 
 
+def test_a_successful_screen_records_why_each_row_got_its_label():
+    """The sibling test above covers the screen that *raises*. A screen that
+    succeeds is written to `benchmarks.json` and read months later, and it used
+    to carry `screen_labels` and nothing else -- so a dataset that discarded
+    43% of what it judged could not be read at all without a GPU rerun.
+
+    `lb:harm-pressure-knowledge-report` is the case: UNPARSED there means the
+    judge emitted no verdict, or the model refused, or the model claimed
+    knowledge the belief step never established -- one broken judge and two
+    facts about the model. HONEST is likewise two branches, one of which
+    ("claimed_known_answer") implies the item was knowable and the other
+    ("denied_without_knowledge") that it was not. Hence `raw` per label, not
+    just per unparsed row.
+    """
+    def reasons(item, response):
+        return {
+            0: (base.DECEPTIVE, "denied_known_answer"),
+            1: (base.HONEST, "claimed_known_answer"),
+            2: (base.UNPARSED, "REFUSE"),
+            3: (base.UNPARSED, "claimed_without_demonstrated_knowledge"),
+        }[int(item.item_id[1:]) % 4]
+
+    ctx = make_ctx(make_cli(benchmark_n_per_dataset=2,
+                            benchmark_screen_budget=16))
+    screen = _run_screen(ctx, FakeBench(make_items(40), reasons))
+    stats = screen.stats
+    raw = stats["screen_raw"]
+
+    # Every judged row is accounted for, and each label's reasons sum to the
+    # count `screen_labels` already reported -- so the two cannot drift.
+    assert set(raw) == {base.DECEPTIVE, base.HONEST, base.UNPARSED}
+    assert sum(sum(b.values()) for b in raw.values()) == stats["judged"]
+    for label, bucket in raw.items():
+        assert sum(bucket.values()) == stats["screen_labels"][label], label
+
+    # The distinction the counts cannot make: two UNPARSED routes that mean
+    # different things, kept apart rather than summed.
+    assert set(raw[base.UNPARSED]) == {
+        "REFUSE", "claimed_without_demonstrated_knowledge"}
+    assert min(raw[base.UNPARSED].values()) > 0
+    # ...and the same for the labels that were *kept*, which is where the
+    # knowledge-report scenario hides whether an item was knowable at all.
+    assert raw[base.HONEST] == {"claimed_known_answer":
+                                stats["screen_labels"][base.HONEST]}
+    assert raw[base.DECEPTIVE] == {"denied_known_answer":
+                                   stats["screen_labels"][base.DECEPTIVE]}
+
+
 def test_the_unparsed_reasons_are_capped_so_a_judge_verdict_cannot_flood_them():
     """`raw` is free-form: MASK and Liars' Bench both put judge text in it."""
     reasons = {"reason %d" % i: 1 for i in range(20)}

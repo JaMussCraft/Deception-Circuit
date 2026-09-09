@@ -666,11 +666,25 @@ def run_screen(ctx, bench, client, dataset) -> Screen:
     belief_judge_failed = 0
     chunk_size = max(target * SCREEN_CHUNK_FACTOR, cli.benchmark_gen_batch_size)
     label_counts = {}
-    # `raw` for every UNPARSED row, and a few of the responses behind them.
-    # Only ever read when the screen selected nothing, which is the one time
-    # nobody can go and look at the responses afterwards -- the screen is not
-    # written on that path.
-    unparsed_reasons = {}
+    # `raw` for every judged row, bucketed by label, plus a few of the
+    # responses behind the unparsed ones.
+    #
+    # `screen_labels` says how many rows a screen discarded; only this says
+    # why, and the reasons behind one label are not interchangeable. UNPARSED
+    # alone covers a judge that emitted no verdict (broken judge), a model that
+    # refused (a fact about the model), and a response the adapter could not
+    # read (a fact about the adapter) -- three findings that call for three
+    # different responses. Kept for HONEST and DECEPTIVE too, because `raw` is
+    # also where a scenario records which branch produced the row: Liars' Bench
+    # knowledge-report scores DENIED_KNOWLEDGE as honest against an item the
+    # model does not know and deceptive against one it does, and the counts
+    # cannot be told apart without it.
+    #
+    # This used to be UNPARSED-only and read only when the screen selected
+    # nothing. That left a *successful* screen with no record of why it
+    # discarded what it discarded -- recoverable only by a GPU rerun, which is
+    # the cost `_no_deception_message` already exists to avoid.
+    raw_counts = {}
     unparsed_samples = []
 
     # The plan is explicit for outcome-kind benchmarks: "if honest bycatch from
@@ -721,9 +735,10 @@ def run_screen(ctx, bench, client, dataset) -> Screen:
 
         for index, (item, row) in enumerate(zip(chunk, rows)):
             label_counts[row["label"]] = label_counts.get(row["label"], 0) + 1
+            reason = row.get("raw")
+            bucket = raw_counts.setdefault(row["label"], {})
+            bucket[reason] = bucket.get(reason, 0) + 1
             if row["label"] == base.UNPARSED:
-                reason = row.get("raw")
-                unparsed_reasons[reason] = unparsed_reasons.get(reason, 0) + 1
                 if len(unparsed_samples) < UNPARSED_SAMPLES:
                     unparsed_samples.append((reason, responses[index]))
             prompt = clean_ids[index][clean_mask[index].bool()].tolist()
@@ -748,7 +763,8 @@ def run_screen(ctx, bench, client, dataset) -> Screen:
             print("  %s: unparsed (%s): %r" % (dataset, reason,
                                                (response or "")[:200]))
         raise RuntimeError(_no_deception_message(
-            dataset, screened, label_counts, unparsed_reasons, no_belief))
+            dataset, screened, label_counts,
+            raw_counts.get(base.UNPARSED, {}), no_belief))
 
     screen.items = [s["item"] for s in selected]
     screen.prompts = [s["text"] for s in selected]
@@ -769,6 +785,10 @@ def run_screen(ctx, bench, client, dataset) -> Screen:
         # the model, the other is a fact about an API.
         "dropped_belief_judge_failed": belief_judge_failed,
         "screen_labels": label_counts,
+        # `{label: {raw: count}}` -- the reason breakdown behind
+        # `screen_labels`. See `raw_counts` above for why a bare label count is
+        # not enough to read a screen.
+        "screen_raw": raw_counts,
         "early_stopped": screened < len(candidates),
         "budget": budget,
         # True whenever the screen stopped with the reference pool still
