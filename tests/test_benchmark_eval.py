@@ -819,6 +819,65 @@ def test_a_benchmark_the_model_is_never_deceptive_on_raises_rather_than_reportin
         _run_screen(ctx, bench)
 
 
+def test_a_screen_that_finds_nothing_says_why_its_rows_were_unparsed(capsys):
+    """The counts alone cannot tell a refusing model from a broken adapter.
+
+    `lb:harm-pressure-choice` failed with `Labels seen: {'unparsed': 195,
+    'honest': 17}` and nothing else, and `parse_judgement` has two UNPARSED
+    branches ("no_belief", "no_letter") that mean completely different things.
+    Which one it was decided whether the finding was about llama-3.1-8B or
+    about this repo -- and answering it needed a GPU rerun, because the screen
+    is not written on the path that raises. So `raw` travels with the failure.
+    """
+    class Dropping(FakeBench):
+        def belief_request(self, item):
+            return [{"name": "p", "messages": item.messages}]
+
+        def parse_belief(self, item, probes):
+            # A quarter of the pool never reaches a judgement at all.
+            return "b" if int(item.item_id[1:]) % 4 else None
+
+    def unreadable(item, response):
+        index = int(item.item_id[1:])
+        return (base.UNPARSED, "no_letter" if index % 2 else "refused")
+
+    ctx = make_ctx(make_cli(benchmark_n_per_dataset=2,
+                            benchmark_screen_budget=16))
+    with pytest.raises(RuntimeError) as caught:
+        _run_screen(ctx, Dropping(make_items(40), unreadable))
+
+    message = str(caught.value)
+    assert "Unparsed reasons:" in message
+    ranked = [(name, int(n)) for name, n
+              in re.findall(r"(no_letter|refused) x(\d+)", message)]
+    assert {name for name, _ in ranked} == {"no_letter", "refused"}, message
+    # The reasons account for every unparsed row, and the dominant one is named
+    # first -- which is the whole point of printing them. Which of the two
+    # dominates is a property of the seeded shuffle, so the assertion is on the
+    # ordering, not on either name.
+    assert sum(n for _, n in ranked) == 12
+    assert [n for _, n in ranked] == sorted((n for _, n in ranked), reverse=True)
+    # ...and the candidates that never got as far as a judgement are counted
+    # apart, not silently missing from the arithmetic.
+    assert "4 further candidates were dropped" in message
+
+    # The responses themselves go to the log, not into the message: they are
+    # the evidence for whether the model refused or the parse missed, and they
+    # are far too long to store in `benchmarks.json`.
+    printed = capsys.readouterr().out
+    assert printed.count("unparsed (") == B.UNPARSED_SAMPLES
+
+
+def test_the_unparsed_reasons_are_capped_so_a_judge_verdict_cannot_flood_them():
+    """`raw` is free-form: MASK and Liars' Bench both put judge text in it."""
+    reasons = {"reason %d" % i: 1 for i in range(20)}
+    reasons["x" * 400] = 99
+    message = B._no_deception_message("d", 10, {base.UNPARSED: 119}, reasons, 0)
+    assert len(message) < 800
+    assert "x" * (B._REASON_WIDTH + 1) not in message
+    assert "and %d more" % (21 - B._REASON_LIMIT) in message
+
+
 # ==============================================================================
 # THE REFERENCE POOL
 # ==============================================================================

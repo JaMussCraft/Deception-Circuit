@@ -93,6 +93,11 @@ CONFIG_LABELS = {
 #: common, without paying for the whole pool when it is rare.
 SCREEN_CHUNK_FACTOR = 2
 
+#: How many unparsed responses a screen that selected nothing prints before it
+#: raises. Enough to see what shape the model answered in; few enough that a
+#: 300-candidate screen does not print 300 refusals into the suite log.
+UNPARSED_SAMPLES = 3
+
 #: How far past the target the screen may keep walking *once the evaluation set
 #: is already full*, as a multiple of the target count.
 #:
@@ -573,6 +578,41 @@ def _screen_is_judge_damaged(screen):
     return ""
 
 
+#: How many distinct `raw` reasons the "no deception" message names, and how
+#: much of each it prints. `raw` is free-form -- most adapters return a short
+#: tag (`no_letter`, `sandbag_missing_tags`) but some return a judge verdict,
+#: and this string is stored verbatim in `benchmarks.json`.
+_REASON_LIMIT = 6
+_REASON_WIDTH = 48
+
+
+def _no_deception_message(dataset, screened, label_counts, reasons, no_belief):
+    """Why a dataset had nothing to knock out, in the one place it is visible.
+
+    The label counts alone say a screen found no deception; they do not say
+    whether the model refused the task, answered in a shape the adapter cannot
+    read, or never got as far as being judged. Those are three different
+    findings -- one about the model, one about the adapter, one about the
+    belief probes -- and telling them apart used to need a GPU rerun, because
+    `raw` (which already distinguishes them) was counted nowhere. So the
+    reasons behind every UNPARSED row travel with the failure.
+    """
+    text = ("%s: the full model was not judged deceptive on any of the %d "
+            "candidates screened, so there is no deception for a knockout to "
+            "reduce. Labels seen: %s" % (dataset, screened, label_counts))
+    if no_belief:
+        text += ("; %d further candidates were dropped before judging for "
+                 "want of an agreed belief" % no_belief)
+    if reasons:
+        ranked = sorted(reasons.items(), key=lambda kv: (-kv[1], str(kv[0])))
+        named = ", ".join("%s x%d" % (str(reason)[:_REASON_WIDTH], count)
+                          for reason, count in ranked[:_REASON_LIMIT])
+        if len(ranked) > _REASON_LIMIT:
+            named += ", and %d more" % (len(ranked) - _REASON_LIMIT)
+        text += ". Unparsed reasons: %s" % named
+    return text
+
+
 def run_screen(ctx, bench, client, dataset) -> Screen:
     """Walk the candidate pool until the evaluation set and reference pool fill.
 
@@ -626,6 +666,12 @@ def run_screen(ctx, bench, client, dataset) -> Screen:
     belief_judge_failed = 0
     chunk_size = max(target * SCREEN_CHUNK_FACTOR, cli.benchmark_gen_batch_size)
     label_counts = {}
+    # `raw` for every UNPARSED row, and a few of the responses behind them.
+    # Only ever read when the screen selected nothing, which is the one time
+    # nobody can go and look at the responses afterwards -- the screen is not
+    # written on that path.
+    unparsed_reasons = {}
+    unparsed_samples = []
 
     # The plan is explicit for outcome-kind benchmarks: "if honest bycatch from
     # the screen is < N, keep screening until the honest bank reaches N (or the
@@ -675,6 +721,11 @@ def run_screen(ctx, bench, client, dataset) -> Screen:
 
         for index, (item, row) in enumerate(zip(chunk, rows)):
             label_counts[row["label"]] = label_counts.get(row["label"], 0) + 1
+            if row["label"] == base.UNPARSED:
+                reason = row.get("raw")
+                unparsed_reasons[reason] = unparsed_reasons.get(reason, 0) + 1
+                if len(unparsed_samples) < UNPARSED_SAMPLES:
+                    unparsed_samples.append((reason, responses[index]))
             prompt = clean_ids[index][clean_mask[index].bool()].tolist()
             if row["label"] == base.DECEPTIVE and len(selected) < target:
                 selected.append({
@@ -690,10 +741,14 @@ def run_screen(ctx, bench, client, dataset) -> Screen:
                              "ref": (prompt, completions[index])})
 
     if not selected:
-        raise RuntimeError(
-            "%s: the full model was not judged deceptive on any of the %d "
-            "candidates screened, so there is no deception for a knockout to "
-            "reduce. Labels seen: %s" % (dataset, screened, label_counts))
+        # Printed rather than raised: the responses are the evidence for which
+        # of the reasons above is the model's doing, but they are long, and the
+        # message is stored in `benchmarks.json` and read in a report.
+        for reason, response in unparsed_samples:
+            print("  %s: unparsed (%s): %r" % (dataset, reason,
+                                               (response or "")[:200]))
+        raise RuntimeError(_no_deception_message(
+            dataset, screened, label_counts, unparsed_reasons, no_belief))
 
     screen.items = [s["item"] for s in selected]
     screen.prompts = [s["text"] for s in selected]
