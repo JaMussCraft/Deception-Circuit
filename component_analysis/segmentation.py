@@ -90,10 +90,6 @@ class Segment:
         Pressure Clause, so a Segment can be legitimately empty."""
         return "present" if self.spans else "absent"
 
-    @property
-    def n_tokens(self) -> int:
-        return sum(end - start for start, end in self.spans)
-
     def token_indices(self) -> List[int]:
         return [i for start, end in self.spans for i in range(start, end)]
 
@@ -113,9 +109,6 @@ class Segmentation:
     readout: int
     segments: Dict[str, Segment] = field(default_factory=dict)
     scheme: str = ""
-
-    def __getitem__(self, name: str) -> Segment:
-        return self.segments[name]
 
     @property
     def names(self) -> List[str]:
@@ -616,11 +609,14 @@ def apply_overrides(segmentation: Segmentation, overrides: Dict[str, str],
 # ==============================================================================
 
 def prediction_position(tokenizer, prompt: str) -> int:
-    """The position the task reads its answer at: `prefix_length - 1`.
+    """Where the Readout falls: `prefix_length - 1`.
 
     `DeceptionDatasetLlama` and `STDDatasetLlama` both set `prefix_length` to
     the unpadded token count of the clean prompt and `pred_spec` reads
-    `prefix_length - 1`, so this is the same number by the same route.
+    `prefix_length - 1`, so this is the same number by the same route — which
+    is why `test_the_readout_agrees_with_the_dataset_class_the_task_loads`
+    checks it against the dataset class rather than against this function.
+    The name mirrors the repo's own `pred_pos` / `pred_spec` in `tasks/`.
     """
     return len(tokenizer.encode(prompt, add_special_tokens=False)) - 1
 

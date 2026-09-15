@@ -17,12 +17,22 @@ from __future__ import annotations
 
 import json
 import os
+import time
 from typing import Dict, List, Optional, Sequence
 
 from component_analysis import sampling, segmentation as seg
 
 SEGMENTATION_FILENAME = "segmentation.json"
 SAMPLE_FILENAME = "sample.json"
+
+#: Bumped when the shape of either file changes, as `head_table.py` does for
+#: the head table, so a reader can tell an old cell from a new one.
+SCHEMA_VERSION = 1
+
+
+def _header() -> dict:
+    return {"schema_version": SCHEMA_VERSION,
+            "created": time.strftime("%Y-%m-%dT%H:%M:%S")}
 
 
 # ==============================================================================
@@ -80,8 +90,7 @@ def resolve_split_segmentation(task: str, records: Sequence[dict], tokenizer, *,
     not others is a property of the data and is only counted.
     """
     overrides = dict(overrides or {})
-    ids = list(ids) if ids is not None else [
-        sampling.record_id(record, i) for i, record in enumerate(records)]
+    ids = list(ids) if ids is not None else sampling.record_ids(records)
 
     resolved, overlaps = [], []
     matched = {name: 0 for name in overrides}
@@ -117,6 +126,7 @@ def write_segmentation(cell_dir: str, segmentations: Sequence, *, task: str,
     sources = ({name: segmentations[0].segments[name].source for name in names}
                if segmentations else {})
     payload = {
+        **_header(),
         "task": task,
         "scheme": segmentations[0].scheme if segmentations else None,
         "split": split,
@@ -159,7 +169,7 @@ def write_sample(cell_dir: str, sample, *, task: str, split: str = "test",
     """Write `sample.json` for one cell."""
     os.makedirs(cell_dir, exist_ok=True)
     path = os.path.join(cell_dir, SAMPLE_FILENAME)
-    payload = {"task": task, "split": split, **sample.as_json(),
+    payload = {**_header(), "task": task, "split": split, **sample.as_json(),
                "meta": meta or {}}
     with open(path, "w") as handle:
         json.dump(payload, handle, indent=2)

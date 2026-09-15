@@ -51,6 +51,12 @@ def record_id(record: dict, index: int) -> str:
     return str(value) if value else f"index{index:06d}"
 
 
+def record_ids(records: Sequence[dict]) -> List[str]:
+    """`record_id` over a whole split, so the CLI, the segmentation and the
+    sample all key their output the same way."""
+    return [record_id(record, i) for i, record in enumerate(records)]
+
+
 # ==============================================================================
 # THE SAMPLE
 # ==============================================================================
@@ -85,7 +91,7 @@ class Sample:
     inactive_factors: Dict[str, Optional[str]]   # factor -> its only level
     strata: List[Stratum]
     ids: List[str]
-    indices: List[int]
+    indices: List[int]        # positions in the split AS LOADED (see as_json)
     marginals: Dict[str, Dict[str, int]]
 
     @property
@@ -103,6 +109,13 @@ class Sample:
                           for factor, counts in self.marginals.items()},
             "instance_ids": list(self.ids),
             "split_indices": list(self.indices),
+            "join_on": ("instance_ids. split_indices are positions in the "
+                        "split as the task's loader returns it, BEFORE the "
+                        "dataset class filters it — DeceptionDatasetLlama "
+                        "drops any record whose target or distractor is not a "
+                        "single token — so on a split that is not already "
+                        "prefiltered they do not index the dataset the causal "
+                        "analyses iterate. The ids always do."),
         }
 
 
@@ -170,8 +183,7 @@ def draw_sample(records: Sequence[dict], *, n: int = DEFAULT_N_CAUSAL,
     if n < 0:
         raise ValueError(f"--n-causal must not be negative, got {n}")
     records = list(records)
-    ids = list(ids) if ids is not None else [record_id(record, i)
-                                             for i, record in enumerate(records)]
+    ids = list(ids) if ids is not None else record_ids(records)
     if len(ids) != len(records):
         raise ValueError(f"{len(ids)} ids for {len(records)} records")
 

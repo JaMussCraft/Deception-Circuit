@@ -426,3 +426,24 @@ def test_an_item_the_question_never_names_is_refused(tokenizer):
     seg = S.resolve_segmentation("sdr", record, tokenizer)
     with pytest.raises(S.SegmentationError, match="item_2_question"):
         S.validate_segmentation(seg, record, tokenizer)
+
+
+def test_the_readout_agrees_with_the_dataset_class_the_task_loads(tokenizer):
+    """The Readout against `DeceptionDatasetLlama`, not against a re-derivation.
+
+    `prediction_position` recomputes `len(encode(prompt)) - 1`, which is the
+    same expression the dataset class uses, so comparing the two alone would
+    only restate it. This drives the record through the class the task's
+    dataloader actually builds and reads the `prefix_length` it stored, which
+    is the number `pred_spec` subtracts one from.
+    """
+    from dataset.deception_common import DeceptionDatasetLlama
+
+    record = sdr_record()
+    dataset = DeceptionDatasetLlama([record], tokenizer, max_length=256)
+    assert len(dataset.processed_data) == 1, \
+        "the fixture was dropped by the dataset class, so nothing is compared"
+
+    seg = S.resolve_segmentation("sdr", record, tokenizer)
+    assert seg.readout == dataset.processed_data[0]["prefix_length"] - 1
+    assert indices_of(seg, "readout") == [seg.readout]

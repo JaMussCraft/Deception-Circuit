@@ -156,10 +156,8 @@ def write_cell(cell_dir: str, circuit_spec, task_spec, rows, components,
 class TaskInstances:
     """One task's resolved Segments and its causal sample, ready to write."""
 
-    def __init__(self, task_spec, records, segmentations, report, sample,
-                 overrides):
+    def __init__(self, task_spec, segmentations, report, sample, overrides):
         self.task_spec = task_spec
-        self.records = records
         self.segmentations = segmentations
         self.report = report
         self.sample = sample
@@ -197,13 +195,13 @@ def resolve_instances(cli, resolved, *, tokenizer=None) -> dict:
     out = {}
     for task_spec in wanted:
         records = instances.load_records(task_spec, ANALYSIS_SPLIT)
-        ids = [sampling.record_id(record, i) for i, record in enumerate(records)]
+        ids = sampling.record_ids(records)
         segmentations, report = instances.resolve_split_segmentation(
             task_spec.name, records, tokenizer, overrides=overrides, ids=ids)
         sample = sampling.draw_sample(records, n=cli.n_causal, seed=cli.seed,
                                       ids=ids)
-        out[task_spec.label] = TaskInstances(task_spec, records, segmentations,
-                                             report, sample, overrides)
+        out[task_spec.label] = TaskInstances(task_spec, segmentations, report,
+                                             sample, overrides)
     return out
 
 
