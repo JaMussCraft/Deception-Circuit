@@ -71,7 +71,10 @@ The prompt shape shared by all three tasks: a system turn naming two items and
 designating one of them, a **Pressure Clause**, a user turn asking a one-word
 question about the two items, and a pre-filled assistant stem. Held constant so
 that a circuit difference is attributable to the mechanism, not the format.
-_Avoid_: template (reserved for **Template Variant**)
+_Avoid_: template (reserved for **Template Variant**). One carve-out: a field
+of a `TemplateVariant` — its intro, designation, question or stem — may be
+called a **template piece**, because that is what it is a piece of. The
+Scaffold is the shape those pieces render; a piece of it is a Scaffold piece.
 
 **Predicate**:
 The adjective pair applied to the designated item — failing/passing,
@@ -163,11 +166,13 @@ by role rather than by index:
 - **Inverse Predicate Token** — the adjective applied to the other item.
 
 **Item Mention**:
-One occurrence of an item word in a prompt. Each item is mentioned three
-times — in the intro, at the Designation Site (the designated item only), and
-in the user question — and a component attending to one mention is doing
-something different from one attending to another, so mentions are never
-pooled.
+One occurrence of an item word in a prompt. Each item is mentioned **four**
+times — in the intro, twice in the user question (once where the question names
+the pair, "miles or hours?", and once inside that item's quoted option), and,
+for the designated item only, at the Designation Site, which makes five for it.
+A component attending to one mention is doing something different from one
+attending to another, so mentions are never pooled: the two question mentions
+are separate Segments, not one.
 
 **Segment**:
 A named span of a prompt used as the unit for aggregating what a component
@@ -189,7 +194,7 @@ used by the pressure evaluations).
 The unit of interpretation: an attention head or an MLP block, identified by
 layer and index. Finer gates (attention neurons, MLP hidden and output
 dimensions) are collapsed onto their Component. A **Circuit Component** is one
-whose Component has any active gate in the circuit under study.
+whose Component has any active leaf gate in the circuit under study.
 
 **Component Role**:
 A label for what a Component does in the task, assigned only from the
