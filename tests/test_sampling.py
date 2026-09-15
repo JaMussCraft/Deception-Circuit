@@ -4,8 +4,9 @@ Library-seam tests for `component_analysis/sampling.py`.
 Descriptive analyses run over the whole test split; causal ones run over a
 fixed-seed sample whose ids are written out. The properties that matter to the
 caller are: the sample has the size asked for, it is stratified over every
-metadata factor that has more than one level, a task with only one level of
-every factor still gets its N, and the same seed gives the same instances.
+metadata factor that has more than one level, the strata come out as balanced
+as their populations allow, a task with only one level of every factor still
+gets its N, and the same seed gives the same instances.
 """
 
 from __future__ import annotations
@@ -57,6 +58,29 @@ def identity_only_records(n=300):
              "template_variant": "audit"} for i in range(n)]
 
 
+#: Three roomy strata and one holding two instances. An equal share of 100 over
+#: four strata is 25 each, which the tiny one cannot fill.
+TINY_STRATUM_SIZES = {("identity", 1, "audit"): 200,
+                      ("identity", 2, "audit"): 200,
+                      ("inversion", 1, "audit"): 200,
+                      ("inversion", 2, "lab"): 2}
+
+
+def one_tiny_stratum_records():
+    records = []
+    for key, size in TINY_STRATUM_SIZES.items():
+        designation, item_polarity, variant = key
+        for i in range(size):
+            records.append({
+                "instance_id": f"{designation[:3]}{item_polarity}"
+                               f"{variant[:3]}{i:04d}",
+                "designation_polarity": designation,
+                "item_polarity": item_polarity,
+                "template_variant": variant,
+            })
+    return records
+
+
 # ==============================================================================
 # TESTS
 # ==============================================================================
@@ -72,14 +96,21 @@ def test_a_balanced_fixture_is_sampled_evenly_over_every_stratum():
     assert len(set(sample.ids)) == 100
 
 
-def test_achieved_counts_track_the_populations_marginals():
-    """Proportional allocation: the sample's polarity balance is the split's."""
+def test_a_skewed_split_is_sampled_balanced_not_proportional():
+    """The draw equalises the strata, it does not reproduce the split.
+
+    `skewed_records` holds four non-empty strata of 509, 60, 213 and 218, and
+    569 of its 1000 rows are identity polarity. A proportional draw would give
+    57 identity and 43 inversion; the balanced one gives each stratum 25, so
+    the polarity contrast is evenly powered instead.
+    """
     sample = sampling.draw_sample(skewed_records(), n=100, seed=0)
 
-    assert sample.marginals["designation_polarity"] == {"identity": 57,
-                                                        "inversion": 43}
-    assert sample.marginals["template_variant"] == {"audit": 78, "lab": 22}
-    assert sum(sample.marginals["item_polarity"].values()) == 100
+    assert sample.n_drawn == 100
+    assert [stratum.achieved for stratum in sample.strata] == [25, 25, 25, 25]
+    assert sample.marginals["designation_polarity"] == {"identity": 50,
+                                                        "inversion": 50}
+    assert sample.marginals["template_variant"] == {"audit": 75, "lab": 25}
 
 
 def test_an_identity_only_task_still_returns_n_instances():
@@ -135,25 +166,38 @@ def test_asking_for_more_than_the_split_holds_returns_the_whole_split():
     assert sorted(sample.ids) == sorted(r["instance_id"] for r in records)
 
 
-def test_no_stratum_is_ever_drawn_beyond_what_it_holds():
-    """A tiny stratum beside large ones still gets its proportional share and
-    no more, and the allocation still sums to N."""
-    records = balanced_records(per_cell=50)
-    records = [r for r in records
-               if not (r["designation_polarity"] == "inversion"
-                       and r["item_polarity"] == 2
-                       and r["template_variant"] == "lab")][:351]
-    records += [dict(r, instance_id=f"rare{i}")
-                for i, r in enumerate(balanced_records(per_cell=2)[-2:])]
+def test_a_tiny_stratum_is_capped_and_its_surplus_goes_to_the_others():
+    """The balanced share a stratum cannot fill is redistributed, not lost.
 
-    sample = sampling.draw_sample(records, n=100, seed=2)
+    This is the case that makes `target` and `achieved` two different numbers,
+    which is why `sample.json` writes both: the tiny stratum falls short of the
+    equal share, and the strata with room take more than it.
+    """
+    sample = sampling.draw_sample(one_tiny_stratum_records(), n=100, seed=2)
+
     assert sample.n_drawn == 100
+    by_key = {tuple(s.key.values()): s for s in sample.strata}
+    tiny = by_key[("inversion", "2", "lab")]
+    assert tiny.available == 2
+    assert tiny.target == 25 and tiny.achieved == 2
+
+    absorbers = [s for s in sample.strata if s is not tiny]
+    assert all(s.achieved > s.target for s in absorbers)
+    achieved = [s.achieved for s in absorbers]
+    assert max(achieved) - min(achieved) <= 1, \
+        "the redistributed surplus is spread, not dumped on one stratum"
+    assert sum(achieved) + tiny.achieved == 100
     for stratum in sample.strata:
         assert stratum.achieved <= stratum.available
-        # Proportional quotas never exceed the stratum that produced them, so
-        # the draw always reaches its target; `achieved` is written out anyway
-        # for the balanced allocation the researcher may ask for instead.
-        assert stratum.achieved == stratum.target
+
+
+def test_the_sample_is_the_whole_stratum_when_every_one_is_too_small():
+    """N larger than the split: every stratum is capped, nothing is lost."""
+    records = one_tiny_stratum_records()
+    sample = sampling.draw_sample(records, n=10_000, seed=0)
+
+    assert sample.n_drawn == len(records)
+    assert sorted(sample.ids) == sorted(r["instance_id"] for r in records)
 
 
 def test_the_sample_json_records_ids_and_achieved_counts(tmp_path):
@@ -162,7 +206,9 @@ def test_the_sample_json_records_ids_and_achieved_counts(tmp_path):
 
     assert payload["n_requested"] == 50 and payload["n_drawn"] == 50
     assert payload["seed"] == 4
+    assert payload["allocation"].startswith(sampling.ALLOCATION)
     assert payload["instance_ids"] == sample.ids
+    assert all("target" in s and "achieved" in s for s in payload["strata"])
     assert sum(s["achieved"] for s in payload["strata"]) == 50
     for stratum in payload["strata"]:
         assert set(stratum["key"]) == set(sampling.DEFAULT_FACTORS)

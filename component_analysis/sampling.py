@@ -15,19 +15,23 @@ fields at all, so a factor with one level (or no level, which is the same
 thing) is recorded as inactive and the draw falls back to a plain seeded sample
 of N. A missing level is a property of the dataset, never a failure here.
 
-Allocation is **proportional**: a stratum holding 57% of the split gets 57% of
-the sample, by largest remainder, so the sample's marginals reproduce the
-split's and a polarity effect read off the sample is not an artefact of the
-draw. Under proportional allocation a quota can never exceed the stratum that
-produced it, so `target` and `achieved` always agree; both are written out
-anyway, because a balanced allocation — equal N per stratum, which the
-researcher may want instead — can fall short on a small stratum, and a reader
-of `sample.json` should not have to know which allocation produced it.
+Allocation is **balanced** (researcher's decision, 2026-09-15): N is spread as
+equally as the populations allow, rather than proportionally. A proportional
+draw reproduces the split's marginals, which is what you want for describing
+the split — but the causal analyses are comparing the levels of a factor
+against each other, and on the SDR test split proportional allocation gives the
+`inversion / lab` cell one instance where balanced gives it twelve. A contrast
+read off one instance is not a contrast. The price is that the sample no longer
+represents the split, so a rate read off the sample is not the split's rate.
+
+`target` and `achieved` are therefore two different numbers and `sample.json`
+writes both: `target` is the equal share a stratum was aiming at, `achieved`
+what it could give, which is smaller on a stratum too small to fill its share
+and larger on the strata that absorb that stratum's surplus.
 """
 
 from __future__ import annotations
 
-import math
 import random
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Sequence, Tuple
@@ -37,6 +41,10 @@ DEFAULT_FACTORS = ("designation_polarity", "item_polarity", "template_variant")
 
 DEFAULT_N_CAUSAL = 100
 DEFAULT_SEED = 0
+
+#: How N is spread over the strata, recorded in `sample.json` so a reader of a
+#: written sample never has to guess which allocation produced it.
+ALLOCATION = "balanced"
 
 
 def record_id(record: dict, index: int) -> str:
@@ -103,7 +111,9 @@ class Sample:
             "n_requested": self.n_requested, "n_drawn": self.n_drawn,
             "seed": self.seed, "factors": list(self.factors),
             "inactive_factors": dict(self.inactive_factors),
-            "allocation": "proportional (largest remainder)",
+            "allocation": f"{ALLOCATION} (equal share per stratum, capped by "
+                          f"each stratum's population, surplus redistributed "
+                          f"round-robin to the strata with room)",
             "strata": [stratum.as_json() for stratum in self.strata],
             "marginals": {factor: dict(counts)
                           for factor, counts in self.marginals.items()},
@@ -140,39 +150,51 @@ def _active_factors(records: Sequence[dict], factors: Sequence[str]):
     return active, inactive
 
 
-def allocate(sizes: Sequence[int], n: int) -> List[int]:
-    """Proportional allocation of `n` over strata of `sizes`, largest remainder.
+def allocate(sizes: Sequence[int], n: int) -> Tuple[List[int], List[int]]:
+    """Balanced allocation of `n` over strata of `sizes`.
 
-    `sum(result) == min(n, sum(sizes))`, and no stratum is allocated more than
-    it holds. The second property is free here rather than earned: a
-    proportional quota `size * n / total` cannot exceed `size` once `n` is
-    capped at `total`. The `counts[i] < sizes[i]` guard below is therefore
-    never the binding constraint under this allocation; it is kept so that a
-    balanced allocation, added later, can reuse the same rounding.
+    Returns `(targets, counts)`:
+
+    - `targets` is the **equal share** — `n // k` for each of the `k` non-empty
+      strata, plus one more for the first `n % k` of them in the order they
+      were given, which is the sorted stratum-key order `draw_sample` builds.
+      It is what a stratum would get if every stratum had room, and it is
+      recorded so `sample.json` says what the draw was aiming at.
+    - `counts` is what can actually be drawn: the target capped by the
+      stratum's population, with the surplus from any capped stratum handed
+      round-robin to the strata that still have room. Round-robin rather than
+      largest-first keeps the strata that absorb the surplus within one of each
+      other, so the result stays as balanced as the populations allow.
+
+    `sum(counts) == min(n, sum(sizes))`. An empty stratum gets a target of zero
+    rather than an equal share it could never fill; it cannot arise from
+    `draw_sample`, which builds strata from the records they hold, but
+    `allocate` is callable on its own.
     """
+    targets = [0] * len(sizes)
+    counts = [0] * len(sizes)
     total = sum(sizes)
     n = min(n, total)
     if n == 0:
-        return [0] * len(sizes)
+        return targets, counts
 
-    quotas = [size * n / total for size in sizes]
-    counts = [min(int(math.floor(q)), size) for q, size in zip(quotas, sizes)]
-    order = sorted(range(len(sizes)),
-                   key=lambda i: (-(quotas[i] - math.floor(quotas[i])), i))
+    live = [i for i, size in enumerate(sizes) if size > 0]
+    share, extra = divmod(n, len(live))
+    for rank, i in enumerate(live):
+        targets[i] = share + (1 if rank < extra else 0)
+        counts[i] = min(targets[i], sizes[i])
 
     remaining = n - sum(counts)
     while remaining > 0:
-        moved = False
-        for i in order:
+        room = [i for i in live if counts[i] < sizes[i]]
+        if not room:                    # every stratum is full
+            break
+        for i in room:
             if remaining == 0:
                 break
-            if counts[i] < sizes[i]:
-                counts[i] += 1
-                remaining -= 1
-                moved = True
-        if not moved:                   # every stratum is full
-            break
-    return counts
+            counts[i] += 1
+            remaining -= 1
+    return targets, counts
 
 
 def draw_sample(records: Sequence[dict], *, n: int = DEFAULT_N_CAUSAL,
@@ -198,12 +220,12 @@ def draw_sample(records: Sequence[dict], *, n: int = DEFAULT_N_CAUSAL,
     # rather than the dataset's row order, decide the draw.
     keys = sorted(buckets, key=lambda k: tuple(str(v) for _, v in k))
     pools = [sorted(buckets[key]) for key in keys]
-    targets = allocate([len(pool) for pool in pools], n)
+    targets, counts = allocate([len(pool) for pool in pools], n)
 
     rng = random.Random(seed)
     strata: List[Stratum] = []
-    for key, pool, target in zip(keys, pools, targets):
-        drawn = sorted(rng.sample(pool, target)) if target else []
+    for key, pool, target, count in zip(keys, pools, targets, counts):
+        drawn = sorted(rng.sample(pool, count)) if count else []
         strata.append(Stratum(
             key={factor: ("" if value is None else value) for factor, value in key},
             available=len(pool), target=target,
