@@ -71,7 +71,13 @@ def record_ids(records: Sequence[dict]) -> List[str]:
 
 @dataclass
 class Stratum:
-    """One cell of the cross product of the active factors."""
+    """One cell of the cross product of the active factors.
+
+    `target` is the equal share this cell was allocated and `achieved` is what
+    it could give. Under balanced allocation the two differ whenever some cell
+    is too small to fill its share: that cell falls short and the cells that
+    absorb its surplus exceed theirs.
+    """
 
     key: Dict[str, str]
     available: int
@@ -111,9 +117,11 @@ class Sample:
             "n_requested": self.n_requested, "n_drawn": self.n_drawn,
             "seed": self.seed, "factors": list(self.factors),
             "inactive_factors": dict(self.inactive_factors),
-            "allocation": f"{ALLOCATION} (equal share per stratum, capped by "
-                          f"each stratum's population, surplus redistributed "
-                          f"round-robin to the strata with room)",
+            "allocation": ALLOCATION,
+            "allocation_rule": ("the equal share per stratum, capped by each "
+                                "stratum's population, with the surplus "
+                                "redistributed round-robin to the strata that "
+                                "still have room"),
             "strata": [stratum.as_json() for stratum in self.strata],
             "marginals": {factor: dict(counts)
                           for factor, counts in self.marginals.items()},
@@ -187,8 +195,11 @@ def allocate(sizes: Sequence[int], n: int) -> Tuple[List[int], List[int]]:
     remaining = n - sum(counts)
     while remaining > 0:
         room = [i for i in live if counts[i] < sizes[i]]
-        if not room:                    # every stratum is full
-            break
+        # A shortfall always leaves room somewhere, so this is an invariant
+        # rather than a case to handle: `n` is capped at the total, so if every
+        # stratum were full `counts` would already sum to the total, which is
+        # at least `n`, and `remaining` would not be positive.
+        assert room, "every stratum is full but the draw is still short"
         for i in room:
             if remaining == 0:
                 break

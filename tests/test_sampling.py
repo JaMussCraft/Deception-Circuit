@@ -206,7 +206,8 @@ def test_the_sample_json_records_ids_and_achieved_counts(tmp_path):
 
     assert payload["n_requested"] == 50 and payload["n_drawn"] == 50
     assert payload["seed"] == 4
-    assert payload["allocation"].startswith(sampling.ALLOCATION)
+    assert payload["allocation"] == sampling.ALLOCATION == "balanced"
+    assert payload["allocation_rule"]
     assert payload["instance_ids"] == sample.ids
     assert all("target" in s and "achieved" in s for s in payload["strata"])
     assert sum(s["achieved"] for s in payload["strata"]) == 50

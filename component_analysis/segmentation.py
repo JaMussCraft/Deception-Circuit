@@ -441,8 +441,8 @@ def segment_mechanism(record: dict, index: TokenIndex) -> _Builder:
         # refuses both rather than this raising, so an instance whose question
         # has drifted is reported by the validation pass with all the others.
         spans = _all_spans(question, record[slot], user_start)
-        builder.claim(f"{slot}_question_pair", spans[:1])
-        builder.claim(f"{slot}_question_option", spans[1:])
+        for mention, claimed in zip(QUESTION_MENTIONS, (spans[:1], spans[1:])):
+            builder.claim(f"{slot}_question_{mention}", claimed)
     builder.claim("intro", [intro])
     # This claim is the tie-break for the ".T"/"HE" token of the saved SDR
     # prompts: the sentence and the suffix are glued with no space, so one
