@@ -1209,11 +1209,11 @@ def test_a_missing_api_key_is_caught_before_a_model_is_ever_loaded(monkeypatch):
         raise AssertionError("build_session ran before the key check")
 
     monkeypatch.setattr(evaluate_circuit, "build_session", explode)
-    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
     monkeypatch.setattr("sys.argv", ["evaluate_circuit.py", "r", "--evals",
                                      "benchmarks", "--benchmarks",
                                      "mask:known_facts"])
-    with pytest.raises(SystemExit, match="OPENAI_API_KEY"):
+    with pytest.raises(SystemExit, match="OPENROUTER_API_KEY"):
         evaluate_circuit.main()
 
 
@@ -1235,7 +1235,7 @@ def test_dry_run_does_not_require_an_api_key(monkeypatch):
     monkeypatch.setattr(evaluate_circuit, "check_benchmark_keys", boom)
     monkeypatch.setattr(evaluate_circuit, "build_session",
                         lambda cli: (_ for _ in ()).throw(Reached()))
-    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
     monkeypatch.setattr("sys.argv",
                         ["evaluate_circuit.py", "r", "--evals", "benchmarks",
                          "--dry-run", "--benchmarks", "mask:known_facts"])

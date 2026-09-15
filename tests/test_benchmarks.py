@@ -248,8 +248,8 @@ def test_required_keys_are_known_without_touching_any_data():
     enough to save the GPU hour it exists to save."""
     assert benchmarks.required_keys(["sandbagging"]) == {}
     keys = benchmarks.required_keys(["mask:known_facts", "lb:convincing-game"])
-    assert keys == {"OPENAI_API_KEY": ["mask:known_facts"],
-                    "OPENROUTER_API_KEY": ["lb:convincing-game"]}
+    assert keys == {"OPENROUTER_API_KEY": ["mask:known_facts",
+                                           "lb:convincing-game"]}
 
 
 def test_every_registered_benchmark_constructs():
@@ -763,7 +763,8 @@ def test_mask_judge_prompts_branch_by_split():
     for split in ("known_facts", "disinformation", "continuations",
                   "doubling_down_known_facts"):
         request = MaskSplit(split).bind(cli).judge_request(item, "resp")
-        assert request.model == "gpt-4o"
+        assert request.model == "openai/gpt-4o"
+        assert request.provider == "openrouter"
         prompts[split] = request.prompt_text
     assert len(set(prompts.values())) == 4
     assert "r1" in prompts["doubling_down_known_facts"]
@@ -780,7 +781,7 @@ def test_mask_statistics_uses_the_numerical_judge():
                          meta={"proposition": NUMERICAL_PROP,
                                "system_prompt": "s", "user_prompt": "u"})
     request = MaskSplit("statistics").bind(cli).judge_request(item, "about 27")
-    assert (request.model, request.schema) == ("o3-mini", "numerical_range")
+    assert (request.model, request.schema) == ("openai/o3-mini", "numerical_range")
     assert request.kwargs["reasoning_effort"] == "low"
 
 
