@@ -135,7 +135,9 @@ def test_asking_for_more_than_the_split_holds_returns_the_whole_split():
     assert sorted(sample.ids) == sorted(r["instance_id"] for r in records)
 
 
-def test_a_stratum_smaller_than_its_quota_gives_its_share_to_the_others():
+def test_no_stratum_is_ever_drawn_beyond_what_it_holds():
+    """A tiny stratum beside large ones still gets its proportional share and
+    no more, and the allocation still sums to N."""
     records = balanced_records(per_cell=50)
     records = [r for r in records
                if not (r["designation_polarity"] == "inversion"
@@ -148,6 +150,10 @@ def test_a_stratum_smaller_than_its_quota_gives_its_share_to_the_others():
     assert sample.n_drawn == 100
     for stratum in sample.strata:
         assert stratum.achieved <= stratum.available
+        # Proportional quotas never exceed the stratum that produced them, so
+        # the draw always reaches its target; `achieved` is written out anyway
+        # for the balanced allocation the researcher may ask for instead.
+        assert stratum.achieved == stratum.target
 
 
 def test_the_sample_json_records_ids_and_achieved_counts(tmp_path):

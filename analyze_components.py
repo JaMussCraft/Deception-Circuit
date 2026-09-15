@@ -291,8 +291,13 @@ def dry_run(cli, resolved, *, tokenizer=None) -> int:
             print(f"    {files['segmentation']}")
             print(f"    {files['sample']}")
 
-    print("\n  The head table, the segmentation and the sample were written. "
-          "The analyses that need a model come from the later tickets.")
+    if resolved_instances:
+        print("\n  The head table, the segmentation and the sample were "
+              "written.", end=" ")
+    else:
+        print("\n  Only the head table was written: no task in this run has a "
+              "default segmentation.", end=" ")
+    print("The analyses that need a model come from the later tickets.")
     return 0
 
 

@@ -18,9 +18,11 @@ of N. A missing level is a property of the dataset, never a failure here.
 Allocation is **proportional**: a stratum holding 57% of the split gets 57% of
 the sample, by largest remainder, so the sample's marginals reproduce the
 split's and a polarity effect read off the sample is not an artefact of the
-draw. A stratum with fewer instances than its quota gives the shortfall to the
-others, which is why `achieved` is written beside `target` rather than assumed
-equal to it.
+draw. Under proportional allocation a quota can never exceed the stratum that
+produced it, so `target` and `achieved` always agree; both are written out
+anyway, because a balanced allocation — equal N per stratum, which the
+researcher may want instead — can fall short on a small stratum, and a reader
+of `sample.json` should not have to know which allocation produced it.
 """
 
 from __future__ import annotations
@@ -128,9 +130,12 @@ def _active_factors(records: Sequence[dict], factors: Sequence[str]):
 def allocate(sizes: Sequence[int], n: int) -> List[int]:
     """Proportional allocation of `n` over strata of `sizes`, largest remainder.
 
-    Never allocates more to a stratum than it holds; the shortfall goes to the
-    strata that still have room, which is what keeps `sum(result) == n`
-    whenever the strata hold `n` instances between them.
+    `sum(result) == min(n, sum(sizes))`, and no stratum is allocated more than
+    it holds. The second property is free here rather than earned: a
+    proportional quota `size * n / total` cannot exceed `size` once `n` is
+    capped at `total`. The `counts[i] < sizes[i]` guard below is therefore
+    never the binding constraint under this allocation; it is kept so that a
+    balanced allocation, added later, can reuse the same rounding.
     """
     total = sum(sizes)
     n = min(n, total)
