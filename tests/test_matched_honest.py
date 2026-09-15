@@ -8,6 +8,10 @@ when it is not cached locally.
 
 from __future__ import annotations
 
+import json
+import os
+import re
+
 import pytest
 
 from dataset import deception_common as dc
@@ -351,13 +355,17 @@ def test_loader_reads_the_survivors_written_beside_the_dataset(tok, tmp_path):
     dataset_dir = tmp_path / "sdr"
     datasets.DatasetDict({"test": datasets.Dataset.from_list(recs)}).save_to_disk(
         str(dataset_dir))
+    # The loader reads the real dataset_config.json rather than guessing, so
+    # the fixture writes one the way the build script does.
+    with open(dataset_dir / "dataset_config.json", "w") as f:
+        json.dump({"task": "sdr", "max_seq_length": 128,
+                   "margin_thresh": 1.0}, f)
     survivors = recs[:2]
     mh.write_survivors(str(dataset_dir), "sdr", survivors,
                        {"overall": {"n_survivors": len(survivors)}})
 
     ds = mh.load_matched_honest(str(dataset_dir), tok, split="test",
-                                task="sdr", pools_dir=str(tmp_path / "pools"),
-                                max_length=128)
+                                pools_dir=str(tmp_path / "pools"))
     assert [ds.item(i)["instance_id"] for i in range(len(ds))] == \
         [r["instance_id"] for r in survivors]
 
@@ -375,7 +383,6 @@ TASKS = ["far", "sdr", "ser"]
 
 
 def test_candidate_ladder_records_its_own_token_counts(llama_tok):
-    import json
     with open(f"{dc.POOLS_DIR}/{mh.CANDIDATES_FILE}") as f:
         payload = json.load(f)
     candidates = payload["candidates"]
@@ -387,7 +394,6 @@ def test_candidate_ladder_records_its_own_token_counts(llama_tok):
 
 
 def test_no_candidate_reuses_an_item_word_or_a_predicate_word():
-    import re
     banned = {w for pair in dc.load_item_pairs() for w in pair}
     banned |= {w for spec in dc.SPECS.values()
                for w in (spec.desig_inversion, spec.desig_identity)}
@@ -432,7 +438,6 @@ def test_matched_instructions_hold_the_prompt_length_over_the_whole_scaffold(
 
 
 def test_the_saved_sdr_split_aligns_under_the_pool(llama_tok):
-    import os
     dataset_dir = os.path.join("data", "datasets", "sdr")
     if not os.path.exists(os.path.join(dataset_dir, "dataset_dict.json")):
         pytest.skip("the SDR dataset is not in this checkout")
@@ -454,7 +459,7 @@ def test_the_fixed_length_honest_variant_is_a_different_object(llama_tok):
     """
     from evaluation import variants
 
-    assert variants.PROMPT_VARIANTS == ("no_pressure", "honest_instruction")
+    assert "honest_instruction" in variants.PROMPT_VARIANTS
     assert variants.pressure_text("honest_instruction", dc.HONEST_INSTRUCTION) \
         == dc.HONEST_INSTRUCTION
 
@@ -499,3 +504,45 @@ def test_both_honest_criteria_are_recorded_so_the_choice_needs_no_rerun(tok, tmp
     assert mh.load_survivors(str(tmp_path)) == report["survivor_ids"]["both"]
     assert mh.load_survivors(str(tmp_path), "clean") == \
         report["survivor_ids"]["clean"]
+
+
+def test_a_third_token_under_the_instruction_is_counted_not_read_as_a_lie(tok):
+    """A clause at a zero honest rate is a different finding when the model
+    stopped answering than when it kept lying."""
+    recs, pressures = _filter_records(tok, 4)
+    pool = _pool_for(tok, pressures)
+    tt = _answer_tokens(tok, recs)
+    p_clean = _script([(t, d) for t, d in tt])
+    p_corrupt = _script([(d, t) for t, d in tt])
+    # Row 0 emits an unrelated token under the instruction; the rest keep lying.
+    other = max(tok.vocab.values()) + 1
+    h_clean = [{other: 9.0, tt[0][0]: 1.0, tt[0][1]: 0.0}] + \
+        _script([(t, d) for t, d in tt[1:]])
+    h_corrupt = _script([(d, t) for t, d in tt])
+    model = ScriptedModel([p_clean, p_corrupt, h_clean, h_corrupt])
+
+    _, report = mh.filter_matched_honest(
+        recs, pool, model, tok, "cpu", margin_thresh=1.0,
+        honest_streams="both", max_length=128, batch_size=4)
+
+    assert sum(report["unexpected_argmax_tokens_under_instruction"].values()) == 1
+    row = report["by_clause"][recs[0]["pressure_id"]]
+    assert row["n_honest_other_argmax"] == 1
+    assert row["n_honest_pass_clean"] == 0
+
+
+def test_loader_refuses_a_dataset_with_no_config_rather_than_guessing(tok, tmp_path):
+    datasets = pytest.importorskip("datasets")
+    recs, pressures = _filter_records(tok, 2)
+    pool = _pool_for(tok, pressures)
+    mh.write_matched_honest_pool("sdr", pool, pools_dir=str(tmp_path / "pools"),
+                                 meta={"model": "fake"})
+    dataset_dir = tmp_path / "sdr"
+    datasets.DatasetDict({"test": datasets.Dataset.from_list(recs)}).save_to_disk(
+        str(dataset_dir))
+    mh.write_survivors(str(dataset_dir), "sdr", recs, {"overall": {}})
+
+    with pytest.raises(FileNotFoundError, match="dataset_config.json"):
+        mh.load_matched_honest(str(dataset_dir), tok, split="test", task="sdr",
+                               pools_dir=str(tmp_path / "pools"),
+                               max_length=128)

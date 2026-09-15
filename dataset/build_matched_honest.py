@@ -229,11 +229,12 @@ def main(argv=None):
     print(f"  {args.task.upper()} — PER-CLAUSE PASS RATES")
     print("=" * 70)
     print(f"{'pressure':<12} {'n':>5} {'deceive':>8} {'honest(c)':>10} "
-          f"{'honest(b)':>10} {'kept':>6} {'rate':>7}")
+          f"{'honest(b)':>10} {'other':>6} {'kept':>6} {'rate':>7}")
     for pid, row in report["by_clause"].items():
         print(f"{pid:<12} {row['n']:>5} {row['pressure_pass_rate']:>8.2f} "
               f"{row['honest_pass_rate_clean']:>10.2f} "
               f"{row['honest_pass_rate_both']:>10.2f} "
+              f"{row['n_honest_other_argmax']:>6} "
               f"{row['n_survivors']:>6} {row['survivor_rate']:>7.2f}")
     overall = report["overall"]
     print(f"\noverall: {overall['n_survivors']}/{overall['n']} kept "
@@ -241,7 +242,17 @@ def main(argv=None):
           f"{len(report['usable_clauses'])} clause(s) usable at "
           f">= {args.min_survivors} survivor(s)")
     print("  'rate' columns are conditional on n, and n is very uneven across "
-          "clauses —\n  read a rate on a handful of instances as noise.")
+          "clauses —\n  read a rate on a handful of instances as noise. "
+          "'other' counts instances whose\n  clean-stream argmax under the "
+          "instruction was neither answer word: a clause at a\n  zero honest "
+          "rate because the model stopped answering is a different finding "
+          "from\n  one where it kept lying.")
+    third = report["unexpected_argmax_tokens_under_instruction"]
+    if third:
+        print("\n  Argmax tokens under the instruction that were neither "
+              "answer word:")
+        for token_repr, count in list(third.items())[:10]:
+            print(f"    {count:>5}  {token_repr}")
     other = "clean" if args.honest_streams == "both" else "both"
     n_other = len(report["survivor_ids"][other])
     n_usable_other = sum(

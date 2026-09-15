@@ -22,8 +22,9 @@ What lives here
     assert_clause_aligned_pair             the new alignment assertion
     select_matched_instruction / build_pool   the drafting script's engine
     load_candidates / load_matched_honest_pool   the pool files
-    filter_matched_honest                  the two-sided margin filter
-    pair_with_matched_instructions         one honest twin per record, asserted
+    filter_matched_honest                  the Behavioral Filter, run both ways
+    instructed_counterpart                 one record's counterpart, asserted
+    pair_with_matched_instructions         the same over a whole split
     MatchedHonestDataset / load_matched_honest   the loader the analyses use
 
 Why string surgery rather than `deception_common.rebuild_prompt`. The saved
@@ -290,58 +291,86 @@ def load_candidates(pools_dir: Optional[str] = None) -> List[str]:
 
 
 # ==============================================================================
-# THE TWO-SIDED MARGIN FILTER
+# THE BEHAVIORAL FILTER, RUN BOTH WAYS
 # ==============================================================================
 
 HONEST_STREAM_CHOICES = ("both", "clean")
+
+
+def instructed_counterpart(record: Dict, pool: Dict[str, Dict], tokenizer,
+                           max_seq_length: int = dc.MAX_SEQ_LENGTH
+                           ) -> Tuple[Dict, Tuple[int, int]]:
+    """One record's Honest-Instruction counterpart, fully asserted.
+
+    Returns (counterpart record, clause span). The counterpart is the same
+    record with both prompts' Pressure Clause replaced by that clause's Matched
+    Honest Instruction; its Target and Distractor labels are unchanged, because
+    under the instruction the model is expected to pick the DISTRACTOR, and that
+    is what makes the honest side of the filter the flipped reading of the same
+    margin.
+
+    NOT an Honest Twin. CONTEXT.md reserves that term for the unpaired
+    `<task>_honest` dataset harvested from the Behavioral Filter's failures and
+    marginally resampled; this is the paired counterfactual, same instance, one
+    clause swapped.
+
+    Raises KeyError when the clause has no instruction, so the two callers can
+    differ on what to do about it: the build step collects the clause id and
+    carries on, the loader refuses.
+    """
+    entry = pool.get(record["pressure_id"])
+    if entry is None:
+        raise KeyError(
+            f"no Matched Honest Instruction for pressure "
+            f"{record['pressure_id']!r}; rebuild the pool with "
+            f"dataset/build_matched_honest.py --write-pool")
+    clause = record["pressure"]
+    if entry["pressure"] != clause:
+        raise ValueError(
+            f"pool entry {record['pressure_id']} holds a different clause "
+            f"than record {record['instance_id']}")
+
+    clean = replace_clause(record["clean_prompt"], clause, entry["instruction"])
+    corrupt = replace_clause(record["corrupt_prompt"], clause,
+                             entry["instruction"])
+    _, _, span = assert_clause_aligned_pair(
+        tokenizer, record["clean_prompt"], clean, clause, max_seq_length)
+    assert_clause_aligned_pair(tokenizer, record["corrupt_prompt"], corrupt,
+                               clause, max_seq_length)
+    # The instructed pair is itself an item-swap pair, so it keeps the existing
+    # single-position assertion. Not cosmetic: `evaluate_behavior` takes
+    # `prefix_length` from the clean prompt and reads position
+    # `prefix_length - 1` in BOTH streams, so a merge that lengthened the
+    # instructed corrupt prompt would move the Readout under the honest
+    # criterion without anything saying so.
+    dc.assert_aligned_pair(tokenizer, clean, corrupt, record["clean_item_d"],
+                           record["corrupt_item_d"], max_seq_length)
+    return {**record, "clean_prompt": clean, "corrupt_prompt": corrupt,
+            "matched_honest_instruction": entry["instruction"]}, span
 
 
 def pair_with_matched_instructions(
         records: Sequence[Dict], pool: Dict[str, Dict], tokenizer,
         max_seq_length: int = dc.MAX_SEQ_LENGTH
 ) -> Tuple[List[Dict], List[Dict], List[str]]:
-    """(records that have an instruction, their honest twins, clause ids without one).
+    """(records that have an instruction, their counterparts, clause ids without one).
 
     Every returned pair has been through `assert_clause_aligned_pair`, so the
     "asserts it on every instance at build time" requirement is discharged here
-    and not left to the caller. The honest twin carries the same target and
-    distractor labels as its source record: under the instruction the model is
-    expected to pick the DISTRACTOR, which is what makes the honest side of the
-    filter the flipped reading of the same margin.
+    and not left to the caller. A clause with no instruction is reported, never
+    silently dropped.
     """
-    kept, honest, missing = [], [], []
+    kept, instructed, missing = [], [], []
     for record in records:
-        entry = pool.get(record["pressure_id"])
-        if entry is None:
+        try:
+            counterpart, _ = instructed_counterpart(record, pool, tokenizer,
+                                                    max_seq_length)
+        except KeyError:
             missing.append(record["pressure_id"])
             continue
-        clause = record["pressure"]
-        if entry["pressure"] != clause:
-            raise ValueError(
-                f"pool entry {record['pressure_id']} holds a different clause "
-                f"than record {record['instance_id']}")
-        clean = replace_clause(record["clean_prompt"], clause,
-                               entry["instruction"])
-        corrupt = replace_clause(record["corrupt_prompt"], clause,
-                                 entry["instruction"])
-        assert_clause_aligned_pair(tokenizer, record["clean_prompt"], clean,
-                                   clause, max_seq_length)
-        assert_clause_aligned_pair(tokenizer, record["corrupt_prompt"], corrupt,
-                                   clause, max_seq_length)
-        # The honest pair is itself an item-swap pair, so it keeps the existing
-        # single-position assertion. Not cosmetic: `evaluate_behavior` takes
-        # `prefix_length` from the clean prompt and reads position
-        # `prefix_length - 1` in BOTH streams, so a merge that lengthened the
-        # honest corrupt prompt would move the Readout under the honest
-        # criterion without anything saying so.
-        dc.assert_aligned_pair(tokenizer, clean, corrupt,
-                               record["clean_item_d"], record["corrupt_item_d"],
-                               max_seq_length)
         kept.append(record)
-        honest.append({**record, "clean_prompt": clean,
-                       "corrupt_prompt": corrupt,
-                       "matched_honest_instruction": entry["instruction"]})
-    return kept, honest, sorted(set(missing))
+        instructed.append(counterpart)
+    return kept, instructed, sorted(set(missing))
 
 
 def filter_matched_honest(records: Sequence[Dict], pool: Dict[str, Dict],
@@ -375,7 +404,7 @@ def filter_matched_honest(records: Sequence[Dict], pool: Dict[str, Dict],
         raise ValueError(f"honest_streams must be one of "
                          f"{list(HONEST_STREAM_CHOICES)}, got {honest_streams!r}")
 
-    kept, honest, missing = pair_with_matched_instructions(
+    kept, instructed, missing = pair_with_matched_instructions(
         records, pool, tokenizer, max_length)
     report = {
         "margin_thresh": margin_thresh,
@@ -393,6 +422,7 @@ def filter_matched_honest(records: Sequence[Dict], pool: Dict[str, Dict],
                              "n_survivors": 0, "survivor_rate": 0.0}
         report["min_survivors"] = min_survivors
         report["unexpected_argmax_tokens"] = {}
+        report["unexpected_argmax_tokens_under_instruction"] = {}
         report["survivor_ids"] = {"clean": [], "both": []}
         return [], report
 
@@ -402,16 +432,31 @@ def filter_matched_honest(records: Sequence[Dict], pool: Dict[str, Dict],
         max_length=max_length, batch_size=batch_size)
 
     # --- honest side: the same filter read with the answer flipped --------
-    honest_behaviors = dc.evaluate_behavior(honest, model, tokenizer, device,
-                                            max_length=max_length,
+    honest_behaviors = dc.evaluate_behavior(instructed, model, tokenizer,
+                                            device, max_length=max_length,
                                             batch_size=batch_size)
-    # Sets b["honest"] for the both-streams reading.
-    dc.harvest_honest_twins(honest, honest_behaviors,
+    # Called for its side effect: it sets b["honest"] for the both-streams
+    # reading. Its return value is the relabelled Honest Twin records, which is
+    # not what this is -- these are paired counterparts, so the list is dropped.
+    dc.harvest_honest_twins(instructed, honest_behaviors,
                             margin_thresh=margin_thresh)
+    honest_other = Counter()
     for b in honest_behaviors:
+        # Mirrors harvest_honest_twins' own clean_ok. The assertion below is
+        # what stops the two readings drifting apart if that one changes.
         b["honest_clean"] = bool(
             b["clean_argmax_id"] == b["distractor_token"] and
             -b["clean_margin"] >= margin_thresh)
+        assert not b["honest"] or b["honest_clean"], (
+            "honest in both streams but not in the clean stream: this reading "
+            "has drifted from deception_common.harvest_honest_twins")
+        # A clause at a zero honest rate is a different data finding depending
+        # on whether the model kept lying or stopped answering the question, so
+        # the third tokens are counted rather than lumped in with the lies.
+        for stream in ("clean", "corrupt"):
+            if b[f"{stream}_argmax_id"] not in (b["target_token"],
+                                                b["distractor_token"]):
+                honest_other[repr(b[f"{stream}_argmax"])] += 1
 
     honest_key = {"both": "honest", "clean": "honest_clean"}[honest_streams]
     survivors, by_clause = [], {}
@@ -424,11 +469,15 @@ def filter_matched_honest(records: Sequence[Dict], pool: Dict[str, Dict],
             "instruction": pool[record["pressure_id"]]["instruction"],
             "clause_tokens": pool[record["pressure_id"]]["clause_tokens"],
             "n": 0, "n_pressure_pass": 0, "n_honest_pass_clean": 0,
-            "n_honest_pass_both": 0, "n_survivors": 0})
+            "n_honest_pass_both": 0, "n_honest_other_argmax": 0,
+            "n_survivors": 0})
         row["n"] += 1
         row["n_pressure_pass"] += int(pb["passed"])
         row["n_honest_pass_clean"] += int(hb["honest_clean"])
         row["n_honest_pass_both"] += int(hb["honest"])
+        row["n_honest_other_argmax"] += int(
+            hb["clean_argmax_id"] not in (hb["target_token"],
+                                          hb["distractor_token"]))
         for criterion, key in (("clean", "honest_clean"), ("both", "honest")):
             if pb["passed"] and hb[key]:
                 survivor_ids[criterion].append(record["instance_id"])
@@ -457,6 +506,8 @@ def filter_matched_honest(records: Sequence[Dict], pool: Dict[str, Dict],
         "survivor_rate": len(survivors) / len(kept),
     }
     report["unexpected_argmax_tokens"] = dict(unexpected.most_common())
+    report["unexpected_argmax_tokens_under_instruction"] = dict(
+        honest_other.most_common())
     report["survivor_ids"] = survivor_ids
     return survivors, report
 
@@ -542,19 +593,17 @@ class MatchedHonestDataset(Dataset):
         self.max_length = max_length
         self.items: List[Dict] = []
         for item in self.base.processed_data:
-            entry = pool.get(item["pressure_id"])
-            if entry is None:
-                raise KeyError(
-                    f"no Matched Honest Instruction for pressure "
-                    f"{item['pressure_id']!r}; rebuild the pool")
-            clause = item["pressure"]
-            honest = replace_clause(item["clean_prompt"], clause,
-                                    entry["instruction"])
-            _, _, span = assert_clause_aligned_pair(
-                tokenizer, item["clean_prompt"], honest, clause, max_length)
-            self.items.append({**item, "honest_prompt": honest,
-                               "matched_honest_instruction": entry["instruction"],
-                               "clause_span": span})
+            # The same substitution and the same assertions the build step ran;
+            # a missing instruction raises here rather than being collected,
+            # because a partly-paired dataset is not something to analyse.
+            counterpart, span = instructed_counterpart(item, pool, tokenizer,
+                                                       max_length)
+            self.items.append({
+                **item,
+                "honest_prompt": counterpart["clean_prompt"],
+                "matched_honest_instruction":
+                    counterpart["matched_honest_instruction"],
+                "clause_span": span})
 
     def __len__(self) -> int:
         return len(self.items)
@@ -589,8 +638,11 @@ def load_matched_honest(dataset_dir: str, tokenizer, *, split: str = "test",
                         honest_streams: Optional[str] = None
                         ) -> MatchedHonestDataset:
     """The paired dataset: the base split, filtered to the survivors, plus the pool."""
-    config = dc.load_dataset_config(dataset_dir) if os.path.exists(
-        os.path.join(dataset_dir, "dataset_config.json")) else {}
+    # Let dc.load_dataset_config raise. Guarding it with os.path.exists and
+    # falling back to the defaults would silently analyse at dc.MAX_SEQ_LENGTH
+    # when the dataset was built at some other budget, and the raise already
+    # carries the fix.
+    config = dc.load_dataset_config(dataset_dir)
     task = task or config.get("task")
     if task is None:
         raise ValueError(
