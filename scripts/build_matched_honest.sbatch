@@ -4,7 +4,10 @@
 # honestly under that clause's Matched Honest Instruction.
 #
 #   sbatch scripts/build_matched_honest.sbatch --task sdr
-#   sbatch scripts/build_matched_honest.sbatch --task sdr --honest-streams clean
+#   sbatch scripts/build_matched_honest.sbatch --task sdr --honest-streams both
+#
+# The honest criterion defaults to the clean stream; --honest-streams both is
+# the strict two-sided reading. Both id lists are written either way.
 #
 # Every extra argument goes to dataset/build_matched_honest.py.
 #

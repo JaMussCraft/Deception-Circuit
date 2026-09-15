@@ -27,6 +27,13 @@ What lives here
     pair_with_matched_instructions         the same over a whole split
     MatchedHonestDataset / load_matched_honest   the loader the analyses use
 
+Which streams must go honest. The Behavioral Filter's two-sided reading —
+honest in the clean AND the item-swapped stream — is the strict one, but the
+Honest-Instruction Counterfactual pair is (clean prompt, clean prompt with its
+clause replaced), so the item-swapped stream is not in the pair at all.
+`DEFAULT_HONEST_STREAMS` is therefore "clean"; "both" stays selectable as a
+robustness subset and both id lists are written by every build.
+
 Why string surgery rather than `deception_common.rebuild_prompt`. The saved
 SDR dataset was built from an older designating-sentence template ("The miles
 result is the one that is damaging, and the other is harmless."), so rebuilding
@@ -296,6 +303,17 @@ def load_candidates(pools_dir: Optional[str] = None) -> List[str]:
 
 HONEST_STREAM_CHOICES = ("both", "clean")
 
+#: Which streams must give the honest answer under the Matched Honest
+#: Instruction. "clean" is the default on the researcher's decision of
+#: 2026-09-15: the Honest-Instruction Counterfactual pair is (clean prompt,
+#: clean prompt with the clause replaced), so the clean stream is the only one
+#: the pair contains, and requiring the item-swapped stream to go honest too
+#: throws away most of the data (SDR: 364 instances over 4 clauses, against 629
+#: over 14). "both" — the strict reading of the existing margin filter — stays
+#: selectable as a robustness subset, and both id lists are written by every
+#: build, so switching between them costs no GPU time.
+DEFAULT_HONEST_STREAMS = "clean"
+
 
 def instructed_counterpart(record: Dict, pool: Dict[str, Dict], tokenizer,
                            max_seq_length: int = dc.MAX_SEQ_LENGTH
@@ -376,7 +394,7 @@ def pair_with_matched_instructions(
 def filter_matched_honest(records: Sequence[Dict], pool: Dict[str, Dict],
                           model, tokenizer, device, *,
                           margin_thresh: float = 1.0,
-                          honest_streams: str = "both",
+                          honest_streams: str = DEFAULT_HONEST_STREAMS,
                           max_length: int = dc.MAX_SEQ_LENGTH,
                           batch_size: int = 32,
                           min_survivors: int = 1) -> Tuple[List[Dict], Dict]:
@@ -392,11 +410,12 @@ def filter_matched_honest(records: Sequence[Dict], pool: Dict[str, Dict],
     pressure clean, pressure corrupt, honest clean, honest corrupt. With a batch
     size covering the whole record list that is four calls.
 
-    `honest_streams` picks the honest criterion: "both" (the default, and the
-    strict reading of the existing filter) requires the honest answer at margin
-    in the clean AND corrupt streams; "clean" requires it in the clean stream
-    only, which is the stream the analyses actually read. Both rates are always
-    reported, so the choice can be revisited without another GPU run.
+    `honest_streams` picks the honest criterion: "clean" (the default) requires
+    the honest answer at margin in the clean stream only, which is the stream
+    the Honest-Instruction Counterfactual pair is built from; "both" is the
+    strict reading of the existing filter and additionally requires it in the
+    item-swapped stream. Both rates are always reported, so the choice can be
+    revisited without another GPU run.
 
     Returns (surviving records, report).
     """
@@ -543,12 +562,16 @@ def write_survivors(dataset_dir: str, task: str, survivors: Sequence[Dict],
     return {"survivors": ids_path, "report": report_path}
 
 
-def load_survivors(dataset_dir: str, honest_streams: Optional[str] = None
+def load_survivors(dataset_dir: str,
+                   honest_streams: Optional[str] = DEFAULT_HONEST_STREAMS
                    ) -> List[str]:
-    """The surviving instance ids.
+    """The surviving instance ids under one honest criterion.
 
-    `honest_streams` re-reads the file under the other honest criterion without
-    a GPU rerun; the default is whichever criterion the build was run with.
+    The default is `DEFAULT_HONEST_STREAMS` — the clean stream — whichever
+    criterion the build itself was run with, because every build writes both id
+    lists and the criterion is an analysis choice rather than a build one.
+    `honest_streams=None` asks instead for whatever the build recorded, which
+    is what the build script's own summary reports.
     """
     path = os.path.join(dataset_dir, SURVIVORS_FILE)
     if not os.path.exists(path):
@@ -635,9 +658,13 @@ def load_matched_honest(dataset_dir: str, tokenizer, *, split: str = "test",
                         pools_dir: Optional[str] = None,
                         max_length: Optional[int] = None,
                         survivors_only: bool = True,
-                        honest_streams: Optional[str] = None
+                        honest_streams: Optional[str] = DEFAULT_HONEST_STREAMS
                         ) -> MatchedHonestDataset:
-    """The paired dataset: the base split, filtered to the survivors, plus the pool."""
+    """The paired dataset: the base split, filtered to the survivors, plus the pool.
+
+    `honest_streams` is the honest criterion the survivors are read under; see
+    `DEFAULT_HONEST_STREAMS` for why the clean stream is the default.
+    """
     # Let dc.load_dataset_config raise. Guarding it with os.path.exists and
     # falling back to the defaults would silently analyse at dc.MAX_SEQ_LENGTH
     # when the dataset was built at some other budget, and the raise already

@@ -67,9 +67,11 @@ def build_parser():
                    help="Default: the build-time margin_thresh in "
                         "dataset_config.json, else 1.0.")
     p.add_argument("--honest-streams", choices=list(mh.HONEST_STREAM_CHOICES),
-                   default="both",
+                   default=mh.DEFAULT_HONEST_STREAMS,
                    help="Which streams must give the honest answer under the "
-                        "instruction. Both rates are reported either way.")
+                        "instruction. Default: the clean stream, the only one "
+                        "the counterfactual pair contains. Both rates are "
+                        "reported either way, and both id lists are written.")
     p.add_argument("--min-survivors", type=int, default=1,
                    help="A clause counts as usable at this many survivors.")
     p.add_argument("--max-seq-length", type=int, default=None,

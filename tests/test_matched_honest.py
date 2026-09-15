@@ -360,14 +360,27 @@ def test_loader_reads_the_survivors_written_beside_the_dataset(tok, tmp_path):
     with open(dataset_dir / "dataset_config.json", "w") as f:
         json.dump({"task": "sdr", "max_seq_length": 128,
                    "margin_thresh": 1.0}, f)
-    survivors = recs[:2]
-    mh.write_survivors(str(dataset_dir), "sdr", survivors,
-                       {"overall": {"n_survivors": len(survivors)}})
+    # The build writes both criteria. The clean-stream list is the larger one,
+    # which is the point: it is the stream the counterfactual pair contains.
+    both = recs[:2]
+    clean = recs[:3]
+    mh.write_survivors(
+        str(dataset_dir), "sdr", both,
+        {"overall": {"n_survivors": len(both)}, "honest_streams": "both",
+         "survivor_ids": {"both": [r["instance_id"] for r in both],
+                          "clean": [r["instance_id"] for r in clean]}})
 
     ds = mh.load_matched_honest(str(dataset_dir), tok, split="test",
                                 pools_dir=str(tmp_path / "pools"))
     assert [ds.item(i)["instance_id"] for i in range(len(ds))] == \
-        [r["instance_id"] for r in survivors]
+        [r["instance_id"] for r in clean], \
+        "the loader defaults to the clean-stream honest criterion"
+
+    strict = mh.load_matched_honest(str(dataset_dir), tok, split="test",
+                                    pools_dir=str(tmp_path / "pools"),
+                                    honest_streams="both")
+    assert [strict.item(i)["instance_id"] for i in range(len(strict))] == \
+        [r["instance_id"] for r in both]
 
     loader = mh.matched_honest_loader(ds, batch_size=2)
     batch = next(iter(loader))
@@ -501,9 +514,24 @@ def test_both_honest_criteria_are_recorded_so_the_choice_needs_no_rerun(tok, tmp
     assert report["survivor_ids"]["clean"] == [r["instance_id"] for r in recs]
 
     mh.write_survivors(str(tmp_path), "sdr", survivors, report)
-    assert mh.load_survivors(str(tmp_path)) == report["survivor_ids"]["both"]
-    assert mh.load_survivors(str(tmp_path), "clean") == \
-        report["survivor_ids"]["clean"]
+    # The default criterion is the clean stream, whichever one the build ran.
+    assert mh.load_survivors(str(tmp_path)) == report["survivor_ids"]["clean"]
+    assert mh.load_survivors(str(tmp_path), "both") == \
+        report["survivor_ids"]["both"]
+    # None still means "whatever this build recorded", which was "both" here.
+    assert mh.load_survivors(str(tmp_path), None) == \
+        report["survivor_ids"]["both"]
+
+
+def test_a_survivors_file_from_an_older_build_says_to_rerun(tmp_path):
+    """The default criterion needs the per-criterion id lists. A file written
+    before they existed must say so rather than quietly serve the other one."""
+    with open(os.path.join(str(tmp_path), mh.SURVIVORS_FILE), "w") as f:
+        json.dump({"task": "sdr", "split": "test", "honest_streams": "both",
+                   "n": 1, "instance_ids": ["a"]}, f)
+
+    with pytest.raises(KeyError, match="does not record survivors"):
+        mh.load_survivors(str(tmp_path))
 
 
 def test_a_third_token_under_the_instruction_is_counted_not_read_as_a_lie(tok):
