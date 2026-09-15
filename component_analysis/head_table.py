@@ -37,11 +37,20 @@ CSV_NAME = "head_table.csv"
 JSON_NAME = "head_table.json"
 
 
-def row_key(row: dict) -> tuple:
-    """(kind, layer, index) for a row or a Component."""
-    if hasattr(row, "key"):
+def row_key(row) -> tuple:
+    """(kind, layer, index) for a row, a Component or a hand-built key.
+
+    Always (str, int, int), whatever the caller had to hand: a key rebuilt from
+    a CSV read carries `layer` and `index` as strings, and an uncoerced key
+    would miss the row it names and silently append a duplicate Component.
+    """
+    if isinstance(row, tuple):
+        kind, layer, index = row
+    elif hasattr(row, "key"):
         return row.key
-    return (row["kind"], int(row["layer"]), int(row["index"]))
+    else:
+        kind, layer, index = row["kind"], row["layer"], row["index"]
+    return (str(kind), int(layer), int(index))
 
 
 def rows_from_components(components, extra=None) -> list:
@@ -91,7 +100,7 @@ def merge_columns(rows, updates, *, namespace: str = None) -> list:
 
     named = {}
     for key, values in (updates or {}).items():
-        key = row_key(key) if not isinstance(key, tuple) else key
+        key = row_key(key)
         named[key] = {(f"{namespace}.{c}" if namespace else c): v
                       for c, v in values.items()}
 

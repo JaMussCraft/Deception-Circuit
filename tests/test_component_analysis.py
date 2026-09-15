@@ -300,6 +300,25 @@ def test_merge_columns_adds_rows_for_components_not_already_in_the_table():
     assert by_key[("head", 1, 3)]["head_gate_active"] is None
 
 
+def test_merge_columns_treats_a_string_typed_key_as_the_same_component():
+    """A key read back from a CSV is (kind, "layer", "index"), all strings.
+
+    The completeness sweep is the caller that builds keys from a prior table
+    rather than from Component objects. Without coercion the same Component
+    gets a second row, the analysis value lands on it, and "one row per
+    Component" breaks silently while the CSV still looks well formed.
+    """
+    from component_analysis.head_table import merge_columns
+
+    rows = sample_rows()
+    merged = merge_columns(rows, {("head", "0", "3"): {"logit_diff": 1.0}},
+                           namespace="sweep")
+
+    assert len(merged) == len(rows)
+    by_key = {(r["kind"], r["layer"], r["index"]): r for r in merged}
+    assert by_key[("head", 0, 3)]["sweep.logit_diff"] == 1.0
+
+
 def test_merge_columns_refuses_to_overwrite_a_confirmed_role():
     from component_analysis.head_table import merge_columns
 
