@@ -47,6 +47,21 @@ ones in prompt order, then `unsegmented` — and each claim takes only the token
 still free. So `intro`, `question` and `designating_sentence` are the *frames*
 around the mentions and positions carved out of them, not spans that contain
 them.
+
+Known dataset quirks
+--------------------
+**The saved SDR prompts glue the Designating Sentence to the Designation
+Suffix with no space** — `"...harmless.THE DAMAGING ONE IS..."` — so Llama
+emits one token `".T"` spanning the end of the sentence and the start of the
+suffix, then `"HE"`. Because the region-level Segments claim in prompt order,
+`designating_sentence` takes the shared token and `designation_suffix` starts
+mid-word at `"HE"`. The researcher accepted that reading on 2026-09-15: the
+sentence wins, and the missing space will be fixed when the FAR/SDR/SER
+datasets are next regenerated, after which the quirk disappears on its own.
+Nothing here special-cases it, so a rebuilt dataset needs no change. The one
+thing to know is that on the *current* SDR files a plot of the Designation
+Suffix is missing its first character and a plot of the Designating Sentence
+carries one character too many.
 """
 
 from __future__ import annotations
@@ -429,6 +444,10 @@ def segment_mechanism(record: dict, index: TokenIndex) -> _Builder:
         builder.claim(f"{slot}_question_pair", spans[:1])
         builder.claim(f"{slot}_question_option", spans[1:])
     builder.claim("intro", [intro])
+    # This claim is the tie-break for the ".T"/"HE" token of the saved SDR
+    # prompts: the sentence and the suffix are glued with no space, so one
+    # token spans both and the earlier claim takes it. See "Known dataset
+    # quirks" in the module docstring.
     builder.claim("designating_sentence",
                   [(region_start, region_start + sentence_end)])
     builder.claim("designation_suffix", [suffix_span] if suffix_span else [])
