@@ -818,9 +818,14 @@ def check_judges_answer(cli) -> None:
             # Generous on purpose. A reasoning model (MASK's numerical judge is
             # o3-mini) spends its budget thinking before it emits anything, so
             # a tight cap returns an empty completion and the probe reports a
-            # dead judge that is in fact perfectly healthy. The probe is one
-            # call; the tokens are worth less than the false alarm.
-            kwargs={"max_completion_tokens": 256})))
+            # dead judge that is in fact perfectly healthy. 256 was not
+            # generous enough: job 22104734 died on exactly this, o3-mini via
+            # OpenRouter having used all 256 tokens on reasoning
+            # (finish_reason "length", content ""). Measured at default
+            # effort it reasons for 64-330 tokens on this prompt, so the cap
+            # is an order of magnitude above the worst case seen. The probe is
+            # one call; the tokens are worth less than the false alarm.
+            kwargs={"max_completion_tokens": 4096})))
     if not probes:
         return
 
