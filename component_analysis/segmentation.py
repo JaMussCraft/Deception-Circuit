@@ -10,6 +10,13 @@ question, the assistant stem and the Readout. Spans are half-open ranges of
 item-swap Corruption is a single-token edit, so clean and corrupt align
 position for position.
 
+Each item has four Item Mentions, not three — the intro, the pair naming in the
+user question, that item's quoted option in the same question, and, for the
+designated item only, the Designation Site. The two question mentions are
+separate Segments (`item_N_question_pair`, `item_N_question_option`) because
+attention to the choice on offer is not the same thing as attention to the
+option about to be copied.
+
 Anchors, not stored Scaffold text
 ---------------------------------
 Each task's default segmentation is built from its Scaffold pieces (the chat
@@ -287,9 +294,19 @@ MECHANISM_SEGMENTS = (
     "intro", "item_1_intro", "item_2_intro",
     "designating_sentence", "designation_site", "predicate_token",
     "other_token", "inverse_predicate_token", "designation_suffix",
-    "pressure_clause", "question", "item_1_question", "item_2_question",
+    "pressure_clause", "question",
+    "item_1_question_pair", "item_1_question_option",
+    "item_2_question_pair", "item_2_question_option",
     "stem", "readout", UNSEGMENTED,
 )
+
+#: The two Item Mentions the user question carries, per item, in prompt order.
+#: The question names the pair ("staffing or pricing?") and then names each
+#: item again inside its quoted option ('"...I will show you is staffing"'), so
+#: the first occurrence is the pair naming and the second is the option. They
+#: are separate Segments because a Component attending to the choice on offer
+#: is doing something different from one attending to the option it copies.
+QUESTION_MENTIONS = ("pair", "option")
 
 
 def _mechanism_intro(prompt: str, record: dict, system: Tuple[int, int]) -> int:
@@ -403,8 +420,14 @@ def segment_mechanism(record: dict, index: TokenIndex) -> _Builder:
                                 what="Item Mention", where="intro")
         builder.claim(f"{slot}_intro", [(intro[0] + start, intro[0] + end)])
     for slot in ("item_1", "item_2"):
-        builder.claim(f"{slot}_question",
-                      _all_spans(question, record[slot], user_start))
+        # First occurrence is the pair naming, the rest are the quoted option.
+        # A Scaffold that stops naming the item twice leaves one of the two
+        # Segments empty or gives the other two spans; `validate_segmentation`
+        # refuses both rather than this raising, so an instance whose question
+        # has drifted is reported by the validation pass with all the others.
+        spans = _all_spans(question, record[slot], user_start)
+        builder.claim(f"{slot}_question_pair", spans[:1])
+        builder.claim(f"{slot}_question_option", spans[1:])
     builder.claim("intro", [intro])
     builder.claim("designating_sentence",
                   [(region_start, region_start + sentence_end)])
@@ -670,13 +693,26 @@ def validate_segmentation(segmentation: Segmentation, record: dict,
                     f"{name!r} resolved to {len(segment.spans)} spans, not one")
         # The Designation Suffix and the Pressure Clause may be absent (the
         # saved FAR run, the pilot condition); the Item Mentions may not — the
-        # user question names both items in every variant.
-        for name in ("item_1_intro", "item_2_intro",
-                     "item_1_question", "item_2_question"):
+        # intro names both items and the user question names each of them
+        # twice, once for the pair and once inside its quoted option. Each of
+        # those mentions is exactly one span: an empty one would plot nothing,
+        # and two spans in one would mean a third mention had been pooled into
+        # it, which is what splitting the question mentions was meant to stop.
+        for name in ("item_1_intro", "item_2_intro"):
             if not segmentation.segments[name].spans:
                 raise SegmentationError(
                     f"record {segmentation.record_id!r}: Item Mention {name!r} "
                     f"is empty, so every plot of it would be too")
+        for slot in ("item_1", "item_2"):
+            for mention in QUESTION_MENTIONS:
+                name = f"{slot}_question_{mention}"
+                spans = segmentation.segments[name].spans
+                if len(spans) != 1:
+                    raise SegmentationError(
+                        f"record {segmentation.record_id!r}: Item Mention "
+                        f"{name!r} resolved to {len(spans)} spans, not one. "
+                        f"The user question names each item exactly twice — "
+                        f"once for the pair, once inside its quoted option.")
 
     return {"readout": segmentation.readout,
             "n_tokens": segmentation.n_tokens,

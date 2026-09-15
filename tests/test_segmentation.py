@@ -147,23 +147,36 @@ def test_the_region_segments_are_the_frames_around_what_is_carved_out(sdr):
     assert positions and not (sentence & positions)
 
 
-def test_each_item_is_mentioned_twice_in_the_user_question(sdr):
-    """The question names the pair once and again in each quoted option.
+def test_each_question_mention_of_an_item_is_its_own_segment(sdr):
+    """The question names the pair ("staffing or pricing?") and names each item
+    again inside its quoted option.
 
-    CONTEXT.md's "three mentions" counts the question as one; the Scaffold as
-    it stands mentions each item there twice, so the Segment carries both spans
-    and a later analysis can still tell them apart.
+    A Component attending to the choice on offer is doing something different
+    from one attending to the option it is about to copy, so the two mentions
+    are separate Segments rather than one pooled Item Mention. That is also
+    what makes the glossary's count four mentions per item, not three.
     """
     record, seg = sdr
     prompt = record["clean_prompt"]
     text = dict((i, t) for i, t, _ in chunks(prompt))
+    question = set(indices_of(seg, "question"))
 
     for slot in ("item_1", "item_2"):
         word = record[slot]
-        mentions = indices_of(seg, f"{slot}_question")
-        assert len(mentions) == 2
-        assert all(word in text[i] for i in mentions)
-        assert not (set(indices_of(seg, "question")) & set(mentions))
+        pair = indices_of(seg, f"{slot}_question_pair")
+        option = indices_of(seg, f"{slot}_question_option")
+        assert len(pair) == 1 and len(option) == 1
+        assert pair[0] < option[0]
+        assert all(word in text[i] for i in pair + option)
+        assert not (question & set(pair + option))
+
+    # Both pair-naming mentions come before either quoted option, which is what
+    # makes "first occurrence is the pair naming" the right rule.
+    pairs = indices_of(seg, "item_1_question_pair") + \
+        indices_of(seg, "item_2_question_pair")
+    options = indices_of(seg, "item_1_question_option") + \
+        indices_of(seg, "item_2_question_option")
+    assert max(pairs) < min(options)
 
 
 def test_the_readout_is_the_last_token_and_the_stem_is_the_rest(sdr):
@@ -425,7 +438,23 @@ def test_an_item_the_question_never_names_is_refused(tokenizer):
             tail.replace("pricing", "the other one")
 
     seg = S.resolve_segmentation("sdr", record, tokenizer)
-    with pytest.raises(S.SegmentationError, match="item_2_question"):
+    with pytest.raises(S.SegmentationError, match="item_2_question_pair"):
+        S.validate_segmentation(seg, record, tokenizer)
+
+
+def test_a_question_that_names_an_item_a_third_time_is_refused(tokenizer):
+    """Two mentions per item is the Scaffold: the pair naming and the quoted
+    option. A third would be pooled into one of the two Segments and quietly
+    change what a plot of it means, so validation refuses it."""
+    record = dict(sdr_record())
+    for key in ("clean_prompt", "corrupt_prompt"):
+        head, sep, tail = record[key].partition(
+            "<|start_header_id|>user<|end_header_id|>")
+        record[key] = head + sep + tail.replace(
+            "Only respond", "Prefer pricing. Only respond", 1)
+
+    seg = S.resolve_segmentation("sdr", record, tokenizer)
+    with pytest.raises(S.SegmentationError, match="item_2_question_option"):
         S.validate_segmentation(seg, record, tokenizer)
 
 
