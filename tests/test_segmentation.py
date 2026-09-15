@@ -1,7 +1,7 @@
 """
 Library-seam tests for `component_analysis/segmentation.py`.
 
-Prompts are built from the *real* template pieces (`dataset.deception_common`
+Prompts are built from the *real* Scaffold pieces (`dataset.deception_common`
 and `dataset.std_llama`) and tokenized with `tests.fakes.FakeWordTokenizer`, so
 the spans asserted here are the spans the researcher gets on a real prompt,
 minus the byte-level BPE. The expected token indices are derived in the test
@@ -150,8 +150,8 @@ def test_the_region_segments_are_the_frames_around_what_is_carved_out(sdr):
 def test_each_item_is_mentioned_twice_in_the_user_question(sdr):
     """The question names the pair once and again in each quoted option.
 
-    CONTEXT.md's "three mentions" counts the question as one; the templates as
-    they stand mention each item there twice, so the Segment carries both spans
+    CONTEXT.md's "three mentions" counts the question as one; the Scaffold as
+    it stands mentions each item there twice, so the Segment carries both spans
     and a later analysis can still tell them apart.
     """
     record, seg = sdr
@@ -240,7 +240,7 @@ def test_the_readout_must_be_the_position_the_task_predicts_at(sdr, tokenizer):
     """`pred_spec` reads `prefix_length - 1`; a Segment map on a different
     token axis would put every later plot on the wrong spans."""
     record, seg = sdr
-    assert seg.readout == S.prediction_position(tokenizer, record["clean_prompt"])
+    assert seg.readout == S.readout_position(tokenizer, record["clean_prompt"])
 
     moved = S.Segmentation(task=seg.task, record_id=seg.record_id,
                            n_tokens=seg.n_tokens, readout=seg.readout - 1,
@@ -262,7 +262,7 @@ def test_a_designation_position_that_repeats_in_the_sentence_is_refused(tokenize
         S.resolve_segmentation("sdr", record, tokenizer)
 
 
-def test_an_intro_that_does_not_match_the_template_is_refused(tokenizer):
+def test_an_intro_that_does_not_match_the_scaffold_is_refused(tokenizer):
     record = dict(sdr_record())
     for key in ("clean_prompt", "corrupt_prompt"):
         record[key] = record[key].replace("'s audit reviewed", " looked at")
@@ -401,10 +401,11 @@ def test_std_stipulation_is_read_from_the_record_not_guessed(tokenizer):
 # TEMPLATE ASSUMPTIONS THE SEGMENTER MAKES
 # ==============================================================================
 
-def test_every_mechanism_template_still_says_other():
-    """The Other Token is literal in the template, not a record field, so the
-    segmenter names the word itself. If a variant ever stops saying it, this
-    fails here rather than on every instance of a GPU run."""
+def test_every_template_variant_still_says_other():
+    """The Other Token is literal in the Designating Sentence, not a record
+    field, so the segmenter names the word itself. If a Template Variant ever
+    stops saying it, this fails here rather than on every instance of a GPU
+    run."""
     for spec in SPECS.values():
         for name in spec.variant_names:
             designation = spec.variant(name).designation
@@ -415,7 +416,7 @@ def test_every_mechanism_template_still_says_other():
 
 def test_an_item_the_question_never_names_is_refused(tokenizer):
     """Both items are named in the user question; a prompt where one is not is
-    a template change, and every Item Mention plot would silently be empty."""
+    a Scaffold change, and every Item Mention plot would silently be empty."""
     record = dict(sdr_record())
     for key in ("clean_prompt", "corrupt_prompt"):
         head, _, tail = record[key].partition(
@@ -431,7 +432,7 @@ def test_an_item_the_question_never_names_is_refused(tokenizer):
 def test_the_readout_agrees_with_the_dataset_class_the_task_loads(tokenizer):
     """The Readout against `DeceptionDatasetLlama`, not against a re-derivation.
 
-    `prediction_position` recomputes `len(encode(prompt)) - 1`, which is the
+    `readout_position` recomputes `len(encode(prompt)) - 1`, which is the
     same expression the dataset class uses, so comparing the two alone would
     only restate it. This drives the record through the class the task's
     dataloader actually builds and reads the `prefix_length` it stored, which

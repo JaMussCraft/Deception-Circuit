@@ -10,17 +10,18 @@ question, the assistant stem and the Readout. Spans are half-open ranges of
 item-swap Corruption is a single-token edit, so clean and corrupt align
 position for position.
 
-Anchors, not templates
-----------------------
-Each task's default segmentation is built from its template pieces (the chat
-shell, the intro sentence, the assistant stem) and from the record's own
-metadata (`item_1`, `item_2`, `clean_item_d`, `desig`, `desig_inv`,
-`pressure`). Predicate words are **never** assumed from the task spec: the
-pools have changed words over time — the saved FAR run was built with
-ready/delayed while `dataset/deception_common.py` now says weak/strong, and the
-saved SDR designating sentence is worded differently from the current template
-— so the words are read off each record and located in that record's own
-prompt.
+Anchors, not stored Scaffold text
+---------------------------------
+Each task's default segmentation is built from its Scaffold pieces (the chat
+shell, the intro sentence, the assistant stem — the ticket calls these the
+task's "template pieces") and from the record's own metadata (`item_1`,
+`item_2`, `clean_item_d`, `desig`, `desig_inv`, `pressure`). Predicate words
+are **never** assumed from the task spec: the pools have changed words over
+time — the saved FAR run was built with ready/delayed while
+`dataset/deception_common.py` now says weak/strong, and the saved SDR
+Designating Sentence is worded differently from the one that module builds
+today — so the words are read off each record and located in that record's
+own prompt.
 
 A partition, by construction
 ----------------------------
@@ -61,7 +62,7 @@ DESIGNATION_POSITIONS = ("designation_site", "predicate_token", "other_token",
                          "inverse_predicate_token")
 
 #: The word the Designating Sentence uses for the non-designated item. It is
-#: literal in every template variant of every mechanism task rather than a
+#: literal in every Template Variant of every mechanism task rather than a
 #: record field, so it is named here and asserted to be present exactly once.
 OTHER_WORD = "other"
 
@@ -292,9 +293,9 @@ MECHANISM_SEGMENTS = (
 
 
 def _mechanism_intro(prompt: str, record: dict, system: Tuple[int, int]) -> int:
-    """Character end of the intro sentence, from the variant's own template.
+    """Character end of the intro sentence, from the Template Variant itself.
 
-    The intro is the one template piece that has not drifted from the saved
+    The intro is the one Scaffold piece that has not drifted from the saved
     datasets, so it is matched exactly. A mismatch is raised rather than
     guessed around: `--dry-run` exists to fail on the login node, and a
     sentence-splitting fallback would silently move every span in the prompt.
@@ -424,7 +425,7 @@ STD_SEGMENTS = ("stipulation_token", "statement", "pressure_clause",
 
 #: The literal run-up to the stipulated lexeme in `std_llama.CHAT_FORMAT`. The
 #: word itself can also occur inside the statement, so the Stipulation Token is
-#: located by this template piece rather than by searching the system turn.
+#: located by this Scaffold piece rather than by searching the system turn.
 _STD_PREFIX = "Assume this statement is "
 
 
@@ -580,7 +581,7 @@ def apply_overrides(segmentation: Segmentation, overrides: Dict[str, str],
     An override takes the tokens its regex matches whatever else holds them, so
     it can overlap the defaults; `validate_segmentation` reports any overlap it
     creates rather than refusing it, because a caller asking for a span the
-    template does not guarantee is the point of the flag. `unsegmented` is
+    Scaffold does not guarantee is the point of the flag. `unsegmented` is
     recomputed afterwards so the Segments still account for every token.
     """
     text = index.text
@@ -608,15 +609,19 @@ def apply_overrides(segmentation: Segmentation, overrides: Dict[str, str],
 # VALIDATION
 # ==============================================================================
 
-def prediction_position(tokenizer, prompt: str) -> int:
-    """Where the Readout falls: `prefix_length - 1`.
+def readout_position(tokenizer, prompt: str) -> int:
+    """Which token the Readout is: `prefix_length - 1`.
 
     `DeceptionDatasetLlama` and `STDDatasetLlama` both set `prefix_length` to
     the unpadded token count of the clean prompt and `pred_spec` reads
     `prefix_length - 1`, so this is the same number by the same route — which
     is why `test_the_readout_agrees_with_the_dataset_class_the_task_loads`
     checks it against the dataset class rather than against this function.
-    The name mirrors the repo's own `pred_pos` / `pred_spec` in `tasks/`.
+
+    Named for the Readout rather than for the prediction, because CONTEXT.md
+    reserves that Segment's name and tells the rest of the codebase to avoid
+    "prediction head" and "answer position" for it. `tasks/*.py` still spells
+    the same quantity `pred_pos`; that is older than the glossary.
     """
     return len(tokenizer.encode(prompt, add_special_tokens=False)) - 1
 
@@ -625,12 +630,12 @@ def validate_segmentation(segmentation: Segmentation, record: dict,
                           tokenizer) -> dict:
     """Check the three properties a later plot depends on, and report overlaps.
 
-    Raises on: a default Segment overlapping another default (the template
+    Raises on: a default Segment overlapping another default (the Scaffold
     guarantees they do not), a Designation Position that is not exactly one
     span, or a Readout that is not the position the task predicts at. Overlaps
     an override created are returned rather than raised.
     """
-    expected = prediction_position(tokenizer, record["clean_prompt"])
+    expected = readout_position(tokenizer, record["clean_prompt"])
     if segmentation.readout != expected:
         raise SegmentationError(
             f"record {segmentation.record_id!r}: the Readout Segment is token "
