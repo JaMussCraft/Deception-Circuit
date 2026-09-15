@@ -308,3 +308,32 @@ def test_merge_columns_refuses_to_overwrite_a_confirmed_role():
     with pytest.raises(ValueError, match="role_confirmed"):
         merge_columns(rows, {(rows[0]["kind"], rows[0]["layer"], rows[0]["index"]):
                              {"role_confirmed": "binder"}})
+
+
+def test_the_hook_module_is_the_only_place_that_imports_nnsight():
+    """ADR-0001: one module holds the hook surface, so a 0.8 migration is local.
+
+    Pure source parsing, so it runs in both environments rather than only
+    where nnsight 0.7.0 is installed.
+    """
+    import ast
+    import component_analysis
+
+    package = os.path.dirname(component_analysis.__file__)
+    offenders = []
+    for name in sorted(os.listdir(package)):
+        if not name.endswith(".py") or name == "hooks.py":
+            continue
+        tree = ast.parse(open(os.path.join(package, name)).read())
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                names = [a.name for a in node.names]
+            elif isinstance(node, ast.ImportFrom):
+                names = [node.module or ""]
+            else:
+                continue
+            if any(n.split(".")[0] == "nnsight" for n in names):
+                offenders.append(f"{name}:{node.lineno}")
+
+    assert offenders == [], \
+        f"nnsight is imported outside hooks.py: {', '.join(offenders)}"

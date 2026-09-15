@@ -57,6 +57,15 @@ def load_analysis_model(model_name: str, *, device: str = "cuda",
     same loaded model is switched to eager for attention patterns and back to
     SDPA for everything else (`set_attn_implementation` exists in transformers
     5.13); callers that only ever want one of the two can pass it here.
+
+    `dispatch` is consumed by nnsight's own `MetaMixin.__init__` in 0.7.0
+    (checked in the installed source, since the only mentions in the package
+    are in docstrings); `device_map` and `dtype` pass through to
+    `from_pretrained`, where `dtype` is transformers 5.x's spelling of what
+    `models/__init__.py` still calls `torch_dtype` for the 4.57 login env.
+
+    Not exercised by any test: it needs real weights and a GPU. The first
+    ticket to load a model should treat that as its own first assertion.
     """
     import torch
     from nnsight import LanguageModel

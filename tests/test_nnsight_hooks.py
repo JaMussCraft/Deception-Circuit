@@ -73,29 +73,3 @@ def test_envoy_accesses_must_be_written_in_execution_order(input_ids):
         with traced.trace(input_ids):
             traced.model.layers[0].self_attn.o_proj.input.save()
             traced.model.layers[0].self_attn.q_proj.output.save()
-
-
-def test_the_hook_module_is_the_only_place_that_imports_nnsight():
-    """ADR-0001: one module holds the hook surface, so a 0.8 migration is local."""
-    import ast
-    import os
-    import component_analysis
-
-    package = os.path.dirname(component_analysis.__file__)
-    offenders = []
-    for name in sorted(os.listdir(package)):
-        if not name.endswith(".py") or name == "hooks.py":
-            continue
-        tree = ast.parse(open(os.path.join(package, name)).read())
-        for node in ast.walk(tree):
-            if isinstance(node, ast.Import):
-                names = [a.name for a in node.names]
-            elif isinstance(node, ast.ImportFrom):
-                names = [node.module or ""]
-            else:
-                continue
-            if any(n.split(".")[0] == "nnsight" for n in names):
-                offenders.append(f"{name}:{node.lineno}")
-
-    assert offenders == [], \
-        f"nnsight is imported outside hooks.py: {', '.join(offenders)}"
