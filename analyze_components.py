@@ -234,9 +234,10 @@ def print_instances(task_instances: TaskInstances) -> None:
     else:
         print("      no factor has more than one level; drawn unstratified")
     if sample.inactive_factors:
-        print("      one level only: " + ", ".join(
-            f"{factor}={level!r}" for factor, level
-            in sample.inactive_factors.items()))
+        print("      not stratified over: " + ", ".join(
+            f"{factor} (the records do not carry it)" if level is None
+            else f"{factor} (one level: {level})"
+            for factor, level in sample.inactive_factors.items()))
 
 
 # ==============================================================================

@@ -39,10 +39,6 @@ def chunk_indices(prompt, pattern):
     return [i for i, text, _ in chunks(prompt) if re.fullmatch(pattern, text)]
 
 
-def spans_of(seg, name):
-    return [list(span) for span in seg.segments[name].spans]
-
-
 def indices_of(seg, name):
     return seg.segments[name].token_indices()
 
@@ -399,3 +395,34 @@ def test_std_stipulation_is_read_from_the_record_not_guessed(tokenizer):
     text = dict((i, t) for i, t, _ in chunks(other["clean_prompt"]))
     stip = indices_of(seg, "stipulation_token")
     assert text[stip[0]].startswith("invalid")
+
+
+# ==============================================================================
+# TEMPLATE ASSUMPTIONS THE SEGMENTER MAKES
+# ==============================================================================
+
+def test_every_mechanism_template_still_says_other():
+    """The Other Token is literal in the template, not a record field, so the
+    segmenter names the word itself. If a variant ever stops saying it, this
+    fails here rather than on every instance of a GPU run."""
+    for spec in SPECS.values():
+        for name in spec.variant_names:
+            designation = spec.variant(name).designation
+            assert re.search(r"(?<![A-Za-z0-9_])" + S.OTHER_WORD +
+                             r"(?![A-Za-z0-9_])", designation), \
+                f"{spec.task}/{name}: {designation!r}"
+
+
+def test_an_item_the_question_never_names_is_refused(tokenizer):
+    """Both items are named in the user question; a prompt where one is not is
+    a template change, and every Item Mention plot would silently be empty."""
+    record = dict(sdr_record())
+    for key in ("clean_prompt", "corrupt_prompt"):
+        head, _, tail = record[key].partition(
+            "<|start_header_id|>user<|end_header_id|>")
+        record[key] = head + "<|start_header_id|>user<|end_header_id|>" + \
+            tail.replace("pricing", "the other one")
+
+    seg = S.resolve_segmentation("sdr", record, tokenizer)
+    with pytest.raises(S.SegmentationError, match="item_2_question"):
+        S.validate_segmentation(seg, record, tokenizer)

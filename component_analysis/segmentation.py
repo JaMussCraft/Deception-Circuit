@@ -185,16 +185,12 @@ class TokenIndex:
 
         Every token the character span touches is included, which is what makes
         a word-level Segment claim the token that carries its leading space.
+        An empty character span, or one that touches no token, gives the empty
+        range `(0, 0)`.
         """
-        if end <= start:
-            return (0, 0)
-        first = next((i for i, (a, b) in enumerate(self.offsets)
-                      if b > start and a < end), None)
-        if first is None:
-            return (0, 0)
-        last = max(i for i, (a, b) in enumerate(self.offsets)
-                   if b > start and a < end)
-        return (first, last + 1)
+        touched = [i for i, (a, b) in enumerate(self.offsets)
+                   if b > start and a < end] if end > start else []
+        return (touched[0], touched[-1] + 1) if touched else (0, 0)
 
 
 def _word_re(word: str) -> "re.Pattern":
@@ -225,21 +221,9 @@ class _Builder:
         self.taken = [False] * len(index)
         self.segments: Dict[str, Segment] = {}
 
-    def claim(self, name: str, char_spans: Sequence[Tuple[int, int]], *,
-              source: str = "default") -> Segment:
-        wanted: List[int] = []
-        for start, end in char_spans:
-            first, last = self.index.token_range(start, end)
-            wanted.extend(range(first, last))
-        free = sorted({i for i in wanted if not self.taken[i]})
-        for i in free:
-            self.taken[i] = True
-        segment = Segment(name=name, spans=_contiguous(free), source=source)
-        self.segments[name] = segment
-        return segment
-
     def claim_tokens(self, name: str, indices: Sequence[int], *,
                      source: str = "default") -> Segment:
+        """Give `name` the tokens of `indices` that no earlier Segment took."""
         free = sorted({i for i in indices if not self.taken[i]})
         for i in free:
             self.taken[i] = True
@@ -247,12 +231,20 @@ class _Builder:
                                       source=source)
         return self.segments[name]
 
+    def claim(self, name: str, char_spans: Sequence[Tuple[int, int]], *,
+              source: str = "default") -> Segment:
+        """The same, addressed by character spans of the prompt."""
+        wanted: List[int] = []
+        for start, end in char_spans:
+            first, last = self.index.token_range(start, end)
+            wanted.extend(range(first, last))
+        return self.claim_tokens(name, wanted, source=source)
+
     def claim_remainder(self, name: str = UNSEGMENTED) -> Segment:
-        free = [i for i, taken in enumerate(self.taken) if not taken]
-        for i in free:
-            self.taken[i] = True
-        self.segments[name] = Segment(name=name, spans=_contiguous(free))
-        return self.segments[name]
+        """Give `name` every token still free, so the Segments partition the
+        prompt."""
+        return self.claim_tokens(
+            name, [i for i, taken in enumerate(self.taken) if not taken])
 
 
 def _contiguous(indices: Sequence[int]) -> Tuple[Tuple[int, int], ...]:
@@ -675,6 +667,15 @@ def validate_segmentation(segmentation: Segmentation, record: dict,
                 raise SegmentationError(
                     f"record {segmentation.record_id!r}: Designation Position "
                     f"{name!r} resolved to {len(segment.spans)} spans, not one")
+        # The Designation Suffix and the Pressure Clause may be absent (the
+        # saved FAR run, the pilot condition); the Item Mentions may not — the
+        # user question names both items in every variant.
+        for name in ("item_1_intro", "item_2_intro",
+                     "item_1_question", "item_2_question"):
+            if not segmentation.segments[name].spans:
+                raise SegmentationError(
+                    f"record {segmentation.record_id!r}: Item Mention {name!r} "
+                    f"is empty, so every plot of it would be too")
 
     return {"readout": segmentation.readout,
             "n_tokens": segmentation.n_tokens,
