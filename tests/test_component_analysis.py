@@ -98,7 +98,15 @@ def component_keys(components):
 # COARSENING
 # ==============================================================================
 
-def test_coarsening_agrees_with_the_evaluation_packages_coarsening():
+def test_coarsening_matches_the_evaluation_package_on_a_hierarchy_valid_circuit():
+    """Agreement where the two rules cannot disagree, which is the common case.
+
+    `make_masks` runs `validate_hierarchy`, which ties each head's coarse gate
+    to its neuron gates, so this fixture cannot tell the leaf rule from the
+    coarse one — it would pass either way. It is here because agreement on
+    ordinary circuits is what the ticket promises; the case that discriminates
+    is `test_an_open_head_gate_over_dead_neurons_is_not_a_component`.
+    """
     from component_analysis.components import circuit_components
 
     masks = make_masks({0: [0, 3], 1: [2]}, {0, 1})
@@ -131,8 +139,13 @@ def test_coarsening_of_a_leaf_only_delta_agrees_too():
     assert component_keys(components), "the delta came out empty; nothing tested"
 
 
-def test_a_head_is_a_component_when_any_leaf_gate_is_active():
-    """The rule from the glossary, asserted one head at a time."""
+def test_an_open_head_gate_over_dead_neurons_is_not_a_component():
+    """The test that fails if membership ever consults the coarse gate.
+
+    The glossary's rule, asserted one head at a time, on a mask that
+    deliberately breaks the hierarchy so that the head gate and the leaf gates
+    disagree. `evaluation/masks.coarsen_masks` would call this head live.
+    """
     from component_analysis.components import circuit_components
 
     masks = make_masks({0: [2]}, set())
