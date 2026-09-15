@@ -19,9 +19,11 @@ Layout
     hooks.py        every nnsight call in the package, and nothing else
 
 Only `hooks.py` imports nnsight, and it does so inside its functions, so the
-rest of the package imports in the login-node environment where nnsight cannot
-be installed (it needs Python >= 3.10). The CLI is `analyze_components.py` at
-the repo root, beside `evaluate_circuit.py`.
+rest of the package imports in the login-node base environment. That env has an
+nnsight — 0.5.12, for the parent Alignment repo — but not the 0.7.0 ADR-0001
+pins, which needs Python >= 3.10; the nnsight tests therefore gate on the
+version being exactly 0.7.0 rather than on nnsight importing. The CLI is
+`analyze_components.py` at the repo root, beside `evaluate_circuit.py`.
 
 The package is named `component_analysis` rather than `analysis` because
 `analysis.py` at the repo root is the node-mask extraction module and an

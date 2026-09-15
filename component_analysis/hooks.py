@@ -12,8 +12,11 @@ surface is confined to this one module: a 0.8 migration touches this file and
 no other. Two rules keep that true:
 
   * every nnsight import happens *inside* a function, so the rest of the
-    package imports in the login-node environment, where nnsight cannot be
-    installed (it needs Python >= 3.10);
+    package imports in the login-node base environment. That env is Python 3.9
+    and does carry an nnsight — 0.5.12, kept for the parent Alignment repo —
+    but not the pinned 0.7.0, which needs Python >= 3.10. So the question is
+    never "does nnsight import here" but "is it the pinned version", which is
+    what `tests/test_nnsight_hooks.py` gates on;
   * no other module in this package imports nnsight, directly or indirectly.
 
 Ticket 01 fills in only the model loading. The attention-profile, DLA,

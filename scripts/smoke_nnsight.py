@@ -2,8 +2,10 @@
 """
 scripts/smoke_nnsight.py — does nnsight trace this repo's model, in this env?
 
-Run it in the `mgnp` environment, which is the only one where nnsight installs
-(it needs Python >= 3.10; the login-node base env is 3.9):
+Run it in the `mgnp` environment, the only one with the pinned nnsight 0.7.0.
+The login-node base env is Python 3.9 and carries nnsight 0.5.12 for the parent
+Alignment repo, so this script imports there and then fails its own version
+check — which is the point of making that check first:
 
     source /sw/external/python/anaconda3/etc/profile.d/conda.sh
     conda activate mgnp
