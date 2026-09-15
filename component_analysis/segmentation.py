@@ -10,12 +10,13 @@ question, the assistant stem and the Readout. Spans are half-open ranges of
 item-swap Corruption is a single-token edit, so clean and corrupt align
 position for position.
 
-Each item has four Item Mentions, not three — the intro, the pair naming in the
-user question, that item's quoted option in the same question, and, for the
-designated item only, the Designation Site. The two question mentions are
-separate Segments (`item_N_question_pair`, `item_N_question_option`) because
-attention to the choice on offer is not the same thing as attention to the
-option about to be copied.
+The designated item has four Item Mentions, not three — the intro, the
+Designation Site, the pair naming in the user question and that item's quoted
+option in the same question; the other item has three, having no Designation
+Site. The two question mentions are separate Segments
+(`item_N_question_pair`, `item_N_question_option`) because attention to the
+choice on offer is not the same thing as attention to the option about to be
+copied.
 
 Anchors, not stored Scaffold text
 ---------------------------------

@@ -567,11 +567,12 @@ def load_survivors(dataset_dir: str,
                    ) -> List[str]:
     """The surviving instance ids under one honest criterion.
 
-    The default is `DEFAULT_HONEST_STREAMS` — the clean stream — whichever
-    criterion the build itself was run with, because every build writes both id
-    lists and the criterion is an analysis choice rather than a build one.
-    `honest_streams=None` asks instead for whatever the build recorded, which
-    is what the build script's own summary reports.
+    The default is `DEFAULT_HONEST_STREAMS` (the clean stream) regardless of
+    the criterion the build itself was run with, because every build writes
+    both id lists and the criterion is an analysis choice rather than a build
+    one. `honest_streams=None` returns the list the build wrote under its own
+    criterion (the top-level `instance_ids`), which is what the build's
+    report file counts as survivors.
     """
     path = os.path.join(dataset_dir, SURVIVORS_FILE)
     if not os.path.exists(path):

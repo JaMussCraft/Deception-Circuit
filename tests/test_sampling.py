@@ -191,6 +191,25 @@ def test_a_tiny_stratum_is_capped_and_its_surplus_goes_to_the_others():
         assert stratum.achieved <= stratum.available
 
 
+def test_the_surplus_levels_the_absorbing_strata_even_when_n_does_not_divide():
+    """The strata that absorb a capped stratum's surplus end within one.
+
+    `allocate` hands out the equal share plus one extra to the first `n % k`
+    strata, so a stratum can already be one ahead before redistribution starts.
+    Handing the surplus out in index order would stack the extra on the same
+    stratum: 10 over sizes 100, 100, 2 would give 5, 3, 2. The surplus goes to
+    the currently smallest stratum with room instead, so it levels.
+    """
+    targets, counts = sampling.allocate([100, 100, 2], 10)
+
+    assert targets == [4, 3, 3]
+    assert counts == [4, 4, 2]
+    assert sum(counts) == 10
+
+    absorbers = [counts[i] for i in (0, 1)]
+    assert max(absorbers) - min(absorbers) <= 1
+
+
 def test_the_sample_is_the_whole_stratum_when_every_one_is_too_small():
     """N larger than the split: every stratum is capped, nothing is lost."""
     records = one_tiny_stratum_records()

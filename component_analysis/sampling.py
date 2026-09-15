@@ -169,10 +169,12 @@ def allocate(sizes: Sequence[int], n: int) -> Tuple[List[int], List[int]]:
       It is what a stratum would get if every stratum had room, and it is
       recorded so `sample.json` says what the draw was aiming at.
     - `counts` is what can actually be drawn: the target capped by the
-      stratum's population, with the surplus from any capped stratum handed
-      round-robin to the strata that still have room. Round-robin rather than
-      largest-first keeps the strata that absorb the surplus within one of each
-      other, so the result stays as balanced as the populations allow.
+      stratum's population, with the surplus from any capped stratum handed one
+      at a time to the smallest stratum that still has room. That leaves the
+      strata which absorb the surplus within one of each other, so the result
+      is as balanced as the populations allow. Handing it out in index order
+      instead would stack it on a stratum already one ahead from the `n % k`
+      extra.
 
     `sum(counts) == min(n, sum(sizes))`. An empty stratum gets a target of zero
     rather than an equal share it could never fill; it cannot arise from
@@ -200,7 +202,11 @@ def allocate(sizes: Sequence[int], n: int) -> Tuple[List[int], List[int]]:
         # stratum were full `counts` would already sum to the total, which is
         # at least `n`, and `remaining` would not be positive.
         assert room, "every stratum is full but the draw is still short"
-        for i in room:
+        # Smallest first, ties by index. Index order alone would stack the
+        # surplus on a stratum that is already one ahead from the `n % k`
+        # extra: 10 over sizes 100, 100, 2 would give 5, 3, 2 rather than
+        # 4, 4, 2. Deterministic either way; this one actually levels.
+        for i in sorted(room, key=lambda j: (counts[j], j)):
             if remaining == 0:
                 break
             counts[i] += 1
