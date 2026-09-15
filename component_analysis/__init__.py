@@ -13,6 +13,9 @@ Layout
     components.py   mask object -> Components (pure Python, no model)
     head_table.py   the one table every analysis writes into (CSV + JSON)
     intake.py       circuit / reference / task resolution and the cell layout
+    segmentation.py prompt -> Segments (the spans an analysis aggregates over)
+    sampling.py     the fixed-seed stratified sample the causal analyses use
+    instances.py    the split's records, and segmentation.json / sample.json
     hooks.py        every nnsight call in the package, and nothing else
 
 Only `hooks.py` imports nnsight, and it does so inside its functions, so the
