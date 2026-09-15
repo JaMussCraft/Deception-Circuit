@@ -23,6 +23,7 @@ What lives here
     select_matched_instruction / build_pool   the drafting script's engine
     load_candidates / load_matched_honest_pool   the pool files
     filter_matched_honest                  the two-sided margin filter
+    pair_with_matched_instructions         one honest twin per record, asserted
     MatchedHonestDataset / load_matched_honest   the loader the analyses use
 
 Why string surgery rather than `deception_common.rebuild_prompt`. The saved
@@ -295,9 +296,10 @@ def load_candidates(pools_dir: Optional[str] = None) -> List[str]:
 HONEST_STREAM_CHOICES = ("both", "clean")
 
 
-def honest_records(records: Sequence[Dict], pool: Dict[str, Dict], tokenizer,
-                   max_seq_length: int = dc.MAX_SEQ_LENGTH
-                   ) -> Tuple[List[Dict], List[Dict], List[str]]:
+def pair_with_matched_instructions(
+        records: Sequence[Dict], pool: Dict[str, Dict], tokenizer,
+        max_seq_length: int = dc.MAX_SEQ_LENGTH
+) -> Tuple[List[Dict], List[Dict], List[str]]:
     """(records that have an instruction, their honest twins, clause ids without one).
 
     Every returned pair has been through `assert_clause_aligned_pair`, so the
@@ -326,6 +328,15 @@ def honest_records(records: Sequence[Dict], pool: Dict[str, Dict], tokenizer,
                                    clause, max_seq_length)
         assert_clause_aligned_pair(tokenizer, record["corrupt_prompt"], corrupt,
                                    clause, max_seq_length)
+        # The honest pair is itself an item-swap pair, so it keeps the existing
+        # single-position assertion. Not cosmetic: `evaluate_behavior` takes
+        # `prefix_length` from the clean prompt and reads position
+        # `prefix_length - 1` in BOTH streams, so a merge that lengthened the
+        # honest corrupt prompt would move the Readout under the honest
+        # criterion without anything saying so.
+        dc.assert_aligned_pair(tokenizer, clean, corrupt,
+                               record["clean_item_d"], record["corrupt_item_d"],
+                               max_seq_length)
         kept.append(record)
         honest.append({**record, "clean_prompt": clean,
                        "corrupt_prompt": corrupt,
@@ -364,7 +375,8 @@ def filter_matched_honest(records: Sequence[Dict], pool: Dict[str, Dict],
         raise ValueError(f"honest_streams must be one of "
                          f"{list(HONEST_STREAM_CHOICES)}, got {honest_streams!r}")
 
-    kept, honest, missing = honest_records(records, pool, tokenizer, max_length)
+    kept, honest, missing = pair_with_matched_instructions(
+        records, pool, tokenizer, max_length)
     report = {
         "margin_thresh": margin_thresh,
         "honest_streams": honest_streams,
@@ -379,6 +391,9 @@ def filter_matched_honest(records: Sequence[Dict], pool: Dict[str, Dict],
         report["overall"] = {"n": 0, "n_pressure_pass": 0,
                              "n_honest_pass_clean": 0, "n_honest_pass_both": 0,
                              "n_survivors": 0, "survivor_rate": 0.0}
+        report["min_survivors"] = min_survivors
+        report["unexpected_argmax_tokens"] = {}
+        report["survivor_ids"] = {"clean": [], "both": []}
         return [], report
 
     # --- pressure side: the existing filter, unchanged --------------------
@@ -398,8 +413,12 @@ def filter_matched_honest(records: Sequence[Dict], pool: Dict[str, Dict],
             b["clean_argmax_id"] == b["distractor_token"] and
             -b["clean_margin"] >= margin_thresh)
 
-    honest_key = "honest" if honest_streams == "both" else "honest_clean"
+    honest_key = {"both": "honest", "clean": "honest_clean"}[honest_streams]
     survivors, by_clause = [], {}
+    # Both criteria's survivor ids are recorded, not just the chosen one: the
+    # forward passes have already been paid for, and the choice between them is
+    # the researcher's. Writing both means revisiting it costs no GPU time.
+    survivor_ids = {"clean": [], "both": []}
     for record, pb, hb in zip(kept, pressure_behaviors, honest_behaviors):
         row = by_clause.setdefault(record["pressure_id"], {
             "instruction": pool[record["pressure_id"]]["instruction"],
@@ -410,6 +429,9 @@ def filter_matched_honest(records: Sequence[Dict], pool: Dict[str, Dict],
         row["n_pressure_pass"] += int(pb["passed"])
         row["n_honest_pass_clean"] += int(hb["honest_clean"])
         row["n_honest_pass_both"] += int(hb["honest"])
+        for criterion, key in (("clean", "honest_clean"), ("both", "honest")):
+            if pb["passed"] and hb[key]:
+                survivor_ids[criterion].append(record["instance_id"])
         if pb["passed"] and hb[honest_key]:
             row["n_survivors"] += 1
             survivors.append(record)
@@ -434,7 +456,8 @@ def filter_matched_honest(records: Sequence[Dict], pool: Dict[str, Dict],
         "n_survivors": len(survivors),
         "survivor_rate": len(survivors) / len(kept),
     }
-    report["unexpected_argmax_tokens"] = dict(Counter(unexpected).most_common())
+    report["unexpected_argmax_tokens"] = dict(unexpected.most_common())
+    report["survivor_ids"] = survivor_ids
     return survivors, report
 
 
@@ -452,11 +475,15 @@ def write_survivors(dataset_dir: str, task: str, survivors: Sequence[Dict],
     """
     os.makedirs(dataset_dir, exist_ok=True)
     ids_path = os.path.join(dataset_dir, SURVIVORS_FILE)
+    payload = {"task": task, "split": split,
+               "honest_streams": report.get("honest_streams"),
+               "n": len(survivors),
+               "instance_ids": [r["instance_id"] for r in survivors]}
+    if "survivor_ids" in report:
+        # Both honest criteria, so switching between them needs no GPU rerun.
+        payload["instance_ids_by_criterion"] = report["survivor_ids"]
     with open(ids_path, "w") as f:
-        json.dump({"task": task, "split": split,
-                   "n": len(survivors),
-                   "instance_ids": [r["instance_id"] for r in survivors]},
-                  f, indent=1)
+        json.dump(payload, f, indent=1)
         f.write("\n")
     report_path = os.path.join(dataset_dir, REPORT_FILE)
     with open(report_path, "w") as f:
@@ -465,14 +492,29 @@ def write_survivors(dataset_dir: str, task: str, survivors: Sequence[Dict],
     return {"survivors": ids_path, "report": report_path}
 
 
-def load_survivors(dataset_dir: str) -> List[str]:
+def load_survivors(dataset_dir: str, honest_streams: Optional[str] = None
+                   ) -> List[str]:
+    """The surviving instance ids.
+
+    `honest_streams` re-reads the file under the other honest criterion without
+    a GPU rerun; the default is whichever criterion the build was run with.
+    """
     path = os.path.join(dataset_dir, SURVIVORS_FILE)
     if not os.path.exists(path):
         raise FileNotFoundError(
             f"{path} not found — run dataset/build_matched_honest.py to filter "
             f"the split before loading the Honest-Instruction Counterfactual.")
     with open(path) as f:
-        return list(json.load(f)["instance_ids"])
+        payload = json.load(f)
+    if honest_streams is None:
+        return list(payload["instance_ids"])
+    by_criterion = payload.get("instance_ids_by_criterion")
+    if by_criterion is None or honest_streams not in by_criterion:
+        raise KeyError(
+            f"{path} does not record survivors for honest_streams="
+            f"{honest_streams!r}; it was written by an older build. Rerun "
+            f"dataset/build_matched_honest.py.")
+    return list(by_criterion[honest_streams])
 
 
 # ==============================================================================
@@ -543,7 +585,9 @@ def load_matched_honest(dataset_dir: str, tokenizer, *, split: str = "test",
                         task: Optional[str] = None,
                         pools_dir: Optional[str] = None,
                         max_length: Optional[int] = None,
-                        survivors_only: bool = True) -> MatchedHonestDataset:
+                        survivors_only: bool = True,
+                        honest_streams: Optional[str] = None
+                        ) -> MatchedHonestDataset:
     """The paired dataset: the base split, filtered to the survivors, plus the pool."""
     config = dc.load_dataset_config(dataset_dir) if os.path.exists(
         os.path.join(dataset_dir, "dataset_config.json")) else {}
@@ -556,7 +600,7 @@ def load_matched_honest(dataset_dir: str, tokenizer, *, split: str = "test",
 
     records = dc.load_or_generate_deception_data(dataset_dir, split=split)
     if survivors_only:
-        keep = set(load_survivors(dataset_dir))
+        keep = set(load_survivors(dataset_dir, honest_streams))
         records = [r for r in records if r["instance_id"] in keep]
     pool = load_matched_honest_pool(task, pools_dir)
     return MatchedHonestDataset(records, pool, tokenizer, max_length=max_length)

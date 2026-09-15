@@ -184,8 +184,8 @@ def main(argv=None):
 
     # The every-instance assertion. This is what makes the pool a guarantee
     # rather than a sample: it runs on the login node, before any GPU time.
-    kept, _, missing = mh.honest_records(records, pool, tokenizer,
-                                         args.max_seq_length)
+    kept, _, missing = mh.pair_with_matched_instructions(
+        records, pool, tokenizer, args.max_seq_length)
     print(f"\nClause-span alignment asserted on {len(kept)}/{len(records)} "
           f"instance(s) of {args.split}.")
     if missing:
@@ -242,6 +242,14 @@ def main(argv=None):
           f">= {args.min_survivors} survivor(s)")
     print("  'rate' columns are conditional on n, and n is very uneven across "
           "clauses —\n  read a rate on a handful of instances as noise.")
+    other = "clean" if args.honest_streams == "both" else "both"
+    n_other = len(report["survivor_ids"][other])
+    n_usable_other = sum(
+        1 for pid in report["by_clause"]
+        if report["by_clause"][pid][f"n_honest_pass_{other}"] > 0)
+    print(f"  --honest-streams {other} would keep {n_other} instance(s) across "
+          f"{n_usable_other} clause(s); both id lists are written, so switching "
+          f"costs no GPU time.")
 
     written = mh.write_survivors(args.dataset_dir, args.task, survivors, report,
                                  split=args.split)

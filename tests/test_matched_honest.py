@@ -438,7 +438,8 @@ def test_the_saved_sdr_split_aligns_under_the_pool(llama_tok):
         pytest.skip("the SDR dataset is not in this checkout")
     records = dc.load_or_generate_deception_data(dataset_dir, split="test")[:200]
     pool = mh.load_matched_honest_pool("sdr")
-    kept, honest, missing = mh.honest_records(records, pool, llama_tok, 128)
+    kept, honest, missing = mh.pair_with_matched_instructions(
+        records, pool, llama_tok, 128)
     assert missing == []
     assert len(kept) == len(records) == len(honest)
 
@@ -474,3 +475,27 @@ def test_the_fixed_length_honest_variant_is_a_different_object(llama_tok):
     assert mismatched > 0, \
         "the fixed-length variant preserved every prompt length; the pool " \
         "would then be redundant"
+
+
+def test_both_honest_criteria_are_recorded_so_the_choice_needs_no_rerun(tok, tmp_path):
+    recs, pressures = _filter_records(tok, 4)
+    pool = _pool_for(tok, pressures)
+    tt = _answer_tokens(tok, recs)
+    p_clean = _script([(t, d) for t, d in tt])
+    p_corrupt = _script([(d, t) for t, d in tt])
+    h_clean = _script([(d, t) for t, d in tt])          # all four honest, clean
+    h_corrupt = _script([(tt[0][0], tt[0][1])] +
+                        [(d, t) for t, d in tt[1:]])    # only row 0 honest, corrupt
+    model = ScriptedModel([p_clean, p_corrupt, h_clean, h_corrupt])
+
+    survivors, report = mh.filter_matched_honest(
+        recs, pool, model, tok, "cpu", margin_thresh=1.0,
+        honest_streams="both", max_length=128, batch_size=4)
+
+    assert report["survivor_ids"]["both"] == [recs[0]["instance_id"]]
+    assert report["survivor_ids"]["clean"] == [r["instance_id"] for r in recs]
+
+    mh.write_survivors(str(tmp_path), "sdr", survivors, report)
+    assert mh.load_survivors(str(tmp_path)) == report["survivor_ids"]["both"]
+    assert mh.load_survivors(str(tmp_path), "clean") == \
+        report["survivor_ids"]["clean"]
