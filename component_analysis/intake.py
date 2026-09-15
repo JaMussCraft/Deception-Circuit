@@ -105,7 +105,13 @@ def resolve_intake(cli) -> Intake:
     rather than as a shape error inside an analysis.
     """
     specs, bindings, _operands, configs, geometry = \
-        circuit_intake.resolve_circuits(cli)
+        circuit_intake.resolve_circuit_specs(
+            run_dir=getattr(cli, "run_dir", None),
+            circuit=getattr(cli, "circuit", None),
+            expr=getattr(cli, "expr", None),
+            xor=getattr(cli, "xor", None),
+            all_pairs_delta=getattr(cli, "all_pairs_delta", False),
+            compose_granularity=getattr(cli, "compose_granularity", "both"))
     tasks = circuit_intake.resolve_tasks(cli, bindings, configs)
 
     refs = reference_bindings(cli)

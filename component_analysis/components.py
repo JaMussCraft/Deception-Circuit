@@ -30,10 +30,6 @@ from dataclasses import dataclass
 
 import numpy as np
 
-#: The two kinds of Component. Attention neurons, MLP hidden and MLP output
-#: units are not Components of their own — see the spec's Out of Scope.
-KINDS = ("head", "mlp")
-
 
 @dataclass(frozen=True)
 class Component:
@@ -152,7 +148,8 @@ def mlp_component(masks: dict, layer: int):
         if not live_layer or masks.get("mlp_blocks") is None:
             return None
         return Component(kind="mlp", layer=layer, index=0, kv_group=None,
-                         head_gate_active=True, active_neuron_count=0)
+                         head_gate_active=_block_gate(masks, "mlp_blocks", layer),
+                         active_neuron_count=0)
 
     count = int(sum(int(v.sum()) for v in (hidden, output) if v is not None))
     if not (count > 0 and live_layer):

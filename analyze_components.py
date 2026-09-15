@@ -100,15 +100,15 @@ def build_parser():
 # HEAD TABLE
 # ==============================================================================
 
-def head_table_for(circuit_spec, cells_intake, *, num_kv_heads: int):
+def head_table_for(circuit_spec, resolved, *, num_kv_heads: int):
     """The intake rows for one circuit: its Components plus reference columns."""
-    geometry = cells_intake.geometry
+    geometry = resolved.geometry
     components = circuit_components(
         circuit_spec.masks, num_heads=geometry["num_heads"],
         head_dim=geometry["head_dim"], num_kv_heads=num_kv_heads)
 
     rows = rows_from_components(components)
-    for name, masks in cells_intake.references.items():
+    for name, masks in resolved.references.items():
         membership = {
             component.key: {name: is_component_of(
                 component, masks, num_heads=geometry["num_heads"],
@@ -119,10 +119,10 @@ def head_table_for(circuit_spec, cells_intake, *, num_kv_heads: int):
 
 
 def write_cell(cell_dir: str, circuit_spec, task_spec, rows, components,
-               cells_intake) -> dict:
+               resolved) -> dict:
     meta = {"circuit": circuit_spec.provenance(),
             "task": task_spec.provenance(),
-            "intake": cells_intake.provenance(),
+            "intake": resolved.provenance(),
             "components": count_components(components)}
     return write_head_table(cell_dir, rows, meta=meta)
 
@@ -131,34 +131,34 @@ def write_cell(cell_dir: str, circuit_spec, task_spec, rows, components,
 # DRY RUN
 # ==============================================================================
 
-def dry_run(cli, cells_intake) -> int:
+def dry_run(cli, resolved) -> int:
     kv_heads = intake.num_key_value_heads(
-        cells_intake.model, hf_token=cli.hf_token, override=cli.num_kv_heads)
-    root = intake.analyses_root(cli, cells_intake.base_run_dir)
+        resolved.model, hf_token=cli.hf_token, override=cli.num_kv_heads)
+    root = intake.analyses_root(cli, resolved.base_run_dir)
 
     print("\nDRY RUN — no model loaded, no CUDA touched")
-    print(f"  model        {cells_intake.model}")
-    print(f"  geometry     {cells_intake.geometry}")
+    print(f"  model        {resolved.model}")
+    print(f"  geometry     {resolved.geometry}")
     print(f"  kv heads     {kv_heads} "
-          f"({cells_intake.geometry['num_heads'] // kv_heads} query heads per group)")
+          f"({resolved.geometry['num_heads'] // kv_heads} query heads per group)")
     print("  references   " + (", ".join(
-        f"{n}={d}" for n, d in cells_intake.reference_run_dirs.items()) or "(none)"))
+        f"{n}={d}" for n, d in resolved.reference_run_dirs.items()) or "(none)"))
     print(f"  output root  {root}\n")
 
-    for circuit_spec in cells_intake.circuits:
-        components, rows = head_table_for(circuit_spec, cells_intake,
+    for circuit_spec in resolved.circuits:
+        components, rows = head_table_for(circuit_spec, resolved,
                                           num_kv_heads=kv_heads)
         census = count_components(components)
-        for task_spec in cells_intake.tasks:
+        for task_spec in resolved.tasks:
             cell = intake.cell_dir(root, circuit_spec, task_spec)
             written = write_cell(cell, circuit_spec, task_spec, rows,
-                                 components, cells_intake)
+                                 components, resolved)
             print(f"  {circuit_spec.label} x {task_spec.label}")
             print(f"    {census['heads']} head(s) and {census['mlps']} MLP "
                   f"block(s) over {census['layers']} layer(s); "
                   f"{census['heads_head_gate_active']} head(s) have their head "
                   f"gate open")
-            for name in cells_intake.references:
+            for name in resolved.references:
                 shared = sum(1 for r in rows if r.get(f"reference.{name}"))
                 print(f"    shared with {name}: {shared} of {len(rows)} Components")
             print(f"    {written['csv']}")
@@ -175,13 +175,13 @@ def dry_run(cli, cells_intake) -> int:
 
 def main(argv=None) -> int:
     cli = build_parser().parse_args(argv)
-    cells_intake = intake.resolve_intake(cli)
+    resolved = intake.resolve_intake(cli)
     if not cli.dry_run:
         raise SystemExit(
             "analyze_components.py currently implements --dry-run only: circuit "
             "intake and the head table. The analyses that load a model arrive "
             "with the tickets that add them.")
-    return dry_run(cli, cells_intake)
+    return dry_run(cli, resolved)
 
 
 if __name__ == "__main__":

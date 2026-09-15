@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import csv
 import json
+import os
 import sys
 
 import numpy as np
@@ -217,12 +218,22 @@ def test_membership_reports_whether_a_component_is_in_another_circuit():
 
 
 def test_the_intake_layer_does_not_import_nnsight():
-    """Pure-Python parts must import in the base env, where nnsight cannot."""
-    import component_analysis.components          # noqa: F401
-    import component_analysis.head_table          # noqa: F401
-    import component_analysis.intake              # noqa: F401
+    """The pure-Python parts must import where nnsight 0.7.0 is not installed.
 
-    assert "nnsight" not in sys.modules
+    Run in a fresh interpreter on purpose: `sys.modules` is process-wide, so
+    checking it in-process would pass or fail on whether some earlier test in
+    the session happened to import nnsight first.
+    """
+    import subprocess
+
+    probe = ("import component_analysis.components, component_analysis.head_table, "
+             "component_analysis.intake, sys; "
+             "assert 'nnsight' not in sys.modules, sorted(sys.modules)")
+    result = subprocess.run([sys.executable, "-c", probe],
+                            cwd=os.path.dirname(os.path.dirname(
+                                os.path.abspath(__file__))),
+                            capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr
 
 
 # ==============================================================================

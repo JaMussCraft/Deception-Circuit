@@ -1,12 +1,16 @@
 """
 The nnsight facts the component analyses are built on, on the tiny model.
 
-Everything here needs nnsight, which installs only in the `mgnp` environment
-(Python >= 3.10), so the module skips wholesale in the login-node base env and
-the rest of the suite still collects. The assertions are the same ones
-`scripts/smoke_nnsight.py` makes by hand — they live here as well so that an
-nnsight or transformers upgrade that moves a module boundary fails the suite
-rather than a GPU job three tickets later.
+Everything here describes nnsight 0.7.0, which is the version ADR-0001 pins and
+which lives in the `mgnp` environment. The module skips wholesale anywhere
+else, and "anywhere else" is not hypothetical: the login-node base env carries
+an nnsight 0.5.12 for the parent Alignment repo, so gating on "nnsight
+imports" would run 0.7.0 assertions against 0.5.12 and report the wrong
+version as a broken hook. The gate is the version itself.
+
+The assertions are the same ones `scripts/smoke_nnsight.py` makes by hand —
+they live here as well so that an nnsight or transformers upgrade that moves a
+module boundary fails the suite rather than a GPU job three tickets later.
 
 Tests are deliberately at the same seam the hook module will use: module
 boundaries on the unmodified `LlamaForCausalLM`, never the prunable wrapper
@@ -17,7 +21,12 @@ from __future__ import annotations
 
 import pytest
 
-pytest.importorskip("nnsight")
+nnsight = pytest.importorskip("nnsight")
+PINNED = "0.7.0"
+if nnsight.__version__ != PINNED:
+    pytest.skip(f"nnsight {nnsight.__version__} is installed, not the pinned "
+                f"{PINNED}; these are 0.7.0 behaviours.",
+                allow_module_level=True)
 
 import torch                                              # noqa: E402
 

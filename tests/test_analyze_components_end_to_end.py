@@ -86,6 +86,26 @@ def read_table(root, *cell):
 # TESTS
 # ==============================================================================
 
+def test_circuits_resolve_without_an_evaluator_session(tiny_runs):
+    """The prefactor's point: intake needs no Session and no argparse.
+
+    `build_session` loads 32 GB of weights and the notebook has no CLI
+    namespace, so circuit resolution has to be reachable by keyword on its own.
+    """
+    from evaluation.circuits import resolve_circuit_specs
+
+    run_dir, honest, _out = tiny_runs
+    specs, bindings, _operands, configs, geometry = resolve_circuit_specs(
+        circuit=[f"sdr={run_dir}", f"twin={honest}"],
+        expr=["delta=sdr \\ twin"], compose_granularity="head")
+
+    assert [spec.label for spec in specs] == ["delta__head"]
+    assert specs[0].kind == "head"
+    assert sorted(bindings) == ["sdr", "twin"]
+    assert configs["sdr"]["task"] == "tinystd"
+    assert geometry["num_heads"] == TINY["heads"]
+
+
 def test_dry_run_writes_the_head_table_and_nothing_else(tiny_runs):
     run_dir, _honest, out = tiny_runs
 
