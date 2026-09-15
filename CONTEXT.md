@@ -138,6 +138,65 @@ one position, one target token, one distractor token, each a single token with
 a leading space.
 _Avoid_: prediction head, answer position
 
+### Prompt anatomy (component analysis)
+
+**Designating Sentence**:
+The system-turn sentence that singles out one item and applies the
+**Predicate** to it: "The {item} result is {predicate}, and the other result is
+{inverse predicate}." It contains the four **Designation Positions**.
+
+**Designation Suffix**:
+The task-specific sentence that follows the Designating Sentence and restates
+which kind of item matters (e.g. "Notice which one is strong and which one is
+weak."). It repeats predicate words without naming an item, so attention to it
+is kept separate from attention to the Predicate Token.
+
+**Designation Positions**:
+The four tokens of the Designating Sentence that carry the designation, named
+by role rather than by index:
+- **Designation Site** — the designated item's word; the only token the
+  **Corruption** changes. _Avoid_: designation token, corruption token.
+- **Predicate Token** — the adjective applied to the designated item
+  (failing / critical / unfavorable, or their identity counterparts).
+- **Other Token** — the word "other", which refers to the non-designated item
+  without naming it.
+- **Inverse Predicate Token** — the adjective applied to the other item.
+
+**Item Mention**:
+One occurrence of an item word in a prompt. Each item is mentioned three
+times — in the intro, at the Designation Site (the designated item only), and
+in the user question — and a component attending to one mention is doing
+something different from one attending to another, so mentions are never
+pooled.
+
+**Segment**:
+A named span of a prompt used as the unit for aggregating what a component
+reads: intro, each Item Mention, each Designation Position, the Pressure
+Clause, the Designation Suffix, the user question, the assistant stem, and the
+**Readout**. The segmentation is task-defined; STD has its own.
+
+**Matched Honest Instruction**:
+An honesty instruction written to occupy exactly the same number of tokens as
+the Pressure Clause it replaces, so a prompt and its honest counterpart align
+token for token everywhere and differ only inside the clause. The
+**Honest-Instruction Counterfactual** is the pair (prompt, prompt with its
+clause replaced by its Matched Honest Instruction); it is the paired, causal
+version of the Honest Twin contrast, which is unpaired.
+_Avoid_: honest variant (reserved for the unmatched fixed-length instruction
+used by the pressure evaluations).
+
+**Component**:
+The unit of interpretation: an attention head or an MLP block, identified by
+layer and index. Finer gates (attention neurons, MLP hidden and output
+dimensions) are collapsed onto their Component. A **Circuit Component** is one
+whose Component has any active gate in the circuit under study.
+
+**Component Role**:
+A label for what a Component does in the task, assigned only from the
+conjunction of where it reads (attention pattern), what it writes (direct
+logit attribution) and what it depends on (path patching). No single view
+assigns a role.
+
 **Target** / **Distractor**:
 The token the mechanism's deceptive behavior selects, and the honest token it
 competes against. Which is which flips between the clean and corrupt streams.
