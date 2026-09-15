@@ -28,10 +28,12 @@ if nnsight.__version__ != PINNED:
                 f"{PINNED}; these are 0.7.0 behaviours.",
                 allow_module_level=True)
 
+from types import SimpleNamespace                         # noqa: E402
+
 import torch                                              # noqa: E402
 
 from scripts import smoke_nnsight                         # noqa: E402
-from tests.helpers import TINY                            # noqa: E402
+from tests.helpers import TINY, tiny_config               # noqa: E402
 
 SEQ = smoke_nnsight.SEQ
 
@@ -73,3 +75,75 @@ def test_envoy_accesses_must_be_written_in_execution_order(input_ids):
         with traced.trace(input_ids):
             traced.model.layers[0].self_attn.o_proj.input.save()
             traced.model.layers[0].self_attn.q_proj.output.save()
+
+
+# ==============================================================================
+# load_analysis_model
+# ==============================================================================
+
+def fake_hf_loaders(monkeypatch) -> dict:
+    """Record what the HuggingFace loaders receive, and load nothing real.
+
+    nnsight reaches `AutoConfig`, `AutoTokenizer` and `AutoModelForCausalLM`
+    through the transformers classes themselves, so replacing their
+    `from_pretrained` runs `LanguageModel.__init__` end to end without a repo,
+    a network or weights. The tiny random Llama stands in for the real model so
+    that nnsight's own wrapping is exercised rather than skipped.
+
+    Returns {"config" | "tokenizer" | "model": the kwargs that loader saw}.
+    """
+    import transformers
+
+    seen = {}
+
+    def load_config(repo_id, **kwargs):
+        seen["config"] = kwargs
+        return tiny_config()
+
+    def load_tokenizer(repo_id, **kwargs):
+        kwargs.pop("config", None)
+        seen["tokenizer"] = kwargs
+        return SimpleNamespace(pad_token="<pad>", eos_token="<eos>")
+
+    def load_model(repo_id, **kwargs):
+        seen["model"] = kwargs
+        return smoke_nnsight.build_tiny()
+
+    monkeypatch.setattr(transformers.AutoConfig, "from_pretrained", load_config)
+    monkeypatch.setattr(transformers.AutoTokenizer, "from_pretrained",
+                        load_tokenizer)
+    monkeypatch.setattr(transformers.AutoModelForCausalLM, "from_pretrained",
+                        load_model)
+    return seen
+
+
+def test_the_hf_token_reaches_the_tokenizer_and_not_only_the_weights(monkeypatch):
+    """A gated repo needs the token twice, and nnsight keeps the two apart.
+
+    `LanguageModel._load` forwards `**kwargs` to the config and to the model,
+    but loads the tokenizer from a separate `tokenizer_kwargs` that defaults to
+    empty. A token passed only in `**kwargs` therefore loads the weights of a
+    gated repo and then fails on the tokenizer with a 401 that names the
+    tokenizer rather than the token.
+    """
+    from component_analysis.hooks import load_analysis_model
+
+    seen = fake_hf_loaders(monkeypatch)
+
+    load_analysis_model("some-org/some-gated-llama", device="cpu",
+                        hf_token="hf_a_test_token")
+
+    assert seen["tokenizer"].get("token") == "hf_a_test_token"
+    assert seen["model"].get("token") == "hf_a_test_token"
+
+
+def test_no_hf_token_means_no_token_kwarg_anywhere(monkeypatch):
+    """An ungated repo, or a cached login, must not be handed a null token."""
+    from component_analysis.hooks import load_analysis_model
+
+    seen = fake_hf_loaders(monkeypatch)
+
+    load_analysis_model("some-org/some-open-llama", device="cpu")
+
+    assert "token" not in seen["tokenizer"]
+    assert "token" not in seen["model"]

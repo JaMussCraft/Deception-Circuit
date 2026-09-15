@@ -64,8 +64,11 @@ def load_analysis_model(model_name: str, *, device: str = "cuda",
     `from_pretrained`, where `dtype` is transformers 5.x's spelling of what
     `models/__init__.py` still calls `torch_dtype` for the 4.57 login env.
 
-    Not exercised by any test: it needs real weights and a GPU. The first
-    ticket to load a model should treat that as its own first assertion.
+    `tests/test_nnsight_hooks.py` exercises the CPU path with the three
+    HuggingFace loaders faked, which pins where each kwarg lands. The GPU path
+    — `device_map="cuda"` and the bfloat16 default that follows from it — has
+    no test, so the first ticket to load a model on a GPU should treat a
+    successful call as its own first assertion.
     """
     import torch
     from nnsight import LanguageModel
@@ -84,5 +87,12 @@ def load_analysis_model(model_name: str, *, device: str = "cuda",
         kwargs["dtype"] = torch.bfloat16
     if hf_token:
         kwargs["token"] = hf_token
+        # `LanguageModel._load` forwards **kwargs to the config and to the
+        # model, but loads the tokenizer from a separate `tokenizer_kwargs`
+        # that defaults to empty. Without this the weights of a gated repo load
+        # and the tokenizer then 401s, naming the tokenizer rather than the
+        # token. `models/__init__.py` passes it to both loaders for the same
+        # reason.
+        kwargs["tokenizer_kwargs"] = {"token": hf_token}
 
     return LanguageModel(hf_id, device_map=device, dispatch=True, **kwargs)
