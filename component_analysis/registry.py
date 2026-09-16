@@ -33,9 +33,23 @@ import os
 from dataclasses import dataclass, field
 from typing import List, Optional
 
-#: The built-in analyses, in the order they run. Tickets 03, 04, 07 and 08 add
-#: one dotted module path each.
-ANALYSES: List[str] = []
+#: The built-in analyses, in the order they run: descriptive ones first, so a
+#: causal analysis can read a column an earlier one wrote.
+#:
+#: One line per analysis, and the four that block on this scaffold each have
+#: their own placeholder line to replace. The blank lines between them are not
+#: decoration: four sibling branches each adding a line to the same one-element
+#: list conflict on every rebase after the first, and a line of their own,
+#: separated, does not.
+ANALYSES: List[str] = [
+    # ticket 03, attention patterns:     "component_analysis.attention",
+
+    # ticket 04, DLA and logit lens:     "component_analysis.dla",
+
+    # ticket 07, per-Component knockout: "component_analysis.knockout",
+
+    # ticket 08, path patching:          "component_analysis.path_patching",
+]
 
 #: The five names a module must expose to be an analysis.
 REQUIRED = ("NAME", "SUBDIR", "add_arguments", "estimate", "run")
