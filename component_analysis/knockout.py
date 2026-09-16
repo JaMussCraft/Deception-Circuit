@@ -47,6 +47,11 @@ import os
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
+# The head table's own key coercion: a Component, a (kind, layer, index)
+# tuple or a key read back out of JSON all become one tuple, so a row here
+# and a row there cannot disagree about what names a Component.
+from component_analysis.head_table import row_key
+
 NAME = "knockout"
 SUBDIR = "knockout"
 
@@ -58,6 +63,13 @@ PNG_NAME = "knockout.png"
 #: The only ablation scheme that exists, and the two that do not yet.
 SCHEME = "interchange"
 FUTURE_SCHEMES = ("mean", "zero")
+
+#: What of the loader's report belongs in this analysis's JSON. The
+#: Honest-Instruction counts it also carries are the paired analyses' business:
+#: a knockout runs on the item-swap pair alone, and printing "71 of 100 paired"
+#: beside a knockout number would invite the reader to think it used them.
+SAMPLE_FIELDS = ("task", "split", "batch_size", "max_length", "n_requested",
+                 "n_instances", "missing_from_split", "dropped_by_tokenization")
 
 #: Seconds per forward pass at batch 8 x 128 tokens on an A40, measured by the
 #: block C scaffold check (ticket 02b). Only `--dry-run`'s estimate uses it.
@@ -103,8 +115,8 @@ class Effects:
 
     ids: List[str]
     keys: List[tuple]
-    clean_logit_diff: List[float]
-    knocked_logit_diff: Dict[tuple, List[float]]
+    clean_logit_difference: List[float]
+    knocked_logit_difference: Dict[tuple, List[float]]
     scheme: str = SCHEME
     #: What the loader said about the sample it built; carried into the JSON.
     report: dict = field(default_factory=dict)
@@ -112,14 +124,7 @@ class Effects:
     def drops(self, key) -> List[float]:
         """Clean minus knocked-out, per instance. Positive helps deception."""
         return [clean - knocked for clean, knocked
-                in zip(self.clean_logit_diff, self.knocked_logit_diff[key])]
-
-
-def _key(component) -> tuple:
-    """A `Component`, or a plain (kind, layer, index), as a tuple key."""
-    key = getattr(component, "key", component)
-    kind, layer, index = key
-    return (str(kind), int(layer), int(index))
+                in zip(self.clean_logit_difference, self.knocked_logit_difference[key])]
 
 
 def _accuracy(values) -> Optional[float]:
@@ -153,10 +158,10 @@ def clean_run(effects: Effects) -> dict:
     random-circuit null is a baseline too.
     """
     return {
-        "mean_logit_difference": _mean(effects.clean_logit_diff),
-        "standard_error": _standard_error(effects.clean_logit_diff),
-        "accuracy": _accuracy(effects.clean_logit_diff),
-        "n_instances": len(effects.clean_logit_diff),
+        "mean_logit_difference": _mean(effects.clean_logit_difference),
+        "standard_error": _standard_error(effects.clean_logit_difference),
+        "accuracy": _accuracy(effects.clean_logit_difference),
+        "n_instances": len(effects.clean_logit_difference),
     }
 
 
@@ -168,12 +173,12 @@ def summarize(effects: Effects, components=None) -> List[dict]:
     enough without it. Ties keep the order the Components came in, which is
     head-table order, so a rerun never reshuffles equal rows.
     """
-    by_key = {_key(one): one for one in (components or [])}
-    clean_accuracy = _accuracy(effects.clean_logit_diff)
+    by_key = {row_key(one): one for one in (components or [])}
+    clean_accuracy = _accuracy(effects.clean_logit_difference)
 
     rows = []
     for key in effects.keys:
-        knocked = effects.knocked_logit_diff[key]
+        knocked = effects.knocked_logit_difference[key]
         drops = effects.drops(key)
         accuracy = _accuracy(knocked)
         component = by_key.get(key)
@@ -184,7 +189,7 @@ def summarize(effects: Effects, components=None) -> List[dict]:
             "n": len(drops),
             "mean_drop": _mean(drops),
             "standard_error": _standard_error(drops),
-            "knockout_logit_difference": _mean(knocked),
+            "knocked_logit_difference": _mean(knocked),
             "accuracy": accuracy,
             "accuracy_drop": (None if accuracy is None or clean_accuracy is None
                               else clean_accuracy - accuracy),
@@ -200,17 +205,25 @@ def summarize(effects: Effects, components=None) -> List[dict]:
     return rows
 
 
+#: What the head table gains, before the CLI adds the `knockout` namespace.
+#: Ticket 03 reads `knockout.rank` to order its per-head charts, so these
+#: strings are an interface: rename one and the sibling analysis stops finding
+#: the column rather than failing.
+COLUMNS = ("logit_diff_drop", "rank", "standard_error", "accuracy")
+
+
 def columns(rows) -> dict:
     """The head-table update: `{component key: {column: value}}`.
 
     The CLI namespaces these under `knockout`, so they land as
-    `knockout.knockout_logit_diff_drop` and `knockout.knockout_rank`.
+    `knockout.logit_diff_drop`, `knockout.rank`, `knockout.standard_error` and
+    `knockout.accuracy`.
     """
-    return {_key(row["key"]): {
-        "knockout_logit_diff_drop": row["mean_drop"],
-        "knockout_rank": row["rank"],
-        "knockout_standard_error": row["standard_error"],
-        "knockout_accuracy": row["accuracy"],
+    return {row_key(row["key"]): {
+        "logit_diff_drop": row["mean_drop"],
+        "rank": row["rank"],
+        "standard_error": row["standard_error"],
+        "accuracy": row["accuracy"],
     } for row in rows}
 
 
@@ -244,7 +257,8 @@ def payload(effects: Effects, *, circuit: str, task: str, components=None,
         },
         "n_components": len(rows),
         "instances": effects.ids,
-        "sample": effects.report,
+        "sample": {key: value for key, value in effects.report.items()
+                   if key in SAMPLE_FIELDS},
         "clean_run": clean_run(effects),
         # JSON keys are strings, so a key is written as a list and read back
         # with `head_table.row_key`.
@@ -256,8 +270,8 @@ def payload(effects: Effects, *, circuit: str, task: str, components=None,
 # THE FORWARD LOOP
 # ==============================================================================
 
-def knockout_effects(model, batches, components, *, scheme=SCHEME,
-                     device=None, log=None) -> Effects:
+def knockout_effects(model, batches, components, *,
+                     scheme=SCHEME) -> Effects:
     """Knock out each Component alone, over every batch, and keep every number.
 
     Three kinds of forward per batch: one clean run to measure against, one
@@ -274,9 +288,10 @@ def knockout_effects(model, batches, components, *, scheme=SCHEME,
     from component_analysis import hooks
 
     scheme = resolve_scheme(scheme)
-    keys = [_key(one) for one in components]
-    if device is None:
-        device, _dtype = hooks.device_and_dtype(model)
+    keys = [row_key(one) for one in components]
+    # Where the weights actually are, which is not always what `--device` asked
+    # for: the CLI seam test runs the tiny model on a CPU under `--device cuda`.
+    device, _dtype = hooks.device_and_dtype(model)
 
     def logit_difference(capture, target, distractor):
         return hooks.target_minus_distractor(
@@ -284,10 +299,10 @@ def knockout_effects(model, batches, components, *, scheme=SCHEME,
             target, distractor).tolist()
 
     ids: List[str] = []
-    clean_logit_diff: List[float] = []
+    clean_logit_difference: List[float] = []
     knocked: Dict[tuple, List[float]] = {key: [] for key in keys}
 
-    for number, batch in enumerate(batches, start=1):
+    for batch in batches:
         clean_ids = batch.input_ids.to(device)
         clean_mask = batch.attention_mask.to(device)
         corrupt_ids = batch.corrupt_input_ids.to(device)
@@ -305,7 +320,7 @@ def knockout_effects(model, batches, components, *, scheme=SCHEME,
             corrupt = hooks.capture_forward(model, corrupt_ids, corrupt_mask,
                                             components=keys, positions=readout)
             ids.extend(batch.ids)
-            clean_logit_diff.extend(logit_difference(clean, target, distractor))
+            clean_logit_difference.extend(logit_difference(clean, target, distractor))
 
             for key in keys:
                 patched = hooks.capture_forward(
@@ -314,12 +329,8 @@ def knockout_effects(model, batches, components, *, scheme=SCHEME,
                     replacements={key: corrupt.outputs[key]})
                 knocked[key].extend(logit_difference(patched, target,
                                                      distractor))
-        if log is not None:
-            log(f"      batch {number}: {len(batch)} instance(s), "
-                f"{len(keys) + 2} forward pass(es)")
-
-    return Effects(ids=ids, keys=keys, clean_logit_diff=clean_logit_diff,
-                   knocked_logit_diff=knocked, scheme=scheme,
+    return Effects(ids=ids, keys=keys, clean_logit_difference=clean_logit_difference,
+                   knocked_logit_difference=knocked, scheme=scheme,
                    report=dict(getattr(batches, "report", {}) or {}))
 
 
@@ -414,8 +425,8 @@ def estimate(ctx) -> str:
     batches = ctx.causal_batches()
     passes = len(batches) * (len(ctx.components) + 2)
     return (f"{len(ctx.components)} Component(s) x {len(batches)} batch(es) of "
-            f"{batches.report['batch_size']} (+2 clean and corrupt passes per batch) = "
-            f"{passes} forward pass(es), about "
+            f"{batches.report['batch_size']} (+2 clean and corrupt passes per "
+            f"batch) = {passes} forward pass(es), about "
             f"{passes * SECONDS_PER_FORWARD / 60:.1f} min on an A40, over "
             f"{batches.n_instances} instance(s); scheme "
             f"{resolve_scheme(getattr(ctx.cli, 'knockout_scheme', SCHEME))}")
@@ -425,8 +436,6 @@ def run(ctx) -> dict:
     """Knock out every Component, write the JSON and the PNG, return the columns."""
     scheme = resolve_scheme(getattr(ctx.cli, "knockout_scheme", SCHEME))
     batches = ctx.causal_batches()
-    # No `device=ctx.device`: that is what the CLI was *asked* for, and the
-    # model is where the weights actually are.
     effects = knockout_effects(ctx.model, batches, ctx.components, scheme=scheme)
 
     rows = summarize(effects, ctx.components)

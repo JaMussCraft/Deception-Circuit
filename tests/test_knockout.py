@@ -26,8 +26,9 @@ def effects(clean, knocked, ids=None):
     return knockout.Effects(
         ids=list(ids or [f"i{n}" for n in range(len(clean))]),
         keys=list(knocked),
-        clean_logit_diff=list(clean),
-        knocked_logit_diff={key: list(values) for key, values in knocked.items()},
+        clean_logit_difference=list(clean),
+        knocked_logit_difference={key: list(values)
+                                  for key, values in knocked.items()},
     )
 
 
@@ -202,13 +203,16 @@ def test_a_json_twin_and_a_png_carry_the_same_components(tmp_path):
     assert twin["clean_run"]["n_instances"] == 1
 
 
-def test_the_head_table_columns_are_the_ones_the_ticket_names():
+def test_the_head_table_columns_are_the_ones_the_orchestrator_named():
     updates = knockout.columns(knockout.summarize(effects(
         clean=[2.0], knocked={("head", 0, 1): [1.0], ("mlp", 1, 0): [3.0]})))
 
     assert set(updates) == {("head", 0, 1), ("mlp", 1, 0)}
-    assert updates[("head", 0, 1)]["knockout_rank"] == 1
-    assert updates[("mlp", 1, 0)]["knockout_rank"] == 2
-    assert updates[("head", 0, 1)]["knockout_logit_diff_drop"] == pytest.approx(1.0)
-    assert updates[("mlp", 1, 0)]["knockout_logit_diff_drop"] == pytest.approx(-1.0)
-    assert updates[("head", 0, 1)]["knockout_accuracy"] == pytest.approx(1.0)
+    # Bare names: the CLI puts the `knockout` namespace in front of each, and
+    # ticket 03 looks the result up as `knockout.rank`.
+    assert set(updates[("head", 0, 1)]) == set(knockout.COLUMNS)
+    assert updates[("head", 0, 1)]["rank"] == 1
+    assert updates[("mlp", 1, 0)]["rank"] == 2
+    assert updates[("head", 0, 1)]["logit_diff_drop"] == pytest.approx(1.0)
+    assert updates[("mlp", 1, 0)]["logit_diff_drop"] == pytest.approx(-1.0)
+    assert updates[("head", 0, 1)]["accuracy"] == pytest.approx(1.0)

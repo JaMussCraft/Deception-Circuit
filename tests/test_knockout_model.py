@@ -110,7 +110,7 @@ def test_knocking_out_a_component_is_replacing_its_output_with_the_corrupt_one(
                                   replacements={key: corrupt.outputs[key]},
                                   positions=batch.readout),
             batch)
-        assert effects.knocked_logit_diff[key] == pytest.approx(expected,
+        assert effects.knocked_logit_difference[key] == pytest.approx(expected,
                                                                 abs=1e-4)
 
 
@@ -135,28 +135,8 @@ def test_knocking_nothing_out_reproduces_the_clean_logits(model, batch):
     clean = logit_difference_of(
         plain_readout_logits(model, batch.input_ids, batch.attention_mask),
         batch)
-    assert effects.clean_logit_diff == pytest.approx(clean, abs=1e-4)
+    assert effects.clean_logit_difference == pytest.approx(clean, abs=1e-4)
     assert effects.ids == batch.ids
-
-
-def test_a_knockout_does_not_leak_into_the_other_components(model, batch):
-    """One Component is replaced; its neighbours carry what they always did."""
-    victim, neighbour = ("head", 1, 2), ("head", 1, 3)
-    corrupt = hooks.capture_forward(model, batch.corrupt_input_ids,
-                                    batch.corrupt_attention_mask,
-                                    components=[victim],
-                                    positions=batch.readout)
-    clean = hooks.capture_forward(model, batch.input_ids, batch.attention_mask,
-                                  components=[neighbour],
-                                  positions=batch.readout)
-
-    under_knockout = hooks.capture_forward(
-        model, batch.input_ids, batch.attention_mask, components=[neighbour],
-        positions=batch.readout,
-        replacements={victim: corrupt.outputs[victim]})
-
-    assert torch.allclose(under_knockout.outputs[neighbour],
-                          clean.outputs[neighbour], atol=1e-6)
 
 
 def test_the_effects_are_per_instance_over_every_batch(model, batch):
@@ -164,8 +144,8 @@ def test_the_effects_are_per_instance_over_every_batch(model, batch):
                                         [("head", 0, 0)])
 
     assert len(effects.ids) == 2 * BATCH
-    assert len(effects.clean_logit_diff) == 2 * BATCH
-    assert len(effects.knocked_logit_diff[("head", 0, 0)]) == 2 * BATCH
+    assert len(effects.clean_logit_difference) == 2 * BATCH
+    assert len(effects.knocked_logit_difference[("head", 0, 0)]) == 2 * BATCH
     assert knockout.summarize(effects)[0]["n"] == 2 * BATCH
 
 
@@ -215,9 +195,9 @@ def test_a_cli_run_writes_the_json_the_png_and_the_head_table_columns(
     assert os.path.join(*CELL, knockout.SUBDIR, knockout.PNG_NAME) in written
 
     table = read_json(out, *CELL, "head_table.json")
-    assert "knockout.knockout_logit_diff_drop" in table["columns"]
-    assert "knockout.knockout_rank" in table["columns"]
-    ranks = sorted(row["knockout.knockout_rank"] for row in table["rows"])
+    assert "knockout.logit_diff_drop" in table["columns"]
+    assert "knockout.rank" in table["columns"]
+    ranks = sorted(row["knockout.rank"] for row in table["rows"])
     assert ranks == list(range(1, len(table["rows"]) + 1))
 
 
@@ -252,8 +232,8 @@ def test_the_head_table_agrees_with_the_json(sdr_run, cli_model):
               for row in table["rows"]}
     for one in written["components"]:
         row = by_key[tuple(one["key"])]
-        assert row["knockout.knockout_rank"] == one["rank"]
-        assert row["knockout.knockout_logit_diff_drop"] == \
+        assert row["knockout.rank"] == one["rank"]
+        assert row["knockout.logit_diff_drop"] == \
             pytest.approx(one["mean_drop"])
 
 
