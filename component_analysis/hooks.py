@@ -511,10 +511,13 @@ def replace_forward(model, input_ids, attention_mask, *, replacements,
                     positions=None):
     """The Readout logits of one forward with those sites replaced.
 
-    This is *the* interchange primitive: feed it `capture_forward`'s outputs
-    from the corrupt stream and the named senders carry corrupt values while
-    everything else runs clean. Knockout replaces one Component, path patching
-    replaces one sender and re-runs the receivers; neither re-implements it.
+    This is the interchange primitive in its simplest form: feed it
+    `capture_forward`'s outputs from the corrupt stream and the named senders
+    carry corrupt values while everything else runs clean. It returns the
+    model's own bfloat16 logits, which ADR-0001 does not allow for a ranking
+    metric, so the analyses (knockout, path patching) use
+    `capture_forward(..., replacements=...)` instead and read the residual it
+    returns through `readout_logits`; none re-implements the replacement.
 
     Each replacement is a `[batch, seq, dim]` tensor (written at every
     position) or a `Replacement` carrying a boolean position mask. Receiver
@@ -590,8 +593,11 @@ def readout_logits(model, residual, *, scale_from=None):
     some other instance's scale) and the unembedding is an fp32 matmul.
 
     `residual` is `[..., hidden]` — `Capture.residual[:, -1]` for a whole
-    forward, or one Component's contribution for direct logit attribution.
-    Returns `[..., vocab]` in float32.
+    forward, or one Component's contribution for direct logit attribution, in
+    which case the full Readout residual must be passed as `scale_from`
+    (normalizing a contribution by its own RMS is the wrong reading; the
+    contributions would not sum to the whole). Returns `[..., vocab]` in
+    float32.
 
     `scale_from`, when given, is the `[..., hidden]` residual whose RMS sets
     the norm's scale instead of `residual`'s own. Direct logit attribution
@@ -625,8 +631,10 @@ def o_proj_weight(model, layer: int):
     bias; that is asserted so a model with one cannot be attributed silently.
     """
     o_proj = _hf(model).model.layers[layer].self_attn.o_proj
-    assert getattr(o_proj, "bias", None) is None, (
-        "o_proj has a bias; per-head attribution would need to split it")
+    if getattr(o_proj, "bias", None) is not None:
+        raise NotImplementedError(
+            f"layer {layer} o_proj has a bias; per-head attribution would "
+            f"have to split it across heads, which is not implemented")
     return o_proj.weight.detach()
 
 
