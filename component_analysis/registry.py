@@ -42,7 +42,7 @@ from typing import Any, Dict, List, Optional
 #: list conflict on every rebase after the first, and a line of their own,
 #: separated, does not.
 ANALYSES: List[str] = [
-    # ticket 03, attention patterns:     "component_analysis.attention",
+    "component_analysis.attention_patterns",                   # ticket 03
 
     # ticket 04, DLA and logit lens:     "component_analysis.dla",
 
