@@ -34,6 +34,23 @@ Conditions, and which instances each is measured over:
                          term and is reported beside it so the difference is
                          never read against the full-split mean
 
+## What lands in the cell
+
+    dla/dla.json                  every condition, Component and split level
+    dla/dla.png                   the per-Component bar chart, all conditions
+    dla/logit_lens.json           the cumulative lens, every condition
+    dla/logit_lens.png            the lens overlay, all conditions
+    dla/dla_paired_scatter.json   the paired contrast, one point per Component
+    dla/dla_paired_scatter.png
+    dla/logit_lens_paired.json    the lens over the two paired conditions only
+    dla/logit_lens_paired.png
+
+The last four are the **paired** pair: both axes of the scatter and both curves
+of that lens are measured over the same instance ids, so a difference between
+them is that instance's difference. The two all-condition figures beside them
+also carry the Honest Twin, which is a different population; mixing the two
+readings is the mistake spec user story 27 exists to prevent.
+
 ## The fixed scale, and why the sum adds up
 
 RMSNorm is not linear, so "each Component's contribution to the logits" is only
@@ -1256,6 +1273,82 @@ def plot_components(path: str, payload: dict, *, table: dict = None) -> str:
     return path
 
 
+#: When the scatter earns a second, zoomed panel, and where it cuts.
+#:
+#: On the SDR head-granularity delta one MLP block writes twenty times what any
+#: head does, so a single panel scaled to it puts fourteen labels on the same
+#: pixel and the figure says nothing about fourteen of its eighteen
+#: Components. But on a circuit whose Components are all of a size, a second
+#: panel showing the first panel again is worse than no second panel. The cut
+#: goes at the largest *ratio* gap in the sorted magnitudes — the place the
+#: outliers actually separate from the rest — and only when that gap is at
+#: least `ZOOM_GAP`-fold and leaves at least two Components inside.
+ZOOM_GAP = 4.0
+ZOOM_MARGIN = 1.25
+ZOOM_MIN_INSIDE = 2
+
+
+def zoom_limit(points: Sequence[dict]) -> Optional[float]:
+    """The half-width of a second panel for the cluster, or None if it earns none.
+
+    A ratio gap rather than a percentile because what is being zoomed past is
+    by definition an outlier, and how many outliers there are is exactly what
+    is not known in advance: one MLP block on this circuit, possibly three
+    late heads on the next.
+    """
+    magnitudes = sorted(max(abs(one["x"]), abs(one["y"])) for one in points
+                        if one["x"] is not None and one["y"] is not None)
+    if len(magnitudes) < 3:
+        return None
+
+    best, cut = 0.0, None
+    for index in range(ZOOM_MIN_INSIDE - 1, len(magnitudes) - 1):
+        lower = magnitudes[index]
+        if lower <= 0.0:
+            continue
+        ratio = magnitudes[index + 1] / lower
+        if ratio > best:
+            best, cut = ratio, lower
+    if cut is None or best < ZOOM_GAP:
+        return None
+    return cut * ZOOM_MARGIN
+
+
+def _scatter_panel(axes, points, limit, *, label_from: float = 0.0):
+    """One square panel of the scatter: the diagonal, the axes and the labels.
+
+    Every panel draws every point; only the labels differ. `label_from` is the
+    magnitude a Component must reach to be labelled *here*, so the two panels
+    divide the labels between them rather than each stacking all of them: the
+    full panel names the outliers that set its scale, the zoom panel names the
+    cluster underneath them, and no Component goes unnamed.
+    """
+    labelled = [one for one in points
+                if label_from <= max(abs(one["x"]), abs(one["y"])) <= limit]
+    axes.errorbar([one["x"] for one in points], [one["y"] for one in points],
+                  xerr=[one["x_se"] or 0.0 for one in points],
+                  yerr=[one["y_se"] or 0.0 for one in points], fmt="o",
+                  markersize=5, linewidth=0.8, capsize=2,
+                  color=COLOURS[PRESSURE_PAIRED], ecolor="#b0bec5", zorder=3)
+    # Labels alternate above and below their point: the interesting Components
+    # sit close together by construction, so a single offset stacks them.
+    for index, one in enumerate(sorted(labelled, key=lambda p: p["x"])):
+        axes.annotate(one["label"], (one["x"], one["y"]),
+                      textcoords="offset points",
+                      xytext=(5, 5 if index % 2 == 0 else -9), fontsize=7)
+    axes.plot([-limit, limit], [-limit, limit], linestyle="--", linewidth=0.9,
+              color="#555555", zorder=1,
+              label="y = x: writes the same under both")
+    axes.axhline(0.0, color="black", linewidth=0.8, zorder=2)
+    axes.axvline(0.0, color="black", linewidth=0.8, zorder=2)
+    axes.set_xlim(-limit, limit)
+    axes.set_ylim(-limit, limit)
+    axes.set_xlabel(f"DLA under pressure ({PRESSURE_PAIRED})")
+    axes.set_ylabel(f"DLA under the Matched Honest Instruction "
+                    f"({HONEST_INSTRUCTION})", fontsize=9)
+    return len(labelled)
+
+
 def plot_paired_scatter(path: str, twin: dict) -> str:
     """The paired DLA scatter: pressure against the Matched Honest Instruction.
 
@@ -1271,33 +1364,29 @@ def plot_paired_scatter(path: str, twin: dict) -> str:
         return _empty_figure(path, twin["skipped"] or
                              "no Component had a value under both conditions")
 
-    figure, axes = plt.subplots(figsize=(6.4, 6.0))
-    x = [one["x"] for one in points]
-    y = [one["y"] for one in points]
-    axes.errorbar(x, y, xerr=[one["x_se"] or 0.0 for one in points],
-                  yerr=[one["y_se"] or 0.0 for one in points], fmt="o",
-                  markersize=5, linewidth=0.8, capsize=2,
-                  color=COLOURS[PRESSURE_PAIRED],
-                  ecolor="#b0bec5", zorder=3)
-    for one in points:
-        axes.annotate(one["label"], (one["x"], one["y"]),
-                      textcoords="offset points", xytext=(5, 4), fontsize=7)
+    full = max([abs(one["x"]) for one in points]
+               + [abs(one["y"]) for one in points] + [1e-3]) * 1.25
+    zoom = zoom_limit(points)
 
-    limit = max([abs(one) for one in x + y] + [1e-3]) * 1.25
-    axes.plot([-limit, limit], [-limit, limit], linestyle="--", linewidth=0.9,
-              color="#555555", zorder=1,
-              label="y = x: writes the same under both")
-    axes.axhline(0.0, color="black", linewidth=0.8, zorder=2)
-    axes.axvline(0.0, color="black", linewidth=0.8, zorder=2)
-    axes.set_xlim(-limit, limit)
-    axes.set_ylim(-limit, limit)
-    axes.set_xlabel(f"DLA under pressure ({PRESSURE_PAIRED})")
-    axes.set_ylabel(f"DLA under the Matched Honest Instruction "
-                    f"({HONEST_INSTRUCTION})")
-    axes.set_title(f"Paired DLA at the Readout — {twin['circuit']} x "
-                   f"{twin['task']}\n{twin['n_instances']} paired instance(s); "
-                   f"deceptive - honest, both axes")
-    axes.legend(fontsize=7, loc="upper left")
+    figure, axes = plt.subplots(1, 2 if zoom else 1, squeeze=False,
+                                figsize=(11.6 if zoom else 6.4, 6.2))
+    named = _scatter_panel(axes[0][0], points, full, label_from=zoom or 0.0)
+    axes[0][0].set_title(
+        f"all {len(points)} Component(s)" if not zoom else
+        f"all {len(points)} drawn; the {named} above +/-{zoom:.3f} named here",
+        fontsize=9)
+    axes[0][0].legend(fontsize=7, loc="upper left")
+    if zoom:
+        # The outliers set the first panel's scale, so the Components that sit
+        # near the origin are unreadable there and get a panel of their own.
+        # The labels divide between the two panels; the points do not.
+        shown = _scatter_panel(axes[0][1], points, zoom)
+        axes[0][1].set_title(f"zoomed to +/-{zoom:.3f}: the other {shown} "
+                             f"Component(s), named here", fontsize=9)
+
+    figure.suptitle(f"Paired DLA at the Readout — {twin['circuit']} x "
+                    f"{twin['task']}\n{twin['n_instances']} paired "
+                    f"instance(s); deceptive - honest, both axes", fontsize=11)
     figure.tight_layout()
     figure.savefig(path, dpi=150)
     plt.close(figure)

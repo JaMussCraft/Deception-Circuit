@@ -460,3 +460,43 @@ def test_this_module_pair_does_not_import_nnsight():
          "import component_analysis.attention_patterns, component_analysis.dla; "
          "assert 'nnsight' not in sys.modules, sorted(sys.modules)"],
         check=True, cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+
+# ==============================================================================
+# THE SCATTER'S SECOND PANEL
+# ==============================================================================
+
+def spread(*pairs):
+    return [{"label": f"C{i}", "x": x, "y": y, "x_se": 0.0, "y_se": 0.0,
+             "differential": x - y} for i, (x, y) in enumerate(pairs)]
+
+
+def test_a_cluster_under_one_outlier_earns_a_zoom_panel():
+    """The real SDR run put one MLP at -0.24/-0.57 and thirteen heads inside
+    0.01 of the origin, and every label in the clump landed on top of the
+    others. The zoom limit is what makes the clump readable."""
+    points = spread((-0.24, -0.57), (0.13, 0.05), (0.06, -0.01),
+                    (0.003, 0.001), (0.001, 0.0), (0.0005, -0.0002),
+                    (0.0004, 0.0001), (0.0002, 0.0))
+
+    limit = ap_dla_zoom(points)
+
+    assert limit is not None
+    assert limit < 0.06, "the three big Components must fall outside the zoom"
+    assert limit > 0.003, "the cluster's own largest member must fall inside it"
+
+
+def test_points_spread_evenly_earn_no_zoom_panel():
+    """A second panel showing the same thing as the first is worse than none."""
+    points = spread((0.5, 0.4), (0.3, 0.25), (0.2, 0.1), (-0.4, -0.45),
+                    (-0.25, -0.2))
+
+    assert ap_dla_zoom(points) is None
+
+
+def test_a_single_point_earns_no_zoom_panel():
+    assert ap_dla_zoom(spread((0.2, 0.1))) is None
+
+
+def ap_dla_zoom(points):
+    return dla.zoom_limit(points)

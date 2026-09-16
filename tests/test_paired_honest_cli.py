@@ -215,7 +215,12 @@ def test_the_paired_condition_can_be_turned_off_by_name(paired_run):
     assert "--attention-conditions" in skipped[ap.HONEST_INSTRUCTION]
 
 
-def test_an_unknown_attention_condition_fails_before_the_model_loads(paired_run):
+def test_an_unknown_attention_condition_is_refused_by_name_in_a_dry_run(
+        paired_run):
+    """`--dry-run` is where a bad configuration is meant to die, on the login
+    node. A real run validates the flag inside `run()`, after the model is
+    loaded, exactly as `--dla-conditions` does; the dry run is the cheap gate
+    and is what the sbatch header tells the researcher to rehearse with."""
     run_dir, out, _records, _ids = paired_run
 
     with pytest.raises(ValueError) as failure:
