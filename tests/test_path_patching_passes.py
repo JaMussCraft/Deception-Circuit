@@ -324,3 +324,29 @@ def test_the_heatmap_twin_has_a_value_for_every_cell_and_null_for_every_non_path
     assert filled == 13
     assert [one["kind"] for one in twin["columns"]] == [
         "q", "q", "k", "k", "v", "v", "mlp_in", "readout"]
+
+
+def test_path_instances_caps_what_the_run_actually_patches_over(sdr_run,
+                                                                monkeypatch):
+    """The lever `--dry-run`'s estimate advertises has to move the run too.
+
+    The cap is rounded up to a whole batch, so 8 of 16 at batch 8 is one batch.
+    """
+    import analyze_components
+    from component_analysis import registry
+    from tests.fakes import FAKE_VOCAB_SIZE
+    from tests.test_analyze_components_segmentation import CELL, read_json
+
+    run_dir, out, _records = sdr_run
+    monkeypatch.setattr(registry, "ANALYSES", [pp])
+    monkeypatch.setattr(analyze_components, "load_model",
+                        lambda cli, resolved: tiny_analysis_model(FAKE_VOCAB_SIZE))
+
+    analyze_components.main([str(run_dir), "--num-kv-heads", "2", "--n-causal",
+                             "16", "--path-instances", "8", "--device", "cpu",
+                             "--output-dir", str(out)])
+
+    written = read_json(out, *CELL, pp.SUBDIR, pp.AGNOSTIC_FILE)
+    assert written["sample"]["n_instances"] == 8
+    assert len(written["sample"]["instance_ids"]) == 8
+    assert all(one["n"] == 8 for one in written["cells"])
