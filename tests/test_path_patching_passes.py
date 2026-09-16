@@ -687,3 +687,97 @@ def test_the_segment_pass_selects_nothing_when_no_cell_clears_the_threshold(
 
     written = read_json(out, *CELL, pp.SUBDIR, pp.SEGMENTS_FILE)
     assert written["n_selected"] == 0 and written["cells"] == []
+
+
+# ==============================================================================
+# THE COMPLETENESS SWEEP
+# ==============================================================================
+
+def test_the_sweep_shortcut_is_the_same_number_as_the_two_pass_direct_effect(
+        model, streams):
+    """The sweep is one forward per sender, not two, and this says why it may be.
+
+    A replacement at the Readout receiver is written into the final norm's
+    input and then read straight back out; nothing between them can change it.
+    So pass 2 rewrites exactly the value pass 1 already read, and the two-pass
+    direct effect is the one-pass one. The sweep patches every head and MLP
+    block of the model, so halving its cost is the difference between fitting
+    the short-job budget and not.
+    """
+    for sender in (("head", 0, 1), ("mlp", 0, 0), ("head", 1, 3)):
+        two_pass = pp.patched_readout(model, streams, senders=[sender],
+                                      receivers=[pp.READOUT_KEY])
+
+        assert torch.equal(pp.sweep_readout(model, streams, sender),
+                           two_pass), sender
+
+
+def test_the_sweep_ranks_every_component_of_the_model_and_marks_membership(
+        sdr_run, monkeypatch):
+    """The CLI seam for `--path-completeness-sweep`.
+
+    The tiny model has 2 layers of 4 heads plus 2 MLP blocks, and the fixture's
+    circuit is three of those, so the sweep must score eleven senders (the
+    embedding included) and mark three of them as circuit members.
+    """
+    import analyze_components
+    from component_analysis import registry
+    from tests.fakes import FAKE_VOCAB_SIZE
+    from tests.test_analyze_components_segmentation import CELL, read_json
+
+    run_dir, out, _records = sdr_run
+    monkeypatch.setattr(registry, "ANALYSES", [pp])
+    monkeypatch.setattr(analyze_components, "load_model",
+                        lambda cli, resolved: tiny_analysis_model(FAKE_VOCAB_SIZE))
+
+    assert analyze_components.main([
+        str(run_dir), "--num-kv-heads", "2", "--n-causal", "16",
+        "--path-completeness-sweep", "--path-position-threshold", "1e9",
+        "--device", "cpu", "--output-dir", str(out)]) == 0
+
+    written = read_json(out, *CELL, pp.SUBDIR, pp.SWEEP_FILE)
+    assert written["pass"] == "completeness_sweep"
+    assert written["counterfactual"] == pp.ITEM_SWAP
+    assert written["n_senders"] == 11 and written["n_in_circuit"] == 3
+    assert written["receiver"] == "readout"
+    assert [one["rank"] for one in written["senders"]] == list(range(1, 12))
+    assert written["flagged"] == []          # nothing clears a threshold of 1e9
+    assert os.path.getsize(os.path.join(str(out), *CELL, pp.SUBDIR,
+                                        "sweep_bars.png")) > 0
+
+    table = read_json(out, *CELL, "head_table.json")
+    assert len(table["rows"]) == 3, \
+        "no Component outside the circuit cleared the threshold, so no row is " \
+        "appended"
+    assert all(row[f"{pp.NAME}.sweep_in_circuit"] for row in table["rows"])
+
+
+def test_a_strong_component_outside_the_circuit_gets_a_row_of_its_own(
+        sdr_run, monkeypatch):
+    """What the sweep is for: a Component the pruning missed becomes visible.
+
+    With the threshold at zero every Component clears it, so all ten of the
+    tiny model's Components land in the head table and the seven outside the
+    circuit are flagged.
+    """
+    import analyze_components
+    from component_analysis import registry
+    from tests.fakes import FAKE_VOCAB_SIZE
+    from tests.test_analyze_components_segmentation import CELL, read_json
+
+    run_dir, out, _records = sdr_run
+    monkeypatch.setattr(registry, "ANALYSES", [pp])
+    monkeypatch.setattr(analyze_components, "load_model",
+                        lambda cli, resolved: tiny_analysis_model(FAKE_VOCAB_SIZE))
+    analyze_components.main([
+        str(run_dir), "--num-kv-heads", "2", "--n-causal", "16",
+        "--path-completeness-sweep", "--path-position-threshold", "0",
+        "--device", "cpu", "--output-dir", str(out)])
+
+    table = read_json(out, *CELL, "head_table.json")
+    flagged = [row for row in table["rows"] if row[f"{pp.NAME}.sweep_flagged"]]
+
+    assert len(table["rows"]) == 10
+    assert len(flagged) == 7
+    assert all(not row[f"{pp.NAME}.sweep_in_circuit"] for row in flagged)
+    assert all(row[f"{pp.NAME}.sweep_rank"] is not None for row in table["rows"])

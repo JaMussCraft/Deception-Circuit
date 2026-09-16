@@ -56,6 +56,13 @@ This module implements the **position-agnostic** pass of the spec — the
 sender's value is written at every position and the receiver takes it at every
 position — and, for the cells that clear `--path-position-threshold`, the
 **position-specific** pass by Segment.
+
+**The completeness sweep** (`--path-completeness-sweep`, off by default) asks
+the one question the grid cannot: the grid only ever patches the circuit's own
+Components, so a Component with a large direct effect that the pruning missed
+is invisible to it. The sweep patches every head and MLP block of the whole
+model into the Readout, ranks them, and flags the ones outside the circuit that
+clear the threshold — those get a head-table row of their own.
 """
 
 from __future__ import annotations
@@ -140,6 +147,10 @@ QUERY_ENTRY = "query_positions"
 #: prompt: the receiver patched at every Segment at once must give back the
 #: position-agnostic cell.
 UNION_ENTRY = "union"
+
+#: How many senders the completeness sweep's bar chart shows. The JSON twin
+#: carries all of them; a thousand bars on one axis carries nothing.
+SWEEP_BAR_TOP = 40
 
 #: Receiver kinds whose position-specific pass is by Segment. The others take
 #: one patch at the query positions.
@@ -655,6 +666,15 @@ def add_arguments(group) -> None:
                             "covers only the instances that survived the "
                             f"honest filter; {BOTH!r} runs each in turn and "
                             "writes one file and one column set per pair.")
+    group.add_argument("--path-completeness-sweep", action="store_true",
+                       help="Also patch every head and MLP block of the whole "
+                            "model into the Readout, so that a Component with "
+                            "a large direct effect that the pruning missed "
+                            "becomes visible. Off by default: it is one "
+                            "forward per Component per batch, which on an 8B "
+                            "model is more work than the grid itself. "
+                            "--dry-run prints what it would cost. It runs once, "
+                            "on the item-swap pair when that is selected.")
     group.add_argument("--path-top", type=int, default=10,
                        help="How many of the strongest cells, by absolute "
                             "normalized effect, are listed in the JSON.")
@@ -713,6 +733,18 @@ def estimate(ctx) -> str:
              f"counterfactual, about {budget['minutes']:.0f} min at ticket 02b's "
              f"A40 rate of {budget['seconds_per_forward']:.2f} s per forward"]
     lines.append(f"counterfactual(s): {', '.join(chosen)}")
+    if getattr(ctx.cli, "path_completeness_sweep", False):
+        shape = ctx.intake.geometry
+        n_senders = shape["num_layers"] * (shape["num_heads"] + 1) + 1
+        forwards = n_batches * (2 + n_senders)
+        per_forward = seconds_per_forward(budget["batch_size"])
+        lines.append(f"completeness sweep: {n_senders} sender(s) into the "
+                     f"Readout, {forwards} forward(s), about "
+                     f"{forwards * per_forward / 60:.0f} min, on "
+                     f"{sweep_counterfactual(ctx)} only")
+    lines.append(f"each cell that clears --path-position-threshold costs one "
+                 f"more forward per batch plus one per Segment (K and V "
+                 f"receivers) or one at the query positions (everything else)")
     if HONEST_INSTRUCTION in chosen:
         lines.append(f"{paired} of {n_instances} instance(s) have an "
                      f"Honest-Instruction counterpart, so that pass costs "
@@ -768,7 +800,27 @@ def run(ctx) -> dict:
             continue
         _merge(updates, head_table_columns(grid, summaries), counterfactual)
         segment_pass(ctx, grid, batches, counterfactual, summaries)
+
+    # Last, and in its own loop over the batches, because it is the most
+    # expensive pass and the least likely to fit: a job killed on the wall
+    # clock during the sweep still leaves every pass above it written.
+    if getattr(ctx.cli, "path_completeness_sweep", False):
+        counterfactual = sweep_counterfactual(ctx)
+        payload = completeness_sweep(ctx, grid, batches, counterfactual)
+        _merge(updates, sweep_columns(payload), counterfactual)
     return updates
+
+
+def sweep_counterfactual(ctx) -> str:
+    """Which pair the completeness sweep runs on: one, not both.
+
+    The sweep asks whether pruning missed a Component of the circuit, which is
+    a question about the circuit's own Corruption, and it costs more than the
+    grid — so it runs on the item swap when that is selected and on the single
+    selected pair otherwise, rather than twice.
+    """
+    chosen = selected_counterfactuals(ctx)
+    return ITEM_SWAP if ITEM_SWAP in chosen else chosen[0]
 
 
 def _merge(updates: Dict[tuple, dict], columns: Dict[tuple, dict],
@@ -928,6 +980,186 @@ def _payload(ctx, grid, summaries, *, budget, tally: _Tally,
                                     if tally.forwards else None),
         },
     }
+
+
+# ==============================================================================
+# THE COMPLETENESS SWEEP
+# ==============================================================================
+
+def sweep_readout(model, streams: Streams, sender):
+    """One sender's direct effect at the Readout, in a single forward.
+
+    The two-pass cell reads the receiver's input off the frozen forward and
+    writes it into a clean one. For the **Readout** receiver those are the same
+    number: `hooks._traced_forward` saves the final norm's input after any
+    replacement at it, so pass 2 would write back exactly the value pass 1 read
+    and nothing between the two can change it. A test asserts the two are
+    bit-identical. The sweep patches every head and MLP block of the model, so
+    this halving is what puts it inside the short-job budget.
+    """
+    return _readout_of(model, receiver_inputs(model, streams, senders=[sender],
+                                              receivers=[READOUT_KEY]))
+
+
+def sweep_senders(model) -> List[tuple]:
+    """Every sender of the model: the embedding, every head, every MLP block.
+
+    The embedding is included although the ticket asks for heads and MLP
+    blocks, so that the sweep's ranked list is directly comparable with the
+    grid's `direct_effect_on_readout`, which has a row for it. It is not a
+    Component and never becomes a head-table row.
+    """
+    from component_analysis import hooks
+
+    return list(hooks.all_component_keys(model))
+
+
+def completeness_sweep(ctx, grid: Grid, batches, counterfactual: str) -> dict:
+    """Every head and MLP block of the model, patched into the Readout.
+
+    The grid only ever asks about the circuit's own Components, so a Component
+    with a large direct effect that pruning missed is invisible to it. This
+    sweep is the check: one number per Component of the whole model, ranked,
+    with circuit membership marked.
+    """
+    senders = sweep_senders(ctx.model)
+    in_circuit = {row_key(one) for one in ctx.components}
+    threshold = float(getattr(ctx.cli, "path_position_threshold", 0.05))
+
+    values: Dict[tuple, List[float]] = {key: [] for key in senders}
+    tally = _Tally()
+    started = time.perf_counter()
+
+    for batch in batches:
+        streams = capture_streams(ctx.model, batch, senders=senders,
+                                  counterfactual=counterfactual)
+        if streams is None:
+            tally.unpaired.extend(batch.ids)
+            continue
+        tally.forwards += 2
+        tally.used_ids.extend(streams.ids)
+        for sender in senders:
+            values[sender].extend(
+                normalized_effect(streams,
+                                  sweep_readout(ctx.model, streams,
+                                                sender)).tolist())
+            tally.forwards += 1
+        del streams
+
+    tally.wall_seconds = time.perf_counter() - started
+    scored = [{"sender": label(key), "kind": key[0], "layer": key[1],
+               "index": key[2], "in_circuit": key in in_circuit,
+               **summarize(values[key])}
+              for key in senders]
+    # Strongest first by absolute effect; a sender with no mean at all has no
+    # rank rather than the last one, and sorts to the end.
+    ranked = sorted([one for one in scored if one["mean"] is not None],
+                    key=lambda one: abs(one["mean"]), reverse=True)
+    for rank, one in enumerate(ranked, start=1):
+        one["rank"] = rank
+    unranked = [{**one, "rank": None} for one in scored if one["mean"] is None]
+    ranked = ranked + unranked
+    for one in ranked:
+        one["clears_threshold"] = (one["mean"] is not None
+                                   and abs(one["mean"]) >= threshold)
+        one["flagged"] = one["clears_threshold"] and not one["in_circuit"]
+
+    payload = {
+        "analysis": NAME,
+        "pass": "completeness_sweep",
+        "circuit": ctx.circuit_spec.label,
+        "task": ctx.task_spec.name,
+        "counterfactual": counterfactual,
+        "metric": metric_meta(counterfactual),
+        "receiver": label(READOUT_KEY),
+        "threshold": threshold,
+        "n_senders": len(senders),
+        "n_in_circuit": sum(1 for one in ranked if one["in_circuit"]),
+        "flagged": [one["sender"] for one in ranked if one["flagged"]],
+        "senders": ranked,
+        "strongest": ranked[:int(getattr(ctx.cli, "path_top", 10))],
+        "sample": {"n_instances": len(tally.used_ids),
+                   "instance_ids": tally.used_ids,
+                   "n_without_a_counterpart": len(tally.unpaired)},
+        "cost": {"forwards": tally.forwards,
+                 "wall_seconds": tally.wall_seconds,
+                 "note": "one forward per sender per batch; the Readout "
+                         "receiver needs no second pass"},
+    }
+    ctx.write_json(SUBDIR, _named("sweep", counterfactual, "json"), payload)
+    _sweep_figure(ctx, counterfactual, payload)
+    return payload
+
+
+def sweep_columns(payload: dict) -> Dict[tuple, dict]:
+    """The head-table columns the sweep contributes, keyed by Component.
+
+    Every circuit Component gets its sweep number. A Component **outside** the
+    circuit gets a row of its own only when it clears the threshold — that is
+    the whole point of the sweep, and appending all thousand-odd of them would
+    bury the circuit in its own table.
+    """
+    updates = {}
+    for one in payload["senders"]:
+        key = (one["kind"], one["layer"], one["index"])
+        if key == EMBED_KEY:
+            continue
+        if not one["in_circuit"] and not one["flagged"]:
+            continue
+        updates[key] = {
+            "sweep_direct_effect": one["mean"],
+            "sweep_direct_effect_se": one["se"],
+            "sweep_rank": one["rank"],
+            "sweep_in_circuit": one["in_circuit"],
+            "sweep_flagged": one["flagged"],
+        }
+    return updates
+
+
+def _sweep_figure(ctx, counterfactual: str, payload: dict) -> None:
+    """The strongest senders as a bar chart, circuit Components highlighted."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    top = [one for one in payload["senders"]
+           if one["mean"] is not None][:SWEEP_BAR_TOP]
+
+    ctx.write_json(SUBDIR, _named("sweep_bars", counterfactual, "json"), {
+        "title": f"Completeness sweep: direct effect on the Readout "
+                 f"({counterfactual})",
+        "counterfactual": counterfactual,
+        "n_shown": len(top), "n_senders": payload["n_senders"],
+        "threshold": payload["threshold"],
+        "senders": top, "metric": payload["metric"],
+    })
+
+    if not top:
+        return
+
+    figure, axes = plt.subplots(figsize=(max(6.0, 0.28 * len(top) + 2.0), 3.8))
+    heights = [one["mean"] for one in top]
+    errors = [one["se"] or 0.0 for one in top]
+    axes.bar(range(len(top)), heights, yerr=errors, capsize=2,
+             color=["#b2182b" if one["in_circuit"] else "#bdbdbd"
+                    for one in top])
+    axes.axhline(0.0, color="black", linewidth=0.8)
+    for sign in (1, -1):
+        axes.axhline(sign * payload["threshold"], color="black",
+                     linewidth=0.6, linestyle=":")
+    axes.set_xticks(range(len(top)))
+    axes.set_xticklabels([one["sender"] for one in top], rotation=90, fontsize=6)
+    axes.set_ylabel("normalized effect")
+    axes.set_title(f"Completeness sweep ({counterfactual}) — "
+                   f"{ctx.circuit_spec.label} x {ctx.task_spec.name}\n"
+                   f"strongest {len(top)} of {payload['n_senders']} sender(s); "
+                   f"red = in the circuit, dotted = threshold "
+                   f"{payload['threshold']:g}", fontsize=9)
+    figure.tight_layout()
+    figure.savefig(os.path.join(ctx.subdir(SUBDIR),
+                                _named("sweep_bars", counterfactual, "png")),
+                   dpi=200)
+    plt.close(figure)
 
 
 # ==============================================================================

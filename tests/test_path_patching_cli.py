@@ -64,3 +64,48 @@ def test_dry_run_writes_nothing_of_the_analysis(sdr_run, registered):
     assert written_files(out) == [os.path.join(*CELL, name)
                                   for name in INTAKE_FILES]
     assert not os.path.exists(os.path.join(str(out), *CELL, pp.SUBDIR))
+
+
+def test_dry_run_sizes_the_completeness_sweep_before_the_gpu_is_asked_for(
+        sdr_run, registered, capsys):
+    """The sweep is the pass most likely not to fit an hour, so the login node
+    has to say what it costs before the job is submitted."""
+    run_dir, out, _records = sdr_run
+
+    assert run_cli(str(run_dir), "--dry-run", "--num-kv-heads", "2",
+                   "--n-causal", "16", "--path-completeness-sweep",
+                   "--output-dir", str(out)) == 0
+
+    line = next(one for one in capsys.readouterr().out.splitlines()
+                if one.strip().startswith(f"{pp.NAME}: "))
+    assert "completeness sweep" in line
+    assert "11 sender(s) into the Readout" in line
+    assert "on item_swap only" in line
+
+
+def test_dry_run_names_the_counterfactuals_it_would_run(sdr_run, registered,
+                                                        capsys):
+    run_dir, out, _records = sdr_run
+
+    run_cli(str(run_dir), "--dry-run", "--num-kv-heads", "2", "--n-causal", "16",
+            "--path-counterfactual", "both", "--output-dir", str(out))
+
+    line = next(one for one in capsys.readouterr().out.splitlines()
+                if one.strip().startswith(f"{pp.NAME}: "))
+    assert "counterfactual(s): item_swap, honest_instruction" in line
+    assert "Honest-Instruction counterpart" in line
+
+
+def test_dry_run_still_writes_nothing_with_every_extension_asked_for(
+        sdr_run, registered):
+    """`--dry-run` never touches a GPU and never writes an analysis output,
+    however many passes the flags turn on."""
+    run_dir, out, _records = sdr_run
+
+    run_cli(str(run_dir), "--dry-run", "--num-kv-heads", "2", "--n-causal", "16",
+            "--path-counterfactual", "both", "--path-completeness-sweep",
+            "--path-position-threshold", "0", "--output-dir", str(out))
+
+    assert written_files(out) == [os.path.join(*CELL, name)
+                                  for name in INTAKE_FILES]
+    assert not os.path.exists(os.path.join(str(out), *CELL, pp.SUBDIR))
