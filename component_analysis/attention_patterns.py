@@ -103,6 +103,7 @@ still line up.
 
 from __future__ import annotations
 
+import argparse
 import math
 import os
 from dataclasses import dataclass
@@ -175,6 +176,18 @@ SUM_TOLERANCE = 2e-2
 # READING THE FLAGS
 # ==============================================================================
 
+class UnknownCondition(ValueError, argparse.ArgumentTypeError):
+    """A condition name that is not one of `CONDITIONS`.
+
+    Both base classes on purpose. `argparse` reports the message of an
+    `ArgumentTypeError` and replaces the message of a plain `ValueError` with
+    "invalid parse_conditions value: 'honest'", which names the function
+    instead of the flag and says nothing about what the valid names are. A
+    caller that reaches `wanted_conditions` directly still catches a
+    `ValueError`, as `dla.wanted_conditions` raises.
+    """
+
+
 def parse_conditions(value) -> List[str]:
     """`"a,b"` to `["a", "b"]`, refusing an unknown name.
 
@@ -189,7 +202,7 @@ def parse_conditions(value) -> List[str]:
     wanted = [one.strip() for one in value.split(",") if one.strip()]
     unknown = [one for one in wanted if one not in CONDITIONS]
     if unknown:
-        raise ValueError(
+        raise UnknownCondition(
             f"--attention-conditions names {', '.join(unknown)}, which "
             f"{'is' if len(unknown) == 1 else 'are'} not an attention "
             f"condition. Choose from {', '.join(CONDITIONS)}.")

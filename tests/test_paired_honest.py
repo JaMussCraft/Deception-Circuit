@@ -582,3 +582,32 @@ def test_the_paired_conditions_are_named_once_for_both_figures():
     assert set(dla.paired_lens_payload(lens)["conditions"]) == \
         set(dla.PAIRED_CONDITIONS)
     assert (scatter["x"], scatter["y"]) == dla.PAIRED_CONDITIONS
+
+
+def test_the_refusal_names_the_bad_condition_and_the_good_ones():
+    """Through argparse as well as directly. `argparse` keeps the message of an
+    `ArgumentTypeError` and throws away the message of a plain `ValueError`,
+    replacing it with "invalid parse_conditions value: 'honest'" — which names
+    the function rather than the flag and lists nothing. The error is both."""
+    import argparse
+
+    assert issubclass(ap.UnknownCondition, ValueError)
+    assert issubclass(ap.UnknownCondition, argparse.ArgumentTypeError)
+
+    parser = argparse.ArgumentParser(prog="analyze_components.py")
+    ap.add_arguments(parser)
+
+    with pytest.raises(SystemExit):
+        parser.parse_args(["--attention-conditions", "honest"])
+
+
+def test_the_flag_parses_its_value_at_parse_time_not_at_run_time():
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    ap.add_arguments(parser)
+
+    assert parser.parse_args([]).attention_conditions == list(ap.CONDITIONS)
+    assert parser.parse_args(
+        ["--attention-conditions", "honest_twin,pressure"]
+    ).attention_conditions == [ap.PRESSURE, ap.HONEST_TWIN]
