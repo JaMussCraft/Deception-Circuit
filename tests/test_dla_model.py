@@ -383,3 +383,26 @@ def test_the_dry_run_estimates_every_condition_and_writes_no_dla_files(dla_run,
     assert f"pressure {len(records)} instance(s)" in printed
     assert "honest_twin" in printed
     assert not os.path.exists(os.path.join(str(out), *CELL, dla.SUBDIR))
+
+
+def test_max_batches_stops_a_condition_early(dla_run):
+    """The smoke-run flag: a GPU run should be shortenable without editing code."""
+    run_dir, out, records = dla_run
+
+    assert run_cli(str(run_dir), "--num-kv-heads", "2", "--dla-conditions",
+                   "pressure", "--dla-max-batches", "1", "--dla-sum-check",
+                   "off", "--output-dir", str(out)) == 0
+
+    payload = read_json(out, *CELL, dla.SUBDIR, dla.JSON_NAME)
+    pressure = payload["conditions"]["pressure"]
+    assert pressure["n_instances"] == payload["sources"]["pressure"]["batch_size"]
+    assert pressure["n_instances"] < len(records), "one batch, not the split"
+    assert payload["sum_check"] is None, "--dla-sum-check off spends no pass"
+
+
+def test_an_unknown_condition_is_refused_by_name(dla_run):
+    run_dir, out, _records = dla_run
+
+    with pytest.raises(ValueError, match="nosuch"):
+        run_cli(str(run_dir), "--num-kv-heads", "2", "--dla-conditions",
+                "nosuch", "--output-dir", str(out))
