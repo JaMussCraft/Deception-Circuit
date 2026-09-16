@@ -271,10 +271,10 @@ def test_a_counterfactual_the_module_does_not_know_is_refused_by_name():
 
 def test_the_item_swap_keeps_ticket_08s_filenames_and_the_other_pair_is_suffixed():
     """A head table and a figure from before this ticket still resolve."""
-    assert pp._named("agnostic", pp.ITEM_SWAP, "json") == pp.AGNOSTIC_FILE
-    assert pp._named("agnostic", pp.HONEST_INSTRUCTION, "json") == \
+    assert pp.output_name("agnostic", pp.ITEM_SWAP, "json") == pp.AGNOSTIC_FILE
+    assert pp.output_name("agnostic", pp.HONEST_INSTRUCTION, "json") == \
         "agnostic_honest_instruction.json"
-    assert pp._named("segments", pp.ITEM_SWAP, "json") == pp.SEGMENTS_FILE
+    assert pp.output_name("segments", pp.ITEM_SWAP, "json") == pp.SEGMENTS_FILE
 
 
 def test_only_the_cells_that_clear_the_threshold_are_selected_strongest_first():

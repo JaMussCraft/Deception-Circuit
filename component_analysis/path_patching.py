@@ -692,8 +692,10 @@ def selected_counterfactuals(ctx) -> List[str]:
     return [value]
 
 
-def _named(stem: str, counterfactual: str, extension: str) -> str:
-    """`stem.ext` for the item swap, `stem_<counterfactual>.ext` otherwise.
+def output_name(stem: str, counterfactual: str, extension: str) -> str:
+    """The file one pass writes, by counterfactual.
+
+    `stem.ext` for the item swap, `stem_<counterfactual>.ext` otherwise.
 
     The item-swap files keep the names ticket 08 wrote, so the block C outputs
     of record and anything reading them still resolve; a second counterfactual
@@ -878,7 +880,7 @@ def agnostic_pass(ctx, grid: Grid, batches, counterfactual: str):
 
     tally.wall_seconds = time.perf_counter() - started
     if not tally.used_ids:
-        ctx.write_json(SUBDIR, _named("agnostic", counterfactual, "json"),
+        ctx.write_json(SUBDIR, output_name("agnostic", counterfactual, "json"),
                        _skipped_payload(ctx, counterfactual, tally))
         return None, tally
 
@@ -888,7 +890,7 @@ def agnostic_pass(ctx, grid: Grid, batches, counterfactual: str):
                  for cell in grid.cells}
     payload = _payload(ctx, grid, summaries, budget=budget, tally=tally,
                        counterfactual=counterfactual)
-    ctx.write_json(SUBDIR, _named("agnostic", counterfactual, "json"), payload)
+    ctx.write_json(SUBDIR, output_name("agnostic", counterfactual, "json"), payload)
     _figures(ctx, grid, summaries, payload, counterfactual)
     return summaries, tally
 
@@ -1086,7 +1088,7 @@ def completeness_sweep(ctx, grid: Grid, batches, counterfactual: str) -> dict:
                  "note": "one forward per sender per batch; the Readout "
                          "receiver needs no second pass"},
     }
-    ctx.write_json(SUBDIR, _named("sweep", counterfactual, "json"), payload)
+    ctx.write_json(SUBDIR, output_name("sweep", counterfactual, "json"), payload)
     _sweep_figure(ctx, counterfactual, payload)
     return payload
 
@@ -1125,7 +1127,7 @@ def _sweep_figure(ctx, counterfactual: str, payload: dict) -> None:
     top = [one for one in payload["senders"]
            if one["mean"] is not None][:SWEEP_BAR_TOP]
 
-    ctx.write_json(SUBDIR, _named("sweep_bars", counterfactual, "json"), {
+    ctx.write_json(SUBDIR, output_name("sweep_bars", counterfactual, "json"), {
         "title": f"Completeness sweep: direct effect on the Readout "
                  f"({counterfactual})",
         "counterfactual": counterfactual,
@@ -1157,7 +1159,7 @@ def _sweep_figure(ctx, counterfactual: str, payload: dict) -> None:
                    f"{payload['threshold']:g}", fontsize=9)
     figure.tight_layout()
     figure.savefig(os.path.join(ctx.subdir(SUBDIR),
-                                _named("sweep_bars", counterfactual, "png")),
+                                output_name("sweep_bars", counterfactual, "png")),
                    dpi=200)
     plt.close(figure)
 
@@ -1331,7 +1333,7 @@ def segment_pass(ctx, grid: Grid, batches, counterfactual: str,
                                summaries, threshold=threshold, tally=tally,
                                names=names,
                                missing_segmentation=missing_segmentation)
-    ctx.write_json(SUBDIR, _named("segments", counterfactual, "json"), payload)
+    ctx.write_json(SUBDIR, output_name("segments", counterfactual, "json"), payload)
     _segment_figure(ctx, counterfactual, payload)
     return payload
 
@@ -1508,7 +1510,7 @@ def _figures(ctx, grid: Grid, summaries: Dict[Cell, dict], payload: dict,
     # needs a scale with a width; fall back to the largest effect, then to one.
     extent = extent or (float(finite.max()) if finite.size else 0.0) or 1.0
 
-    ctx.write_json(SUBDIR, _named("heatmap", counterfactual, "json"), {
+    ctx.write_json(SUBDIR, output_name("heatmap", counterfactual, "json"), {
         "title": f"Position-agnostic path patching, normalized effect "
                  f"({counterfactual})",
         "counterfactual": counterfactual,
@@ -1549,12 +1551,12 @@ def _figures(ctx, grid: Grid, summaries: Dict[Cell, dict], payload: dict,
     figure.colorbar(image, ax=axes, fraction=0.03, pad=0.02, extend="both")
     figure.tight_layout()
     figure.savefig(os.path.join(ctx.subdir(SUBDIR),
-                                _named("heatmap", counterfactual, "png")),
+                                output_name("heatmap", counterfactual, "png")),
                    dpi=200)
     plt.close(figure)
 
     direct = payload["direct_effect_on_readout"]
-    ctx.write_json(SUBDIR, _named("direct_effect", counterfactual, "json"), {
+    ctx.write_json(SUBDIR, output_name("direct_effect", counterfactual, "json"), {
         "title": f"Direct effect on the Readout, by sender ({counterfactual})",
         "counterfactual": counterfactual,
         "receiver": label(READOUT_KEY), "senders": direct,
@@ -1575,7 +1577,7 @@ def _figures(ctx, grid: Grid, summaries: Dict[Cell, dict], payload: dict,
                    fontsize=9)
     figure.tight_layout()
     figure.savefig(os.path.join(ctx.subdir(SUBDIR),
-                                _named("direct_effect", counterfactual, "png")),
+                                output_name("direct_effect", counterfactual, "png")),
                    dpi=200)
     plt.close(figure)
 
@@ -1600,7 +1602,7 @@ def _segment_figure(ctx, counterfactual: str, payload: dict) -> None:
               for one in cells]
     rows = [one["cell"] for one in cells]
 
-    ctx.write_json(SUBDIR, _named("segments_heatmap", counterfactual, "json"), {
+    ctx.write_json(SUBDIR, output_name("segments_heatmap", counterfactual, "json"), {
         "title": f"Position-specific path patching by Segment ({counterfactual})",
         "counterfactual": counterfactual,
         "rows": rows, "columns": columns, "values": values,
@@ -1641,7 +1643,7 @@ def _segment_figure(ctx, counterfactual: str, payload: dict) -> None:
     figure.colorbar(image, ax=axes, fraction=0.03, pad=0.02)
     figure.tight_layout()
     figure.savefig(os.path.join(ctx.subdir(SUBDIR),
-                                _named("segments_heatmap", counterfactual, "png")),
+                                output_name("segments_heatmap", counterfactual, "png")),
                    dpi=200)
     plt.close(figure)
 
