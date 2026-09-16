@@ -658,3 +658,25 @@ def test_the_bar_chart_shows_at_most_the_requested_number_of_heads(sdr_cell):
     chart = read_json(out, *CELL, "attention", "top_heads.json")
     assert chart["rows"] == ["L0H0"]
     assert len(chart["matrix"]) == 1
+
+
+def test_a_query_segment_absent_from_the_whole_batch_counts_per_level():
+    """Each level counts its own rows as absent, not the whole batch.
+
+    `designation_suffix` is absent from every instance of the saved FAR run, so
+    a query position on it takes this path. Adding the batch size to every
+    level would tell a reader that identity and inversion each lost as many
+    instances as the two of them together.
+    """
+    profiles = ap.Profiles(head_keys=[("head", 0, 0)], names=list(NAMES),
+                           query_names=["intro"])
+
+    profiles.add({(0, 0): torch.zeros(3, 0, len(NAMES))},
+                 [[ap.ALL_LEVEL, "identity"], [ap.ALL_LEVEL, "inversion"],
+                  [ap.ALL_LEVEL, "identity"]],
+                 torch.zeros(3, 0, dtype=torch.bool), [])
+
+    written = profiles.as_json()
+    absent = {one["level"]: one["n_absent_by_query_position"]["intro"]
+              for one in written}
+    assert absent == {ap.ALL_LEVEL: 3, "identity": 2, "inversion": 1}

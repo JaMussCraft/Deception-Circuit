@@ -368,9 +368,15 @@ class Profiles:
         for query in self.query_names:
             columns = [i for i, (name, _k) in enumerate(slots) if name == query]
             if not columns:
+                # This Segment is absent from every instance of the batch, so
+                # every instance counts as absent — but each level counts only
+                # its own rows. Adding the whole batch to each would tell a
+                # reader that `identity` and `inversion` each lost as many
+                # instances as the two together.
                 for level in {one for row in levels for one in row}:
                     self._absent[(level, query)] = (
-                        self._absent.get((level, query), 0) + len(levels))
+                        self._absent.get((level, query), 0)
+                        + sum(1 for row in levels if level in row))
                 continue
             weight = positions_valid[:, columns].float()
             denominator = weight.sum(1)
