@@ -173,11 +173,9 @@ SWEEP_BAR_TOP = 40
 SEGMENTED_KINDS = ("k", "v")
 
 #: How far from zero a cell's position-agnostic effect must be to earn the
-#: second, position-specific pass, and how strong a Component outside the
-#: circuit must be in the completeness sweep to be flagged. Five percent of the
-#: clean-minus-counterfactual gap, per the spec. Spelled once: `add_arguments`
-#: and both readers take it from here, so a changed default cannot disagree
-#: with itself.
+#: second, position-specific pass. Five percent of the clean-minus-
+#: counterfactual gap, per the spec. Spelled once: `add_arguments` and the
+#: reader take it from here, so a changed default cannot disagree with itself.
 DEFAULT_POSITION_THRESHOLD = 0.05
 
 #: An instance whose clean-minus-corrupt gap is this small is not normalized by
@@ -716,6 +714,15 @@ def add_arguments(group) -> None:
                             "covers only the instances that survived the "
                             f"honest filter; {BOTH!r} runs each in turn and "
                             "writes one file and one column set per pair.")
+    group.add_argument("--path-sweep-threshold", type=float, default=None,
+                       help="How strong a Component outside the circuit must "
+                            "be in the completeness sweep to be flagged in the "
+                            "head table. Defaults to --path-position-"
+                            "threshold, so behaviour is unchanged unless it is "
+                            "set. It is a separate flag because the two "
+                            "questions are separate: a value chosen to widen "
+                            "or narrow the Segment pass would otherwise move "
+                            "which Components the sweep calls strong.")
     group.add_argument("--path-completeness-sweep", action="store_true",
                        help="Also patch every head and MLP block of the whole "
                             "model into the Readout, so that a Component with "
@@ -728,6 +735,23 @@ def add_arguments(group) -> None:
     group.add_argument("--path-top", type=int, default=10,
                        help="How many of the strongest cells, by absolute "
                             "normalized effect, are listed in the JSON.")
+
+
+def position_threshold(ctx) -> float:
+    """Which cells earn the position-specific pass."""
+    return float(getattr(ctx.cli, "path_position_threshold",
+                         DEFAULT_POSITION_THRESHOLD))
+
+
+def sweep_threshold(ctx) -> float:
+    """Which sweep Components outside the circuit are flagged.
+
+    Falls back to the position threshold when `--path-sweep-threshold` is not
+    given, which is what it was before the two were split, so an old command
+    line means what it used to.
+    """
+    given = getattr(ctx.cli, "path_sweep_threshold", None)
+    return position_threshold(ctx) if given is None else float(given)
 
 
 def selected_counterfactuals(ctx) -> List[str]:
@@ -1094,8 +1118,7 @@ def completeness_sweep(ctx, grid: Grid, batches, counterfactual: str) -> dict:
     """
     senders = sweep_senders(ctx.model)
     in_circuit = {row_key(one) for one in ctx.components}
-    threshold = float(getattr(ctx.cli, "path_position_threshold",
-                             DEFAULT_POSITION_THRESHOLD))
+    threshold = sweep_threshold(ctx)
 
     values: Dict[tuple, List[float]] = {key: [] for key in senders}
     tally = _Tally()
@@ -1137,6 +1160,8 @@ def completeness_sweep(ctx, grid: Grid, batches, counterfactual: str) -> dict:
         "metric": metric_meta(counterfactual),
         "receiver": label(READOUT_KEY),
         "threshold": threshold,
+        "threshold_flag": "--path-sweep-threshold, defaulting to "
+                          "--path-position-threshold",
         "n_senders": len(senders),
         "n_in_circuit": sum(1 for one in ranked if one["in_circuit"]),
         "flagged": [one["sender"] for one in ranked if one["flagged"]],
@@ -1378,8 +1403,7 @@ def segment_pass(ctx, grid: Grid, batches, counterfactual: str,
     """
     import torch
 
-    threshold = float(getattr(ctx.cli, "path_position_threshold",
-                             DEFAULT_POSITION_THRESHOLD))
+    threshold = position_threshold(ctx)
     chosen = selected_cells(summaries, threshold)
     segmentations = by_record_id(getattr(ctx, "segmentations", None))
     names = segment_names_of(segmentations)

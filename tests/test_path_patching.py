@@ -378,3 +378,31 @@ def test_the_threshold_default_is_spelled_once():
     default = parser.get_default("path_position_threshold")
 
     assert default == pp.DEFAULT_POSITION_THRESHOLD == 0.05
+
+
+def test_the_sweep_threshold_falls_back_to_the_position_threshold():
+    """Splitting the two flags must not move an existing command line: the
+    sweep still flags at the position threshold unless told otherwise."""
+    import argparse
+
+    shared = type("C", (), {"cli": argparse.Namespace(
+        path_position_threshold=0.02, path_sweep_threshold=None)})()
+    split = type("C", (), {"cli": argparse.Namespace(
+        path_position_threshold=0.02, path_sweep_threshold=0.2)})()
+
+    assert pp.position_threshold(shared) == 0.02
+    assert pp.sweep_threshold(shared) == 0.02
+    assert pp.position_threshold(split) == 0.02
+    assert pp.sweep_threshold(split) == 0.2
+
+
+def test_the_two_thresholds_are_separate_flags_with_one_default():
+    """A value chosen to widen the Segment pass must not silently move which
+    Components the completeness sweep calls strong."""
+    import analyze_components
+
+    parser = analyze_components.build_parser()
+
+    assert parser.get_default("path_position_threshold") == \
+        pp.DEFAULT_POSITION_THRESHOLD == 0.05
+    assert parser.get_default("path_sweep_threshold") is None
