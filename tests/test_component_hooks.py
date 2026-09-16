@@ -224,7 +224,7 @@ def test_the_residual_stream_is_one_row_per_layer_plus_the_embedding(model, stre
 
 def test_attention_rows_sum_to_one_and_sdpa_comes_back(model, streams):
     clean, _corrupt, mask = streams
-    before = hooks._hf(model).config._attn_implementation
+    before = hooks.attention_implementation(model)
     queries = [3, SEQ - 1]
 
     rows = hooks.attention_weights(model, clean, mask, layer=1,
@@ -233,7 +233,7 @@ def test_attention_rows_sum_to_one_and_sdpa_comes_back(model, streams):
     assert tuple(rows.shape) == (BATCH, 2, len(queries), SEQ)
     assert torch.allclose(rows.sum(-1), torch.ones(BATCH, 2, len(queries)),
                           atol=1e-4)
-    assert hooks._hf(model).config._attn_implementation == before == hooks.SDPA
+    assert hooks.attention_implementation(model) == before == hooks.SDPA
 
 
 def test_attention_query_positions_may_differ_per_instance(model, streams):
@@ -257,17 +257,116 @@ def test_sdpa_is_restored_even_when_the_trace_raises(model, streams):
         hooks.attention_weights(model, clean, mask, layer=99, heads=[0],
                                 query_positions=[0])
 
-    assert hooks._hf(model).config._attn_implementation == hooks.SDPA
+    assert hooks.attention_implementation(model) == hooks.SDPA
 
 
-def test_a_key_that_is_not_a_component_is_refused(model, streams):
+def test_a_key_the_forward_cannot_reach_is_refused(model, streams):
+    """A silently ignored key looks exactly like a Component with no effect."""
     clean, _corrupt, mask = streams
 
-    with pytest.raises(ValueError, match="not a Component kind"):
+    with pytest.raises(ValueError, match="not a kind this pass can reach"):
         hooks.capture_forward(model, clean, mask,
                               components=[("neuron", 0, 3)])
     with pytest.raises(ValueError, match="outside the model"):
         hooks.capture_forward(model, clean, mask, components=[("head", 7, 0)])
+    # K and V are per KV group: the tiny model has 4 heads over 2 groups, so
+    # group 3 does not exist even though head 3 does.
+    with pytest.raises(ValueError, match="per KV group"):
+        hooks.capture_forward(model, clean, mask, components=[("k", 0, 3)])
+
+
+# ==============================================================================
+# RECEIVERS
+# ==============================================================================
+
+def test_replacing_every_receiver_with_its_own_clean_capture_changes_nothing(
+        model, streams):
+    """The no-op invariant for the receiver side of the grid.
+
+    Every Q slice, every KV group's K and V, every MLP input and the Readout
+    residual, written back with the value that site already carried. If any
+    slice were addressed wrongly — a Q head at the wrong offset, a K group read
+    as a head — the logits would move.
+    """
+    clean, _corrupt, mask = streams
+    keys = hooks.all_receiver_keys(model)
+
+    captured = hooks.capture_forward(model, clean, mask, components=keys)
+    got = hooks.replace_forward(model, clean, mask,
+                                replacements=captured.outputs)
+
+    assert len(keys) == TINY["layers"] * (TINY["heads"] + 2 * TINY["kv_heads"] + 1) + 1
+    assert torch.allclose(got, plain_readout_logits(model, clean, mask),
+                          atol=1e-6)
+
+
+def test_patching_one_kv_groups_k_leaves_the_other_groups_k_alone(model, streams):
+    """K and V are per KV group under GQA, and a group is not a head.
+
+    The tiny model has 4 query heads over 2 KV heads, so group 0 serves heads
+    0 and 1. Patching group 0's K must move the Readout logits and must leave
+    group 1's K exactly where it was.
+    """
+    clean, corrupt, mask = streams
+    victim = ("k", 1, 0)
+    other = ("k", 1, 1)
+
+    corrupt_run = hooks.capture_forward(model, corrupt, mask, components=[victim])
+    clean_run = hooks.capture_forward(model, clean, mask, components=[other])
+    under = hooks.capture_forward(model, clean, mask, components=[other],
+                                  replacements={victim: corrupt_run.outputs[victim]})
+
+    assert hooks.heads_of_kv_group(model, 0) == [0, 1]
+    assert hooks.kv_group_of(model, 3) == 1
+    assert not torch.allclose(under.logits, clean_run.logits, atol=1e-4)
+    assert torch.equal(under.outputs[other], clean_run.outputs[other])
+
+
+def test_the_readout_receiver_is_the_residual_the_final_norm_sees(model, streams):
+    clean, _corrupt, mask = streams
+
+    captured = hooks.capture_forward(model, clean, mask,
+                                     components=[hooks.READOUT_KEY])
+
+    rows = torch.arange(BATCH)
+    assert torch.equal(captured.residual[:, -1, :],
+                       captured.outputs[hooks.READOUT_KEY][rows,
+                                                           captured.readout, :])
+
+
+# ==============================================================================
+# THE FP32 READOUT
+# ==============================================================================
+
+def test_the_fp32_readout_reproduces_the_models_own_logits(model, streams):
+    """ADR-0001 reads ranking metrics through an fp32 final norm and unembedding.
+
+    The check that it is the *same* readout and not merely a similar one: run
+    the captured residual through it and compare with the logits the model
+    produced on the same forward.
+    """
+    clean, _corrupt, mask = streams
+
+    captured = hooks.capture_forward(model, clean, mask, components=[])
+    recomputed = hooks.readout_logits(model, captured.residual[:, -1, :])
+
+    assert recomputed.dtype is torch.float32
+    assert torch.allclose(recomputed, captured.logits.float(), atol=1e-4)
+
+
+def test_the_logit_difference_reads_both_streams_with_one_assignment(model,
+                                                                     streams):
+    clean, corrupt, mask = streams
+    target = torch.tensor([3, 4])
+    distractor = torch.tensor([11, 12])
+
+    clean_run = hooks.capture_forward(model, clean, mask, components=[])
+    corrupt_run = hooks.capture_forward(model, corrupt, mask, components=[])
+    gap = (hooks.target_minus_distractor(clean_run.logits, target, distractor)
+           - hooks.target_minus_distractor(corrupt_run.logits, target, distractor))
+
+    assert tuple(gap.shape) == (BATCH,)
+    assert gap.dtype is torch.float32
 
 
 # ==============================================================================
@@ -315,4 +414,4 @@ def test_the_gpu_scaffold_check_runs_end_to_end_on_the_tiny_model(model, streams
     assert measured["replace_all_with_corrupt_max_abs_logit_error"] < 1e-4
     assert measured["timings"]["batch_size"] == BATCH
     assert measured["timings"]["attention_weights_eager_s"] > 0
-    assert hooks._hf(model).config._attn_implementation == hooks.SDPA
+    assert hooks.attention_implementation(model) == hooks.SDPA

@@ -31,7 +31,7 @@ from __future__ import annotations
 import importlib
 import os
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 #: The built-in analyses, in the order they run: descriptive ones first, so a
 #: causal analysis can read a column an earlier one wrote.
@@ -114,49 +114,58 @@ class AnalysisContext:
     both want the sample share one load.
     """
 
-    cli: object
-    intake: object
-    circuit_spec: object
-    task_spec: object
-    components: list
+    #: The parsed CLI namespace, including every analysis's own flags.
+    cli: "argparse.Namespace"
+    #: The resolved `intake.Intake`: model name, geometry, reference circuits.
+    intake: Any
+    #: `evaluation.circuits` specs for this cell.
+    circuit_spec: Any
+    task_spec: Any
+    #: `[components.Component]`, the circuit's Components in head-table order.
+    components: List[Any]
     cell_dir: str
-    model: object = None
-    tokenizer: object = None
-    segmentations: Optional[list] = None
-    sample: object = None
+    #: The nnsight-wrapped model, or None under `--dry-run`. Reach it only
+    #: through `component_analysis.hooks`.
+    model: Any = None
+    tokenizer: Any = None
+    #: `[segmentation.Segmentation]`, one per instance of the split.
+    segmentations: Optional[List[Any]] = None
+    #: The `sampling.Sample` the causal analyses run over, or None.
+    sample: Any = None
     device: str = "cuda"
-    _loaders: dict = field(default_factory=dict, repr=False)
+    _loaders: Dict[str, Any] = field(default_factory=dict, repr=False)
 
     @property
     def keys(self) -> list:
         """The Component keys of this circuit, in head-table order."""
         return [component.key for component in self.components]
 
+    def _batches(self, name: str, ids):
+        """One loader per cell per kind, built on first use and kept."""
+        from component_analysis import dataloaders
+
+        if name not in self._loaders:
+            self._loaders[name] = dataloaders.batches_for_task(
+                self.task_spec, self.tokenizer, ids=ids,
+                batch_size=getattr(self.cli, "batch_size",
+                                   dataloaders.DEFAULT_BATCH_SIZE))
+        return self._loaders[name]
+
     def causal_batches(self):
         """The fixed-seed sample, joined by instance id, with both pairs."""
         from component_analysis import dataloaders
 
-        if "causal" not in self._loaders:
-            if self.sample is None:
-                raise ValueError(
-                    f"task {self.task_spec.name!r} has no causal sample, so a "
-                    f"causal analysis cannot run on it")
-            self._loaders["causal"] = dataloaders.batches_for_task(
-                self.task_spec, self.tokenizer, ids=self.sample.ids,
-                batch_size=getattr(self.cli, "batch_size",
-                                   dataloaders.DEFAULT_BATCH_SIZE))
-        return self._loaders["causal"]
+        if "causal" in self._loaders:
+            return self._loaders["causal"]
+        if self.sample is None:
+            raise dataloaders.LoaderUnavailable(
+                f"task {self.task_spec.name!r} has no causal sample, so a "
+                f"causal analysis cannot run on it")
+        return self._batches("causal", self.sample.ids)
 
     def descriptive_batches(self):
         """The whole test split, item-swap pair only."""
-        from component_analysis import dataloaders
-
-        if "descriptive" not in self._loaders:
-            self._loaders["descriptive"] = dataloaders.batches_for_task(
-                self.task_spec, self.tokenizer, ids=None,
-                batch_size=getattr(self.cli, "batch_size",
-                                   dataloaders.DEFAULT_BATCH_SIZE))
-        return self._loaders["descriptive"]
+        return self._batches("descriptive", None)
 
     def subdir(self, analysis) -> str:
         """The analysis's own directory inside the cell, created on demand.

@@ -251,6 +251,33 @@ def test_the_intake_layer_does_not_import_nnsight():
     assert result.returncode == 0, result.stderr
 
 
+def test_nnsights_private_model_handle_is_confined_to_the_hook_module():
+    """ADR-0001's "a migration touches one file" covers the handle, not just imports.
+
+    `LanguageModel._model` is nnsight's private attribute. Reading it from an
+    analysis, a script or the CLI would mean a 0.8 migration touches every one
+    of them, even though none of them imports nnsight. `hooks` exposes
+    `device_and_dtype`, `attention_implementation` and `describe` so that no
+    caller needs it.
+    """
+    import glob
+
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    allowed = os.path.join(root, "component_analysis", "hooks.py")
+    offenders = []
+    for path in (glob.glob(os.path.join(root, "component_analysis", "*.py"))
+                 + glob.glob(os.path.join(root, "analyze_components.py"))
+                 + glob.glob(os.path.join(root, "scripts", "verify_block_c.py"))
+                 + glob.glob(os.path.join(root, "tests", "stub_analysis.py"))):
+        if os.path.abspath(path) == allowed:
+            continue
+        with open(path) as handle:
+            if "._model" in handle.read():
+                offenders.append(os.path.relpath(path, root))
+    assert not offenders, \
+        f"these reach through the nnsight wrapper instead of asking hooks: {offenders}"
+
+
 # ==============================================================================
 # HEAD TABLE
 # ==============================================================================

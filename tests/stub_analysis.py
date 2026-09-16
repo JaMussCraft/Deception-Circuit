@@ -65,19 +65,6 @@ def run(ctx) -> dict:
 # THE MEASUREMENT
 # ==============================================================================
 
-def _logit_difference(logits, target, distractor):
-    """logit(Target) - logit(Distractor), with the *clean* stream's assignment.
-
-    The corrupt stream swaps which word is the Target, so reading its own
-    assignment would make the gap a difference of two positive numbers instead
-    of the drop the patching metric normalizes by.
-    """
-    import torch
-
-    rows = torch.arange(logits.shape[0], device=logits.device)
-    return (logits[rows, target].float() - logits[rows, distractor].float())
-
-
 def _timed(function, *, cuda: bool):
     import torch
 
@@ -92,11 +79,9 @@ def _timed(function, *, cuda: bool):
 
 def measure(ctx) -> dict:
     """The three scaffold numbers, over the first batches of the causal sample."""
-    import torch
-
     from component_analysis import hooks
 
-    device = next(iter(ctx.model._model.parameters())).device
+    device, dtype = hooks.device_and_dtype(ctx.model)
     cuda = device.type == "cuda"
     keys = hooks.all_component_keys(ctx.model)
     batches = list(ctx.causal_batches())
@@ -133,8 +118,14 @@ def measure(ctx) -> dict:
                                           replacements=corrupt.outputs,
                                           positions=readout), cuda=cuda)
 
-        gap = (_logit_difference(clean.logits, target, distractor)
-               - _logit_difference(corrupt.logits, target, distractor))
+        # Read through the fp32 readout ADR-0001 requires, from the residual
+        # the final norm sees, rather than off the bfloat16 logits.
+        gap = (hooks.target_minus_distractor(
+                   hooks.readout_logits(ctx.model, clean.residual[:, -1, :]),
+                   target, distractor)
+               - hooks.target_minus_distractor(
+                   hooks.readout_logits(ctx.model, corrupt.residual[:, -1, :]),
+                   target, distractor))
         gaps.extend(gap.tolist())
         worst_replace = max(
             worst_replace,
@@ -167,7 +158,7 @@ def measure(ctx) -> dict:
     mean = sum(gaps) / len(gaps) if gaps else float("nan")
     return {
         "device": str(device),
-        "dtype": str(next(iter(ctx.model._model.parameters())).dtype),
+        "dtype": str(dtype),
         "n_instances": len(gaps),
         "n_batches": len(batches),
         "n_keys_replaced": len(keys),

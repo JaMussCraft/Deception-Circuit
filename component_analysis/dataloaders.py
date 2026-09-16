@@ -21,6 +21,16 @@ the task's loader returns it, *before* `DeceptionDatasetLlama` drops any record
 whose target or distractor is not a single token. The ids survive that; the
 indices do not.
 
+**The retention rule is applied here, by id.** `DeceptionDatasetLlama` keeps
+only records whose Target and Distractor are single tokens, and it keeps them
+in a list with no key back to the ids the sample named. Joining a split's ids
+against that list by `instance_id` loses every task whose records carry none
+(the ids fall back to the split position), and the loss shows up as "dropped
+because an answer word is not a single token" whether or not that is true. So
+the same rule is applied here instead, against the ids `sampling.record_ids`
+produced, and `dropped_by_tokenization` holds exactly the ids it really
+dropped. A test asserts the rule still agrees with the dataset class.
+
 **An instance with no honest counterpart is reported, not dropped.** Most of a
 split has no Matched Honest survivor — 629 of 1000 on SDR, and none at all on a
 task whose build has not been run — and the item-swap analyses do not care.
@@ -42,6 +52,15 @@ from typing import List, Optional, Sequence
 import torch
 
 from component_analysis import sampling
+
+class LoaderUnavailable(ValueError):
+    """These loaders do not cover this task, or this cell has no causal sample.
+
+    Its own class because `--dry-run` turns it into a printed "not applicable"
+    line and keeps going, while any other failure is a bad configuration and
+    must stop the run on the login node.
+    """
+
 
 #: The tasks these loaders cover. Both pairs they build are properties of the
 #: mechanism tasks: the item-swap Corruption edits the Designation Site, and the
@@ -216,22 +235,31 @@ def _batches(dataset_dir: str, tokenizer, *, ids: Optional[Sequence[str]],
     task = task or config.get("task")
     reason = uncovered_reason(task)
     if reason:
-        raise ValueError(reason)
+        raise LoaderUnavailable(reason)
     if max_length is None:
         max_length = int(config.get("max_seq_length", dc.MAX_SEQ_LENGTH))
 
     records = dc.load_or_generate_deception_data(dataset_dir, split=split)
-    record_ids = sampling.record_ids(records)
-    by_id = dict(zip(record_ids, records))
+    split_ids = sampling.record_ids(records)
+    by_id = dict(zip(split_ids, records))
 
-    wanted = list(ids) if ids is not None else record_ids
+    wanted = list(ids) if ids is not None else split_ids
     missing = [one for one in wanted if one not in by_id]
-    selected = [by_id[one] for one in wanted if one in by_id]
 
-    dataset = dc.DeceptionDatasetLlama(selected, tokenizer, max_length=max_length)
-    kept = {item["instance_id"]: item for item in dataset.processed_data
-            if "instance_id" in item}
-    dropped = [one for one in wanted if one in by_id and one not in kept]
+    kept, dropped = {}, []
+    for one in wanted:
+        record = by_id.get(one)
+        if record is None:
+            continue
+        target = dc.encode_answer_token(tokenizer, record["target"])
+        distractor = dc.encode_answer_token(tokenizer, record["distractor"])
+        if len(target) != 1 or len(distractor) != 1:
+            dropped.append(one)
+            continue
+        kept[one] = {**record, "target_token": target[0],
+                     "distractor_token": distractor[0],
+                     "prefix_length": len(tokenizer.encode(
+                         record["clean_prompt"], add_special_tokens=False))}
 
     honest, source = ({}, "not requested")
     if with_honest:
@@ -354,7 +382,8 @@ def summarize(batches: Batches) -> List[str]:
                      f"{', '.join(report['missing_from_split'][:3])}")
     if report["dropped_by_tokenization"]:
         lines.append(f"!! {len(report['dropped_by_tokenization'])} id(s) dropped "
-                     f"because an answer word is not a single token")
+                     f"because the Target or the Distractor is not a single "
+                     f"token: {', '.join(report['dropped_by_tokenization'][:3])}")
     if report["honest_source"] == "absent":
         lines.append("no Matched Honest survivors file for this task, so no "
                      "Honest-Instruction Counterfactual")

@@ -278,13 +278,24 @@ def selected_analyses(cli) -> list:
 
 
 def print_estimates(ctx, selected) -> None:
-    """`--dry-run`: one line per analysis, and no file created by any of them."""
+    """`--dry-run`: one line per analysis, and no file created by any of them.
+
+    An analysis whose loader this cell cannot supply — a causal analysis on a
+    task with no sample, or on a task the loaders do not cover — prints "not
+    applicable" and the dry run continues. Only that one failure is softened:
+    every other exception is a bad configuration, which is what `--dry-run` is
+    for catching on the login node.
+    """
     if not selected:
         print("    analyses: none registered, so this run would only write the "
               "head table, the segmentation and the sample")
         return
     for module in selected:
-        print(f"    {module.NAME}: {module.estimate(ctx)}")
+        try:
+            line = module.estimate(ctx)
+        except dataloaders.LoaderUnavailable as unavailable:
+            line = f"not applicable — {unavailable}"
+        print(f"    {module.NAME}: {line}")
 
 
 # ==============================================================================
@@ -378,12 +389,11 @@ def load_model(cli, resolved):
     nnsight: the login node carries 0.5.12 for the parent repo, not the 0.7.0
     ADR-0001 pins.
     """
-    from component_analysis.hooks import load_analysis_model
+    from component_analysis import hooks
 
-    model = load_analysis_model(resolved.model, device=cli.device,
-                                hf_token=cli.hf_token)
-    parameter = next(iter(model._model.parameters()))
-    print(f"  model loaded on {parameter.device} as {parameter.dtype}")
+    model = hooks.load_analysis_model(resolved.model, device=cli.device,
+                                      hf_token=cli.hf_token)
+    print(f"  model loaded: {hooks.describe(model)}")
     return model
 
 

@@ -50,20 +50,18 @@ def loading_model_is_the_first_assertion(cli, resolved):
     """Replaces `analyze_components.load_model` for this run."""
     import torch
 
-    from component_analysis.hooks import load_analysis_model
+    from component_analysis import hooks
 
     print(f"[0] load_analysis_model({resolved.model!r}, device={cli.device!r})")
-    model = load_analysis_model(resolved.model, device=cli.device,
-                                hf_token=cli.hf_token)
-    parameter = next(iter(model._model.parameters()))
-    assert parameter.device.type == "cuda", \
-        f"weights are on {parameter.device}, not CUDA"
-    assert parameter.dtype is torch.bfloat16, \
-        f"weights are {parameter.dtype}, not the bfloat16 default for a GPU"
-    print(f"    OK — {type(model).__name__} over "
-          f"{type(model._model).__name__}, {parameter.device}, "
-          f"{parameter.dtype}, attn "
-          f"{model._model.config._attn_implementation}")
+    model = hooks.load_analysis_model(resolved.model, device=cli.device,
+                                      hf_token=cli.hf_token)
+    device, dtype = hooks.device_and_dtype(model)
+    assert device.type == "cuda", f"weights are on {device}, not CUDA"
+    assert dtype is torch.bfloat16, \
+        f"weights are {dtype}, not the bfloat16 default for a GPU"
+    assert hooks.attention_implementation(model) == hooks.SDPA, \
+        "the model did not load under SDPA, which ADR-0001 makes the default"
+    print(f"    OK — {hooks.describe(model)}")
     return model
 
 

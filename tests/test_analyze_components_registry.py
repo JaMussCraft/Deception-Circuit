@@ -22,7 +22,8 @@ import pytest
 import analyze_components
 from component_analysis import registry
 from tests import stub_analysis
-from tests.test_analyze_components_end_to_end import written_files
+from tests.test_analyze_components_end_to_end import (  # noqa: F401
+    tiny_runs, written_files)
 from tests.test_analyze_components_segmentation import (  # noqa: F401
     CELL, read_json, run_cli, sdr_run)
 
@@ -211,3 +212,22 @@ def test_an_analysis_can_read_the_whole_split_through_the_descriptive_loader(
     assert seen["n_instances"] == len(records)
     assert seen["memoized"], "two analyses in a cell must share one load"
     assert seen["honest"] == 0, "the descriptive loader builds no honest pair"
+
+
+def test_dry_run_says_not_applicable_where_a_causal_analysis_cannot_run(
+        tiny_runs, registered, capsys):
+    """A task with no causal sample must not abort the whole dry run.
+
+    `tinystd` has no default segmentation, so the cell has no sample and the
+    stub's estimate asks for a loader that cannot exist. Before this check the
+    dry run raised there, one line after printing that the task had no causal
+    loader, and the researcher lost the head table for every later cell.
+    """
+    run_dir, _honest, out = tiny_runs
+
+    assert run_cli(str(run_dir), "--dry-run", "--num-kv-heads", "2",
+                   "--output-dir", str(out)) == 0
+
+    printed = capsys.readouterr().out
+    assert "stub: not applicable" in printed
+    assert "has no causal sample" in printed

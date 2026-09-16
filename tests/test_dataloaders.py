@@ -265,3 +265,43 @@ def test_std_is_refused_by_name_rather_than_yielding_an_empty_loader(sdr_split):
     with pytest.raises(ValueError, match="not one of the mechanism tasks"):
         dataloaders.causal_batches(str(dataset_dir), tokenizer, ids=[],
                                    task="std")
+
+
+def test_records_with_no_instance_id_still_join_on_their_positional_ids(
+        sdr_split, tmp_path):
+    """`sampling.record_id` falls back to the split position, and so must the join.
+
+    Before this check the loader keyed the split by `record_ids` but keyed the
+    kept records by `instance_id`, so a task whose records carry none — STD —
+    matched nothing and every id was reported as "dropped because an answer
+    word is not a single token". A false diagnosis is worse than a crash.
+    """
+    datasets = pytest.importorskip("datasets")
+    _dir, _pools, records, tokenizer, _survivors = sdr_split
+
+    stripped = [{k: v for k, v in r.items() if k != "instance_id"}
+                for r in records[:6]]
+    anonymous = tmp_path / "anonymous"
+    datasets.DatasetDict({"test": datasets.Dataset.from_list(stripped)}) \
+        .save_to_disk(str(anonymous))
+    with open(anonymous / "dataset_config.json", "w") as handle:
+        json.dump({"task": "sdr", "max_seq_length": MAX_LENGTH}, handle)
+
+    wanted = sampling.record_ids(stripped)
+    batches = dataloaders.causal_batches(str(anonymous), tokenizer, ids=wanted,
+                                         task="sdr", max_length=MAX_LENGTH)
+
+    assert wanted == [f"index{i:06d}" for i in range(len(stripped))]
+    assert batches.report["dropped_by_tokenization"] == []
+    assert [i for batch in batches for i in batch.ids] == wanted
+
+
+def test_the_retention_rule_still_agrees_with_the_repos_dataset_class(sdr_split):
+    """The rule is applied here now, so it has to stay the same rule."""
+    dataset_dir, _pools, records, tokenizer, _survivors = sdr_split
+
+    batches = dataloaders.descriptive_batches(str(dataset_dir), tokenizer,
+                                              task="sdr", max_length=MAX_LENGTH)
+    dataset = dc.DeceptionDatasetLlama(records, tokenizer, max_length=MAX_LENGTH)
+
+    assert batches.ids == [item["instance_id"] for item in dataset.processed_data]
