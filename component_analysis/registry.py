@@ -44,7 +44,7 @@ from typing import Any, Dict, List, Optional
 ANALYSES: List[str] = [
     "component_analysis.attention_patterns",                   # ticket 03
 
-    # ticket 04, DLA and logit lens:     "component_analysis.dla",
+    "component_analysis.dla",          # ticket 04, DLA and logit lens
 
     "component_analysis.knockout",                    # ticket 07
 
