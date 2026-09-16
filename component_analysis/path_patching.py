@@ -128,6 +128,23 @@ MISSING_COLOUR = "#e8e8e8"
 #: say so; the JSON twin carries every unclipped number.
 HEATMAP_PERCENTILE = 98.0
 
+#: Where a Q, MLP or Readout receiver takes its patch in the position-specific
+#: pass: at the query positions, not per Segment (the spec's rule). Ticket 03
+#: owns `--query-positions`; this is its default, spelled out here because an
+#: analysis module may not import another analysis module. A test asserts the
+#: two spellings equal wherever both are importable.
+DEFAULT_QUERY_POSITION = "readout"
+QUERY_ENTRY = "query_positions"
+
+#: The entry name for the check that the Segments really do partition the
+#: prompt: the receiver patched at every Segment at once must give back the
+#: position-agnostic cell.
+UNION_ENTRY = "union"
+
+#: Receiver kinds whose position-specific pass is by Segment. The others take
+#: one patch at the query positions.
+SEGMENTED_KINDS = ("k", "v")
+
 #: An instance whose clean-minus-corrupt gap is this small is not normalized by
 #: it: the Corruption did not move the answer, so every cell would be a ratio of
 #: two small numbers. Excluded and counted rather than returned as a spike.
@@ -540,6 +557,33 @@ def patched_readout(model, streams: Streams, *, senders, receivers):
                          for one in receivers})
 
 
+def positioned_effects(model, streams: Streams, sender, receiver, entries):
+    """`{entry name: [batch] normalized effect}` for one cell, by position.
+
+    `entries` is `[(name, mask)]`, each mask a `[batch, seq]` boolean saying
+    where the receiver takes the sender's corrupt value; `None` means every
+    position, which is the position-agnostic cell. Pass 1 is run **once** and
+    shared: what the receiver reads while the sender carries its corrupt value
+    does not depend on where that value is later written in.
+
+    This is the seam the position-specific pass is asserted at: the Segments
+    partition the prompt, so the union of their masks must give back the
+    position-agnostic cell.
+    """
+    from component_analysis import hooks
+
+    captured = receiver_inputs(model, streams, senders=[sender],
+                               receivers=[receiver]).outputs[receiver]
+    out = {}
+    for name, mask in entries:
+        replacement = (captured if mask is None
+                       else hooks.Replacement(captured,
+                                              positions=mask.to(captured.device)))
+        patched = readout_from_receivers(model, streams, {receiver: replacement})
+        out[name] = normalized_effect(streams, patched)
+    return out
+
+
 def normalized_effect(streams: Streams, patched):
     """`(patched - clean) / (clean - corrupt)` per instance, `[batch]` fp32.
 
@@ -594,6 +638,14 @@ def strongest(cells: Sequence[dict], limit: int) -> List[dict]:
 # ==============================================================================
 
 def add_arguments(group) -> None:
+    group.add_argument("--path-position-threshold", type=float, default=0.05,
+                       help="A (sender, receiver) cell whose position-agnostic "
+                            "normalized effect is at least this far from zero "
+                            "gets a second, position-specific pass by Segment, "
+                            "and a Component outside the circuit that clears it "
+                            "in the completeness sweep is flagged in the head "
+                            "table. The default is five percent of the "
+                            "clean-minus-counterfactual gap.")
     group.add_argument("--path-counterfactual", default=ITEM_SWAP,
                        choices=sorted(COUNTERFACTUALS) + [BOTH],
                        help="Which counterfactual pair the senders carry. "
@@ -715,6 +767,7 @@ def run(ctx) -> dict:
                    counterfactual)
             continue
         _merge(updates, head_table_columns(grid, summaries), counterfactual)
+        segment_pass(ctx, grid, batches, counterfactual, summaries)
     return updates
 
 
@@ -875,6 +928,254 @@ def _payload(ctx, grid, summaries, *, budget, tally: _Tally,
                                     if tally.forwards else None),
         },
     }
+
+
+# ==============================================================================
+# THE POSITION-SPECIFIC PASS, BY SEGMENT
+# ==============================================================================
+
+def query_segment_names(ctx) -> List[str]:
+    """The Segments a Q, MLP or Readout receiver takes its patch at.
+
+    Ticket 03 owns `--query-positions` and validates the names against the
+    task; this reads the same flag so the two passes are anchored at the same
+    tokens, and falls back to the Readout when the flag is not registered (a
+    test that registers this analysis alone).
+    """
+    value = getattr(ctx.cli, "query_positions", None)
+    if not value:
+        return [DEFAULT_QUERY_POSITION]
+    return [one.strip() for one in value.split(",") if one.strip()]
+
+
+def selected_cells(summaries: Dict[Cell, dict], threshold: float) -> List[Cell]:
+    """The cells whose position-agnostic effect clears the threshold.
+
+    By absolute effect, so a path that suppresses the counterfactual answer is
+    selected as readily as one that carries it; strongest first, because the
+    second pass is the expensive one and a truncated run should have spent its
+    time on the largest cells.
+    """
+    ranked = [(cell, one) for cell, one in summaries.items()
+              if one["mean"] is not None and abs(one["mean"]) >= threshold]
+    ranked.sort(key=lambda pair: abs(pair[1]["mean"]), reverse=True)
+    return [cell for cell, _one in ranked]
+
+
+def position_mask(segmentations: dict, ids, names: Sequence[str],
+                  n_positions: int):
+    """`([batch, n_positions] bool, [batch] bool)`: where, and for which rows.
+
+    The second tensor is whether the instance has any of those Segments at all.
+    A Segment can be legitimately absent — the saved FAR run predates the
+    Designation Suffix — and an absent Segment patches nothing, so its effect
+    would be exactly zero. Counting those zeros as data would pull the
+    Segment's mean toward nothing; they are marked here and excluded instead.
+    """
+    import torch
+
+    mask = torch.zeros((len(ids), n_positions), dtype=torch.bool)
+    for row, one in enumerate(ids):
+        segmentation = segmentations.get(one)
+        if segmentation is None:
+            continue
+        for name in names:
+            segment = segmentation.segments.get(name)
+            if segment is None:
+                continue
+            for start, end in segment.spans:
+                if start < n_positions:
+                    mask[row, start:min(end, n_positions)] = True
+    return mask, mask.any(-1)
+
+
+def segment_entries(ctx, receiver: tuple, streams: Streams, segmentations: dict,
+                    n_positions: int):
+    """`[(name, mask, present)]` for one receiver, in the order they are run.
+
+    K and V receivers take the patch at each Segment's key positions in turn,
+    plus the union of them all as the check that the split is a decomposition.
+    Q, MLP and Readout receivers take one patch at the configured query
+    positions, which is the spec's rule rather than a saving: their input is
+    read at the position the model answers from, so a Segment sweep over them
+    would be a sweep over positions the receiver does not read.
+    """
+    kind = receiver[0]
+    ids = list(streams.ids)
+    if kind not in SEGMENTED_KINDS:
+        names = query_segment_names(ctx)
+        mask, present = position_mask(segmentations, ids, names, n_positions)
+        return [(QUERY_ENTRY, mask, present, list(names))]
+
+    names = segment_names_of(segmentations, ids)
+    entries = []
+    for name in names:
+        mask, present = position_mask(segmentations, ids, [name], n_positions)
+        entries.append((name, mask, present, [name]))
+    union, present = position_mask(segmentations, ids, names, n_positions)
+    entries.append((UNION_ENTRY, union, present, list(names)))
+    return entries
+
+
+def segment_names_of(segmentations: dict, ids) -> List[str]:
+    """Every Segment name the instances of this batch carry, in prompt order.
+
+    Read off the resolved segmentation rather than from the task's default
+    list, so that a `--segment` override on the command line is swept too.
+    """
+    names: List[str] = []
+    for one in ids:
+        segmentation = segmentations.get(one)
+        if segmentation is None:
+            continue
+        for name in segmentation.segments:
+            if name not in names:
+                names.append(name)
+    return names
+
+
+def by_record_id(segmentations) -> dict:
+    """The cell's resolved segmentation, keyed by the id the loaders join on.
+
+    `Segmentation.record_id` and `Batch.ids` both come from
+    `sampling.record_ids`, so this join is by instance id and never by split
+    position.
+    """
+    return {one.record_id: one for one in (segmentations or [])}
+
+
+def segment_pass(ctx, grid: Grid, batches, counterfactual: str,
+                 summaries: Dict[Cell, dict]) -> dict:
+    """The second pass over the cells that cleared `--path-position-threshold`.
+
+    One pass 1 per (cell, batch), shared across every position entry of that
+    cell, and one pass 2 per entry. The result says, for each selected cell,
+    where in the prompt the path carries its effect.
+    """
+    import torch
+
+    threshold = float(getattr(ctx.cli, "path_position_threshold", 0.05))
+    chosen = selected_cells(summaries, threshold)
+    segmentations = by_record_id(getattr(ctx, "segmentations", None))
+
+    rows: Dict[Cell, Dict[str, List[float]]] = {
+        cell: {} for cell in chosen}
+    absent: Dict[Cell, Dict[str, int]] = {cell: {} for cell in chosen}
+    tally = _Tally()
+    started = time.perf_counter()
+    missing_segmentation: List[str] = []
+
+    if chosen:
+        for batch in batches:
+            streams = capture_streams(ctx.model, batch, senders=grid.senders,
+                                      counterfactual=counterfactual)
+            if streams is None:
+                continue
+            tally.forwards += 2
+            tally.used_ids.extend(streams.ids)
+            missing_segmentation.extend(one for one in streams.ids
+                                        if one not in segmentations)
+            n_positions = streams.input_ids.shape[1]
+            for cell in chosen:
+                entries = segment_entries(ctx, cell.receiver, streams,
+                                          segmentations, n_positions)
+                effects = positioned_effects(
+                    ctx.model, streams, cell.sender, cell.receiver,
+                    [(name, mask) for name, mask, _present, _names in entries])
+                tally.forwards += 1 + len(entries)
+                for name, _mask, present, _names in entries:
+                    values = torch.where(present.to(effects[name].device),
+                                         effects[name],
+                                         torch.full_like(effects[name],
+                                                         float("nan")))
+                    rows[cell].setdefault(name, []).extend(values.tolist())
+                    absent[cell][name] = absent[cell].get(name, 0) + int(
+                        (~present).sum())
+            del streams
+
+    tally.wall_seconds = time.perf_counter() - started
+    payload = _segment_payload(ctx, counterfactual, chosen, rows, absent,
+                               summaries, threshold=threshold, tally=tally,
+                               segmentations=segmentations,
+                               missing_segmentation=missing_segmentation)
+    ctx.write_json(SUBDIR, _named("segments", counterfactual, "json"), payload)
+    _segment_figure(ctx, counterfactual, payload)
+    return payload
+
+
+def _segment_payload(ctx, counterfactual, chosen, rows, absent, summaries, *,
+                     threshold, tally, segmentations, missing_segmentation):
+    """The per-cell, per-Segment table, with the union check beside each cell.
+
+    `agnostic` and `union` are the same quantity measured two ways, so a reader
+    can see that the split is a decomposition. `sum_of_segments` is recorded
+    beside them and is **not** expected to equal either: patching two Segments
+    at once is not the sum of patching each, because the receiver's forward is
+    not linear in its input. The check the spec asks for is the union one.
+    """
+    cells = []
+    for cell in chosen:
+        entries = {}
+        for name, values in rows[cell].items():
+            entries[name] = {**summarize(values),
+                             "n_absent": absent[cell].get(name, 0)}
+        segments = {name: one for name, one in entries.items()
+                    if name not in (UNION_ENTRY, QUERY_ENTRY)}
+        means = [one["mean"] for one in segments.values()
+                 if one["mean"] is not None]
+        agnostic = summaries[cell]["mean"]
+        union = entries.get(UNION_ENTRY, {}).get("mean")
+        cells.append({
+            "cell": cell.name,
+            "sender": label(cell.sender), "receiver": label(cell.receiver),
+            "receiver_kind": cell.receiver[0],
+            "by_segment": entries,
+            "agnostic": agnostic,
+            "union": union,
+            "union_minus_agnostic": (None if union is None or agnostic is None
+                                     else union - agnostic),
+            "sum_of_segments": sum(means) if means else None,
+            "top_segment": _top_segment(segments),
+        })
+    return {
+        "analysis": NAME,
+        "pass": "position_specific",
+        "circuit": ctx.circuit_spec.label,
+        "task": ctx.task_spec.name,
+        "counterfactual": counterfactual,
+        "metric": metric_meta(counterfactual),
+        "threshold": threshold,
+        "selection": f"cells whose position-agnostic |mean| is at least "
+                     f"{threshold}",
+        "n_selected": len(chosen),
+        "query_positions": query_segment_names(ctx),
+        "position_rule": (
+            "K and V receivers take the patch at each Segment's key positions; "
+            "Q, MLP and Readout receivers take it at the query positions"),
+        "union_check": (
+            "the Segments partition the prompt, so 'union' must reproduce "
+            "'agnostic'; 'sum_of_segments' is recorded for information and is "
+            "not expected to, because a receiver's forward is not linear in "
+            "its input"),
+        "segments": segment_names_of(segmentations, tally.used_ids),
+        "cells": cells,
+        "sample": {"n_instances": len(tally.used_ids),
+                   "instance_ids": tally.used_ids,
+                   "n_without_a_segmentation": len(missing_segmentation),
+                   "without_a_segmentation": missing_segmentation},
+        "cost": {"forwards": tally.forwards,
+                 "wall_seconds": tally.wall_seconds},
+    }
+
+
+def _top_segment(segments: Dict[str, dict]):
+    """The Segment carrying the most of a cell's effect, by absolute mean."""
+    ranked = [(name, one["mean"]) for name, one in segments.items()
+              if one["mean"] is not None]
+    if not ranked:
+        return {"segment": None, "mean": None}
+    name, mean = max(ranked, key=lambda pair: abs(pair[1]))
+    return {"segment": name, "mean": mean}
 
 
 # ==============================================================================
@@ -1039,6 +1340,72 @@ def _figures(ctx, grid: Grid, summaries: Dict[Cell, dict], payload: dict,
     figure.tight_layout()
     figure.savefig(os.path.join(ctx.subdir(SUBDIR),
                                 _named("direct_effect", counterfactual, "png")),
+                   dpi=200)
+    plt.close(figure)
+
+
+def _segment_figure(ctx, counterfactual: str, payload: dict) -> None:
+    """One row per selected cell, one column per Segment, with its JSON twin.
+
+    Q, MLP and Readout receivers have no Segment row — they take one patch at
+    the query positions — so they occupy the trailing column and the Segment
+    columns are grey for them, which is the same "no cell here" grey the
+    position-agnostic heatmap uses.
+    """
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    segments = list(payload["segments"])
+    columns = segments + [QUERY_ENTRY]
+    cells = payload["cells"]
+    values = [[one["by_segment"].get(name, {}).get("mean") for name in columns]
+              for one in cells]
+    rows = [one["cell"] for one in cells]
+
+    ctx.write_json(SUBDIR, _named("segments_heatmap", counterfactual, "json"), {
+        "title": f"Position-specific path patching by Segment ({counterfactual})",
+        "counterfactual": counterfactual,
+        "rows": rows, "columns": columns, "values": values,
+        "missing": "null where this receiver kind takes no patch at that "
+                   "column; K and V receivers are swept by Segment, everything "
+                   "else takes one patch at the query positions",
+        "threshold": payload["threshold"],
+        "metric": payload["metric"],
+    })
+
+    if not cells:
+        return
+
+    grid_values = np.array([[np.nan if one is None else one for one in row]
+                            for row in values], dtype=float)
+    finite = np.abs(grid_values[np.isfinite(grid_values)])
+    extent = float(finite.max()) if finite.size else 1.0
+    extent = extent or 1.0
+
+    figure, axes = plt.subplots(
+        figsize=(max(6.0, 0.55 * len(columns) + 3.0),
+                 max(3.0, 0.4 * len(rows) + 2.0)))
+    colours = plt.get_cmap("coolwarm").with_extremes(bad=MISSING_COLOUR)
+    image = axes.imshow(np.ma.masked_invalid(grid_values), cmap=colours,
+                        vmin=-extent, vmax=extent, aspect="auto")
+    axes.set_xticks(range(len(columns)))
+    axes.set_xticklabels(columns, rotation=90, fontsize=7)
+    axes.set_yticks(range(len(rows)))
+    axes.set_yticklabels(rows, fontsize=7)
+    axes.axvline(len(segments) - 0.5, color="black", linewidth=0.8)
+    axes.set_xlabel("Segment the patch is written at")
+    axes.set_ylabel("sender -> receiver")
+    axes.set_title(f"Path patching by Segment ({counterfactual}) — "
+                   f"{ctx.circuit_spec.label} x {ctx.task_spec.name}\n"
+                   f"cells with |position-agnostic effect| >= "
+                   f"{payload['threshold']:g}; grey = not swept",
+                   fontsize=9)
+    figure.colorbar(image, ax=axes, fraction=0.03, pad=0.02)
+    figure.tight_layout()
+    figure.savefig(os.path.join(ctx.subdir(SUBDIR),
+                                _named("segments_heatmap", counterfactual, "png")),
                    dpi=200)
     plt.close(figure)
 

@@ -237,3 +237,79 @@ def test_this_module_imports_without_nnsight_and_without_the_hook_module():
         capture_output=True, text=True)
 
     assert result.returncode == 0, result.stderr
+
+
+# ==============================================================================
+# THE COUNTERFACTUALS AND THE POSITION-SPECIFIC SELECTION
+# ==============================================================================
+
+def test_the_default_query_position_agrees_with_the_attention_analysis():
+    """`--query-positions` belongs to ticket 03; this module may not import an
+    analysis module, so it spells the default out and pins it here instead."""
+    from component_analysis import attention_patterns
+
+    assert pp.DEFAULT_QUERY_POSITION == attention_patterns.DEFAULT_QUERY_POSITION
+
+
+def test_both_counterfactuals_are_run_when_the_flag_says_both():
+    import argparse
+
+    ctx = type("C", (), {"cli": argparse.Namespace(path_counterfactual=pp.BOTH)})()
+
+    assert pp.selected_counterfactuals(ctx) == [pp.ITEM_SWAP,
+                                                pp.HONEST_INSTRUCTION]
+
+
+def test_a_counterfactual_the_module_does_not_know_is_refused_by_name():
+    import argparse
+
+    ctx = type("C", (), {"cli": argparse.Namespace(path_counterfactual="swap")})()
+
+    with pytest.raises(ValueError, match="swap"):
+        pp.selected_counterfactuals(ctx)
+
+
+def test_the_item_swap_keeps_ticket_08s_filenames_and_the_other_pair_is_suffixed():
+    """A head table and a figure from before this ticket still resolve."""
+    assert pp._named("agnostic", pp.ITEM_SWAP, "json") == pp.AGNOSTIC_FILE
+    assert pp._named("agnostic", pp.HONEST_INSTRUCTION, "json") == \
+        "agnostic_honest_instruction.json"
+    assert pp._named("segments", pp.ITEM_SWAP, "json") == pp.SEGMENTS_FILE
+
+
+def test_only_the_cells_that_clear_the_threshold_are_selected_strongest_first():
+    """By absolute effect, so a path that suppresses is selected too."""
+    cells = {pp.Cell(("head", 0, 1), pp.READOUT_KEY): {"mean": -0.20},
+             pp.Cell(("head", 0, 2), pp.READOUT_KEY): {"mean": 0.07},
+             pp.Cell(("head", 0, 3), pp.READOUT_KEY): {"mean": 0.01},
+             pp.Cell(("head", 0, 4), pp.READOUT_KEY): {"mean": None}}
+
+    chosen = pp.selected_cells(cells, 0.05)
+
+    assert [one.sender[2] for one in chosen] == [1, 2]
+
+
+def test_a_segment_absent_from_an_instance_is_marked_rather_than_scored_zero():
+    """An absent Segment patches nothing, so its effect would be exactly zero;
+    counting that as data would pull the Segment's mean toward nothing."""
+    from component_analysis.segmentation import Segment, Segmentation
+
+    def one(record_id, spans):
+        return Segmentation(task="sdr", record_id=record_id, n_tokens=8,
+                            readout=7,
+                            segments={"clause": Segment(name="clause",
+                                                        spans=spans)})
+
+    segmentations = {"a": one("a", ((2, 4),)), "b": one("b", ())}
+
+    mask, present = pp.position_mask(segmentations, ["a", "b"], ["clause"], 8)
+
+    assert mask[0].tolist() == [False, False, True, True, False, False, False,
+                                False]
+    assert present.tolist() == [True, False]
+
+
+def test_an_instance_with_no_segmentation_at_all_masks_nothing():
+    mask, present = pp.position_mask({}, ["a"], ["clause"], 4)
+
+    assert not mask.any() and not present.any()

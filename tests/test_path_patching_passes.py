@@ -562,3 +562,128 @@ def test_both_counterfactuals_give_the_head_table_one_column_set_each(
                for row in table["rows"])
     assert all(row[f"{pp.NAME}.direct_effect_honest_instruction"] is None
                for row in table["rows"])
+
+
+# ==============================================================================
+# THE POSITION-SPECIFIC PASS, BY SEGMENT
+# ==============================================================================
+
+def tiny_segmentations(ids, n_tokens=SEQ, readout=None):
+    """Three Segments partitioning a tiny prompt, one Segmentation per id.
+
+    The real segmenter needs a real prompt; what the position-specific pass
+    needs of it is only the token spans, so these are written directly. The
+    three Segments partition the prompt, which is what makes the union check
+    below a statement about the whole pass rather than about three spans.
+    """
+    from component_analysis.segmentation import Segment, Segmentation
+
+    spans = {"head_span": ((0, 3),), "middle_span": ((3, 6),),
+             "tail_span": ((6, n_tokens),)}
+    return [Segmentation(task="sdr", record_id=one, n_tokens=n_tokens,
+                         readout=n_tokens - 1 if readout is None else readout,
+                         segments={name: Segment(name=name, spans=span)
+                                   for name, span in spans.items()})
+            for one in ids]
+
+
+def test_patching_every_segment_at_once_is_the_position_agnostic_cell(
+        model, streams, whole_model_grid):
+    """The invariant that makes the second pass a decomposition of the first.
+
+    The Segments partition the prompt, so writing the receiver's patched input
+    at the union of them must reproduce the cell the position-agnostic pass
+    measured. If it did not, a Segment row and its own total would be measuring
+    two different things.
+    """
+    sender, receiver = ("head", 0, 0), ("k", 1, 0)
+    union = torch.zeros((len(streams.ids), SEQ), dtype=torch.bool)
+    union[:, :] = True
+
+    effects = pp.positioned_effects(model, streams, sender, receiver,
+                                    [("agnostic", None), ("union", union)])
+
+    assert torch.allclose(effects["agnostic"], effects["union"], atol=1e-5)
+
+
+def test_one_segment_is_not_the_whole_cell_so_the_split_says_something(
+        model, streams):
+    """The other half: a single Segment must differ from the union, or the
+    position-specific pass would be an expensive way to repeat the first one."""
+    sender, receiver = ("head", 0, 0), ("k", 1, 0)
+    middle = torch.zeros((len(streams.ids), SEQ), dtype=torch.bool)
+    middle[:, 3:6] = True
+
+    effects = pp.positioned_effects(model, streams, sender, receiver,
+                                    [("agnostic", None), ("middle", middle)])
+
+    assert not torch.allclose(effects["agnostic"], effects["middle"], atol=1e-4)
+
+
+def test_the_segment_pass_writes_the_selected_cells_and_the_union_check(
+        sdr_run, monkeypatch):
+    """The CLI seam for the position-specific pass.
+
+    A threshold of zero selects every cell that has a mean, which on this tiny
+    circuit is all thirteen, so the file shows both receiver kinds: the K and V
+    cells swept by Segment and the Q, MLP and Readout cells taking one patch at
+    the query positions.
+    """
+    import analyze_components
+    from component_analysis import registry
+    from tests.fakes import FAKE_VOCAB_SIZE
+    from tests.test_analyze_components_segmentation import CELL, read_json
+
+    run_dir, out, _records = sdr_run
+    monkeypatch.setattr(registry, "ANALYSES", [pp])
+    monkeypatch.setattr(analyze_components, "load_model",
+                        lambda cli, resolved: tiny_analysis_model(FAKE_VOCAB_SIZE))
+
+    assert analyze_components.main([
+        str(run_dir), "--num-kv-heads", "2", "--n-causal", "16",
+        "--path-position-threshold", "0", "--device", "cpu",
+        "--output-dir", str(out)]) == 0
+
+    written = read_json(out, *CELL, pp.SUBDIR, pp.SEGMENTS_FILE)
+    assert written["pass"] == "position_specific"
+    assert written["threshold"] == 0.0
+    assert written["n_selected"] == 13
+    assert written["query_positions"] == ["readout"]
+    assert os.path.getsize(os.path.join(str(out), *CELL, pp.SUBDIR,
+                                        "segments_heatmap.png")) > 0
+
+    by_kind = {}
+    for cell in written["cells"]:
+        by_kind.setdefault(cell["receiver_kind"], []).append(cell)
+
+    for cell in by_kind["k"] + by_kind["v"]:
+        assert cell["union"] == pytest.approx(cell["agnostic"], abs=1e-4), \
+            f"{cell['cell']}: the Segments must partition the prompt"
+        assert cell["top_segment"]["segment"] in written["segments"]
+        assert len(cell["by_segment"]) == len(written["segments"]) + 1
+
+    for cell in by_kind["q"] + by_kind["readout"]:
+        assert list(cell["by_segment"]) == [pp.QUERY_ENTRY]
+        assert cell["union"] is None
+
+
+def test_the_segment_pass_selects_nothing_when_no_cell_clears_the_threshold(
+        sdr_run, monkeypatch):
+    """The default is five percent of the gap, and a tiny random circuit moves
+    nothing near that far; the file is still written, saying so."""
+    import analyze_components
+    from component_analysis import registry
+    from tests.fakes import FAKE_VOCAB_SIZE
+    from tests.test_analyze_components_segmentation import CELL, read_json
+
+    run_dir, out, _records = sdr_run
+    monkeypatch.setattr(registry, "ANALYSES", [pp])
+    monkeypatch.setattr(analyze_components, "load_model",
+                        lambda cli, resolved: tiny_analysis_model(FAKE_VOCAB_SIZE))
+    analyze_components.main([
+        str(run_dir), "--num-kv-heads", "2", "--n-causal", "16",
+        "--path-position-threshold", "1e9", "--device", "cpu",
+        "--output-dir", str(out)])
+
+    written = read_json(out, *CELL, pp.SUBDIR, pp.SEGMENTS_FILE)
+    assert written["n_selected"] == 0 and written["cells"] == []
