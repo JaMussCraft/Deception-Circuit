@@ -48,7 +48,7 @@ ANALYSES: List[str] = [
 
     "component_analysis.knockout",                    # ticket 07
 
-    # ticket 08, path patching:          "component_analysis.path_patching",
+    "component_analysis.path_patching",   # ticket 08
 ]
 
 #: The five names a module must expose to be an analysis.
