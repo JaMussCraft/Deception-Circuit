@@ -1030,11 +1030,17 @@ def estimate(ctx) -> str:
              f"conditions {', '.join(wanted)}"]
     total = 0.0
 
-    def line(label, n_batches, n_instances):
+    def line(label, n_batches, n_instances, *, passes=1):
+        """One condition's cost. `passes` is how many times each batch is read:
+        the paired condition reads each of its batches twice, once for the
+        pressure prompt and once for its counterfactual, and saying "26
+        batches" instead would misreport the loader."""
         nonlocal total
-        forwards, seconds = _cost(n_batches, layers, batch_size)
+        forwards, seconds = _cost(n_batches * passes, layers, batch_size)
         total += seconds
-        return (f"{label} {n_instances} instance(s) in {n_batches} batch(es), "
+        over = f"{n_batches} batch(es)" if passes == 1 else \
+            f"{n_batches} batch(es) read {passes}x"
+        return (f"{label} {n_instances} instance(s) in {over}, "
                 f"{forwards} eager forward(s) ~{_duration(seconds)}")
 
     if PRESSURE in wanted:
@@ -1046,10 +1052,9 @@ def estimate(ctx) -> str:
     if reason:
         parts.append(f"honest-instruction (paired): none — {reason}")
     else:
-        # Both sides of the pair are profiled, so the paired condition costs
-        # two passes over its rows rather than one.
         parts.append(line("honest-instruction (paired), both sides:",
-                          2 * len(causal), causal.report["n_with_honest"]))
+                          len(causal), causal.report["n_with_honest"],
+                          passes=2))
 
     directory, reason = (None, "not in --attention-conditions") \
         if HONEST_TWIN not in wanted else honest_twin_dir(ctx)
