@@ -103,8 +103,8 @@ def test_accuracy_is_the_share_of_instances_the_target_still_wins():
     assert got[0]["accuracy_drop"] == pytest.approx(0.5)   # clean accuracy is 1.0
 
 
-def test_the_clean_baseline_is_reported_beside_the_knockouts():
-    summary = knockout.baseline(effects(
+def test_the_clean_run_is_reported_beside_the_knockouts():
+    summary = knockout.clean_run(effects(
         clean=[2.0, -1.0], knocked={("head", 0, 0): [0.0, 0.0]}))
 
     assert summary["mean_logit_difference"] == pytest.approx(0.5)
@@ -199,7 +199,7 @@ def test_a_json_twin_and_a_png_carry_the_same_components(tmp_path):
     # 1.0, so the head is rank 1 and the MLP block is last.
     assert [one["key"] for one in twin["components"]] == [["head", 0, 1],
                                                           ["mlp", 1, 0]]
-    assert twin["baseline"]["n_instances"] == 1
+    assert twin["clean_run"]["n_instances"] == 1
 
 
 def test_the_head_table_columns_are_the_ones_the_ticket_names():

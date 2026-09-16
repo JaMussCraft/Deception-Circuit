@@ -146,8 +146,12 @@ def _standard_error(values) -> Optional[float]:
     return math.sqrt(variance) / math.sqrt(len(values))
 
 
-def baseline(effects: Effects) -> dict:
-    """The un-knocked-out run every drop is measured against."""
+def clean_run(effects: Effects) -> dict:
+    """The un-knocked-out run every drop is measured against.
+
+    Not called a baseline: CONTEXT.md reserves that word, because the
+    random-circuit null is a baseline too.
+    """
     return {
         "mean_logit_difference": _mean(effects.clean_logit_diff),
         "standard_error": _standard_error(effects.clean_logit_diff),
@@ -212,7 +216,7 @@ def columns(rows) -> dict:
 
 def payload(effects: Effects, *, circuit: str, task: str, components=None,
             rows=None) -> dict:
-    """`knockout.json`: the ranked table, the baseline, and what it all means.
+    """`knockout.json`: the ranked table, the clean run, and what it all means.
 
     `rows` is the ranking when the caller already has it, so that the table in
     the file and the table the head-table columns and the figure are built from
@@ -241,7 +245,7 @@ def payload(effects: Effects, *, circuit: str, task: str, components=None,
         "n_components": len(rows),
         "instances": effects.ids,
         "sample": effects.report,
-        "baseline": baseline(effects),
+        "clean_run": clean_run(effects),
         # JSON keys are strings, so a key is written as a list and read back
         # with `head_table.row_key`.
         "components": [{**row, "key": list(row["key"])} for row in rows],
@@ -256,7 +260,7 @@ def knockout_effects(model, batches, components, *, scheme=SCHEME,
                      device=None, log=None) -> Effects:
     """Knock out each Component alone, over every batch, and keep every number.
 
-    Three kinds of forward per batch: one clean run for the baseline, one
+    Three kinds of forward per batch: one clean run to measure against, one
     corrupt run that captures what each Component carried there, and one run
     per Component with that capture written over the clean stream. So a batch
     costs `len(components) + 2` passes and nothing is recomputed per Component.
@@ -410,7 +414,7 @@ def estimate(ctx) -> str:
     batches = ctx.causal_batches()
     passes = len(batches) * (len(ctx.components) + 2)
     return (f"{len(ctx.components)} Component(s) x {len(batches)} batch(es) of "
-            f"{batches.report['batch_size']} (+2 baseline passes per batch) = "
+            f"{batches.report['batch_size']} (+2 clean and corrupt passes per batch) = "
             f"{passes} forward pass(es), about "
             f"{passes * SECONDS_PER_FORWARD / 60:.1f} min on an A40, over "
             f"{batches.n_instances} instance(s); scheme "

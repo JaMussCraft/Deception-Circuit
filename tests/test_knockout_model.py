@@ -124,7 +124,7 @@ def test_at_least_one_knockout_actually_moves_the_metric(model, batch):
 
 
 def test_knocking_nothing_out_reproduces_the_clean_logits(model, batch):
-    """The baseline is the untouched model, with the circuit the whole model.
+    """The run every drop is measured against is the untouched model.
 
     Stated over every head and every MLP block on purpose: an invariant that
     only held for a subset would not tell us the knockout loop leaves the rest
@@ -229,12 +229,12 @@ def test_the_written_json_holds_the_numbers_the_chart_draws(sdr_run, cli_model):
     written = read_json(out, *CELL, knockout.SUBDIR, knockout.JSON_NAME)
 
     assert written["scheme"] == "interchange"
-    assert written["baseline"]["n_instances"] > 0, \
+    assert written["clean_run"]["n_instances"] > 0, \
         "an empty causal sample would make every assertion here vacuous"
-    assert len(written["instances"]) == written["baseline"]["n_instances"]
+    assert len(written["instances"]) == written["clean_run"]["n_instances"]
     assert written["n_components"] == len(written["components"])
     for row in written["components"]:
-        assert row["n"] == written["baseline"]["n_instances"]
+        assert row["n"] == written["clean_run"]["n_instances"]
         assert row["mean_drop"] is not None
         assert 0.0 <= row["accuracy"] <= 1.0
 
