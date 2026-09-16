@@ -72,6 +72,7 @@ from __future__ import annotations
 
 import math
 import os
+from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple
 
 import torch
@@ -433,14 +434,19 @@ class Profiles:
 # THE THREE CONDITIONS
 # ==============================================================================
 
+@dataclass
 class Slice:
-    """The rows of one batch a condition actually reads, and their Segments."""
+    """The rows of one batch a condition actually reads, and their Segments.
 
-    def __init__(self, input_ids, attention_mask, records, segmentations):
-        self.input_ids = input_ids
-        self.attention_mask = attention_mask
-        self.records = records
-        self.segmentations = segmentations
+    A dataclass for the same reason `dataloaders.Batch` is one: it carries
+    aligned tensors and lists and nothing else, and every row of it belongs to
+    the same instance at the same index.
+    """
+
+    input_ids: "torch.Tensor"
+    attention_mask: "torch.Tensor"
+    records: List[dict]
+    segmentations: List
 
     def __len__(self) -> int:
         return len(self.records)

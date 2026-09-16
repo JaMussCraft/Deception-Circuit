@@ -303,8 +303,10 @@ def test_a_head_forced_to_attend_to_one_span_reports_that_segment_as_its_top(
 
     Head 0 of layer 0 is built to attend to the marker token, which sits in
     `designation_site`. Head 1 shares its KV group but not its query
-    projection, so it is the control: if the masses were being read off the
-    wrong head or the wrong query row, both would say the same thing.
+    projection, so it is the unforced comparison: if the masses were being
+    read off the wrong head or the wrong query row, both would say the same
+    thing. (CONTEXT.md reserves "control" for something else, so the name
+    here says what it is.)
     """
     ids, mask, segmentations = toy_batch()
     positions, _valid, _slots = ap.query_slots(segmentations, ["readout"])
@@ -317,8 +319,8 @@ def test_a_head_forced_to_attend_to_one_span_reports_that_segment_as_its_top(
     profile = dict(zip(TOY_NAMES, masses[(0, 0)][0, 0].tolist()))
     assert ap.top_segment(profile)[0] == "designation_site"
     assert profile["designation_site"] > 0.99
-    control = dict(zip(TOY_NAMES, masses[(0, 1)][0, 0].tolist()))
-    assert control["designation_site"] < 0.5
+    unforced = dict(zip(TOY_NAMES, masses[(0, 1)][0, 0].tolist()))
+    assert unforced["designation_site"] < 0.5
 
 
 def test_the_forced_head_follows_the_marker_when_the_prompt_moves_it(
@@ -357,8 +359,8 @@ def test_sdpa_is_left_in_place_after_the_masses_are_read(tiny_model):
 # THE CLI SEAM
 # ==============================================================================
 
-from tests.test_analyze_components_segmentation import (  # noqa: E402
-    CELL, build_sdr_split, read_json, run_cli, sdr_run)  # noqa: F401
+from tests.test_analyze_components_segmentation import (  # noqa: E402,F401
+    CELL, build_sdr_split, read_json, run_cli, sdr_run)
 
 
 @pytest.fixture
