@@ -198,6 +198,25 @@ def test_a_condition_that_did_not_run_leaves_its_columns_empty_not_missing():
 
 # ==============================================================================
 # THE TWO SIDES OF THE PAIR
+#
+# These three reach below the seam the repo's testing rule names: they assert
+# on the tensors an internal generator yields, not on a written file. They are
+# kept deliberately, and the standards review recorded the tension rather than
+# waving it through.
+#
+# Two reasons. First, the file-seam form of the same property —
+# `test_both_sides_of_the_pair_are_profiled_over_the_same_instances`, which
+# compares the two conditions' recorded `instance_ids` in `patterns.json` —
+# needs a model, so it is in the nnsight-0.7.0-gated CLI file and does not run
+# on the login node at all. Without these, the property that makes "paired"
+# mean anything has no coverage in the base environment.
+#
+# Second, the bug they catch is invisible at the file seam: yielding
+# `batch.honest.input_ids` for both sides would produce a perfectly
+# well-formed `patterns.json` with matching ids, matching counts and every
+# paired difference exactly zero. That reads as a finding, not as a failure.
+# Only the prompts themselves distinguish the two, so the assertion has to be
+# on the prompts.
 # ==============================================================================
 
 def hand_segmentation(record_id, *, n_tokens=6, clause=(2, 4)):
@@ -390,22 +409,28 @@ def test_the_paired_lens_twin_keeps_only_the_two_paired_curves():
     assert twin["conditions"][dla.PRESSURE_PAIRED]["n_instances"] == 7
 
 
-def test_the_paired_lens_figure_payload_is_the_lens_with_the_others_dropped():
-    """The overlay reuses `plot_lens`, so it must hand it a real lens payload."""
+def test_the_paired_lens_figure_is_drawn_from_its_own_json_twin():
+    """Not from `logit_lens.json`. Deriving the picture and the file separately
+    from one source lets the two drift; deriving the picture from the file
+    cannot, which is the rule the scatter's docstring already states."""
     lens = lens_payload(**{
         dla.PRESSURE: lens_condition([0.0, 0.5, 1.7], n=48),
         dla.PRESSURE_PAIRED: lens_condition([0.0, -0.2, 0.9]),
         dla.HONEST_INSTRUCTION: lens_condition([0.0, -0.4, -2.3])})
+    twin = dla.paired_lens_payload(lens)
+    twin["conditions"][dla.HONEST_INSTRUCTION]["mean"] = [9.0, 9.0, 9.0]
 
-    figure_payload = dla.paired_lens_figure_payload(lens)
+    figure_payload = dla.paired_lens_figure_payload(twin)
 
     assert set(figure_payload["conditions"]) == {dla.PRESSURE_PAIRED,
                                                  dla.HONEST_INSTRUCTION}
     assert figure_payload["circuit"] == lens["circuit"]
-    assert lens["conditions"][dla.PRESSURE], "the source payload is not mutated"
+    # What the twin says is what gets drawn, even when the twin is edited.
+    assert figure_payload["conditions"][dla.HONEST_INSTRUCTION]["levels"][
+        dla.ALL]["mean"] == [9.0, 9.0, 9.0]
 
 
-def test_the_paired_lens_twin_says_why_it_is_empty(tmp_path):
+def test_the_paired_lens_twin_says_why_it_is_empty():
     lens = lens_payload(**{dla.PRESSURE: lens_condition([0.0, 0.5, 1.7])})
 
     twin = dla.paired_lens_payload(lens)
@@ -423,7 +448,8 @@ def test_both_paired_figures_write_a_png_even_with_nothing_to_draw(tmp_path):
 
     dla.plot_paired_scatter(scatter, dla.paired_scatter_payload(empty))
     dla.plot_lens(lens_path, dla.paired_lens_figure_payload(
-        lens_payload(**{dla.PRESSURE: lens_condition([0.0, 0.5])})),
+        dla.paired_lens_payload(
+            lens_payload(**{dla.PRESSURE: lens_condition([0.0, 0.5])}))),
         empty_message=dla.NOT_PAIRED)
 
     assert os.path.getsize(scatter) > 0 and os.path.getsize(lens_path) > 0
@@ -479,7 +505,7 @@ def test_a_cluster_under_one_outlier_earns_a_zoom_panel():
                     (0.003, 0.001), (0.001, 0.0), (0.0005, -0.0002),
                     (0.0004, 0.0001), (0.0002, 0.0))
 
-    limit = ap_dla_zoom(points)
+    limit = dla.zoom_limit(points)
 
     assert limit is not None
     assert limit < 0.06, "the three big Components must fall outside the zoom"
@@ -491,12 +517,68 @@ def test_points_spread_evenly_earn_no_zoom_panel():
     points = spread((0.5, 0.4), (0.3, 0.25), (0.2, 0.1), (-0.4, -0.45),
                     (-0.25, -0.2))
 
-    assert ap_dla_zoom(points) is None
+    assert dla.zoom_limit(points) is None
 
 
 def test_a_single_point_earns_no_zoom_panel():
-    assert ap_dla_zoom(spread((0.2, 0.1))) is None
+    assert dla.zoom_limit(spread((0.2, 0.1))) is None
 
 
-def ap_dla_zoom(points):
-    return dla.zoom_limit(points)
+
+def test_the_scatter_twin_records_the_zoom_and_which_panel_names_each_point():
+    """The twin must describe the figure, or it is not a twin of it. A reader
+    of the file has to be able to tell that the picture has two panels and
+    where it cuts, without opening the PNG."""
+    points = spread((-0.24, -0.57), (0.13, 0.05), (0.06, -0.01),
+                    (0.003, 0.001), (0.001, 0.0), (0.0005, -0.0002),
+                    (0.0004, 0.0001), (0.0002, 0.0))
+    payload = dla_payload(**{
+        dla.PRESSURE_PAIRED: dla_condition({COMPONENTS[0]: 0.02,
+                                            COMPONENTS[1]: -0.24}),
+        dla.HONEST_INSTRUCTION: dla_condition({COMPONENTS[0]: -0.05,
+                                               COMPONENTS[1]: -0.57})})
+
+    twin = dla.paired_scatter_payload(payload)
+
+    assert "zoom" in twin and "panels" in twin
+    assert all("panel" in one for one in twin["points"])
+    assert dla.zoom_limit(points) is not None     # the fixture earns a zoom
+
+
+def test_a_component_exactly_on_the_cut_is_named_in_one_panel_only():
+    """Inclusive on both ends would name it twice and make the panel counts
+    sum to more than the number of Components, which the titles deny."""
+    on_the_cut = {"label": "C", "x": 0.05, "y": 0.0, "x_se": 0.0, "y_se": 0.0}
+
+    assert dla.panel_of(on_the_cut, 0.05) == dla.FULL_PANEL
+    assert dla.panel_of(on_the_cut, 0.06) == dla.ZOOM_PANEL
+    assert dla.panel_of(on_the_cut, None) == dla.SINGLE_PANEL
+
+
+def test_the_two_panels_between_them_name_every_component_exactly_once():
+    points = spread((-0.24, -0.57), (0.13, 0.05), (0.06, -0.01),
+                    (0.003, 0.001), (0.001, 0.0), (0.0005, -0.0002),
+                    (0.0004, 0.0001), (0.0002, 0.0))
+    zoom = dla.zoom_limit(points)
+
+    panels = [dla.panel_of(one, zoom) for one in points]
+
+    assert len(panels) == len(points)
+    assert set(panels) == {dla.FULL_PANEL, dla.ZOOM_PANEL}
+
+
+def test_the_paired_conditions_are_named_once_for_both_figures():
+    """The scatter's axes and the lens's curves must agree about which pair is
+    the pair, so the pair is spelled in one place."""
+    assert dla.PAIRED_CONDITIONS == (dla.PRESSURE_PAIRED,
+                                     dla.HONEST_INSTRUCTION)
+
+    lens = lens_payload(**{
+        dla.PRESSURE: lens_condition([0.0, 1.7], n=48),
+        dla.PRESSURE_PAIRED: lens_condition([0.0, 0.9]),
+        dla.HONEST_INSTRUCTION: lens_condition([0.0, -2.3])})
+    scatter = dla.paired_scatter_payload(paired_dla())
+
+    assert set(dla.paired_lens_payload(lens)["conditions"]) == \
+        set(dla.PAIRED_CONDITIONS)
+    assert (scatter["x"], scatter["y"]) == dla.PAIRED_CONDITIONS

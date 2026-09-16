@@ -52,6 +52,12 @@ figure's numbers:
                            circuit's attention heads in head-table order
     conditions             one entry per condition that ran:
                              name, kind, paired, descriptive, dataset
+                             instance_ids  which instances it was profiled
+                                           over, in the order they were read.
+                                           The two paired conditions carry the
+                                           same list, which is what makes
+                                           "paired" checkable in the file
+                                           rather than only in the code
                              n_instances   what it was profiled over
                              n_loaded      what the loader held (they differ
                                            for the paired condition, where
@@ -169,16 +175,18 @@ SUM_TOLERANCE = 2e-2
 # READING THE FLAGS
 # ==============================================================================
 
-def wanted_conditions(cli) -> List[str]:
-    """`--attention-conditions`, validated by name.
+def parse_conditions(value) -> List[str]:
+    """`"a,b"` to `["a", "b"]`, refusing an unknown name.
 
-    The same semantics as `dla.wanted_conditions`, and deliberately the same
-    shape: the two descriptive analyses are read side by side in one head
-    table, and a flag that means one thing under `--dla-conditions` and
-    another under `--attention-conditions` would be a trap.
+    Wired as the flag's `type=`, so an unknown condition is refused by
+    `argparse` at parse time — before the circuits resolve and long before an
+    8B model is loaded onto a GPU. `registry.select` refuses an unknown
+    `--analyses` name the same way up front, and a flag that costs a GPU load
+    to reject a typo is a flag that gets typo'd on the cluster.
     """
-    raw = getattr(cli, "attention_conditions", None) or ",".join(CONDITIONS)
-    wanted = [one.strip() for one in raw.split(",") if one.strip()]
+    if not isinstance(value, str):
+        return [one for one in CONDITIONS if one in value]
+    wanted = [one.strip() for one in value.split(",") if one.strip()]
     unknown = [one for one in wanted if one not in CONDITIONS]
     if unknown:
         raise ValueError(
@@ -188,16 +196,35 @@ def wanted_conditions(cli) -> List[str]:
     return [one for one in CONDITIONS if one in wanted]
 
 
+def wanted_conditions(cli) -> List[str]:
+    """The conditions this run profiles, in measurement order.
+
+    The same semantics as `dla.wanted_conditions`, and deliberately the same
+    shape: the two descriptive analyses are read side by side in one head
+    table, and a flag that means one thing under `--dla-conditions` and
+    another under `--attention-conditions` would be a trap. The one difference
+    is when a typo is caught — here at parse time, there inside `run` — and it
+    is recorded in ticket 06 rather than left for a reader to discover.
+    """
+    value = getattr(cli, "attention_conditions", None)
+    if value is None:
+        return list(CONDITIONS)
+    return parse_conditions(value)
+
+
 def add_arguments(group) -> None:
-    group.add_argument("--attention-conditions", default=",".join(CONDITIONS),
-                       metavar="NAME[,NAME]",
+    group.add_argument("--attention-conditions", type=parse_conditions,
+                       default=list(CONDITIONS), metavar="NAME[,NAME]",
                        help="Which conditions to profile: "
                             f"{', '.join(CONDITIONS)}. "
                             f"{HONEST_INSTRUCTION} is the paired "
                             "Honest-Instruction Counterfactual and brings its "
-                            f"own left term, {PRESSURE_PAIRED}, with it. A "
-                            "condition whose data this cell does not have is "
-                            "reported under 'skipped' and left out.")
+                            f"own left term, {PRESSURE_PAIRED}, with it. "
+                            f"Dropping {PRESSURE} is allowed and leaves the "
+                            "cell with no full-split column, which is a "
+                            "smoke-run shape, not a reporting one. A condition "
+                            "whose data this cell does not have is reported "
+                            "under 'skipped' and left out.")
     group.add_argument("--query-positions", default=None,
                        metavar="SEGMENT[,SEGMENT]",
                        help="Which Segments to read attention from, by name "
@@ -687,16 +714,27 @@ def twin_slices(batches, ctx, overrides, resolved_out: List):
 
 def collect_condition(ctx, slices, *, head_keys, names, query_names, split,
                       heads_by_layer) -> Tuple[Profiles, dict]:
-    """Every batch of one condition through the model, into one `Profiles`."""
+    """Every batch of one condition through the model, into one `Profiles`.
+
+    The ids of the instances actually profiled are collected alongside, into
+    `checks["instance_ids"]`, as `dla.json` records them per condition. Without
+    them a reader of `patterns.json` — and a test — can compare two conditions'
+    instance *counts* but not their instance *ids*, so "paired" would be a
+    property of the code path rather than of the file (spec user stories 28 and
+    43).
+    """
     from component_analysis import hooks
 
     device, _dtype = hooks.device_and_dtype(ctx.model)
     profiles = Profiles(head_keys, names, query_names)
-    checks = {"max_abs_sum_minus_one": 0.0, "max_outside": 0.0, "n_batches": 0}
+    checks = {"max_abs_sum_minus_one": 0.0, "max_outside": 0.0, "n_batches": 0,
+              "instance_ids": []}
 
     for one in slices:
         if not len(one):
             continue
+        checks["instance_ids"].extend(
+            segment.record_id for segment in one.segmentations)
         positions, valid, slots = query_slots(one.segmentations, query_names)
         ids = segment_id_batch(one.segmentations, names, one.input_ids.shape[1])
         masses, batch_checks = batch_masses(
@@ -947,7 +985,6 @@ def columns(payload: dict) -> dict:
     column reads exactly like a head that attends nowhere.
     """
     query = payload["column_query_position"]
-    wanted = COLUMN_PREFIXES
     by_condition = {condition["name"]: condition
                     for condition in payload["conditions"]}
 
@@ -955,7 +992,7 @@ def columns(payload: dict) -> dict:
     for component in payload["components"]:
         key = tuple(component["key"])
         cells: Dict[str, object] = {"query_position": query}
-        for condition_name, prefix in wanted.items():
+        for condition_name, prefix in COLUMN_PREFIXES.items():
             condition = by_condition.get(condition_name)
             level = _levels_of(condition).get(ALL_LEVEL) if condition else None
             profile = (level or {}).get("masses", {}).get(
@@ -1218,12 +1255,18 @@ def run(ctx) -> dict:
 def _condition_json(name, kind, paired, batches, profiles, checks, notes, *,
                     dataset=None, extra=None, n_instances=None) -> dict:
     levels = profiles.as_json()
+    checks = dict(checks)
+    # The ids are the condition's own field rather than a check: they say which
+    # instances the profile is of, which is what makes two paired conditions
+    # comparable at the file rather than only in the code.
+    instance_ids = checks.pop("instance_ids", [])
     return {
         "name": name,
         "kind": kind,
         "paired": paired,
         "descriptive": not paired,
         "dataset": dataset,
+        "instance_ids": instance_ids,
         # What this condition was actually profiled over. It is the loader's
         # instance count except for the paired condition, where most of the
         # sample has no counterpart and the loader's 100 would read as an n.

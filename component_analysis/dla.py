@@ -130,6 +130,12 @@ CONDITIONS = (PRESSURE, HONEST_INSTRUCTION, HONEST_TWIN)
 PRESSURE_PAIRED = "pressure_paired"
 DIFFERENTIAL = "differential"
 
+#: The two conditions the paired figures show, in plotting order: the same
+#: instance ids on both sides. Spelled once so the scatter's axes, the paired
+#: lens's curves and its JSON twin cannot come to disagree about which pair is
+#: the pair.
+PAIRED_CONDITIONS = (PRESSURE_PAIRED, HONEST_INSTRUCTION)
+
 #: How far below zero a mean has to sit to be called suppression, in logits.
 #: Read it against the two scales it sits between. The whole model's Readout
 #: logit difference on SDR nls0.3 is about +1.75 and the clean-minus-corrupt
@@ -899,7 +905,7 @@ def run(ctx) -> dict:
     paired_lens = paired_lens_payload(lens)
     ctx.write_json(SUBDIR, PAIRED_LENS_JSON_NAME, paired_lens)
     plot_lens(os.path.join(directory, PAIRED_LENS_PNG_NAME),
-              paired_lens_figure_payload(lens),
+              paired_lens_figure_payload(paired_lens),
               title=f"Paired logit lens at the Readout — {payload['circuit']} "
                     f"x {payload['task']}",
               empty_message=NOT_PAIRED)
@@ -1062,6 +1068,10 @@ def paired_scatter_payload(payload: dict) -> dict:
                      "instruction, and its signed distance from the line is "
                      "dla.differential"),
         "points": [],
+        "zoom": None,
+        "panels": ("one panel over every Component, unless an outlier makes "
+                   "the rest illegible; then a second panel zoomed to 'zoom', "
+                   "with each point's 'panel' saying which one names it"),
         "skipped": None,
     }
     if left is None or right is None:
@@ -1087,13 +1097,41 @@ def paired_scatter_payload(payload: dict) -> dict:
             "y": y.get("mean"), "y_se": y.get("se"),
             "differential": difference.get(key, {}).get("mean"),
         })
+
+    # Which panel of the figure names each Component, recorded here so that a
+    # reader of the file knows what the picture looks like without opening it.
+    twin["zoom"] = zoom_limit(twin["points"])
+    for point in twin["points"]:
+        point["panel"] = panel_of(point, twin["zoom"])
     return twin
+
+
+#: The scatter's panels, and the name each point's `panel` field carries.
+FULL_PANEL = "full"
+ZOOM_PANEL = "zoom"
+SINGLE_PANEL = "single"
+
+
+def panel_of(point: dict, zoom: Optional[float]) -> str:
+    """Which panel of the scatter labels this Component.
+
+    Half-open at the cut: a Component sitting exactly on `zoom` is named in the
+    full panel and not in the zoomed one. Inclusive on both sides would name it
+    twice and make the two panels' counts sum to more than the number of
+    Components, which contradicts what the titles say they are doing.
+    """
+    if zoom is None:
+        return SINGLE_PANEL
+    if point["x"] is None or point["y"] is None:
+        return SINGLE_PANEL
+    magnitude = max(abs(point["x"]), abs(point["y"]))
+    return ZOOM_PANEL if magnitude < zoom else FULL_PANEL
 
 
 def paired_lens_conditions(lens: dict) -> dict:
     """The two paired conditions of `logit_lens.json`, flattened for the twin."""
     out = {}
-    for name in (PRESSURE_PAIRED, HONEST_INSTRUCTION):
+    for name in PAIRED_CONDITIONS:
         condition = lens["conditions"].get(name)
         level = (condition or {}).get("levels", {}).get(ALL)
         if not level:
@@ -1134,17 +1172,33 @@ def paired_lens_payload(lens: dict) -> dict:
     }
 
 
-def paired_lens_figure_payload(lens: dict) -> dict:
-    """`lens` with every unpaired condition dropped, ready for `plot_lens`.
+def paired_lens_figure_payload(twin: dict) -> dict:
+    """The paired lens's **JSON twin**, reshaped into what `plot_lens` reads.
 
-    One plotter, two figures: the paired overlay is the same picture over a
-    subset of the curves, and a second implementation of it would be a second
-    place for the sign convention to go wrong.
+    The argument is the twin, not `logit_lens.json`, and that is the point.
+    Deriving the picture and the file from the same source twice lets the two
+    drift; deriving the picture *from* the file cannot. It is the rule
+    `plot_paired_scatter` already states — "whatever a reader finds in the file
+    is what was plotted" — applied to the second figure as well.
+
+    One plotter, two figures: the overlay is `plot_lens`'s own picture over a
+    subset of its curves, and a second implementation would be a second place
+    for the sign convention to go wrong.
     """
-    kept = {name: lens["conditions"][name]
-            for name in (PRESSURE_PAIRED, HONEST_INSTRUCTION)
-            if name in lens["conditions"]}
-    return dict(lens, conditions=kept)
+    return {
+        "circuit": twin["circuit"],
+        "task": twin["task"],
+        "metric": twin["metric"],
+        "rows": twin["rows"],
+        "conditions": {
+            name: {"n_instances": condition["n_instances"],
+                   "sign_flip_row": condition["sign_flip_row"],
+                   "sign_flip_layer": condition["sign_flip_layer"],
+                   "sign_change_rows": condition["sign_change_rows"],
+                   "levels": {ALL: {"mean": condition["mean"],
+                                    "se": condition["se"]}}}
+            for name, condition in twin["conditions"].items()},
+    }
 
 
 def columns(payload) -> dict:
@@ -1314,17 +1368,18 @@ def zoom_limit(points: Sequence[dict]) -> Optional[float]:
     return cut * ZOOM_MARGIN
 
 
-def _scatter_panel(axes, points, limit, *, label_from: float = 0.0):
+def _scatter_panel(axes, points, limit, *, names: Sequence[str]):
     """One square panel of the scatter: the diagonal, the axes and the labels.
 
-    Every panel draws every point; only the labels differ. `label_from` is the
-    magnitude a Component must reach to be labelled *here*, so the two panels
-    divide the labels between them rather than each stacking all of them: the
-    full panel names the outliers that set its scale, the zoom panel names the
-    cluster underneath them, and no Component goes unnamed.
+    Every panel draws every point; only the labels differ. `names` is the set
+    of `panel` values this panel is responsible for, read off the JSON twin
+    rather than recomputed here, so the file's account of which panel names a
+    Component is the figure's account too. The two panels divide the labels
+    between them: the full one names the outliers that set its scale, the
+    zoomed one names the cluster underneath them, and no Component is named
+    twice or left unnamed.
     """
-    labelled = [one for one in points
-                if label_from <= max(abs(one["x"]), abs(one["y"])) <= limit]
+    labelled = [one for one in points if one.get("panel", SINGLE_PANEL) in names]
     axes.errorbar([one["x"] for one in points], [one["y"] for one in points],
                   xerr=[one["x_se"] or 0.0 for one in points],
                   yerr=[one["y_se"] or 0.0 for one in points], fmt="o",
@@ -1366,21 +1421,22 @@ def plot_paired_scatter(path: str, twin: dict) -> str:
 
     full = max([abs(one["x"]) for one in points]
                + [abs(one["y"]) for one in points] + [1e-3]) * 1.25
-    zoom = zoom_limit(points)
+    zoom = twin.get("zoom")
 
     figure, axes = plt.subplots(1, 2 if zoom else 1, squeeze=False,
                                 figsize=(11.6 if zoom else 6.4, 6.2))
-    named = _scatter_panel(axes[0][0], points, full, label_from=zoom or 0.0)
+    named = _scatter_panel(axes[0][0], points, full,
+                           names=(FULL_PANEL, SINGLE_PANEL))
     axes[0][0].set_title(
         f"all {len(points)} Component(s)" if not zoom else
-        f"all {len(points)} drawn; the {named} above +/-{zoom:.3f} named here",
-        fontsize=9)
+        f"all {len(points)} drawn; the {named} at or above +/-{zoom:.3f} "
+        f"named here", fontsize=9)
     axes[0][0].legend(fontsize=7, loc="upper left")
     if zoom:
         # The outliers set the first panel's scale, so the Components that sit
         # near the origin are unreadable there and get a panel of their own.
         # The labels divide between the two panels; the points do not.
-        shown = _scatter_panel(axes[0][1], points, zoom)
+        shown = _scatter_panel(axes[0][1], points, zoom, names=(ZOOM_PANEL,))
         axes[0][1].set_title(f"zoomed to +/-{zoom:.3f}: the other {shown} "
                              f"Component(s), named here", fontsize=9)
 

@@ -38,7 +38,7 @@ from dataset import matched_honest as mh                   # noqa: E402
 from tests.fakes import FAKE_VOCAB_SIZE                    # noqa: E402
 from tests.helpers import TINY                             # noqa: E402
 from tests.test_analyze_components_segmentation import (   # noqa: E402,F401
-    CELL, build_sdr_split, read_json, run_cli, sdr_run)
+    CELL, read_json, run_cli, sdr_run)
 
 ATTENTION_DIR = ap.SUBDIR
 DLA_DIR = dla.SUBDIR
@@ -110,11 +110,13 @@ def paired_run(sdr_run, monkeypatch, tmp_path):
                                    tmp_path / "pools", records, tokenizer,
                                    monkeypatch)
 
-    twin = [dict(one, target=one["distractor"], distractor=one["target"],
-                 condition="honest") for one in records]
-    twin_dir = os.path.join(data_dir, "sdr_honest")
-    DatasetDict({"test": Dataset.from_list(twin)}).save_to_disk(twin_dir)
-    with open(os.path.join(twin_dir, "dataset_config.json"), "w") as handle:
+    honest_twin = [dict(one, target=one["distractor"],
+                        distractor=one["target"], condition="honest")
+                   for one in records]
+    honest_twin_dir = os.path.join(data_dir, "sdr_honest")
+    DatasetDict({"test": Dataset.from_list(honest_twin)}) \
+        .save_to_disk(honest_twin_dir)
+    with open(os.path.join(honest_twin_dir, "dataset_config.json"), "w") as handle:
         json.dump({"task": "sdr", "max_seq_length": 128, "margin_thresh": 1.0},
                   handle)
 
@@ -165,13 +167,34 @@ def test_both_sides_of_the_pair_are_profiled_over_the_same_instances(paired_run)
 
     conditions = conditions_of(patterns_of(out))
 
-    assert conditions[ap.PRESSURE_PAIRED]["n_instances"] == len(ids)
-    assert conditions[ap.PRESSURE_PAIRED]["paired"] is True
-    assert conditions[ap.HONEST_INSTRUCTION]["paired"] is True
-    for level in conditions[ap.PRESSURE_PAIRED]["levels"]:
-        other = {one["level"]: one for one in
-                 conditions[ap.HONEST_INSTRUCTION]["levels"]}[level["level"]]
+    left = conditions[ap.PRESSURE_PAIRED]
+    right = conditions[ap.HONEST_INSTRUCTION]
+
+    # The ids, not only the counts. Two conditions can agree on how many
+    # instances they read and still have read different ones, and the file is
+    # where a reader has to be able to tell.
+    assert left["instance_ids"] == right["instance_ids"]
+    assert set(left["instance_ids"]) <= set(ids)
+    assert left["n_instances"] == len(ids)
+    assert left["paired"] is True and right["paired"] is True
+    for level in left["levels"]:
+        other = {one["level"]: one for one in right["levels"]}[level["level"]]
         assert level["n"] == other["n"]
+
+
+def test_the_full_split_condition_reads_more_instances_than_the_paired_one(
+        paired_run):
+    """And says so by id, which is what stops the paired honest column being
+    read against the full-split pressure column (spec user story 27)."""
+    run_dir, out, records, ids = paired_run
+    analyse(run_dir, out)
+
+    conditions = conditions_of(patterns_of(out))
+
+    assert len(conditions[ap.PRESSURE]["instance_ids"]) == len(records)
+    assert len(conditions[ap.PRESSURE_PAIRED]["instance_ids"]) == len(ids)
+    assert conditions[ap.PRESSURE]["instance_ids"] != \
+        conditions[ap.PRESSURE_PAIRED]["instance_ids"]
 
 
 def test_the_head_table_carries_the_paired_attention_columns(paired_run):
@@ -215,18 +238,19 @@ def test_the_paired_condition_can_be_turned_off_by_name(paired_run):
     assert "--attention-conditions" in skipped[ap.HONEST_INSTRUCTION]
 
 
-def test_an_unknown_attention_condition_is_refused_by_name_in_a_dry_run(
-        paired_run):
-    """`--dry-run` is where a bad configuration is meant to die, on the login
-    node. A real run validates the flag inside `run()`, after the model is
-    loaded, exactly as `--dla-conditions` does; the dry run is the cheap gate
-    and is what the sbatch header tells the researcher to rehearse with."""
+def test_an_unknown_attention_condition_is_refused_before_anything_loads(
+        paired_run, capsys):
+    """At parse time, the way `registry.select` refuses an unknown `--analyses`
+    name: no circuit resolved, no dataset read, and above all no 8B model
+    loaded onto a GPU to reject a typo. A real run, not a dry run — that is
+    the point."""
     run_dir, out, _records, _ids = paired_run
 
-    with pytest.raises(ValueError) as failure:
-        analyse(run_dir, out, "--dry-run", "--attention-conditions", "honest")
+    with pytest.raises(SystemExit) as failure:
+        analyse(run_dir, out, "--attention-conditions", "honest")
 
-    assert "honest" in str(failure.value)
+    assert failure.value.code == 2
+    assert "honest" in capsys.readouterr().err
 
 
 # ==============================================================================
@@ -241,23 +265,23 @@ def test_the_paired_dla_scatter_is_written_with_its_json_twin(paired_run):
     assert os.path.getsize(os.path.join(directory,
                                         dla.PAIRED_SCATTER_PNG_NAME)) > 0
 
-    twin = read_json(out, *CELL, DLA_DIR, dla.PAIRED_SCATTER_JSON_NAME)
-    assert twin["figure"] == dla.PAIRED_SCATTER_PNG_NAME
-    assert twin["x"] == dla.PRESSURE_PAIRED and twin["y"] == dla.HONEST_INSTRUCTION
-    assert twin["n_instances"] == len(ids)
-    assert "deceptive answer" in twin["metric"]
-    labels = [one["label"] for one in twin["points"]]
-    assert labels and all(one["x"] is not None for one in twin["points"])
+    scatter = read_json(out, *CELL, DLA_DIR, dla.PAIRED_SCATTER_JSON_NAME)
+    assert scatter["figure"] == dla.PAIRED_SCATTER_PNG_NAME
+    assert scatter["x"] == dla.PRESSURE_PAIRED and scatter["y"] == dla.HONEST_INSTRUCTION
+    assert scatter["n_instances"] == len(ids)
+    assert "deceptive answer" in scatter["metric"]
+    labels = [one["label"] for one in scatter["points"]]
+    assert labels and all(one["x"] is not None for one in scatter["points"])
 
 
 def test_the_scatter_labels_every_component_of_the_circuit(paired_run):
     run_dir, out, _records, _ids = paired_run
     analyse(run_dir, out)
 
-    twin = read_json(out, *CELL, DLA_DIR, dla.PAIRED_SCATTER_JSON_NAME)
+    scatter = read_json(out, *CELL, DLA_DIR, dla.PAIRED_SCATTER_JSON_NAME)
     rows = head_table(out)
 
-    assert sorted(one["label"] for one in twin["points"]) == sorted(
+    assert sorted(one["label"] for one in scatter["points"]) == sorted(
         dla.label_of((row["kind"], row["layer"], row["index"])) for row in rows)
 
 
@@ -269,22 +293,22 @@ def test_the_paired_lens_overlays_only_the_two_paired_conditions(paired_run):
     assert os.path.getsize(os.path.join(directory,
                                         dla.PAIRED_LENS_PNG_NAME)) > 0
 
-    twin = read_json(out, *CELL, DLA_DIR, dla.PAIRED_LENS_JSON_NAME)
-    assert twin["figure"] == dla.PAIRED_LENS_PNG_NAME
-    assert set(twin["conditions"]) == {dla.PRESSURE_PAIRED,
+    lens = read_json(out, *CELL, DLA_DIR, dla.PAIRED_LENS_JSON_NAME)
+    assert lens["figure"] == dla.PAIRED_LENS_PNG_NAME
+    assert set(lens["conditions"]) == {dla.PRESSURE_PAIRED,
                                        dla.HONEST_INSTRUCTION}
-    assert dla.PRESSURE not in twin["conditions"]
-    assert dla.HONEST_TWIN not in twin["conditions"]
+    assert dla.PRESSURE not in lens["conditions"]
+    assert dla.HONEST_TWIN not in lens["conditions"]
 
 
 def test_the_paired_lens_rows_are_rows_and_say_so(paired_run):
     run_dir, out, _records, _ids = paired_run
     analyse(run_dir, out)
 
-    twin = read_json(out, *CELL, DLA_DIR, dla.PAIRED_LENS_JSON_NAME)
+    lens = read_json(out, *CELL, DLA_DIR, dla.PAIRED_LENS_JSON_NAME)
 
-    assert "row" in twin["rows"]
-    for condition in twin["conditions"].values():
+    assert "row" in lens["rows"]
+    for condition in lens["conditions"].values():
         assert len(condition["mean"]) == TINY["layers"] + 1
 
 
@@ -305,8 +329,8 @@ def test_both_figures_say_why_they_are_empty_when_nothing_is_paired(
     directory = os.path.join(str(out), *CELL, DLA_DIR)
     for name in (dla.PAIRED_SCATTER_PNG_NAME, dla.PAIRED_LENS_PNG_NAME):
         assert os.path.getsize(os.path.join(directory, name)) > 0
-    twin = read_json(out, *CELL, DLA_DIR, dla.PAIRED_SCATTER_JSON_NAME)
-    assert twin["points"] == [] and twin["skipped"]
+    scatter = read_json(out, *CELL, DLA_DIR, dla.PAIRED_SCATTER_JSON_NAME)
+    assert scatter["points"] == [] and scatter["skipped"]
 
 
 # ==============================================================================
