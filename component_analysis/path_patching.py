@@ -54,10 +54,10 @@ from __future__ import annotations
 import math
 import os
 import time
-from dataclasses import dataclass
-from typing import Dict, List, Optional, Sequence, Tuple
+from dataclasses import dataclass, field
+from typing import Dict, List, Sequence, Tuple
 
-from component_analysis import hooks
+from component_analysis.head_table import row_key
 
 #: The registration protocol (`component_analysis/registry.py`).
 NAME = "path_patching"
@@ -70,9 +70,14 @@ HEATMAP_JSON = "heatmap.json"
 DIRECT_EFFECT_PNG = "direct_effect.png"
 DIRECT_EFFECT_JSON = "direct_effect.json"
 
-#: Re-exported so a caller never has to know they came from the hook module.
-EMBED_KEY = hooks.EMBED_KEY
-READOUT_KEY = hooks.READOUT_KEY
+#: The two keys that are not Components: the start and the end of the residual
+#: stream. Spelled out here rather than imported, because `registry.py` requires
+#: an analysis module to import neither nnsight nor `hooks` at module scope —
+#: it is imported on the login node when the parser is built. They are asserted
+#: equal to the hook module's own in `tests/test_path_patching_passes.py`, so
+#: the two spellings cannot drift.
+EMBED_KEY = ("embed", 0, 0)
+READOUT_KEY = ("readout", 0, 0)
 
 #: Receiver kinds, in the order the heatmap groups them.
 RECEIVER_KINDS = ("q", "k", "v", "mlp_in", "readout")
@@ -163,9 +168,6 @@ class Grid:
     def size(self) -> dict:
         return {"senders": len(self.senders), "receivers": len(self.receivers),
                 "cells": len(self.cells)}
-
-    def receiver_of(self, key) -> Receiver:
-        return next(one for one in self.receivers if one.key == key)
 
     def cells_into(self, key) -> List[Cell]:
         return [cell for cell in self.cells if cell.receiver == key]
@@ -276,6 +278,18 @@ def cost(grid: Grid, *, n_batches: int, batch_size: int) -> dict:
 # ==============================================================================
 
 @dataclass
+class _Tally:
+    """What a run accumulates besides the cells: the instances it saw, the
+    gaps it normalized by, and what it cost."""
+
+    gaps: List[float] = field(default_factory=list)
+    used_ids: List[str] = field(default_factory=list)
+    excluded: List[str] = field(default_factory=list)
+    forwards: int = 0
+    wall_seconds: float = 0.0
+
+
+@dataclass
 class Streams:
     """Both streams of one batch, captured once and shared by every cell of it.
 
@@ -305,12 +319,6 @@ class Streams:
     ids: Sequence[str] = ()
 
     @property
-    def rows(self):
-        import torch
-
-        return torch.arange(self.input_ids.shape[0], device=self.positions.device)
-
-    @property
     def usable(self):
         """Instances whose Corruption moved the answer far enough to divide by.
 
@@ -327,8 +335,10 @@ def capture_streams(model, batch, *, senders) -> Streams:
     the Target and Distractor token ids read with the **clean** stream's
     assignment on both runs, and the Readout position of each row.
     """
+    from component_analysis import hooks
+
     device, _dtype = hooks.device_and_dtype(model)
-    keys = [_key(one) for one in senders]
+    keys = [row_key(one) for one in senders]
     frozen = hooks.all_component_keys(model)
 
     input_ids = batch.input_ids.to(device)
@@ -360,12 +370,6 @@ def capture_streams(model, batch, *, senders) -> Streams:
         gap=clean_metric - corrupt_metric, ids=tuple(getattr(batch, "ids", ())))
 
 
-def _key(component) -> tuple:
-    key = getattr(component, "key", component)
-    kind, layer, index = key
-    return (str(kind), int(layer), int(index))
-
-
 def _readout_of(model, capture):
     """The fp32 Readout logits of a capture that asked for `READOUT_KEY`.
 
@@ -375,6 +379,8 @@ def _readout_of(model, capture):
     site is what lets the Readout be a receiver like any other.
     """
     import torch
+
+    from component_analysis import hooks
 
     rows = torch.arange(capture.logits.shape[0], device=capture.readout.device)
     residual = capture.outputs[READOUT_KEY][rows, capture.readout, :]
@@ -389,13 +395,15 @@ def receiver_inputs(model, streams: Streams, *, senders, receivers):
     The receivers come back at every position, which is what makes this the
     position-agnostic pass.
     """
-    patched = {_key(one) for one in senders}
+    from component_analysis import hooks
+
+    patched = {row_key(one) for one in senders}
     replacements = {key: value for key, value in streams.clean_outputs.items()
                     if key not in patched}
     replacements.update({key: streams.corrupt_outputs[key] for key in patched})
     return hooks.capture_forward(model, streams.input_ids,
                                  streams.attention_mask,
-                                 components=[_key(one) for one in receivers],
+                                 components=[row_key(one) for one in receivers],
                                  replacements=replacements,
                                  positions=streams.positions)
 
@@ -406,6 +414,8 @@ def readout_from_receivers(model, streams: Streams, replacements):
     Nothing else in the forward is touched, so whatever the patched receiver
     does with its new input propagates exactly as the model would do it.
     """
+    from component_analysis import hooks
+
     capture = hooks.capture_forward(model, streams.input_ids,
                                     streams.attention_mask,
                                     components=[READOUT_KEY],
@@ -424,7 +434,7 @@ def patched_readout(model, streams: Streams, *, senders, receivers):
     captured = receiver_inputs(model, streams, senders=senders,
                                receivers=receivers)
     return readout_from_receivers(
-        model, streams, {_key(one): captured.outputs[_key(one)]
+        model, streams, {row_key(one): captured.outputs[row_key(one)]
                          for one in receivers})
 
 
@@ -435,6 +445,8 @@ def normalized_effect(streams: Streams, patched):
     instances are counted in the output rather than averaged in.
     """
     import torch
+
+    from component_analysis import hooks
 
     metric = hooks.target_minus_distractor(patched, streams.target,
                                            streams.distractor)
@@ -480,12 +492,12 @@ def strongest(cells: Sequence[dict], limit: int) -> List[dict]:
 # ==============================================================================
 
 def add_arguments(group) -> None:
-    group.add_argument("--patch-instances", type=int, default=0,
+    group.add_argument("--path-instances", type=int, default=0,
                        help="Cap the causal sample this analysis patches over. "
                             "0 uses all of it. The cap is rounded up to a whole "
                             "batch, and it is the lever when --dry-run's cost "
                             "estimate does not fit the job's wall clock.")
-    group.add_argument("--patch-top", type=int, default=10,
+    group.add_argument("--path-top", type=int, default=10,
                        help="How many of the strongest cells, by absolute "
                             "normalized effect, are listed in the JSON.")
 
@@ -507,7 +519,7 @@ def grid_for(ctx) -> Grid:
 def _planned(ctx, batches) -> Tuple[int, int]:
     """(batches, instances) this run would use, after `--patch-instances`."""
     size = batches.report.get("batch_size") or 1
-    wanted = int(getattr(ctx.cli, "patch_instances", 0) or 0)
+    wanted = int(getattr(ctx.cli, "path_instances", 0) or 0)
     if wanted <= 0 or wanted >= batches.n_instances:
         return len(batches), batches.n_instances
     n_batches = min(len(batches), -(-wanted // size))
@@ -534,6 +546,8 @@ def _check_kv_groups(ctx, model) -> None:
     `--num-kv-heads` is an override, and a wrong one would send every K and V
     patch to a neighbouring group without any of the assertions noticing.
     """
+    from component_analysis import hooks
+
     wrong = [one for one in ctx.components if one.kind == "head"
              and one.kv_group != hooks.kv_group_of(model, one.index)]
     if wrong:
@@ -560,22 +574,19 @@ def run(ctx) -> dict:
                   batch_size=batches.report.get("batch_size") or 1)
 
     values: Dict[Cell, List[float]] = {cell: [] for cell in grid.cells}
-    gaps: List[float] = []
-    used_ids: List[str] = []
-    excluded: List[str] = []
-    forwards = 0
+    tally = _Tally()
     started = time.perf_counter()
 
     for index, batch in enumerate(batches):
         if index >= n_batches:
             break
         streams = capture_streams(ctx.model, batch, senders=grid.senders)
-        forwards += 2
-        gaps.extend(streams.gap.tolist())
-        used_ids.extend(batch.ids)
-        excluded.extend(one for one, usable in zip(batch.ids,
-                                                   streams.usable.tolist())
-                        if not usable)
+        tally.forwards += 2
+        tally.gaps.extend(streams.gap.tolist())
+        tally.used_ids.extend(batch.ids)
+        tally.excluded.extend(one for one, usable in zip(batch.ids,
+                                                         streams.usable.tolist())
+                              if not usable)
 
         for sender in grid.senders:
             receivers = grid.receivers_for(sender)
@@ -583,31 +594,31 @@ def run(ctx) -> dict:
                 continue
             captured = receiver_inputs(ctx.model, streams, senders=[sender],
                                        receivers=receivers)
-            forwards += 1
+            tally.forwards += 1
             for receiver in receivers:
                 patched = readout_from_receivers(
                     ctx.model, streams, {receiver: captured.outputs[receiver]})
-                forwards += 1
+                tally.forwards += 1
                 values[Cell(sender, receiver)].extend(
                     normalized_effect(streams, patched).tolist())
             del captured
         del streams
 
-    wall = time.perf_counter() - started
-    cells = [{"sender": label(cell.sender), "receiver": label(cell.receiver),
-              "cell": cell.name, **summarize(values[cell])}
-             for cell in grid.cells]
-    payload = _payload(ctx, grid, cells, budget=budget, gaps=gaps,
-                       used_ids=used_ids, excluded=excluded, wall=wall,
-                       forwards=forwards, batches=batches)
+    tally.wall_seconds = time.perf_counter() - started
+    summaries = {cell: {"sender": label(cell.sender),
+                        "receiver": label(cell.receiver), "cell": cell.name,
+                        **summarize(values[cell])}
+                 for cell in grid.cells}
+    payload = _payload(ctx, grid, summaries, budget=budget, tally=tally)
     ctx.write_json(SUBDIR, AGNOSTIC_FILE, payload)
-    _figures(ctx, grid, cells, payload)
-    return head_table_columns(grid, cells)
+    _figures(ctx, grid, summaries, payload)
+    return head_table_columns(grid, summaries)
 
 
-def _payload(ctx, grid, cells, *, budget, gaps, used_ids, excluded, wall,
-             forwards, batches) -> dict:
-    direct = [one for one in cells if one["receiver"] == label(READOUT_KEY)]
+def _payload(ctx, grid, summaries, *, budget, tally: _Tally) -> dict:
+    cells = list(summaries.values())
+    direct = [summaries[Cell(sender, READOUT_KEY)] for sender in grid.senders]
+    gaps = tally.gaps
     return {
         "analysis": NAME,
         "pass": "position_agnostic",
@@ -629,17 +640,17 @@ def _payload(ctx, grid, cells, *, budget, gaps, used_ids, excluded, wall,
                        "circuit_heads": list(one.circuit_heads)}
                       for one in grid.receivers],
         "cells": cells,
-        "strongest": strongest(cells, int(getattr(ctx.cli, "patch_top", 10))),
+        "strongest": strongest(cells, int(getattr(ctx.cli, "path_top", 10))),
         "direct_effect_on_readout": direct,
         "cells_without_a_mean": [one["cell"] for one in cells
                                  if one["mean"] is None],
         "sample": {
-            "n_instances": len(used_ids),
-            "n_batches": min(len(batches), budget["n_batches"]),
+            "n_instances": len(tally.used_ids),
+            "n_batches": budget["n_batches"],
             "batch_size": budget["batch_size"],
-            "instance_ids": used_ids,
-            "n_excluded_by_gap": len(excluded),
-            "excluded_by_gap": excluded,
+            "instance_ids": tally.used_ids,
+            "n_excluded_by_gap": len(tally.excluded),
+            "excluded_by_gap": tally.excluded,
         },
         "gap": {
             "mean": (sum(gaps) / len(gaps)) if gaps else None,
@@ -649,9 +660,10 @@ def _payload(ctx, grid, cells, *, budget, gaps, used_ids, excluded, wall,
         },
         "cost": {
             "estimated": budget,
-            "forwards": forwards,
-            "wall_seconds": wall,
-            "seconds_per_forward": wall / forwards if forwards else None,
+            "forwards": tally.forwards,
+            "wall_seconds": tally.wall_seconds,
+            "seconds_per_forward": (tally.wall_seconds / tally.forwards
+                                    if tally.forwards else None),
         },
     }
 
@@ -660,63 +672,49 @@ def _payload(ctx, grid, cells, *, budget, gaps, used_ids, excluded, wall,
 # HEAD-TABLE COLUMNS
 # ==============================================================================
 
-def _receives(grid: Grid, component) -> List[tuple]:
-    """The receiver keys a patch at which reaches this Component.
+def _receives(grid: Grid, key: tuple) -> List[tuple]:
+    """The receiver keys at which a patch reaches this Component.
 
     A K or V receiver is a KV group, so a cell into it is incoming to **every**
     circuit head of that group, not only to the head whose index named it.
     """
-    if component.kind == "mlp":
-        return [("mlp_in", component.layer, 0)]
+    kind, layer, index = key
+    if kind == "mlp":
+        return [("mlp_in", layer, 0)]
     return [one.key for one in grid.receivers
-            if one.layer == component.layer
-            and component.index in one.circuit_heads]
+            if one.layer == layer and index in one.circuit_heads]
 
 
-def head_table_columns(grid: Grid, cells: Sequence[dict]) -> dict:
-    """The three columns the ticket asks for, per Component.
+def head_table_columns(grid: Grid, summaries: Dict[Cell, dict]) -> dict:
+    """The three things the ticket asks of the head table, per Component.
 
     The strongest incoming and outgoing paths are by absolute mean effect, so a
     Component that suppresses the deceptive answer is as visible as one that
-    promotes it; the sign is on the effect column beside the name.
+    promotes it; the sign is on the effect column beside the name. The columns
+    carry no analysis prefix — the head table's namespace already says
+    `path_patching`.
     """
-    by_cell = {one["cell"]: one for one in cells}
-    readout = label(READOUT_KEY)
     updates = {}
-    for component in _components_of(grid):
-        incoming = [by_cell[cell.name]
-                    for key in _receives(grid, component)
-                    for cell in grid.cells_into(key)]
-        outgoing = [by_cell[cell.name] for cell in grid.cells
-                    if cell.sender == component.key]
+    for key in grid.senders:
+        if key == EMBED_KEY:
+            continue          # the embedding is a sender, never a head-table row
+        incoming = [summaries[cell] for receiver in _receives(grid, key)
+                    for cell in grid.cells_into(receiver)]
+        outgoing = [summaries[cell] for cell in grid.cells if cell.sender == key]
         best_in = strongest(incoming, 1)
         best_out = strongest(outgoing, 1)
-        direct = by_cell.get(f"{label(component.key)}->{readout}")
-        updates[component.key] = {
+        direct = summaries[Cell(key, READOUT_KEY)]
+        updates[key] = {
             "strongest_incoming": best_in[0]["cell"] if best_in else None,
             "strongest_incoming_effect": best_in[0]["mean"] if best_in else None,
             "strongest_outgoing": best_out[0]["cell"] if best_out else None,
             "strongest_outgoing_effect": best_out[0]["mean"] if best_out else None,
-            "readout_direct_effect": direct["mean"] if direct else None,
-            "readout_direct_effect_se": direct["se"] if direct else None,
+            "direct_effect": direct["mean"],
+            "direct_effect_se": direct["se"],
         }
     return updates
 
 
-@dataclass(frozen=True)
-class _GridComponent:
-    kind: str
-    layer: int
-    index: int
-
-    @property
-    def key(self) -> tuple:
-        return (self.kind, self.layer, self.index)
-
-
-def _components_of(grid: Grid) -> List[_GridComponent]:
-    """The circuit's Components, recovered from the grid's sender list."""
-    return [_GridComponent(*key) for key in grid.senders if key != EMBED_KEY]
 
 
 # ==============================================================================
@@ -736,24 +734,24 @@ def heatmap_order(grid: Grid) -> List[Receiver]:
                                    one.key[2]))
 
 
-def _matrix(grid: Grid, cells: Sequence[dict]) -> Tuple[list, list, list]:
+def _matrix(grid: Grid, summaries: Dict[Cell, dict]) -> Tuple[list, list, list]:
     """(row labels, ordered receivers, values) with None where no cell exists."""
-    by_cell = {one["cell"]: one["mean"] for one in cells}
     columns = heatmap_order(grid)
     rows = [label(one) for one in grid.senders]
-    values = [[by_cell.get(f"{label(sender)}->{label(one.key)}")
+    values = [[summaries[Cell(sender, one.key)]["mean"]
+               if Cell(sender, one.key) in summaries else None
                for one in columns] for sender in grid.senders]
     return rows, columns, values
 
 
-def _figures(ctx, grid: Grid, cells: Sequence[dict], payload: dict) -> None:
+def _figures(ctx, grid: Grid, summaries: Dict[Cell, dict], payload: dict) -> None:
     """The two PNGs, each with the JSON twin an agent with no GUI reads."""
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
     import numpy as np
 
-    rows, columns, values = _matrix(grid, cells)
+    rows, columns, values = _matrix(grid, summaries)
     ctx.write_json(SUBDIR, HEATMAP_JSON, {
         "title": "Position-agnostic path patching, normalized effect",
         "rows": rows,

@@ -210,3 +210,30 @@ def test_the_strongest_cells_are_ranked_by_size_whatever_their_sign():
     cells = [{"mean": 0.2}, {"mean": -0.9}, {"mean": 0.5}]
 
     assert pp.strongest(cells, 2) == [{"mean": -0.9}, {"mean": 0.5}]
+
+
+# ==============================================================================
+# THE LOGIN NODE
+# ==============================================================================
+
+def test_this_module_imports_without_nnsight_and_without_the_hook_module():
+    """`--dry-run` is a login-node mode and the login node has no nnsight 0.7.0.
+
+    The analysis is imported when the parser is built, so that every analysis
+    can register its own flags — before anyone knows whether this run wants a
+    model. A fresh interpreter, because `sys.modules` is process-wide and an
+    earlier test in the session may have imported nnsight already.
+    """
+    import os
+    import subprocess
+    import sys
+
+    probe = ("import component_analysis.path_patching, sys; "
+             "assert 'nnsight' not in sys.modules, 'nnsight'; "
+             "assert 'component_analysis.hooks' not in sys.modules, 'hooks'")
+    result = subprocess.run(
+        [sys.executable, "-c", probe],
+        cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        capture_output=True, text=True)
+
+    assert result.returncode == 0, result.stderr

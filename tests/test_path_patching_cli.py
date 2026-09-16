@@ -68,11 +68,11 @@ def test_dry_run_writes_nothing_of_the_analysis(sdr_run, registered):
 
 def test_the_estimate_counts_fewer_instances_when_the_sample_is_capped(
         sdr_run, registered, capsys):
-    """`--patch-instances` is the lever for a grid that does not fit the hour."""
+    """`--path-instances` is the lever for a grid that does not fit the hour."""
     run_dir, out, _records = sdr_run
 
     run_cli(str(run_dir), "--dry-run", "--num-kv-heads", "2", "--n-causal", "16",
-            "--patch-instances", "8", "--output-dir", str(out))
+            "--path-instances", "8", "--output-dir", str(out))
     capped = next(one for one in capsys.readouterr().out.splitlines()
                   if one.strip().startswith(f"{pp.NAME}: "))
 

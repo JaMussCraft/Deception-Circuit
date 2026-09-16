@@ -114,6 +114,15 @@ def fp32_readout(model, input_ids, attention_mask, positions, replacements=None)
     return hooks.readout_logits(model, residual)
 
 
+def test_the_two_keys_that_are_not_components_agree_with_the_hook_module(model):
+    """This module spells `EMBED_KEY` and `READOUT_KEY` out rather than
+    importing `hooks` at module scope, because `registry.py` forbids that of an
+    analysis. So the two spellings are asserted equal here, where nnsight is
+    installed, and cannot drift apart unnoticed."""
+    assert pp.EMBED_KEY == hooks.EMBED_KEY
+    assert pp.READOUT_KEY == hooks.READOUT_KEY
+
+
 def test_the_whole_model_circuit_covers_every_sender_and_receiver_of_the_model(
         model, whole_model_grid):
     """The two "reproduces the other stream" invariants below only hold for the
@@ -287,10 +296,9 @@ def test_a_cli_run_writes_the_json_the_figures_and_the_head_table_columns(
         assert "NaN" not in f.read(), "the JSON twin must be strict JSON"
 
     table = read_json(out, *CELL, "head_table.json")
-    for column in ("strongest_incoming", "strongest_outgoing",
-                   "readout_direct_effect"):
+    for column in ("strongest_incoming", "strongest_outgoing", "direct_effect"):
         assert f"{pp.NAME}.{column}" in table["columns"]
-    assert all(row[f"{pp.NAME}.readout_direct_effect"] is not None
+    assert all(row[f"{pp.NAME}.direct_effect"] is not None
                for row in table["rows"])
 
 
