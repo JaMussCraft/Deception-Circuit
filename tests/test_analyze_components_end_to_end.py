@@ -245,9 +245,12 @@ def test_a_reference_name_may_not_also_be_a_circuit_name(tiny_runs):
                 "--task-from", str(run_dir), "--output-dir", str(out))
 
 
-def test_a_run_with_no_analysis_registered_loads_no_model(tiny_runs):
-    """Nothing is registered on this branch, so a run would be a 32 GB no-op."""
+def test_a_run_with_no_analysis_registered_loads_no_model(tiny_runs, monkeypatch):
+    """With nothing registered a run would be a 32 GB no-op, so it refuses."""
+    from component_analysis import registry
+
     run_dir, _honest, out = tiny_runs
+    monkeypatch.setattr(registry, "ANALYSES", [])
 
     with pytest.raises(SystemExit, match="--dry-run"):
         run_cli(str(run_dir), "--num-kv-heads", "2", "--output-dir", str(out))

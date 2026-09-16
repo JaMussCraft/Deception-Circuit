@@ -415,3 +415,28 @@ def test_the_gpu_scaffold_check_runs_end_to_end_on_the_tiny_model(model, streams
     assert measured["timings"]["batch_size"] == BATCH
     assert measured["timings"]["attention_weights_eager_s"] > 0
     assert hooks.attention_implementation(model) == hooks.SDPA
+
+
+def test_a_shared_scale_makes_readout_contributions_additive(model, streams):
+    """`scale_from` fixes the norm's scale so parts sum to the whole.
+
+    RMSNorm is not linear, so the readout of two halves of a residual does not
+    sum to the readout of the residual — unless both halves are normalized
+    with the residual's own scale, which is what direct logit attribution
+    needs. The `o_proj` weight accessor is exercised alongside: it must have
+    the shape the per-head slices multiply into.
+    """
+    clean, _corrupt, mask = streams
+    capture = hooks.capture_forward(model, clean, mask, components=[])
+    residual = capture.residual[:, -1]
+    first, second = residual * 0.3, residual * 0.7
+
+    whole = hooks.readout_logits(model, residual)
+    parts = (hooks.readout_logits(model, first, scale_from=residual)
+             + hooks.readout_logits(model, second, scale_from=residual))
+    assert torch.allclose(parts, whole, atol=1e-4)
+
+    shapes = hooks.geometry(model)
+    weight = hooks.o_proj_weight(model, 0)
+    assert tuple(weight.shape) == (
+        residual.shape[-1], shapes["num_heads"] * shapes["head_dim"])

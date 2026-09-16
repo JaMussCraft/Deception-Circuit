@@ -577,7 +577,7 @@ def attention_weights(model, input_ids, attention_mask, *, layer, heads,
 # THE FP32 READOUT
 # ==============================================================================
 
-def readout_logits(model, residual):
+def readout_logits(model, residual, *, scale_from=None):
     """Logits from a residual at the Readout, in fp32, through the real norm.
 
     ADR-0001: *"Ranking metrics are read through an fp32 final norm and
@@ -592,6 +592,12 @@ def readout_logits(model, residual):
     `residual` is `[..., hidden]` — `Capture.residual[:, -1]` for a whole
     forward, or one Component's contribution for direct logit attribution.
     Returns `[..., vocab]` in float32.
+
+    `scale_from`, when given, is the `[..., hidden]` residual whose RMS sets
+    the norm's scale instead of `residual`'s own. Direct logit attribution
+    passes the full residual at the Readout here and one Component's
+    contribution as `residual`, so every contribution is normalized with the
+    same scale and the contributions sum to the readout of the full residual.
     """
     import torch
 
@@ -603,10 +609,25 @@ def readout_logits(model, residual):
 
     with torch.no_grad():
         hidden = residual.detach().float()
-        scaled = hidden * torch.rsqrt(hidden.pow(2).mean(-1, keepdim=True)
+        basis = hidden if scale_from is None else scale_from.detach().float()
+        scaled = hidden * torch.rsqrt(basis.pow(2).mean(-1, keepdim=True)
                                       + epsilon)
         scaled = scaled * norm.weight.detach().float()
         return scaled @ hf.lm_head.weight.detach().float().T
+
+
+def o_proj_weight(model, layer: int):
+    """`[hidden, num_heads * head_dim]` output-projection weight of one layer.
+
+    Direct logit attribution turns a head's `Capture.outputs` slice (its
+    `o_proj` input) into a residual-stream contribution by multiplying with
+    the matching `head_dim` columns of this weight. Llama's `o_proj` has no
+    bias; that is asserted so a model with one cannot be attributed silently.
+    """
+    o_proj = _hf(model).model.layers[layer].self_attn.o_proj
+    assert getattr(o_proj, "bias", None) is None, (
+        "o_proj has a bias; per-head attribution would need to split it")
+    return o_proj.weight.detach()
 
 
 def target_minus_distractor(logits, target, distractor):
