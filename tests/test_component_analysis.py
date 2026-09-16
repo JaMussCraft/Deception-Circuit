@@ -242,7 +242,8 @@ def test_the_intake_layer_does_not_import_nnsight():
     probe = ("import component_analysis.components, component_analysis.head_table, "
              "component_analysis.intake, component_analysis.segmentation, "
              "component_analysis.sampling, component_analysis.instances, "
-             "component_analysis.registry, component_analysis.dataloaders, sys; "
+             "component_analysis.registry, component_analysis.dataloaders, "
+             "component_analysis.knockout, sys; "
              "assert 'nnsight' not in sys.modules, sorted(sys.modules)")
     result = subprocess.run([sys.executable, "-c", probe],
                             cwd=os.path.dirname(os.path.dirname(

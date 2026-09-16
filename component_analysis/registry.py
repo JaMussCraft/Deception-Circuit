@@ -46,7 +46,7 @@ ANALYSES: List[str] = [
 
     # ticket 04, DLA and logit lens:     "component_analysis.dla",
 
-    # ticket 07, per-Component knockout: "component_analysis.knockout",
+    "component_analysis.knockout",                    # ticket 07
 
     # ticket 08, path patching:          "component_analysis.path_patching",
 ]
