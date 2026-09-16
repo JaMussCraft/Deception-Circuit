@@ -1222,7 +1222,7 @@ def position_mask(segmentations: dict, ids, names: Sequence[str],
 
 
 def segment_entries(ctx, receiver: tuple, streams: Streams, segmentations: dict,
-                    n_positions: int):
+                    n_positions: int, names: Sequence[str]):
     """`[(name, mask, present)]` for one receiver, in the order they are run.
 
     K and V receivers take the patch at each Segment's key positions in turn,
@@ -1231,35 +1231,35 @@ def segment_entries(ctx, receiver: tuple, streams: Streams, segmentations: dict,
     positions, which is the spec's rule rather than a saving: their input is
     read at the position the model answers from, so a Segment sweep over them
     would be a sweep over positions the receiver does not read.
-    """
-    kind = receiver[0]
-    ids = list(streams.ids)
-    if kind not in SEGMENTED_KINDS:
-        names = query_segment_names(ctx)
-        mask, present = position_mask(segmentations, ids, names, n_positions)
-        return [(QUERY_ENTRY, mask, present, list(names))]
 
-    names = segment_names_of(segmentations, ids)
+    `names` is the whole cell's Segment list, fixed once by the caller, so
+    every batch contributes to the same columns even if one batch happens to
+    have no instance carrying some Segment.
+    """
+    ids = list(streams.ids)
+    if receiver[0] not in SEGMENTED_KINDS:
+        query = query_segment_names(ctx)
+        mask, present = position_mask(segmentations, ids, query, n_positions)
+        return [(QUERY_ENTRY, mask, present)]
+
     entries = []
     for name in names:
         mask, present = position_mask(segmentations, ids, [name], n_positions)
-        entries.append((name, mask, present, [name]))
+        entries.append((name, mask, present))
     union, present = position_mask(segmentations, ids, names, n_positions)
-    entries.append((UNION_ENTRY, union, present, list(names)))
+    entries.append((UNION_ENTRY, union, present))
     return entries
 
 
-def segment_names_of(segmentations: dict, ids) -> List[str]:
-    """Every Segment name the instances of this batch carry, in prompt order.
+def segment_names_of(segmentations) -> List[str]:
+    """Every Segment name the cell's segmentation carries, in prompt order.
 
     Read off the resolved segmentation rather than from the task's default
-    list, so that a `--segment` override on the command line is swept too.
+    list, so that a `--segment` override on the command line is swept too, and
+    fixed once for the whole pass rather than per batch.
     """
     names: List[str] = []
-    for one in ids:
-        segmentation = segmentations.get(one)
-        if segmentation is None:
-            continue
+    for segmentation in segmentations.values():
         for name in segmentation.segments:
             if name not in names:
                 names.append(name)
@@ -1289,6 +1289,7 @@ def segment_pass(ctx, grid: Grid, batches, counterfactual: str,
     threshold = float(getattr(ctx.cli, "path_position_threshold", 0.05))
     chosen = selected_cells(summaries, threshold)
     segmentations = by_record_id(getattr(ctx, "segmentations", None))
+    names = segment_names_of(segmentations)
 
     rows: Dict[Cell, Dict[str, List[float]]] = {
         cell: {} for cell in chosen}
@@ -1310,12 +1311,12 @@ def segment_pass(ctx, grid: Grid, batches, counterfactual: str,
             n_positions = streams.input_ids.shape[1]
             for cell in chosen:
                 entries = segment_entries(ctx, cell.receiver, streams,
-                                          segmentations, n_positions)
+                                          segmentations, n_positions, names)
                 effects = positioned_effects(
                     ctx.model, streams, cell.sender, cell.receiver,
-                    [(name, mask) for name, mask, _present, _names in entries])
+                    [(name, mask) for name, mask, _present in entries])
                 tally.forwards += 1 + len(entries)
-                for name, _mask, present, _names in entries:
+                for name, _mask, present in entries:
                     values = torch.where(present.to(effects[name].device),
                                          effects[name],
                                          torch.full_like(effects[name],
@@ -1328,7 +1329,7 @@ def segment_pass(ctx, grid: Grid, batches, counterfactual: str,
     tally.wall_seconds = time.perf_counter() - started
     payload = _segment_payload(ctx, counterfactual, chosen, rows, absent,
                                summaries, threshold=threshold, tally=tally,
-                               segmentations=segmentations,
+                               names=names,
                                missing_segmentation=missing_segmentation)
     ctx.write_json(SUBDIR, _named("segments", counterfactual, "json"), payload)
     _segment_figure(ctx, counterfactual, payload)
@@ -1336,7 +1337,7 @@ def segment_pass(ctx, grid: Grid, batches, counterfactual: str,
 
 
 def _segment_payload(ctx, counterfactual, chosen, rows, absent, summaries, *,
-                     threshold, tally, segmentations, missing_segmentation):
+                     threshold, tally, names, missing_segmentation):
     """The per-cell, per-Segment table, with the union check beside each cell.
 
     `agnostic` and `union` are the same quantity measured two ways, so a reader
@@ -1389,7 +1390,10 @@ def _segment_payload(ctx, counterfactual, chosen, rows, absent, summaries, *,
             "'agnostic'; 'sum_of_segments' is recorded for information and is "
             "not expected to, because a receiver's forward is not linear in "
             "its input"),
-        "segments": segment_names_of(segmentations, tally.used_ids),
+        "segments": list(names),
+        "spans": "the Segments are resolved on the pressure prompt; both "
+                 "counterfactual streams are aligned to it token for token, so "
+                 "the same spans address both",
         "cells": cells,
         "sample": {"n_instances": len(tally.used_ids),
                    "instance_ids": tally.used_ids,
