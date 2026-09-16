@@ -442,6 +442,30 @@ def test_an_item_the_question_never_names_is_refused(tokenizer):
         S.validate_segmentation(seg, record, tokenizer)
 
 
+def test_the_mechanism_scheme_declares_these_eighteen_segments_in_this_order():
+    """The Segment list written out, spelled here rather than read from the
+    module.
+
+    `test_the_segmentation_file_covers_every_instance_and_every_segment`
+    compares `segmentation.json` against `MECHANISM_SEGMENTS`, which only says
+    the file agrees with the constant. This is the list itself: the names
+    `CONTEXT.md` introduces, in the order it introduces them, so a rename or a
+    reordering has to be made here too and cannot pass unnoticed.
+    """
+    assert S.segment_names("sdr") == (
+        "intro", "item_1_intro", "item_2_intro",
+        "designating_sentence", "designation_site", "predicate_token",
+        "other_token", "inverse_predicate_token", "designation_suffix",
+        "pressure_clause", "question",
+        "item_1_question_pair", "item_1_question_option",
+        "item_2_question_pair", "item_2_question_option",
+        "stem", "readout", "unsegmented",
+    )
+    assert S.segment_names("far") == S.segment_names("ser") == \
+        S.segment_names("sdr")
+    assert len(S.segment_names("std")) == 7
+
+
 def test_a_question_that_names_an_item_a_third_time_is_refused(tokenizer):
     """Two mentions per item is the Scaffold: the pair naming and the quoted
     option. A third would be pooled into one of the two Segments and quietly

@@ -71,10 +71,9 @@ The prompt shape shared by all three tasks: a system turn naming two items and
 designating one of them, a **Pressure Clause**, a user turn asking a one-word
 question about the two items, and a pre-filled assistant stem. Held constant so
 that a circuit difference is attributable to the mechanism, not the format.
-_Avoid_: template (reserved for **Template Variant**). One carve-out: a field
-of a `TemplateVariant` — its intro, designation, question or stem — may be
-called a **template piece**, because that is what it is a piece of. The
-Scaffold is the shape those pieces render; a piece of it is a Scaffold piece.
+_Avoid_: template (reserved for **Template Variant**), with one carve-out: a
+field of a `TemplateVariant` — its intro, designation, question or stem — may
+be called a **template piece**, because that is what it is a piece of.
 
 **Predicate**:
 The adjective pair applied to the designated item — failing/passing,

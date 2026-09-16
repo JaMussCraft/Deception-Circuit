@@ -120,8 +120,8 @@ class Sample:
             "allocation": ALLOCATION,
             "allocation_rule": ("the equal share per stratum, capped by each "
                                 "stratum's population, with the surplus "
-                                "redistributed round-robin to the strata that "
-                                "still have room"),
+                                "handed one at a time to the smallest stratum "
+                                "that still has room"),
             "strata": [stratum.as_json() for stratum in self.strata],
             "marginals": {factor: dict(counts)
                           for factor, counts in self.marginals.items()},
