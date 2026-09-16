@@ -271,10 +271,17 @@ def test_a_counterfactual_the_module_does_not_know_is_refused_by_name():
 
 def test_the_item_swap_keeps_ticket_08s_filenames_and_the_other_pair_is_suffixed():
     """A head table and a figure from before this ticket still resolve."""
-    assert pp.output_name("agnostic", pp.ITEM_SWAP, "json") == pp.AGNOSTIC_FILE
-    assert pp.output_name("agnostic", pp.HONEST_INSTRUCTION, "json") == \
+    assert pp.output_name(pp.AGNOSTIC_STEM, pp.ITEM_SWAP, "json") == \
+        pp.AGNOSTIC_FILE
+    assert pp.output_name(pp.AGNOSTIC_STEM, pp.HONEST_INSTRUCTION, "json") == \
         "agnostic_honest_instruction.json"
-    assert pp.output_name("segments", pp.ITEM_SWAP, "json") == pp.SEGMENTS_FILE
+    assert pp.output_name(pp.SEGMENTS_STEM, pp.ITEM_SWAP, "json") == \
+        pp.SEGMENTS_FILE
+    assert pp.output_name(pp.SWEEP_STEM, pp.ITEM_SWAP, "json") == pp.SWEEP_FILE
+    assert pp.output_name(pp.SWEEP_BARS_STEM, pp.ITEM_SWAP, "png") == \
+        pp.SWEEP_BARS_PNG
+    assert pp.output_name(pp.SEGMENTS_HEATMAP_STEM, pp.ITEM_SWAP, "png") == \
+        pp.SEGMENTS_HEATMAP_PNG
 
 
 def test_only_the_cells_that_clear_the_threshold_are_selected_strongest_first():
@@ -313,3 +320,61 @@ def test_an_instance_with_no_segmentation_at_all_masks_nothing():
     mask, present = pp.position_mask({}, ["a"], ["clause"], 4)
 
     assert not mask.any() and not present.any()
+
+
+def test_the_honest_instruction_name_agrees_with_the_dla_analysis():
+    """Two analyses name the same counterfactual, and a head table is read
+    across both columns; the string may not drift between them."""
+    from component_analysis import dla
+
+    assert pp.HONEST_INSTRUCTION == dla.HONEST_INSTRUCTION
+
+
+def test_a_query_position_that_is_not_a_segment_of_the_task_is_refused_by_name():
+    """Ticket 03 refuses an unknown `--query-positions` name, and so must this.
+
+    With `--analyses path_patching` ticket 03's own validation never runs, and
+    an unknown Segment gives an all-false mask: every Q, MLP and Readout entry
+    would come back with a null mean, which reads as a path that carries
+    nothing rather than as a typo.
+    """
+    import argparse
+
+    ctx = type("C", (), {"cli": argparse.Namespace(
+        query_positions="pressure_clasue")})()
+
+    with pytest.raises(ValueError, match="pressure_clasue"):
+        pp.query_segment_names(ctx, ["pressure_clause", "readout"])
+
+
+def test_the_default_query_position_needs_no_flag_and_must_still_exist():
+    import argparse
+
+    ctx = type("C", (), {"cli": argparse.Namespace(query_positions=None)})()
+
+    assert pp.query_segment_names(ctx, ["readout"]) == ["readout"]
+    with pytest.raises(ValueError, match="readout"):
+        pp.query_segment_names(ctx, ["intro"])
+
+
+def test_a_segment_named_after_a_table_row_is_refused_rather_than_overwritten():
+    """`union` and `query_positions` are rows of the position-specific table
+    that are not Segments; a --segment override using either name would
+    silently overwrite one."""
+    pp.check_entry_names(["intro", "readout"])
+
+    with pytest.raises(ValueError, match="union"):
+        pp.check_entry_names(["intro", pp.UNION_ENTRY])
+    with pytest.raises(ValueError, match=pp.QUERY_ENTRY):
+        pp.check_entry_names([pp.QUERY_ENTRY])
+
+
+def test_the_threshold_default_is_spelled_once():
+    """The flag's default and both readers' fallbacks come from one constant,
+    so a changed default cannot disagree with itself."""
+    import analyze_components
+
+    parser = analyze_components.build_parser()
+    default = parser.get_default("path_position_threshold")
+
+    assert default == pp.DEFAULT_POSITION_THRESHOLD == 0.05

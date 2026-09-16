@@ -486,7 +486,7 @@ def test_the_honest_pass_writes_its_own_file_and_names_the_counterfactual(
 
     assert summaries is not None
     written = json.loads(open(os.path.join(str(tmp_path), pp.SUBDIR,
-                                           "agnostic_honest_instruction.json")).read())
+                                           pp.output_name(pp.AGNOSTIC_STEM, pp.HONEST_INSTRUCTION, "json"))).read())
     assert written["counterfactual"] == pp.HONEST_INSTRUCTION
     assert written["metric"]["counterfactual"] == pp.HONEST_INSTRUCTION
     assert "negative" in written["metric"]["sign"]
@@ -507,7 +507,7 @@ def test_the_honest_pass_reports_the_instances_that_have_no_counterpart(
                      pp.HONEST_INSTRUCTION)
 
     written = json.loads(open(os.path.join(str(tmp_path), pp.SUBDIR,
-                                           "agnostic_honest_instruction.json")).read())
+                                           pp.output_name(pp.AGNOSTIC_STEM, pp.HONEST_INSTRUCTION, "json"))).read())
     assert written["sample"]["n_instances"] == 1
     assert written["sample"]["without_a_counterpart"] == ["tiny0"]
 
@@ -522,7 +522,7 @@ def test_a_counterfactual_with_no_instance_at_all_writes_a_skipped_file(
 
     assert summaries is None
     written = json.loads(open(os.path.join(str(tmp_path), pp.SUBDIR,
-                                           "agnostic_honest_instruction.json")).read())
+                                           pp.output_name(pp.AGNOSTIC_STEM, pp.HONEST_INSTRUCTION, "json"))).read())
     assert pp.HONEST_INSTRUCTION in written["skipped"]
     assert written["without_a_counterpart"] == ["tiny0", "tiny1"]
 
@@ -551,7 +551,7 @@ def test_both_counterfactuals_give_the_head_table_one_column_set_each(
         "--output-dir", str(out)]) == 0
 
     swap = read_json(out, *CELL, pp.SUBDIR, pp.AGNOSTIC_FILE)
-    honest = read_json(out, *CELL, pp.SUBDIR, "agnostic_honest_instruction.json")
+    honest = read_json(out, *CELL, pp.SUBDIR, pp.output_name(pp.AGNOSTIC_STEM, pp.HONEST_INSTRUCTION, "json"))
     assert swap["counterfactual"] == pp.ITEM_SWAP
     assert pp.HONEST_INSTRUCTION in honest["skipped"]
 
@@ -650,7 +650,7 @@ def test_the_segment_pass_writes_the_selected_cells_and_the_union_check(
     assert written["n_selected"] == 13
     assert written["query_positions"] == ["readout"]
     assert os.path.getsize(os.path.join(str(out), *CELL, pp.SUBDIR,
-                                        "segments_heatmap.png")) > 0
+                                        pp.SEGMENTS_HEATMAP_PNG)) > 0
 
     by_kind = {}
     for cell in written["cells"]:
@@ -743,7 +743,7 @@ def test_the_sweep_ranks_every_component_of_the_model_and_marks_membership(
     assert [one["rank"] for one in written["senders"]] == list(range(1, 12))
     assert written["flagged"] == []          # nothing clears a threshold of 1e9
     assert os.path.getsize(os.path.join(str(out), *CELL, pp.SUBDIR,
-                                        "sweep_bars.png")) > 0
+                                        pp.SWEEP_BARS_PNG)) > 0
 
     table = read_json(out, *CELL, "head_table.json")
     assert len(table["rows"]) == 3, \

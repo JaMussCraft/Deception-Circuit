@@ -109,3 +109,21 @@ def test_dry_run_still_writes_nothing_with_every_extension_asked_for(
     assert written_files(out) == [os.path.join(*CELL, name)
                                   for name in INTAKE_FILES]
     assert not os.path.exists(os.path.join(str(out), *CELL, pp.SUBDIR))
+
+
+def test_dry_run_counts_the_re_capture_forwards_of_the_position_specific_pass(
+        sdr_run, registered, capsys):
+    """The estimate is what a researcher sizes a job by, so every forward a
+    pass makes has to be in it — including the two per batch that re-capture
+    the streams before any cell is patched."""
+    run_dir, out, _records = sdr_run
+
+    run_cli(str(run_dir), "--dry-run", "--num-kv-heads", "2", "--n-causal", "16",
+            "--output-dir", str(out))
+
+    line = next(one for one in capsys.readouterr().out.splitlines()
+                if one.strip().startswith(f"{pp.NAME}: "))
+    # 2 batches of 8: 4 forwards to re-capture, and a K or V cell costs
+    # 2 x (2 + 18 Segments) = 40 on top of that.
+    assert "4 forward(s) to re-capture the streams" in line
+    assert "40 per selected K or V cell (18 Segment(s)" in line

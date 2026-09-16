@@ -79,7 +79,19 @@ from component_analysis.head_table import row_key
 NAME = "path_patching"
 SUBDIR = "path_patching"
 
-#: The per-cell table, and the two figures with their JSON twins.
+#: The stem of every file this analysis writes. `output_name` turns a stem into
+#: a filename for one counterfactual, so production and tests name a file the
+#: same way and a renamed file cannot pass its own test.
+AGNOSTIC_STEM = "agnostic"
+SEGMENTS_STEM = "segments"
+SWEEP_STEM = "sweep"
+HEATMAP_STEM = "heatmap"
+DIRECT_EFFECT_STEM = "direct_effect"
+SEGMENTS_HEATMAP_STEM = "segments_heatmap"
+SWEEP_BARS_STEM = "sweep_bars"
+
+#: The item-swap spellings, which are ticket 08's and must not move: a head
+#: table or a figure written before ticket 09 still resolves by these names.
 AGNOSTIC_FILE = "agnostic.json"
 SEGMENTS_FILE = "segments.json"
 SWEEP_FILE = "sweep.json"
@@ -87,6 +99,10 @@ HEATMAP_PNG = "heatmap.png"
 HEATMAP_JSON = "heatmap.json"
 DIRECT_EFFECT_PNG = "direct_effect.png"
 DIRECT_EFFECT_JSON = "direct_effect.json"
+SEGMENTS_HEATMAP_PNG = "segments_heatmap.png"
+SEGMENTS_HEATMAP_JSON = "segments_heatmap.json"
+SWEEP_BARS_PNG = "sweep_bars.png"
+SWEEP_BARS_JSON = "sweep_bars.json"
 
 #: The two keys that are not Components: the start and the end of the residual
 #: stream. Spelled out here rather than imported, because `registry.py` requires
@@ -155,6 +171,14 @@ SWEEP_BAR_TOP = 40
 #: Receiver kinds whose position-specific pass is by Segment. The others take
 #: one patch at the query positions.
 SEGMENTED_KINDS = ("k", "v")
+
+#: How far from zero a cell's position-agnostic effect must be to earn the
+#: second, position-specific pass, and how strong a Component outside the
+#: circuit must be in the completeness sweep to be flagged. Five percent of the
+#: clean-minus-counterfactual gap, per the spec. Spelled once: `add_arguments`
+#: and both readers take it from here, so a changed default cannot disagree
+#: with itself.
+DEFAULT_POSITION_THRESHOLD = 0.05
 
 #: An instance whose clean-minus-corrupt gap is this small is not normalized by
 #: it: the Corruption did not move the answer, so every cell would be a ratio of
@@ -442,6 +466,31 @@ def counterfactual_pair(batch, counterfactual: str):
     return rows, pair.input_ids, pair.attention_mask
 
 
+def stream_batches(ctx, batches, *, senders, counterfactual: str,
+                   tally: "_Tally"):
+    """Every batch of the loader as a `Streams`, with the tally kept.
+
+    The three passes — position-agnostic, position-specific and the
+    completeness sweep — each walk the loader the same way: capture the two
+    streams, skip a batch that has no instance of this counterfactual, count
+    the two forwards, and record which instances the pass really covered. That
+    preamble is here once, so a pass that forgot to count a forward or to name
+    an unpaired instance cannot differ from the pass beside it.
+    """
+    for batch in batches:
+        streams = capture_streams(ctx.model, batch, senders=senders,
+                                  counterfactual=counterfactual)
+        if streams is None:
+            tally.unpaired.extend(batch.ids)
+            continue
+        tally.forwards += 2
+        tally.used_ids.extend(streams.ids)
+        covered = set(streams.ids)
+        tally.unpaired.extend(one for one in batch.ids if one not in covered)
+        yield streams
+        del streams
+
+
 def capture_streams(model, batch, *, senders,
                     counterfactual: str = ITEM_SWAP):
     """The two forwards every cell of one batch is measured against.
@@ -649,7 +698,8 @@ def strongest(cells: Sequence[dict], limit: int) -> List[dict]:
 # ==============================================================================
 
 def add_arguments(group) -> None:
-    group.add_argument("--path-position-threshold", type=float, default=0.05,
+    group.add_argument("--path-position-threshold", type=float,
+                       default=DEFAULT_POSITION_THRESHOLD,
                        help="A (sender, receiver) cell whose position-agnostic "
                             "normalized effect is at least this far from zero "
                             "gets a second, position-specific pass by Segment, "
@@ -721,32 +771,59 @@ def grid_for(ctx) -> Grid:
 
 
 def estimate(ctx) -> str:
+    """One line for `--dry-run`: every pass this configuration would run.
+
+    Each pass's re-capture of the two streams is counted, not only its patched
+    forwards, because that is what ticket 08 verified the estimate against.
+    """
     grid = grid_for(ctx)
     batches = ctx.causal_batches()
     n_batches, n_instances = len(batches), batches.n_instances
     budget = cost(grid, n_batches=n_batches,
                   batch_size=batches.report.get("batch_size") or 1)
+    per_forward = seconds_per_forward(budget["batch_size"])
     chosen = selected_counterfactuals(ctx)
     paired = batches.report.get("n_with_honest") or 0
+
+    segmentations = by_record_id(getattr(ctx, "segmentations", None))
+    names = segment_names_of(segmentations)
+    # The two names the position-specific table reserves are checked here as
+    # well as in the pass, so a --segment override that collides fails on the
+    # login node rather than an hour into a job.
+    check_entry_names(names)
+    if names:
+        query_segment_names(ctx, names)
+
+    def minutes(forwards):
+        return forwards * per_forward / 60
+
     lines = [f"{budget['senders']} sender(s) x {budget['receivers']} receiver(s) "
              f"= {budget['cells']} cell(s) after upstream ordering; "
              f"{n_instances} instance(s) in {n_batches} batch(es) of "
              f"{budget['batch_size']}; {budget['forwards']} forward(s) per "
              f"counterfactual, about {budget['minutes']:.0f} min at ticket 02b's "
-             f"A40 rate of {budget['seconds_per_forward']:.2f} s per forward"]
-    lines.append(f"counterfactual(s): {', '.join(chosen)}")
+             f"A40 rate of {per_forward:.2f} s per forward",
+             f"counterfactual(s): {', '.join(chosen)}"]
+
+    kv = n_batches * (2 + len(names))
+    other = n_batches * 2
+    lines.append(
+        f"position-specific pass: {other} forward(s) to re-capture the "
+        f"streams, then {kv} per selected K or V cell ({len(names)} Segment(s) "
+        f"plus the union check, about {minutes(kv):.1f} min) and {other} per "
+        f"selected Q, MLP or Readout cell (about {minutes(other):.1f} min); how "
+        f"many cells clear --path-position-threshold is not knowable until the "
+        f"position-agnostic pass has run")
+
     if getattr(ctx.cli, "path_completeness_sweep", False):
         shape = ctx.intake.geometry
         n_senders = shape["num_layers"] * (shape["num_heads"] + 1) + 1
         forwards = n_batches * (2 + n_senders)
-        per_forward = seconds_per_forward(budget["batch_size"])
         lines.append(f"completeness sweep: {n_senders} sender(s) into the "
                      f"Readout, {forwards} forward(s), about "
-                     f"{forwards * per_forward / 60:.0f} min, on "
+                     f"{minutes(forwards):.0f} min, on "
                      f"{sweep_counterfactual(ctx)} only")
-    lines.append(f"each cell that clears --path-position-threshold costs one "
-                 f"more forward per batch plus one per Segment (K and V "
-                 f"receivers) or one at the query positions (everything else)")
+
     if HONEST_INSTRUCTION in chosen:
         lines.append(f"{paired} of {n_instances} instance(s) have an "
                      f"Honest-Instruction counterpart, so that pass costs "
@@ -847,17 +924,9 @@ def agnostic_pass(ctx, grid: Grid, batches, counterfactual: str):
     tally = _Tally()
     started = time.perf_counter()
 
-    for batch in batches:
-        streams = capture_streams(ctx.model, batch, senders=grid.senders,
-                                  counterfactual=counterfactual)
-        if streams is None:
-            tally.unpaired.extend(batch.ids)
-            continue
-        tally.forwards += 2
+    for streams in stream_batches(ctx, batches, senders=grid.senders,
+                                  counterfactual=counterfactual, tally=tally):
         tally.gaps.extend(streams.gap.tolist())
-        tally.used_ids.extend(streams.ids)
-        tally.unpaired.extend(one for one in batch.ids
-                              if one not in set(streams.ids))
         tally.excluded.extend(one for one, usable in zip(streams.ids,
                                                          streams.usable.tolist())
                               if not usable)
@@ -876,11 +945,10 @@ def agnostic_pass(ctx, grid: Grid, batches, counterfactual: str):
                 values[Cell(sender, receiver)].extend(
                     normalized_effect(streams, patched).tolist())
             del captured
-        del streams
 
     tally.wall_seconds = time.perf_counter() - started
     if not tally.used_ids:
-        ctx.write_json(SUBDIR, output_name("agnostic", counterfactual, "json"),
+        ctx.write_json(SUBDIR, output_name(AGNOSTIC_STEM, counterfactual, "json"),
                        _skipped_payload(ctx, counterfactual, tally))
         return None, tally
 
@@ -890,7 +958,7 @@ def agnostic_pass(ctx, grid: Grid, batches, counterfactual: str):
                  for cell in grid.cells}
     payload = _payload(ctx, grid, summaries, budget=budget, tally=tally,
                        counterfactual=counterfactual)
-    ctx.write_json(SUBDIR, output_name("agnostic", counterfactual, "json"), payload)
+    ctx.write_json(SUBDIR, output_name(AGNOSTIC_STEM, counterfactual, "json"), payload)
     _figures(ctx, grid, summaries, payload, counterfactual)
     return summaries, tally
 
@@ -1026,27 +1094,21 @@ def completeness_sweep(ctx, grid: Grid, batches, counterfactual: str) -> dict:
     """
     senders = sweep_senders(ctx.model)
     in_circuit = {row_key(one) for one in ctx.components}
-    threshold = float(getattr(ctx.cli, "path_position_threshold", 0.05))
+    threshold = float(getattr(ctx.cli, "path_position_threshold",
+                             DEFAULT_POSITION_THRESHOLD))
 
     values: Dict[tuple, List[float]] = {key: [] for key in senders}
     tally = _Tally()
     started = time.perf_counter()
 
-    for batch in batches:
-        streams = capture_streams(ctx.model, batch, senders=senders,
-                                  counterfactual=counterfactual)
-        if streams is None:
-            tally.unpaired.extend(batch.ids)
-            continue
-        tally.forwards += 2
-        tally.used_ids.extend(streams.ids)
+    for streams in stream_batches(ctx, batches, senders=senders,
+                                  counterfactual=counterfactual, tally=tally):
         for sender in senders:
             values[sender].extend(
                 normalized_effect(streams,
                                   sweep_readout(ctx.model, streams,
                                                 sender)).tolist())
             tally.forwards += 1
-        del streams
 
     tally.wall_seconds = time.perf_counter() - started
     scored = [{"sender": label(key), "kind": key[0], "layer": key[1],
@@ -1088,7 +1150,7 @@ def completeness_sweep(ctx, grid: Grid, batches, counterfactual: str) -> dict:
                  "note": "one forward per sender per batch; the Readout "
                          "receiver needs no second pass"},
     }
-    ctx.write_json(SUBDIR, output_name("sweep", counterfactual, "json"), payload)
+    ctx.write_json(SUBDIR, output_name(SWEEP_STEM, counterfactual, "json"), payload)
     _sweep_figure(ctx, counterfactual, payload)
     return payload
 
@@ -1127,7 +1189,7 @@ def _sweep_figure(ctx, counterfactual: str, payload: dict) -> None:
     top = [one for one in payload["senders"]
            if one["mean"] is not None][:SWEEP_BAR_TOP]
 
-    ctx.write_json(SUBDIR, output_name("sweep_bars", counterfactual, "json"), {
+    ctx.write_json(SUBDIR, output_name(SWEEP_BARS_STEM, counterfactual, "json"), {
         "title": f"Completeness sweep: direct effect on the Readout "
                  f"({counterfactual})",
         "counterfactual": counterfactual,
@@ -1159,7 +1221,7 @@ def _sweep_figure(ctx, counterfactual: str, payload: dict) -> None:
                    f"{payload['threshold']:g}", fontsize=9)
     figure.tight_layout()
     figure.savefig(os.path.join(ctx.subdir(SUBDIR),
-                                output_name("sweep_bars", counterfactual, "png")),
+                                output_name(SWEEP_BARS_STEM, counterfactual, "png")),
                    dpi=200)
     plt.close(figure)
 
@@ -1168,18 +1230,46 @@ def _sweep_figure(ctx, counterfactual: str, payload: dict) -> None:
 # THE POSITION-SPECIFIC PASS, BY SEGMENT
 # ==============================================================================
 
-def query_segment_names(ctx) -> List[str]:
+def query_segment_names(ctx, available: Sequence[str]) -> List[str]:
     """The Segments a Q, MLP or Readout receiver takes its patch at.
 
-    Ticket 03 owns `--query-positions` and validates the names against the
-    task; this reads the same flag so the two passes are anchored at the same
-    tokens, and falls back to the Readout when the flag is not registered (a
-    test that registers this analysis alone).
+    Ticket 03 owns `--query-positions`; this reads the same flag so the two
+    passes are anchored at the same tokens, and refuses an unknown name the
+    same way ticket 03 does. That refusal is the point: a Segment that does not
+    exist gives an all-false mask, which patches nothing and comes back as a
+    null mean on every row — indistinguishable from a path that carries
+    nothing. And with `--analyses path_patching` alone, ticket 03's own
+    validation never runs, so this is the only thing standing between a typo
+    and a table of nulls.
     """
     value = getattr(ctx.cli, "query_positions", None)
-    if not value:
-        return [DEFAULT_QUERY_POSITION]
-    return [one.strip() for one in value.split(",") if one.strip()]
+    wanted = ([one.strip() for one in value.split(",") if one.strip()]
+              if value else [DEFAULT_QUERY_POSITION])
+    if not wanted:
+        raise ValueError("--query-positions was given no Segment name")
+    unknown = [one for one in wanted if one not in available]
+    if unknown:
+        raise ValueError(
+            f"--query-positions names {', '.join(unknown)}, which "
+            f"{'is' if len(unknown) == 1 else 'are'} not a Segment of this "
+            f"task. Its Segments are: {', '.join(available)}")
+    return wanted
+
+
+def check_entry_names(names: Sequence[str]) -> None:
+    """No Segment may be called `union` or `query_positions`.
+
+    Those two are rows of the position-specific table that are not Segments —
+    the partition check and the single entry a Q, MLP or Readout receiver
+    takes — and a task whose segmentation used either name would overwrite one
+    of them silently. A `--segment` override is the likely way in.
+    """
+    clash = [one for one in names if one in (UNION_ENTRY, QUERY_ENTRY)]
+    if clash:
+        raise ValueError(
+            f"Segment name(s) {', '.join(clash)} collide with the "
+            f"position-specific table's own row names ({UNION_ENTRY}, "
+            f"{QUERY_ENTRY}); rename the Segment or the --segment override")
 
 
 def selected_cells(summaries: Dict[Cell, dict], threshold: float) -> List[Cell]:
@@ -1240,7 +1330,7 @@ def segment_entries(ctx, receiver: tuple, streams: Streams, segmentations: dict,
     """
     ids = list(streams.ids)
     if receiver[0] not in SEGMENTED_KINDS:
-        query = query_segment_names(ctx)
+        query = query_segment_names(ctx, names)
         mask, present = position_mask(segmentations, ids, query, n_positions)
         return [(QUERY_ENTRY, mask, present)]
 
@@ -1288,10 +1378,15 @@ def segment_pass(ctx, grid: Grid, batches, counterfactual: str,
     """
     import torch
 
-    threshold = float(getattr(ctx.cli, "path_position_threshold", 0.05))
+    threshold = float(getattr(ctx.cli, "path_position_threshold",
+                             DEFAULT_POSITION_THRESHOLD))
     chosen = selected_cells(summaries, threshold)
     segmentations = by_record_id(getattr(ctx, "segmentations", None))
     names = segment_names_of(segmentations)
+    check_entry_names(names)
+    # Validated before the loop, not inside it: a typo must fail on the first
+    # batch of a GPU job, not after the grid has been patched.
+    query_segment_names(ctx, names)
 
     rows: Dict[Cell, Dict[str, List[float]]] = {
         cell: {} for cell in chosen}
@@ -1301,13 +1396,9 @@ def segment_pass(ctx, grid: Grid, batches, counterfactual: str,
     missing_segmentation: List[str] = []
 
     if chosen:
-        for batch in batches:
-            streams = capture_streams(ctx.model, batch, senders=grid.senders,
-                                      counterfactual=counterfactual)
-            if streams is None:
-                continue
-            tally.forwards += 2
-            tally.used_ids.extend(streams.ids)
+        for streams in stream_batches(ctx, batches, senders=grid.senders,
+                                      counterfactual=counterfactual,
+                                      tally=tally):
             missing_segmentation.extend(one for one in streams.ids
                                         if one not in segmentations)
             n_positions = streams.input_ids.shape[1]
@@ -1326,14 +1417,13 @@ def segment_pass(ctx, grid: Grid, batches, counterfactual: str,
                     rows[cell].setdefault(name, []).extend(values.tolist())
                     absent[cell][name] = absent[cell].get(name, 0) + int(
                         (~present).sum())
-            del streams
 
     tally.wall_seconds = time.perf_counter() - started
     payload = _segment_payload(ctx, counterfactual, chosen, rows, absent,
                                summaries, threshold=threshold, tally=tally,
                                names=names,
                                missing_segmentation=missing_segmentation)
-    ctx.write_json(SUBDIR, output_name("segments", counterfactual, "json"), payload)
+    ctx.write_json(SUBDIR, output_name(SEGMENTS_STEM, counterfactual, "json"), payload)
     _segment_figure(ctx, counterfactual, payload)
     return payload
 
@@ -1383,7 +1473,7 @@ def _segment_payload(ctx, counterfactual, chosen, rows, absent, summaries, *,
         "selection": f"cells whose position-agnostic |mean| is at least "
                      f"{threshold}",
         "n_selected": len(chosen),
-        "query_positions": query_segment_names(ctx),
+        "query_positions": query_segment_names(ctx, names),
         "position_rule": (
             "K and V receivers take the patch at each Segment's key positions; "
             "Q, MLP and Readout receivers take it at the query positions"),
@@ -1510,7 +1600,7 @@ def _figures(ctx, grid: Grid, summaries: Dict[Cell, dict], payload: dict,
     # needs a scale with a width; fall back to the largest effect, then to one.
     extent = extent or (float(finite.max()) if finite.size else 0.0) or 1.0
 
-    ctx.write_json(SUBDIR, output_name("heatmap", counterfactual, "json"), {
+    ctx.write_json(SUBDIR, output_name(HEATMAP_STEM, counterfactual, "json"), {
         "title": f"Position-agnostic path patching, normalized effect "
                  f"({counterfactual})",
         "counterfactual": counterfactual,
@@ -1551,12 +1641,12 @@ def _figures(ctx, grid: Grid, summaries: Dict[Cell, dict], payload: dict,
     figure.colorbar(image, ax=axes, fraction=0.03, pad=0.02, extend="both")
     figure.tight_layout()
     figure.savefig(os.path.join(ctx.subdir(SUBDIR),
-                                output_name("heatmap", counterfactual, "png")),
+                                output_name(HEATMAP_STEM, counterfactual, "png")),
                    dpi=200)
     plt.close(figure)
 
     direct = payload["direct_effect_on_readout"]
-    ctx.write_json(SUBDIR, output_name("direct_effect", counterfactual, "json"), {
+    ctx.write_json(SUBDIR, output_name(DIRECT_EFFECT_STEM, counterfactual, "json"), {
         "title": f"Direct effect on the Readout, by sender ({counterfactual})",
         "counterfactual": counterfactual,
         "receiver": label(READOUT_KEY), "senders": direct,
@@ -1577,7 +1667,7 @@ def _figures(ctx, grid: Grid, summaries: Dict[Cell, dict], payload: dict,
                    fontsize=9)
     figure.tight_layout()
     figure.savefig(os.path.join(ctx.subdir(SUBDIR),
-                                output_name("direct_effect", counterfactual, "png")),
+                                output_name(DIRECT_EFFECT_STEM, counterfactual, "png")),
                    dpi=200)
     plt.close(figure)
 
@@ -1602,7 +1692,7 @@ def _segment_figure(ctx, counterfactual: str, payload: dict) -> None:
               for one in cells]
     rows = [one["cell"] for one in cells]
 
-    ctx.write_json(SUBDIR, output_name("segments_heatmap", counterfactual, "json"), {
+    ctx.write_json(SUBDIR, output_name(SEGMENTS_HEATMAP_STEM, counterfactual, "json"), {
         "title": f"Position-specific path patching by Segment ({counterfactual})",
         "counterfactual": counterfactual,
         "rows": rows, "columns": columns, "values": values,
@@ -1643,7 +1733,7 @@ def _segment_figure(ctx, counterfactual: str, payload: dict) -> None:
     figure.colorbar(image, ax=axes, fraction=0.03, pad=0.02)
     figure.tight_layout()
     figure.savefig(os.path.join(ctx.subdir(SUBDIR),
-                                output_name("segments_heatmap", counterfactual, "png")),
+                                output_name(SEGMENTS_HEATMAP_STEM, counterfactual, "png")),
                    dpi=200)
     plt.close(figure)
 
