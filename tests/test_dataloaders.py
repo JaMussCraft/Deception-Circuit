@@ -242,3 +242,26 @@ def test_the_descriptive_loader_covers_the_whole_split(sdr_split):
     seen = [i for batch in batches for i in batch.ids]
     assert seen == sampling.record_ids(records)
     assert batches.report["n_with_honest"] == 0
+
+
+# ==============================================================================
+# WHAT THESE LOADERS DO NOT COVER
+# ==============================================================================
+
+def test_std_is_refused_by_name_rather_than_yielding_an_empty_loader(sdr_split):
+    """STD segments and samples, but neither counterfactual pair is its own.
+
+    Its Corruption swaps the Designating Stipulation, not an item, and
+    "accurate" / "inaccurate" are several tokens each, so the mechanism dataset
+    class drops every instance. Before this check the STD dry run reported "100
+    id(s) dropped because an answer word is not a single token", which is true
+    and points at the data rather than at the loader.
+    """
+    dataset_dir, _pools, _records, tokenizer, _survivors = sdr_split
+
+    assert dataloaders.uncovered_reason("sdr") is None
+    assert "mechanism tasks" in dataloaders.uncovered_reason("std")
+
+    with pytest.raises(ValueError, match="not one of the mechanism tasks"):
+        dataloaders.causal_batches(str(dataset_dir), tokenizer, ids=[],
+                                   task="std")

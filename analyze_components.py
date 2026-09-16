@@ -344,8 +344,12 @@ def dry_run(cli, resolved, *, tokenizer=None) -> int:
 
             ctx = analysis_context(cli, resolved, circuit_spec, task_spec,
                                    components, cell, task_instances)
-            for line in dataloaders.summarize(ctx.causal_batches()):
-                print(f"    causal loader: {line}")
+            uncovered = dataloaders.uncovered_reason(task_spec.name)
+            if uncovered:
+                print(f"    causal loader: none — {uncovered}")
+            else:
+                for line in dataloaders.summarize(ctx.causal_batches()):
+                    print(f"    causal loader: {line}")
             print_estimates(ctx, selected)
 
     if resolved_instances:

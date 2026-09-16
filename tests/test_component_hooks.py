@@ -152,6 +152,48 @@ def test_a_replacement_can_be_confined_to_chosen_positions(model, streams):
     assert not torch.allclose(confined, everywhere, atol=1e-4)
 
 
+def test_a_per_instance_position_mask_writes_only_on_the_rows_it_names(model,
+                                                                       streams):
+    """A Segment is a per-instance span, so the mask has to be per row.
+
+    Ticket 08's position-specific pass patches K and V receivers at the key
+    positions of one Segment, which differ instance by instance.
+    """
+    clean, corrupt, mask = streams
+    victim = ("head", 0, 2)
+
+    corrupt_run = hooks.capture_forward(model, corrupt, mask, components=[victim])
+    per_row = torch.zeros(BATCH, SEQ, dtype=torch.bool)
+    per_row[0, 4] = True                      # row 0 only, one position only
+    confined = hooks.replace_forward(
+        model, clean, mask,
+        replacements={victim: hooks.Replacement(corrupt_run.outputs[victim],
+                                                positions=per_row)})
+    untouched = hooks.replace_forward(model, clean, mask, replacements={})
+
+    assert not torch.allclose(confined[0], untouched[0], atol=1e-4)
+    assert torch.allclose(confined[1], untouched[1], atol=1e-6)
+
+
+def test_replacing_an_mlp_block_moves_the_logits_on_its_own(model, streams):
+    clean, corrupt, mask = streams
+    victim = ("mlp", 0, 0)
+
+    corrupt_run = hooks.capture_forward(model, corrupt, mask, components=[victim])
+    clean_run = hooks.capture_forward(model, clean, mask, components=[victim])
+    replaced = hooks.replace_forward(model, clean, mask,
+                                     replacements={victim: corrupt_run.outputs[victim]})
+
+    assert tuple(clean_run.outputs[victim].shape) == (BATCH, SEQ, TINY["hidden"])
+    assert not torch.allclose(replaced, clean_run.logits, atol=1e-4)
+    # Replacing it with its own clean capture is a no-op, which is what says
+    # the write lands on the MLP output rather than somewhere near it.
+    assert torch.allclose(
+        hooks.replace_forward(model, clean, mask,
+                              replacements={victim: clean_run.outputs[victim]}),
+        clean_run.logits, atol=1e-6)
+
+
 def test_the_readout_defaults_to_the_last_unpadded_position(model, streams):
     clean, _corrupt, mask = streams
 

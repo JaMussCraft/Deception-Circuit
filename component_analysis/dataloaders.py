@@ -43,6 +43,15 @@ import torch
 
 from component_analysis import sampling
 
+#: The tasks these loaders cover. Both pairs they build are properties of the
+#: mechanism tasks: the item-swap Corruption edits the Designation Site, and the
+#: Matched Honest Instruction replaces a Pressure Clause. STD is segmentable and
+#: samples fine, but its Corruption swaps the Designating Stipulation rather
+#: than an item, and its answer words ("accurate" / "inaccurate") are several
+#: tokens each, which `DeceptionDatasetLlama` drops on sight — all 1000 of them.
+#: A causal loader for STD is its own piece of work, not a silent empty batch.
+MECHANISM_TASKS = ("far", "sdr", "ser")
+
 #: Instances per forward. Sized for a 128-token prompt on a 40 GB card under
 #: bfloat16; the analyses that need eager attention pay a
 #: [batch, heads, seq, seq] buffer per layer and pass a smaller one.
@@ -115,6 +124,17 @@ class Batches:
 # ==============================================================================
 # BUILDING
 # ==============================================================================
+
+def uncovered_reason(task: Optional[str]) -> Optional[str]:
+    """Why these loaders do not cover `task`, or None when they do."""
+    if task in MECHANISM_TASKS:
+        return None
+    return (f"task {task!r} is not one of the mechanism tasks "
+            f"({', '.join(MECHANISM_TASKS)}), whose item-swap Corruption and "
+            f"Pressure Clause these loaders pair on. Its answer words are not "
+            f"single tokens either, so the mechanism dataset class would drop "
+            f"every instance and hand back an empty loader")
+
 
 def _encode(tokenizer, prompt: str, max_length: int):
     encoded = tokenizer(prompt, padding="max_length", max_length=max_length,
@@ -194,6 +214,9 @@ def _batches(dataset_dir: str, tokenizer, *, ids: Optional[Sequence[str]],
 
     config = dc.load_dataset_config(dataset_dir)
     task = task or config.get("task")
+    reason = uncovered_reason(task)
+    if reason:
+        raise ValueError(reason)
     if max_length is None:
         max_length = int(config.get("max_seq_length", dc.MAX_SEQ_LENGTH))
 

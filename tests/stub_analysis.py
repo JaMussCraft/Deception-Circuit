@@ -139,9 +139,9 @@ def measure(ctx) -> dict:
         worst_replace = max(
             worst_replace,
             float((replaced.float() - corrupt.logits.float()).abs().max()))
-        # The control the replace-all error is read against: how far apart the
+        # The scale the replace-all error is read against: how far apart the
         # two streams' Readout logits are in the first place. In bfloat16 the
-        # replacement cannot be bit-exact, so "small" only means anything
+        # replacement need not be bit-exact, so "small" only means anything
         # beside the difference it is supposed to have reproduced.
         widest_stream = max(
             widest_stream,

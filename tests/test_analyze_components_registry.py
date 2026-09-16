@@ -182,3 +182,32 @@ def test_the_stub_check_file_is_json_the_agent_can_read(sdr_run, registered):
     with open(path) as handle:
         assert set(json.load(handle)) == {"circuit", "task", "n_components",
                                           "measurements"}
+
+
+def test_an_analysis_can_read_the_whole_split_through_the_descriptive_loader(
+        sdr_run, monkeypatch):
+    """Tickets 03 and 04 are descriptive: the split, not the causal sample."""
+    seen = {}
+
+    def run(ctx):
+        batches = ctx.descriptive_batches()
+        seen["n_instances"] = batches.n_instances
+        seen["memoized"] = ctx.descriptive_batches() is batches
+        seen["honest"] = batches.report["n_with_honest"]
+        return {}
+
+    descriptive = type(stub_analysis)("descriptive")
+    descriptive.NAME, descriptive.SUBDIR = "descriptive", "descriptive"
+    descriptive.add_arguments = lambda group: None
+    descriptive.estimate = lambda ctx: "the whole split"
+    descriptive.run = run
+    monkeypatch.setattr(registry, "ANALYSES", [descriptive])
+    monkeypatch.setattr(analyze_components, "load_model", lambda cli, resolved: None)
+    run_dir, out, records = sdr_run
+
+    assert run_cli(str(run_dir), "--num-kv-heads", "2",
+                   "--output-dir", str(out)) == 0
+
+    assert seen["n_instances"] == len(records)
+    assert seen["memoized"], "two analyses in a cell must share one load"
+    assert seen["honest"] == 0, "the descriptive loader builds no honest pair"
