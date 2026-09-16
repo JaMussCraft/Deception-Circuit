@@ -39,10 +39,26 @@ figure's numbers:
     query_positions        the Segment names queried, in order
     column_query_position  the one the head-table columns were read at
     segments               every Segment name, in CONTEXT.md's order
-    components             [{key, kind, layer, index, kv_group}], circuit heads
-    conditions             [{name, kind, paired, dataset, n_instances, batches,
-                             levels: [{level, n, n_absent, masses}],
-                             checks: {...}, notes: [...]}]
+    sum_tolerance          how far a row may be from one before `sums_to_one`
+                           goes false
+    components             [{key, name, label, layer, index, kv_group}], the
+                           circuit's attention heads in head-table order
+    conditions             one entry per condition that ran:
+                             name, kind, paired, descriptive, dataset
+                             n_instances   what it was profiled over
+                             n_loaded      what the loader held (they differ
+                                           for the paired condition, where
+                                           most of the sample has no
+                                           counterpart)
+                             batches
+                             levels        [{level, n, n_by_query_position,
+                                             n_absent_by_query_position,
+                                             masses}]
+                             checks        {max_abs_sum_minus_one, max_outside,
+                                            n_batches, n_nan, sums_to_one}
+                             notes         [str]
+                             alignment     paired condition only: the token
+                                           diff against the pressure prompts
     skipped                [{condition, reason}] — a condition that could not
                            run says so rather than going missing
 
