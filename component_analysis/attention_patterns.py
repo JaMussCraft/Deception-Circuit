@@ -8,8 +8,9 @@ polarity, both or neither. A head that reads the Designation Positions is doing
 something different from one that reads the quoted option it is about to copy,
 and this is the view that tells them apart.
 
-Three conditions, and the difference between them is the whole point of reading
-the table (CONTEXT.md; spec user story 27):
+Three conditions, chosen with `--attention-conditions`, and the difference
+between them is the whole point of reading the table (CONTEXT.md; spec user
+story 27):
 
     pressure             the task's own test split, under the Pressure Clause.
                          Descriptive, over every instance.
@@ -24,6 +25,12 @@ the table (CONTEXT.md; spec user story 27):
                          difference here is a difference between populations
                          and must never be read as a causal one, which is why
                          every column and every figure panel carries the label.
+
+A fourth condition, `pressure_paired`, is derived rather than selectable: it is
+the Pressure Clause on exactly the instances that have an Honest-Instruction
+Counterfactual. It exists because `pressure` is the whole split, so the paired
+honest column has nothing over the same instance ids to be read against without
+it, and "paired" means the same instance ids on both sides.
 
 Eager attention is on only inside `hooks.attention_weights`, which restores
 SDPA in a `finally` (ADR-0001). This is the one analysis that pays the
@@ -73,15 +80,19 @@ cell's head table, and by layer when it does not.
 Head-table columns, namespaced `attention_patterns.` by the CLI:
 
     query_position                          which query Segment the columns read
-    pressure_top_segment / _top_mass        under the Pressure Clause
+    pressure_top_segment / _top_mass        under the Pressure Clause, whole split
+    pressure_paired_top_segment / _top_mass the paired subset's left term
+    honest_instruction_top_segment /
+        _top_mass                           paired: the same instance ids, under
+                                            the Matched Honest Instruction
     honest_twin_descriptive_top_segment /
         _top_mass                           the unpaired twin, labelled in the
                                             column name so a CSV reader cannot
                                             mistake it for a paired contrast
 
-The paired honest-instruction condition is computed and written into
-`patterns.json`, but its head-table column belongs to ticket 06, which owns the
-paired columns across the descriptive analyses.
+Every condition gets its columns whether or not it ran; a condition with no
+data leaves them empty rather than absent, so head tables from different cells
+still line up.
 """
 
 from __future__ import annotations
@@ -107,6 +118,24 @@ SCHEMA_VERSION = 1
 #: The default query position. The Readout is where the answer is produced, so
 #: it is what a head reads "at the moment it matters" (spec user story 7).
 DEFAULT_QUERY_POSITION = "readout"
+
+#: The conditions `--attention-conditions` selects, in the order they are
+#: measured and plotted. Named here rather than spelled at each use so that the
+#: flag, the payload and the columns cannot drift apart.
+PRESSURE = "pressure"
+HONEST_INSTRUCTION = "honest_instruction"
+HONEST_TWIN = "honest_twin"
+CONDITIONS = (PRESSURE, HONEST_INSTRUCTION, HONEST_TWIN)
+
+#: The paired condition's own left term: the *pressure* prompts of exactly the
+#: instances that have an Honest-Instruction Counterfactual. Derived rather
+#: than selectable, for the reason `dla.PRESSURE_PAIRED` is: "paired" means the
+#: same instance ids on both sides, and `pressure` is profiled over the whole
+#: test split. Comparing the paired honest column against the full-split
+#: pressure column is a population contrast wearing a causal contrast's name,
+#: which is what spec user story 27 exists to prevent, so the left term is
+#: measured on its own rows and reported beside its right term.
+PRESSURE_PAIRED = "pressure_paired"
 
 #: `--split NAME` to the record fields whose levels the profiles are split by.
 SPLITS: Dict[str, Tuple[str, ...]] = {
@@ -140,7 +169,35 @@ SUM_TOLERANCE = 2e-2
 # READING THE FLAGS
 # ==============================================================================
 
+def wanted_conditions(cli) -> List[str]:
+    """`--attention-conditions`, validated by name.
+
+    The same semantics as `dla.wanted_conditions`, and deliberately the same
+    shape: the two descriptive analyses are read side by side in one head
+    table, and a flag that means one thing under `--dla-conditions` and
+    another under `--attention-conditions` would be a trap.
+    """
+    raw = getattr(cli, "attention_conditions", None) or ",".join(CONDITIONS)
+    wanted = [one.strip() for one in raw.split(",") if one.strip()]
+    unknown = [one for one in wanted if one not in CONDITIONS]
+    if unknown:
+        raise ValueError(
+            f"--attention-conditions names {', '.join(unknown)}, which "
+            f"{'is' if len(unknown) == 1 else 'are'} not an attention "
+            f"condition. Choose from {', '.join(CONDITIONS)}.")
+    return [one for one in CONDITIONS if one in wanted]
+
+
 def add_arguments(group) -> None:
+    group.add_argument("--attention-conditions", default=",".join(CONDITIONS),
+                       metavar="NAME[,NAME]",
+                       help="Which conditions to profile: "
+                            f"{', '.join(CONDITIONS)}. "
+                            f"{HONEST_INSTRUCTION} is the paired "
+                            "Honest-Instruction Counterfactual and brings its "
+                            f"own left term, {PRESSURE_PAIRED}, with it. A "
+                            "condition whose data this cell does not have is "
+                            "reported under 'skipped' and left out.")
     group.add_argument("--query-positions", default=None,
                        metavar="SEGMENT[,SEGMENT]",
                        help="Which Segments to read attention from, by name "
@@ -497,6 +554,39 @@ def pressure_slices(batches, segmentations, missing: List[str]):
                     [known[batch.ids[row]] for row in rows])
 
 
+def paired_rows(batch, known: dict) -> List[int]:
+    """The rows of `batch` that have an Honest-Instruction Counterfactual *and*
+    a resolved segmentation — the batch's share of the paired instance ids.
+
+    Both paired conditions select their rows through this one function, so the
+    left and the right term of the pair cannot drift onto different instances.
+    That they do not is the whole meaning of "paired"; a helper is cheaper than
+    a comment asking two loops to stay in step.
+    """
+    if batch.honest is None:
+        return []
+    return [row for row in batch.honest.rows if batch.ids[row] in known]
+
+
+def pressure_paired_slices(batches, segmentations):
+    """The *pressure* prompts of the instances that have an honest counterpart.
+
+    The left term of the paired contrast. It exists for the reason
+    `dla.PRESSURE_PAIRED` does: the `pressure` condition is profiled over the
+    whole test split, so subtracting the paired honest profile from it would be
+    a difference between two populations. This is the same instances, under the
+    Pressure Clause, and it is what the paired honest column is read against.
+    """
+    known = by_record_id(segmentations)
+    for batch in batches:
+        rows = paired_rows(batch, known)
+        if not rows:
+            continue
+        yield Slice(batch.input_ids[rows], batch.attention_mask[rows],
+                    [batch.records[row] for row in rows],
+                    [known[batch.ids[row]] for row in rows])
+
+
 def honest_instruction_slices(batches, segmentations, report: dict):
     """The paired Honest-Instruction Counterfactual of the sampled instances.
 
@@ -509,9 +599,7 @@ def honest_instruction_slices(batches, segmentations, report: dict):
     """
     known = by_record_id(segmentations)
     for batch in batches:
-        if batch.honest is None:
-            continue
-        rows = [row for row in batch.honest.rows if batch.ids[row] in known]
+        rows = paired_rows(batch, known)
         if not rows:
             continue
         keep = [batch.honest.rows.index(row) for row in rows]
@@ -833,15 +921,33 @@ def write_top_heads(ctx, payload: dict) -> Optional[str]:
 # HEAD-TABLE COLUMNS
 # ==============================================================================
 
+#: Each condition's head-table column prefix, in column order.
+#:
+#: The honest-twin columns carry `descriptive` in their own names, and the
+#: paired pair does not, which is block C's binding rule: a column read over
+#: the unpaired twin dataset is marked in its own name and a paired one is
+#: bare, so a reader who sees only a CSV header cannot mistake an unpaired
+#: population contrast for a causal one. `pressure_paired` is here so that the
+#: paired honest column has a left term over the same instance ids;
+#: `pressure` is the whole split and is not one.
+COLUMN_PREFIXES = {
+    PRESSURE: "pressure",
+    PRESSURE_PAIRED: "pressure_paired",
+    HONEST_INSTRUCTION: "honest_instruction",
+    HONEST_TWIN: "honest_twin_descriptive",
+}
+
+
 def columns(payload: dict) -> dict:
     """`{component key: {column: value}}` — the top Segment per head.
 
-    The honest-twin columns carry `descriptive` in their own names: the CSV is
-    read column by column, and a reader who sees only the header must not be
-    able to mistake an unpaired population contrast for a paired one.
+    Every condition gets its columns whether or not it ran: a condition with no
+    data leaves them empty rather than absent, because a head table whose
+    columns differ from cell to cell cannot be concatenated and an absent
+    column reads exactly like a head that attends nowhere.
     """
     query = payload["column_query_position"]
-    wanted = {"pressure": "pressure", "honest_twin": "honest_twin_descriptive"}
+    wanted = COLUMN_PREFIXES
     by_condition = {condition["name"]: condition
                     for condition in payload["conditions"]}
 
@@ -915,11 +1021,13 @@ def estimate(ctx) -> str:
         return ("no attention head in this circuit, so nothing to profile "
                 f"({len(ctx.components)} Component(s), MLP blocks only)")
 
+    wanted = wanted_conditions(ctx.cli)
     batch_size = getattr(ctx.cli, "batch_size", dataloaders.DEFAULT_BATCH_SIZE)
     layers = len(heads_by_layer)
     parts = [f"{len(heads)} head(s) over {layers} layer(s), "
              f"{len(query)} query position(s) ({', '.join(query)}), "
-             f"{len(names)} Segment(s), split by {split}"]
+             f"{len(names)} Segment(s), split by {split}",
+             f"conditions {', '.join(wanted)}"]
     total = 0.0
 
     def line(label, n_batches, n_instances):
@@ -929,17 +1037,22 @@ def estimate(ctx) -> str:
         return (f"{label} {n_instances} instance(s) in {n_batches} batch(es), "
                 f"{forwards} eager forward(s) ~{_duration(seconds)}")
 
-    pressure = ctx.descriptive_batches()
-    parts.append(line("pressure:", len(pressure), pressure.n_instances))
+    if PRESSURE in wanted:
+        pressure = ctx.descriptive_batches()
+        parts.append(line("pressure:", len(pressure), pressure.n_instances))
 
-    causal, reason = paired_batches(ctx)
+    causal, reason = (None, "not in --attention-conditions") \
+        if HONEST_INSTRUCTION not in wanted else paired_batches(ctx)
     if reason:
         parts.append(f"honest-instruction (paired): none — {reason}")
     else:
-        parts.append(line("honest-instruction (paired):", len(causal),
-                          causal.report["n_with_honest"]))
+        # Both sides of the pair are profiled, so the paired condition costs
+        # two passes over its rows rather than one.
+        parts.append(line("honest-instruction (paired), both sides:",
+                          2 * len(causal), causal.report["n_with_honest"]))
 
-    directory, reason = honest_twin_dir(ctx)
+    directory, reason = (None, "not in --attention-conditions") \
+        if HONEST_TWIN not in wanted else honest_twin_dir(ctx)
     if reason:
         parts.append(f"honest twin (descriptive): none — {reason}")
     else:
@@ -1001,36 +1114,60 @@ def run(ctx) -> dict:
     shared = {"head_keys": [one.key for one in heads], "names": names,
               "query_names": query, "split": split,
               "heads_by_layer": heads_by_layer}
+    wanted = wanted_conditions(ctx.cli)
 
     # --- pressure, over the whole test split --------------------------------
-    missing: List[str] = []
-    batches = ctx.descriptive_batches()
-    profiles, checks = collect_condition(
-        ctx, pressure_slices(batches, ctx.segmentations, missing), **shared)
-    notes = []
-    if missing:
-        notes.append(f"{len(missing)} instance(s) of the loader's split have no "
-                     f"resolved segmentation and were not profiled: "
-                     f"{', '.join(missing[:3])}")
-    payload["conditions"].append(_condition_json(
-        "pressure", "pressure", False, batches, profiles, checks, notes))
+    if PRESSURE not in wanted:
+        payload["skipped"].append(
+            {"condition": PRESSURE,
+             "reason": f"{PRESSURE} is not in --attention-conditions"})
+    else:
+        missing: List[str] = []
+        batches = ctx.descriptive_batches()
+        profiles, checks = collect_condition(
+            ctx, pressure_slices(batches, ctx.segmentations, missing), **shared)
+        notes = []
+        if missing:
+            notes.append(f"{len(missing)} instance(s) of the loader's split "
+                         f"have no resolved segmentation and were not "
+                         f"profiled: {', '.join(missing[:3])}")
+        payload["conditions"].append(_condition_json(
+            PRESSURE, "pressure", False, batches, profiles, checks, notes))
 
     # --- the paired Honest-Instruction Counterfactual ------------------------
-    causal, reason = paired_batches(ctx)
+    causal, reason = (None, f"{HONEST_INSTRUCTION} is not in "
+                            f"--attention-conditions") \
+        if HONEST_INSTRUCTION not in wanted else paired_batches(ctx)
     if reason:
-        payload["skipped"].append({"condition": "honest_instruction",
+        payload["skipped"].append({"condition": HONEST_INSTRUCTION,
                                    "reason": reason})
     else:
+        n_paired = causal.report["n_with_honest"]
+
+        # The left term first, over exactly the rows the honest side will read.
+        left, left_checks = collect_condition(
+            ctx, pressure_paired_slices(causal, ctx.segmentations), **shared)
+        payload["conditions"].append(_condition_json(
+            PRESSURE_PAIRED, "pressure (paired subset)", True, causal, left,
+            left_checks,
+            [f"the Pressure Clause on the {n_paired} instance(s) that have a "
+             f"Matched Honest Instruction — the left term of the paired "
+             f"contrast, and the column the {HONEST_INSTRUCTION} column is to "
+             f"be read against",
+             f"NOT the same as {PRESSURE}, which is the whole test split: the "
+             f"paired instances are the survivors of the Matched Honest "
+             f"filter and not a random subset of it"],
+            n_instances=n_paired))
+
         report = {"n_pairs": 0, "n_identical_to_pressure": 0,
                   "n_differing_outside_the_clause": 0,
                   "examples_outside_the_clause": []}
         profiles, checks = collect_condition(
             ctx, honest_instruction_slices(causal, ctx.segmentations, report),
             **shared)
-        notes = [f"paired with the pressure condition, instance by instance; "
-                 f"{causal.report['n_with_honest']} of "
-                 f"{causal.report['n_instances']} sampled instances have a "
-                 f"Matched Honest Instruction",
+        notes = [f"paired with the {PRESSURE_PAIRED} condition, instance by "
+                 f"instance; {n_paired} of {causal.report['n_instances']} "
+                 f"sampled instances have a Matched Honest Instruction",
                  "the honest prompt reuses its pressure prompt's Segments, "
                  "which the token-level diff below re-checks per instance"]
         if report["n_differing_outside_the_clause"]:
@@ -1039,14 +1176,15 @@ def run(ctx) -> dict:
                 f"outside the Pressure Clause, so their Segments are not the "
                 f"pressure prompt's: {', '.join(report['examples_outside_the_clause'])}")
         payload["conditions"].append(_condition_json(
-            "honest_instruction", "honest instruction", True, causal, profiles,
-            checks, notes, extra={"alignment": report},
-            n_instances=causal.report["n_with_honest"]))
+            HONEST_INSTRUCTION, "honest instruction", True, causal, profiles,
+            checks, notes, extra={"alignment": report}, n_instances=n_paired))
 
     # --- the unpaired honest twin -------------------------------------------
-    directory, reason = honest_twin_dir(ctx)
+    directory, reason = (None, f"{HONEST_TWIN} is not in "
+                               f"--attention-conditions") \
+        if HONEST_TWIN not in wanted else honest_twin_dir(ctx)
     if reason:
-        payload["skipped"].append({"condition": "honest_twin", "reason": reason})
+        payload["skipped"].append({"condition": HONEST_TWIN, "reason": reason})
     else:
         twin = dataloaders.descriptive_batches(
             directory, ctx.tokenizer, task=ctx.task_spec.name,

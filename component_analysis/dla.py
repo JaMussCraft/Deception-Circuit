@@ -83,6 +83,18 @@ PNG_NAME = "dla.png"
 LENS_JSON_NAME = "logit_lens.json"
 LENS_PNG_NAME = "logit_lens.png"
 
+#: The two paired figures (ticket 06). They sit beside the two above rather
+#: than replacing them: `dla.png` and `logit_lens.png` show every condition
+#: this cell measured, including the two population ones, and these show the
+#: paired contrast on its own, over the same instance ids on both axes. Reading
+#: a sign flip off a figure that mixes the two is exactly the mistake spec user
+#: story 27 is about.
+PAIRED_SCATTER_JSON_NAME = "dla_paired_scatter.json"
+PAIRED_SCATTER_PNG_NAME = "dla_paired_scatter.png"
+
+PAIRED_LENS_JSON_NAME = "logit_lens_paired.json"
+PAIRED_LENS_PNG_NAME = "logit_lens_paired.png"
+
 SCHEMA_VERSION = 1
 
 #: The three conditions, in the order they are measured and plotted.
@@ -860,6 +872,20 @@ def run(ctx) -> dict:
     directory = ctx.subdir(SUBDIR)
     plot_components(os.path.join(directory, PNG_NAME), payload, table=table)
     plot_lens(os.path.join(directory, LENS_PNG_NAME), lens)
+
+    # The paired pair of figures, beside the all-condition pair above.
+    scatter = paired_scatter_payload(payload)
+    ctx.write_json(SUBDIR, PAIRED_SCATTER_JSON_NAME, scatter)
+    plot_paired_scatter(os.path.join(directory, PAIRED_SCATTER_PNG_NAME),
+                        scatter)
+
+    paired_lens = paired_lens_payload(lens)
+    ctx.write_json(SUBDIR, PAIRED_LENS_JSON_NAME, paired_lens)
+    plot_lens(os.path.join(directory, PAIRED_LENS_PNG_NAME),
+              paired_lens_figure_payload(lens),
+              title=f"Paired logit lens at the Readout — {payload['circuit']} "
+                    f"x {payload['task']}",
+              empty_message=NOT_PAIRED)
     return table
 
 
@@ -976,6 +1002,132 @@ def lens_payload(ctx, tallies) -> dict:
                 "Both sign_flip_row and sign_flip_layer are given.",
         "conditions": conditions,
     }
+
+
+#: Why the paired figures can be empty, said once so both say the same thing.
+NOT_PAIRED = (f"this cell has no paired condition: {HONEST_INSTRUCTION} did "
+              f"not run, so there is nothing measured over the same instance "
+              f"ids on both sides. See 'skipped' in " + JSON_NAME + ".")
+
+
+def paired_scatter_payload(payload: dict) -> dict:
+    """`dla/dla_paired_scatter.json`: one point per Component, both paired axes.
+
+    x is the paired subset's pressure DLA and y is the same instances' DLA
+    under their Matched Honest Instruction, so a Component that sits on the
+    diagonal writes the same thing either way — a mover that does not know it
+    is lying — and one that crosses the y = x line, or the y axis, changes what
+    it writes when the pressure is removed. The full-split `pressure` column is
+    deliberately *not* an axis here: it is a different set of instances, and a
+    scatter of it against the honest column would be a population contrast
+    drawn to look like a paired one.
+    """
+    conditions = payload["conditions"]
+    left = conditions.get(PRESSURE_PAIRED)
+    right = conditions.get(HONEST_INSTRUCTION)
+
+    twin = {
+        "figure": PAIRED_SCATTER_PNG_NAME,
+        "shows": (f"per-Component direct logit attribution at the Readout "
+                  f"under pressure (x) against the same instances under their "
+                  f"Matched Honest Instruction (y)"),
+        "x": PRESSURE_PAIRED,
+        "y": HONEST_INSTRUCTION,
+        "paired": True,
+        "metric": METRIC,
+        "circuit": payload["circuit"],
+        "task": payload["task"],
+        "n_instances": 0,
+        "instance_ids": [],
+        "diagonal": ("y = x means the Component writes the same thing under "
+                     "both conditions; one below the line writes more towards "
+                     "the deceptive answer under pressure than under the "
+                     "instruction, and its signed distance from the line is "
+                     "dla.differential"),
+        "points": [],
+        "skipped": None,
+    }
+    if left is None or right is None:
+        twin["skipped"] = NOT_PAIRED
+        return twin
+
+    twin["n_instances"] = right["n_instances"]
+    twin["instance_ids"] = right["instance_ids"]
+    difference = {tuple(row["key"]): row["levels"].get(ALL, {})
+                  for row in conditions.get(DIFFERENTIAL, {})
+                  .get("components", [])}
+    by_key = {name: {tuple(row["key"]): row for row in conditions[name]["components"]}
+              for name in (PRESSURE_PAIRED, HONEST_INSTRUCTION)}
+
+    for row in left["components"]:
+        key = tuple(row["key"])
+        x = by_key[PRESSURE_PAIRED][key]["levels"].get(ALL, {})
+        y = by_key[HONEST_INSTRUCTION].get(key, {}).get("levels", {}).get(ALL, {})
+        twin["points"].append({
+            "key": list(key), "label": row["label"], "layer": row["layer"],
+            "kind": row["kind"],
+            "x": x.get("mean"), "x_se": x.get("se"),
+            "y": y.get("mean"), "y_se": y.get("se"),
+            "differential": difference.get(key, {}).get("mean"),
+        })
+    return twin
+
+
+def paired_lens_conditions(lens: dict) -> dict:
+    """The two paired conditions of `logit_lens.json`, flattened for the twin."""
+    out = {}
+    for name in (PRESSURE_PAIRED, HONEST_INSTRUCTION):
+        condition = lens["conditions"].get(name)
+        level = (condition or {}).get("levels", {}).get(ALL)
+        if not level:
+            continue
+        out[name] = {
+            "n_instances": condition["n_instances"],
+            "mean": level["mean"],
+            "se": level.get("se"),
+            "sign_flip_row": condition.get("sign_flip_row"),
+            "sign_flip_layer": condition.get("sign_flip_layer"),
+            "sign_change_rows": condition.get("sign_change_rows", []),
+        }
+    return out
+
+
+def paired_lens_payload(lens: dict) -> dict:
+    """`dla/logit_lens_paired.json`: the two paired conditions and nothing else.
+
+    `logit_lens.json` carries every condition the cell measured, the two
+    population ones included. This twin carries only the contrast in which the
+    same instances appear on both curves, because the layer at which the
+    deceptive answer overtakes the honest one is a claim about *those*
+    instances and the full-split curve is not evidence for it.
+    """
+    conditions = paired_lens_conditions(lens)
+    return {
+        "figure": PAIRED_LENS_PNG_NAME,
+        "shows": ("the cumulative-residual logit lens at the Readout under "
+                  "pressure and under the Matched Honest Instruction, over "
+                  "the same instances"),
+        "paired": True,
+        "metric": METRIC,
+        "circuit": lens["circuit"],
+        "task": lens["task"],
+        "rows": lens["rows"],
+        "conditions": conditions,
+        "skipped": None if conditions else NOT_PAIRED,
+    }
+
+
+def paired_lens_figure_payload(lens: dict) -> dict:
+    """`lens` with every unpaired condition dropped, ready for `plot_lens`.
+
+    One plotter, two figures: the paired overlay is the same picture over a
+    subset of the curves, and a second implementation of it would be a second
+    place for the sign convention to go wrong.
+    """
+    kept = {name: lens["conditions"][name]
+            for name in (PRESSURE_PAIRED, HONEST_INSTRUCTION)
+            if name in lens["conditions"]}
+    return dict(lens, conditions=kept)
 
 
 def columns(payload) -> dict:
@@ -1104,13 +1256,63 @@ def plot_components(path: str, payload: dict, *, table: dict = None) -> str:
     return path
 
 
-def plot_lens(path: str, payload: dict) -> str:
+def plot_paired_scatter(path: str, twin: dict) -> str:
+    """The paired DLA scatter: pressure against the Matched Honest Instruction.
+
+    Drawn from the JSON twin rather than from `dla.json`, so the picture and
+    the numbers beside it cannot disagree: whatever a reader finds in the file
+    is what was plotted.
+    """
+    plt = _pyplot()
+
+    points = [one for one in twin["points"]
+              if one["x"] is not None and one["y"] is not None]
+    if not points:
+        return _empty_figure(path, twin["skipped"] or
+                             "no Component had a value under both conditions")
+
+    figure, axes = plt.subplots(figsize=(6.4, 6.0))
+    x = [one["x"] for one in points]
+    y = [one["y"] for one in points]
+    axes.errorbar(x, y, xerr=[one["x_se"] or 0.0 for one in points],
+                  yerr=[one["y_se"] or 0.0 for one in points], fmt="o",
+                  markersize=5, linewidth=0.8, capsize=2,
+                  color=COLOURS[PRESSURE_PAIRED],
+                  ecolor="#b0bec5", zorder=3)
+    for one in points:
+        axes.annotate(one["label"], (one["x"], one["y"]),
+                      textcoords="offset points", xytext=(5, 4), fontsize=7)
+
+    limit = max([abs(one) for one in x + y] + [1e-3]) * 1.25
+    axes.plot([-limit, limit], [-limit, limit], linestyle="--", linewidth=0.9,
+              color="#555555", zorder=1,
+              label="y = x: writes the same under both")
+    axes.axhline(0.0, color="black", linewidth=0.8, zorder=2)
+    axes.axvline(0.0, color="black", linewidth=0.8, zorder=2)
+    axes.set_xlim(-limit, limit)
+    axes.set_ylim(-limit, limit)
+    axes.set_xlabel(f"DLA under pressure ({PRESSURE_PAIRED})")
+    axes.set_ylabel(f"DLA under the Matched Honest Instruction "
+                    f"({HONEST_INSTRUCTION})")
+    axes.set_title(f"Paired DLA at the Readout — {twin['circuit']} x "
+                   f"{twin['task']}\n{twin['n_instances']} paired instance(s); "
+                   f"deceptive - honest, both axes")
+    axes.legend(fontsize=7, loc="upper left")
+    figure.tight_layout()
+    figure.savefig(path, dpi=150)
+    plt.close(figure)
+    return path
+
+
+def plot_lens(path: str, payload: dict, *, title: str = None,
+              empty_message: str = None) -> str:
     """The logit lens, one line per condition, the sign flip marked."""
     plt = _pyplot()
 
     conditions = payload["conditions"]
     if not conditions:
-        return _empty_figure(path, "no condition of this cell had a logit lens")
+        return _empty_figure(path, empty_message or
+                             "no condition of this cell had a logit lens")
     figure, axes = plt.subplots(figsize=(7.5, 4.6))
     for row, (name, condition) in enumerate(conditions.items()):
         level = condition["levels"].get(ALL)
@@ -1137,8 +1339,8 @@ def plot_lens(path: str, payload: dict) -> str:
     axes.set_xlabel("cumulative residual: row 0 is the embedding, "
                     "row l+1 is after layer l")
     axes.set_ylabel("logit difference\n(deceptive - honest)")
-    axes.set_title(f"Logit lens at the Readout — {payload['circuit']} x "
-                   f"{payload['task']}")
+    axes.set_title(title or f"Logit lens at the Readout — "
+                            f"{payload['circuit']} x {payload['task']}")
     axes.legend(fontsize=7)
     figure.tight_layout()
     figure.savefig(path, dpi=150)
