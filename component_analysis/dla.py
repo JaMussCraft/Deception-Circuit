@@ -1017,21 +1017,25 @@ def plot_lens(path: str, payload: dict) -> str:
     conditions = payload["conditions"]
     if not conditions:
         return path
-    figure, axes = plt.subplots(figsize=(7.0, 4.2))
-    for name, condition in conditions.items():
+    figure, axes = plt.subplots(figsize=(7.5, 4.6))
+    for row, (name, condition) in enumerate(conditions.items()):
         level = condition["levels"].get(ALL)
         if not level:
             continue
         means = level["mean"]
+        colour = COLOURS.get(name, "#333333")
         axes.plot(range(len(means)), means, marker="o", markersize=3,
-                  label=name, color=COLOURS.get(name, "#333333"))
+                  label=name, color=colour)
         flip = level.get("sign_flip_layer")
-        if flip is not None:
-            axes.axvline(flip, linestyle="--", linewidth=0.9, alpha=0.6,
-                         color=COLOURS.get(name, "#333333"))
-            axes.annotate(f"{name} flips at row {flip}", (flip, means[flip]),
-                          textcoords="offset points", xytext=(4, 6),
-                          fontsize=7, color=COLOURS.get(name, "#333333"))
+        if flip is None:
+            continue
+        axes.axvline(flip, linestyle="--", linewidth=0.9, alpha=0.6,
+                     color=colour)
+        # Every condition crosses in the same narrow band of layers, so the
+        # labels are stacked rather than each sitting on its own line.
+        axes.annotate(f"{name} at row {flip}", (flip, 0.0),
+                      textcoords="offset points",
+                      xytext=(4, 10 + 11 * row), fontsize=7, color=colour)
 
     axes.axhline(0.0, color="black", linewidth=0.8)
     axes.set_xlabel("cumulative residual: row 0 is the embedding, "
