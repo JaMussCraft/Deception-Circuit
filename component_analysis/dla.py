@@ -691,6 +691,10 @@ def assert_honest_twin(batches, directory: str) -> None:
     point at any directory given one. Pointing it at an ordinary deceptive
     split would silently report every Component with its sign inverted, so the
     records are asked what they are.
+
+    The first batch is enough: a split is built in one condition, and reading
+    every record would tokenize the whole split a second time to catch a case
+    that cannot happen without the dataset builder itself being wrong.
     """
     from component_analysis import dataloaders
 
