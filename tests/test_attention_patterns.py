@@ -596,3 +596,63 @@ def test_this_analysis_module_does_not_import_nnsight():
         capture_output=True, text=True)
 
     assert result.returncode == 0, result.stderr
+
+
+# ==============================================================================
+# WHICH HEADS THE BAR CHART SHOWS
+# ==============================================================================
+
+def inject_column(out, column, values):
+    """Put a column into the cell's written head table, as a later analysis would.
+
+    Ticket 07 writes `knockout.rank` on a second pass over the same cell, so
+    this is what this analysis finds there when it is rerun.
+    """
+    path = os.path.join(str(out), *CELL, "head_table.json")
+    with open(path) as handle:
+        table = json.load(handle)
+    table["columns"].append(column)
+    for row in table["rows"]:
+        row[column] = values.get((row["kind"], row["layer"], row["index"]))
+    with open(path, "w") as handle:
+        json.dump(table, handle)
+
+
+def test_the_bar_chart_falls_back_to_layer_order_with_no_knockout_column(sdr_cell):
+    run_dir, out, _records, _twin = sdr_cell
+
+    run_cli(str(run_dir), "--num-kv-heads", "2", "--output-dir", str(out))
+
+    chart = read_json(out, *CELL, "attention", "top_heads.json")
+    assert "layer order" in chart["ranked_by"]
+    assert chart["rows"] == ["L0H0", "L0H2"]
+
+
+def test_the_bar_chart_ranks_by_knockout_once_that_column_exists(sdr_cell):
+    """Rank 1 is ticket 07's largest signed drop, so it is shown first.
+
+    The MLP block is in the same ranked list and has no attention pattern, so
+    a chart of heads must skip it rather than plotting an empty row.
+    """
+    run_dir, out, _records, _twin = sdr_cell
+    run_cli(str(run_dir), "--num-kv-heads", "2", "--output-dir", str(out))
+    inject_column(out, "knockout.rank",
+                  {("head", 0, 0): 3, ("head", 0, 2): 1, ("mlp", 1, 0): 2})
+
+    run_cli(str(run_dir), "--num-kv-heads", "2", "--output-dir", str(out))
+
+    chart = read_json(out, *CELL, "attention", "top_heads.json")
+    assert chart["ranked_by"].startswith("knockout.rank")
+    assert "ascending" in chart["ranked_by"]
+    assert chart["rows"] == ["L0H2", "L0H0"]
+
+
+def test_the_bar_chart_shows_at_most_the_requested_number_of_heads(sdr_cell):
+    run_dir, out, _records, _twin = sdr_cell
+
+    run_cli(str(run_dir), "--num-kv-heads", "2", "--attention-top-k", "1",
+            "--output-dir", str(out))
+
+    chart = read_json(out, *CELL, "attention", "top_heads.json")
+    assert chart["rows"] == ["L0H0"]
+    assert len(chart["matrix"]) == 1
