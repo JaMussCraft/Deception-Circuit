@@ -44,9 +44,18 @@ The grid is built from the Components alone, with no model, because `--dry-run`
 prints its size and a cost estimate on the login node, where there is no GPU
 and no nnsight 0.7.0.
 
-This module implements the **position-agnostic** pass of the spec: the sender's
-value is written at every position and the receiver takes it at every position.
-The position-specific pass, by Segment, is ticket 09.
+**The counterfactuals.** Two pairs, one code path. `item_swap` is the dataset's
+own Corruption; `honest_instruction` replaces the Pressure Clause with its
+Matched Honest Instruction (ticket 05) and exists only for the instances that
+survived the honest filter, so its pass covers fewer rows and says which ones.
+`counterfactual_pair` is the only function that knows which is which;
+everything below it takes two aligned streams. Each counterfactual writes its
+own JSON and figures and its own head-table columns, suffixed by name.
+
+This module implements the **position-agnostic** pass of the spec — the
+sender's value is written at every position and the receiver takes it at every
+position — and, for the cells that clear `--path-position-threshold`, the
+**position-specific** pass by Segment.
 """
 
 from __future__ import annotations
@@ -65,6 +74,8 @@ SUBDIR = "path_patching"
 
 #: The per-cell table, and the two figures with their JSON twins.
 AGNOSTIC_FILE = "agnostic.json"
+SEGMENTS_FILE = "segments.json"
+SWEEP_FILE = "sweep.json"
 HEATMAP_PNG = "heatmap.png"
 HEATMAP_JSON = "heatmap.json"
 DIRECT_EFFECT_PNG = "direct_effect.png"
@@ -81,6 +92,29 @@ READOUT_KEY = ("readout", 0, 0)
 
 #: Receiver kinds, in the order the heatmap groups them.
 RECEIVER_KINDS = ("q", "k", "v", "mlp_in", "readout")
+
+#: The two counterfactual pairs of `dataloaders.Batch`, and the `--path-
+#: counterfactual` value that asks for both. `item_swap` is the dataset's own
+#: Corruption (the Designation Site swapped); `honest_instruction` replaces the
+#: Pressure Clause with its Matched Honest Instruction (ticket 05) and exists
+#: only for the instances that survived the honest filter.
+ITEM_SWAP = "item_swap"
+HONEST_INSTRUCTION = "honest_instruction"
+COUNTERFACTUALS = (ITEM_SWAP, HONEST_INSTRUCTION)
+BOTH = "both"
+
+#: What each counterfactual appends to a head-table column's bare name. The
+#: item-swap columns keep the names ticket 08 wrote, so a head table from before
+#: this ticket still reads; the honest ones are spelled out in full rather than
+#: as `_honest`, because `dla` already has both a `honest_instruction` column
+#: and a `honest_twin_descriptive` one and `_honest` would not say which.
+COLUMN_SUFFIX = {ITEM_SWAP: "", HONEST_INSTRUCTION: "_honest_instruction"}
+
+#: The bare names this analysis writes per Component per counterfactual, before
+#: the suffix and before the head table's own `path_patching.` namespace.
+COLUMN_NAMES = ("strongest_incoming", "strongest_incoming_effect",
+                "strongest_outgoing", "strongest_outgoing_effect",
+                "direct_effect", "direct_effect_se")
 
 #: The heatmap's colour for a (sender, receiver) pair that is not a path, so
 #: that "no cell" never reads as "an effect of zero".
@@ -293,6 +327,8 @@ class _Tally:
     gaps: List[float] = field(default_factory=list)
     used_ids: List[str] = field(default_factory=list)
     excluded: List[str] = field(default_factory=list)
+    #: Instances of the sample with no counterpart under this counterfactual.
+    unpaired: List[str] = field(default_factory=list)
     forwards: int = 0
     wall_seconds: float = 0.0
 
@@ -325,6 +361,12 @@ class Streams:
     corrupt_metric: "torch.Tensor"
     gap: "torch.Tensor"
     ids: Sequence[str] = ()
+    #: Which counterfactual the `corrupt_*` fields hold, one of `COUNTERFACTUALS`.
+    counterfactual: str = ITEM_SWAP
+    #: Which rows of the batch these streams cover. Every row under the item
+    #: swap; only the rows with a Matched Honest survivor under the honest
+    #: instruction.
+    rows: Sequence[int] = ()
 
     @property
     def usable(self):
@@ -336,30 +378,80 @@ class Streams:
         return self.gap.abs() >= MIN_GAP
 
 
-def capture_streams(model, batch, *, senders) -> Streams:
+def counterfactual_pair(batch, counterfactual: str):
+    """`(rows, input_ids, attention_mask)` of one counterfactual, or None.
+
+    The item swap has a counterpart for every row of the batch. The Honest-
+    Instruction Counterfactual has one only for the instances that survived the
+    honest filter, and `HonestPair.rows` names them; a batch with none at all
+    gives None, which a caller reports rather than averaging zeros in.
+
+    This is the one function that knows which pair is which. Everything below
+    it takes two aligned streams and does not care where they came from, which
+    is user story 24's "same code path".
+    """
+    import torch
+
+    if counterfactual not in COUNTERFACTUALS:
+        raise ValueError(
+            f"{counterfactual!r} is not a counterfactual; expected one of "
+            f"{', '.join(COUNTERFACTUALS)}")
+    if counterfactual == ITEM_SWAP:
+        rows = list(range(len(batch.ids)))
+        return rows, batch.corrupt_input_ids, batch.corrupt_attention_mask
+
+    pair = batch.honest
+    if pair is None or not pair.rows:
+        return None
+    rows = list(pair.rows)
+    selector = torch.tensor(rows, dtype=torch.long)
+    if not torch.equal(pair.attention_mask.sum(-1).long() - 1,
+                       batch.readout[selector]):
+        raise ValueError(
+            "an Honest-Instruction Counterfactual does not end at the same "
+            "position as its pressure prompt, so the two Readouts are not the "
+            "same token; the pool has drifted from the dataset")
+    return rows, pair.input_ids, pair.attention_mask
+
+
+def capture_streams(model, batch, *, senders,
+                    counterfactual: str = ITEM_SWAP):
     """The two forwards every cell of one batch is measured against.
 
-    `batch` is a `dataloaders.Batch`: the clean and item-swap-corrupt prompts,
-    the Target and Distractor token ids read with the **clean** stream's
-    assignment on both runs, and the Readout position of each row.
+    `batch` is a `dataloaders.Batch`. The clean stream is always the pressure
+    prompt; the counterfactual stream is the item-swap corruption or the
+    Matched Honest Instruction, and both are aligned to it token for token, so
+    the Target and Distractor ids are read with the **clean** stream's
+    assignment on both runs and the Readout position is shared.
+
+    Returns None when this batch has no instance of the counterfactual, which
+    on the Honest-Instruction Counterfactual is most batches of most splits.
     """
+    import torch
+
     from component_analysis import hooks
+
+    selected = counterfactual_pair(batch, counterfactual)
+    if selected is None:
+        return None
+    rows, other_ids, other_mask = selected
 
     device, _dtype = hooks.device_and_dtype(model)
     keys = [row_key(one) for one in senders]
     frozen = hooks.all_component_keys(model)
+    selector = torch.tensor(rows, dtype=torch.long)
 
-    input_ids = batch.input_ids.to(device)
-    attention_mask = batch.attention_mask.to(device)
-    positions = batch.readout.to(device)
-    target = batch.target_token.to(device)
-    distractor = batch.distractor_token.to(device)
+    input_ids = batch.input_ids[selector].to(device)
+    attention_mask = batch.attention_mask[selector].to(device)
+    positions = batch.readout[selector].to(device)
+    target = batch.target_token[selector].to(device)
+    distractor = batch.distractor_token[selector].to(device)
 
     clean = hooks.capture_forward(model, input_ids, attention_mask,
                                   components=list(frozen) + [READOUT_KEY],
                                   positions=positions)
-    corrupt = hooks.capture_forward(model, batch.corrupt_input_ids.to(device),
-                                    batch.corrupt_attention_mask.to(device),
+    corrupt = hooks.capture_forward(model, other_ids.to(device),
+                                    other_mask.to(device),
                                     components=keys + [READOUT_KEY],
                                     positions=positions)
 
@@ -375,7 +467,9 @@ def capture_streams(model, batch, *, senders) -> Streams:
         corrupt_outputs={key: corrupt.outputs[key] for key in keys},
         clean_readout=clean_readout, corrupt_readout=corrupt_readout,
         clean_metric=clean_metric, corrupt_metric=corrupt_metric,
-        gap=clean_metric - corrupt_metric, ids=tuple(getattr(batch, "ids", ())))
+        gap=clean_metric - corrupt_metric,
+        ids=tuple(getattr(batch, "ids", ())[row] for row in rows),
+        counterfactual=counterfactual, rows=tuple(rows))
 
 
 def _readout_of(model, capture):
@@ -500,9 +594,42 @@ def strongest(cells: Sequence[dict], limit: int) -> List[dict]:
 # ==============================================================================
 
 def add_arguments(group) -> None:
+    group.add_argument("--path-counterfactual", default=ITEM_SWAP,
+                       choices=sorted(COUNTERFACTUALS) + [BOTH],
+                       help="Which counterfactual pair the senders carry. "
+                            f"{ITEM_SWAP!r} is the dataset's own Corruption; "
+                            f"{HONEST_INSTRUCTION!r} replaces the Pressure "
+                            "Clause with its Matched Honest Instruction and "
+                            "covers only the instances that survived the "
+                            f"honest filter; {BOTH!r} runs each in turn and "
+                            "writes one file and one column set per pair.")
     group.add_argument("--path-top", type=int, default=10,
                        help="How many of the strongest cells, by absolute "
                             "normalized effect, are listed in the JSON.")
+
+
+def selected_counterfactuals(ctx) -> List[str]:
+    """The counterfactuals `--path-counterfactual` asks for, in a fixed order."""
+    value = getattr(ctx.cli, "path_counterfactual", ITEM_SWAP) or ITEM_SWAP
+    if value == BOTH:
+        return list(COUNTERFACTUALS)
+    if value not in COUNTERFACTUALS:
+        raise ValueError(
+            f"--path-counterfactual {value!r} is not one of "
+            f"{', '.join(sorted(COUNTERFACTUALS) + [BOTH])}")
+    return [value]
+
+
+def _named(stem: str, counterfactual: str, extension: str) -> str:
+    """`stem.ext` for the item swap, `stem_<counterfactual>.ext` otherwise.
+
+    The item-swap files keep the names ticket 08 wrote, so the block C outputs
+    of record and anything reading them still resolve; a second counterfactual
+    writes beside them rather than over them.
+    """
+    if counterfactual == ITEM_SWAP:
+        return f"{stem}.{extension}"
+    return f"{stem}_{counterfactual}.{extension}"
 
 
 def heads_per_group(ctx) -> int:
@@ -525,12 +652,21 @@ def estimate(ctx) -> str:
     n_batches, n_instances = len(batches), batches.n_instances
     budget = cost(grid, n_batches=n_batches,
                   batch_size=batches.report.get("batch_size") or 1)
-    return (f"{budget['senders']} sender(s) x {budget['receivers']} receiver(s) "
-            f"= {budget['cells']} cell(s) after upstream ordering; "
-            f"{n_instances} instance(s) in {n_batches} batch(es) of "
-            f"{budget['batch_size']}; {budget['forwards']} forward(s), about "
-            f"{budget['minutes']:.0f} min at ticket 02b's A40 rate of "
-            f"{budget['seconds_per_forward']:.2f} s per forward")
+    chosen = selected_counterfactuals(ctx)
+    paired = batches.report.get("n_with_honest") or 0
+    lines = [f"{budget['senders']} sender(s) x {budget['receivers']} receiver(s) "
+             f"= {budget['cells']} cell(s) after upstream ordering; "
+             f"{n_instances} instance(s) in {n_batches} batch(es) of "
+             f"{budget['batch_size']}; {budget['forwards']} forward(s) per "
+             f"counterfactual, about {budget['minutes']:.0f} min at ticket 02b's "
+             f"A40 rate of {budget['seconds_per_forward']:.2f} s per forward"]
+    lines.append(f"counterfactual(s): {', '.join(chosen)}")
+    if HONEST_INSTRUCTION in chosen:
+        lines.append(f"{paired} of {n_instances} instance(s) have an "
+                     f"Honest-Instruction counterpart, so that pass costs "
+                     f"about {budget['minutes'] * paired / max(n_instances, 1):.0f} "
+                     f"min")
+    return "; ".join(lines)
 
 
 def _check_kv_groups(ctx, model) -> None:
@@ -554,28 +690,68 @@ def _check_kv_groups(ctx, model) -> None:
 
 
 def run(ctx) -> dict:
-    """The position-agnostic pass over the causal sample.
+    """Every selected counterfactual's position-agnostic pass, in turn.
 
     One pair of captures per batch, one patched forward per sender, and one
-    forward per cell to read the receiver's new input back at the Readout.
+    forward per cell to read the receiver's new input back at the Readout. Each
+    counterfactual writes its own JSON and figures and contributes its own
+    head-table columns, and each is written as it finishes rather than at the
+    end, so a job that runs out of wall clock leaves the passes that did finish
+    on disk.
     """
     grid = grid_for(ctx)
     _check_kv_groups(ctx, ctx.model)
     batches = ctx.causal_batches()
-    n_batches = len(batches)
-    budget = cost(grid, n_batches=n_batches,
-                  batch_size=batches.report.get("batch_size") or 1)
 
+    updates: Dict[tuple, dict] = {}
+    for counterfactual in selected_counterfactuals(ctx):
+        summaries, tally = agnostic_pass(ctx, grid, batches, counterfactual)
+        if summaries is None:
+            # The columns still appear, empty: a counterfactual that found no
+            # instance is a data finding, and a missing column looks like an
+            # analysis that was never asked for.
+            _merge(updates, {key: dict.fromkeys(COLUMN_NAMES)
+                             for key in grid.senders if key != EMBED_KEY},
+                   counterfactual)
+            continue
+        _merge(updates, head_table_columns(grid, summaries), counterfactual)
+    return updates
+
+
+def _merge(updates: Dict[tuple, dict], columns: Dict[tuple, dict],
+           counterfactual: str) -> None:
+    """Fold one counterfactual's columns in, suffixed by which pair they are."""
+    suffix = COLUMN_SUFFIX[counterfactual]
+    for key, values in columns.items():
+        updates.setdefault(key, {}).update(
+            {f"{name}{suffix}": value for name, value in values.items()})
+
+
+def agnostic_pass(ctx, grid: Grid, batches, counterfactual: str):
+    """One counterfactual's position-agnostic pass: `(summaries, tally)`.
+
+    `(None, tally)` when this counterfactual has no instance in the sample —
+    on the Honest-Instruction Counterfactual that is a data finding, so it is
+    written out as a skipped file rather than left as an absent one.
+    """
+    budget = cost(grid, n_batches=len(batches),
+                  batch_size=batches.report.get("batch_size") or 1)
     values: Dict[Cell, List[float]] = {cell: [] for cell in grid.cells}
     tally = _Tally()
     started = time.perf_counter()
 
     for batch in batches:
-        streams = capture_streams(ctx.model, batch, senders=grid.senders)
+        streams = capture_streams(ctx.model, batch, senders=grid.senders,
+                                  counterfactual=counterfactual)
+        if streams is None:
+            tally.unpaired.extend(batch.ids)
+            continue
         tally.forwards += 2
         tally.gaps.extend(streams.gap.tolist())
-        tally.used_ids.extend(batch.ids)
-        tally.excluded.extend(one for one, usable in zip(batch.ids,
+        tally.used_ids.extend(streams.ids)
+        tally.unpaired.extend(one for one in batch.ids
+                              if one not in set(streams.ids))
+        tally.excluded.extend(one for one, usable in zip(streams.ids,
                                                          streams.usable.tolist())
                               if not usable)
 
@@ -596,17 +772,63 @@ def run(ctx) -> dict:
         del streams
 
     tally.wall_seconds = time.perf_counter() - started
+    if not tally.used_ids:
+        ctx.write_json(SUBDIR, _named("agnostic", counterfactual, "json"),
+                       _skipped_payload(ctx, counterfactual, tally))
+        return None, tally
+
     summaries = {cell: {"sender": label(cell.sender),
                         "receiver": label(cell.receiver), "cell": cell.name,
                         **summarize(values[cell])}
                  for cell in grid.cells}
-    payload = _payload(ctx, grid, summaries, budget=budget, tally=tally)
-    ctx.write_json(SUBDIR, AGNOSTIC_FILE, payload)
-    _figures(ctx, grid, summaries, payload)
-    return head_table_columns(grid, summaries)
+    payload = _payload(ctx, grid, summaries, budget=budget, tally=tally,
+                       counterfactual=counterfactual)
+    ctx.write_json(SUBDIR, _named("agnostic", counterfactual, "json"), payload)
+    _figures(ctx, grid, summaries, payload, counterfactual)
+    return summaries, tally
 
 
-def _payload(ctx, grid, summaries, *, budget, tally: _Tally) -> dict:
+def _skipped_payload(ctx, counterfactual: str, tally: _Tally) -> dict:
+    """What is written when a counterfactual has no instance in the sample.
+
+    An absent file and an empty one are indistinguishable from a crash; this
+    one says which counterfactual found nothing and how many instances it
+    looked at, which on the Honest-Instruction Counterfactual is the answer to
+    "has the Matched Honest build been run for this task".
+    """
+    return {
+        "analysis": NAME, "pass": "position_agnostic",
+        "circuit": ctx.circuit_spec.label, "task": ctx.task_spec.name,
+        "counterfactual": counterfactual,
+        "skipped": f"no instance of the causal sample has a {counterfactual} "
+                   f"counterpart",
+        "n_without_a_counterpart": len(tally.unpaired),
+        "without_a_counterpart": tally.unpaired,
+        "cells": [],
+    }
+
+
+def metric_meta(counterfactual: str) -> dict:
+    """The metric block every JSON of this analysis carries.
+
+    It states the sign convention in the file itself. Path patching reads
+    **negative** where a path carries the counterfactual, which is the opposite
+    of knockout's positive drop; the two are reconciled in the roles vocabulary
+    (ticket 10) and until then every file says which one it is.
+    """
+    return {
+        "quantity": "logit(Target) - logit(Distractor) at the Readout, fp32",
+        "effect": "(patched - clean) / (clean - corrupt), per instance",
+        "counterfactual": counterfactual,
+        "sign": f"negative means the path carries the {counterfactual} "
+                f"counterfactual; -1 is the whole clean-minus-counterfactual "
+                f"gap. Knockout (ticket 07) uses the opposite sign.",
+        "min_gap": MIN_GAP,
+    }
+
+
+def _payload(ctx, grid, summaries, *, budget, tally: _Tally,
+             counterfactual: str) -> dict:
     cells = list(summaries.values())
     direct = [summaries[Cell(sender, READOUT_KEY)] for sender in grid.senders]
     gaps = tally.gaps
@@ -615,14 +837,8 @@ def _payload(ctx, grid, summaries, *, budget, tally: _Tally) -> dict:
         "pass": "position_agnostic",
         "circuit": ctx.circuit_spec.label,
         "task": ctx.task_spec.name,
-        "counterfactual": "item_swap",
-        "metric": {
-            "quantity": "logit(Target) - logit(Distractor) at the Readout, fp32",
-            "effect": "(patched - clean) / (clean - corrupt), per instance",
-            "sign": "negative means the path carries the Corruption; -1 is the "
-                    "whole clean-minus-corrupt gap",
-            "min_gap": MIN_GAP,
-        },
+        "counterfactual": counterfactual,
+        "metric": metric_meta(counterfactual),
         "grid": grid.size,
         "senders": [label(one) for one in grid.senders],
         "receivers": [{"key": label(one.key), "kind": one.kind,
@@ -640,6 +856,8 @@ def _payload(ctx, grid, summaries, *, budget, tally: _Tally) -> dict:
             "n_batches": budget["n_batches"],
             "batch_size": budget["batch_size"],
             "instance_ids": tally.used_ids,
+            "n_without_a_counterpart": len(tally.unpaired),
+            "without_a_counterpart": tally.unpaired,
             "n_excluded_by_gap": len(tally.excluded),
             "excluded_by_gap": tally.excluded,
         },
@@ -735,7 +953,8 @@ def _matrix(grid: Grid, summaries: Dict[Cell, dict]) -> Tuple[list, list, list]:
     return rows, columns, values
 
 
-def _figures(ctx, grid: Grid, summaries: Dict[Cell, dict], payload: dict) -> None:
+def _figures(ctx, grid: Grid, summaries: Dict[Cell, dict], payload: dict,
+             counterfactual: str) -> None:
     """The two PNGs, each with the JSON twin an agent with no GUI reads."""
     import matplotlib
     matplotlib.use("Agg")
@@ -752,8 +971,10 @@ def _figures(ctx, grid: Grid, summaries: Dict[Cell, dict], payload: dict) -> Non
     # needs a scale with a width; fall back to the largest effect, then to one.
     extent = extent or (float(finite.max()) if finite.size else 0.0) or 1.0
 
-    ctx.write_json(SUBDIR, HEATMAP_JSON, {
-        "title": "Position-agnostic path patching, normalized effect",
+    ctx.write_json(SUBDIR, _named("heatmap", counterfactual, "json"), {
+        "title": f"Position-agnostic path patching, normalized effect "
+                 f"({counterfactual})",
+        "counterfactual": counterfactual,
         "rows": rows,
         "columns": [{"key": label(one.key), "kind": one.kind,
                      "layer": one.layer, "index": one.key[2],
@@ -782,7 +1003,7 @@ def _figures(ctx, grid: Grid, summaries: Dict[Cell, dict], payload: dict) -> Non
         axes.axvline(boundary - 0.5, color="black", linewidth=0.8)
     axes.set_xlabel("receiver, grouped by type then layer")
     axes.set_ylabel("sender")
-    axes.set_title(f"Path patching (position-agnostic) — "
+    axes.set_title(f"Path patching (position-agnostic, {counterfactual}) — "
                    f"{ctx.circuit_spec.label} x {ctx.task_spec.name}\n"
                    f"(patched - clean) / (clean - corrupt); grey = no path; "
                    f"scale to the {HEATMAP_PERCENTILE:g}th percentile, "
@@ -790,12 +1011,15 @@ def _figures(ctx, grid: Grid, summaries: Dict[Cell, dict], payload: dict) -> Non
                    fontsize=9)
     figure.colorbar(image, ax=axes, fraction=0.03, pad=0.02, extend="both")
     figure.tight_layout()
-    figure.savefig(os.path.join(ctx.subdir(SUBDIR), HEATMAP_PNG), dpi=200)
+    figure.savefig(os.path.join(ctx.subdir(SUBDIR),
+                                _named("heatmap", counterfactual, "png")),
+                   dpi=200)
     plt.close(figure)
 
     direct = payload["direct_effect_on_readout"]
-    ctx.write_json(SUBDIR, DIRECT_EFFECT_JSON, {
-        "title": "Direct effect on the Readout, by sender",
+    ctx.write_json(SUBDIR, _named("direct_effect", counterfactual, "json"), {
+        "title": f"Direct effect on the Readout, by sender ({counterfactual})",
+        "counterfactual": counterfactual,
         "receiver": label(READOUT_KEY), "senders": direct,
         "metric": payload["metric"],
     })
@@ -809,10 +1033,13 @@ def _figures(ctx, grid: Grid, summaries: Dict[Cell, dict], payload: dict) -> Non
     axes.set_xticklabels([one["sender"] for one in direct], rotation=90,
                          fontsize=6)
     axes.set_ylabel("normalized effect")
-    axes.set_title(f"Direct effect on the Readout — {ctx.circuit_spec.label} x "
-                   f"{ctx.task_spec.name}", fontsize=9)
+    axes.set_title(f"Direct effect on the Readout ({counterfactual}) — "
+                   f"{ctx.circuit_spec.label} x {ctx.task_spec.name}",
+                   fontsize=9)
     figure.tight_layout()
-    figure.savefig(os.path.join(ctx.subdir(SUBDIR), DIRECT_EFFECT_PNG), dpi=200)
+    figure.savefig(os.path.join(ctx.subdir(SUBDIR),
+                                _named("direct_effect", counterfactual, "png")),
+                   dpi=200)
     plt.close(figure)
 
 

@@ -16,6 +16,7 @@ is built in `tests/test_path_patching.py`, which needs no model.
 
 from __future__ import annotations
 
+import json
 import os
 
 import pytest
@@ -324,3 +325,240 @@ def test_the_heatmap_twin_has_a_value_for_every_cell_and_null_for_every_non_path
     assert filled == 13
     assert [one["kind"] for one in twin["columns"]] == [
         "q", "q", "k", "k", "v", "v", "mlp_in", "readout"]
+
+
+# ==============================================================================
+# THE HONEST-INSTRUCTION COUNTERFACTUAL
+# ==============================================================================
+
+def honest_batch(paired_rows):
+    """A causal batch whose `paired_rows` carry an Honest-Instruction pair.
+
+    The honest prompt is a third random token sequence over the same mask, so
+    it is aligned token for token with the pressure prompt and ends at the same
+    Readout — which is all the patching code asks of it. The clause span is a
+    slice in the middle, standing in for the Pressure Clause.
+    """
+    torch.manual_seed(2)
+    clean = torch.randint(0, TINY["vocab"], (BATCH, SEQ))
+    corrupt = torch.randint(0, TINY["vocab"], (BATCH, SEQ))
+    instructed = torch.randint(0, TINY["vocab"], (BATCH, SEQ))
+    mask = torch.ones_like(clean)
+    mask[1, SEQ - 2:] = 0
+    readout = mask.sum(-1) - 1
+    items = []
+    for row in range(BATCH):
+        pair = None
+        if row in paired_rows:
+            pair = {"input_ids": instructed[row], "attention_mask": mask[row],
+                    "clause_span": [2, 5], "instruction": "Be honest."}
+        items.append({
+            "instance_id": f"tiny{row}", "record": {},
+            "input_ids": clean[row], "attention_mask": mask[row],
+            "corrupt_input_ids": corrupt[row], "corrupt_attention_mask": mask[row],
+            "target_token": 3 + row, "distractor_token": 11 + row,
+            "readout": int(readout[row]), "honest": pair})
+    batch = next(iter(dataloaders.Batches(items, batch_size=BATCH, report={})))
+    return batch, instructed, mask
+
+
+def test_the_honest_counterfactual_reproduces_the_honest_logits_through_the_same_function(
+        model, whole_model_grid):
+    """User story 24: both counterfactuals go through one code path.
+
+    The same invariant the item-swap pair is held to — patch every sender into
+    every receiver and the clean run becomes the counterfactual run — asserted
+    on the Honest-Instruction Counterfactual, through `capture_streams` and
+    `patched_readout` with no second implementation underneath.
+    """
+    batch, instructed, mask = honest_batch({0, 1})
+    receivers = [one.key for one in whole_model_grid.receivers]
+
+    streams = pp.capture_streams(model, batch, senders=whole_model_grid.senders,
+                                 counterfactual=pp.HONEST_INSTRUCTION)
+    got = pp.patched_readout(model, streams, senders=whole_model_grid.senders,
+                             receivers=receivers)
+
+    assert streams.counterfactual == pp.HONEST_INSTRUCTION
+    assert torch.allclose(got, fp32_readout(model, instructed, mask,
+                                            streams.positions), atol=1e-4)
+    assert not torch.allclose(got, streams.clean_readout, atol=1e-3)
+
+
+def test_the_honest_counterfactual_covers_only_the_rows_that_have_a_pair(
+        model, whole_model_grid):
+    """An instance with no Matched Honest survivor is left out, not filled in.
+
+    Most of a split has no counterpart, and a filler row would be averaged into
+    every cell as a null effect.
+    """
+    batch, _instructed, _mask = honest_batch({1})
+
+    streams = pp.capture_streams(model, batch, senders=whole_model_grid.senders,
+                                 counterfactual=pp.HONEST_INSTRUCTION)
+
+    assert list(streams.ids) == ["tiny1"]
+    assert streams.input_ids.shape[0] == 1
+    assert tuple(streams.gap.shape) == (1,)
+
+
+def test_a_batch_with_no_honest_pair_at_all_yields_no_streams(
+        model, batch, whole_model_grid):
+    """`batch` is the item-swap fixture, whose rows have no counterpart."""
+    assert pp.capture_streams(model, batch, senders=whole_model_grid.senders,
+                              counterfactual=pp.HONEST_INSTRUCTION) is None
+
+
+def test_the_item_swap_counterfactual_is_the_default_and_names_itself(
+        model, streams):
+    assert streams.counterfactual == pp.ITEM_SWAP
+
+
+class StubContext:
+    """The smallest `registry.AnalysisContext` an analysis pass really uses.
+
+    `agnostic_pass` is called with the real CLI context on a GPU; here it is
+    called with a stub so that the Honest-Instruction Counterfactual can be
+    driven end to end on the tiny model. The CLI seam has no Matched Honest
+    pool to build from (`tests/test_dla_model.py` has the same limitation), so
+    this is where the honest pass's written output is asserted.
+    """
+
+    def __init__(self, model, cell_dir, batches):
+        import argparse
+        self.model = model
+        self.cell_dir = str(cell_dir)
+        self.cli = argparse.Namespace(path_top=5, path_counterfactual=pp.BOTH)
+        self.circuit_spec = type("S", (), {"label": "tiny"})()
+        self.task_spec = type("T", (), {"name": "sdr"})()
+        self._batches = batches
+        self.segmentations = None
+
+    def causal_batches(self):
+        return self._batches
+
+    def subdir(self, analysis):
+        name = analysis if isinstance(analysis, str) else analysis.SUBDIR
+        path = os.path.join(self.cell_dir, name)
+        os.makedirs(path, exist_ok=True)
+        return path
+
+    def write_json(self, analysis, filename, payload):
+        import json
+        path = os.path.join(self.subdir(analysis), filename)
+        with open(path, "w") as handle:
+            json.dump(payload, handle, indent=2)
+        return path
+
+
+def honest_batches(paired_rows):
+    """A one-batch `Batches` whose `paired_rows` carry an honest pair."""
+    batch, _instructed, _mask = honest_batch(paired_rows)
+    items = [{"instance_id": batch.ids[row], "record": {},
+              "input_ids": batch.input_ids[row],
+              "attention_mask": batch.attention_mask[row],
+              "corrupt_input_ids": batch.corrupt_input_ids[row],
+              "corrupt_attention_mask": batch.corrupt_attention_mask[row],
+              "target_token": int(batch.target_token[row]),
+              "distractor_token": int(batch.distractor_token[row]),
+              "readout": int(batch.readout[row]),
+              "honest": None if batch.honest is None
+                        or row not in set(batch.honest.rows)
+                        else {"input_ids": batch.honest.input_ids[
+                                  list(batch.honest.rows).index(row)],
+                              "attention_mask": batch.honest.attention_mask[
+                                  list(batch.honest.rows).index(row)],
+                              "clause_span": [2, 5],
+                              "instruction": "Be honest."}}
+             for row in range(BATCH)]
+    return dataloaders.Batches(items, batch_size=BATCH,
+                               report={"batch_size": BATCH})
+
+
+def test_the_honest_pass_writes_its_own_file_and_names_the_counterfactual(
+        model, whole_model_grid, tmp_path):
+    """Two counterfactuals, two files: the item-swap one keeps ticket 08's name
+    and the honest one is written beside it, never over it."""
+    ctx = StubContext(model, tmp_path, honest_batches({0, 1}))
+
+    summaries, tally = pp.agnostic_pass(ctx, whole_model_grid, ctx.causal_batches(),
+                                        pp.HONEST_INSTRUCTION)
+
+    assert summaries is not None
+    written = json.loads(open(os.path.join(str(tmp_path), pp.SUBDIR,
+                                           "agnostic_honest_instruction.json")).read())
+    assert written["counterfactual"] == pp.HONEST_INSTRUCTION
+    assert written["metric"]["counterfactual"] == pp.HONEST_INSTRUCTION
+    assert "negative" in written["metric"]["sign"]
+    assert written["sample"]["n_instances"] == BATCH
+    assert len(written["cells"]) == len(whole_model_grid.cells)
+    assert not os.path.exists(os.path.join(str(tmp_path), pp.SUBDIR,
+                                           pp.AGNOSTIC_FILE))
+    assert list(tally.used_ids) == ["tiny0", "tiny1"]
+
+
+def test_the_honest_pass_reports_the_instances_that_have_no_counterpart(
+        model, whole_model_grid, tmp_path):
+    """An instance with no Matched Honest survivor is named in the file, so a
+    smaller n is explained rather than noticed."""
+    ctx = StubContext(model, tmp_path, honest_batches({1}))
+
+    pp.agnostic_pass(ctx, whole_model_grid, ctx.causal_batches(),
+                     pp.HONEST_INSTRUCTION)
+
+    written = json.loads(open(os.path.join(str(tmp_path), pp.SUBDIR,
+                                           "agnostic_honest_instruction.json")).read())
+    assert written["sample"]["n_instances"] == 1
+    assert written["sample"]["without_a_counterpart"] == ["tiny0"]
+
+
+def test_a_counterfactual_with_no_instance_at_all_writes_a_skipped_file(
+        model, whole_model_grid, tmp_path):
+    ctx = StubContext(model, tmp_path, honest_batches(set()))
+
+    summaries, _tally = pp.agnostic_pass(ctx, whole_model_grid,
+                                         ctx.causal_batches(),
+                                         pp.HONEST_INSTRUCTION)
+
+    assert summaries is None
+    written = json.loads(open(os.path.join(str(tmp_path), pp.SUBDIR,
+                                           "agnostic_honest_instruction.json")).read())
+    assert pp.HONEST_INSTRUCTION in written["skipped"]
+    assert written["without_a_counterpart"] == ["tiny0", "tiny1"]
+
+
+def test_both_counterfactuals_give_the_head_table_one_column_set_each(
+        sdr_run, monkeypatch):
+    """The CLI seam for `--path-counterfactual both`.
+
+    This fixture's dataset has no Matched Honest survivors file, so the honest
+    pass is skipped — and the columns still appear, empty, because a missing
+    column reads as an analysis that was never asked for.
+    """
+    import analyze_components
+    from component_analysis import registry
+    from tests.fakes import FAKE_VOCAB_SIZE
+    from tests.test_analyze_components_segmentation import CELL, read_json
+
+    run_dir, out, _records = sdr_run
+    monkeypatch.setattr(registry, "ANALYSES", [pp])
+    monkeypatch.setattr(analyze_components, "load_model",
+                        lambda cli, resolved: tiny_analysis_model(FAKE_VOCAB_SIZE))
+
+    assert analyze_components.main([
+        str(run_dir), "--num-kv-heads", "2", "--n-causal", "16",
+        "--path-counterfactual", "both", "--device", "cpu",
+        "--output-dir", str(out)]) == 0
+
+    swap = read_json(out, *CELL, pp.SUBDIR, pp.AGNOSTIC_FILE)
+    honest = read_json(out, *CELL, pp.SUBDIR, "agnostic_honest_instruction.json")
+    assert swap["counterfactual"] == pp.ITEM_SWAP
+    assert pp.HONEST_INSTRUCTION in honest["skipped"]
+
+    table = read_json(out, *CELL, "head_table.json")
+    assert f"{pp.NAME}.direct_effect" in table["columns"]
+    assert f"{pp.NAME}.direct_effect_honest_instruction" in table["columns"]
+    assert all(row[f"{pp.NAME}.direct_effect"] is not None
+               for row in table["rows"])
+    assert all(row[f"{pp.NAME}.direct_effect_honest_instruction"] is None
+               for row in table["rows"])
