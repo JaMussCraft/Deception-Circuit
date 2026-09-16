@@ -64,22 +64,3 @@ def test_dry_run_writes_nothing_of_the_analysis(sdr_run, registered):
     assert written_files(out) == [os.path.join(*CELL, name)
                                   for name in INTAKE_FILES]
     assert not os.path.exists(os.path.join(str(out), *CELL, pp.SUBDIR))
-
-
-def test_the_estimate_counts_fewer_instances_when_the_sample_is_capped(
-        sdr_run, registered, capsys):
-    """`--path-instances` is the lever for a grid that does not fit the hour."""
-    run_dir, out, _records = sdr_run
-
-    run_cli(str(run_dir), "--dry-run", "--num-kv-heads", "2", "--n-causal", "16",
-            "--path-instances", "8", "--output-dir", str(out))
-    capped = next(one for one in capsys.readouterr().out.splitlines()
-                  if one.strip().startswith(f"{pp.NAME}: "))
-
-    run_cli(str(run_dir), "--dry-run", "--num-kv-heads", "2", "--n-causal", "16",
-            "--output-dir", str(out))
-    whole = next(one for one in capsys.readouterr().out.splitlines()
-                 if one.strip().startswith(f"{pp.NAME}: "))
-
-    assert "8 instance(s)" in capped
-    assert "16 instance(s)" in whole

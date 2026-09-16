@@ -500,11 +500,6 @@ def strongest(cells: Sequence[dict], limit: int) -> List[dict]:
 # ==============================================================================
 
 def add_arguments(group) -> None:
-    group.add_argument("--path-instances", type=int, default=0,
-                       help="Cap the causal sample this analysis patches over. "
-                            "0 uses all of it. The cap is rounded up to a whole "
-                            "batch, and it is the lever when --dry-run's cost "
-                            "estimate does not fit the job's wall clock.")
     group.add_argument("--path-top", type=int, default=10,
                        help="How many of the strongest cells, by absolute "
                             "normalized effect, are listed in the JSON.")
@@ -524,20 +519,10 @@ def grid_for(ctx) -> Grid:
     return build_grid(ctx.components, heads_per_group=heads_per_group(ctx))
 
 
-def _planned(ctx, batches) -> Tuple[int, int]:
-    """(batches, instances) this run would use, after `--patch-instances`."""
-    size = batches.report.get("batch_size") or 1
-    wanted = int(getattr(ctx.cli, "path_instances", 0) or 0)
-    if wanted <= 0 or wanted >= batches.n_instances:
-        return len(batches), batches.n_instances
-    n_batches = min(len(batches), -(-wanted // size))
-    return n_batches, min(batches.n_instances, n_batches * size)
-
-
 def estimate(ctx) -> str:
     grid = grid_for(ctx)
     batches = ctx.causal_batches()
-    n_batches, n_instances = _planned(ctx, batches)
+    n_batches, n_instances = len(batches), batches.n_instances
     budget = cost(grid, n_batches=n_batches,
                   batch_size=batches.report.get("batch_size") or 1)
     return (f"{budget['senders']} sender(s) x {budget['receivers']} receiver(s) "
@@ -577,7 +562,7 @@ def run(ctx) -> dict:
     grid = grid_for(ctx)
     _check_kv_groups(ctx, ctx.model)
     batches = ctx.causal_batches()
-    n_batches, _planned_instances = _planned(ctx, batches)
+    n_batches = len(batches)
     budget = cost(grid, n_batches=n_batches,
                   batch_size=batches.report.get("batch_size") or 1)
 
@@ -585,9 +570,7 @@ def run(ctx) -> dict:
     tally = _Tally()
     started = time.perf_counter()
 
-    for index, batch in enumerate(batches):
-        if index >= n_batches:
-            break
+    for batch in batches:
         streams = capture_streams(ctx.model, batch, senders=grid.senders)
         tally.forwards += 2
         tally.gaps.extend(streams.gap.tolist())
