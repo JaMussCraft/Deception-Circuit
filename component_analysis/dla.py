@@ -45,17 +45,10 @@ exactly to the model's logit difference — which is the invariant
 `tests/test_dla.py` asserts, and the thing that catches a transposed projection
 or a mis-sliced head.
 
-`hooks.readout_logits` is that fp32 readout, and it normalizes by the RMS of
-whatever vector it is handed — correct for a whole residual, wrong for one
-Component's contribution. Rescaling gets the fixed scale out of it exactly,
-with the model's own epsilon, and without a second readout implementation:
-
-    kappa = rms(residual) / rms(contribution)      # per instance, per Component
-    dla   = readout_logits(kappa * contribution) / kappa
-
-`mean((kappa*c)^2)` is `mean(r^2)` exactly, so the norm inside `readout_logits`
-applies the residual's scale, and dividing by `kappa` afterwards undoes the
-only other thing the rescale did. See `fixed_scale_readout`.
+`hooks.readout_logits(model, contribution, scale_from=residual)` is that fp32
+readout: `scale_from` is the vector whose RMS sets the norm's scale, so one
+Component's contribution is normalized by the whole residual's scale rather
+than its own. See `fixed_scale_readout`.
 
 The **logit lens** does not use the fixed scale: each layer's cumulative
 residual is normalized by its own RMS, which is what a logit lens is — the
@@ -69,10 +62,9 @@ concatenation, and `o_proj` is a bias-free linear map, so head h's own
 contribution is its slice times the matching *columns* of `o_proj.weight`. MLP
 blocks and the embedding write their outputs into the residual stream directly.
 
-`o_proj.weight` is read through the nnsight Envoy, which delegates attribute
-access to the wrapped module; the private `_model` handle ADR-0001 confines to
-`hooks.py` is never touched. `_head_output_weight` is the one place it happens,
-so `hooks.o_proj_weight` is a one-line swap if the seam ever grows one.
+`hooks.o_proj_weight(model, layer)` supplies that weight and asserts the
+projection has no bias, so every model access in this analysis goes through the
+one hook module ADR-0001 confines them to.
 """
 
 from __future__ import annotations
@@ -100,13 +92,16 @@ HONEST_TWIN = "honest_twin"
 CONDITIONS = (PRESSURE, HONEST_INSTRUCTION, HONEST_TWIN)
 
 #: How far below zero a mean has to sit to be called suppression, in logits.
-#: The clean-minus-corrupt Readout logit difference on SDR nls0.3 is about
-#: 3.26 (ticket 02b), so this is a little over one percent of the effect the
-#: whole circuit produces — small enough to keep a real suppressor, large
-#: enough that a Component sitting on zero does not flicker into the flag from
-#: bfloat16 noise in the captures. It is a flag, `--dla-suppression-margin`,
-#: and the standard error of every mean is in `dla.json` for a reader who
-#: wants a stricter rule.
+#: Read it against the two scales it sits between. The whole model's Readout
+#: logit difference on SDR nls0.3 is about +1.75 and the clean-minus-corrupt
+#: gap about +3.26 (ticket 02b), so 0.05 is a few percent of the effect. But a
+#: single Component writes far less: on that circuit the largest direct
+#: contribution is +0.18 and most are under 0.05, so this margin is not a small
+#: fraction of a Component's own mass, and on a circuit whose Components each
+#: write little it will flag nothing. That is deliberate — the flag exists to
+#: name a Component that genuinely pushes the honest answer, not to rank the
+#: noise — and it is a flag, `--dla-suppression-margin`, with the standard
+#: error of every mean in `dla.json` for a reader who wants another rule.
 DEFAULT_SUPPRESSION_MARGIN = 0.05
 
 #: `--dla-split` levels, sharing ticket 03's vocabulary: the record fields a
@@ -192,6 +187,26 @@ def sign_flip_layer(values: Sequence[Optional[float]]) -> Optional[int]:
     return None
 
 
+def sign_changes(values: Sequence[Optional[float]]) -> List[int]:
+    """Every row where the lens changes sign from the row before it.
+
+    Reported beside `sign_flip_layer` because the one number cannot say how
+    decisive the crossing was. On the SDR circuit the lens sits within a tenth
+    of a logit of zero for the first eighteen rows and crosses once, very
+    early, so "the flip is at row 1" is true and a reader who sees only that
+    would think the deceptive answer led from the start.
+    """
+    rows = [None if one is None else float(one) for one in values]
+    out = []
+    for index in range(1, len(rows)):
+        before, after = rows[index - 1], rows[index]
+        if before is None or after is None:
+            continue
+        if (before > 0) != (after > 0) and before != 0 and after != 0:
+            out.append(index)
+    return out
+
+
 def stratum_of(record: dict, factors: Sequence[str]) -> str:
     """The split level an instance belongs to, as one readable key.
 
@@ -220,27 +235,6 @@ READOUT_CHUNK = 16
 SENDER_KINDS = ("embed", "head", "mlp")
 
 
-def _head_output_weight(model, layer: int):
-    """`o_proj.weight` of one layer, `[hidden, num_heads * head_dim]`.
-
-    Read through the nnsight Envoy, which delegates attribute access to the
-    module it wraps, so the private `_model` handle ADR-0001 confines to
-    `hooks.py` is not touched. This is the only place in the package that
-    reaches a weight, and it is a one-line swap if the hook module ever grows
-    an `o_proj_weight`.
-
-    `o_proj` is bias-free in every Llama, which is what makes a head's
-    contribution its own slice times its own columns and nothing else; a bias
-    would belong to no single head and is refused rather than silently spread.
-    """
-    projection = model.model.layers[layer].self_attn.o_proj
-    if getattr(projection, "bias", None) is not None:
-        raise NotImplementedError(
-            f"layer {layer}'s o_proj has a bias, which belongs to no single "
-            f"head; per-head direct logit attribution is not defined for it")
-    return projection.weight
-
-
 def component_contributions(model, capture, keys) -> "torch.Tensor":
     """`[batch, len(keys), hidden]`: what each key added to the residual stream.
 
@@ -263,7 +257,7 @@ def component_contributions(model, capture, keys) -> "torch.Tensor":
         value = value[rows, capture.readout, :].float()
         if kind == "head":
             head_dim = value.shape[-1]
-            weight = _head_output_weight(model, int(layer)).detach().float()
+            weight = hooks_module().o_proj_weight(model, int(layer)).float()
             span = slice(int(index) * head_dim, (int(index) + 1) * head_dim)
             value = value @ weight[:, span].T
         out.append(value)
@@ -276,33 +270,21 @@ def fixed_scale_readout(model, contributions, residual) -> "torch.Tensor":
     RMSNorm is only linear once its scale is fixed, and the scale that makes
     the contributions add up to the model's own logits is the one the final
     norm actually applied: the whole residual's, at that instance's Readout.
+    `hooks.readout_logits` takes it as `scale_from`, so every Component is
+    normalized by the same number and the parts sum to the whole.
 
-    `hooks.readout_logits` normalizes by the RMS of what it is handed, so a
-    contribution is rescaled to carry the residual's RMS exactly, read, and
-    scaled back. `mean((kappa*c)^2) == mean(r^2)`, so the norm inside uses the
-    residual's scale *including the model's own epsilon* — which is why this
-    needs no second readout implementation and no access to the norm's
-    internals.
-
-    A contribution that is exactly zero reads as zero rather than as a division
-    by zero: `kappa` is held at one there and the fp32 readout of a zero vector
-    is zero.
+    The readout is chunked over Components because it materializes
+    `[batch, chunk, vocab]` in float32 — a completeness sweep over every head
+    in the model would otherwise ask for one allocation of several gigabytes.
     """
     import torch
 
     contributions = contributions.float()
-    residual_rms = residual.float().pow(2).mean(-1, keepdim=True).sqrt()
-    contribution_rms = contributions.pow(2).mean(-1, keepdim=True).sqrt()
-    safe = torch.where(contribution_rms > 0, contribution_rms,
-                       torch.ones_like(contribution_rms))
-    kappa = residual_rms.unsqueeze(1) / safe
-
-    chunks = []
-    for start in range(0, contributions.shape[1], READOUT_CHUNK):
-        span = slice(start, start + READOUT_CHUNK)
-        scaled = contributions[:, span] * kappa[:, span]
-        chunks.append(hooks_module().readout_logits(model, scaled)
-                      / kappa[:, span])
+    scale_from = residual.float().unsqueeze(1)
+    chunks = [hooks_module().readout_logits(model, contributions[:, span],
+                                            scale_from=scale_from)
+              for span in (slice(start, start + READOUT_CHUNK) for start in
+                           range(0, contributions.shape[1], READOUT_CHUNK))]
     return torch.cat(chunks, dim=1)
 
 
@@ -399,9 +381,8 @@ class Tally:
                 for column, key in enumerate(self.keys):
                     self.components[key].setdefault(stratum, []).append(
                         self.sign * float(per_component[row, column]))
-                if lens is not None:
-                    self.lens.setdefault(stratum, []).append(
-                        [self.sign * float(one) for one in lens[row]])
+                self.lens.setdefault(stratum, []).append(
+                    [self.sign * float(one) for one in lens[row]])
                 bucket = self.totals.setdefault(stratum, {})
                 bucket.setdefault("model_logit_difference", []).append(
                     self.sign * float(total[row]))
@@ -441,6 +422,7 @@ class Tally:
                 "mean": [one["mean"] for one in stats],
                 "se": [one["se"] for one in stats],
                 "sign_flip_layer": sign_flip_layer([one["mean"] for one in stats]),
+                "sign_changes": sign_changes([one["mean"] for one in stats]),
             }
         return out
 
@@ -494,6 +476,10 @@ def measure_batch(model, keys, input_ids, attention_mask, readout, target,
                                                distractor=distractor)
     lens = lens_logit_difference(model, capture, target=target,
                                  distractor=distractor)
+    # The lens's last row is this same number by construction. It is read
+    # again, on its own, because it is what the per-Component sum is checked
+    # against — a quantity that checks itself checks nothing — and one more
+    # readout of a [batch, hidden] residual is the cheapest pass here.
     total = hooks.target_minus_distractor(
         hooks.readout_logits(model, capture.residual[:, -1, :]),
         target, distractor)
@@ -506,10 +492,22 @@ def _to_device(model, *tensors):
 
 
 def _add_batch(tally, records, ids, per_component, lens, total) -> None:
-    """Split the per-key column block into circuit, embedding and remainder."""
-    circuit_sum = per_component[:, :-1].sum(dim=1)
-    tally.add(records, ids, per_component, lens, total, circuit_sum,
-              per_component[:, -1])
+    """Split the per-key column block into circuit, embedding and remainder.
+
+    The embedding is a sender and not a Component, so it is not part of the
+    circuit's own sum; it is found by key rather than by position, so a caller
+    that orders its keys differently still gets the right split.
+    """
+    import torch
+
+    embed = tuple(hooks_module().EMBED_KEY)
+    columns_of_circuit = [index for index, key in enumerate(tally.keys)
+                          if key != embed]
+    circuit_sum = per_component[:, columns_of_circuit].sum(dim=1)
+    embedding = (per_component[:, tally.keys.index(embed)]
+                 if embed in tally.keys
+                 else torch.zeros_like(circuit_sum))
+    tally.add(records, ids, per_component, lens, total, circuit_sum, embedding)
 
 
 def measure_condition(model, batches, keys, *, factors=(), sign: int = 1,
@@ -636,6 +634,21 @@ def honest_twin_dir(ctx) -> str:
     return instances.dataset_dir(ctx.task_spec) + "_honest"
 
 
+def dataset_of(ctx, condition: str) -> str:
+    """Which dataset directory a condition's prompts come from.
+
+    Written into `dla.json` because "honest" names two different things here —
+    the paired counterfactual built from the task's own split, and the Honest
+    Twin's separate split — and a reader of the file should not have to infer
+    which one a column came from.
+    """
+    from component_analysis import instances
+
+    if condition == HONEST_TWIN:
+        return honest_twin_dir(ctx)
+    return instances.dataset_dir(ctx.task_spec)
+
+
 def condition_batches(ctx, condition: str):
     """The loader one condition runs over, or `LoaderUnavailable` with the reason."""
     from component_analysis import dataloaders
@@ -751,8 +764,8 @@ def run(ctx) -> dict:
         except dataloaders.LoaderUnavailable as unavailable:
             skipped[condition] = str(unavailable)
             continue
-        sources[condition] = dict(batches.report, paired=(
-            condition == HONEST_INSTRUCTION))
+        sources[condition] = dict(batches.report, dataset_dir=dataset_of(
+            ctx, condition), paired=(condition == HONEST_INSTRUCTION))
         if condition == HONEST_INSTRUCTION:
             paired, honest, difference, unpaired = measure_paired(
                 ctx.model, batches, keys, factors=factors,
@@ -772,11 +785,12 @@ def run(ctx) -> dict:
     payload = dla_payload(ctx, tallies, sources, skipped, keys, margin=margin,
                           factors=factors, unpaired=unpaired,
                           sum_check_result=checked)
+    lens = lens_payload(ctx, tallies)
     ctx.write_json(SUBDIR, JSON_NAME, payload)
-    ctx.write_json(SUBDIR, LENS_JSON_NAME, lens_payload(ctx, tallies))
+    ctx.write_json(SUBDIR, LENS_JSON_NAME, lens)
     directory = ctx.subdir(SUBDIR)
     plot_components(os.path.join(directory, PNG_NAME), payload)
-    plot_lens(os.path.join(directory, LENS_PNG_NAME), lens_payload(ctx, tallies))
+    plot_lens(os.path.join(directory, LENS_PNG_NAME), lens)
     return columns(payload)
 
 
@@ -876,6 +890,7 @@ def lens_payload(ctx, tallies) -> dict:
             "n_instances": tally.n_instances,
             "n_rows": len(stats[ALL]["mean"]) if ALL in stats else 0,
             "sign_flip_layer": stats.get(ALL, {}).get("sign_flip_layer"),
+            "sign_changes": stats.get(ALL, {}).get("sign_changes", []),
             "levels": stats,
         }
     return {
