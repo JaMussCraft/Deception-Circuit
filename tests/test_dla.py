@@ -71,17 +71,25 @@ def test_suppression_flags_only_a_mean_below_the_negative_margin():
         "a Component with no measurement is unflagged, not unsuppressed"
 
 
-def test_the_sign_flip_layer_is_where_the_lens_takes_its_final_sign_for_good():
-    # Layer 0 is the embedding row; the lens goes positive at 3 and stays.
-    assert dla.sign_flip_layer([-1.0, -0.5, -0.2, 0.3, 0.9]) == 3
+def test_the_sign_flip_row_is_where_the_lens_takes_its_final_sign_for_good():
+    # Row 0 is the embedding; the lens goes positive at row 3 and stays.
+    assert dla.sign_flip_row([-1.0, -0.5, -0.2, 0.3, 0.9]) == 3
 
 
 def test_a_lens_that_goes_back_over_the_axis_flips_at_the_later_crossing():
-    assert dla.sign_flip_layer([-1.0, 0.4, -0.2, 0.3, 0.9]) == 3
+    assert dla.sign_flip_row([-1.0, 0.4, -0.2, 0.3, 0.9]) == 3
 
 
 def test_a_lens_that_never_changes_sign_has_no_flip():
-    assert dla.sign_flip_layer([0.2, 0.4, 0.9]) is None
+    assert dla.sign_flip_row([0.2, 0.4, 0.9]) is None
+
+
+def test_a_lens_row_is_not_a_layer():
+    """Row 0 is the embedding's output, so it belongs to no decoder layer."""
+    assert dla.layer_of_row(3) == 2
+    assert dla.layer_of_row(1) == 0
+    assert dla.layer_of_row(0) is None
+    assert dla.layer_of_row(None) is None
 
 
 def test_the_honest_twin_metric_is_negated_into_the_deception_direction():
@@ -98,6 +106,6 @@ def test_the_honest_twin_metric_is_negated_into_the_deception_direction():
 
 def test_every_crossing_is_reported_beside_the_flip_layer():
     """One number cannot say whether the crossing was decisive or noise."""
-    assert dla.sign_changes([-1.0, 0.4, -0.2, 0.3, 0.9]) == [1, 2, 3]
-    assert dla.sign_changes([-0.02, 0.01, 0.05, 3.0]) == [1]
-    assert dla.sign_changes([0.2, 0.4, 0.9]) == []
+    assert dla.sign_change_rows([-1.0, 0.4, -0.2, 0.3, 0.9]) == [1, 2, 3]
+    assert dla.sign_change_rows([-0.02, 0.01, 0.05, 3.0]) == [1]
+    assert dla.sign_change_rows([0.2, 0.4, 0.9]) == []

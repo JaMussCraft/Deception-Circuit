@@ -91,6 +91,16 @@ HONEST_INSTRUCTION = "honest_instruction"
 HONEST_TWIN = "honest_twin"
 CONDITIONS = (PRESSURE, HONEST_INSTRUCTION, HONEST_TWIN)
 
+#: Two more conditions, derived rather than measured on their own prompts and
+#: so not selectable with `--dla-conditions`. They exist because "paired" means
+#: the same instance ids on both sides: `differential` is the per-instance
+#: difference over the instances that have an Honest-Instruction
+#: Counterfactual, and `pressure_paired` is its left term, reported with its
+#: own n so that nobody subtracts the full-split `pressure` mean from the
+#: paired honest mean and calls the result paired.
+PRESSURE_PAIRED = "pressure_paired"
+DIFFERENTIAL = "differential"
+
 #: How far below zero a mean has to sit to be called suppression, in logits.
 #: Read it against the two scales it sits between. The whole model's Readout
 #: logit difference on SDR nls0.3 is about +1.75 and the clean-minus-corrupt
@@ -164,15 +174,19 @@ def is_suppressing(mean: Optional[float], *, margin: float) -> Optional[bool]:
     return bool(mean < -abs(margin))
 
 
-def sign_flip_layer(values: Sequence[Optional[float]]) -> Optional[int]:
-    """The layer at which the lens takes its final sign and keeps it.
+def sign_flip_row(values: Sequence[Optional[float]]) -> Optional[int]:
+    """The **row** at which the lens takes its final sign and keeps it.
 
-    `values` is the mean logit difference per row of the cumulative residual,
-    row 0 being the embedding and row `l + 1` the output of layer `l`. The
-    answer is the first row of the unbroken run that reaches the end, so a lens
-    that crosses the axis twice reports the later crossing — the earlier one
-    did not decide anything. None when the last row is already the sign of the
-    first (nothing flipped) or the lens ends on exactly zero.
+    A row is not a layer. `values` is the mean logit difference per row of the
+    cumulative residual, and row 0 is the embedding's output, so row `l + 1` is
+    the output of decoder layer `l` and `layer_of_row` converts. The two are
+    reported side by side everywhere this appears.
+
+    The answer is the first row of the unbroken run that reaches the end, so a
+    lens that crosses the axis twice reports the later crossing — the earlier
+    one did not decide anything. None when the last row is already the sign of
+    the first (nothing flipped), when the lens ends on exactly zero, or when
+    the run is broken by a row that was never measured.
     """
     rows = [None if one is None else float(one) for one in values]
     if not rows or rows[-1] is None or rows[-1] == 0.0:
@@ -187,10 +201,10 @@ def sign_flip_layer(values: Sequence[Optional[float]]) -> Optional[int]:
     return None
 
 
-def sign_changes(values: Sequence[Optional[float]]) -> List[int]:
+def sign_change_rows(values: Sequence[Optional[float]]) -> List[int]:
     """Every row where the lens changes sign from the row before it.
 
-    Reported beside `sign_flip_layer` because the one number cannot say how
+    Reported beside `sign_flip_row` because the one number cannot say how
     decisive the crossing was. On the SDR circuit the lens sits within a tenth
     of a logit of zero for the first eighteen rows and crosses once, very
     early, so "the flip is at row 1" is true and a reader who sees only that
@@ -205,6 +219,20 @@ def sign_changes(values: Sequence[Optional[float]]) -> List[int]:
         if (before > 0) != (after > 0) and before != 0 and after != 0:
             out.append(index)
     return out
+
+
+def layer_of_row(row: Optional[int]) -> Optional[int]:
+    """The decoder layer a lens row belongs to, or None for the embedding row.
+
+    Row 0 is the embedding's output and row `l + 1` is the residual after layer
+    `l`, so the layer is one less than the row and row 0 belongs to no layer.
+    The ticket asks for "the layer where the sign flips" and the rows are what
+    the lens is indexed by, so both are written out rather than one being left
+    for the reader to convert.
+    """
+    if row is None or row <= 0:
+        return None
+    return row - 1
 
 
 def stratum_of(record: dict, factors: Sequence[str]) -> str:
@@ -415,14 +443,17 @@ class Tally:
         """Per split level: the mean lens per layer, its standard error, the flip."""
         out = {}
         for stratum, rows in self.lens.items():
-            per_layer = list(zip(*rows)) if rows else []
-            stats = [mean_and_se(one) for one in per_layer]
+            per_row = list(zip(*rows)) if rows else []
+            stats = [mean_and_se(one) for one in per_row]
+            means = [one["mean"] for one in stats]
+            flip = sign_flip_row(means)
             out[stratum] = {
                 "n": len(rows),
-                "mean": [one["mean"] for one in stats],
+                "mean": means,
                 "se": [one["se"] for one in stats],
-                "sign_flip_layer": sign_flip_layer([one["mean"] for one in stats]),
-                "sign_changes": sign_changes([one["mean"] for one in stats]),
+                "sign_flip_row": flip,
+                "sign_flip_layer": layer_of_row(flip),
+                "sign_change_rows": sign_change_rows(means),
             }
         return out
 
@@ -498,16 +529,18 @@ def _add_batch(tally, records, ids, per_component, lens, total) -> None:
     circuit's own sum; it is found by key rather than by position, so a caller
     that orders its keys differently still gets the right split.
     """
-    import torch
-
     embed = tuple(hooks_module().EMBED_KEY)
+    if embed not in tally.keys:
+        raise ValueError(
+            "the embedding must be measured alongside the Components: it is "
+            "what the residual stream starts from, so without it "
+            "outside_circuit silently absorbs it and the condition's totals "
+            "do not describe the circuit")
     columns_of_circuit = [index for index, key in enumerate(tally.keys)
                           if key != embed]
     circuit_sum = per_component[:, columns_of_circuit].sum(dim=1)
-    embedding = (per_component[:, tally.keys.index(embed)]
-                 if embed in tally.keys
-                 else torch.zeros_like(circuit_sum))
-    tally.add(records, ids, per_component, lens, total, circuit_sum, embedding)
+    tally.add(records, ids, per_component, lens, total, circuit_sum,
+              per_component[:, tally.keys.index(embed)])
 
 
 def measure_condition(model, batches, keys, *, factors=(), sign: int = 1,
@@ -649,13 +682,39 @@ def dataset_of(ctx, condition: str) -> str:
     return instances.dataset_dir(ctx.task_spec)
 
 
-def condition_batches(ctx, condition: str):
-    """The loader one condition runs over, or `LoaderUnavailable` with the reason."""
+def assert_honest_twin(batches, directory: str) -> None:
+    """The twin split must really be the Honest Condition, not another split.
+
+    `direction_sign` negates this condition because `harvest_honest_twins`
+    swaps Target and Distractor when it builds a `<task>_honest` split. That is
+    a property of the split, not of the flag, and `--dla-honest-twin-dir` will
+    point at any directory given one. Pointing it at an ordinary deceptive
+    split would silently report every Component with its sign inverted, so the
+    records are asked what they are.
+    """
     from component_analysis import dataloaders
 
-    reason = dataloaders.uncovered_reason(ctx.task_spec.name)
-    if reason:
-        raise dataloaders.LoaderUnavailable(reason)
+    for batch in batches:
+        wrong = {record.get("condition") for record in batch.records} - {"honest"}
+        if wrong:
+            raise dataloaders.LoaderUnavailable(
+                f"{directory} is not an Honest Twin split: its records carry "
+                f"condition {', '.join(sorted(str(one) for one in wrong))} "
+                f"rather than 'honest', and this column is negated into the "
+                f"deception direction on the assumption that it is one")
+        return
+
+
+def condition_batches(ctx, condition: str):
+    """The loader one condition runs over, or `LoaderUnavailable` with the reason.
+
+    Each condition is gated on what *it* needs. The mechanism-task gate lives
+    in the loaders and each of them raises it with its own reason, so a
+    descriptive condition is not refused here for a pairing requirement it does
+    not have.
+    """
+    from component_analysis import dataloaders
+
     if ctx.tokenizer is None:
         raise dataloaders.LoaderUnavailable(
             f"task {ctx.task_spec.name!r} has no resolved tokenizer, so its "
@@ -664,6 +723,9 @@ def condition_batches(ctx, condition: str):
     if condition == PRESSURE:
         return ctx.descriptive_batches()
     if condition == HONEST_INSTRUCTION:
+        reason = dataloaders.uncovered_reason(ctx.task_spec.name)
+        if reason:
+            raise dataloaders.LoaderUnavailable(reason)
         batches = ctx.causal_batches()
         if not batches.report["n_with_honest"]:
             raise dataloaders.LoaderUnavailable(
@@ -677,9 +739,11 @@ def condition_batches(ctx, condition: str):
         raise dataloaders.LoaderUnavailable(
             f"no Honest Twin dataset at {directory}; bind one with "
             f"--dla-honest-twin-dir")
-    return dataloaders.descriptive_batches(
+    batches = dataloaders.descriptive_batches(
         directory, ctx.tokenizer, task=ctx.task_spec.name,
         batch_size=getattr(ctx.cli, "batch_size", dataloaders.DEFAULT_BATCH_SIZE))
+    assert_honest_twin(batches, directory)
+    return batches
 
 
 # ==============================================================================
@@ -771,8 +835,8 @@ def run(ctx) -> dict:
                 ctx.model, batches, keys, factors=factors,
                 max_batches=max_batches)
             tallies[HONEST_INSTRUCTION] = honest
-            tallies["pressure_paired"] = paired
-            tallies["differential"] = difference
+            tallies[PRESSURE_PAIRED] = paired
+            tallies[DIFFERENTIAL] = difference
             continue
         tallies[condition] = measure_condition(
             ctx.model, batches, keys, factors=factors,
@@ -786,12 +850,13 @@ def run(ctx) -> dict:
                           factors=factors, unpaired=unpaired,
                           sum_check_result=checked)
     lens = lens_payload(ctx, tallies)
+    table = columns(payload)
     ctx.write_json(SUBDIR, JSON_NAME, payload)
     ctx.write_json(SUBDIR, LENS_JSON_NAME, lens)
     directory = ctx.subdir(SUBDIR)
-    plot_components(os.path.join(directory, PNG_NAME), payload)
+    plot_components(os.path.join(directory, PNG_NAME), payload, table=table)
     plot_lens(os.path.join(directory, LENS_PNG_NAME), lens)
-    return columns(payload)
+    return table
 
 
 # ==============================================================================
@@ -889,8 +954,9 @@ def lens_payload(ctx, tallies) -> dict:
         conditions[name] = {
             "n_instances": tally.n_instances,
             "n_rows": len(stats[ALL]["mean"]) if ALL in stats else 0,
+            "sign_flip_row": stats.get(ALL, {}).get("sign_flip_row"),
             "sign_flip_layer": stats.get(ALL, {}).get("sign_flip_layer"),
-            "sign_changes": stats.get(ALL, {}).get("sign_changes", []),
+            "sign_change_rows": stats.get(ALL, {}).get("sign_change_rows", []),
             "levels": stats,
         }
     return {
@@ -901,7 +967,9 @@ def lens_payload(ctx, tallies) -> dict:
         "task": ctx.task_spec.name,
         "metric": METRIC,
         "rows": "row 0 is the embedding's output; row l+1 is the residual "
-                "stream after decoder layer l, read at the Readout",
+                "stream after decoder layer l, read at the Readout. A row is "
+                "not a layer: layer = row - 1, and row 0 belongs to no layer. "
+                "Both sign_flip_row and sign_flip_layer are given.",
         "conditions": conditions,
     }
 
@@ -934,10 +1002,11 @@ def columns(payload) -> dict:
             "pressure": pressure,
             "pressure_se": value(PRESSURE, key, "se"),
             "honest_instruction": value(HONEST_INSTRUCTION, key),
-            "pressure_paired": value("pressure_paired", key),
-            "differential": value("differential", key),
-            "differential_se": value("differential", key, "se"),
-            "honest_twin": value(HONEST_TWIN, key),
+            "pressure_paired": value(PRESSURE_PAIRED, key),
+            "differential": value(DIFFERENTIAL, key),
+            "differential_se": value(DIFFERENTIAL, key, "se"),
+            "honest_twin_descriptive": value(HONEST_TWIN, key),
+            "honest_twin_descriptive_se": value(HONEST_TWIN, key, "se"),
             "suppression": is_suppressing(pressure, margin=margin),
         }
     return out
@@ -959,18 +1028,39 @@ def _pyplot():
 
 #: One colour per condition, so the two figures read as one.
 COLOURS = {PRESSURE: "#2c6fbb", HONEST_INSTRUCTION: "#e08a1e",
-           HONEST_TWIN: "#7f8c8d", "pressure_paired": "#5fa2dd",
-           "differential": "#8e44ad"}
+           HONEST_TWIN: "#7f8c8d", PRESSURE_PAIRED: "#5fa2dd",
+           DIFFERENTIAL: "#8e44ad"}
 
 
-def plot_components(path: str, payload: dict) -> str:
-    """The DLA bar chart: Components ordered by layer, suppressors marked."""
+def _empty_figure(path: str, message: str) -> str:
+    """A figure saying why it is empty, so that no JSON sits beside no PNG."""
+    plt = _pyplot()
+
+    figure, axes = plt.subplots(figsize=(6.0, 2.0))
+    axes.axis("off")
+    axes.text(0.5, 0.5, message, ha="center", va="center", fontsize=9,
+              wrap=True)
+    figure.tight_layout()
+    figure.savefig(path, dpi=150)
+    plt.close(figure)
+    return path
+
+
+def plot_components(path: str, payload: dict, *, table: dict = None) -> str:
+    """The DLA bar chart: Components ordered by layer, suppressors marked.
+
+    A figure is written even when there is nothing to draw, so that a reader
+    who finds `dla.json` beside no PNG knows the run failed rather than that
+    the analysis found nothing.
+    """
     plt = _pyplot()
 
     series = [name for name in (PRESSURE, HONEST_INSTRUCTION, HONEST_TWIN)
               if name in payload["conditions"]]
     if not series:
-        return path
+        return _empty_figure(
+            path, "no condition of this cell had data to measure; "
+            "see skipped in dla.json")
     rows = sorted(payload["conditions"][series[0]]["components"],
                   key=lambda row: (row["layer"], row["kind"] == "mlp",
                                    row["index"]))
@@ -989,7 +1079,7 @@ def plot_components(path: str, payload: dict) -> str:
                  means, width, yerr=errors, capsize=2, label=name,
                  color=COLOURS.get(name, "#333333"))
 
-    flagged = {key for key, values in columns(payload).items()
+    flagged = {key for key, values in (table or columns(payload)).items()
                if values["suppression"]}
     for index, key in enumerate(order):
         if key in flagged:
@@ -1016,7 +1106,7 @@ def plot_lens(path: str, payload: dict) -> str:
 
     conditions = payload["conditions"]
     if not conditions:
-        return path
+        return _empty_figure(path, "no condition of this cell had a logit lens")
     figure, axes = plt.subplots(figsize=(7.5, 4.6))
     for row, (name, condition) in enumerate(conditions.items()):
         level = condition["levels"].get(ALL)
@@ -1026,14 +1116,16 @@ def plot_lens(path: str, payload: dict) -> str:
         colour = COLOURS.get(name, "#333333")
         axes.plot(range(len(means)), means, marker="o", markersize=3,
                   label=name, color=colour)
-        flip = level.get("sign_flip_layer")
+        flip = level.get("sign_flip_row")
         if flip is None:
             continue
         axes.axvline(flip, linestyle="--", linewidth=0.9, alpha=0.6,
                      color=colour)
         # Every condition crosses in the same narrow band of layers, so the
         # labels are stacked rather than each sitting on its own line.
-        axes.annotate(f"{name} at row {flip}", (flip, 0.0),
+        layer = layer_of_row(flip)
+        where = f"row {flip}" + ("" if layer is None else f" (layer {layer})")
+        axes.annotate(f"{name} at {where}", (flip, 0.0),
                       textcoords="offset points",
                       xytext=(4, 10 + 11 * row), fontsize=7, color=colour)
 

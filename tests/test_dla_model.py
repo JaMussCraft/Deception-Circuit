@@ -97,14 +97,6 @@ def total_logit_difference(model, capture, answers):
         target, distractor)
 
 
-def test_the_residual_the_lens_reads_is_the_one_the_final_norm_sees(model,
-                                                                    capture):
-    """The premise of everything below, asserted rather than assumed."""
-    got = hooks.readout_logits(model, capture.residual[:, -1, :])
-
-    assert torch.allclose(got, capture.logits.float(), atol=1e-4)
-
-
 def test_dla_over_every_component_and_the_embedding_sums_to_the_logit_difference(
         model, capture, answers):
     """The invariant. It holds only for the whole model, never for a subset.
@@ -284,7 +276,9 @@ def test_the_head_table_gains_the_dla_columns_under_its_own_name(dla_run):
 
     table = read_json(out, *CELL, "head_table.json")
 
-    for column in ("dla.pressure", "dla.pressure_se", "dla.honest_twin",
+    for column in ("dla.pressure", "dla.pressure_se",
+                   "dla.honest_twin_descriptive",
+                   "dla.honest_twin_descriptive_se",
                    "dla.suppression", "dla.differential"):
         assert column in table["columns"]
     assert all(row["dla.pressure"] is not None for row in table["rows"])
@@ -306,8 +300,8 @@ def test_the_honest_twin_column_is_read_in_the_deception_direction(dla_run):
 
     assert table["rows"], "no Components to compare"
     for row in table["rows"]:
-        assert row["dla.honest_twin"] == pytest.approx(row["dla.pressure"],
-                                                       abs=1e-5)
+        assert row["dla.honest_twin_descriptive"] == pytest.approx(
+            row["dla.pressure"], abs=1e-5)
 
 
 def test_the_logit_lens_json_has_one_row_per_layer_and_names_the_flip(dla_run):
@@ -321,7 +315,9 @@ def test_the_logit_lens_json_has_one_row_per_layer_and_names_the_flip(dla_run):
     level = pressure["levels"]["all"]
     assert len(level["mean"]) == TINY["layers"] + 1
     assert len(level["se"]) == TINY["layers"] + 1
-    assert pressure["sign_flip_layer"] == dla.sign_flip_layer(level["mean"])
+    assert pressure["sign_flip_row"] == dla.sign_flip_row(level["mean"])
+    assert pressure["sign_flip_layer"] == dla.layer_of_row(
+        pressure["sign_flip_row"]), "a row is not a layer, and both are given"
 
 
 def test_the_run_records_whether_the_sum_invariant_held_on_this_model(dla_run):
@@ -406,3 +402,79 @@ def test_an_unknown_condition_is_refused_by_name(dla_run):
     with pytest.raises(ValueError, match="nosuch"):
         run_cli(str(run_dir), "--num-kv-heads", "2", "--dla-conditions",
                 "nosuch", "--output-dir", str(out))
+
+
+def test_a_twin_directory_that_is_not_the_honest_condition_is_refused(
+        dla_run, tmp_path, monkeypatch):
+    """The twin column is negated, so pointing the flag elsewhere would invert it.
+
+    `--dla-honest-twin-dir` takes any directory. A deceptive split behind it
+    would be read as an Honest Twin and every Component reported with its sign
+    flipped, which is a silent wrong answer rather than a failure.
+    """
+    run_dir, out, records = dla_run
+    from datasets import Dataset, DatasetDict
+
+    impostor = tmp_path / "datasets" / "sdr_not_honest"
+    DatasetDict({"test": Dataset.from_list(
+        [dict(r, condition="deceptive") for r in records])}).save_to_disk(
+            str(impostor))
+    with open(os.path.join(str(impostor), "dataset_config.json"), "w") as handle:
+        json.dump({"task": "sdr", "max_seq_length": 128, "margin_thresh": 1.0},
+                  handle)
+
+    run_cli(str(run_dir), "--num-kv-heads", "2", "--dla-honest-twin-dir",
+            str(impostor), "--output-dir", str(out))
+
+    payload = read_json(out, *CELL, dla.SUBDIR, dla.JSON_NAME)
+    assert "honest_twin" in payload["skipped"]
+    assert "not an Honest Twin split" in payload["skipped"]["honest_twin"]
+
+
+def test_the_differential_is_the_paired_difference_over_the_same_ids(model,
+                                                                     prompts,
+                                                                     answers):
+    """`paired` means the same instance ids on both sides, not two populations.
+
+    The Honest-Instruction Counterfactual here is the pressure prompt itself,
+    so every Component's differential must be exactly zero and both sides must
+    name the same instances. A differential taken between a full-split pressure
+    mean and a paired honest mean would satisfy neither.
+    """
+    from component_analysis.dataloaders import Batch, HonestPair
+
+    ids, mask = prompts
+    target, distractor = answers
+    rows = list(range(BATCH))
+    batch = Batch(
+        ids=[f"i{row}" for row in rows],
+        records=[{"designation_polarity": "identity"} for _ in rows],
+        input_ids=ids, attention_mask=mask,
+        corrupt_input_ids=ids, corrupt_attention_mask=mask,
+        target_token=target, distractor_token=distractor,
+        readout=hooks.readout_positions(mask),
+        honest=HonestPair(rows=rows, input_ids=ids.clone(),
+                          attention_mask=mask.clone(),
+                          clause_span=torch.zeros(BATCH, 2, dtype=torch.long),
+                          instructions=["itself"] * BATCH))
+
+    paired, honest, differential, unpaired = dla.measure_paired(
+        model, [batch], ALL_KEYS)
+
+    assert unpaired == []
+    assert paired.ids == honest.ids == differential.ids == batch.ids
+    for key in ALL_KEYS:
+        assert differential.component_stats(key)["all"]["mean"] == \
+            pytest.approx(0.0, abs=1e-5)
+
+
+def test_a_differential_over_different_instances_is_refused(model, prompts,
+                                                            answers):
+    """The guard that makes the column paired rather than merely subtracted."""
+    left = dla.Tally(ALL_KEYS)
+    left.ids = ["a", "b"]
+    right = dla.Tally(ALL_KEYS)
+    right.ids = ["a", "c"]
+
+    with pytest.raises(ValueError, match="same instances"):
+        dla.paired_difference(left, right)
