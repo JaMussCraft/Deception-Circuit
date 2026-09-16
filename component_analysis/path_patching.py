@@ -86,6 +86,14 @@ RECEIVER_KINDS = ("q", "k", "v", "mlp_in", "readout")
 #: that "no cell" never reads as "an effect of zero".
 MISSING_COLOUR = "#e8e8e8"
 
+#: The heatmap's colour scale runs to this percentile of the absolute effects
+#: rather than to the largest of them. One cell is usually an order of magnitude
+#: above the rest — on SDR nls0.3 the last MLP block's direct effect is 0.094
+#: against a second place of 0.019 — and a scale set by it washes the other 392
+#: cells to white. Cells beyond the scale saturate, and the colour bar's arrows
+#: say so; the JSON twin carries every unclipped number.
+HEATMAP_PERCENTILE = 98.0
+
 #: An instance whose clean-minus-corrupt gap is this small is not normalized by
 #: it: the Corruption did not move the answer, so every cell would be a ratio of
 #: two small numbers. Excluded and counted rather than returned as a spike.
@@ -752,6 +760,15 @@ def _figures(ctx, grid: Grid, summaries: Dict[Cell, dict], payload: dict) -> Non
     import numpy as np
 
     rows, columns, values = _matrix(grid, summaries)
+    grid_values = np.array([[np.nan if one is None else one for one in row]
+                            for row in values], dtype=float)
+    finite = np.abs(grid_values[np.isfinite(grid_values)])
+    extent = float(np.percentile(finite, HEATMAP_PERCENTILE)) if finite.size else 1.0
+    clipped = int((finite > extent).sum()) if finite.size else 0
+    # A grid whose effects are all zero, or whose 98th percentile is, still
+    # needs a scale with a width; fall back to the largest effect, then to one.
+    extent = extent or (float(finite.max()) if finite.size else 0.0) or 1.0
+
     ctx.write_json(SUBDIR, HEATMAP_JSON, {
         "title": "Position-agnostic path patching, normalized effect",
         "rows": rows,
@@ -761,14 +778,10 @@ def _figures(ctx, grid: Grid, summaries: Dict[Cell, dict], payload: dict) -> Non
                     for one in columns],
         "values": values,
         "missing": "null where the sender is not strictly upstream of the receiver",
+        "colour_scale": {"percentile": HEATMAP_PERCENTILE, "extent": extent,
+                         "cells_beyond_the_scale": clipped},
         "metric": payload["metric"],
     })
-
-    grid_values = np.array([[np.nan if one is None else one for one in row]
-                            for row in values], dtype=float)
-    finite = grid_values[np.isfinite(grid_values)]
-    extent = float(np.abs(finite).max()) if finite.size else 1.0
-    extent = extent or 1.0
 
     figure, axes = plt.subplots(
         figsize=(max(6.0, 0.42 * len(columns) + 3.0),
@@ -788,9 +801,11 @@ def _figures(ctx, grid: Grid, summaries: Dict[Cell, dict], payload: dict) -> Non
     axes.set_ylabel("sender")
     axes.set_title(f"Path patching (position-agnostic) — "
                    f"{ctx.circuit_spec.label} x {ctx.task_spec.name}\n"
-                   f"(patched - clean) / (clean - corrupt); grey = no path",
+                   f"(patched - clean) / (clean - corrupt); grey = no path; "
+                   f"scale to the {HEATMAP_PERCENTILE:g}th percentile, "
+                   f"{clipped} cell(s) beyond it",
                    fontsize=9)
-    figure.colorbar(image, ax=axes, fraction=0.03, pad=0.02)
+    figure.colorbar(image, ax=axes, fraction=0.03, pad=0.02, extend="both")
     figure.tight_layout()
     figure.savefig(os.path.join(ctx.subdir(SUBDIR), HEATMAP_PNG), dpi=200)
     plt.close(figure)
