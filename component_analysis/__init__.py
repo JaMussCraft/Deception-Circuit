@@ -16,6 +16,8 @@ Layout
     segmentation.py prompt -> Segments (the spans an analysis aggregates over)
     sampling.py     the fixed-seed stratified sample the causal analyses use
     instances.py    the split's records, and segmentation.json / sample.json
+    dataloaders.py  the batches an analysis runs over, both counterfactuals
+    registry.py     what an analysis is, which ones exist, and their context
     hooks.py        every nnsight call in the package, and nothing else
 
 Only `hooks.py` imports nnsight, and it does so inside its functions, so the

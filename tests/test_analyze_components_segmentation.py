@@ -47,6 +47,11 @@ def build_sdr_split(path, tokenizer, n=N_RECORDS):
         tokenizer, SPECS["sdr"], n, load_entities()[:4], load_item_pairs()[:6],
         load_pressures("sdr")[:3], seed=0)
     DatasetDict({"test": Dataset.from_list(records)}).save_to_disk(str(path))
+    # Every built dataset carries one, and the loaders read the token budget
+    # from it rather than guessing, so the fixture writes one too.
+    with open(os.path.join(str(path), "dataset_config.json"), "w") as handle:
+        json.dump({"task": "sdr", "max_seq_length": 128, "margin_thresh": 1.0},
+                  handle)
     return records
 
 

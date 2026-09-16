@@ -45,7 +45,7 @@ from __future__ import annotations
 import argparse
 import sys
 
-from component_analysis import instances, intake, sampling
+from component_analysis import dataloaders, instances, intake, registry, sampling
 from component_analysis import segmentation as segments
 from component_analysis.components import circuit_components, count_components, \
     is_component_of
@@ -107,6 +107,21 @@ def build_parser():
                    help="Seed for the causal sample. Does not touch the run's "
                         "own training seed.")
 
+    g = p.add_argument_group("analyses")
+    g.add_argument("--analyses", default=None, metavar="NAME[,NAME]",
+                   help="Which registered analyses to run, in registration "
+                        "order. Default: every registered one, which is "
+                        f"currently {', '.join(registry.names()) or '(none)'}.")
+    g.add_argument("--batch-size", type=int,
+                   default=dataloaders.DEFAULT_BATCH_SIZE,
+                   help="Instances per forward pass.")
+    g.add_argument("--device", default="cuda",
+                   help="Where the model is loaded. Ignored by --dry-run, "
+                        "which loads no model.")
+
+    for module in registry.registered():
+        module.add_arguments(p.add_argument_group(f"{module.NAME} analysis"))
+
     g = p.add_argument_group("output")
     g.add_argument("--output-dir", default=None,
                    help="Default: outputs/_analyses/<suite-name>.")
@@ -156,12 +171,16 @@ def write_cell(cell_dir: str, circuit_spec, task_spec, rows, components,
 class TaskInstances:
     """One task's resolved Segments and its causal sample, ready to write."""
 
-    def __init__(self, task_spec, segmentations, report, sample, overrides):
+    def __init__(self, task_spec, segmentations, report, sample, overrides,
+                 tokenizer=None):
         self.task_spec = task_spec
         self.segmentations = segmentations
         self.report = report
         self.sample = sample
         self.overrides = overrides
+        # Kept so the analyses tokenize their prompts with the tokenizer the
+        # Segments were resolved against, rather than loading a second one.
+        self.tokenizer = tokenizer
 
     def write(self, cell_dir: str, *, meta: dict) -> dict:
         return {
@@ -201,7 +220,7 @@ def resolve_instances(cli, resolved, *, tokenizer=None) -> dict:
         sample = sampling.draw_sample(records, n=cli.n_causal, seed=cli.seed,
                                       ids=ids)
         out[task_spec.label] = TaskInstances(task_spec, segmentations, report,
-                                             sample, overrides)
+                                             sample, overrides, tokenizer)
     return out
 
 
@@ -239,10 +258,41 @@ def print_instances(task_instances: TaskInstances) -> None:
 
 
 # ==============================================================================
+# ANALYSES
+# ==============================================================================
+
+def analysis_context(cli, resolved, circuit_spec, task_spec, components, cell,
+                     task_instances, *, model=None) -> registry.AnalysisContext:
+    """What every analysis is handed for one (circuit, task) cell."""
+    return registry.AnalysisContext(
+        cli=cli, intake=resolved, circuit_spec=circuit_spec,
+        task_spec=task_spec, components=components, cell_dir=cell, model=model,
+        tokenizer=None if task_instances is None else task_instances.tokenizer,
+        segmentations=None if task_instances is None else task_instances.segmentations,
+        sample=None if task_instances is None else task_instances.sample,
+        device=getattr(cli, "device", "cuda"))
+
+
+def selected_analyses(cli) -> list:
+    return registry.select(registry.parse_names(getattr(cli, "analyses", None)))
+
+
+def print_estimates(ctx, selected) -> None:
+    """`--dry-run`: one line per analysis, and no file created by any of them."""
+    if not selected:
+        print("    analyses: none registered, so this run would only write the "
+              "head table, the segmentation and the sample")
+        return
+    for module in selected:
+        print(f"    {module.NAME}: {module.estimate(ctx)}")
+
+
+# ==============================================================================
 # DRY RUN
 # ==============================================================================
 
 def dry_run(cli, resolved, *, tokenizer=None) -> int:
+    selected = selected_analyses(cli)
     kv_heads = intake.num_key_value_heads(
         resolved.model, hf_token=cli.hf_token, override=cli.num_kv_heads)
     root = intake.analyses_root(cli, resolved.base_run_dir)
@@ -279,8 +329,11 @@ def dry_run(cli, resolved, *, tokenizer=None) -> int:
             task_instances = resolved_instances.get(task_spec.label)
             if task_instances is None:
                 print(f"    segmentation: task {task_spec.name!r} has no "
-                      f"default segmentation, so no segmentation.json or "
-                      f"sample.json")
+                      f"default segmentation, so no segmentation.json, no "
+                      f"sample.json and no causal loader")
+                print_estimates(analysis_context(cli, resolved, circuit_spec,
+                                                 task_spec, components, cell,
+                                                 None), selected)
                 continue
             files = task_instances.write(cell, meta={
                 "circuit": circuit_spec.provenance(),
@@ -289,13 +342,90 @@ def dry_run(cli, resolved, *, tokenizer=None) -> int:
             print(f"    {files['segmentation']}")
             print(f"    {files['sample']}")
 
+            ctx = analysis_context(cli, resolved, circuit_spec, task_spec,
+                                   components, cell, task_instances)
+            for line in dataloaders.summarize(ctx.causal_batches()):
+                print(f"    causal loader: {line}")
+            print_estimates(ctx, selected)
+
     if resolved_instances:
         print("\n  The head table, the segmentation and the sample were "
               "written.", end=" ")
     else:
         print("\n  Only the head table was written: no task in this run has a "
               "default segmentation.", end=" ")
-    print("The analyses that need a model come from the later tickets.")
+    if selected:
+        print(f"Without --dry-run this would run: "
+              f"{', '.join(module.NAME for module in selected)}.")
+    else:
+        print("No analysis is registered yet, so the analyses that need a "
+              "model come from the later tickets.")
+    return 0
+
+
+# ==============================================================================
+# THE RUN
+# ==============================================================================
+
+def load_model(cli, resolved):
+    """The model every analysis shares, loaded once for the whole run.
+
+    Imported here rather than at module scope so that `--dry-run` never reaches
+    nnsight: the login node carries 0.5.12 for the parent repo, not the 0.7.0
+    ADR-0001 pins.
+    """
+    from component_analysis.hooks import load_analysis_model
+
+    model = load_analysis_model(resolved.model, device=cli.device,
+                                hf_token=cli.hf_token)
+    parameter = next(iter(model._model.parameters()))
+    print(f"  model loaded on {parameter.device} as {parameter.dtype}")
+    return model
+
+
+def run(cli, resolved, *, model=None) -> int:
+    """Every selected analysis over every cell, then one head table per cell."""
+    selected = selected_analyses(cli)
+    if not selected:
+        raise SystemExit(
+            "no analysis is registered, so a run without --dry-run would load "
+            "a model and do nothing with it. Register one in "
+            "component_analysis/registry.py, or pass --dry-run.")
+
+    kv_heads = intake.num_key_value_heads(
+        resolved.model, hf_token=cli.hf_token, override=cli.num_kv_heads)
+    root = intake.analyses_root(cli, resolved.base_run_dir)
+    resolved_instances = resolve_instances(cli, resolved)
+    if model is None:
+        model = load_model(cli, resolved)
+
+    print(f"\n  running {', '.join(m.NAME for m in selected)} over "
+          f"{len(resolved.circuits)} circuit(s) x {len(resolved.tasks)} task(s)")
+    for circuit_spec in resolved.circuits:
+        components, base_rows = head_table_for(circuit_spec, resolved,
+                                               num_kv_heads=kv_heads)
+        for task_spec in resolved.tasks:
+            cell = intake.cell_dir(root, circuit_spec, task_spec)
+            task_instances = resolved_instances.get(task_spec.label)
+            ctx = analysis_context(cli, resolved, circuit_spec, task_spec,
+                                   components, cell, task_instances, model=model)
+            print(f"  {circuit_spec.label} x {task_spec.label}")
+
+            rows = base_rows
+            for module in selected:
+                updates = module.run(ctx) or {}
+                rows = merge_columns(rows, updates, namespace=module.NAME)
+                print(f"    {module.NAME}: {len(updates)} Component(s) updated, "
+                      f"output under {module.SUBDIR}/")
+
+            if task_instances is not None:
+                task_instances.write(cell, meta={
+                    "circuit": circuit_spec.provenance(),
+                    "task": task_spec.provenance()})
+            written = write_cell(cell, circuit_spec, task_spec, rows, components,
+                                 resolved)
+            print(f"    {written['csv']}")
+            print(f"    {written['json']}")
     return 0
 
 
@@ -306,12 +436,9 @@ def dry_run(cli, resolved, *, tokenizer=None) -> int:
 def main(argv=None) -> int:
     cli = build_parser().parse_args(argv)
     resolved = intake.resolve_intake(cli)
-    if not cli.dry_run:
-        raise SystemExit(
-            "analyze_components.py currently implements --dry-run only: circuit "
-            "intake and the head table. The analyses that load a model arrive "
-            "with the tickets that add them.")
-    return dry_run(cli, resolved)
+    if cli.dry_run:
+        return dry_run(cli, resolved)
+    return run(cli, resolved)
 
 
 if __name__ == "__main__":

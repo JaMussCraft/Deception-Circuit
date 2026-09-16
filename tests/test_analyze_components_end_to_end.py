@@ -245,7 +245,8 @@ def test_a_reference_name_may_not_also_be_a_circuit_name(tiny_runs):
                 "--task-from", str(run_dir), "--output-dir", str(out))
 
 
-def test_without_dry_run_it_says_what_is_not_built_yet(tiny_runs):
+def test_a_run_with_no_analysis_registered_loads_no_model(tiny_runs):
+    """Nothing is registered on this branch, so a run would be a 32 GB no-op."""
     run_dir, _honest, out = tiny_runs
 
     with pytest.raises(SystemExit, match="--dry-run"):
