@@ -199,7 +199,10 @@ whose Component has any active leaf gate in the circuit under study.
 A label for what a Component does in the task, assigned only from the
 conjunction of where it reads (attention pattern), what it writes (direct
 logit attribution) and what it depends on (path patching). No single view
-assigns a role.
+assigns a role. The vocabulary (binder, selector, mover, suppressor, unknown;
+pressure reader reserved) and the criteria that assign each one are in
+`docs/component-roles.md`; the sign convention they read across analyses is
+ADR-0002.
 
 **Target** / **Distractor**:
 The token the mechanism's deceptive behavior selects, and the honest token it

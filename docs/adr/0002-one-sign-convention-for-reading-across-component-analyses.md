@@ -1,0 +1,101 @@
+# ADR-0002: One sign convention for reading across the component analyses, applied by derived columns rather than by rewriting an output
+
+Date: 2026-09-20
+Status: accepted
+
+## Context
+
+Four analyses write per-Component numbers into one head table, and two of them
+disagree about what a positive number means.
+
+- **Knockout** (`knockout.logit_diff_drop`) is
+  `clean logit difference - knocked-out logit difference`. **Positive means the
+  Component helps deception**: removing it moves the model away from the
+  deceptive answer.
+- **DLA** (`dla.pressure` and its siblings) is the Component's contribution to
+  `logit(deceptive answer) - logit(honest answer)` at the Readout, with the
+  Honest Twin condition negated into that same direction. **Positive means the
+  Component writes towards deception.**
+- **Path patching** (`path_patching.direct_effect` and every `*_effect` cell)
+  is `(patched - clean) / (clean - counterfactual)`. **Negative means the path
+  carries the counterfactual** — for the item-swap pair, that the path carries
+  the Corruption, which is the same physical claim knockout states with a
+  positive number.
+- **Attention masses** are non-negative and carry no direction at all.
+
+So a reader scanning one row of the head table meets `+0.4465` and `-0.0207`
+for the same head and has to remember which column reverses. The researcher's
+block D decision was that each analysis keeps its native sign, each JSON states
+its own convention in its `meta`, and the roles vocabulary settles one
+convention for reading across them.
+
+Each of those columns is an output of record with GPU runs behind it
+(`outputs/_analyses/ca03-attention`, `dla-verify3`, `ca07-knockout`,
+`ca08-path-patching`, `ca06-paired2`, `ca09-path-patching`, `ca09-sweep`), and
+tickets 03 and 09 both note that a sibling analysis reads a column by name.
+
+## Decision
+
+**The deception-support convention: a number is positive when the Component
+supports the deceptive answer.** It is the convention every cross-analysis
+reading uses — the role criteria in `docs/component-roles.md`, the roles JSON,
+and any figure or notebook panel that puts two analyses on one axis.
+
+It is applied in one of two ways, never a third:
+
+1. **A column whose native sign already matches is read natively**, and the
+   criteria say so where they read it. `knockout.logit_diff_drop` and every
+   `dla.*` column are read natively.
+2. **A column whose native sign is opposite gets a new derived column** in the
+   reader's own namespace, never a change to the original. The roles pass adds
+   `roles.direct_support = -path_patching.direct_effect` and
+   `roles.direct_support_honest_instruction =
+   -path_patching.direct_effect_honest_instruction`, with the standard errors
+   copied across unchanged (a standard error has no sign).
+
+**No existing column, JSON key or figure is renamed, re-signed or rewritten.**
+`path_patching.direct_effect` keeps its native sign and its meaning in every
+file already written, and `path_patching.json`'s `metric` block keeps saying
+what it says.
+
+Magnitudes that carry no direction are read as magnitudes, and the criteria say
+so: `attention_patterns.*_top_mass` is a probability mass, and
+`path_patching.strongest_incoming_effect` and `strongest_outgoing_effect` are
+read as `|effect|` with the receiver's name, because "which Component feeds
+which" is a question about the size of a path, not its direction.
+
+**Under the Honest-Instruction Counterfactual the counterfactual is the honest
+prompt**, so a negative `path_patching.*_honest_instruction` cell means the
+path carries the *honest instruction*, not the Corruption. The derived
+`roles.direct_support_honest_instruction` is therefore positive when the
+Component supports the deceptive answer *against* the honest instruction, which
+is the same convention, and the criteria doc repeats the sentence where it uses
+the column.
+
+## Alternatives
+
+- **Flip `path_patching`'s sign at the source.** Rejected: it rewrites outputs
+  of record, silently changes the meaning of every `path_patching.json` already
+  written, and would make the tables in tickets 08 and 09 wrong without
+  marking them.
+- **Let the roles criteria read each column in its native sign and simply say
+  which is which.** Rejected for the columns that flip: a criterion reading
+  `direct_effect <= -0.005` beside `logit_diff_drop >= +0.01`, both meaning
+  "supports deception", is exactly the trap this ADR exists to close. The
+  derived column makes the convention checkable in the table rather than only
+  in prose.
+- **A single global "support" table replacing the per-analysis columns.**
+  Rejected: analyses are implemented and reviewed one module at a time, and a
+  derived column that a later analysis may ignore is additive where a
+  replacement table is not.
+
+## Consequences
+
+- Any later analysis whose native sign is opposite adds its own derived
+  `<namespace>.*_support` column rather than negotiating with the original.
+- The head table now carries two columns for the same measurement
+  (`path_patching.direct_effect` and `roles.direct_support`). They are exact
+  negations of each other, and the roles JSON records that relation so a reader
+  who finds only one of them can reconstruct the other.
+- `roles.*` columns exist only after the roles pass has run. Nothing else reads
+  them, so a cell that never runs the pass is unaffected.
