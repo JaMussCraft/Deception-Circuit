@@ -55,8 +55,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
 from component_analysis.head_table import BASE_COLUMNS, JSON_NAME as TABLE_JSON, \
-    KEY_COLUMNS, PROTECTED_COLUMNS, load_head_table, merge_columns, row_key, \
-    write_head_table
+    KEY_COLUMNS, PROTECTED_COLUMNS, merge_columns, row_key, write_head_table
 
 NAME = "roles"
 SUBDIR = "roles"

@@ -389,6 +389,15 @@ def test_the_subcommand_writes_the_derived_support_column_beside_the_native_one(
     assert row_17["roles.direct_support"] == pytest.approx(0.021)
 
 
+def test_the_columns_written_are_the_ones_the_module_declares(cell):
+    """`COLUMNS` is an interface, so it is asserted rather than described."""
+    run_roles(cell)
+
+    written = {column for column in read(cell, "head_table.json")["columns"]
+               if column.startswith("roles.")}
+    assert written == {f"roles.{one}" for one in roles.COLUMNS}
+
+
 def test_the_decisions_json_records_every_threshold_and_every_criterion(cell):
     run_roles(cell)
 
