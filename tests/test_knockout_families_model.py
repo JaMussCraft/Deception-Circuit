@@ -15,7 +15,6 @@ everywhere.
 
 from __future__ import annotations
 
-import json
 import os
 
 import pytest
@@ -28,7 +27,7 @@ if nnsight.__version__ != PINNED:
                 allow_module_level=True)
 
 import analyze_components                                          # noqa: E402
-from component_analysis import knockout, registry, roles           # noqa: E402
+from component_analysis import knockout, roles                     # noqa: E402
 from component_analysis.head_table import load_head_table          # noqa: E402
 from tests.test_analyze_components_end_to_end import written_files  # noqa: E402, F401
 from tests.test_analyze_components_segmentation import (           # noqa: E402, F401
@@ -266,5 +265,4 @@ def test_the_roles_the_families_were_built_from_are_the_ones_in_the_table(
     for family in payload["families"]:
         for member in family["members"]:
             assert proposed[tuple(member)] == family["role"]
-    assert set(payload["counts"] if "counts" in payload else
-               [one["role"] for one in payload["families"]]) <= set(roles.ROLES)
+    assert {one["role"] for one in payload["families"]} <= set(roles.ROLES)

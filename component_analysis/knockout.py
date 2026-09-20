@@ -106,15 +106,19 @@ def resolve_scheme(value) -> str:
 
 @dataclass
 class Effects:
-    """Per-instance logit differences: clean, and under each single knockout.
+    """Per-instance logit differences: clean, and under each knockout.
 
-    One list per Component, in the order the instances came out of the loader,
-    so every summary statistic below is over the causal sample and nothing is
-    averaged twice.
+    One list per knocked-out group, in the order the instances came out of the
+    loader, so every summary statistic below is over the causal sample and
+    nothing is averaged twice. A group is one Component for the per-Component
+    pass, where `keys` holds Component keys, and every Component of one
+    Component Role for the family pass, where `keys` holds role names.
     """
 
     ids: List[str]
-    keys: List[tuple]
+    #: The label of each knocked-out group: a Component key, or a role name.
+    keys: List
+
     clean_logit_difference: List[float]
     knocked_logit_difference: Dict[tuple, List[float]]
     scheme: str = SCHEME
@@ -620,7 +624,10 @@ def add_arguments(group) -> None:
     group.add_argument("--knockout-roles-from", default=None, metavar="CELL_DIR",
                        help="Where the role columns are read from. Default: "
                             "this cell's own head table, which is the case "
-                            "where the roles pass has already run here.")
+                            "where the roles pass has already run here. Give "
+                            "this run its own --suite-name: an analysis run "
+                            "rebuilds the head table from the intake's rows "
+                            "and would drop the roles columns it just read.")
 
 
 def roles_source(ctx) -> str:

@@ -589,15 +589,34 @@ NOT_MERGED = set(KEY_COLUMNS) | set(BASE_COLUMNS) | set(PROTECTED_COLUMNS)
 
 
 def merge_cells(rows, cell_dirs) -> list:
-    """Another cell's analysis columns, onto the rows that are already here."""
+    """Another cell's analysis columns, onto the rows that are already here.
+
+    A column that already holds a different value is refused by name rather
+    than overwritten: two cells that both ran path patching would otherwise
+    have the last one on the command line win silently, and a role assigned
+    from columns whose provenance is "whichever cell came last" is not
+    auditable. Merging a cell that agrees, or that only fills blanks, is fine.
+    """
+    seen = {row_key(one): dict(one) for one in rows}
     for cell_dir in cell_dirs:
         other, _meta = read_table(cell_dir)
-        updates = {row_key(one): {column: value
-                                  for column, value in one.items()
-                                  if column not in NOT_MERGED and value is not None}
-                   for one in other}
-        rows = merge_columns(rows, {key: values for key, values
-                                    in updates.items() if values})
+        updates = {}
+        for one in other:
+            key = row_key(one)
+            values = {column: value for column, value in one.items()
+                      if column not in NOT_MERGED and value is not None}
+            for column, value in values.items():
+                held = seen.get(key, {}).get(column)
+                if held is not None and held != value:
+                    raise SystemExit(
+                        f"--roles-merge-from {cell_dir!r} would overwrite "
+                        f"{column!r} on {key}: it already holds {held!r} and "
+                        f"the merged cell says {value!r}. Merge cells that ran "
+                        f"different analyses, or drop one of them.")
+            if values:
+                updates[key] = values
+                seen.setdefault(key, {}).update(values)
+        rows = merge_columns(rows, updates)
     return rows
 
 

@@ -459,20 +459,54 @@ def test_a_threshold_flag_changes_the_proposal(cell):
 
 
 def test_merging_another_cell_brings_its_columns_in_before_the_criteria_run(
-        cell, tmp_path):
-    """The analyses of record live one suite per analysis, not one cell."""
-    other = os.path.join(str(tmp_path), "other", *CELL[1:])
+        tmp_path):
+    """The analyses of record live one suite per analysis, not one cell.
+
+    The DLA cell knows the Component writes towards deception; the knockout
+    cell, merged in, says removing it *helps* deception. Neither cell alone
+    could produce the disagreement, which is the point of merging them.
+    """
+    base = os.path.join(str(tmp_path), "dla_suite", *CELL[1:])
+    write_head_table(base, [merged(reads("item_1_question_option", 0.35),
+                                   writes(0.04, 0.005, differential=0.06,
+                                          differential_se=0.01),
+                                   paths(direct=-0.02, direct_se=0.004,
+                                         outgoing="head.17.25->readout",
+                                         outgoing_effect=-0.02))])
+    other = os.path.join(str(tmp_path), "knockout_suite", *CELL[1:])
     write_head_table(other, [{"kind": "head", "layer": 17, "index": 25,
                               "knockout.logit_diff_drop": -0.5,
                               "knockout.standard_error": 0.02}])
 
-    run_roles(cell, "--roles-merge-from", other)
+    assert run_roles(base, "--roles-merge-from", other) == 0
 
-    row_17 = by_key(load_head_table(cell))[("head", 17, 25)]
+    row_17 = by_key(load_head_table(base))[("head", 17, 25)]
     assert row_17["knockout.logit_diff_drop"] == pytest.approx(-0.5)
-    assert row_17["roles.role_proposed"] == "unknown", \
-        "the merged knockout disagrees with the DLA already there"
-    assert read(cell, roles.SUBDIR, roles.JSON_NAME)["merged_from"] == [other]
+    assert row_17["roles.role_proposed"] == "unknown"
+    assert row_17["roles.role_notes"].startswith("unknown/disagree")
+    assert read(base, roles.SUBDIR, roles.JSON_NAME)["merged_from"] == [other]
+
+
+def test_a_merge_that_would_overwrite_a_measured_column_is_refused_by_name(
+        cell, tmp_path):
+    """Whichever cell came last is not a provenance a role can be audited on."""
+    other = os.path.join(str(tmp_path), "clash", *CELL[1:])
+    write_head_table(other, [{"kind": "head", "layer": 17, "index": 25,
+                              "dla.pressure": 0.99}])
+
+    with pytest.raises(SystemExit, match="dla.pressure"):
+        run_roles(cell, "--roles-merge-from", other)
+
+
+def test_a_merge_that_only_fills_blanks_is_allowed(cell, tmp_path):
+    other = os.path.join(str(tmp_path), "fills", *CELL[1:])
+    write_head_table(other, [{"kind": "head", "layer": 17, "index": 25,
+                              "dla.pressure": 0.03,
+                              "knockout.accuracy": 0.99}])
+
+    assert run_roles(cell, "--roles-merge-from", other) == 0
+    assert by_key(load_head_table(cell))[("head", 17, 25)][
+        "knockout.accuracy"] == pytest.approx(0.99)
 
 
 def test_a_cell_with_no_head_table_is_refused_by_name(tmp_path):

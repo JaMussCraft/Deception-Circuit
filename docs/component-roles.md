@@ -1,7 +1,13 @@
 # Component Roles: the vocabulary and the assignment criteria
 
 Status: pre-registered 2026-09-20, before any role was assigned to any
-Component of any circuit.
+Component of any circuit. Stated plainly, because it is what makes the
+thresholds auditable: the author had read the block C and D outputs of record
+(the SDR nls0.3 head tables) during orientation, so these numbers were not
+written blind. What pre-registration means here is the part that can be
+checked — the criteria and every threshold were committed *before* the pass
+was run, and **no threshold and no clause was changed after seeing what the
+pass proposed**.
 Owner of the final labels: the researcher, in `role_confirmed`.
 Applied by: `python analyze_components.py roles <cell dir>`.
 Sign convention: ADR-0002.
@@ -293,7 +299,11 @@ by rerunning the pass.
 ## Knockout by role family
 
 An analysis run rebuilds the head table from the intake's rows, so a second
-run into the same cell drops the `roles.*` columns the pass wrote. The family
+run into the same cell drops the `roles.*` columns the pass wrote. **`--dry-run`
+does it too**, because the dry run writes the head table before it prints its
+estimates: pointing any `analyze_components.py` run, dry or not, at the cell
+the roles pass wrote will overwrite that table. Give the family knockout its
+own `--suite-name`. The family
 knockout therefore writes into its own suite and reads the roles from the cell
 the pass ran on, with `--knockout-roles-from`; rerun the roles pass on a cell
 whose analyses were rerun.
