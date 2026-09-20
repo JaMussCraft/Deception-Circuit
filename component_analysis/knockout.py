@@ -658,6 +658,24 @@ def families_for(ctx) -> Dict[str, List[tuple]]:
             f"no Component in {source!r} carries a role, so there is no family "
             f"to knock out. Run `python analyze_components.py roles` on that "
             f"cell first.")
+
+    # A roles cell may hold rows this circuit does not: the completeness sweep
+    # appends the Components it scored from outside the circuit, and the roles
+    # pass gives every one of them a role (`unknown`, for want of any view).
+    # Knocking those out would quietly widen the family beyond the circuit
+    # under study, and nothing in the output would say so.
+    inside = set(ctx.keys)
+    strays = sorted({member for members in families.values()
+                     for member in members if member not in inside})
+    if strays:
+        raise SystemExit(
+            f"{source!r} carries a role for {len(strays)} Component(s) that "
+            f"are not in this circuit: "
+            f"{', '.join(str(one) for one in strays[:5])}"
+            f"{' ...' if len(strays) > 5 else ''}. A family knockout ablates "
+            f"the circuit's own Components, so read the roles from a cell of "
+            f"this circuit, or rerun the roles pass without the completeness "
+            f"sweep's rows.")
     return families
 
 

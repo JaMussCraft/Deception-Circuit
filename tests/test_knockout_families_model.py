@@ -225,6 +225,33 @@ def test_the_roles_may_be_read_from_another_cell(sdr_run, cli_model, tmp_path):
     assert payload["grouping"]["read_from"] == roles_cell(out)
 
 
+def test_a_role_on_a_component_outside_this_circuit_is_refused_by_name(
+        sdr_run, cli_model, tmp_path):
+    """A completeness sweep's rows carry roles too, and they are not the circuit.
+
+    `path_patching`'s sweep appends the Components it scored from outside the
+    circuit, and the roles pass gives every one of them a role. Knocking those
+    out would widen the family past the circuit under study with nothing in the
+    output saying so.
+    """
+    from component_analysis.head_table import write_head_table
+
+    run_dir, out, _records = sdr_run
+    assert run_cli(str(run_dir), "--num-kv-heads", "2", "--analyses", "knockout",
+                   "--device", "cpu", "--output-dir", str(out)) == 0
+    assert analyze_components.main(["roles", roles_cell(out)]) == 0
+    rows = load_head_table(roles_cell(out))
+    rows.append({"kind": "head", "layer": 1, "index": 3,
+                 "roles.role_proposed": "unknown"})
+    write_head_table(roles_cell(out), rows)
+
+    with pytest.raises(SystemExit, match="not in this circuit"):
+        run_cli(str(run_dir), "--num-kv-heads", "2", "--analyses", "knockout",
+                "--device", "cpu", "--output-dir", str(tmp_path / "families"),
+                "--knockout-families", "--knockout-roles-from",
+                roles_cell(out))
+
+
 def test_families_without_a_role_column_are_refused_by_name(sdr_run, cli_model):
     """A silent empty family set would look like a circuit with no roles."""
     run_dir, out, _records = sdr_run
