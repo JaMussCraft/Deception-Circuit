@@ -118,8 +118,10 @@ it, so a circuit discovered against the item-swap Corruption has no reason to
 contain them. The name is held so that nothing else takes it. The mechanical
 pass **notes** a pressure-reader signature when it sees one
 (`attention_patterns.pressure_paired_top_segment` is `pressure_clause` and
-`attention_patterns.honest_instruction_top_segment` is not) and assigns
-`unknown` all the same.
+`attention_patterns.honest_instruction_top_segment` is not) and **never
+assigns the reserved name**. The note is appended whatever role the Component
+gets, an assigned one included: a mover may also read the pressure, and that is
+worth seeing.
 
 ## The columns the criteria read
 
@@ -210,7 +212,15 @@ such as ticket 03's `bos`, which has not been shown to be anything.
 | `item_mention` | `item_1_intro`, `item_2_intro`, `item_1_question_pair`, `item_1_question_option`, `item_2_question_pair`, `item_2_question_option` |
 | `pressure` | `pressure_clause` |
 | `frame` | `intro`, `question`, `stem` |
-| `unestablished` | `readout`, `unsegmented`, `other`, and any Segment not named above |
+| `unestablished` | `readout`, `unsegmented`, and any Segment not named above |
+
+**These are the mechanism tasks' Segments (FAR, SDR, SER).** STD has its own
+segmentation — `stipulation_token` and `statement` in place of the Designating
+Sentence's anatomy — and neither is in the table, so on an STD cell every head
+would read as unestablished. That is presently harmless, because STD is out of
+the causal analyses by the researcher's 2026-09-16 decision and its depends
+views would be null anyway, but a full table of `unknown` reads like a finding.
+Give STD its groups before running the pass on an STD cell.
 
 Three judgement calls, made here and not revisited:
 
@@ -251,6 +261,18 @@ ever assigned over a contradiction.
   `roles.direct_support` significantly negative;
 - reads: not contradicted (the reads view never blocks a suppressor; the top
   Segment and its mass go in the notes).
+
+**Say the carve-out out loud, because it is the one place the conjunction is
+weaker than the glossary's sentence.** Every other role needs all three of the
+glossary's views. A suppressor can be assigned on `dla.suppression` alone plus
+a negative knockout — that is one glossary view (DLA) and knockout, which is
+not one of the three. It is written this way on purpose: a suppressor is
+defined by what it produces, its reads view is as likely to be the attention
+sink as anything else, and a circuit discovered against a deceptive Corruption
+has no reason to make its suppressors legible. **It is also a researcher
+decision to bless or tighten**, and it is in ticket 10's open questions. No
+suppressor has been assigned on any circuit so far, so no output of record
+depends on it.
 
 **3. binder.** All of:
 - reads: top Segment in the `designation` group with mass at or above the
@@ -293,6 +315,30 @@ the word "unknown".
 A Component that satisfies no role but whose views are all established and
 agree is still `unknown/insufficient`; the notes say so, and that is a signal
 that the vocabulary is missing a role rather than that the Component is dull.
+
+## A Component the completeness sweep flagged, but the circuit does not contain
+
+Ticket 09's completeness sweep appends rows for Components outside the circuit
+— on SDR nls0.3, seven of them cleared its 0.05 direct-effect threshold, one
+(`mlp.30.0`, +0.1275) larger in magnitude than the circuit's own layer-31 MLP,
+and non-circuit direct paths carried about three quarters of the gap on that
+draw. Those rows carry `path_patching.sweep_*` columns and **nothing else**: no
+attention, no DLA, no knockout, because no analysis ran over them.
+
+The criteria treat them as the conjunction requires and no better: every view
+is silent, so the role is `unknown/insufficient` and the note says "no analysis
+scored this Component". **A sweep flag is not a view and never becomes one**,
+because a large direct effect says what a Component writes into the Readout,
+not where it reads or what it depends on, and a role assigned from it would be
+a role assigned from one view.
+
+Two consequences, both deliberate. Merging a sweep cell into a roles table adds
+those rows as `unknown`, inflating the `unknown` count with Components that
+were never candidates; and the family knockout **drops** them rather than
+ablating them, because a family knockout is a statement about the circuit under
+study, with the dropped count recorded in `knockout_families.json`'s `grouping`
+block. If the researcher wants those Components analysed, the answer is to put
+them in a circuit and run the analyses over them, not to give the sweep a role.
 
 ## What the pass writes
 

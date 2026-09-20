@@ -53,13 +53,16 @@ instances. The analyses that need a model are added by later tickets.
 from __future__ import annotations
 
 import argparse
+import json
+import os
 import sys
 
 from component_analysis import dataloaders, instances, intake, registry, sampling
 from component_analysis import segmentation as segments
 from component_analysis.components import circuit_components, count_components, \
     is_component_of
-from component_analysis.head_table import merge_columns, rows_from_components, \
+from component_analysis.head_table import JSON_NAME as TABLE_JSON, \
+    PROTECTED_COLUMNS, merge_columns, row_key, rows_from_components, \
     write_head_table
 from evaluation import circuits as circuit_intake
 
@@ -173,6 +176,56 @@ def head_table_for(circuit_spec, resolved, *, num_kv_heads: int):
             for component in components}
         rows = merge_columns(rows, membership, namespace="reference")
     return components, rows
+
+
+#: Columns that belong to the researcher and to the roles pass, not to any
+#: analysis. A run rebuilds the head table from the intake's rows, so without
+#: carrying these forward a rerun into a cell would silently drop the
+#: researcher's confirmed roles along with the proposals they were confirming.
+CARRIED_COLUMNS = PROTECTED_COLUMNS + ("roles.",)
+
+
+def carry_roles(cell_dir: str, rows) -> list:
+    """Put a cell's existing role columns back onto the fresh intake rows.
+
+    Every run of every analysis builds its rows from the circuit intake and
+    writes the whole head table at the end, so anything written into the table
+    by something that is not an analysis — `role_confirmed`, which only the
+    researcher writes, and the `roles.*` columns the roles pass writes — would
+    be lost on the next run into that cell. They are copied back here, matched
+    by row key, before the analyses run and before the table is written.
+
+    A Component in the old table that this circuit does not contain is not
+    carried: the rows are this circuit's Components, and a stale row would
+    reappear in a table that no longer has a reason to hold it.
+
+    Returns new rows. `merge_columns` is deliberately not used: it refuses to
+    write `role_confirmed` at all, which is exactly the protection that makes
+    this function necessary rather than optional.
+    """
+    path = os.path.join(cell_dir, TABLE_JSON)
+    if not os.path.exists(path):
+        return rows
+    with open(path) as handle:
+        existing = json.load(handle).get("rows", [])
+
+    carried = {}
+    for row in existing:
+        values = {column: value for column, value in row.items()
+                  if value is not None
+                  and (column in PROTECTED_COLUMNS
+                       or column.startswith("roles."))}
+        if values:
+            carried[row_key(row)] = values
+    if not carried:
+        return rows
+
+    out = []
+    for row in rows:
+        row = dict(row)
+        row.update(carried.get(row_key(row), {}))
+        out.append(row)
+    return out
 
 
 def write_cell(cell_dir: str, circuit_spec, task_spec, rows, components,
@@ -344,8 +397,8 @@ def dry_run(cli, resolved, *, tokenizer=None) -> int:
         census = count_components(components)
         for task_spec in resolved.tasks:
             cell = intake.cell_dir(root, circuit_spec, task_spec)
-            written = write_cell(cell, circuit_spec, task_spec, rows,
-                                 components, resolved)
+            written = write_cell(cell, circuit_spec, task_spec,
+                                 carry_roles(cell, rows), components, resolved)
             print(f"  {circuit_spec.label} x {task_spec.label}")
             print(f"    {census['heads']} head(s) and {census['mlps']} MLP "
                   f"block(s) over {census['layers']} layer(s); "
@@ -445,18 +498,13 @@ def run(cli, resolved, *, model=None) -> int:
                                    components, cell, task_instances, model=model)
             print(f"  {circuit_spec.label} x {task_spec.label}")
 
-            rows = base_rows
+            # Before the analyses, so an analysis that groups by a role sees
+            # the roles this cell already carries, and before write_cell, so
+            # the table it writes still has them.
+            rows = carry_roles(cell, base_rows)
             for module in selected:
                 updates = module.run(ctx) or {}
                 rows = merge_columns(rows, updates, namespace=module.NAME)
-                # An analysis may also contribute columns that are not its
-                # own: the family knockout carries the `roles.*` columns it
-                # grouped by back into the table, which this run rebuilds from
-                # the intake's rows and would otherwise write without them.
-                # Optional, so the five-name analysis protocol is unchanged.
-                carried = getattr(module, "extra_columns", None)
-                if carried is not None:
-                    rows = merge_columns(rows, carried(ctx) or {})
                 print(f"    {module.NAME}: {len(updates)} Component(s) updated, "
                       f"output under {module.SUBDIR}/")
 

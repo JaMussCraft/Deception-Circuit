@@ -196,3 +196,42 @@ def test_the_n_causal_default_is_a_hundred(sdr_run):
     sample = read_json(out, *CELL, "sample.json")
     assert sample["n_requested"] == 100
     assert sample["n_drawn"] == len(records)     # the split is smaller than N
+
+
+# ==============================================================================
+# THE RESEARCHER'S COLUMN SURVIVES A RERUN
+# ==============================================================================
+
+def test_a_rerun_into_a_cell_keeps_the_confirmed_and_proposed_roles(sdr_run):
+    """Every run rebuilds the head table from the intake's rows.
+
+    `role_confirmed` is the researcher's column and the `roles.*` columns are
+    the roles pass's; neither belongs to an analysis, so neither is rebuilt.
+    Without carrying them forward a second run into the same cell would drop a
+    confirmed role along with the proposal it was confirming, silently. A dry
+    run is the cheapest way to assert it, and it is also the way the loss was
+    easiest to hit.
+    """
+    from component_analysis.head_table import load_head_table, write_head_table
+
+    run_dir, out, _records = sdr_run
+    assert run_cli(str(run_dir), "--num-kv-heads", "2", "--dry-run",
+                   "--output-dir", str(out)) == 0
+
+    cell = os.path.join(str(out), *CELL)
+    rows = load_head_table(cell)
+    assert rows, "the dry run wrote a head table to carry roles onto"
+    rows[0]["role_confirmed"] = "mover"
+    rows[0]["roles.role_proposed"] = "selector"
+    rows[0]["roles.role_notes"] = "selector: the note the researcher read"
+    key = (rows[0]["kind"], rows[0]["layer"], rows[0]["index"])
+    write_head_table(cell, rows)
+
+    assert run_cli(str(run_dir), "--num-kv-heads", "2", "--dry-run",
+                   "--output-dir", str(out)) == 0
+
+    after = {(r["kind"], r["layer"], r["index"]): r for r in load_head_table(cell)}
+    assert after[key]["role_confirmed"] == "mover"
+    assert after[key]["roles.role_proposed"] == "selector"
+    assert after[key]["roles.role_notes"].startswith("selector:")
+    assert after[key]["kv_group"] is not None, "the intake columns are still there"
