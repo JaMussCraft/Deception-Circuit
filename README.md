@@ -420,9 +420,12 @@ off-grid path patch — calling the same library functions the CLI calls. **It
 needs a GPU**: run the notebook inside a Slurm job on `gpuA100x4` or
 `gpuA40x4`, never on a login node.
 
-The notebook needs `circuitsvis`, `plotly` and `ipykernel`, which are installed
-in the `mgnp` environment only (see `requirements.txt`); the login-node base
-environment runs the CLI and the tests without them.
+The notebook's extra dependencies are in `requirements-notebook.txt`, which is
+deliberately separate from `requirements.txt`: they belong in the `mgnp`
+environment only, and one of them pins torch, so installing them into the
+login-node base environment would move the torch everything else runs on. That
+file carries the exact install commands. The CLI, the Slurm jobs and both test
+suites run without any of them.
 
 ## Tests
 

@@ -1,4 +1,4 @@
-"""Reading a finished cell back for human review.
+"""component_analysis/review.py — reading a finished cell back for review.
 
 `analyze_components.py` writes a cell — `head_table.csv`/`.json` at the root,
 `segmentation.json`, `sample.json`, and one subdirectory per analysis holding a
@@ -28,22 +28,25 @@ import os
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Sequence
 
+from component_analysis import dla, head_table, knockout, path_patching
+
 # ==============================================================================
 # THE CELL'S LAYOUT
 # ==============================================================================
 
-HEAD_TABLE_JSON = "head_table.json"
-HEAD_TABLE_CSV = "head_table.csv"
+HEAD_TABLE_JSON = head_table.JSON_NAME
 SEGMENTATION_JSON = "segmentation.json"
 SAMPLE_JSON = "sample.json"
 
-#: One subdirectory per analysis, named by that module's `SUBDIR`. Spelled out
-#: rather than imported, because importing `attention_patterns` would pull
-#: torch into a module the base env has to import without it.
+#: Asked of the modules that own them, so a renamed output file breaks the
+#: import rather than silently rendering "absent" over a file that is there.
+#: `attention_patterns` is the one exception: it imports torch at module scope
+#: (for its mass arithmetic), and this module has to import where torch is not
+#: wanted, so its two names are spelled out and a test pins them.
 ATTENTION_SUBDIR = "attention"
-DLA_SUBDIR = "dla"
-KNOCKOUT_SUBDIR = "knockout"
-PATH_PATCHING_SUBDIR = "path_patching"
+DLA_SUBDIR = dla.SUBDIR
+KNOCKOUT_SUBDIR = knockout.SUBDIR
+PATH_PATCHING_SUBDIR = path_patching.SUBDIR
 
 #: The role triple. Ticket 10 writes the proposal and the notes under the
 #: `roles` namespace; `role_confirmed` is the human's column and `head_table.py`
@@ -52,6 +55,22 @@ PATH_PATCHING_SUBDIR = "path_patching"
 #: silently blank the role columns in the notebook.
 ROLE_NAMES = ("role_proposed", "role_confirmed", "role_notes")
 ROLE_NAMESPACE = "roles"
+
+#: Why each one might not be there, said one column at a time. An
+#: all-or-nothing note would say "no role columns" over a table that has two of
+#: the three, which is exactly the table a researcher is reading when they want
+#: to know where the third goes.
+ROLE_ABSENCE = {
+    "role_proposed": "the mechanical role pass has not run on this cell.",
+    "role_confirmed": ("no tool writes it. It is the researcher's own column, "
+                       "added by hand to the head table to own the final "
+                       "label."),
+    "role_notes": "the mechanical role pass has not run on this cell.",
+}
+
+#: The logit lens's x axis. The JSON's `rows` field is a paragraph saying
+#: what a row is; it belongs in a note, not in an axis label.
+ROW_AXIS = "residual row (0 = the embedding, l + 1 = after layer l)"
 
 #: Shown first in the head table, before the role triple and the analyses.
 IDENTITY_COLUMNS = ("label", "kind", "layer", "index")
@@ -231,20 +250,17 @@ def found(directory: str, subdir: str, pattern: str) -> List[str]:
 
 
 def component_label(row) -> str:
-    """`L17H3` for a head, `L17 MLP` for an MLP block — `dla.label_of`'s spelling.
+    """`L17H3` for a head, `L17 MLP` for an MLP block, via `dla.label_of`.
 
-    Copied rather than imported for the same reason the subdirectory names are:
-    `dla` carries torch.
+    Takes a head-table row, a key tuple or a key list, because the analyses
+    write all three spellings. The label itself is `dla`'s to define: two
+    spellings of the same head would read as two heads.
     """
     if isinstance(row, dict):
-        kind, layer, index = row.get("kind"), row.get("layer"), row.get("index")
+        key = (row.get("kind"), row.get("layer"), row.get("index"))
     else:
-        kind, layer, index = tuple(row)
-    if kind == "head":
-        return f"L{layer}H{index}"
-    if kind == "mlp":
-        return f"L{layer} MLP"
-    return str(kind)
+        key = tuple(row)
+    return dla.label_of(key)
 
 
 def cell_subtitle(meta: dict, extra: str = "") -> str:
@@ -296,12 +312,9 @@ def head_table_view(results_dir: str) -> Table:
     columns = list(payload.get("columns", []))
     roles = role_columns(columns)
     notes = []
-    if not roles:
-        notes.append(
-            "no role columns yet — ticket 10's proposal step writes "
-            "`roles.role_proposed` and `roles.role_notes`, and `role_confirmed` "
-            "is the researcher's own column. Until then every Component is "
-            "unlabelled.")
+    for name in ROLE_NAMES:
+        if name not in roles:
+            notes.append(f"no {name} column: {ROLE_ABSENCE[name]}")
     meta = payload.get("meta", {})
     return Table(title="Head table",
                  subtitle=cell_subtitle(meta, f"{len(rows)} Component(s)"),
@@ -339,9 +352,9 @@ def attention_views(results_dir: str) -> "Group":
     notebook draws is what the PNG of record drew. `patterns.json` is opened
     only for the sum-to-one check, which is the reason to trust either.
     """
-    twins = [one for one in found(results_dir, ATTENTION_SUBDIR,
-                                  PATTERNS_TWIN_GLOB)
-             if os.path.basename(one) != PATTERNS_JSON]
+    # `patterns_*.json` does not match `patterns.json`, which is the data of
+    # record rather than a figure twin.
+    twins = found(results_dir, ATTENTION_SUBDIR, PATTERNS_TWIN_GLOB)
     if not twins:
         return _missing("attention patterns",
                         os.path.join(results_dir, ATTENTION_SUBDIR,
@@ -361,17 +374,19 @@ def attention_views(results_dir: str) -> "Group":
                 values=[list(row) for row in panel.get("matrix", [])]))
 
     notes = []
-    checks = read_json(os.path.join(results_dir, ATTENTION_SUBDIR, PATTERNS_JSON))
-    if checks:
-        tolerance = checks.get("sum_tolerance")
-        for condition in checks.get("conditions", []):
-            report = condition.get("checks", {})
+    record = read_json(os.path.join(results_dir, ATTENTION_SUBDIR, PATTERNS_JSON))
+    if record:
+        tolerance = record.get("sum_tolerance")
+        for condition in record.get("conditions", []):
+            report = condition.get("checks") or {}
             verdict = ("sum to one" if report.get("sums_to_one")
                        else "DO NOT sum to one")
             notes.append(
-                f"{condition.get('name')}: the rows {verdict} "
-                f"(largest deviation {report.get('max_abs_sum_minus_one'):.2g}, "
-                f"tolerance {tolerance}), {report.get('n_nan')} NaN row(s).")
+                f"{condition.get('name')}: the rows {verdict} (largest "
+                f"deviation {_number(report.get('max_abs_sum_minus_one'), 2)}, "
+                f"tolerance {_number(tolerance, 2)}), "
+                f"{report.get('n_nan', 'an unrecorded number of')} NaN row(s).")
+        notes += skipped_notes(record.get("skipped"))
     return Group(title="Attention patterns by Segment",
                  subtitle=cell_subtitle(_cell_meta(results_dir)),
                  items=items, notes=notes)
@@ -409,10 +424,10 @@ def coloured_tokens(heatmap: Heatmap):
 # DIRECT LOGIT ATTRIBUTION AND THE LOGIT LENS
 # ==============================================================================
 
-DLA_JSON = "dla.json"
-PAIRED_SCATTER_JSON = "dla_paired_scatter.json"
-LENS_JSON = "logit_lens.json"
-PAIRED_LENS_JSON = "logit_lens_paired.json"
+DLA_JSON = dla.JSON_NAME
+PAIRED_SCATTER_JSON = dla.PAIRED_SCATTER_JSON_NAME
+LENS_JSON = dla.LENS_JSON_NAME
+PAIRED_LENS_JSON = dla.PAIRED_LENS_JSON_NAME
 
 #: Every condition is reported at this level as well as at each split level;
 #: the notebook's default view is the pooled one.
@@ -450,11 +465,21 @@ def dla_view(results_dir: str, level: str = ALL_LEVEL) -> "Group":
                       f"{_number(model.get('mean'))}"),
             labels=labels, values=values, errors=errors))
 
+    check = payload.get("sum_check") or {}
     notes = [payload.get("metric", ""),
              f"The suppression flag is set when a Component's attribution "
              f"favours the Distractor by more than "
              f"{payload.get('suppression_margin')}.",
              payload.get("fixed_scale", "")]
+    if check:
+        notes.append(
+            f"Sum check: over {check.get('n_senders')} sender(s) on "
+            f"{check.get('n_instances')} instance(s), the parts miss the "
+            f"model's own logit difference by at most "
+            f"{_number(check.get('max_abs_error'), 4)} against a mean "
+            f"magnitude of "
+            f"{_number(check.get('mean_abs_logit_difference'), 3)}.")
+    notes += skipped_notes(payload.get("skipped"))
     return Group(title="Direct logit attribution at the Readout",
                  subtitle=cell_subtitle(_cell_meta(results_dir)),
                  items=items, notes=[one for one in notes if one])
@@ -560,7 +585,8 @@ def logit_lens_views(results_dir: str) -> "Group":
     items.append(Lines(title="Logit lens at the Readout",
                        subtitle=cell_subtitle(_cell_meta(results_dir),
                                               f"level {ALL_LEVEL}"),
-                       x=x, x_title=payload.get("rows", "row"), series=series))
+                       x=x, x_title=ROW_AXIS, series=series,
+                       notes=[payload.get("rows", "")]))
 
     overlay = read_json(os.path.join(results_dir, DLA_SUBDIR, PAIRED_LENS_JSON))
     if overlay and not overlay.get("skipped"):
@@ -569,17 +595,55 @@ def logit_lens_views(results_dir: str) -> "Group":
             title="Logit lens, paired conditions only",
             subtitle=overlay.get("shows", ""),
             x=list(range(len(next(iter(paired.values()), {}).get("mean", [])))),
-            x_title=overlay.get("rows", "row"),
+            x_title=ROW_AXIS,
             series=[Series(name=name, y=list(one.get("mean", [])),
                            se=one.get("se"))
                     for name, one in paired.items()]))
 
-    return Group(title="Logit lens", subtitle=payload.get("metric", ""),
-                 items=items, notes=_lens_notes(conditions))
+    return Group(title="Logit lens",
+                 subtitle=cell_subtitle(_cell_meta(results_dir)),
+                 items=items,
+                 notes=[payload.get("metric", "")] + _lens_notes(conditions))
 
 
-def _number(value) -> str:
-    return "unavailable" if value is None else f"{value:.3f}"
+def _number(value, precision: int = 3) -> str:
+    """A number for prose, or the word for its absence.
+
+    Formatting a missing value raises rather than printing `None`, which is how
+    an absent check key used to take a whole section down with it.
+    """
+    if value is None:
+        return "unrecorded"
+    try:
+        return f"{value:.{precision}g}" if precision < 3 else f"{value:.{precision}f}"
+    except (TypeError, ValueError):
+        return str(value)
+
+
+def skipped_notes(skipped) -> List[str]:
+    """One sentence per condition an analysis could not compute.
+
+    Spec user story 26 makes a Matched Honest Instruction that fails *"a data
+    finding rather than a circuit finding"*, and the ticket's rule is that an
+    absent analysis renders a note. A condition that was asked for and failed
+    leaves no figure behind, so without this it reads exactly like one that was
+    never asked for. The analyses write `skipped` as a list of entries or as a
+    `{condition: reason}` mapping; both are read.
+    """
+    if not skipped:
+        return []
+    if isinstance(skipped, dict):
+        return [f"not computed — {name}: {reason}"
+                for name, reason in skipped.items()]
+    notes = []
+    for entry in skipped:
+        if isinstance(entry, dict):
+            name = entry.get("condition") or entry.get("name") or "a condition"
+            notes.append(f"not computed — {name}: "
+                         f"{entry.get('reason', 'no reason recorded')}")
+        else:
+            notes.append(f"not computed — {entry}")
+    return notes
 
 
 def _cell_meta(results_dir: str) -> dict:
@@ -591,7 +655,7 @@ def _cell_meta(results_dir: str) -> dict:
 # KNOCKOUT
 # ==============================================================================
 
-KNOCKOUT_JSON = "knockout.json"
+KNOCKOUT_JSON = knockout.JSON_NAME
 #: The family-level knockout, written beside the per-Component one by the role
 #: pass. `knockout_families.json` is the name that pass settled on; the second
 #: pattern is kept so a cell written before it was settled still renders.
@@ -621,7 +685,18 @@ def family_knockout_view(results_dir: str) -> Bars:
             paths=tuple(os.path.join(results_dir, KNOCKOUT_SUBDIR, pattern)
                         for pattern in FAMILY_KNOCKOUT_GLOBS))
     payload = read_json(matches[0])
-    return _knockout_bars(payload, title="Interchange knockout by role family")
+    view = _knockout_bars(payload, title="Interchange knockout by role family")
+    grouping = payload.get("grouping") or {}
+    if grouping.get("column"):
+        view.notes.append(f"Grouped by {grouping['column']}, read from "
+                          f"{grouping.get('read_from')}, against the criteria "
+                          f"in {grouping.get('criteria_doc')}.")
+    if len(matches) > 1:
+        view.notes.append(
+            "more than one family file in this cell; showing "
+            f"{os.path.basename(matches[0])} and ignoring "
+            + ", ".join(os.path.basename(one) for one in matches[1:]))
+    return view
 
 
 def _knockout_bars(payload: dict, *, title: str) -> Bars:
@@ -669,9 +744,9 @@ def path_patching_views(results_dir: str) -> "Group":
     2026-09-16), so every view carries its own JSON's `metric.sign` sentence
     rather than a convention this module assumes.
     """
-    agnostic = [one for one in found(results_dir, PATH_PATCHING_SUBDIR,
-                                     AGNOSTIC_HEATMAP_GLOB)
-                if "segments" not in os.path.basename(one)]
+    # `heatmap*.json` anchors at the start of the basename, so the Segment
+    # pass's `segments_heatmap*.json` is not caught here.
+    agnostic = found(results_dir, PATH_PATCHING_SUBDIR, AGNOSTIC_HEATMAP_GLOB)
     segments = found(results_dir, PATH_PATCHING_SUBDIR, SEGMENTS_HEATMAP_GLOB)
     direct = found(results_dir, PATH_PATCHING_SUBDIR, DIRECT_EFFECT_GLOB)
     if not (agnostic or segments or direct):
@@ -779,12 +854,16 @@ def segmentation_view(results_dir: str) -> Table:
     for name in payload.get("segment_names", []):
         spans = [one.get("segments", {}).get(name, []) for one in instances]
         present = [span for span in spans if span]
+        # A Segment is a list of half-open [start, end) ranges, so its width is
+        # the ranges summed, not the number of ranges. Counting the ranges made
+        # a three-range, eight-token Segment read as three tokens wide.
+        widths = [sum(end - start for start, end in span) for span in present]
         rows.append({
             "segment": name,
             "source": sources.get(name, "?"),
             "present_on": f"{len(present)} of {len(instances)}",
-            "mean_tokens": (round(sum(len(one) for one in present) / len(present), 1)
-                            if present else 0.0)})
+            "mean_tokens": (round(sum(widths) / len(widths), 1)
+                            if widths else 0.0)})
 
     overrides = payload.get("overrides", {})
     overlapping = payload.get("report", {}).get(

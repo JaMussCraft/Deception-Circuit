@@ -28,13 +28,7 @@ openai>=1.40
 # Tests.
 pytest
 
-# The component-analysis review notebook (review_components.ipynb) only. The
-# CLI and the test suites never import these, so the login-node base env does
-# not need them; they were installed into `mgnp` alone, where the notebook
-# runs. Verified there at circuitsvis 1.43.3, plotly 7.1.0, ipykernel 7.3.0
-# (with importlib_metadata 9.0.1, which circuitsvis imports but does not pin,
-# and narwhals 2.26.0 under plotly). Installing them changed no version of
-# torch, transformers, numpy or nnsight.
-circuitsvis>=1.43   # attention views; install with --no-deps, it pins torch
-plotly>=6.0         # every heatmap, bar chart and line in the notebook
-ipykernel           # so the notebook can select the mgnp environment
+# The component-analysis review notebook has its own file,
+# requirements-notebook.txt, and is deliberately not installed from here: one
+# of its packages pins torch, and `pip install -r requirements.txt` is the
+# documented way to set up the login-node base environment.

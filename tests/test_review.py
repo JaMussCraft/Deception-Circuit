@@ -16,6 +16,8 @@ Cells, and which sections each one exercises:
   empty/          every section's "missing analysis" note
 """
 
+from __future__ import annotations
+
 import json
 import os
 
@@ -114,11 +116,12 @@ def test_a_head_table_without_role_columns_carries_a_note_not_an_error():
 
 
 def _write_head_table(directory, rows):
-    payload = {"schema_version": 1, "columns": sorted({k for r in rows for k in r}),
-               "meta": {"circuit": {"label": "c"}, "task": {"label": "t"}},
-               "rows": rows}
-    with open(os.path.join(str(directory), "head_table.json"), "w") as handle:
-        json.dump(payload, handle)
+    """Through the writer the analyses use, so a schema change reaches here."""
+    from component_analysis import head_table
+
+    head_table.write_head_table(
+        str(directory), rows,
+        meta={"circuit": {"label": "c"}, "task": {"label": "t"}})
 
 
 # ==============================================================================
@@ -170,7 +173,10 @@ def test_a_heatmap_converts_to_circuitsvis_coloured_tokens():
     assert tokens == heatmap.columns
     assert labels == heatmap.rows
     assert len(values) == 18 and len(values[0]) == 17
-    assert values[0][0] == heatmap.values[0][0]
+    # Off the diagonal, or the assertion holds whether or not anything was
+    # transposed: Segment 3 of head 1, against head 1's row at Segment 3.
+    assert values[3][1] == heatmap.values[1][3]
+    assert values[3][1] != values[1][3]
 
 
 # ==============================================================================
@@ -268,28 +274,15 @@ def test_family_knockout_is_absent_until_ticket_ten_writes_it():
     assert "knockout_families.json" in missing.note
 
 
-def test_family_knockout_reads_the_file_ticket_ten_actually_writes(tmp_path):
-    """`knockout_families.json`, one row per role rather than per Component."""
-    directory = tmp_path / "knockout"
-    directory.mkdir()
-    payload = {"scheme": "interchange",
-               "clean_run": {"mean_logit_difference": 1.6, "accuracy": 1.0,
-                             "n_instances": 100},
-               "metric": {"sign": "positive means it helps deception"},
-               "families": [{"role": "mover", "n_components": 3, "n": 100,
-                             "mean_drop": 0.9, "standard_error": 0.02,
-                             "accuracy": 0.8, "rank": 1},
-                            {"role": "unknown", "n_components": 15, "n": 100,
-                             "mean_drop": 0.1, "standard_error": 0.01,
-                             "accuracy": 0.99, "rank": 2}]}
-    with open(str(directory / "knockout_families.json"), "w") as handle:
-        json.dump(payload, handle)
-
-    view = review.family_knockout_view(str(tmp_path))
+def test_family_knockout_reads_the_file_the_role_pass_writes():
+    """A real `knockout_families.json`, one row per role rather than per head."""
+    view = review.family_knockout_view(cell("family"))
     assert view
-    assert view.labels == ["mover", "unknown"]
-    assert view.values == [0.9, 0.1]
+    assert view.labels[0] == "unknown"
+    assert view.labels == ["unknown", "selector", "mover"]
+    assert view.values[0] is not None
     assert "interchange" in view.subtitle
+    assert any("role_confirmed" in note for note in view.notes)
 
 
 # ==============================================================================
@@ -480,3 +473,154 @@ def test_the_dla_heatmap_aligns_conditions_by_component_not_by_position(tmp_path
     assert view.rows == ["L5H5", "L9H1", "embed"]
     assert view.columns == ["pressure", "honest_instruction"]
     assert view.values == [[1.0, None], [2.0, 9.0], [3.0, 4.0]]
+
+
+# ==============================================================================
+# ROLES
+# ==============================================================================
+
+
+def test_the_role_columns_the_role_pass_actually_writes_are_found():
+    view = review.head_table_view(cell("roles"))
+    assert view.role_columns == {"role_proposed": "roles.role_proposed",
+                                 "role_notes": "roles.role_notes"}
+    assert view.columns[:6] == ["label", "kind", "layer", "index",
+                                "roles.role_proposed", "roles.role_notes"]
+    assert view.rows[0]["roles.role_proposed"] == "unknown"
+
+
+def test_a_role_column_that_is_absent_is_named_in_its_own_note():
+    """`role_confirmed` is the researcher's column and no tool writes it.
+
+    An all-or-nothing note would say "no role columns" over a table that has
+    two of the three, which is exactly the table the researcher is looking at
+    when they want to know where to type the third.
+    """
+    view = review.head_table_view(cell("roles"))
+    assert any("role_confirmed" in note for note in view.notes)
+    assert not any("role_proposed" in note for note in view.notes)
+
+
+# ==============================================================================
+# WHAT DID NOT RUN
+# ==============================================================================
+
+
+def test_a_skipped_attention_condition_is_reported_rather_than_just_absent(tmp_path):
+    """US 26: a Matched Honest Instruction that failed is a data finding.
+
+    A condition the analysis could not compute leaves no panel behind, so
+    without the `skipped` entry the reader cannot tell a failed condition from
+    one that was never asked for.
+    """
+    directory = tmp_path / "attention"
+    directory.mkdir()
+    with open(str(directory / "patterns_all.json"), "w") as handle:
+        json.dump({"level": "all", "query_position": "readout",
+                   "rows": ["L5H5"], "columns": ["intro"],
+                   "panels": [{"condition": "pressure", "kind": "pressure",
+                               "paired": False, "n": 3, "matrix": [[1.0]]}]},
+                  handle)
+    with open(str(directory / "patterns.json"), "w") as handle:
+        json.dump({"sum_tolerance": 0.02, "conditions": [],
+                   "skipped": [{"condition": "honest_instruction",
+                                "reason": "no Matched Honest pool for sdr"}]},
+                  handle)
+
+    group = review.attention_views(str(tmp_path))
+    assert group
+    assert any("honest_instruction" in note and "no Matched Honest pool" in note
+               for note in group.notes)
+
+
+def test_the_sum_to_one_note_survives_a_condition_with_no_checks(tmp_path):
+    directory = tmp_path / "attention"
+    directory.mkdir()
+    with open(str(directory / "patterns_all.json"), "w") as handle:
+        json.dump({"level": "all", "rows": [], "columns": [], "panels": []},
+                  handle)
+    with open(str(directory / "patterns.json"), "w") as handle:
+        json.dump({"conditions": [{"name": "pressure", "checks": {}}]}, handle)
+
+    group = review.attention_views(str(tmp_path))
+    assert any("pressure" in note for note in group.notes)
+
+
+def test_the_dla_sum_check_is_shown_beside_the_attribution():
+    """The check that the parts add up to the whole is why the parts are trusted.
+
+    The numbers, not the word: `fixed_scale` already says "sum" in prose, so an
+    assertion on the word would pass without the check ever being rendered.
+    """
+    group = review.dla_view(cell("attention_dla"))
+    assert any("0.0163" in note and "1057" in note for note in group.notes)
+
+
+def test_a_skipped_dla_condition_is_named(tmp_path):
+    directory = tmp_path / "dla"
+    directory.mkdir()
+    with open(str(directory / "dla.json"), "w") as handle:
+        json.dump({"conditions": {}, "suppression_margin": 0.05,
+                   "skipped": {"honest_twin": "no honest twin was bound"}},
+                  handle)
+    group = review.dla_view(str(tmp_path))
+    assert any("honest_twin" in note and "no honest twin was bound" in note
+               for note in group.notes)
+
+
+# ==============================================================================
+# SEGMENT WIDTHS
+# ==============================================================================
+
+
+def test_mean_tokens_counts_tokens_and_not_spans(tmp_path):
+    """A Segment is a list of half-open [start, end) ranges, not a list of tokens.
+
+    Counting the ranges made an eight-token Segment read as three, which is the
+    exact misreading `segmentation.json` exists to prevent (US 10).
+    """
+    payload = {"segment_names": ["intro", "readout", "absent_here"],
+               "segment_sources": {"intro": "default", "readout": "default",
+                                   "absent_here": "default"},
+               "n_instances": 2, "split": "test", "overrides": {},
+               "report": {"instances_with_overlapping_segments": []},
+               "meta": {},
+               "instances": [
+                   {"record_id": "a",
+                    "segments": {"intro": [[5, 11], [12, 13], [14, 15]],
+                                 "readout": [[20, 21]], "absent_here": []}},
+                   {"record_id": "b",
+                    "segments": {"intro": [[5, 9]], "readout": [[20, 21]],
+                                 "absent_here": []}}]}
+    with open(os.path.join(str(tmp_path), "segmentation.json"), "w") as handle:
+        json.dump(payload, handle)
+
+    view = review.segmentation_view(str(tmp_path))
+    by_name = {row["segment"]: row for row in view.rows}
+    assert by_name["intro"]["mean_tokens"] == 6.0      # (6+1+1) and 4, over 2
+    assert by_name["readout"]["mean_tokens"] == 1.0
+    assert by_name["absent_here"]["present_on"] == "0 of 2"
+    assert by_name["absent_here"]["mean_tokens"] == 0.0
+
+
+def test_an_override_that_overlaps_a_default_segment_is_called_out(tmp_path):
+    payload = {"segment_names": ["intro"], "segment_sources": {"intro": "regex"},
+               "n_instances": 1, "split": "test",
+               "overrides": {"intro": "^Two"},
+               "report": {"instances_with_overlapping_segments": ["a", "b"]},
+               "meta": {},
+               "instances": [{"record_id": "a",
+                              "segments": {"intro": [[0, 2]]}}]}
+    with open(os.path.join(str(tmp_path), "segmentation.json"), "w") as handle:
+        json.dump(payload, handle)
+
+    view = review.segmentation_view(str(tmp_path))
+    assert any("overlaps a default Segment on 2 instance(s)" in note
+               for note in view.notes)
+    assert any("overridden by regex: intro" in note for note in view.notes)
+
+
+def test_a_segmentation_with_no_overrides_says_every_segment_is_a_default():
+    view = review.segmentation_view(cell("knockout"))
+    assert any("no Segment was overridden" in note for note in view.notes)
+    assert any("no Segment overlaps another" in note for note in view.notes)
