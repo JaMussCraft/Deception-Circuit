@@ -292,6 +292,12 @@ by rerunning the pass.
 
 ## Knockout by role family
 
+An analysis run rebuilds the head table from the intake's rows, so a second
+run into the same cell drops the `roles.*` columns the pass wrote. The family
+knockout therefore writes into its own suite and reads the roles from the cell
+the pass ran on, with `--knockout-roles-from`; rerun the roles pass on a cell
+whose analyses were rerun.
+
 Once roles exist, `--knockout-families` groups the Components by
 `role_confirmed` where the researcher has set it and by `roles.role_proposed`
 everywhere else, and interchange-ablates each group **together**, through the

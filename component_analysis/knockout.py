@@ -283,12 +283,44 @@ def knockout_effects(model, batches, components, *,
     because only the capture hands back the residual the final norm sees, and
     the metric has to be read from it in fp32.
     """
+    keys = [row_key(one) for one in components]
+    return knock_out_groups(model, batches, [(key, [key]) for key in keys],
+                            scheme=scheme)
+
+
+def knock_out_groups(model, batches, groups, *, scheme=SCHEME) -> Effects:
+    """Knock out each *group* of Components together, and keep every number.
+
+    `groups` is `[(label, [component key, ...]), ...]`. A single-Component
+    knockout is the case where every group has one member, which is how
+    `knockout_effects` calls it, and a role family is the case where a group
+    has several, which is how `family_effects` calls it. One loop, so the
+    family numbers are the single numbers' own arithmetic rather than a second
+    implementation of the same ablation.
+
+    A group is ablated by writing the corrupt stream's value over *every* one
+    of its members in one forward, so a family's effect is the joint effect and
+    not the sum of its members'.
+
+    Per batch: one clean run, one corrupt run capturing every member of every
+    group, and one run per group. `Effects.keys` holds the labels in the order
+    they were given.
+    """
     import torch
 
     from component_analysis import hooks
 
     scheme = resolve_scheme(scheme)
-    keys = [row_key(one) for one in components]
+    groups = [(label, [row_key(one) for one in members])
+              for label, members in groups]
+    labels = [label for label, _members in groups]
+    # Every Component any group ablates, captured once on the corrupt stream:
+    # two families that share a member cost one capture, not two.
+    keys = []
+    for _label, members in groups:
+        for key in members:
+            if key not in keys:
+                keys.append(key)
     # Where the weights actually are, which is not always what `--device` asked
     # for: the CLI seam test runs the tiny model on a CPU under `--device cuda`.
     device, _dtype = hooks.device_and_dtype(model)
@@ -300,7 +332,7 @@ def knockout_effects(model, batches, components, *,
 
     ids: List[str] = []
     clean_logit_difference: List[float] = []
-    knocked: Dict[tuple, List[float]] = {key: [] for key in keys}
+    knocked: Dict[tuple, List[float]] = {label: [] for label in labels}
 
     for batch in batches:
         clean_ids = batch.input_ids.to(device)
@@ -322,16 +354,129 @@ def knockout_effects(model, batches, components, *,
             ids.extend(batch.ids)
             clean_logit_difference.extend(logit_difference(clean, target, distractor))
 
-            for key in keys:
+            for label, members in groups:
                 patched = hooks.capture_forward(
                     model, clean_ids, clean_mask, components=[],
                     positions=readout,
-                    replacements={key: corrupt.outputs[key]})
-                knocked[key].extend(logit_difference(patched, target,
-                                                     distractor))
-    return Effects(ids=ids, keys=keys, clean_logit_difference=clean_logit_difference,
+                    replacements={key: corrupt.outputs[key] for key in members})
+                knocked[label].extend(logit_difference(patched, target,
+                                                       distractor))
+    return Effects(ids=ids, keys=labels,
+                   clean_logit_difference=clean_logit_difference,
                    knocked_logit_difference=knocked, scheme=scheme,
                    report=dict(getattr(batches, "report", {}) or {}))
+
+
+# ==============================================================================
+# ROLE FAMILIES
+# ==============================================================================
+
+#: The grouping column, in the order it is consulted. The researcher's
+#: confirmed role wins wherever they have set one; the mechanical proposal
+#: (ticket 10, `docs/component-roles.md`) fills in the rest.
+ROLE_COLUMNS = ("role_confirmed", "roles.role_proposed")
+
+FAMILY_JSON_NAME = "knockout_families.json"
+FAMILY_PNG_NAME = "knockout_families.png"
+
+#: The head-table columns the family pass adds, beside the single knockout's.
+FAMILY_COLUMNS = ("family", "family_logit_diff_drop")
+
+
+def role_of(row) -> Optional[str]:
+    """This row's role: confirmed if the researcher set one, else proposed."""
+    for column in ROLE_COLUMNS:
+        value = row.get(column)
+        if value not in (None, ""):
+            return str(value)
+    return None
+
+
+def families_from_rows(rows) -> Dict[str, List[tuple]]:
+    """`{role: [component key, ...]}` in head-table order.
+
+    A Component with no role at all is left out rather than guessed into a
+    family: the roles pass has not run on it, and a family whose membership is
+    a default would be a knockout of something nobody named.
+    """
+    families: Dict[str, List[tuple]] = {}
+    for row in rows:
+        role = role_of(row)
+        if role is None:
+            continue
+        families.setdefault(role, []).append(row_key(row))
+    return families
+
+
+def family_effects(model, batches, families, *, scheme=SCHEME) -> Effects:
+    """Interchange-ablate every Component of a role, together, one role at a time."""
+    return knock_out_groups(model, batches, list(families.items()),
+                            scheme=scheme)
+
+
+def summarize_families(effects: Effects, families) -> List[dict]:
+    """One ranked row per role, strongest drop first, signed like the singles."""
+    clean_accuracy = _accuracy(effects.clean_logit_difference)
+
+    rows = []
+    for role in effects.keys:
+        knocked = effects.knocked_logit_difference[role]
+        drops = effects.drops(role)
+        accuracy = _accuracy(knocked)
+        members = list(families.get(role, []))
+        rows.append({
+            "role": role,
+            "n_components": len(members),
+            "members": [list(one) for one in members],
+            "n": len(drops),
+            "mean_drop": _mean(drops),
+            "standard_error": _standard_error(drops),
+            "knocked_logit_difference": _mean(knocked),
+            "accuracy": accuracy,
+            "accuracy_drop": (None if accuracy is None or clean_accuracy is None
+                              else clean_accuracy - accuracy),
+        })
+
+    rows.sort(key=lambda row: -(row["mean_drop"] if row["mean_drop"] is not None
+                                else float("-inf")))
+    for rank, row in enumerate(rows, start=1):
+        row["rank"] = rank
+    return rows
+
+
+def family_columns(rows) -> dict:
+    """`{component key: {family, family_logit_diff_drop}}` for every member."""
+    # `members` is written as a list, because a JSON key is not a tuple.
+    return {row_key(tuple(member)): {"family": row["role"],
+                              "family_logit_diff_drop": row["mean_drop"]}
+            for row in rows for member in row["members"]}
+
+
+def family_payload(effects: Effects, families, *, circuit: str, task: str,
+                   rows=None, roles_from: str = None) -> dict:
+    """`knockout_families.json`: the same shape and the same signs as the singles."""
+    rows = summarize_families(effects, families) if rows is None else list(rows)
+    single = payload(effects, circuit=circuit, task=task, rows=[])
+    return {
+        **{key: value for key, value in single.items()
+           if key not in ("components", "n_components")},
+        "analysis": f"{NAME}_families",
+        "grouping": {
+            "column": "role_confirmed, else roles.role_proposed",
+            "criteria_doc": os.path.join("docs", "component-roles.md"),
+            "read_from": roles_from,
+            "n_components": sum(len(one) for one in families.values()),
+        },
+        "metric": {**single["metric"],
+                   "ablation": ("every Component of the role has its output at "
+                                "every position replaced by the value it "
+                                "carried on the item-swap corrupt stream, all "
+                                "in one forward, so the number is the family's "
+                                "joint effect and not the sum of its members'"),
+                   "figure": FAMILY_PNG_NAME},
+        "n_families": len(rows),
+        "families": rows,
+    }
 
 
 # ==============================================================================
@@ -410,6 +555,52 @@ def write_figure(path: str, rows, *, title: str = "") -> str:
     return path
 
 
+def write_family_figure(path: str, rows, *, title: str = "") -> str:
+    """The ranked bar chart of role families, on the singles' sign convention.
+
+    One bar per role, ordered by the signed drop so a family that opposes
+    deception sits at the bottom on the other side of the zero line, exactly as
+    a suppressing Component does in the per-Component chart. The bar is
+    labelled with the family's size, because "unknown, 16 Components" and
+    "mover, 1" are not the same claim and the chart would otherwise invite the
+    reader to compare them as if they were.
+    """
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    rows = list(rows)
+    if not rows:
+        raise ValueError("no family to plot; no Component carries a role")
+
+    labels = [f"{row['role']}  ({row['n_components']})" for row in rows]
+    height = max(2.2, 0.5 * len(rows) + 1.4)
+    figure, axes = plt.subplots(figsize=(7.5, height))
+    positions = range(len(rows))
+    axes.barh(list(positions), [row["mean_drop"] for row in rows],
+              xerr=[row["standard_error"] or 0.0 for row in rows],
+              color="#4c72a8", edgecolor="none", height=0.6,
+              error_kw={"ecolor": "#5b6670", "elinewidth": 1.0, "capsize": 2.5})
+    axes.set_yticks(list(positions))
+    axes.set_yticklabels(labels, fontsize=9)
+    axes.invert_yaxis()
+    axes.axvline(0.0, color="#333a40", linewidth=1.0)
+    axes.set_xlabel("drop in logit(Target) - logit(Distractor)\n"
+                    "(positive: the family helps deception)", fontsize=9)
+    axes.set_title(title or "Interchange knockout by Component Role family",
+                   fontsize=11)
+    axes.grid(axis="x", color="#d6dade", linewidth=0.6)
+    axes.set_axisbelow(True)
+    for edge in ("top", "right", "left"):
+        axes.spines[edge].set_visible(False)
+    axes.tick_params(axis="both", length=0, labelsize=9)
+
+    figure.tight_layout()
+    figure.savefig(path, dpi=160)
+    plt.close(figure)
+    return path
+
+
 # ==============================================================================
 # THE ANALYSIS
 # ==============================================================================
@@ -419,22 +610,77 @@ def add_arguments(group) -> None:
                        help=f"How a Component is ablated. {SCHEME!r} is the "
                             f"only scheme built; {' and '.join(FUTURE_SCHEMES)} "
                             f"are future work and are refused by name.")
+    group.add_argument("--knockout-families", action="store_true",
+                       help="Also knock out every Component of a Component "
+                            "Role together, one role at a time. Roles come "
+                            "from role_confirmed where the researcher has set "
+                            "one and from roles.role_proposed otherwise, so "
+                            "`analyze_components.py roles` must have run on "
+                            "the cell this reads them from.")
+    group.add_argument("--knockout-roles-from", default=None, metavar="CELL_DIR",
+                       help="Where the role columns are read from. Default: "
+                            "this cell's own head table, which is the case "
+                            "where the roles pass has already run here.")
+
+
+def roles_source(ctx) -> str:
+    """The cell whose head table carries the roles: the flag, or this cell."""
+    return getattr(ctx.cli, "knockout_roles_from", None) or ctx.cell_dir
+
+
+def families_for(ctx) -> Dict[str, List[tuple]]:
+    """The role families this run would ablate, read off a written head table.
+
+    Refused by name rather than silently empty: a family knockout that quietly
+    found no role would write a file saying nothing happened, which looks
+    exactly like a circuit whose Components have no roles.
+    """
+    from component_analysis.head_table import JSON_NAME as TABLE_JSON
+    from component_analysis.head_table import load_head_table
+
+    source = roles_source(ctx)
+    if not os.path.exists(os.path.join(source, TABLE_JSON)):
+        raise SystemExit(
+            f"--knockout-families needs a head table with a role column, and "
+            f"{source!r} has no {TABLE_JSON}. Run "
+            f"`python analyze_components.py roles <cell>` first, or point "
+            f"--knockout-roles-from at a cell where it has run.")
+    families = families_from_rows(load_head_table(source))
+    if not families:
+        raise SystemExit(
+            f"no Component in {source!r} carries a role, so there is no family "
+            f"to knock out. Run `python analyze_components.py roles` on that "
+            f"cell first.")
+    return families
 
 
 def estimate(ctx) -> str:
     batches = ctx.causal_batches()
     passes = len(batches) * (len(ctx.components) + 2)
-    return (f"{len(ctx.components)} Component(s) x {len(batches)} batch(es) of "
+    line = (f"{len(ctx.components)} Component(s) x {len(batches)} batch(es) of "
             f"{batches.report['batch_size']} (+2 clean and corrupt passes per "
             f"batch) = {passes} forward pass(es), about "
             f"{passes * SECONDS_PER_FORWARD / 60:.1f} min on an A40, over "
             f"{batches.n_instances} instance(s); scheme "
             f"{resolve_scheme(getattr(ctx.cli, 'knockout_scheme', SCHEME))}")
+    if not getattr(ctx.cli, "knockout_families", False):
+        return line
+    families = families_for(ctx)
+    family_passes = len(batches) * (len(families) + 2)
+    return (line + f"; plus {len(families)} role famil"
+            f"{'y' if len(families) == 1 else 'ies'} "
+            f"({', '.join(f'{role} x{len(members)}' for role, members in families.items())}) "
+            f"from {roles_source(ctx)} = {family_passes} more forward pass(es), "
+            f"about {family_passes * SECONDS_PER_FORWARD / 60:.1f} min")
 
 
 def run(ctx) -> dict:
     """Knock out every Component, write the JSON and the PNG, return the columns."""
     scheme = resolve_scheme(getattr(ctx.cli, "knockout_scheme", SCHEME))
+    # Read before the forwards, so a missing role column fails in seconds
+    # rather than after the per-Component pass has already run.
+    families = families_for(ctx) \
+        if getattr(ctx.cli, "knockout_families", False) else None
     batches = ctx.causal_batches()
     effects = knockout_effects(ctx.model, batches, ctx.components, scheme=scheme)
 
@@ -445,4 +691,21 @@ def run(ctx) -> dict:
     write_figure(os.path.join(ctx.subdir(SUBDIR), PNG_NAME), rows,
                  title=f"{ctx.circuit_spec.label} x {ctx.task_spec.name}: "
                        f"per-Component {scheme} knockout")
-    return columns(rows)
+    updates = columns(rows)
+    if families is None:
+        return updates
+
+    grouped = family_effects(ctx.model, batches, families, scheme=scheme)
+    family_rows = summarize_families(grouped, families)
+    ctx.write_json(SUBDIR, FAMILY_JSON_NAME,
+                   family_payload(grouped, families,
+                                  circuit=ctx.circuit_spec.label,
+                                  task=ctx.task_spec.name, rows=family_rows,
+                                  roles_from=roles_source(ctx)))
+    write_family_figure(os.path.join(ctx.subdir(SUBDIR), FAMILY_PNG_NAME),
+                        family_rows,
+                        title=f"{ctx.circuit_spec.label} x {ctx.task_spec.name}: "
+                              f"{scheme} knockout by Component Role family")
+    for key, values in family_columns(family_rows).items():
+        updates.setdefault(key, {}).update(values)
+    return updates
