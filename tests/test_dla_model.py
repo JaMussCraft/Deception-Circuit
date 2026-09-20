@@ -399,7 +399,11 @@ def test_max_batches_stops_a_condition_early(dla_run):
 def test_an_unknown_condition_is_refused_by_name(dla_run):
     run_dir, out, _records = dla_run
 
-    with pytest.raises(ValueError, match="nosuch"):
+    # Refused by argparse at parse time, before any model is loaded — the
+    # same moment `--attention-conditions` refuses one (ticket 06's open
+    # question 4). SystemExit is what argparse raises after printing the
+    # message that names the flag and the condition.
+    with pytest.raises(SystemExit):
         run_cli(str(run_dir), "--num-kv-heads", "2", "--dla-conditions",
                 "nosuch", "--output-dir", str(out))
 

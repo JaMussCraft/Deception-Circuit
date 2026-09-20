@@ -86,6 +86,7 @@ one hook module ADR-0001 confines them to.
 
 from __future__ import annotations
 
+import argparse
 import math
 import os
 from typing import Dict, List, Optional, Sequence
@@ -674,17 +675,43 @@ def sum_check(model, batch, keys) -> dict:
 # WHERE EACH CONDITION'S PROMPTS COME FROM
 # ==============================================================================
 
-def wanted_conditions(cli) -> List[str]:
-    """`--dla-conditions`, validated by name."""
-    raw = getattr(cli, "dla_conditions", None) or ",".join(CONDITIONS)
-    wanted = [one.strip() for one in raw.split(",") if one.strip()]
+class UnknownCondition(ValueError, argparse.ArgumentTypeError):
+    """A condition name that is not one of `CONDITIONS`.
+
+    Both base classes on purpose, exactly as `attention_patterns` does it:
+    `argparse` prints the message of an `ArgumentTypeError` and throws away a
+    plain `ValueError`'s, and a caller reaching `wanted_conditions` directly
+    still catches the `ValueError` it always raised.
+    """
+
+
+def parse_conditions(value) -> List[str]:
+    """`"a,b"` to `["a", "b"]`, refusing an unknown name.
+
+    Wired as the flag's `type=`, so a typo is refused by `argparse` at parse
+    time on the login node rather than inside `run`, after an 8B model has been
+    loaded onto a GPU. `--attention-conditions` has refused typos this way
+    since ticket 06; this is the sibling flag catching up (ticket 06's open
+    question 4, carried by ticket 10).
+    """
+    if not isinstance(value, str):
+        return [one for one in CONDITIONS if one in value]
+    wanted = [one.strip() for one in value.split(",") if one.strip()]
     unknown = [one for one in wanted if one not in CONDITIONS]
     if unknown:
-        raise ValueError(
+        raise UnknownCondition(
             f"--dla-conditions names {', '.join(unknown)}, which "
             f"{'is' if len(unknown) == 1 else 'are'} not a DLA condition. "
             f"Choose from {', '.join(CONDITIONS)}.")
     return [one for one in CONDITIONS if one in wanted]
+
+
+def wanted_conditions(cli) -> List[str]:
+    """`--dla-conditions`, validated by name."""
+    value = getattr(cli, "dla_conditions", None)
+    if value is None:
+        return list(CONDITIONS)
+    return parse_conditions(value)
 
 
 def honest_twin_dir(ctx) -> str:
@@ -790,8 +817,8 @@ def condition_batches(ctx, condition: str):
 # ==============================================================================
 
 def add_arguments(group) -> None:
-    group.add_argument("--dla-conditions", default=",".join(CONDITIONS),
-                       metavar="NAME[,NAME]",
+    group.add_argument("--dla-conditions", type=parse_conditions,
+                       default=list(CONDITIONS), metavar="NAME[,NAME]",
                        help="Which conditions to measure: "
                             f"{', '.join(CONDITIONS)}. A condition whose data "
                             f"this cell does not have is reported and skipped.")
