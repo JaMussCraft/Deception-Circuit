@@ -447,7 +447,21 @@ def run(cli, resolved, *, model=None) -> int:
 # MAIN
 # ==============================================================================
 
+#: Subcommands that do not analyse a circuit and so do not take the circuit
+#: intake flags at all. `roles` reads a *finished* head table off disk and
+#: needs no model, no circuit binding and no task: it is not a registered
+#: analysis because a registered analysis runs inside one invocation, from the
+#: intake's fresh rows, and never sees the columns a previous run wrote.
+SUBCOMMANDS = {"roles": "component_analysis.roles"}
+
+
 def main(argv=None) -> int:
+    argv = sys.argv[1:] if argv is None else list(argv)
+    if argv and argv[0] in SUBCOMMANDS:
+        import importlib
+
+        return importlib.import_module(SUBCOMMANDS[argv[0]]).main(argv[1:])
+
     cli = build_parser().parse_args(argv)
     resolved = intake.resolve_intake(cli)
     if cli.dry_run:

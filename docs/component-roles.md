@@ -153,6 +153,14 @@ The defaults are flags so a different task or circuit can be read at a
 different scale, and the values actually used are written into `roles.json`
 beside every decision.
 
+Two flags of the subcommand are not criteria. `--dry-run` proposes and prints
+without writing, so the pass can be rehearsed on the login node like every
+other part of the CLI. `--roles-merge-from CELL_DIR` (repeatable) copies
+another cell's analysis columns onto the matching rows before the criteria
+run, because the analyses of record were run one suite per analysis and the
+conjunction needs all three views in one table; it never copies a key column,
+an intake column or `role_confirmed`.
+
 ## Segment groups: what counts as a read
 
 The reads view is the **top Segment** at the query position and its mass. The
