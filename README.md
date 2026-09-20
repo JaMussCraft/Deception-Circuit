@@ -386,6 +386,21 @@ sbatch scripts/analyze_components.sbatch --circuit ... --expr ... --suite-name m
 `--analyses NAME[,NAME]` picks which of the registered analyses run;
 `--dry-run` never writes anything an analysis would write.
 
+`scripts/analyze_components.sbatch` mirrors `scripts/evaluate_circuit.sbatch`.
+Submit it from the repository root: it `cd`s to `SLURM_SUBMIT_DIR`, so every
+relative path in the arguments resolves where you typed them. It activates
+`mgnp` and passes every argument straight through to `analyze_components.py`,
+which is why a circuit is composed by name there exactly as it is on the
+command line. Its defaults are one A40 (`--partition=gpuA40x4`,
+`--gpus-per-node=1`, account `beto-delta-gpu`), 64 GB and four hours, sized for
+one cell of the descriptive analyses plus a position-agnostic patching pass
+over a hundred instances; a larger sender-receiver grid or the
+position-specific second pass wants more time. Logs land in
+`logs/analyze_components_<jobid>.out`. Run `--dry-run` on the login node before
+every submission: it resolves the circuits, the Segments and the causal sample,
+says how much of the sample has an Honest-Instruction Counterfactual, and
+prints a cost estimate per analysis, all without a GPU.
+
 ### The results layout
 
 One **cell** per (circuit, task):
