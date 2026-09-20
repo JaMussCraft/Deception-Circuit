@@ -405,3 +405,54 @@ def test_rebuilding_a_task_spec_without_provenance_says_so():
 def test_the_model_name_comes_from_the_cells_intake():
     view = review.head_table_view(cell("attention_dla"))
     assert review.model_name_of(view.meta) == "llama-8b-instruct"
+
+
+# ==============================================================================
+# THE SHAPES THEMSELVES
+# ==============================================================================
+
+
+def test_an_empty_group_reads_like_a_missing_one():
+    """The notebook prints `view.note` on anything falsy, Group included.
+
+    A Group whose files were there but held nothing to draw is falsy, so a
+    renderer that reached for `.note` on it would raise in the middle of a
+    review — which is the one thing this section must not do.
+    """
+    group = review.Group(title="t", subtitle="s", items=[])
+    assert not group
+    assert "nothing to draw" in group.note
+    full = review.Group(title="t", subtitle="s", items=[1], notes=["why"])
+    assert full.note == "why"
+
+
+def test_the_dla_heatmap_aligns_conditions_by_component_not_by_position(tmp_path):
+    """Conditions are separate passes; one of them may cover fewer Components.
+
+    Indexing the second condition by the first's row number would then read one
+    Component's number under another's name, which is the worst thing a head
+    table can do.
+    """
+    directory = tmp_path / "dla"
+    directory.mkdir()
+    def component(label, mean):
+        return {"key": ["head", 5, 5], "kind": "head", "layer": 5, "index": 5,
+                "label": label, "levels": {"all": {"mean": mean, "se": 0.0,
+                                                   "n": 1}}}
+    payload = {"metric": "m", "conditions": {
+        "pressure": {"n_instances": 2,
+                     "components": [component("L5H5", 1.0),
+                                    component("L9H1", 2.0)],
+                     "embedding": {"label": "embed",
+                                   "levels": {"all": {"mean": 3.0}}}},
+        "honest_instruction": {"n_instances": 1,
+                               "components": [component("L9H1", 9.0)],
+                               "embedding": {"label": "embed",
+                                             "levels": {"all": {"mean": 4.0}}}}}}
+    with open(str(directory / "dla.json"), "w") as handle:
+        json.dump(payload, handle)
+
+    view = review.dla_heatmap(str(tmp_path))
+    assert view.rows == ["L5H5", "L9H1", "embed"]
+    assert view.columns == ["pressure", "honest_instruction"]
+    assert view.values == [[1.0, None], [2.0, 9.0], [3.0, 4.0]]

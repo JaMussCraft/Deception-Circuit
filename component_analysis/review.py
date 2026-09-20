@@ -168,6 +168,18 @@ class Group:
     def __bool__(self) -> bool:
         return bool(self.items)
 
+    @property
+    def note(self) -> str:
+        """What to print when this Group is falsy, spelled like `Missing.note`.
+
+        A renderer reaches for `.note` on anything falsy, so an empty Group has
+        to answer that question rather than raise in the middle of a review.
+        """
+        if self.notes:
+            return " ".join(self.notes)
+        return (f"{self.title}: the files are there but there is nothing to "
+                f"draw in them.")
+
 
 @dataclass
 class Series:
@@ -469,16 +481,20 @@ def dla_heatmap(results_dir: str, level: str = ALL_LEVEL) -> Heatmap:
     if first.get("embedding"):
         rows.append(first["embedding"].get("label", "embed"))
 
-    values = []
-    for position in range(len(rows)):
-        row = []
-        for name in names:
-            condition = conditions[name]
-            components = condition.get("components", [])
-            entry = (components[position] if position < len(components)
-                     else condition.get("embedding"))
-            row.append(_stat((entry or {}).get("levels"), level, "mean"))
-        values.append(row)
+    # Joined on the Component's label, not on its row number: the conditions
+    # are separate passes over different instance sets, and one of them may
+    # have dropped a Component. Reading by position would then put one
+    # Component's attribution under another's name.
+    by_label = {}
+    for name, condition in conditions.items():
+        entries = list(condition.get("components", []))
+        if condition.get("embedding"):
+            entries.append(condition["embedding"])
+        by_label[name] = {one.get("label"): one for one in entries}
+
+    values = [[_stat(by_label[name].get(label, {}).get("levels"), level, "mean")
+               for name in names]
+              for label in rows]
 
     magnitudes = [abs(one) for row in values for one in row if one is not None]
     return Heatmap(
