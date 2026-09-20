@@ -2,12 +2,15 @@
 
 Status: pre-registered 2026-09-20, before any role was assigned to any
 Component of any circuit. Stated plainly, because it is what makes the
-thresholds auditable: the author had read the block C and D outputs of record
-(the SDR nls0.3 head tables) during orientation, so these numbers were not
-written blind. What pre-registration means here is the part that can be
-checked — the criteria and every threshold were committed *before* the pass
-was run, and **no threshold and no clause was changed after seeing what the
-pass proposed**.
+thresholds auditable:
+
+- the author had read the block C and D outputs of record (the SDR nls0.3 head
+  tables) during orientation, so these numbers were not written blind;
+- the criteria and every threshold were committed **before** any pass was run;
+- **one threshold has since been amended** — the path floor, on 2026-09-20,
+  for a reason external to any result — and the change, its reason and the
+  result it changed are logged under "Changing these criteria" at the end of
+  this file. Nothing else has moved. Read that section before quoting a role.
 Owner of the final labels: the researcher, in `role_confirmed`.
 Applied by: `python analyze_components.py roles <cell dir>`.
 Sign convention: ADR-0002.
@@ -70,6 +73,20 @@ Readout, and the Honest-Instruction Counterfactual reaches it at **its own
 query**: the honest-instruction path patching says its strongest incoming path
 is a `q.` receiver on this Component. That is the spec's "the lie signal enters
 at their queries", made mechanical.
+
+**What that clause does and does not test.** It reads the *strongest single
+incoming receiver*, which is not the same as the query dominating the
+Component's input. Ticket 09's Slurm read-back is explicit that the two differ
+where it matters: layer 9 is V-dominated through `head.8.15 -> v.9.3` in the
+Pressure Clause, layers 13 and 14 are level between Q and K/V, and at layer 17
+Q wins the single strongest cell while K and V are larger *in sum*. So a head
+can satisfy this clause while most of the honest instruction reaches it
+somewhere other than its query. The clause is the mechanical form of the
+pre-registered hypothesis, not evidence for it, and a selector proposed by it
+is a candidate for the Q-versus-V test the spec describes rather than the
+result of one. A Q-dominance clause would need a per-receiver total the head
+table does not carry; that is a column for a later ticket, not a criterion
+here.
 
 **mover** — writes the selected item to the Readout. It writes a measurable
 contribution towards the deceptive answer, its effect reaches the Readout
@@ -357,9 +374,16 @@ nls0.3 delta had one selector (L17H25) and one mover (the layer-31 MLP); at
 0.01 it has the mover alone and seventeen unknowns.** L17H25's selector label
 rested on its honest-instruction query cell at **0.0068** — above the old
 floor, below the new one, and inside the cross-card noise. Both passes are
-reported in ticket 10; the 0.01 pass is the one of record. Nothing else about
-the criteria changed, and no threshold was moved after seeing what a pass
-proposed.
+reported in ticket 10; the 0.01 pass is the one of record.
+
+**Nothing else about the criteria changed.** This one threshold did move after
+a pass had run, which is exactly why it is logged here with its cause rather
+than quietly re-defaulted: the cause is ticket 09's cross-card measurement,
+which arrived after the first pass and would have set the floor here had it
+arrived before. The test of whether that is a fit rather than a fact is whether
+the reason survives without the result, and it does: a criterion inside the
+noise of its own measurement is not a criterion, whichever way this circuit had
+come out.
 
 The rest of this section is the rule for any future change. A threshold or a
 clause may be changed, and then:

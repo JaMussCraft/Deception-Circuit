@@ -304,6 +304,13 @@ def knock_out_groups(model, batches, groups, *, scheme=SCHEME) -> Effects:
     family numbers are the single numbers' own arithmetic rather than a second
     implementation of the same ablation.
 
+    The two callers make **two calls**, not one, so a run that does both spends
+    one extra clean and corrupt pass per batch (about five seconds of a
+    two-minute job). Folding them into a single call would save that and would
+    also mean splitting one `Effects` back into two afterwards, changing the
+    signature ticket 07's tests and ticket 03's `knockout.rank` consumer read.
+    The waste is deliberate and it is the cheaper of the two costs.
+
     A group is ablated by writing the corrupt stream's value over *every* one
     of its members in one forward, so a family's effect is the joint effect and
     not the sum of its members'.
