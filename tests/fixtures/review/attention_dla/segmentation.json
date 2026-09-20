@@ -1,0 +1,415 @@
+{
+ "schema_version": 1,
+ "created": "2026-09-16T14:13:31",
+ "task": "sdr",
+ "scheme": "mechanism",
+ "split": "test",
+ "n_instances": 2,
+ "segment_names": [
+  "intro",
+  "item_1_intro",
+  "item_2_intro",
+  "designating_sentence",
+  "designation_site",
+  "predicate_token",
+  "other_token",
+  "inverse_predicate_token",
+  "designation_suffix",
+  "pressure_clause",
+  "question",
+  "item_1_question_pair",
+  "item_1_question_option",
+  "item_2_question_pair",
+  "item_2_question_option",
+  "stem",
+  "readout",
+  "unsegmented"
+ ],
+ "segment_sources": {
+  "intro": "default",
+  "item_1_intro": "default",
+  "item_2_intro": "default",
+  "designating_sentence": "default",
+  "designation_site": "default",
+  "predicate_token": "default",
+  "other_token": "default",
+  "inverse_predicate_token": "default",
+  "designation_suffix": "default",
+  "pressure_clause": "default",
+  "question": "default",
+  "item_1_question_pair": "default",
+  "item_1_question_option": "default",
+  "item_2_question_pair": "default",
+  "item_2_question_option": "default",
+  "stem": "default",
+  "readout": "default",
+  "unsegmented": "default"
+ },
+ "overrides": {},
+ "spans": "half-open [start, end) ranges of token indices over the CLEAN prompt, tokenized with add_special_tokens=False. The corrupt stream shares them: the item-swap Corruption is a single-token edit, so the two streams align position for position.",
+ "empty_spans": "A Segment with an empty span list is absent from that instance \u2014 the saved FAR run predates the Designation Suffix, and the pilot condition has no Pressure Clause.",
+ "partition": "The default Segments are pairwise disjoint and cover every token, 'unsegmented' holding what the named ones do not claim. 'intro', 'question' and 'designating_sentence' are the frames around the Item Mentions and Designation Positions carved out of them, not spans that contain them. An override may overlap the defaults; any instance where it does is listed under report.instances_with_overlapping_segments.",
+ "report": {
+  "override_match_counts": {},
+  "instances_with_overlapping_segments": []
+ },
+ "meta": {
+  "circuit": {
+   "label": "delta__head",
+   "kind": "head",
+   "expr": "sdr \\ honest_c",
+   "operands": {
+    "sdr": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/ca-06/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+    "honest_c": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/ca-06/outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525"
+   },
+   "home_run_dir": null,
+   "counts": {
+    "attention_heads": 17,
+    "mlp_blocks": 1,
+    "attention_neurons": 890,
+    "mlp_hidden": 1209,
+    "mlp_output": 1186,
+    "attention_blocks": 8
+   }
+  },
+  "task": {
+   "label": "sdr",
+   "task": "sdr",
+   "home_run_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/ca-06/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+   "dataset": {
+    "data_dir": "./data/datasets",
+    "std_variant": "azaria",
+    "deception_condition": "deceptive",
+    "test_samples": 1000
+   }
+  }
+ },
+ "instances": [
+  {
+   "record_id": "002b4501bbfd",
+   "n_tokens": 113,
+   "readout": 112,
+   "segments": {
+    "intro": [
+     [
+      5,
+      11
+     ],
+     [
+      12,
+      13
+     ],
+     [
+      14,
+      15
+     ]
+    ],
+    "item_1_intro": [
+     [
+      11,
+      12
+     ]
+    ],
+    "item_2_intro": [
+     [
+      13,
+      14
+     ]
+    ],
+    "designating_sentence": [
+     [
+      15,
+      16
+     ],
+     [
+      17,
+      23
+     ],
+     [
+      24,
+      27
+     ],
+     [
+      28,
+      29
+     ],
+     [
+      30,
+      31
+     ]
+    ],
+    "designation_site": [
+     [
+      16,
+      17
+     ]
+    ],
+    "predicate_token": [
+     [
+      23,
+      24
+     ]
+    ],
+    "other_token": [
+     [
+      27,
+      28
+     ]
+    ],
+    "inverse_predicate_token": [
+     [
+      29,
+      30
+     ]
+    ],
+    "designation_suffix": [
+     [
+      31,
+      47
+     ]
+    ],
+    "pressure_clause": [
+     [
+      47,
+      61
+     ]
+    ],
+    "question": [
+     [
+      66,
+      73
+     ],
+     [
+      74,
+      75
+     ],
+     [
+      76,
+      88
+     ],
+     [
+      89,
+      99
+     ],
+     [
+      100,
+      101
+     ]
+    ],
+    "item_1_question_pair": [
+     [
+      73,
+      74
+     ]
+    ],
+    "item_1_question_option": [
+     [
+      88,
+      89
+     ]
+    ],
+    "item_2_question_pair": [
+     [
+      75,
+      76
+     ]
+    ],
+    "item_2_question_option": [
+     [
+      99,
+      100
+     ]
+    ],
+    "stem": [
+     [
+      106,
+      112
+     ]
+    ],
+    "readout": [
+     [
+      112,
+      113
+     ]
+    ],
+    "unsegmented": [
+     [
+      0,
+      5
+     ],
+     [
+      61,
+      66
+     ],
+     [
+      101,
+      106
+     ]
+    ]
+   }
+  },
+  {
+   "record_id": "008f053297c9",
+   "n_tokens": 114,
+   "readout": 113,
+   "segments": {
+    "intro": [
+     [
+      5,
+      14
+     ],
+     [
+      15,
+      16
+     ],
+     [
+      17,
+      18
+     ]
+    ],
+    "item_1_intro": [
+     [
+      14,
+      15
+     ]
+    ],
+    "item_2_intro": [
+     [
+      16,
+      17
+     ]
+    ],
+    "designating_sentence": [
+     [
+      18,
+      19
+     ],
+     [
+      20,
+      23
+     ],
+     [
+      24,
+      27
+     ],
+     [
+      28,
+      30
+     ],
+     [
+      31,
+      32
+     ]
+    ],
+    "designation_site": [
+     [
+      19,
+      20
+     ]
+    ],
+    "predicate_token": [
+     [
+      23,
+      24
+     ]
+    ],
+    "other_token": [
+     [
+      27,
+      28
+     ]
+    ],
+    "inverse_predicate_token": [
+     [
+      30,
+      31
+     ]
+    ],
+    "designation_suffix": [
+     [
+      32,
+      48
+     ]
+    ],
+    "pressure_clause": [
+     [
+      48,
+      62
+     ]
+    ],
+    "question": [
+     [
+      67,
+      74
+     ],
+     [
+      75,
+      76
+     ],
+     [
+      77,
+      89
+     ],
+     [
+      90,
+      100
+     ],
+     [
+      101,
+      102
+     ]
+    ],
+    "item_1_question_pair": [
+     [
+      74,
+      75
+     ]
+    ],
+    "item_1_question_option": [
+     [
+      89,
+      90
+     ]
+    ],
+    "item_2_question_pair": [
+     [
+      76,
+      77
+     ]
+    ],
+    "item_2_question_option": [
+     [
+      100,
+      101
+     ]
+    ],
+    "stem": [
+     [
+      107,
+      113
+     ]
+    ],
+    "readout": [
+     [
+      113,
+      114
+     ]
+    ],
+    "unsegmented": [
+     [
+      0,
+      5
+     ],
+     [
+      62,
+      67
+     ],
+     [
+      102,
+      107
+     ]
+    ]
+   }
+  }
+ ]
+}

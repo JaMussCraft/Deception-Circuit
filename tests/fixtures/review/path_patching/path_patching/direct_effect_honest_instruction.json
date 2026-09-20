@@ -1,0 +1,185 @@
+{
+  "title": "Direct effect on the Readout, by sender (honest_instruction)",
+  "counterfactual": "honest_instruction",
+  "receiver": "readout",
+  "senders": [
+    {
+      "sender": "embed",
+      "receiver": "readout",
+      "cell": "embed->readout",
+      "mean": 0.0,
+      "se": 0.0,
+      "n": 71,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.5.5",
+      "receiver": "readout",
+      "cell": "head.5.5->readout",
+      "mean": -0.00032499767875263607,
+      "se": 0.00019194350044850347,
+      "n": 71,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.5.6",
+      "receiver": "readout",
+      "cell": "head.5.6->readout",
+      "mean": -6.199197081463046e-05,
+      "se": 0.00013662417625584384,
+      "n": 71,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.5.8",
+      "receiver": "readout",
+      "cell": "head.5.8->readout",
+      "mean": -1.3051287559917422e-06,
+      "se": 0.00013729264109402938,
+      "n": 71,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.5.9",
+      "receiver": "readout",
+      "cell": "head.5.9->readout",
+      "mean": 0.00012534164004047315,
+      "se": 0.00017692388780089598,
+      "n": 71,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.5.11",
+      "receiver": "readout",
+      "cell": "head.5.11->readout",
+      "mean": -9.764442026133905e-05,
+      "se": 0.00013739395249266423,
+      "n": 71,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.8.12",
+      "receiver": "readout",
+      "cell": "head.8.12->readout",
+      "mean": -3.718903149028463e-05,
+      "se": 0.00017515680408311472,
+      "n": 71,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.8.14",
+      "receiver": "readout",
+      "cell": "head.8.14->readout",
+      "mean": 3.9757673073862106e-05,
+      "se": 0.0001786671431003335,
+      "n": 71,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.8.15",
+      "receiver": "readout",
+      "cell": "head.8.15->readout",
+      "mean": 9.352358597745581e-05,
+      "se": 0.0002234692619853524,
+      "n": 71,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.9.12",
+      "receiver": "readout",
+      "cell": "head.9.12->readout",
+      "mean": 0.00010959314404061215,
+      "se": 0.00026775660304485045,
+      "n": 71,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.13.17",
+      "receiver": "readout",
+      "cell": "head.13.17->readout",
+      "mean": 0.00026964494851010616,
+      "se": 0.0003699537354929317,
+      "n": 71,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.14.7",
+      "receiver": "readout",
+      "cell": "head.14.7->readout",
+      "mean": -0.00014258044352509003,
+      "se": 0.00047692100998193606,
+      "n": 71,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.14.21",
+      "receiver": "readout",
+      "cell": "head.14.21->readout",
+      "mean": 0.0005055731728108941,
+      "se": 0.00034229107658761867,
+      "n": 71,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.14.22",
+      "receiver": "readout",
+      "cell": "head.14.22->readout",
+      "mean": 0.001105211045438076,
+      "se": 0.0003682566325428871,
+      "n": 71,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.17.25",
+      "receiver": "readout",
+      "cell": "head.17.25->readout",
+      "mean": -0.008825241237580383,
+      "se": 0.0007100324208247842,
+      "n": 71,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.24.18",
+      "receiver": "readout",
+      "cell": "head.24.18->readout",
+      "mean": -0.016712357787621163,
+      "se": 0.004400125584624551,
+      "n": 71,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.24.25",
+      "receiver": "readout",
+      "cell": "head.24.25->readout",
+      "mean": -0.02090210624738946,
+      "se": 0.00598380008029184,
+      "n": 71,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.27.4",
+      "receiver": "readout",
+      "cell": "head.27.4->readout",
+      "mean": 0.0010156153949653127,
+      "se": 0.0010922058686240513,
+      "n": 71,
+      "n_excluded": 0
+    },
+    {
+      "sender": "mlp.31.0",
+      "receiver": "readout",
+      "cell": "mlp.31.0->readout",
+      "mean": -0.07700239967646628,
+      "se": 0.0228677511287943,
+      "n": 71,
+      "n_excluded": 0
+    }
+  ],
+  "metric": {
+    "quantity": "logit(Target) - logit(Distractor) at the Readout, fp32",
+    "effect": "(patched - clean) / (clean - corrupt), per instance",
+    "counterfactual": "honest_instruction",
+    "sign": "negative means the path carries the honest_instruction counterfactual; -1 is the whole clean-minus-counterfactual gap. Knockout (ticket 07) uses the opposite sign.",
+    "min_gap": 0.001
+  }
+}

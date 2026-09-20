@@ -1,0 +1,378 @@
+{
+  "figure": "dla_paired_scatter.png",
+  "shows": "per-Component direct logit attribution at the Readout under pressure (x) against the same instances under their Matched Honest Instruction (y)",
+  "x": "pressure_paired",
+  "y": "honest_instruction",
+  "paired": true,
+  "metric": "logit(deceptive answer) - logit(honest answer) at the Readout, in float32 through the model's own final RMSNorm and unembedding. The Honest Twin split labels its answers the other way round (harvest_honest_twins swaps target and distractor), so that condition is negated into the same direction as the others.",
+  "circuit": "delta__head",
+  "task": "sdr",
+  "n_instances": 71,
+  "instance_ids": [
+    "008f053297c9",
+    "013ec1d91f8a",
+    "0158f2422069",
+    "03541fed733b",
+    "0f54549c2ddc",
+    "0f9c9f6d7d25",
+    "111f25db5052",
+    "11fc25f0d854",
+    "132fab7e7d10",
+    "1544a8201152",
+    "161b7fd1ad89",
+    "1a3ddf3683fd",
+    "1ac57fbbdb5a",
+    "206840ea6f59",
+    "21b775374149",
+    "2475fee0c376",
+    "2ccfbb095a6d",
+    "2cec481dedb3",
+    "3632a4cd897a",
+    "392e9a37a5d4",
+    "3cd6ab8d2cdc",
+    "3ce7d170966a",
+    "402b64f414f2",
+    "415a8d01442b",
+    "42975c92602d",
+    "442c5c4f00de",
+    "45356e1be9f1",
+    "45a95562daaa",
+    "46059785833f",
+    "47a2b3f86d8b",
+    "493ee6445f57",
+    "4bfd9185dc70",
+    "4f06d312f031",
+    "50f95b30d47a",
+    "512d198ce6e0",
+    "51312478b245",
+    "566d27378d38",
+    "583697f5de79",
+    "58dce096b8c8",
+    "5c130cf95341",
+    "60e04807fcfa",
+    "63a568e2b5c4",
+    "6b2a8efc133f",
+    "6f75cae29a1a",
+    "7505e761fb5c",
+    "886798464958",
+    "8d95ce0cc909",
+    "8dce7aa0abb5",
+    "8fa9df9d4f45",
+    "9170144670ad",
+    "91a28ca1d803",
+    "922ccd17a837",
+    "9522bb83f4e7",
+    "96af7ef04c46",
+    "9719298da642",
+    "9aad39e874db",
+    "9ac1637e2c8f",
+    "9e42c9c23b04",
+    "a24b17174a2f",
+    "a804d06af2f7",
+    "abf15f096b17",
+    "ac642ed71dfc",
+    "acd56a8d9b1a",
+    "b109fd1f20f7",
+    "b12de1026f62",
+    "b27e84a7609f",
+    "b776de2cbcfd",
+    "bd57365bb34d",
+    "c3be997704ac",
+    "c3bff9fe9f98",
+    "c43653968522"
+  ],
+  "diagonal": "y = x means the Component writes the same thing under both conditions; one below the line writes more towards the deceptive answer under pressure than under the instruction, and its signed distance from the line is dla.differential",
+  "points": [
+    {
+      "key": [
+        "head",
+        5,
+        5
+      ],
+      "label": "L5H5",
+      "layer": 5,
+      "kind": "head",
+      "x": -0.0013904714888014213,
+      "x_se": 0.0027329183856382292,
+      "y": -0.0016777059260073683,
+      "y_se": 0.002704123245498501,
+      "differential": 0.0002872344372059468,
+      "panel": "zoom"
+    },
+    {
+      "key": [
+        "head",
+        5,
+        6
+      ],
+      "label": "L5H6",
+      "layer": 5,
+      "kind": "head",
+      "x": 8.86232985682051e-05,
+      "x_se": 0.0013017801256468774,
+      "y": 0.000437775659571651,
+      "y_se": 0.0013545099628716364,
+      "differential": -0.0003491523610034459,
+      "panel": "zoom"
+    },
+    {
+      "key": [
+        "head",
+        5,
+        8
+      ],
+      "label": "L5H8",
+      "layer": 5,
+      "kind": "head",
+      "x": -0.0006344153850772221,
+      "x_se": 0.0012002657322003083,
+      "y": -0.0007717468920098224,
+      "y_se": 0.0012827685767869323,
+      "differential": 0.00013733150693260028,
+      "panel": "zoom"
+    },
+    {
+      "key": [
+        "head",
+        5,
+        9
+      ],
+      "label": "L5H9",
+      "layer": 5,
+      "kind": "head",
+      "x": -0.002468924129932699,
+      "x_se": 0.0018424260494707349,
+      "y": -0.001830613516061239,
+      "y_se": 0.0018549309809258408,
+      "differential": -0.0006383106138714602,
+      "panel": "zoom"
+    },
+    {
+      "key": [
+        "head",
+        5,
+        11
+      ],
+      "label": "L5H11",
+      "layer": 5,
+      "kind": "head",
+      "x": -0.002603412145079756,
+      "x_se": 0.0020907327676570305,
+      "y": -0.002369942018945872,
+      "y_se": 0.0021443713897571007,
+      "differential": -0.00023347012613388434,
+      "panel": "zoom"
+    },
+    {
+      "key": [
+        "head",
+        8,
+        12
+      ],
+      "label": "L8H12",
+      "layer": 8,
+      "kind": "head",
+      "x": -0.0004059595722396871,
+      "x_se": 0.0008709745833780736,
+      "y": -0.0007961505013977138,
+      "y_se": 0.0008977622183183579,
+      "differential": 0.00039019092915802667,
+      "panel": "zoom"
+    },
+    {
+      "key": [
+        "head",
+        8,
+        14
+      ],
+      "label": "L8H14",
+      "layer": 8,
+      "kind": "head",
+      "x": -0.0013918862710903647,
+      "x_se": 0.001529929143656523,
+      "y": -0.001812901234739578,
+      "y_se": 0.001544658310555411,
+      "differential": 0.0004210149636492133,
+      "panel": "zoom"
+    },
+    {
+      "key": [
+        "head",
+        8,
+        15
+      ],
+      "label": "L8H15",
+      "layer": 8,
+      "kind": "head",
+      "x": 0.000273762720072983,
+      "x_se": 0.001616279123619754,
+      "y": 0.0006581973050832486,
+      "y_se": 0.001840111365201256,
+      "differential": -0.0003844345850102656,
+      "panel": "zoom"
+    },
+    {
+      "key": [
+        "head",
+        9,
+        12
+      ],
+      "label": "L9H12",
+      "layer": 9,
+      "kind": "head",
+      "x": 0.0028188004105968376,
+      "x_se": 0.0034369814820904157,
+      "y": 0.002287849718311303,
+      "y_se": 0.0034310284298251564,
+      "differential": 0.0005309506922855343,
+      "panel": "zoom"
+    },
+    {
+      "key": [
+        "head",
+        13,
+        17
+      ],
+      "label": "L13H17",
+      "layer": 13,
+      "kind": "head",
+      "x": 0.004270328523617395,
+      "x_se": 0.004389415068713172,
+      "y": 0.0046202513736895694,
+      "y_se": 0.004274234009744772,
+      "differential": -0.000349922850072174,
+      "panel": "zoom"
+    },
+    {
+      "key": [
+        "head",
+        14,
+        7
+      ],
+      "label": "L14H7",
+      "layer": 14,
+      "kind": "head",
+      "x": 0.00013244302917114447,
+      "x_se": 0.0021056196613179726,
+      "y": -0.0007119761373270565,
+      "y_se": 0.0017882744018845964,
+      "differential": 0.000844419166498201,
+      "panel": "zoom"
+    },
+    {
+      "key": [
+        "head",
+        14,
+        21
+      ],
+      "label": "L14H21",
+      "layer": 14,
+      "kind": "head",
+      "x": 0.0015901315327681287,
+      "x_se": 0.0036829789966046815,
+      "y": 0.003751096138599473,
+      "y_se": 0.00318335789309227,
+      "differential": -0.0021609646058313443,
+      "panel": "zoom"
+    },
+    {
+      "key": [
+        "head",
+        14,
+        22
+      ],
+      "label": "L14H22",
+      "layer": 14,
+      "kind": "head",
+      "x": -0.006555217698636189,
+      "x_se": 0.0042599356967885854,
+      "y": -0.002798253257142406,
+      "y_se": 0.004102051342223511,
+      "differential": -0.003756964441493783,
+      "panel": "zoom"
+    },
+    {
+      "key": [
+        "head",
+        17,
+        25
+      ],
+      "label": "L17H25",
+      "layer": 17,
+      "kind": "head",
+      "x": 0.03484616042311552,
+      "x_se": 0.004672394588195171,
+      "y": 0.00015948723319550635,
+      "y_se": 0.004097769738257917,
+      "differential": 0.03468667318992002,
+      "panel": "full"
+    },
+    {
+      "key": [
+        "head",
+        24,
+        18
+      ],
+      "label": "L24H18",
+      "layer": 24,
+      "kind": "head",
+      "x": 0.061550979387723435,
+      "x_se": 0.09379376122897831,
+      "y": -0.008700606888684799,
+      "y_se": 0.10155613339884287,
+      "differential": 0.07025158627640823,
+      "panel": "full"
+    },
+    {
+      "key": [
+        "head",
+        24,
+        25
+      ],
+      "label": "L24H25",
+      "layer": 24,
+      "kind": "head",
+      "x": 0.1337633203456021,
+      "x_se": 0.09458540387176675,
+      "y": 0.048858877835454236,
+      "y_se": 0.08951123012960119,
+      "differential": 0.08490444251014785,
+      "panel": "full"
+    },
+    {
+      "key": [
+        "head",
+        27,
+        4
+      ],
+      "label": "L27H4",
+      "layer": 27,
+      "kind": "head",
+      "x": -0.0034459767154824566,
+      "x_se": 0.023762901261910385,
+      "y": -0.0002953704892539642,
+      "y_se": 0.022552547664381577,
+      "differential": -0.0031506062262284923,
+      "panel": "zoom"
+    },
+    {
+      "key": [
+        "mlp",
+        31,
+        0
+      ],
+      "label": "L31 MLP",
+      "layer": 31,
+      "kind": "mlp",
+      "x": -0.24239480327552473,
+      "x_se": 0.24865664636211998,
+      "y": -0.5676789753873583,
+      "y_se": 0.24936149225199464,
+      "differential": 0.3252841721118336,
+      "panel": "full"
+    }
+  ],
+  "zoom": 0.008194022123295237,
+  "panels": "one panel over every Component, unless an outlier makes the rest illegible; then a second panel zoomed to 'zoom', with each point's 'panel' saying which one names it",
+  "skipped": null
+}
