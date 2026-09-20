@@ -194,6 +194,21 @@ def test_dla_view_gives_one_bar_chart_per_condition_in_head_table_order():
     assert "1000 instance(s)" in bars.subtitle
 
 
+def test_dla_is_also_a_component_by_condition_heatmap():
+    """The ticket asks for a DLA heatmap; the bars are one condition at a time."""
+    view = review.dla_heatmap(cell("attention_dla"))
+    assert view
+    assert view.rows[0] == "L5H5" and view.rows[-1] == "embed"
+    assert view.columns == ["pressure", "honest_instruction", "pressure_paired",
+                            "differential", "honest_twin"]
+    assert len(view.values) == 19 and len(view.values[0]) == 5
+    assert view.extent is not None and view.extent > 0
+
+
+def test_a_dla_heatmap_is_missing_when_the_cell_has_no_dla():
+    assert not review.dla_heatmap(cell("knockout"))
+
+
 def test_dla_view_states_the_metric_and_the_suppression_margin():
     group = review.dla_view(cell("attention_dla"))
     assert any("logit(deceptive answer)" in note for note in group.notes)
@@ -357,3 +372,36 @@ def test_review_imports_without_torch_nnsight_plotly_or_circuitsvis():
         cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
         capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
+
+
+# ==============================================================================
+# THE LIVE SECTION'S ONE NON-RENDERING DECISION
+# ==============================================================================
+
+
+def test_the_task_spec_is_rebuilt_from_the_cells_own_provenance():
+    """The live section reloads instances without re-resolving the circuits.
+
+    `analyze_components.py` resolves a TaskSpec from run directories that may
+    no longer be mounted where the cell was written (every cell of record names
+    a worktree that has since been removed). The head table already records
+    what the loaders need, so the notebook rebuilds the spec from that instead.
+    """
+    view = review.head_table_view(cell("attention_dla"))
+    spec = review.task_spec_from_meta(view.meta)
+    assert spec.name == "sdr"
+    assert spec.label == "sdr"
+    assert spec.args.data_dir == "./data/datasets"
+    assert spec.args.test_samples == 1000
+    assert spec.args.deception_condition == "deceptive"
+    assert spec.args.std_variant == "azaria"
+
+
+def test_rebuilding_a_task_spec_without_provenance_says_so():
+    with pytest.raises(ValueError, match="no task provenance"):
+        review.task_spec_from_meta({})
+
+
+def test_the_model_name_comes_from_the_cells_intake():
+    view = review.head_table_view(cell("attention_dla"))
+    assert review.model_name_of(view.meta) == "llama-8b-instruct"

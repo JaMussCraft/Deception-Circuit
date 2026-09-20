@@ -361,6 +361,69 @@ outputs/_suites/<suite-name>/
 The per-cell body is the same code either way, so a suite cell's JSON is
 byte-comparable with a legacy run's.
 
+## Component-level analysis
+
+Circuit evaluation says a circuit matters; component analysis says which heads
+and MLP blocks inside it do what. `analyze_components.py` takes the same
+circuit bindings and set-algebra expressions as `evaluate_circuit.py`, coarsens
+the circuit to Components (attention heads and MLP blocks), and runs the
+registered analyses in the full, unmodified model through nnsight.
+
+```bash
+# Validate circuits, Segments, sample and the sender-receiver grid, and print a
+# cost estimate. Seconds on a login node; loads no model and never touches CUDA.
+python analyze_components.py \
+    --circuit sdr=outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414 \
+    --circuit honest_c=outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525 \
+    --reference honest=outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525 \
+    --expr 'delta=sdr \ honest_c' --compose-granularity head \
+    --suite-name my-suite --dry-run
+
+# The same run on a GPU, through the scheduler.
+sbatch scripts/analyze_components.sbatch --circuit ... --expr ... --suite-name my-suite
+```
+
+`--analyses NAME[,NAME]` picks which of the registered analyses run;
+`--dry-run` never writes anything an analysis would write.
+
+### The results layout
+
+One **cell** per (circuit, task):
+
+```
+outputs/_analyses/<suite-name>/<circuit-label>/<task-label>/
+  head_table.csv / head_table.json   one row per Component, columns namespaced
+                                     by the analysis that wrote them
+  segmentation.json                  the Segment spans actually used, per instance
+  sample.json                        the fixed-seed causal sample and its strata
+  attention/                         patterns*.json/.png, top_heads.json/.png
+  dla/                               dla.*, logit_lens.*, the paired twins
+  knockout/                          knockout.json/.png
+  path_patching/                     agnostic, segments, sweep, and their figures
+```
+
+Every figure has a JSON twin holding exactly what it drew, so an agent with no
+browser reads the same result the researcher sees.
+
+### The review notebook
+
+`review_components.ipynb` at the repository root renders one cell. Its first
+code cell holds `RESULTS_DIR`, `LIVE` and `REPO_ROOT`; set the first to a cell
+directory and run the notebook top to bottom. Every section above the live one
+reads only JSON and CSV, so it runs on a login node, and an analysis the cell
+does not contain prints a note rather than raising.
+
+With `LIVE = True` the last section loads the model once through
+`component_analysis.hooks` and offers three drill-downs — one head's attention
+on one instance, direct logit attribution on a hand-typed prompt, and one
+off-grid path patch — calling the same library functions the CLI calls. **It
+needs a GPU**: run the notebook inside a Slurm job on `gpuA100x4` or
+`gpuA40x4`, never on a login node.
+
+The notebook needs `circuitsvis`, `plotly` and `ipykernel`, which are installed
+in the `mgnp` environment only (see `requirements.txt`); the login-node base
+environment runs the CLI and the tests without them.
+
 ## Tests
 
 ```bash

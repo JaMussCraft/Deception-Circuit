@@ -448,6 +448,47 @@ def dla_view(results_dir: str, level: str = ALL_LEVEL) -> "Group":
                  items=items, notes=[one for one in notes if one])
 
 
+def dla_heatmap(results_dir: str, level: str = ALL_LEVEL) -> Heatmap:
+    """Every Component against every condition in one matrix.
+
+    The bars answer "who writes the deceptive answer under pressure"; this
+    answers "which Components write something different under the honest
+    instruction", which is the differential column read as a picture. The
+    colour scale is symmetric about zero and clipped to the largest magnitude
+    in the matrix, so a suppressor reads as the opposite colour of a mover.
+    """
+    path = os.path.join(results_dir, DLA_SUBDIR, DLA_JSON)
+    payload = read_json(path)
+    if payload is None:
+        return _missing("direct logit attribution", path)
+
+    conditions = payload.get("conditions", {})
+    names = list(conditions)
+    first = conditions.get(names[0], {}) if names else {}
+    rows = [one.get("label") for one in first.get("components", [])]
+    if first.get("embedding"):
+        rows.append(first["embedding"].get("label", "embed"))
+
+    values = []
+    for position in range(len(rows)):
+        row = []
+        for name in names:
+            condition = conditions[name]
+            components = condition.get("components", [])
+            entry = (components[position] if position < len(components)
+                     else condition.get("embedding"))
+            row.append(_stat((entry or {}).get("levels"), level, "mean"))
+        values.append(row)
+
+    magnitudes = [abs(one) for row in values for one in row if one is not None]
+    return Heatmap(
+        title="Direct logit attribution, every Component by condition",
+        subtitle=cell_subtitle(_cell_meta(results_dir), f"level {level}"),
+        rows=rows, columns=names, values=values,
+        extent=max(magnitudes) if magnitudes else None,
+        notes=[payload.get("metric", "")])
+
+
 def dla_scatter_view(results_dir: str) -> "Scatter":
     """Each Component under pressure against itself under the honest instruction."""
     path = os.path.join(results_dir, DLA_SUBDIR, PAIRED_SCATTER_JSON)
@@ -781,3 +822,46 @@ def sample_view(results_dir: str) -> Table:
                  columns=factors + ["available", "target", "achieved"],
                  rows=rows, notes=[one for one in notes if one],
                  meta=payload.get("meta", {}))
+
+
+# ==============================================================================
+# WHAT THE LIVE SECTION NEEDS FROM THE CELL
+# ==============================================================================
+#
+# The live section of the notebook calls `hooks`, `dla` and `path_patching`
+# with the same signatures the CLI uses; the only thing it cannot take
+# straight from those modules is a way to reach one instance's prompts without
+# re-resolving the circuit expression. Every cell of record names run
+# directories inside worktrees that have since been removed, so re-resolving
+# would fail on a cell that is otherwise perfectly readable. The head table
+# already records what the loaders need, and these two functions read it.
+
+
+def model_name_of(meta: dict) -> str:
+    """The model this cell was computed on, for `hooks.load_analysis_model`."""
+    name = (meta or {}).get("intake", {}).get("model")
+    if not name:
+        raise ValueError(
+            "this head table records no intake provenance, so the model it was "
+            "computed on is unknown; set MODEL_NAME in the live section by hand")
+    return name
+
+
+def task_spec_from_meta(meta: dict):
+    """An `evaluation.circuits.TaskSpec` rebuilt from a written cell.
+
+    Imported inside the function: `evaluation.circuits` reaches the task
+    registry, which the pure read-back path has no reason to load.
+    """
+    import argparse
+
+    from evaluation.circuits import TaskSpec
+
+    task = (meta or {}).get("task")
+    if not task or not task.get("task"):
+        raise ValueError(
+            "this head table has no task provenance, so its instances cannot "
+            "be reloaded; build the TaskSpec by hand in the live section")
+    args = argparse.Namespace(task=task["task"], **task.get("dataset", {}))
+    return TaskSpec(name=task["task"], label=task.get("label", task["task"]),
+                    args=args, home_run_dir=task.get("home_run_dir"))
