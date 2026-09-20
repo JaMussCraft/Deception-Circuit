@@ -32,6 +32,16 @@ Results land in `outputs/_analyses/<suite>/<circuit>/<task>/`, one cell per
 (circuit, task) pair — a composed circuit has no home run directory, so
 analyses never write inside one.
 
+Subcommands come before the flags. There is one:
+
+    # propose a Component Role per Component from a finished head table
+    python analyze_components.py roles outputs/_analyses/<suite>/<circuit>/<task>
+
+It needs no model and no circuit binding — it reads the head table the analyses
+left and applies the pre-registered criteria in `docs/component-roles.md` — so
+it is a subcommand rather than a registered analysis. `--help` after the word
+`roles` describes its own flags.
+
 `--dry-run` resolves everything on the login node with no GPU and writes three
 files per cell: the head table, the `segmentation.json` that says which tokens
 each Segment covers on every test instance, and the `sample.json` that names
@@ -56,6 +66,13 @@ from evaluation import circuits as circuit_intake
 #: Descriptive analyses run over this split; the causal sample is drawn from it.
 ANALYSIS_SPLIT = "test"
 
+#: Subcommands that do not analyse a circuit and so do not take the circuit
+#: intake flags at all. `roles` reads a *finished* head table off disk and
+#: needs no model, no circuit binding and no task: it is not a registered
+#: analysis because a registered analysis runs inside one invocation, from the
+#: intake's fresh rows, and never sees the columns a previous run wrote.
+SUBCOMMANDS = {"roles": "component_analysis.roles"}
+
 
 # ==============================================================================
 # CLI
@@ -63,7 +80,10 @@ ANALYSIS_SPLIT = "test"
 
 def build_parser():
     p = argparse.ArgumentParser(
-        description="Component-level analysis of node-pruned circuits.",
+        description="Component-level analysis of node-pruned circuits. "
+                    "Subcommands, given before any flag: "
+                    + ", ".join(SUBCOMMANDS)
+                    + " (try `analyze_components.py roles --help`).",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     p.add_argument("run_dir", nargs="?", default=None,
@@ -429,6 +449,14 @@ def run(cli, resolved, *, model=None) -> int:
             for module in selected:
                 updates = module.run(ctx) or {}
                 rows = merge_columns(rows, updates, namespace=module.NAME)
+                # An analysis may also contribute columns that are not its
+                # own: the family knockout carries the `roles.*` columns it
+                # grouped by back into the table, which this run rebuilds from
+                # the intake's rows and would otherwise write without them.
+                # Optional, so the five-name analysis protocol is unchanged.
+                carried = getattr(module, "extra_columns", None)
+                if carried is not None:
+                    rows = merge_columns(rows, carried(ctx) or {})
                 print(f"    {module.NAME}: {len(updates)} Component(s) updated, "
                       f"output under {module.SUBDIR}/")
 
@@ -446,14 +474,6 @@ def run(cli, resolved, *, model=None) -> int:
 # ==============================================================================
 # MAIN
 # ==============================================================================
-
-#: Subcommands that do not analyse a circuit and so do not take the circuit
-#: intake flags at all. `roles` reads a *finished* head table off disk and
-#: needs no model, no circuit binding and no task: it is not a registered
-#: analysis because a registered analysis runs inside one invocation, from the
-#: intake's fresh rows, and never sees the columns a previous run wrote.
-SUBCOMMANDS = {"roles": "component_analysis.roles"}
-
 
 def main(argv=None) -> int:
     argv = sys.argv[1:] if argv is None else list(argv)

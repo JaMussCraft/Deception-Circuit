@@ -69,8 +69,10 @@ prompt**, so a negative `path_patching.*_honest_instruction` cell means the
 path carries the *honest instruction*, not the Corruption. The derived
 `roles.direct_support_honest_instruction` is therefore positive when the
 Component supports the deceptive answer *against* the honest instruction, which
-is the same convention, and the criteria doc repeats the sentence where it uses
-the column.
+is the same convention. **No criterion reads that column today**; it is
+written for the notebook and for a reader comparing the two
+counterfactuals, and it carries ticket 09's caveat that it covers 71
+instances where its item-swap partner covers 100.
 
 ## Alternatives
 
@@ -97,5 +99,8 @@ the column.
   (`path_patching.direct_effect` and `roles.direct_support`). They are exact
   negations of each other, and the roles JSON records that relation so a reader
   who finds only one of them can reconstruct the other.
-- `roles.*` columns exist only after the roles pass has run. Nothing else reads
-  them, so a cell that never runs the pass is unaffected.
+- `roles.*` columns exist only after the roles pass has run, so a cell that
+  never runs the pass is unaffected. One thing does read them back: the
+  family knockout groups by `role_confirmed` else `roles.role_proposed`
+  (`component_analysis/knockout.py`) and carries those columns into the
+  table it writes. Any other reader should expect them to be absent.

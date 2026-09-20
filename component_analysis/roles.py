@@ -78,9 +78,11 @@ DISAGREE = "disagree"
 INSUFFICIENT = "insufficient"
 
 #: Segment name -> group, from CONTEXT.md's prompt anatomy. A name that is not
-#: here falls in `other`, which is unestablished: `designation_site` counts as
-#: designation rather than as an Item Mention, and `question` is a frame
-#: because the Item Mentions inside it are carved out into their own Segments.
+#: here is `unestablished`, which is also what an absent read is: a Segment the
+#: vocabulary does not know about has not been shown to be anything, and a
+#: `--segment` override (ticket 03's `bos`) arrives that way. `designation_site`
+#: counts as designation rather than as an Item Mention, and `question` is a
+#: frame because the Item Mentions inside it are carved into their own Segments.
 SEGMENT_GROUPS: Dict[str, str] = {
     "designating_sentence": "designation",
     "designation_site": "designation",
@@ -105,8 +107,10 @@ SEGMENT_GROUPS: Dict[str, str] = {
 #: The groups a read has to fall in to be established at all.
 ESTABLISHED_GROUPS = ("designation", "item_mention", "pressure", "frame")
 
-#: The columns the criteria read, by view. Named here so that a renamed column
-#: upstream fails loudly in one place rather than silently reading nulls.
+#: The columns the criteria read, by view. Named here, and checked against the
+#: table by `require_columns`, so that a renamed column upstream fails loudly in
+#: one place rather than turning every Component into an `unknown` that reads
+#: like a finding.
 TOP_SEGMENT = "attention_patterns.pressure_top_segment"
 TOP_MASS = "attention_patterns.pressure_top_mass"
 PAIRED_TOP_SEGMENT = "attention_patterns.pressure_paired_top_segment"
@@ -127,8 +131,22 @@ INCOMING_HONEST = "path_patching.strongest_incoming_honest_instruction"
 INCOMING_HONEST_EFFECT = \
     "path_patching.strongest_incoming_effect_honest_instruction"
 
-#: The human's column, read and never written.
-CONFIRMED = PROTECTED_COLUMNS[0]
+#: The human's column, read and never written. Looked up by name rather than by
+#: position, because `head_table` documents `PROTECTED_COLUMNS` as extensible.
+CONFIRMED = "role_confirmed"
+assert CONFIRMED in PROTECTED_COLUMNS, (
+    "head_table stopped protecting role_confirmed, which the roles pass relies "
+    "on to keep the researcher's column out of an analysis's reach")
+
+#: One column per view whose absence means that view was never computed. A
+#: table missing all of one view's columns cannot support a conjunction, and
+#: saying so beats proposing `unknown` for every Component.
+REQUIRED_COLUMNS = {
+    "reads (attention_patterns)": (TOP_SEGMENT, TOP_MASS),
+    "writes (dla)": (DLA, DLA_SE),
+    "depends, whether (knockout)": (KNOCKOUT, KNOCKOUT_SE),
+    "depends, how (path_patching)": (DIRECT_EFFECT, DIRECT_EFFECT_SE, OUTGOING),
+}
 
 #: What the head table gains, before the CLI adds the `roles` namespace.
 COLUMNS = ("role_proposed", "role_notes", "direct_support", "direct_support_se",
@@ -142,7 +160,7 @@ class Thresholds:
     z: float = 2.0
     dla_floor: float = 0.01
     knockout_floor: float = 0.01
-    path_floor: float = 0.005
+    path_floor: float = 0.01
     attention_floor: float = 0.20
 
     def as_dict(self) -> dict:
@@ -167,19 +185,36 @@ def _number(row, column) -> Optional[float]:
         return None
 
 
+def _flag(value) -> bool:
+    """A boolean column, however it was written.
+
+    The JSON twin keeps booleans as booleans, but the CSV view writes them as
+    0 and 1 and a hand-edited table may hold "false". `bool("0")` is True, and
+    the suppressor clause is checked first, so an unnormalized read of
+    `dla.suppression` would make every Component a suppressor candidate.
+    """
+    if isinstance(value, str):
+        return value.strip().lower() in ("1", "true", "yes")
+    return bool(value)
+
+
 def direction(value, se, floor, thresholds: Thresholds) -> int:
     """+1, -1 or 0: the sign of a number that clears both the z bar and its floor.
 
     Both bars, because they catch different things. Without the z test a large
     number measured over nothing counts; without the floor a path-patching cell
     four standard errors from zero at 0.0005 counts, which is noise measured
-    precisely. A missing standard error is not a small one: it fails.
+    precisely. A missing standard error is not a small one: it fails, and so
+    does a standard error of exactly zero — a spread of zero over a sample is
+    a spread that was not measured (one instance, or a column written by
+    something that does not compute one), not a measurement of perfect
+    agreement.
     """
     if value is None or abs(value) < floor:
         return 0
-    if se is None:
+    if not se or se <= 0:
         return 0
-    if se > 0 and abs(value) / se < thresholds.z:
+    if abs(value) / se < thresholds.z:
         return 0
     return 1 if value > 0 else -1
 
@@ -275,7 +310,7 @@ def views_of(row, thresholds: Thresholds) -> dict:
             "differential_sign": direction(
                 differential, _number(row, DLA_DIFFERENTIAL_SE),
                 thresholds.dla_floor, thresholds),
-            "suppression": bool(row.get(DLA_SUPPRESSION)),
+            "suppression": _flag(row.get(DLA_SUPPRESSION)),
         },
         "depends": {
             "knockout": knockout, "knockout_se": _number(row, KNOCKOUT_SE),
@@ -495,6 +530,13 @@ def columns(decisions: List[Decision]) -> dict:
     return {one.key: one.columns() for one in decisions}
 
 
+def _label(provenance) -> Optional[str]:
+    """A circuit's or task's label out of the head table's provenance block."""
+    if isinstance(provenance, dict):
+        return provenance.get("label") or provenance.get("name")
+    return None if provenance is None else str(provenance)
+
+
 def counts(decisions: List[Decision]) -> dict:
     out = {role: 0 for role in ROLES}
     for one in decisions:
@@ -503,7 +545,8 @@ def counts(decisions: List[Decision]) -> dict:
 
 
 def payload(decisions: List[Decision], *, cell_dir: str, thresholds: Thresholds,
-            merged_from: List[str], meta: dict = None) -> dict:
+            merged_from: List[str], meta: dict = None,
+            missing_views: List[str] = None) -> dict:
     return {
         "analysis": NAME,
         "created": time.strftime("%Y-%m-%dT%H:%M:%S"),
@@ -517,8 +560,14 @@ def payload(decisions: List[Decision], *, cell_dir: str, thresholds: Thresholds,
         "thresholds": thresholds.as_dict(),
         "cell": cell_dir,
         "merged_from": list(merged_from),
-        "circuit": (meta or {}).get("circuit"),
-        "task": (meta or {}).get("task"),
+        #: Views whose columns were absent from the table. Non-empty only with
+        #: --roles-allow-missing-views, and every role here is worth less.
+        "missing_views": list(missing_views or []),
+        # Label strings, as every sibling analysis JSON writes them: the head
+        # table's meta holds the full provenance dicts, and a notebook reading
+        # "circuit" across the analyses must not meet two types.
+        "circuit": _label((meta or {}).get("circuit")),
+        "task": _label((meta or {}).get("task")),
         "counts": counts(decisions),
         "n_components": len(decisions),
         "components": [one.as_dict() for one in decisions],
@@ -557,6 +606,12 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--roles-attention-floor", type=float,
                    default=Thresholds.attention_floor,
                    help="Smallest top-Segment mass that establishes a read.")
+    p.add_argument("--roles-allow-missing-views", action="store_true",
+                   help="Propose even when a whole view's columns are absent "
+                        "from the table. Off by default, because a table with "
+                        "no DLA columns proposes `unknown` for every Component "
+                        "and that reads like a finding. The views that were "
+                        "missing are recorded in roles.json.")
     p.add_argument("--dry-run", action="store_true",
                    help="Propose and print; write nothing.")
     return p
@@ -567,6 +622,39 @@ def thresholds_from(cli) -> Thresholds:
                       knockout_floor=cli.roles_knockout_floor,
                       path_floor=cli.roles_path_floor,
                       attention_floor=cli.roles_attention_floor)
+
+
+def require_columns(rows, *, cell_dir: str, merged_from=(), allow=False) -> list:
+    """Refuse a table that is missing a whole view, naming the columns.
+
+    Not a refusal of *null cells* — an MLP block legitimately has no attention
+    columns, and a Component an analysis skipped legitimately has nulls. This
+    refuses a table where the column does not exist at all, which is what a
+    renamed column upstream and a forgotten `--roles-merge-from` both look
+    like, and which would otherwise come out as a full table of `unknown`.
+    """
+    present = {column for row in rows for column in row}
+    missing = {view: [c for c in columns if c not in present]
+               for view, columns in REQUIRED_COLUMNS.items()}
+    absent = {view: columns for view, columns in missing.items()
+              if len(columns) == len(REQUIRED_COLUMNS[view])}
+    if not absent:
+        return []
+    merged = (f" (merged from {', '.join(merged_from)})" if merged_from
+              else " (nothing was merged in)")
+    complaint = (
+        f"{cell_dir!r}{merged} has no column at all for: "
+        + "; ".join(f"{view} — {', '.join(columns)}"
+                    for view, columns in absent.items())
+        + ". A Component Role is a conjunction of all three views, so a table "
+          "missing one of them can only propose `unknown`.")
+    if not allow:
+        raise SystemExit(complaint + " Run the missing analyses, or merge the "
+                         "cell that has them with --roles-merge-from, or pass "
+                         "--roles-allow-missing-views to propose anyway.")
+    print(f"  !! {complaint} Proposing anyway, because "
+          f"--roles-allow-missing-views was given.")
+    return sorted(absent)
 
 
 def read_table(cell_dir: str) -> tuple:
@@ -635,11 +723,14 @@ def main(argv=None) -> int:
     thresholds = thresholds_from(cli)
     rows, meta = read_table(cli.cell_dir)
     rows = merge_cells(rows, cli.roles_merge_from)
-
-    decisions = decide_rows(rows, thresholds)
     print(f"\nROLES — {cli.cell_dir}")
     print(f"  criteria: {CRITERIA_DOC} (pre-registered)")
     print(f"  thresholds: {thresholds.as_dict()}\n")
+    missing_views = require_columns(
+        rows, cell_dir=cli.cell_dir, merged_from=cli.roles_merge_from,
+        allow=cli.roles_allow_missing_views)
+
+    decisions = decide_rows(rows, thresholds)
     print_decisions(decisions)
 
     if cli.dry_run:
@@ -660,7 +751,8 @@ def main(argv=None) -> int:
     with open(json_path, "w") as handle:
         json.dump(payload(decisions, cell_dir=cli.cell_dir,
                           thresholds=thresholds,
-                          merged_from=cli.roles_merge_from, meta=meta),
+                          merged_from=cli.roles_merge_from, meta=meta,
+                          missing_views=missing_views),
                   handle, indent=2, default=str)
 
     print(f"\n  {written['csv']}\n  {written['json']}\n  {json_path}")

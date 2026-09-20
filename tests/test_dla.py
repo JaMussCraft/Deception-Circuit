@@ -109,3 +109,23 @@ def test_every_crossing_is_reported_beside_the_flip_layer():
     assert dla.sign_change_rows([-1.0, 0.4, -0.2, 0.3, 0.9]) == [1, 2, 3]
     assert dla.sign_change_rows([-0.02, 0.01, 0.05, 3.0]) == [1]
     assert dla.sign_change_rows([0.2, 0.4, 0.9]) == []
+
+
+def test_an_unknown_condition_is_refused_from_a_list_too():
+    """The same typo must not be an error on the command line and a silent
+    empty measurement from a library caller."""
+    import pytest
+
+    from component_analysis import dla
+
+    with pytest.raises(ValueError, match="nosuch"):
+        dla.parse_conditions(["nosuch"])
+
+
+def test_an_empty_selection_still_means_every_condition():
+    """`--dla-conditions ""` meant "all" before the flag was validated at parse
+    time, and a silent change from all to none would cost a run its numbers."""
+    from component_analysis import dla
+
+    assert dla.parse_conditions("") == list(dla.CONDITIONS)
+    assert dla.parse_conditions([]) == list(dla.CONDITIONS)

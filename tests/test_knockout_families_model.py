@@ -138,7 +138,8 @@ def run_roles_then_families(run_dir, out, family_out, *extra):
     """
     assert run_cli(str(run_dir), "--num-kv-heads", "2", "--analyses", "knockout",
                    "--device", "cpu", "--output-dir", str(out)) == 0
-    assert analyze_components.main(["roles", roles_cell(out)]) == 0
+    assert analyze_components.main(["roles", roles_cell(out),
+                              "--roles-allow-missing-views"]) == 0
     return run_cli(str(run_dir), "--num-kv-heads", "2", "--analyses", "knockout",
                    "--device", "cpu", "--output-dir", str(family_out),
                    "--knockout-families", "--knockout-roles-from",
@@ -166,8 +167,8 @@ def test_a_cli_run_writes_the_family_json_the_png_and_the_head_table_columns(
     assert len(members) == len(set(members)), "a Component is in one family"
 
     table = read_json(family_out, *CELL, "head_table.json")
-    assert "knockout.family" in table["columns"]
-    assert "knockout.family_logit_diff_drop" in table["columns"]
+    assert "knockout.role_family" in table["columns"]
+    assert "knockout.role_family_logit_diff_drop" in table["columns"]
 
 
 def test_the_family_and_the_single_knockout_agree_where_a_family_has_one_member(
@@ -186,7 +187,8 @@ def test_the_family_and_the_single_knockout_agree_where_a_family_has_one_member(
 
     assert run_cli(str(run_dir), "--num-kv-heads", "2", "--analyses", "knockout",
                    "--device", "cpu", "--output-dir", str(out)) == 0
-    assert analyze_components.main(["roles", roles_cell(out)]) == 0
+    assert analyze_components.main(["roles", roles_cell(out),
+                              "--roles-allow-missing-views"]) == 0
     rows = load_head_table(roles_cell(out))
     rows[0]["role_confirmed"] = "mover"
     write_head_table(roles_cell(out), rows)
@@ -212,7 +214,8 @@ def test_the_roles_may_be_read_from_another_cell(sdr_run, cli_model, tmp_path):
     run_dir, out, _records = sdr_run
     assert run_cli(str(run_dir), "--num-kv-heads", "2", "--analyses", "knockout",
                    "--device", "cpu", "--output-dir", str(out)) == 0
-    assert analyze_components.main(["roles", roles_cell(out)]) == 0
+    assert analyze_components.main(["roles", roles_cell(out),
+                              "--roles-allow-missing-views"]) == 0
 
     elsewhere = str(tmp_path / "second")
     assert run_cli(str(run_dir), "--num-kv-heads", "2", "--analyses", "knockout",
@@ -225,31 +228,40 @@ def test_the_roles_may_be_read_from_another_cell(sdr_run, cli_model, tmp_path):
     assert payload["grouping"]["read_from"] == roles_cell(out)
 
 
-def test_a_role_on_a_component_outside_this_circuit_is_refused_by_name(
+def test_a_role_on_a_component_outside_this_circuit_is_dropped_and_counted(
         sdr_run, cli_model, tmp_path):
     """A completeness sweep's rows carry roles too, and they are not the circuit.
 
     `path_patching`'s sweep appends the Components it scored from outside the
     circuit, and the roles pass gives every one of them a role. Knocking those
-    out would widen the family past the circuit under study with nothing in the
-    output saying so.
+    out would widen the family past the circuit under study, so they are
+    dropped and the count is recorded where the figure's reader can see it.
     """
     from component_analysis.head_table import write_head_table
 
     run_dir, out, _records = sdr_run
     assert run_cli(str(run_dir), "--num-kv-heads", "2", "--analyses", "knockout",
                    "--device", "cpu", "--output-dir", str(out)) == 0
-    assert analyze_components.main(["roles", roles_cell(out)]) == 0
+    assert analyze_components.main(["roles", roles_cell(out),
+                              "--roles-allow-missing-views"]) == 0
     rows = load_head_table(roles_cell(out))
     rows.append({"kind": "head", "layer": 1, "index": 3,
                  "roles.role_proposed": "unknown"})
     write_head_table(roles_cell(out), rows)
 
-    with pytest.raises(SystemExit, match="not in this circuit"):
-        run_cli(str(run_dir), "--num-kv-heads", "2", "--analyses", "knockout",
-                "--device", "cpu", "--output-dir", str(tmp_path / "families"),
-                "--knockout-families", "--knockout-roles-from",
-                roles_cell(out))
+    family_out = str(tmp_path / "families")
+    assert run_cli(str(run_dir), "--num-kv-heads", "2", "--analyses", "knockout",
+                   "--device", "cpu", "--output-dir", family_out,
+                   "--knockout-families", "--knockout-roles-from",
+                   roles_cell(out)) == 0
+
+    payload = read_json(family_out, *CELL, knockout.SUBDIR,
+                        knockout.FAMILY_JSON_NAME)
+    assert payload["grouping"]["n_outside_this_circuit"] == 1
+    assert payload["grouping"]["outside_this_circuit"] == [["head", 1, 3]]
+    members = [tuple(one) for family in payload["families"]
+               for one in family["members"]]
+    assert ("head", 1, 3) not in members, "not in the circuit, so not ablated"
 
 
 def test_families_without_a_role_column_are_refused_by_name(sdr_run, cli_model):
@@ -267,7 +279,8 @@ def test_a_dry_run_sizes_the_family_pass_and_writes_nothing(sdr_run, cli_model,
     run_dir, out, _records = sdr_run
     assert run_cli(str(run_dir), "--num-kv-heads", "2", "--analyses", "knockout",
                    "--device", "cpu", "--output-dir", str(out)) == 0
-    assert analyze_components.main(["roles", roles_cell(out)]) == 0
+    assert analyze_components.main(["roles", roles_cell(out),
+                              "--roles-allow-missing-views"]) == 0
 
     dry = str(tmp_path / "dry")
     assert run_cli(str(run_dir), "--num-kv-heads", "2", "--analyses", "knockout",
@@ -293,3 +306,33 @@ def test_the_roles_the_families_were_built_from_are_the_ones_in_the_table(
         for member in family["members"]:
             assert proposed[tuple(member)] == family["role"]
     assert {one["role"] for one in payload["families"]} <= set(roles.ROLES)
+
+
+def test_the_family_run_keeps_the_role_columns_it_grouped_by(sdr_run, cli_model):
+    """The default --knockout-roles-from is this cell, and a run rewrites it.
+
+    Every analysis run rebuilds the head table from the intake's rows, so
+    without the carry-through a family run would read a role, ablate by it, and
+    write a table with no role column left in it — the grouping its own figure
+    was built from, gone from the table the figure sits beside.
+    """
+    run_dir, out, _records = sdr_run
+    assert run_cli(str(run_dir), "--num-kv-heads", "2", "--analyses", "knockout",
+                   "--device", "cpu", "--output-dir", str(out)) == 0
+    assert analyze_components.main(["roles", roles_cell(out),
+                                    "--roles-allow-missing-views"]) == 0
+    before = {(r["kind"], r["layer"], r["index"]): r["roles.role_proposed"]
+              for r in load_head_table(roles_cell(out))}
+
+    assert run_cli(str(run_dir), "--num-kv-heads", "2", "--analyses", "knockout",
+                   "--device", "cpu", "--output-dir", str(out),
+                   "--knockout-families") == 0
+
+    after = {(r["kind"], r["layer"], r["index"]): r.get("roles.role_proposed")
+             for r in load_head_table(roles_cell(out))}
+    assert after == before
+    families = read_json(out, *CELL, knockout.SUBDIR,
+                         knockout.FAMILY_JSON_NAME)["families"]
+    for family in families:
+        for member in family["members"]:
+            assert after[tuple(member)] == family["role"]

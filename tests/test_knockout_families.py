@@ -130,9 +130,9 @@ def test_every_component_carries_its_family_s_drop_into_the_head_table(rows):
     columns = knockout.family_columns(
         knockout.summarize_families(effects, families))
 
-    assert columns[UNKNOWN]["family"] == "unknown"
-    assert columns[UNKNOWN]["family_logit_diff_drop"] == pytest.approx(0.5)
-    assert columns[("head", 24, 18)]["family"] == "unknown"
+    assert columns[UNKNOWN]["role_family"] == "unknown"
+    assert columns[UNKNOWN]["role_family_logit_diff_drop"] == pytest.approx(0.5)
+    assert columns[("head", 24, 18)]["role_family"] == "unknown"
 
 
 def test_the_payload_states_the_same_sign_convention_as_the_single_knockout(rows):

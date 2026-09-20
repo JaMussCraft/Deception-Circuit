@@ -396,16 +396,19 @@ def test_max_batches_stops_a_condition_early(dla_run):
     assert payload["sum_check"] is None, "--dla-sum-check off spends no pass"
 
 
-def test_an_unknown_condition_is_refused_by_name(dla_run):
+def test_an_unknown_condition_is_refused_by_name(dla_run, capsys):
     run_dir, out, _records = dla_run
 
     # Refused by argparse at parse time, before any model is loaded — the
     # same moment `--attention-conditions` refuses one (ticket 06's open
     # question 4). SystemExit is what argparse raises after printing the
-    # message that names the flag and the condition.
+    # message, and the message has to name the condition it refused: a bare
+    # SystemExit is satisfied by any argparse error at all, including one that
+    # never mentions the typo.
     with pytest.raises(SystemExit):
         run_cli(str(run_dir), "--num-kv-heads", "2", "--dla-conditions",
                 "nosuch", "--output-dir", str(out))
+    assert "nosuch" in capsys.readouterr().err
 
 
 def test_a_twin_directory_that_is_not_the_honest_condition_is_refused(

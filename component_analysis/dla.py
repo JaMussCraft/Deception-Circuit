@@ -693,10 +693,19 @@ def parse_conditions(value) -> List[str]:
     loaded onto a GPU. `--attention-conditions` has refused typos this way
     since ticket 06; this is the sibling flag catching up (ticket 06's open
     question 4, carried by ticket 10).
+
+    An unknown name is refused whether it arrives as a string from the command
+    line or as a list from a library caller: refusing one and dropping the
+    other would make the same typo an error in one place and an empty
+    measurement in the other. An **empty** selection keeps the meaning it had
+    before the flag was validated at parse time — every condition — because
+    `--dla-conditions ""` used to mean that and a silent change from "all" to
+    "none" is the one way this fix could cost a run its numbers.
     """
-    if not isinstance(value, str):
-        return [one for one in CONDITIONS if one in value]
-    wanted = [one.strip() for one in value.split(",") if one.strip()]
+    wanted = ([one.strip() for one in value.split(",") if one.strip()]
+              if isinstance(value, str) else [str(one) for one in value])
+    if not wanted:
+        return list(CONDITIONS)
     unknown = [one for one in wanted if one not in CONDITIONS]
     if unknown:
         raise UnknownCondition(

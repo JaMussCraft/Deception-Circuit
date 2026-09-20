@@ -55,8 +55,10 @@ from component_analysis.head_table import row_key
 NAME = "knockout"
 SUBDIR = "knockout"
 
-#: The files the researcher reads. The JSON is the PNG's twin: every number the
-#: bar chart draws is in it, so an agent with no display loses nothing.
+#: The four files this analysis writes. Each JSON is its PNG's twin: every
+#: number a chart draws is in it, so an agent with no display loses nothing.
+#: The per-Component pair is always written; the family pair only under
+#: `--knockout-families` (see "Knockout by role family" below).
 JSON_NAME = "knockout.json"
 PNG_NAME = "knockout.png"
 
@@ -384,7 +386,11 @@ FAMILY_JSON_NAME = "knockout_families.json"
 FAMILY_PNG_NAME = "knockout_families.png"
 
 #: The head-table columns the family pass adds, beside the single knockout's.
-FAMILY_COLUMNS = ("family", "family_logit_diff_drop")
+#: `role_family`, not `family`: CONTEXT.md already uses "family" for task
+#: families and for the STD scenario families, and a bare `knockout.family`
+#: holding the word "selector" would be ambiguous against both. The JSON keeps
+#: its own key names, which ticket 11's notebook reads.
+FAMILY_COLUMNS = ("role_family", "role_family_logit_diff_drop")
 
 
 def role_of(row) -> Optional[str]:
@@ -449,15 +455,15 @@ def summarize_families(effects: Effects, families) -> List[dict]:
 
 
 def family_columns(rows) -> dict:
-    """`{component key: {family, family_logit_diff_drop}}` for every member."""
+    """`{component key: {role_family, role_family_logit_diff_drop}}` per member."""
     # `members` is written as a list, because a JSON key is not a tuple.
-    return {row_key(tuple(member)): {"family": row["role"],
-                              "family_logit_diff_drop": row["mean_drop"]}
+    return {row_key(tuple(member)): {"role_family": row["role"],
+                                    "role_family_logit_diff_drop": row["mean_drop"]}
             for row in rows for member in row["members"]}
 
 
 def family_payload(effects: Effects, families, *, circuit: str, task: str,
-                   rows=None, roles_from: str = None) -> dict:
+                   rows=None, roles_from: str = None, dropped=()) -> dict:
     """`knockout_families.json`: the same shape and the same signs as the singles."""
     rows = summarize_families(effects, families) if rows is None else list(rows)
     single = payload(effects, circuit=circuit, task=task, rows=[])
@@ -470,6 +476,11 @@ def family_payload(effects: Effects, families, *, circuit: str, task: str,
             "criteria_doc": os.path.join("docs", "component-roles.md"),
             "read_from": roles_from,
             "n_components": sum(len(one) for one in families.values()),
+            # Components that carried a role in the source cell but are not in
+            # this circuit — the completeness sweep's rows, typically. They are
+            # not ablated, and the count is here so the drop is visible.
+            "n_outside_this_circuit": len(dropped),
+            "outside_this_circuit": [list(one) for one in sorted(dropped)],
         },
         "metric": {**single["metric"],
                    "ablation": ("every Component of the role has its output at "
@@ -624,10 +635,12 @@ def add_arguments(group) -> None:
     group.add_argument("--knockout-roles-from", default=None, metavar="CELL_DIR",
                        help="Where the role columns are read from. Default: "
                             "this cell's own head table, which is the case "
-                            "where the roles pass has already run here. Give "
-                            "this run its own --suite-name: an analysis run "
-                            "rebuilds the head table from the intake's rows "
-                            "and would drop the roles columns it just read.")
+                            "where the roles pass has already run here. Every "
+                            "run rebuilds the head table from the intake's "
+                            "rows, so the role columns this pass grouped by "
+                            "are copied back into the table it writes; roles "
+                            "for Components outside this circuit are dropped "
+                            "and counted in knockout_families.json.")
 
 
 def roles_source(ctx) -> str:
@@ -635,8 +648,8 @@ def roles_source(ctx) -> str:
     return getattr(ctx.cli, "knockout_roles_from", None) or ctx.cell_dir
 
 
-def families_for(ctx) -> Dict[str, List[tuple]]:
-    """The role families this run would ablate, read off a written head table.
+def families_for(ctx) -> tuple:
+    """`(families, dropped)`: the role families this run ablates, off a head table.
 
     Refused by name rather than silently empty: a family knockout that quietly
     found no role would write a file saying nothing happened, which looks
@@ -662,21 +675,27 @@ def families_for(ctx) -> Dict[str, List[tuple]]:
     # A roles cell may hold rows this circuit does not: the completeness sweep
     # appends the Components it scored from outside the circuit, and the roles
     # pass gives every one of them a role (`unknown`, for want of any view).
-    # Knocking those out would quietly widen the family beyond the circuit
-    # under study, and nothing in the output would say so.
+    # Those are dropped rather than ablated, because a family knockout is a
+    # statement about the circuit under study, and the count is recorded in
+    # the JSON's `grouping` block so the drop is visible rather than silent.
     inside = set(ctx.keys)
-    strays = sorted({member for members in families.values()
-                     for member in members if member not in inside})
-    if strays:
+    kept, dropped = {}, []
+    for role, members in families.items():
+        here = [one for one in members if one in inside]
+        dropped.extend(one for one in members if one not in inside)
+        if here:
+            kept[role] = here
+    if dropped:
+        print(f"    knockout: {len(dropped)} Component(s) in {source} carry a "
+              f"role but are not in this circuit and are not ablated: "
+              f"{', '.join(str(one) for one in sorted(dropped)[:5])}"
+              f"{' ...' if len(dropped) > 5 else ''}")
+    if not kept:
         raise SystemExit(
-            f"{source!r} carries a role for {len(strays)} Component(s) that "
-            f"are not in this circuit: "
-            f"{', '.join(str(one) for one in strays[:5])}"
-            f"{' ...' if len(strays) > 5 else ''}. A family knockout ablates "
-            f"the circuit's own Components, so read the roles from a cell of "
-            f"this circuit, or rerun the roles pass without the completeness "
-            f"sweep's rows.")
-    return families
+            f"every Component with a role in {source!r} is outside this "
+            f"circuit, so there is no family to knock out. Read the roles from "
+            f"a cell of this circuit.")
+    return kept, dropped
 
 
 def estimate(ctx) -> str:
@@ -690,7 +709,7 @@ def estimate(ctx) -> str:
             f"{resolve_scheme(getattr(ctx.cli, 'knockout_scheme', SCHEME))}")
     if not getattr(ctx.cli, "knockout_families", False):
         return line
-    families = families_for(ctx)
+    families, dropped = families_for(ctx)
     family_passes = len(batches) * (len(families) + 2)
     return (line + f"; plus {len(families)} role famil"
             f"{'y' if len(families) == 1 else 'ies'} "
@@ -704,8 +723,8 @@ def run(ctx) -> dict:
     scheme = resolve_scheme(getattr(ctx.cli, "knockout_scheme", SCHEME))
     # Read before the forwards, so a missing role column fails in seconds
     # rather than after the per-Component pass has already run.
-    families = families_for(ctx) \
-        if getattr(ctx.cli, "knockout_families", False) else None
+    families, dropped = families_for(ctx) \
+        if getattr(ctx.cli, "knockout_families", False) else (None, [])
     batches = ctx.causal_batches()
     effects = knockout_effects(ctx.model, batches, ctx.components, scheme=scheme)
 
@@ -726,7 +745,8 @@ def run(ctx) -> dict:
                    family_payload(grouped, families,
                                   circuit=ctx.circuit_spec.label,
                                   task=ctx.task_spec.name, rows=family_rows,
-                                  roles_from=roles_source(ctx)))
+                                  roles_from=roles_source(ctx),
+                                  dropped=dropped))
     write_family_figure(os.path.join(ctx.subdir(SUBDIR), FAMILY_PNG_NAME),
                         family_rows,
                         title=f"{ctx.circuit_spec.label} x {ctx.task_spec.name}: "
@@ -734,3 +754,47 @@ def run(ctx) -> dict:
     for key, values in family_columns(family_rows).items():
         updates.setdefault(key, {}).update(values)
     return updates
+
+
+#: The role columns the family pass carries back into the head table it just
+#: rewrote. Without this a `--knockout-families` run would read a role, ablate
+#: by it, and then write a table with no role column in it, because every run
+#: rebuilds the table from the intake's rows.
+CARRIED_ROLE_COLUMNS = ("roles.role_proposed", "roles.role_notes",
+                        "roles.reads_group")
+
+
+def extra_columns(ctx) -> dict:
+    """The `roles.*` columns this run grouped by, for the CLI to merge unnamespaced.
+
+    Optional in the analysis protocol (`registry.REQUIRED` is unchanged), and
+    empty unless `--knockout-families` ran.
+    """
+    if not getattr(ctx.cli, "knockout_families", False):
+        return {}
+    return carried_roles(ctx)
+
+
+def carried_roles(ctx) -> dict:
+    """`{component key: {column: value}}` for the roles this run read.
+
+    Returned unnamespaced-by-`knockout` on purpose: the CLI namespaces an
+    analysis's own columns, and these are not this analysis's columns — they
+    are `roles.*`, copied through so the table the run writes still carries the
+    grouping its own figure was built from. `role_confirmed` is **not** copied;
+    it is the researcher's column and `merge_columns` refuses it anyway.
+    """
+    from component_analysis.head_table import load_head_table
+
+    source = roles_source(ctx)
+    inside = set(ctx.keys)
+    out = {}
+    for row in load_head_table(source):
+        key = row_key(row)
+        if key not in inside:
+            continue
+        values = {column: row[column] for column in CARRIED_ROLE_COLUMNS
+                  if row.get(column) is not None}
+        if values:
+            out[key] = values
+    return out

@@ -101,7 +101,7 @@ def a_selector(**kwargs):
                   paths(direct=-0.021, direct_se=0.0017,
                         outgoing="head.17.25->readout", outgoing_effect=-0.021,
                         incoming_hi="head.14.22->q.17.25",
-                        incoming_hi_effect=0.0068),
+                        incoming_hi_effect=0.021),
                   layer=17, index=25, **kwargs)
 
 
@@ -316,7 +316,17 @@ def test_the_thresholds_used_are_the_defaults_the_criteria_doc_states():
     thresholds = roles.Thresholds()
     assert (thresholds.z, thresholds.dla_floor, thresholds.knockout_floor,
             thresholds.path_floor, thresholds.attention_floor) == \
-        (2.0, 0.01, 0.01, 0.005, 0.20)
+        (2.0, 0.01, 0.01, 0.01, 0.20)
+
+
+def test_the_path_floor_sits_above_the_measured_cross_card_noise():
+    """Ticket 09 measured about 0.005 between an A40 and an A100 on one cell.
+
+    A criterion resting on a cell inside that noise is a criterion that changes
+    with the card the job landed on, so the floor is twice it. The number is in
+    the criteria doc's amendment log with the same reason.
+    """
+    assert roles.Thresholds().path_floor >= 2 * 0.005
 
 
 # ==============================================================================
@@ -534,3 +544,78 @@ def test_the_roles_module_does_not_import_nnsight():
         cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
         capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
+
+
+# ==============================================================================
+# WHAT THE REVIEWS FOUND
+# ==============================================================================
+
+def test_a_standard_error_of_exactly_zero_is_not_a_measured_spread():
+    """A spread of zero over a sample was not measured; it is not significance."""
+    assert propose(a_mover(**{}) | {"dla.pressure_se": 0.0}).role == "unknown"
+    assert roles.direction(1.0, 0.0, 0.01, roles.Thresholds()) == 0
+
+
+def test_a_boolean_column_read_back_as_a_string_is_not_always_true():
+    """`bool("0")` is True, and the suppressor clause is checked first."""
+    not_suppressing = a_mover(**{}) | {"dla.suppression": "0"}
+    assert propose(not_suppressing).role == "mover"
+    assert roles._flag("false") is False
+    assert roles._flag("true") is True
+    assert roles._flag(1) is True
+
+
+def test_a_table_missing_a_whole_view_is_refused_and_names_the_columns(tmp_path):
+    """A table of `unknown` reads like a finding; a refusal does not."""
+    only_knockout = os.path.join(str(tmp_path), "one_view", *CELL[1:])
+    write_head_table(only_knockout, [merged(knocked(0.4, 0.02))])
+
+    with pytest.raises(SystemExit, match="dla.pressure"):
+        run_roles(only_knockout)
+
+
+def test_the_missing_views_may_be_allowed_and_are_then_recorded(tmp_path):
+    only_knockout = os.path.join(str(tmp_path), "allowed", *CELL[1:])
+    write_head_table(only_knockout, [merged(knocked(0.4, 0.02))])
+
+    assert run_roles(only_knockout, "--roles-allow-missing-views") == 0
+
+    payload = read(only_knockout, roles.SUBDIR, roles.JSON_NAME)
+    assert any("dla" in view for view in payload["missing_views"])
+    assert payload["components"][0]["role"] == "unknown"
+
+
+def test_a_table_with_every_view_records_no_missing_view(cell):
+    run_roles(cell)
+
+    assert read(cell, roles.SUBDIR, roles.JSON_NAME)["missing_views"] == []
+
+
+def test_the_circuit_and_the_task_are_label_strings_like_every_sibling_json(cell):
+    """The notebook reads `circuit` across the analyses and must meet one type."""
+    run_roles(cell)
+
+    payload = read(cell, roles.SUBDIR, roles.JSON_NAME)
+    assert payload["circuit"] == "delta__head"
+    assert payload["task"] == "sdr"
+
+
+def test_an_unknown_segment_name_is_unestablished_not_a_group_of_its_own():
+    """An override such as ticket 03's `bos` has not been shown to be anything."""
+    assert roles.segment_group("bos") == "unestablished"
+    assert roles.segment_group(None) == "unestablished"
+
+
+def test_a_query_cell_inside_the_cross_card_noise_does_not_make_a_selector():
+    """The amendment of 2026-09-20, asserted rather than only written down.
+
+    L17H25 on SDR nls0.3 is the real case: its honest-instruction query cell is
+    0.0068, which cleared the old 0.005 floor and does not clear 0.01.
+    """
+    marginal = a_selector(**{}) | {
+        "path_patching.strongest_incoming_effect_honest_instruction": 0.0068}
+
+    assert propose(a_selector()).role == "selector"
+    assert propose(marginal).role != "selector"
+    assert roles.propose(marginal, roles.Thresholds(path_floor=0.005)).role \
+        == "selector", "and the old floor is what admitted it"

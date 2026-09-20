@@ -152,27 +152,40 @@ Every numeric criterion asks two questions, and a column must clear both.
 | `--roles-z` | 2.0 | two standard errors |
 | `--roles-dla-floor` | 0.01 logits | the SDR clean margin is about 1.6 logits, so this is under one percent of what the Readout has to explain |
 | `--roles-knockout-floor` | 0.01 logits | the same scale on the same metric; it excludes the three Components ticket 07 called indistinguishable from zero |
-| `--roles-path-floor` | 0.005 | half of one percent of the clean-minus-corrupt gap, which the patching metric normalizes to 1. Ticket 09's `--path-position-threshold` default of 0.05 admits exactly one cell on this circuit and ticket 09 asked for a weigh-in: **0.005 is the number these criteria use, and the recommendation is that the position threshold default move to it** |
+| `--roles-path-floor` | 0.01 | one percent of the clean-minus-corrupt gap, which the patching metric normalizes to 1, and **twice ticket 09's measured cross-card noise floor** of about 0.005 on a path-patching cell (A40 against A100). A criterion resting on a cell inside that noise is one that changes with the card the job landed on. Amended from 0.005 on 2026-09-20; see "Changing these criteria" |
 | `--roles-attention-floor` | 0.20 | a Segment must carry a fifth of the head's mass at the query position before the pass calls it what the head reads |
 
 The defaults are flags so a different task or circuit can be read at a
 different scale, and the values actually used are written into `roles.json`
 beside every decision.
 
-Two flags of the subcommand are not criteria. `--dry-run` proposes and prints
+**The position-threshold question is recorded here, not decided.** Ticket 09's
+`--path-position-threshold` defaults to 0.05, which selects exactly one cell on
+this circuit, and its verification ran at 0.0035, which selects cells that
+change between cards. That default is the researcher's call and these criteria
+do not make it; the roles path floor above is a separate number answering a
+separate question, and it is set where it is for the cross-card reason given.
+
+Three flags of the subcommand are not criteria. `--dry-run` proposes and prints
 without writing, so the pass can be rehearsed on the login node like every
 other part of the CLI. `--roles-merge-from CELL_DIR` (repeatable) copies
 another cell's analysis columns onto the matching rows before the criteria
 run, because the analyses of record were run one suite per analysis and the
 conjunction needs all three views in one table; it never copies a key column,
-an intake column or `role_confirmed`.
+an intake column or `role_confirmed`, and it refuses to overwrite a column that
+already holds a different value. `--roles-allow-missing-views` proposes anyway
+when a whole view's columns are absent from the table, which is otherwise
+refused: a table with no DLA columns proposes `unknown` for every Component,
+and that reads like a finding. The views that were missing are recorded in
+`roles.json`.
 
 ## Segment groups: what counts as a read
 
 The reads view is the **top Segment** at the query position and its mass. The
 Segment names come from the task's segmentation (`segmentation.json`); the
-groups are fixed here, from `CONTEXT.md`'s prompt anatomy, and an unrecognized
-Segment name falls in `other`.
+groups are fixed here, from `CONTEXT.md`'s prompt anatomy, and a Segment name
+the table does not list is `unestablished` — including a `--segment` override
+such as ticket 03's `bos`, which has not been shown to be anything.
 
 | group | Segments |
 |---|---|
@@ -316,6 +329,11 @@ knockout therefore writes into its own suite and reads the roles from the cell
 the pass ran on, with `--knockout-roles-from`; rerun the roles pass on a cell
 whose analyses were rerun.
 
+The family pass adds two columns of its own, `knockout.role_family` and
+`knockout.role_family_logit_diff_drop`, and carries the `roles.*` columns it
+grouped by back into the table it writes, so the grouping a figure was built
+from is still in the table beside it.
+
 Once roles exist, `--knockout-families` groups the Components by
 `role_confirmed` where the researcher has set it and by `roles.role_proposed`
 everywhere else, and interchange-ablates each group **together**, through the
@@ -326,9 +344,25 @@ means the family helps deception.
 
 ## Changing these criteria
 
-The point of writing them down before running them is that the numbers cannot
-argue them into a different shape. A threshold or a clause may be changed, and
-then:
+**2026-09-20 — `--roles-path-floor` raised from 0.005 to 0.01.** Reason:
+ticket 09's Slurm read-back measured the **cross-card noise floor on a
+path-patching cell at about 0.005** (the same cell computed on an A40 and on an
+A100). The original floor sat exactly on that number, so any criterion it
+admitted at the margin was one that could change with the card the job landed
+on. The new floor is twice it.
+
+This is a change made from a fact about the measurement, not from the result,
+and the result it changes is stated here rather than buried: **at 0.005 the SDR
+nls0.3 delta had one selector (L17H25) and one mover (the layer-31 MLP); at
+0.01 it has the mover alone and seventeen unknowns.** L17H25's selector label
+rested on its honest-instruction query cell at **0.0068** — above the old
+floor, below the new one, and inside the cross-card noise. Both passes are
+reported in ticket 10; the 0.01 pass is the one of record. Nothing else about
+the criteria changed, and no threshold was moved after seeing what a pass
+proposed.
+
+The rest of this section is the rule for any future change. A threshold or a
+clause may be changed, and then:
 
 1. say so here, with the date and the reason;
 2. rerun the mechanical pass over every cell that has a role column, because a
