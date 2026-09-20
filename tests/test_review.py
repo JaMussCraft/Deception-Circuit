@@ -265,7 +265,31 @@ def test_knockout_view_states_its_sign_convention_and_its_clean_run():
 def test_family_knockout_is_absent_until_ticket_ten_writes_it():
     missing = review.family_knockout_view(cell("knockout"))
     assert not missing
-    assert "family" in missing.note
+    assert "knockout_families.json" in missing.note
+
+
+def test_family_knockout_reads_the_file_ticket_ten_actually_writes(tmp_path):
+    """`knockout_families.json`, one row per role rather than per Component."""
+    directory = tmp_path / "knockout"
+    directory.mkdir()
+    payload = {"scheme": "interchange",
+               "clean_run": {"mean_logit_difference": 1.6, "accuracy": 1.0,
+                             "n_instances": 100},
+               "metric": {"sign": "positive means it helps deception"},
+               "families": [{"role": "mover", "n_components": 3, "n": 100,
+                             "mean_drop": 0.9, "standard_error": 0.02,
+                             "accuracy": 0.8, "rank": 1},
+                            {"role": "unknown", "n_components": 15, "n": 100,
+                             "mean_drop": 0.1, "standard_error": 0.01,
+                             "accuracy": 0.99, "rank": 2}]}
+    with open(str(directory / "knockout_families.json"), "w") as handle:
+        json.dump(payload, handle)
+
+    view = review.family_knockout_view(str(tmp_path))
+    assert view
+    assert view.labels == ["mover", "unknown"]
+    assert view.values == [0.9, 0.1]
+    assert "interchange" in view.subtitle
 
 
 # ==============================================================================

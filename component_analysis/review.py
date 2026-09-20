@@ -592,10 +592,10 @@ def _cell_meta(results_dir: str) -> dict:
 # ==============================================================================
 
 KNOCKOUT_JSON = "knockout.json"
-#: Ticket 10 writes the family-level knockout beside the per-Component one. Its
-#: exact filename is that ticket's to choose, so the section globs for it and
-#: renders a note until one appears.
-FAMILY_KNOCKOUT_GLOB = "family*.json"
+#: The family-level knockout, written beside the per-Component one by the role
+#: pass. `knockout_families.json` is the name that pass settled on; the second
+#: pattern is kept so a cell written before it was settled still renders.
+FAMILY_KNOCKOUT_GLOBS = ("knockout_families.json", "family*.json")
 
 
 def knockout_view(results_dir: str) -> Bars:
@@ -610,15 +610,16 @@ def knockout_view(results_dir: str) -> Bars:
 
 def family_knockout_view(results_dir: str) -> Bars:
     """The same knockout grouped by Component Role, once roles exist."""
-    matches = found(results_dir, KNOCKOUT_SUBDIR, FAMILY_KNOCKOUT_GLOB)
+    matches = [one for pattern in FAMILY_KNOCKOUT_GLOBS
+               for one in found(results_dir, KNOCKOUT_SUBDIR, pattern)]
     if not matches:
         return Missing(
             what="family knockout",
             note="no family knockout in this cell — it is written by the "
-                 "role-family pass (ticket 10), which needs a role column "
-                 "first. Looked for knockout/family*.json.",
-            paths=(os.path.join(results_dir, KNOCKOUT_SUBDIR,
-                                FAMILY_KNOCKOUT_GLOB),))
+                 "role-family pass, which needs a role column first. Looked "
+                 "for knockout/knockout_families.json.",
+            paths=tuple(os.path.join(results_dir, KNOCKOUT_SUBDIR, pattern)
+                        for pattern in FAMILY_KNOCKOUT_GLOBS))
     payload = read_json(matches[0])
     return _knockout_bars(payload, title="Interchange knockout by role family")
 
@@ -627,7 +628,8 @@ def _knockout_bars(payload: dict, *, title: str) -> Bars:
     rows = payload.get("components") or payload.get("families") or []
     clean = payload.get("clean_run", {})
     metric = payload.get("metric", {})
-    labels = [row.get("label") or row.get("role") or component_label(row.get("key"))
+    labels = [row.get("label") or row.get("role")
+              or component_label(row.get("key") or ("?", 0, 0))
               for row in rows]
     hover = [f"rank {row.get('rank')} · accuracy {row.get('accuracy')} "
              f"(clean run {clean.get('accuracy')}) · n={row.get('n')}"
