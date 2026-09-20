@@ -296,6 +296,14 @@ records the three views' inputs, each criterion's pass or fail, the role and
 the notes, so that a disputed label is settled by reading the file rather than
 by rerunning the pass.
 
+**The mechanical pass runs first and its output is kept.** An agent may rewrite
+`roles.role_notes` in the head table to say something a one-line template
+cannot, and a researcher may write `role_confirmed`. Neither touches
+`roles.json`, which holds the mechanical note and the mechanical role as the
+pass produced them; a rerun of the pass rewrites the table's notes from the
+criteria again, so a hand-written note belongs in the ticket or in
+`role_confirmed`, not only in a cell that the next run regenerates.
+
 ## Knockout by role family
 
 An analysis run rebuilds the head table from the intake's rows, so a second
