@@ -98,7 +98,8 @@ def test_role_columns_are_rendered_right_after_the_identity_columns(tmp_path):
                                 "roles.role_notes"]
     assert view.role_columns["role_proposed"] == "roles.role_proposed"
     assert view.role_columns["role_confirmed"] == "role_confirmed"
-    assert view.notes == []
+    assert not any("role_proposed" in note or "role_confirmed" in note
+                   or "role_notes" in note for note in view.notes)
 
 
 def test_an_unnamespaced_role_column_is_found_too(tmp_path):
@@ -624,3 +625,50 @@ def test_a_segmentation_with_no_overrides_says_every_segment_is_a_default():
     view = review.segmentation_view(cell("knockout"))
     assert any("no Segment was overridden" in note for note in view.notes)
     assert any("no Segment overlaps another" in note for note in view.notes)
+
+
+# ==============================================================================
+# THE ROLE-FAMILY COLUMNS
+# ==============================================================================
+#
+# The family knockout writes two columns into the head table beside its JSON.
+# The role pass is renaming them from `knockout.family` to
+# `knockout.role_family` on its own branch, so both spellings are accepted for
+# the same reason both spellings of the role triple are: a namespace settled
+# after this module was written must not silently blank a column.
+
+
+def test_the_family_columns_are_found_under_the_spelling_in_the_written_cell():
+    view = review.head_table_view(cell("family"))
+    assert view.family_columns == {
+        "family": "knockout.family",
+        "family_logit_diff_drop": "knockout.family_logit_diff_drop"}
+    assert view.rows[0]["knockout.family"] == "unknown"
+
+
+def test_the_family_columns_are_found_under_the_renamed_spelling_too(tmp_path):
+    _write_head_table(tmp_path, [
+        {"kind": "head", "layer": 5, "index": 5,
+         "knockout.role_family": "mover",
+         "knockout.role_family_logit_diff_drop": 0.6},
+    ])
+    view = review.head_table_view(str(tmp_path))
+    assert view.family_columns == {
+        "family": "knockout.role_family",
+        "family_logit_diff_drop": "knockout.role_family_logit_diff_drop"}
+
+
+def test_the_family_columns_are_shown_beside_the_role_they_group_by():
+    view = review.head_table_view(cell("family"))
+    head = view.columns[:len(review.IDENTITY_COLUMNS)]
+    assert head == list(review.IDENTITY_COLUMNS)
+    after = view.columns[len(review.IDENTITY_COLUMNS):]
+    # The family a Component belongs to is read with its role, not with the
+    # rest of the knockout numbers twenty columns later.
+    assert after[:2] == ["knockout.family", "knockout.family_logit_diff_drop"]
+
+
+def test_a_head_table_without_family_columns_says_so_rather_than_failing():
+    view = review.head_table_view(cell("attention_dla"))
+    assert view.family_columns == {}
+    assert any("family" in note for note in view.notes)

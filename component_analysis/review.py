@@ -72,6 +72,14 @@ ROLE_ABSENCE = {
 #: what a row is; it belongs in a note, not in an axis label.
 ROW_AXIS = "residual row (0 = the embedding, l + 1 = after layer l)"
 
+#: The two columns the family knockout writes into the head table: which role
+#: family a Component was grouped into, and what removing that whole family
+#: cost. The role pass is renaming them from `knockout.family` to
+#: `knockout.role_family`, so both prefixes are accepted, for the same reason
+#: both spellings of the role triple are.
+FAMILY_NAMES = ("family", "family_logit_diff_drop")
+FAMILY_PREFIXES = ("knockout.role_", "knockout.")
+
 #: Shown first in the head table, before the role triple and the analyses.
 IDENTITY_COLUMNS = ("label", "kind", "layer", "index")
 
@@ -110,6 +118,8 @@ class Table:
     meta: Dict[str, Any] = field(default_factory=dict)
     #: `{bare role name: the column that holds it}` for the roles present.
     role_columns: Dict[str, str] = field(default_factory=dict)
+    #: The same for the two columns the family knockout writes.
+    family_columns: Dict[str, str] = field(default_factory=dict)
 
     def __bool__(self) -> bool:
         return True
@@ -287,9 +297,27 @@ def role_columns(columns: Sequence[str]) -> Dict[str, str]:
     return present
 
 
-def _ordered_columns(columns: Sequence[str], roles: Dict[str, str]) -> List[str]:
+def family_columns(columns: Sequence[str]) -> Dict[str, str]:
+    """`{bare family name: the column holding it}` for the ones this cell has."""
+    present = {}
+    for name in FAMILY_NAMES:
+        for prefix in FAMILY_PREFIXES:
+            if prefix + name in columns:
+                present[name] = prefix + name
+                break
+    return present
+
+
+def _ordered_columns(columns: Sequence[str], roles: Dict[str, str],
+                     families: Dict[str, str]) -> List[str]:
+    """Identity, then the role triple, then the family, then every analysis.
+
+    The family a Component was grouped into is read with its role, not twenty
+    columns later among the rest of the knockout numbers.
+    """
     ordered = [one for one in IDENTITY_COLUMNS if one in columns or one == "label"]
     ordered += [roles[name] for name in ROLE_NAMES if name in roles]
+    ordered += [families[name] for name in FAMILY_NAMES if name in families]
     ordered += [one for one in columns if one not in ordered]
     return ordered
 
@@ -311,15 +339,23 @@ def head_table_view(results_dir: str) -> Table:
         row["label"] = component_label(row)
     columns = list(payload.get("columns", []))
     roles = role_columns(columns)
+    families = family_columns(columns)
     notes = []
     for name in ROLE_NAMES:
         if name not in roles:
             notes.append(f"no {name} column: {ROLE_ABSENCE[name]}")
+    if not families:
+        notes.append(
+            "no role-family columns: the family knockout has not run on this "
+            "cell. It groups the Components by their role and writes "
+            "`knockout.role_family` and `knockout.role_family_logit_diff_drop` "
+            "(spelled `knockout.family` in cells written before the rename).")
     meta = payload.get("meta", {})
     return Table(title="Head table",
                  subtitle=cell_subtitle(meta, f"{len(rows)} Component(s)"),
-                 columns=_ordered_columns(columns, roles), rows=rows,
-                 notes=notes, meta=meta, role_columns=roles)
+                 columns=_ordered_columns(columns, roles, families), rows=rows,
+                 notes=notes, meta=meta, role_columns=roles,
+                 family_columns=families)
 
 
 # ==============================================================================
