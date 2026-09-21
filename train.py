@@ -302,15 +302,27 @@ def _evaluate_test(task, model, label, full_model, test_dl, device, tokenizer, s
     return task.evaluate(model, label, full_model, test_dl, device, tokenizer, state)
 
 
+def _is_per_subtask(metrics) -> bool:
+    """True for the joint task's {subtask: metrics_dict} shape.
+
+    A single task's evaluation is itself a flat dict (floats plus an
+    'outputs' list), so testing ``isinstance(metrics, dict)`` alone routed
+    every single-task run through the per-subtask path and crashed on
+    ``float.get``.
+    """
+    return (isinstance(metrics, dict) and bool(metrics)
+            and all(isinstance(v, dict) for v in metrics.values()))
+
+
 def _fidelity_report_rows(task, baseline, node_eval, edge_eval):
-    if isinstance(baseline, dict):
+    if _is_per_subtask(baseline):
         from tasks.joint_deception import JointDeceptionTask
         rows = JointDeceptionTask.fidelity_rows(baseline, "Baseline (Full Model)")
-        if isinstance(node_eval, dict):
+        if _is_per_subtask(node_eval):
             rows.extend(JointDeceptionTask.fidelity_rows(node_eval, "Node-Pruned Circuit"))
         else:
             rows.append(("Node-Pruned Circuit", node_eval))
-        if isinstance(edge_eval, dict):
+        if _is_per_subtask(edge_eval):
             rows.extend(JointDeceptionTask.fidelity_rows(edge_eval, "Edge-Pruned Circuit"))
         else:
             rows.append(("Edge-Pruned Circuit", edge_eval))
