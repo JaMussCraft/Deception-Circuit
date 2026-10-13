@@ -74,9 +74,10 @@ ROW_AXIS = "residual row (0 = the embedding, l + 1 = after layer l)"
 
 #: The two columns the family knockout writes into the head table: which role
 #: family a Component was grouped into, and what removing that whole family
-#: cost. The role pass is renaming them from `knockout.family` to
-#: `knockout.role_family`, so both prefixes are accepted, for the same reason
-#: both spellings of the role triple are.
+#: cost. Ticket 10 renamed them from `knockout.family` to
+#: `knockout.role_family`; `head_table_view` reads an older cell under the
+#: current name through `head_table.LEGACY_COLUMNS`, and both prefixes stay
+#: accepted here for a caller handing `family_columns` raw column names.
 FAMILY_NAMES = ("family", "family_logit_diff_drop")
 FAMILY_PREFIXES = ("knockout.role_", "knockout.")
 
@@ -120,6 +121,12 @@ class Table:
     role_columns: Dict[str, str] = field(default_factory=dict)
     #: The same for the two columns the family knockout writes.
     family_columns: Dict[str, str] = field(default_factory=dict)
+    #: Legacy column names this cell was written with, old -> the current name
+    #: they are shown under (`head_table.LEGACY_COLUMNS`).
+    renamed_columns: Dict[str, str] = field(default_factory=dict)
+    #: `{column: n}`: how many instances each column was computed over, for
+    #: the columns the cell's meta records (`head_table.coverage_of`).
+    coverage: Dict[str, int] = field(default_factory=dict)
 
     def __bool__(self) -> bool:
         return True
@@ -334,13 +341,36 @@ def head_table_view(results_dir: str) -> Table:
     if payload is None:
         return _missing("head table", path)
 
-    rows = [dict(row) for row in payload.get("rows", [])]
+    # A cell of record may predate a rename; it is shown under the current
+    # names, with a note, rather than refused.
+    rows, renamed = head_table.modernize_columns(payload.get("rows", []))
     for row in rows:
         row["label"] = component_label(row)
-    columns = list(payload.get("columns", []))
+    columns = []
+    for column in payload.get("columns", []):
+        column = head_table.LEGACY_COLUMNS.get(column, column)
+        if column not in columns:
+            columns.append(column)
     roles = role_columns(columns)
     families = family_columns(columns)
+    meta = payload.get("meta", {})
+    coverage = {}
+    for column in columns:
+        entry = head_table.coverage_of(meta, column)
+        if entry is not None:
+            coverage[column] = entry["n"]
     notes = []
+    if renamed:
+        notes.append(
+            "this cell was written before its paired columns said paired in "
+            "their names (2026-10-13) or before a later rename, and is shown "
+            "under the current names: " + ", ".join(
+                f"{old} -> {new}" for old, new in renamed.items()))
+    if not coverage:
+        notes.append(
+            "no per-column coverage in this cell's meta: it was written before "
+            "the head table recorded how many instances each column covers. "
+            "The analyses' own JSON files carry their instance ids.")
     for name in ROLE_NAMES:
         if name not in roles:
             notes.append(f"no {name} column: {ROLE_ABSENCE[name]}")
@@ -350,12 +380,12 @@ def head_table_view(results_dir: str) -> Table:
             "cell. It groups the Components by their role and writes "
             "`knockout.role_family` and `knockout.role_family_logit_diff_drop` "
             "(spelled `knockout.family` in cells written before the rename).")
-    meta = payload.get("meta", {})
     return Table(title="Head table",
                  subtitle=cell_subtitle(meta, f"{len(rows)} Component(s)"),
                  columns=_ordered_columns(columns, roles, families), rows=rows,
                  notes=notes, meta=meta, role_columns=roles,
-                 family_columns=families)
+                 family_columns=families, renamed_columns=renamed,
+                 coverage=coverage)
 
 
 # ==============================================================================

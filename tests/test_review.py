@@ -125,6 +125,61 @@ def _write_head_table(directory, rows):
         meta={"circuit": {"label": "c"}, "task": {"label": "t"}})
 
 
+def test_a_legacy_cell_of_record_renders_under_the_current_names_with_a_note():
+    """Written before 2026-10-13, when the paired columns did not say paired.
+
+    The cell of record is rendered, not refused, and the reader is told which
+    columns were read under which current name."""
+    view = review.head_table_view(cell("roles"))
+
+    assert view
+    assert "dla.differential_paired" in view.columns
+    assert "dla.differential" not in view.columns
+    assert "attention_patterns.honest_instruction_paired_top_segment" in view.columns
+    assert all("dla.differential" not in row for row in view.rows)
+    assert view.renamed_columns["dla.differential"] == "dla.differential_paired"
+    legacy = [note for note in view.notes if "before" in note and "paired" in note]
+    assert legacy and "dla.differential" in legacy[0]
+
+
+def test_a_current_cell_has_no_legacy_note(tmp_path):
+    _write_head_table(tmp_path, [
+        {"kind": "head", "layer": 5, "index": 5, "dla.differential_paired": 0.1},
+    ])
+    view = review.head_table_view(str(tmp_path))
+
+    assert view.renamed_columns == {}
+    assert not any("paired" in note for note in view.notes)
+
+
+def test_the_head_table_view_reports_how_many_instances_each_column_covers(
+        tmp_path):
+    from component_analysis import head_table
+
+    meta = head_table.add_coverage(
+        {"circuit": {"label": "c"}, "task": {"label": "t"}},
+        ["differential_paired"], [f"i{one}" for one in range(71)],
+        instance_set="paired_honest_instruction", namespace="dla")
+    meta = head_table.add_coverage(meta, ["pressure"],
+                                   [f"i{one}" for one in range(1000)],
+                                   instance_set="test_split", namespace="dla")
+    head_table.write_head_table(str(tmp_path), [
+        {"kind": "head", "layer": 5, "index": 5, "dla.pressure": 0.2,
+         "dla.differential_paired": 0.1}], meta=meta)
+
+    view = review.head_table_view(str(tmp_path))
+
+    assert view.coverage == {"dla.differential_paired": 71, "dla.pressure": 1000}
+    assert not any("coverage" in note for note in view.notes)
+
+
+def test_a_cell_without_coverage_says_so_rather_than_inventing_it():
+    view = review.head_table_view(cell("attention_dla"))
+
+    assert view.coverage == {}
+    assert any("coverage" in note for note in view.notes)
+
+
 # ==============================================================================
 # ATTENTION PATTERNS
 # ==============================================================================
@@ -632,18 +687,18 @@ def test_a_segmentation_with_no_overrides_says_every_segment_is_a_default():
 # ==============================================================================
 #
 # The family knockout writes two columns into the head table beside its JSON.
-# The role pass is renaming them from `knockout.family` to
-# `knockout.role_family` on its own branch, so both spellings are accepted for
-# the same reason both spellings of the role triple are: a namespace settled
-# after this module was written must not silently blank a column.
+# Ticket 10 renamed them from `knockout.family` to `knockout.role_family`; a
+# cell written before that (the `family` fixture is one) is read under the
+# current names through `head_table.LEGACY_COLUMNS`, like every other rename.
 
 
-def test_the_family_columns_are_found_under_the_spelling_in_the_written_cell():
+def test_the_family_columns_of_a_cell_written_before_the_rename_are_found():
     view = review.head_table_view(cell("family"))
     assert view.family_columns == {
-        "family": "knockout.family",
-        "family_logit_diff_drop": "knockout.family_logit_diff_drop"}
-    assert view.rows[0]["knockout.family"] == "unknown"
+        "family": "knockout.role_family",
+        "family_logit_diff_drop": "knockout.role_family_logit_diff_drop"}
+    assert view.rows[0]["knockout.role_family"] == "unknown"
+    assert view.renamed_columns["knockout.family"] == "knockout.role_family"
 
 
 def test_the_family_columns_are_found_under_the_renamed_spelling_too(tmp_path):
@@ -665,7 +720,8 @@ def test_the_family_columns_are_shown_beside_the_role_they_group_by():
     after = view.columns[len(review.IDENTITY_COLUMNS):]
     # The family a Component belongs to is read with its role, not with the
     # rest of the knockout numbers twenty columns later.
-    assert after[:2] == ["knockout.family", "knockout.family_logit_diff_drop"]
+    assert after[:2] == ["knockout.role_family",
+                         "knockout.role_family_logit_diff_drop"]
 
 
 def test_a_head_table_without_family_columns_says_so_rather_than_failing():
