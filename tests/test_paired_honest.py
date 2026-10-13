@@ -78,13 +78,15 @@ def profile(**masses):
     return {name: masses.get(name, 0.0) for name in SEGMENTS}
 
 
-def condition(name, *, masses, n=4, paired=False):
+def condition(name, *, masses, n=4, paired=False, ids=None, dataset=None):
     return {
         "name": name,
         "kind": name.replace("_", " "),
         "paired": paired,
         "descriptive": not paired,
-        "dataset": None,
+        "dataset": dataset,
+        "instance_ids": list(ids) if ids is not None else
+        [f"{name}-{one}" for one in range(n)],
         "n_instances": n,
         "n_loaded": n,
         "batches": 1,
@@ -135,9 +137,13 @@ def test_the_paired_honest_instruction_gets_its_own_top_segment_column():
 
     updates = ap.columns(payload)
 
-    assert updates[HEADS[0]]["honest_instruction_top_segment"] == "item_1_question"
-    assert updates[HEADS[0]]["honest_instruction_top_mass"] == pytest.approx(0.9)
-    assert updates[HEADS[1]]["honest_instruction_top_segment"] == "readout"
+    assert updates[HEADS[0]]["honest_instruction_paired_top_segment"] == \
+        "item_1_question"
+    assert updates[HEADS[0]]["honest_instruction_paired_top_mass"] == \
+        pytest.approx(0.9)
+    assert updates[HEADS[1]]["honest_instruction_paired_top_segment"] == "readout"
+    assert "honest_instruction_top_segment" not in updates[HEADS[0]], \
+        "a paired column says paired in its own name (2026-10-13)"
 
 
 def test_the_paired_columns_have_a_left_term_read_over_the_same_instances():
@@ -174,8 +180,8 @@ def test_the_unpaired_twin_column_still_says_descriptive_in_its_own_name():
 
     assert updates[HEADS[0]]["honest_twin_descriptive_top_segment"] == \
         "designation_site"
-    assert "honest_instruction_top_segment" in updates[HEADS[0]]
-    assert updates[HEADS[0]]["honest_instruction_top_segment"] is None
+    assert "honest_instruction_paired_top_segment" in updates[HEADS[0]]
+    assert updates[HEADS[0]]["honest_instruction_paired_top_segment"] is None
 
 
 def test_a_condition_that_did_not_run_leaves_its_columns_empty_not_missing():
@@ -190,10 +196,65 @@ def test_a_condition_that_did_not_run_leaves_its_columns_empty_not_missing():
     updates = ap.columns(payload)
 
     for key in HEADS:
-        for name in ("honest_instruction", "pressure_paired",
+        for name in ("honest_instruction_paired", "pressure_paired",
                      "honest_twin_descriptive"):
             assert updates[key][f"{name}_top_segment"] is None
             assert updates[key][f"{name}_top_mass"] is None
+
+
+def test_every_condition_declares_the_instances_its_columns_were_read_over(
+        tmp_path):
+    """The 71-versus-100 coverage goes into the head table's meta, per column."""
+    from component_analysis import registry
+
+    sample = [f"sdr-{one}" for one in range(6)]
+    paired = sample[:4]
+    payload = patterns_payload(
+        condition(ap.PRESSURE, n=6, ids=sample, masses=masses_where(
+            {HEADS[0]: "readout", HEADS[1]: "readout"})),
+        condition(ap.PRESSURE_PAIRED, n=4, ids=paired, paired=True,
+                  masses=masses_where({HEADS[0]: "readout", HEADS[1]: "readout"})),
+        condition(ap.HONEST_INSTRUCTION, n=4, ids=paired, paired=True,
+                  masses=masses_where({HEADS[0]: "readout", HEADS[1]: "readout"})),
+        condition(ap.HONEST_TWIN, n=3, ids=["twin-0", "twin-1", "twin-2"],
+                  dataset="data/datasets/sdr_honest", masses=masses_where(
+                      {HEADS[0]: "readout", HEADS[1]: "readout"})))
+    ctx = registry.AnalysisContext(cli=None, intake=None, circuit_spec=None,
+                                   task_spec=None, components=[],
+                                   cell_dir=str(tmp_path))
+
+    ap.declare_coverage(ctx, payload)
+    declared = {column: one for one in ctx.take_coverage()
+                for column in one["columns"]}
+
+    assert declared["pressure_top_segment"]["instance_ids"] == sample
+    assert declared["pressure_top_mass"]["instance_set"] == "test_split"
+    for name in ("pressure_paired", "honest_instruction_paired"):
+        assert declared[f"{name}_top_segment"]["instance_ids"] == paired
+        assert declared[f"{name}_top_mass"]["instance_set"] == \
+            "paired_honest_instruction"
+    twin = declared["honest_twin_descriptive_top_segment"]
+    assert twin["instance_ids"] == ["twin-0", "twin-1", "twin-2"]
+    assert twin["dataset"] == "data/datasets/sdr_honest"
+    assert set(declared) == {f"{prefix}_{field}"
+                             for prefix in ap.COLUMN_PREFIXES.values()
+                             for field in ("top_segment", "top_mass")}
+
+
+def test_a_condition_that_did_not_run_declares_its_columns_over_nothing(tmp_path):
+    from component_analysis import registry
+
+    payload = patterns_payload(condition(ap.PRESSURE, masses=masses_where(
+        {HEADS[0]: "readout", HEADS[1]: "readout"})))
+    ctx = registry.AnalysisContext(cli=None, intake=None, circuit_spec=None,
+                                   task_spec=None, components=[],
+                                   cell_dir=str(tmp_path))
+
+    ap.declare_coverage(ctx, payload)
+    declared = {column: one for one in ctx.take_coverage()
+                for column in one["columns"]}
+
+    assert declared["honest_instruction_paired_top_segment"]["instance_ids"] == []
 
 
 # ==============================================================================

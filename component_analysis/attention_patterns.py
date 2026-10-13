@@ -88,7 +88,7 @@ Head-table columns, namespaced `attention_patterns.` by the CLI:
     query_position                          which query Segment the columns read
     pressure_top_segment / _top_mass        under the Pressure Clause, whole split
     pressure_paired_top_segment / _top_mass the paired subset's left term
-    honest_instruction_top_segment /
+    honest_instruction_paired_top_segment /
         _top_mass                           paired: the same instance ids, under
                                             the Matched Honest Instruction
     honest_twin_descriptive_top_segment /
@@ -96,9 +96,14 @@ Head-table columns, namespaced `attention_patterns.` by the CLI:
                                             column name so a CSV reader cannot
                                             mistake it for a paired contrast
 
-Every condition gets its columns whether or not it ran; a condition with no
-data leaves them empty rather than absent, so head tables from different cells
-still line up.
+Both paired columns say `paired` in their names and the twin's says
+`descriptive` (the researcher's 2026-10-13 decision; before it the paired honest
+column was `honest_instruction_top_segment`, which `head_table.LEGACY_COLUMNS`
+still translates). Every condition gets its columns whether or not it ran; a
+condition with no data leaves them empty rather than absent, so head tables
+from different cells still line up. Each column's instances are declared into
+the head table's meta (`declare_coverage`): the whole split, the paired subset
+or the twin's split, with n = 0 for a condition that did not run.
 """
 
 from __future__ import annotations
@@ -974,18 +979,26 @@ def write_top_heads(ctx, payload: dict) -> Optional[str]:
 
 #: Each condition's head-table column prefix, in column order.
 #:
-#: The honest-twin columns carry `descriptive` in their own names, and the
-#: paired pair does not, which is block C's binding rule: a column read over
-#: the unpaired twin dataset is marked in its own name and a paired one is
-#: bare, so a reader who sees only a CSV header cannot mistake an unpaired
-#: population contrast for a causal one. `pressure_paired` is here so that the
-#: paired honest column has a left term over the same instance ids;
+#: The honest-twin columns carry `descriptive` in their own names and the two
+#: paired ones carry `paired`, so a reader who sees only a CSV header cannot
+#: mistake an unpaired population contrast for a causal one (block C's rule,
+#: extended by the researcher's 2026-10-13 decision). `pressure_paired` is here
+#: so that the paired honest column has a left term over the same instance ids;
 #: `pressure` is the whole split and is not one.
 COLUMN_PREFIXES = {
     PRESSURE: "pressure",
     PRESSURE_PAIRED: "pressure_paired",
-    HONEST_INSTRUCTION: "honest_instruction",
+    HONEST_INSTRUCTION: "honest_instruction_paired",
     HONEST_TWIN: "honest_twin_descriptive",
+}
+
+#: The instance set each condition's columns are read over, by name, for the
+#: head table's coverage meta. The paired pair shares one: the same ids.
+INSTANCE_SETS = {
+    PRESSURE: "test_split",
+    PRESSURE_PAIRED: "paired_honest_instruction",
+    HONEST_INSTRUCTION: "paired_honest_instruction",
+    HONEST_TWIN: "honest_twin_split",
 }
 
 
@@ -1015,6 +1028,25 @@ def columns(payload: dict) -> dict:
             cells[f"{prefix}_top_mass"] = mass
         updates[key] = cells
     return updates
+
+
+def declare_coverage(ctx, payload: dict) -> None:
+    """Tell the head table which instances each condition's columns cover.
+
+    Read off `patterns.json`'s own `instance_ids`, so the meta and the file
+    cannot disagree. A condition that did not run declares its columns over
+    nothing, which the table records as n = 0. `query_position` is a setting,
+    not a measurement, and declares nothing.
+    """
+    by_condition = {condition["name"]: condition
+                    for condition in payload["conditions"]}
+    for condition_name, prefix in COLUMN_PREFIXES.items():
+        condition = by_condition.get(condition_name) or {}
+        ctx.declare_coverage(
+            [f"{prefix}_top_segment", f"{prefix}_top_mass"],
+            instance_ids=condition.get("instance_ids") or [],
+            instance_set=INSTANCE_SETS[condition_name],
+            dataset=condition.get("dataset"))
 
 
 # ==============================================================================
@@ -1262,6 +1294,7 @@ def run(ctx) -> dict:
     ctx.write_json(SUBDIR, PATTERNS_FILE, payload)
     write_heatmaps(ctx, payload)
     write_top_heads(ctx, payload)
+    declare_coverage(ctx, payload)
     return columns(payload)
 
 
