@@ -54,7 +54,7 @@ ATTENTION_COLORMAP = "YlOrRd"
 #: into one colour rather than taking a colormap, and its default is blue.
 ATTENTION_TOP_COLOUR = "#800026"
 #: Where `--attention-token-level` writes, and its one index file.
-TOKEN_LEVEL_SUBDIR = "attention/token_level"
+TOKEN_LEVEL_PATH = "attention/token_level"
 TOKEN_LEVEL_INDEX = "token_level.json"
 DLA_SUBDIR = dla.SUBDIR
 KNOCKOUT_SUBDIR = knockout.SUBDIR
@@ -528,7 +528,7 @@ def token_level_views(results_dir: str) -> "Group":
     When the twin does carry its values, each row's largest tokens are named
     in the notes, which is what the figure is read for.
     """
-    path = os.path.join(results_dir, TOKEN_LEVEL_SUBDIR, TOKEN_LEVEL_INDEX)
+    path = os.path.join(results_dir, TOKEN_LEVEL_PATH, TOKEN_LEVEL_INDEX)
     index = read_json(path)
     if index is None:
         return Missing(

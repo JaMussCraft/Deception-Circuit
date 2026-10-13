@@ -289,7 +289,7 @@ def test_review_spells_the_attention_colormap_the_module_draws_with():
     assert review.ATTENTION_COLORMAP == ap.COLORMAP
     assert review.ATTENTION_TOP_COLOUR == to_hex(
         matplotlib.colormaps[ap.COLORMAP](1.0))
-    assert review.TOKEN_LEVEL_SUBDIR == f"{ap.SUBDIR}/{ap.TOKEN_LEVEL_SUBDIR}"
+    assert review.TOKEN_LEVEL_PATH == f"{ap.SUBDIR}/{ap.TOKEN_LEVEL_SUBDIR}"
     assert review.TOKEN_LEVEL_INDEX == ap.TOKEN_LEVEL_INDEX
 
 

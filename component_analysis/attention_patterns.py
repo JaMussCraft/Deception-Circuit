@@ -1119,18 +1119,22 @@ TOKEN_LEVEL_ORDER = (PRESSURE, PRESSURE_PAIRED, HONEST_INSTRUCTION, HONEST_TWIN)
 #: What a record says when it carries no `template_variant`.
 NO_VARIANT = "-"
 
+#: The run name of tokens no Segment claims. The default Segments partition the
+#: prompt, so only an override that leaves gaps produces one.
+UNCLAIMED_RUN = "unclaimed"
+
 
 def segment_runs(segmentation, names: Sequence[str]) -> List[Tuple[str, int]]:
     """`[(Segment name, width)]`: the prompt as maximal runs of one Segment.
 
     Interleaved Segments (the intro around its two Item Mentions) are several
     runs, in prompt order. A token no Segment claims is a run named
-    `UNKNOWN_LEVEL`, which the default segmentation never produces.
+    `UNCLAIMED_RUN`, which the default segmentation never produces.
     """
     ids = segment_ids(segmentation, names, segmentation.n_tokens).tolist()
     runs: List[List] = []
     for owner in ids:
-        name = names[owner] if owner >= 0 else UNKNOWN_LEVEL
+        name = names[owner] if owner >= 0 else UNCLAIMED_RUN
         if runs and runs[-1][0] == name:
             runs[-1][1] += 1
         else:
@@ -1309,6 +1313,7 @@ def token_level_payloads(tokens: TokenProfiles, tokenizer, *, labels) -> Tuple[d
         slots = group.slots()
         row_keys = _row_keys(group, tokens.query_names)
         slot_tokens, slot_share, slot_labels = [], [], []
+        slot_segments = [group.run_names[key[0]] for key in slots]
         for key in slots:
             counts = group.tokens.get(key, {})
             total = sum(counts.values())
@@ -1341,7 +1346,7 @@ def token_level_payloads(tokens: TokenProfiles, tokenizer, *, labels) -> Tuple[d
             "n_slots": len(slots),
             "slot_labels": slot_labels, "slot_tokens": slot_tokens,
             "slot_token_share": slot_share,
-            "slot_segments": [group.run_names[key[0]] for key in slots],
+            "slot_segments": slot_segments,
             "rows": rows_meta})
         for position, label in enumerate(labels):
             rows = []
@@ -1355,7 +1360,7 @@ def token_level_payloads(tokens: TokenProfiles, tokenizer, *, labels) -> Tuple[d
                     "condition": row_key[0], "query_position": row_key[1],
                     "label": meta["label"], "n_instances": n, "values": values,
                     "top_tokens": [{"slot": i, "token": slot_labels[i],
-                                    "segment": index_groups[-1]["slot_segments"][i],
+                                    "segment": slot_segments[i],
                                     "mass": values[i]}
                                    for i in top[:TOKEN_LEVEL_TOP]]})
             panels_by_head[label].append({"group": group_id, "title": title,
