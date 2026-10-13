@@ -201,6 +201,24 @@ def test_a_cli_run_writes_the_json_the_png_and_the_head_table_columns(
     assert ranks == list(range(1, len(table["rows"]) + 1))
 
 
+def test_every_knockout_column_declares_the_sample_it_was_measured_over(
+        sdr_run, cli_model):
+    """Ticket 13: the head table's meta says, per column, n and which instances."""
+    from component_analysis.head_table import coverage_of
+
+    run_dir, out, _records = sdr_run
+    run_cli(str(run_dir), "--num-kv-heads", "2", "--analyses", "knockout",
+            "--device", "cpu", "--output-dir", str(out))
+
+    written = read_json(out, *CELL, knockout.SUBDIR, knockout.JSON_NAME)
+    meta = read_json(out, *CELL, "head_table.json")["meta"]
+    for column in knockout.COLUMNS:
+        entry = coverage_of(meta, f"{knockout.NAME}.{column}")
+        assert entry["n"] == written["clean_run"]["n_instances"] > 0
+        assert entry["instance_ids"] == written["instances"]
+        assert entry["instance_set"].startswith("causal_sample")
+
+
 def test_the_written_json_holds_the_numbers_the_chart_draws(sdr_run, cli_model):
     run_dir, out, _records = sdr_run
     run_cli(str(run_dir), "--num-kv-heads", "2", "--analyses", "knockout",

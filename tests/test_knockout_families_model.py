@@ -170,6 +170,13 @@ def test_a_cli_run_writes_the_family_json_the_png_and_the_head_table_columns(
     assert "knockout.role_family" in table["columns"]
     assert "knockout.role_family_logit_diff_drop" in table["columns"]
 
+    from component_analysis.head_table import coverage_of
+
+    entry = coverage_of(table["meta"], "knockout.role_family_logit_diff_drop")
+    single = coverage_of(table["meta"], "knockout.logit_diff_drop")
+    assert entry["n"] > 0 and entry["instance_set"] == single["instance_set"], \
+        "the family pass runs over the single knockout's sample"
+
 
 def test_the_family_and_the_single_knockout_agree_where_a_family_has_one_member(
         sdr_run, cli_model, tmp_path):

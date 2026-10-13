@@ -218,6 +218,11 @@ def summarize(effects: Effects, components=None) -> List[dict]:
 COLUMNS = ("logit_diff_drop", "rank", "standard_error", "accuracy")
 
 
+#: The instance set every knockout column covers, by name, for the head table's
+#: coverage meta: the causal sample, as far as the loader could tokenize it.
+INSTANCE_SET = "causal_sample"
+
+
 def columns(rows) -> dict:
     """The head-table update: `{component key: {column: value}}`.
 
@@ -743,6 +748,8 @@ def run(ctx) -> dict:
                  title=f"{ctx.circuit_spec.label} x {ctx.task_spec.name}: "
                        f"per-Component {scheme} knockout")
     updates = columns(rows)
+    ctx.declare_coverage(COLUMNS, instance_ids=effects.ids,
+                         instance_set=INSTANCE_SET)
     if families is None:
         return updates
 
@@ -760,4 +767,6 @@ def run(ctx) -> dict:
                               f"{scheme} knockout by Component Role family")
     for key, values in family_columns(family_rows).items():
         updates.setdefault(key, {}).update(values)
+    ctx.declare_coverage(FAMILY_COLUMNS, instance_ids=grouped.ids,
+                         instance_set=INSTANCE_SET)
     return updates
