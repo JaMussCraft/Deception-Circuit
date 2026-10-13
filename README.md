@@ -406,9 +406,12 @@ sbatch --time=02:30:00 --partition=gpuA100x4 scripts/analyze_components.sbatch \
 
 Size `--time` from the `--dry-run` estimate; on an A40 the descriptive trio is
 about 11 minutes, each position-agnostic path-patching grid over 100 instances
-13 to 18 minutes, and the completeness sweep about 45 minutes. The sweep runs
-on the grid's own causal sample (`--n-causal`, 100 by default), so its columns
-and the grid's cover one instance set.
+13 to 18 minutes, and the completeness sweep 29 minutes over 64 instances
+(ticket 12). On an A100 the sweep over the grid's 100 instances took 23 minutes,
+and the whole `--path-counterfactual both` job with the Segment pass and the
+sweep 40 minutes (ticket 14). The sweep runs on the grid's own causal sample
+(`--n-causal`, 100 by default), so its columns and the grid's cover one
+instance set.
 A shorter `--time` backfills sooner on a busy queue. Logs land in
 `logs/analyze_components_<jobid>.out`. Run `--dry-run` on the login node before
 every submission: it resolves the circuits, the Segments and the causal sample,

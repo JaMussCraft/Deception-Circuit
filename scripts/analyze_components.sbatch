@@ -30,9 +30,10 @@
 # Size --time from the --dry-run estimate. On an A40 the descriptive trio
 # (attention_patterns, dla, knockout) is about 11 minutes, each
 # position-agnostic path-patching grid over 100 instances 13 to 18 minutes,
-# and the completeness sweep about 45 minutes on the grid's own 100 instances
-# (ticket 12's runtime table, scaled from 64). Shorter --time requests
-# backfill sooner on a busy queue.
+# and the completeness sweep 29 minutes over 64 instances (ticket 12). On an
+# A100 the sweep over the grid's 100 instances took 23 minutes and the whole
+# --path-counterfactual both job with the sweep 40 minutes (ticket 14).
+# Shorter --time requests backfill sooner on a busy queue.
 #
 # Several jobs may run into one cell (same --suite-name or --output-dir): each
 # replaces the columns of the analyses it runs and carries the rest forward.

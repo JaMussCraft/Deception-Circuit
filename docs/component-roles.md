@@ -528,8 +528,10 @@ did. **Every number a criterion compares is the same number as before**, so no
 threshold, clause, role or flavour can move, and no rerun of a cell of record
 is required by rule 2 below. A row holding both generations (a legacy cell
 merged into a new one with `--roles-merge-from`) is refused by name rather than
-read either way, and `roles.json`'s `sign_convention` says which reading the
-pass applied. Checked on a copy of `sdr-first-run`: the same 0/0/1/0/17 and the
+read either way. Where a cell holds the path-patching JSON its columns came
+from, that file's `metric.convention` marker must agree with the columns'
+generation, or the pass refuses the cell. `roles.json` records the markers
+read in `path_conventions`, with a sentence in `sign_convention`. Checked on a copy of `sdr-first-run`: the same 0/0/1/0/17 and the
 same `roles.direct_support` values (ticket 14's comments).
 
 The rest of this section is the rule for any future change. A threshold or a

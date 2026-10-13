@@ -168,8 +168,11 @@ reason it was rejected: no output of record is rewritten.
   1 above); on a legacy cell it is `-path_patching.direct_effect`, as before
   (rule 2). The two give the same number for the same measurement, so no
   criterion and no role moves; a row carrying both generations is refused by
-  name rather than read either way, and `roles.json` says which reading it
-  applied.
+  name rather than read either way. The roles pass tells the generations
+  apart by column name, and where the cell holds the path-patching JSON the
+  columns came from, it also requires that file's `metric.convention` marker
+  to agree, and refuses the cell by name when it does not. `roles.json`
+  records the markers it read in (`path_conventions`).
 
 Why names and a JSON marker, rather than a marker alone in the head table's
 meta: a column name travels with its values through every merge, carry-forward
