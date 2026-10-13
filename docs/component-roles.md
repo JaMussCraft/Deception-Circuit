@@ -144,9 +144,9 @@ written, by the roles pass. The roles pass writes only `roles.*` columns.
 | writes (paired) | `dla.honest_instruction_paired`, `dla.differential_paired`, `dla.differential_paired_se` | native |
 | writes | `dla.suppression` | boolean, true means it favours the Distractor |
 | depends (whether) | `knockout.logit_diff_drop`, `knockout.standard_error` | native: positive supports deception |
-| depends (how, direct) | `roles.direct_support` = `-path_patching.direct_effect`, se from `path_patching.direct_effect_se` | **derived**, ADR-0002 |
-| depends (how, indirect) | `path_patching.strongest_outgoing`, `..._effect` | magnitude and receiver name |
-| depends (query side) | `path_patching.strongest_incoming_honest_instruction_paired`, `..._effect_honest_instruction_paired` | magnitude and receiver name |
+| depends (how, direct) | `roles.direct_support` = `path_patching.direct_support`, se from `path_patching.direct_support_se`; on a cell written before 2026-10-13, `-path_patching.direct_effect`, se from `path_patching.direct_effect_se` | **native** since 2026-10-13; **derived** (negated) on a legacy cell, ADR-0002 |
+| depends (how, indirect) | `path_patching.strongest_outgoing`, `..._support` (legacy `..._effect`) | magnitude and receiver name |
+| depends (query side) | `path_patching.strongest_incoming_honest_instruction_paired`, `..._support_honest_instruction_paired` (legacy `..._effect_honest_instruction_paired`) | magnitude and receiver name |
 
 `role_confirmed` is read if the table has it and **never written** by anything
 in the package; `head_table.PROTECTED_COLUMNS` enforces that.
@@ -167,14 +167,15 @@ test split; `dla.honest_instruction_paired`, `dla.differential_paired`, the
 paired attention columns and every `*_honest_instruction_paired` path column
 are computed over the instances with a Matched Honest survivor (71 of the
 100-instance causal sample on SDR nls0.3), and `knockout.*` and
-`path_patching.direct_effect` over all 100. **The head table's meta says so
+`path_patching.direct_support` (`direct_effect` on a legacy cell) over all
+100. **The head table's meta says so
 per column**: `meta.coverage[<column>]` gives `n` and an instance-set id, and
 `meta.instance_sets[<id>]` lists the ids (`head_table.coverage_of` reads both).
 The criteria never subtract one from the other across that boundary: each
 column is thresholded on its own, and the comparisons that must be paired
 (`dla.differential_paired`) are computed per instance by the analysis that
-owns them. The derived `roles.direct_support*` columns take the coverage of the
-path-patching column each negates.
+owns them. The `roles.direct_support*` columns take the coverage of the
+path-patching column each copies (or, on a legacy cell, negates).
 
 ## Significance: a z-score and a floor, both
 
@@ -342,7 +343,8 @@ depends on it.
 - writes: `dla.pressure` and `dla.differential_paired` not significant or below
   the DLA floor, and `dla.suppression` false;
 - depends (how): `roles.direct_support` not significant or below the path
-  floor, `|path_patching.strongest_outgoing_effect|` below the path floor, and
+  floor, `|path_patching.strongest_outgoing_support|` (`..._effect` on a
+  legacy cell) below the path floor, and
   no honest-instruction path at the Component's own query at or above it.
 
 The DLA and path-patching columns must have been **measured** for this
@@ -372,7 +374,8 @@ that the vocabulary is missing a role rather than that the Component is dull.
 
 Ticket 09's completeness sweep appends rows for Components outside the circuit
 — on SDR nls0.3, seven of them cleared its 0.05 direct-effect threshold, one
-(`mlp.30.0`, +0.1275) larger in magnitude than the circuit's own layer-31 MLP,
+(`mlp.30.0`, +0.1275 in the legacy sign, so a path that pushes against the
+deceptive answer) larger in magnitude than the circuit's own layer-31 MLP,
 and non-circuit direct paths carried about three quarters of the gap on that
 draw. Those rows carry `path_patching.sweep_*` columns and **nothing else**: no
 attention, no DLA, no knockout, because no analysis ran over them.
@@ -398,7 +401,9 @@ Into the head table, namespaced `roles.`, next to the columns it read:
 
     roles.role_proposed     one of binder, selector, mover, suppressor, unknown
     roles.role_notes        one line: the flavour, the lean and the numbers
-    roles.direct_support    the derived column of ADR-0002
+    roles.direct_support    ADR-0002's support column: path_patching.direct_support
+                            as written, or -path_patching.direct_effect on a
+                            cell written before 2026-10-13
     roles.direct_support_se
     roles.direct_support_honest_instruction_paired
     roles.reads_group       designation / item_mention / pressure / frame /
@@ -510,6 +515,22 @@ has reads evidence and the flavour's premise does not hold. L14H7 and L14H22
 are excluded the same way (an established `question` read). Rule 2 below asks
 for every cell with a role column to be rerun; the cells of record are the
 researcher's, and the rerun on them is theirs to make.
+
+**2026-10-13 — path patching is read natively; no criterion changed.**
+Reason: the researcher's decision that path patching's sign agrees with
+knockout (ticket 14). A path-patching run now writes `(clean - patched) /
+(clean - counterfactual)`, positive helps deception, under new column names
+(`path_patching.direct_support`, `..._support_se`, `strongest_*_support`,
+`sweep_direct_support`, and their `_honest_instruction_paired` twins with the
+standard error last). `roles.direct_support` copies the new column; on a cell
+written before, it negates `path_patching.direct_effect` exactly as it always
+did. **Every number a criterion compares is the same number as before**, so no
+threshold, clause, role or flavour can move, and no rerun of a cell of record
+is required by rule 2 below. A row holding both generations (a legacy cell
+merged into a new one with `--roles-merge-from`) is refused by name rather than
+read either way, and `roles.json`'s `sign_convention` says which reading the
+pass applied. Checked on a copy of `sdr-first-run`: the same 0/0/1/0/17 and the
+same `roles.direct_support` values (ticket 14's comments).
 
 The rest of this section is the rule for any future change. A threshold or a
 clause may be changed, and then:

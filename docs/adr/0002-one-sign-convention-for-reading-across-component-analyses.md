@@ -133,4 +133,46 @@ the derived `roles.direct_support_honest_instruction`). It is a departure from
   that map. The same day the researcher also decided that path patching's sign
   flips to agree with knockout (positive helps deception), with old cells told
   apart by their JSON meta; that change, and how this ADR's derived-column rule
-  meets it, is ticket 14's to record here, not this amendment's.
+  meets it, is recorded in the next amendment.
+
+## Amendment, 2026-10-13 (ticket 14): path patching now writes the support sign, under new names
+
+The researcher decided that path patching's sign agrees with knockout. **For
+every run from this date, a path-patching cell is `(clean - patched) / (clean -
+counterfactual)`: positive means the path helps the deceptive answer**, the
+same claim knockout's positive drop makes. This revisits the first rejected
+alternative above ("flip `path_patching`'s sign at the source"), and keeps the
+reason it was rejected: no output of record is rewritten.
+
+- **New sign, new names.** The columns whose sign changed are new columns:
+  `path_patching.direct_support`, `direct_support_se`,
+  `strongest_incoming_support`, `strongest_outgoing_support` and
+  `sweep_direct_support`, `sweep_direct_support_se`, with honest-instruction
+  twins that end `_honest_instruction_paired` and put a standard error last
+  (`direct_support_honest_instruction_paired_se`). The names of the strongest
+  cells, the sweep's rank and flags, and the files themselves keep their names,
+  because selection by absolute effect did not change.
+- **Old cells keep their old sign under their old names**
+  (`path_patching.direct_effect`, `*_effect`). `head_table.LEGACY_COLUMNS`
+  maps neither generation into the other, because a sign is meaning; a reader
+  tells them apart by which names a row carries.
+- **Every path-patching JSON carries the marker** `metric.convention =
+  "positive_helps_deception"` (with `convention_version: 2`) beside the `sign`
+  sentence. A file without it is legacy (`path_patching.convention_of`). The
+  review seam puts the convention in every path figure's subtitle and shows
+  values as written; `scripts/check_cell.py` prints it, and calls out a cell
+  whose directory holds both (a new run into a legacy cell rewrites only the
+  files of the passes it ran).
+- **The derived-column rule now applies to legacy cells only.** On a new cell
+  `roles.direct_support` is `path_patching.direct_support` read natively (rule
+  1 above); on a legacy cell it is `-path_patching.direct_effect`, as before
+  (rule 2). The two give the same number for the same measurement, so no
+  criterion and no role moves; a row carrying both generations is refused by
+  name rather than read either way, and `roles.json` says which reading it
+  applied.
+
+Why names and a JSON marker, rather than a marker alone in the head table's
+meta: a column name travels with its values through every merge, carry-forward
+and CSV export, and the CSV has no meta at all, so a marker kept only in the
+meta could be lost on the way while the numbers survived; with distinct names,
+an old number can never be read as a new one.
