@@ -784,7 +784,10 @@ def add_arguments(group) -> None:
                             "forward per Component per batch, which on an 8B "
                             "model is more work than the grid itself. "
                             "--dry-run prints what it would cost. It runs once, "
-                            "on the item-swap pair when that is selected.")
+                            "on the item-swap pair when that is selected, over "
+                            "the grid's own causal sample (--n-causal, "
+                            "--seed), so its columns and the grid's cover the "
+                            "same instances.")
     group.add_argument("--path-top", type=int, default=10,
                        help="How many of the strongest cells, by absolute "
                             "normalized effect, are listed in the JSON.")
@@ -899,7 +902,8 @@ def estimate(ctx) -> str:
         lines.append(f"completeness sweep: {n_senders} sender(s) into the "
                      f"Readout, {forwards} forward(s), about "
                      f"{minutes(forwards):.0f} min, on "
-                     f"{sweep_counterfactual(ctx)} only")
+                     f"{sweep_counterfactual(ctx)} only, over the grid's "
+                     f"{n_instances} instance(s)")
 
     if HONEST_INSTRUCTION in chosen:
         lines.append(f"{paired} of {n_instances} instance(s) have an "
@@ -944,8 +948,10 @@ def run(ctx) -> dict:
     batches = ctx.causal_batches()
 
     updates: Dict[tuple, dict] = {}
+    grid_ids: Dict[str, List[str]] = {}
     for counterfactual in selected_counterfactuals(ctx):
         summaries, tally = agnostic_pass(ctx, grid, batches, counterfactual)
+        grid_ids[counterfactual] = list(tally.used_ids)
         if summaries is None:
             # The columns still appear, empty: a counterfactual that found no
             # instance is a data finding, and a missing column looks like an
@@ -964,9 +970,10 @@ def run(ctx) -> dict:
     # clock during the sweep still leaves every pass above it written.
     if getattr(ctx.cli, "path_completeness_sweep", False):
         counterfactual = sweep_counterfactual(ctx)
-        payload = completeness_sweep(ctx, grid, batches, counterfactual)
+        payload = completeness_sweep(ctx, grid, batches, counterfactual,
+                                     grid_ids=grid_ids.get(counterfactual))
         _merge(updates, sweep_columns(payload), counterfactual)
-        _declare(ctx, SWEEP_COLUMN_NAMES, payload["sample"]["instance_ids"],
+        _declare(ctx, SWEEP_COLUMN_NAMES, sweep_measured_ids(payload),
                  counterfactual)
     return updates
 
@@ -976,6 +983,15 @@ def measured_ids(tally) -> List[str]:
     clean-minus-counterfactual gap excluded them."""
     excluded = set(tally.excluded)
     return [one for one in tally.used_ids if one not in excluded]
+
+
+def sweep_measured_ids(payload: dict) -> List[str]:
+    """The instances a sweep's means are over, as `measured_ids` is for the
+    grid: those it saw, less any the gap excluded. The same rule on both sides
+    is what gives the grid's and the sweep's columns one instance set."""
+    excluded = set(payload["sample"].get("excluded_by_gap") or ())
+    return [one for one in payload["sample"]["instance_ids"]
+            if one not in excluded]
 
 
 def _declare(ctx, names, instance_ids, counterfactual: str) -> None:
@@ -1203,13 +1219,20 @@ def sweep_senders(model) -> List[tuple]:
     return list(hooks.all_component_keys(model))
 
 
-def completeness_sweep(ctx, grid: Grid, batches, counterfactual: str) -> dict:
+def completeness_sweep(ctx, grid: Grid, batches, counterfactual: str, *,
+                       grid_ids: Sequence[str] = None) -> dict:
     """Every head and MLP block of the model, patched into the Readout.
 
     The grid only ever asks about the circuit's own Components, so a Component
     with a large direct effect that pruning missed is invisible to it. This
     sweep is the check: one number per Component of the whole model, ranked,
     with circuit membership marked.
+
+    It walks the same `batches` as the grid — the analysis's one causal sample,
+    drawn by the global `--n-causal` and `--seed` — so its numbers and the
+    grid's are over the same instances. `grid_ids` is the grid pass's instance
+    list on this counterfactual, when it ran, and the file records whether the
+    two agree.
     """
     senders = sweep_senders(ctx.model)
     in_circuit = {row_key(one) for one in ctx.components}
@@ -1221,6 +1244,9 @@ def completeness_sweep(ctx, grid: Grid, batches, counterfactual: str) -> dict:
 
     for streams in stream_batches(ctx, batches, senders=senders,
                                   counterfactual=counterfactual, tally=tally):
+        tally.excluded.extend(one for one, usable in zip(streams.ids,
+                                                         streams.usable.tolist())
+                              if not usable)
         for sender in senders:
             values[sender].extend(
                 normalized_effect(streams,
@@ -1264,7 +1290,13 @@ def completeness_sweep(ctx, grid: Grid, batches, counterfactual: str) -> dict:
         "strongest": ranked[:int(getattr(ctx.cli, "path_top", 10))],
         "sample": {"n_instances": len(tally.used_ids),
                    "instance_ids": tally.used_ids,
-                   "n_without_a_counterpart": len(tally.unpaired)},
+                   "n_without_a_counterpart": len(tally.unpaired),
+                   "n_excluded_by_gap": len(tally.excluded),
+                   "excluded_by_gap": tally.excluded,
+                   "drawn_by": "the analysis's causal sample (--n-causal, "
+                               "--seed), the grid's own",
+                   "same_as_grid": (None if grid_ids is None
+                                    else list(grid_ids) == tally.used_ids)},
         "cost": {"forwards": tally.forwards,
                  "wall_seconds": tally.wall_seconds,
                  "note": "one forward per sender per batch; the Readout "

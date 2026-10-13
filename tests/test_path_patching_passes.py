@@ -865,3 +865,75 @@ def test_a_strong_component_outside_the_circuit_gets_a_row_of_its_own(
     entry = coverage_of(table["meta"], f"{pp.NAME}.sweep_direct_support")
     assert entry["n"] == sweep["sample"]["n_instances"] > 0
     assert set(entry["instance_ids"]) == set(sweep["sample"]["instance_ids"])
+
+
+def test_the_sweep_runs_on_the_grids_own_sample_and_its_coverage_says_so(
+        sdr_run, monkeypatch):
+    """One draw for the whole analysis: the global `--n-causal`/`--seed`
+    sample. The sweep's instances are the grid's, its head-table columns point
+    at the same instance set in the coverage meta, and on a circuit Component
+    its direct support is the grid's own Readout cell."""
+    import analyze_components
+    from component_analysis import registry
+    from component_analysis.head_table import coverage_of
+    from tests.fakes import FAKE_VOCAB_SIZE
+    from tests.test_analyze_components_segmentation import CELL, read_json
+
+    run_dir, out, _records = sdr_run
+    monkeypatch.setattr(registry, "ANALYSES", [pp])
+    monkeypatch.setattr(analyze_components, "load_model",
+                        lambda cli, resolved: tiny_analysis_model(FAKE_VOCAB_SIZE))
+    assert analyze_components.main([
+        str(run_dir), "--num-kv-heads", "2", "--n-causal", "16",
+        "--path-completeness-sweep", "--path-position-threshold", "1e9",
+        "--device", "cpu", "--output-dir", str(out)]) == 0
+
+    grid = read_json(out, *CELL, pp.SUBDIR, pp.AGNOSTIC_FILE)
+    sweep = read_json(out, *CELL, pp.SUBDIR, pp.SWEEP_FILE)
+    sample = read_json(out, *CELL, "sample.json")
+    assert sweep["sample"]["instance_ids"] == grid["sample"]["instance_ids"]
+    assert len(sweep["sample"]["instance_ids"]) == 16
+    assert sweep["sample"]["same_as_grid"] is True
+    assert set(sweep["sample"]["instance_ids"]) == set(
+        sample["instance_ids"] if "instance_ids" in sample
+        else [one["instance_id"] for one in sample["instances"]])
+
+    table = read_json(out, *CELL, "head_table.json")
+    grid_entry = coverage_of(table["meta"], f"{pp.NAME}.direct_support")
+    sweep_entry = coverage_of(table["meta"], f"{pp.NAME}.sweep_direct_support")
+    assert grid_entry["instance_set"] == sweep_entry["instance_set"]
+    assert grid_entry["n"] == sweep_entry["n"] == 16
+    for row in table["rows"]:
+        assert row[f"{pp.NAME}.sweep_direct_support"] == \
+            row[f"{pp.NAME}.direct_support"]
+
+
+def test_an_instance_the_gap_excludes_is_excluded_from_the_sweep_as_from_the_grid(
+        model, whole_model_grid, tmp_path):
+    """An instance whose Corruption does not move the answer is left out of
+    every cell's mean, so the sweep's columns must not claim to cover it
+    while the grid's say they do not."""
+    torch.manual_seed(1)
+    clean = torch.randint(0, TINY["vocab"], (BATCH, SEQ))
+    corrupt = clean.clone()
+    corrupt[0] = torch.randint(0, TINY["vocab"], (SEQ,))   # row 1 never moves
+    mask = torch.ones_like(clean)
+    items = [{"instance_id": f"tiny{row}", "record": {},
+              "input_ids": clean[row], "attention_mask": mask[row],
+              "corrupt_input_ids": corrupt[row],
+              "corrupt_attention_mask": mask[row],
+              "target_token": 3 + row, "distractor_token": 11 + row,
+              "readout": SEQ - 1, "honest": None} for row in range(BATCH)]
+    batches = dataloaders.Batches(items, batch_size=BATCH,
+                                  report={"batch_size": BATCH})
+    ctx = StubContext(model, tmp_path, batches)
+    ctx.components = []
+
+    _summaries, tally = pp.agnostic_pass(ctx, whole_model_grid, batches,
+                                         pp.ITEM_SWAP)
+    sweep = pp.completeness_sweep(ctx, whole_model_grid, batches, pp.ITEM_SWAP,
+                                  grid_ids=tally.used_ids)
+
+    assert tally.excluded == ["tiny1"]
+    assert sweep["sample"]["excluded_by_gap"] == ["tiny1"]
+    assert pp.sweep_measured_ids(sweep) == pp.measured_ids(tally) == ["tiny0"]

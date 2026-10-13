@@ -406,7 +406,9 @@ sbatch --time=02:30:00 --partition=gpuA100x4 scripts/analyze_components.sbatch \
 
 Size `--time` from the `--dry-run` estimate; on an A40 the descriptive trio is
 about 11 minutes, each position-agnostic path-patching grid over 100 instances
-13 to 18 minutes, and the completeness sweep about 30 minutes per 64 instances.
+13 to 18 minutes, and the completeness sweep about 45 minutes. The sweep runs
+on the grid's own causal sample (`--n-causal`, 100 by default), so its columns
+and the grid's cover one instance set.
 A shorter `--time` backfills sooner on a busy queue. Logs land in
 `logs/analyze_components_<jobid>.out`. Run `--dry-run` on the login node before
 every submission: it resolves the circuits, the Segments and the causal sample,
@@ -453,7 +455,7 @@ under the current column names, and records the translation in the meta's
 **Column names say what they compare.** A column computed over the same
 instance ids on both sides of a contrast carries `paired` in its name
 (`dla.differential_paired`,
-`path_patching.direct_effect_honest_instruction_paired`); one computed over the
+`path_patching.direct_support_honest_instruction_paired`); one computed over the
 unpaired Honest Twin carries `descriptive`. Cells written before 2026-10-13
 use older names, which every reader translates through
 `head_table.LEGACY_COLUMNS`. **How many instances a column covers is in the
@@ -462,6 +464,15 @@ gives `n` and an instance-set id, `meta.instance_sets[<id>]` lists the ids,
 and `head_table.coverage_of(meta, column)` reads both — so a paired column
 over the 71 instances with a Matched Honest Instruction is told apart from its
 neighbour over the 100-instance causal sample.
+
+**Positive helps deception, in knockout and path patching alike.** Since
+2026-10-13 a path-patching cell is `(clean - patched) / (clean -
+counterfactual)`, the sign of knockout's drop, and its signed head-table
+columns are `path_patching.*_support`. A cell written before keeps the opposite
+sign under its old `path_patching.*_effect` names, which are deliberately not
+translated; every path-patching JSON says which in `metric.convention` (absent
+on a legacy file), every figure says so in its subtitle, and the roles pass
+reads either (ADR-0002).
 
 ### The review notebook
 
