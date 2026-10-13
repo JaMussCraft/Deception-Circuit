@@ -1831,8 +1831,15 @@ def run(ctx) -> dict:
              f"{TWIN_SEGMENTATION_FILE}"],
             dataset=directory))
 
-    if tokens is not None:
+    if tokens is not None and tokens.groups:
         payload["token_level"] = write_token_level(ctx, tokens, payload)
+    elif tokens is not None:
+        # Asked for, but every condition was skipped: say so rather than draw
+        # a PNG per head with no row in it.
+        payload["token_level"] = {
+            "payload": "none",
+            "reason": "no condition was profiled, so there are no tokens to "
+                      "render; see 'skipped'"}
     ctx.write_json(SUBDIR, PATTERNS_FILE, payload)
     write_heatmaps(ctx, payload)
     write_top_heads(ctx, payload)

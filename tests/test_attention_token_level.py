@@ -122,6 +122,18 @@ def test_every_attention_twin_records_the_colormap_it_was_drawn_with(sdr_cell):
             assert json.load(handle)["colormap"] == ap.COLORMAP, path
 
 
+def test_token_level_with_nothing_profiled_says_so_and_draws_nothing(sdr_cell):
+    # The fixture has no Matched Honest survivors, so this run profiles nothing.
+    out, _records = run_token_level(sdr_cell, "--attention-conditions",
+                                    "honest_instruction")
+
+    assert not os.path.exists(token_level_dir(out))
+    with open(os.path.join(attention_dir(out), ap.PATTERNS_FILE)) as handle:
+        token_level = json.load(handle)["token_level"]
+    assert token_level["payload"] == "none"
+    assert "no condition" in token_level["reason"]
+
+
 def token_level_index(out) -> dict:
     with open(os.path.join(token_level_dir(out), ap.TOKEN_LEVEL_INDEX)) as handle:
         return json.load(handle)
