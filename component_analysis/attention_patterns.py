@@ -36,6 +36,14 @@ Eager attention is on only inside `hooks.attention_weights`, which restores
 SDPA in a `finally` (ADR-0001). This is the one analysis that pays the
 `[batch, heads, seq, seq]` buffer per layer.
 
+Every attention figure is drawn in `COLORMAP`, yellow through orange to dark
+red, because the researcher reads these on a screen with a strong blue-light
+filter, which dims and yellows blues and purples, so a map whose low end is
+dark purple or blue (magma, viridis) collapses its bottom third to near-black
+there, while this one carries its range in luminance and red-orange-yellow
+hue. Each figure's JSON twin records the name under `colormap`, and the review
+notebook draws its attention heatmaps in the same map.
+
 What lands in the cell
 ----------------------
 `attention/patterns.json`, which is the whole result and the twin of every
@@ -109,11 +117,13 @@ or the twin's split, with n = 0 for a condition that did not run.
 from __future__ import annotations
 
 import argparse
+import json
 import math
 import os
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple
 
+import numpy as np
 import torch
 
 from component_analysis import head_table as ht
@@ -170,6 +180,18 @@ UNKNOWN_LEVEL = "unknown"
 #: Seconds per eager forward at batch 8 x 128 tokens on an A40, measured by
 #: ticket 02b's scaffold job (22106585). `estimate` scales it by the batch.
 EAGER_SECONDS_PER_BATCH_OF_8 = 0.19
+
+#: The colormap of every attention figure, and the name each JSON twin records
+#: under `colormap` (the module docstring says why it is warm). Matplotlib and
+#: plotly both know it by this name and agree on its ends, light yellow at zero
+#: and dark red at the top, so the notebook takes it from the twin unchanged.
+COLORMAP = "YlOrRd"
+
+#: Where no value exists — a head with no profile — the axes show through as
+#: grey hatching. A missing cell must not read as zero, and on this map zero is
+#: the palest colour, so a blank white cell would.
+MISSING_HATCH = "xx"
+MISSING_HATCH_COLOUR = "#9a9a9a"
 
 #: How far a row of attention may be from summing to one before the run says
 #: so. HuggingFace's eager attention softmaxes in fp32 and casts the weights
@@ -269,6 +291,16 @@ def add_arguments(group) -> None:
     group.add_argument("--attention-rank-column", default=None, metavar="COLUMN",
                        help="Rank the bar chart's heads by this head-table "
                             "column instead (largest magnitude first).")
+    group.add_argument("--attention-token-level", action="store_true",
+                       help="Also render, per circuit head, the mean attention "
+                            "from the query positions to every token of the "
+                            "prompt (no Segment summing), one PNG per head "
+                            f"under {SUBDIR}/{TOKEN_LEVEL_SUBDIR}/, grouped by "
+                            "template variant. Read from the same forward "
+                            "passes, so it adds no GPU pass. The per-head JSON "
+                            "twins carry their values only while they total "
+                            f"under {TOKEN_LEVEL_JSON_LIMIT_BYTES // 1_000_000} "
+                            "MB per cell, and are meta-only above it.")
 
 
 def parse_query_positions(value: Optional[str],
@@ -400,7 +432,7 @@ def masses_from_rows(rows: torch.Tensor, ids: torch.Tensor, *, n_segments: int):
 # ==============================================================================
 
 def batch_masses(model, input_ids, attention_mask, *, heads_by_layer,
-                 positions, ids, n_segments):
+                 positions, ids, n_segments, rows_out: Optional[dict] = None):
     """`({(layer, head): [batch, queries, n_segments]}, checks)` for one batch.
 
     One `hooks.attention_weights` call per layer, carrying every circuit head
@@ -414,6 +446,10 @@ def batch_masses(model, input_ids, attention_mask, *, heads_by_layer,
     landed outside the segmentation. Both are written into the output: on a
     bfloat16 model a row sums to one only to about 1e-2, so a reader needs the
     number rather than a promise.
+
+    `rows_out`, when given, receives each head's raw rows `[batch, queries,
+    keys]` on the CPU: the token-level rendering is read from them, so it
+    costs no forward pass of its own.
     """
     from component_analysis import hooks
 
@@ -431,6 +467,8 @@ def batch_masses(model, input_ids, attention_mask, *, heads_by_layer,
         worst_outside = max(worst_outside, float(outside.max()))
         for column, head in enumerate(heads):
             masses[(layer, head)] = per_segment[:, column].cpu()
+            if rows_out is not None:
+                rows_out[(layer, head)] = rows[:, column].float().cpu()
     return masses, {"max_abs_sum_minus_one": worst_sum,
                     "max_outside": worst_outside}
 
@@ -733,7 +771,8 @@ def twin_slices(batches, ctx, overrides, resolved_out: List):
 # ==============================================================================
 
 def collect_condition(ctx, slices, *, head_keys, names, query_names, split,
-                      heads_by_layer) -> Tuple[Profiles, dict]:
+                      heads_by_layer, tokens: Optional["TokenProfiles"] = None,
+                      condition: Optional[str] = None) -> Tuple[Profiles, dict]:
     """Every batch of one condition through the model, into one `Profiles`.
 
     The ids of the instances actually profiled are collected alongside, into
@@ -742,6 +781,9 @@ def collect_condition(ctx, slices, *, head_keys, names, query_names, split,
     instance *counts* but not their instance *ids*, so "paired" would be a
     property of the code path rather than of the file (spec user stories 28 and
     43).
+
+    With `tokens`, the same rows also feed the token-level rendering under
+    `condition`'s name.
     """
     from component_analysis import hooks
 
@@ -757,10 +799,13 @@ def collect_condition(ctx, slices, *, head_keys, names, query_names, split,
             segment.record_id for segment in one.segmentations)
         positions, valid, slots = query_slots(one.segmentations, query_names)
         ids = segment_id_batch(one.segmentations, names, one.input_ids.shape[1])
+        rows = {} if tokens is not None else None
         masses, batch_checks = batch_masses(
             ctx.model, one.input_ids.to(device), one.attention_mask.to(device),
             heads_by_layer=heads_by_layer, positions=positions, ids=ids,
-            n_segments=len(names))
+            n_segments=len(names), rows_out=rows)
+        if tokens is not None:
+            tokens.add(condition, one, rows, valid, slots)
         levels = []
         for record in one.records:
             row = [ALL_LEVEL]
@@ -788,6 +833,29 @@ def count_nan(levels: List[dict]) -> int:
 # ==============================================================================
 # FIGURES
 # ==============================================================================
+
+def colormap():
+    """`COLORMAP` as a matplotlib colormap whose missing cells are transparent,
+    so `show_missing_as_hatching` shows through them."""
+    import matplotlib
+
+    return matplotlib.colormaps[COLORMAP].with_extremes(bad=(0.0, 0.0, 0.0, 0.0))
+
+
+def show_missing_as_hatching(axis) -> None:
+    """Grey hatching behind an image, visible only where a cell is missing."""
+    axis.patch.set_facecolor("white")
+    axis.patch.set_hatch(MISSING_HATCH)
+    axis.patch.set_edgecolor(MISSING_HATCH_COLOUR)
+
+
+def bar_colour():
+    """One colour from `COLORMAP` for bar charts: dark enough to read against
+    white, and from the same warm family as every heatmap beside it."""
+    import matplotlib
+
+    return matplotlib.colormaps[COLORMAP](0.75)
+
 
 def figure_name(stem: str, level: str) -> str:
     """A filename for one split level. `both` levels are `inversion|1`, and a
@@ -850,7 +918,8 @@ def write_heatmaps(ctx, payload: dict) -> List[str]:
         for column, ((condition, level), matrix) in enumerate(zip(panels, matrices)):
             axis = axes[0][column]
             image = axis.imshow(matrix, aspect="auto", vmin=0.0, vmax=1.0,
-                                cmap="magma")
+                                cmap=colormap())
+            show_missing_as_hatching(axis)
             axis.set_xticks(range(len(segment_names)))
             axis.set_xticklabels(segment_names, rotation=90, fontsize=7)
             axis.set_yticks(range(len(labels)))
@@ -869,6 +938,8 @@ def write_heatmaps(ctx, payload: dict) -> List[str]:
         ctx.write_json(SUBDIR, stem + ".json", {
             "figure": stem + ".png",
             "shows": f"attention mass per Segment at {query}",
+            "colormap": COLORMAP,
+            "value_range": [0.0, 1.0],
             "level": level_name,
             "query_position": query,
             "rows": labels,
@@ -947,7 +1018,7 @@ def write_top_heads(ctx, payload: dict) -> Optional[str]:
         figsize=(max(6.0, 0.45 * len(segment_names)), 1.6 * len(shown) + 1.2))
     for position, (name, values) in enumerate(zip(shown, rows)):
         axis = axes[position][0]
-        axis.bar(range(len(segment_names)), values, color="#4c72b0")
+        axis.bar(range(len(segment_names)), values, color=bar_colour())
         axis.set_ylim(0.0, 1.0)
         axis.set_ylabel(labels.get(name, name), fontsize=8)
         axis.tick_params(labelsize=7)
@@ -964,6 +1035,7 @@ def write_top_heads(ctx, payload: dict) -> Optional[str]:
     ctx.write_json(SUBDIR, "top_heads.json", {
         "figure": "top_heads.png",
         "shows": f"{condition['name']} attention mass per Segment at {query}",
+        "colormap": COLORMAP,
         "condition": condition["name"],
         "level": ALL_LEVEL,
         "query_position": query,
@@ -973,6 +1045,456 @@ def write_top_heads(ctx, payload: dict) -> Optional[str]:
         "matrix": rows,
     })
     return path
+
+
+# ==============================================================================
+# TOKEN BY TOKEN
+# ==============================================================================
+#
+# `--attention-token-level`: per circuit head, the mean attention from the
+# query positions to every token of the prompt, with no Segment summing. It is
+# read from the same attention rows as the Segment masses, so it costs no
+# forward pass of its own.
+#
+# Prompts differ in length, so a mean over "position 37" would average
+# different words. Instances are therefore grouped by Template Variant (and,
+# within one, by the order of the Segment runs their tokens fall into, which on
+# the saved SDR split is one order per variant), and a token's place is its
+# run and its offset in that run, counted from whichever end of the run is
+# nearer. A run that is the same width everywhere — the chat shell, the
+# Designation Positions, the question, the stem — then lines up token for
+# token; a run that varies (the intro around the entity name, the Pressure
+# Clause) lines up at both ends and is ragged only in its middle. The Segments
+# are used to line tokens up, never to sum them.
+#
+# Each slot's value is its summed attention divided by the group's instance
+# count, so an instance with no token at a slot contributes nothing there,
+# which is literally what it attended to. Every row then sums to one, and a
+# Segment's tokens sum back to its mass in `patterns.json`.
+
+#: Where the token-level files go, inside `attention/`.
+TOKEN_LEVEL_SUBDIR = "token_level"
+#: The cell's one token-level index: layout, labels, instance ids, colour scale.
+TOKEN_LEVEL_INDEX = "token_level.json"
+#: `<stem>_<head label>.png` and its JSON twin, one per circuit head.
+TOKEN_LEVEL_STEM = "token_level"
+
+#: The per-head JSON twins carry their values only while all of them together
+#: stay under this many bytes per cell; above it every per-head twin is written
+#: meta-only (shape, where the instance ids are, how to regenerate) and the
+#: PNGs are the record. On SDR nls0.3 the full twins are about 1 MB.
+TOKEN_LEVEL_JSON_LIMIT_BYTES = 5_000_000
+
+#: The token-level colour scale: `COLORMAP` through a square-root norm on 0..1.
+#: Most of a head's mass sits on a few tokens (on Llama, often the
+#: `<|begin_of_text|>` sink) and the rest is spread thin over a hundred, so a
+#: linear scale draws everything but the sink at the palest colour. The square
+#: root keeps one fixed scale for every head and every cell, so two PNGs can be
+#: compared by eye, while a mass of 0.01 is a tenth of the way up the map.
+TOKEN_LEVEL_GAMMA = 0.5
+TOKEN_LEVEL_SCALE = {"norm": "power", "gamma": TOKEN_LEVEL_GAMMA,
+                     "vmin": 0.0, "vmax": 1.0}
+
+#: Colour-bar ticks, so a reader of the square-root scale can read a mass off it.
+TOKEN_LEVEL_TICKS = (0.0, 0.01, 0.05, 0.1, 0.25, 0.5, 1.0)
+
+#: How many of a row's largest tokens its twin names, largest first.
+TOKEN_LEVEL_TOP = 8
+
+#: The family of prompts a group's tokens come from. The three conditions on the
+#: task's own prompts share groups and labels; the honest twin is a different
+#: dataset and gets groups of its own.
+PRESSURE_PROMPTS = "pressure"
+TWIN_PROMPTS = "honest_twin"
+
+#: The conditions whose prompts label the slots. Not the honest instruction:
+#: its prompt is its pressure prompt with the clause replaced, so it reads the
+#: pressure prompt's labels, and inside the Pressure Clause its own tokens are
+#: the Matched Honest Instruction's rather than the label shown.
+LABEL_CONDITIONS = (PRESSURE, PRESSURE_PAIRED, HONEST_TWIN)
+
+#: Every condition, in the order rows are drawn.
+TOKEN_LEVEL_ORDER = (PRESSURE, PRESSURE_PAIRED, HONEST_INSTRUCTION, HONEST_TWIN)
+
+#: What a record says when it carries no `template_variant`.
+NO_VARIANT = "-"
+
+
+def segment_runs(segmentation, names: Sequence[str]) -> List[Tuple[str, int]]:
+    """`[(Segment name, width)]`: the prompt as maximal runs of one Segment.
+
+    Interleaved Segments (the intro around its two Item Mentions) are several
+    runs, in prompt order. A token no Segment claims is a run named
+    `UNKNOWN_LEVEL`, which the default segmentation never produces.
+    """
+    ids = segment_ids(segmentation, names, segmentation.n_tokens).tolist()
+    runs: List[List] = []
+    for owner in ids:
+        name = names[owner] if owner >= 0 else UNKNOWN_LEVEL
+        if runs and runs[-1][0] == name:
+            runs[-1][1] += 1
+        else:
+            runs.append([name, 1])
+    return [(name, width) for name, width in runs]
+
+
+def run_slot_keys(runs: Sequence[Tuple[str, int]]) -> List[Tuple[int, str, int]]:
+    """One slot key per token: `(run, side, offset)`, counted from the nearer end.
+
+    The first half of a run of width w (rounded up) is `("L", k)` from its
+    start and the rest `("R", k)` from its end, so two runs of different width
+    agree on their first and last tokens and differ only in the middle.
+    """
+    keys = []
+    for run, (_name, width) in enumerate(runs):
+        left = (width + 1) // 2
+        for k in range(width):
+            keys.append((run, "L", k) if k < left
+                        else (run, "R", width - 1 - k))
+    return keys
+
+
+#: Longest token label drawn on an axis; the twin keeps the whole string.
+AXIS_LABEL_CHARS = 24
+
+
+def axis_label(label: str) -> str:
+    """A slot label cut to `AXIS_LABEL_CHARS`, so one long token cannot take
+    the figure's height."""
+    if len(label) <= AXIS_LABEL_CHARS:
+        return label
+    return label[:AXIS_LABEL_CHARS - 1] + "\u2026"
+
+
+def display_token(text: str) -> str:
+    """A token as an axis label: control characters visible, nothing else changed."""
+    return text.replace("\n", "\\n").replace("\t", "\\t").replace("\r", "\\r")
+
+
+class TokenGroup:
+    """Running sums for one group of prompts that share a token layout."""
+
+    def __init__(self, family: str, variant: str, run_names: tuple, n_heads: int):
+        self.family = family
+        self.variant = variant
+        self.run_names = run_names
+        self.n_heads = n_heads
+        self.widths = [[0, 0] for _ in run_names]          # [left, right] per run
+        self.sums: Dict[tuple, Dict[tuple, "np.ndarray"]] = {}
+        self.present: Dict[tuple, Dict[tuple, int]] = {}
+        self.ids: Dict[tuple, List[str]] = {}
+        self.tokens: Dict[tuple, Dict[int, int]] = {}
+        self.labelled: set = set()
+
+    def add(self, row_key, record_id, slot_keys, values, token_ids, *, label):
+        """One instance: `values` is `[heads, n_tokens]` of this instance's mean
+        attention from the query position, `token_ids` its prompt."""
+        sums = self.sums.setdefault(row_key, {})
+        present = self.present.setdefault(row_key, {})
+        self.ids.setdefault(row_key, []).append(record_id)
+        for position, key in enumerate(slot_keys):
+            run, side, offset = key
+            width = self.widths[run]
+            column = 0 if side == "L" else 1
+            width[column] = max(width[column], offset + 1)
+            if key in sums:
+                sums[key] = sums[key] + values[:, position]
+            else:
+                sums[key] = values[:, position].copy()
+            present[key] = present.get(key, 0) + 1
+        if label and record_id not in self.labelled:
+            self.labelled.add(record_id)
+            for position, key in enumerate(slot_keys):
+                counts = self.tokens.setdefault(key, {})
+                token = int(token_ids[position])
+                counts[token] = counts.get(token, 0) + 1
+
+    def slots(self) -> List[tuple]:
+        """Every slot key in prompt order: a run's left half, then its right."""
+        out = []
+        for run, (left, right) in enumerate(self.widths):
+            out += [(run, "L", k) for k in range(left)]
+            out += [(run, "R", k) for k in reversed(range(right))]
+        return out
+
+
+class TokenProfiles:
+    """Token-level means for every condition, grouped by token layout."""
+
+    def __init__(self, head_keys, names, query_names):
+        self.head_keys = list(head_keys)
+        self.names = list(names)
+        self.query_names = list(query_names)
+        self.groups: Dict[tuple, TokenGroup] = {}
+
+    def add(self, condition: str, one: "Slice", rows: dict, positions_valid,
+            slots) -> None:
+        """One batch of one condition. `rows` is `{(layer, head): [batch,
+        query slots, keys]}`, the raw attention rows of this batch."""
+        stacked = torch.stack([rows[(key[1], key[2])] for key in self.head_keys],
+                              dim=1).float()          # [batch, heads, slots, keys]
+        family = TWIN_PROMPTS if condition == HONEST_TWIN else PRESSURE_PROMPTS
+        label = condition in LABEL_CONDITIONS
+        for row, (record, segmentation) in enumerate(
+                zip(one.records, one.segmentations)):
+            n_tokens = segmentation.n_tokens
+            runs = segment_runs(segmentation, self.names)
+            variant = str(record.get("template_variant") or NO_VARIANT)
+            names = tuple(name for name, _width in runs)
+            group = self.groups.get((family, variant, names))
+            if group is None:
+                group = self.groups[(family, variant, names)] = TokenGroup(
+                    family, variant, names, len(self.head_keys))
+            keys = run_slot_keys(runs)
+            token_ids = one.input_ids[row, :n_tokens].tolist()
+            for query in self.query_names:
+                columns = [i for i, (name, _k) in enumerate(slots)
+                           if name == query and bool(positions_valid[row, i])]
+                if not columns:
+                    continue
+                values = stacked[row][:, columns, :n_tokens].mean(1).numpy()
+                group.add((condition, query), segmentation.record_id, keys,
+                          values, token_ids, label=label)
+
+    def ordered_groups(self) -> List[Tuple[str, TokenGroup]]:
+        """`[(group id, group)]`: the task's prompts first, larger groups first.
+
+        A group id is `<family>/<template variant>`, with `#2`, `#3` after it
+        when one variant holds more than one token layout.
+        """
+        def size(group):
+            return max((len(ids) for ids in group.ids.values()), default=0)
+
+        out, seen = [], {}
+        for family in (PRESSURE_PROMPTS, TWIN_PROMPTS):
+            members = sorted((group for group in self.groups.values()
+                              if group.family == family),
+                             key=lambda group: (-size(group), group.variant))
+            for group in members:
+                base = f"{family}/{group.variant}"
+                seen[base] = seen.get(base, 0) + 1
+                out.append((base if seen[base] == 1 else f"{base}#{seen[base]}",
+                            group))
+        return out
+
+
+def _row_keys(group: TokenGroup, query_names) -> List[tuple]:
+    present = set(group.sums)
+    return [(condition, query) for condition in TOKEN_LEVEL_ORDER
+            for query in query_names if (condition, query) in present]
+
+
+def _row_label(row_key, n: int, query_names) -> str:
+    condition, query = row_key
+    where = f" @ {query}" if len(query_names) > 1 else ""
+    return f"{condition}{where} (n={n})"
+
+
+def token_level_payloads(tokens: TokenProfiles, tokenizer, *, labels) -> Tuple[dict, dict]:
+    """`(index, {head label: full twin})` — everything the figures are drawn from.
+
+    The index holds what every head shares: each group's slots, their labels
+    and Segments, and which instances stand behind each row. A head's twin
+    holds its values and its largest tokens per row.
+    """
+    decoded: Dict[int, str] = {}
+
+    def decode(token: int) -> str:
+        if token not in decoded:
+            decoded[token] = display_token(tokenizer.decode([token]))
+        return decoded[token]
+
+    index_groups, panels_by_head = [], {label: [] for label in labels}
+    for group_id, group in tokens.ordered_groups():
+        slots = group.slots()
+        row_keys = _row_keys(group, tokens.query_names)
+        slot_tokens, slot_share, slot_labels = [], [], []
+        for key in slots:
+            counts = group.tokens.get(key, {})
+            total = sum(counts.values())
+            if not counts:
+                slot_tokens.append(None)
+                slot_share.append(0.0)
+                slot_labels.append("?")
+                continue
+            token, count = max(counts.items(), key=lambda item: (item[1], -item[0]))
+            share = count / total
+            slot_tokens.append(decode(token))
+            slot_share.append(share)
+            slot_labels.append(decode(token) if share == 1.0
+                               else f"{decode(token)} ({share:.0%})")
+        rows_meta = []
+        for row_key in row_keys:
+            n = len(group.ids[row_key])
+            rows_meta.append({
+                "condition": row_key[0], "query_position": row_key[1],
+                "label": _row_label(row_key, n, tokens.query_names),
+                "n_instances": n, "instance_ids": list(group.ids[row_key]),
+                "n_present": [group.present[row_key].get(key, 0) for key in slots]})
+        title = (f"{'honest-twin' if group.family == TWIN_PROMPTS else 'task'} "
+                 f"prompts, template variant {group.variant}: averaged over "
+                 + ", ".join(f"{meta['n_instances']} ({meta['condition']})"
+                             for meta in rows_meta) + " instance(s)")
+        index_groups.append({
+            "group": group_id, "family": group.family,
+            "template_variant": group.variant, "title": title,
+            "n_slots": len(slots),
+            "slot_labels": slot_labels, "slot_tokens": slot_tokens,
+            "slot_token_share": slot_share,
+            "slot_segments": [group.run_names[key[0]] for key in slots],
+            "rows": rows_meta})
+        for position, label in enumerate(labels):
+            rows = []
+            for row_key, meta in zip(row_keys, rows_meta):
+                n = meta["n_instances"]
+                sums = group.sums[row_key]
+                values = [float(sums[key][position]) / n if key in sums else 0.0
+                          for key in slots]
+                top = sorted(range(len(values)), key=lambda i: -values[i])
+                rows.append({
+                    "condition": row_key[0], "query_position": row_key[1],
+                    "label": meta["label"], "n_instances": n, "values": values,
+                    "top_tokens": [{"slot": i, "token": slot_labels[i],
+                                    "segment": index_groups[-1]["slot_segments"][i],
+                                    "mass": values[i]}
+                                   for i in top[:TOKEN_LEVEL_TOP]]})
+            panels_by_head[label].append({"group": group_id, "title": title,
+                                          "rows": rows})
+    index = {"groups": index_groups}
+    return index, panels_by_head
+
+
+def plot_token_level(path: str, twin: dict, groups: Dict[str, dict]) -> None:
+    """One head: a panel per group, a row per condition, a column per token."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from matplotlib.colors import PowerNorm
+
+    panels = twin["panels"]
+    widest = max((groups[panel["group"]]["n_slots"] for panel in panels),
+                 default=1)
+    # Room under each panel for its rotated token labels, from the longest one:
+    # about 0.6 of the font size per character, at 5.5 pt.
+    labels_of = {panel["group"]: [axis_label(one) for one in
+                                  groups[panel["group"]]["slot_labels"]]
+                 for panel in panels}
+    heights = [0.3 * max(1, len(panel["rows"])) + 0.9
+               + max((len(one) for one in labels_of[panel["group"]]), default=1)
+               * 5.5 * 0.6 / 72.0
+               for panel in panels]
+    figure, axes = plt.subplots(
+        max(1, len(panels)), 1, squeeze=False, constrained_layout=True,
+        figsize=(max(8.0, 0.12 * widest + 3.0), sum(heights) + 0.8),
+        gridspec_kw={"height_ratios": heights or [1.0]})
+    norm = PowerNorm(gamma=TOKEN_LEVEL_GAMMA, vmin=0.0, vmax=1.0)
+    for axis, panel in zip(axes[:, 0], panels):
+        group = groups[panel["group"]]
+        matrix = [row["values"] for row in panel["rows"]]
+        image = axis.imshow(matrix, aspect="auto", cmap=colormap(), norm=norm,
+                            interpolation="nearest")
+        show_missing_as_hatching(axis)
+        axis.set_xticks(range(group["n_slots"]))
+        axis.set_xticklabels(labels_of[panel["group"]], rotation=90,
+                             fontsize=5.5)
+        axis.set_yticks(range(len(panel["rows"])))
+        axis.set_yticklabels([row["label"] for row in panel["rows"]], fontsize=7)
+        axis.set_title(panel["title"], fontsize=8)
+        figure.colorbar(image, ax=axis, fraction=0.02, pad=0.01,
+                        ticks=TOKEN_LEVEL_TICKS)
+    figure.suptitle(twin["title"], fontsize=9)
+    figure.savefig(path, dpi=150)
+    plt.close(figure)
+
+
+def write_token_level(ctx, tokens: TokenProfiles, payload: dict) -> dict:
+    """Every head's PNG and twin, and the index; returns what `patterns.json`
+    says about them."""
+    subdir = os.path.join(SUBDIR, TOKEN_LEVEL_SUBDIR)
+    directory = ctx.subdir(subdir)
+    components = payload["components"]
+    labels = [one["label"] for one in components]
+    index, panels_by_head = token_level_payloads(tokens, ctx.tokenizer,
+                                                 labels=labels)
+    groups = {group["group"]: group for group in index["groups"]}
+    queries = ", ".join(tokens.query_names)
+
+    twins = {}
+    for component in components:
+        label = component["label"]
+        twins[label] = {
+            "figure": f"{TOKEN_LEVEL_STEM}_{label}.png",
+            "shows": (f"{label}'s mean attention from {queries} to every "
+                      f"token of the prompt, no Segment summing"),
+            "title": (f"{label}: attention from {queries} to every token, "
+                      f"mean over instances (n per row); colour "
+                      f"{COLORMAP}, square-root scale 0 to 1"),
+            "head": component["key"], "label": label,
+            "colormap": COLORMAP, "colour_scale": TOKEN_LEVEL_SCALE,
+            "index": TOKEN_LEVEL_INDEX, "payload": "full",
+            "panels": panels_by_head[label]}
+    full_bytes = sum(len(json.dumps(twin, indent=2)) for twin in twins.values())
+    full = full_bytes <= TOKEN_LEVEL_JSON_LIMIT_BYTES
+    regenerate = (
+        "Rerun analyze_components.py into this cell with the circuit bindings "
+        "recorded in head_table.json's meta and --analyses attention_patterns "
+        "--attention-token-level, after raising "
+        "attention_patterns.TOKEN_LEVEL_JSON_LIMIT_BYTES above full_twins_bytes. "
+        "The PNGs are complete either way.")
+
+    heads = []
+    for component in components:
+        label = component["label"]
+        twin = twins[label]
+        plot_token_level(os.path.join(directory, twin["figure"]), twin, groups)
+        if not full:
+            twin = {key: value for key, value in twin.items() if key != "panels"}
+            twin.update(
+                payload="meta-only",
+                shape=[{"group": panel["group"], "rows": len(panel["rows"]),
+                        "slots": groups[panel["group"]]["n_slots"]}
+                       for panel in panels_by_head[label]],
+                instance_ids=(f"in {TOKEN_LEVEL_INDEX}, under "
+                              f"groups[].rows[].instance_ids"),
+                json_limit_bytes=TOKEN_LEVEL_JSON_LIMIT_BYTES,
+                full_twins_bytes=full_bytes, regenerate=regenerate)
+        name = f"{TOKEN_LEVEL_STEM}_{label}.json"
+        ctx.write_json(subdir, name, twin)
+        heads.append({"key": component["key"], "label": label,
+                      "figure": twin["figure"], "twin": name})
+
+    ctx.write_json(subdir, TOKEN_LEVEL_INDEX, {
+        "analysis": NAME, "schema_version": SCHEMA_VERSION,
+        "task": payload["task"], "circuit": payload["circuit"],
+        "shows": (f"mean attention from {queries} to every token of the "
+                  f"prompt, per circuit head; one PNG per head"),
+        "colormap": COLORMAP, "colour_scale": TOKEN_LEVEL_SCALE,
+        "query_positions": list(tokens.query_names),
+        "level": ALL_LEVEL,
+        "alignment": ("instances grouped by template variant and Segment-run "
+                      "order; a token's slot is its run and its offset from "
+                      "the nearer end of that run, so runs of varying width "
+                      "are ragged only in the middle"),
+        "values": ("summed attention over the group's instances divided by "
+                   "the group's instance count, so every row sums to one and a "
+                   "Segment's slots sum to its mass in patterns.json; "
+                   "n_present says how many instances have a token at a slot"),
+        "labels": ("the most common token at the slot among the group's "
+                   "pressure-prompt (or honest-twin) instances, with the share "
+                   "carrying it when it is not all of them; the "
+                   "honest_instruction row reads the pressure labels, and "
+                   "inside the Pressure Clause its own tokens are the Matched "
+                   "Honest Instruction's"),
+        "payload": "full" if full else "meta-only",
+        "json_limit_bytes": TOKEN_LEVEL_JSON_LIMIT_BYTES,
+        "full_twins_bytes": full_bytes,
+        "regenerate": regenerate,
+        "heads": heads, **index})
+    return {"index": f"{TOKEN_LEVEL_SUBDIR}/{TOKEN_LEVEL_INDEX}",
+            "payload": "full" if full else "meta-only",
+            "full_twins_bytes": full_bytes,
+            "json_limit_bytes": TOKEN_LEVEL_JSON_LIMIT_BYTES,
+            "n_heads": len(heads)}
 
 
 # ==============================================================================
@@ -1155,6 +1677,9 @@ def estimate(ctx) -> str:
             parts.append(f"honest twin (descriptive): none — {directory} "
                          f"could not be loaded ({failure})")
 
+    if getattr(ctx.cli, "attention_token_level", False):
+        parts.append(f"token-level: one PNG per head ({len(heads)}), read from "
+                     f"the same forwards, no extra pass")
     parts.append(f"about {_duration(total)} on an A40 in total, plus the "
                  f"figures")
     return "; ".join(parts)
@@ -1179,12 +1704,15 @@ def run(ctx) -> dict:
         "column_query_position": column_query,
         "segments": names,
         "sum_tolerance": SUM_TOLERANCE,
+        "colormap": COLORMAP,
         "components": [{"key": list(one.key), "name": component_key_name(one.key),
                         "label": head_label(one.key), "layer": one.layer,
                         "index": one.index, "kv_group": one.kv_group}
                        for one in heads],
         "conditions": [],
         "skipped": [],
+        # What --attention-token-level wrote, or None when it was not asked for.
+        "token_level": None,
     }
 
     if ctx.model is None:
@@ -1204,6 +1732,8 @@ def run(ctx) -> dict:
               "query_names": query, "split": split,
               "heads_by_layer": heads_by_layer}
     wanted = wanted_conditions(ctx.cli)
+    tokens = (TokenProfiles(shared["head_keys"], names, query)
+              if getattr(ctx.cli, "attention_token_level", False) else None)
 
     # --- pressure, over the whole test split --------------------------------
     if PRESSURE not in wanted:
@@ -1214,7 +1744,8 @@ def run(ctx) -> dict:
         missing: List[str] = []
         batches = ctx.descriptive_batches()
         profiles, checks = collect_condition(
-            ctx, pressure_slices(batches, ctx.segmentations, missing), **shared)
+            ctx, pressure_slices(batches, ctx.segmentations, missing), **shared,
+            tokens=tokens, condition=PRESSURE)
         notes = []
         if missing:
             notes.append(f"{len(missing)} instance(s) of the loader's split "
@@ -1235,7 +1766,8 @@ def run(ctx) -> dict:
 
         # The left term first, over exactly the rows the honest side will read.
         left, left_checks = collect_condition(
-            ctx, pressure_paired_slices(causal, ctx.segmentations), **shared)
+            ctx, pressure_paired_slices(causal, ctx.segmentations), **shared,
+            tokens=tokens, condition=PRESSURE_PAIRED)
         payload["conditions"].append(_condition_json(
             PRESSURE_PAIRED, "pressure (paired subset)", True, causal, left,
             left_checks,
@@ -1253,7 +1785,7 @@ def run(ctx) -> dict:
                   "examples_outside_the_clause": []}
         profiles, checks = collect_condition(
             ctx, honest_instruction_slices(causal, ctx.segmentations, report),
-            **shared)
+            **shared, tokens=tokens, condition=HONEST_INSTRUCTION)
         notes = [f"paired with the {PRESSURE_PAIRED} condition, instance by "
                  f"instance; {n_paired} of {causal.report['n_instances']} "
                  f"sampled instances have a Matched Honest Instruction",
@@ -1282,7 +1814,8 @@ def run(ctx) -> dict:
         overrides = segs.parse_segment_overrides(getattr(ctx.cli, "segment", None))
         resolved: List = []
         profiles, checks = collect_condition(
-            ctx, twin_slices(twin, ctx, overrides, resolved), **shared)
+            ctx, twin_slices(twin, ctx, overrides, resolved), **shared,
+            tokens=tokens, condition=HONEST_TWIN)
         _write_twin_segmentation(ctx, resolved, directory, overrides)
         payload["conditions"].append(_condition_json(
             "honest_twin", "honest twin", False, twin, profiles, checks,
@@ -1293,6 +1826,8 @@ def run(ctx) -> dict:
              f"{TWIN_SEGMENTATION_FILE}"],
             dataset=directory))
 
+    if tokens is not None:
+        payload["token_level"] = write_token_level(ctx, tokens, payload)
     ctx.write_json(SUBDIR, PATTERNS_FILE, payload)
     write_heatmaps(ctx, payload)
     write_top_heads(ctx, payload)
