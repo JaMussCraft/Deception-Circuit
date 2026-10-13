@@ -35,3 +35,34 @@ def test_a_cell_without_coverage_is_reported_as_such(capsys):
     _check_cell().check(os.path.join(FIXTURES, "attention_dla"))
 
     assert "no per-column coverage" in capsys.readouterr().out
+
+
+def test_a_legacy_path_patching_cell_is_reported_in_its_legacy_sign(capsys):
+    _check_cell().check(os.path.join(FIXTURES, "path_patching"))
+
+    printed = capsys.readouterr().out
+    assert "path-patching sign: legacy" in printed
+
+
+def test_a_cell_mixing_both_path_patching_signs_is_called_out(tmp_path, capsys):
+    """A run since 2026-10-13 into a legacy cell rewrites only the files of
+    the counterfactuals it ran; the others keep their old sign beside them."""
+    import json
+    import shutil
+
+    from component_analysis import path_patching as pp
+
+    target = str(tmp_path / "cell")
+    shutil.copytree(os.path.join(FIXTURES, "path_patching"), target)
+    path = os.path.join(target, "path_patching", "heatmap.json")
+    with open(path) as handle:
+        payload = json.load(handle)
+    payload["metric"] = pp.metric_meta(pp.ITEM_SWAP)
+    with open(path, "w") as handle:
+        json.dump(payload, handle)
+
+    _check_cell().check(target)
+
+    printed = capsys.readouterr().out
+    assert "path-patching sign: MIXED" in printed
+    assert "heatmap.json" in printed

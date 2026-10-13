@@ -908,12 +908,19 @@ def _receiver_labels(columns: Sequence) -> List[str]:
     return [one["key"] if isinstance(one, dict) else str(one) for one in columns]
 
 
+def _convention(payload: dict) -> str:
+    """The sign sentence for one path-patching figure, from its own marker."""
+    return path_patching.convention_sentence(payload.get("metric"))
+
+
 def path_patching_views(results_dir: str) -> "Group":
     """Both passes of both counterfactuals: agnostic grid, direct effect, Segments.
 
-    The sign convention differs from knockout's on purpose (block D decision,
-    2026-09-16), so every view carries its own JSON's `metric.sign` sentence
-    rather than a convention this module assumes.
+    Path patching's sign flipped on 2026-10-13 to agree with knockout, and a
+    cell written before keeps its old sign. So every figure states, in its
+    subtitle, the convention its own JSON's `metric.convention` marker records
+    (`path_patching.convention_sentence`), and shows the values as the file
+    holds them: a legacy cell is labelled, never re-signed.
     """
     # `heatmap*.json` anchors at the start of the basename, so the Segment
     # pass's `segments_heatmap*.json` is not caught here.
@@ -935,7 +942,7 @@ def path_patching_views(results_dir: str) -> "Group":
             title=f"position-agnostic path patching ({counterfactual})",
             subtitle=(f"sender rows into receiver columns · "
                       f"{scale.get('cells_beyond_the_scale')} cell(s) beyond "
-                      f"the colour scale"),
+                      f"the colour scale · {_convention(payload)}"),
             rows=[str(one) for one in payload.get("rows", [])],
             columns=_receiver_labels(payload.get("columns", [])),
             values=[list(row) for row in payload.get("values", [])],
@@ -948,7 +955,8 @@ def path_patching_views(results_dir: str) -> "Group":
         items.append(Bars(
             title=f"direct effect on the Readout "
                   f"({payload.get('counterfactual', '?')})",
-            subtitle=f"receiver {payload.get('receiver')}",
+            subtitle=(f"receiver {payload.get('receiver')} · "
+                      f"{_convention(payload)}"),
             labels=[one.get("sender") for one in senders],
             values=[one.get("mean") for one in senders],
             errors=[one.get("se") for one in senders],
@@ -961,7 +969,8 @@ def path_patching_views(results_dir: str) -> "Group":
                   f"({payload.get('counterfactual', '?')})",
             subtitle=(f"only the sender-receiver pairs clearing "
                       f"{payload.get('threshold')} of the clean-minus-"
-                      f"counterfactual gap were swept by Segment"),
+                      f"counterfactual gap were swept by Segment · "
+                      f"{_convention(payload)}"),
             rows=[str(one) for one in payload.get("rows", [])],
             columns=[str(one) for one in payload.get("columns", [])],
             values=[list(row) for row in payload.get("values", [])],
@@ -975,6 +984,23 @@ def path_patching_views(results_dir: str) -> "Group":
                  items=items, notes=seen)
 
 
+def path_patching_conventions(results_dir: str) -> Dict[str, str]:
+    """`{file name: sign convention}` for every path-patching JSON in a cell.
+
+    One value normally. Two when a run since 2026-10-13 went into a legacy
+    cell: it rewrites only the files of the counterfactuals and passes it ran,
+    so the rest keep the old sign beside the new — each figure still says
+    which it is, and this is how a reader of the whole cell finds out.
+    """
+    out = {}
+    for path in found(results_dir, PATH_PATCHING_SUBDIR, "*.json"):
+        payload = read_json(path)
+        if isinstance(payload, dict) and "metric" in payload:
+            out[os.path.basename(path)] = path_patching.convention_of(
+                payload.get("metric"))
+    return out
+
+
 def sweep_view(results_dir: str) -> Bars:
     """Every head and MLP block as a sender into the Readout, ranked."""
     path = os.path.join(results_dir, PATH_PATCHING_SUBDIR, SWEEP_BARS_JSON)
@@ -986,7 +1012,7 @@ def sweep_view(results_dir: str) -> Bars:
         title=f"Completeness sweep into the Readout "
               f"({payload.get('counterfactual', '?')})",
         subtitle=(f"top {payload.get('n_shown')} of {payload.get('n_senders')} "
-                  f"senders swept"),
+                  f"senders swept · {_convention(payload)}"),
         labels=[one.get("sender") for one in senders],
         values=[one.get("mean") for one in senders],
         errors=[one.get("se") for one in senders],

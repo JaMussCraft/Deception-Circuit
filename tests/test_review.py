@@ -380,6 +380,71 @@ def test_the_segment_pass_records_the_threshold_that_selected_its_cells():
     assert segments.rows[0] == "mlp.31.0->readout"
 
 
+def path_figures(group):
+    return [one for one in group.items]
+
+
+def test_a_legacy_cell_s_path_figures_say_their_sign_in_the_subtitle():
+    """The fixtures are a cell written before 2026-10-13: no convention
+    marker, so every figure is read in the legacy sign and says so where the
+    figure is read, not only in a note under the group."""
+    group = review.path_patching_views(cell("path_patching"))
+    for one in path_figures(group):
+        assert "legacy sign" in one.subtitle, one.title
+        assert "negative = the path helps" in one.subtitle, one.title
+    assert "legacy sign" in review.sweep_view(cell("sweep")).subtitle
+
+
+def as_new_convention(source, target):
+    """A copy of a legacy fixture cell as a run since 2026-10-13 writes it:
+    the convention marker in every metric block and every value negated."""
+    import shutil
+
+    from component_analysis import path_patching as pp
+
+    shutil.copytree(source, target)
+    directory = os.path.join(target, "path_patching")
+    for name in os.listdir(directory):
+        path = os.path.join(directory, name)
+        with open(path) as handle:
+            payload = json.load(handle)
+        payload["metric"] = pp.metric_meta(payload.get("counterfactual",
+                                                       pp.ITEM_SWAP))
+        if "values" in payload:
+            payload["values"] = [[None if one is None else -one for one in row]
+                                 for row in payload["values"]]
+        for entry in payload.get("senders", []):
+            if isinstance(entry, dict) and entry.get("mean") is not None:
+                entry["mean"] = -entry["mean"]
+        with open(path, "w") as handle:
+            json.dump(payload, handle)
+    return target
+
+
+def test_a_new_cell_s_path_figures_say_positive_helps_deception(tmp_path):
+    new = as_new_convention(cell("path_patching"), str(tmp_path / "new"))
+    group = review.path_patching_views(new)
+    for one in path_figures(group):
+        assert "positive = the path helps the deceptive answer" in \
+            one.subtitle, one.title
+        assert "legacy" not in one.subtitle, one.title
+
+    old = review.path_patching_views(cell("path_patching"))
+    first_new = [one for one in group.items if one.title ==
+                 "position-agnostic path patching (item_swap)"][0]
+    first_old = [one for one in old.items if one.title ==
+                 "position-agnostic path patching (item_swap)"][0]
+    assert first_new.values[0][0] == -first_old.values[0][0], \
+        "values are shown as the file holds them, never re-signed"
+
+
+def test_a_new_sweep_says_positive_helps_deception(tmp_path):
+    new = as_new_convention(cell("sweep"), str(tmp_path / "new"))
+    view = review.sweep_view(new)
+    assert "positive = the path helps the deceptive answer" in view.subtitle
+    assert view.values[0] == pytest.approx(-0.12747240484895883)
+
+
 def test_the_completeness_sweep_ranks_every_sender_and_flags_non_circuit_ones():
     view = review.sweep_view(cell("sweep"))
     assert view
