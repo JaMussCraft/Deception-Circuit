@@ -278,3 +278,135 @@ def test_the_json_is_valid_json_and_the_png_is_a_png(sdr_run, cli_model):
     with open(os.path.join(str(out), *CELL, knockout.SUBDIR,
                            knockout.PNG_NAME), "rb") as handle:
         assert handle.read(8) == b"\x89PNG\r\n\x1a\n"
+
+
+# ==============================================================================
+# THE COMPLETENESS SWEEP (ticket 15)
+# ==============================================================================
+
+def test_the_sweep_covers_every_component_the_model_s_geometry_declares(
+        model, batch):
+    effects = knockout.sweep_effects(model, [batch])
+
+    shape = hooks.geometry(model)
+    declared = [key for key in hooks.all_component_keys(model)
+                if key != hooks.EMBED_KEY]
+    assert effects.keys == declared
+    assert len(effects.keys) == shape["num_layers"] * (shape["num_heads"] + 1)
+    assert set(effects.keys) == set(ALL_COMPONENTS)
+
+
+def test_a_circuit_component_s_sweep_entry_is_its_single_knockout_exactly(
+        model, batch):
+    """Equal, not approximately equal: the sweep is ticket 07's loop over more
+    groups, and capturing every Component on the corrupt pass changes no
+    number."""
+    circuit = [("head", 1, 2), ("mlp", 0, 0), ("head", 0, 1)]
+
+    swept = knockout.sweep_effects(model, [batch, batch])
+    single = knockout.knockout_effects(model, [batch, batch], circuit)
+
+    read = swept.restrict(circuit)
+    assert read.clean_logit_difference == single.clean_logit_difference
+    assert read.knocked_logit_difference == single.knocked_logit_difference
+    assert knockout.summarize(read) == knockout.summarize(single)
+
+
+def run_knockout(run_dir, out, *extra):
+    return run_cli(str(run_dir), "--num-kv-heads", "2", "--analyses", "knockout",
+                   "--device", "cpu", "--output-dir", str(out), *extra)
+
+
+def test_a_sweep_run_writes_the_sweep_json_and_png_beside_the_singles(
+        sdr_run, cli_model):
+    run_dir, out, _records = sdr_run
+
+    assert run_knockout(run_dir, out, "--knockout-completeness-sweep") == 0
+
+    written = written_files(out)
+    for name in (knockout.JSON_NAME, knockout.PNG_NAME,
+                 knockout.SWEEP_JSON_NAME, knockout.SWEEP_PNG_NAME):
+        assert os.path.join(*CELL, knockout.SUBDIR, name) in written
+    with open(os.path.join(str(out), *CELL, knockout.SUBDIR,
+                           knockout.SWEEP_PNG_NAME), "rb") as handle:
+        assert handle.read(8) == b"\x89PNG\r\n\x1a\n"
+
+    sweep = read_json(out, *CELL, knockout.SUBDIR, knockout.SWEEP_JSON_NAME)
+    assert sweep["n_components"] == len(ALL_COMPONENTS)
+    assert sorted(tuple(one["key"]) for one in sweep["components"]) == \
+        sorted(ALL_COMPONENTS)
+    assert [one["rank"] for one in sweep["components"]] == \
+        list(range(1, len(ALL_COMPONENTS) + 1))
+    assert sweep["cost"]["forwards"] > 0 and sweep["cost"]["wall_seconds"] > 0
+
+
+def test_the_sweep_s_circuit_entries_are_knockout_json_s_numbers_exactly(
+        sdr_run, cli_model):
+    run_dir, out, _records = sdr_run
+    run_knockout(run_dir, out, "--knockout-completeness-sweep")
+
+    singles = read_json(out, *CELL, knockout.SUBDIR, knockout.JSON_NAME)
+    sweep = read_json(out, *CELL, knockout.SUBDIR, knockout.SWEEP_JSON_NAME)
+
+    assert sweep["instances"] == singles["instances"]
+    assert sweep["clean_run"] == singles["clean_run"]
+    swept = {tuple(one["key"]): one for one in sweep["components"]}
+    assert singles["components"]
+    for one in singles["components"]:
+        entry = swept[tuple(one["key"])]
+        assert entry["in_circuit"] is True
+        for field in ("mean_drop", "standard_error", "accuracy",
+                      "knocked_logit_difference", "n"):
+            assert entry[field] == one[field]
+    assert sum(1 for one in sweep["components"] if one["in_circuit"]) == \
+        len(singles["components"])
+
+
+def test_knockout_json_is_the_same_with_and_without_the_sweep(
+        sdr_run, cli_model, tmp_path):
+    run_dir, out, _records = sdr_run
+    run_knockout(run_dir, out)
+    alone = read_json(out, *CELL, knockout.SUBDIR, knockout.JSON_NAME)
+
+    run_knockout(run_dir, tmp_path / "swept", "--knockout-completeness-sweep")
+    swept = read_json(tmp_path / "swept", *CELL, knockout.SUBDIR,
+                      knockout.JSON_NAME)
+
+    assert swept == alone
+
+
+def test_the_sweep_columns_land_on_circuit_rows_only_with_their_coverage(
+        sdr_run, cli_model):
+    from component_analysis.head_table import coverage_of
+
+    run_dir, out, _records = sdr_run
+    run_knockout(run_dir, out, "--knockout-completeness-sweep",
+                 "--knockout-sweep-threshold", "0")
+
+    singles = read_json(out, *CELL, knockout.SUBDIR, knockout.JSON_NAME)
+    sweep = read_json(out, *CELL, knockout.SUBDIR, knockout.SWEEP_JSON_NAME)
+    table = read_json(out, *CELL, "head_table.json")
+
+    # Threshold 0 flags every outsider, and still none becomes a row.
+    assert len(sweep["flagged"]) == len(ALL_COMPONENTS) - len(table["rows"])
+    assert len(table["rows"]) == singles["n_components"]
+    swept = {tuple(one["key"]): one for one in sweep["components"]}
+    for row in table["rows"]:
+        entry = swept[(row["kind"], row["layer"], row["index"])]
+        assert row["knockout.sweep_rank"] == entry["rank"]
+        assert row["knockout.sweep_clears_threshold"] is True
+    for column in knockout.SWEEP_COLUMNS:
+        entry = coverage_of(table["meta"], f"{knockout.NAME}.{column}")
+        assert entry["instance_ids"] == sweep["instances"]
+        assert entry["instance_set"].startswith("causal_sample")
+
+
+def test_without_the_flag_there_is_no_sweep_file_and_no_sweep_column(
+        sdr_run, cli_model):
+    run_dir, out, _records = sdr_run
+    run_knockout(run_dir, out)
+
+    assert not os.path.exists(os.path.join(str(out), *CELL, knockout.SUBDIR,
+                                           knockout.SWEEP_JSON_NAME))
+    table = read_json(out, *CELL, "head_table.json")
+    assert "knockout.sweep_rank" not in table["columns"]

@@ -44,6 +44,7 @@ from __future__ import annotations
 import argparse
 import math
 import os
+import time
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
@@ -131,6 +132,28 @@ class Effects:
         """Clean minus knocked-out, per instance. Positive helps deception."""
         return [clean - knocked for clean, knocked
                 in zip(self.clean_logit_difference, self.knocked_logit_difference[key])]
+
+    def restrict(self, keys) -> "Effects":
+        """The same run, read for `keys` only, in that order.
+
+        How the completeness sweep hands the circuit's single knockouts to
+        `knockout.json`: they were among the forwards the sweep ran, so they
+        are read out of it rather than run again, and the two files cannot
+        disagree.
+        """
+        keys = [row_key(one) for one in keys]
+        absent = [one for one in keys if one not in self.knocked_logit_difference]
+        if absent:
+            raise ValueError(
+                f"{len(absent)} Component(s) were not knocked out in this run, "
+                f"the first being {absent[0]}; a restriction can only read "
+                f"numbers the run measured")
+        return Effects(ids=list(self.ids), keys=keys,
+                       clean_logit_difference=list(self.clean_logit_difference),
+                       knocked_logit_difference={
+                           key: list(self.knocked_logit_difference[key])
+                           for key in keys},
+                       scheme=self.scheme, report=dict(self.report))
 
 
 def _accuracy(values) -> Optional[float]:
@@ -507,6 +530,184 @@ def family_payload(effects: Effects, families, *, circuit: str, task: str,
 
 
 # ==============================================================================
+# THE COMPLETENESS SWEEP
+# ==============================================================================
+#
+# The single knockouts rank the circuit's own Components; a Component the
+# pruning missed is invisible to them. `--knockout-completeness-sweep` knocks
+# out every head and MLP block of the model, one at a time, with the same
+# interchange ablation on the same causal sample, through the same
+# `knock_out_groups` call — the circuit's singles are read out of the sweep's
+# forwards (`Effects.restrict`), so `knockout.json` and `sweep.json` share one
+# clean and one corrupt pass per batch and agree to the bit.
+
+SWEEP_JSON_NAME = "sweep.json"
+SWEEP_PNG_NAME = "sweep.png"
+
+#: The head-table columns the sweep adds, for circuit Components only. Kept
+#: apart from `COLUMNS`, which ticket 03 and the coverage tests pin.
+SWEEP_COLUMNS = ("sweep_rank", "sweep_clears_threshold")
+
+#: `--knockout-sweep-threshold`'s default, in **logits** of
+#: logit(Target) - logit(Distractor), not a fraction of the clean-minus-corrupt
+#: gap as `--path-sweep-threshold` is. Why 0.1 on SDR nls0.3 (ticket 07's
+#: job 22110635): it is about twice the standard error of the strong circuit
+#: Components (0.03 to 0.07), so a listed drop is not one standard error of
+#: noise on a strong head; it is about 3% of the 3.26 clean-minus-corrupt gap;
+#: and four of the circuit's eighteen clear it (L17H25 +0.45, L31 MLP +0.31,
+#: L5H11 +0.15, L14H22 +0.11), so a flagged outsider is as strong as the
+#: circuit's top four. The JSON also counts what clears `THRESHOLD_LADDER`,
+#: so the cut can be moved without a rerun.
+DEFAULT_SWEEP_THRESHOLD = 0.1
+THRESHOLD_LADDER = (0.02, 0.05, 0.1, 0.2)
+
+#: How many Components the bar chart draws; the JSON carries all of them.
+SWEEP_BAR_TOP = 40
+
+
+def sweep_size(geometry: dict) -> int:
+    """How many Components the sweep knocks out: every head and MLP block."""
+    return geometry["num_layers"] * (geometry["num_heads"] + 1)
+
+
+def sweep_components(model) -> List[tuple]:
+    """Every head and MLP block of the model, in run order.
+
+    The model's own sender list less the embedding, which is not a Component:
+    interchange-ablating it is running the corrupt prompt.
+    """
+    from component_analysis import hooks
+
+    return [key for key in hooks.all_component_keys(model)
+            if key[0] in ("head", "mlp")]
+
+
+def sweep_effects(model, batches, *, scheme=SCHEME) -> Effects:
+    """Knock out every head and MLP block of the model, one at a time.
+
+    `knock_out_groups` with one-member groups, as `knockout_effects` calls it:
+    per batch one clean pass, one corrupt pass capturing every Component, and
+    one pass per Component.
+    """
+    return knockout_effects(model, batches, sweep_components(model),
+                            scheme=scheme)
+
+
+def _label_of(key) -> str:
+    """`head.17.25`, `mlp.31.0`: the path-patching sweep's spelling, so the
+    two sweeps' lists can be compared by eye and by string."""
+    return f"{key[0]}.{key[1]}.{key[2]}"
+
+
+def summarize_sweep(effects: Effects, circuit_keys, *, threshold: float,
+                    heads_per_group: Optional[int] = None) -> List[dict]:
+    """Every Component, ranked by the size of its drop, circuit marked.
+
+    Ranked by **|drop|**, not by the signed drop `knockout.rank` uses: the
+    sweep asks which Components matter that the circuit lacks, and a strong
+    suppressor outside the circuit is one of those answers. The sign stays in
+    `mean_drop` (positive helps deception) and `signed_rank` is knockout's own
+    ranking of the same rows. `flagged` is a Component outside the circuit
+    whose |drop| is at least `threshold`.
+    """
+    inside = {row_key(one) for one in circuit_keys}
+    signed = summarize(effects)
+    for row in signed:
+        row["signed_rank"] = row.pop("rank")
+
+    def strength(row):
+        return abs(row["mean_drop"]) if row["mean_drop"] is not None else -1.0
+
+    # `summarize` returns the signed order; re-sort from the run's own key
+    # order so that ties keep model order rather than the signed order.
+    by_key = {row["key"]: row for row in signed}
+    rows = sorted((by_key[key] for key in effects.keys), key=strength,
+                  reverse=True)
+    for rank, row in enumerate(rows, start=1):
+        key = row["key"]
+        measured = row["mean_drop"] is not None
+        se = row["standard_error"]
+        row.update({
+            "label": _label_of(key),
+            "rank": rank if measured else None,
+            "kv_group": (key[2] // heads_per_group
+                         if heads_per_group and key[0] == "head" else None),
+            "in_circuit": key in inside,
+            "z": (row["mean_drop"] / se) if measured and se else None,
+            "clears_threshold": measured and abs(row["mean_drop"]) >= threshold,
+        })
+        row["flagged"] = row["clears_threshold"] and not row["in_circuit"]
+    return rows
+
+
+def sweep_columns(rows) -> dict:
+    """`{circuit Component key: {sweep_rank, sweep_clears_threshold}}`.
+
+    Circuit Components only. A Component outside the circuit stays in
+    `sweep.json`, flagged or not, and never becomes a head-table row: the
+    table is the circuit's.
+    """
+    return {row_key(row["key"]): {"sweep_rank": row["rank"],
+                                  "sweep_clears_threshold": row["clears_threshold"]}
+            for row in rows if row["in_circuit"]}
+
+
+def threshold_counts(rows, ladder=THRESHOLD_LADDER) -> List[dict]:
+    """How many Components, inside and outside the circuit, clear each cut."""
+    out = []
+    for cut in ladder:
+        clearing = [row for row in rows if row["mean_drop"] is not None
+                    and abs(row["mean_drop"]) >= cut]
+        out.append({"threshold": cut,
+                    "outside_circuit": sum(1 for row in clearing
+                                           if not row["in_circuit"]),
+                    "in_circuit": sum(1 for row in clearing if row["in_circuit"])})
+    return out
+
+
+def sweep_payload(effects: Effects, rows, *, circuit: str, task: str,
+                  threshold: float, cost: Optional[dict] = None,
+                  top: int = 10) -> dict:
+    """`sweep.json`: every Component ranked, and the twin of `sweep.png`."""
+    single = payload(effects, circuit=circuit, task=task, rows=[])
+    rows = list(rows)
+    shown = [row for row in rows if row["rank"] is not None][:SWEEP_BAR_TOP]
+    as_json = [{**row, "key": list(row["key"])} for row in rows]
+    return {
+        **{key: value for key, value in single.items()
+           if key not in ("components", "n_components")},
+        "analysis": NAME,
+        "pass": "completeness_sweep",
+        "metric": {**single["metric"],
+                   "ranking": ("rank is by |drop|, strongest first, so a "
+                               "Component that opposes deception ranks beside "
+                               "one that helps it; the sign is in mean_drop. "
+                               "signed_rank is knockout's own ranking (rank 1 "
+                               "helps deception most), the one knockout.rank "
+                               "uses inside the circuit"),
+                   "figure": SWEEP_PNG_NAME},
+        "threshold": threshold,
+        "threshold_units": ("logits of logit(Target) - logit(Distractor), not "
+                            "a fraction of the clean-minus-corrupt gap"),
+        "threshold_flag": "--knockout-sweep-threshold",
+        "flagged_means": ("outside the circuit and |mean_drop| >= threshold; "
+                          "listed here, never added to the head table"),
+        "n_components": len(rows),
+        "n_in_circuit": sum(1 for row in rows if row["in_circuit"]),
+        "flagged": [row["label"] for row in rows if row["flagged"]],
+        "threshold_counts": threshold_counts(rows),
+        "strongest_outside_circuit": [
+            {**row, "key": list(row["key"])} for row in rows
+            if not row["in_circuit"] and row["rank"] is not None][:top],
+        "figure": {"file": SWEEP_PNG_NAME, "n_shown": len(shown),
+                   "shows": f"the {len(shown)} strongest by |drop|, circuit "
+                            f"Components highlighted"},
+        "cost": cost or {},
+        "components": as_json,
+    }
+
+
+# ==============================================================================
 # THE FIGURE
 # ==============================================================================
 
@@ -628,9 +829,80 @@ def write_family_figure(path: str, rows, *, title: str = "") -> str:
     return path
 
 
+#: Circuit bars and the rest. Told apart by lightness as well as hue, so the
+#: highlight survives a blue-light filter and a greyscale print: a dark
+#: burnt orange against a light grey, and the circuit's tick labels in bold.
+SWEEP_CIRCUIT_COLOUR = "#b4471b"
+SWEEP_OTHER_COLOUR = "#b9c0c7"
+
+
+def write_sweep_figure(path: str, rows, *, threshold: float,
+                       title: str = "") -> str:
+    """The strongest `SWEEP_BAR_TOP` Components by |drop|, circuit highlighted.
+
+    Horizontal bars in rank order, signed, so a Component that opposes
+    deception sits left of zero; dotted lines at plus and minus the threshold.
+    Every number drawn is a row of `sweep.json`.
+    """
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from matplotlib.patches import Patch
+
+    top = [row for row in rows if row["rank"] is not None][:SWEEP_BAR_TOP]
+    if not top:
+        raise ValueError("no Component to plot; the sweep scored none")
+
+    height = max(2.5, 0.26 * len(top) + 1.6)
+    figure, axes = plt.subplots(figsize=(8.0, height))
+    positions = list(range(len(top)))
+    axes.barh(positions, [row["mean_drop"] for row in top],
+              xerr=[row["standard_error"] or 0.0 for row in top],
+              color=[SWEEP_CIRCUIT_COLOUR if row["in_circuit"]
+                     else SWEEP_OTHER_COLOUR for row in top],
+              edgecolor="none", height=0.7,
+              error_kw={"ecolor": "#4a525a", "elinewidth": 0.9, "capsize": 2})
+    axes.set_yticks(positions)
+    axes.set_yticklabels([_label(row) for row in top], fontsize=8)
+    for tick, row in zip(axes.get_yticklabels(), top):
+        if row["in_circuit"]:
+            tick.set_fontweight("bold")
+    axes.invert_yaxis()
+    axes.axvline(0.0, color="#333a40", linewidth=1.0)
+    for sign in (1, -1):
+        axes.axvline(sign * threshold, color="#333a40", linewidth=0.8,
+                     linestyle=":")
+    axes.set_xlabel("drop in logit(Target) - logit(Distractor)\n"
+                    "(positive: the Component helps deception; dotted: "
+                    f"threshold {threshold:g})", fontsize=9)
+    axes.set_title(title or "Knockout completeness sweep", fontsize=10)
+    axes.legend(handles=[Patch(color=SWEEP_CIRCUIT_COLOUR, label="in the circuit"),
+                         Patch(color=SWEEP_OTHER_COLOUR, label="not in the circuit")],
+                loc="lower right", fontsize=8, frameon=False)
+    axes.grid(axis="x", color="#d6dade", linewidth=0.6)
+    axes.set_axisbelow(True)
+    for edge in ("top", "right", "left"):
+        axes.spines[edge].set_visible(False)
+    axes.tick_params(axis="both", length=0, labelsize=8)
+
+    figure.tight_layout()
+    figure.savefig(path, dpi=160)
+    plt.close(figure)
+    return path
+
+
 # ==============================================================================
 # THE ANALYSIS
 # ==============================================================================
+
+def _non_negative(value) -> float:
+    number = float(value)
+    if number < 0:
+        raise argparse.ArgumentTypeError(
+            f"--knockout-sweep-threshold is a size of drop and cannot be "
+            f"negative; got {value}")
+    return number
+
 
 def add_arguments(group) -> None:
     group.add_argument("--knockout-scheme", type=resolve_scheme, default=SCHEME,
@@ -653,6 +925,32 @@ def add_arguments(group) -> None:
                             "are copied back into the table it writes; roles "
                             "for Components outside this circuit are dropped "
                             "and counted in knockout_families.json.")
+    group.add_argument("--knockout-completeness-sweep", action="store_true",
+                       help="Also knock out every head and MLP block of the "
+                            "whole model, one at a time, on the same causal "
+                            "sample, and write knockout/sweep.json and "
+                            "sweep.png ranked by |drop| with circuit "
+                            "membership marked. The circuit's own single "
+                            "knockouts are read from the same forwards. About "
+                            "1056 forwards per batch on an 8B model; "
+                            "--dry-run prints the cost.")
+    group.add_argument("--knockout-sweep-threshold", type=_non_negative,
+                       default=DEFAULT_SWEEP_THRESHOLD,
+                       help="A Component outside the circuit whose |drop| "
+                            "is at least this many logits is listed as "
+                            "flagged in sweep.json (never added to the head "
+                            "table). Logits of logit(Target) - "
+                            "logit(Distractor), not a fraction of the gap "
+                            "like --path-sweep-threshold. Default "
+                            f"{DEFAULT_SWEEP_THRESHOLD}: about twice the "
+                            "standard error of the circuit's strong "
+                            "Components on SDR nls0.3, and 3%% of its "
+                            "clean-minus-corrupt gap.")
+
+
+def sweep_threshold(ctx) -> float:
+    return float(getattr(ctx.cli, "knockout_sweep_threshold",
+                         DEFAULT_SWEEP_THRESHOLD))
 
 
 def roles_source(ctx) -> str:
@@ -719,6 +1017,21 @@ def estimate(ctx) -> str:
             f"{passes * SECONDS_PER_FORWARD / 60:.1f} min on an A40, over "
             f"{batches.n_instances} instance(s); scheme "
             f"{resolve_scheme(getattr(ctx.cli, 'knockout_scheme', SCHEME))}")
+    if getattr(ctx.cli, "knockout_completeness_sweep", False):
+        shape = ctx.intake.geometry
+        n_swept = sweep_size(shape)
+        swept = len(batches) * (n_swept + 2)
+        line = (f"completeness sweep: {n_swept} Component(s) of the model "
+                f"({shape['num_layers']} layers x ({shape['num_heads']} heads "
+                f"+ 1 MLP block)) x {len(batches)} batch(es) of "
+                f"{batches.report['batch_size']} (+2 shared clean and corrupt "
+                f"passes per batch) = {swept} forward pass(es), about "
+                f"{swept * SECONDS_PER_FORWARD / 60:.1f} min on an A40, over "
+                f"{batches.n_instances} instance(s); the circuit's "
+                f"{len(ctx.components)} single knockout(s) are read from the "
+                f"same forwards, not added; flagged outside the circuit at "
+                f"threshold {sweep_threshold(ctx):g} logits; scheme "
+                f"{resolve_scheme(getattr(ctx.cli, 'knockout_scheme', SCHEME))}")
     if not getattr(ctx.cli, "knockout_families", False):
         return line
     families, dropped = families_for(ctx)
@@ -730,6 +1043,45 @@ def estimate(ctx) -> str:
             f"about {family_passes * SECONDS_PER_FORWARD / 60:.1f} min")
 
 
+def _write_sweep(ctx, swept: Effects, wall: float, *, scheme: str,
+                 updates: dict) -> None:
+    """`sweep.json`, `sweep.png`, and the two sweep columns on circuit rows."""
+    from component_analysis import hooks
+
+    threshold = sweep_threshold(ctx)
+    per_group = hooks.geometry(ctx.model)["heads_per_group"]
+    rows = summarize_sweep(swept, ctx.keys, threshold=threshold,
+                           heads_per_group=per_group)
+    n_batches = len(ctx.causal_batches())
+    forwards = n_batches * (len(swept.keys) + 2)
+    cost = {"forwards": forwards, "n_batches": n_batches,
+            "wall_seconds": wall,
+            "seconds_per_forward": wall / forwards if forwards else None,
+            "estimate_seconds_per_forward": SECONDS_PER_FORWARD,
+            "note": ("per batch one clean pass, one corrupt pass capturing "
+                     "every Component, and one pass per Component; the "
+                     "circuit's single knockouts are among them")}
+    ctx.write_json(SUBDIR, SWEEP_JSON_NAME,
+                   sweep_payload(swept, rows, circuit=ctx.circuit_spec.label,
+                                 task=ctx.task_spec.name, threshold=threshold,
+                                 cost=cost))
+    write_sweep_figure(
+        os.path.join(ctx.subdir(SUBDIR), SWEEP_PNG_NAME), rows,
+        threshold=threshold,
+        title=f"{ctx.circuit_spec.label} x {ctx.task_spec.name}: {scheme} "
+              f"knockout of every Component of the model\nstrongest "
+              f"{min(SWEEP_BAR_TOP, len(rows))} of {len(rows)} by |drop|")
+    for key, values in sweep_columns(rows).items():
+        updates.setdefault(key, {}).update(values)
+    ctx.declare_coverage(SWEEP_COLUMNS, instance_ids=swept.ids,
+                         instance_set=INSTANCE_SET)
+    flagged = [row["label"] for row in rows if row["flagged"]]
+    print(f"    knockout sweep: {len(rows)} Component(s) in {wall:.0f} s; "
+          f"{len(flagged)} outside the circuit clear {threshold:g}"
+          + (f": {', '.join(flagged[:10])}{' ...' if len(flagged) > 10 else ''}"
+             if flagged else ""))
+
+
 def run(ctx) -> dict:
     """Knock out every Component, write the JSON and the PNG, return the columns."""
     scheme = resolve_scheme(getattr(ctx.cli, "knockout_scheme", SCHEME))
@@ -738,7 +1090,18 @@ def run(ctx) -> dict:
     families, dropped = families_for(ctx) \
         if getattr(ctx.cli, "knockout_families", False) else (None, [])
     batches = ctx.causal_batches()
-    effects = knockout_effects(ctx.model, batches, ctx.components, scheme=scheme)
+    swept = None
+    if getattr(ctx.cli, "knockout_completeness_sweep", False):
+        # One loop over every Component of the model; the circuit's singles
+        # are read out of it, so the two files share their clean and corrupt
+        # passes and agree to the bit.
+        started = time.perf_counter()
+        swept = sweep_effects(ctx.model, batches, scheme=scheme)
+        wall = time.perf_counter() - started
+        effects = swept.restrict(ctx.keys)
+    else:
+        effects = knockout_effects(ctx.model, batches, ctx.components,
+                                   scheme=scheme)
 
     rows = summarize(effects, ctx.components)
     ctx.write_json(SUBDIR, JSON_NAME,
@@ -750,6 +1113,8 @@ def run(ctx) -> dict:
     updates = columns(rows)
     ctx.declare_coverage(COLUMNS, instance_ids=effects.ids,
                          instance_set=INSTANCE_SET)
+    if swept is not None:
+        _write_sweep(ctx, swept, wall, scheme=scheme, updates=updates)
     if families is None:
         return updates
 

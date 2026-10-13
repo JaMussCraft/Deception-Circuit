@@ -882,6 +882,46 @@ def family_knockout_view(results_dir: str) -> Bars:
     return view
 
 
+def knockout_sweep_view(results_dir: str) -> Bars:
+    """Every head and MLP block of the model knocked out, strongest first.
+
+    The strongest `knockout.SWEEP_BAR_TOP` by |drop|, as `sweep.png` draws
+    them; `sweep.json` holds all of them.
+    """
+    path = os.path.join(results_dir, KNOCKOUT_SUBDIR, knockout.SWEEP_JSON_NAME)
+    payload = read_json(path)
+    if payload is None:
+        return Missing(
+            what="knockout completeness sweep",
+            note=f"no knockout completeness sweep in this cell — looked for "
+                 f"{knockout.SUBDIR}/{knockout.SWEEP_JSON_NAME}. It is "
+                 f"written by the knockout analysis under "
+                 f"--knockout-completeness-sweep.",
+            paths=(path,))
+    rows = [row for row in payload.get("components", [])
+            if row.get("rank") is not None][:knockout.SWEEP_BAR_TOP]
+    metric = payload.get("metric", {})
+    flagged = payload.get("flagged") or []
+    return Bars(
+        title="Knockout completeness sweep",
+        subtitle=(f"strongest {len(rows)} of {payload.get('n_components')} "
+                  f"Components by |drop| · {payload.get('n_in_circuit')} in "
+                  f"the circuit · {payload.get('scheme')} ablation"),
+        labels=[row.get("label") for row in rows],
+        values=[row.get("mean_drop") for row in rows],
+        errors=[row.get("standard_error") for row in rows],
+        hover=[("in the circuit" if row.get("in_circuit")
+                else "not in the circuit")
+               + (" · flagged" if row.get("flagged") else "")
+               + f" · rank {row.get('rank')} (signed {row.get('signed_rank')})"
+               for row in rows],
+        notes=[metric.get("sign", ""), metric.get("ranking", ""),
+               f"{len(flagged)} Component(s) outside the circuit clear "
+               f"{payload.get('threshold')} "
+               f"{payload.get('threshold_units', '')}"
+               + (f": {', '.join(flagged)}" if flagged else "")])
+
+
 def _knockout_bars(payload: dict, *, title: str) -> Bars:
     rows = payload.get("components") or payload.get("families") or []
     clean = payload.get("clean_run", {})

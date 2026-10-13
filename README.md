@@ -412,6 +412,9 @@ and the whole `--path-counterfactual both` job with the Segment pass and the
 sweep 40 minutes (ticket 14). The sweep runs on the grid's own causal sample
 (`--n-causal`, 100 by default), so its columns and the grid's cover one
 instance set.
+The knockout completeness sweep (`--knockout-completeness-sweep`, every head
+and MLP block of the model knocked out on the same 100 instances as the single
+knockouts) is 1058 forwards per batch; `--dry-run` prints its estimate.
 A shorter `--time` backfills sooner on a busy queue. Logs land in
 `logs/analyze_components_<jobid>.out`. Run `--dry-run` on the login node before
 every submission: it resolves the circuits, the Segments and the causal sample,
@@ -430,7 +433,8 @@ outputs/_analyses/<suite-name>/<circuit-label>/<task-label>/
   sample.json                        the fixed-seed causal sample and its strata
   attention/                         patterns*.json/.png, top_heads.json/.png
   dla/                               dla.*, logit_lens.*, the paired twins
-  knockout/                          knockout.json/.png
+  knockout/                          knockout.json/.png, knockout_families.*,
+                                     sweep.json/.png (--knockout-completeness-sweep)
   path_patching/                     agnostic, segments, sweep, and their figures
 ```
 

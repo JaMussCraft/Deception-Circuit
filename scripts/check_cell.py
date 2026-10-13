@@ -31,6 +31,7 @@ VIEWS = (
     ("logit lens", review.logit_lens_views),
     ("knockout", review.knockout_view),
     ("family knockout", review.family_knockout_view),
+    ("knockout sweep", review.knockout_sweep_view),
     ("path patching", review.path_patching_views),
     ("completeness sweep", review.sweep_view),
     ("segmentation", review.segmentation_view),
