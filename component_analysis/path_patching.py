@@ -127,17 +127,28 @@ COUNTERFACTUALS = (ITEM_SWAP, HONEST_INSTRUCTION)
 BOTH = "both"
 
 #: What each counterfactual appends to a head-table column's bare name. The
-#: item-swap columns keep the names ticket 08 wrote, so a head table from before
-#: this ticket still reads; the honest ones are spelled out in full rather than
-#: as `_honest`, because `dla` already has both a `honest_instruction` column
-#: and a `honest_twin_descriptive` one and `_honest` would not say which.
-COLUMN_SUFFIX = {ITEM_SWAP: "", HONEST_INSTRUCTION: "_honest_instruction"}
+#: item-swap columns keep the names ticket 08 wrote. The honest ones are spelled
+#: out in full rather than as `_honest`, because `dla` has both a paired
+#: honest-instruction column and an unpaired honest-twin one, and end in
+#: `_paired` because they are computed over the same instance ids on both sides
+#: (the researcher's 2026-10-13 decision). Before it they ended in
+#: `_honest_instruction`, which `head_table.LEGACY_COLUMNS` translates.
+COLUMN_SUFFIX = {ITEM_SWAP: "", HONEST_INSTRUCTION: "_honest_instruction_paired"}
 
 #: The bare names this analysis writes per Component per counterfactual, before
 #: the suffix and before the head table's own `path_patching.` namespace.
 COLUMN_NAMES = ("strongest_incoming", "strongest_incoming_effect",
                 "strongest_outgoing", "strongest_outgoing_effect",
                 "direct_effect", "direct_effect_se")
+
+#: The completeness sweep's bare names, suffixed the same way.
+SWEEP_COLUMN_NAMES = ("sweep_direct_effect", "sweep_direct_effect_se",
+                      "sweep_rank", "sweep_in_circuit", "sweep_flagged")
+
+#: The instance set each counterfactual's columns cover, by name, for the head
+#: table's coverage meta: the causal sample, or its paired subset.
+INSTANCE_SETS = {ITEM_SWAP: "causal_sample",
+                 HONEST_INSTRUCTION: "paired_honest_instruction"}
 
 #: The heatmap's colour for a (sender, receiver) pair that is not a path, so
 #: that "no cell" never reads as "an effect of zero".
@@ -900,8 +911,10 @@ def run(ctx) -> dict:
             _merge(updates, {key: dict.fromkeys(COLUMN_NAMES)
                              for key in grid.senders if key != EMBED_KEY},
                    counterfactual)
+            _declare(ctx, COLUMN_NAMES, [], counterfactual)
             continue
         _merge(updates, head_table_columns(grid, summaries), counterfactual)
+        _declare(ctx, COLUMN_NAMES, measured_ids(tally), counterfactual)
         segment_pass(ctx, grid, batches, counterfactual, summaries)
 
     # Last, and in its own loop over the batches, because it is the most
@@ -911,7 +924,24 @@ def run(ctx) -> dict:
         counterfactual = sweep_counterfactual(ctx)
         payload = completeness_sweep(ctx, grid, batches, counterfactual)
         _merge(updates, sweep_columns(payload), counterfactual)
+        _declare(ctx, SWEEP_COLUMN_NAMES, payload["sample"]["instance_ids"],
+                 counterfactual)
     return updates
+
+
+def measured_ids(tally) -> List[str]:
+    """The instances a pass's means are over: those it saw, less any whose
+    clean-minus-counterfactual gap excluded them."""
+    excluded = set(tally.excluded)
+    return [one for one in tally.used_ids if one not in excluded]
+
+
+def _declare(ctx, names, instance_ids, counterfactual: str) -> None:
+    """One counterfactual's columns, declared over the instances they cover."""
+    suffix = COLUMN_SUFFIX[counterfactual]
+    ctx.declare_coverage([f"{name}{suffix}" for name in names],
+                         instance_ids=instance_ids,
+                         instance_set=INSTANCE_SETS[counterfactual])
 
 
 def sweep_counterfactual(ctx) -> str:

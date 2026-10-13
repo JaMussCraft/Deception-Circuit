@@ -406,3 +406,20 @@ def test_the_two_thresholds_are_separate_flags_with_one_default():
     assert parser.get_default("path_position_threshold") == \
         pp.DEFAULT_POSITION_THRESHOLD == 0.05
     assert parser.get_default("path_sweep_threshold") is None
+
+
+def test_the_honest_instruction_columns_say_paired_in_their_names():
+    """Computed over the same instance ids on both sides, so `paired` is in the
+    name (the researcher's 2026-10-13 decision); the item swap's names are
+    ticket 08's and do not move."""
+    assert pp.COLUMN_SUFFIX[pp.ITEM_SWAP] == ""
+    assert pp.COLUMN_SUFFIX[pp.HONEST_INSTRUCTION] == "_honest_instruction_paired"
+
+
+def test_the_legacy_names_cover_every_column_this_module_writes():
+    from component_analysis import head_table
+
+    for name in pp.COLUMN_NAMES + pp.SWEEP_COLUMN_NAMES:
+        old = f"{pp.NAME}.{name}_honest_instruction"
+        assert head_table.LEGACY_COLUMNS[old] == \
+            f"{pp.NAME}.{name}{pp.COLUMN_SUFFIX[pp.HONEST_INSTRUCTION]}"

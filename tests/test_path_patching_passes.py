@@ -557,11 +557,24 @@ def test_both_counterfactuals_give_the_head_table_one_column_set_each(
 
     table = read_json(out, *CELL, "head_table.json")
     assert f"{pp.NAME}.direct_effect" in table["columns"]
-    assert f"{pp.NAME}.direct_effect_honest_instruction" in table["columns"]
+    assert f"{pp.NAME}.direct_effect_honest_instruction_paired" in table["columns"]
     assert all(row[f"{pp.NAME}.direct_effect"] is not None
                for row in table["rows"])
-    assert all(row[f"{pp.NAME}.direct_effect_honest_instruction"] is None
+    assert all(row[f"{pp.NAME}.direct_effect_honest_instruction_paired"] is None
                for row in table["rows"])
+
+    # The coverage, per column, in the table's meta (ticket 13): the item swap
+    # over the sample it ran on, the skipped honest pass over nothing.
+    from component_analysis.head_table import coverage_of
+
+    meta = table["meta"]
+    for name in pp.COLUMN_NAMES:
+        swap_entry = coverage_of(meta, f"{pp.NAME}.{name}")
+        assert swap_entry["n"] == len(swap["sample"]["instance_ids"])
+        assert swap_entry["instance_set"].startswith("causal_sample")
+        honest_entry = coverage_of(
+            meta, f"{pp.NAME}.{name}_honest_instruction_paired")
+        assert honest_entry["n"] == 0 and honest_entry["instance_set"] is None
 
 
 # ==============================================================================
@@ -781,3 +794,10 @@ def test_a_strong_component_outside_the_circuit_gets_a_row_of_its_own(
     assert len(flagged) == 7
     assert all(not row[f"{pp.NAME}.sweep_in_circuit"] for row in flagged)
     assert all(row[f"{pp.NAME}.sweep_rank"] is not None for row in table["rows"])
+
+    from component_analysis.head_table import coverage_of
+
+    sweep = read_json(out, *CELL, pp.SUBDIR, pp.SWEEP_FILE)
+    entry = coverage_of(table["meta"], f"{pp.NAME}.sweep_direct_effect")
+    assert entry["n"] == sweep["sample"]["n_instances"] > 0
+    assert set(entry["instance_ids"]) == set(sweep["sample"]["instance_ids"])
