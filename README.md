@@ -438,6 +438,14 @@ of the analyses it runs and carries every other column forward — the other
 analyses', the roles pass's `roles.*` and the researcher's `role_confirmed`
 alike. A `--dry-run` into a cell replaces nothing. So the descriptive trio in
 one job and path patching in another leave one table with all four analyses.
+**A rerun replaces its analysis's whole namespace**, not only the columns that
+run writes: a `path_patching` job with `--path-counterfactual item_swap` and no
+`--path-completeness-sweep` into a cell that held both counterfactuals and the
+sweep leaves the `*_honest_instruction_paired` and `sweep_*` columns empty.
+Rerun an analysis with every option the cell already holds, or into a new
+suite. A run into a cell written before 2026-10-13 also writes its table back
+under the current column names, and records the translation in the meta's
+`renamed_columns`.
 
 **Column names say what they compare.** A column computed over the same
 instance ids on both sides of a contrast carries `paired` in its name

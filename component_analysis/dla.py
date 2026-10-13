@@ -91,6 +91,8 @@ import math
 import os
 from typing import Dict, List, Optional, Sequence
 
+from component_analysis import head_table as ht
+
 NAME = "dla"
 SUBDIR = "dla"
 
@@ -1288,11 +1290,11 @@ COLUMN_SOURCES = {
 #: The instance set each condition is measured over, by name, for the head
 #: table's coverage meta. The three paired conditions share one: the same ids.
 INSTANCE_SETS = {
-    PRESSURE: "test_split",
-    PRESSURE_PAIRED: "paired_honest_instruction",
-    HONEST_INSTRUCTION: "paired_honest_instruction",
-    DIFFERENTIAL: "paired_honest_instruction",
-    HONEST_TWIN: "honest_twin_split",
+    PRESSURE: ht.TEST_SPLIT,
+    PRESSURE_PAIRED: ht.PAIRED_HONEST_INSTRUCTION,
+    HONEST_INSTRUCTION: ht.PAIRED_HONEST_INSTRUCTION,
+    DIFFERENTIAL: ht.PAIRED_HONEST_INSTRUCTION,
+    HONEST_TWIN: ht.HONEST_TWIN_SPLIT,
 }
 
 

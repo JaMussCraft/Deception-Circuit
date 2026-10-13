@@ -52,9 +52,13 @@ def check(results_dir: str) -> int:
             if view_of is review.head_table_view:
                 # What an agent would otherwise only see in the notebook: a
                 # cell read under renamed columns, or one with no coverage.
-                for note in view.notes:
-                    if "paired" in note or "coverage" in note:
-                        print(f"           note: {note}")
+                if view.renamed_columns:
+                    print("           legacy names read as: " + ", ".join(
+                        f"{old} -> {new}"
+                        for old, new in view.renamed_columns.items()))
+                if not view.coverage:
+                    print("           no per-column coverage in the meta "
+                          "(written before ticket 13)")
         else:
             print(f"  Missing  {label}: {view.note}")
             missing += 1

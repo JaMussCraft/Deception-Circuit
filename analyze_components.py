@@ -72,10 +72,10 @@ from component_analysis import dataloaders, instances, intake, registry, samplin
 from component_analysis import segmentation as segments
 from component_analysis.components import circuit_components, count_components, \
     is_component_of
-from component_analysis.head_table import BASE_COLUMNS, COVERAGE, \
-    INSTANCE_SETS, JSON_NAME as TABLE_JSON, LEGACY_COLUMNS, PROTECTED_COLUMNS, \
-    add_coverage, merge_columns, modernize_columns, row_key, \
-    rows_from_components, write_head_table
+from component_analysis.head_table import BASE_COLUMNS, COVERAGE_KEY, \
+    INSTANCE_SETS_KEY, JSON_NAME as TABLE_JSON, PROTECTED_COLUMNS, RENAMED_KEY, \
+    add_coverage, is_appended_row, merge_columns, modernize_columns, \
+    modernize_meta, row_key, rows_from_components, write_head_table
 from evaluation import circuits as circuit_intake
 
 #: Descriptive analyses run over this split; the causal sample is drawn from it.
@@ -243,7 +243,7 @@ def carry_forward(cell_dir: str, rows, *, replaced=()) -> tuple:
     with open(path) as handle:
         table = json.load(handle)
     old_rows, renamed = modernize_columns(table.get("rows", []))
-    old_meta = table.get("meta") or {}
+    old_meta = modernize_meta(table.get("meta"), renamed)
     replaced = set(replaced)
 
     fresh = {row_key(row) for row in rows}
@@ -253,7 +253,7 @@ def carry_forward(cell_dir: str, rows, *, replaced=()) -> tuple:
         values = {column: value for column, value in row.items()
                   if not _rebuilt(column, replaced)}
         if key not in fresh:
-            if row.get("active_neuron_count") is not None:
+            if not is_appended_row(row):
                 continue           # an intake row of a circuit this one is not
             if all(value is None for value in values.values()):
                 continue           # appended by an analysis that is rerunning
@@ -265,15 +265,10 @@ def carry_forward(cell_dir: str, rows, *, replaced=()) -> tuple:
 
     kept = {column for values in carried.values() for column in values}
     meta = {name: value for name, value in old_meta.items()
-            if name not in INTAKE_META + (COVERAGE, INSTANCE_SETS)}
-    coverage = {LEGACY_COLUMNS.get(column, column): entry for column, entry
-                in (old_meta.get(COVERAGE) or {}).items()}
-    meta[COVERAGE] = {column: entry for column, entry in coverage.items()
-                      if column in kept}
-    meta[INSTANCE_SETS] = dict(old_meta.get(INSTANCE_SETS) or {})
-    if renamed:
-        meta["renamed_columns"] = {**(old_meta.get("renamed_columns") or {}),
-                                   **renamed}
+            if name not in INTAKE_META}
+    meta[COVERAGE_KEY] = {column: entry for column, entry
+                          in (old_meta.get(COVERAGE_KEY) or {}).items()
+                          if column in kept}
     return out, meta
 
 
@@ -290,10 +285,10 @@ def print_carried(rows, meta) -> None:
                          for column in columns})
     print(f"    carried forward from the cell's head table: {len(columns)} "
           f"column(s) under {', '.join(namespaces)}")
-    if meta.get("renamed_columns"):
-        print(f"    !! legacy column names translated: "
+    if meta.get(RENAMED_KEY):
+        print("    !! legacy column names translated: "
               + ", ".join(f"{old} -> {new}" for old, new
-                          in meta["renamed_columns"].items()))
+                          in meta[RENAMED_KEY].items()))
 
 
 def write_cell(cell_dir: str, circuit_spec, task_spec, rows, components,

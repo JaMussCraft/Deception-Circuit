@@ -348,12 +348,12 @@ def head_table_view(results_dir: str) -> Table:
         row["label"] = component_label(row)
     columns = []
     for column in payload.get("columns", []):
-        column = head_table.LEGACY_COLUMNS.get(column, column)
+        column = head_table.current_name(column)
         if column not in columns:
             columns.append(column)
     roles = role_columns(columns)
     families = family_columns(columns)
-    meta = payload.get("meta", {})
+    meta = head_table.modernize_meta(payload.get("meta", {}))
     coverage = {}
     for column in columns:
         entry = head_table.coverage_of(meta, column)

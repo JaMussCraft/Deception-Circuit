@@ -119,8 +119,12 @@ columns of three analyses (`dla.honest_instruction` to
 the derived `roles.direct_support_honest_instruction`). It is a departure from
 "no existing column is renamed" above, made deliberately and limited to names:
 
-- no value and no sign changes, and no output of record is rewritten — the
-  cells of record keep the names they were written with;
+- no value and no sign changes, and nothing rewrites a cell of record for the
+  rename — the cells of record keep the names they were written with until
+  something is run into them: a later roles pass or `analyze_components.py`
+  run into a legacy cell (a dry run included) writes its head table back
+  under the current names, with the same values, and records each
+  translation in the meta's `renamed_columns`;
 - every reader translates an old name through one map,
   `head_table.LEGACY_COLUMNS`, so an old cell reads under the new names (the
   roles pass, the notebook seam and `analyze_components.py`'s carry-forward

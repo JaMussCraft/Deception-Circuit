@@ -60,9 +60,9 @@ import time
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
-from component_analysis.head_table import BASE_COLUMNS, COVERAGE, \
-    INSTANCE_SETS, JSON_NAME as TABLE_JSON, KEY_COLUMNS, LEGACY_COLUMNS, \
-    PROTECTED_COLUMNS, merge_columns, modernize_columns, row_key, \
+from component_analysis.head_table import BASE_COLUMNS, COVERAGE_KEY, \
+    INSTANCE_SETS_KEY, JSON_NAME as TABLE_JSON, KEY_COLUMNS, PROTECTED_COLUMNS, \
+    RENAMED_KEY, merge_columns, modernize_columns, modernize_meta, row_key, \
     write_head_table
 
 NAME = "roles"
@@ -635,7 +635,7 @@ def payload(decisions: List[Decision], *, cell_dir: str, thresholds: Thresholds,
         "counts": counts(decisions),
         "flavour_counts": flavour_counts(decisions),
         #: Legacy column names translated on the way in, old -> current.
-        "renamed_columns": dict(renamed or {}),
+        RENAMED_KEY: dict(renamed or {}),
         "n_components": len(decisions),
         "components": [one.as_dict() for one in decisions],
     }
@@ -740,11 +740,7 @@ def read_table(cell_dir: str) -> tuple:
     with open(path) as handle:
         table = json.load(handle)
     rows, renamed = modernize_columns(table["rows"])
-    meta = dict(table.get("meta") or {})
-    if meta.get(COVERAGE):
-        meta[COVERAGE] = {LEGACY_COLUMNS.get(column, column): entry
-                          for column, entry in meta[COVERAGE].items()}
-    return rows, meta, renamed
+    return rows, modernize_meta(table.get("meta")), renamed
 
 
 #: Never copied by `--roles-merge-from`: the key identifies the row, the intake
@@ -770,12 +766,12 @@ def merge_cells(rows, cell_dirs, *, meta: dict = None) -> tuple:
     for cell_dir in cell_dirs:
         other, other_meta, renamed = read_table(cell_dir)
         renamed_all.update(renamed)
-        coverage = dict(meta.get(COVERAGE) or {})
-        for column, entry in (other_meta.get(COVERAGE) or {}).items():
+        coverage = dict(meta.get(COVERAGE_KEY) or {})
+        for column, entry in (other_meta.get(COVERAGE_KEY) or {}).items():
             coverage.setdefault(column, entry)
-        meta[COVERAGE] = coverage
-        meta[INSTANCE_SETS] = {**(other_meta.get(INSTANCE_SETS) or {}),
-                               **(meta.get(INSTANCE_SETS) or {})}
+        meta[COVERAGE_KEY] = coverage
+        meta[INSTANCE_SETS_KEY] = {**(other_meta.get(INSTANCE_SETS_KEY) or {}),
+                                   **(meta.get(INSTANCE_SETS_KEY) or {})}
         updates = {}
         for one in other:
             key = row_key(one)
@@ -799,12 +795,12 @@ def merge_cells(rows, cell_dirs, *, meta: dict = None) -> tuple:
 def derived_coverage(meta: dict) -> dict:
     """The meta with each derived column given its source column's coverage."""
     meta = dict(meta or {})
-    coverage = dict(meta.get(COVERAGE) or {})
+    coverage = dict(meta.get(COVERAGE_KEY) or {})
     for column, source in DERIVED_FROM.items():
         if source in coverage:
             coverage[f"{NAME}.{column}"] = dict(coverage[source])
     if coverage:
-        meta[COVERAGE] = coverage
+        meta[COVERAGE_KEY] = coverage
     return meta
 
 
@@ -845,10 +841,7 @@ def main(argv=None) -> int:
         return 0
 
     rows = merge_columns(rows, columns(decisions), namespace=NAME)
-    meta = derived_coverage(meta)
-    if renamed:
-        meta["renamed_columns"] = {**(meta.get("renamed_columns") or {}),
-                                   **renamed}
+    meta = modernize_meta(derived_coverage(meta), renamed)
     meta["roles"] = {"criteria_doc": CRITERIA_DOC,
                      "thresholds": thresholds.as_dict(),
                      "merged_from": list(cli.roles_merge_from),

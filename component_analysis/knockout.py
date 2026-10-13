@@ -50,7 +50,7 @@ from typing import Dict, List, Optional
 # The head table's own key coercion: a Component, a (kind, layer, index)
 # tuple or a key read back out of JSON all become one tuple, so a row here
 # and a row there cannot disagree about what names a Component.
-from component_analysis.head_table import row_key
+from component_analysis.head_table import CAUSAL_SAMPLE, row_key
 
 NAME = "knockout"
 SUBDIR = "knockout"
@@ -220,7 +220,7 @@ COLUMNS = ("logit_diff_drop", "rank", "standard_error", "accuracy")
 
 #: The instance set every knockout column covers, by name, for the head table's
 #: coverage meta: the causal sample, as far as the loader could tokenize it.
-INSTANCE_SET = "causal_sample"
+INSTANCE_SET = CAUSAL_SAMPLE
 
 
 def columns(rows) -> dict:

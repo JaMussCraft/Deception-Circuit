@@ -73,7 +73,8 @@ import time
 from dataclasses import dataclass, field
 from typing import Dict, List, Sequence, Tuple
 
-from component_analysis.head_table import row_key
+from component_analysis.head_table import CAUSAL_SAMPLE, \
+    PAIRED_HONEST_INSTRUCTION, row_key
 
 #: The registration protocol (`component_analysis/registry.py`).
 NAME = "path_patching"
@@ -147,8 +148,8 @@ SWEEP_COLUMN_NAMES = ("sweep_direct_effect", "sweep_direct_effect_se",
 
 #: The instance set each counterfactual's columns cover, by name, for the head
 #: table's coverage meta: the causal sample, or its paired subset.
-INSTANCE_SETS = {ITEM_SWAP: "causal_sample",
-                 HONEST_INSTRUCTION: "paired_honest_instruction"}
+INSTANCE_SETS = {ITEM_SWAP: CAUSAL_SAMPLE,
+                 HONEST_INSTRUCTION: PAIRED_HONEST_INSTRUCTION}
 
 #: The heatmap's colour for a (sender, receiver) pair that is not a path, so
 #: that "no cell" never reads as "an effect of zero".

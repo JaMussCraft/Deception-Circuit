@@ -2,8 +2,8 @@
 component_analysis/head_table.py — the one table every analysis writes into.
 
 One row per Component, keyed by (kind, layer, index). Every analysis adds its
-own columns through `merge_columns`, which namespaces them (`dla.differential`,
-`attention.designation_site`, ...) so that two analyses can never collide on a
+own columns through `merge_columns`, which namespaces them
+(`dla.differential_paired`, `knockout.logit_diff_drop`, ...) so that two analyses can never collide on a
 name, and refuses to touch `role_confirmed`, which is the human's column.
 
 The JSON file is the typed source of truth — it keeps ints as ints, booleans as
@@ -58,9 +58,18 @@ SCHEMA_VERSION = 1
 CSV_NAME = "head_table.csv"
 JSON_NAME = "head_table.json"
 
-#: The two meta keys that carry per-column coverage.
-COVERAGE = "coverage"
-INSTANCE_SETS = "instance_sets"
+#: The meta keys this module owns: per-column coverage, the instance sets it
+#: points at, and the legacy names a reader translated (old -> current).
+COVERAGE_KEY = "coverage"
+INSTANCE_SETS_KEY = "instance_sets"
+RENAMED_KEY = "renamed_columns"
+
+#: The names of the instance sets the analyses declare coverage over. A set id
+#: is one of these plus a digest of its ids (`instance_set_id`).
+TEST_SPLIT = "test_split"
+CAUSAL_SAMPLE = "causal_sample"
+PAIRED_HONEST_INSTRUCTION = "paired_honest_instruction"
+HONEST_TWIN_SPLIT = "honest_twin_split"
 
 #: The bare names `path_patching` writes per counterfactual. Spelled here only
 #: to derive their legacy names; `path_patching.COLUMN_NAMES` is the owner and a
@@ -221,6 +230,37 @@ def modernize_columns(rows) -> tuple:
     return out, renamed
 
 
+def current_name(column: str) -> str:
+    """A column's current name: itself, or what `LEGACY_COLUMNS` renamed it to."""
+    return LEGACY_COLUMNS.get(column, column)
+
+
+def modernize_meta(meta, renamed=None) -> dict:
+    """A table's meta under the current column names, with `renamed` recorded.
+
+    The coverage keys are column names, so they are translated like the rows;
+    `renamed` (from `modernize_columns`) is merged into the meta's record of
+    every translation the cell has been through. Returns a new meta.
+    """
+    meta = dict(meta or {})
+    if meta.get(COVERAGE_KEY):
+        meta[COVERAGE_KEY] = {current_name(column): entry
+                              for column, entry in meta[COVERAGE_KEY].items()}
+    if renamed:
+        meta[RENAMED_KEY] = {**(meta.get(RENAMED_KEY) or {}), **renamed}
+    return meta
+
+
+def is_appended_row(row) -> bool:
+    """Did an analysis append this row, rather than the circuit intake?
+
+    Intake rows always carry `active_neuron_count` (an int, 0 included); a row
+    `merge_columns` appended for a Component outside the circuit, as the
+    completeness sweep does, has it empty.
+    """
+    return row.get("active_neuron_count") is None
+
+
 def instance_set_id(name: str, instance_ids, dataset: str = None):
     """`<name>:<digest>`, the same for the same instances in any order.
 
@@ -244,8 +284,8 @@ def add_coverage(meta, columns, instance_ids, *, instance_set: str,
     new meta; the input is not mutated. Redeclaring a column replaces it.
     """
     meta = dict(meta or {})
-    coverage = dict(meta.get(COVERAGE) or {})
-    sets = dict(meta.get(INSTANCE_SETS) or {})
+    coverage = dict(meta.get(COVERAGE_KEY) or {})
+    sets = dict(meta.get(INSTANCE_SETS_KEY) or {})
     ids = [str(one) for one in instance_ids or ()]
     set_id = instance_set_id(instance_set, ids, dataset)
     if set_id is not None and set_id not in sets:
@@ -254,8 +294,8 @@ def add_coverage(meta, columns, instance_ids, *, instance_set: str,
     for column in columns:
         name = f"{namespace}.{column}" if namespace else column
         coverage[name] = {"n": len(ids), "instance_set": set_id}
-    meta[COVERAGE] = coverage
-    meta[INSTANCE_SETS] = sets
+    meta[COVERAGE_KEY] = coverage
+    meta[INSTANCE_SETS_KEY] = sets
     return meta
 
 
@@ -265,10 +305,10 @@ def coverage_of(meta, column):
     None means the table does not record it — a table written before coverage
     existed, or a column nothing declared — which is not the same as n = 0.
     """
-    entry = ((meta or {}).get(COVERAGE) or {}).get(column)
+    entry = ((meta or {}).get(COVERAGE_KEY) or {}).get(column)
     if entry is None:
         return None
-    found = ((meta or {}).get(INSTANCE_SETS) or {}).get(entry.get("instance_set")) or {}
+    found = ((meta or {}).get(INSTANCE_SETS_KEY) or {}).get(entry.get("instance_set")) or {}
     return {"n": entry.get("n"), "instance_set": entry.get("instance_set"),
             "instance_ids": list(found.get("instance_ids", [])),
             "dataset": found.get("dataset")}
@@ -282,14 +322,14 @@ def _pruned(meta, columns) -> dict:
     a column the reader cannot find.
     """
     meta = dict(meta or {})
-    if COVERAGE not in meta and INSTANCE_SETS not in meta:
+    if COVERAGE_KEY not in meta and INSTANCE_SETS_KEY not in meta:
         return meta
-    coverage = {column: entry for column, entry in (meta.get(COVERAGE) or {}).items()
+    coverage = {column: entry for column, entry in (meta.get(COVERAGE_KEY) or {}).items()
                 if column in columns}
     used = {entry.get("instance_set") for entry in coverage.values()}
-    meta[COVERAGE] = coverage
-    meta[INSTANCE_SETS] = {set_id: one for set_id, one
-                           in (meta.get(INSTANCE_SETS) or {}).items()
+    meta[COVERAGE_KEY] = coverage
+    meta[INSTANCE_SETS_KEY] = {set_id: one for set_id, one
+                           in (meta.get(INSTANCE_SETS_KEY) or {}).items()
                            if set_id in used}
     return meta
 
