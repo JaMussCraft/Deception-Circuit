@@ -23,15 +23,17 @@ held at clean, the receiver's input differs from its clean input by the
 sender's own contribution and nothing else, so the cell is the direct path.
 
 **The metric.** `logit(Target) - logit(Distractor)` at the Readout, read in
-fp32 through `hooks.readout_logits`, as the change from the clean run divided
+fp32 through `hooks.readout_logits`, as the drop from the clean run divided
 by that instance's clean-minus-corrupt gap:
 
-    effect = (patched - clean) / (clean - corrupt)
+    effect = (clean - patched) / (clean - corrupt)
 
-So **a negative cell is a path that carries the Corruption**: -1 means patching
-that one path alone moved the answer as far as corrupting the whole prompt, and
-0 means the path carries nothing. Instances are normalized one by one and then
-averaged, so a prompt with a wide gap does not outvote a narrow one.
+So **a positive cell is a path that helps the deceptive answer** — the sign
+knockout's drop has: +1 means patching that one path alone moved the answer as
+far as corrupting the whole prompt, and 0 means the path carries nothing.
+Instances are normalized one by one and then averaged, so a prompt with a wide
+gap does not outvote a narrow one. Cells written before 2026-10-13 read the
+other way round; every JSON says which in `metric.convention` (`CONVENTION`).
 
 **The grid.** Senders are the circuit's Components plus the token embedding.
 Receivers are each circuit head's Q (per head) and K and V (per KV group, the
@@ -150,6 +152,16 @@ SWEEP_COLUMN_NAMES = ("sweep_direct_effect", "sweep_direct_effect_se",
 #: table's coverage meta: the causal sample, or its paired subset.
 INSTANCE_SETS = {ITEM_SWAP: CAUSAL_SAMPLE,
                  HONEST_INSTRUCTION: PAIRED_HONEST_INSTRUCTION}
+
+#: The sign convention every JSON of this analysis states in `metric`, as a
+#: marker a reader tests rather than a sentence it parses. Since 2026-10-13 a
+#: cell is `(clean - patched) / (clean - counterfactual)`: **positive means the
+#: path helps the deceptive answer**, the sign knockout's drop has. Files
+#: written before carry no `convention` key and read the other way round
+#: (`LEGACY_CONVENTION`); `convention_of` is the one test of which is which.
+CONVENTION = "positive_helps_deception"
+CONVENTION_VERSION = 2
+LEGACY_CONVENTION = "negative_helps_deception"
 
 #: The heatmap's colour for a (sender, receiver) pair that is not a path, so
 #: that "no cell" never reads as "an effect of zero".
@@ -655,10 +667,12 @@ def positioned_effects(model, streams: Streams, sender, receiver, entries):
 
 
 def normalized_effect(streams: Streams, patched):
-    """`(patched - clean) / (clean - corrupt)` per instance, `[batch]` fp32.
+    """`(clean - patched) / (clean - corrupt)` per instance, `[batch]` fp32.
 
-    NaN where the Corruption did not move that instance's answer; those
-    instances are counted in the output rather than averaged in.
+    Positive where the path carries the clean prompt's signal toward the
+    deceptive answer, the sign knockout's drop has (`CONVENTION`). NaN where
+    the Corruption did not move that instance's answer; those instances are
+    counted in the output rather than averaged in.
     """
     import torch
 
@@ -666,7 +680,7 @@ def normalized_effect(streams: Streams, patched):
 
     metric = hooks.target_minus_distractor(patched, streams.target,
                                            streams.distractor)
-    effect = (metric - streams.clean_metric) / streams.gap
+    effect = (streams.clean_metric - metric) / streams.gap
     return torch.where(streams.usable, effect,
                        torch.full_like(effect, float("nan")))
 
@@ -1041,20 +1055,44 @@ def _skipped_payload(ctx, counterfactual: str, tally: _Tally) -> dict:
 def metric_meta(counterfactual: str) -> dict:
     """The metric block every JSON of this analysis carries.
 
-    It states the sign convention in the file itself. Path patching reads
-    **negative** where a path carries the counterfactual, which is the opposite
-    of knockout's positive drop; the two are reconciled in the roles vocabulary
-    (ticket 10) and until then every file says which one it is.
+    It states the sign convention in the file itself, in words (`sign`) and as
+    a marker a reader can test (`convention`, `convention_version`). A file
+    written before 2026-10-13 has no `convention` key and the opposite sign;
+    `convention_of` tells the two apart, and nothing rewrites the old files.
     """
+    against = ("the Corruption (the item swap)" if counterfactual == ITEM_SWAP
+               else "the Matched Honest Instruction")
     return {
         "quantity": "logit(Target) - logit(Distractor) at the Readout, fp32",
-        "effect": "(patched - clean) / (clean - corrupt), per instance",
+        "effect": "(clean - patched) / (clean - counterfactual), per instance",
         "counterfactual": counterfactual,
-        "sign": f"negative means the path carries the {counterfactual} "
-                f"counterfactual; -1 is the whole clean-minus-counterfactual "
-                f"gap. Knockout (ticket 07) uses the opposite sign.",
+        "convention": CONVENTION,
+        "convention_version": CONVENTION_VERSION,
+        "sign": f"positive means the path carries the pressure prompt's "
+                f"signal toward the deceptive answer, against {against}; +1 "
+                f"is the whole clean-minus-counterfactual gap. Knockout's drop "
+                f"has the same sign (positive helps deception).",
         "min_gap": MIN_GAP,
     }
+
+
+def convention_of(metric) -> str:
+    """`CONVENTION` or `LEGACY_CONVENTION`, from a JSON's `metric` block.
+
+    The marker is what tells a cell written before the sign flip apart from
+    one written after: its absence means the legacy sign, in which a path that
+    helps deception reads negative.
+    """
+    return (metric or {}).get("convention") or LEGACY_CONVENTION
+
+
+def convention_sentence(metric) -> str:
+    """One line for a figure subtitle: which way this file's numbers point."""
+    if convention_of(metric) == CONVENTION:
+        return ("positive = the path helps the deceptive answer "
+                "(same sign as knockout)")
+    return ("legacy sign, written before 2026-10-13: negative = the path helps "
+            "the deceptive answer (opposite to knockout)")
 
 
 def _payload(ctx, grid, summaries, *, budget, tally: _Tally,
@@ -1274,7 +1312,8 @@ def _sweep_figure(ctx, counterfactual: str, payload: dict) -> None:
                    f"{ctx.circuit_spec.label} x {ctx.task_spec.name}\n"
                    f"strongest {len(top)} of {payload['n_senders']} sender(s); "
                    f"red = in the circuit, dotted = threshold "
-                   f"{payload['threshold']:g}", fontsize=9)
+                   f"{payload['threshold']:g}\n"
+                   f"{convention_sentence(payload['metric'])}", fontsize=9)
     figure.tight_layout()
     figure.savefig(os.path.join(ctx.subdir(SUBDIR),
                                 output_name(SWEEP_BARS_STEM, counterfactual, "png")),
@@ -1689,7 +1728,8 @@ def _figures(ctx, grid: Grid, summaries: Dict[Cell, dict], payload: dict,
     axes.set_ylabel("sender")
     axes.set_title(f"Path patching (position-agnostic, {counterfactual}) — "
                    f"{ctx.circuit_spec.label} x {ctx.task_spec.name}\n"
-                   f"(patched - clean) / (clean - corrupt); grey = no path; "
+                   f"(clean - patched) / (clean - corrupt), positive helps "
+                   f"deception; grey = no path; "
                    f"scale to the {HEATMAP_PERCENTILE:g}th percentile, "
                    f"{clipped} cell(s) beyond it",
                    fontsize=9)
@@ -1711,14 +1751,17 @@ def _figures(ctx, grid: Grid, summaries: Dict[Cell, dict], payload: dict,
     heights = [one["mean"] or 0.0 for one in direct]
     errors = [one["se"] or 0.0 for one in direct]
     axes.bar(range(len(direct)), heights, yerr=errors, capsize=2,
-             color=["#b2182b" if one < 0 else "#2166ac" for one in heights])
+             # Red is positive, as on the heatmap's colour scale: since
+             # 2026-10-13 a positive bar is a path that helps deception.
+             color=["#b2182b" if one > 0 else "#2166ac" for one in heights])
     axes.axhline(0.0, color="black", linewidth=0.8)
     axes.set_xticks(range(len(direct)))
     axes.set_xticklabels([one["sender"] for one in direct], rotation=90,
                          fontsize=6)
     axes.set_ylabel("normalized effect")
     axes.set_title(f"Direct effect on the Readout ({counterfactual}) — "
-                   f"{ctx.circuit_spec.label} x {ctx.task_spec.name}",
+                   f"{ctx.circuit_spec.label} x {ctx.task_spec.name}\n"
+                   f"{convention_sentence(payload['metric'])}",
                    fontsize=9)
     figure.tight_layout()
     figure.savefig(os.path.join(ctx.subdir(SUBDIR),
@@ -1783,7 +1826,8 @@ def _segment_figure(ctx, counterfactual: str, payload: dict) -> None:
     axes.set_title(f"Path patching by Segment ({counterfactual}) — "
                    f"{ctx.circuit_spec.label} x {ctx.task_spec.name}\n"
                    f"cells with |position-agnostic effect| >= "
-                   f"{payload['threshold']:g}; grey = not swept",
+                   f"{payload['threshold']:g}; grey = not swept\n"
+                   f"{convention_sentence(payload['metric'])}",
                    fontsize=9)
     figure.colorbar(image, ax=axes, fraction=0.03, pad=0.02)
     figure.tight_layout()

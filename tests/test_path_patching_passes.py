@@ -242,8 +242,9 @@ def test_a_cell_is_the_change_in_the_metric_over_that_instances_gap(
     """The normalization the spec defines, at the seam that returns numbers.
 
     Patching every sender into every receiver is the whole Corruption, so its
-    normalized effect is -1 on every instance by construction: the change is
-    exactly minus the gap.
+    normalized effect is +1 on every instance by construction: the clean
+    metric minus the patched one is exactly the gap. Positive means the path
+    carries the clean prompt's signal, the sign knockout's drop has.
     """
     receivers = [one.key for one in whole_model_grid.receivers]
 
@@ -252,7 +253,66 @@ def test_a_cell_is_the_change_in_the_metric_over_that_instances_gap(
     effect = pp.normalized_effect(streams, logits)
 
     assert tuple(effect.shape) == (BATCH,)
-    assert torch.allclose(effect, torch.full((BATCH,), -1.0), atol=1e-3)
+    assert torch.allclose(effect, torch.full((BATCH,), 1.0), atol=1e-3)
+
+
+def batch_with_answers(batch, target, distractor):
+    """The fixture's batch with the Target and Distractor of each row replaced."""
+    items = [{
+        "instance_id": batch.ids[row], "record": {},
+        "input_ids": batch.input_ids[row],
+        "attention_mask": batch.attention_mask[row],
+        "corrupt_input_ids": batch.corrupt_input_ids[row],
+        "corrupt_attention_mask": batch.corrupt_attention_mask[row],
+        "target_token": int(target[row]),
+        "distractor_token": int(distractor[row]),
+        "readout": int(batch.readout[row]), "honest": None,
+    } for row in range(len(batch.ids))]
+    return next(iter(dataloaders.Batches(items, batch_size=len(items),
+                                         report={})))
+
+
+def test_a_path_that_helps_the_target_gives_a_positive_cell(model, batch):
+    """The sign convention, on the one sender whose direct effect is its total.
+
+    The last layer's MLP block has nothing downstream of it, so its cell into
+    the Readout is what knocking it out by interchange does. The Target and
+    Distractor of each instance are chosen so that the block's clean output
+    favours the Target over its corrupt output, and so that the Corruption
+    moves the answer away from the Target (a positive gap), which is the shape
+    of every real instance. Knockout calls that block helpful with a positive
+    drop; the cell must say the same, and be that drop over the gap.
+    """
+    sender = ("mlp", TINY["layers"] - 1, 0)
+    first = pp.capture_streams(model, batch, senders=[sender])
+    knocked = fp32_readout(model, first.input_ids, first.attention_mask,
+                           first.positions,
+                           replacements={sender: first.corrupt_outputs[sender]})
+    helps = first.clean_readout - knocked           # [batch, vocab]
+    swap = first.clean_readout - first.corrupt_readout
+    target, distractor = [], []
+    for row in range(BATCH):
+        both = torch.minimum(helps[row][:, None] - helps[row][None, :],
+                             swap[row][:, None] - swap[row][None, :])
+        best = int(torch.argmax(both))
+        target.append(best // both.shape[1])
+        distractor.append(best % both.shape[1])
+        assert float(both.flatten()[best]) > 0.05, "no such pair in the vocab"
+
+    streams = pp.capture_streams(model, batch_with_answers(batch, target,
+                                                           distractor),
+                                 senders=[sender])
+    effect = pp.normalized_effect(
+        streams, pp.patched_readout(model, streams, senders=[sender],
+                                    receivers=[pp.READOUT_KEY]))
+    knocked_metric = hooks.target_minus_distractor(
+        knocked, streams.target, streams.distractor)
+    drop = streams.clean_metric - knocked_metric
+
+    assert bool((streams.gap > 0).all())
+    assert bool((drop > 0).all())
+    assert bool((effect > 0).all()), effect
+    assert torch.allclose(effect, drop / streams.gap, atol=1e-4)
 
 
 # ==============================================================================
@@ -489,7 +549,8 @@ def test_the_honest_pass_writes_its_own_file_and_names_the_counterfactual(
                                            pp.output_name(pp.AGNOSTIC_STEM, pp.HONEST_INSTRUCTION, "json"))).read())
     assert written["counterfactual"] == pp.HONEST_INSTRUCTION
     assert written["metric"]["counterfactual"] == pp.HONEST_INSTRUCTION
-    assert "negative" in written["metric"]["sign"]
+    assert written["metric"]["convention"] == pp.CONVENTION
+    assert written["metric"]["sign"].startswith("positive")
     assert written["sample"]["n_instances"] == BATCH
     assert len(written["cells"]) == len(whole_model_grid.cells)
     assert not os.path.exists(os.path.join(str(tmp_path), pp.SUBDIR,
