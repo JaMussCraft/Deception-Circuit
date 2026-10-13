@@ -437,9 +437,18 @@ def knockout_only(views: dict) -> bool:
     established read (an MLP block has none to establish); nothing written at
     the Readout, pressure-dependent or not; no direct path, no onward path and
     no honest-instruction path at its own query above the path floor.
+
+    "Nothing written" and "no path" are claims about views that were
+    measured: a table missing DLA or path patching (allowed with
+    `--roles-allow-missing-views`) leaves those views unmeasured, not silent,
+    and the Component is `unknown/insufficient`. An unmeasured read is no
+    reads evidence, which is the flavour's premise, so it does not block.
     """
     reads, writes, depends = views["reads"], views["writes"], views["depends"]
-    return (depends["knockout_sign"] != 0
+    measured = (writes["value"] is not None
+                and depends["direct_support"] is not None
+                and depends["outgoing_effect"] is not None)
+    return (measured and depends["knockout_sign"] != 0
             and not reads["established"]
             and writes["sign"] == 0 and writes["differential_sign"] == 0
             and not writes["suppression"]

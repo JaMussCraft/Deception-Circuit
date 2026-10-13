@@ -345,6 +345,12 @@ depends on it.
   floor, `|path_patching.strongest_outgoing_effect|` below the path floor, and
   no honest-instruction path at the Component's own query at or above it.
 
+The DLA and path-patching columns must have been **measured** for this
+Component: a table missing either view (allowed with
+`--roles-allow-missing-views`) leaves it unmeasured rather than silent, and
+the Component stays `unknown/insufficient`. An unmeasured read is no reads
+evidence, which is the flavour's premise, so it does not block.
+
 An established read is reads evidence, so a Component that reads an Item
 Mention and matters on knockout alone is `unknown/insufficient`, not
 `knockout-only`; that is the line between "we cannot see what it reads" and

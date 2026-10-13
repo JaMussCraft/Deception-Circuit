@@ -793,3 +793,31 @@ def test_the_derived_columns_take_the_coverage_of_the_columns_they_negate(
     assert coverage_of(written, "roles.direct_support_se")["n"] == 100
     assert coverage_of(
         written, "roles.direct_support_honest_instruction_paired")["n"] == 71
+
+
+@pytest.mark.parametrize("unmeasured", [
+    ("dla.pressure", "dla.pressure_se", "dla.differential_paired",
+     "dla.differential_paired_se"),
+    ("path_patching.direct_effect", "path_patching.direct_effect_se",
+     "path_patching.strongest_outgoing", "path_patching.strongest_outgoing_effect"),
+])
+def test_a_view_that_was_never_measured_is_not_a_view_that_is_silent(unmeasured):
+    """Under --roles-allow-missing-views a table may lack DLA or path patching
+    altogether; "no other view speaks" would then be a claim about views
+    nobody measured, so the flavour is insufficient instead."""
+    one = {column: value for column, value in knockout_alone().items()
+           if column not in unmeasured}
+
+    decision = propose(one)
+
+    assert decision.flavour == roles.INSUFFICIENT
+
+
+def test_every_flavour_of_unknown_is_named_in_the_criteria_doc():
+    path = os.path.join(os.path.dirname(os.path.dirname(
+        os.path.abspath(roles.__file__))), roles.CRITERIA_DOC)
+    with open(path) as handle:
+        text = handle.read()
+
+    for flavour in roles.FLAVOURS:
+        assert f"unknown/{flavour}" in text
