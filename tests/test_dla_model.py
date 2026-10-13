@@ -279,7 +279,7 @@ def test_the_head_table_gains_the_dla_columns_under_its_own_name(dla_run):
     for column in ("dla.pressure", "dla.pressure_se",
                    "dla.honest_twin_descriptive",
                    "dla.honest_twin_descriptive_se",
-                   "dla.suppression", "dla.differential"):
+                   "dla.suppression", "dla.differential_paired"):
         assert column in table["columns"]
     assert all(row["dla.pressure"] is not None for row in table["rows"])
     assert all(row["dla.suppression"] in (True, False) for row in table["rows"])
@@ -341,7 +341,8 @@ def test_a_condition_with_no_data_is_named_and_skipped_rather_than_failing(dla_r
     assert "honest_instruction" in payload["skipped"]
     assert "honest_instruction" not in payload["conditions"]
     table = read_json(out, *CELL, "head_table.json")
-    assert all(row["dla.honest_instruction"] is None for row in table["rows"])
+    assert all(row["dla.honest_instruction_paired"] is None
+               for row in table["rows"])
 
 
 def test_conditions_can_be_chosen_on_the_command_line(dla_run):

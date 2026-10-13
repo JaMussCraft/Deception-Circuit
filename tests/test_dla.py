@@ -129,3 +129,80 @@ def test_an_empty_selection_still_means_every_condition():
 
     assert dla.parse_conditions("") == list(dla.CONDITIONS)
     assert dla.parse_conditions([]) == list(dla.CONDITIONS)
+
+
+# ==============================================================================
+# THE HEAD-TABLE COLUMNS AND THEIR COVERAGE (ticket 13)
+# ==============================================================================
+
+KEYS = [("head", 17, 25), ("mlp", 31, 0)]
+SAMPLE = [f"sdr-{one}" for one in range(5)]
+PAIRED = SAMPLE[:3]
+TWIN_DIR = "data/datasets/sdr_honest"
+
+
+def _condition(ids, mean):
+    return {"n_instances": len(ids), "instance_ids": list(ids),
+            "components": [{"key": list(key), "levels": {
+                "all": {"mean": mean, "se": 0.01, "n": len(ids)}}}
+                for key in KEYS]}
+
+
+def _payload(*, honest=True):
+    conditions = {dla.PRESSURE: _condition(SAMPLE, 0.2),
+                  dla.HONEST_TWIN: _condition(["t-0", "t-1"], 0.1)}
+    if honest:
+        conditions.update({dla.PRESSURE_PAIRED: _condition(PAIRED, 0.3),
+                           dla.HONEST_INSTRUCTION: _condition(PAIRED, -0.4),
+                           dla.DIFFERENTIAL: _condition(PAIRED, 0.7)})
+    return {"suppression_margin": dla.DEFAULT_SUPPRESSION_MARGIN,
+            "conditions": conditions,
+            "sources": {dla.PRESSURE: {"dataset_dir": "data/datasets/sdr"},
+                        dla.HONEST_TWIN: {"dataset_dir": TWIN_DIR}}}
+
+
+class _Ctx:
+    """Only the one method `declare_coverage` calls."""
+
+    def __init__(self):
+        self.declared = {}
+
+    def declare_coverage(self, columns, *, instance_ids, instance_set,
+                         dataset=None):
+        for column in columns:
+            self.declared[column] = (list(instance_ids), instance_set, dataset)
+
+
+def test_every_paired_dla_column_says_paired_in_its_name():
+    row = dla.columns(_payload())[KEYS[0]]
+
+    assert row["honest_instruction_paired"] == -0.4
+    assert row["differential_paired"] == 0.7
+    assert row["differential_paired_se"] == 0.01
+    assert row["pressure_paired"] == 0.3
+    assert not {"honest_instruction", "differential", "differential_se"} & set(row)
+    assert row["honest_twin_descriptive"] == 0.1, "the unpaired one says descriptive"
+
+
+def test_every_dla_column_declares_the_instances_it_was_measured_over():
+    ctx = _Ctx()
+
+    dla.declare_coverage(ctx, _payload())
+
+    assert set(ctx.declared) == set(dla.columns(_payload())[KEYS[0]])
+    for column in ("pressure", "pressure_se", "suppression"):
+        assert ctx.declared[column][:2] == (SAMPLE, "test_split")
+    for column in ("pressure_paired", "honest_instruction_paired",
+                   "differential_paired", "differential_paired_se"):
+        assert ctx.declared[column][:2] == (PAIRED, "paired_honest_instruction")
+    assert ctx.declared["honest_twin_descriptive"] == (
+        ["t-0", "t-1"], "honest_twin_split", TWIN_DIR)
+
+
+def test_a_paired_condition_that_did_not_run_declares_its_columns_over_nothing():
+    ctx = _Ctx()
+
+    dla.declare_coverage(ctx, _payload(honest=False))
+
+    assert ctx.declared["differential_paired"][0] == []
+    assert ctx.declared["pressure"][0] == SAMPLE

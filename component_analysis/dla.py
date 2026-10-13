@@ -945,6 +945,7 @@ def run(ctx) -> dict:
               title=f"Paired logit lens at the Readout — {payload['circuit']} "
                     f"x {payload['task']}",
               empty_message=NOT_PAIRED)
+    declare_coverage(ctx, payload)
     return table
 
 
@@ -1102,7 +1103,7 @@ def paired_scatter_payload(payload: dict) -> dict:
                      "both conditions; one below the line writes more towards "
                      "the deceptive answer under pressure than under the "
                      "instruction, and its signed distance from the line is "
-                     "dla.differential"),
+                     "dla.differential_paired"),
         "points": [],
         "zoom": None,
         "panels": ("one panel over every Component, unless an outlier makes "
@@ -1260,19 +1261,62 @@ def columns(payload) -> dict:
 
     out = {}
     for key in ordered:
-        pressure = value(PRESSURE, key)
-        out[key] = {
-            "pressure": pressure,
-            "pressure_se": value(PRESSURE, key, "se"),
-            "honest_instruction": value(HONEST_INSTRUCTION, key),
-            "pressure_paired": value(PRESSURE_PAIRED, key),
-            "differential": value(DIFFERENTIAL, key),
-            "differential_se": value(DIFFERENTIAL, key, "se"),
-            "honest_twin_descriptive": value(HONEST_TWIN, key),
-            "honest_twin_descriptive_se": value(HONEST_TWIN, key, "se"),
-            "suppression": is_suppressing(pressure, margin=margin),
-        }
+        out[key] = {column: value(condition, key, field)
+                    for column, (condition, field) in COLUMN_SOURCES.items()}
+        out[key]["suppression"] = is_suppressing(out[key]["pressure"],
+                                                 margin=margin)
     return out
+
+
+#: Each head-table column, and the condition and statistic it is read from.
+#: Paired columns say `paired` in their names and the twin's say
+#: `descriptive` (the researcher's 2026-10-13 decision; `honest_instruction`,
+#: `differential` and `differential_se` are the names written before it, which
+#: `head_table.LEGACY_COLUMNS` translates). `suppression` is derived from
+#: `pressure` and covers its instances.
+COLUMN_SOURCES = {
+    "pressure": (PRESSURE, "mean"),
+    "pressure_se": (PRESSURE, "se"),
+    "honest_instruction_paired": (HONEST_INSTRUCTION, "mean"),
+    "pressure_paired": (PRESSURE_PAIRED, "mean"),
+    "differential_paired": (DIFFERENTIAL, "mean"),
+    "differential_paired_se": (DIFFERENTIAL, "se"),
+    "honest_twin_descriptive": (HONEST_TWIN, "mean"),
+    "honest_twin_descriptive_se": (HONEST_TWIN, "se"),
+}
+
+#: The instance set each condition is measured over, by name, for the head
+#: table's coverage meta. The three paired conditions share one: the same ids.
+INSTANCE_SETS = {
+    PRESSURE: "test_split",
+    PRESSURE_PAIRED: "paired_honest_instruction",
+    HONEST_INSTRUCTION: "paired_honest_instruction",
+    DIFFERENTIAL: "paired_honest_instruction",
+    HONEST_TWIN: "honest_twin_split",
+}
+
+
+def declare_coverage(ctx, payload) -> None:
+    """Tell the head table which instances each column was measured over.
+
+    Read off `dla.json`'s own `instance_ids` per condition, so the meta and the
+    file cannot disagree; a condition that did not run declares its columns
+    over nothing (n = 0). The Honest Twin is a different dataset, named so its
+    ids are never mistaken for the pressure split's.
+    """
+    conditions = payload["conditions"]
+    sources = payload.get("sources") or {}
+    columns_of = {}
+    for column, (condition, _field) in COLUMN_SOURCES.items():
+        columns_of.setdefault(condition, []).append(column)
+    columns_of[PRESSURE].append("suppression")
+    for condition, columns_here in columns_of.items():
+        ids = (conditions.get(condition) or {}).get("instance_ids") or []
+        dataset = (sources.get(HONEST_TWIN) or {}).get("dataset_dir") \
+            if condition == HONEST_TWIN else None
+        ctx.declare_coverage(columns_here, instance_ids=ids,
+                             instance_set=INSTANCE_SETS[condition],
+                             dataset=dataset)
 
 
 # ==============================================================================

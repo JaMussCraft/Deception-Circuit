@@ -206,23 +206,55 @@ def test_the_head_table_carries_the_paired_attention_columns(paired_run):
     assert heads
 
     for row in heads:
-        assert row[f"{ap.NAME}.honest_instruction_top_segment"]
+        assert row[f"{ap.NAME}.honest_instruction_paired_top_segment"]
         assert row[f"{ap.NAME}.pressure_paired_top_segment"]
-        assert 0.0 <= float(row[f"{ap.NAME}.honest_instruction_top_mass"]) <= 1.0
+        assert 0.0 <= float(row[f"{ap.NAME}.honest_instruction_paired_top_mass"]) <= 1.0
 
 
 def test_the_paired_columns_are_distinguishable_from_the_descriptive_twin(
         paired_run):
-    """A CSV reader sees `_descriptive` on the unpaired column and nothing on
-    the paired one, which is block C's rule and spec user story 27's demand."""
+    """A CSV reader sees `_descriptive` on the unpaired column and `_paired` on
+    the paired one: block C's rule, the researcher's 2026-10-13 decision that
+    "paired" goes into every paired name, and spec user story 27's demand."""
     run_dir, out, _records, _ids = paired_run
     analyse(run_dir, out)
 
     names = set(head_table(out)[0])
 
     assert f"{ap.NAME}.honest_twin_descriptive_top_segment" in names
-    assert f"{ap.NAME}.honest_instruction_top_segment" in names
+    assert f"{ap.NAME}.honest_instruction_paired_top_segment" in names
     assert f"{ap.NAME}.honest_instruction_descriptive_top_segment" not in names
+
+
+def test_the_head_table_meta_says_how_many_instances_each_column_covers(
+        paired_run):
+    """The 71-versus-100 coverage is read from the table's meta, per column,
+    for both analyses this fixture runs (the 2026-10-13 decision)."""
+    from component_analysis.head_table import coverage_of, load_head_table_meta
+
+    run_dir, out, records, ids = paired_run
+    analyse(run_dir, out)
+    meta = load_head_table_meta(os.path.join(str(out), *CELL))
+
+    for column in (f"{ap.NAME}.pressure_top_segment", f"{dla.NAME}.pressure",
+                   f"{dla.NAME}.pressure_se", f"{dla.NAME}.suppression"):
+        assert coverage_of(meta, column)["n"] == len(records), column
+    for column in (f"{ap.NAME}.honest_instruction_paired_top_segment",
+                   f"{ap.NAME}.pressure_paired_top_mass",
+                   f"{dla.NAME}.honest_instruction_paired",
+                   f"{dla.NAME}.pressure_paired",
+                   f"{dla.NAME}.differential_paired",
+                   f"{dla.NAME}.differential_paired_se"):
+        entry = coverage_of(meta, column)
+        assert entry["n"] == len(ids), column
+        assert set(entry["instance_ids"]) == set(ids), column
+        assert entry["instance_set"].startswith("paired_honest_instruction")
+    twin = coverage_of(meta, f"{dla.NAME}.honest_twin_descriptive")
+    assert twin["n"] == len(records)
+    assert twin["dataset"].endswith("sdr_honest")
+    assert twin["instance_set"] != coverage_of(
+        meta, f"{dla.NAME}.pressure")["instance_set"], \
+        "a different dataset is a different set, whatever its ids"
 
 
 def test_the_paired_condition_can_be_turned_off_by_name(paired_run):
@@ -345,10 +377,10 @@ def test_the_differential_column_is_the_paired_difference_of_the_two_columns(
 
     for row in head_table(out):
         left = row[f"{dla.NAME}.pressure_paired"]
-        right = row[f"{dla.NAME}.honest_instruction"]
+        right = row[f"{dla.NAME}.honest_instruction_paired"]
         if left in (None, "") or right in (None, ""):
             continue
-        assert float(row[f"{dla.NAME}.differential"]) == pytest.approx(
+        assert float(row[f"{dla.NAME}.differential_paired"]) == pytest.approx(
             float(left) - float(right), abs=1e-4)
 
 
