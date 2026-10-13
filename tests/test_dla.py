@@ -161,16 +161,20 @@ def _payload(*, honest=True):
                         dla.HONEST_TWIN: {"dataset_dir": TWIN_DIR}}}
 
 
-class _Ctx:
-    """Only the one method `declare_coverage` calls."""
+def _written_meta(tmp_path, payload):
+    """The columns and the coverage written into a head table, the way the CLI
+    writes them, and read back off disk. No model: only the payload."""
+    from component_analysis import head_table, registry
 
-    def __init__(self):
-        self.declared = {}
-
-    def declare_coverage(self, columns, *, instance_ids, instance_set,
-                         dataset=None):
-        for column in columns:
-            self.declared[column] = (list(instance_ids), instance_set, dataset)
+    ctx = registry.AnalysisContext(cli=None, intake=None, circuit_spec=None,
+                                   task_spec=None, components=[],
+                                   cell_dir=str(tmp_path))
+    dla.declare_coverage(ctx, payload)
+    rows = head_table.merge_columns([], dla.columns(payload), namespace=dla.NAME)
+    meta = head_table.add_declarations({}, ctx.take_coverage(),
+                                       namespace=dla.NAME)
+    head_table.write_head_table(str(tmp_path), rows, meta=meta)
+    return head_table.load_head_table_meta(str(tmp_path))
 
 
 def test_every_paired_dla_column_says_paired_in_its_name():
@@ -184,25 +188,34 @@ def test_every_paired_dla_column_says_paired_in_its_name():
     assert row["honest_twin_descriptive"] == 0.1, "the unpaired one says descriptive"
 
 
-def test_every_dla_column_declares_the_instances_it_was_measured_over():
-    ctx = _Ctx()
+def test_every_dla_column_says_in_the_written_table_which_instances_it_covers(
+        tmp_path):
+    from component_analysis.head_table import coverage_of
 
-    dla.declare_coverage(ctx, _payload())
+    meta = _written_meta(tmp_path, _payload())
 
-    assert set(ctx.declared) == set(dla.columns(_payload())[KEYS[0]])
+    assert set(meta["coverage"]) == {f"dla.{column}" for column
+                                     in dla.columns(_payload())[KEYS[0]]}
     for column in ("pressure", "pressure_se", "suppression"):
-        assert ctx.declared[column][:2] == (SAMPLE, "test_split")
+        entry = coverage_of(meta, f"dla.{column}")
+        assert (entry["n"], entry["instance_ids"]) == (len(SAMPLE), SAMPLE)
+        assert entry["instance_set"].startswith("test_split:")
     for column in ("pressure_paired", "honest_instruction_paired",
                    "differential_paired", "differential_paired_se"):
-        assert ctx.declared[column][:2] == (PAIRED, "paired_honest_instruction")
-    assert ctx.declared["honest_twin_descriptive"] == (
-        ["t-0", "t-1"], "honest_twin_split", TWIN_DIR)
+        entry = coverage_of(meta, f"dla.{column}")
+        assert (entry["n"], entry["instance_ids"]) == (len(PAIRED), PAIRED)
+        assert entry["instance_set"].startswith("paired_honest_instruction:")
+    twin = coverage_of(meta, "dla.honest_twin_descriptive")
+    assert twin["instance_ids"] == ["t-0", "t-1"] and twin["dataset"] == TWIN_DIR
+    assert len(meta["instance_sets"]) == 3, "one set per population, written once"
 
 
-def test_a_paired_condition_that_did_not_run_declares_its_columns_over_nothing():
-    ctx = _Ctx()
+def test_a_paired_condition_that_did_not_run_is_written_as_covering_nothing(
+        tmp_path):
+    from component_analysis.head_table import coverage_of
 
-    dla.declare_coverage(ctx, _payload(honest=False))
+    meta = _written_meta(tmp_path, _payload(honest=False))
 
-    assert ctx.declared["differential_paired"][0] == []
-    assert ctx.declared["pressure"][0] == SAMPLE
+    entry = coverage_of(meta, "dla.differential_paired")
+    assert entry["n"] == 0 and entry["instance_set"] is None
+    assert coverage_of(meta, "dla.pressure")["n"] == len(SAMPLE)

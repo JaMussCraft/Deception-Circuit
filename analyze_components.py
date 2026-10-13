@@ -74,7 +74,7 @@ from component_analysis.components import circuit_components, count_components, 
     is_component_of
 from component_analysis.head_table import BASE_COLUMNS, COVERAGE_KEY, \
     INSTANCE_SETS_KEY, JSON_NAME as TABLE_JSON, PROTECTED_COLUMNS, RENAMED_KEY, \
-    add_coverage, is_appended_row, merge_columns, modernize_columns, \
+    add_declarations, is_appended_row, merge_columns, modernize_columns, \
     modernize_meta, row_key, rows_from_components, write_head_table
 from evaluation import circuits as circuit_intake
 
@@ -576,11 +576,8 @@ def run(cli, resolved, *, model=None) -> int:
             for module in selected:
                 updates = module.run(ctx) or {}
                 rows = merge_columns(rows, updates, namespace=module.NAME)
-                for declared in ctx.take_coverage():
-                    meta = add_coverage(
-                        meta, declared["columns"], declared["instance_ids"],
-                        instance_set=declared["instance_set"],
-                        namespace=module.NAME, dataset=declared["dataset"])
+                meta = add_declarations(meta, ctx.take_coverage(),
+                                        namespace=module.NAME)
                 print(f"    {module.NAME}: {len(updates)} Component(s) updated, "
                       f"output under {module.SUBDIR}/")
 

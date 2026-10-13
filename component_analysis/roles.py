@@ -445,10 +445,7 @@ def knockout_only(views: dict) -> bool:
     reads evidence, which is the flavour's premise, so it does not block.
     """
     reads, writes, depends = views["reads"], views["writes"], views["depends"]
-    measured = (writes["value"] is not None
-                and depends["direct_support"] is not None
-                and depends["outgoing_effect"] is not None)
-    return (measured and depends["knockout_sign"] != 0
+    return (not unmeasured_views(views) and depends["knockout_sign"] != 0
             and not reads["established"]
             and writes["sign"] == 0 and writes["differential_sign"] == 0
             and not writes["suppression"]
@@ -538,7 +535,26 @@ def propose(row, thresholds: Thresholds = None) -> Decision:
     missing = _missing(criteria, lean) if lean else None
     notes = "unknown/insufficient: "
     notes += f"{lean} lean, {missing} not met; " if lean else ""
+    unmeasured = unmeasured_views(views)
+    if unmeasured:
+        notes += f"not measured: {', '.join(unmeasured)}; "
     return decide("unknown", INSUFFICIENT, notes + _evidence(views))
+
+
+def unmeasured_views(views: dict) -> List[str]:
+    """The DLA and path-patching views with no value on this row.
+
+    Named in the notes so a Component held at `unknown/insufficient` because a
+    view was never measured (a table proposed with `--roles-allow-missing-views`)
+    is not read as one whose views were measured and silent.
+    """
+    out = []
+    if views["writes"]["value"] is None:
+        out.append("writes (dla)")
+    if views["depends"]["direct_support"] is None \
+            or views["depends"]["outgoing_effect"] is None:
+        out.append("depends, how (path_patching)")
+    return out
 
 
 def _missing(criteria, role) -> str:

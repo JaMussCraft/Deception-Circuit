@@ -202,10 +202,26 @@ def test_a_condition_that_did_not_run_leaves_its_columns_empty_not_missing():
             assert updates[key][f"{name}_top_mass"] is None
 
 
-def test_every_condition_declares_the_instances_its_columns_were_read_over(
+def _written_meta(tmp_path, payload):
+    """The columns and the coverage written into a head table, the way the CLI
+    writes them, and read back off disk. No model: only the payload."""
+    from component_analysis import head_table, registry
+
+    ctx = registry.AnalysisContext(cli=None, intake=None, circuit_spec=None,
+                                   task_spec=None, components=[],
+                                   cell_dir=str(tmp_path))
+    ap.declare_coverage(ctx, payload)
+    rows = head_table.merge_columns([], ap.columns(payload), namespace=ap.NAME)
+    meta = head_table.add_declarations({}, ctx.take_coverage(),
+                                       namespace=ap.NAME)
+    head_table.write_head_table(str(tmp_path), rows, meta=meta)
+    return head_table.load_head_table_meta(str(tmp_path))
+
+
+def test_the_written_table_says_which_instances_each_condition_was_read_over(
         tmp_path):
     """The 71-versus-100 coverage goes into the head table's meta, per column."""
-    from component_analysis import registry
+    from component_analysis.head_table import coverage_of
 
     sample = [f"sdr-{one}" for one in range(6)]
     paired = sample[:4]
@@ -219,42 +235,34 @@ def test_every_condition_declares_the_instances_its_columns_were_read_over(
         condition(ap.HONEST_TWIN, n=3, ids=["twin-0", "twin-1", "twin-2"],
                   dataset="data/datasets/sdr_honest", masses=masses_where(
                       {HEADS[0]: "readout", HEADS[1]: "readout"})))
-    ctx = registry.AnalysisContext(cli=None, intake=None, circuit_spec=None,
-                                   task_spec=None, components=[],
-                                   cell_dir=str(tmp_path))
 
-    ap.declare_coverage(ctx, payload)
-    declared = {column: one for one in ctx.take_coverage()
-                for column in one["columns"]}
+    meta = _written_meta(tmp_path, payload)
 
-    assert declared["pressure_top_segment"]["instance_ids"] == sample
-    assert declared["pressure_top_mass"]["instance_set"] == "test_split"
+    assert set(meta["coverage"]) == {
+        f"{ap.NAME}.{prefix}_{field}" for prefix in ap.COLUMN_PREFIXES.values()
+        for field in ("top_segment", "top_mass")}
+    pressure = coverage_of(meta, f"{ap.NAME}.pressure_top_mass")
+    assert (pressure["n"], pressure["instance_ids"]) == (6, sample)
+    assert pressure["instance_set"].startswith("test_split:")
     for name in ("pressure_paired", "honest_instruction_paired"):
-        assert declared[f"{name}_top_segment"]["instance_ids"] == paired
-        assert declared[f"{name}_top_mass"]["instance_set"] == \
-            "paired_honest_instruction"
-    twin = declared["honest_twin_descriptive_top_segment"]
+        entry = coverage_of(meta, f"{ap.NAME}.{name}_top_segment")
+        assert (entry["n"], entry["instance_ids"]) == (4, paired)
+        assert entry["instance_set"].startswith("paired_honest_instruction:")
+    twin = coverage_of(meta, f"{ap.NAME}.honest_twin_descriptive_top_segment")
     assert twin["instance_ids"] == ["twin-0", "twin-1", "twin-2"]
     assert twin["dataset"] == "data/datasets/sdr_honest"
-    assert set(declared) == {f"{prefix}_{field}"
-                             for prefix in ap.COLUMN_PREFIXES.values()
-                             for field in ("top_segment", "top_mass")}
 
 
-def test_a_condition_that_did_not_run_declares_its_columns_over_nothing(tmp_path):
-    from component_analysis import registry
+def test_a_condition_that_did_not_run_is_written_as_covering_nothing(tmp_path):
+    from component_analysis.head_table import coverage_of
 
     payload = patterns_payload(condition(ap.PRESSURE, masses=masses_where(
         {HEADS[0]: "readout", HEADS[1]: "readout"})))
-    ctx = registry.AnalysisContext(cli=None, intake=None, circuit_spec=None,
-                                   task_spec=None, components=[],
-                                   cell_dir=str(tmp_path))
 
-    ap.declare_coverage(ctx, payload)
-    declared = {column: one for one in ctx.take_coverage()
-                for column in one["columns"]}
+    meta = _written_meta(tmp_path, payload)
 
-    assert declared["honest_instruction_paired_top_segment"]["instance_ids"] == []
+    entry = coverage_of(meta, f"{ap.NAME}.honest_instruction_paired_top_segment")
+    assert entry["n"] == 0 and entry["instance_set"] is None
 
 
 # ==============================================================================

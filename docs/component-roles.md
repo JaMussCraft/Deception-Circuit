@@ -348,8 +348,9 @@ depends on it.
 The DLA and path-patching columns must have been **measured** for this
 Component: a table missing either view (allowed with
 `--roles-allow-missing-views`) leaves it unmeasured rather than silent, and
-the Component stays `unknown/insufficient`. An unmeasured read is no reads
-evidence, which is the flavour's premise, so it does not block.
+the Component stays `unknown/insufficient` with the note naming the views that
+were "not measured". An unmeasured read is no reads evidence, which is the
+flavour's premise, so it does not block.
 
 An established read is reads evidence, so a Component that reads an Item
 Mention and matters on knockout alone is `unknown/insufficient`, not
@@ -442,8 +443,10 @@ the other analyses' columns, `role_confirmed` and the `roles.*` columns alike â€
 and a `--dry-run` rewrites nothing. So the family knockout can run into the
 very cell the roles pass wrote, and reads its roles from that cell by default.
 `--knockout-roles-from` still reads them from another cell. Rerun the roles
-pass on a cell whose analyses were rerun: the carried `roles.*` columns were
-proposed from the old numbers.
+pass on a cell whose analyses were rerun: the carried `roles.*` columns, and
+the `roles` block of the head table's meta (criteria, thresholds, counts),
+were proposed from the old numbers and are carried beside the new ones until
+the pass runs again.
 
 The family pass adds two columns of its own, `knockout.role_family` and
 `knockout.role_family_logit_diff_drop`, beside the `roles.*` columns it

@@ -443,7 +443,10 @@ run writes: a `path_patching` job with `--path-counterfactual item_swap` and no
 `--path-completeness-sweep` into a cell that held both counterfactuals and the
 sweep leaves the `*_honest_instruction_paired` and `sweep_*` columns empty.
 Rerun an analysis with every option the cell already holds, or into a new
-suite. A run into a cell written before 2026-10-13 also writes its table back
+suite. **After any analysis reruns, rerun the roles pass** (`analyze_components.py
+roles <cell>`): the carried `roles.*` columns, and the `roles` block of the
+meta, were proposed from the old numbers. A run into a cell written before
+2026-10-13 also writes its table back
 under the current column names, and records the translation in the meta's
 `renamed_columns`.
 

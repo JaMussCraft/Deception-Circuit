@@ -811,6 +811,16 @@ def test_a_view_that_was_never_measured_is_not_a_view_that_is_silent(unmeasured)
     decision = propose(one)
 
     assert decision.flavour == roles.INSUFFICIENT
+    assert "not measured" in decision.notes
+    assert unmeasured[0].split(".")[0] in decision.notes
+
+
+def test_a_measured_and_insignificant_view_is_silent_so_knockout_is_alone():
+    """The other side of the distinction: measured, below its bar, says nothing."""
+    decision = propose(knockout_alone())
+
+    assert decision.flavour == roles.KNOCKOUT_ONLY
+    assert "not measured" not in decision.notes
 
 
 def test_every_flavour_of_unknown_is_named_in_the_criteria_doc():

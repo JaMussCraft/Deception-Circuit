@@ -299,6 +299,19 @@ def add_coverage(meta, columns, instance_ids, *, instance_set: str,
     return meta
 
 
+def add_declarations(meta, declarations, *, namespace: str) -> dict:
+    """Fold `AnalysisContext.take_coverage()`'s declarations into a meta.
+
+    What the CLI does after each analysis runs, in one place, so a test can
+    drive an analysis's declarations into a written table the same way.
+    """
+    for one in declarations:
+        meta = add_coverage(meta, one["columns"], one["instance_ids"],
+                            instance_set=one["instance_set"],
+                            namespace=namespace, dataset=one.get("dataset"))
+    return meta
+
+
 def coverage_of(meta, column):
     """`{"n", "instance_set", "instance_ids", "dataset"}` for one column, or None.
 
