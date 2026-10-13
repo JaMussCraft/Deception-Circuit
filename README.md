@@ -451,6 +451,9 @@ one job and path patching in another leave one table with all four analyses.
 run writes: a `path_patching` job with `--path-counterfactual item_swap` and no
 `--path-completeness-sweep` into a cell that held both counterfactuals and the
 sweep leaves the `*_honest_instruction_paired` and `sweep_*` columns empty.
+The same holds for `knockout` without `--knockout-completeness-sweep`, and in
+both cases the earlier run's `sweep.json` and its figure stay on disk and still
+render in the notebook, describing numbers the head table no longer carries.
 Rerun an analysis with every option the cell already holds, or into a new
 suite. **After any analysis reruns, rerun the roles pass** (`analyze_components.py
 roles <cell>`): the carried `roles.*` columns, and the `roles` block of the

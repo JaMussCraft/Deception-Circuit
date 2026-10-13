@@ -395,6 +395,17 @@ study, with the dropped count recorded in `knockout_families.json`'s `grouping`
 block. If the researcher wants those Components analysed, the answer is to put
 them in a circuit and run the analyses over them, not to give the sweep a role.
 
+The **knockout** completeness sweep (ticket 15, `--knockout-completeness-sweep`)
+adds no rows at all: Components outside the circuit stay in
+`knockout/sweep.json`, flagged when |drop| clears `--knockout-sweep-threshold`
+(default 0.1 logits: about twice the strong circuit Components' standard
+error on SDR nls0.3, 3% of its gap, and cleared by the circuit's top four). The
+circuit's own rows gain `knockout.sweep_rank` and
+`knockout.sweep_clears_threshold`. `knockout.sweep_rank` ranks by **|drop|**
+over every Component of the model, while `knockout.rank` ranks by the
+**signed** drop within the circuit; neither sweep column is read by the
+criteria, so the sweep is not a view either.
+
 ## What the pass writes
 
 Into the head table, namespaced `roles.`, next to the columns it read:

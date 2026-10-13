@@ -159,6 +159,9 @@ def test_the_json_lists_the_flagged_outsiders_and_states_its_conventions():
     assert "positive drop means the Component helps deception" \
         in written["metric"]["sign"]
     assert "|drop|" in written["metric"]["ranking"]
+    assert "embedding" in written["excludes"]
+    assert "twice the standard error" in written["threshold_justification"]
+    assert "knockout.sweep_rank" in written["head_table_columns"]
     assert written["n_components"] == 4 and written["n_in_circuit"] == 2
     assert [one["key"] for one in written["components"]] == [
         ["head", 0, 1], ["head", 0, 0], ["head", 1, 0], ["mlp", 0, 0]]
