@@ -49,6 +49,12 @@ def check(results_dir: str) -> int:
             continue
         if view:
             print(f"  present  {label}")
+            if view_of is review.head_table_view:
+                # What an agent would otherwise only see in the notebook: a
+                # cell read under renamed columns, or one with no coverage.
+                for note in view.notes:
+                    if "paired" in note or "coverage" in note:
+                        print(f"           note: {note}")
         else:
             print(f"  Missing  {label}: {view.note}")
             missing += 1
