@@ -38,22 +38,6 @@ VIEWS = (
 )
 
 
-def print_path_conventions(results_dir: str) -> None:
-    """Path patching's sign flipped on 2026-10-13; say which this cell has."""
-    conventions = review.path_patching_conventions(results_dir)
-    kinds = sorted(set(conventions.values()))
-    if len(kinds) == 1:
-        legacy = kinds[0] == review.path_patching.LEGACY_CONVENTION
-        print(f"           path-patching sign: "
-              f"{'legacy, ' if legacy else ''}{kinds[0]}")
-    elif kinds:
-        print("           path-patching sign: MIXED — " + "; ".join(
-            f"{kind} in " + ", ".join(sorted(name for name, one
-                                              in conventions.items()
-                                              if one == kind))
-            for kind in kinds))
-
-
 def check(results_dir: str) -> int:
     missing = 0
     for label, view_of in VIEWS:
@@ -75,8 +59,8 @@ def check(results_dir: str) -> int:
                 if not view.coverage:
                     print("           no per-column coverage in the meta "
                           "(written before ticket 13)")
-            if view_of is review.path_patching_views:
-                print_path_conventions(results_dir)
+            for line in getattr(view, "check_lines", None) or []:
+                print(f"           {line}")
         else:
             print(f"  Missing  {label}: {view.note}")
             missing += 1

@@ -230,6 +230,9 @@ class Group:
     subtitle: str
     items: List[Any]
     notes: List[str] = field(default_factory=list)
+    #: One-line facts about the whole group that an agent reading the cell
+    #: without the notebook must see (`scripts/check_cell.py` prints them).
+    check_lines: List[str] = field(default_factory=list)
 
     def __bool__(self) -> bool:
         return bool(self.items)
@@ -990,7 +993,8 @@ def path_patching_views(results_dir: str) -> "Group":
         if note and note not in seen:
             seen.append(note)
     return Group(title="Path patching", subtitle=cell_subtitle(_cell_meta(results_dir)),
-                 items=items, notes=seen)
+                 items=items, notes=seen,
+                 check_lines=[convention_summary(results_dir)])
 
 
 def path_patching_conventions(results_dir: str) -> Dict[str, str]:
@@ -1008,6 +1012,23 @@ def path_patching_conventions(results_dir: str) -> Dict[str, str]:
             out[os.path.basename(path)] = path_patching.convention_of(
                 payload.get("metric"))
     return out
+
+
+def convention_summary(results_dir: str) -> str:
+    """`path-patching sign: ...` for the whole cell, `MIXED` when its files
+    disagree, naming which file holds which."""
+    conventions = path_patching_conventions(results_dir)
+    kinds = sorted(set(conventions.values()))
+    if not kinds:
+        return "path-patching sign: no file records one"
+    if len(kinds) == 1:
+        legacy = kinds[0] == path_patching.LEGACY_CONVENTION
+        return f"path-patching sign: {'legacy, ' if legacy else ''}{kinds[0]}"
+    return "path-patching sign: MIXED — " + "; ".join(
+        f"{kind} in " + ", ".join(sorted(name for name, one
+                                          in conventions.items()
+                                          if one == kind))
+        for kind in kinds)
 
 
 def sweep_view(results_dir: str) -> Bars:

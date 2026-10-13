@@ -356,8 +356,57 @@ def test_a_row_carrying_both_sign_conventions_is_refused_by_name():
     have different names, so the merge's own conflict check cannot see it,
     and either reading would silently drop the other measurement."""
     both = a_selector() | {"path_patching.direct_support": 0.021}
-    with pytest.raises(ValueError, match="path_patching.direct_effect"):
+    with pytest.raises(roles.MixedConventions, match="path_patching.direct_effect"):
         roles.derived_columns(both)
+
+
+def write_agnostic_json(cell_dir, counterfactual, convention):
+    """A path-patching JSON carrying one sign convention's `metric` block:
+    the current one, or a legacy file's, which has no marker at all."""
+    from component_analysis import path_patching as pp
+
+    metric = (pp.metric_meta(counterfactual) if convention == pp.CONVENTION
+              else {"effect": "(patched - clean) / (clean - corrupt)"})
+    directory = os.path.join(cell_dir, pp.SUBDIR)
+    os.makedirs(directory, exist_ok=True)
+    with open(os.path.join(directory, pp.output_name(
+            pp.AGNOSTIC_STEM, counterfactual, "json")), "w") as handle:
+        json.dump({"counterfactual": counterfactual, "metric": metric}, handle)
+
+
+def test_a_cell_whose_columns_and_json_marker_agree_is_read(tmp_path):
+    from component_analysis import path_patching as pp
+
+    path = os.path.join(str(tmp_path), *CELL)
+    write_head_table(path, [native(a_selector())])
+    write_agnostic_json(path, pp.ITEM_SWAP, pp.CONVENTION)
+
+    assert run_roles(path) == 0
+
+
+def test_a_cell_whose_columns_contradict_its_json_marker_fails_loudly(tmp_path):
+    """The columns say one sign and the file they came from says the other:
+    either the table or the JSON was edited by hand, or a cell was assembled
+    from two runs. Neither reading is safe, so the pass refuses by name."""
+    from component_analysis import path_patching as pp
+
+    path = os.path.join(str(tmp_path), *CELL)
+    write_head_table(path, [native(a_selector())])
+    write_agnostic_json(path, pp.ITEM_SWAP, pp.LEGACY_CONVENTION)
+
+    with pytest.raises(SystemExit, match="agnostic.json"):
+        run_roles(path)
+
+
+def test_a_legacy_cell_with_a_new_marker_fails_loudly_too(tmp_path):
+    from component_analysis import path_patching as pp
+
+    path = os.path.join(str(tmp_path), *CELL)
+    write_head_table(path, [a_selector()])
+    write_agnostic_json(path, pp.ITEM_SWAP, pp.CONVENTION)
+
+    with pytest.raises(SystemExit, match=pp.LEGACY_CONVENTION):
+        run_roles(path)
 
 
 def test_a_new_cell_gets_the_same_roles_and_support_as_its_legacy_twin(tmp_path):
@@ -379,10 +428,12 @@ def test_a_new_cell_gets_the_same_roles_and_support_as_its_legacy_twin(tmp_path)
     assert rows_new[("head", 17, 25)]["roles.role_proposed"] == "selector"
     assert rows_new[("head", 24, 18)]["roles.direct_support"] == \
         pytest.approx(0.024)
-    assert "native" in read(new, roles.SUBDIR, roles.JSON_NAME)[
-        "sign_convention"]
-    assert "negat" in read(old, roles.SUBDIR, roles.JSON_NAME)[
-        "sign_convention"]
+    from component_analysis import path_patching as pp
+
+    assert read(new, roles.SUBDIR, roles.JSON_NAME)["path_conventions"] == \
+        [pp.CONVENTION]
+    assert read(old, roles.SUBDIR, roles.JSON_NAME)["path_conventions"] == \
+        [pp.LEGACY_CONVENTION]
 
 
 def test_a_legacy_cell_of_record_reads_the_direct_support_it_always_had(

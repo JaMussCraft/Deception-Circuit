@@ -586,6 +586,8 @@ def test_a_counterfactual_with_no_instance_at_all_writes_a_skipped_file(
                                            pp.output_name(pp.AGNOSTIC_STEM, pp.HONEST_INSTRUCTION, "json"))).read())
     assert pp.HONEST_INSTRUCTION in written["skipped"]
     assert written["without_a_counterpart"] == ["tiny0", "tiny1"]
+    assert written["metric"]["convention"] == pp.CONVENTION, \
+        "every path-patching JSON says which sign it is, a skipped one too"
 
 
 def test_both_counterfactuals_give_the_head_table_one_column_set_each(
@@ -931,9 +933,9 @@ def test_an_instance_the_gap_excludes_is_excluded_from_the_sweep_as_from_the_gri
 
     _summaries, tally = pp.agnostic_pass(ctx, whole_model_grid, batches,
                                          pp.ITEM_SWAP)
-    sweep = pp.completeness_sweep(ctx, whole_model_grid, batches, pp.ITEM_SWAP,
-                                  grid_ids=tally.used_ids)
+    sweep, sweep_tally = pp.completeness_sweep(
+        ctx, whole_model_grid, batches, pp.ITEM_SWAP, grid_ids=tally.used_ids)
 
     assert tally.excluded == ["tiny1"]
     assert sweep["sample"]["excluded_by_gap"] == ["tiny1"]
-    assert pp.sweep_measured_ids(sweep) == pp.measured_ids(tally) == ["tiny0"]
+    assert pp.measured_ids(sweep_tally) == pp.measured_ids(tally) == ["tiny0"]

@@ -64,6 +64,7 @@ import time
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
+from component_analysis import path_patching
 from component_analysis.head_table import BASE_COLUMNS, COVERAGE_KEY, \
     INSTANCE_SETS_KEY, JSON_NAME as TABLE_JSON, KEY_COLUMNS, PROTECTED_COLUMNS, \
     RENAMED_KEY, merge_columns, modernize_columns, modernize_meta, row_key, \
@@ -166,15 +167,35 @@ OUTGOING_EFFECT = "path_patching.strongest_outgoing_effect"
 INCOMING_HONEST_EFFECT = \
     "path_patching.strongest_incoming_effect_honest_instruction_paired"
 
-#: `{native column: legacy column}` for every number the criteria read from
-#: path patching. A signed pair is negated on the legacy side; a standard error
-#: pair is copied, because a standard error has no sign.
-SIGNED_PAIRS = {DIRECT_SUPPORT: DIRECT_EFFECT,
-                DIRECT_SUPPORT_HONEST: DIRECT_EFFECT_HONEST,
-                OUTGOING_SUPPORT: OUTGOING_EFFECT,
-                INCOMING_HONEST_SUPPORT: INCOMING_HONEST_EFFECT}
-SE_PAIRS = {DIRECT_SUPPORT_SE: DIRECT_EFFECT_SE,
-            DIRECT_SUPPORT_HONEST_SE: DIRECT_EFFECT_HONEST_SE}
+#: Every number the criteria read from path patching, by the name the roles
+#: pass gives it in the support convention: `(native column, legacy column)`.
+#: The one table both generations are read through — `path_value` reads a row
+#: through it, `derived_coverage` takes coverage through it, `conventions_of`
+#: finds the generation through it. A legacy value is negated, except a
+#: standard error (`_se`), which has no sign.
+PATH_READS = {
+    "direct_support": (DIRECT_SUPPORT, DIRECT_EFFECT),
+    "direct_support_se": (DIRECT_SUPPORT_SE, DIRECT_EFFECT_SE),
+    "direct_support_honest_instruction_paired": (DIRECT_SUPPORT_HONEST,
+                                                 DIRECT_EFFECT_HONEST),
+    "outgoing_support": (OUTGOING_SUPPORT, OUTGOING_EFFECT),
+    "incoming_honest_instruction_support": (INCOMING_HONEST_SUPPORT,
+                                            INCOMING_HONEST_EFFECT),
+}
+
+#: Which head-table column each counterfactual's path-patching JSON stands
+#: behind, `(native, legacy)`: the file's convention marker must agree with
+#: the generation of the column (`check_markers`).
+MARKED_BY = {path_patching.ITEM_SWAP: PATH_READS["direct_support"],
+             path_patching.HONEST_INSTRUCTION:
+                 PATH_READS["direct_support_honest_instruction_paired"]}
+
+
+class MixedConventions(ValueError):
+    """Path-patching numbers of both sign conventions where one was expected:
+    a row holding both generations' columns, or a column whose generation
+    disagrees with its own JSON's convention marker."""
+
 
 #: The human's column, read and never written. Looked up by name rather than by
 #: position, because `head_table` documents `PROTECTED_COLUMNS` as extensible.
@@ -198,15 +219,10 @@ REQUIRED_COLUMNS = {
 COLUMNS = ("role_proposed", "role_notes", "direct_support", "direct_support_se",
            "direct_support_honest_instruction_paired", "reads_group")
 
-#: The derived columns, and the columns each is read from, native first: a
-#: derived column covers exactly the instances its source does, so it takes
-#: the coverage of whichever source the table holds.
-DERIVED_FROM = {
-    "direct_support": (DIRECT_SUPPORT, DIRECT_EFFECT),
-    "direct_support_se": (DIRECT_SUPPORT_SE, DIRECT_EFFECT_SE),
-    "direct_support_honest_instruction_paired": (DIRECT_SUPPORT_HONEST,
-                                                 DIRECT_EFFECT_HONEST)}
-
+#: The `COLUMNS` read from path patching through `PATH_READS`; each covers
+#: exactly the instances its source column does, so it takes its coverage.
+DERIVED = ("direct_support", "direct_support_se",
+           "direct_support_honest_instruction_paired")
 
 @dataclass
 class Thresholds:
@@ -281,52 +297,78 @@ def segment_group(segment) -> str:
     return SEGMENT_GROUPS.get(str(segment), "unestablished")
 
 
-def _one_generation(row, native: str, legacy: str):
-    """`(native value, legacy value)`, refusing a row that holds both.
+def path_value(row, name: str) -> Optional[float]:
+    """One path-patching number of `PATH_READS`, in the support convention.
 
-    A row with both is two path-patching runs of opposite sign merged into one
-    table (`--roles-merge-from` a legacy cell into a new one): the merge's own
-    conflict check cannot see it, because the names differ, and reading either
+    The native column is read as it is; the legacy column is negated
+    (ADR-0002), except a standard error, which is copied. Absent rather than
+    zero when neither is there. A row holding both generations is refused:
+    that is two path-patching runs of opposite sign merged into one table
+    (`--roles-merge-from` a legacy cell into a new one), which the merge's own
+    conflict check cannot see because the names differ, and reading either
     would silently drop the other measurement.
     """
+    native, legacy = PATH_READS[name]
     new, old = _number(row, native), _number(row, legacy)
     if new is not None and old is not None:
-        raise ValueError(
+        raise MixedConventions(
             f"{row_key(row)} carries both {legacy} (written before path "
             f"patching's sign flipped on 2026-10-13, negative helps deception) "
             f"and {native} (positive helps deception). They are two runs, not "
             f"one; drop one of the cells this table was merged from.")
-    return new, old
-
-
-def support_of(row, native: str, legacy: str) -> Optional[float]:
-    """A signed path-patching number in the deception-support convention.
-
-    The native column is read as it is; the legacy column is negated
-    (ADR-0002). Absent rather than zero when neither is there.
-    """
-    new, old = _one_generation(row, native, legacy)
     if new is not None:
         return new
-    return None if old is None else -old
+    if old is None or name.endswith("_se"):
+        return old
+    return -old
 
 
-def standard_error(row, native: str, legacy: str) -> Optional[float]:
-    new, old = _one_generation(row, native, legacy)
-    return new if new is not None else old
-
-
-def conventions_of(rows) -> List[str]:
-    """Which path-patching sign conventions a table's rows were read in:
-    `native`, `legacy`, both (across rows), or neither."""
+def generations_of(rows) -> List[str]:
+    """The path-patching sign conventions a table's rows hold, as
+    `path_patching`'s own markers, current first: `[CONVENTION]`,
+    `[LEGACY_CONVENTION]`, both (across rows), or none."""
+    present = {column for one in rows for column, value in one.items()
+               if value is not None and value != ""}
     found = []
-    for one in rows:
-        for native, legacy in SIGNED_PAIRS.items():
-            if _number(one, native) is not None and "native" not in found:
-                found.append("native")
-            if _number(one, legacy) is not None and "legacy" not in found:
-                found.append("legacy")
-    return sorted(found, reverse=True)
+    for marker, side in ((path_patching.CONVENTION, 0),
+                         (path_patching.LEGACY_CONVENTION, 1)):
+        if any(pair[side] in present for pair in PATH_READS.values()):
+            found.append(marker)
+    return found
+
+
+def check_markers(rows, cell_dir: str) -> None:
+    """The cell's path-patching JSONs must say the sign its columns are in.
+
+    The roles pass tells the generations apart by column name, because a
+    name travels with its values through every merge and a CSV has no meta.
+    Where the JSON a column came from is in the cell, its `metric.convention`
+    marker is the second witness: a disagreement means the table or the file
+    was edited, or the cell was assembled from two runs, and neither reading
+    is safe.
+    """
+    for counterfactual, (native, legacy) in MARKED_BY.items():
+        path = os.path.join(cell_dir, path_patching.SUBDIR,
+                            path_patching.output_name(
+                                path_patching.AGNOSTIC_STEM, counterfactual,
+                                "json"))
+        if not os.path.isfile(path):
+            continue
+        has_native = any(_number(one, native) is not None for one in rows)
+        has_legacy = any(_number(one, legacy) is not None for one in rows)
+        if not (has_native or has_legacy):
+            continue
+        with open(path) as handle:
+            marker = path_patching.convention_of(json.load(handle).get("metric"))
+        columns = (path_patching.CONVENTION if has_native
+                   else path_patching.LEGACY_CONVENTION)
+        if marker != columns or (has_native and has_legacy):
+            raise MixedConventions(
+                f"{path} says {marker}, but the head table's "
+                f"{native if has_native else legacy} column is in "
+                f"{columns}. The column and the file it came from disagree "
+                f"about the sign; rerun path patching into this cell, or "
+                f"restore the file the table was written with.")
 
 
 def derived_columns(row) -> dict:
@@ -338,13 +380,7 @@ def derived_columns(row) -> dict:
     negated, as it always was; the original column keeps its meaning in every
     file already written. A standard error has no sign and is copied.
     """
-    return {
-        "direct_support": support_of(row, DIRECT_SUPPORT, DIRECT_EFFECT),
-        "direct_support_se": standard_error(row, DIRECT_SUPPORT_SE,
-                                            DIRECT_EFFECT_SE),
-        "direct_support_honest_instruction_paired":
-            support_of(row, DIRECT_SUPPORT_HONEST, DIRECT_EFFECT_HONEST),
-    }
+    return {name: path_value(row, name) for name in DERIVED}
 
 
 def receiver_of(path) -> Optional[str]:
@@ -395,9 +431,8 @@ def views_of(row, thresholds: Thresholds) -> dict:
     knockout = _number(row, KNOCKOUT)
     derived = derived_columns(row)
     support = derived["direct_support"]
-    outgoing_effect = support_of(row, OUTGOING_SUPPORT, OUTGOING_EFFECT)
-    incoming_effect = support_of(row, INCOMING_HONEST_SUPPORT,
-                              INCOMING_HONEST_EFFECT)
+    outgoing_support = path_value(row, "outgoing_support")
+    incoming_support = path_value(row, "incoming_honest_instruction_support")
 
     return {
         "reads": {
@@ -427,16 +462,16 @@ def views_of(row, thresholds: Thresholds) -> dict:
             "direct_support_sign": direction(support, derived["direct_support_se"],
                                              thresholds.path_floor, thresholds),
             "outgoing": row.get(OUTGOING),
-            "outgoing_support": outgoing_effect,
-            "outgoing_clears_floor": (outgoing_effect is not None
-                                      and abs(outgoing_effect) >= thresholds.path_floor),
+            "outgoing_support": outgoing_support,
+            "outgoing_clears_floor": (outgoing_support is not None
+                                      and abs(outgoing_support) >= thresholds.path_floor),
             "outgoing_is_readout": is_readout_receiver(row.get(OUTGOING)),
             "incoming_honest_instruction": row.get(INCOMING_HONEST),
-            "incoming_honest_instruction_support": incoming_effect,
+            "incoming_honest_instruction_support": incoming_support,
             "honest_instruction_at_own_query": (
                 is_query_receiver_on(row.get(INCOMING_HONEST), key)
-                and incoming_effect is not None
-                and abs(incoming_effect) >= thresholds.path_floor),
+                and incoming_support is not None
+                and abs(incoming_support) >= thresholds.path_floor),
         },
     }
 
@@ -710,14 +745,17 @@ def flavour_counts(decisions: List[Decision]) -> dict:
     return out
 
 
-def sign_convention(conventions) -> str:
-    """The roles JSON's sentence on how path patching was read in this table."""
+def sign_convention(markers) -> str:
+    """The roles JSON's sentence on how path patching was read in this table.
+
+    For a human; a reader tests `path_conventions`, the markers themselves.
+    """
     ways = []
-    if "native" in conventions:
+    if path_patching.CONVENTION in markers:
         ways.append("roles.direct_support is path_patching.direct_support "
                     "read natively (a path-patching run since 2026-10-13, "
                     "positive helps deception)")
-    if "legacy" in conventions:
+    if path_patching.LEGACY_CONVENTION in markers:
         ways.append("roles.direct_support is -path_patching.direct_effect, "
                     "negating a legacy cell written before 2026-10-13")
     if not ways:
@@ -735,6 +773,9 @@ def payload(decisions: List[Decision], *, cell_dir: str, thresholds: Thresholds,
         "created": time.strftime("%Y-%m-%dT%H:%M:%S"),
         "criteria_doc": CRITERIA_DOC,
         "sign_convention": sign_convention(conventions),
+        #: `path_patching.CONVENTION` and/or `LEGACY_CONVENTION`: the sign
+        #: conventions of the path-patching columns this table was read from.
+        "path_conventions": list(conventions),
         "vocabulary": list(ROLES),
         "reserved": list(RESERVED),
         "thresholds": thresholds.as_dict(),
@@ -912,8 +953,8 @@ def derived_coverage(meta: dict) -> dict:
     """The meta with each derived column given its source column's coverage."""
     meta = dict(meta or {})
     coverage = dict(meta.get(COVERAGE_KEY) or {})
-    for column, sources in DERIVED_FROM.items():
-        for source in sources:
+    for column in DERIVED:
+        for source in PATH_READS[column]:
             if source in coverage:
                 coverage[f"{NAME}.{column}"] = dict(coverage[source])
                 break
@@ -937,6 +978,14 @@ def main(argv=None) -> int:
     cli = build_parser().parse_args(argv)
     thresholds = thresholds_from(cli)
     rows, meta, renamed = read_table(cli.cell_dir)
+    try:
+        # Each cell's columns against its own JSONs, before the merge mixes
+        # the cells' rows together.
+        check_markers(rows, cli.cell_dir)
+        for other in cli.roles_merge_from:
+            check_markers(read_table(other)[0], other)
+    except MixedConventions as error:
+        raise SystemExit(str(error))
     rows, meta, merged_renamed = merge_cells(rows, cli.roles_merge_from,
                                              meta=meta)
     renamed = {**renamed, **merged_renamed}
@@ -953,9 +1002,9 @@ def main(argv=None) -> int:
 
     try:
         decisions = decide_rows(rows, thresholds)
-    except ValueError as error:
+    except MixedConventions as error:
         raise SystemExit(f"{cli.cell_dir!r}: {error}")
-    conventions = conventions_of(rows)
+    conventions = generations_of(rows)
     print_decisions(decisions)
 
     if cli.dry_run:

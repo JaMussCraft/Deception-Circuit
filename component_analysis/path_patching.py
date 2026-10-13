@@ -26,9 +26,10 @@ sender's own contribution and nothing else, so the cell is the direct path.
 fp32 through `hooks.readout_logits`, as the drop from the clean run divided
 by that instance's clean-minus-corrupt gap:
 
-    effect = (clean - patched) / (clean - corrupt)
+    effect = (clean - patched) / (clean - counterfactual)
 
-So **a positive cell is a path that helps the deceptive answer** — the sign
+where the counterfactual is the item-swap Corruption or the Matched Honest
+Instruction (below). So **a positive cell is a path that helps the deceptive answer** — the sign
 knockout's drop has: +1 means patching that one path alone moved the answer as
 far as corrupting the whole prompt, and 0 means the path carries nothing.
 Instances are normalized one by one and then averaged, so a prompt with a wide
@@ -73,7 +74,7 @@ import math
 import os
 import time
 from dataclasses import dataclass, field
-from typing import Dict, List, Sequence, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple
 
 from component_analysis.head_table import CAUSAL_SAMPLE, \
     PAIRED_HONEST_INSTRUCTION, row_key
@@ -532,7 +533,8 @@ def stream_batches(ctx, batches, *, senders, counterfactual: str,
     The three passes — position-agnostic, position-specific and the
     completeness sweep — each walk the loader the same way: capture the two
     streams, skip a batch that has no instance of this counterfactual, count
-    the two forwards, and record which instances the pass really covered. That
+    the two forwards, and record which instances the pass really covered and
+    which of them the gap excluded (`MIN_GAP`). That
     preamble is here once, so a pass that forgot to count a forward or to name
     an unpaired instance cannot differ from the pass beside it.
     """
@@ -544,6 +546,9 @@ def stream_batches(ctx, batches, *, senders, counterfactual: str,
             continue
         tally.forwards += 2
         tally.used_ids.extend(streams.ids)
+        tally.excluded.extend(one for one, usable
+                              in zip(streams.ids, streams.usable.tolist())
+                              if not usable)
         covered = set(streams.ids)
         tally.unpaired.extend(one for one in batch.ids if one not in covered)
         yield streams
@@ -704,7 +709,7 @@ def positioned_effects(model, streams: Streams, sender, receiver, entries):
 
 
 def normalized_effect(streams: Streams, patched):
-    """`(clean - patched) / (clean - corrupt)` per instance, `[batch]` fp32.
+    """`(clean - patched) / (clean - counterfactual)` per instance, `[batch]` fp32.
 
     Positive where the path carries the clean prompt's signal toward the
     deceptive answer, the sign knockout's drop has (`CONVENTION`). NaN where
@@ -980,28 +985,22 @@ def run(ctx) -> dict:
     # clock during the sweep still leaves every pass above it written.
     if getattr(ctx.cli, "path_completeness_sweep", False):
         counterfactual = sweep_counterfactual(ctx)
-        payload = completeness_sweep(ctx, grid, batches, counterfactual,
-                                     grid_ids=grid_ids.get(counterfactual))
+        payload, sweep_tally = completeness_sweep(
+            ctx, grid, batches, counterfactual,
+            grid_ids=grid_ids.get(counterfactual))
         _merge(updates, sweep_columns(payload), counterfactual)
-        _declare(ctx, SWEEP_COLUMN_NAMES, sweep_measured_ids(payload),
+        _declare(ctx, SWEEP_COLUMN_NAMES, measured_ids(sweep_tally),
                  counterfactual)
     return updates
 
 
 def measured_ids(tally) -> List[str]:
     """The instances a pass's means are over: those it saw, less any whose
-    clean-minus-counterfactual gap excluded them."""
+    clean-minus-counterfactual gap excluded them. The grid and the sweep both
+    declare their coverage through this, which is what gives their columns one
+    instance set."""
     excluded = set(tally.excluded)
     return [one for one in tally.used_ids if one not in excluded]
-
-
-def sweep_measured_ids(payload: dict) -> List[str]:
-    """The instances a sweep's means are over, as `measured_ids` is for the
-    grid: those it saw, less any the gap excluded. The same rule on both sides
-    is what gives the grid's and the sweep's columns one instance set."""
-    excluded = set(payload["sample"].get("excluded_by_gap") or ())
-    return [one for one in payload["sample"]["instance_ids"]
-            if one not in excluded]
 
 
 def _declare(ctx, names, instance_ids, counterfactual: str) -> None:
@@ -1048,9 +1047,6 @@ def agnostic_pass(ctx, grid: Grid, batches, counterfactual: str):
     for streams in stream_batches(ctx, batches, senders=grid.senders,
                                   counterfactual=counterfactual, tally=tally):
         tally.gaps.extend(streams.gap.tolist())
-        tally.excluded.extend(one for one, usable in zip(streams.ids,
-                                                         streams.usable.tolist())
-                              if not usable)
 
         for sender in grid.senders:
             receivers = grid.receivers_for(sender)
@@ -1096,6 +1092,7 @@ def _skipped_payload(ctx, counterfactual: str, tally: _Tally) -> dict:
         "analysis": NAME, "pass": "position_agnostic",
         "circuit": ctx.circuit_spec.label, "task": ctx.task_spec.name,
         "counterfactual": counterfactual,
+        "metric": metric_meta(counterfactual),
         "skipped": f"no instance of the causal sample has a {counterfactual} "
                    f"counterpart",
         "n_without_a_counterpart": len(tally.unpaired),
@@ -1120,8 +1117,9 @@ def metric_meta(counterfactual: str) -> dict:
         "counterfactual": counterfactual,
         "convention": CONVENTION,
         "convention_version": CONVENTION_VERSION,
-        "sign": f"positive means the path carries the pressure prompt's "
-                f"signal toward the deceptive answer, against {against}; +1 "
+        "sign": f"positive means the path carries the clean stream (the "
+                f"prompt under its Pressure Clause) toward the deceptive "
+                f"answer, against {against}; +1 "
                 f"is the whole clean-minus-counterfactual gap. Knockout's drop "
                 f"has the same sign (positive helps deception).",
         "min_gap": MIN_GAP,
@@ -1230,7 +1228,7 @@ def sweep_senders(model) -> List[tuple]:
 
 
 def completeness_sweep(ctx, grid: Grid, batches, counterfactual: str, *,
-                       grid_ids: Sequence[str] = None) -> dict:
+                       grid_ids: Optional[Sequence[str]] = None):
     """Every head and MLP block of the model, patched into the Readout.
 
     The grid only ever asks about the circuit's own Components, so a Component
@@ -1242,7 +1240,7 @@ def completeness_sweep(ctx, grid: Grid, batches, counterfactual: str, *,
     drawn by the global `--n-causal` and `--seed` — so its numbers and the
     grid's are over the same instances. `grid_ids` is the grid pass's instance
     list on this counterfactual, when it ran, and the file records whether the
-    two agree.
+    two agree. Returns `(payload, tally)`, as `agnostic_pass` does.
     """
     senders = sweep_senders(ctx.model)
     in_circuit = {row_key(one) for one in ctx.components}
@@ -1254,9 +1252,6 @@ def completeness_sweep(ctx, grid: Grid, batches, counterfactual: str, *,
 
     for streams in stream_batches(ctx, batches, senders=senders,
                                   counterfactual=counterfactual, tally=tally):
-        tally.excluded.extend(one for one, usable in zip(streams.ids,
-                                                         streams.usable.tolist())
-                              if not usable)
         for sender in senders:
             values[sender].extend(
                 normalized_effect(streams,
@@ -1314,7 +1309,7 @@ def completeness_sweep(ctx, grid: Grid, batches, counterfactual: str, *,
     }
     ctx.write_json(SUBDIR, output_name(SWEEP_STEM, counterfactual, "json"), payload)
     _sweep_figure(ctx, counterfactual, payload)
-    return payload
+    return payload, tally
 
 
 def sweep_columns(payload: dict) -> Dict[tuple, dict]:
@@ -1796,7 +1791,7 @@ def _figures(ctx, grid: Grid, summaries: Dict[Cell, dict], payload: dict,
     axes.set_ylabel("sender")
     axes.set_title(f"Path patching (position-agnostic, {counterfactual}) — "
                    f"{ctx.circuit_spec.label} x {ctx.task_spec.name}\n"
-                   f"(clean - patched) / (clean - corrupt), positive helps "
+                   f"(clean - patched) / (clean - counterfactual), positive helps "
                    f"deception; grey = no path; "
                    f"scale to the {HEATMAP_PERCENTILE:g}th percentile, "
                    f"{clipped} cell(s) beyond it",
