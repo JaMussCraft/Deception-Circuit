@@ -71,9 +71,10 @@ CAUSAL_SAMPLE = "causal_sample"
 PAIRED_HONEST_INSTRUCTION = "paired_honest_instruction"
 HONEST_TWIN_SPLIT = "honest_twin_split"
 
-#: The bare names `path_patching` writes per counterfactual. Spelled here only
-#: to derive their legacy names; `path_patching.COLUMN_NAMES` is the owner and a
-#: test pins the two equal.
+#: The bare names `path_patching` wrote per counterfactual before its sign
+#: flipped (2026-10-13). Spelled here only to derive their pre-`paired` legacy
+#: names; `path_patching.LEGACY_COLUMN_NAMES` is the owner and a test pins the
+#: two equal. The flipped columns have new names and are never in the map.
 _PATH_COLUMNS = ("strongest_incoming", "strongest_incoming_effect",
                  "strongest_outgoing", "strongest_outgoing_effect",
                  "direct_effect", "direct_effect_se")

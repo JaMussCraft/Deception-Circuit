@@ -357,9 +357,9 @@ def test_a_cli_run_writes_the_json_the_figures_and_the_head_table_columns(
         assert "NaN" not in f.read(), "the JSON twin must be strict JSON"
 
     table = read_json(out, *CELL, "head_table.json")
-    for column in ("strongest_incoming", "strongest_outgoing", "direct_effect"):
+    for column in ("strongest_incoming", "strongest_outgoing", "direct_support"):
         assert f"{pp.NAME}.{column}" in table["columns"]
-    assert all(row[f"{pp.NAME}.direct_effect"] is not None
+    assert all(row[f"{pp.NAME}.direct_support"] is not None
                for row in table["rows"])
 
 
@@ -617,11 +617,14 @@ def test_both_counterfactuals_give_the_head_table_one_column_set_each(
     assert pp.HONEST_INSTRUCTION in honest["skipped"]
 
     table = read_json(out, *CELL, "head_table.json")
-    assert f"{pp.NAME}.direct_effect" in table["columns"]
-    assert f"{pp.NAME}.direct_effect_honest_instruction_paired" in table["columns"]
-    assert all(row[f"{pp.NAME}.direct_effect"] is not None
+    assert f"{pp.NAME}.direct_support" in table["columns"]
+    assert f"{pp.NAME}.direct_support_honest_instruction_paired" in table["columns"]
+    assert f"{pp.NAME}.direct_support_honest_instruction_paired_se" in \
+        table["columns"]
+    assert not any("direct_effect" in one for one in table["columns"])
+    assert all(row[f"{pp.NAME}.direct_support"] is not None
                for row in table["rows"])
-    assert all(row[f"{pp.NAME}.direct_effect_honest_instruction_paired"] is None
+    assert all(row[f"{pp.NAME}.direct_support_honest_instruction_paired"] is None
                for row in table["rows"])
 
     # The coverage, per column, in the table's meta (ticket 13): the item swap
@@ -634,7 +637,7 @@ def test_both_counterfactuals_give_the_head_table_one_column_set_each(
         assert swap_entry["n"] == len(swap["sample"]["instance_ids"])
         assert swap_entry["instance_set"].startswith("causal_sample")
         honest_entry = coverage_of(
-            meta, f"{pp.NAME}.{name}_honest_instruction_paired")
+            meta, f"{pp.NAME}.{pp.column_name(name, pp.HONEST_INSTRUCTION)}")
         assert honest_entry["n"] == 0 and honest_entry["instance_set"] is None
 
 
@@ -859,6 +862,6 @@ def test_a_strong_component_outside_the_circuit_gets_a_row_of_its_own(
     from component_analysis.head_table import coverage_of
 
     sweep = read_json(out, *CELL, pp.SUBDIR, pp.SWEEP_FILE)
-    entry = coverage_of(table["meta"], f"{pp.NAME}.sweep_direct_effect")
+    entry = coverage_of(table["meta"], f"{pp.NAME}.sweep_direct_support")
     assert entry["n"] == sweep["sample"]["n_instances"] > 0
     assert set(entry["instance_ids"]) == set(sweep["sample"]["instance_ids"])

@@ -129,24 +129,51 @@ HONEST_INSTRUCTION = "honest_instruction"
 COUNTERFACTUALS = (ITEM_SWAP, HONEST_INSTRUCTION)
 BOTH = "both"
 
-#: What each counterfactual appends to a head-table column's bare name. The
-#: item-swap columns keep the names ticket 08 wrote. The honest ones are spelled
-#: out in full rather than as `_honest`, because `dla` has both a paired
-#: honest-instruction column and an unpaired honest-twin one, and end in
-#: `_paired` because they are computed over the same instance ids on both sides
-#: (the researcher's 2026-10-13 decision). Before it they ended in
-#: `_honest_instruction`, which `head_table.LEGACY_COLUMNS` translates.
+#: What each counterfactual adds to a head-table column's bare name, before a
+#: trailing `_se` (`column_name`). The item-swap columns carry no suffix. The
+#: honest ones are spelled out in full rather than as `_honest`, because `dla`
+#: has both a paired honest-instruction column and an unpaired honest-twin one,
+#: and end in `_paired` because they are computed over the same instance ids on
+#: both sides (the researcher's 2026-10-13 decision).
 COLUMN_SUFFIX = {ITEM_SWAP: "", HONEST_INSTRUCTION: "_honest_instruction_paired"}
 
 #: The bare names this analysis writes per Component per counterfactual, before
 #: the suffix and before the head table's own `path_patching.` namespace.
-COLUMN_NAMES = ("strongest_incoming", "strongest_incoming_effect",
-                "strongest_outgoing", "strongest_outgoing_effect",
-                "direct_effect", "direct_effect_se")
+#: `*_support` columns are signed by `CONVENTION` (positive helps deception);
+#: the two `strongest_*` names are cells chosen by absolute effect, so their
+#: meaning did not change with the sign and they keep their names.
+COLUMN_NAMES = ("strongest_incoming", "strongest_incoming_support",
+                "strongest_outgoing", "strongest_outgoing_support",
+                "direct_support", "direct_support_se")
 
 #: The completeness sweep's bare names, suffixed the same way.
-SWEEP_COLUMN_NAMES = ("sweep_direct_effect", "sweep_direct_effect_se",
+SWEEP_COLUMN_NAMES = ("sweep_direct_support", "sweep_direct_support_se",
                       "sweep_rank", "sweep_in_circuit", "sweep_flagged")
+
+#: The bare names written before the sign flipped (2026-10-13), in the legacy
+#: sign: `*_effect` is negative where a path helps deception. A cell of record
+#: still holds them. They are **not** translated to the new names, because
+#: their meaning differs (`head_table.LEGACY_COLUMNS` renames only what kept
+#: its meaning); a reader picks the generation by which names a row carries.
+LEGACY_COLUMN_NAMES = ("strongest_incoming", "strongest_incoming_effect",
+                       "strongest_outgoing", "strongest_outgoing_effect",
+                       "direct_effect", "direct_effect_se")
+LEGACY_SWEEP_COLUMN_NAMES = ("sweep_direct_effect", "sweep_direct_effect_se",
+                             "sweep_rank", "sweep_in_circuit", "sweep_flagged")
+
+
+def column_name(name: str, counterfactual: str) -> str:
+    """A bare column name for one counterfactual: `<name><suffix>[_se]`.
+
+    The suffix goes before a trailing `_se`, so a standard error sits beside
+    its mean (`direct_support_honest_instruction_paired_se`), the order
+    `dla.differential_paired_se` has.
+    """
+    suffix = COLUMN_SUFFIX[counterfactual]
+    if name.endswith("_se"):
+        return f"{name[:-3]}{suffix}_se"
+    return f"{name}{suffix}"
+
 
 #: The instance set each counterfactual's columns cover, by name, for the head
 #: table's coverage meta: the causal sample, or its paired subset.
@@ -953,8 +980,7 @@ def measured_ids(tally) -> List[str]:
 
 def _declare(ctx, names, instance_ids, counterfactual: str) -> None:
     """One counterfactual's columns, declared over the instances they cover."""
-    suffix = COLUMN_SUFFIX[counterfactual]
-    ctx.declare_coverage([f"{name}{suffix}" for name in names],
+    ctx.declare_coverage([column_name(name, counterfactual) for name in names],
                          instance_ids=instance_ids,
                          instance_set=INSTANCE_SETS[counterfactual])
 
@@ -974,10 +1000,10 @@ def sweep_counterfactual(ctx) -> str:
 def _merge(updates: Dict[tuple, dict], columns: Dict[tuple, dict],
            counterfactual: str) -> None:
     """Fold one counterfactual's columns in, suffixed by which pair they are."""
-    suffix = COLUMN_SUFFIX[counterfactual]
     for key, values in columns.items():
         updates.setdefault(key, {}).update(
-            {f"{name}{suffix}": value for name, value in values.items()})
+            {column_name(name, counterfactual): value
+             for name, value in values.items()})
 
 
 def agnostic_pass(ctx, grid: Grid, batches, counterfactual: str):
@@ -1265,8 +1291,8 @@ def sweep_columns(payload: dict) -> Dict[tuple, dict]:
         if not one["in_circuit"] and not one["flagged"]:
             continue
         updates[key] = {
-            "sweep_direct_effect": one["mean"],
-            "sweep_direct_effect_se": one["se"],
+            "sweep_direct_support": one["mean"],
+            "sweep_direct_support_se": one["se"],
             "sweep_rank": one["rank"],
             "sweep_in_circuit": one["in_circuit"],
             "sweep_flagged": one["flagged"],
@@ -1638,11 +1664,11 @@ def head_table_columns(grid: Grid, summaries: Dict[Cell, dict]) -> dict:
         direct = summaries[Cell(key, READOUT_KEY)]
         updates[key] = {
             "strongest_incoming": best_in[0]["cell"] if best_in else None,
-            "strongest_incoming_effect": best_in[0]["mean"] if best_in else None,
+            "strongest_incoming_support": best_in[0]["mean"] if best_in else None,
             "strongest_outgoing": best_out[0]["cell"] if best_out else None,
-            "strongest_outgoing_effect": best_out[0]["mean"] if best_out else None,
-            "direct_effect": direct["mean"],
-            "direct_effect_se": direct["se"],
+            "strongest_outgoing_support": best_out[0]["mean"] if best_out else None,
+            "direct_support": direct["mean"],
+            "direct_support_se": direct["se"],
         }
     return updates
 

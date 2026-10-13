@@ -416,10 +416,59 @@ def test_the_honest_instruction_columns_say_paired_in_their_names():
     assert pp.COLUMN_SUFFIX[pp.HONEST_INSTRUCTION] == "_honest_instruction_paired"
 
 
-def test_the_legacy_names_cover_every_column_this_module_writes():
+def test_the_columns_whose_sign_flipped_have_new_names():
+    """Since 2026-10-13 a positive cell helps deception. A column whose sign
+    changed is a new column, so an old cell can never be read as a new one
+    under the same name; the names of the cells, ranks and flags did not
+    change meaning and keep their names."""
+    assert pp.COLUMN_NAMES == (
+        "strongest_incoming", "strongest_incoming_support",
+        "strongest_outgoing", "strongest_outgoing_support",
+        "direct_support", "direct_support_se")
+    assert pp.SWEEP_COLUMN_NAMES == (
+        "sweep_direct_support", "sweep_direct_support_se", "sweep_rank",
+        "sweep_in_circuit", "sweep_flagged")
+    assert pp.LEGACY_COLUMN_NAMES == (
+        "strongest_incoming", "strongest_incoming_effect",
+        "strongest_outgoing", "strongest_outgoing_effect",
+        "direct_effect", "direct_effect_se")
+
+
+def test_an_honest_instruction_column_puts_paired_before_the_se():
+    """`<name>_paired_se`, the order `dla.differential_paired_se` has."""
+    honest = pp.HONEST_INSTRUCTION
+    assert pp.column_name("direct_support_se", honest) == \
+        "direct_support_honest_instruction_paired_se"
+    assert pp.column_name("sweep_direct_support_se", honest) == \
+        "sweep_direct_support_honest_instruction_paired_se"
+    assert pp.column_name("direct_support", honest) == \
+        "direct_support_honest_instruction_paired"
+    assert pp.column_name("direct_support_se", pp.ITEM_SWAP) == \
+        "direct_support_se"
+
+
+def test_no_legacy_translation_reaches_a_column_whose_sign_flipped():
+    """`head_table.LEGACY_COLUMNS` renames without changing meaning, so it may
+    neither produce nor consume a column of the new sign convention."""
     from component_analysis import head_table
 
-    for name in pp.COLUMN_NAMES + pp.SWEEP_COLUMN_NAMES:
+    signed = {f"{pp.NAME}.{pp.column_name(name, counterfactual)}"
+              for name in pp.COLUMN_NAMES + pp.SWEEP_COLUMN_NAMES
+              if "support" in name
+              for counterfactual in pp.COUNTERFACTUALS}
+    assert f"{pp.NAME}.direct_support_honest_instruction_paired_se" in signed
+    for old, new in head_table.LEGACY_COLUMNS.items():
+        assert old not in signed and new not in signed, (old, new)
+
+
+def test_the_legacy_names_still_read_a_cell_written_before_the_paired_names():
+    """Ticket 13's translation of the old honest spellings stays: both sides
+    are of the legacy sign, so the meaning is unchanged."""
+    from component_analysis import head_table
+
+    for name in pp.LEGACY_COLUMN_NAMES + pp.LEGACY_SWEEP_COLUMN_NAMES:
         old = f"{pp.NAME}.{name}_honest_instruction"
         assert head_table.LEGACY_COLUMNS[old] == \
-            f"{pp.NAME}.{name}{pp.COLUMN_SUFFIX[pp.HONEST_INSTRUCTION]}"
+            f"{pp.NAME}.{name}_honest_instruction_paired"
+
+
