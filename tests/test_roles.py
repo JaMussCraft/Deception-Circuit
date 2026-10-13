@@ -306,6 +306,148 @@ def test_the_honest_instruction_support_column_is_negated_too_and_keeps_its_suff
         pytest.approx(0.0088)
 
 
+#: A legacy-sign column (written before 2026-10-13) and the column that
+#: replaced it in the new sign, where positive helps deception.
+SIGN_FLIPPED = {
+    "path_patching.direct_effect": "path_patching.direct_support",
+    "path_patching.strongest_outgoing_effect":
+        "path_patching.strongest_outgoing_support",
+    "path_patching.direct_effect_honest_instruction_paired":
+        "path_patching.direct_support_honest_instruction_paired",
+    "path_patching.strongest_incoming_effect_honest_instruction_paired":
+        "path_patching.strongest_incoming_support_honest_instruction_paired",
+}
+SE_RENAMED = {
+    "path_patching.direct_effect_se": "path_patching.direct_support_se",
+    "path_patching.direct_effect_se_honest_instruction_paired":
+        "path_patching.direct_support_honest_instruction_paired_se",
+}
+
+
+def native(one):
+    """The same row as a path-patching run since 2026-10-13 writes it: the
+    signed columns under their new names and negated, the standard errors
+    renamed and unchanged."""
+    out = {}
+    for column, value in one.items():
+        if column in SIGN_FLIPPED:
+            out[SIGN_FLIPPED[column]] = None if value is None else -value
+        else:
+            out[SE_RENAMED.get(column, column)] = value
+    return out
+
+
+def test_a_new_cell_s_direct_support_is_the_path_patching_column_read_natively():
+    derived = roles.derived_columns(native(a_selector()))
+    assert derived["direct_support"] == pytest.approx(0.021)
+    assert derived["direct_support_se"] == pytest.approx(0.0017)
+
+
+def test_a_new_cell_s_honest_instruction_support_is_native_too():
+    derived = roles.derived_columns(native(
+        a_selector()
+        | {"path_patching.direct_effect_honest_instruction_paired": -0.0088}))
+    assert derived["direct_support_honest_instruction_paired"] == \
+        pytest.approx(0.0088)
+
+
+def test_a_row_carrying_both_sign_conventions_is_refused_by_name():
+    """Reachable by merging a legacy cell into a new one: the two generations
+    have different names, so the merge's own conflict check cannot see it,
+    and either reading would silently drop the other measurement."""
+    both = a_selector() | {"path_patching.direct_support": 0.021}
+    with pytest.raises(ValueError, match="path_patching.direct_effect"):
+        roles.derived_columns(both)
+
+
+def test_a_new_cell_gets_the_same_roles_and_support_as_its_legacy_twin(tmp_path):
+    new = os.path.join(str(tmp_path), "new", *CELL)
+    old = os.path.join(str(tmp_path), "old", *CELL)
+    table = [a_binder(), a_selector(), a_mover(), a_suppressor(),
+             knockout_alone()]
+    write_head_table(old, table)
+    write_head_table(new, [native(one) for one in table])
+
+    assert run_roles(new) == 0 and run_roles(old) == 0
+
+    rows_new, rows_old = (by_key(load_head_table(new)),
+                          by_key(load_head_table(old)))
+    for key, one in rows_old.items():
+        assert rows_new[key]["roles.role_proposed"] == one["roles.role_proposed"]
+        assert rows_new[key]["roles.direct_support"] == \
+            one["roles.direct_support"]
+    assert rows_new[("head", 17, 25)]["roles.role_proposed"] == "selector"
+    assert rows_new[("head", 24, 18)]["roles.direct_support"] == \
+        pytest.approx(0.024)
+    assert "native" in read(new, roles.SUBDIR, roles.JSON_NAME)[
+        "sign_convention"]
+    assert "negat" in read(old, roles.SUBDIR, roles.JSON_NAME)[
+        "sign_convention"]
+
+
+def test_a_legacy_cell_of_record_reads_the_direct_support_it_always_had(
+        tmp_path):
+    """Two rows of `sdr-first-run`'s head table as written (item-swap direct
+    effect in the legacy sign, honest columns already under ticket 13's
+    names). The derived support is what the roles pass of record wrote."""
+    path = os.path.join(str(tmp_path), *CELL)
+    record = [
+        row("mlp", 31, 0, **{
+            "path_patching.direct_effect": -0.09507,
+            "path_patching.direct_effect_se": 0.01611,
+            "path_patching.strongest_outgoing": "mlp.31.0->readout",
+            "path_patching.strongest_outgoing_effect": -0.09507,
+            "path_patching.direct_effect_honest_instruction_paired": -0.07700,
+            "path_patching.direct_effect_se_honest_instruction_paired": 0.02290}),
+        row("head", 17, 25, **{
+            "path_patching.direct_effect": -0.01920,
+            "path_patching.direct_effect_se": 0.00140,
+            "path_patching.strongest_outgoing": "head.17.25->readout",
+            "path_patching.strongest_outgoing_effect": -0.01920}),
+    ]
+    write_head_table(path, record)
+
+    assert run_roles(path, "--roles-allow-missing-views") == 0
+
+    rows = by_key(load_head_table(path))
+    assert rows[("mlp", 31, 0)]["roles.direct_support"] == pytest.approx(0.09507)
+    assert rows[("mlp", 31, 0)]["roles.direct_support_se"] == \
+        pytest.approx(0.01611)
+    assert rows[("mlp", 31, 0)][
+        "roles.direct_support_honest_instruction_paired"] == \
+        pytest.approx(0.07700)
+    assert rows[("head", 17, 25)]["roles.direct_support"] == \
+        pytest.approx(0.01920)
+    assert rows[("head", 17, 25)]["path_patching.direct_effect"] == \
+        pytest.approx(-0.01920), "the legacy column itself is never rewritten"
+
+
+def test_the_derived_columns_of_a_new_cell_take_the_native_columns_coverage(
+        tmp_path):
+    from component_analysis.head_table import (
+        add_coverage, coverage_of, load_head_table_meta)
+
+    path = os.path.join(str(tmp_path), *CELL)
+    meta = add_coverage({}, ["direct_support", "direct_support_se"],
+                        [f"i{one}" for one in range(100)],
+                        instance_set="causal_sample", namespace="path_patching")
+    meta = add_coverage(meta, ["direct_support_honest_instruction_paired"],
+                        [f"i{one}" for one in range(71)],
+                        instance_set="paired_honest_instruction",
+                        namespace="path_patching")
+    write_head_table(path, [native(a_selector(**{
+        "path_patching.direct_effect_honest_instruction_paired": -0.0088}))],
+        meta=meta)
+
+    assert run_roles(path) == 0
+
+    written = load_head_table_meta(path)
+    assert coverage_of(written, "roles.direct_support")["n"] == 100
+    assert coverage_of(written, "roles.direct_support_se")["n"] == 100
+    assert coverage_of(
+        written, "roles.direct_support_honest_instruction_paired")["n"] == 71
+
+
 # ==============================================================================
 # THRESHOLDS ARE FLAGS
 # ==============================================================================

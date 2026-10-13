@@ -13,14 +13,18 @@ committed before any role was assigned to any Component. This file implements
 exactly those rules; where a threshold appears here it is the default the doc
 states and the reason is in the doc, not in a comment here. The sign convention
 the criteria read across analyses is ADR-0002: **positive supports the
-deceptive answer**, with `path_patching`'s opposite sign carried by the derived
-`roles.direct_support` column rather than by touching the original.
+deceptive answer**. Path patching has written that sign since 2026-10-13 and
+is read natively; a cell written before holds the opposite sign under its old
+names, and the derived `roles.direct_support` column negates it rather than
+touching the original.
 
 What comes out, per Component:
 
     roles.role_proposed    binder | selector | mover | suppressor | unknown
     roles.role_notes       one line: the flavour, the lean, and the numbers
-    roles.direct_support   -path_patching.direct_effect  (ADR-0002)
+    roles.direct_support   path_patching.direct_support, or on a cell
+                           written before 2026-10-13 -path_patching.direct_effect
+                           (ADR-0002)
     roles.direct_support_se
     roles.direct_support_honest_instruction_paired
     roles.reads_group      which group the top Segment falls in
@@ -135,14 +139,42 @@ DLA_DIFFERENTIAL_SE = "dla.differential_paired_se"
 DLA_SUPPRESSION = "dla.suppression"
 KNOCKOUT = "knockout.logit_diff_drop"
 KNOCKOUT_SE = "knockout.standard_error"
+#: The path-patching columns, in the sign every path-patching run writes since
+#: 2026-10-13 (`path_patching.CONVENTION`: positive helps deception), read
+#: natively. A cell written before carries the legacy columns below instead,
+#: in the opposite sign, and those are negated (ADR-0002). The two generations
+#: have different names, so a row says by its names which one it is.
+DIRECT_SUPPORT = "path_patching.direct_support"
+DIRECT_SUPPORT_SE = "path_patching.direct_support_se"
+DIRECT_SUPPORT_HONEST = "path_patching.direct_support_honest_instruction_paired"
+DIRECT_SUPPORT_HONEST_SE = \
+    "path_patching.direct_support_honest_instruction_paired_se"
+OUTGOING = "path_patching.strongest_outgoing"
+OUTGOING_SUPPORT = "path_patching.strongest_outgoing_support"
+INCOMING_HONEST = "path_patching.strongest_incoming_honest_instruction_paired"
+INCOMING_HONEST_SUPPORT = \
+    "path_patching.strongest_incoming_support_honest_instruction_paired"
+
+#: The legacy-sign spellings (negative helps deception), under ticket 13's
+#: paired names. Never translated into the columns above: a sign is meaning.
 DIRECT_EFFECT = "path_patching.direct_effect"
 DIRECT_EFFECT_SE = "path_patching.direct_effect_se"
 DIRECT_EFFECT_HONEST = "path_patching.direct_effect_honest_instruction_paired"
-OUTGOING = "path_patching.strongest_outgoing"
+DIRECT_EFFECT_HONEST_SE = \
+    "path_patching.direct_effect_se_honest_instruction_paired"
 OUTGOING_EFFECT = "path_patching.strongest_outgoing_effect"
-INCOMING_HONEST = "path_patching.strongest_incoming_honest_instruction_paired"
 INCOMING_HONEST_EFFECT = \
     "path_patching.strongest_incoming_effect_honest_instruction_paired"
+
+#: `{native column: legacy column}` for every number the criteria read from
+#: path patching. A signed pair is negated on the legacy side; a standard error
+#: pair is copied, because a standard error has no sign.
+SIGNED_PAIRS = {DIRECT_SUPPORT: DIRECT_EFFECT,
+                DIRECT_SUPPORT_HONEST: DIRECT_EFFECT_HONEST,
+                OUTGOING_SUPPORT: OUTGOING_EFFECT,
+                INCOMING_HONEST_SUPPORT: INCOMING_HONEST_EFFECT}
+SE_PAIRS = {DIRECT_SUPPORT_SE: DIRECT_EFFECT_SE,
+            DIRECT_SUPPORT_HONEST_SE: DIRECT_EFFECT_HONEST_SE}
 
 #: The human's column, read and never written. Looked up by name rather than by
 #: position, because `head_table` documents `PROTECTED_COLUMNS` as extensible.
@@ -158,18 +190,22 @@ REQUIRED_COLUMNS = {
     "reads (attention_patterns)": (TOP_SEGMENT, TOP_MASS),
     "writes (dla)": (DLA, DLA_SE),
     "depends, whether (knockout)": (KNOCKOUT, KNOCKOUT_SE),
-    "depends, how (path_patching)": (DIRECT_EFFECT, DIRECT_EFFECT_SE, OUTGOING),
+    "depends, how (path_patching)": (DIRECT_SUPPORT, DIRECT_SUPPORT_SE,
+                                     DIRECT_EFFECT, DIRECT_EFFECT_SE, OUTGOING),
 }
 
 #: What the head table gains, before the CLI adds the `roles` namespace.
 COLUMNS = ("role_proposed", "role_notes", "direct_support", "direct_support_se",
            "direct_support_honest_instruction_paired", "reads_group")
 
-#: The derived columns, and the column each is read from: a derived column
-#: covers exactly the instances its source does, so it takes its coverage.
-DERIVED_FROM = {"direct_support": DIRECT_EFFECT,
-                "direct_support_se": DIRECT_EFFECT_SE,
-                "direct_support_honest_instruction_paired": DIRECT_EFFECT_HONEST}
+#: The derived columns, and the columns each is read from, native first: a
+#: derived column covers exactly the instances its source does, so it takes
+#: the coverage of whichever source the table holds.
+DERIVED_FROM = {
+    "direct_support": (DIRECT_SUPPORT, DIRECT_EFFECT),
+    "direct_support_se": (DIRECT_SUPPORT_SE, DIRECT_EFFECT_SE),
+    "direct_support_honest_instruction_paired": (DIRECT_SUPPORT_HONEST,
+                                                 DIRECT_EFFECT_HONEST)}
 
 
 @dataclass
@@ -245,20 +281,69 @@ def segment_group(segment) -> str:
     return SEGMENT_GROUPS.get(str(segment), "unestablished")
 
 
-def derived_columns(row) -> dict:
-    """ADR-0002's sign flip, as new columns rather than a rewrite.
+def _one_generation(row, native: str, legacy: str):
+    """`(native value, legacy value)`, refusing a row that holds both.
 
-    `path_patching` is negative where knockout and DLA are positive, so the
-    criteria read a derived negation and the original column keeps its meaning
-    in every file already written. A standard error has no sign and is copied.
+    A row with both is two path-patching runs of opposite sign merged into one
+    table (`--roles-merge-from` a legacy cell into a new one): the merge's own
+    conflict check cannot see it, because the names differ, and reading either
+    would silently drop the other measurement.
     """
-    direct = _number(row, DIRECT_EFFECT)
-    honest = _number(row, DIRECT_EFFECT_HONEST)
+    new, old = _number(row, native), _number(row, legacy)
+    if new is not None and old is not None:
+        raise ValueError(
+            f"{row_key(row)} carries both {legacy} (written before path "
+            f"patching's sign flipped on 2026-10-13, negative helps deception) "
+            f"and {native} (positive helps deception). They are two runs, not "
+            f"one; drop one of the cells this table was merged from.")
+    return new, old
+
+
+def support_of(row, native: str, legacy: str) -> Optional[float]:
+    """A signed path-patching number in the deception-support convention.
+
+    The native column is read as it is; the legacy column is negated
+    (ADR-0002). Absent rather than zero when neither is there.
+    """
+    new, old = _one_generation(row, native, legacy)
+    if new is not None:
+        return new
+    return None if old is None else -old
+
+
+def standard_error(row, native: str, legacy: str) -> Optional[float]:
+    new, old = _one_generation(row, native, legacy)
+    return new if new is not None else old
+
+
+def conventions_of(rows) -> List[str]:
+    """Which path-patching sign conventions a table's rows were read in:
+    `native`, `legacy`, both (across rows), or neither."""
+    found = []
+    for one in rows:
+        for native, legacy in SIGNED_PAIRS.items():
+            if _number(one, native) is not None and "native" not in found:
+                found.append("native")
+            if _number(one, legacy) is not None and "legacy" not in found:
+                found.append("legacy")
+    return sorted(found, reverse=True)
+
+
+def derived_columns(row) -> dict:
+    """ADR-0002's support convention, read from either generation.
+
+    A path-patching run since 2026-10-13 writes `path_patching.direct_support`
+    with positive helping deception, and it is copied as it is. A cell written
+    before holds `path_patching.direct_effect` in the opposite sign, and it is
+    negated, as it always was; the original column keeps its meaning in every
+    file already written. A standard error has no sign and is copied.
+    """
     return {
-        "direct_support": None if direct is None else -direct,
-        "direct_support_se": _number(row, DIRECT_EFFECT_SE),
+        "direct_support": support_of(row, DIRECT_SUPPORT, DIRECT_EFFECT),
+        "direct_support_se": standard_error(row, DIRECT_SUPPORT_SE,
+                                            DIRECT_EFFECT_SE),
         "direct_support_honest_instruction_paired":
-            None if honest is None else -honest,
+            support_of(row, DIRECT_SUPPORT_HONEST, DIRECT_EFFECT_HONEST),
     }
 
 
@@ -310,8 +395,9 @@ def views_of(row, thresholds: Thresholds) -> dict:
     knockout = _number(row, KNOCKOUT)
     derived = derived_columns(row)
     support = derived["direct_support"]
-    outgoing_effect = _number(row, OUTGOING_EFFECT)
-    incoming_effect = _number(row, INCOMING_HONEST_EFFECT)
+    outgoing_effect = support_of(row, OUTGOING_SUPPORT, OUTGOING_EFFECT)
+    incoming_effect = support_of(row, INCOMING_HONEST_SUPPORT,
+                              INCOMING_HONEST_EFFECT)
 
     return {
         "reads": {
@@ -341,12 +427,12 @@ def views_of(row, thresholds: Thresholds) -> dict:
             "direct_support_sign": direction(support, derived["direct_support_se"],
                                              thresholds.path_floor, thresholds),
             "outgoing": row.get(OUTGOING),
-            "outgoing_effect": outgoing_effect,
+            "outgoing_support": outgoing_effect,
             "outgoing_clears_floor": (outgoing_effect is not None
                                       and abs(outgoing_effect) >= thresholds.path_floor),
             "outgoing_is_readout": is_readout_receiver(row.get(OUTGOING)),
             "incoming_honest_instruction": row.get(INCOMING_HONEST),
-            "incoming_honest_instruction_effect": incoming_effect,
+            "incoming_honest_instruction_support": incoming_effect,
             "honest_instruction_at_own_query": (
                 is_query_receiver_on(row.get(INCOMING_HONEST), key)
                 and incoming_effect is not None
@@ -552,7 +638,7 @@ def unmeasured_views(views: dict) -> List[str]:
     if views["writes"]["value"] is None:
         out.append("writes (dla)")
     if views["depends"]["direct_support"] is None \
-            or views["depends"]["outgoing_effect"] is None:
+            or views["depends"]["outgoing_support"] is None:
         out.append("depends, how (path_patching)")
     return out
 
@@ -624,17 +710,31 @@ def flavour_counts(decisions: List[Decision]) -> dict:
     return out
 
 
+def sign_convention(conventions) -> str:
+    """The roles JSON's sentence on how path patching was read in this table."""
+    ways = []
+    if "native" in conventions:
+        ways.append("roles.direct_support is path_patching.direct_support "
+                    "read natively (a path-patching run since 2026-10-13, "
+                    "positive helps deception)")
+    if "legacy" in conventions:
+        ways.append("roles.direct_support is -path_patching.direct_effect, "
+                    "negating a legacy cell written before 2026-10-13")
+    if not ways:
+        ways.append("no path-patching column was present")
+    return ("positive supports the deceptive answer (ADR-0002); knockout and "
+            "dla are read natively; " + "; ".join(ways))
+
+
 def payload(decisions: List[Decision], *, cell_dir: str, thresholds: Thresholds,
             merged_from: List[str], meta: dict = None,
-            missing_views: List[str] = None, renamed: dict = None) -> dict:
+            missing_views: List[str] = None, renamed: dict = None,
+            conventions: List[str] = ()) -> dict:
     return {
         "analysis": NAME,
         "created": time.strftime("%Y-%m-%dT%H:%M:%S"),
         "criteria_doc": CRITERIA_DOC,
-        "sign_convention": (
-            "positive supports the deceptive answer (ADR-0002); "
-            "knockout and dla are read natively and roles.direct_support is "
-            "-path_patching.direct_effect"),
+        "sign_convention": sign_convention(conventions),
         "vocabulary": list(ROLES),
         "reserved": list(RESERVED),
         "thresholds": thresholds.as_dict(),
@@ -812,9 +912,11 @@ def derived_coverage(meta: dict) -> dict:
     """The meta with each derived column given its source column's coverage."""
     meta = dict(meta or {})
     coverage = dict(meta.get(COVERAGE_KEY) or {})
-    for column, source in DERIVED_FROM.items():
-        if source in coverage:
-            coverage[f"{NAME}.{column}"] = dict(coverage[source])
+    for column, sources in DERIVED_FROM.items():
+        for source in sources:
+            if source in coverage:
+                coverage[f"{NAME}.{column}"] = dict(coverage[source])
+                break
     if coverage:
         meta[COVERAGE_KEY] = coverage
     return meta
@@ -849,7 +951,11 @@ def main(argv=None) -> int:
         rows, cell_dir=cli.cell_dir, merged_from=cli.roles_merge_from,
         allow=cli.roles_allow_missing_views)
 
-    decisions = decide_rows(rows, thresholds)
+    try:
+        decisions = decide_rows(rows, thresholds)
+    except ValueError as error:
+        raise SystemExit(f"{cli.cell_dir!r}: {error}")
+    conventions = conventions_of(rows)
     print_decisions(decisions)
 
     if cli.dry_run:
@@ -872,7 +978,8 @@ def main(argv=None) -> int:
         json.dump(payload(decisions, cell_dir=cli.cell_dir,
                           thresholds=thresholds,
                           merged_from=cli.roles_merge_from, meta=meta,
-                          missing_views=missing_views, renamed=renamed),
+                          missing_views=missing_views, renamed=renamed,
+                          conventions=conventions),
                   handle, indent=2, default=str)
 
     print(f"\n  {written['csv']}\n  {written['json']}\n  {json_path}")
