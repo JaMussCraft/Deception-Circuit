@@ -22,7 +22,7 @@ What comes out, per Component:
     roles.role_notes       one line: the flavour, the lean, and the numbers
     roles.direct_support   -path_patching.direct_effect  (ADR-0002)
     roles.direct_support_se
-    roles.direct_support_honest_instruction
+    roles.direct_support_honest_instruction_paired
     roles.reads_group      which group the top Segment falls in
 
 and `roles/roles.json`, which records every threshold, every view's input and
@@ -41,7 +41,13 @@ Usage:
 
 `--roles-merge-from` exists because the analyses of record were run one suite
 per analysis: it copies another cell's analysis columns onto the matching rows
-before the criteria run, so that one table carries all three views.
+before the criteria run, so that one table carries all three views. Since
+ticket 13 a cell is assembled by running every job into it, so new cells need
+no merge.
+
+A table written before the paired columns said `paired` in their names is read
+under the current names (`head_table.modernize_columns`), both the cell's own
+and every merged one, and the translation is recorded in `roles.json`.
 """
 
 from __future__ import annotations
@@ -54,8 +60,10 @@ import time
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
-from component_analysis.head_table import BASE_COLUMNS, JSON_NAME as TABLE_JSON, \
-    KEY_COLUMNS, PROTECTED_COLUMNS, merge_columns, row_key, write_head_table
+from component_analysis.head_table import BASE_COLUMNS, COVERAGE, \
+    INSTANCE_SETS, JSON_NAME as TABLE_JSON, KEY_COLUMNS, LEGACY_COLUMNS, \
+    PROTECTED_COLUMNS, merge_columns, modernize_columns, row_key, \
+    write_head_table
 
 NAME = "roles"
 SUBDIR = "roles"
@@ -73,9 +81,14 @@ ROLES = ("binder", "selector", "mover", "suppressor", "unknown")
 #: pass notes the signature and assigns `unknown`.
 RESERVED = ("pressure reader",)
 
-#: The two flavours of `unknown`, which the notes name apart.
+#: The flavours of `unknown`, which the notes name apart. `knockout-only` is
+#: the researcher's 2026-10-13 amendment: a Component whose only significant
+#: view is knockout, held at `unknown` until there is reads evidence rather
+#: than given a fifth role (docs/component-roles.md, "Changing these criteria").
 DISAGREE = "disagree"
 INSUFFICIENT = "insufficient"
+KNOCKOUT_ONLY = "knockout-only"
+FLAVOURS = (DISAGREE, KNOCKOUT_ONLY, INSUFFICIENT)
 
 #: Segment name -> group, from CONTEXT.md's prompt anatomy. A name that is not
 #: here is `unestablished`, which is also what an absent read is: a Segment the
@@ -114,22 +127,22 @@ ESTABLISHED_GROUPS = ("designation", "item_mention", "pressure", "frame")
 TOP_SEGMENT = "attention_patterns.pressure_top_segment"
 TOP_MASS = "attention_patterns.pressure_top_mass"
 PAIRED_TOP_SEGMENT = "attention_patterns.pressure_paired_top_segment"
-HONEST_TOP_SEGMENT = "attention_patterns.honest_instruction_top_segment"
+HONEST_TOP_SEGMENT = "attention_patterns.honest_instruction_paired_top_segment"
 DLA = "dla.pressure"
 DLA_SE = "dla.pressure_se"
-DLA_DIFFERENTIAL = "dla.differential"
-DLA_DIFFERENTIAL_SE = "dla.differential_se"
+DLA_DIFFERENTIAL = "dla.differential_paired"
+DLA_DIFFERENTIAL_SE = "dla.differential_paired_se"
 DLA_SUPPRESSION = "dla.suppression"
 KNOCKOUT = "knockout.logit_diff_drop"
 KNOCKOUT_SE = "knockout.standard_error"
 DIRECT_EFFECT = "path_patching.direct_effect"
 DIRECT_EFFECT_SE = "path_patching.direct_effect_se"
-DIRECT_EFFECT_HONEST = "path_patching.direct_effect_honest_instruction"
+DIRECT_EFFECT_HONEST = "path_patching.direct_effect_honest_instruction_paired"
 OUTGOING = "path_patching.strongest_outgoing"
 OUTGOING_EFFECT = "path_patching.strongest_outgoing_effect"
-INCOMING_HONEST = "path_patching.strongest_incoming_honest_instruction"
+INCOMING_HONEST = "path_patching.strongest_incoming_honest_instruction_paired"
 INCOMING_HONEST_EFFECT = \
-    "path_patching.strongest_incoming_effect_honest_instruction"
+    "path_patching.strongest_incoming_effect_honest_instruction_paired"
 
 #: The human's column, read and never written. Looked up by name rather than by
 #: position, because `head_table` documents `PROTECTED_COLUMNS` as extensible.
@@ -150,7 +163,13 @@ REQUIRED_COLUMNS = {
 
 #: What the head table gains, before the CLI adds the `roles` namespace.
 COLUMNS = ("role_proposed", "role_notes", "direct_support", "direct_support_se",
-           "direct_support_honest_instruction", "reads_group")
+           "direct_support_honest_instruction_paired", "reads_group")
+
+#: The derived columns, and the column each is read from: a derived column
+#: covers exactly the instances its source does, so it takes its coverage.
+DERIVED_FROM = {"direct_support": DIRECT_EFFECT,
+                "direct_support_se": DIRECT_EFFECT_SE,
+                "direct_support_honest_instruction_paired": DIRECT_EFFECT_HONEST}
 
 
 @dataclass
@@ -238,7 +257,8 @@ def derived_columns(row) -> dict:
     return {
         "direct_support": None if direct is None else -direct,
         "direct_support_se": _number(row, DIRECT_EFFECT_SE),
-        "direct_support_honest_instruction": None if honest is None else -honest,
+        "direct_support_honest_instruction_paired":
+            None if honest is None else -honest,
     }
 
 
@@ -410,6 +430,24 @@ def lean_of(criteria: Dict[str, Dict[str, bool]]) -> Optional[str]:
     return best
 
 
+def knockout_only(views: dict) -> bool:
+    """Is knockout the only view that speaks? The `unknown/knockout-only` test.
+
+    Knockout significant and above its floor, in either direction; no
+    established read (an MLP block has none to establish); nothing written at
+    the Readout, pressure-dependent or not; no direct path, no onward path and
+    no honest-instruction path at its own query above the path floor.
+    """
+    reads, writes, depends = views["reads"], views["writes"], views["depends"]
+    return (depends["knockout_sign"] != 0
+            and not reads["established"]
+            and writes["sign"] == 0 and writes["differential_sign"] == 0
+            and not writes["suppression"]
+            and depends["direct_support_sign"] == 0
+            and not depends["outgoing_clears_floor"]
+            and not depends["honest_instruction_at_own_query"])
+
+
 def pressure_reader_signature(views: dict) -> bool:
     """Reads the Pressure Clause under pressure, and stops under the instruction.
 
@@ -479,6 +517,14 @@ def propose(row, thresholds: Thresholds = None) -> Decision:
         if all(criteria[role].values()):
             return decide(role, None, f"{role}: {_evidence(views)}")
 
+    if knockout_only(views):
+        way = ("supports deception" if views["depends"]["knockout_sign"] > 0
+               else "opposes deception")
+        return decide("unknown", KNOCKOUT_ONLY,
+                      f"unknown/knockout-only: knockout {way} and no other view "
+                      f"speaks, held until there is reads evidence; "
+                      + _evidence(views))
+
     lean = lean_of(criteria)
     missing = _missing(criteria, lean) if lean else None
     notes = "unknown/insufficient: "
@@ -544,9 +590,18 @@ def counts(decisions: List[Decision]) -> dict:
     return out
 
 
+def flavour_counts(decisions: List[Decision]) -> dict:
+    """How many `unknown`s of each flavour, the ones that occurred only."""
+    out: Dict[str, int] = {}
+    for one in decisions:
+        if one.flavour:
+            out[one.flavour] = out.get(one.flavour, 0) + 1
+    return out
+
+
 def payload(decisions: List[Decision], *, cell_dir: str, thresholds: Thresholds,
             merged_from: List[str], meta: dict = None,
-            missing_views: List[str] = None) -> dict:
+            missing_views: List[str] = None, renamed: dict = None) -> dict:
     return {
         "analysis": NAME,
         "created": time.strftime("%Y-%m-%dT%H:%M:%S"),
@@ -569,6 +624,9 @@ def payload(decisions: List[Decision], *, cell_dir: str, thresholds: Thresholds,
         "circuit": _label((meta or {}).get("circuit")),
         "task": _label((meta or {}).get("task")),
         "counts": counts(decisions),
+        "flavour_counts": flavour_counts(decisions),
+        #: Legacy column names translated on the way in, old -> current.
+        "renamed_columns": dict(renamed or {}),
         "n_components": len(decisions),
         "components": [one.as_dict() for one in decisions],
     }
@@ -658,7 +716,12 @@ def require_columns(rows, *, cell_dir: str, merged_from=(), allow=False) -> list
 
 
 def read_table(cell_dir: str) -> tuple:
-    """`(rows, meta)` of a written head table, or a refusal naming the file."""
+    """`(rows, meta, renamed)` of a written head table, under the current names.
+
+    `renamed` is the legacy translation applied, old -> current, so a cell of
+    record written before the paired names reads like any other. A missing
+    table is refused by name.
+    """
     path = os.path.join(cell_dir, TABLE_JSON)
     if not os.path.exists(path):
         raise SystemExit(f"no {TABLE_JSON} in {cell_dir!r}: the roles pass "
@@ -667,7 +730,12 @@ def read_table(cell_dir: str) -> tuple:
                          f"at the cells that have them).")
     with open(path) as handle:
         table = json.load(handle)
-    return table["rows"], table.get("meta", {})
+    rows, renamed = modernize_columns(table["rows"])
+    meta = dict(table.get("meta") or {})
+    if meta.get(COVERAGE):
+        meta[COVERAGE] = {LEGACY_COLUMNS.get(column, column): entry
+                          for column, entry in meta[COVERAGE].items()}
+    return rows, meta, renamed
 
 
 #: Never copied by `--roles-merge-from`: the key identifies the row, the intake
@@ -675,18 +743,30 @@ def read_table(cell_dir: str) -> tuple:
 NOT_MERGED = set(KEY_COLUMNS) | set(BASE_COLUMNS) | set(PROTECTED_COLUMNS)
 
 
-def merge_cells(rows, cell_dirs) -> list:
-    """Another cell's analysis columns, onto the rows that are already here.
+def merge_cells(rows, cell_dirs, *, meta: dict = None) -> tuple:
+    """`(rows, meta, renamed)`: other cells' analysis columns, onto these rows.
 
     A column that already holds a different value is refused by name rather
     than overwritten: two cells that both ran path patching would otherwise
     have the last one on the command line win silently, and a role assigned
     from columns whose provenance is "whichever cell came last" is not
     auditable. Merging a cell that agrees, or that only fills blanks, is fine.
+    Each merged cell is read under the current column names first, so the same
+    column under its legacy spelling is compared as itself. Its coverage
+    comes with its columns, without replacing coverage already held.
     """
+    meta = dict(meta or {})
+    renamed_all: Dict[str, str] = {}
     seen = {row_key(one): dict(one) for one in rows}
     for cell_dir in cell_dirs:
-        other, _meta = read_table(cell_dir)
+        other, other_meta, renamed = read_table(cell_dir)
+        renamed_all.update(renamed)
+        coverage = dict(meta.get(COVERAGE) or {})
+        for column, entry in (other_meta.get(COVERAGE) or {}).items():
+            coverage.setdefault(column, entry)
+        meta[COVERAGE] = coverage
+        meta[INSTANCE_SETS] = {**(other_meta.get(INSTANCE_SETS) or {}),
+                               **(meta.get(INSTANCE_SETS) or {})}
         updates = {}
         for one in other:
             key = row_key(one)
@@ -704,7 +784,19 @@ def merge_cells(rows, cell_dirs) -> list:
                 updates[key] = values
                 seen.setdefault(key, {}).update(values)
         rows = merge_columns(rows, updates)
-    return rows
+    return rows, meta, renamed_all
+
+
+def derived_coverage(meta: dict) -> dict:
+    """The meta with each derived column given its source column's coverage."""
+    meta = dict(meta or {})
+    coverage = dict(meta.get(COVERAGE) or {})
+    for column, source in DERIVED_FROM.items():
+        if source in coverage:
+            coverage[f"{NAME}.{column}"] = dict(coverage[source])
+    if coverage:
+        meta[COVERAGE] = coverage
+    return meta
 
 
 def print_decisions(decisions: List[Decision]) -> None:
@@ -721,11 +813,17 @@ def print_decisions(decisions: List[Decision]) -> None:
 def main(argv=None) -> int:
     cli = build_parser().parse_args(argv)
     thresholds = thresholds_from(cli)
-    rows, meta = read_table(cli.cell_dir)
-    rows = merge_cells(rows, cli.roles_merge_from)
+    rows, meta, renamed = read_table(cli.cell_dir)
+    rows, meta, merged_renamed = merge_cells(rows, cli.roles_merge_from,
+                                             meta=meta)
+    renamed = {**renamed, **merged_renamed}
     print(f"\nROLES — {cli.cell_dir}")
     print(f"  criteria: {CRITERIA_DOC} (pre-registered)")
-    print(f"  thresholds: {thresholds.as_dict()}\n")
+    print(f"  thresholds: {thresholds.as_dict()}")
+    if renamed:
+        print("  legacy column names read under their current names: "
+              + ", ".join(f"{old} -> {new}" for old, new in renamed.items()))
+    print()
     missing_views = require_columns(
         rows, cell_dir=cli.cell_dir, merged_from=cli.roles_merge_from,
         allow=cli.roles_allow_missing_views)
@@ -738,11 +836,15 @@ def main(argv=None) -> int:
         return 0
 
     rows = merge_columns(rows, columns(decisions), namespace=NAME)
-    meta = dict(meta)
+    meta = derived_coverage(meta)
+    if renamed:
+        meta["renamed_columns"] = {**(meta.get("renamed_columns") or {}),
+                                   **renamed}
     meta["roles"] = {"criteria_doc": CRITERIA_DOC,
                      "thresholds": thresholds.as_dict(),
                      "merged_from": list(cli.roles_merge_from),
-                     "counts": counts(decisions)}
+                     "counts": counts(decisions),
+                     "flavour_counts": flavour_counts(decisions)}
     written = write_head_table(cli.cell_dir, rows, meta=meta)
 
     out = os.path.join(cli.cell_dir, SUBDIR)
@@ -752,7 +854,7 @@ def main(argv=None) -> int:
         json.dump(payload(decisions, cell_dir=cli.cell_dir,
                           thresholds=thresholds,
                           merged_from=cli.roles_merge_from, meta=meta,
-                          missing_views=missing_views),
+                          missing_views=missing_views, renamed=renamed),
                   handle, indent=2, default=str)
 
     print(f"\n  {written['csv']}\n  {written['json']}\n  {json_path}")

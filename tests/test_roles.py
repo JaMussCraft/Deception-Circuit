@@ -47,10 +47,10 @@ def writes(value, se, *, differential=None, differential_se=None,
            suppression=False, honest_instruction=None):
     out = {"dla.pressure": value, "dla.pressure_se": se,
            "dla.suppression": suppression,
-           "dla.honest_instruction": honest_instruction}
+           "dla.honest_instruction_paired": honest_instruction}
     if differential is not None:
-        out["dla.differential"] = differential
-        out["dla.differential_se"] = differential_se
+        out["dla.differential_paired"] = differential
+        out["dla.differential_paired_se"] = differential_se
     return out
 
 
@@ -64,8 +64,9 @@ def paths(direct=None, direct_se=None, outgoing=None, outgoing_effect=None,
             "path_patching.direct_effect_se": direct_se,
             "path_patching.strongest_outgoing": outgoing,
             "path_patching.strongest_outgoing_effect": outgoing_effect,
-            "path_patching.strongest_incoming_honest_instruction": incoming_hi,
-            "path_patching.strongest_incoming_effect_honest_instruction":
+            "path_patching.strongest_incoming_honest_instruction_paired":
+                incoming_hi,
+            "path_patching.strongest_incoming_effect_honest_instruction_paired":
                 incoming_hi_effect}
 
 
@@ -243,16 +244,16 @@ def test_a_head_with_a_null_attention_column_is_unestablished_not_not_applicable
 def test_the_incoming_honest_instruction_path_is_what_separates_selector_from_mover():
     """One column apart: the same Component, the honest instruction at its Q."""
     at_the_query = a_mover(**{}) | {
-        "path_patching.strongest_incoming_honest_instruction": "head.17.25->q.24.18",
-        "path_patching.strongest_incoming_effect_honest_instruction": -0.02}
+        "path_patching.strongest_incoming_honest_instruction_paired": "head.17.25->q.24.18",
+        "path_patching.strongest_incoming_effect_honest_instruction_paired": -0.02}
     assert propose(a_mover()).role == "mover"
     assert propose(at_the_query).role == "selector"
 
 
 def test_a_query_side_path_on_another_component_does_not_make_a_selector():
     elsewhere = a_mover(**{}) | {
-        "path_patching.strongest_incoming_honest_instruction": "head.17.25->q.30.1",
-        "path_patching.strongest_incoming_effect_honest_instruction": -0.02}
+        "path_patching.strongest_incoming_honest_instruction_paired": "head.17.25->q.30.1",
+        "path_patching.strongest_incoming_effect_honest_instruction_paired": -0.02}
     assert propose(elsewhere).role == "mover"
 
 
@@ -270,7 +271,7 @@ def test_a_binder_with_a_direct_path_to_the_readout_is_not_a_binder():
 def test_a_pressure_reader_signature_is_noted_and_never_assigned():
     candidate = a_binder(**{}) | {
         "attention_patterns.pressure_paired_top_segment": "pressure_clause",
-        "attention_patterns.honest_instruction_top_segment": "question"}
+        "attention_patterns.honest_instruction_paired_top_segment": "question"}
     decision = propose(candidate)
     assert decision.role in roles.ROLES
     assert decision.role != "pressure reader"
@@ -299,8 +300,10 @@ def test_the_derived_column_is_absent_rather_than_zero_when_the_cell_is():
 
 def test_the_honest_instruction_support_column_is_negated_too_and_keeps_its_suffix():
     derived = roles.derived_columns(
-        a_selector(**{}) | {"path_patching.direct_effect_honest_instruction": -0.0088})
-    assert derived["direct_support_honest_instruction"] == pytest.approx(0.0088)
+        a_selector(**{})
+        | {"path_patching.direct_effect_honest_instruction_paired": -0.0088})
+    assert derived["direct_support_honest_instruction_paired"] == \
+        pytest.approx(0.0088)
 
 
 # ==============================================================================
@@ -613,9 +616,180 @@ def test_a_query_cell_inside_the_cross_card_noise_does_not_make_a_selector():
     0.0068, which cleared the old 0.005 floor and does not clear 0.01.
     """
     marginal = a_selector(**{}) | {
-        "path_patching.strongest_incoming_effect_honest_instruction": 0.0068}
+        "path_patching.strongest_incoming_effect_honest_instruction_paired":
+            0.0068}
 
     assert propose(a_selector()).role == "selector"
     assert propose(marginal).role != "selector"
     assert roles.propose(marginal, roles.Thresholds(path_floor=0.005)).role \
         == "selector", "and the old floor is what admitted it"
+
+
+
+# ==============================================================================
+# unknown/knockout-only (the researcher's 2026-10-13 decision)
+# ==============================================================================
+
+def knockout_alone(**kwargs):
+    """L5H8 on SDR nls0.3: a knockout five standard errors from zero, an
+    unestablished read, and nothing written or passed on above a floor."""
+    return merged(reads("unsegmented", 0.42),
+                  writes(-0.0000, 0.0006, differential=0.0001,
+                         differential_se=0.0006),
+                  knocked(0.0572, 0.0112),
+                  paths(direct=-0.0001, direct_se=0.00004,
+                        outgoing="head.5.8->q.13.17", outgoing_effect=0.0029),
+                  layer=5, index=8, **kwargs)
+
+
+def test_a_component_that_matters_on_knockout_alone_is_unknown_knockout_only():
+    decision = propose(knockout_alone())
+
+    assert decision.role == "unknown"
+    assert decision.flavour == roles.KNOCKOUT_ONLY == "knockout-only"
+    assert decision.notes.startswith("unknown/knockout-only: ")
+    assert "supports deception" in decision.notes
+
+
+def test_an_established_read_is_reads_evidence_so_knockout_is_not_alone():
+    """L5H11's case: an item-mention read at 0.35 is a view that speaks."""
+    decision = propose(knockout_alone() | reads("item_1_question_option", 0.35))
+
+    assert decision.role == "unknown"
+    assert decision.flavour == roles.INSUFFICIENT
+
+
+@pytest.mark.parametrize("speaks", [
+    writes(0.03, 0.001),                                     # it writes
+    writes(0.0, 0.0006, differential=0.04, differential_se=0.005),
+    paths(direct=-0.02, direct_se=0.002, outgoing="head.5.8->readout",
+          outgoing_effect=-0.02),                            # a direct path
+    paths(direct=-0.0001, direct_se=0.00004, outgoing="head.5.8->q.13.17",
+          outgoing_effect=0.02),                             # feeds another
+])
+def test_any_other_view_above_its_floor_means_knockout_is_not_alone(speaks):
+    decision = propose(knockout_alone() | speaks)
+
+    assert decision.flavour != roles.KNOCKOUT_ONLY
+
+
+def test_a_knockout_that_does_not_clear_its_bar_is_not_knockout_only():
+    decision = propose(knockout_alone() | knocked(0.0203, 0.0406))
+
+    assert decision.flavour == roles.INSUFFICIENT
+
+
+def test_a_negative_knockout_alone_is_knockout_only_and_says_which_way():
+    decision = propose(knockout_alone() | knocked(-0.0936, 0.0284))
+
+    assert decision.flavour == roles.KNOCKOUT_ONLY
+    assert "opposes deception" in decision.notes
+
+
+def test_an_mlp_block_has_no_reads_evidence_to_wait_for_and_can_be_knockout_only():
+    mlp = {k: v for k, v in knockout_alone().items()
+           if not k.startswith("attention_patterns.")}
+    mlp.update(kind="mlp", layer=30, index=0, kv_group=None)
+
+    assert propose(mlp).flavour == roles.KNOCKOUT_ONLY
+
+
+def test_the_criteria_doc_states_the_knockout_only_criterion_and_its_date():
+    path = os.path.join(os.path.dirname(os.path.dirname(
+        os.path.abspath(roles.__file__))), roles.CRITERIA_DOC)
+    with open(path) as handle:
+        text = handle.read()
+
+    assert "unknown/knockout-only" in text
+    assert "2026-10-13" in text
+
+
+def test_the_decisions_json_counts_the_flavours_of_unknown(tmp_path):
+    path = os.path.join(str(tmp_path), *CELL)
+    write_head_table(path, [knockout_alone(), a_mover()])
+
+    assert run_roles(path) == 0
+
+    payload = read(path, roles.SUBDIR, roles.JSON_NAME)
+    assert payload["flavour_counts"] == {roles.KNOCKOUT_ONLY: 1}
+    assert by_key(load_head_table(path))[("head", 5, 8)][
+        "roles.role_notes"].startswith("unknown/knockout-only")
+
+
+# ==============================================================================
+# A CELL WRITTEN BEFORE THE PAIRED NAMES (ticket 13)
+# ==============================================================================
+
+def legacy(one):
+    """The same row under the names written before 2026-10-13."""
+    from component_analysis.head_table import LEGACY_COLUMNS
+
+    current = {new: old for old, new in LEGACY_COLUMNS.items()}
+    return {current.get(column, column): value for column, value in one.items()}
+
+
+def test_a_legacy_cell_gets_the_same_roles_and_is_written_under_the_new_names(
+        tmp_path):
+    new = os.path.join(str(tmp_path), "new", *CELL)
+    old = os.path.join(str(tmp_path), "old", *CELL)
+    table = [a_binder(), a_selector(), a_mover(), a_suppressor(),
+             knockout_alone()]
+    write_head_table(new, table)
+    write_head_table(old, [legacy(one) for one in table])
+    assert "dla.differential" in load_head_table(old)[1], "the fixture is legacy"
+
+    assert run_roles(new) == 0 and run_roles(old) == 0
+
+    roles_new = {k: r["roles.role_proposed"] for k, r
+                 in by_key(load_head_table(new)).items()}
+    roles_old = by_key(load_head_table(old))
+    assert {k: r["roles.role_proposed"] for k, r in roles_old.items()} == roles_new
+    assert roles_new[("head", 17, 25)] == "selector", \
+        "the selector's query clause reads the renamed honest-instruction column"
+    selector = roles_old[("head", 17, 25)]
+    assert "dla.differential_paired" in selector
+    assert "dla.differential" not in selector
+    assert "roles.direct_support_honest_instruction_paired" in selector
+    assert read(old, roles.SUBDIR, roles.JSON_NAME)["renamed_columns"][
+        "dla.differential"] == "dla.differential_paired"
+
+
+def test_a_legacy_cell_merged_into_a_new_one_compares_under_the_new_names(
+        tmp_path):
+    """Translated before the conflict check, so the same value under two
+    spellings is the same column, not two."""
+    base = os.path.join(str(tmp_path), "base", *CELL)
+    other = os.path.join(str(tmp_path), "other", *CELL)
+    write_head_table(base, [a_selector()])
+    write_head_table(other, [legacy(a_selector())])
+
+    assert run_roles(base, "--roles-merge-from", other) == 0
+
+    row_17 = load_head_table(base)[0]
+    assert "dla.differential" not in row_17
+
+
+def test_the_derived_columns_take_the_coverage_of_the_columns_they_negate(
+        tmp_path):
+    from component_analysis.head_table import (
+        add_coverage, coverage_of, load_head_table_meta)
+
+    path = os.path.join(str(tmp_path), *CELL)
+    meta = add_coverage({}, ["direct_effect", "direct_effect_se"],
+                        [f"i{one}" for one in range(100)],
+                        instance_set="causal_sample", namespace="path_patching")
+    meta = add_coverage(meta, ["direct_effect_honest_instruction_paired"],
+                        [f"i{one}" for one in range(71)],
+                        instance_set="paired_honest_instruction",
+                        namespace="path_patching")
+    write_head_table(path, [a_selector(**{
+        "path_patching.direct_effect_honest_instruction_paired": -0.0088})],
+        meta=meta)
+
+    assert run_roles(path) == 0
+
+    written = load_head_table_meta(path)
+    assert coverage_of(written, "roles.direct_support")["n"] == 100
+    assert coverage_of(written, "roles.direct_support_se")["n"] == 100
+    assert coverage_of(
+        written, "roles.direct_support_honest_instruction_paired")["n"] == 71

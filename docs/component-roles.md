@@ -8,9 +8,11 @@ thresholds auditable:
   tables) during orientation, so these numbers were not written blind;
 - the criteria and every threshold were committed **before** any pass was run;
 - **one threshold has since been amended** — the path floor, on 2026-09-20,
-  for a reason external to any result — and the change, its reason and the
-  result it changed are logged under "Changing these criteria" at the end of
-  this file. Nothing else has moved. Read that section before quoting a role.
+  for a reason external to any result — and **one flavour of `unknown` has
+  been added** — `unknown/knockout-only`, on 2026-10-13, by the researcher's
+  decision. Both changes, their reasons and the results they changed are
+  logged under "Changing these criteria" at the end of this file. Nothing else
+  has moved. Read that section before quoting a role.
 Owner of the final labels: the researcher, in `role_confirmed`.
 Applied by: `python analyze_components.py roles <cell dir>`.
 Sign convention: ADR-0002.
@@ -102,10 +104,16 @@ suppressor is defined by what it produces rather than by what it reads, the
 reads view constrains it only by not contradicting it; the read is recorded in
 the notes.
 
-**unknown** — everything else, in two flavours that the notes name apart:
+**unknown** — everything else, in three flavours that the notes name apart:
 
 - `unknown/disagree` — two support views are significant in opposite
   directions. The Component does something, and the views do not agree on what.
+- `unknown/knockout-only` — knockout is the only view that speaks: its
+  knockout clears the bar, and it has no established read, writes nothing at
+  the Readout and passes nothing on above the path floor. It matters causally
+  and does nothing the four roles describe, and it is held here **until there
+  is reads evidence** rather than given a fifth role (the researcher's
+  2026-10-13 decision; the criterion is rule 6 below).
 - `unknown/insufficient` — some view is silent, unestablished, or below its
   floor. The notes carry the lean ("mover lean: writes and direct effect
   support deception, read unestablished").
@@ -118,7 +126,7 @@ it, so a circuit discovered against the item-swap Corruption has no reason to
 contain them. The name is held so that nothing else takes it. The mechanical
 pass **notes** a pressure-reader signature when it sees one
 (`attention_patterns.pressure_paired_top_segment` is `pressure_clause` and
-`attention_patterns.honest_instruction_top_segment` is not) and **never
+`attention_patterns.honest_instruction_paired_top_segment` is not) and **never
 assigns the reserved name**. The note is appended whatever role the Component
 gets, an assigned one included: a mover may also read the pressure, and that is
 worth seeing.
@@ -131,28 +139,42 @@ written, by the roles pass. The roles pass writes only `roles.*` columns.
 | view | column | sign |
 |---|---|---|
 | reads | `attention_patterns.pressure_top_segment` / `_top_mass` | mass, no direction |
-| reads (paired) | `attention_patterns.pressure_paired_top_segment`, `attention_patterns.honest_instruction_top_segment` | names, no direction |
+| reads (paired) | `attention_patterns.pressure_paired_top_segment`, `attention_patterns.honest_instruction_paired_top_segment` | names, no direction |
 | writes | `dla.pressure`, `dla.pressure_se` | native: positive supports deception |
-| writes (paired) | `dla.honest_instruction`, `dla.differential`, `dla.differential_se` | native |
+| writes (paired) | `dla.honest_instruction_paired`, `dla.differential_paired`, `dla.differential_paired_se` | native |
 | writes | `dla.suppression` | boolean, true means it favours the Distractor |
 | depends (whether) | `knockout.logit_diff_drop`, `knockout.standard_error` | native: positive supports deception |
 | depends (how, direct) | `roles.direct_support` = `-path_patching.direct_effect`, se from `path_patching.direct_effect_se` | **derived**, ADR-0002 |
 | depends (how, indirect) | `path_patching.strongest_outgoing`, `..._effect` | magnitude and receiver name |
-| depends (query side) | `path_patching.strongest_incoming_honest_instruction`, `..._effect_honest_instruction` | magnitude and receiver name |
+| depends (query side) | `path_patching.strongest_incoming_honest_instruction_paired`, `..._effect_honest_instruction_paired` | magnitude and receiver name |
 
 `role_confirmed` is read if the table has it and **never written** by anything
 in the package; `head_table.PROTECTED_COLUMNS` enforces that.
 
+**Every paired column says `paired` in its name** (the researcher's 2026-10-13
+decision): a column computed over the same instance ids on both sides of a
+contrast is `..._paired...`, and one computed over the unpaired Honest Twin is
+`..._descriptive...`. Cells written before that decision carry the older names
+(`dla.differential`, `path_patching.*_honest_instruction`, ...). The pass reads
+them under the current names — `head_table.LEGACY_COLUMNS` is the one map —
+writes the table back under the current names, and records the translation
+in `roles.json`'s `renamed_columns`.
+
 ### Two columns do not cover the same instances
 
 `dla.pressure` and `attention_patterns.pressure_*` are computed over the whole
-test split; `dla.honest_instruction`, `dla.differential`, the paired attention
-columns and every `*_honest_instruction` path column are computed over the
-instances with a Matched Honest survivor (71 of the 100-instance causal sample
-on SDR nls0.3), and `knockout.*` and `path_patching.direct_effect` over all 100.
+test split; `dla.honest_instruction_paired`, `dla.differential_paired`, the
+paired attention columns and every `*_honest_instruction_paired` path column
+are computed over the instances with a Matched Honest survivor (71 of the
+100-instance causal sample on SDR nls0.3), and `knockout.*` and
+`path_patching.direct_effect` over all 100. **The head table's meta says so
+per column**: `meta.coverage[<column>]` gives `n` and an instance-set id, and
+`meta.instance_sets[<id>]` lists the ids (`head_table.coverage_of` reads both).
 The criteria never subtract one from the other across that boundary: each
 column is thresholded on its own, and the comparisons that must be paired
-(`dla.differential`) are computed per instance by the analysis that owns them.
+(`dla.differential_paired`) are computed per instance by the analysis that
+owns them. The derived `roles.direct_support*` columns take the coverage of the
+path-patching column each negates.
 
 ## Significance: a z-score and a floor, both
 
@@ -189,8 +211,11 @@ Three flags of the subcommand are not criteria. `--dry-run` proposes and prints
 without writing, so the pass can be rehearsed on the login node like every
 other part of the CLI. `--roles-merge-from CELL_DIR` (repeatable) copies
 another cell's analysis columns onto the matching rows before the criteria
-run, because the analyses of record were run one suite per analysis and the
-conjunction needs all three views in one table; it never copies a key column,
+run, because the block C and D analyses of record were run one suite per
+analysis and the conjunction needs all three views in one table (since ticket
+13 every job runs into one cell and carries the others' columns forward, so a
+new cell needs no merge); it reads a merged cell under the current column
+names before comparing, brings its coverage with it, never copies a key column,
 an intake column or `role_confirmed`, and it refuses to overwrite a column that
 already holds a different value. `--roles-allow-missing-views` proposes anyway
 when a whole view's columns are absent from the table, which is otherwise
@@ -289,13 +314,13 @@ depends on it.
   or `frame`, with mass at or above the attention floor. Not applicable, and so
   satisfied, for an MLP block;
 - writes: `dla.pressure` significant and above the DLA floor, **and**
-  `dla.differential` significant and above the DLA floor — the contribution is
-  pressure-dependent;
+  `dla.differential_paired` significant and above the DLA floor — the
+  contribution is pressure-dependent;
 - depends (whether): `knockout.logit_diff_drop` or `roles.direct_support`
   significantly positive and above its floor;
-- depends (query side): `path_patching.strongest_incoming_honest_instruction`
-  names a `q.` receiver **on this Component**, with `|effect|` at or above the
-  path floor. This clause is what separates selector from mover, and it is the
+- depends (query side):
+  `path_patching.strongest_incoming_honest_instruction_paired` names a `q.`
+  receiver **on this Component**, with `|effect|` at or above the path floor. This clause is what separates selector from mover, and it is the
   one the researcher should argue with first.
 
 **5. mover.** All of:
@@ -307,7 +332,27 @@ depends on it.
   effect reaches the Readout directly;
 - and not a selector by rule 4.
 
-**6. unknown/insufficient.** Everything else. The notes say which views were
+**6. unknown/knockout-only.** No role above holds, and all of:
+- depends (whether): `knockout.logit_diff_drop` significant and above the
+  knockout floor, **in either direction** — the notes say which ("knockout
+  supports deception" or "opposes deception");
+- reads: **not established** — the top Segment is unestablished, below the
+  attention floor or unmeasured; an MLP block, whose reads view is not
+  applicable, has no reads evidence to wait for and qualifies;
+- writes: `dla.pressure` and `dla.differential_paired` not significant or below
+  the DLA floor, and `dla.suppression` false;
+- depends (how): `roles.direct_support` not significant or below the path
+  floor, `|path_patching.strongest_outgoing_effect|` below the path floor, and
+  no honest-instruction path at the Component's own query at or above it.
+
+An established read is reads evidence, so a Component that reads an Item
+Mention and matters on knockout alone is `unknown/insufficient`, not
+`knockout-only`; that is the line between "we cannot see what it reads" and
+"we can see what it reads but not what it does with it". Incoming paths other
+than the query-side one do not count against the flavour: they say what feeds
+the Component, not what it does.
+
+**7. unknown/insufficient.** Everything else. The notes say which views were
 established, which were silent, and which role the established ones lean
 towards, so that a researcher reading the table sees the evidence rather than
 the word "unknown".
@@ -348,7 +393,7 @@ Into the head table, namespaced `roles.`, next to the columns it read:
     roles.role_notes        one line: the flavour, the lean and the numbers
     roles.direct_support    the derived column of ADR-0002
     roles.direct_support_se
-    roles.direct_support_honest_instruction
+    roles.direct_support_honest_instruction_paired
     roles.reads_group       designation / item_mention / pressure / frame /
                             unestablished / not_applicable
 
@@ -368,9 +413,11 @@ And into the cell, under `roles/`:
                         evaluated value and verdict, per Component
 
 `roles.json` is the audit trail the spec asks for: for each Component it
-records the three views' inputs, each criterion's pass or fail, the role and
-the notes, so that a disputed label is settled by reading the file rather than
-by rerunning the pass.
+records the three views' inputs, each criterion's pass or fail, the role, its
+flavour and the notes, so that a disputed label is settled by reading the file
+rather than by rerunning the pass. It also counts the flavours of `unknown`
+(`flavour_counts`) and names any legacy column it read under a current name
+(`renamed_columns`).
 
 **The mechanical pass runs first and its output is kept.** An agent may rewrite
 `roles.role_notes` in the head table to say something a one-line template
@@ -382,20 +429,20 @@ criteria again, so a hand-written note belongs in the ticket or in
 
 ## Knockout by role family
 
-An analysis run rebuilds the head table from the intake's rows, so a second
-run into the same cell drops the `roles.*` columns the pass wrote. **`--dry-run`
-does it too**, because the dry run writes the head table before it prints its
-estimates: pointing any `analyze_components.py` run, dry or not, at the cell
-the roles pass wrote will overwrite that table. Give the family knockout its
-own `--suite-name`. The family
-knockout therefore writes into its own suite and reads the roles from the cell
-the pass ran on, with `--knockout-roles-from`; rerun the roles pass on a cell
-whose analyses were rerun.
+**A cell is assembled by running jobs into it** (ticket 13). A run of
+`analyze_components.py` into a cell that already has a head table rewrites the
+namespaces of the analyses it runs and carries every other column forward —
+the other analyses' columns, `role_confirmed` and the `roles.*` columns alike —
+and a `--dry-run` rewrites nothing. So the family knockout can run into the
+very cell the roles pass wrote, and reads its roles from that cell by default.
+`--knockout-roles-from` still reads them from another cell. Rerun the roles
+pass on a cell whose analyses were rerun: the carried `roles.*` columns were
+proposed from the old numbers.
 
 The family pass adds two columns of its own, `knockout.role_family` and
-`knockout.role_family_logit_diff_drop`, and carries the `roles.*` columns it
-grouped by back into the table it writes, so the grouping a figure was built
-from is still in the table beside it.
+`knockout.role_family_logit_diff_drop`, beside the `roles.*` columns it
+grouped by, so the grouping a figure was built from is still in the table
+beside it.
 
 Once roles exist, `--knockout-families` groups the Components by
 `role_confirmed` where the researcher has set it and by `roles.role_proposed`
@@ -430,6 +477,30 @@ arrived before. The test of whether that is a fit rather than a fact is whether
 the reason survives without the result, and it does: a criterion inside the
 noise of its own measurement is not a criterion, whichever way this circuit had
 come out.
+
+**2026-10-13 — `unknown/knockout-only` added as a flavour of `unknown`.**
+Reason: the researcher's decision on the SDR first run. Five Components of the
+SDR nls0.3 head-granularity delta (ticket 10 named L5H8, L5H9, L5H11, L8H14 and
+L9H12; the write-up's section 5 named the binding band's L8H12, L8H14, L8H15
+and L9H12) have a knockout effect several standard errors from zero, no DLA,
+no direct effect and no onward path above the floor. Ticket 10 asked whether
+the vocabulary was missing a fifth role for them. **The answer is no fifth
+role**: they get the `unknown` flavour `unknown/knockout-only` until there is
+reads evidence, because without a read there is nothing to say what they do
+beyond that they matter. The criterion is rule 6 above. It changes **no role**,
+only the flavour of some `unknown`s, so no count of binder, selector, mover,
+suppressor or unknown can move.
+
+Its result, on a copy of the cell of record `sdr-first-run` (ticket 13's
+comments carry the full table): **0 binder, 0 selector, 1 mover, 0 suppressor,
+17 unknown, as before**, of which six are now `unknown/knockout-only` — L5H8,
+L5H9, L8H12, L8H14, L8H15 and L9H12 — and eleven stay `unknown/insufficient`.
+**L5H11 is not knockout-only**, although ticket 10 listed it: its top Segment
+at the Readout is `item_1_question_option` at 0.35, an established read, so it
+has reads evidence and the flavour's premise does not hold. L14H7 and L14H22
+are excluded the same way (an established `question` read). Rule 2 below asks
+for every cell with a role column to be rerun; the cells of record are the
+researcher's, and the rerun on them is theirs to make.
 
 The rest of this section is the rule for any future change. A threshold or a
 clause may be changed, and then:
