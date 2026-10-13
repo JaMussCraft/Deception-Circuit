@@ -152,6 +152,28 @@ def test_a_current_cell_has_no_legacy_note(tmp_path):
     assert not any("paired" in note for note in view.notes)
 
 
+def test_a_head_table_with_legacy_sign_path_columns_says_which_way_they_point(
+        tmp_path):
+    _write_head_table(tmp_path, [
+        {"kind": "mlp", "layer": 31, "index": 0,
+         "path_patching.direct_effect": -0.0951},
+    ])
+    view = review.head_table_view(str(tmp_path))
+
+    sign = [note for note in view.notes if "path_patching.direct_effect" in note]
+    assert sign and "negative" in sign[0]
+
+
+def test_a_head_table_in_the_new_sign_has_no_legacy_sign_note(tmp_path):
+    _write_head_table(tmp_path, [
+        {"kind": "mlp", "layer": 31, "index": 0,
+         "path_patching.direct_support": 0.0944},
+    ])
+    view = review.head_table_view(str(tmp_path))
+
+    assert not any("legacy sign" in note for note in view.notes)
+
+
 def test_the_head_table_view_reports_how_many_instances_each_column_covers(
         tmp_path):
     from component_analysis import head_table

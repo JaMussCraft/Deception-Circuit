@@ -162,6 +162,16 @@ LEGACY_SWEEP_COLUMN_NAMES = ("sweep_direct_effect", "sweep_direct_effect_se",
                              "sweep_rank", "sweep_in_circuit", "sweep_flagged")
 
 
+def legacy_signed_columns() -> List[str]:
+    """The namespaced head-table columns a legacy cell holds in the old sign,
+    under ticket 13's paired names: what a reader must not take as a number
+    where positive helps deception."""
+    return [f"{NAME}.{name}{COLUMN_SUFFIX[counterfactual]}"
+            for name in LEGACY_COLUMN_NAMES + LEGACY_SWEEP_COLUMN_NAMES
+            if name.endswith("_effect")
+            for counterfactual in COUNTERFACTUALS]
+
+
 def column_name(name: str, counterfactual: str) -> str:
     """A bare column name for one counterfactual: `<name><suffix>[_se]`.
 

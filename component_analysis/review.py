@@ -396,6 +396,15 @@ def head_table_view(results_dir: str) -> Table:
             "their names (2026-10-13) or before a later rename, and is shown "
             "under the current names: " + ", ".join(
                 f"{old} -> {new}" for old, new in renamed.items()))
+    legacy_signed = [one for one in path_patching.legacy_signed_columns()
+                     if one in columns]
+    if legacy_signed:
+        notes.append(
+            "legacy sign: " + ", ".join(legacy_signed) + " were written before "
+            "2026-10-13, when a path that helps deception read negative "
+            "(opposite to knockout); a cell run since writes "
+            "path_patching.*_support, positive helps deception. The roles pass "
+            "negates the legacy columns into roles.direct_support.")
     if not coverage:
         notes.append(
             "no per-column coverage in this cell's meta: it was written before "
