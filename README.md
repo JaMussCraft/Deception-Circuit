@@ -392,10 +392,22 @@ relative path in the arguments resolves where you typed them. It activates
 `mgnp` and passes every argument straight through to `analyze_components.py`,
 which is why a circuit is composed by name there exactly as it is on the
 command line. Its defaults are one A40 (`--partition=gpuA40x4`,
-`--gpus-per-node=1`, account `beto-delta-gpu`), 64 GB and four hours, sized for
-one cell of the descriptive analyses plus a position-agnostic patching pass
-over a hundred instances; a larger sender-receiver grid or the
-position-specific second pass wants more time. Logs land in
+`--gpus-per-node=1`, account `beto-delta-gpu`), 64 GB and four hours. **Those
+are a starting point, not a budget**: multi-hour jobs and the A100
+(`gpuA100x4`, `gpuA100x8`) and H200 (`gpuH200x8`) partitions are all allowed
+whenever they make a run simpler or faster. Override them on the `sbatch`
+command line, before the script name, and always give `--time` there:
+
+```bash
+sbatch --time=02:30:00 --partition=gpuA100x4 scripts/analyze_components.sbatch \
+    --circuit ... --expr ... --analyses path_patching --path-counterfactual both \
+    --path-completeness-sweep --suite-name my-suite
+```
+
+Size `--time` from the `--dry-run` estimate; on an A40 the descriptive trio is
+about 11 minutes, each position-agnostic path-patching grid over 100 instances
+13 to 18 minutes, and the completeness sweep about 30 minutes per 64 instances.
+A shorter `--time` backfills sooner on a busy queue. Logs land in
 `logs/analyze_components_<jobid>.out`. Run `--dry-run` on the login node before
 every submission: it resolves the circuits, the Segments and the causal sample,
 says how much of the sample has an Honest-Instruction Counterfactual, and
@@ -419,6 +431,26 @@ outputs/_analyses/<suite-name>/<circuit-label>/<task-label>/
 
 Every figure has a JSON twin holding exactly what it drew, so an agent with no
 browser reads the same result the researcher sees.
+
+**A cell is assembled by running jobs into it.** Point several runs at the same
+`--suite-name` (or `--output-dir`) and each one replaces the head-table columns
+of the analyses it runs and carries every other column forward — the other
+analyses', the roles pass's `roles.*` and the researcher's `role_confirmed`
+alike. A `--dry-run` into a cell replaces nothing. So the descriptive trio in
+one job and path patching in another leave one table with all four analyses.
+
+**Column names say what they compare.** A column computed over the same
+instance ids on both sides of a contrast carries `paired` in its name
+(`dla.differential_paired`,
+`path_patching.direct_effect_honest_instruction_paired`); one computed over the
+unpaired Honest Twin carries `descriptive`. Cells written before 2026-10-13
+use older names, which every reader translates through
+`head_table.LEGACY_COLUMNS`. **How many instances a column covers is in the
+table's meta**, not its name: `head_table.json`'s `meta.coverage[<column>]`
+gives `n` and an instance-set id, `meta.instance_sets[<id>]` lists the ids,
+and `head_table.coverage_of(meta, column)` reads both — so a paired column
+over the 71 instances with a Matched Honest Instruction is told apart from its
+neighbour over the 100-instance causal sample.
 
 ### The review notebook
 

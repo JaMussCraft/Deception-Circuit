@@ -49,9 +49,11 @@ It is applied in one of two ways, never a third:
 2. **A column whose native sign is opposite gets a new derived column** in the
    reader's own namespace, never a change to the original. The roles pass adds
    `roles.direct_support = -path_patching.direct_effect` and
-   `roles.direct_support_honest_instruction =
-   -path_patching.direct_effect_honest_instruction`, with the standard errors
-   copied across unchanged (a standard error has no sign).
+   `roles.direct_support_honest_instruction_paired =
+   -path_patching.direct_effect_honest_instruction_paired`, with the standard
+   errors copied across unchanged (a standard error has no sign). (Both
+   honest-instruction names gained `_paired` on 2026-10-13; see the
+   amendment below.)
 
 **No existing column, JSON key or figure is renamed, re-signed or rewritten.**
 `path_patching.direct_effect` keeps its native sign and its meaning in every
@@ -65,9 +67,9 @@ read as `|effect|` with the receiver's name, because "which Component feeds
 which" is a question about the size of a path, not its direction.
 
 **Under the Honest-Instruction Counterfactual the counterfactual is the honest
-prompt**, so a negative `path_patching.*_honest_instruction` cell means the
-path carries the *honest instruction*, not the Corruption. The derived
-`roles.direct_support_honest_instruction` is therefore positive when the
+prompt**, so a negative `path_patching.*_honest_instruction_paired` cell means
+the path carries the *honest instruction*, not the Corruption. The derived
+`roles.direct_support_honest_instruction_paired` is therefore positive when the
 Component supports the deceptive answer *against* the honest instruction, which
 is the same convention. **No criterion reads that column today**; it is
 written for the notebook and for a reader comparing the two
@@ -102,5 +104,29 @@ instances where its item-swap partner covers 100.
 - `roles.*` columns exist only after the roles pass has run, so a cell that
   never runs the pass is unaffected. One thing does read them back: the
   family knockout groups by `role_confirmed` else `roles.role_proposed`
-  (`component_analysis/knockout.py`) and carries those columns into the
-  table it writes. Any other reader should expect them to be absent.
+  (`component_analysis/knockout.py`), and every run into a cell carries them
+  forward with the cell's other columns (ticket 13). Any other reader should
+  expect them to be absent.
+
+## Amendment, 2026-10-13: names change, signs do not
+
+The researcher decided that **every paired column carries `paired` in its
+name**. That renames, without re-signing or rewriting, the honest-instruction
+columns of three analyses (`dla.honest_instruction` to
+`dla.honest_instruction_paired`, `dla.differential` to
+`dla.differential_paired`, `path_patching.*_honest_instruction` to
+`path_patching.*_honest_instruction_paired`, the paired attention column, and
+the derived `roles.direct_support_honest_instruction`). It is a departure from
+"no existing column is renamed" above, made deliberately and limited to names:
+
+- no value and no sign changes, and no output of record is rewritten — the
+  cells of record keep the names they were written with;
+- every reader translates an old name through one map,
+  `head_table.LEGACY_COLUMNS`, so an old cell reads under the new names (the
+  roles pass, the notebook seam and `analyze_components.py`'s carry-forward
+  all do), and records the translation it made;
+- a column whose **meaning** changes — a sign flip included — never goes in
+  that map. The same day the researcher also decided that path patching's sign
+  flips to agree with knockout (positive helps deception), with old cells told
+  apart by their JSON meta; that change, and how this ADR's derived-column rule
+  meets it, is ticket 14's to record here, not this amendment's.

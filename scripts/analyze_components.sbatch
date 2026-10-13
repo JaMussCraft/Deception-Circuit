@@ -19,9 +19,22 @@
 # Honest-Instruction Counterfactual, and prints each analysis's cost estimate,
 # all without a GPU.
 #
-# --time is sized for one cell of the descriptive analyses plus a
-# position-agnostic patching pass over 100 instances. A larger grid, or the
-# position-specific second pass, wants more.
+# The partition, account and --time below are a starting point, not a budget:
+# multi-hour jobs and the A100 (gpuA100x4, gpuA100x8) and H200 (gpuH200x8)
+# partitions are all allowed whenever they make a run simpler or faster
+# (researcher's decision, 2026-10-13). Override on the sbatch command line,
+# before the script name, and always give --time there:
+#
+#   sbatch --time=02:30:00 --partition=gpuA100x4 scripts/analyze_components.sbatch ...
+#
+# Size --time from the --dry-run estimate. On an A40 the descriptive trio
+# (attention_patterns, dla, knockout) is about 11 minutes, each
+# position-agnostic path-patching grid over 100 instances 13 to 18 minutes,
+# and the completeness sweep about 30 minutes per 64 instances (ticket 12's
+# runtime table). Shorter --time requests backfill sooner on a busy queue.
+#
+# Several jobs may run into one cell (same --suite-name or --output-dir): each
+# replaces the columns of the analyses it runs and carries the rest forward.
 #
 #SBATCH --job-name=analyze-components
 #SBATCH --account=beto-delta-gpu
