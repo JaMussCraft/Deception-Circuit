@@ -32,6 +32,17 @@ Results land in `outputs/_analyses/<suite>/<circuit>/<task>/`, one cell per
 (circuit, task) pair — a composed circuit has no home run directory, so
 analyses never write inside one.
 
+**A cell is assembled by running jobs into it.** Each run into a cell that
+already has a head table replaces the columns of the analyses it runs and
+carries every other column forward, with its coverage meta (`carry_forward`):
+
+    sbatch scripts/analyze_components.sbatch <intake flags> --analyses attention_patterns,dla,knockout --suite-name S
+    sbatch scripts/analyze_components.sbatch <intake flags> --analyses path_patching --suite-name S
+
+leaves one table holding all four analyses' columns. A dry run replaces
+nothing. The researcher's `role_confirmed` and the roles pass's `roles.*`
+columns survive every run by the same rule.
+
 Subcommands come before the flags. There is one:
 
     # propose a Component Role per Component from a finished head table
@@ -61,9 +72,10 @@ from component_analysis import dataloaders, instances, intake, registry, samplin
 from component_analysis import segmentation as segments
 from component_analysis.components import circuit_components, count_components, \
     is_component_of
-from component_analysis.head_table import JSON_NAME as TABLE_JSON, \
-    PROTECTED_COLUMNS, merge_columns, row_key, rows_from_components, \
-    write_head_table
+from component_analysis.head_table import BASE_COLUMNS, COVERAGE, \
+    INSTANCE_SETS, JSON_NAME as TABLE_JSON, LEGACY_COLUMNS, PROTECTED_COLUMNS, \
+    add_coverage, merge_columns, modernize_columns, row_key, \
+    rows_from_components, write_head_table
 from evaluation import circuits as circuit_intake
 
 #: Descriptive analyses run over this split; the causal sample is drawn from it.
@@ -178,62 +190,121 @@ def head_table_for(circuit_spec, resolved, *, num_kv_heads: int):
     return components, rows
 
 
-#: Columns that belong to the researcher and to the roles pass, not to any
-#: analysis. A run rebuilds the head table from the intake's rows, so without
-#: carrying these forward a rerun into a cell would silently drop the
-#: researcher's confirmed roles along with the proposals they were confirming.
-CARRIED_COLUMNS = PROTECTED_COLUMNS + ("roles.",)
+#: Namespaces the intake rebuilds on every run. Never carried from an old table:
+#: the fresh intake's value is the right one, whatever an earlier run wrote.
+INTAKE_NAMESPACES = ("reference",)
+
+#: The meta keys `write_cell` rebuilds on every run. Every other key of an old
+#: table's meta (the roles pass's `roles` block, say) is carried with the table.
+INTAKE_META = ("circuit", "task", "intake", "components")
 
 
-def carry_roles(cell_dir: str, rows) -> list:
-    """Put a cell's existing role columns back onto the fresh intake rows.
+def _rebuilt(column: str, replaced) -> bool:
+    """Does this run write `column` afresh, so the old value must not be kept?"""
+    if column in BASE_COLUMNS:
+        return True
+    namespace = column.split(".", 1)[0] if "." in column else None
+    return namespace in INTAKE_NAMESPACES or namespace in replaced
 
-    Every run of every analysis builds its rows from the circuit intake and
-    writes the whole head table at the end, so anything written into the table
-    by something that is not an analysis — `role_confirmed`, which only the
-    researcher writes, and the `roles.*` columns the roles pass writes — would
-    be lost on the next run into that cell. They are copied back here, matched
-    by row key, before the analyses run and before the table is written.
 
-    A Component in the old table that this circuit does not contain is not
-    carried: the rows are this circuit's Components, and a stale row would
-    reappear in a table that no longer has a reason to hold it.
+def carry_forward(cell_dir: str, rows, *, replaced=()) -> tuple:
+    """`(rows, meta)`: a cell's existing columns, carried onto the fresh rows.
 
-    Returns new rows. `merge_columns` is deliberately not used: it refuses to
-    write `role_confirmed` at all, which is exactly the protection that makes
-    this function necessary rather than optional.
+    Every run builds its rows from the circuit intake and writes the whole head
+    table at the end. A cell is assembled from several jobs, so before the
+    analyses run the existing table's columns are copied back onto those rows,
+    matched by row key — **all of them except the intake's own and those under
+    a namespace in `replaced`**, which is the namespaces of the analyses this
+    invocation runs. A rerun of an analysis therefore replaces its whole
+    namespace, stale columns included, and touches nothing else; a dry run
+    replaces nothing. `role_confirmed` (the researcher's, bare) and `roles.*`
+    (the roles pass's, which the CLI never runs) are carried by the same rule
+    and need no case of their own.
+
+    Rows:
+
+    * an old row whose key the fresh intake has gets its carried columns;
+    * an old row an analysis **appended** — a Component outside the circuit,
+      as the completeness sweep writes, recognisable by its empty intake
+      columns — is kept while it still holds a carried column, and goes with
+      its namespace when that analysis reruns;
+    * an old *intake* row the fresh intake no longer has belonged to a
+      different circuit under the same label, and is dropped.
+
+    Legacy column names are translated on the way (`head_table.LEGACY_COLUMNS`)
+    and the translation is recorded in the meta's `renamed_columns`, so a cell
+    of record touched by a later run reads under the current names. The meta
+    returned carries the coverage of every carried column and every old meta
+    key that is not the intake's. Returns new rows; nothing is mutated.
     """
     path = os.path.join(cell_dir, TABLE_JSON)
     if not os.path.exists(path):
-        return rows
+        return rows, {}
     with open(path) as handle:
-        existing = json.load(handle).get("rows", [])
+        table = json.load(handle)
+    old_rows, renamed = modernize_columns(table.get("rows", []))
+    old_meta = table.get("meta") or {}
+    replaced = set(replaced)
 
+    fresh = {row_key(row) for row in rows}
     carried = {}
-    for row in existing:
+    for row in old_rows:
+        key = row_key(row)
         values = {column: value for column, value in row.items()
-                  if value is not None
-                  and (column in PROTECTED_COLUMNS
-                       or column.startswith("roles."))}
-        if values:
-            carried[row_key(row)] = values
-    if not carried:
-        return rows
+                  if not _rebuilt(column, replaced)}
+        if key not in fresh:
+            if row.get("active_neuron_count") is not None:
+                continue           # an intake row of a circuit this one is not
+            if all(value is None for value in values.values()):
+                continue           # appended by an analysis that is rerunning
+        carried[key] = values
 
-    out = []
-    for row in rows:
-        row = dict(row)
-        row.update(carried.get(row_key(row), {}))
-        out.append(row)
-    return out
+    out = [dict(row, **carried.get(row_key(row), {})) for row in rows]
+    out += [{"kind": key[0], "layer": key[1], "index": key[2], **values}
+            for key, values in carried.items() if key not in fresh]
+
+    kept = {column for values in carried.values() for column in values}
+    meta = {name: value for name, value in old_meta.items()
+            if name not in INTAKE_META + (COVERAGE, INSTANCE_SETS)}
+    coverage = {LEGACY_COLUMNS.get(column, column): entry for column, entry
+                in (old_meta.get(COVERAGE) or {}).items()}
+    meta[COVERAGE] = {column: entry for column, entry in coverage.items()
+                      if column in kept}
+    meta[INSTANCE_SETS] = dict(old_meta.get(INSTANCE_SETS) or {})
+    if renamed:
+        meta["renamed_columns"] = {**(old_meta.get("renamed_columns") or {}),
+                                   **renamed}
+    return out, meta
+
+
+def print_carried(rows, meta) -> None:
+    """One line saying what a run kept from the cell it ran into."""
+    columns = sorted({column for row in rows for column in row
+                      if column not in BASE_COLUMNS and "." in column
+                      and not column.startswith(INTAKE_NAMESPACES)}
+                     | {column for row in rows for column in row
+                        if column in PROTECTED_COLUMNS})
+    if not columns:
+        return
+    namespaces = sorted({column.split(".", 1)[0] if "." in column else column
+                         for column in columns})
+    print(f"    carried forward from the cell's head table: {len(columns)} "
+          f"column(s) under {', '.join(namespaces)}")
+    if meta.get("renamed_columns"):
+        print(f"    !! legacy column names translated: "
+              + ", ".join(f"{old} -> {new}" for old, new
+                          in meta["renamed_columns"].items()))
 
 
 def write_cell(cell_dir: str, circuit_spec, task_spec, rows, components,
-               resolved) -> dict:
-    meta = {"circuit": circuit_spec.provenance(),
-            "task": task_spec.provenance(),
-            "intake": resolved.provenance(),
-            "components": count_components(components)}
+               resolved, *, meta: dict = None) -> dict:
+    """The head table, with the intake's meta rebuilt over whatever `meta`
+    carries (the coverage, and the keys a previous run left)."""
+    meta = dict(meta or {})
+    meta.update({"circuit": circuit_spec.provenance(),
+                 "task": task_spec.provenance(),
+                 "intake": resolved.provenance(),
+                 "components": count_components(components)})
     return write_head_table(cell_dir, rows, meta=meta)
 
 
@@ -397,9 +468,13 @@ def dry_run(cli, resolved, *, tokenizer=None) -> int:
         census = count_components(components)
         for task_spec in resolved.tasks:
             cell = intake.cell_dir(root, circuit_spec, task_spec)
-            written = write_cell(cell, circuit_spec, task_spec,
-                                 carry_roles(cell, rows), components, resolved)
+            # A dry run runs no analysis, so it replaces no namespace: every
+            # column the cell already holds is written back as it was.
+            carried, meta = carry_forward(cell, rows)
+            written = write_cell(cell, circuit_spec, task_spec, carried,
+                                 components, resolved, meta=meta)
             print(f"  {circuit_spec.label} x {task_spec.label}")
+            print_carried(carried, meta)
             print(f"    {census['heads']} head(s) and {census['mlps']} MLP "
                   f"block(s) over {census['layers']} layer(s); "
                   f"{census['heads_head_gate_active']} head(s) have their head "
@@ -498,13 +573,19 @@ def run(cli, resolved, *, model=None) -> int:
                                    components, cell, task_instances, model=model)
             print(f"  {circuit_spec.label} x {task_spec.label}")
 
-            # Before the analyses, so an analysis that groups by a role sees
-            # the roles this cell already carries, and before write_cell, so
-            # the table it writes still has them.
-            rows = carry_roles(cell, base_rows)
+            # Before the analyses, so the table they leave holds every column
+            # the cell already had except the namespaces about to be rewritten.
+            rows, meta = carry_forward(
+                cell, base_rows, replaced={module.NAME for module in selected})
+            print_carried(rows, meta)
             for module in selected:
                 updates = module.run(ctx) or {}
                 rows = merge_columns(rows, updates, namespace=module.NAME)
+                for declared in ctx.take_coverage():
+                    meta = add_coverage(
+                        meta, declared["columns"], declared["instance_ids"],
+                        instance_set=declared["instance_set"],
+                        namespace=module.NAME, dataset=declared["dataset"])
                 print(f"    {module.NAME}: {len(updates)} Component(s) updated, "
                       f"output under {module.SUBDIR}/")
 
@@ -513,7 +594,7 @@ def run(cli, resolved, *, model=None) -> int:
                     "circuit": circuit_spec.provenance(),
                     "task": task_spec.provenance()})
             written = write_cell(cell, circuit_spec, task_spec, rows, components,
-                                 resolved)
+                                 resolved, meta=meta)
             print(f"    {written['csv']}")
             print(f"    {written['json']}")
     return 0

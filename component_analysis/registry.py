@@ -16,6 +16,17 @@ two analyses cannot collide. It writes its own JSON and PNG under
 `ctx.subdir()`; the head table is written once, by the CLI, after every
 analysis has run.
 
+Inside `run`, an analysis also says which instances each of its columns was
+computed over, with `ctx.declare_coverage(columns, instance_ids=...,
+instance_set=...)`. The CLI namespaces those declarations like the columns and
+writes them into the head table's meta (`head_table.add_coverage`), which is
+how a 71-instance paired column and its 100-instance neighbour are told apart
+without reading the analysis's JSON.
+
+A run into a cell that already has a head table **replaces the namespaces of
+the analyses it runs and carries every other column forward**, so a cell is
+assembled by running several jobs into it (`analyze_components.carry_forward`).
+
 `ANALYSES` is the one place registration happens: a new analysis is one line
 here and one new module. That is deliberate — tickets 03, 04, 07 and 08 are
 implemented on sibling branches cut from the same commit, and one line each in
@@ -134,6 +145,27 @@ class AnalysisContext:
     sample: Any = None
     device: str = "cuda"
     _loaders: Dict[str, Any] = field(default_factory=dict, repr=False)
+    _coverage: List[dict] = field(default_factory=list, repr=False)
+
+    def declare_coverage(self, columns, *, instance_ids, instance_set: str,
+                         dataset: Optional[str] = None) -> None:
+        """Say which instances some of this analysis's columns were computed over.
+
+        `columns` are the bare names `run` returns; `instance_set` names the
+        kind of set (`test_split`, `causal_sample`, `paired_honest_instruction`,
+        `honest_twin_split`, ...), and `dataset` the directory when it is not
+        the cell's own task. An empty id list is a column computed over nothing,
+        which the table records as n = 0 rather than leaving unrecorded.
+        """
+        self._coverage.append({"columns": list(columns),
+                               "instance_ids": [str(one) for one in instance_ids or ()],
+                               "instance_set": instance_set, "dataset": dataset})
+
+    def take_coverage(self) -> List[dict]:
+        """The declarations made since the last call, emptied. The CLI's half."""
+        taken = list(self._coverage)
+        del self._coverage[:]
+        return taken
 
     @property
     def keys(self) -> list:
