@@ -24,6 +24,7 @@ import numpy as np
 import pytest
 
 from component_analysis import attention_patterns as ap
+from component_analysis import attention_token_level as atl
 
 # ==============================================================================
 # THE COLORMAP UNDER A BLUE-LIGHT FILTER
@@ -98,7 +99,7 @@ def attention_dir(out) -> str:
 
 
 def token_level_dir(out) -> str:
-    return os.path.join(attention_dir(out), ap.TOKEN_LEVEL_SUBDIR)
+    return os.path.join(attention_dir(out), atl.SUBDIR)
 
 
 def run_token_level(sdr_cell, *extra):
@@ -135,13 +136,13 @@ def test_token_level_with_nothing_profiled_says_so_and_draws_nothing(sdr_cell):
 
 
 def token_level_index(out) -> dict:
-    with open(os.path.join(token_level_dir(out), ap.TOKEN_LEVEL_INDEX)) as handle:
+    with open(os.path.join(token_level_dir(out), atl.INDEX)) as handle:
         return json.load(handle)
 
 
 def head_twin(out, label) -> dict:
     with open(os.path.join(token_level_dir(out),
-                           f"{ap.TOKEN_LEVEL_STEM}_{label}.json")) as handle:
+                           f"{atl.STEM}_{label}.json")) as handle:
         return json.load(handle)
 
 
@@ -151,9 +152,9 @@ def test_token_level_writes_one_png_and_twin_per_circuit_head(sdr_cell):
     written = set(os.listdir(token_level_dir(out)))
     # The fixture circuit's heads are L0H0 and L0H2 (ticket 03's fixture).
     for label in ("L0H0", "L0H2"):
-        assert f"{ap.TOKEN_LEVEL_STEM}_{label}.png" in written
-        assert f"{ap.TOKEN_LEVEL_STEM}_{label}.json" in written
-    assert ap.TOKEN_LEVEL_INDEX in written
+        assert f"{atl.STEM}_{label}.png" in written
+        assert f"{atl.STEM}_{label}.json" in written
+    assert atl.INDEX in written
     assert sorted(one["label"] for one in token_level_index(out)["heads"]) == \
         ["L0H0", "L0H2"]
 
@@ -174,7 +175,7 @@ def test_each_template_variant_is_its_own_group_and_says_how_many_it_averaged(
 
     index = token_level_index(out)
     pressure_groups = [group for group in index["groups"]
-                       if group["family"] == "pressure"]
+                       if group["family"] == atl.TASK_PROMPTS]
     variants = sorted({record["template_variant"] for record in records})
     assert sorted(group["template_variant"] for group in pressure_groups) == \
         variants
@@ -202,7 +203,7 @@ def test_every_token_level_row_is_a_distribution_over_the_prompt(sdr_cell):
 
 def test_token_level_sums_back_to_the_segment_masses_of_patterns_json(sdr_cell):
     """The two views of one head cannot disagree: a Segment's mass is the sum
-    of its tokens, weighted over the template groups by their instances."""
+    of its tokens, weighted over the Template Variant groups by their instances."""
     out, _records = run_token_level(sdr_cell)
 
     with open(os.path.join(attention_dir(out), ap.PATTERNS_FILE)) as handle:
@@ -245,9 +246,9 @@ def test_every_panel_title_says_how_many_instances_each_row_averaged(sdr_cell):
             assert f"n={row['n_instances']}" in row["label"]
 
 
-def test_above_the_size_limit_the_head_twins_are_meta_only(sdr_cell, monkeypatch):
-    monkeypatch.setattr(ap, "TOKEN_LEVEL_JSON_LIMIT_BYTES", 1000)
-    out, records = run_token_level(sdr_cell)
+def test_above_the_size_limit_the_head_twins_are_meta_only(sdr_cell):
+    out, records = run_token_level(sdr_cell,
+                                   "--attention-token-level-json-limit", "1000")
 
     index = token_level_index(out)
     assert index["payload"] == "meta-only"
@@ -255,19 +256,20 @@ def test_above_the_size_limit_the_head_twins_are_meta_only(sdr_cell, monkeypatch
     assert index["full_twins_bytes"] > 1000
     assert index["colormap"] == ap.COLORMAP
     # The instance ids stay recorded, once, in the index.
-    ids = [one for group in index["groups"] if group["family"] == "pressure"
+    ids = [one for group in index["groups"] if group["family"] == atl.TASK_PROMPTS
            for row in group["rows"] if row["condition"] == "pressure"
            for one in row["instance_ids"]]
     assert len(ids) == len(records)
 
     written = set(os.listdir(token_level_dir(out)))
     for label in ("L0H0", "L0H2"):
-        assert f"{ap.TOKEN_LEVEL_STEM}_{label}.png" in written
+        assert f"{atl.STEM}_{label}.png" in written
         twin = head_twin(out, label)
         assert twin["payload"] == "meta-only"
         assert "panels" not in twin
         assert twin["colormap"] == ap.COLORMAP
-        assert twin["regenerate"]
+        assert twin["regenerate"] == index["regenerate"]
+        assert atl.INDEX in twin["instance_ids"]
         assert [one["slots"] for one in twin["shape"]] == \
             [group["n_slots"] for group in index["groups"]]
 
@@ -275,12 +277,35 @@ def test_above_the_size_limit_the_head_twins_are_meta_only(sdr_cell, monkeypatch
         assert json.load(handle)["token_level"]["payload"] == "meta-only"
 
 
+def test_the_regenerate_pointer_names_the_flags_that_rewrite_this_cell(sdr_cell):
+    out, _records = run_token_level(
+        sdr_cell, "--attention-token-level-json-limit", "1000",
+        "--attention-conditions", "pressure")
+
+    index = token_level_index(out)
+    how = index["regenerate"]
+    assert "--attention-token-level " in how
+    assert "--query-positions readout" in how
+    assert "--attention-conditions pressure" in how
+    assert f"--attention-token-level-json-limit {index['full_twins_bytes']}" in how
+
+
+def test_each_panel_title_names_its_group(sdr_cell):
+    """Two layouts of one Template Variant are two groups, `variant` and
+    `variant#2`; their panels must not share a title."""
+    out, _records = run_token_level(sdr_cell)
+
+    for label in ("L0H0", "L0H2"):
+        for panel in head_twin(out, label)["panels"]:
+            assert panel["title"].startswith(panel["group"] + " ")
+
+
 def test_under_the_size_limit_the_head_twins_carry_their_values(sdr_cell):
     out, _records = run_token_level(sdr_cell)
 
     index = token_level_index(out)
     assert index["payload"] == "full"
-    assert index["full_twins_bytes"] <= ap.TOKEN_LEVEL_JSON_LIMIT_BYTES
+    assert index["full_twins_bytes"] <= atl.JSON_LIMIT_BYTES
 
 
 # ==============================================================================
@@ -301,8 +326,8 @@ def test_review_spells_the_attention_colormap_the_module_draws_with():
     assert review.ATTENTION_COLORMAP == ap.COLORMAP
     assert review.ATTENTION_TOP_COLOUR == to_hex(
         matplotlib.colormaps[ap.COLORMAP](1.0))
-    assert review.TOKEN_LEVEL_PATH == f"{ap.SUBDIR}/{ap.TOKEN_LEVEL_SUBDIR}"
-    assert review.TOKEN_LEVEL_INDEX == ap.TOKEN_LEVEL_INDEX
+    assert review.TOKEN_LEVEL_PATH == os.path.join(ap.SUBDIR, atl.SUBDIR)
+    assert review.TOKEN_LEVEL_INDEX == atl.INDEX
 
 
 def test_a_cell_written_before_the_colormap_was_recorded_is_drawn_in_it_anyway():
@@ -312,7 +337,7 @@ def test_a_cell_written_before_the_colormap_was_recorded_is_drawn_in_it_anyway()
     for heatmap in view.items:
         assert heatmap.colorscale == ap.COLORMAP
         assert heatmap.value_range == [0.0, 1.0]
-    assert any("colormap" in note for note in view.notes)
+    assert any("predate the recorded colormap" in note for note in view.notes)
 
 
 def test_a_cell_without_token_level_output_renders_a_note():
@@ -330,7 +355,8 @@ def test_the_notebook_views_carry_the_recorded_colormap_and_the_token_pngs(
     attention = review.attention_views(results_dir)
     assert attention.items
     assert {one.colorscale for one in attention.items} == {ap.COLORMAP}
-    assert not any("colormap" in note for note in attention.notes)
+    assert not any("predate" in note for note in attention.notes)
+    assert any(ap.COLORMAP in note for note in attention.notes)
     assert review.top_heads_view(results_dir).colorscale == ap.COLORMAP
 
     pictures = review.token_level_views(results_dir)
@@ -341,9 +367,9 @@ def test_the_notebook_views_carry_the_recorded_colormap_and_the_token_pngs(
         assert any("largest" in note for note in picture.notes)
 
 
-def test_a_meta_only_cell_still_gives_the_notebook_its_pngs(sdr_cell, monkeypatch):
-    monkeypatch.setattr(ap, "TOKEN_LEVEL_JSON_LIMIT_BYTES", 1000)
-    out, _records = run_token_level(sdr_cell)
+def test_a_meta_only_cell_still_gives_the_notebook_its_pngs(sdr_cell):
+    out, _records = run_token_level(sdr_cell,
+                                    "--attention-token-level-json-limit", "1000")
 
     pictures = review.token_level_views(os.path.join(str(out), *CELL))
 
