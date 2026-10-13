@@ -44,6 +44,18 @@ SAMPLE_JSON = "sample.json"
 #: (for its mass arithmetic), and this module has to import where torch is not
 #: wanted, so its two names are spelled out and a test pins them.
 ATTENTION_SUBDIR = "attention"
+
+#: The attention figures' colormap (`attention_patterns.COLORMAP`), spelled out
+#: for the same reason as `ATTENTION_SUBDIR` and pinned by a test. A twin
+#: written since ticket 16 records its own under `colormap`, which wins; this is
+#: what a cell written before then is drawn in. Plotly knows it by this name.
+ATTENTION_COLORMAP = "YlOrRd"
+#: The map's darkest colour, for circuitsvis: `colored_tokens` mixes white
+#: into one colour rather than taking a colormap, and its default is blue.
+ATTENTION_TOP_COLOUR = "#800026"
+#: Where `--attention-token-level` writes, and its one index file.
+TOKEN_LEVEL_SUBDIR = "attention/token_level"
+TOKEN_LEVEL_INDEX = "token_level.json"
 DLA_SUBDIR = dla.SUBDIR
 KNOCKOUT_SUBDIR = knockout.SUBDIR
 PATH_PATCHING_SUBDIR = path_patching.SUBDIR
@@ -147,6 +159,10 @@ class Heatmap:
     #: plotly choose".
     extent: Optional[float] = None
     notes: List[str] = field(default_factory=list)
+    #: A sequential colormap name when the values are one-signed (attention
+    #: mass), drawn over `value_range`; None keeps the diverging default.
+    colorscale: Optional[str] = None
+    value_range: Optional[List[float]] = None
 
     def __bool__(self) -> bool:
         return True
@@ -182,6 +198,19 @@ class Scatter:
     y_title: str
     x_se: Optional[List[Optional[float]]] = None
     y_se: Optional[List[Optional[float]]] = None
+    notes: List[str] = field(default_factory=list)
+
+    def __bool__(self) -> bool:
+        return True
+
+
+@dataclass
+class Picture:
+    """A PNG of record the notebook shows as it is, with what to read off it."""
+
+    title: str
+    subtitle: str
+    path: str
     notes: List[str] = field(default_factory=list)
 
     def __bool__(self) -> bool:
@@ -426,20 +455,28 @@ def attention_views(results_dir: str) -> "Group":
                         os.path.join(results_dir, ATTENTION_SUBDIR,
                                      PATTERNS_TWIN_GLOB))
 
-    items = []
+    items, unrecorded = [], False
     for path in twins:
         payload = read_json(path)
         level = payload.get("level", "?")
         query_position = payload.get("query_position", "?")
+        unrecorded = unrecorded or "colormap" not in payload
         for panel in payload.get("panels", []):
             items.append(Heatmap(
                 title=f"attention mass per Segment — {panel.get('kind')} ({level})",
                 subtitle=_condition_subtitle(panel, query_position),
                 rows=list(payload.get("rows", [])),
                 columns=list(payload.get("columns", [])),
-                values=[list(row) for row in panel.get("matrix", [])]))
+                values=[list(row) for row in panel.get("matrix", [])],
+                colorscale=_attention_colormap(payload),
+                value_range=list(payload.get("value_range") or [0.0, 1.0])))
 
     notes = []
+    if unrecorded:
+        notes.append(f"these figures predate the recorded colormap; the "
+                     f"notebook draws them in {ATTENTION_COLORMAP}, the colormap "
+                     f"the PNGs of record are now drawn in, and an older PNG "
+                     f"may differ.")
     record = read_json(os.path.join(results_dir, ATTENTION_SUBDIR, PATTERNS_JSON))
     if record:
         tolerance = record.get("sum_tolerance")
@@ -470,7 +507,72 @@ def top_heads_view(results_dir: str) -> Heatmap:
                   f"ranked by {payload.get('ranked_by')}"),
         rows=list(payload.get("rows", [])),
         columns=list(payload.get("columns", [])),
-        values=[list(row) for row in payload.get("matrix", [])])
+        values=[list(row) for row in payload.get("matrix", [])],
+        colorscale=_attention_colormap(payload), value_range=[0.0, 1.0])
+
+
+def _attention_colormap(payload: dict) -> str:
+    """The colormap a twin records, else the one every attention PNG uses now."""
+    return payload.get("colormap") or ATTENTION_COLORMAP
+
+
+#: How many of each row's largest tokens a token-level picture's notes name.
+TOKEN_LEVEL_NOTE_TOP = 5
+
+
+def token_level_views(results_dir: str) -> "Group":
+    """One Picture per circuit head: its token-by-token attention PNG.
+
+    The notebook shows the PNGs of record rather than redrawing them, because
+    a cell over the size limit has meta-only twins with no values to redraw.
+    When the twin does carry its values, each row's largest tokens are named
+    in the notes, which is what the figure is read for.
+    """
+    path = os.path.join(results_dir, TOKEN_LEVEL_SUBDIR, TOKEN_LEVEL_INDEX)
+    index = read_json(path)
+    if index is None:
+        return Missing(
+            what="token-level attention",
+            note=(f"no token-level attention in this cell ({path} is absent); "
+                  f"rerun attention_patterns with --attention-token-level to "
+                  f"write it"),
+            paths=(path,))
+
+    directory = os.path.dirname(path)
+    items = []
+    for head in index.get("heads", []):
+        twin = read_json(os.path.join(directory, head.get("twin", ""))) or {}
+        notes = []
+        for panel in twin.get("panels", []):
+            for row in panel.get("rows", []):
+                top = ", ".join(
+                    f"{one.get('token')!r} {_number(one.get('mass'), 3)}"
+                    for one in row.get("top_tokens", [])[:TOKEN_LEVEL_NOTE_TOP])
+                notes.append(f"{panel.get('group')}, {row.get('label')}: "
+                             f"largest {top}")
+        items.append(Picture(
+            title=f"{head.get('label')} — attention to every token",
+            subtitle=twin.get("title", ""),
+            path=os.path.join(directory, head.get("figure", "")),
+            notes=notes))
+
+    notes = [f"colour {index.get('colormap')}, "
+             f"{(index.get('colour_scale') or {}).get('norm')} scale "
+             f"(gamma {(index.get('colour_scale') or {}).get('gamma')}) from 0 "
+             f"to 1, the same for every head.",
+             f"alignment: {index.get('alignment')}.",
+             f"labels: {index.get('labels')}."]
+    if index.get("payload") == "meta-only":
+        notes.append(
+            f"the per-head twins are meta-only: together they would be "
+            f"{index.get('full_twins_bytes')} bytes, over the "
+            f"{index.get('json_limit_bytes')}-byte limit. The PNGs are "
+            f"complete. {index.get('regenerate')}")
+    return Group(title="Attention to every token, per head",
+                 subtitle=cell_subtitle(_cell_meta(results_dir),
+                                        f"query position(s) "
+                                        f"{', '.join(index.get('query_positions', []))}"),
+                 items=items, notes=notes)
 
 
 def coloured_tokens(heatmap: Heatmap):
