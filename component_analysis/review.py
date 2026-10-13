@@ -53,8 +53,9 @@ ATTENTION_COLORMAP = "YlOrRd"
 #: The map's darkest colour, for circuitsvis: `colored_tokens` mixes white
 #: into one colour rather than taking a colormap, and its default is blue.
 ATTENTION_TOP_COLOUR = "#800026"
-#: Where `--attention-token-level` writes, and its one index file.
-TOKEN_LEVEL_PATH = "attention/token_level"
+#: Where `--attention-token-level` writes, and its one index file
+#: (`attention_token_level.SUBDIR` and `.INDEX`, which imports torch too).
+TOKEN_LEVEL_PATH = os.path.join(ATTENTION_SUBDIR, "token_level")
 TOKEN_LEVEL_INDEX = "token_level.json"
 DLA_SUBDIR = dla.SUBDIR
 KNOCKOUT_SUBDIR = knockout.SUBDIR
@@ -455,12 +456,12 @@ def attention_views(results_dir: str) -> "Group":
                         os.path.join(results_dir, ATTENTION_SUBDIR,
                                      PATTERNS_TWIN_GLOB))
 
-    items, unrecorded = [], False
+    items, recorded = [], set()
     for path in twins:
         payload = read_json(path)
         level = payload.get("level", "?")
         query_position = payload.get("query_position", "?")
-        unrecorded = unrecorded or "colormap" not in payload
+        recorded.add(payload.get("colormap"))
         for panel in payload.get("panels", []):
             items.append(Heatmap(
                 title=f"attention mass per Segment — {panel.get('kind')} ({level})",
@@ -471,8 +472,10 @@ def attention_views(results_dir: str) -> "Group":
                 colorscale=_attention_colormap(payload),
                 value_range=list(payload.get("value_range") or [0.0, 1.0])))
 
-    notes = []
-    if unrecorded:
+    notes = [f"colour: {', '.join(sorted(one for one in recorded if one))}, "
+             f"as recorded in the figures' JSON twins."] if recorded - {None} \
+        else []
+    if None in recorded:
         notes.append(f"these figures predate the recorded colormap; the "
                      f"notebook draws them in {ATTENTION_COLORMAP}, the colormap "
                      f"the PNGs of record are now drawn in, and an older PNG "
