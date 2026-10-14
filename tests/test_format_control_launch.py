@@ -428,6 +428,76 @@ def test_submit_records_the_slurm_job_id_and_skips_submitted_jobs(launch, tmp_pa
     assert "# skip D__far: submitted as 1001" in lines
 
 
+def test_a_failed_sbatch_mid_loop_keeps_the_ids_already_queued(launch, tmp_path, monkeypatch):
+    """Each job id is saved the moment its sbatch returns, so a failure (QOS
+    limit, bad account, Ctrl-C) on the third job cannot make a re-run submit
+    the first two again."""
+    monkeypatch.chdir(tmp_path)
+    path = str(tmp_path / "suite_manifest.json")
+    manifest = _ready_manifest(launch)
+    calls = []
+
+    def run(cmd):
+        calls.append(cmd)
+        if len(calls) == 3:
+            raise RuntimeError("sbatch: error: QOSMaxSubmitJobPerUserLimit")
+        return f"Submitted batch job {2000 + len(calls)}"
+
+    with pytest.raises(RuntimeError, match="QOS"):
+        launch.submit(manifest, dry=False, accounts=["bgrb-delta-gpu"], partition="gpuA40x4",
+                      suites=["format-control-far-nls0.3"], run=run,
+                      save=lambda m: launch.save_manifest(m, path))
+
+    with open(path) as f:
+        saved = json.load(f)
+    ids = {j["job"]: j["slurm"]["job_id"]
+           for j in saved["suites"]["format-control-far-nls0.3"]["jobs"]}
+    assert ids["D__far"] == "2001" and ids["D__far_honest"] == "2002"
+    assert ids["H__far"] is None
+
+    # The re-run sends only the jobs that never got an id.
+    sent = []
+    launch.submit(saved, dry=False, accounts=["bgrb-delta-gpu"], partition="gpuA40x4",
+                  suites=["format-control-far-nls0.3"],
+                  run=lambda cmd: sent.append(cmd) or "Submitted batch job 3000")
+    assert [c[4] for c in sent] == ["--job-name=fc-far-H__far", "--job-name=fc-far-H__far_honest"]
+
+
+def _write_dryrun_log(launch, path, args, passed=True):
+    import shlex
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w") as f:
+        f.write(f"# 2026-10-13T20:00:00  python evaluate_circuit.py {shlex.join(args)} --dry-run\n")
+        if passed:
+            f.write("  TOTAL     76.6 min (1 cell(s))\n\n  Nothing was written. Drop --dry-run to run it.\n")
+
+
+def test_a_dry_run_log_counts_only_for_the_arguments_it_ran(launch, tmp_path):
+    """A log from before a configuration change (an F retune, a corrected
+    path) is not a dry-run of the job as it now stands."""
+    fc_cells = _launch_module("fc_cells")
+    suite = "format-control-far-nls0.3"
+    cfg = {suite: dict(CONFIG[suite], runs={"D": "/r/far_D", "H": "/r/far_H", "F": "/r/far_F"})}
+    jobs = {j["job"]: j for j in fc_cells.plan_suite(suite, cfg[suite])}
+    d = tmp_path / "dryrun" / suite
+    _write_dryrun_log(launch, str(d / "D__far.log"), fc_cells.job_args(jobs["D__far"]))
+    old = dict(cfg[suite], runs={"D": "/r/far_D", "H": "/r/far_H", "F": "/r/far_F_nls0.2"})
+    _write_dryrun_log(launch, str(d / "F__far.log"),
+                      fc_cells.job_args({j["job"]: j for j in fc_cells.plan_suite(suite, old)}["F__far"]))
+
+    got = launch.read_dryruns(cfg, str(tmp_path / "dryrun"))
+    assert got[(suite, "D__far")]["passed"] is True
+    assert got[(suite, "D__far")]["estimate_min"] == 76.6
+    assert got[(suite, "F__far")]["passed"] is None
+    assert got[(suite, "F__far")]["stale"] is True
+
+    manifest = launch.build_manifest(cfg, dryruns=got)
+    lines = launch.submit(manifest, dry=True, accounts=["bgrb-delta-gpu"], partition="gpuA40x4",
+                          suites=[suite], jobs=["D__far", "F__far"], run=None)
+    assert any(ln.startswith("sbatch ") and "fc-far-D__far " in ln for ln in lines)
+    assert "# skip F__far: dry-run log is for other arguments; dry-run it again" in lines
+
+
 # ==============================================================================
 # OVERLAP
 # ==============================================================================

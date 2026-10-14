@@ -94,16 +94,35 @@ def build_manifest(config: dict, previous: dict = None, dryruns: dict = None) ->
             "config": os.path.join(LAUNCH_REL, "suites.json"), "suites": suites}
 
 
+_LOG_HEADER = re.compile(r"^# \S+\s+python evaluate_circuit\.py (.*) --dry-run$")
+
+
+def dryrun_log_args(first_line: str):
+    """The argument string a dry-run log's header records, or None."""
+    m = _LOG_HEADER.match(first_line.rstrip("\n"))
+    return m.group(1) if m else None
+
+
 def read_dryruns(config: dict, dryrun_dir: str = DRYRUN_DIR) -> dict:
+    """(suite, job) -> dry-run verdict. A log counts only when its header
+    records exactly the job's current arguments; a log for other arguments
+    (an F retune, a corrected path, changed common settings) is `stale` and
+    the job counts as not dry-run."""
     out = {}
     for sname, cfg in config.items():
         for job in plan_suite(sname, cfg):
             path = os.path.join(dryrun_dir, sname, f"{job['job']}.log")
-            if os.path.exists(path):
-                with open(path, errors="replace") as f:
-                    passed, est = parse_dryrun_log(f.read())
-                out[(sname, job["job"])] = {"log": os.path.relpath(path, HERE),
-                                            "passed": passed, "estimate_min": est}
+            if not os.path.exists(path) or job["awaits"]:
+                continue
+            with open(path, errors="replace") as f:
+                text = f.read()
+            rel = os.path.relpath(path, HERE)
+            if dryrun_log_args(text.split("\n", 1)[0]) != shlex.join(job_args(job)):
+                out[(sname, job["job"])] = {"log": rel, "passed": None, "estimate_min": None,
+                                            "stale": True}
+                continue
+            passed, est = parse_dryrun_log(text)
+            out[(sname, job["job"])] = {"log": rel, "passed": passed, "estimate_min": est}
     return out
 
 
@@ -148,9 +167,12 @@ def _default_run(cmd: list) -> str:
 
 
 def submit(manifest: dict, *, dry: bool, accounts, partition: str, suites=None, jobs=None,
-           time: str = None, resubmit: bool = False, run=_default_run) -> list:
+           time: str = None, resubmit: bool = False, run=_default_run, save=None) -> list:
     """Submit (or with dry=True print) one sbatch per ready job. Returns the
-    printed lines; records job ids in `manifest` in place."""
+    printed lines; records job ids in `manifest` in place and calls
+    `save(manifest)` after every successful sbatch, so a failure later in the
+    loop never loses an id that Slurm already holds. A job that already has an
+    id is skipped unless `resubmit`."""
     lines, i = [], 0
     for sname, suite in manifest["suites"].items():
         if suites and sname not in suites:
@@ -167,6 +189,10 @@ def submit(manifest: dict, *, dry: bool, accounts, partition: str, suites=None, 
                 lines.append(f"# skip {job['job']}: submitted as {jid}")
                 continue
             dr = job.get("dryrun") or {}
+            if dr.get("stale"):
+                lines.append(f"# skip {job['job']}: dry-run log is for other arguments; "
+                             f"dry-run it again")
+                continue
             if not dr.get("passed"):
                 lines.append(f"# skip {job['job']}: no passing dry-run")
                 continue
@@ -183,6 +209,8 @@ def submit(manifest: dict, *, dry: bool, accounts, partition: str, suites=None, 
             job["slurm"] = {"job_id": new_id, "account": account, "partition": partition,
                             "time": t, "submitted": time_stamp()}
             lines.append(f"#   -> {new_id}")
+            if save is not None:
+                save(manifest)
     return lines
 
 
@@ -275,7 +303,8 @@ def main(argv=None):
     p.add_argument("--time", default=None, help="override the per-job estimate")
     p.add_argument("--suite", action="append")
     p.add_argument("--job", action="append")
-    p.add_argument("--resubmit", action="store_true")
+    p.add_argument("--resubmit", "--force", dest="resubmit", action="store_true",
+                   help="also submit jobs that already have a Slurm job id")
     p = sub.add_parser("merge")
     p.add_argument("suite")
     p.add_argument("--force", action="store_true")
@@ -309,10 +338,9 @@ def main(argv=None):
     elif a.cmd == "submit":
         m = refresh_manifest()
         lines = submit(m, dry=a.dry, accounts=a.accounts, partition=a.partition,
-                       suites=a.suite, jobs=a.job, time=a.time, resubmit=a.resubmit)
+                       suites=a.suite, jobs=a.job, time=a.time, resubmit=a.resubmit,
+                       save=None if a.dry else save_manifest)
         print("\n".join(lines))
-        if not a.dry:
-            save_manifest(m)
     elif a.cmd == "merge":
         from merge_shards import expected_from_manifest, merge_suite
         refresh_manifest()
