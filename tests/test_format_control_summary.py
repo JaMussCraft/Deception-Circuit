@@ -583,25 +583,83 @@ def test_coarse_missing_heads_only_cell_is_named(tmp_path):
 # EVAL 5
 # ==============================================================================
 
-def make_eval5(tmp_path, ref_nll_ko=None, distinct_ko=None):
-    """An eval 5 suite with D, H, F on two benchmark datasets."""
+def make_eval5(tmp_path, ref_nll_ko=None, distinct_ko=None, name="eval5_format_fine",
+               datasets=("sandbagging", "mask:known_facts")):
+    """An eval 5 suite (ticket 06 layout) with D, H, F on some benchmark datasets.
+
+    ref_nll_ko[role] is a float for every dataset, or {dataset: float};
+    datasets is a tuple for every role, or {role: tuple}."""
     ref_nll_ko = ref_nll_ko or {"D": 1.5, "H": 1.0, "F": 1.2}
     distinct_ko = distinct_ko or {"D": 0.5, "H": 0.6, "F": 0.6}
-    d = str(tmp_path / "eval5_format-control-far")
+    d = str(tmp_path / name)
     for r in ROLES:
-        datasets = {}
-        for name in ("sandbagging", "mask:known_facts"):
-            datasets[name] = {
+        names = datasets[r] if isinstance(datasets, dict) else datasets
+        out = {}
+        for ds in names:
+            ko = ref_nll_ko[r][ds] if isinstance(ref_nll_ko[r], dict) else ref_nll_ko[r]
+            out[ds] = {
                 "configs": {
                     "full": {"rates": {"deceptive": 1.0},
                              "coherence": {"ref_nll": 0.3, "distinct_n": 0.7}},
                     "knockout": {"rates": {"deceptive": 0.2},
-                                 "coherence": {"ref_nll": ref_nll_ko[r],
-                                               "distinct_n": distinct_ko[r]}}},
+                                 "coherence": {"ref_nll": ko, "distinct_n": distinct_ko[r]}}},
                 "null": {"deceptive": {"p5": 0.05, "p50": 0.1}}}
         _dump(os.path.join(d, "cells", r, "far", "interchange", "benchmarks.json"),
-              {"datasets": datasets})
+              {"datasets": out})
     return d
+
+
+def test_eval5_collateral_compares_only_datasets_both_circuits_have(tmp_path):
+    # D has one more dataset than F, with a large ref-NLL rise (4.7). Pooled, D's mean
+    # rise would be (1.2 + 1.2 + 4.7) / 3 = 2.37 and F's 1.4 would pass (a). Over the
+    # two shared datasets D's rise is 1.2, so F's 1.4 fails: (b).
+    root, data = make_suite(tmp_path)
+    e5 = make_eval5(tmp_path,
+                    ref_nll_ko={"D": {"sandbagging": 1.5, "mask:known_facts": 1.5,
+                                      "lb:convincing-game": 5.0},
+                                "H": 1.0, "F": 1.7},
+                    datasets={"D": ("sandbagging", "mask:known_facts", "lb:convincing-game"),
+                              "H": ("sandbagging",),
+                              "F": ("sandbagging", "mask:known_facts")})
+    md, decision = run(root, data, eval5_dirs=[e5])
+    cond = {c["name"]: c for c in decision["conditions"]}["collateral"]
+    assert cond["D"] == pytest.approx(1.2)
+    assert cond["F"] == pytest.approx(1.4)
+    assert cond["datasets"] == ["mask:known_facts", "sandbagging"]
+    assert cond["excluded"] == {"D": ["lb:convincing-game"], "F": []}
+    assert decision["verdict"] == "b"
+    assert "lb:convincing-game" in md.split("## Eval 5 benchmarks", 1)[1].split("##", 1)[0]
+    assert "excluded from the comparison (not shared by D and F): D lb:convincing-game" in md
+
+
+def test_eval5_without_shared_datasets_leaves_collateral_missing(tmp_path):
+    root, data = make_suite(tmp_path)
+    e5 = make_eval5(tmp_path, datasets={"D": ("sandbagging",), "H": ("sandbagging",),
+                                        "F": ("mask:known_facts",)})
+    _, decision = run(root, data, eval5_dirs=[e5])
+    assert decision["verdict"] is None
+    assert any("reference-NLL rise" in m for m in decision["missing_inputs"])
+
+
+def test_two_eval5_groups_are_merged(tmp_path):
+    # ticket 06 writes the sm and lb benchmark groups as two suites; both are passed.
+    root, data = make_suite(tmp_path)
+    sm = make_eval5(tmp_path, name="eval5_format_fine",
+                    datasets=("sandbagging", "mask:known_facts"))
+    lb = make_eval5(tmp_path, name="eval5_format_fine_lb",
+                    ref_nll_ko={"D": 2.3, "H": 1.0, "F": 0.3},
+                    datasets=("lb:instructed-deception", "lb:convincing-game"))
+    md, decision = run(root, data, eval5_dirs=[sm, lb])
+    assert decision["eval5_dirs"] == [sm, lb]
+    cond = {c["name"]: c for c in decision["conditions"]}["collateral"]
+    assert cond["datasets"] == ["lb:convincing-game", "lb:instructed-deception",
+                                "mask:known_facts", "sandbagging"]
+    assert cond["D"] == pytest.approx((1.2 + 1.2 + 2.0 + 2.0) / 4)
+    assert cond["F"] == pytest.approx((0.9 + 0.9 + 0.0 + 0.0) / 4)
+    table = md.split("## Eval 5 benchmarks", 1)[1].split("##", 1)[0]
+    for ds in ("sandbagging", "mask:known_facts", "lb:instructed-deception",
+               "lb:convincing-game"):
+        assert f"| F | {ds} |" in table
 
 
 def test_eval5_columns_appear_only_when_a_directory_is_given(tmp_path):

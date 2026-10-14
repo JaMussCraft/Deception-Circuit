@@ -109,11 +109,12 @@ DECISIONS_TAKEN = {
                            "the H and F test sets are informational. Mode `all` adds the H "
                            f"and F test sets to the rule ({HONEST_ROWS_RULING})."),
     "collateral": ("Collateral is the reference-NLL rise (eval 5, knockout minus full, mean "
-                   "over the benchmark datasets both circuits have) when an eval 5 "
-                   "directory is given, else the wikitext KL/token of eval 2."),
+                   "over the benchmark datasets both D and F have, with the sm and lb groups "
+                   "merged; a dataset only one of them has is excluded and named) when an eval "
+                   "5 directory is given, else the wikitext KL/token of eval 2."),
     "distinct2": (f"Distinct-2 collapse = F's knockout distinct-2 below "
                   f"{DISTINCT2_COLLAPSE_FRAC:g} x the full model's: eval 5 `distinct_n` "
-                  f"(mean over datasets) when given, else word bigrams of eval 2's three "
+                  f"(mean over all of F's datasets) when given, else word bigrams of eval 2's three "
                   f"greedy wikitext continuations ({UNREGISTERED})."),
     "null": "Outside the null = knockout accuracy strictly below the null's 5th percentile.",
     "missing": ("A condition whose inputs are missing is reported as missing; the verdict is "
@@ -511,9 +512,13 @@ def decide(inputs, honest_rows="variants"):
     key, label = (("ref_nll_rise", "reference-NLL rise (eval 5)") if eval5
                   else ("wikitext_kl", "wikitext KL/token (eval 2)"))
     a, b = need("D", label, key), need("F", label, key)
-    conditions.append({"name": "collateral", "measure": label, "rule": "F <= D",
-                       "D": a, "F": b,
-                       "passed": None if a is None or b is None else b <= a + TOL})
+    coll = {"name": "collateral", "measure": label, "rule": "F <= D",
+            "D": a, "F": b, "passed": None if a is None or b is None else b <= a + TOL}
+    if eval5:
+        e5d = inputs.get("eval5_datasets") or {}
+        coll["datasets"] = list(e5d.get("shared") or [])
+        coll["excluded"] = dict(e5d.get("excluded") or {})
+    conditions.append(coll)
 
     # 4. both knockouts outside their own nulls
     od, of = need("D", "null 5th percentile", "outside_null"), need(
@@ -661,6 +666,13 @@ def summarize(suite_root, *, data_dir="data/datasets", eval5_dirs=(), family=Non
         missing.append("flip_audit.json")
 
     # ---- decision inputs
+    # Eval 5 collateral compares D and F on the datasets both have (sm and lb groups
+    # merged); any dataset only one of them has is excluded and named.
+    e5 = eval5 or {}
+    shared = sorted(set(e5.get("D") or {}) & set(e5.get("F") or {}))
+    eval5_datasets = {"shared": shared,
+                      "excluded": {r: sorted(set(e5.get(r) or {}) - set(shared))
+                                   for r in ("D", "F")}}
     sides = {}
     for r in ("D", "F"):
         row = paired[(r, "D")]["knockout"] or {}
@@ -672,8 +684,10 @@ def summarize(suite_root, *, data_dir="data/datasets", eval5_dirs=(), family=Non
         drops["F test set"] = (paired[(r, "F")]["knockout"] or {}).get("drop")
         kcell = cells.get((knockout_label(r, family), datasets["D"])) or {}
         if eval5_dirs:
-            agg = eval5_aggregate((eval5 or {}).get(r))
-            d2, src = agg["distinct2_ratio"], "eval 5 distinct_n"
+            rows = e5.get(r) or {}
+            agg = eval5_aggregate({k: rows[k] for k in shared})
+            # The (c) gate is F against its own full model: all of F's datasets count.
+            d2, src = eval5_aggregate(rows)["distinct2_ratio"], "eval 5 distinct_n"
         else:
             agg = {"ref_nll_rise": None}
             d2 = eval2_distinct2(kcell.get("knockout"))["distinct2_ratio"]
@@ -683,8 +697,8 @@ def summarize(suite_root, *, data_dir="data/datasets", eval5_dirs=(), family=Non
                     "honest_rows": drops, "wikitext_kl": row.get("wikitext_kl"),
                     "ref_nll_rise": agg.get("ref_nll_rise"),
                     "distinct2_ratio": d2, "distinct2_source": src}
-    decision = decide({"D": sides["D"], "F": sides["F"], "eval5": bool(eval5_dirs)},
-                      honest_rows=honest_rows)
+    decision = decide({"D": sides["D"], "F": sides["F"], "eval5": bool(eval5_dirs),
+                       "eval5_datasets": eval5_datasets}, honest_rows=honest_rows)
 
     result = {"suite": os.path.basename(root), "root": root, "family": family, "task": task,
               "datasets": datasets, "dataset_conditions": conditions,
@@ -842,6 +856,12 @@ def render(res):
             if c.get("threshold") is not None:
                 rule += f"; threshold {_f(c['threshold'])}"
             L.append(_row([c["name"], rule, _f(c["D"]), _f(c["F"]), _pf(c["passed"])]))
+    coll = next((c for c in d["conditions"] if c["name"] == "collateral"), {})
+    if "datasets" in coll:
+        exc = "; ".join(f"{r} {', '.join(v)}" for r, v in coll["excluded"].items() if v)
+        L += ["", f"Eval 5 collateral compares the {len(coll['datasets'])} benchmark "
+                  f"dataset(s) both D and F have ({', '.join(coll['datasets']) or 'none'}); "
+                  f"excluded from the comparison (not shared by D and F): {exc or 'none'}."]
     g = d["gate"]
     L += ["", f"(c) gate on F's knockout: wikitext KL/token {_f(g['kl'])} vs gate "
               f"{g['kl_gate']:g} ({'FAILS' if g['kl_fails'] else 'missing' if g['kl_fails'] is None else 'passes'}); "
