@@ -204,6 +204,13 @@ pressure reader reserved) and the criteria that assign each one are in
 `docs/component-roles.md`; the sign convention they read across analyses is
 ADR-0002.
 
+**Positive Control** (knockout completeness sweep):
+A Component whose knockout is expected to destroy the behavior for a reason
+the circuit cannot explain, so its effect shows the knockout works rather than
+a Component the circuit missed: the layer 0 MLP, which acts as a second
+embedding. It stays ranked and drawn but is not counted as an outsider. Not
+"control" in the Honest Condition sense, which this glossary avoids.
+
 **Target** / **Distractor**:
 The token the mechanism's deceptive behavior selects, and the honest token it
 competes against. Which is which flips between the clean and corrupt streams.

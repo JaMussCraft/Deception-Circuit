@@ -409,14 +409,16 @@ The **knockout** completeness sweep (ticket 15, `--knockout-completeness-sweep`)
 adds no rows at all: Components outside the circuit stay in
 `knockout/sweep.json`, flagged when |drop| clears `--knockout-sweep-threshold`.
 Its default is **0.4 logits**, the researcher's 2026-10-14 call, hand-tuned on
-SDR nls0.3: there it flags the 20 strongest Components outside the circuit,
-where ticket 15's first default of 0.1 flagged 90, and L17H25 is the one
-circuit Component to clear it. Tune it by hand per run. The full ranked list
-of every Component is always written to `sweep.json`, with a ladder of counts
-at 0.02, 0.05, 0.1 and 0.2, so the cut hides nothing.
-**The layer 0 MLP is a positive control.** Knocking it out removes almost the
-whole margin on SDR nls0.3 (+3.12 of 1.66, accuracy 0.01), because it acts as
-a second embedding. It stays in the ranked list and on the figure, marked
+SDR nls0.3. Observed there on 2026-10-14 (job 22874364): it flags the 20
+strongest Components outside the circuit, where ticket 15's first default of
+0.1 flagged 90, and L17H25 is the one circuit Component to clear it. Tune it by
+hand per run. The full ranked list of every Component is always written to
+`sweep.json`, with a ladder of counts at 0.02, 0.05, 0.1, 0.2 and 0.4, so the
+cut hides nothing.
+**The layer 0 MLP is a positive control** (CONTEXT.md). Knocking it out
+reverses the margin on SDR nls0.3 (drop +3.12 against a clean 1.66, knocked
+logit difference about -1.46, accuracy 0.01), because it acts as a second
+embedding. It stays in the ranked list and on the figure, marked
 `positive_control: true` and hatched and labelled on the bar chart. It is left
 out of `flagged`, `strongest_outside_circuit` and the ladder's outside count,
 the way the embedding is left out of the sweep, and `sweep.json`'s
@@ -570,7 +572,9 @@ same `roles.direct_support` values (ticket 14's comments).
 criterion changed.** Reason: the researcher's decision to apply rule 6
 literally and name L5H11, L14H7 and L14H22 separately. The pass adds a phrase
 to `roles.role_notes` (see beside rule 6); no threshold, clause, role or
-flavour moves, so rule 2 below asks for no rerun.
+flavour moves, so rule 2 below asks for no rerun. Checked on a copy of
+`sdr-first-run`: the same 0/0/1/0/17, the same six knockout-only heads, and
+the note on L5H11, L14H7 and L14H22 and no other row (ticket 17's comments).
 
 The rest of this section is the rule for any future change. A threshold or a
 clause may be changed, and then:

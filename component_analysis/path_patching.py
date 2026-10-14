@@ -244,10 +244,12 @@ DEFAULT_POSITION_THRESHOLD = 0.05
 #: fraction of the gap. Its own default since the researcher's 2026-10-14
 #: decision: the Segment threshold is tuned by hand per run (0.01 on SDR
 #: nls0.3), and a sweep that followed it flagged 55 Components there.
-DEFAULT_SWEEP_THRESHOLD = 0.05
+DEFAULT_SWEEP_THRESHOLD_GAP_FRACTION = 0.05
+#: Said once, in `--help` and in the sweep JSON's `threshold_flag`.
+SWEEP_THRESHOLD_INDEPENDENT = "it does not follow --path-position-threshold"
 SWEEP_THRESHOLD_FLAG = ("--path-sweep-threshold, default "
-                        f"{DEFAULT_SWEEP_THRESHOLD}; it does not follow "
-                        "--path-position-threshold")
+                        f"{DEFAULT_SWEEP_THRESHOLD_GAP_FRACTION:g}; "
+                        f"{SWEEP_THRESHOLD_INDEPENDENT}")
 
 #: An instance whose clean-minus-corrupt gap is this small is not normalized by
 #: it: the Corruption did not move the answer, so every cell would be a ratio of
@@ -792,12 +794,12 @@ def add_arguments(group) -> None:
                             f"honest filter; {BOTH!r} runs each in turn and "
                             "writes one file and one column set per pair.")
     group.add_argument("--path-sweep-threshold", type=float,
-                       default=DEFAULT_SWEEP_THRESHOLD,
+                       default=DEFAULT_SWEEP_THRESHOLD_GAP_FRACTION,
                        help="How strong a Component outside the circuit must "
                             "be in the completeness sweep to be flagged in the "
                             "head table, as a fraction of the gap. Default "
-                            f"{DEFAULT_SWEEP_THRESHOLD}; it does not follow "
-                            "--path-position-threshold, because the two "
+                            f"{DEFAULT_SWEEP_THRESHOLD_GAP_FRACTION:g}; "
+                            f"{SWEEP_THRESHOLD_INDEPENDENT}, because the two "
                             "questions are separate: a value chosen to widen "
                             "or narrow the Segment pass would otherwise move "
                             "which Components the sweep calls strong.")
@@ -827,11 +829,12 @@ def position_threshold(ctx) -> float:
 def sweep_threshold(ctx) -> float:
     """Which sweep Components outside the circuit are flagged.
 
-    `--path-sweep-threshold`, defaulting to `DEFAULT_SWEEP_THRESHOLD` and
+    `--path-sweep-threshold`, defaulting to `DEFAULT_SWEEP_THRESHOLD_GAP_FRACTION` and
     never to the position threshold (the researcher's 2026-10-14 decision).
     """
     given = getattr(ctx.cli, "path_sweep_threshold", None)
-    return DEFAULT_SWEEP_THRESHOLD if given is None else float(given)
+    return (DEFAULT_SWEEP_THRESHOLD_GAP_FRACTION if given is None
+            else float(given))
 
 
 def selected_counterfactuals(ctx) -> List[str]:

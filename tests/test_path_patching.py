@@ -408,7 +408,7 @@ def test_the_two_thresholds_are_separate_flags_with_their_own_defaults():
     assert parser.get_default("path_position_threshold") == \
         pp.DEFAULT_POSITION_THRESHOLD == 0.05
     assert parser.get_default("path_sweep_threshold") == \
-        pp.DEFAULT_SWEEP_THRESHOLD == 0.05
+        pp.DEFAULT_SWEEP_THRESHOLD_GAP_FRACTION == 0.05
     text = " ".join(parser.format_help().split())
     assert "--path-sweep-threshold" in text
     assert "does not follow --path-position-threshold" in text

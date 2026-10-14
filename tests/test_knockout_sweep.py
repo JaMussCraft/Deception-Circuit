@@ -181,6 +181,8 @@ def test_the_json_leaves_the_positive_control_out_of_every_outsider_count():
     assert counts[0.05]["outside_circuit"] == 2
     assert counts[0.2]["outside_circuit"] == 1
     assert counts[0.2]["in_circuit"] == 1
+    assert counts[0.4] == {"threshold": 0.4, "outside_circuit": 1,
+                           "in_circuit": 0}
     # Still in the ranked list, marked, and the meta says why it is set aside.
     control = next(one for one in written["components"]
                    if one["label"] == "mlp.0.0")
@@ -192,14 +194,21 @@ def test_the_json_leaves_the_positive_control_out_of_every_outsider_count():
     json.dumps(written)
 
 
-def test_the_png_draws_a_positive_control(tmp_path):
+def test_the_png_marks_a_positive_control(tmp_path):
+    """The same numbers drawn with and without the mark give different PNGs:
+    the hatch, the tick label and the legend entry are drawn."""
     rows = knockout.summarize_sweep(WITH_CONTROL, CONTROL_CIRCUIT, threshold=0.4)
-    path = str(tmp_path / knockout.SWEEP_PNG_NAME)
+    unmarked = [{**row, "positive_control": False} for row in rows]
+    marked_path = str(tmp_path / "marked.png")
+    plain_path = str(tmp_path / "plain.png")
 
-    knockout.write_sweep_figure(path, rows, threshold=0.4)
+    knockout.write_sweep_figure(marked_path, rows, threshold=0.4)
+    knockout.write_sweep_figure(plain_path, unmarked, threshold=0.4)
 
-    with open(path, "rb") as handle:
-        assert handle.read(8) == b"\x89PNG\r\n\x1a\n"
+    with open(marked_path, "rb") as marked, open(plain_path, "rb") as plain:
+        marked_bytes, plain_bytes = marked.read(), plain.read()
+    assert marked_bytes[:8] == b"\x89PNG\r\n\x1a\n"
+    assert marked_bytes != plain_bytes
 
 
 def test_the_review_view_labels_the_positive_control(tmp_path):
@@ -312,7 +321,7 @@ def test_the_sweep_is_off_by_default_and_the_threshold_has_its_stated_default():
     cli = parse()
 
     assert cli.knockout_completeness_sweep is False
-    assert cli.knockout_sweep_threshold == knockout.DEFAULT_SWEEP_THRESHOLD == 0.4
+    assert cli.knockout_sweep_threshold == knockout.DEFAULT_SWEEP_THRESHOLD_LOGITS == 0.4
 
 
 def test_the_help_states_the_default_and_why(capsys):
