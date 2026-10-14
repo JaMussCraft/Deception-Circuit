@@ -13,7 +13,7 @@ import torch
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 
-from tasks import Task
+from tasks import DECEPTION_CONDITIONS, Task
 
 
 class DeceptionTask(Task):
@@ -25,9 +25,13 @@ class DeceptionTask(Task):
         return family == "llama"
 
     def dataset_dir(self, args) -> str:
-        """<data-dir>/<task>, or <data-dir>/<task>_honest for the honest twin."""
-        condition = getattr(args, "deception_condition", "deceptive")
-        suffix = "_honest" if condition == "honest" else ""
+        """<data-dir>/<task> for the deceptive condition, else
+        <data-dir>/<task>_<condition> (`_honest`, `_nopressure`)."""
+        condition = getattr(args, "deception_condition", None) or "deceptive"
+        if condition not in DECEPTION_CONDITIONS:
+            raise ValueError(f"unknown deception condition {condition!r}; "
+                             f"choose from {DECEPTION_CONDITIONS}")
+        suffix = "" if condition == "deceptive" else f"_{condition}"
         return os.path.join(args.data_dir, f"{self.name}{suffix}")
 
     def build_dataloaders(self, tokenizer, family, full_model, device, args, state):

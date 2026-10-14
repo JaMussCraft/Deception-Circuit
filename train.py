@@ -17,7 +17,9 @@ Tasks  : ioi, gp, gt, std, far, sdr, ser, joint
           llama-8b-instruct via dataset/build_std_dataset.py and
           dataset/build_deception_dataset.py. far/sdr/ser are the three
           deception mechanisms — fabrication, omission, pragmatic distortion —
-          and each has an honest twin: --deception-condition honest.
+          and each has an honest twin: --deception-condition honest, and a
+          no-pressure condition whose circuit is the Format Circuit:
+          --deception-condition nopressure.
           joint concatenates full train/val splits from --joint-tasks for
           multitask circuit discovery.)
 
@@ -36,7 +38,7 @@ from config import (NodePruningConfig, EdgeConfig, GRANULARITIES,
                     default_node_config, default_hyperparams,
                     DEFAULT_NODE_LAMBDA_SPARSITY, DEFAULT_EDGE_LAMBDA_SPARSITY)
 from models import ModelAdapter, MODEL_REGISTRY, list_models
-from tasks import get_task, list_tasks, DECEPTION_TASKS
+from tasks import get_task, list_tasks, DECEPTION_TASKS, DECEPTION_CONDITIONS
 from pruning import GPUMemoryTracker, run_node_pruning, run_edge_pruning
 from analysis import (extract_active_nodes, extract_node_masks, save_active_nodes,
                       load_active_nodes, count_dense_edges, analyze_edge_circuit)
@@ -121,10 +123,13 @@ def build_parser():
 
     g = p.add_argument_group("deception-mechanism tasks (far / sdr / ser)")
     g.add_argument("--deception-condition", default="deceptive",
-                   choices=["deceptive", "honest"],
-                   help="Which built dataset to load: <data-dir>/<task> or "
-                        "<data-dir>/<task>_honest. The comparison unit is "
-                        "Δ = C_deceptive − C_honest, so both are trained.")
+                   choices=DECEPTION_CONDITIONS,
+                   help="Which built dataset to load: <data-dir>/<task>, "
+                        "<data-dir>/<task>_honest (the honest twin) or "
+                        "<data-dir>/<task>_nopressure (pressure clause deleted, "
+                        "honest labels; its circuit is the Format Circuit). The "
+                        "comparison unit is Δ = C_deceptive − C_honest, so both "
+                        "are trained.")
     g.add_argument("--deception-runtime-filter", action="store_true",
                    help="Re-filter val/test for the expected behavior with the "
                         "current full model (splits are already prefiltered by "

@@ -155,3 +155,9 @@ def list_tasks():
 #: The deception-mechanism family: one task per mechanism, built from one shared
 #: content pool so their circuits can be compared (see dataset/deception_common.py).
 DECEPTION_TASKS = ["far", "sdr", "ser"]
+
+#: Which dataset of a mechanism task a run trains on: `<task>` (deceptive),
+#: `<task>_honest` (the Honest Twin) or `<task>_nopressure` (the Pressure Clause
+#: deleted, honest labels; its circuit is the Format Circuit). Every condition
+#: but `deceptive` is a `_<condition>` suffix on the task's directory.
+DECEPTION_CONDITIONS = ["deceptive", "honest", "nopressure"]

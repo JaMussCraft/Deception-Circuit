@@ -26,7 +26,7 @@ from config import default_hyperparams
 from evaluation import algebra
 from evaluation.context import geometry_from_masks, load_run_config, resolve_train_args
 from evaluation.masks import count_masks, load_circuit_masks, validate_hierarchy
-from tasks import get_task, list_tasks
+from tasks import DECEPTION_TASKS, get_task, list_tasks
 
 #: Hyperparameters that belong to the *task*, not to the run, and so must be
 #: re-derived when `--task NAME` borrows another run's config as a template.
@@ -232,6 +232,34 @@ def resolve_circuits(cli):
                 operands={n: bindings[n] for n in algebra.expr_names(tree)}))
 
     return specs, bindings, operands, configs, geometry
+
+
+# ==============================================================================
+# CONDITIONS
+# ==============================================================================
+
+def condition_of(config) -> str:
+    """The deception condition a run config (dict) or train args name.
+
+    `deceptive`, `honest` or `nopressure` for the mechanism tasks (and joint);
+    "-" for a task that has no condition, so a printed plan never suggests one.
+    """
+    get = config.get if isinstance(config, dict) else (
+        lambda key, default=None: getattr(config, key, default))
+    if get("task") not in tuple(DECEPTION_TASKS) + ("joint",):
+        return "-"
+    return get("deception_condition") or "deceptive"
+
+
+def circuit_condition(spec) -> str:
+    """The condition(s) a circuit was pruned on, read from its operands' runs:
+    `nopressure` for an atomic circuit, `D:deceptive,F:nopressure` for a
+    composed one."""
+    conditions = {name: condition_of(load_run_config(run_dir))
+                  for name, run_dir in spec.operands.items()}
+    if spec.is_atomic:
+        return next(iter(conditions.values()))
+    return ",".join(f"{name}:{cond}" for name, cond in conditions.items())
 
 
 # ==============================================================================

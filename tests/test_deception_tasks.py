@@ -41,12 +41,22 @@ def test_hyperparameters_are_identical_across_the_three_mechanisms():
 
 
 @pytest.mark.parametrize("name", TASKS)
-def test_dataset_dir_follows_the_condition(name):
+@pytest.mark.parametrize("condition, directory", [
+    ("deceptive", "{task}"),
+    ("honest", "{task}_honest"),        # the Honest Twin
+    ("nopressure", "{task}_nopressure"),  # the Format Circuit's dataset
+])
+def test_dataset_dir_follows_the_condition(name, condition, directory):
     task = tasks.get_task(name)
-    args = SimpleNamespace(data_dir="/data", deception_condition="deceptive")
-    assert task.dataset_dir(args) == f"/data/{name}"
-    args.deception_condition = "honest"
-    assert task.dataset_dir(args) == f"/data/{name}_honest"
+    args = SimpleNamespace(data_dir="/data", deception_condition=condition)
+    assert task.dataset_dir(args) == "/data/" + directory.format(task=name)
+
+
+def test_dataset_dir_refuses_an_unknown_condition():
+    # A typo must not silently load a directory nobody built.
+    args = SimpleNamespace(data_dir="/data", deception_condition="no_pressure")
+    with pytest.raises(ValueError, match="deception condition"):
+        tasks.get_task("far").dataset_dir(args)
 
 
 def test_pred_spec_reads_the_token_after_the_prompt():
@@ -138,48 +148,59 @@ def test_build_dataloaders_reports_a_missing_dataset(tmp_path):
 # CLI wiring
 # ==============================================================================
 
-def test_train_cli_exposes_the_deception_flags():
+@pytest.mark.parametrize("condition", ["honest", "nopressure"])
+def test_train_cli_exposes_the_deception_flags(condition):
     import train
     args = train.build_parser().parse_args(
         ["--model", "llama-8b-instruct", "--task", "ser",
-         "--deception-condition", "honest"])
+         "--deception-condition", condition])
     assert args.task == "ser"
-    assert args.deception_condition == "honest"
+    assert args.deception_condition == condition
     assert args.deception_runtime_filter is False
     assert args.deception_margin_loss is None
 
 
-def test_run_slug_separates_the_honest_twin():
+def test_train_cli_help_names_the_format_circuit(capsys):
+    import train
+    with pytest.raises(SystemExit):
+        train.build_parser().parse_args(["--help"])
+    assert "Format Circuit" in " ".join(capsys.readouterr().out.split())
+
+
+def test_run_slug_separates_the_conditions():
     import train
     from config import NodePruningConfig
     from run_io import build_run_slug
 
     slugs = {}
-    for condition in ("deceptive", "honest"):
+    for condition in ("deceptive", "honest", "nopressure"):
         args = train.build_parser().parse_args(
             ["--model", "llama-8b-instruct", "--task", "far",
-             "--deception-condition", condition])
+             "--deception-condition", condition, "--no-edge-pruning",
+             "--node-lambda-sparsity", "0.3"])
         train.resolve_args(args)
         slugs[condition] = build_run_slug(args, NodePruningConfig())
     # Timestamps differ anyway, but the run directory has to say WHICH
     # condition it is: mixing them up inverts Δ = C_deceptive − C_honest.
-    assert "honest" in slugs["honest"]
-    assert "honest" not in slugs["deceptive"]
+    assert slugs["deceptive"].startswith("nls0.3_noedge_")
+    assert slugs["honest"].startswith("nls0.3_honest_noedge_")
+    assert slugs["nopressure"].startswith("nls0.3_nopressure_noedge_")
 
 
-def test_run_config_records_the_condition():
+@pytest.mark.parametrize("condition", ["honest", "nopressure"])
+def test_run_config_records_the_condition(condition):
     import train
     from config import EdgeConfig, NodePruningConfig
     from run_io import resolved_run_config
 
     args = train.build_parser().parse_args(
         ["--model", "llama-8b-instruct", "--task", "far",
-         "--deception-condition", "honest"])
+         "--deception-condition", condition])
     train.resolve_args(args)
     cfg = resolved_run_config(args, NodePruningConfig(), EdgeConfig())
     # Without this, a run trained on far_honest is indistinguishable from one
     # trained on far, and evaluate_circuit would reload the wrong dataset.
-    assert cfg["deception_condition"] == "honest"
+    assert cfg["deception_condition"] == condition
 
 
 def test_evaluation_context_restores_the_condition():
