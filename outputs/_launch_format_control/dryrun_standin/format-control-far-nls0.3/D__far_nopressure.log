@@ -1,0 +1,126 @@
+# 2026-10-13T20:36:06  python evaluate_circuit.py --circuit D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914 --task-from /u/swong2/.claude/jobs/fcfa1a47/tmp/standin_runs/format-control-far-nls0.3 --evals sanity knockout null pressure --ablation interchange --n-random 20 --knockout-null-count 20 --suite-name format-control-far-nls0.3 --output-dir outputs/_suites/format-control-far-nls0.3/_shards/D__far_nopressure --dry-run
+
+====================================================================================
+  DRY RUN — no model loaded, no CUDA touched
+====================================================================================
+  model                        llama-8b-instruct
+  ablation                     interchange
+  evaluations                  sanity, knockout, null, pressure
+  layout                       suite (outputs/_suites/format-control-far-nls0.3/_shards/D__far_nopressure)
+
+====================================================================================
+  ABLATION SCHEME: interchange
+====================================================================================
+
+  Ablated nodes take their value from the corrupted stream — the 
+  same reference the gates were trained against. This is the only 
+  scheme that can reproduce the in-run numbers.
+
+====================================================================================
+  CIRCUITS
+====================================================================================
+
+  D                                  atomic       5,436 fine units   condition=deceptive   /projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914
+
+====================================================================================
+  TASKS
+====================================================================================
+
+  far                  task=far      condition=nopressure  n=1000  data=./data/datasets  /u/swong2/.claude/jobs/fcfa1a47/tmp/standin_runs/format-control-far-nls0.3
+
+====================================================================================
+  CELL GRID (1 circuits x 1 tasks)
+====================================================================================
+
+  outputs/_suites/format-control-far-nls0.3/_shards/D__far_nopressure/cells/D/far/interchange
+
+====================================================================================
+  DISCOVERED CIRCUIT
+====================================================================================
+
+  Granularity                Active        Total    Kept %
+  --------------------------------------------------------
+  attention_blocks               10           32   31.250%
+  mlp_blocks                      1           32    3.125%
+  attention_heads                48        1,024    4.688%
+  attention_neurons           3,289      131,072    2.509%
+  mlp_hidden                  1,319      458,752    0.288%
+  mlp_output                    828      131,072    0.632%
+  --------------------------------------------------------
+  TOTAL                       5,495      721,984    0.761%
+
+  Geometry: 32 layers x 32 heads x 128 dims, hidden 4096, intermediate 14336
+
+------------------------------------------------------------------------------------
+  PER-LAYER COUNTS
+------------------------------------------------------------------------------------
+
+  Layer        attention_heads   attention_neurons          mlp_hidden          mlp_output
+  ----------------------------------------------------------------------------------------
+  0                          0                   0               1,319                 828
+  7                          5                 314                   0                   0
+  8                          5                 330                   0                   0
+  9                          5                 322                   0                   0
+  12                         7                 422                   0                   0
+  13                         5                 287                   0                   0
+  14                         4                 319                   0                   0
+  15                         3                 289                   0                   0
+  17                         3                 264                   0                   0
+  22                         3                 253                   0                   0
+  24                         8                 489                   0                   0
+  ----------------------------------------------------------------------------------------
+  TOTAL                     48               3,289               1,319                 828
+
+====================================================================================
+  KNOCKOUT (finest)
+====================================================================================
+
+  complement verified: knockout ∧ circuit = 0, knockout ∪ circuit = 1
+  fine units ablated: 5,436
+    attention_neurons       127,783 live (97.49%)
+    mlp_hidden              457,433 live (99.71%)
+    mlp_output              130,244 live (99.37%)
+
+====================================================================================
+  RANDOM CIRCUITS (20 sampled, seed 0, alloc uniform)
+====================================================================================
+
+  hierarchy validated on every sample (no empty drawn head, no orphaned neuron)
+  all 20 samples size-matched to the discovered circuit at every granularity and layer
+
+------------------------------------------------------------------------------------
+  PER-LAYER COUNTS — random circuit 0 (must match above)
+------------------------------------------------------------------------------------
+
+  Layer        attention_heads   attention_neurons          mlp_hidden          mlp_output
+  ----------------------------------------------------------------------------------------
+  0                          0                   0               1,319                 828
+  7                          5                 314                   0                   0
+  8                          5                 330                   0                   0
+  9                          5                 322                   0                   0
+  12                         7                 422                   0                   0
+  13                         5                 287                   0                   0
+  14                         4                 319                   0                   0
+  15                         3                 289                   0                   0
+  17                         3                 264                   0                   0
+  22                         3                 253                   0                   0
+  24                         8                 489                   0                   0
+  ----------------------------------------------------------------------------------------
+  TOTAL                     48               3,289               1,319                 828
+
+====================================================================================
+  ESTIMATED RUNTIME (1x A100, very rough)
+====================================================================================
+
+  model load                                                             3.3 min
+  eval 3 (null, 20 circuits)                                            18.3 min
+  eval 2 (task knockout)                                                 1.8 min
+  eval 2 (wikitext, 22 configs)                                          4.8 min
+  eval 2 (task null, 20 knockouts)                                      18.3 min
+  eval 2 (prompt variants, 2 x 3 configs, live reference)               11.0 min
+  eval 2 (3 generation examples)                                         2.5 min
+  eval 4 (pressure clause, 3 variants x 3 configs, live reference)      16.5 min
+  ---------------------------------------------------------------------------
+  TOTAL                                                                 76.6 min (1 cell(s))
+
+  Nothing was written. Drop --dry-run to run it.

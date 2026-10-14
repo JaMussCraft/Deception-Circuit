@@ -1,0 +1,31 @@
+{
+ "_comment": "The one configuration point of the format-control suites. Set each F to its Format Circuit run directory once ticket 03 lands (expected slugs: outputs/llama-8b-instruct_far/nls0.3_nopressure_noedge_<stamp>, outputs/llama-8b-instruct_sdr/nls0.3_nopressure_noedge_<stamp>, outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_<stamp>), then run `fc_launch.py plan`. D and H are the main checkout's runs (read-only). allmlp is the all-MLP, no-head operand of the coarse heads-only knockout (built by outputs/llama-8b-instruct_sdr_coarse/_launch/submit_headsko.sh).",
+ "format-control-far-nls0.3": {
+  "family": "fine",
+  "task": "far",
+  "runs": {
+   "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+   "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_honest_noedge_260819-084020",
+   "F": null
+  }
+ },
+ "format-control-sdr-nls0.3": {
+  "family": "fine",
+  "task": "sdr",
+  "runs": {
+   "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+   "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525",
+   "F": null
+  }
+ },
+ "format-control-sdr-coarse-nls0.3": {
+  "family": "coarse",
+  "task": "sdr",
+  "runs": {
+   "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+   "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+   "F": null
+  },
+  "allmlp": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/_allmlp_nomb"
+ }
+}

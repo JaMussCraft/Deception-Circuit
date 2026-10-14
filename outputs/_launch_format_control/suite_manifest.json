@@ -1,0 +1,2078 @@
+{
+ "created": "2026-10-13T20:36:03",
+ "config": "outputs/_launch_format_control/suites.json",
+ "suites": {
+  "format-control-far-nls0.3": {
+   "family": "fine",
+   "task": "far",
+   "runs": {
+    "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+    "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_honest_noedge_260819-084020",
+    "F": null
+   },
+   "allmlp": null,
+   "jobs": [
+    {
+     "job": "D__far",
+     "cells": [
+      {
+       "circuit": "D",
+       "dataset": "far",
+       "roles": [
+        "faithfulness",
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--evals",
+      "sanity",
+      "knockout",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-far-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-far-nls0.3/_shards/D__far"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-far-nls0.3/D__far.log",
+      "passed": true,
+      "estimate_min": 81.2
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "D__far_honest",
+     "cells": [
+      {
+       "circuit": "D",
+       "dataset": "far_honest",
+       "roles": [
+        "faithfulness",
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "H",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_honest_noedge_260819-084020",
+      "--evals",
+      "sanity",
+      "knockout",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-far-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-far-nls0.3/_shards/D__far_honest"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-far-nls0.3/D__far_honest.log",
+      "passed": true,
+      "estimate_min": 76.6
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "D__far_nopressure",
+     "cells": [
+      {
+       "circuit": "D",
+       "dataset": "far_nopressure",
+       "roles": [
+        "faithfulness",
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "F",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "H__far",
+     "cells": [
+      {
+       "circuit": "H",
+       "dataset": "far",
+       "roles": [
+        "faithfulness",
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_honest_noedge_260819-084020",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--evals",
+      "sanity",
+      "knockout",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-far-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-far-nls0.3/_shards/H__far"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-far-nls0.3/H__far.log",
+      "passed": true,
+      "estimate_min": 76.6
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "H__far_honest",
+     "cells": [
+      {
+       "circuit": "H",
+       "dataset": "far_honest",
+       "roles": [
+        "faithfulness",
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "H",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_honest_noedge_260819-084020",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_honest_noedge_260819-084020",
+      "--evals",
+      "sanity",
+      "knockout",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-far-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-far-nls0.3/_shards/H__far_honest"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-far-nls0.3/H__far_honest.log",
+      "passed": true,
+      "estimate_min": 81.2
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "H__far_nopressure",
+     "cells": [
+      {
+       "circuit": "H",
+       "dataset": "far_nopressure",
+       "roles": [
+        "faithfulness",
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "F",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "F__far",
+     "cells": [
+      {
+       "circuit": "F",
+       "dataset": "far",
+       "roles": [
+        "faithfulness",
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "D",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "F__far_honest",
+     "cells": [
+      {
+       "circuit": "F",
+       "dataset": "far_honest",
+       "roles": [
+        "faithfulness",
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "H",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "F__far_nopressure",
+     "cells": [
+      {
+       "circuit": "F",
+       "dataset": "far_nopressure",
+       "roles": [
+        "faithfulness",
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "F",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "D_minus_F__far",
+     "cells": [
+      {
+       "circuit": "D_minus_F__leaf",
+       "dataset": "far",
+       "roles": [
+        "delta"
+       ]
+      },
+      {
+       "circuit": "D_minus_F__head",
+       "dataset": "far",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "both",
+     "task_from_role": "D",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "D_and_F__far",
+     "cells": [
+      {
+       "circuit": "D_and_F__leaf",
+       "dataset": "far",
+       "roles": [
+        "delta"
+       ]
+      },
+      {
+       "circuit": "D_and_F__head",
+       "dataset": "far",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "both",
+     "task_from_role": "D",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "F_minus_D__far",
+     "cells": [
+      {
+       "circuit": "F_minus_D__leaf",
+       "dataset": "far",
+       "roles": [
+        "delta"
+       ]
+      },
+      {
+       "circuit": "F_minus_D__head",
+       "dataset": "far",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "both",
+     "task_from_role": "D",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "D_minus_H_minus_F__far",
+     "cells": [
+      {
+       "circuit": "D_minus_H_minus_F__leaf",
+       "dataset": "far",
+       "roles": [
+        "delta"
+       ]
+      },
+      {
+       "circuit": "D_minus_H_minus_F__head",
+       "dataset": "far",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "both",
+     "task_from_role": "D",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "H_minus_D_minus_F__far",
+     "cells": [
+      {
+       "circuit": "H_minus_D_minus_F__leaf",
+       "dataset": "far",
+       "roles": [
+        "delta"
+       ]
+      },
+      {
+       "circuit": "H_minus_D_minus_F__head",
+       "dataset": "far",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "both",
+     "task_from_role": "D",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "F_minus_D_minus_H__far",
+     "cells": [
+      {
+       "circuit": "F_minus_D_minus_H__leaf",
+       "dataset": "far",
+       "roles": [
+        "delta"
+       ]
+      },
+      {
+       "circuit": "F_minus_D_minus_H__head",
+       "dataset": "far",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "both",
+     "task_from_role": "D",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    }
+   ]
+  },
+  "format-control-sdr-nls0.3": {
+   "family": "fine",
+   "task": "sdr",
+   "runs": {
+    "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+    "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525",
+    "F": null
+   },
+   "allmlp": null,
+   "jobs": [
+    {
+     "job": "D__sdr",
+     "cells": [
+      {
+       "circuit": "D",
+       "dataset": "sdr",
+       "roles": [
+        "faithfulness",
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "--evals",
+      "sanity",
+      "knockout",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-nls0.3/_shards/D__sdr"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-nls0.3/D__sdr.log",
+      "passed": true,
+      "estimate_min": 81.2
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "D__sdr_honest",
+     "cells": [
+      {
+       "circuit": "D",
+       "dataset": "sdr_honest",
+       "roles": [
+        "faithfulness",
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "H",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525",
+      "--evals",
+      "sanity",
+      "knockout",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-nls0.3/_shards/D__sdr_honest"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-nls0.3/D__sdr_honest.log",
+      "passed": true,
+      "estimate_min": 76.6
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "D__sdr_nopressure",
+     "cells": [
+      {
+       "circuit": "D",
+       "dataset": "sdr_nopressure",
+       "roles": [
+        "faithfulness",
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "F",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "H__sdr",
+     "cells": [
+      {
+       "circuit": "H",
+       "dataset": "sdr",
+       "roles": [
+        "faithfulness",
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "--evals",
+      "sanity",
+      "knockout",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-nls0.3/_shards/H__sdr"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-nls0.3/H__sdr.log",
+      "passed": true,
+      "estimate_min": 76.6
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "H__sdr_honest",
+     "cells": [
+      {
+       "circuit": "H",
+       "dataset": "sdr_honest",
+       "roles": [
+        "faithfulness",
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "H",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525",
+      "--evals",
+      "sanity",
+      "knockout",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-nls0.3/_shards/H__sdr_honest"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-nls0.3/H__sdr_honest.log",
+      "passed": true,
+      "estimate_min": 81.2
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "H__sdr_nopressure",
+     "cells": [
+      {
+       "circuit": "H",
+       "dataset": "sdr_nopressure",
+       "roles": [
+        "faithfulness",
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "F",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "F__sdr",
+     "cells": [
+      {
+       "circuit": "F",
+       "dataset": "sdr",
+       "roles": [
+        "faithfulness",
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "D",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "F__sdr_honest",
+     "cells": [
+      {
+       "circuit": "F",
+       "dataset": "sdr_honest",
+       "roles": [
+        "faithfulness",
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "H",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "F__sdr_nopressure",
+     "cells": [
+      {
+       "circuit": "F",
+       "dataset": "sdr_nopressure",
+       "roles": [
+        "faithfulness",
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "F",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "D_minus_F__sdr",
+     "cells": [
+      {
+       "circuit": "D_minus_F__leaf",
+       "dataset": "sdr",
+       "roles": [
+        "delta"
+       ]
+      },
+      {
+       "circuit": "D_minus_F__head",
+       "dataset": "sdr",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "both",
+     "task_from_role": "D",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "D_and_F__sdr",
+     "cells": [
+      {
+       "circuit": "D_and_F__leaf",
+       "dataset": "sdr",
+       "roles": [
+        "delta"
+       ]
+      },
+      {
+       "circuit": "D_and_F__head",
+       "dataset": "sdr",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "both",
+     "task_from_role": "D",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "F_minus_D__sdr",
+     "cells": [
+      {
+       "circuit": "F_minus_D__leaf",
+       "dataset": "sdr",
+       "roles": [
+        "delta"
+       ]
+      },
+      {
+       "circuit": "F_minus_D__head",
+       "dataset": "sdr",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "both",
+     "task_from_role": "D",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "D_minus_H_minus_F__sdr",
+     "cells": [
+      {
+       "circuit": "D_minus_H_minus_F__leaf",
+       "dataset": "sdr",
+       "roles": [
+        "delta"
+       ]
+      },
+      {
+       "circuit": "D_minus_H_minus_F__head",
+       "dataset": "sdr",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "both",
+     "task_from_role": "D",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "H_minus_D_minus_F__sdr",
+     "cells": [
+      {
+       "circuit": "H_minus_D_minus_F__leaf",
+       "dataset": "sdr",
+       "roles": [
+        "delta"
+       ]
+      },
+      {
+       "circuit": "H_minus_D_minus_F__head",
+       "dataset": "sdr",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "both",
+     "task_from_role": "D",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "F_minus_D_minus_H__sdr",
+     "cells": [
+      {
+       "circuit": "F_minus_D_minus_H__leaf",
+       "dataset": "sdr",
+       "roles": [
+        "delta"
+       ]
+      },
+      {
+       "circuit": "F_minus_D_minus_H__head",
+       "dataset": "sdr",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "both",
+     "task_from_role": "D",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    }
+   ]
+  },
+  "format-control-sdr-coarse-nls0.3": {
+   "family": "coarse",
+   "task": "sdr",
+   "runs": {
+    "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+    "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+    "F": null
+   },
+   "allmlp": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/_allmlp_nomb",
+   "jobs": [
+    {
+     "job": "D__sdr",
+     "cells": [
+      {
+       "circuit": "D",
+       "dataset": "sdr",
+       "roles": [
+        "faithfulness"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--evals",
+      "sanity",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/D__sdr"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/D__sdr.log",
+      "passed": true,
+      "estimate_min": 42.8
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "D__sdr_honest",
+     "cells": [
+      {
+       "circuit": "D",
+       "dataset": "sdr_honest",
+       "roles": [
+        "faithfulness"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "H",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--evals",
+      "sanity",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/D__sdr_honest"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/D__sdr_honest.log",
+      "passed": true,
+      "estimate_min": 38.2
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "D__sdr_nopressure",
+     "cells": [
+      {
+       "circuit": "D",
+       "dataset": "sdr_nopressure",
+       "roles": [
+        "faithfulness"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "F",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "H__sdr",
+     "cells": [
+      {
+       "circuit": "H",
+       "dataset": "sdr",
+       "roles": [
+        "faithfulness"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--evals",
+      "sanity",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/H__sdr"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/H__sdr.log",
+      "passed": true,
+      "estimate_min": 38.2
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "H__sdr_honest",
+     "cells": [
+      {
+       "circuit": "H",
+       "dataset": "sdr_honest",
+       "roles": [
+        "faithfulness"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "H",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--evals",
+      "sanity",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/H__sdr_honest"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/H__sdr_honest.log",
+      "passed": true,
+      "estimate_min": 42.8
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "H__sdr_nopressure",
+     "cells": [
+      {
+       "circuit": "H",
+       "dataset": "sdr_nopressure",
+       "roles": [
+        "faithfulness"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "F",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "F__sdr",
+     "cells": [
+      {
+       "circuit": "F",
+       "dataset": "sdr",
+       "roles": [
+        "faithfulness"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "D",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "F__sdr_honest",
+     "cells": [
+      {
+       "circuit": "F",
+       "dataset": "sdr_honest",
+       "roles": [
+        "faithfulness"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "H",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "F__sdr_nopressure",
+     "cells": [
+      {
+       "circuit": "F",
+       "dataset": "sdr_nopressure",
+       "roles": [
+        "faithfulness"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "F",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "D_hko__sdr",
+     "cells": [
+      {
+       "circuit": "D_hko__leaf",
+       "dataset": "sdr",
+       "roles": [
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--circuit",
+      "m=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/_allmlp_nomb",
+      "--expr",
+      "D_hko=(D) - m",
+      "--compose-granularity",
+      "leaf",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/D_hko__sdr"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/D_hko__sdr.log",
+      "passed": true,
+      "estimate_min": 41.8
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "D_hko__sdr_honest",
+     "cells": [
+      {
+       "circuit": "D_hko__leaf",
+       "dataset": "sdr_honest",
+       "roles": [
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "H",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--circuit",
+      "m=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/_allmlp_nomb",
+      "--expr",
+      "D_hko=(D) - m",
+      "--compose-granularity",
+      "leaf",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/D_hko__sdr_honest"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/D_hko__sdr_honest.log",
+      "passed": true,
+      "estimate_min": 41.8
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "D_hko__sdr_nopressure",
+     "cells": [
+      {
+       "circuit": "D_hko__leaf",
+       "dataset": "sdr_nopressure",
+       "roles": [
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "F",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "H_hko__sdr",
+     "cells": [
+      {
+       "circuit": "H_hko__leaf",
+       "dataset": "sdr",
+       "roles": [
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--circuit",
+      "m=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/_allmlp_nomb",
+      "--expr",
+      "H_hko=(H) - m",
+      "--compose-granularity",
+      "leaf",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/H_hko__sdr"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/H_hko__sdr.log",
+      "passed": true,
+      "estimate_min": 41.8
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "H_hko__sdr_honest",
+     "cells": [
+      {
+       "circuit": "H_hko__leaf",
+       "dataset": "sdr_honest",
+       "roles": [
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "H",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--circuit",
+      "m=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/_allmlp_nomb",
+      "--expr",
+      "H_hko=(H) - m",
+      "--compose-granularity",
+      "leaf",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/H_hko__sdr_honest"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/H_hko__sdr_honest.log",
+      "passed": true,
+      "estimate_min": 41.8
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "H_hko__sdr_nopressure",
+     "cells": [
+      {
+       "circuit": "H_hko__leaf",
+       "dataset": "sdr_nopressure",
+       "roles": [
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "F",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "F_hko__sdr",
+     "cells": [
+      {
+       "circuit": "F_hko__leaf",
+       "dataset": "sdr",
+       "roles": [
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "D",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "F_hko__sdr_honest",
+     "cells": [
+      {
+       "circuit": "F_hko__leaf",
+       "dataset": "sdr_honest",
+       "roles": [
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "H",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "F_hko__sdr_nopressure",
+     "cells": [
+      {
+       "circuit": "F_hko__leaf",
+       "dataset": "sdr_nopressure",
+       "roles": [
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "F",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "D_minus_F_hko__sdr",
+     "cells": [
+      {
+       "circuit": "D_minus_F_hko__leaf",
+       "dataset": "sdr",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "D",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "D_and_F_hko__sdr",
+     "cells": [
+      {
+       "circuit": "D_and_F_hko__leaf",
+       "dataset": "sdr",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "D",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "F_minus_D_hko__sdr",
+     "cells": [
+      {
+       "circuit": "F_minus_D_hko__leaf",
+       "dataset": "sdr",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "D",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "D_minus_H_minus_F_hko__sdr",
+     "cells": [
+      {
+       "circuit": "D_minus_H_minus_F_hko__leaf",
+       "dataset": "sdr",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "D",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "H_minus_D_minus_F_hko__sdr",
+     "cells": [
+      {
+       "circuit": "H_minus_D_minus_F_hko__leaf",
+       "dataset": "sdr",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "D",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    },
+    {
+     "job": "F_minus_D_minus_H_hko__sdr",
+     "cells": [
+      {
+       "circuit": "F_minus_D_minus_H_hko__leaf",
+       "dataset": "sdr",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "D",
+     "awaits": [
+      "F"
+     ],
+     "args": null,
+     "dryrun": {
+      "log": null,
+      "passed": null,
+      "estimate_min": null
+     },
+     "slurm": {
+      "job_id": null
+     }
+    }
+   ]
+  }
+ }
+}

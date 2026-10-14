@@ -1,0 +1,162 @@
+# 2026-10-13T20:37:01  python evaluate_circuit.py --circuit D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742 --task-from /u/swong2/.claude/jobs/fcfa1a47/tmp/standin_runs/format-control-sdr-coarse-nls0.3 --evals sanity null pressure --ablation interchange --n-random 20 --knockout-null-count 20 --suite-name format-control-sdr-coarse-nls0.3 --output-dir outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/D__sdr_nopressure --dry-run
+
+====================================================================================
+  DRY RUN — no model loaded, no CUDA touched
+====================================================================================
+  model                        llama-8b-instruct
+  ablation                     interchange
+  evaluations                  sanity, null, pressure
+  layout                       suite (outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/D__sdr_nopressure)
+
+====================================================================================
+  ABLATION SCHEME: interchange
+====================================================================================
+
+  Ablated nodes take their value from the corrupted stream — the 
+  same reference the gates were trained against. This is the only 
+  scheme that can reproduce the in-run numbers.
+
+====================================================================================
+  CIRCUITS
+====================================================================================
+
+  D                                  atomic     598,656 fine units   condition=deceptive   /projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742
+
+====================================================================================
+  TASKS
+====================================================================================
+
+  sdr                  task=sdr      condition=nopressure  n=1000  data=./data/datasets  /u/swong2/.claude/jobs/fcfa1a47/tmp/standin_runs/format-control-sdr-coarse-nls0.3
+
+====================================================================================
+  CELL GRID (1 circuits x 1 tasks)
+====================================================================================
+
+  outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/D__sdr_nopressure/cells/D/sdr/interchange
+
+====================================================================================
+  DISCOVERED CIRCUIT
+====================================================================================
+
+  Granularity                Active        Total    Kept %
+  --------------------------------------------------------
+  attention_blocks               12           32   37.500%
+  attention_heads                69        1,024    6.738%
+  attention_neurons           8,832      131,072    6.738%
+  mlp_hidden                458,752      458,752  100.000%
+  mlp_output                131,072      131,072  100.000%
+  --------------------------------------------------------
+  TOTAL                     598,737      721,952   82.933%
+
+  Geometry: 32 layers x 32 heads x 128 dims, hidden 4096, intermediate 14336
+
+------------------------------------------------------------------------------------
+  PER-LAYER COUNTS
+------------------------------------------------------------------------------------
+
+  Layer        attention_heads   attention_neurons          mlp_hidden          mlp_output
+  ----------------------------------------------------------------------------------------
+  0                          0                   0              14,336               4,096
+  1                          0                   0              14,336               4,096
+  2                          0                   0              14,336               4,096
+  3                          0                   0              14,336               4,096
+  4                          0                   0              14,336               4,096
+  5                          6                 768              14,336               4,096
+  6                          0                   0              14,336               4,096
+  7                          7                 896              14,336               4,096
+  8                          8               1,024              14,336               4,096
+  9                          6                 768              14,336               4,096
+  10                         4                 512              14,336               4,096
+  11                         5                 640              14,336               4,096
+  12                         6                 768              14,336               4,096
+  13                         7                 896              14,336               4,096
+  14                         8               1,024              14,336               4,096
+  15                         3                 384              14,336               4,096
+  16                         0                   0              14,336               4,096
+  17                         4                 512              14,336               4,096
+  18                         0                   0              14,336               4,096
+  19                         0                   0              14,336               4,096
+  20                         0                   0              14,336               4,096
+  21                         0                   0              14,336               4,096
+  22                         0                   0              14,336               4,096
+  23                         0                   0              14,336               4,096
+  24                         5                 640              14,336               4,096
+  25                         0                   0              14,336               4,096
+  26                         0                   0              14,336               4,096
+  27                         0                   0              14,336               4,096
+  28                         0                   0              14,336               4,096
+  29                         0                   0              14,336               4,096
+  30                         0                   0              14,336               4,096
+  31                         0                   0              14,336               4,096
+  ----------------------------------------------------------------------------------------
+  TOTAL                     69               8,832             458,752             131,072
+
+====================================================================================
+  KNOCKOUT (finest)
+====================================================================================
+
+  complement verified: knockout ∧ circuit = 0, knockout ∪ circuit = 1
+  fine units ablated: 598,656
+    attention_neurons       122,240 live (93.26%)
+    mlp_hidden                    0 live (0.00%)
+    mlp_output                    0 live (0.00%)
+
+====================================================================================
+  RANDOM CIRCUITS (20 sampled, seed 0, alloc uniform)
+====================================================================================
+
+  hierarchy validated on every sample (no empty drawn head, no orphaned neuron)
+  all 20 samples size-matched to the discovered circuit at every granularity and layer
+
+------------------------------------------------------------------------------------
+  PER-LAYER COUNTS — random circuit 0 (must match above)
+------------------------------------------------------------------------------------
+
+  Layer        attention_heads   attention_neurons          mlp_hidden          mlp_output
+  ----------------------------------------------------------------------------------------
+  0                          0                   0              14,336               4,096
+  1                          0                   0              14,336               4,096
+  2                          0                   0              14,336               4,096
+  3                          0                   0              14,336               4,096
+  4                          0                   0              14,336               4,096
+  5                          6                 768              14,336               4,096
+  6                          0                   0              14,336               4,096
+  7                          7                 896              14,336               4,096
+  8                          8               1,024              14,336               4,096
+  9                          6                 768              14,336               4,096
+  10                         4                 512              14,336               4,096
+  11                         5                 640              14,336               4,096
+  12                         6                 768              14,336               4,096
+  13                         7                 896              14,336               4,096
+  14                         8               1,024              14,336               4,096
+  15                         3                 384              14,336               4,096
+  16                         0                   0              14,336               4,096
+  17                         4                 512              14,336               4,096
+  18                         0                   0              14,336               4,096
+  19                         0                   0              14,336               4,096
+  20                         0                   0              14,336               4,096
+  21                         0                   0              14,336               4,096
+  22                         0                   0              14,336               4,096
+  23                         0                   0              14,336               4,096
+  24                         5                 640              14,336               4,096
+  25                         0                   0              14,336               4,096
+  26                         0                   0              14,336               4,096
+  27                         0                   0              14,336               4,096
+  28                         0                   0              14,336               4,096
+  29                         0                   0              14,336               4,096
+  30                         0                   0              14,336               4,096
+  31                         0                   0              14,336               4,096
+  ----------------------------------------------------------------------------------------
+  TOTAL                     69               8,832             458,752             131,072
+
+====================================================================================
+  ESTIMATED RUNTIME (1x A100, very rough)
+====================================================================================
+
+  model load                                                             3.3 min
+  eval 3 (null, 20 circuits)                                            18.3 min
+  eval 4 (pressure clause, 3 variants x 3 configs, live reference)      16.5 min
+  ---------------------------------------------------------------------------
+  TOTAL                                                                 38.2 min (1 cell(s))
+
+  Nothing was written. Drop --dry-run to run it.
