@@ -234,3 +234,25 @@ def test_runtime_filter_applies_to_nopressure_as_to_honest(
     assert state["margin"] == 1000.0
     assert len(train_dl.dataset) == 4        # train is never re-filtered
     assert len(val_dl.dataset) == len(test_dl.dataset) == expected_test
+
+
+def test_a_composed_circuit_names_each_operands_condition(tmp_path):
+    """A delta such as D-F mixes conditions; the plan names each operand's."""
+    from types import SimpleNamespace
+
+    from evaluation.circuits import circuit_condition, condition_of
+
+    runs = {}
+    for name, condition in (("D", "deceptive"), ("F", "nopressure")):
+        run = tmp_path / name
+        run.mkdir()
+        (run / "config.json").write_text(json.dumps(
+            {"task": "sdr", "deception_condition": condition}))
+        runs[name] = str(run)
+
+    atomic = SimpleNamespace(is_atomic=True, operands={"F": runs["F"]})
+    delta = SimpleNamespace(is_atomic=False, operands=runs)
+    assert circuit_condition(atomic) == "nopressure"
+    assert circuit_condition(delta) == "D:deceptive,F:nopressure"
+    # A task without conditions never shows one.
+    assert condition_of({"task": "std", "deception_condition": "deceptive"}) == "-"
