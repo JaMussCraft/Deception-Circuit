@@ -1,4 +1,4 @@
-# 2026-10-13T21:04:40  python evaluate_circuit.py --circuit D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742 --circuit H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743 --circuit F=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743 --circuit m=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/_allmlp_nomb --expr D_hko=D - m --expr H_hko=H - m --expr F_hko=F - m --compose-granularity leaf --task-from /projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742 --evals benchmarks --ablation interchange --benchmarks sandbagging mask --benchmark-n-per-dataset 50 --benchmark-n-random 6 --benchmark-screen-budget 600 --benchmark-screen-cache /projects/beto/swong2/Alignment/Deception-Circuit/outputs/_screens --benchmark-repo-root /projects/beto/swong2/Alignment --output-dir outputs/eval5_format_sdr_coarse --dry-run
+# 2026-10-13T21:39:04  python evaluate_circuit.py --circuit D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742 --circuit H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743 --circuit F=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743 --circuit m=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/_allmlp_nomb --expr D_hko=D - m --expr H_hko=H - m --expr F_hko=F - m --compose-granularity leaf --task-from /projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742 --evals benchmarks --ablation interchange --benchmarks sandbagging mask --benchmark-n-per-dataset 50 --benchmark-n-random 6 --benchmark-screen-budget 600 --benchmark-screen-cache /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_eval5_format_cache/screens --benchmark-repo-root /projects/beto/swong2/Alignment --output-dir outputs/eval5_format_sdr_coarse --dry-run
 
 ====================================================================================
   DRY RUN — no model loaded, no CUDA touched
@@ -136,7 +136,7 @@
 
   Corrupt reference: --benchmark-ref-pool honest. Random null: 6 circuit(s).
 
-  Screen cache: /projects/beto/swong2/Alignment/Deception-Circuit/outputs/_screens
+  Screen cache: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_eval5_format_cache/screens
     sandbagging                        nothing cached for this configuration
     mask:continuations                 nothing cached for this configuration
     mask:disinformation                nothing cached for this configuration
@@ -191,3 +191,14 @@
   measures — so size the job against the ceiling.
 
   Nothing was written. Drop --dry-run to run it.
+  cost: 3 cell(s); judge calls (ablated configs, upper bound, items from known post-screen counts): 4,671
+        judge calls for uncached screens (at most): 0  (cached screens: 7 of 7)
+        GPU hours (dry-run estimate, 1 GPU, very rough): 24.3 - 29.6
+          sandbagging                             0
+          mask:continuations                    756
+          mask:disinformation                   324
+          mask:doubling_down_known_facts        783
+          mask:known_facts                    1,026
+          mask:provided_facts                 1,350
+          mask:statistics                       432
+        (item counts from /projects/beto/swong2/Alignment/Deception-Circuit/outputs/eval5_sdr_coarse_nls0.3_nomb)

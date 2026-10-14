@@ -6,11 +6,16 @@ circuit D, its Honest Twin H and the Format Circuit F in ONE
 `evaluate_circuit.py` invocation, so the three knockouts share one screen and
 one judge cache. Nothing here submits a job.
 
-Seams under test (the ticket's Testing Decisions):
-  * the command generator, a pure function (bindings, groups, coarse rewriting);
-  * the pre-flight gate on each F knockout's wikitext KL (pass, fail, missing);
-  * `submit_eval5.sh`'s refusals (F null, gate, no go-ahead);
-  * the `result_summary.md` writer on a fixture suite with three circuits.
+Seams under test (the ticket's Testing Decisions plus the review round):
+  * the command generator, a pure function (bindings, groups, coarse rewriting,
+    and no writable path into the main checkout);
+  * the worktree-local screen cache: seeding (A40 copies only) and the
+    post-dry-run cache check (refuses unless --allow-rescreen with a reason);
+  * the pre-flight gate on each F knockout's wikitext KL (pass, fail, missing,
+    stale F, explicit recorded override);
+  * `submit_eval5.sh`'s refusals and its record, with stub sbatch / evaluator;
+  * the `result_summary.md` writer on a fixture suite with three circuits, and
+    its grader caveats quoted from their source files.
 """
 
 from __future__ import annotations
@@ -18,18 +23,22 @@ from __future__ import annotations
 import importlib
 import json
 import os
+import shutil
+import subprocess
 import sys
 
 import pytest
 
 LAUNCH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                       "outputs", "_launch_format_control")
+MAIN_OUTPUTS = "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/"
 
 D_RUN = "/runs/far/nls0.3_noedge_A"
 H_RUN = "/runs/far/nls0.3_honest_noedge_B"
 F_RUN = "/runs/far/nls0.3_nopressure_noedge_C"
 M_RUN = "/runs/sdr_coarse/_allmlp_nomb"
 RUNS = {"D": D_RUN, "H": H_RUN, "F": F_RUN}
+CACHE = "/cache/screens"
 
 
 def _launch_module(name):
@@ -92,13 +101,32 @@ def test_groups_select_the_benchmarks_and_the_output_directory(e5):
     assert _flag_values(lb, "--output-dir") == [["outputs/eval5_format_sdr_lb"]]
 
 
-def test_screens_and_benchmark_sources_come_from_the_main_checkout(e5):
-    # The cached screens (A40) live only in the main checkout; reading them is
-    # what puts D, H and F on the same items as the existing eval5_* suites.
+def test_screens_come_from_the_worktree_local_copy(e5):
     args = e5.eval5_args("far", "lb", RUNS)
-    assert _flag_values(args, "--benchmark-screen-cache") == [
-        ["/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_screens"]]
+    assert _flag_values(args, "--benchmark-screen-cache") == [[e5.LOCAL_SCREEN_CACHE]]
+    assert e5.LOCAL_SCREEN_CACHE.startswith(e5.WORKTREE + os.sep)
+    assert not e5.LOCAL_SCREEN_CACHE.startswith(MAIN_OUTPUTS)
+    assert _flag_values(e5.eval5_args("far", "lb", RUNS, screen_cache=CACHE),
+                        "--benchmark-screen-cache") == [[CACHE]]
+    # read-only benchmark sources beside the main checkout
     assert _flag_values(args, "--benchmark-repo-root") == [["/projects/beto/swong2/Alignment"]]
+
+
+@pytest.mark.parametrize("family", ["far", "sdr", "sdr_coarse"])
+@pytest.mark.parametrize("group", ["sm", "lb"])
+def test_no_path_in_the_command_is_writable_under_the_main_checkout(e5, family, group):
+    """Only the read-only circuit run directories may sit under the main
+    checkout's outputs/; the screen cache, output dir and logs may not."""
+    runs = {r: MAIN_OUTPUTS + f"llama-8b-instruct_x/run_{r}" for r in ("D", "H", "F")}
+    allmlp = MAIN_OUTPUTS + "llama-8b-instruct_sdr_coarse/_allmlp_nomb"
+    allowed = set(runs.values()) | {allmlp}
+    args = e5.eval5_args(family, group, runs, allmlp=allmlp)
+    cmd = e5.sbatch_cmd(family, group, args, account="a", ceiling_min=100.0)
+    for token in cmd:
+        for piece in token.split("="):
+            path = os.path.abspath(os.path.join(e5.WORKTREE, piece)) if piece else ""
+            if path.startswith(MAIN_OUTPUTS):
+                assert path in allowed, (token, path)
 
 
 def test_coarse_family_knocks_out_heads_only_against_the_all_mlp_operand(e5):
@@ -131,11 +159,117 @@ def test_a_missing_format_circuit_is_refused_by_name(e5):
 
 
 # ==============================================================================
+# THE WORKTREE-LOCAL SCREEN CACHE
+# ==============================================================================
+
+def _sidecar(directory, stem, device, payload=b"pickle"):
+    os.makedirs(directory, exist_ok=True)
+    with open(os.path.join(directory, stem + ".json"), "w") as f:
+        json.dump({"dataset": "x", "device": device, "_stamp": {"device": device}}, f)
+    with open(os.path.join(directory, stem + ".pt"), "wb") as f:
+        f.write(payload)
+
+
+def test_group_datasets_match_what_the_evaluator_expands(e5):
+    # the committed stand-in dry-run logs list what `--benchmarks` expands to
+    for group, family in (("sm", "far"), ("lb", "far")):
+        with open(os.path.join(LAUNCH, "dryrun_eval5_standin", f"{family}_{group}.log")) as f:
+            parsed = e5.parse_dryrun(f.read())
+        assert [d["name"] for d in parsed["datasets"]] == list(e5.GROUP_DATASETS[group])
+
+
+def test_seeding_copies_only_A40_screens_as_real_files(e5, tmp_path):
+    src, dst = tmp_path / "src", tmp_path / "dst"
+    _sidecar(src / "mask__statistics", "aaa", "NVIDIA A40", b"a40")
+    _sidecar(src / "mask__statistics", "bbb", "NVIDIA H200", b"h200")
+    (src / "mask__statistics" / "ccc.json").write_text(json.dumps({"device": "NVIDIA A40"}))  # no .pt
+    out = e5.seed_screen_cache(["mask:statistics"], src=str(src), dst=str(dst))
+    d = dst / "mask__statistics"
+    assert sorted(os.listdir(d)) == ["aaa.json", "aaa.pt"]
+    assert not os.path.islink(d / "aaa.pt") and (d / "aaa.pt").read_bytes() == b"a40"
+    assert out["copied"] == ["mask__statistics/aaa"]
+
+
+def test_seeding_follows_a_symlinked_source_and_never_overwrites(e5, tmp_path):
+    src, dst = tmp_path / "src", tmp_path / "dst"
+    _sidecar(tmp_path / "real", "aaa", "NVIDIA A40", b"a40")
+    (src).mkdir()
+    os.symlink(tmp_path / "real", src / "sandbagging")
+    e5.seed_screen_cache(["sandbagging"], src=str(src), dst=str(dst))
+    pt = dst / "sandbagging" / "aaa.pt"
+    assert not os.path.islink(dst / "sandbagging") and not os.path.islink(pt)
+    pt.write_bytes(b"local")
+    out = e5.seed_screen_cache(["sandbagging"], src=str(src), dst=str(dst))
+    assert pt.read_bytes() == b"local" and out["copied"] == []
+
+
+CACHED_LOG = """\
+  dataset                            condition tokens     pool  judge
+  ----------------------------------------------------------------------------------------------------
+  lb:instructed-deception            outcome      512     4000  openrouter/openai/gpt-4o
+  lb:harm-pressure-knowledge-report  outcome      512     4000  openrouter/openai/gpt-4o
+  lb:convincing-game                 outcome      512     4000  openrouter/openai/gpt-4o
+
+  eval 5 lb:instructed-deception: screen (50-600 items) [cached]          0.0 - 9.0 min
+  eval 5 lb:harm-pressure-knowledge-report: screen (50-600 items) [cached]          0.0 - 9.0 min
+  eval 5 lb:convincing-game: screen (50-600 items)                        6.0 - 9.0 min
+  TOTAL                                                                   549.8 - 752.0 min (3 cell(s))
+
+  Nothing was written. Drop --dry-run to run it.
+"""
+
+
+def _local_cache(tmp_path, devices=("NVIDIA A40",)):
+    root = tmp_path / "local"
+    for name in ("lb__instructed-deception", "lb__harm-pressure-knowledge-report",
+                 "lb__convincing-game"):
+        for i, dev in enumerate(devices):
+            _sidecar(root / name, f"k{i}", dev)
+    return str(root)
+
+
+def test_cache_check_refuses_an_uncached_dataset(e5, tmp_path):
+    r = e5.cache_check(e5.parse_dryrun(CACHED_LOG), "lb", cache_dir=_local_cache(tmp_path),
+                       partition="gpuA40x4")
+    assert len(r["reasons"]) == 1 and "lb:convincing-game" in r["reasons"][0]
+    assert r["passed"] is False
+
+
+def test_cache_check_passes_a_fully_cached_A40_suite(e5, tmp_path):
+    log = CACHED_LOG.replace("convincing-game: screen (50-600 items)  ",
+                             "convincing-game: screen (50-600 items) [cached]")
+    r = e5.cache_check(e5.parse_dryrun(log), "lb", cache_dir=_local_cache(tmp_path),
+                       partition="gpuA40x4")
+    assert r == {"passed": True, "reasons": [], "allowed": None}
+
+
+def test_cache_check_refuses_a_non_A40_partition_or_copy(e5, tmp_path):
+    log = CACHED_LOG.replace("convincing-game: screen (50-600 items)  ",
+                             "convincing-game: screen (50-600 items) [cached]")
+    r = e5.cache_check(e5.parse_dryrun(log), "lb", cache_dir=_local_cache(tmp_path),
+                       partition="gpuA100x4")
+    assert any("gpuA100x4" in x for x in r["reasons"])
+    mixed = _local_cache(tmp_path, devices=("NVIDIA A40", "NVIDIA H200"))
+    r = e5.cache_check(e5.parse_dryrun(log), "lb", cache_dir=mixed, partition="gpuA40x4")
+    assert any("NVIDIA H200" in x for x in r["reasons"])
+
+
+def test_allow_rescreen_with_a_reason_clears_the_cache_check(e5, tmp_path):
+    r = e5.cache_check(e5.parse_dryrun(CACHED_LOG), "lb", cache_dir=_local_cache(tmp_path),
+                       partition="gpuA100x4", allow_rescreen="A40 queue is 3 days")
+    assert r["passed"] is True and r["allowed"] == "A40 queue is 3 days"
+    assert len(r["reasons"]) == 2                     # still reported, not hidden
+    with pytest.raises(ValueError, match="reason"):
+        e5.cache_check(e5.parse_dryrun(CACHED_LOG), "lb", cache_dir=_local_cache(tmp_path),
+                       partition="gpuA40x4", allow_rescreen="  ")
+
+
+# ==============================================================================
 # THE PRE-FLIGHT GATE (F knockout wikitext KL <= 0.66)
 # ==============================================================================
 
-def _manifest_suite(task, f_label="F"):
-    """A ticket 04 manifest entry: the per-suite `cells` index."""
+def _manifest_suite(task, f_label="F", f_run=F_RUN):
+    """A ticket 04 manifest entry: the configured runs and the `cells` index."""
     cells = []
     for circuit in ("D", "H", f_label):
         for cond, ds in (("deceptive", task), ("honest", f"{task}_honest"),
@@ -148,10 +282,11 @@ def _manifest_suite(task, f_label="F"):
     cells.append({"circuit": "F_minus_D__head", "dataset": task, "condition": "deceptive",
                   "roles": ["delta"], "job": "F_minus_D__x",
                   "path": f"cells/F_minus_D__head/{task}/interchange"})
-    return {"family": "fine", "task": task, "cells": cells}
+    return {"family": "fine", "task": task, "runs": {"D": D_RUN, "H": H_RUN, "F": f_run},
+            "cells": cells}
 
 
-def _write_knockout(root, path, kl, *, where="both"):
+def _write_knockout(root, path, kl, *, where="both", f_run=F_RUN, summary=True):
     d = os.path.join(root, path)
     os.makedirs(d, exist_ok=True)
     body = {"granularity": "finest", "ablation": "interchange"}
@@ -161,15 +296,25 @@ def _write_knockout(root, path, kl, *, where="both"):
         body["headline"] = {"task_accuracy": 0.0, "wikitext_kl": kl}
     with open(os.path.join(d, "knockout.json"), "w") as f:
         json.dump(body, f)
+    if summary:
+        operands = {"F": f_run}
+        if "_hko" in path:
+            operands["m"] = M_RUN
+        with open(os.path.join(d, "summary.json"), "w") as f:
+            json.dump({"circuit_spec": {"label": path.split("/")[1], "operands": operands}}, f)
+
+
+def _gate(e5, root, suite, f_run=F_RUN, **kw):
+    return e5.gate(root, suite, f_run=f_run, **kw)
 
 
 def test_gate_passes_when_both_F_knockouts_are_under_the_bar(e5, tmp_path):
     root = str(tmp_path)
     _write_knockout(root, "cells/F/far/interchange", 0.33)
     _write_knockout(root, "cells/F/far_nopressure/interchange", 0.66)   # the bar is inclusive
-    g = e5.gate(root, _manifest_suite("far"))
+    g = _gate(e5, root, _manifest_suite("far"))
     assert g["passed"] is True
-    assert g["reasons"] == []
+    assert g["reasons"] == [] and g["overridden"] == []
     assert sorted(g["kl"].values()) == [0.33, 0.66]
 
 
@@ -177,7 +322,7 @@ def test_gate_refuses_and_names_the_number(e5, tmp_path):
     root = str(tmp_path)
     _write_knockout(root, "cells/F/far/interchange", 0.33)
     _write_knockout(root, "cells/F/far_nopressure/interchange", 0.8123)
-    g = e5.gate(root, _manifest_suite("far"))
+    g = _gate(e5, root, _manifest_suite("far"))
     assert g["passed"] is False
     assert len(g["reasons"]) == 1
     reason = g["reasons"][0]
@@ -190,7 +335,7 @@ def test_gate_refuses_and_names_the_number(e5, tmp_path):
 def test_gate_refuses_a_missing_cell(e5, tmp_path):
     root = str(tmp_path)
     _write_knockout(root, "cells/F/far_nopressure/interchange", 0.30)
-    g = e5.gate(root, _manifest_suite("far"))
+    g = _gate(e5, root, _manifest_suite("far"))
     assert g["passed"] is False
     assert any("missing" in r and "cells/F/far/interchange" in r for r in g["reasons"])
 
@@ -199,16 +344,29 @@ def test_gate_refuses_a_cell_without_wikitext_kl(e5, tmp_path):
     root = str(tmp_path)
     _write_knockout(root, "cells/F/far/interchange", 0.30)
     _write_knockout(root, "cells/F/far_nopressure/interchange", None)
-    g = e5.gate(root, _manifest_suite("far"))
+    g = _gate(e5, root, _manifest_suite("far"))
     assert g["passed"] is False
     assert any("no wikitext KL" in r for r in g["reasons"])
+
+
+def test_gate_refuses_a_malformed_cell_with_a_reason(e5, tmp_path):
+    root = str(tmp_path)
+    _write_knockout(root, "cells/F/far/interchange", 0.30)
+    _write_knockout(root, "cells/F/far_nopressure/interchange", 0.30)
+    with open(os.path.join(root, "cells/F/far/interchange/knockout.json"), "w") as f:
+        json.dump([1, 2], f)
+    with open(os.path.join(root, "cells/F/far_nopressure/interchange/knockout.json"), "w") as f:
+        json.dump({"headline": {"wikitext_kl": [0.1]}}, f)
+    g = _gate(e5, root, _manifest_suite("far"))
+    assert g["passed"] is False and len(g["reasons"]) == 2
+    assert all("unreadable" in r for r in g["reasons"])
 
 
 def test_gate_reads_the_KL_from_either_place_the_evaluator_writes_it(e5, tmp_path):
     root = str(tmp_path)
     _write_knockout(root, "cells/F/far/interchange", 0.2, where="wikitext")
     _write_knockout(root, "cells/F/far_nopressure/interchange", 0.7, where="headline")
-    g = e5.gate(root, _manifest_suite("far"))
+    g = _gate(e5, root, _manifest_suite("far"))
     assert sorted(g["kl"].values()) == [0.2, 0.7]
     assert g["passed"] is False
 
@@ -217,7 +375,7 @@ def test_gate_finds_the_coarse_heads_only_knockout_cells(e5, tmp_path):
     root = str(tmp_path)
     _write_knockout(root, "cells/F_hko__leaf/sdr/interchange", 0.36)
     _write_knockout(root, "cells/F_hko__leaf/sdr_nopressure/interchange", 0.37)
-    g = e5.gate(root, _manifest_suite("sdr", f_label="F_hko__leaf"))
+    g = _gate(e5, root, _manifest_suite("sdr", f_label="F_hko__leaf"))
     assert g["passed"] is True
     assert len(g["kl"]) == 2
 
@@ -225,9 +383,53 @@ def test_gate_finds_the_coarse_heads_only_knockout_cells(e5, tmp_path):
 def test_gate_refuses_when_the_manifest_plans_no_F_knockout(e5, tmp_path):
     suite = _manifest_suite("far")
     suite["cells"] = [c for c in suite["cells"] if c["circuit"] != "F"]
-    g = e5.gate(str(tmp_path), suite)
+    g = _gate(e5, str(tmp_path), suite)
     assert g["passed"] is False
     assert any("no F knockout cell" in r for r in g["reasons"])
+
+
+def test_gate_refuses_a_cell_from_a_different_F_than_the_configured_one(e5, tmp_path):
+    root = str(tmp_path)
+    stale = "/runs/sdr/nls0.3_nopressure_noedge_OLD"
+    _write_knockout(root, "cells/F/far/interchange", 0.30, f_run=stale)
+    _write_knockout(root, "cells/F/far_nopressure/interchange", 0.30)
+    g = _gate(e5, root, _manifest_suite("far"))
+    assert g["passed"] is False
+    assert len(g["reasons"]) == 1
+    assert stale in g["reasons"][0] and F_RUN in g["reasons"][0]
+
+
+def test_gate_refuses_when_the_suite_was_planned_with_another_F(e5, tmp_path):
+    root = str(tmp_path)
+    _write_knockout(root, "cells/F/far/interchange", 0.30)
+    _write_knockout(root, "cells/F/far_nopressure/interchange", 0.30)
+    g = _gate(e5, root, _manifest_suite("far", f_run="/runs/other_F"))
+    assert g["passed"] is False
+    assert any("/runs/other_F" in r and "suite_manifest" in r for r in g["reasons"])
+
+
+def test_gate_refuses_a_cell_whose_F_cannot_be_verified(e5, tmp_path):
+    root = str(tmp_path)
+    _write_knockout(root, "cells/F/far/interchange", 0.30, summary=False)
+    _write_knockout(root, "cells/F/far_nopressure/interchange", 0.30)
+    g = _gate(e5, root, _manifest_suite("far"))
+    assert g["passed"] is False
+    assert any("cannot verify" in r for r in g["reasons"])
+
+
+def test_gate_override_clears_only_the_KL_bar_and_is_reported(e5, tmp_path):
+    root = str(tmp_path)
+    _write_knockout(root, "cells/F/far/interchange", 0.70)
+    _write_knockout(root, "cells/F/far_nopressure/interchange", 0.71)
+    g = _gate(e5, root, _manifest_suite("far"), override="generations read fluent (JW)")
+    assert g["passed"] is True and g["reasons"] == []
+    assert len(g["overridden"]) == 2 and "0.710" in " ".join(g["overridden"])
+    # a missing cell or a stale F is never overridable
+    shutil.rmtree(os.path.join(root, "cells/F/far"))
+    g = _gate(e5, root, _manifest_suite("far"), override="generations read fluent (JW)")
+    assert g["passed"] is False and any("missing" in r for r in g["reasons"])
+    with pytest.raises(ValueError, match="reason"):
+        _gate(e5, root, _manifest_suite("far"), override=" ")
 
 
 # ==============================================================================
@@ -263,6 +465,11 @@ def test_the_stand_in_puts_H_in_Fs_place_and_says_so(e5):
     assert fam["runs"]["F"] == H_RUN and fam["standin"] is True
 
 
+def test_a_stand_in_is_refused_once_F_is_configured(e5):
+    with pytest.raises(ValueError, match="stand-in"):
+        e5.family_runs(_config(), "far", standin=True)
+
+
 def test_nothing_refuses_a_gated_go_ahead_suite(e5, tmp_path):
     manifest = _gated_suite(str(tmp_path))
     r = e5.refusals("far", "sm", config=_config(), manifest=manifest,
@@ -281,6 +488,9 @@ def test_refusal_when_the_gate_fails_names_the_number(e5, tmp_path):
     r = e5.refusals("far", "lb", config=_config(), manifest=manifest,
                     env={e5.GO_ENV: "1"}, suite_root=str(tmp_path))
     assert any("0.900" in x for x in r)
+    ok = e5.refusals("far", "lb", config=_config(), manifest=manifest,
+                     env={e5.GO_ENV: "1"}, suite_root=str(tmp_path), gate_override="fluent")
+    assert ok == []
 
 
 def test_refusal_without_the_researchers_go_ahead(e5, tmp_path):
@@ -302,12 +512,32 @@ def test_a_dry_run_needs_no_go_ahead_but_still_obeys_the_gate(e5, tmp_path):
 
 
 def test_a_stand_in_suite_is_never_submittable(e5, tmp_path):
-    r = e5.refusals("far", "sm", config=_config(), manifest=_gated_suite(str(tmp_path)),
+    r = e5.refusals("far", "sm", config=_config(f_run=None), manifest=_gated_suite(str(tmp_path)),
                     env={e5.GO_ENV: "1"}, suite_root=str(tmp_path), standin=True)
     assert any("stand-in" in x for x in r)
-    r = e5.refusals("far", "sm", config=_config(), manifest=_gated_suite(str(tmp_path)),
+    r = e5.refusals("far", "sm", config=_config(f_run=None), manifest=_gated_suite(str(tmp_path)),
                     env={}, suite_root=str(tmp_path), standin=True, dry=True)
     assert any("stand-in" in x for x in r)
+
+
+def _run_dir(tmp_path, name, masks):
+    d = tmp_path / name
+    d.mkdir()
+    (d / "active_nodes.json").write_text(json.dumps({"masks": {k: [] for k in masks}}))
+    return str(d)
+
+
+def test_coarse_runs_must_match_the_all_mlp_operands_mask_signature(e5, tmp_path):
+    nomb = ("attention_heads", "attention_neurons")
+    runs = {"D": _run_dir(tmp_path, "d", nomb), "H": _run_dir(tmp_path, "h", nomb),
+            "F": _run_dir(tmp_path, "f", nomb + ("mlp_blocks",))}
+    assert e5.coarse_signature_reasons(runs, "/x/_allmlp_nomb") == [
+        f"F run {runs['F']} has an mlp_blocks gate (signature mb) but the all-MLP operand is "
+        f"/x/_allmlp_nomb (nomb)"]
+    runs["F"] = _run_dir(tmp_path, "f2", nomb)
+    assert e5.coarse_signature_reasons(runs, "/x/_allmlp_nomb") == []
+    runs["H"] = str(tmp_path / "nowhere")
+    assert any("cannot read" in r for r in e5.coarse_signature_reasons(runs, "/x/_allmlp_nomb"))
 
 
 def test_sbatch_line_sizes_the_walltime_from_the_dry_run_ceiling(e5):
@@ -407,47 +637,76 @@ def test_cost_uses_known_item_counts_from_an_existing_suite(e5, tmp_path):
 # submit_eval5.sh — refusals end to end, with stubs for sbatch and the evaluator
 # ==============================================================================
 
-import shutil      # noqa: E402
-import subprocess  # noqa: E402
-
 SUBMIT = os.path.join(LAUNCH, "submit_eval5.sh")
+
+#: What the stub evaluator prints: a passing dry-run with every sm screen cached.
+SM_DATASETS = ("sandbagging", "mask:continuations", "mask:disinformation",
+               "mask:doubling_down_known_facts", "mask:known_facts", "mask:provided_facts",
+               "mask:statistics")
+
+
+def _fake_log(cached=SM_DATASETS):
+    rows = "\n".join(f"  {d:<34} outcome      512      100  openrouter/openai/gpt-4o"
+                     for d in SM_DATASETS)
+    screens = "\n".join(f"  eval 5 {d}: screen (50-100 items){' [cached]' if d in cached else ''}"
+                        f"     0.0 - 9.0 min" for d in SM_DATASETS)
+    return (f"  CELL GRID (3 circuits x 1 tasks)\n\n"
+            f"  outputs/eval5_format_far/cells/D/far/interchange\n"
+            f"  outputs/eval5_format_far/cells/H/far/interchange\n"
+            f"  outputs/eval5_format_far/cells/F/far/interchange\n\n"
+            f"  dataset                            condition tokens     pool  judge\n"
+            f"  {'-' * 60}\n{rows}\n\n{screens}\n"
+            f"  TOTAL     1460.5 - 1774.3 min (3 cell(s))\n\n"
+            f"  Nothing was written. Drop --dry-run to run it.\n")
 
 
 @pytest.fixture
 def harness(tmp_path, e5):
-    """A config, manifest and suite root in tmp; `sbatch` and the evaluator
-    are stubs that record their argv, so no test can reach Slurm."""
+    """A config, manifest, suite root, cache source and local cache in tmp;
+    `sbatch` and the evaluator are stubs that record their argv, so no test can
+    reach Slurm and no test writes into the worktree's outputs/."""
     bin_dir = tmp_path / "bin"
     bin_dir.mkdir()
     calls = tmp_path / "sbatch_calls.txt"
     sb = bin_dir / "sbatch"
     sb.write_text("#!/bin/bash\necho \"$@\" >> %s\necho 'Submitted batch job 4242'\n" % calls)
     sb.chmod(0o755)
-    fake_eval = tmp_path / "fake_evaluate.py"
-    fake_eval.write_text(
-        "import sys\nprint('ARGV', ' '.join(sys.argv[1:]))\n"
-        "print(DRY)\n".replace("DRY", repr(DRYRUN_LOG)))
     suite_root = tmp_path / "suite"
     suite_root.mkdir()
+    src = tmp_path / "screens_src"
+    for d in SM_DATASETS:
+        _sidecar(src / d.replace(":", "__"), "k0", "NVIDIA A40")
     env = {k: v for k, v in os.environ.items() if k != e5.GO_ENV}
     env.update(PATH=f"{bin_dir}{os.pathsep}{env.get('PATH', '')}", PYTHON=sys.executable,
-               EVAL5_EVALUATOR=str(fake_eval))
+               EVAL5_ALLOW_PATH_OVERRIDES="1")
     assert shutil.which("sbatch", path=env["PATH"]) == str(sb)   # the stub shadows Slurm
 
-    def run(*args, config=None, kl=0.3, go=False):
+    def run(*args, config=None, kl=0.3, go=False, log=None, fail=False, overrides=True):
         cfg = tmp_path / "suites.json"
         cfg.write_text(json.dumps(config if config is not None else _config()))
         man = tmp_path / "manifest.json"
         man.write_text(json.dumps(_gated_suite(str(suite_root), kl=kl)))
-        e = dict(env, **({e5.GO_ENV: "1"} if go else {}))
+        fake_eval = tmp_path / "fake_evaluate.py"
+        fake_eval.write_text("import sys\nprint('ARGV', ' '.join(sys.argv[1:]))\nprint(%r)\n%s"
+                             % (log if log is not None else _fake_log(),
+                                "sys.exit(1)\n" if fail else ""))
+        e = dict(env, EVAL5_EVALUATOR=str(fake_eval), **({e5.GO_ENV: "1"} if go else {}))
+        if not overrides:
+            e.pop("EVAL5_ALLOW_PATH_OVERRIDES")
         cmd = ["bash", SUBMIT, *args, "--config", str(cfg), "--manifest", str(man),
                "--suite-root", str(suite_root), "--log-dir", str(tmp_path / "logs"),
-               "--jobs-file", str(tmp_path / "jobs.txt"), "--account", "bgrb-delta-gpu"]
+               "--record", str(tmp_path / "record.json"), "--cache-src", str(src),
+               "--cache-dir", str(tmp_path / "local_cache"), "--account", "bgrb-delta-gpu"]
         p = subprocess.run(cmd, capture_output=True, text=True, env=e, timeout=120)
         sbatched = calls.read_text() if calls.exists() else ""
         return p.returncode, p.stdout + p.stderr, sbatched
 
+    def record():
+        path = tmp_path / "record.json"
+        return json.loads(path.read_text()) if path.exists() else None
+
     run.tmp = tmp_path
+    run.record = record
     return run
 
 
@@ -459,7 +718,7 @@ def test_submit_refuses_when_F_is_null(harness):
 def test_dry_refuses_to_build_a_command_without_F(harness):
     code, out, sbatched = harness("far", "sm", "--dry", config=_config(f_run=None))
     assert code == 3 and "F run directory" in out and sbatched == ""
-    assert "ARGV" not in out                                   # no dry-run either
+    assert not (harness.tmp / "logs").exists()                 # no dry-run either
 
 
 def test_submit_refuses_without_the_go_ahead(harness, e5):
@@ -472,16 +731,35 @@ def test_submit_refuses_a_failing_gate_and_names_the_number(harness):
     assert code == 3 and "0.710" in out and sbatched == ""
 
 
-def test_dry_prints_the_command_runs_the_dry_run_and_the_submit_line(harness):
+def test_submit_refuses_a_failing_dry_run(harness):
+    code, out, sbatched = harness("far", "sm", go=True, fail=True)
+    assert code == 5 and "DRY-RUN FAILED" in out and sbatched == ""
+
+
+def test_submit_refuses_a_stand_in(harness):
+    code, out, sbatched = harness("far", "sm", "--standin", config=_config(f_run=None), go=True)
+    assert code == 3 and "stand-in" in out and sbatched == ""
+
+
+def test_submit_refuses_path_overrides_without_the_test_switch(harness):
+    code, out, sbatched = harness("far", "sm", go=True, overrides=False)
+    assert code == 2 and "--dry" in out and sbatched == ""
+
+
+def test_dry_seeds_the_local_cache_and_prints_the_submit_line(harness, e5):
     code, out, sbatched = harness("far", "sm", "--dry")
     assert code == 0, out
     assert "command: python " in out and f"--circuit D={D_RUN}" in out
     log = (harness.tmp / "logs" / "far_sm.log").read_text()
     argv = log.splitlines()[1]                                  # the evaluator's own echo
     assert argv.startswith(f"ARGV --circuit D={D_RUN}") and argv.endswith(" --dry-run")
+    assert f"--benchmark-screen-cache {harness.tmp / 'local_cache'} " in argv
+    assert (harness.tmp / "local_cache" / "mask__statistics" / "k0.pt").is_file()
+    assert "judge calls" in log                                 # the cost is kept with the log
     assert "sbatch --account=bgrb-delta-gpu --partition=gpuA40x4 --time=44:30:00" in out
-    assert "judge calls" in out
-    assert sbatched == ""                                      # --dry never submits
+    assert sbatched == ""                                       # --dry never submits
+    ev = harness.record()["suites"]["eval5_format_far"]["events"][-1]
+    assert ev["event"] == "dry" and ev["cost"]["judge_calls_ablated"] > 0
 
 
 def test_dry_prints_no_submit_line_when_the_gate_fails(harness):
@@ -489,6 +767,12 @@ def test_dry_prints_no_submit_line_when_the_gate_fails(harness):
     assert code == 0                                           # the dry-run itself passed
     assert "0.900" in out and "no submit line" in out
     assert "sbatch --account" not in out and sbatched == ""
+
+
+def test_dry_prints_no_submit_line_when_a_screen_is_not_cached(harness):
+    code, out, sbatched = harness("far", "sm", "--dry", log=_fake_log(cached=SM_DATASETS[:-1]))
+    assert code == 0
+    assert "mask:statistics" in out and "no submit line" in out and sbatched == ""
 
 
 def test_a_stand_in_dry_run_is_labelled_and_never_gets_a_submit_line(harness):
@@ -504,7 +788,31 @@ def test_submit_with_every_refusal_cleared_reaches_sbatch_once(harness):
     assert sbatched.count("\n") == 1
     assert sbatched.startswith("--account=bgrb-delta-gpu --partition=gpuA40x4 --time=44:30:00 "
                                "--job-name=e5fc-far-sm scripts/evaluate_circuit.sbatch --circuit D=")
-    assert "4242" in (harness.tmp / "jobs.txt").read_text()
+    ev = harness.record()["suites"]["eval5_format_far"]["events"][-1]
+    assert ev["event"] == "submit" and ev["job_id"] == "4242"
+    assert ev["gate_override"] is None and ev["allow_rescreen"] is None
+
+
+def test_submit_refuses_an_uncached_screen_unless_a_rescreen_is_allowed(harness):
+    log = _fake_log(cached=SM_DATASETS[1:])
+    code, out, sbatched = harness("far", "sm", go=True, log=log)
+    assert code == 3 and "sandbagging" in out and sbatched == ""
+    code, out, sbatched = harness("far", "sm", "--allow-rescreen", "A40 queue down (JW)",
+                                  go=True, log=log)
+    assert code == 0, out
+    assert sbatched.count("\n") == 1
+    ev = harness.record()["suites"]["eval5_format_far"]["events"][-1]
+    assert ev["allow_rescreen"] == "A40 queue down (JW)"
+
+
+def test_a_gate_override_is_recorded_with_its_reason(harness):
+    code, out, sbatched = harness("far", "sm", "--gate-override", "generations fluent (JW)",
+                                  kl=0.8, go=True)
+    assert code == 0, out
+    assert "overridden" in out and "0.800" in out
+    ev = harness.record()["suites"]["eval5_format_far"]["events"][-1]
+    assert ev["gate_override"] == "generations fluent (JW)"
+    assert any("0.800" in x for x in ev["gate_overridden"])
 
 
 # ==============================================================================
@@ -611,10 +919,29 @@ def test_summary_prints_the_three_grader_caveats_and_the_random_row_note(summ, t
     md = summ.render(_write_suite(tmp_path))
     assert len(summ.GRADER_CAVEATS) == 3
     for caveat in summ.GRADER_CAVEATS:
-        assert caveat["text"] in md
+        for quote in caveat["quotes"]:
+            assert " ".join(quote["text"].split()) in " ".join(md.split())
+            assert quote["source"] in md
     assert summ.RANDOM_ROWS_NOTE in md
     assert "size-matched per circuit" in summ.RANDOM_ROWS_NOTE
     assert "shared" in summ.RANDOM_ROWS_NOTE
+
+
+def test_grader_caveats_are_quoted_verbatim_from_their_sources(summ):
+    """Each quote appears word for word (whitespace re-flowed) in its source."""
+    assert [c["ticket"] for c in summ.GRADER_CAVEATS][:2] == [True, True]
+    assert summ.GRADER_CAVEATS[2]["ticket"] is False          # no ticket: labelled so
+    checked = 0
+    for caveat in summ.GRADER_CAVEATS:
+        for quote in caveat["quotes"]:
+            if not os.path.isfile(quote["source"]):
+                continue
+            with open(quote["source"], encoding="utf-8") as f:
+                source = " ".join(f.read().split())
+            assert " ".join(quote["text"].split()) in source, (quote["source"], quote["text"])
+            checked += 1
+    if checked == 0:
+        pytest.skip("caveat source files are not on this machine")
 
 
 def test_summary_counts_rows_that_trigger_a_caveat(summ, tmp_path):
@@ -665,6 +992,19 @@ def test_summary_reports_an_empty_suite(summ, tmp_path):
     assert "D: cell missing" in md and "H: cell missing" in md and "F: cell missing" in md
 
 
+def test_summary_reports_an_unreadable_or_duplicate_cell(summ, tmp_path):
+    root = _write_suite(tmp_path)
+    with open(os.path.join(root, "cells", "H", "far", "interchange", "benchmarks.json"), "w") as f:
+        f.write("{ not json")
+    dup = os.path.join(root, "cells", "F_hko__leaf", "far", "interchange")
+    os.makedirs(dup)
+    shutil.copy(os.path.join(root, "cells", "F", "far", "interchange", "benchmarks.json"), dup)
+    md = summ.render(root)
+    assert "H: cell unreadable" in md
+    assert "F: more than one cell" in md and "F_hko__leaf" in md
+    assert _table_row(md, ["sandbagging", "H knockout"])[2] == "missing"
+
+
 def test_summary_flags_a_full_row_that_differs_between_cells(summ, tmp_path):
     md = summ.render(_write_suite(tmp_path, full_override={"H": (9, 1, 0, 0.3, 0.8)}))
     assert "full row differs between cells" in md
@@ -682,6 +1022,9 @@ def test_summary_reports_a_failed_dataset(summ, tmp_path):
     md = summ.render(root)
     assert "judge outage" in md
     assert _table_row(md, ["mask:statistics", "D knockout"])[2] == "failed"
+    # the means are over the datasets every circuit has, so they stay comparable
+    mean = _table_row(md, ["**mean over 1 dataset(s) common to all circuits**"])
+    assert mean[2:6] == ["1.000", "0.200", "0.400", "0.600"]
 
 
 def test_write_produces_the_summary_and_the_json_ticket_05_can_read(summ, tmp_path):

@@ -1,4 +1,4 @@
-# 2026-10-13T21:05:01  python evaluate_circuit.py --circuit D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414 --circuit H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525 --circuit F=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525 --task-from /projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414 --evals benchmarks --ablation interchange --benchmarks lb:instructed-deception lb:harm-pressure-knowledge-report lb:convincing-game --benchmark-n-per-dataset 50 --benchmark-n-random 6 --benchmark-screen-budget 600 --benchmark-screen-cache /projects/beto/swong2/Alignment/Deception-Circuit/outputs/_screens --benchmark-repo-root /projects/beto/swong2/Alignment --output-dir outputs/eval5_format_sdr_lb --dry-run
+# 2026-10-13T21:39:20  python evaluate_circuit.py --circuit D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414 --circuit H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525 --circuit F=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525 --task-from /projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414 --evals benchmarks --ablation interchange --benchmarks lb:instructed-deception lb:harm-pressure-knowledge-report lb:convincing-game --benchmark-n-per-dataset 50 --benchmark-n-random 6 --benchmark-screen-budget 600 --benchmark-screen-cache /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_eval5_format_cache/screens --benchmark-repo-root /projects/beto/swong2/Alignment --output-dir outputs/eval5_format_sdr_lb --dry-run
 
 ====================================================================================
   DRY RUN — no model loaded, no CUDA touched
@@ -139,7 +139,7 @@
 
   Corrupt reference: --benchmark-ref-pool honest. Random null: 6 circuit(s).
 
-  Screen cache: /projects/beto/swong2/Alignment/Deception-Circuit/outputs/_screens
+  Screen cache: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_eval5_format_cache/screens
     lb:instructed-deception            nothing cached for this configuration
     lb:harm-pressure-knowledge-report  nothing cached for this configuration
     lb:convincing-game                 nothing cached for this configuration
@@ -174,3 +174,10 @@
   measures — so size the job against the ceiling.
 
   Nothing was written. Drop --dry-run to run it.
+  cost: 3 cell(s); judge calls (ablated configs, upper bound, items from known post-screen counts): 4,050
+        judge calls for uncached screens (at most): 0  (cached screens: 3 of 3)
+        GPU hours (dry-run estimate, 1 GPU, very rough): 9.2 - 12.5
+          lb:instructed-deception             1,350
+          lb:harm-pressure-knowledge-report   1,350
+          lb:convincing-game                  1,350
+        (item counts from /projects/beto/swong2/Alignment/Deception-Circuit/outputs/eval5_sdr_lb)

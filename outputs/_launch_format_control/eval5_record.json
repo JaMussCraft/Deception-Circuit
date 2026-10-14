@@ -1,0 +1,478 @@
+{
+ "schema": "eval5_record/1",
+ "suites": {
+  "eval5_format_far": {
+   "events": [
+    {
+     "event": "dry",
+     "standin": true,
+     "runs": {
+      "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_honest_noedge_260819-084020",
+      "F": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_honest_noedge_260819-084020"
+     },
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_honest_noedge_260819-084020",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_honest_noedge_260819-084020",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--evals",
+      "benchmarks",
+      "--ablation",
+      "interchange",
+      "--benchmarks",
+      "sandbagging",
+      "mask",
+      "--benchmark-n-per-dataset",
+      "50",
+      "--benchmark-n-random",
+      "6",
+      "--benchmark-screen-budget",
+      "600",
+      "--benchmark-screen-cache",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_eval5_format_cache/screens",
+      "--benchmark-repo-root",
+      "/projects/beto/swong2/Alignment",
+      "--output-dir",
+      "outputs/eval5_format_far"
+     ],
+     "log": "outputs/_launch_format_control/dryrun_eval5_standin/far_sm.log",
+     "dry_run_passed": true,
+     "cost": {
+      "cells": 3,
+      "configs_judged_per_cell": 9,
+      "judge_calls_ablated": 4671,
+      "judge_calls_per_dataset": {
+       "sandbagging": 0,
+       "mask:continuations": 756,
+       "mask:disinformation": 324,
+       "mask:doubling_down_known_facts": 783,
+       "mask:known_facts": 1026,
+       "mask:provided_facts": 1350,
+       "mask:statistics": 432
+      },
+      "judge_calls_screen_max": 0,
+      "gpu_hours": [
+       24.3,
+       29.6
+      ],
+      "items_from": "known post-screen counts"
+     },
+     "cost_items_from": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/eval5_far",
+     "account": "bgrb-delta-gpu",
+     "partition": "gpuA40x4",
+     "job_id": null,
+     "gate_kl": null,
+     "gate_reasons": null,
+     "gate_override": null,
+     "gate_overridden": [],
+     "cache_reasons": [],
+     "allow_rescreen": null,
+     "time": "2026-10-13T21:39:08",
+     "family": "far",
+     "group": "sm"
+    }
+   ]
+  },
+  "eval5_format_sdr_coarse": {
+   "events": [
+    {
+     "event": "dry",
+     "standin": true,
+     "runs": {
+      "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "F": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743"
+     },
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--circuit",
+      "m=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/_allmlp_nomb",
+      "--expr",
+      "D_hko=D - m",
+      "--expr",
+      "H_hko=H - m",
+      "--expr",
+      "F_hko=F - m",
+      "--compose-granularity",
+      "leaf",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--evals",
+      "benchmarks",
+      "--ablation",
+      "interchange",
+      "--benchmarks",
+      "sandbagging",
+      "mask",
+      "--benchmark-n-per-dataset",
+      "50",
+      "--benchmark-n-random",
+      "6",
+      "--benchmark-screen-budget",
+      "600",
+      "--benchmark-screen-cache",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_eval5_format_cache/screens",
+      "--benchmark-repo-root",
+      "/projects/beto/swong2/Alignment",
+      "--output-dir",
+      "outputs/eval5_format_sdr_coarse"
+     ],
+     "log": "outputs/_launch_format_control/dryrun_eval5_standin/sdr_coarse_sm.log",
+     "dry_run_passed": true,
+     "cost": {
+      "cells": 3,
+      "configs_judged_per_cell": 9,
+      "judge_calls_ablated": 4671,
+      "judge_calls_per_dataset": {
+       "sandbagging": 0,
+       "mask:continuations": 756,
+       "mask:disinformation": 324,
+       "mask:doubling_down_known_facts": 783,
+       "mask:known_facts": 1026,
+       "mask:provided_facts": 1350,
+       "mask:statistics": 432
+      },
+      "judge_calls_screen_max": 0,
+      "gpu_hours": [
+       24.3,
+       29.6
+      ],
+      "items_from": "known post-screen counts"
+     },
+     "cost_items_from": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/eval5_sdr_coarse_nls0.3_nomb",
+     "account": "bgrb-delta-gpu",
+     "partition": "gpuA40x4",
+     "job_id": null,
+     "gate_kl": null,
+     "gate_reasons": null,
+     "gate_override": null,
+     "gate_overridden": [],
+     "cache_reasons": [],
+     "allow_rescreen": null,
+     "time": "2026-10-13T21:39:19",
+     "family": "sdr_coarse",
+     "group": "sm"
+    }
+   ]
+  },
+  "eval5_format_sdr": {
+   "events": [
+    {
+     "event": "dry",
+     "standin": true,
+     "runs": {
+      "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525",
+      "F": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525"
+     },
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "--evals",
+      "benchmarks",
+      "--ablation",
+      "interchange",
+      "--benchmarks",
+      "sandbagging",
+      "mask",
+      "--benchmark-n-per-dataset",
+      "50",
+      "--benchmark-n-random",
+      "6",
+      "--benchmark-screen-budget",
+      "600",
+      "--benchmark-screen-cache",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_eval5_format_cache/screens",
+      "--benchmark-repo-root",
+      "/projects/beto/swong2/Alignment",
+      "--output-dir",
+      "outputs/eval5_format_sdr"
+     ],
+     "log": "outputs/_launch_format_control/dryrun_eval5_standin/sdr_sm.log",
+     "dry_run_passed": true,
+     "cost": {
+      "cells": 3,
+      "configs_judged_per_cell": 9,
+      "judge_calls_ablated": 4671,
+      "judge_calls_per_dataset": {
+       "sandbagging": 0,
+       "mask:continuations": 756,
+       "mask:disinformation": 324,
+       "mask:doubling_down_known_facts": 783,
+       "mask:known_facts": 1026,
+       "mask:provided_facts": 1350,
+       "mask:statistics": 432
+      },
+      "judge_calls_screen_max": 0,
+      "gpu_hours": [
+       24.3,
+       29.6
+      ],
+      "items_from": "known post-screen counts"
+     },
+     "cost_items_from": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/eval5_sdr",
+     "account": "bgrb-delta-gpu",
+     "partition": "gpuA40x4",
+     "job_id": null,
+     "gate_kl": null,
+     "gate_reasons": null,
+     "gate_override": null,
+     "gate_overridden": [],
+     "cache_reasons": [],
+     "allow_rescreen": null,
+     "time": "2026-10-13T21:39:19",
+     "family": "sdr",
+     "group": "sm"
+    }
+   ]
+  },
+  "eval5_format_far_lb": {
+   "events": [
+    {
+     "event": "dry",
+     "standin": true,
+     "runs": {
+      "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_honest_noedge_260819-084020",
+      "F": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_honest_noedge_260819-084020"
+     },
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_honest_noedge_260819-084020",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_honest_noedge_260819-084020",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--evals",
+      "benchmarks",
+      "--ablation",
+      "interchange",
+      "--benchmarks",
+      "lb:instructed-deception",
+      "lb:harm-pressure-knowledge-report",
+      "lb:convincing-game",
+      "--benchmark-n-per-dataset",
+      "50",
+      "--benchmark-n-random",
+      "6",
+      "--benchmark-screen-budget",
+      "600",
+      "--benchmark-screen-cache",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_eval5_format_cache/screens",
+      "--benchmark-repo-root",
+      "/projects/beto/swong2/Alignment",
+      "--output-dir",
+      "outputs/eval5_format_far_lb"
+     ],
+     "log": "outputs/_launch_format_control/dryrun_eval5_standin/far_lb.log",
+     "dry_run_passed": true,
+     "cost": {
+      "cells": 3,
+      "configs_judged_per_cell": 9,
+      "judge_calls_ablated": 4050,
+      "judge_calls_per_dataset": {
+       "lb:instructed-deception": 1350,
+       "lb:harm-pressure-knowledge-report": 1350,
+       "lb:convincing-game": 1350
+      },
+      "judge_calls_screen_max": 0,
+      "gpu_hours": [
+       9.2,
+       12.5
+      ],
+      "items_from": "known post-screen counts"
+     },
+     "cost_items_from": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/eval5_far_lb",
+     "account": "bgrb-delta-gpu",
+     "partition": "gpuA40x4",
+     "job_id": null,
+     "gate_kl": null,
+     "gate_reasons": null,
+     "gate_override": null,
+     "gate_overridden": [],
+     "cache_reasons": [],
+     "allow_rescreen": null,
+     "time": "2026-10-13T21:39:27",
+     "family": "far",
+     "group": "lb"
+    }
+   ]
+  },
+  "eval5_format_sdr_coarse_lb": {
+   "events": [
+    {
+     "event": "dry",
+     "standin": true,
+     "runs": {
+      "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "F": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743"
+     },
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--circuit",
+      "m=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/_allmlp_nomb",
+      "--expr",
+      "D_hko=D - m",
+      "--expr",
+      "H_hko=H - m",
+      "--expr",
+      "F_hko=F - m",
+      "--compose-granularity",
+      "leaf",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--evals",
+      "benchmarks",
+      "--ablation",
+      "interchange",
+      "--benchmarks",
+      "lb:instructed-deception",
+      "lb:harm-pressure-knowledge-report",
+      "lb:convincing-game",
+      "--benchmark-n-per-dataset",
+      "50",
+      "--benchmark-n-random",
+      "6",
+      "--benchmark-screen-budget",
+      "600",
+      "--benchmark-screen-cache",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_eval5_format_cache/screens",
+      "--benchmark-repo-root",
+      "/projects/beto/swong2/Alignment",
+      "--output-dir",
+      "outputs/eval5_format_sdr_coarse_lb"
+     ],
+     "log": "outputs/_launch_format_control/dryrun_eval5_standin/sdr_coarse_lb.log",
+     "dry_run_passed": true,
+     "cost": {
+      "cells": 3,
+      "configs_judged_per_cell": 9,
+      "judge_calls_ablated": 4050,
+      "judge_calls_per_dataset": {
+       "lb:instructed-deception": 1350,
+       "lb:harm-pressure-knowledge-report": 1350,
+       "lb:convincing-game": 1350
+      },
+      "judge_calls_screen_max": 0,
+      "gpu_hours": [
+       9.2,
+       12.5
+      ],
+      "items_from": "known post-screen counts"
+     },
+     "cost_items_from": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/eval5_sdr_coarse_nls0.3_nomb_lb",
+     "account": "bgrb-delta-gpu",
+     "partition": "gpuA40x4",
+     "job_id": null,
+     "gate_kl": null,
+     "gate_reasons": null,
+     "gate_override": null,
+     "gate_overridden": [],
+     "cache_reasons": [],
+     "allow_rescreen": null,
+     "time": "2026-10-13T21:39:37",
+     "family": "sdr_coarse",
+     "group": "lb"
+    }
+   ]
+  },
+  "eval5_format_sdr_lb": {
+   "events": [
+    {
+     "event": "dry",
+     "standin": true,
+     "runs": {
+      "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525",
+      "F": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525"
+     },
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "--evals",
+      "benchmarks",
+      "--ablation",
+      "interchange",
+      "--benchmarks",
+      "lb:instructed-deception",
+      "lb:harm-pressure-knowledge-report",
+      "lb:convincing-game",
+      "--benchmark-n-per-dataset",
+      "50",
+      "--benchmark-n-random",
+      "6",
+      "--benchmark-screen-budget",
+      "600",
+      "--benchmark-screen-cache",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_eval5_format_cache/screens",
+      "--benchmark-repo-root",
+      "/projects/beto/swong2/Alignment",
+      "--output-dir",
+      "outputs/eval5_format_sdr_lb"
+     ],
+     "log": "outputs/_launch_format_control/dryrun_eval5_standin/sdr_lb.log",
+     "dry_run_passed": true,
+     "cost": {
+      "cells": 3,
+      "configs_judged_per_cell": 9,
+      "judge_calls_ablated": 4050,
+      "judge_calls_per_dataset": {
+       "lb:instructed-deception": 1350,
+       "lb:harm-pressure-knowledge-report": 1350,
+       "lb:convincing-game": 1350
+      },
+      "judge_calls_screen_max": 0,
+      "gpu_hours": [
+       9.2,
+       12.5
+      ],
+      "items_from": "known post-screen counts"
+     },
+     "cost_items_from": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/eval5_sdr_lb",
+     "account": "bgrb-delta-gpu",
+     "partition": "gpuA40x4",
+     "job_id": null,
+     "gate_kl": null,
+     "gate_reasons": null,
+     "gate_override": null,
+     "gate_overridden": [],
+     "cache_reasons": [],
+     "allow_rescreen": null,
+     "time": "2026-10-13T21:39:38",
+     "family": "sdr",
+     "group": "lb"
+    }
+   ]
+  }
+ }
+}
