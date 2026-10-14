@@ -387,8 +387,12 @@ def test_the_sweep_columns_land_on_circuit_rows_only_with_their_coverage(
     sweep = read_json(out, *CELL, knockout.SUBDIR, knockout.SWEEP_JSON_NAME)
     table = read_json(out, *CELL, "head_table.json")
 
-    # Threshold 0 flags every outsider, and still none becomes a row.
-    assert len(sweep["flagged"]) == len(ALL_COMPONENTS) - len(table["rows"])
+    # Threshold 0 flags every outsider but the layer 0 MLP, a positive control
+    # (the researcher's 2026-10-14 decision), and still none becomes a row.
+    assert len(sweep["flagged"]) == \
+        len(ALL_COMPONENTS) - len(table["rows"]) - 1
+    assert "mlp.0.0" not in sweep["flagged"]
+    assert sweep["positive_controls"]["components"] == ["mlp.0.0"]
     assert len(table["rows"]) == singles["n_components"]
     swept = {tuple(one["key"]): one for one in sweep["components"]}
     for row in table["rows"]:
