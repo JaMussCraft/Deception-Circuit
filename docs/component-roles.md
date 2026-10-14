@@ -397,9 +397,20 @@ them in a circuit and run the analyses over them, not to give the sweep a role.
 
 The **knockout** completeness sweep (ticket 15, `--knockout-completeness-sweep`)
 adds no rows at all: Components outside the circuit stay in
-`knockout/sweep.json`, flagged when |drop| clears `--knockout-sweep-threshold`
-(default 0.1 logits: about twice the strong circuit Components' standard
-error on SDR nls0.3, 3% of its gap, and cleared by the circuit's top four). The
+`knockout/sweep.json`, flagged when |drop| clears `--knockout-sweep-threshold`.
+Its default is **0.4 logits**, the researcher's 2026-10-14 call, hand-tuned on
+SDR nls0.3: there it flags the 20 strongest Components outside the circuit,
+where ticket 15's first default of 0.1 flagged 90, and L17H25 is the one
+circuit Component to clear it. Tune it by hand per run. The full ranked list
+of every Component is always written to `sweep.json`, with a ladder of counts
+at 0.02, 0.05, 0.1 and 0.2, so the cut hides nothing.
+**The layer 0 MLP is a positive control.** Knocking it out removes almost the
+whole margin on SDR nls0.3 (+3.12 of 1.66, accuracy 0.01), because it acts as
+a second embedding. It stays in the ranked list and on the figure, marked
+`positive_control: true` and hatched and labelled on the bar chart. It is left
+out of `flagged`, `strongest_outside_circuit` and the ladder's outside count,
+the way the embedding is left out of the sweep, and `sweep.json`'s
+`positive_controls` block says so. The
 circuit's own rows gain `knockout.sweep_rank` and
 `knockout.sweep_clears_threshold`. `knockout.sweep_rank` ranks by **|drop|**
 over every Component of the model, while `knockout.rank` ranks by the

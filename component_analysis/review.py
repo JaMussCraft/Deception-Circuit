@@ -913,6 +913,7 @@ def knockout_sweep_view(results_dir: str) -> Bars:
         hover=[("in the circuit" if row.get("in_circuit")
                 else "not in the circuit")
                + (" · flagged" if row.get("flagged") else "")
+               + (" · positive control" if row.get("positive_control") else "")
                + f" · rank {row.get('rank')} (signed {row.get('signed_rank')})"
                for row in rows],
         notes=[metric.get("sign", ""), metric.get("ranking", ""),

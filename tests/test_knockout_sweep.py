@@ -132,6 +132,95 @@ def test_restricting_to_a_component_the_sweep_never_knocked_out_is_refused():
 
 
 # ==============================================================================
+# THE LAYER 0 MLP: A POSITIVE CONTROL (the researcher's 2026-10-14 decision)
+# ==============================================================================
+
+#: The layer 0 MLP outside the circuit and the strongest Component of all,
+#: as on SDR nls0.3 (+3.12 of a 1.66 margin). Drops: mlp 0 +1.5, head 0.1
+#: +0.6, head 0.0 +0.3 (the circuit), mlp 1 +0.05.
+WITH_CONTROL = effects(
+    clean=[2.0, 2.0],
+    knocked={("head", 0, 0): [1.7, 1.7],
+             ("head", 0, 1): [1.4, 1.4],
+             ("mlp", 0, 0): [0.5, 0.5],
+             ("mlp", 1, 0): [1.95, 1.95]})
+CONTROL_CIRCUIT = [("head", 0, 0)]
+
+
+def test_the_layer_0_mlp_stays_ranked_and_is_marked_a_positive_control():
+    rows = knockout.summarize_sweep(WITH_CONTROL, CONTROL_CIRCUIT, threshold=0.4)
+    keyed = by_key(rows)
+
+    assert [tuple(row["key"]) for row in rows][0] == ("mlp", 0, 0)
+    assert keyed[("mlp", 0, 0)]["rank"] == 1
+    assert keyed[("mlp", 0, 0)]["positive_control"] is True
+    assert keyed[("mlp", 0, 0)]["clears_threshold"] is True
+    assert [key for key, row in keyed.items() if row["positive_control"]] == [
+        ("mlp", 0, 0)]
+
+
+def test_a_positive_control_is_never_flagged_as_a_component_the_circuit_missed():
+    rows = by_key(knockout.summarize_sweep(WITH_CONTROL, CONTROL_CIRCUIT,
+                                           threshold=0.4))
+
+    assert rows[("mlp", 0, 0)]["flagged"] is False
+    assert rows[("head", 0, 1)]["flagged"] is True
+
+
+def test_the_json_leaves_the_positive_control_out_of_every_outsider_count():
+    rows = knockout.summarize_sweep(WITH_CONTROL, CONTROL_CIRCUIT, threshold=0.4)
+
+    written = knockout.sweep_payload(WITH_CONTROL, rows, circuit="delta",
+                                     task="sdr", threshold=0.4)
+    counts = {one["threshold"]: one for one in written["threshold_counts"]}
+
+    assert written["flagged"] == ["head.0.1"]
+    assert [one["label"] for one in written["strongest_outside_circuit"]] == [
+        "head.0.1", "mlp.1.0"]
+    # |drops| outside the circuit, control aside: 0.6 and 0.05.
+    assert counts[0.05]["outside_circuit"] == 2
+    assert counts[0.2]["outside_circuit"] == 1
+    assert counts[0.2]["in_circuit"] == 1
+    # Still in the ranked list, marked, and the meta says why it is set aside.
+    control = next(one for one in written["components"]
+                   if one["label"] == "mlp.0.0")
+    assert control["positive_control"] is True and control["rank"] == 1
+    assert written["positive_controls"]["components"] == ["mlp.0.0"]
+    assert "embedding" in written["positive_controls"]["why"]
+    assert "positive control" in written["flagged_means"]
+    assert "positive control" in written["figure"]["shows"]
+    json.dumps(written)
+
+
+def test_the_png_draws_a_positive_control(tmp_path):
+    rows = knockout.summarize_sweep(WITH_CONTROL, CONTROL_CIRCUIT, threshold=0.4)
+    path = str(tmp_path / knockout.SWEEP_PNG_NAME)
+
+    knockout.write_sweep_figure(path, rows, threshold=0.4)
+
+    with open(path, "rb") as handle:
+        assert handle.read(8) == b"\x89PNG\r\n\x1a\n"
+
+
+def test_the_review_view_labels_the_positive_control(tmp_path):
+    from component_analysis import review
+
+    rows = knockout.summarize_sweep(WITH_CONTROL, CONTROL_CIRCUIT, threshold=0.4)
+    directory = tmp_path / knockout.SUBDIR
+    directory.mkdir(parents=True)
+    (directory / knockout.SWEEP_JSON_NAME).write_text(json.dumps(
+        knockout.sweep_payload(WITH_CONTROL, rows, circuit="delta", task="sdr",
+                               threshold=0.4)))
+
+    view = review.knockout_sweep_view(str(tmp_path))
+
+    assert view.labels[0] == "mlp.0.0"
+    assert "positive control" in view.hover[0]
+    assert "flagged" not in view.hover[0]
+    assert "positive control" not in view.hover[1]
+
+
+# ==============================================================================
 # THE HEAD TABLE, THE JSON, THE PNG
 # ==============================================================================
 
@@ -160,7 +249,8 @@ def test_the_json_lists_the_flagged_outsiders_and_states_its_conventions():
         in written["metric"]["sign"]
     assert "|drop|" in written["metric"]["ranking"]
     assert "embedding" in written["excludes"]
-    assert "twice the standard error" in written["threshold_justification"]
+    assert "hand-tuned on SDR nls0.3" in written["threshold_justification"]
+    assert "full ranked list" in written["threshold_justification"]
     assert "knockout.sweep_rank" in written["head_table_columns"]
     assert written["n_components"] == 4 and written["n_in_circuit"] == 2
     assert [one["key"] for one in written["components"]] == [
@@ -218,10 +308,21 @@ def parse(*argv):
 
 
 def test_the_sweep_is_off_by_default_and_the_threshold_has_its_stated_default():
+    """0.4 logits, the researcher's 2026-10-14 call, hand-tuned on SDR nls0.3."""
     cli = parse()
 
     assert cli.knockout_completeness_sweep is False
-    assert cli.knockout_sweep_threshold == knockout.DEFAULT_SWEEP_THRESHOLD == 0.1
+    assert cli.knockout_sweep_threshold == knockout.DEFAULT_SWEEP_THRESHOLD == 0.4
+
+
+def test_the_help_states_the_default_and_why(capsys):
+    with pytest.raises(SystemExit):
+        parse("--help")
+    text = " ".join(capsys.readouterr().out.split())
+
+    assert "Default 0.4" in text
+    assert "hand-tuned on SDR nls0.3" in text
+    assert "full ranked list" in text
 
 
 def test_a_negative_threshold_is_refused_at_parse_time(capsys):
@@ -270,7 +371,7 @@ def test_dry_run_sizes_the_sweep_over_every_component_of_the_model(
     batches = int(re.search(r"x (\d+) batch\(es\)", line).group(1))
     assert batches >= 1
     assert f"= {batches * 12} forward pass(es)" in line
-    assert "threshold 0.1 logits" in line
+    assert "threshold 0.4 logits" in line
 
 
 def test_without_the_flag_the_dry_run_does_not_mention_a_sweep(

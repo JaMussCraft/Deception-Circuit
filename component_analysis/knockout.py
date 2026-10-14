@@ -553,23 +553,35 @@ SWEEP_COLUMNS = ("sweep_rank", "sweep_clears_threshold")
 
 #: `--knockout-sweep-threshold`'s default, in **logits** of
 #: logit(Target) - logit(Distractor), not a fraction of the clean-minus-corrupt
-#: gap as `--path-sweep-threshold` is. Why 0.1 on SDR nls0.3 (ticket 07's
-#: job 22110635): it is about twice the standard error of the strong circuit
-#: Components (0.03 to 0.07), so a listed drop is not one standard error of
-#: noise on a strong head; it is about 3% of the 3.26 clean-minus-corrupt gap;
-#: and four of the circuit's eighteen clear it (L17H25 +0.45, L31 MLP +0.31,
-#: L5H11 +0.15, L14H22 +0.11), so a flagged outsider is as strong as the
-#: circuit's top four. The JSON also counts what clears `THRESHOLD_LADDER`,
-#: so the cut can be moved without a rerun.
-DEFAULT_SWEEP_THRESHOLD = 0.1
+#: gap as `--path-sweep-threshold` is. 0.4 is the researcher's 2026-10-14 call,
+#: hand-tuned on SDR nls0.3 (job 22874364): ticket 15's first default of 0.1
+#: flagged 90 Components outside the circuit, which is not a selection, and at
+#: 0.4 the flagged list is the 20 strongest outsiders (the layer 0 MLP, a
+#: positive control, set aside) and the circuit's L17H25 is its only member to
+#: clear it. It is a cut to read the list at, not a finding: `sweep.json`
+#: always carries every Component ranked, and `THRESHOLD_LADDER` counts what
+#: clears other cuts, so the cut can be moved by hand without a rerun.
+DEFAULT_SWEEP_THRESHOLD = 0.4
 THRESHOLD_JUSTIFICATION = (
-    "0.1 logits is about twice the standard error of the circuit's strong "
-    "Components on SDR nls0.3 (0.03 to 0.07, ticket 07), about 3% of its "
-    "3.26 clean-minus-corrupt gap, and cleared by four of the circuit's "
-    "eighteen (L17H25, L31 MLP, L5H11, L14H22): a flagged Component outside "
-    "the circuit is as strong as the circuit's top four. Calibrated on that "
-    "circuit only")
+    "0.4 logits, hand-tuned on SDR nls0.3 (the researcher's 2026-10-14 "
+    "decision): there it flags the 20 strongest Components outside the "
+    "circuit, the layer 0 MLP set aside as a positive control, where 0.1 "
+    "flagged 90. Tune it by hand per run; the full ranked list is always "
+    "written in components, so nothing below the cut is hidden")
 THRESHOLD_LADDER = (0.02, 0.05, 0.1, 0.2)
+
+#: Components the sweep keeps, ranks and draws but never counts as something
+#: the circuit missed: the researcher's 2026-10-14 decision on ticket 15's
+#: finding that knocking out the layer 0 MLP removes almost the whole margin
+#: on SDR nls0.3 (+3.12 of 1.66, accuracy 0.01). Left out of `flagged`,
+#: `strongest_outside_circuit` and the ladder's outside count, the way the
+#: embedding is left out of the sweep, and labelled on the figure.
+POSITIVE_CONTROLS = (("mlp", 0, 0),)
+POSITIVE_CONTROL_WHY = (
+    "the layer 0 MLP acts as a second embedding: interchange-ablating it "
+    "rewrites the corrupted token's representation, much as ablating the "
+    "embedding (not swept) would run the corrupt prompt, so its large drop "
+    "shows the knockout works rather than a Component the circuit missed")
 
 #: How many Components the bar chart draws; the JSON carries all of them.
 SWEEP_BAR_TOP = 40
@@ -616,7 +628,8 @@ def summarize_sweep(effects: Effects, circuit_keys, *, threshold: float,
     suppressor outside the circuit is one of those answers. The sign stays in
     `mean_drop` (positive helps deception) and `signed_rank` is knockout's own
     ranking of the same rows. `flagged` is a Component outside the circuit
-    whose |drop| is at least `threshold`.
+    whose |drop| is at least `threshold` and that is not a positive control
+    (`POSITIVE_CONTROLS`); a positive control stays ranked and is marked.
     """
     inside = {row_key(one) for one in circuit_keys}
     signed = summarize(effects)
@@ -641,10 +654,12 @@ def summarize_sweep(effects: Effects, circuit_keys, *, threshold: float,
             "kv_group": (key[2] // heads_per_group
                          if heads_per_group and key[0] == "head" else None),
             "in_circuit": key in inside,
+            "positive_control": key in POSITIVE_CONTROLS,
             "z": (row["mean_drop"] / se) if measured and se else None,
             "clears_threshold": measured and abs(row["mean_drop"]) >= threshold,
         })
-        row["flagged"] = row["clears_threshold"] and not row["in_circuit"]
+        row["flagged"] = (row["clears_threshold"] and not row["in_circuit"]
+                          and not row["positive_control"])
     return rows
 
 
@@ -661,14 +676,19 @@ def sweep_columns(rows) -> dict:
 
 
 def threshold_counts(rows, ladder=THRESHOLD_LADDER) -> List[dict]:
-    """How many Components, inside and outside the circuit, clear each cut."""
+    """How many Components, inside and outside the circuit, clear each cut.
+
+    A positive control is in neither count's outside half: it is not a
+    Component the circuit missed.
+    """
     out = []
     for cut in ladder:
         clearing = [row for row in rows if row["mean_drop"] is not None
                     and abs(row["mean_drop"]) >= cut]
         out.append({"threshold": cut,
-                    "outside_circuit": sum(1 for row in clearing
-                                           if not row["in_circuit"]),
+                    "outside_circuit": sum(
+                        1 for row in clearing if not row["in_circuit"]
+                        and not row.get("positive_control")),
                     "in_circuit": sum(1 for row in clearing if row["in_circuit"])})
     return out
 
@@ -716,18 +736,31 @@ def sweep_payload(effects: Effects, rows, *, circuit: str, task: str,
                               "deception most); signed_rank here is the same "
                               "rule over every Component"),
         },
-        "flagged_means": ("outside the circuit and |mean_drop| >= threshold; "
-                          "listed here, never added to the head table"),
+        "flagged_means": ("outside the circuit, not a positive control, and "
+                          "|mean_drop| >= threshold; listed here, never added "
+                          "to the head table"),
+        "positive_controls": {
+            "components": [row["label"] for row in rows
+                           if row.get("positive_control")],
+            "why": POSITIVE_CONTROL_WHY,
+            "treatment": ("kept in components, ranked and drawn, marked "
+                          "positive_control; left out of flagged, "
+                          "strongest_outside_circuit and threshold_counts' "
+                          "outside_circuit, as the embedding is left out of "
+                          "the sweep"),
+        },
         "n_components": len(rows),
         "n_in_circuit": sum(1 for row in rows if row["in_circuit"]),
         "flagged": [row["label"] for row in rows if row["flagged"]],
         "threshold_counts": threshold_counts(rows),
         "strongest_outside_circuit": [
             {**row, "key": list(row["key"])} for row in rows
-            if not row["in_circuit"] and row["rank"] is not None][:STRONGEST_OUTSIDE_TOP],
+            if not row["in_circuit"] and not row.get("positive_control")
+            and row["rank"] is not None][:STRONGEST_OUTSIDE_TOP],
         "figure": {"file": SWEEP_PNG_NAME, "n_shown": len(shown),
                    "shows": f"the {len(shown)} strongest by |drop|, circuit "
-                            f"Components highlighted"},
+                            f"Components highlighted, a positive control "
+                            f"hatched and labelled"},
         "cost": cost or {},
         "components": as_json,
     }
@@ -862,6 +895,10 @@ def write_family_figure(path: str, rows, *, title: str = "") -> str:
 #: burnt orange against a light grey, and the circuit's tick labels in bold.
 SWEEP_CIRCUIT_COLOUR = "#b4471b"
 SWEEP_OTHER_COLOUR = "#b9c0c7"
+#: A positive control keeps its circuit or non-circuit fill and gains a hatch
+#: and a label, so the mark survives the same filter and greyscale print.
+SWEEP_CONTROL_HATCH = "////"
+SWEEP_CONTROL_SUFFIX = " (positive control)"
 
 
 def write_sweep_figure(path: str, rows, *, threshold: float,
@@ -869,8 +906,9 @@ def write_sweep_figure(path: str, rows, *, threshold: float,
     """The strongest `SWEEP_BAR_TOP` Components by |drop|, circuit highlighted.
 
     Horizontal bars in rank order, signed, so a Component that opposes
-    deception sits left of zero; dotted lines at plus and minus the threshold.
-    Every number drawn is a row of `sweep.json`.
+    deception sits left of zero; dotted lines at plus and minus the threshold;
+    a positive control hatched, with "(positive control)" on its tick. Every
+    number drawn is a row of `sweep.json`.
     """
     import matplotlib
     matplotlib.use("Agg")
@@ -884,14 +922,22 @@ def write_sweep_figure(path: str, rows, *, threshold: float,
     height = max(2.5, 0.26 * len(top) + 1.6)
     figure, axes = plt.subplots(figsize=(8.0, height))
     positions = list(range(len(top)))
-    axes.barh(positions, [row["mean_drop"] for row in top],
-              xerr=[row["standard_error"] or 0.0 for row in top],
-              color=[SWEEP_CIRCUIT_COLOUR if row["in_circuit"]
-                     else SWEEP_OTHER_COLOUR for row in top],
-              edgecolor="none", height=0.7,
-              error_kw={"ecolor": "#4a525a", "elinewidth": 0.9, "capsize": 2})
+    bars = axes.barh(positions, [row["mean_drop"] for row in top],
+                     xerr=[row["standard_error"] or 0.0 for row in top],
+                     color=[SWEEP_CIRCUIT_COLOUR if row["in_circuit"]
+                            else SWEEP_OTHER_COLOUR for row in top],
+                     edgecolor="none", height=0.7,
+                     error_kw={"ecolor": "#4a525a", "elinewidth": 0.9,
+                               "capsize": 2})
+    controls = [row.get("positive_control", False) for row in top]
+    for bar, control in zip(bars, controls):
+        if control:
+            bar.set_hatch(SWEEP_CONTROL_HATCH)
+            bar.set_edgecolor("#4a525a")
     axes.set_yticks(positions)
-    axes.set_yticklabels([row["label"] for row in top], fontsize=8)
+    axes.set_yticklabels([row["label"] + (SWEEP_CONTROL_SUFFIX if control
+                                          else "")
+                          for row, control in zip(top, controls)], fontsize=8)
     for tick, row in zip(axes.get_yticklabels(), top):
         if row["in_circuit"]:
             tick.set_fontweight("bold")
@@ -904,9 +950,13 @@ def write_sweep_figure(path: str, rows, *, threshold: float,
                     "(positive: the Component helps deception; dotted: "
                     f"threshold {threshold:g})", fontsize=9)
     axes.set_title(title or "Knockout completeness sweep", fontsize=10)
-    axes.legend(handles=[Patch(color=SWEEP_CIRCUIT_COLOUR, label="in the circuit"),
-                         Patch(color=SWEEP_OTHER_COLOUR, label="not in the circuit")],
-                loc="lower right", fontsize=8, frameon=False)
+    handles = [Patch(color=SWEEP_CIRCUIT_COLOUR, label="in the circuit"),
+               Patch(color=SWEEP_OTHER_COLOUR, label="not in the circuit")]
+    if any(controls):
+        handles.append(Patch(facecolor="white", edgecolor="#4a525a",
+                             hatch=SWEEP_CONTROL_HATCH,
+                             label="positive control, not counted as missed"))
+    axes.legend(handles=handles, loc="lower right", fontsize=8, frameon=False)
     axes.grid(axis="x", color="#d6dade", linewidth=0.6)
     axes.set_axisbelow(True)
     for edge in ("top", "right", "left"):
@@ -971,10 +1021,11 @@ def add_arguments(group) -> None:
                             "table). Logits of logit(Target) - "
                             "logit(Distractor), not a fraction of the gap "
                             "like --path-sweep-threshold. Default "
-                            f"{DEFAULT_SWEEP_THRESHOLD}: about twice the "
-                            "standard error of the circuit's strong "
-                            "Components on SDR nls0.3, and 3%% of its "
-                            "clean-minus-corrupt gap.")
+                            f"{DEFAULT_SWEEP_THRESHOLD}, hand-tuned on SDR "
+                            "nls0.3 (the 20 strongest outsiders there); tune "
+                            "it by hand per run. The full ranked list of "
+                            "every Component is always written to sweep.json, "
+                            "so the cut hides nothing.")
 
 
 def scheme_of(ctx) -> str:
@@ -1118,7 +1169,8 @@ def _write_sweep(ctx, swept: Effects, wall: float, *, scheme: str) -> dict:
                          instance_set=INSTANCE_SET)
     flagged = [row["label"] for row in rows if row["flagged"]]
     print(f"    knockout sweep: {len(rows)} Component(s) in {wall:.0f} s; "
-          f"{len(flagged)} outside the circuit clear {threshold:g}"
+          f"{len(flagged)} outside the circuit (positive controls aside) "
+          f"clear {threshold:g}"
           + (f": {', '.join(flagged[:10])}{' ...' if len(flagged) > 10 else ''}"
              if flagged else ""))
     return sweep_columns(rows)
