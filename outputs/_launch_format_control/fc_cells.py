@@ -176,6 +176,16 @@ def plan_suite(suite: str, cfg: dict) -> list:
     return jobs
 
 
+def side_job_args(suite: str, cfg: dict, side: dict) -> list:
+    """Arguments of a side job: one extra circuit (e.g. a retune of F) on one
+    of the suite's test sets, written beside the suite (not under _shards/,
+    so the merge never files it into cells/)."""
+    return ["--circuit", f"{side['circuit']}={side['run']}",
+            "--task-from", cfg["runs"][side["task_from_role"]],
+            "--evals", *side["evals"], *COMMON_ARGS,
+            "--suite-name", suite, "--output-dir", f"{SUITES_ROOT}/{suite}/{side['output_dir']}"]
+
+
 def shard_dir(job: dict) -> str:
     return f"{SUITES_ROOT}/{job['suite']}/_shards/{job['job']}"
 

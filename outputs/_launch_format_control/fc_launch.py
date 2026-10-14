@@ -40,7 +40,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 sys.path.insert(0, os.getcwd())
 
-from fc_cells import job_args, parse_dryrun_log, plan_suite, walltime  # noqa: E402
+from fc_cells import (job_args, parse_dryrun_log, plan_suite, side_job_args,  # noqa: E402
+                      walltime)
 
 LAUNCH_REL = "outputs/_launch_format_control"
 CONFIG_PATH = os.path.join(HERE, "suites.json")
@@ -59,29 +60,63 @@ def load_config(path: str = CONFIG_PATH) -> dict:
     return {k: v for k, v in raw.items() if not k.startswith("_")}
 
 
-def build_manifest(config: dict, previous: dict = None, dryruns: dict = None) -> dict:
-    """Every suite's jobs and cells. `previous` carries Slurm records forward;
-    `dryruns` maps (suite, job) -> {"log", "passed", "estimate_min"}."""
+def load_side_jobs(path: str = CONFIG_PATH) -> dict:
+    """suites.json `_side_jobs`: {suite: [{job, circuit, run, task_from_role,
+    evals, output_dir, why}]}. Side jobs are extra evaluations outside the
+    suite grid (e.g. a retune of F); they are never in the cells index."""
+    with open(path) as f:
+        return json.load(f).get("_side_jobs") or {}
+
+
+def planned_jobs(config: dict, side_jobs: dict = None):
+    """(suite, job id, args or None, awaits) for every grid job and side job."""
+    for sname, cfg in config.items():
+        for job in plan_suite(sname, cfg):
+            yield sname, job["job"], (None if job["awaits"] else job_args(job)), job["awaits"]
+        for side in (side_jobs or {}).get(sname, []):
+            yield sname, side["job"], side_job_args(sname, cfg, side), []
+
+
+def build_manifest(config: dict, previous: dict = None, dryruns: dict = None,
+                   side_jobs: dict = None) -> dict:
+    """Every suite's jobs and cells, plus `side_jobs` kept apart from the
+    cells index. `previous` carries Slurm records forward; `dryruns` maps
+    (suite, job) -> {"log", "passed", "estimate_min"}."""
     prev = {}
     for sname, s in ((previous or {}).get("suites") or {}).items():
         for j in s.get("jobs", []):
             prev[(sname, j["job"])] = j
+    for sname, sides in ((previous or {}).get("side_jobs") or {}).items():
+        for j in sides:
+            prev[(sname, j["job"])] = j
+
+    def records(sname, job_id, args):
+        old = prev.get((sname, job_id), {})
+        dr = (dryruns or {}).get((sname, job_id))
+        if dr is None and old.get("args") == args:
+            dr = old.get("dryrun")
+        return {"args": args,
+                "dryrun": dr or {"log": None, "passed": None, "estimate_min": None},
+                "slurm": old.get("slurm") or {"job_id": None}}
+
+    side_out = {}
+    for sname, sides in (side_jobs or {}).items():
+        if sname not in config:
+            continue
+        side_out[sname] = [dict(side, awaits=[], cells=[],
+                                **records(sname, side["job"],
+                                          side_job_args(sname, config[sname], side)))
+                           for side in sides]
     suites = {}
     for sname, cfg in config.items():
         jobs = []
         for job in plan_suite(sname, cfg):
-            old = prev.get((sname, job["job"]), {})
             args = None if job["awaits"] else job_args(job)
-            dr = (dryruns or {}).get((sname, job["job"]))
-            if dr is None and old.get("args") == args:
-                dr = old.get("dryrun")
             jobs.append({
                 "job": job["job"], "cells": job["cells"], "evals": job["evals"],
                 "compose_granularity": job["compose_granularity"],
                 "task_from_role": job["task_from_role"], "awaits": job["awaits"],
-                "args": args,
-                "dryrun": dr or {"log": None, "passed": None, "estimate_min": None},
-                "slurm": old.get("slurm") or {"job_id": None},
+                **records(sname, job["job"], args),
             })
         # Flat index for readers (ticket 05's summary writer): find a cell by
         # (circuit label, test-set condition) and read it at `path` under the
@@ -91,7 +126,8 @@ def build_manifest(config: dict, previous: dict = None, dryruns: dict = None) ->
         suites[sname] = {"family": cfg["family"], "task": cfg["task"], "runs": cfg["runs"],
                          "allmlp": cfg.get("allmlp"), "cells": cells, "jobs": jobs}
     return {"created": time.strftime("%Y-%m-%dT%H:%M:%S"),
-            "config": os.path.join(LAUNCH_REL, "suites.json"), "suites": suites}
+            "config": os.path.join(LAUNCH_REL, "suites.json"), "suites": suites,
+            "side_jobs": side_out}
 
 
 _LOG_HEADER = re.compile(r"^# \S+\s+python evaluate_circuit\.py (.*) --dry-run$")
@@ -103,26 +139,25 @@ def dryrun_log_args(first_line: str):
     return m.group(1) if m else None
 
 
-def read_dryruns(config: dict, dryrun_dir: str = DRYRUN_DIR) -> dict:
+def read_dryruns(config: dict, dryrun_dir: str = DRYRUN_DIR, side_jobs: dict = None) -> dict:
     """(suite, job) -> dry-run verdict. A log counts only when its header
     records exactly the job's current arguments; a log for other arguments
     (an F retune, a corrected path, changed common settings) is `stale` and
     the job counts as not dry-run."""
     out = {}
-    for sname, cfg in config.items():
-        for job in plan_suite(sname, cfg):
-            path = os.path.join(dryrun_dir, sname, f"{job['job']}.log")
-            if not os.path.exists(path) or job["awaits"]:
-                continue
-            with open(path, errors="replace") as f:
-                text = f.read()
-            rel = os.path.relpath(path, HERE)
-            if dryrun_log_args(text.split("\n", 1)[0]) != shlex.join(job_args(job)):
-                out[(sname, job["job"])] = {"log": rel, "passed": None, "estimate_min": None,
-                                            "stale": True}
-                continue
-            passed, est = parse_dryrun_log(text)
-            out[(sname, job["job"])] = {"log": rel, "passed": passed, "estimate_min": est}
+    for sname, job_id, args, awaits in planned_jobs(config, side_jobs):
+        path = os.path.join(dryrun_dir, sname, f"{job_id}.log")
+        if not os.path.exists(path) or awaits:
+            continue
+        with open(path, errors="replace") as f:
+            text = f.read()
+        rel = os.path.relpath(path, HERE)
+        if dryrun_log_args(text.split("\n", 1)[0]) != shlex.join(args):
+            out[(sname, job_id)] = {"log": rel, "passed": None, "estimate_min": None,
+                                    "stale": True}
+            continue
+        passed, est = parse_dryrun_log(text)
+        out[(sname, job_id)] = {"log": rel, "passed": passed, "estimate_min": est}
     return out
 
 
@@ -141,8 +176,9 @@ def save_manifest(manifest: dict, path: str = MANIFEST_PATH) -> None:
 
 
 def refresh_manifest() -> dict:
-    config = load_config()
-    manifest = build_manifest(config, previous=load_manifest(), dryruns=read_dryruns(config))
+    config, side = load_config(), load_side_jobs()
+    manifest = build_manifest(config, previous=load_manifest(),
+                              dryruns=read_dryruns(config, side_jobs=side), side_jobs=side)
     save_manifest(manifest)
     return manifest
 
@@ -178,7 +214,7 @@ def submit(manifest: dict, *, dry: bool, accounts, partition: str, suites=None, 
         if suites and sname not in suites:
             continue
         lines.append(f"# {sname}")
-        for job in suite["jobs"]:
+        for job in suite["jobs"] + (manifest.get("side_jobs") or {}).get(sname, []):
             if jobs and job["job"] not in jobs:
                 continue
             jid = (job.get("slurm") or {}).get("job_id")
@@ -267,19 +303,15 @@ def _dryrun_one(args: list, log_path: str, timeout: int) -> tuple:
 
 
 def dryrun(config: dict, out_dir: str, *, suites=None, jobs=None, parallel: int = 2,
-           timeout: int = 1800, log=print) -> dict:
+           timeout: int = 1800, log=print, side_jobs: dict = None) -> dict:
     todo = []
-    for sname, cfg in config.items():
-        if suites and sname not in suites:
+    for sname, job_id, args, awaits in planned_jobs(config, side_jobs):
+        if (suites and sname not in suites) or (jobs and job_id not in jobs):
             continue
-        for job in plan_suite(sname, cfg):
-            if jobs and job["job"] not in jobs:
-                continue
-            if job["awaits"]:
-                log(f"  {sname} {job['job']}: awaits {', '.join(job['awaits'])}")
-                continue
-            todo.append((sname, job["job"], job_args(job),
-                         os.path.join(out_dir, sname, f"{job['job']}.log")))
+        if awaits:
+            log(f"  {sname} {job_id}: awaits {', '.join(awaits)}")
+            continue
+        todo.append((sname, job_id, args, os.path.join(out_dir, sname, f"{job_id}.log")))
     results = {}
     with ThreadPoolExecutor(max_workers=max(1, parallel)) as pool:
         futs = {pool.submit(_dryrun_one, a, p, timeout): (s, j, p) for s, j, a, p in todo}
@@ -364,7 +396,7 @@ def main(argv=None):
         print(shlex.join(job_args(job)))
     elif a.cmd == "dryrun":
         dryrun(load_config(), DRYRUN_DIR, suites=a.suite, jobs=a.job, parallel=a.parallel,
-               timeout=a.timeout)
+               timeout=a.timeout, side_jobs=load_side_jobs())
         refresh_manifest()
     elif a.cmd == "standin-dryrun":
         # Only the jobs the real configuration cannot dry-run yet.

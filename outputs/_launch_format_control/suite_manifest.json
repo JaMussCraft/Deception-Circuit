@@ -1,5 +1,5 @@
 {
- "created": "2026-10-14T08:25:05",
+ "created": "2026-10-14T18:04:05",
  "config": "outputs/_launch_format_control/suites.json",
  "suites": {
   "format-control-far-nls0.3": {
@@ -8,7 +8,7 @@
    "runs": {
     "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
     "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_honest_noedge_260819-084020",
-    "F": null
+    "F": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.3_nopressure_noedge_261013-203424"
    },
    "allmlp": null,
    "cells": [
@@ -282,7 +282,11 @@
       "estimate_min": 81.2
      },
      "slurm": {
-      "job_id": null
+      "job_id": "22906787",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T18:04:05"
      }
     },
     {
@@ -334,7 +338,11 @@
       "estimate_min": 76.6
      },
      "slurm": {
-      "job_id": null
+      "job_id": "22906788",
+      "account": "bgrb-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T18:04:07"
      }
     },
     {
@@ -358,17 +366,39 @@
      ],
      "compose_granularity": null,
      "task_from_role": "F",
-     "awaits": [
-      "F"
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.3_nopressure_noedge_261013-203424",
+      "--evals",
+      "sanity",
+      "knockout",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-far-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-far-nls0.3/_shards/D__far_nopressure"
      ],
-     "args": null,
      "dryrun": {
-      "log": null,
-      "passed": null,
-      "estimate_min": null
+      "log": "dryrun/format-control-far-nls0.3/D__far_nopressure.log",
+      "passed": true,
+      "estimate_min": 76.6
      },
      "slurm": {
-      "job_id": null
+      "job_id": "22906789",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T18:04:07"
      }
     },
     {
@@ -420,7 +450,11 @@
       "estimate_min": 76.6
      },
      "slurm": {
-      "job_id": null
+      "job_id": "22906790",
+      "account": "bgrb-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T18:04:07"
      }
     },
     {
@@ -472,7 +506,11 @@
       "estimate_min": 81.2
      },
      "slurm": {
-      "job_id": null
+      "job_id": "22906791",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T18:04:10"
      }
     },
     {
@@ -496,17 +534,39 @@
      ],
      "compose_granularity": null,
      "task_from_role": "F",
-     "awaits": [
-      "F"
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_honest_noedge_260819-084020",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.3_nopressure_noedge_261013-203424",
+      "--evals",
+      "sanity",
+      "knockout",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-far-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-far-nls0.3/_shards/H__far_nopressure"
      ],
-     "args": null,
      "dryrun": {
-      "log": null,
-      "passed": null,
-      "estimate_min": null
+      "log": "dryrun/format-control-far-nls0.3/H__far_nopressure.log",
+      "passed": true,
+      "estimate_min": 76.6
      },
      "slurm": {
-      "job_id": null
+      "job_id": "22906792",
+      "account": "bgrb-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T18:04:10"
      }
     },
     {
@@ -530,17 +590,39 @@
      ],
      "compose_granularity": null,
      "task_from_role": "D",
-     "awaits": [
-      "F"
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.3_nopressure_noedge_261013-203424",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--evals",
+      "sanity",
+      "knockout",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-far-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-far-nls0.3/_shards/F__far"
      ],
-     "args": null,
      "dryrun": {
-      "log": null,
-      "passed": null,
-      "estimate_min": null
+      "log": "dryrun/format-control-far-nls0.3/F__far.log",
+      "passed": true,
+      "estimate_min": 76.6
      },
      "slurm": {
-      "job_id": null
+      "job_id": "22906793",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T18:04:10"
      }
     },
     {
@@ -564,17 +646,39 @@
      ],
      "compose_granularity": null,
      "task_from_role": "H",
-     "awaits": [
-      "F"
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.3_nopressure_noedge_261013-203424",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_honest_noedge_260819-084020",
+      "--evals",
+      "sanity",
+      "knockout",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-far-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-far-nls0.3/_shards/F__far_honest"
      ],
-     "args": null,
      "dryrun": {
-      "log": null,
-      "passed": null,
-      "estimate_min": null
+      "log": "dryrun/format-control-far-nls0.3/F__far_honest.log",
+      "passed": true,
+      "estimate_min": 76.6
      },
      "slurm": {
-      "job_id": null
+      "job_id": "22906794",
+      "account": "bgrb-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T18:04:10"
      }
     },
     {
@@ -598,17 +702,39 @@
      ],
      "compose_granularity": null,
      "task_from_role": "F",
-     "awaits": [
-      "F"
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.3_nopressure_noedge_261013-203424",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.3_nopressure_noedge_261013-203424",
+      "--evals",
+      "sanity",
+      "knockout",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-far-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-far-nls0.3/_shards/F__far_nopressure"
      ],
-     "args": null,
      "dryrun": {
-      "log": null,
-      "passed": null,
-      "estimate_min": null
+      "log": "dryrun/format-control-far-nls0.3/F__far_nopressure.log",
+      "passed": true,
+      "estimate_min": 81.2
      },
      "slurm": {
-      "job_id": null
+      "job_id": "22906795",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T18:04:12"
      }
     },
     {
@@ -636,17 +762,42 @@
      ],
      "compose_granularity": "both",
      "task_from_role": "D",
-     "awaits": [
-      "F"
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.3_nopressure_noedge_261013-203424",
+      "--expr",
+      "D_minus_F=D - F",
+      "--compose-granularity",
+      "both",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-far-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-far-nls0.3/_shards/D_minus_F__far"
      ],
-     "args": null,
      "dryrun": {
-      "log": null,
-      "passed": null,
-      "estimate_min": null
+      "log": "dryrun/format-control-far-nls0.3/D_minus_F__far.log",
+      "passed": true,
+      "estimate_min": 80.2
      },
      "slurm": {
-      "job_id": null
+      "job_id": "22906796",
+      "account": "bgrb-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T18:04:12"
      }
     },
     {
@@ -674,17 +825,42 @@
      ],
      "compose_granularity": "both",
      "task_from_role": "D",
-     "awaits": [
-      "F"
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.3_nopressure_noedge_261013-203424",
+      "--expr",
+      "D_and_F=D & F",
+      "--compose-granularity",
+      "both",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-far-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-far-nls0.3/_shards/D_and_F__far"
      ],
-     "args": null,
      "dryrun": {
-      "log": null,
-      "passed": null,
-      "estimate_min": null
+      "log": "dryrun/format-control-far-nls0.3/D_and_F__far.log",
+      "passed": true,
+      "estimate_min": 80.2
      },
      "slurm": {
-      "job_id": null
+      "job_id": "22906797",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T18:04:12"
      }
     },
     {
@@ -712,17 +888,42 @@
      ],
      "compose_granularity": "both",
      "task_from_role": "D",
-     "awaits": [
-      "F"
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.3_nopressure_noedge_261013-203424",
+      "--expr",
+      "F_minus_D=F - D",
+      "--compose-granularity",
+      "both",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-far-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-far-nls0.3/_shards/F_minus_D__far"
      ],
-     "args": null,
      "dryrun": {
-      "log": null,
-      "passed": null,
-      "estimate_min": null
+      "log": "dryrun/format-control-far-nls0.3/F_minus_D__far.log",
+      "passed": true,
+      "estimate_min": 80.2
      },
      "slurm": {
-      "job_id": null
+      "job_id": "22906798",
+      "account": "bgrb-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T18:04:12"
      }
     },
     {
@@ -750,17 +951,44 @@
      ],
      "compose_granularity": "both",
      "task_from_role": "D",
-     "awaits": [
-      "F"
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_honest_noedge_260819-084020",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.3_nopressure_noedge_261013-203424",
+      "--expr",
+      "D_minus_H_minus_F=D - H - F",
+      "--compose-granularity",
+      "both",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-far-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-far-nls0.3/_shards/D_minus_H_minus_F__far"
      ],
-     "args": null,
      "dryrun": {
-      "log": null,
-      "passed": null,
-      "estimate_min": null
+      "log": "dryrun/format-control-far-nls0.3/D_minus_H_minus_F__far.log",
+      "passed": true,
+      "estimate_min": 80.2
      },
      "slurm": {
-      "job_id": null
+      "job_id": "22906799",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T18:04:15"
      }
     },
     {
@@ -788,17 +1016,44 @@
      ],
      "compose_granularity": "both",
      "task_from_role": "D",
-     "awaits": [
-      "F"
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_honest_noedge_260819-084020",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.3_nopressure_noedge_261013-203424",
+      "--expr",
+      "H_minus_D_minus_F=H - D - F",
+      "--compose-granularity",
+      "both",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-far-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-far-nls0.3/_shards/H_minus_D_minus_F__far"
      ],
-     "args": null,
      "dryrun": {
-      "log": null,
-      "passed": null,
-      "estimate_min": null
+      "log": "dryrun/format-control-far-nls0.3/H_minus_D_minus_F__far.log",
+      "passed": true,
+      "estimate_min": 80.2
      },
      "slurm": {
-      "job_id": null
+      "job_id": "22906800",
+      "account": "bgrb-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T18:04:15"
      }
     },
     {
@@ -826,17 +1081,44 @@
      ],
      "compose_granularity": "both",
      "task_from_role": "D",
-     "awaits": [
-      "F"
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_honest_noedge_260819-084020",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.3_nopressure_noedge_261013-203424",
+      "--expr",
+      "F_minus_D_minus_H=F - D - H",
+      "--compose-granularity",
+      "both",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-far-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-far-nls0.3/_shards/F_minus_D_minus_H__far"
      ],
-     "args": null,
      "dryrun": {
-      "log": null,
-      "passed": null,
-      "estimate_min": null
+      "log": "dryrun/format-control-far-nls0.3/F_minus_D_minus_H__far.log",
+      "passed": true,
+      "estimate_min": 80.2
      },
      "slurm": {
-      "job_id": null
+      "job_id": "22906801",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T18:04:17"
      }
     }
    ]
@@ -3536,5 +3818,54 @@
     }
    ]
   }
+ },
+ "side_jobs": {
+  "format-control-far-nls0.3": [
+   {
+    "job": "F04__far",
+    "circuit": "F04",
+    "run": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.4_nopressure_noedge_261014-081312",
+    "task_from_role": "D",
+    "evals": [
+     "sanity",
+     "knockout"
+    ],
+    "output_dir": "_side_F04",
+    "why": "Retune sensitivity: the FAR NLS 0.4 Format Circuit (failed the in-run gate, KL 0.214, not carried) on the FAR D test set, evals 1 and 2. Outside the suite grid and the cells index.",
+    "awaits": [],
+    "cells": [],
+    "args": [
+     "--circuit",
+     "F04=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.4_nopressure_noedge_261014-081312",
+     "--task-from",
+     "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+     "--evals",
+     "sanity",
+     "knockout",
+     "--ablation",
+     "interchange",
+     "--n-random",
+     "20",
+     "--knockout-null-count",
+     "20",
+     "--suite-name",
+     "format-control-far-nls0.3",
+     "--output-dir",
+     "outputs/_suites/format-control-far-nls0.3/_side_F04"
+    ],
+    "dryrun": {
+     "log": "dryrun/format-control-far-nls0.3/F04__far.log",
+     "passed": true,
+     "estimate_min": 41.8
+    },
+    "slurm": {
+     "job_id": "22906802",
+     "account": "bgrb-delta-gpu",
+     "partition": "gpuA40x4,gpuH200x8",
+     "time": "04:00:00",
+     "submitted": "2026-10-14T18:04:17"
+    }
+   }
+  ]
  }
 }

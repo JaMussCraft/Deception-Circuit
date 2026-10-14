@@ -347,6 +347,53 @@ def test_the_manifest_maps_every_cell_to_its_circuit_and_test_set_condition(laun
     assert coarse[("H_hko__leaf", "nopressure")]["roles"] == ["knockout"]
 
 
+SIDE = {"format-control-far-nls0.3": [
+    {"job": "F04__far", "circuit": "F04", "run": "/r/far_F04", "task_from_role": "D",
+     "evals": ["sanity", "knockout"], "output_dir": "_side_F04",
+     "why": "retune sensitivity"}]}
+
+
+def test_a_side_job_is_planned_outside_the_cell_grid(launch):
+    """The NLS 0.4 retune of FAR F, evaluated on the D test set: recorded
+    under side_jobs with its arguments, never in the cells index the summary
+    writer reads, and its output outside _shards/ so the merge skips it."""
+    manifest = launch.build_manifest(CONFIG, side_jobs=SIDE)
+    (side,) = manifest["side_jobs"]["format-control-far-nls0.3"]
+    assert side["args"] == [
+        "--circuit", "F04=/r/far_F04", "--task-from", "/r/far_D",
+        "--evals", "sanity", "knockout", *COMMON,
+        "--suite-name", "format-control-far-nls0.3",
+        "--output-dir", "outputs/_suites/format-control-far-nls0.3/_side_F04"]
+    assert side["slurm"] == {"job_id": None} and side["why"] == "retune sensitivity"
+    suite = manifest["suites"]["format-control-far-nls0.3"]
+    assert "F04" not in {c["circuit"] for c in suite["cells"]}
+    assert "F04__far" not in {j["job"] for j in suite["jobs"]}
+
+
+def test_a_side_job_needs_its_own_dry_run_and_records_its_id(launch, tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    fc_cells = _launch_module("fc_cells")
+    suite = "format-control-far-nls0.3"
+    cfg = {suite: CONFIG[suite]}
+    manifest = launch.build_manifest(cfg, side_jobs=SIDE)
+    lines = launch.submit(manifest, dry=True, accounts=["beto-delta-gpu"], partition="gpuA40x4",
+                          suites=[suite], jobs=["F04__far"], run=None)
+    assert "# skip F04__far: no passing dry-run" in lines
+
+    d = tmp_path / "dryrun" / suite
+    _write_dryrun_log(launch, str(d / "F04__far.log"),
+                      manifest["side_jobs"][suite][0]["args"])
+    got = launch.read_dryruns(cfg, str(tmp_path / "dryrun"), side_jobs=SIDE)
+    assert got[(suite, "F04__far")]["passed"] is True
+    manifest = launch.build_manifest(cfg, side_jobs=SIDE, dryruns=got)
+    launch.submit(manifest, dry=False, accounts=["bgrb-delta-gpu"], partition="gpuA40x4",
+                  suites=[suite], jobs=["F04__far"], run=lambda cmd: "Submitted batch job 4242")
+    assert manifest["side_jobs"][suite][0]["slurm"]["job_id"] == "4242"
+    again = launch.build_manifest(cfg, previous=manifest, side_jobs=SIDE)
+    assert again["side_jobs"][suite][0]["slurm"]["job_id"] == "4242"
+    assert fc_cells  # the grid planner is untouched by side jobs
+
+
 def test_the_manifest_lists_every_cell_and_keeps_recorded_job_ids(launch):
     manifest = launch.build_manifest(CONFIG)
     suites = manifest["suites"]
