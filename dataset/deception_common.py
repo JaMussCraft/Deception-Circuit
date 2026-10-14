@@ -933,6 +933,19 @@ def evaluate_behavior(data_list, model, tokenizer, device,
     return behaviors
 
 
+def behavior_passes(behavior: Dict, margin_thresh: float) -> bool:
+    """The behavioral filter's rule on one `evaluate_behavior` record: the
+    clean argmax is the target and the corrupt argmax the distractor (the
+    flip), each at margin >= margin_thresh. Pure, so a threshold can be
+    re-applied offline to stored margins."""
+    t, d = behavior["target_token"], behavior["distractor_token"]
+    clean_ok = (behavior["clean_argmax_id"] == t and
+                behavior["clean_margin"] >= margin_thresh)
+    corrupt_ok = (behavior["corrupt_argmax_id"] == d and
+                  behavior["corrupt_margin"] >= margin_thresh)
+    return bool(clean_ok and corrupt_ok)
+
+
 def filter_by_model_behavior(data_list, model, tokenizer, device,
                              margin_thresh: float = 1.0,
                              max_length: int = MAX_SEQ_LENGTH,
@@ -964,9 +977,7 @@ def filter_by_model_behavior(data_list, model, tokenizer, device,
         if b["corrupt_argmax_id"] not in (t, d):
             unexpected_tokens[repr(b["corrupt_argmax"])] += 1
 
-        clean_ok = b["clean_argmax_id"] == t and b["clean_margin"] >= margin_thresh
-        corrupt_ok = b["corrupt_argmax_id"] == d and b["corrupt_margin"] >= margin_thresh
-        b["passed"] = bool(clean_ok and corrupt_ok)
+        b["passed"] = behavior_passes(b, margin_thresh)
         if b["passed"]:
             filtered_data.append(rec)
 

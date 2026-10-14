@@ -76,24 +76,58 @@ def assert_fits(tokenizer, prompt: str, max_seq_length: int, *,
 # RECORD REBUILDING
 # ==============================================================================
 
+def _is_nopressure(record) -> bool:
+    return record.get("condition") == "nopressure" or not record.get("pressure")
+
+
+def empty_variant_reason(task_name: str, variant: str, condition) -> str:
+    """Why a deception task's `variant` prompt set came out empty."""
+    if condition == "nopressure":
+        return (f"{task_name} '{variant}' variant skipped: the dataset's "
+                f"condition is 'nopressure', so it already is the no_pressure "
+                f"variant (the Pressure Clause was deleted at build time) and has "
+                f"no clause to replace with an honest instruction")
+    return (f"{task_name} '{variant}' variant derived no records from the test "
+            f"set")
+
+
 def deception_records(task_name: str, records, variant: str, tokenizer,
                       max_seq_length: int) -> list:
-    """FAR / SDR / SER records with a rebuilt clean/corrupt prompt pair."""
-    import dataset.deception_common as dc
+    """FAR / SDR / SER records with the variant's clean/corrupt prompt pair.
 
-    spec = dc.SPECS[task_name]
-    pressure = pressure_text(variant, dc.HONEST_INSTRUCTION)
+    Derived from the STORED prompt strings by clause surgery
+    (`dataset/clause_surgery.py`), never re-templated through `dc.SPECS`: the
+    stored FAR and SDR datasets use wording the current specs no longer
+    produce, so a rebuilt prompt would not be the prompt the circuit was
+    trained on. A `nopressure` dataset (empty `pressure`) derives no variants
+    and returns [] with the reason printed to the cell's log.
+    """
+    import dataset.deception_common as dc
+    from dataset.clause_surgery import remove_clause, replace_clause
+
+    pressure_text(variant, dc.HONEST_INSTRUCTION)   # rejects unknown variants
+    records = list(records)
+    n_nopressure = sum(_is_nopressure(r) for r in records)
+    if n_nopressure and n_nopressure < len(records):
+        raise ValueError(
+            f"{task_name} test set mixes {n_nopressure} nopressure record(s) "
+            f"(empty pressure) with {len(records) - n_nopressure} record(s) "
+            f"that carry a Pressure Clause; a variant cannot be derived for both")
+    if n_nopressure:
+        print(f"  {empty_variant_reason(task_name, variant, 'nopressure')}")
+        return []
 
     out = []
     for record in records:
-        clean = dc.rebuild_prompt(spec, record, pressure)
-        # rebuild_prompt only builds the clean stream; the corrupt stream is the
-        # same prompt with the *other* item designated.
-        corrupt = dc.build_prompt(
-            spec, spec.variant(record["template_variant"]), record["entity"],
-            record["item_1"], record["item_2"], record["corrupt_item_d"],
-            record["desig"], record["desig_inv"], pressure,
-            honest_item=record["distractor"])
+        clause = record["pressure"]
+        if variant == "no_pressure":
+            clean = remove_clause(record["clean_prompt"], clause)
+            corrupt = remove_clause(record["corrupt_prompt"], clause)
+        else:
+            clean = replace_clause(record["clean_prompt"], clause,
+                                   dc.HONEST_INSTRUCTION)
+            corrupt = replace_clause(record["corrupt_prompt"], clause,
+                                     dc.HONEST_INSTRUCTION)
         assert_fits(tokenizer, clean, max_seq_length,
                     variant=variant, task=task_name)
         assert_fits(tokenizer, corrupt, max_seq_length,
