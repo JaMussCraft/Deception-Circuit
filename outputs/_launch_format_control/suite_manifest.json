@@ -1,5 +1,5 @@
 {
- "created": "2026-10-13T20:36:03",
+ "created": "2026-10-13T20:41:20",
  "config": "outputs/_launch_format_control/suites.json",
  "suites": {
   "format-control-far-nls0.3": {
@@ -11,6 +11,227 @@
     "F": null
    },
    "allmlp": null,
+   "cells": [
+    {
+     "circuit": "D",
+     "dataset": "far",
+     "condition": "deceptive",
+     "roles": [
+      "faithfulness",
+      "knockout"
+     ],
+     "job": "D__far",
+     "path": "cells/D/far/interchange"
+    },
+    {
+     "circuit": "D",
+     "dataset": "far_honest",
+     "condition": "honest",
+     "roles": [
+      "faithfulness",
+      "knockout"
+     ],
+     "job": "D__far_honest",
+     "path": "cells/D/far_honest/interchange"
+    },
+    {
+     "circuit": "D",
+     "dataset": "far_nopressure",
+     "condition": "nopressure",
+     "roles": [
+      "faithfulness",
+      "knockout"
+     ],
+     "job": "D__far_nopressure",
+     "path": "cells/D/far_nopressure/interchange"
+    },
+    {
+     "circuit": "H",
+     "dataset": "far",
+     "condition": "deceptive",
+     "roles": [
+      "faithfulness",
+      "knockout"
+     ],
+     "job": "H__far",
+     "path": "cells/H/far/interchange"
+    },
+    {
+     "circuit": "H",
+     "dataset": "far_honest",
+     "condition": "honest",
+     "roles": [
+      "faithfulness",
+      "knockout"
+     ],
+     "job": "H__far_honest",
+     "path": "cells/H/far_honest/interchange"
+    },
+    {
+     "circuit": "H",
+     "dataset": "far_nopressure",
+     "condition": "nopressure",
+     "roles": [
+      "faithfulness",
+      "knockout"
+     ],
+     "job": "H__far_nopressure",
+     "path": "cells/H/far_nopressure/interchange"
+    },
+    {
+     "circuit": "F",
+     "dataset": "far",
+     "condition": "deceptive",
+     "roles": [
+      "faithfulness",
+      "knockout"
+     ],
+     "job": "F__far",
+     "path": "cells/F/far/interchange"
+    },
+    {
+     "circuit": "F",
+     "dataset": "far_honest",
+     "condition": "honest",
+     "roles": [
+      "faithfulness",
+      "knockout"
+     ],
+     "job": "F__far_honest",
+     "path": "cells/F/far_honest/interchange"
+    },
+    {
+     "circuit": "F",
+     "dataset": "far_nopressure",
+     "condition": "nopressure",
+     "roles": [
+      "faithfulness",
+      "knockout"
+     ],
+     "job": "F__far_nopressure",
+     "path": "cells/F/far_nopressure/interchange"
+    },
+    {
+     "circuit": "D_minus_F__leaf",
+     "dataset": "far",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "D_minus_F__far",
+     "path": "cells/D_minus_F__leaf/far/interchange"
+    },
+    {
+     "circuit": "D_minus_F__head",
+     "dataset": "far",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "D_minus_F__far",
+     "path": "cells/D_minus_F__head/far/interchange"
+    },
+    {
+     "circuit": "D_and_F__leaf",
+     "dataset": "far",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "D_and_F__far",
+     "path": "cells/D_and_F__leaf/far/interchange"
+    },
+    {
+     "circuit": "D_and_F__head",
+     "dataset": "far",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "D_and_F__far",
+     "path": "cells/D_and_F__head/far/interchange"
+    },
+    {
+     "circuit": "F_minus_D__leaf",
+     "dataset": "far",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "F_minus_D__far",
+     "path": "cells/F_minus_D__leaf/far/interchange"
+    },
+    {
+     "circuit": "F_minus_D__head",
+     "dataset": "far",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "F_minus_D__far",
+     "path": "cells/F_minus_D__head/far/interchange"
+    },
+    {
+     "circuit": "D_minus_H_minus_F__leaf",
+     "dataset": "far",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "D_minus_H_minus_F__far",
+     "path": "cells/D_minus_H_minus_F__leaf/far/interchange"
+    },
+    {
+     "circuit": "D_minus_H_minus_F__head",
+     "dataset": "far",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "D_minus_H_minus_F__far",
+     "path": "cells/D_minus_H_minus_F__head/far/interchange"
+    },
+    {
+     "circuit": "H_minus_D_minus_F__leaf",
+     "dataset": "far",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "H_minus_D_minus_F__far",
+     "path": "cells/H_minus_D_minus_F__leaf/far/interchange"
+    },
+    {
+     "circuit": "H_minus_D_minus_F__head",
+     "dataset": "far",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "H_minus_D_minus_F__far",
+     "path": "cells/H_minus_D_minus_F__head/far/interchange"
+    },
+    {
+     "circuit": "F_minus_D_minus_H__leaf",
+     "dataset": "far",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "F_minus_D_minus_H__far",
+     "path": "cells/F_minus_D_minus_H__leaf/far/interchange"
+    },
+    {
+     "circuit": "F_minus_D_minus_H__head",
+     "dataset": "far",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "F_minus_D_minus_H__far",
+     "path": "cells/F_minus_D_minus_H__head/far/interchange"
+    }
+   ],
    "jobs": [
     {
      "job": "D__far",
@@ -18,6 +239,7 @@
       {
        "circuit": "D",
        "dataset": "far",
+       "condition": "deceptive",
        "roles": [
         "faithfulness",
         "knockout"
@@ -69,6 +291,7 @@
       {
        "circuit": "D",
        "dataset": "far_honest",
+       "condition": "honest",
        "roles": [
         "faithfulness",
         "knockout"
@@ -120,6 +343,7 @@
       {
        "circuit": "D",
        "dataset": "far_nopressure",
+       "condition": "nopressure",
        "roles": [
         "faithfulness",
         "knockout"
@@ -153,6 +377,7 @@
       {
        "circuit": "H",
        "dataset": "far",
+       "condition": "deceptive",
        "roles": [
         "faithfulness",
         "knockout"
@@ -204,6 +429,7 @@
       {
        "circuit": "H",
        "dataset": "far_honest",
+       "condition": "honest",
        "roles": [
         "faithfulness",
         "knockout"
@@ -255,6 +481,7 @@
       {
        "circuit": "H",
        "dataset": "far_nopressure",
+       "condition": "nopressure",
        "roles": [
         "faithfulness",
         "knockout"
@@ -288,6 +515,7 @@
       {
        "circuit": "F",
        "dataset": "far",
+       "condition": "deceptive",
        "roles": [
         "faithfulness",
         "knockout"
@@ -321,6 +549,7 @@
       {
        "circuit": "F",
        "dataset": "far_honest",
+       "condition": "honest",
        "roles": [
         "faithfulness",
         "knockout"
@@ -354,6 +583,7 @@
       {
        "circuit": "F",
        "dataset": "far_nopressure",
+       "condition": "nopressure",
        "roles": [
         "faithfulness",
         "knockout"
@@ -387,6 +617,7 @@
       {
        "circuit": "D_minus_F__leaf",
        "dataset": "far",
+       "condition": "deceptive",
        "roles": [
         "delta"
        ]
@@ -394,6 +625,7 @@
       {
        "circuit": "D_minus_F__head",
        "dataset": "far",
+       "condition": "deceptive",
        "roles": [
         "delta"
        ]
@@ -423,6 +655,7 @@
       {
        "circuit": "D_and_F__leaf",
        "dataset": "far",
+       "condition": "deceptive",
        "roles": [
         "delta"
        ]
@@ -430,6 +663,7 @@
       {
        "circuit": "D_and_F__head",
        "dataset": "far",
+       "condition": "deceptive",
        "roles": [
         "delta"
        ]
@@ -459,6 +693,7 @@
       {
        "circuit": "F_minus_D__leaf",
        "dataset": "far",
+       "condition": "deceptive",
        "roles": [
         "delta"
        ]
@@ -466,6 +701,7 @@
       {
        "circuit": "F_minus_D__head",
        "dataset": "far",
+       "condition": "deceptive",
        "roles": [
         "delta"
        ]
@@ -495,6 +731,7 @@
       {
        "circuit": "D_minus_H_minus_F__leaf",
        "dataset": "far",
+       "condition": "deceptive",
        "roles": [
         "delta"
        ]
@@ -502,6 +739,7 @@
       {
        "circuit": "D_minus_H_minus_F__head",
        "dataset": "far",
+       "condition": "deceptive",
        "roles": [
         "delta"
        ]
@@ -531,6 +769,7 @@
       {
        "circuit": "H_minus_D_minus_F__leaf",
        "dataset": "far",
+       "condition": "deceptive",
        "roles": [
         "delta"
        ]
@@ -538,6 +777,7 @@
       {
        "circuit": "H_minus_D_minus_F__head",
        "dataset": "far",
+       "condition": "deceptive",
        "roles": [
         "delta"
        ]
@@ -567,6 +807,7 @@
       {
        "circuit": "F_minus_D_minus_H__leaf",
        "dataset": "far",
+       "condition": "deceptive",
        "roles": [
         "delta"
        ]
@@ -574,6 +815,7 @@
       {
        "circuit": "F_minus_D_minus_H__head",
        "dataset": "far",
+       "condition": "deceptive",
        "roles": [
         "delta"
        ]
@@ -608,6 +850,227 @@
     "F": null
    },
    "allmlp": null,
+   "cells": [
+    {
+     "circuit": "D",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "faithfulness",
+      "knockout"
+     ],
+     "job": "D__sdr",
+     "path": "cells/D/sdr/interchange"
+    },
+    {
+     "circuit": "D",
+     "dataset": "sdr_honest",
+     "condition": "honest",
+     "roles": [
+      "faithfulness",
+      "knockout"
+     ],
+     "job": "D__sdr_honest",
+     "path": "cells/D/sdr_honest/interchange"
+    },
+    {
+     "circuit": "D",
+     "dataset": "sdr_nopressure",
+     "condition": "nopressure",
+     "roles": [
+      "faithfulness",
+      "knockout"
+     ],
+     "job": "D__sdr_nopressure",
+     "path": "cells/D/sdr_nopressure/interchange"
+    },
+    {
+     "circuit": "H",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "faithfulness",
+      "knockout"
+     ],
+     "job": "H__sdr",
+     "path": "cells/H/sdr/interchange"
+    },
+    {
+     "circuit": "H",
+     "dataset": "sdr_honest",
+     "condition": "honest",
+     "roles": [
+      "faithfulness",
+      "knockout"
+     ],
+     "job": "H__sdr_honest",
+     "path": "cells/H/sdr_honest/interchange"
+    },
+    {
+     "circuit": "H",
+     "dataset": "sdr_nopressure",
+     "condition": "nopressure",
+     "roles": [
+      "faithfulness",
+      "knockout"
+     ],
+     "job": "H__sdr_nopressure",
+     "path": "cells/H/sdr_nopressure/interchange"
+    },
+    {
+     "circuit": "F",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "faithfulness",
+      "knockout"
+     ],
+     "job": "F__sdr",
+     "path": "cells/F/sdr/interchange"
+    },
+    {
+     "circuit": "F",
+     "dataset": "sdr_honest",
+     "condition": "honest",
+     "roles": [
+      "faithfulness",
+      "knockout"
+     ],
+     "job": "F__sdr_honest",
+     "path": "cells/F/sdr_honest/interchange"
+    },
+    {
+     "circuit": "F",
+     "dataset": "sdr_nopressure",
+     "condition": "nopressure",
+     "roles": [
+      "faithfulness",
+      "knockout"
+     ],
+     "job": "F__sdr_nopressure",
+     "path": "cells/F/sdr_nopressure/interchange"
+    },
+    {
+     "circuit": "D_minus_F__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "D_minus_F__sdr",
+     "path": "cells/D_minus_F__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "D_minus_F__head",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "D_minus_F__sdr",
+     "path": "cells/D_minus_F__head/sdr/interchange"
+    },
+    {
+     "circuit": "D_and_F__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "D_and_F__sdr",
+     "path": "cells/D_and_F__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "D_and_F__head",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "D_and_F__sdr",
+     "path": "cells/D_and_F__head/sdr/interchange"
+    },
+    {
+     "circuit": "F_minus_D__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "F_minus_D__sdr",
+     "path": "cells/F_minus_D__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "F_minus_D__head",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "F_minus_D__sdr",
+     "path": "cells/F_minus_D__head/sdr/interchange"
+    },
+    {
+     "circuit": "D_minus_H_minus_F__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "D_minus_H_minus_F__sdr",
+     "path": "cells/D_minus_H_minus_F__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "D_minus_H_minus_F__head",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "D_minus_H_minus_F__sdr",
+     "path": "cells/D_minus_H_minus_F__head/sdr/interchange"
+    },
+    {
+     "circuit": "H_minus_D_minus_F__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "H_minus_D_minus_F__sdr",
+     "path": "cells/H_minus_D_minus_F__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "H_minus_D_minus_F__head",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "H_minus_D_minus_F__sdr",
+     "path": "cells/H_minus_D_minus_F__head/sdr/interchange"
+    },
+    {
+     "circuit": "F_minus_D_minus_H__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "F_minus_D_minus_H__sdr",
+     "path": "cells/F_minus_D_minus_H__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "F_minus_D_minus_H__head",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "F_minus_D_minus_H__sdr",
+     "path": "cells/F_minus_D_minus_H__head/sdr/interchange"
+    }
+   ],
    "jobs": [
     {
      "job": "D__sdr",
@@ -615,6 +1078,7 @@
       {
        "circuit": "D",
        "dataset": "sdr",
+       "condition": "deceptive",
        "roles": [
         "faithfulness",
         "knockout"
@@ -666,6 +1130,7 @@
       {
        "circuit": "D",
        "dataset": "sdr_honest",
+       "condition": "honest",
        "roles": [
         "faithfulness",
         "knockout"
@@ -717,6 +1182,7 @@
       {
        "circuit": "D",
        "dataset": "sdr_nopressure",
+       "condition": "nopressure",
        "roles": [
         "faithfulness",
         "knockout"
@@ -750,6 +1216,7 @@
       {
        "circuit": "H",
        "dataset": "sdr",
+       "condition": "deceptive",
        "roles": [
         "faithfulness",
         "knockout"
@@ -801,6 +1268,7 @@
       {
        "circuit": "H",
        "dataset": "sdr_honest",
+       "condition": "honest",
        "roles": [
         "faithfulness",
         "knockout"
@@ -852,6 +1320,7 @@
       {
        "circuit": "H",
        "dataset": "sdr_nopressure",
+       "condition": "nopressure",
        "roles": [
         "faithfulness",
         "knockout"
@@ -885,6 +1354,7 @@
       {
        "circuit": "F",
        "dataset": "sdr",
+       "condition": "deceptive",
        "roles": [
         "faithfulness",
         "knockout"
@@ -918,6 +1388,7 @@
       {
        "circuit": "F",
        "dataset": "sdr_honest",
+       "condition": "honest",
        "roles": [
         "faithfulness",
         "knockout"
@@ -951,6 +1422,7 @@
       {
        "circuit": "F",
        "dataset": "sdr_nopressure",
+       "condition": "nopressure",
        "roles": [
         "faithfulness",
         "knockout"
@@ -984,6 +1456,7 @@
       {
        "circuit": "D_minus_F__leaf",
        "dataset": "sdr",
+       "condition": "deceptive",
        "roles": [
         "delta"
        ]
@@ -991,6 +1464,7 @@
       {
        "circuit": "D_minus_F__head",
        "dataset": "sdr",
+       "condition": "deceptive",
        "roles": [
         "delta"
        ]
@@ -1020,6 +1494,7 @@
       {
        "circuit": "D_and_F__leaf",
        "dataset": "sdr",
+       "condition": "deceptive",
        "roles": [
         "delta"
        ]
@@ -1027,6 +1502,7 @@
       {
        "circuit": "D_and_F__head",
        "dataset": "sdr",
+       "condition": "deceptive",
        "roles": [
         "delta"
        ]
@@ -1056,6 +1532,7 @@
       {
        "circuit": "F_minus_D__leaf",
        "dataset": "sdr",
+       "condition": "deceptive",
        "roles": [
         "delta"
        ]
@@ -1063,6 +1540,7 @@
       {
        "circuit": "F_minus_D__head",
        "dataset": "sdr",
+       "condition": "deceptive",
        "roles": [
         "delta"
        ]
@@ -1092,6 +1570,7 @@
       {
        "circuit": "D_minus_H_minus_F__leaf",
        "dataset": "sdr",
+       "condition": "deceptive",
        "roles": [
         "delta"
        ]
@@ -1099,6 +1578,7 @@
       {
        "circuit": "D_minus_H_minus_F__head",
        "dataset": "sdr",
+       "condition": "deceptive",
        "roles": [
         "delta"
        ]
@@ -1128,6 +1608,7 @@
       {
        "circuit": "H_minus_D_minus_F__leaf",
        "dataset": "sdr",
+       "condition": "deceptive",
        "roles": [
         "delta"
        ]
@@ -1135,6 +1616,7 @@
       {
        "circuit": "H_minus_D_minus_F__head",
        "dataset": "sdr",
+       "condition": "deceptive",
        "roles": [
         "delta"
        ]
@@ -1164,6 +1646,7 @@
       {
        "circuit": "F_minus_D_minus_H__leaf",
        "dataset": "sdr",
+       "condition": "deceptive",
        "roles": [
         "delta"
        ]
@@ -1171,6 +1654,7 @@
       {
        "circuit": "F_minus_D_minus_H__head",
        "dataset": "sdr",
+       "condition": "deceptive",
        "roles": [
         "delta"
        ]
@@ -1205,6 +1689,248 @@
     "F": null
    },
    "allmlp": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/_allmlp_nomb",
+   "cells": [
+    {
+     "circuit": "D",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "faithfulness"
+     ],
+     "job": "D__sdr",
+     "path": "cells/D/sdr/interchange"
+    },
+    {
+     "circuit": "D",
+     "dataset": "sdr_honest",
+     "condition": "honest",
+     "roles": [
+      "faithfulness"
+     ],
+     "job": "D__sdr_honest",
+     "path": "cells/D/sdr_honest/interchange"
+    },
+    {
+     "circuit": "D",
+     "dataset": "sdr_nopressure",
+     "condition": "nopressure",
+     "roles": [
+      "faithfulness"
+     ],
+     "job": "D__sdr_nopressure",
+     "path": "cells/D/sdr_nopressure/interchange"
+    },
+    {
+     "circuit": "H",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "faithfulness"
+     ],
+     "job": "H__sdr",
+     "path": "cells/H/sdr/interchange"
+    },
+    {
+     "circuit": "H",
+     "dataset": "sdr_honest",
+     "condition": "honest",
+     "roles": [
+      "faithfulness"
+     ],
+     "job": "H__sdr_honest",
+     "path": "cells/H/sdr_honest/interchange"
+    },
+    {
+     "circuit": "H",
+     "dataset": "sdr_nopressure",
+     "condition": "nopressure",
+     "roles": [
+      "faithfulness"
+     ],
+     "job": "H__sdr_nopressure",
+     "path": "cells/H/sdr_nopressure/interchange"
+    },
+    {
+     "circuit": "F",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "faithfulness"
+     ],
+     "job": "F__sdr",
+     "path": "cells/F/sdr/interchange"
+    },
+    {
+     "circuit": "F",
+     "dataset": "sdr_honest",
+     "condition": "honest",
+     "roles": [
+      "faithfulness"
+     ],
+     "job": "F__sdr_honest",
+     "path": "cells/F/sdr_honest/interchange"
+    },
+    {
+     "circuit": "F",
+     "dataset": "sdr_nopressure",
+     "condition": "nopressure",
+     "roles": [
+      "faithfulness"
+     ],
+     "job": "F__sdr_nopressure",
+     "path": "cells/F/sdr_nopressure/interchange"
+    },
+    {
+     "circuit": "D_hko__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "knockout"
+     ],
+     "job": "D_hko__sdr",
+     "path": "cells/D_hko__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "D_hko__leaf",
+     "dataset": "sdr_honest",
+     "condition": "honest",
+     "roles": [
+      "knockout"
+     ],
+     "job": "D_hko__sdr_honest",
+     "path": "cells/D_hko__leaf/sdr_honest/interchange"
+    },
+    {
+     "circuit": "D_hko__leaf",
+     "dataset": "sdr_nopressure",
+     "condition": "nopressure",
+     "roles": [
+      "knockout"
+     ],
+     "job": "D_hko__sdr_nopressure",
+     "path": "cells/D_hko__leaf/sdr_nopressure/interchange"
+    },
+    {
+     "circuit": "H_hko__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "knockout"
+     ],
+     "job": "H_hko__sdr",
+     "path": "cells/H_hko__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "H_hko__leaf",
+     "dataset": "sdr_honest",
+     "condition": "honest",
+     "roles": [
+      "knockout"
+     ],
+     "job": "H_hko__sdr_honest",
+     "path": "cells/H_hko__leaf/sdr_honest/interchange"
+    },
+    {
+     "circuit": "H_hko__leaf",
+     "dataset": "sdr_nopressure",
+     "condition": "nopressure",
+     "roles": [
+      "knockout"
+     ],
+     "job": "H_hko__sdr_nopressure",
+     "path": "cells/H_hko__leaf/sdr_nopressure/interchange"
+    },
+    {
+     "circuit": "F_hko__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "knockout"
+     ],
+     "job": "F_hko__sdr",
+     "path": "cells/F_hko__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "F_hko__leaf",
+     "dataset": "sdr_honest",
+     "condition": "honest",
+     "roles": [
+      "knockout"
+     ],
+     "job": "F_hko__sdr_honest",
+     "path": "cells/F_hko__leaf/sdr_honest/interchange"
+    },
+    {
+     "circuit": "F_hko__leaf",
+     "dataset": "sdr_nopressure",
+     "condition": "nopressure",
+     "roles": [
+      "knockout"
+     ],
+     "job": "F_hko__sdr_nopressure",
+     "path": "cells/F_hko__leaf/sdr_nopressure/interchange"
+    },
+    {
+     "circuit": "D_minus_F_hko__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "D_minus_F_hko__sdr",
+     "path": "cells/D_minus_F_hko__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "D_and_F_hko__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "D_and_F_hko__sdr",
+     "path": "cells/D_and_F_hko__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "F_minus_D_hko__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "F_minus_D_hko__sdr",
+     "path": "cells/F_minus_D_hko__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "D_minus_H_minus_F_hko__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "D_minus_H_minus_F_hko__sdr",
+     "path": "cells/D_minus_H_minus_F_hko__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "H_minus_D_minus_F_hko__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "H_minus_D_minus_F_hko__sdr",
+     "path": "cells/H_minus_D_minus_F_hko__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "F_minus_D_minus_H_hko__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "F_minus_D_minus_H_hko__sdr",
+     "path": "cells/F_minus_D_minus_H_hko__leaf/sdr/interchange"
+    }
+   ],
    "jobs": [
     {
      "job": "D__sdr",
@@ -1212,6 +1938,7 @@
       {
        "circuit": "D",
        "dataset": "sdr",
+       "condition": "deceptive",
        "roles": [
         "faithfulness"
        ]
@@ -1260,6 +1987,7 @@
       {
        "circuit": "D",
        "dataset": "sdr_honest",
+       "condition": "honest",
        "roles": [
         "faithfulness"
        ]
@@ -1308,6 +2036,7 @@
       {
        "circuit": "D",
        "dataset": "sdr_nopressure",
+       "condition": "nopressure",
        "roles": [
         "faithfulness"
        ]
@@ -1339,6 +2068,7 @@
       {
        "circuit": "H",
        "dataset": "sdr",
+       "condition": "deceptive",
        "roles": [
         "faithfulness"
        ]
@@ -1387,6 +2117,7 @@
       {
        "circuit": "H",
        "dataset": "sdr_honest",
+       "condition": "honest",
        "roles": [
         "faithfulness"
        ]
@@ -1435,6 +2166,7 @@
       {
        "circuit": "H",
        "dataset": "sdr_nopressure",
+       "condition": "nopressure",
        "roles": [
         "faithfulness"
        ]
@@ -1466,6 +2198,7 @@
       {
        "circuit": "F",
        "dataset": "sdr",
+       "condition": "deceptive",
        "roles": [
         "faithfulness"
        ]
@@ -1497,6 +2230,7 @@
       {
        "circuit": "F",
        "dataset": "sdr_honest",
+       "condition": "honest",
        "roles": [
         "faithfulness"
        ]
@@ -1528,6 +2262,7 @@
       {
        "circuit": "F",
        "dataset": "sdr_nopressure",
+       "condition": "nopressure",
        "roles": [
         "faithfulness"
        ]
@@ -1559,6 +2294,7 @@
       {
        "circuit": "D_hko__leaf",
        "dataset": "sdr",
+       "condition": "deceptive",
        "roles": [
         "knockout"
        ]
@@ -1609,6 +2345,7 @@
       {
        "circuit": "D_hko__leaf",
        "dataset": "sdr_honest",
+       "condition": "honest",
        "roles": [
         "knockout"
        ]
@@ -1659,6 +2396,7 @@
       {
        "circuit": "D_hko__leaf",
        "dataset": "sdr_nopressure",
+       "condition": "nopressure",
        "roles": [
         "knockout"
        ]
@@ -1688,6 +2426,7 @@
       {
        "circuit": "H_hko__leaf",
        "dataset": "sdr",
+       "condition": "deceptive",
        "roles": [
         "knockout"
        ]
@@ -1738,6 +2477,7 @@
       {
        "circuit": "H_hko__leaf",
        "dataset": "sdr_honest",
+       "condition": "honest",
        "roles": [
         "knockout"
        ]
@@ -1788,6 +2528,7 @@
       {
        "circuit": "H_hko__leaf",
        "dataset": "sdr_nopressure",
+       "condition": "nopressure",
        "roles": [
         "knockout"
        ]
@@ -1817,6 +2558,7 @@
       {
        "circuit": "F_hko__leaf",
        "dataset": "sdr",
+       "condition": "deceptive",
        "roles": [
         "knockout"
        ]
@@ -1846,6 +2588,7 @@
       {
        "circuit": "F_hko__leaf",
        "dataset": "sdr_honest",
+       "condition": "honest",
        "roles": [
         "knockout"
        ]
@@ -1875,6 +2618,7 @@
       {
        "circuit": "F_hko__leaf",
        "dataset": "sdr_nopressure",
+       "condition": "nopressure",
        "roles": [
         "knockout"
        ]
@@ -1904,6 +2648,7 @@
       {
        "circuit": "D_minus_F_hko__leaf",
        "dataset": "sdr",
+       "condition": "deceptive",
        "roles": [
         "delta"
        ]
@@ -1933,6 +2678,7 @@
       {
        "circuit": "D_and_F_hko__leaf",
        "dataset": "sdr",
+       "condition": "deceptive",
        "roles": [
         "delta"
        ]
@@ -1962,6 +2708,7 @@
       {
        "circuit": "F_minus_D_hko__leaf",
        "dataset": "sdr",
+       "condition": "deceptive",
        "roles": [
         "delta"
        ]
@@ -1991,6 +2738,7 @@
       {
        "circuit": "D_minus_H_minus_F_hko__leaf",
        "dataset": "sdr",
+       "condition": "deceptive",
        "roles": [
         "delta"
        ]
@@ -2020,6 +2768,7 @@
       {
        "circuit": "H_minus_D_minus_F_hko__leaf",
        "dataset": "sdr",
+       "condition": "deceptive",
        "roles": [
         "delta"
        ]
@@ -2049,6 +2798,7 @@
       {
        "circuit": "F_minus_D_minus_H_hko__leaf",
        "dataset": "sdr",
+       "condition": "deceptive",
        "roles": [
         "delta"
        ]

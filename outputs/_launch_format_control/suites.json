@@ -1,5 +1,6 @@
 {
  "_comment": "The one configuration point of the format-control suites. Set each F to its Format Circuit run directory once ticket 03 lands (expected slugs: outputs/llama-8b-instruct_far/nls0.3_nopressure_noedge_<stamp>, outputs/llama-8b-instruct_sdr/nls0.3_nopressure_noedge_<stamp>, outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_<stamp>), then run `fc_launch.py plan`. D and H are the main checkout's runs (read-only). allmlp is the all-MLP, no-head operand of the coarse heads-only knockout (built by outputs/llama-8b-instruct_sdr_coarse/_launch/submit_headsko.sh).",
+ "_coarse_granularity": "Deliberate deviation from the spec's literal 'coarse at head' (orchestrator ruling 2026-10-13): every coarse knockout and delta cell composes at leaf as (expr) - m, the existing heads-only recipe (submit_headsko.sh). The heads-only runs have no mlp_blocks gate, so head composition ORs the operands' MLP units and keeps all 589,824 of them (the expansion artifact), whereas leaf keeps none and gives the same head sets, because every live head of these masks has all its neurons open. Summaries report these cells at head level.",
  "format-control-far-nls0.3": {
   "family": "fine",
   "task": "far",

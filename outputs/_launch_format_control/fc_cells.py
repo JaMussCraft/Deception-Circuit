@@ -34,7 +34,14 @@ coarse  Heads-only coarse circuits are stored expanded: every MLP unit is open,
         at `leaf`: `head` granularity cannot remove MLPs from circuits that
         have no `mlp_blocks` gate (it ORs the operands' MLP units), and on
         these masks every live head has all its neurons open, so leaf set
-        operations are head set operations.
+        operations are head set operations. This is a deliberate deviation
+        from the spec's literal "coarse at head" (orchestrator ruling,
+        2026-10-13); summaries report these cells at head level.
+
+Every planned cell carries `dataset` (the directory merge_shards.py files it
+under) and `condition` (deceptive / honest / nopressure of its test set); the
+manifest's per-suite `cells` index adds `job` and `path`, so a reader can find
+a cell by (circuit, condition).
 """
 
 from __future__ import annotations
@@ -125,6 +132,12 @@ def plan_suite(suite: str, cfg: dict) -> list:
     ds = {r: dataset_label(task, ROLE_CONDITION[r]) for r in ROLES}
     jobs = []
 
+    def cell(circuit, data_role, roles):
+        """One cell: where it lands (cells/<circuit>/<dataset>/) and the
+        deception condition of its test set."""
+        return {"circuit": circuit, "dataset": ds[data_role],
+                "condition": ROLE_CONDITION[data_role], "roles": roles}
+
     # Atomic circuits on each test set.
     for circ in ROLES:
         for data in ROLES:
@@ -132,13 +145,12 @@ def plan_suite(suite: str, cfg: dict) -> list:
                 jobs.append(_job(
                     suite, cfg, job_id=f"{circ}__{ds[data]}", binds=[circ], exprs=None,
                     granularity=None, task_role=data, evals=FINE_ATOMIC_EVALS,
-                    cells=[{"circuit": circ, "dataset": ds[data],
-                            "roles": ["faithfulness", "knockout"]}]))
+                    cells=[cell(circ, data, ["faithfulness", "knockout"])]))
             else:
                 jobs.append(_job(
                     suite, cfg, job_id=f"{circ}__{ds[data]}", binds=[circ], exprs=None,
                     granularity=None, task_role=data, evals=COARSE_SUFFICIENCY_EVALS,
-                    cells=[{"circuit": circ, "dataset": ds[data], "roles": ["faithfulness"]}]))
+                    cells=[cell(circ, data, ["faithfulness"])]))
     if family == "coarse":
         for circ in ROLES:
             for data in ROLES:
@@ -147,20 +159,18 @@ def plan_suite(suite: str, cfg: dict) -> list:
                     suite, cfg, job_id=f"{label}__{ds[data]}", binds=[circ],
                     exprs=[(label, f"({circ}) - {ALLMLP}")], granularity="leaf",
                     task_role=data, evals=KNOCKOUT_EVALS,
-                    cells=[{"circuit": f"{label}__leaf", "dataset": ds[data],
-                            "roles": ["knockout"]}]))
+                    cells=[cell(f"{label}__leaf", data, ["knockout"])]))
 
     # Deltas on the D test set.
     for label, expr in list(DELTAS) + xor_family():
         binds = _names_in(expr)
         if family == "fine":
             exprs, gran = [(label, expr)], "both"
-            cells = [{"circuit": f"{label}__{g}", "dataset": ds["D"], "roles": ["delta"]}
-                     for g in ("leaf", "head")]
+            cells = [cell(f"{label}__{g}", "D", ["delta"]) for g in ("leaf", "head")]
         else:
             label = f"{label}{HKO}"
             exprs, gran = [(label, f"({expr}) - {ALLMLP}")], "leaf"
-            cells = [{"circuit": f"{label}__leaf", "dataset": ds["D"], "roles": ["delta"]}]
+            cells = [cell(f"{label}__leaf", "D", ["delta"])]
         jobs.append(_job(suite, cfg, job_id=f"{label}__{ds['D']}", binds=binds, exprs=exprs,
                          granularity=gran, task_role="D", evals=KNOCKOUT_EVALS, cells=cells))
     return jobs

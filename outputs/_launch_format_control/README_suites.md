@@ -69,7 +69,13 @@ generations, eval 2 variant rows).
   `head`, none at `leaf`, with identical head counts 69, 43, 26). Every live
   head of these masks has all its neurons open, so leaf set operations are
   head set operations. Same recipe as `llama-8b-instruct_sdr_coarse/_launch/
-  submit_headsko.sh` and `submit_composed.sh`.
+  submit_headsko.sh` and `submit_composed.sh`. This is a deliberate deviation
+  from the spec's literal "coarse at head" (orchestrator ruling 2026-10-13);
+  summaries report these cells at head level.
+
+`suite_manifest.json` has a per-suite `cells` index (circuit, dataset,
+condition, roles, job, path) so a reader finds a cell by (circuit, test-set
+condition).
 
 ## Task labels and the merge
 

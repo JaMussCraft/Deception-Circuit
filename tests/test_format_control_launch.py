@@ -69,6 +69,7 @@ def test_fine_atomic_cell_is_faithfulness_and_knockout_in_one_job(fc):
     jobs = by_id(fc.plan_suite("format-control-far-nls0.3", FINE))
     job = jobs["H__far_nopressure"]
     assert job["cells"] == [{"circuit": "H", "dataset": "far_nopressure",
+                             "condition": "nopressure",
                              "roles": ["faithfulness", "knockout"]}]
     assert fc.job_args(job) == [
         "--circuit", "H=/r/far_H", "--task-from", "/r/far_F",
@@ -90,8 +91,10 @@ def test_fine_delta_is_a_knockout_cell_on_the_d_test_set_at_both_granularities(
     job = by_id(fc.plan_suite("format-control-far-nls0.3", FINE))[job_id]
     label = expr.split("=")[0]
     assert job["cells"] == [
-        {"circuit": f"{label}__leaf", "dataset": "far", "roles": ["delta"]},
-        {"circuit": f"{label}__head", "dataset": "far", "roles": ["delta"]}]
+        {"circuit": f"{label}__leaf", "dataset": "far", "condition": "deceptive",
+         "roles": ["delta"]},
+        {"circuit": f"{label}__head", "dataset": "far", "condition": "deceptive",
+         "roles": ["delta"]}]
     runs = {"D": "/r/far_D", "H": "/r/far_H", "F": "/r/far_F"}
     bind_args = [a for n in binds for a in ("--circuit", f"{n}={runs[n]}")]
     assert fc.job_args(job) == [
@@ -114,7 +117,7 @@ def test_coarse_suite_splits_sufficiency_from_heads_only_knockout(fc):
     # Sufficiency on the atomic (expanded) circuit, no knockout: knocking out
     # an expanded coarse mask removes every MLP.
     job = jobs["F__sdr_honest"]
-    assert job["cells"] == [{"circuit": "F", "dataset": "sdr_honest",
+    assert job["cells"] == [{"circuit": "F", "dataset": "sdr_honest", "condition": "honest",
                              "roles": ["faithfulness"]}]
     assert fc.job_args(job) == [
         "--circuit", "F=/r/c_F", "--task-from", "/r/c_H",
@@ -137,8 +140,10 @@ def test_every_coarse_knockout_is_rewritten_as_c_minus_m(fc, job_id, binds, expr
     label = expr.split("=")[0]
     dataset = job_id.split("__")[1]
     role = "knockout" if job_id.startswith("D_hko") else "delta"
+    condition = {"sdr": "deceptive", "sdr_honest": "honest",
+                 "sdr_nopressure": "nopressure"}[dataset]
     assert job["cells"] == [{"circuit": f"{label}__leaf", "dataset": dataset,
-                             "roles": [role]}]
+                             "condition": condition, "roles": [role]}]
     runs = {"D": "/r/c_D", "H": "/r/c_H", "F": "/r/c_F"}
     bind_args = [a for n in binds for a in ("--circuit", f"{n}={runs[n]}")]
     task_from = {"sdr": "/r/c_D", "sdr_honest": "/r/c_H", "sdr_nopressure": "/r/c_F"}[dataset]
@@ -324,6 +329,22 @@ CONFIG = {
                                          "runs": {"D": "/r/c_D", "H": "/r/c_H", "F": None},
                                          "allmlp": "/r/_allmlp_nomb"},
 }
+
+
+def test_the_manifest_maps_every_cell_to_its_circuit_and_test_set_condition(launch):
+    """Ticket 05's writer finds cells by (circuit, dataset condition): the
+    manifest says where each lands under cells/ and which condition that is."""
+    manifest = launch.build_manifest(CONFIG)
+    index = manifest["suites"]["format-control-far-nls0.3"]["cells"]
+    rows = {(r["circuit"], r["condition"]): r for r in index}
+    assert rows[("D", "honest")]["path"] == "cells/D/far_honest/interchange"
+    assert rows[("F", "nopressure")]["job"] == "F__far_nopressure"
+    assert rows[("D_and_F__head", "deceptive")]["path"] == "cells/D_and_F__head/far/interchange"
+    assert len(rows) == len(index) == 21
+    coarse = {(r["circuit"], r["condition"]): r
+              for r in manifest["suites"]["format-control-sdr-coarse-nls0.3"]["cells"]}
+    assert coarse[("H_hko__leaf", "nopressure")]["path"] == "cells/H_hko__leaf/sdr_nopressure/interchange"
+    assert coarse[("H_hko__leaf", "nopressure")]["roles"] == ["knockout"]
 
 
 def test_the_manifest_lists_every_cell_and_keeps_recorded_job_ids(launch):

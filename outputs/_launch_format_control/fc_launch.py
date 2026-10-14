@@ -83,8 +83,13 @@ def build_manifest(config: dict, previous: dict = None, dryruns: dict = None) ->
                 "dryrun": dr or {"log": None, "passed": None, "estimate_min": None},
                 "slurm": old.get("slurm") or {"job_id": None},
             })
+        # Flat index for readers (ticket 05's summary writer): find a cell by
+        # (circuit label, test-set condition) and read it at `path` under the
+        # suite root, which is where merge_shards.py files it.
+        cells = [dict(c, job=j["job"], path=f"cells/{c['circuit']}/{c['dataset']}/interchange")
+                 for j in jobs for c in j["cells"]]
         suites[sname] = {"family": cfg["family"], "task": cfg["task"], "runs": cfg["runs"],
-                         "allmlp": cfg.get("allmlp"), "jobs": jobs}
+                         "allmlp": cfg.get("allmlp"), "cells": cells, "jobs": jobs}
     return {"created": time.strftime("%Y-%m-%dT%H:%M:%S"),
             "config": os.path.join(LAUNCH_REL, "suites.json"), "suites": suites}
 
