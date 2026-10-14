@@ -26,7 +26,7 @@ generations, eval 2 variant rows).
 | `merge_shards.py` | the cross-task rerun's merge, filing cells by test set (see below) |
 | `flip_audit_analysis.py` | the cross-task rerun's flip audit with the positional-default check; `is_delta` reads operands |
 | `overlap.py` | Jaccard over heads and pooled fine units for D/H, D/F, H/F |
-| `postprocess.sh` | merge, flip audit, overlap, placeholder summary for one suite |
+| `postprocess.sh` | merge, flip audit, overlap, then `write_format_control_summary.py` (ticket 05: summary and verdict) for one suite |
 | `README_suites.md` | this file (named apart from ticket 03's launcher files in the same directory) |
 | `dryrun/<suite>/<job>.log` | login-node `--dry-run` logs of the real jobs |
 | `dryrun_standin/<suite>/<job>.log` | plumbing-only dry-runs with F := H, before the Format Circuits exist |
