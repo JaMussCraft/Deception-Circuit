@@ -1,0 +1,86 @@
+{
+  "task": "sdr",
+  "mechanism": "omission",
+  "condition": "nopressure",
+  "model": "meta-llama/Llama-3.1-8B-Instruct",
+  "margin_thresh": 0.3,
+  "prior_eps": 0.5,
+  "max_seq_length": 128,
+  "designation_words": [
+    "damaging",
+    "harmless"
+  ],
+  "template_variants": [
+    "audit",
+    "lab"
+  ],
+  "n_entities": 72,
+  "n_item_pairs": 41,
+  "n_pressures": 25,
+  "match_length_distribution": false,
+  "overgen_factor": 140,
+  "seed": 42,
+  "train_samples": 200,
+  "val_samples": 200,
+  "test_samples": 1000,
+  "filtered": true,
+  "created": "2026-10-13",
+  "met_minimums": false,
+  "thresholds": [
+    0.7,
+    0.5,
+    0.3
+  ],
+  "thresholds_tried": [
+    {
+      "threshold": 0.7,
+      "survivors": {
+        "train": 90,
+        "validation": 87,
+        "test": 470
+      },
+      "meets_minimums": false
+    },
+    {
+      "threshold": 0.5,
+      "survivors": {
+        "train": 101,
+        "validation": 92,
+        "test": 500
+      },
+      "meets_minimums": false
+    },
+    {
+      "threshold": 0.3,
+      "survivors": {
+        "train": 106,
+        "validation": 96,
+        "test": 520
+      },
+      "meets_minimums": false
+    }
+  ],
+  "min_train": 150,
+  "min_validation": 150,
+  "min_test": 500,
+  "source_counts": {
+    "train": {
+      "deceptive_split": 106,
+      "honest_split": 44
+    },
+    "validation": {
+      "deceptive_split": 96,
+      "honest_split": 54
+    },
+    "test": {
+      "deceptive_split": 520,
+      "honest_split": 0
+    }
+  },
+  "source_datasets": {
+    "deceptive_split": "data/datasets/sdr",
+    "honest_split": "data/datasets/sdr_honest"
+  },
+  "derivation": "stored prompts with the stored Pressure Clause deleted by clause surgery (dataset/clause_surgery.py); deceptive-split labels swapped to honest; pressure_id kept for provenance",
+  "prior_margin_note": "prior_margin is carried over from the source build (measured on the with-pressure neutral prompt); clean_margin / corrupt_margin are this build's, under the honest labels"
+}
