@@ -1,0 +1,53 @@
+{
+  "paired_run": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+  "format_run": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr/nls0.3_nopressure_noedge_261013-204850",
+  "paired_source": "active_nodes.json",
+  "format_source": "active_nodes.json",
+  "paired_counts": {
+    "attention_blocks": 13,
+    "mlp_blocks": 3,
+    "heads": 68,
+    "attention_neurons": 4527,
+    "mlp_hidden": 4498,
+    "mlp_output": 2226,
+    "fine_units": 11251
+  },
+  "format_counts": {
+    "attention_blocks": 14,
+    "mlp_blocks": 3,
+    "heads": 73,
+    "attention_neurons": 5326,
+    "mlp_hidden": 4433,
+    "mlp_output": 2123,
+    "fine_units": 11882
+  },
+  "compared": [
+    "heads",
+    "fine_units"
+  ],
+  "gaps": {
+    "heads": 0.07352941176470588,
+    "fine_units": 0.056083903653008624
+  },
+  "out_of_tolerance": [],
+  "tol": 0.25,
+  "step": 0.1,
+  "paired_nls": 0.3,
+  "format_nls": 0.3,
+  "retuned": false,
+  "verdict": "within_tolerance",
+  "next_nls": null,
+  "note": null,
+  "in_run_gate": {
+    "accuracy": 0.9615384615384616,
+    "exact_match": 0.9615384615384616,
+    "kl_div": 0.12671561883046076,
+    "misses": [],
+    "passes": true,
+    "thresholds": {
+      "accuracy": ">= 0.9",
+      "exact_match": ">= 0.9",
+      "kl_div": "<= 0.2"
+    }
+  }
+}
