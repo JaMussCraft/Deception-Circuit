@@ -270,6 +270,15 @@ def test_dry_run_prints_one_sbatch_line_per_format_circuit_with_the_paired_setti
         assert flag not in far and flag not in sdr
 
 
+def test_training_never_lands_on_the_40_gb_a100_partitions():
+    # Jobs 22879581 / 22879582 hit torch.OutOfMemoryError on gpuA100x8 (39.49 GiB);
+    # node pruning needs about 40 GB, so only the 48 GB A40 and 141 GB H200 qualify.
+    for line in _dry():
+        partitions = re.search(r"--partition=(\S+)", line).group(1).split(",")
+        assert partitions and not any(p.startswith("gpuA100") for p in partitions), line
+        assert "--export=ALL,PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True" in line
+
+
 def test_dry_run_of_a_retune_submits_only_the_named_circuit_at_the_stepped_nls():
     lines = _dry("--only", "sdr_coarse", "--nls", "0.4")
     (line,) = lines

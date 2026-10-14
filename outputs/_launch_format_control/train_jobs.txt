@@ -1,3 +1,6 @@
 far 0.3 outputs/llama-8b-instruct_far/nls0.3_nopressure_noedge_261013-203424 22879579 beto-delta-gpu gpuA40x4,gpuA100x4,gpuA100x8,gpuH200x8 2026-10-13T20:34:25
 sdr 0.3 outputs/llama-8b-instruct_sdr/nls0.3_nopressure_noedge_261013-203424 22879581 beto-delta-gpu gpuA40x4,gpuA100x4,gpuA100x8,gpuH200x8 2026-10-13T20:34:25
 sdr_coarse 0.3 outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-203424 22879582 beto-delta-gpu gpuA40x4,gpuA100x4,gpuA100x8,gpuH200x8 2026-10-13T20:34:25
+sdr 0.3 outputs/llama-8b-instruct_sdr/nls0.3_nopressure_noedge_261013-204850 22879743 beto-delta-gpu gpuA40x4,gpuH200x8 2026-10-13T20:48:50
+# 22879581 and 22879582 FAILED after 2 min on gpuA100x8 (gpuc02): torch.OutOfMemoryError, 39.49 GiB cards; resubmitted as 22879743 / 22879744 on gpuA40x4,gpuH200x8 only
+sdr_coarse 0.3 outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850 22879744 beto-delta-gpu gpuA40x4,gpuH200x8 2026-10-13T20:48:50

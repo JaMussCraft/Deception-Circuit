@@ -38,7 +38,11 @@ MODE=submit
 ONLY="far sdr sdr_coarse"
 NLS=0.3
 ACCOUNT=beto-delta-gpu
-PARTITION=gpuA40x4,gpuA100x4,gpuA100x8,gpuH200x8
+# 48 GB A40 and 141 GB H200 only. The A100 partitions have 39.49 GiB cards and
+# node pruning needs about 40 GB: jobs 22879581 / 22879582 died with
+# torch.OutOfMemoryError on gpuA100x8 (gpuc02) after 2 min. A --partition naming
+# an A100 partition is refused below.
+PARTITION=gpuA40x4,gpuH200x8
 TIME=05:00:00
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -53,6 +57,12 @@ while [ $# -gt 0 ]; do
   esac
   shift
 done
+case ",$PARTITION," in
+  *,gpuA100*) echo "refusing --partition $PARTITION: A100 cards (39.49 GiB) run out of memory in node pruning" >&2; exit 2 ;;
+esac
+# Fragmentation headroom suggested by the OOM message; the sbatch wrapper's
+# environment passes through with --export=ALL.
+EXPORT=ALL,PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
 PAIRED="--deception-condition nopressure --no-edge-pruning --seed 42 --node-epochs 500
         --lr 0.03 --batch-size 7 --max-seq-length 120 --train-samples 200 --val-samples 200
@@ -70,7 +80,7 @@ for circuit in $ONLY; do
     *) echo "unknown circuit: $circuit (far, sdr, sdr_coarse)" >&2; exit 2 ;;
   esac
   out="$root/nls${NLS}_nopressure_${slug}_${STAMP}"
-  cmd=(sbatch --account="$ACCOUNT" --partition="$PARTITION" --time="$TIME" --job-name="fc-${circuit}-${NLS}"
+  cmd=(sbatch --account="$ACCOUNT" --partition="$PARTITION" --time="$TIME" --export="$EXPORT" --job-name="fc-${circuit}-${NLS}"
        scripts/train_deception.sbatch "$task" --node-lambda-sparsity "$NLS" $PAIRED $extra --output-dir "$out")
   case "$MODE" in
     dry)  echo "${cmd[*]}" ;;
