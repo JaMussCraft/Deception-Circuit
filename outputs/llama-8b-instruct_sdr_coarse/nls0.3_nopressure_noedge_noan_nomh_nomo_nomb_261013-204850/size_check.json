@@ -1,0 +1,41 @@
+{
+  "paired_run": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+  "format_run": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+  "paired_source": "active_nodes.coarse.json",
+  "format_source": "active_nodes.coarse.json",
+  "paired_counts": {
+    "attention_blocks": 12,
+    "heads": 69
+  },
+  "format_counts": {
+    "attention_blocks": 12,
+    "heads": 68
+  },
+  "compared": [
+    "heads"
+  ],
+  "gaps": {
+    "heads": -0.014492753623188406
+  },
+  "out_of_tolerance": [],
+  "tol": 0.25,
+  "step": 0.1,
+  "paired_nls": 0.3,
+  "format_nls": 0.3,
+  "retuned": false,
+  "verdict": "within_tolerance",
+  "next_nls": null,
+  "note": null,
+  "in_run_gate": {
+    "accuracy": 0.9653846153846154,
+    "exact_match": 0.9673076923076923,
+    "kl_div": 0.10201551364018367,
+    "misses": [],
+    "passes": true,
+    "thresholds": {
+      "accuracy": ">= 0.9",
+      "exact_match": ">= 0.9",
+      "kl_div": "<= 0.2"
+    }
+  }
+}
