@@ -40,8 +40,9 @@ NLS=0.3
 ACCOUNT=beto-delta-gpu
 # 48 GB A40 and 141 GB H200 only. The A100 partitions have 39.49 GiB cards and
 # node pruning needs about 40 GB: jobs 22879581 / 22879582 died with
-# torch.OutOfMemoryError on gpuA100x8 (gpuc02) after 2 min. A --partition naming
-# an A100 partition is refused below.
+# torch.OutOfMemoryError on gpuA100x8 (gpuc02) after 2 min. --partition accepts
+# only a comma-separated subset of this allowlist; anything else is refused below.
+ALLOWED_PARTITIONS="gpuA40x4 gpuH200x8"
 PARTITION=gpuA40x4,gpuH200x8
 TIME=05:00:00
 while [ $# -gt 0 ]; do
@@ -57,9 +58,20 @@ while [ $# -gt 0 ]; do
   esac
   shift
 done
-case ",$PARTITION," in
-  *,gpuA100*) echo "refusing --partition $PARTITION: A100 cards (39.49 GiB) run out of memory in node pruning" >&2; exit 2 ;;
-esac
+[ -n "${PARTITION//,/}" ] || { echo "refusing --partition '$PARTITION': empty (choose from $ALLOWED_PARTITIONS)" >&2; exit 2; }
+for p in ${PARTITION//,/ }; do
+  case " $ALLOWED_PARTITIONS " in
+    *" $p "*) ;;
+    *) echo "refusing --partition $PARTITION: $p is not one of $ALLOWED_PARTITIONS" \
+            "(node pruning needs about 40 GB; the A100 cards have 39.49 GiB)" >&2; exit 2 ;;
+  esac
+done
+for circuit in $ONLY; do
+  case "$circuit" in
+    far|sdr|sdr_coarse) ;;
+    *) echo "unknown circuit: $circuit (far, sdr, sdr_coarse)" >&2; exit 2 ;;
+  esac
+done
 # Fragmentation headroom suggested by the OOM message; the sbatch wrapper's
 # environment passes through with --export=ALL.
 EXPORT=ALL,PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True

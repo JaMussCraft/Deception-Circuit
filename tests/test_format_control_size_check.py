@@ -279,6 +279,32 @@ def test_training_never_lands_on_the_40_gb_a100_partitions():
         assert "--export=ALL,PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True" in line
 
 
+@pytest.mark.parametrize("partition", [
+    "gpuA100x4", "gpuA100x8", "gpuA40x4,gpuA100x8", "gpuMI100x8", "gpuA40x4,gpuH200x8,cpu",
+    "", ",",
+])
+def test_launcher_refuses_any_partition_outside_the_a40_h200_allowlist(partition):
+    proc = subprocess.run(["bash", SUBMIT, "--dry", "--partition", partition],
+                          capture_output=True, text=True, timeout=60)
+    assert proc.returncode == 2
+    assert "refusing --partition" in proc.stderr
+    assert "sbatch " not in proc.stdout
+
+
+@pytest.mark.parametrize("partition", ["gpuA40x4", "gpuH200x8", "gpuH200x8,gpuA40x4"])
+def test_launcher_accepts_any_subset_of_the_allowlist(partition):
+    lines = _dry("--partition", partition)
+    assert len(lines) == 3
+    assert all(f"--partition={partition} " in line for line in lines)
+
+
+def test_launcher_rejects_an_unknown_circuit_before_printing_any_line():
+    proc = subprocess.run(["bash", SUBMIT, "--dry", "--only", "far bogus"],
+                          capture_output=True, text=True, timeout=60)
+    assert proc.returncode == 2
+    assert "sbatch " not in proc.stdout
+
+
 def test_dry_run_of_a_retune_submits_only_the_named_circuit_at_the_stepped_nls():
     lines = _dry("--only", "sdr_coarse", "--nls", "0.4")
     (line,) = lines
