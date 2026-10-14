@@ -278,6 +278,24 @@ def test_format_knockout_above_the_kl_gate_is_verdict_c_even_when_otherwise_a(tm
     assert "retrain the Format Circuit at a lower NLS" in md
 
 
+UNREGISTERED = "not pre-registered; orchestrator choice 2026-10-13, researcher to confirm"
+
+
+def test_rule_choices_that_were_not_pre_registered_are_labelled_as_such(tmp_path):
+    root, data = make_suite(tmp_path)
+    md, decision = run(root, data)
+    for key in ("c_before_a", "distinct2"):
+        assert UNREGISTERED in decision["decisions_taken"][key], key
+    assert UNREGISTERED in decision["gate"]["distinct2_frac_status"]
+    assert UNREGISTERED in decision["rule_order"][0]
+    decided = md.split("## Decisions taken in applying the rule", 1)[1].split("##", 1)[0]
+    assert decided.count(UNREGISTERED) == 2
+    gate_line = next(ln for ln in md.splitlines() if ln.startswith("(c) gate on F's knockout"))
+    assert UNREGISTERED in gate_line
+    order_line = next(ln for ln in md.splitlines() if ln.startswith("Rule order:"))
+    assert UNREGISTERED in order_line
+
+
 def test_degenerate_format_generations_are_verdict_c(tmp_path):
     root, data = make_suite(tmp_path, over={"gen": {"F": "the the the the the the the the"}})
     _, decision = run(root, data)
