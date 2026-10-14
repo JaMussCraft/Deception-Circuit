@@ -53,6 +53,8 @@ def _ko_block(full, ko, null):
 
 
 def _gens(knockout_text):
+    if knockout_text is None:
+        return {"skipped": "--skip-wikitext was passed, so there are no prompts to continue"}
     full = "the film was released in the summer and earned praise from critics for its score"
     return {"examples": [{"index": i, "continuations": {"full": full + f" {i}",
                                                         "knockout": knockout_text + f" {i}"}}
@@ -234,8 +236,11 @@ def test_honest_answer_drop_on_d_data_follows_the_deceptive_label_convention(tmp
     assert rows["H test set"] == pytest.approx(0.95 - 0.50)       # honest labels
     assert list(rows) == ["honest_instruction (D data)", "no_pressure (D data)",
                           "H test set", "F test set"]
-    rule_rows = [r["row"] for r in decision["conditions"][1]["rows"]]
-    assert rule_rows == list(rows)
+    # Default mode `variants`: only the spec's eval 2 variant rows enter the rule.
+    cond = decision["conditions"][1]
+    assert [r["row"] for r in cond["rows"]] == ["honest_instruction (D data)",
+                                                 "no_pressure (D data)"]
+    assert [r["row"] for r in cond["informational_rows"]] == ["H test set", "F test set"]
 
 
 def test_weaker_format_knockout_is_verdict_b(tmp_path):
@@ -248,15 +253,43 @@ def test_weaker_format_knockout_is_verdict_b(tmp_path):
     assert "Deception-specific machinery exists" in md
 
 
-def test_larger_honest_answer_drop_on_one_row_is_verdict_b(tmp_path):
-    # F's knockout hurts honest answering on the H test set more than D's (0.55 > 0.45).
+RULING = "orchestrator ruling 2026-10-13: spec rows only; researcher may flip"
+
+
+def test_honest_rows_modes_disagree_when_only_a_test_set_row_fails(tmp_path):
+    # F's knockout hurts honest answering on the H test set more than D's (0.55 > 0.45),
+    # while F <= D on both eval 2 variant rows. `variants` (default, the spec's rows)
+    # gives (a); `all` adds the H and F test sets to the rule and gives (b).
     root, data = make_suite(tmp_path, over={"ko": {"F": {"_honest": 0.40}}})
-    _, decision = run(root, data)
-    cond = {c["name"]: c for c in decision["conditions"]}
-    rows = {r["row"]: r["passed"] for r in cond["honest-answer drop"]["rows"]}
-    assert rows == {"honest_instruction (D data)": True, "no_pressure (D data)": True,
-                    "H test set": False, "F test set": True}
-    assert decision["verdict"] == "b"
+    md, decision = run(root, data)
+    assert decision["honest_rows_mode"] == "variants"
+    assert decision["verdict"] == "a"
+    cond = {c["name"]: c for c in decision["conditions"]}["honest-answer drop"]
+    assert {r["row"]: r["passed"] for r in cond["rows"]} == {
+        "honest_instruction (D data)": True, "no_pressure (D data)": True}
+    assert {r["row"]: r["passed"] for r in cond["informational_rows"]} == {
+        "H test set": False, "F test set": True}
+    assert "honest-answer rows: `variants`" in md and RULING in md
+    assert any("in-distribution for F; not in the rule" in c for c in decision["caveats"])
+    informational = [ln for ln in md.splitlines() if "H test set" in ln and "F <= D" in ln]
+    assert informational and "informational" in informational[0]
+
+    md_all, decision_all = run(root, data, honest_rows="all")
+    assert decision_all["honest_rows_mode"] == "all"
+    assert decision_all["verdict"] == "b"
+    cond = {c["name"]: c for c in decision_all["conditions"]}["honest-answer drop"]
+    assert {r["row"]: r["passed"] for r in cond["rows"]} == {
+        "honest_instruction (D data)": True, "no_pressure (D data)": True,
+        "H test set": False, "F test set": True}
+    assert cond["informational_rows"] == []
+    assert "honest-answer rows: `all`" in md_all
+    assert not any("not in the rule" in c for c in decision_all["caveats"])
+
+
+def test_honest_rows_mode_is_rejected_when_unknown(tmp_path):
+    root, data = make_suite(tmp_path)
+    with pytest.raises(ValueError):
+        run(root, data, honest_rows="some")
 
 
 def test_format_knockout_inside_its_null_is_verdict_b(tmp_path):
@@ -344,14 +377,26 @@ def test_80_percent_boundary_through_the_suite(tmp_path):
 # ==============================================================================
 
 def test_missing_rule_cell_is_reported_and_leaves_the_verdict_undecided(tmp_path):
+    # Under `all`, the F x far_honest cell is a rule input (the H test set row).
     root, data = make_suite(tmp_path, skip_cells=("F/far_honest",))
-    md, decision = run(root, data)
+    md, decision = run(root, data, honest_rows="all")
     assert decision["verdict"] is None
     assert "cell F x far_honest (knockout)" in decision["missing"]
     assert any("H test set" in m for m in decision["missing_inputs"])
     section = md.split("## Missing", 1)[1]
     assert "F x far_honest" in section
     assert "**Verdict: undecided.**" in md
+    # Under the default `variants`, the same cell is informational only.
+    _, decision_v = run(root, data)
+    assert decision_v["verdict"] == "a"
+    assert "cell F x far_honest (knockout)" in decision_v["missing"]
+
+
+def test_missing_d_data_knockout_leaves_the_verdict_undecided(tmp_path):
+    root, data = make_suite(tmp_path, skip_cells=("F/far",))
+    _, decision = run(root, data)
+    assert decision["verdict"] is None
+    assert "F deception drop" in decision["missing_inputs"]
 
 
 def test_missing_delta_cell_is_reported_but_the_verdict_still_stands(tmp_path):
@@ -377,15 +422,41 @@ def test_failed_condition_decides_b_even_when_another_input_is_missing(tmp_path)
     # already impossible, so the verdict is (b) with the missing input still listed.
     root, data = make_suite(tmp_path, over={"ko": {"F": {"": 0.60}}},
                             skip_cells=("F/far_honest",))
-    _, decision = run(root, data)
+    _, decision = run(root, data, honest_rows="all")
     assert decision["verdict"] == "b"
     assert any("H test set" in m for m in decision["missing_inputs"])
 
 
 def test_kl_gate_still_decides_c_when_other_inputs_are_missing(tmp_path):
     root, data = make_suite(tmp_path, over={"kl": {"F": 0.9}}, skip_cells=("D/far_honest",))
-    _, decision = run(root, data)
+    _, decision = run(root, data, honest_rows="all")
     assert decision["verdict"] == "c"
+
+
+def test_unassessed_kl_gate_leaves_the_verdict_undecided(tmp_path):
+    # With eval 5 given, collateral is the ref-NLL rise, so F's missing wikitext KL used
+    # to touch only the gate; an (a) must not be issued with the gate unassessed.
+    root, data = make_suite(tmp_path, over={"kl": {"F": None}})
+    _, decision = run(root, data, eval5_dirs=[make_eval5(tmp_path)])
+    assert decision["gate"]["kl_fails"] is None
+    assert decision["verdict"] is None
+    assert "F wikitext KL" in decision["missing_inputs"]
+
+
+def test_unassessed_distinct2_leaves_the_verdict_undecided(tmp_path):
+    root, data = make_suite(tmp_path, over={"gen": {"F": None}})       # no generations
+    md, decision = run(root, data)
+    assert decision["gate"]["degenerate"] is None
+    assert decision["verdict"] is None
+    assert any(m.startswith("F distinct-2") for m in decision["missing_inputs"])
+    assert "**Verdict: undecided.**" in md
+
+
+def test_unassessed_gate_is_undecided_even_when_a_condition_fails(tmp_path):
+    # (c) pre-empts (b) as well as (a), so an unassessed gate cannot give (b) either.
+    root, data = make_suite(tmp_path, over={"gen": {"F": None}, "ko": {"F": {"": 0.60}}})
+    _, decision = run(root, data)
+    assert decision["verdict"] is None
 
 
 # ==============================================================================
@@ -406,7 +477,9 @@ def test_unpaired_far_format_data_is_flagged_from_source_counts(tmp_path):
     md, decision = run(root, data)
     assert decision["pairing"]["paired"] is False
     assert decision["pairing"]["test_honest_share"] == pytest.approx(492 / 500)
-    assert any(c.startswith("F trained on 99% honest-split instances") for c in decision["caveats"])
+    assert decision["pairing"]["train_honest_share"] == pytest.approx(149 / 150)
+    assert ("F trained on 99% honest-split instances (train 149/150); validation 100% "
+            "(150/150), test 98% (492/500)") in " ".join(decision["caveats"])
     assert "NOT paired: 98% honest-split instances" in md
     assert "unpaired (disjoint instances)" in md
 
@@ -420,7 +493,11 @@ def test_paired_sdr_format_data_is_flagged_from_source_counts(tmp_path):
     assert decision["pairing"]["paired"] is True
     assert "paired with D data by instance" in md
     assert not any("NOT instance-paired" in c for c in decision["caveats"])
-    assert any(c.startswith("F trained on 12% honest-split") for c in decision["caveats"])
+    # The share is the TRAIN split's (44/150 = 29%), not all splits pooled (98/820 = 12%).
+    assert decision["pairing"]["train_honest_share"] == pytest.approx(44 / 150)
+    assert ("F trained on 29% honest-split instances (train 44/150); validation 36% "
+            "(54/150), test 0% (0/520)") in " ".join(decision["caveats"])
+    assert not any("12%" in c for c in decision["caveats"])
 
 
 def test_conditions_are_read_from_each_run(tmp_path):
@@ -662,7 +739,8 @@ def test_cli_writes_both_files(tmp_path):
     e5 = make_eval5(tmp_path)
     manifest = make_manifest(tmp_path, root)
     out = subprocess.run([sys.executable, os.path.join(REPO, "write_format_control_summary.py"),
-                          root, "--data-dir", data, "--eval5-dir", e5, "--manifest", manifest],
+                          root, "--data-dir", data, "--eval5-dir", e5, "--manifest", manifest,
+                          "--honest-rows", "all"],
                          cwd=REPO, capture_output=True, text=True, timeout=120)
     assert out.returncode == 0, out.stderr
     assert "verdict (a)" in out.stdout
@@ -670,4 +748,5 @@ def test_cli_writes_both_files(tmp_path):
         d = json.load(f)
     assert d["evaluated_on"] == "eval 2 + eval 5"
     assert d["manifest_indexed"] is True
+    assert d["honest_rows_mode"] == "all"
     assert os.path.exists(os.path.join(root, "evaluation_summary.md"))

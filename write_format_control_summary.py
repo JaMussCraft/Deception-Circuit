@@ -43,6 +43,10 @@ def build_parser():
                    help="ticket 04's suite manifest; its per-suite cells index gives each "
                         "cell's path and dataset condition (default: %(default)s when it "
                         "exists; pass '' to read the default layout)")
+    p.add_argument("--honest-rows", choices=fcs.HONEST_ROWS_MODES, default="variants",
+                   help="honest-answer rows in the rule: 'variants' (default; the spec's eval 2 "
+                        "no_pressure and honest_instruction rows) or 'all' (adds the H and F "
+                        "test sets, where F's knockout is in-distribution)")
     p.add_argument("--family", choices=("fine", "coarse"), default=None,
                    help="override the family inferred from the suite name and cells")
     p.add_argument("--task", default=None,
@@ -59,7 +63,8 @@ def main(argv=None):
         manifest = None
     md, js = fcs.write_summary(args.suite_root, data_dir=args.data_dir,
                                eval5_dirs=args.eval5_dir, family=args.family, task=args.task,
-                               manifest=manifest or None, out_md=args.out,
+                               manifest=manifest or None, honest_rows=args.honest_rows,
+                               out_md=args.out,
                                out_json=args.decision_out)
     with open(js) as f:
         d = json.load(f)
