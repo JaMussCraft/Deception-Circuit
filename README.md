@@ -411,7 +411,9 @@ about 11 minutes, each position-agnostic path-patching grid over 100 instances
 and the whole `--path-counterfactual both` job with the Segment pass and the
 sweep 40 minutes (ticket 14). The sweep runs on the grid's own causal sample
 (`--n-causal`, 100 by default), so its columns and the grid's cover one
-instance set.
+instance set. It flags Components outside the circuit at
+`--path-sweep-threshold`, default 0.05 of the gap, which does not follow
+`--path-position-threshold` (that one is tuned by hand per run).
 The knockout completeness sweep (`--knockout-completeness-sweep`, every head
 and MLP block of the model knocked out on the same 100 instances as the single
 knockouts) is 1058 forwards per batch; `--dry-run` prints its estimate.

@@ -380,23 +380,25 @@ def test_the_threshold_default_is_spelled_once():
     assert default == pp.DEFAULT_POSITION_THRESHOLD == 0.05
 
 
-def test_the_sweep_threshold_falls_back_to_the_position_threshold():
-    """Splitting the two flags must not move an existing command line: the
-    sweep still flags at the position threshold unless told otherwise."""
+def test_the_sweep_threshold_no_longer_follows_the_position_threshold():
+    """The researcher's 2026-10-14 decision: the Segment pass is tuned by hand
+    per run (0.01 on SDR nls0.3), and a sweep that followed it flagged 55
+    Components; the sweep flags at its own 0.05 unless told otherwise."""
     import argparse
 
-    shared = type("C", (), {"cli": argparse.Namespace(
-        path_position_threshold=0.02, path_sweep_threshold=None)})()
+    unset = type("C", (), {"cli": argparse.Namespace(
+        path_position_threshold=0.01, path_sweep_threshold=None)})()
     split = type("C", (), {"cli": argparse.Namespace(
-        path_position_threshold=0.02, path_sweep_threshold=0.2)})()
+        path_position_threshold=0.01, path_sweep_threshold=0.2)})()
+    bare = type("C", (), {"cli": argparse.Namespace()})()
 
-    assert pp.position_threshold(shared) == 0.02
-    assert pp.sweep_threshold(shared) == 0.02
-    assert pp.position_threshold(split) == 0.02
+    assert pp.position_threshold(unset) == 0.01
+    assert pp.sweep_threshold(unset) == 0.05
     assert pp.sweep_threshold(split) == 0.2
+    assert pp.sweep_threshold(bare) == 0.05
 
 
-def test_the_two_thresholds_are_separate_flags_with_one_default():
+def test_the_two_thresholds_are_separate_flags_with_their_own_defaults():
     """A value chosen to widen the Segment pass must not silently move which
     Components the completeness sweep calls strong."""
     import analyze_components
@@ -405,7 +407,11 @@ def test_the_two_thresholds_are_separate_flags_with_one_default():
 
     assert parser.get_default("path_position_threshold") == \
         pp.DEFAULT_POSITION_THRESHOLD == 0.05
-    assert parser.get_default("path_sweep_threshold") is None
+    assert parser.get_default("path_sweep_threshold") == \
+        pp.DEFAULT_SWEEP_THRESHOLD == 0.05
+    text = " ".join(parser.format_help().split())
+    assert "--path-sweep-threshold" in text
+    assert "does not follow --path-position-threshold" in text
 
 
 def test_the_honest_instruction_columns_say_paired_in_their_names():

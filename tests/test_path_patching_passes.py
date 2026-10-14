@@ -812,10 +812,12 @@ def test_the_sweep_ranks_every_component_of_the_model_and_marks_membership(
     assert analyze_components.main([
         str(run_dir), "--num-kv-heads", "2", "--n-causal", "16",
         "--path-completeness-sweep", "--path-position-threshold", "1e9",
+        "--path-sweep-threshold", "1e9",
         "--device", "cpu", "--output-dir", str(out)]) == 0
 
     written = read_json(out, *CELL, pp.SUBDIR, pp.SWEEP_FILE)
     assert written["pass"] == "completeness_sweep"
+    assert written["threshold"] == 1e9
     assert written["counterfactual"] == pp.ITEM_SWAP
     assert written["n_senders"] == 11 and written["n_in_circuit"] == 3
     assert written["receiver"] == "readout"
@@ -829,6 +831,35 @@ def test_the_sweep_ranks_every_component_of_the_model_and_marks_membership(
         "no Component outside the circuit cleared the threshold, so no row is " \
         "appended"
     assert all(row[f"{pp.NAME}.sweep_in_circuit"] for row in table["rows"])
+
+
+def test_the_sweep_flags_at_its_own_default_whatever_the_position_threshold(
+        sdr_run, monkeypatch):
+    """The researcher's 2026-10-14 decision: `--path-sweep-threshold` defaults
+    to 0.05 and no longer follows `--path-position-threshold`, and the JSON
+    says so."""
+    import analyze_components
+    from component_analysis import registry
+    from tests.fakes import FAKE_VOCAB_SIZE
+    from tests.test_analyze_components_segmentation import CELL, read_json
+
+    run_dir, out, _records = sdr_run
+    monkeypatch.setattr(registry, "ANALYSES", [pp])
+    monkeypatch.setattr(analyze_components, "load_model",
+                        lambda cli, resolved: tiny_analysis_model(FAKE_VOCAB_SIZE))
+    assert analyze_components.main([
+        str(run_dir), "--num-kv-heads", "2", "--n-causal", "16",
+        "--path-completeness-sweep", "--path-position-threshold", "1e9",
+        "--device", "cpu", "--output-dir", str(out)]) == 0
+
+    written = read_json(out, *CELL, pp.SUBDIR, pp.SWEEP_FILE)
+    assert written["threshold"] == 0.05
+    assert "does not follow --path-position-threshold" in \
+        written["threshold_flag"]
+    assert written["flagged"] == [
+        one["sender"] for one in written["senders"]
+        if one["mean"] is not None and abs(one["mean"]) >= 0.05
+        and not one["in_circuit"]]
 
 
 def test_a_strong_component_outside_the_circuit_gets_a_row_of_its_own(
@@ -851,6 +882,7 @@ def test_a_strong_component_outside_the_circuit_gets_a_row_of_its_own(
     analyze_components.main([
         str(run_dir), "--num-kv-heads", "2", "--n-causal", "16",
         "--path-completeness-sweep", "--path-position-threshold", "0",
+        "--path-sweep-threshold", "0",
         "--device", "cpu", "--output-dir", str(out)])
 
     table = read_json(out, *CELL, "head_table.json")
@@ -888,6 +920,7 @@ def test_the_sweep_runs_on_the_grids_own_sample_and_its_coverage_says_so(
     assert analyze_components.main([
         str(run_dir), "--num-kv-heads", "2", "--n-causal", "16",
         "--path-completeness-sweep", "--path-position-threshold", "1e9",
+        "--path-sweep-threshold", "1e9",
         "--device", "cpu", "--output-dir", str(out)]) == 0
 
     grid = read_json(out, *CELL, pp.SUBDIR, pp.AGNOSTIC_FILE)

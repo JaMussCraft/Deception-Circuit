@@ -240,6 +240,15 @@ SEGMENTED_KINDS = ("k", "v")
 #: reader take it from here, so a changed default cannot disagree with itself.
 DEFAULT_POSITION_THRESHOLD = 0.05
 
+#: Which Components outside the circuit the completeness sweep flags, as a
+#: fraction of the gap. Its own default since the researcher's 2026-10-14
+#: decision: the Segment threshold is tuned by hand per run (0.01 on SDR
+#: nls0.3), and a sweep that followed it flagged 55 Components there.
+DEFAULT_SWEEP_THRESHOLD = 0.05
+SWEEP_THRESHOLD_FLAG = ("--path-sweep-threshold, default "
+                        f"{DEFAULT_SWEEP_THRESHOLD}; it does not follow "
+                        "--path-position-threshold")
+
 #: An instance whose clean-minus-corrupt gap is this small is not normalized by
 #: it: the Corruption did not move the answer, so every cell would be a ratio of
 #: two small numbers. Excluded and counted rather than returned as a spike.
@@ -768,11 +777,11 @@ def add_arguments(group) -> None:
                        default=DEFAULT_POSITION_THRESHOLD,
                        help="A (sender, receiver) cell whose position-agnostic "
                             "normalized effect is at least this far from zero "
-                            "gets a second, position-specific pass by Segment, "
-                            "and a Component outside the circuit that clears it "
-                            "in the completeness sweep is flagged in the head "
-                            "table. The default is five percent of the "
-                            "clean-minus-counterfactual gap.")
+                            "gets a second, position-specific pass by Segment. "
+                            "The default is five percent of the "
+                            "clean-minus-counterfactual gap; tune it by hand "
+                            "per run. The completeness sweep has its own "
+                            "--path-sweep-threshold.")
     group.add_argument("--path-counterfactual", default=ITEM_SWAP,
                        choices=sorted(COUNTERFACTUALS) + [BOTH],
                        help="Which counterfactual pair the senders carry. "
@@ -782,12 +791,13 @@ def add_arguments(group) -> None:
                             "covers only the instances that survived the "
                             f"honest filter; {BOTH!r} runs each in turn and "
                             "writes one file and one column set per pair.")
-    group.add_argument("--path-sweep-threshold", type=float, default=None,
+    group.add_argument("--path-sweep-threshold", type=float,
+                       default=DEFAULT_SWEEP_THRESHOLD,
                        help="How strong a Component outside the circuit must "
                             "be in the completeness sweep to be flagged in the "
-                            "head table. Defaults to --path-position-"
-                            "threshold, so behaviour is unchanged unless it is "
-                            "set. It is a separate flag because the two "
+                            "head table, as a fraction of the gap. Default "
+                            f"{DEFAULT_SWEEP_THRESHOLD}; it does not follow "
+                            "--path-position-threshold, because the two "
                             "questions are separate: a value chosen to widen "
                             "or narrow the Segment pass would otherwise move "
                             "which Components the sweep calls strong.")
@@ -817,12 +827,11 @@ def position_threshold(ctx) -> float:
 def sweep_threshold(ctx) -> float:
     """Which sweep Components outside the circuit are flagged.
 
-    Falls back to the position threshold when `--path-sweep-threshold` is not
-    given, which is what it was before the two were split, so an old command
-    line means what it used to.
+    `--path-sweep-threshold`, defaulting to `DEFAULT_SWEEP_THRESHOLD` and
+    never to the position threshold (the researcher's 2026-10-14 decision).
     """
     given = getattr(ctx.cli, "path_sweep_threshold", None)
-    return position_threshold(ctx) if given is None else float(given)
+    return DEFAULT_SWEEP_THRESHOLD if given is None else float(given)
 
 
 def selected_counterfactuals(ctx) -> List[str]:
@@ -1286,8 +1295,7 @@ def completeness_sweep(ctx, grid: Grid, batches, counterfactual: str, *,
         "metric": metric_meta(counterfactual),
         "receiver": label(READOUT_KEY),
         "threshold": threshold,
-        "threshold_flag": "--path-sweep-threshold, defaulting to "
-                          "--path-position-threshold",
+        "threshold_flag": SWEEP_THRESHOLD_FLAG,
         "n_senders": len(senders),
         "n_in_circuit": sum(1 for one in ranked if one["in_circuit"]),
         "flagged": [one["sender"] for one in ranked if one["flagged"]],
