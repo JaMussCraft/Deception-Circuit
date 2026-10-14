@@ -551,6 +551,32 @@ def lean_of(criteria: Dict[str, Dict[str, bool]]) -> Optional[str]:
     return best
 
 
+def knockout_alone_of_the_support_views(views: dict) -> bool:
+    """Knockout significant and every DLA and path view measured and silent.
+
+    The clauses rule 6 shares with the established-read note; the read is
+    left to the caller.
+    """
+    writes, depends = views["writes"], views["depends"]
+    return (not unmeasured_views(views) and depends["knockout_sign"] != 0
+            and writes["sign"] == 0 and writes["differential_sign"] == 0
+            and not writes["suppression"]
+            and depends["direct_support_sign"] == 0
+            and not depends["outgoing_clears_floor"]
+            and not depends["honest_instruction_at_own_query"])
+
+
+def knockout_with_established_read(views: dict) -> bool:
+    """A knockout effect with an established read, DLA and paths silent.
+
+    Not a flavour: rule 6 is applied literally, so such a Component stays
+    `unknown/insufficient`, and the notes name it (the researcher's
+    2026-10-14 decision; L5H11, L14H7 and L14H22 on SDR nls0.3).
+    """
+    return (views["reads"]["established"]
+            and knockout_alone_of_the_support_views(views))
+
+
 def knockout_only(views: dict) -> bool:
     """Is knockout the only view that speaks? The `unknown/knockout-only` test.
 
@@ -565,14 +591,8 @@ def knockout_only(views: dict) -> bool:
     and the Component is `unknown/insufficient`. An unmeasured read is no
     reads evidence, which is the flavour's premise, so it does not block.
     """
-    reads, writes, depends = views["reads"], views["writes"], views["depends"]
-    return (not unmeasured_views(views) and depends["knockout_sign"] != 0
-            and not reads["established"]
-            and writes["sign"] == 0 and writes["differential_sign"] == 0
-            and not writes["suppression"]
-            and depends["direct_support_sign"] == 0
-            and not depends["outgoing_clears_floor"]
-            and not depends["honest_instruction_at_own_query"])
+    return (not views["reads"]["established"]
+            and knockout_alone_of_the_support_views(views))
 
 
 def pressure_reader_signature(views: dict) -> bool:
@@ -623,6 +643,10 @@ def propose(row, thresholds: Thresholds = None) -> Decision:
     confirmed = row.get(CONFIRMED)
 
     def decide(role, flavour, notes):
+        if knockout_with_established_read(views):
+            notes += (f"; knockout effect with an established read (knockout "
+                      f"{_knockout_way(views)}, reads {views['reads']['segment']}; DLA and "
+                      f"path views silent)")
         if pressure_reader_signature(views):
             notes += ("; pressure-reader signature (reads the Pressure Clause "
                       "under pressure and leaves it under the instruction), "
@@ -645,10 +669,9 @@ def propose(row, thresholds: Thresholds = None) -> Decision:
             return decide(role, None, f"{role}: {_evidence(views)}")
 
     if knockout_only(views):
-        way = ("supports deception" if views["depends"]["knockout_sign"] > 0
-               else "opposes deception")
         return decide("unknown", KNOCKOUT_ONLY,
-                      f"unknown/knockout-only: knockout {way} and no other view "
+                      f"unknown/knockout-only: knockout {_knockout_way(views)} "
+                      f"and no other view "
                       f"speaks, held until there is reads evidence; "
                       + _evidence(views))
 
@@ -676,6 +699,11 @@ def unmeasured_views(views: dict) -> List[str]:
             or views["depends"]["outgoing_support"] is None:
         out.append("depends, how (path_patching)")
     return out
+
+
+def _knockout_way(views: dict) -> str:
+    return ("supports deception" if views["depends"]["knockout_sign"] > 0
+            else "opposes deception")
 
 
 def _missing(criteria, role) -> str:

@@ -852,6 +852,51 @@ def test_an_established_read_is_reads_evidence_so_knockout_is_not_alone():
     assert decision.flavour == roles.INSUFFICIENT
 
 
+# The researcher's 2026-10-14 decision: rule 6 stays literal, and a Component
+# with a knockout effect and an established read but silent DLA and paths is
+# named in the notes instead (L5H11, L14H7 and L14H22 on SDR nls0.3).
+
+@pytest.mark.parametrize("read, knockout", [
+    (reads("item_1_question_option", 0.35), knocked(0.1503, 0.0197)),  # L5H11
+    (reads("question", 0.32), knocked(-0.0936, 0.0283)),               # L14H7
+    (reads("question", 0.29), knocked(0.1122, 0.0312)),                # L14H22
+])
+def test_a_knockout_effect_with_an_established_read_is_noted_and_not_reflavoured(
+        read, knockout):
+    decision = propose(knockout_alone() | read | knockout)
+
+    assert decision.role == "unknown"
+    assert decision.flavour == roles.INSUFFICIENT
+    assert decision.notes.startswith("unknown/insufficient: ")
+    assert "knockout effect with an established read" in decision.notes
+
+
+def test_a_knockout_only_component_does_not_get_the_established_read_note():
+    decision = propose(knockout_alone())
+
+    assert decision.flavour == roles.KNOCKOUT_ONLY
+    assert "knockout effect with an established read" not in decision.notes
+
+
+def test_an_established_read_with_a_knockout_under_its_bar_is_not_noted():
+    """L5H5 and L5H6: a `question` read, a knockout at z 1.8 and 1.9."""
+    decision = propose(knockout_alone() | reads("question", 0.51)
+                       | knocked(0.0330, 0.0185))
+
+    assert "knockout effect with an established read" not in decision.notes
+
+
+@pytest.mark.parametrize("speaks", [
+    writes(0.03, 0.001),                                     # it writes
+    paths(direct=-0.0001, direct_se=0.00004, outgoing="head.5.8->q.13.17",
+          outgoing_effect=0.02),                             # feeds another
+])
+def test_an_established_read_with_another_view_speaking_is_not_noted(speaks):
+    decision = propose(knockout_alone() | reads("question", 0.32) | speaks)
+
+    assert "knockout effect with an established read" not in decision.notes
+
+
 @pytest.mark.parametrize("speaks", [
     writes(0.03, 0.001),                                     # it writes
     writes(0.0, 0.0006, differential=0.04, differential_se=0.005),
@@ -885,6 +930,18 @@ def test_an_mlp_block_has_no_reads_evidence_to_wait_for_and_can_be_knockout_only
     mlp.update(kind="mlp", layer=30, index=0, kv_group=None)
 
     assert propose(mlp).flavour == roles.KNOCKOUT_ONLY
+
+
+def test_the_criteria_doc_names_the_established_read_case_beside_rule_6():
+    path = os.path.join(os.path.dirname(os.path.dirname(
+        os.path.abspath(roles.__file__))), roles.CRITERIA_DOC)
+    with open(path) as handle:
+        text = handle.read()
+
+    rule_6 = text.index("**6. unknown/knockout-only.**")
+    rule_7 = text.index("**7. unknown/insufficient.**")
+    assert "knockout effect with an established read" in text[rule_6:rule_7]
+    assert "2026-10-14" in text[rule_6:rule_7]
 
 
 def test_the_criteria_doc_states_the_knockout_only_criterion_and_its_date():

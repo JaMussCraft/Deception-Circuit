@@ -361,6 +361,16 @@ Mention and matters on knockout alone is `unknown/insufficient`, not
 than the query-side one do not count against the flavour: they say what feeds
 the Component, not what it does.
 
+**A knockout effect with an established read** is named in the notes, not
+given a flavour (the researcher's 2026-10-14 decision). Rule 6 is applied
+literally, so a Component whose knockout clears the bar and whose read is
+established, but whose DLA and path views are measured and silent by every
+clause of rule 6, stays `unknown/insufficient`, and the pass appends
+"knockout effect with an established read" to `roles.role_notes` with the
+knockout's direction and the Segment read. On SDR nls0.3 these are L5H11
+(`item_1_question_option`), L14H7 and L14H22 (`question`). L5H5 and L5H6 also
+read `question`, but their knockouts do not clear the bar.
+
 **7. unknown/insufficient.** Everything else. The notes say which views were
 established, which were silent, and which role the established ones lean
 towards, so that a researcher reading the table sees the evidence rather than
@@ -555,6 +565,12 @@ from, that file's `metric.convention` marker must agree with the columns'
 generation, or the pass refuses the cell. `roles.json` records the markers
 read in `path_conventions`, with a sentence in `sign_convention`. Checked on a copy of `sdr-first-run`: the same 0/0/1/0/17 and the
 same `roles.direct_support` values (ticket 14's comments).
+
+**2026-10-14 — a note for a knockout effect with an established read; no
+criterion changed.** Reason: the researcher's decision to apply rule 6
+literally and name L5H11, L14H7 and L14H22 separately. The pass adds a phrase
+to `roles.role_notes` (see beside rule 6); no threshold, clause, role or
+flavour moves, so rule 2 below asks for no rerun.
 
 The rest of this section is the rule for any future change. A threshold or a
 clause may be changed, and then:
