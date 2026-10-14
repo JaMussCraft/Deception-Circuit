@@ -8,9 +8,12 @@ recorded either way; at most one retune.
 
 usage (from the repo root):
     python outputs/_launch_format_control/size_check.py <paired_run> <format_run>
+    python outputs/_launch_format_control/size_check.py record-retune <first_run> <retune_run> --carried nls0.3
 
-Prints both sizes per gate kind and the verdict, and writes size_check.json
-beside the format run.
+The first form prints both sizes per gate kind and the verdict, and writes
+size_check.json beside the format run. The second records the retune's outcome
+and the carried run in the first run's size_check.json (and `carried` in the
+retune's), since that is the file read beside the Format Circuit.
 """
 
 from __future__ import annotations
@@ -18,6 +21,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import sys
 from typing import Dict, Mapping, Optional
 
 # Gate kinds the rule compares, in priority order: heads first (the primary
@@ -163,7 +167,65 @@ def check(paired_run: str, format_run: str, *, tol: float = 0.25, step: float = 
     }
 
 
+def _nls_label(nls: float) -> str:
+    return f"nls{nls:g}"
+
+
+def _load_report(run_dir: str) -> dict:
+    with open(os.path.join(run_dir, "size_check.json")) as f:
+        return json.load(f)
+
+
+def _write_report(run_dir: str, report: dict) -> None:
+    with open(os.path.join(run_dir, "size_check.json"), "w") as f:
+        json.dump(report, f, indent=2)
+
+
+def record_retune(first_run: str, retune_run: str, carried: str) -> dict:
+    """Record the retune's outcome beside the first Format Circuit run.
+
+    Both runs must already have size_check.json. The first run's file gains a
+    `retune` block (the retune run's path, NLS, both sizes, gaps, verdict and
+    in-run gate) and `carried`, the label (`nls<NLS>`) of the run carried into
+    evaluation; the retune run's file gains the same `carried`. A label naming
+    neither run is refused before anything is written."""
+    first, retune = _load_report(first_run), _load_report(retune_run)
+    labels = {_nls_label(first["format_nls"]), _nls_label(retune["format_nls"])}
+    if carried not in labels:
+        raise SystemExit(f"--carried {carried!r} names neither run ({', '.join(sorted(labels))})")
+    first["retune"] = {
+        "run": os.path.abspath(retune_run),
+        "nls": retune["format_nls"],
+        **{k: retune[k] for k in ("paired_counts", "format_counts", "gaps",
+                                  "out_of_tolerance", "verdict", "note", "in_run_gate")},
+    }
+    first["carried"] = retune["carried"] = carried
+    _write_report(first_run, first)
+    _write_report(retune_run, retune)
+    return first
+
+
+def _record_retune_main(argv) -> dict:
+    ap = argparse.ArgumentParser(prog="size_check.py record-retune",
+                                 description=record_retune.__doc__)
+    ap.add_argument("first_run", help="the Format Circuit run trained at the paired NLS")
+    ap.add_argument("retune_run", help="its one retune")
+    ap.add_argument("--carried", required=True,
+                    help="label of the run carried into evaluation, e.g. nls0.3")
+    args = ap.parse_args(argv)
+    report = record_retune(args.first_run, args.retune_run, args.carried)
+    rt = report["retune"]
+    print(f"retune {rt['run']} (NLS {rt['nls']}): verdict {rt['verdict']}, heads "
+          f"{rt['format_counts']['heads']} vs {rt['paired_counts']['heads']}, gate "
+          + ("PASS" if rt["in_run_gate"]["passes"] else "MISS on " + ", ".join(rt["in_run_gate"]["misses"])))
+    print(f"carried: {report['carried']} (recorded in both size_check.json files)")
+    return report
+
+
 def main(argv=None) -> dict:
+    argv = list(sys.argv[1:] if argv is None else argv)
+    if argv and argv[0] == "record-retune":
+        return _record_retune_main(argv[1:])
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("paired_run", help="the paired mechanism (D) run directory")
     ap.add_argument("format_run", help="the Format Circuit (F) run directory")

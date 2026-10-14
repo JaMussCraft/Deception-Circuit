@@ -219,6 +219,44 @@ def test_cli_in_run_gate_passes_at_the_thresholds(tmp_path):
     assert gate["passes"] is True and gate["misses"] == []
 
 
+# ------------------------------------------ recording the retune beside the first run
+
+def _first_and_retune(tmp_path):
+    paired = _write_run(tmp_path / "D", _fine_masks(4, 100, 100, 100), nls=0.3)
+    first = _write_run(tmp_path / "F03", _fine_masks(8, 100, 100, 100), nls=0.3)
+    retune = _write_run(tmp_path / "F04", _fine_masks(6, 100, 100, 100), nls=0.4,
+                        node_eval={"accuracy": 0.92, "exact_match": 0.92, "kl_div": 0.21})
+    sc.main([paired, first])
+    sc.main([paired, retune])
+    return first, retune
+
+
+def test_record_retune_writes_the_retune_outcome_and_the_carried_run_beside_the_first_run(tmp_path):
+    # Ticket 05 reads size_check.json beside the carried F run, so the first run's
+    # file must say what the retune found and which run was carried.
+    first, retune = _first_and_retune(tmp_path)
+
+    sc.main(["record-retune", first, retune, "--carried", "nls0.3"])
+
+    r = _report(first)
+    assert r["verdict"] == "retune"                   # the first run's own verdict is kept
+    assert r["carried"] == "nls0.3"
+    rt = r["retune"]
+    assert rt["run"] == os.path.abspath(retune)
+    assert rt["nls"] == pytest.approx(0.4)
+    assert rt["verdict"] == "refused"
+    assert rt["format_counts"]["heads"] == 6 and rt["paired_counts"]["heads"] == 4
+    assert rt["in_run_gate"]["passes"] is False and rt["in_run_gate"]["misses"] == ["kl_div"]
+    assert _report(retune)["carried"] == "nls0.3"     # both files agree on the carried run
+
+
+def test_record_retune_refuses_a_carried_label_naming_neither_run(tmp_path):
+    first, retune = _first_and_retune(tmp_path)
+    with pytest.raises(SystemExit):
+        sc.main(["record-retune", first, retune, "--carried", "nls0.5"])
+    assert "carried" not in _report(first)
+
+
 # ------------------------------------------------------------ the training launcher
 
 SUBMIT = os.path.join(LAUNCH, "submit_train.sh")

@@ -52,5 +52,52 @@
       "exact_match": ">= 0.9",
       "kl_div": "<= 0.2"
     }
-  }
+  },
+  "retune": {
+    "run": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.4_nopressure_noedge_261014-081312",
+    "nls": 0.4,
+    "paired_counts": {
+      "attention_blocks": 10,
+      "mlp_blocks": 1,
+      "heads": 48,
+      "attention_neurons": 3289,
+      "mlp_hidden": 1319,
+      "mlp_output": 828,
+      "fine_units": 5436
+    },
+    "format_counts": {
+      "attention_blocks": 13,
+      "mlp_blocks": 2,
+      "heads": 72,
+      "attention_neurons": 5540,
+      "mlp_hidden": 3481,
+      "mlp_output": 1708,
+      "fine_units": 10729
+    },
+    "gaps": {
+      "heads": 0.5,
+      "fine_units": 0.9736938925680647
+    },
+    "out_of_tolerance": [
+      "heads",
+      "fine_units"
+    ],
+    "verdict": "refused",
+    "note": "size gap in heads, fine_units still above 25% at NLS 0.4; the rule allows at most one retune, so both sizes are recorded and the gap is left for the researcher",
+    "in_run_gate": {
+      "accuracy": 0.922,
+      "exact_match": 0.924,
+      "kl_div": 0.2144364150762558,
+      "misses": [
+        "kl_div"
+      ],
+      "passes": false,
+      "thresholds": {
+        "accuracy": ">= 0.9",
+        "exact_match": ">= 0.9",
+        "kl_div": "<= 0.2"
+      }
+    }
+  },
+  "carried": "nls0.3"
 }
