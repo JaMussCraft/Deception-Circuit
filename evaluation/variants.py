@@ -80,13 +80,44 @@ def _is_nopressure(record) -> bool:
     return record.get("condition") == "nopressure" or not record.get("pressure")
 
 
-def empty_variant_reason(task_name: str, variant: str, condition) -> str:
-    """Why a deception task's `variant` prompt set came out empty."""
-    if condition == "nopressure":
-        return (f"{task_name} '{variant}' variant skipped: the dataset's "
-                f"condition is 'nopressure', so it already is the no_pressure "
-                f"variant (the Pressure Clause was deleted at build time) and has "
-                f"no clause to replace with an honest instruction")
+def _nopressure_reason(task_name: str, variant: str) -> str:
+    return (f"{task_name} '{variant}' variant skipped: the dataset's condition "
+            f"is 'nopressure' (empty pressure), so it already is the no_pressure "
+            f"variant (the Pressure Clause was deleted at build time) and has no "
+            f"clause to replace with an honest instruction")
+
+
+def dataset_is_nopressure(dataset_dir) -> bool:
+    """Whether a stored dataset is a `nopressure` one, read from the data:
+    its dataset_config.json `condition`, else every test record's `pressure`
+    being empty. False for a missing directory."""
+    import json
+    import os
+
+    if not dataset_dir or not os.path.isdir(dataset_dir):
+        return False
+    config = os.path.join(dataset_dir, "dataset_config.json")
+    if os.path.exists(config):
+        with open(config) as f:
+            condition = json.load(f).get("condition")
+        if condition is not None:
+            return condition == "nopressure"
+    try:
+        from datasets import load_from_disk
+        test = load_from_disk(dataset_dir)["test"]
+    except Exception:                                   # noqa: BLE001
+        return False
+    if "pressure" not in test.column_names or len(test) == 0:
+        return False
+    return all(p == "" for p in test["pressure"])
+
+
+def empty_variant_reason(task_name: str, variant: str,
+                         dataset_dir=None) -> str:
+    """Why a deception task's `variant` prompt set came out empty, judged from
+    the dataset itself (see dataset_is_nopressure)."""
+    if dataset_is_nopressure(dataset_dir):
+        return _nopressure_reason(task_name, variant)
     return (f"{task_name} '{variant}' variant derived no records from the test "
             f"set")
 
@@ -114,7 +145,7 @@ def deception_records(task_name: str, records, variant: str, tokenizer,
             f"(empty pressure) with {len(records) - n_nopressure} record(s) "
             f"that carry a Pressure Clause; a variant cannot be derived for both")
     if n_nopressure:
-        print(f"  {empty_variant_reason(task_name, variant, 'nopressure')}")
+        print(f"  {_nopressure_reason(task_name, variant)}")
         return []
 
     out = []

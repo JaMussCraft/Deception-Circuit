@@ -298,32 +298,70 @@ def test_a_dataset_mixing_nopressure_and_pressured_records_is_refused(tok):
         variants.deception_records("far", records, "no_pressure", tok, MAX_SEQ)
 
 
-def test_empty_variant_reason_names_the_nopressure_condition():
-    reason = variants.empty_variant_reason("far", "no_pressure", "nopressure")
+def save_dataset(path, records, condition=None):
+    """A stored DatasetDict with a test split, as the build scripts write it."""
+    import json
+    import os
+
+    from datasets import Dataset, DatasetDict
+    DatasetDict({"test": Dataset.from_list(records)}).save_to_disk(path)
+    if condition is not None:
+        with open(os.path.join(path, "dataset_config.json"), "w") as f:
+            json.dump({"condition": condition}, f)
+    return path
+
+
+def test_empty_variant_reason_reads_the_nopressure_condition_from_the_config(
+        tmp_path):
+    path = save_dataset(str(tmp_path / "far_nopressure"),
+                        [stored_far_record("nopressure")], "nopressure")
+    reason = variants.empty_variant_reason("far", "no_pressure", path)
     assert "nopressure" in reason
     assert "already is the no_pressure variant" in reason
-    generic = variants.empty_variant_reason("far", "no_pressure", "deceptive")
-    assert "no records" in generic
 
 
-def test_session_reports_an_empty_variant_as_unavailable_with_the_reason():
+def test_empty_variant_reason_reads_empty_pressure_from_the_records(tmp_path):
+    """No dataset_config.json: the records' empty `pressure` decides."""
+    path = save_dataset(str(tmp_path / "far_nopressure"),
+                        [stored_far_record("nopressure")] * 2)
+    assert "nopressure" in variants.empty_variant_reason(
+        "far", "honest_instruction", path)
+
+
+def test_empty_variant_reason_is_generic_for_a_pressured_dataset(tmp_path):
+    path = save_dataset(str(tmp_path / "far"), [stored_far_record()],
+                        "deceptive")
+    for dataset_dir in (path, None, str(tmp_path / "missing")):
+        reason = variants.empty_variant_reason("far", "no_pressure",
+                                               dataset_dir)
+        assert "no records" in reason and "nopressure" not in reason
+
+
+def test_session_reports_an_empty_variant_as_unavailable_with_the_reason(
+        tmp_path):
     """An empty variant loader must not reach the metrics (they divide by n);
-    the skip reason is what lands in the cell's payload."""
+    the skip reason is what lands in the cell's payload. The nopressure case is
+    read from the dataset itself, not from the run's arguments."""
     from types import SimpleNamespace
 
     from torch.utils.data import DataLoader
 
     from evaluation.context import Session
 
+    path = save_dataset(str(tmp_path / "far_nopressure"),
+                        [stored_far_record("nopressure")], "nopressure")
+
     class EmptyVariantTask:
         name = "far"
+
+        def dataset_dir(self, args):
+            return path
 
         def build_variant_dataloader(self, variant, tokenizer, args, state):
             return DataLoader([], batch_size=4)
 
     spec = SimpleNamespace(label="F", build=EmptyVariantTask,
-                           args=SimpleNamespace(deception_condition="nopressure",
-                                                batch_size=4))
+                           args=SimpleNamespace(batch_size=4))
     session = Session(SimpleNamespace(device="cpu", eval_batch_size=None),
                       None, {}, None, None, {}, {}, {})
     session._loaders["F"] = (None, None, {})
