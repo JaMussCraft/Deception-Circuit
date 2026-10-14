@@ -527,6 +527,29 @@ def test_overlap_is_jaccard_over_heads_and_pooled_fine_units(tmp_path):
     assert len(paths) == 2
 
 
+def test_the_allmlp_operand_has_the_runs_keys_no_heads_and_every_mlp_unit(tmp_path):
+    """`m` of the coarse heads-only knockout `(X) - m`, built from a run's own
+    expanded mask (the recipe of submit_headsko.sh)."""
+    build = _launch_module("build_allmlp")
+    run = tmp_path / "run"
+    run.mkdir()
+    masks = {"attention_blocks": [1, 0], "attention_heads": {"0": [1, 0], "1": [0, 0]},
+             "attention_neurons": {"0": [1, 1, 0, 0], "1": [0, 0, 0, 0]},
+             "mlp_hidden": {"0": [1, 1, 1], "1": [1, 1, 1]}, "mlp_output": {"0": [1], "1": [1]}}
+    (run / "active_nodes.json").write_text(json.dumps({"masks": masks}))
+    (run / "config.json").write_text(json.dumps({"task": "sdr", "deception_condition": "nopressure"}))
+    out = tmp_path / "m"
+    build.build_allmlp(str(run), str(out))
+    m = json.loads((out / "active_nodes.json").read_text())["masks"]
+    assert sorted(m) == sorted(masks)
+    assert m["attention_blocks"] == [0, 0]
+    assert m["attention_heads"] == {"0": [0, 0], "1": [0, 0]}
+    assert m["attention_neurons"] == {"0": [0, 0, 0, 0], "1": [0, 0, 0, 0]}
+    assert m["mlp_hidden"] == {"0": [1, 1, 1], "1": [1, 1, 1]}
+    assert m["mlp_output"] == {"0": [1], "1": [1]}
+    assert json.loads((out / "config.json").read_text())["task"] == "sdr"
+
+
 def test_coarse_overlap_reads_the_unexpanded_heads(tmp_path):
     """The expanded coarse masks put every MLP unit in every circuit; the
     overlap of coarse circuits is read from active_nodes.coarse.json, heads only."""
@@ -603,6 +626,22 @@ def test_a_faithfulness_cell_and_a_delta_cell_run_merge_and_audit(
     cfg = {"family": "fine", "task": "far", "runs": {"D": run_d, "H": None, "F": run_f}}
     jobs = {j["job"]: j for j in fc_cells.plan_suite(suite, cfg)}
     picked = ["D__far_nopressure", "D_minus_F__far"]
+
+    # The dry-run gate's test-set line: --task-from the nopressure run
+    # inherits the condition and reads <data_dir>/far_nopressure (4 records).
+    launch = _launch_module("fc_launch")
+    assert launch.describe_test_set(fc_cells.job_args(jobs["D__far_nopressure"])) == {
+        "task": "far", "condition": "nopressure",
+        "dataset_dir": os.path.abspath(str(data_dir / "far_nopressure")), "n_test": 4}
+    assert launch.describe_test_set(fc_cells.job_args(jobs["D_minus_F__far"]))["n_test"] == 6
+    # ... and the same line through the CLI the dry-run step calls, whose
+    # arguments are themselves evaluate_circuit.py flags.
+    capsys.readouterr()
+    assert launch.main(["testset", *fc_cells.job_args(jobs["D__far_nopressure"])]) == 0
+    line = capsys.readouterr().out
+    assert "TEST SET  task=far  condition=nopressure  n_test=4" in line
+    assert os.path.abspath(str(data_dir / "far_nopressure")) in line
+
     for job_id in picked:
         args = fc_cells.job_args(jobs[job_id])
         monkeypatch.setattr(sys, "argv", ["evaluate_circuit.py", *args, *TINY_OVERRIDES])

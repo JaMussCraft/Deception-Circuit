@@ -222,6 +222,27 @@ def time_stamp() -> str:
 # DRY RUNS
 # ==============================================================================
 
+def describe_test_set(args: list) -> dict:
+    """The test set a job's `--task-from` resolves to, as the evaluator
+    resolves it (the run's config.json through `resolve_train_args`, then the
+    task's `dataset_dir`), with its absolute directory and loaded size.
+    `evaluate_circuit.py --dry-run` prints only the configured cap
+    (`test_samples`) and the relative data_dir, so this is the proof that the
+    condition was inherited and the directory resolved in this checkout."""
+    import evaluate_circuit
+    from datasets import load_from_disk
+    from evaluation.circuits import _args_from_run, norm_run_dir
+    from tasks import get_task
+
+    cli = evaluate_circuit.build_parser().parse_args(list(args) + ["--dry-run"])
+    task_args = _args_from_run(norm_run_dir(cli.task_from[0]), cli)
+    directory = os.path.abspath(get_task(task_args.task).dataset_dir(task_args))
+    n = len(load_from_disk(os.path.join(directory, "test")))
+    cap = getattr(task_args, "test_samples", None)
+    return {"task": task_args.task, "condition": task_args.deception_condition or "deceptive",
+            "dataset_dir": directory, "n_test": min(n, cap) if cap else n}
+
+
 def _dryrun_one(args: list, log_path: str, timeout: int) -> tuple:
     os.makedirs(os.path.dirname(log_path), exist_ok=True)
     env = dict(os.environ, OMP_NUM_THREADS="1", MKL_NUM_THREADS="1", OPENBLAS_NUM_THREADS="1")
@@ -233,6 +254,14 @@ def _dryrun_one(args: list, log_path: str, timeout: int) -> tuple:
                            stdout=f, stderr=subprocess.STDOUT, env=env, timeout=timeout)
         except subprocess.TimeoutExpired:
             f.write(f"\nDRY-RUN TIMED OUT after {timeout} s\n")
+        f.flush()
+        # The test set actually resolved and its loaded size (the dry-run
+        # itself prints only the configured cap).
+        try:
+            subprocess.run([sys.executable, os.path.join(HERE, "fc_launch.py"), "testset", *args],
+                           stdout=f, stderr=subprocess.STDOUT, env=env, timeout=timeout)
+        except subprocess.TimeoutExpired:
+            f.write("\nTEST SET CHECK TIMED OUT\n")
     with open(log_path, errors="replace") as f:
         return parse_dryrun_log(f.read())
 
@@ -281,9 +310,19 @@ def standin_config(config: dict, f_runs: dict = None) -> dict:
 # ==============================================================================
 
 def main(argv=None):
+    argv = list(sys.argv[1:] if argv is None else argv)
+    if argv[:1] == ["testset"]:
+        # Its arguments are evaluate_circuit.py flags, which argparse's
+        # subparsers would try to parse, so dispatch before them.
+        d = describe_test_set(argv[1:])
+        print(f"  TEST SET  task={d['task']}  condition={d['condition']}  "
+              f"n_test={d['n_test']}  dir={d['dataset_dir']}")
+        return 0
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     sub = ap.add_subparsers(dest="cmd", required=True)
     sub.add_parser("plan", help="(re)write suite_manifest.json")
+    sub.add_parser("testset", help="print the test set a job's --task-from resolves to "
+                                   "(usage: testset <evaluate_circuit.py args>)")
     p = sub.add_parser("args", help="print one job's evaluate_circuit.py arguments")
     p.add_argument("suite")
     p.add_argument("job")

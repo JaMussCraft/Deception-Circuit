@@ -1,4 +1,4 @@
-# 2026-10-13T20:35:53  python evaluate_circuit.py --circuit H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743 --circuit m=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/_allmlp_nomb --expr 'H_hko=(H) - m' --compose-granularity leaf --task-from /projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742 --evals knockout --ablation interchange --n-random 20 --knockout-null-count 20 --suite-name format-control-sdr-coarse-nls0.3 --output-dir outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/H_hko__sdr --dry-run
+# 2026-10-14T08:22:26  python evaluate_circuit.py --circuit H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743 --circuit m=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb --expr 'H_hko=(H) - m' --compose-granularity leaf --task-from /projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742 --evals knockout --ablation interchange --n-random 20 --knockout-null-count 20 --suite-name format-control-sdr-coarse-nls0.3 --output-dir outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/H_hko__sdr --dry-run
 
 ====================================================================================
   DRY RUN — no model loaded, no CUDA touched
@@ -20,7 +20,7 @@
   CIRCUITS
 ====================================================================================
 
-  H_hko__leaf                        leaf         7,168 fine units   condition=H:honest,m:deceptive   (H) - m
+  H_hko__leaf                        leaf         7,168 fine units   condition=H:honest,m:nopressure   (H) - m
 
 ====================================================================================
   TASKS
@@ -123,3 +123,4 @@
   TOTAL                                                        41.8 min (1 cell(s))
 
   Nothing was written. Drop --dry-run to run it.
+  TEST SET  task=sdr  condition=deceptive  n_test=1000  dir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/data/datasets/sdr
