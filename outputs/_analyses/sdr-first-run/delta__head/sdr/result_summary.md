@@ -1,5 +1,21 @@
 # SDR nls0.3, head-granularity delta: the first full component-analysis run
 
+> **Legacy conventions (added 2026-10-14, ticket 17).** This run predates
+> 2026-10-13, and the researcher chose not to rerun it. Two things differ
+> from cells written since:
+>
+> - Every path-patching number below, and in this cell's files, is in the
+>   **legacy sign: negative helps deception**. New cells write the opposite
+>   sign under `*_support` column names (ticket 14).
+> - The head-table column names **predate ticket 13**. For example,
+>   `dla.differential` is now `dla.differential_paired`. Readers translate
+>   them through `head_table.LEGACY_COLUMNS`.
+>
+> See `docs/adr/0002-one-sign-convention-for-reading-across-component-analyses.md`
+> and `component_analysis/head_table.py` (`LEGACY_COLUMNS`). The other cells of
+> record from blocks C and D carry the same caveat in a `LEGACY.md` beside
+> their head tables, in the `component-analysis` worktree.
+
 Cell: `outputs/_analyses/sdr-first-run/delta__head/sdr/`
 Circuit: `delta = sdr \ honest_c` at `--compose-granularity head` — 17 attention
 heads and one MLP block (`head_table.json`, `meta.circuit.counts`).
