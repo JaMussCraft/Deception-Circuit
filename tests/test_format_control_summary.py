@@ -354,6 +354,16 @@ def test_empty_suite_directory_is_reported_not_crashed_on(tmp_path):
     assert "## Missing" in md
 
 
+def test_failed_condition_decides_b_even_when_another_input_is_missing(tmp_path):
+    # Deception drop fails (F drop 0.37) and the F x far_honest cell is missing: (a) is
+    # already impossible, so the verdict is (b) with the missing input still listed.
+    root, data = make_suite(tmp_path, over={"ko": {"F": {"": 0.60}}},
+                            skip_cells=("F/far_honest",))
+    _, decision = run(root, data)
+    assert decision["verdict"] == "b"
+    assert any("H test set" in m for m in decision["missing_inputs"])
+
+
 def test_kl_gate_still_decides_c_when_other_inputs_are_missing(tmp_path):
     root, data = make_suite(tmp_path, over={"kl": {"F": 0.9}}, skip_cells=("D/far_honest",))
     _, decision = run(root, data)

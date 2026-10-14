@@ -98,7 +98,8 @@ DECISIONS_TAKEN = {
                   f"greedy wikitext continuations."),
     "null": "Outside the null = knockout accuracy strictly below the null's 5th percentile.",
     "missing": ("A condition whose inputs are missing is reported as missing; the verdict is "
-                "then undecided unless the (c) gate already fires."),
+                "then undecided unless the (c) gate fires or another condition already "
+                "fails, which rules (a) out and gives (b)."),
 }
 
 
