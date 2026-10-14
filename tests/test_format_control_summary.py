@@ -544,17 +544,112 @@ def test_eval5_distinct2_collapse_is_verdict_c(tmp_path):
 
 
 # ==============================================================================
+# THE SUITE MANIFEST'S CELL INDEX (ticket 04, 4e12a1d)
+# ==============================================================================
+
+def make_manifest(tmp_path, root, family="fine", task="far", moved=None, extra=()):
+    """A suite_manifest.json whose per-suite `cells` index lists every planned cell,
+    as fc_cells.py writes it; `moved` maps (circuit, dataset) -> a different path."""
+    conds = {"": "deceptive", "_honest": "honest", "_nopressure": "nopressure"}
+    cells = []
+    for r in ROLES:
+        for s, c in conds.items():
+            d = task + s
+            if family == "fine":
+                cells.append({"circuit": r, "dataset": d, "condition": c,
+                              "roles": ["faithfulness", "knockout"]})
+            else:
+                cells.append({"circuit": r, "dataset": d, "condition": c,
+                              "roles": ["faithfulness"]})
+                cells.append({"circuit": f"{r}_hko__leaf", "dataset": d, "condition": c,
+                              "roles": ["knockout"]})
+    for lab in DELTAS:
+        for g in (("leaf", "head") if family == "fine" else ("leaf",)):
+            label = f"{lab}__{g}" if family == "fine" else f"{lab}_hko__leaf"
+            cells.append({"circuit": label, "dataset": task, "condition": "deceptive",
+                          "roles": ["delta"]})
+    cells += list(extra)
+    for c in cells:
+        c["path"] = (moved or {}).get((c["circuit"], c["dataset"]),
+                                      f"cells/{c['circuit']}/{c['dataset']}/interchange")
+    path = str(tmp_path / "suite_manifest.json")
+    _dump(path, {"suites": {os.path.basename(root): {"family": family, "task": task,
+                                                      "cells": cells}}})
+    return path
+
+
+def test_cells_are_read_from_the_manifest_index_path(tmp_path):
+    root, data = make_suite(tmp_path, over={"ko": {"F": {"": 0.60}}})      # verdict (b)
+    src = os.path.join(root, "cells", "F", "far", "interchange")
+    dst = os.path.join(root, "cells", "F", "far", "interchange_moved")
+    os.rename(src, dst)
+    manifest = make_manifest(tmp_path, root,
+                             moved={("F", "far"): "cells/F/far/interchange_moved"})
+    _, guessed = run(root, data)
+    assert "cell F x far (knockout)" in guessed["missing"]
+    _, decision = run(root, data, manifest=manifest)
+    assert "cell F x far (knockout)" not in decision["missing"]
+    assert decision["inputs"]["F"]["knockout_acc"] == pytest.approx(0.60)
+    assert decision["verdict"] == "b"
+
+
+def test_dataset_conditions_come_from_the_manifest_index(tmp_path):
+    root, data = make_suite(tmp_path)
+    manifest = make_manifest(tmp_path, root)
+    md, decision = run(root, data, manifest=manifest)
+    assert decision["datasets"]["F"] == {"dir": "far_nopressure", "condition": "nopressure",
+                                         "condition_source": "manifest",
+                                         "full_acc": pytest.approx(0.96)}
+    assert "`far_honest` (condition `honest`, from the manifest)" in md
+
+
+def test_an_indexed_cell_outside_the_grid_is_still_reported_missing(tmp_path):
+    root, data = make_suite(tmp_path)
+    extra = [{"circuit": "D_or_F__head", "dataset": "far", "condition": "deceptive",
+              "roles": ["delta"]}]
+    manifest = make_manifest(tmp_path, root, extra=extra)
+    _, decision = run(root, data, manifest=manifest)
+    assert "cell D_or_F__head x far (delta)" in decision["missing"]
+    assert decision["verdict"] == "a"
+
+
+REAL_MANIFEST = os.path.join(REPO, "outputs", "_launch_format_control", "suite_manifest.json")
+
+
+@pytest.mark.skipif(not os.path.exists(REAL_MANIFEST), reason="no launcher manifest")
+def test_the_writers_grid_is_exactly_the_launchers_cell_index():
+    with open(REAL_MANIFEST) as f:
+        suites = json.load(f)["suites"]
+    assert suites
+    for name, s in suites.items():
+        indexed = {(c["circuit"], c["dataset"]) for c in s["cells"]}
+        assert fcs.expected_cells(s["family"], s["task"]) == indexed, name
+
+
+def test_a_manifest_without_this_suite_falls_back_to_the_grid(tmp_path):
+    root, data = make_suite(tmp_path)
+    manifest = str(tmp_path / "other_manifest.json")
+    _dump(manifest, {"suites": {"format-control-sdr-nls0.3": {"cells": []}}})
+    _, decision = run(root, data, manifest=manifest)
+    assert decision["verdict"] == "a"
+    assert any("not in the manifest" in m for m in decision["missing"])
+
+
+# ==============================================================================
 # CLI
 # ==============================================================================
 
 def test_cli_writes_both_files(tmp_path):
     root, data = make_suite(tmp_path)
     e5 = make_eval5(tmp_path)
+    manifest = make_manifest(tmp_path, root)
     out = subprocess.run([sys.executable, os.path.join(REPO, "write_format_control_summary.py"),
-                          root, "--data-dir", data, "--eval5-dir", e5],
+                          root, "--data-dir", data, "--eval5-dir", e5, "--manifest", manifest],
                          cwd=REPO, capture_output=True, text=True, timeout=120)
     assert out.returncode == 0, out.stderr
     assert "verdict (a)" in out.stdout
     with open(os.path.join(root, "decision.json")) as f:
-        assert json.load(f)["evaluated_on"] == "eval 2 + eval 5"
+        d = json.load(f)
+    assert d["evaluated_on"] == "eval 2 + eval 5"
+    assert d["manifest_indexed"] is True
     assert os.path.exists(os.path.join(root, "evaluation_summary.md"))

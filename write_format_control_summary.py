@@ -25,7 +25,11 @@ from __future__ import annotations
 import argparse
 import json
 
+import os
+
 from evaluation import format_control_summary as fcs
+
+DEFAULT_MANIFEST = "outputs/_launch_format_control/suite_manifest.json"
 
 
 def build_parser():
@@ -35,6 +39,10 @@ def build_parser():
                    help="where <task>_nopressure/dataset_config.json lives (pairing)")
     p.add_argument("--eval5-dir", action="append", default=[],
                    help="an eval 5 suite directory with D, H and F cells; repeatable")
+    p.add_argument("--manifest", default=DEFAULT_MANIFEST,
+                   help="ticket 04's suite manifest; its per-suite cells index gives each "
+                        "cell's path and dataset condition (default: %(default)s when it "
+                        "exists; pass '' to read the default layout)")
     p.add_argument("--family", choices=("fine", "coarse"), default=None,
                    help="override the family inferred from the suite name and cells")
     p.add_argument("--task", default=None,
@@ -46,9 +54,13 @@ def build_parser():
 
 def main(argv=None):
     args = build_parser().parse_args(argv)
+    manifest = args.manifest
+    if manifest == DEFAULT_MANIFEST and not os.path.exists(manifest):
+        manifest = None
     md, js = fcs.write_summary(args.suite_root, data_dir=args.data_dir,
                                eval5_dirs=args.eval5_dir, family=args.family, task=args.task,
-                               out_md=args.out, out_json=args.decision_out)
+                               manifest=manifest or None, out_md=args.out,
+                               out_json=args.decision_out)
     with open(js) as f:
         d = json.load(f)
     v = d["verdict"]

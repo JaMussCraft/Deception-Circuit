@@ -146,8 +146,41 @@ def delta_cells(family):
             for row in ((b, "head", f"{b}__head", True), (b, "leaf", f"{b}__leaf", False))]
 
 
-def _cell(root, label, dataset):
-    d = os.path.join(root, "cells", label, dataset, "interchange")
+def expected_cells(family, task):
+    """{(cell label, dataset dir)} a complete suite has: the grid this writer reads,
+    which must equal ticket 04's manifest cell index (a test pins that)."""
+    datasets = [task + DATASET_SUFFIX[r] for r in ROLES]
+    out = {(r, ds) for r in ROLES for ds in datasets}
+    if family == "coarse":
+        out |= {(knockout_label(r, family), ds) for r in ROLES for ds in datasets}
+    out |= {(lab, task) for _, _, lab, _ in delta_cells(family)}
+    return out
+
+
+def load_manifest_index(manifest, suite_name):
+    """{(circuit, dataset): entry} from the suite manifest's per-suite `cells` index
+    (ticket 04: circuit, dataset, condition, roles, job, path under the suite root),
+    and a note when the manifest has no index for this suite."""
+    if not manifest:
+        return None, None
+    m = manifest if isinstance(manifest, dict) else _load(manifest)
+    cells = _get(m, "suites", suite_name, "cells")
+    if not cells:
+        return None, (f"suite {suite_name} not in the manifest "
+                      f"{manifest if isinstance(manifest, str) else ''} (cells read from the "
+                      f"default layout)").replace("  ", " ")
+    return {(c["circuit"], c["dataset"]): c for c in cells}, None
+
+
+def _cell_dir(root, label, dataset, index=None):
+    entry = (index or {}).get((label, dataset))
+    if entry and entry.get("path"):
+        return os.path.join(root, entry["path"])
+    return os.path.join(root, "cells", label, dataset, "interchange")
+
+
+def _cell(root, label, dataset, index=None):
+    d = _cell_dir(root, label, dataset, index)
     if not os.path.isdir(d):
         return None
     got = {name: _load(os.path.join(d, f"{name}.json"))
@@ -337,9 +370,9 @@ def knockout_row(cell, full, flip):
             "flip_separable": _get(flip, "headline", "separable")}
 
 
-def variant_row(cell, role_data):
+def variant_row(cell, condition):
     """{variant: {...}} from a knockout cell's eval 2 variant rows, with the
-    honest-answer drop under the dataset's label convention."""
+    honest-answer drop under the label convention of the dataset's `condition`."""
     k = (cell or {}).get("knockout")
     out = {}
     for v in VARIANTS:
@@ -364,7 +397,7 @@ def variant_row(cell, role_data):
             out[v] = {"status": "not recorded"}
             continue
         # D data: target is the deceptive answer -> honest accuracy = 1 - accuracy.
-        deceptive_labels = DATASET_CONDITION[role_data] == "deceptive"
+        deceptive_labels = condition == "deceptive"
         drop = (ko - full) if deceptive_labels else (full - ko)
         out[v] = {"status": "ok", "full_acc": full, "knockout_acc": ko,
                   "honest_answer_drop": drop,
@@ -470,27 +503,65 @@ def decide(inputs):
 # THE SUMMARY
 # ==============================================================================
 
-def summarize(suite_root, *, data_dir="data/datasets", eval5_dirs=(), family=None, task=None):
-    """Everything the summary shows, as one dict (decision.json is a view of it)."""
+def _dataset_conditions(datasets, index, suite):
+    """{role: (condition, source)} for each test set: the manifest index first, then
+    the merged suite.json's task provenance, else the condition the role implies."""
+    from_suite = {t.get("label"): _get(t, "dataset", "deception_condition")
+                  for t in suite.get("tasks") or []}
+    out = {}
+    for r in ROLES:
+        ds = datasets[r]
+        got = [c.get("condition") for (_, d), c in (index or {}).items()
+               if d == ds and c.get("condition")]
+        if got:
+            out[r] = (got[0], "manifest")
+        elif from_suite.get(ds):
+            out[r] = (from_suite[ds], "suite.json")
+        else:
+            out[r] = (DATASET_CONDITION[r], "assumed")
+    return out
+
+
+def summarize(suite_root, *, data_dir="data/datasets", eval5_dirs=(), family=None, task=None,
+              manifest=None):
+    """Everything the summary shows, as one dict (decision.json is a view of it).
+
+    `manifest` is ticket 04's suite_manifest.json (path or dict): when it indexes
+    this suite, cells are read from the index's paths and dataset conditions from
+    its `condition`; otherwise the default layout is read."""
     root = os.path.abspath(str(suite_root).rstrip("/"))
     suite = _load(os.path.join(root, "suite.json")) or {}
+    missing = []
+    index, note = load_manifest_index(manifest, os.path.basename(root))
+    if note:
+        missing.append(note)
+    if index:
+        entry = _get(manifest if isinstance(manifest, dict) else _load(manifest),
+                     "suites", os.path.basename(root)) or {}
+        family = family or entry.get("family")
+        task = task or entry.get("task")
     family, task = infer_family_task(root, suite, family, task)
     datasets = {r: task + DATASET_SUFFIX[r] for r in ROLES}
+    conditions = _dataset_conditions(datasets, index, suite)
+    for r in ROLES:
+        if conditions[r][0] != DATASET_CONDITION[r]:
+            missing.append(f"{r} data `{datasets[r]}` has condition `{conditions[r][0]}` "
+                           f"({conditions[r][1]}), expected `{DATASET_CONDITION[r]}`")
     flip = _load(os.path.join(root, "flip_audit.json"))
     flips = {(c.get("circuit"), c.get("task")): c for c in (flip or {}).get("cells") or []}
     overlap = _load(os.path.join(root, "overlap.json"))
-    missing = []
 
     # ---- cells
     cells = {}
     for r in ROLES:
         for dr in ROLES:
             ds = datasets[dr]
-            cells[(r, ds)] = _cell(root, r, ds)
+            cells[(r, ds)] = _cell(root, r, ds, index)
             if family == "coarse":
-                cells[(knockout_label(r, family), ds)] = _cell(root, knockout_label(r, family), ds)
+                kl = knockout_label(r, family)
+                cells[(kl, ds)] = _cell(root, kl, ds, index)
     for _, _, lab, _ in delta_cells(family):
-        cells[(lab, datasets["D"])] = _cell(root, lab, datasets["D"])
+        cells[(lab, datasets["D"])] = _cell(root, lab, datasets["D"], index)
 
     full = {dr: _full_accuracy(cells, datasets[dr]) for dr in ROLES}
 
@@ -508,7 +579,7 @@ def summarize(suite_root, *, data_dir="data/datasets", eval5_dirs=(), family=Non
             row = knockout_row(kcell, full[dr], flips.get((kl, ds)))
             paired[(r, dr)] = {"circuit_alone_acc": _circuit_alone(faith),
                                "knockout": row,
-                               "variants": variant_row(kcell, dr)}
+                               "variants": variant_row(kcell, conditions[dr][0])}
 
     # ---- deltas
     deltas = []
@@ -522,6 +593,12 @@ def summarize(suite_root, *, data_dir="data/datasets", eval5_dirs=(), family=Non
                        "heads": _active(_get(specs.get(lab), "counts", "attention_heads")),
                        "knockout": knockout_row(cell, full["D"],
                                                 flips.get((lab, datasets["D"])))})
+
+    # ---- indexed cells outside the grid above
+    reported = set(cells)
+    for (lab, ds), entry in sorted((index or {}).items()):
+        if (lab, ds) not in reported and _cell(root, lab, ds, index) is None:
+            missing.append(f"cell {lab} x {ds} ({', '.join(entry.get('roles') or [])})")
 
     # ---- runs, pairing, eval 5
     runs = {r: _run_info(d) for r, d in _run_dirs(suite).items()}
@@ -568,7 +645,8 @@ def summarize(suite_root, *, data_dir="data/datasets", eval5_dirs=(), family=Non
     decision = decide({"D": sides["D"], "F": sides["F"], "eval5": bool(eval5_dirs)})
 
     result = {"suite": os.path.basename(root), "root": root, "family": family, "task": task,
-              "datasets": datasets, "full_acc": full, "runs": runs, "pairing": pairing,
+              "datasets": datasets, "dataset_conditions": conditions,
+              "manifest_indexed": bool(index), "full_acc": full, "runs": runs, "pairing": pairing,
               "paired": paired, "deltas": deltas, "overlap": overlap,
               "eval5_dirs": list(eval5_dirs or ()), "eval5": eval5,
               "inputs": sides, "decision": decision, "missing": missing}
@@ -669,7 +747,9 @@ def render(res):
         L.append(_row([f"circuit {r}", f"condition `{ri.get('condition') or '-'}`, NLS "
                        f"{_f(ri.get('nls'), 2)}, `{ri.get('run_dir') or '-'}`"]))
     for r in ROLES:
-        L.append(_row([f"{r} data", f"`{ds[r]}` (condition `{DATASET_CONDITION[r]}`), "
+        cond, src = res["dataset_conditions"][r]
+        src = {"manifest": ", from the manifest", "suite.json": ", from suite.json"}.get(src, "")
+        L.append(_row([f"{r} data", f"`{ds[r]}` (condition `{cond}`{src}), "
                        f"full-model accuracy {_f(res['full_acc'][r])}; {_pairing_flag(res, r)}"]))
     L.append("")
 
@@ -837,17 +917,20 @@ def decision_record(res):
                            "distinct2_collapse_frac": DISTINCT2_COLLAPSE_FRAC, "tol": TOL},
             "inputs": res["inputs"],
             "conditions_of_runs": {r: (res["runs"].get(r) or {}).get("condition") for r in ROLES},
-            "datasets": {r: {"dir": res["datasets"][r], "condition": DATASET_CONDITION[r],
+            "datasets": {r: {"dir": res["datasets"][r],
+                             "condition": res["dataset_conditions"][r][0],
+                             "condition_source": res["dataset_conditions"][r][1],
                              "full_acc": res["full_acc"][r]} for r in ROLES},
+            "manifest_indexed": res["manifest_indexed"],
             "pairing": res["pairing"], "caveats": res["caveats"],
             "missing_inputs": d["missing"], "missing": res["missing"]}
 
 
 def write_summary(suite_root, *, data_dir="data/datasets", eval5_dirs=(), family=None,
-                  task=None, out_md=None, out_json=None):
+                  task=None, manifest=None, out_md=None, out_json=None):
     """Write evaluation_summary.md and decision.json; returns their paths."""
     res = summarize(suite_root, data_dir=data_dir, eval5_dirs=eval5_dirs, family=family,
-                    task=task)
+                    task=task, manifest=manifest)
     out_md = out_md or os.path.join(res["root"], "evaluation_summary.md")
     out_json = out_json or os.path.join(res["root"], "decision.json")
     for p in (out_md, out_json):
