@@ -88,9 +88,13 @@ this order, each naming its reason (exit 3; a failing dry-run exits 5):
      `wikitext.discovered.kl_per_token`) is `<= 0.66`; the refusal names the
      cell and the number. Wikitext KL depends only on the circuit, so the two
      cells should agree; both are required anyway.
-   - coarse only: D, H and F have the mask signature the all-MLP operand's name
-     says (`_allmlp_nomb` = no `mlp_blocks` gate), as the old coarse launcher
-     derived it.
+   - coarse only: D, H and F have the same mask signature as the all-MLP
+     operand (`nomb` = no `mlp_blocks` gate), each read from its own
+     `active_nodes.json`, as the old coarse launcher derived it. The operand is
+     ticket 04's `outputs/_launch_format_control/allmlp_nomb` (built by
+     `build_allmlp.py`); its masks are identical to the main checkout's
+     `_allmlp_nomb`, which the existing coarse suites used (checked 2026-10-15:
+     all five mask arrays equal, plus a `built_from` provenance field).
 3. `FORMAT_CONTROL_EVAL5_GO=1` is set (see the top of this file).
 4. A `--dry-run` of these exact arguments passes (run by the script itself).
 5. Every screen of the group is an A40 cache hit: each dataset is `[cached]` in
@@ -151,6 +155,12 @@ dedups repeats. Screens cached: 0 screen judge calls.
 | any family, `sm` | 4,671 | 24.3 - 29.6 |
 | any family, `lb` | 4,050 | 9.2 - 12.5 |
 | all six | 26,163 | 100.5 - 126.3 |
+
+The real-F dry-runs of 2026-10-15 (`dryrun_eval5/sdr*_{sm,lb}.log`) give the
+same numbers: F's size changes the random draws, not the counts. Gate status on
+that date: `sdr_coarse` passes (F_hko wikitext KL 0.279), and its two submit
+lines are printed but not run. `sdr` is refused (F wikitext KL 1.342). FAR's
+cells were still queued.
 
 Anchored on wall time: the one-cell `eval5_sdr_coarse_nls0.3_nomb` (sm) ran
 3 h 51 min with cached screens, so a three-cell `sm` suite is plausibly about

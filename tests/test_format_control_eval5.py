@@ -529,15 +529,22 @@ def _run_dir(tmp_path, name, masks):
 
 def test_coarse_runs_must_match_the_all_mlp_operands_mask_signature(e5, tmp_path):
     nomb = ("attention_heads", "attention_neurons")
+    # the operand's signature is read from its own masks, not its name (ticket 04
+    # builds it as `allmlp_nomb` in the launcher directory)
+    allmlp = _run_dir(tmp_path, "allmlp_nomb", nomb)
     runs = {"D": _run_dir(tmp_path, "d", nomb), "H": _run_dir(tmp_path, "h", nomb),
             "F": _run_dir(tmp_path, "f", nomb + ("mlp_blocks",))}
-    assert e5.coarse_signature_reasons(runs, "/x/_allmlp_nomb") == [
-        f"F run {runs['F']} has an mlp_blocks gate (signature mb) but the all-MLP operand is "
-        f"/x/_allmlp_nomb (nomb)"]
+    assert e5.coarse_signature_reasons(runs, allmlp) == [
+        f"F run {runs['F']} has an mlp_blocks gate (signature mb) but the all-MLP operand "
+        f"{allmlp} has signature nomb"]
     runs["F"] = _run_dir(tmp_path, "f2", nomb)
-    assert e5.coarse_signature_reasons(runs, "/x/_allmlp_nomb") == []
+    assert e5.coarse_signature_reasons(runs, allmlp) == []
+    mb_operand = _run_dir(tmp_path, "_allmlp_mb", nomb + ("mlp_blocks",))
+    assert len(e5.coarse_signature_reasons(runs, mb_operand)) == 3
     runs["H"] = str(tmp_path / "nowhere")
-    assert any("cannot read" in r for r in e5.coarse_signature_reasons(runs, "/x/_allmlp_nomb"))
+    assert any("cannot read" in r for r in e5.coarse_signature_reasons(runs, allmlp))
+    assert any("cannot read" in r and "nowhere2" in r
+               for r in e5.coarse_signature_reasons(runs, str(tmp_path / "nowhere2")))
 
 
 def test_sbatch_line_sizes_the_walltime_from_the_dry_run_ceiling(e5):
@@ -708,6 +715,19 @@ def harness(tmp_path, e5):
     run.tmp = tmp_path
     run.record = record
     return run
+
+
+def test_concurrent_launchers_never_lose_a_record_event(e5, tmp_path):
+    """Two launchers append to one record at once (as the SDR and coarse dry
+    runs did on 2026-10-15, losing an event): every event must survive."""
+    record = tmp_path / "record.json"
+    code = ("import sys; sys.path.insert(0, %r); import eval5_cmd as e\n"
+            "for i in range(25): e.record_event(%r, 'far', 'sm', {'event': 'dry', 'n': sys.argv[1] + str(i)})\n"
+            % (LAUNCH, str(record)))
+    procs = [subprocess.Popen([sys.executable, "-c", code, tag]) for tag in "abcd"]
+    assert [p.wait(timeout=120) for p in procs] == [0, 0, 0, 0]
+    events = json.loads(record.read_text())["suites"]["eval5_format_far"]["events"]
+    assert sorted(e["n"] for e in events) == sorted(f"{t}{i}" for t in "abcd" for i in range(25))
 
 
 def test_submit_refuses_when_F_is_null(harness):

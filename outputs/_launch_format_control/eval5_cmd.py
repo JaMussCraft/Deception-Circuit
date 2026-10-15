@@ -434,11 +434,14 @@ def _mask_signature(run: str) -> str:
 
 def coarse_signature_reasons(runs: dict, allmlp: str) -> list:
     """The heads-only operand must match each coarse run's mask signature (as
-    llama-8b-instruct_sdr_coarse/_launch/submit_eval5.sh derives it)."""
-    m = re.search(r"_allmlp_(mb|nomb)$", os.path.basename(os.path.normpath(allmlp or "")))
-    if not m:
-        return [f"cannot tell the all-MLP operand's signature from its name: {allmlp}"]
-    want, out = m.group(1), []
+    llama-8b-instruct_sdr_coarse/_launch/submit_eval5.sh derives it). The
+    operand's own signature is read from its masks, not its directory name."""
+    try:
+        want = _mask_signature(allmlp)
+    except Exception as error:                                      # noqa: BLE001
+        return [f"cannot read {allmlp}/active_nodes.json to check the all-MLP operand's mask "
+                f"signature ({type(error).__name__}: {error})"]
+    out = []
     for role in ROLES:
         try:
             sig = _mask_signature(runs[role])
@@ -449,7 +452,7 @@ def coarse_signature_reasons(runs: dict, allmlp: str) -> list:
         if sig != want:
             has = "has an" if sig == "mb" else "has no"
             out.append(f"{role} run {runs[role]} {has} mlp_blocks gate (signature {sig}) but the "
-                       f"all-MLP operand is {allmlp} ({want})")
+                       f"all-MLP operand {allmlp} has signature {want}")
     return out
 
 
@@ -625,19 +628,31 @@ def render_cost(cost: dict, parsed: dict) -> str:
 # ==============================================================================
 
 def record_event(path: str, family: str, group: str, entry: dict) -> dict:
-    """Append one event to the EVAL 5 record, keyed by the suite's output dir."""
-    try:
-        data = load_json(path)
-    except (OSError, ValueError):
-        data = {"schema": "eval5_record/1", "suites": {}}
+    """Append one event to the EVAL 5 record, keyed by the suite's output dir.
+
+    The read-modify-write holds an exclusive flock on `<path>.lock` (the
+    /projects Lustre mount supports flock), so launchers running at the same
+    time never lose each other's events.
+    """
+    import fcntl
+
     key = os.path.basename(output_dir(family, group))
     event = dict(entry, time=time.strftime("%Y-%m-%dT%H:%M:%S"), family=family, group=group)
-    data.setdefault("suites", {}).setdefault(key, {"events": []})["events"].append(event)
     os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
-    tmp = path + ".tmp"
-    with open(tmp, "w") as f:
-        json.dump(data, f, indent=1)
-    os.replace(tmp, path)
+    with open(path + ".lock", "a") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        try:
+            try:
+                data = load_json(path)
+            except (OSError, ValueError):
+                data = {"schema": "eval5_record/1", "suites": {}}
+            data.setdefault("suites", {}).setdefault(key, {"events": []})["events"].append(event)
+            tmp = f"{path}.{os.getpid()}.tmp"
+            with open(tmp, "w") as f:
+                json.dump(data, f, indent=1)
+            os.replace(tmp, path)
+        finally:
+            fcntl.flock(lock, fcntl.LOCK_UN)
     return event
 
 
