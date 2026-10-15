@@ -38,6 +38,7 @@ from __future__ import annotations
 
 import glob
 import json
+import math
 import os
 import re
 
@@ -385,6 +386,7 @@ def knockout_row(cell, full, flip):
     st = _get(k, "task", "null", "stats", "accuracy") or {}
     p5 = _num(st.get("p5"))
     return {"knockout_acc": ko,
+            "n": _num(_get(k, "task", "knockout", "n")),
             "full_acc": full,
             "drop": full - ko if full is not None and ko is not None else None,
             "null_p5": p5, "null_p50": _num(st.get("p50")), "null_p95": _num(st.get("p95")),
@@ -425,6 +427,7 @@ def variant_row(cell, condition):
         deceptive_labels = condition == "deceptive"
         drop = (ko - full) if deceptive_labels else (full - ko)
         out[v] = {"status": "ok", "full_acc": full, "knockout_acc": ko,
+                  "n": _num(_get(sec, "rows", "knockout", "n")),
                   "honest_answer_drop": drop,
                   "labels": "deceptive" if deceptive_labels else "honest"}
     return out
@@ -540,9 +543,31 @@ def decide(inputs, honest_rows="variants"):
         verdict = "a"
     else:
         verdict = None
-    return {"verdict": verdict, "sentence": SENTENCES.get(verdict, "undecided: inputs missing"),
+    spec_sentence = SENTENCES.get(verdict, "undecided: inputs missing")
+    sentence = spec_sentence
+    kl_d = D.get("wikitext_kl")
+    gate["d_kl"] = kl_d
+    gate["d_fails_kl_gate"] = (kl_d > KL_GATE + TOL) if kl_d is not None else None
+    if verdict == "c" and gate["d_fails_kl_gate"]:
+        kl_h = (inputs.get("H") or {}).get("wikitext_kl")
+        sentence = both_fail_sentence(kl_d, kl_h, kl_f)
+    return {"verdict": verdict, "sentence": sentence, "spec_sentence": spec_sentence,
             "conditions": conditions, "gate": gate, "missing": missing,
             "honest_rows_mode": mode}
+
+
+def both_fail_sentence(kl_d, kl_h, kl_f):
+    """The (c) sentence when D's own knockout also fails the KL gate: the spec's
+    remedy (retrain F at a lower NLS) would enlarge F, since a higher NLS prunes
+    harder and gives a SMALLER circuit, so the researcher decides instead."""
+    def f(x):
+        return "-" if x is None else f"{x:.3f}"
+    return ("(c) Uninformative: both D and F knockouts fail the gate at this NLS; the "
+            "comparison is incoherent on both sides; researcher decides. Wikitext KL/token: "
+            f"D {f(kl_d)}, H {f(kl_h)}, F {f(kl_f)} (gate {KL_GATE:g}). Note that a lower "
+            "NLS gives a larger circuit (a higher NLS prunes harder and gives a smaller "
+            "one), so the spec's literal remedy, retraining F at a lower NLS, would make "
+            "F's knockout more destructive. Nothing is launched.")
 
 
 # ==============================================================================
@@ -697,17 +722,141 @@ def summarize(suite_root, *, data_dir="data/datasets", eval5_dirs=(), family=Non
                     "honest_rows": drops, "wikitext_kl": row.get("wikitext_kl"),
                     "ref_nll_rise": agg.get("ref_nll_rise"),
                     "distinct2_ratio": d2, "distinct2_source": src}
-    decision = decide({"D": sides["D"], "F": sides["F"], "eval5": bool(eval5_dirs),
-                       "eval5_datasets": eval5_datasets}, honest_rows=honest_rows)
+    h_kl = (paired[("H", "D")]["knockout"] or {}).get("wikitext_kl")
+    decision = decide({"D": sides["D"], "F": sides["F"], "H": {"wikitext_kl": h_kl},
+                       "eval5": bool(eval5_dirs), "eval5_datasets": eval5_datasets},
+                      honest_rows=honest_rows)
+    diagnostics = diagnose(paired, decision)
+    size_check = (runs.get("F") or {}).get("size_check")
+    null_sampling = null_sampling_of(suite, family)
 
     result = {"suite": os.path.basename(root), "root": root, "family": family, "task": task,
               "datasets": datasets, "dataset_conditions": conditions,
               "manifest_indexed": bool(index), "full_acc": full, "runs": runs, "pairing": pairing,
               "paired": paired, "deltas": deltas, "overlap": overlap,
               "eval5_dirs": list(eval5_dirs or ()), "eval5": eval5,
-              "inputs": sides, "decision": decision, "missing": missing}
+              "inputs": sides, "decision": decision, "missing": missing,
+              "diagnostics": diagnostics, "size_check": size_check,
+              "null_sampling": null_sampling}
     result["caveats"] = caveats(result)
     return result
+
+
+# ==============================================================================
+# DIAGNOSTICS (caveats the data supports; none changes the rule)
+# ==============================================================================
+
+#: Knockout accuracy on D data below which an atomic knockout counts as saturated.
+SATURATION_ACC = 0.02
+
+
+def _row_values(paired, row):
+    """{role: (honest-answer drop, knockout accuracy, n)} for one honest-answer row."""
+    out = {}
+    for r in ROLES:
+        if row.endswith("(D data)"):
+            v = paired[(r, "D")]["variants"][row.split(" ")[0]]
+            out[r] = (v.get("honest_answer_drop"), v.get("knockout_acc"), v.get("n"))
+        else:
+            k = paired[(r, "H" if row == "H test set" else "F")]["knockout"] or {}
+            out[r] = (k.get("drop"), k.get("knockout_acc"), k.get("n"))
+    return out
+
+
+def diagnose(paired, decision):
+    """Saturation of the D-data knockouts, and which rule rows cannot discriminate.
+
+    A rule row is non-discriminating when |F - D| on it is below the binomial
+    standard error of the difference of the two knockout accuracies,
+    sqrt(pD(1-pD)/n + pF(1-pF)/n), and D, H and F all lie within that band of
+    each other (with one full model, the drop difference is the knockout-accuracy
+    difference)."""
+    kd = (paired[("D", "D")]["knockout"] or {}).get("knockout_acc")
+    kf = (paired[("F", "D")]["knockout"] or {}).get("knockout_acc")
+    saturated = (kd is not None and kf is not None
+                 and kd < SATURATION_ACC and kf < SATURATION_ACC)
+    cond = next(c for c in decision["conditions"] if c["name"] == "honest-answer drop")
+    rows = []
+    for row in [r["row"] for r in cond["rows"]]:
+        vals = _row_values(paired, row)
+        (dd, pd_, n), (fd, pf, _), hd = vals["D"], vals["F"], vals["H"][0]
+        entry = {"row": row, "D": dd, "H": hd, "F": fd, "n": n,
+                 "abs_f_minus_d": None, "se": None, "non_discriminating": None}
+        if None not in (dd, fd, pd_, pf) and n:
+            se = math.sqrt(pd_ * (1 - pd_) / n + pf * (1 - pf) / n)
+            drops = [x for x in (dd, hd, fd) if x is not None]
+            spread = max(drops) - min(drops)
+            entry.update(abs_f_minus_d=abs(fd - dd), se=se, spread=spread,
+                         non_discriminating=bool(abs(fd - dd) < se and spread < se))
+        rows.append(entry)
+    return {"saturated": saturated, "saturation_acc": SATURATION_ACC,
+            "knockout_acc_on_d_data": {"D": kd, "F": kf}, "honest_rows": rows}
+
+
+def null_sampling_of(suite, family):
+    """What the size-matched knockout null samples, read from the knockout cells'
+    counts and the run's settings (evaluation/masks.py `sample_random_masks`)."""
+    specs = {c.get("label"): c for c in suite.get("circuits") or []}
+    head_dim = _get(suite, "geometry", "head_dim")
+    cli = suite.get("cli") or {}
+    whole_heads, seen = True, False
+    for r in ROLES:
+        counts = _get(specs.get(knockout_label(r, family)), "counts") or {}
+        heads, neurons = _active(counts.get("attention_heads")), _active(
+            counts.get("attention_neurons"))
+        mlp = sum(_active(counts.get(k)) or 0 for k in ("mlp_hidden", "mlp_output"))
+        if heads is None or neurons is None or head_dim is None:
+            continue
+        seen = True
+        whole_heads &= neurons == heads * head_dim and mlp == 0
+    unit = ("whole heads" if seen and whole_heads else "fine units" if seen else "unknown")
+    alloc = cli.get("null_alloc")
+    n = cli.get("knockout_null_count") or cli.get("n_random")
+    if unit == "whole heads":
+        text = ("Null: size-matched random circuits drawn layer by layer with the same number "
+                "of heads per layer; every live head of these heads-only cells is full "
+                f"({head_dim} of {head_dim} neurons) and they hold no MLP units, so the null "
+                "samples whole heads and no MLP units")
+    elif unit == "fine units":
+        text = ("Null: size-matched random circuits drawn layer by layer in fine units: the "
+                "same number of heads per layer, the same attention neurons placed inside the "
+                f"drawn heads (`{alloc}` allocation), and the same MLP units per layer")
+    else:
+        text = "Null: sampling unit not recorded (no circuit counts in suite.json)"
+    text += (f"; n = {n}, knockout granularity `{cli.get('knockout_granularity', '-')}`, "
+             "blocks held fixed (evaluation/masks.py `sample_random_masks`).")
+    return {"unit": unit, "alloc": alloc, "n": n, "text": text}
+
+
+def _gap(x):
+    return f"{'+' if x >= 0 else '-'}{abs(100 * x):.0f}%"
+
+
+def retune_caveat(sc):
+    """The size rule's outcome for F, from its size_check.json (ticket 03)."""
+    if not sc or sc.get("verdict") in (None, "within_tolerance"):
+        return None
+    names = {"heads": "heads", "fine_units": "fine units"}
+    keys = sc.get("compared") or list((sc.get("gaps") or {}))
+
+    def gaps(g):
+        return ", ".join(f"{_gap(g[k])} {names.get(k, k)}" for k in keys if k in (g or {}))
+    text = f"F oversized at NLS {sc.get('format_nls', 0):g} ({gaps(sc.get('gaps'))})"
+    if any(v < 0 for v in (sc.get("gaps") or {}).values()):
+        text = f"F size out of tolerance at NLS {sc.get('format_nls', 0):g} ({gaps(sc.get('gaps'))})"
+    rt = sc.get("retune")
+    if rt:
+        g = rt.get("in_run_gate") or {}
+        misses = ", misses " + ", ".join(g["misses"]) if g.get("misses") else ""
+        kl = g.get("kl_div")
+        text += (f"; retune to {rt.get('nls', 0):g} {'passed' if g.get('passes') else 'failed'} "
+                 f"the in-run gate (KL {'-' if kl is None else format(kl, '.3f')}{misses}; "
+                 f"still {gaps(rt.get('gaps'))})")
+    elif sc.get("next_nls") is not None:
+        text += f"; retune to {sc['next_nls']:g} not recorded"
+    if sc.get("carried"):
+        text += f"; carried {sc['carried']}"
+    return text + "."
 
 
 def _pct(x):
@@ -758,10 +907,32 @@ def caveats(res):
     if nls is not None and abs(nls - PAIRED_NLS) > TOL:
         out.append(f"F at NLS {nls:g} (retuned from {PAIRED_NLS:g} by the size rule); "
                    f"D and H are at NLS {PAIRED_NLS:g}.")
+    rc = retune_caveat(res.get("size_check"))
+    if rc:
+        out.append(rc)
     if f.get("margin") is not None:
         dm = (res["runs"].get("D") or {}).get("margin")
         out.append(f"F trained with --deception-margin-loss {f['margin']:g} (D: "
-                   f"{'-' if dm is None else format(dm, 'g')}).")
+                   f"{'not recorded in its config.json' if dm is None else format(dm, 'g')}).")
+    return diagnostic_caveats(res.get("diagnostics") or {}) + out
+
+
+def diagnostic_caveats(diag):
+    out = []
+    if diag.get("saturated"):
+        ka = diag["knockout_acc_on_d_data"]
+        out.append("atomic knockouts saturate; the deception-drop condition is trivially "
+                   "satisfied; eval 5 is the discriminating comparison (knockout accuracy on "
+                   f"D data: D {ka['D']:.3f}, F {ka['F']:.3f}, both below "
+                   f"{diag['saturation_acc']:g}).")
+    flagged = [r for r in diag.get("honest_rows") or [] if r.get("non_discriminating")]
+    if flagged:
+        ns = sorted({r["n"] for r in flagged})
+        rows = "; ".join(f"{r['row']}: D {r['D']:.3f}, H {_f(r['H'])}, F {r['F']:.3f}, "
+                         f"|F - D| {r['abs_f_minus_d']:.3f} < SE {r['se']:.3f}" for r in flagged)
+        out.append("variant rows read the ablation source; condition non-discriminating at "
+                   f"n={', '.join(str(n) for n in ns)} ({rows}). SE is the binomial standard "
+                   "error of the difference of D's and F's knockout accuracies on the row.")
     return out
 
 
@@ -878,7 +1049,8 @@ def render(res):
           "Drop = full-model accuracy minus knockout accuracy on the cell's own labels: the "
           "deception drop on D data (deceptive labels, `LABEL_CONVENTION`), the honest-answer "
           "drop on H and F data (honest labels). A knockout is outside its null when its "
-          "accuracy is below the null's 5th percentile.", ""]
+          "accuracy is below the null's 5th percentile.", "",
+          res["null_sampling"]["text"], ""]
     for dr in ROLES:
         lab = "deception drop" if dr == "D" else "honest-answer drop"
         L += [f"### {dr} data `{ds[dr]}` ({lab}; {_pairing_flag(res, dr)})", "",
@@ -995,6 +1167,7 @@ def decision_record(res):
     d = res["decision"]
     return {"suite": res["suite"], "family": res["family"], "task": res["task"],
             "verdict": d["verdict"], "sentence": d["sentence"],
+            "spec_sentence": d["spec_sentence"],
             "evaluated_on": "eval 2 + eval 5" if res["eval5_dirs"] else "eval 2 alone",
             "eval5_dirs": res["eval5_dirs"],
             "honest_rows_mode": d["honest_rows_mode"],
@@ -1011,6 +1184,8 @@ def decision_record(res):
                              "full_acc": res["full_acc"][r]} for r in ROLES},
             "manifest_indexed": res["manifest_indexed"],
             "pairing": res["pairing"], "caveats": res["caveats"],
+            "diagnostics": res["diagnostics"], "size_check": res["size_check"],
+            "null_sampling": res["null_sampling"],
             "missing_inputs": d["missing"], "missing": res["missing"]}
 
 

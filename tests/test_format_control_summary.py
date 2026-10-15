@@ -62,8 +62,8 @@ def _gens(knockout_text):
 
 
 def _variant(full, ko):
-    return {"rows": {"full": {"accuracy": full}, "circuit": {"accuracy": 0.5},
-                     "knockout": {"accuracy": ko}},
+    return {"rows": {"full": {"accuracy": full, "n": 1000}, "circuit": {"accuracy": 0.5},
+                     "knockout": {"accuracy": ko, "n": 1000}},
             "headline": {"full_accuracy": full, "knockout_accuracy": ko,
                          "full_minus_knockout": full - ko}}
 
@@ -114,8 +114,30 @@ def _merge(base, over):
     return out
 
 
+#: The real FAR F run's size_check.json (e2a1b2b), trimmed to the fields the writer reads.
+FAR_SIZE_CHECK = {
+    "compared": ["heads", "fine_units"],
+    "gaps": {"heads": 0.7083333333333334, "fine_units": 1.3888888888888888},
+    "out_of_tolerance": ["heads", "fine_units"], "tol": 0.25, "step": 0.1,
+    "paired_nls": 0.3, "format_nls": 0.3, "retuned": False, "verdict": "retune",
+    "next_nls": 0.4,
+    "in_run_gate": {"kl_div": 0.1333, "misses": [], "passes": True},
+    "retune": {"nls": 0.4, "format_counts": {"heads": 72, "fine_units": 10729},
+               "gaps": {"heads": 0.5, "fine_units": 0.9736938925680647},
+               "out_of_tolerance": ["heads", "fine_units"], "verdict": "refused",
+               "in_run_gate": {"kl_div": 0.2144364150762558, "misses": ["kl_div"],
+                               "passes": False}},
+    "carried": "nls0.3",
+}
+SDR_SIZE_CHECK = {"compared": ["heads", "fine_units"],
+                  "gaps": {"heads": 0.0, "fine_units": -0.12}, "out_of_tolerance": [],
+                  "paired_nls": 0.3, "format_nls": 0.3, "retuned": False,
+                  "verdict": "within_tolerance", "next_nls": None,
+                  "in_run_gate": {"kl_div": 0.1, "misses": [], "passes": True}}
+
+
 def make_suite(tmp_path, family="fine", task="far", over=None, skip_cells=(),
-               f_nls=0.3, overlap=True, flip=True):
+               f_nls=0.3, overlap=True, flip=True, size_check=None):
     """A merged format-control suite under tmp_path; returns (suite_root, data_dir)."""
     p = _merge(DEFAULTS, over)
     name = f"format-control-{task}{'-coarse' if family == 'coarse' else ''}-nls0.3"
@@ -132,13 +154,28 @@ def make_suite(tmp_path, family="fine", task="far", over=None, skip_cells=(),
               {"task": task, "deception_condition": conds[r],
                "node_lambda_sparsity": f_nls if r == "F" else 0.3,
                "deception_margin_loss": 0.7})
-    if f_nls != 0.3:
+    if size_check is not None:
+        _dump(os.path.join(runs["F"], "size_check.json"), size_check)
+    elif f_nls != 0.3:
         _dump(os.path.join(runs["F"], "size_check.json"),
               {"paired_nls": 0.3, "format_nls": f_nls, "retuned": True})
     datasets = {suffix: task + suffix for suffix in ("", "_honest", "_nopressure")}
+    # Fine atomic circuits hold partial heads and MLP units; coarse atomic circuits
+    # hold full heads plus every MLP unit (expanded masks); a heads-only `(X) - m`
+    # cell holds full heads and no MLP unit (the real coarse suite's counts).
     circuits = [{"label": r, "kind": "atomic", "expr": None, "operands": {r: runs[r]},
-                 "home_run_dir": runs[r], "counts": {"attention_heads": 40 + i}}
+                 "home_run_dir": runs[r],
+                 "counts": ({"attention_heads": 40 + i, "attention_neurons": 3000 + i,
+                             "mlp_hidden": 1000, "mlp_output": 500} if family == "fine" else
+                            {"attention_heads": 40 + i, "attention_neurons": (40 + i) * 128,
+                             "mlp_hidden": 458752, "mlp_output": 131072})}
                 for i, r in enumerate(ROLES)]
+    if family == "coarse":
+        circuits += [{"label": f"{r}_hko__leaf", "kind": "leaf", "expr": f"({r}) - m",
+                      "counts": {"attention_heads": 40 + i,
+                                 "attention_neurons": (40 + i) * 128,
+                                 "mlp_hidden": 0, "mlp_output": 0}}
+                     for i, r in enumerate(ROLES)]
     tasks = [{"label": d, "task": task, "dataset": {"deception_condition":
               {"": "deceptive", "_honest": "honest", "_nopressure": "nopressure"}[s]}}
              for s, d in datasets.items()]
@@ -174,7 +211,11 @@ def make_suite(tmp_path, family="fine", task="far", over=None, skip_cells=(),
             heads = 10 + i if g == "head" else {"active": 10 + i, "total": 1024}
             circuits.append({"label": label, "kind": "composed", "expr": lab,
                              "counts": {"attention_heads": heads}})
-    _dump(os.path.join(root, "suite.json"), {"circuits": circuits, "tasks": tasks})
+    _dump(os.path.join(root, "suite.json"),
+          {"circuits": circuits, "tasks": tasks,
+           "geometry": {"num_heads": 32, "head_dim": 128},
+           "cli": {"null_alloc": "uniform", "knockout_granularity": "finest",
+                   "n_random": 20, "knockout_null_count": 20}})
     if overlap:
         def pair(a, b, j, inter):
             return {"pair": f"{a}/{b}", "awaits": [],
@@ -300,15 +341,38 @@ def test_format_knockout_inside_its_null_is_verdict_b(tmp_path):
     assert decision["verdict"] == "b"
 
 
-def test_format_knockout_above_the_kl_gate_is_verdict_c_even_when_otherwise_a(tmp_path):
-    # D is above the gate too, so "F's KL <= D's" passes: only the gate stops (a).
-    root, data = make_suite(tmp_path, over={"kl": {"D": 0.80, "F": 0.70}})
+def test_format_knockout_above_the_kl_gate_is_verdict_c_with_the_spec_remedy(tmp_path):
+    # D's knockout passes the gate (0.50) and F's fails it (0.70): the spec sentence.
+    root, data = make_suite(tmp_path, over={"kl": {"D": 0.50, "F": 0.70}})
     md, decision = run(root, data)
-    assert all(c["passed"] for c in decision["conditions"])
     assert decision["gate"]["kl_fails"] is True
+    assert decision["gate"]["d_fails_kl_gate"] is False
     assert decision["verdict"] == "c"
     assert "retrain the Format Circuit at a lower NLS" in decision["sentence"]
     assert "retrain the Format Circuit at a lower NLS" in md
+    assert decision["spec_sentence"] == decision["sentence"]
+
+
+BOTH_FAIL = ("both D and F knockouts fail the gate at this NLS; the comparison is "
+             "incoherent on both sides; researcher decides")
+
+
+def test_verdict_c_with_d_also_failing_the_gate_replaces_the_remedy(tmp_path):
+    # D is above the gate too, so "F's KL <= D's" passes and only the gate stops (a).
+    # The spec's remedy (retrain F at a lower NLS) would enlarge F, so it is replaced.
+    root, data = make_suite(tmp_path, over={"kl": {"D": 0.80, "H": 0.69, "F": 0.70}})
+    md, decision = run(root, data)
+    assert all(c["passed"] for c in decision["conditions"])
+    assert decision["verdict"] == "c"
+    assert decision["gate"]["d_fails_kl_gate"] is True
+    s = decision["sentence"]
+    assert BOTH_FAIL in s
+    assert "D 0.800" in s and "H 0.690" in s and "F 0.700" in s
+    assert "a lower NLS gives a larger circuit" in s
+    assert "Nothing is launched" in s
+    assert "retrain the Format Circuit at a lower NLS, never to reinterpret" not in s
+    assert "retrain the Format Circuit at a lower NLS" in decision["spec_sentence"]
+    assert BOTH_FAIL in md
 
 
 UNREGISTERED = "not pre-registered; orchestrator choice 2026-10-13, researcher to confirm"
@@ -694,6 +758,99 @@ def test_eval5_distinct2_collapse_is_verdict_c(tmp_path):
     _, decision = run(root, data, eval5_dirs=[e5])
     assert decision["gate"]["distinct2_source"] == "eval 5 distinct_n"
     assert decision["verdict"] == "c"
+
+
+# ==============================================================================
+# DIAGNOSTIC CAVEATS (real-suite round; none changes the rule)
+# ==============================================================================
+
+SATURATED = ("atomic knockouts saturate; the deception-drop condition is trivially "
+             "satisfied; eval 5 is the discriminating comparison")
+
+
+def test_saturated_knockouts_on_d_data_are_caveated(tmp_path):
+    # The real coarse SDR suite: D 0.002, F 0.000 on D data.
+    root, data = make_suite(tmp_path, over={"ko": {"D": {"": 0.002}, "F": {"": 0.0}}})
+    md, decision = run(root, data)
+    assert decision["diagnostics"]["saturated"] is True
+    assert any(SATURATED in c for c in decision["caveats"])
+    assert SATURATED in md
+    assert decision["verdict"] == "a"                      # the rule is unchanged
+
+
+def test_unsaturated_knockouts_are_not_caveated(tmp_path):
+    root, data = make_suite(tmp_path)                      # F 0.10 on D data
+    _, decision = run(root, data)
+    assert decision["diagnostics"]["saturated"] is False
+    assert not any(SATURATED in c for c in decision["caveats"])
+
+
+#: The real coarse SDR rows: honest-answer drops 0.530 / 0.519 / 0.519 (honest_instruction)
+#: and 0.560 / 0.535 / 0.534 (no_pressure) for D / H / F, full model 0.234 / 0.228, n=1000.
+COARSE_ROWS = {"D": {"honest_instruction": (0.234, 0.764), "no_pressure": (0.228, 0.788)},
+               "H": {"honest_instruction": (0.234, 0.753), "no_pressure": (0.228, 0.763)},
+               "F": {"honest_instruction": (0.234, 0.753), "no_pressure": (0.228, 0.762)}}
+
+
+def test_rule_rows_within_binomial_error_are_caveated_non_discriminating(tmp_path):
+    root, data = make_suite(tmp_path, over={"variants": COARSE_ROWS})
+    md, decision = run(root, data)
+    rows = {r["row"]: r for r in decision["diagnostics"]["honest_rows"]}
+    hi, nopress = rows["honest_instruction (D data)"], rows["no_pressure (D data)"]
+    # honest_instruction: |F - D| = 0.011, SE of the knockout-accuracy difference
+    # sqrt(.764*.236/1000 + .753*.247/1000) = 0.0191; D, H, F within 0.011 of each other.
+    assert hi["abs_f_minus_d"] == pytest.approx(0.011)
+    assert hi["se"] == pytest.approx(0.0191, abs=1e-4)
+    assert hi["non_discriminating"] is True
+    # no_pressure: |F - D| = 0.026 > SE 0.0187: the criterion does not flag it.
+    assert nopress["abs_f_minus_d"] == pytest.approx(0.026)
+    assert nopress["non_discriminating"] is False
+    cav = next(c for c in decision["caveats"] if "non-discriminating" in c)
+    assert cav.startswith("variant rows read the ablation source; condition "
+                          "non-discriminating at n=1000")
+    assert "honest_instruction (D data)" in cav and "no_pressure (D data)" not in cav
+    assert decision["verdict"] == "a"                      # the rule is unchanged
+
+
+def test_separated_rule_rows_are_not_caveated(tmp_path):
+    root, data = make_suite(tmp_path)          # drops 0.755 / 0.194 / 0.394: far apart
+    _, decision = run(root, data)
+    assert not any(r["non_discriminating"] for r in decision["diagnostics"]["honest_rows"])
+    assert not any("non-discriminating" in c for c in decision["caveats"])
+
+
+def test_failed_retune_is_caveated_from_size_check(tmp_path):
+    root, data = make_suite(tmp_path, size_check=FAR_SIZE_CHECK)
+    md, decision = run(root, data)
+    want = ("F oversized at NLS 0.3 (+71% heads, +139% fine units); retune to 0.4 failed "
+            "the in-run gate (KL 0.214, misses kl_div; still +50% heads, +97% fine units); "
+            "carried nls0.3")
+    assert any(want in c for c in decision["caveats"])
+    assert want in md
+    assert decision["size_check"]["verdict"] == "retune"
+
+
+def test_size_within_tolerance_has_no_retune_caveat(tmp_path):
+    root, data = make_suite(tmp_path, task="sdr", size_check=SDR_SIZE_CHECK)
+    _, decision = run(root, data)
+    assert not any("oversized" in c or "retune to" in c for c in decision["caveats"])
+
+
+def test_null_sampling_is_stated_for_fine_cells(tmp_path):
+    root, data = make_suite(tmp_path)
+    md, decision = run(root, data)
+    ns = decision["null_sampling"]
+    assert ns["unit"] == "fine units" and ns["alloc"] == "uniform" and ns["n"] == 20
+    header = md.split("## Paired table", 1)[1].split("###", 1)[0]
+    assert "Null:" in header and "fine units" in header and "layer by layer" in header
+
+
+def test_null_sampling_is_whole_heads_for_heads_only_cells(tmp_path):
+    root, data = make_suite(tmp_path, family="coarse", task="sdr")
+    md, decision = run(root, data)
+    assert decision["null_sampling"]["unit"] == "whole heads"
+    header = md.split("## Paired table", 1)[1].split("###", 1)[0]
+    assert "whole heads" in header and "no MLP units" in header
 
 
 # ==============================================================================

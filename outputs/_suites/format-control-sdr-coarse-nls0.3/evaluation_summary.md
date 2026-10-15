@@ -40,6 +40,8 @@ Rule order: (c) first: F's knockout fails the wikitext KL gate (KL/token > 0.66)
 
 Drop = full-model accuracy minus knockout accuracy on the cell's own labels: the deception drop on D data (deceptive labels, `LABEL_CONVENTION`), the honest-answer drop on H and F data (honest labels). A knockout is outside its null when its accuracy is below the null's 5th percentile.
 
+Null: size-matched random circuits drawn layer by layer with the same number of heads per layer; every live head of these heads-only cells is full (128 of 128 neurons) and they hold no MLP units, so the null samples whole heads and no MLP units; n = 20, knockout granularity `finest`, blocks held fixed (evaluation/masks.py `sample_random_masks`).
+
 ### D data `sdr` (deception drop; paired with F data by instance)
 
 | circuit | circuit-alone acc | intact acc | knockout acc | drop | null p5 / p50 / p95 | outside null | wikitext KL | flip audit | paired |
@@ -95,13 +97,15 @@ Full / knockout accuracy on the cell's labels, then the honest-answer drop. On D
 
 ## Caveats
 
+- atomic knockouts saturate; the deception-drop condition is trivially satisfied; eval 5 is the discriminating comparison (knockout accuracy on D data: D 0.002, F 0.000, both below 0.02).
+- variant rows read the ablation source; condition non-discriminating at n=1000 (honest_instruction (D data): D 0.530, H 0.519, F 0.519, |F - D| 0.011 < SE 0.019). SE is the binomial standard error of the difference of D's and F's knockout accuracies on the row.
 - Variant rows (honest_instruction, no_pressure) of FAR and SDR runs at NLS levels other than 0.3 are suspect: they were computed on mixed-wording prompts before the ticket 01 drift fix. Compare this suite's rows only with rows computed after it.
 - H column unpaired: the Honest Twin's instances are disjoint from the deceptive ones (a given instance either lied or it did not), so cells on H data are not instance-paired with D or F data.
 - Honest-answer drops on the H and F test sets are informational: the F test set is in-distribution for F; not in the rule (honest-answer rows: `variants`, orchestrator ruling 2026-10-13: spec rows only; researcher may flip).
 - Coarse knockouts are heads-only: each is composed at leaf as `(expr) - m` (m = the all-MLP, no-head operand) and reported at head level; every live head has all its neurons open, so leaf set operations are head set operations.
 - EVAL 5 absent: the rule is evaluated on eval 2 alone (wikitext KL as the collateral cost; distinct-2 from eval 2's three greedy wikitext continuations). Pass --eval5-dir to add the benchmark columns.
 - F trained on 29% honest-split instances (train 44/150); validation 36% (54/150), test 0% (0/520): the tagged fallback subset of the nopressure build.
-- F trained with --deception-margin-loss 0.7 (D: -).
+- F trained with --deception-margin-loss 0.7 (D: not recorded in its config.json).
 
 ## Decisions taken in applying the rule
 
