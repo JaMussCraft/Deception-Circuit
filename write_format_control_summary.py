@@ -13,11 +13,16 @@ Usage (from the repo root):
 
     python write_format_control_summary.py outputs/_suites/format-control-far-nls0.3
 
-    # with the eval 5 suites (ticket 06), which add the benchmark columns and
-    # switch the collateral condition to the reference-NLL rise
+    # with the eval 5 suites (ticket 06; the sm and lb benchmark groups, named in
+    # outputs/_launch_format_control/README_eval5.md), which add the benchmark
+    # columns and an informational eval 5 deception-drop row, and switch the
+    # collateral condition to the reference-NLL rise
     python write_format_control_summary.py outputs/_suites/format-control-far-nls0.3 \\
-        --eval5-dir outputs/_suites/eval5-format-control-far-sm \\
-        --eval5-dir outputs/_suites/eval5-format-control-far-lb
+        --eval5-dir outputs/eval5_format_far --eval5-dir outputs/eval5_format_far_lb
+
+    # likewise for SDR: outputs/eval5_format_sdr and outputs/eval5_format_sdr_lb
+    # with format-control-sdr-nls0.3; outputs/eval5_format_sdr_coarse and
+    # outputs/eval5_format_sdr_coarse_lb with format-control-sdr-coarse-nls0.3
 """
 
 from __future__ import annotations

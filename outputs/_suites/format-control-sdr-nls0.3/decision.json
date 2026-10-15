@@ -104,6 +104,7 @@
     "collateral": "Collateral is the reference-NLL rise (eval 5, knockout minus full, mean over the benchmark datasets both D and F have, with the sm and lb groups merged; a dataset only one of them has is excluded and named) when an eval 5 directory is given, else the wikitext KL/token of eval 2.",
     "distinct2": "Distinct-2 collapse = F's knockout distinct-2 below 0.5 x the full model's: eval 5 `distinct_n` (mean over all of F's datasets) when given, else word bigrams of eval 2's three greedy wikitext continuations (not pre-registered; orchestrator choice 2026-10-13, researcher to confirm).",
     "null": "Outside the null = knockout accuracy strictly below the null's 5th percentile.",
+    "eval2_conditions": "The deception-drop and outside-null conditions are evaluated on eval 2 (task accuracy and its task-side null) even when --eval5-dir is given; eval 5 enters the rule only through the collateral condition (reference-NLL rise) and the distinct-2 gate. Eval 5's deception drop is printed as an informational row, not in the rule (not pre-registered; orchestrator choice 2026-10-15, researcher to confirm).",
     "missing": "A condition whose inputs are missing is reported as missing; the verdict is then undecided unless the (c) gate fires or another condition already fails, which rules (a) out and gives (b). A missing (c) gate input (F's wikitext KL or distinct-2) always leaves the verdict undecided unless the other gate input already fires: (c) pre-empts both (a) and (b)."
   },
   "thresholds": {
@@ -201,7 +202,7 @@
     "honest_split_total": 98
   },
   "caveats": [
-    "atomic knockouts saturate; the deception-drop condition is trivially satisfied; eval 5 is the discriminating comparison (knockout accuracy on D data: D 0.000, F 0.000, both below 0.02).",
+    "atomic knockouts saturate, so the eval 2 deception-drop condition is trivially satisfied and cannot tell D from F; the rule still evaluates it on eval 2 (eval 5's deception drop, when given, is informational and not in the rule). Knockout accuracy on D data: D 0.000, F 0.000, both below 0.02.",
     "variant rows read the ablation source; condition non-discriminating at n=1000 (honest_instruction (D data): D 0.522, H 0.521, F 0.522, |F - D| 0.000 < SE 0.019; no_pressure (D data): D 0.535, H 0.534, F 0.535, |F - D| 0.000 < SE 0.019). SE is the binomial standard error of the difference of D's and F's knockout accuracies on the row.",
     "Variant rows (honest_instruction, no_pressure) of FAR and SDR runs at NLS levels other than 0.3 are suspect: they were computed on mixed-wording prompts before the ticket 01 drift fix. Compare this suite's rows only with rows computed after it.",
     "H column unpaired: the Honest Twin's instances are disjoint from the deceptive ones (a given instance either lied or it did not), so cells on H data are not instance-paired with D or F data.",
@@ -295,6 +296,7 @@
       }
     }
   },
+  "eval5_deception_drop": null,
   "null_sampling": {
     "unit": "fine units",
     "alloc": "uniform",

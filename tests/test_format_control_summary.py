@@ -723,13 +723,15 @@ def test_coarse_missing_heads_only_cell_is_named(tmp_path):
 # ==============================================================================
 
 def make_eval5(tmp_path, ref_nll_ko=None, distinct_ko=None, name="eval5_format_fine",
-               datasets=("sandbagging", "mask:known_facts")):
+               datasets=("sandbagging", "mask:known_facts"), ko_rate=None):
     """An eval 5 suite (ticket 06 layout) with D, H, F on some benchmark datasets.
 
     ref_nll_ko[role] is a float for every dataset, or {dataset: float};
-    datasets is a tuple for every role, or {role: tuple}."""
+    datasets is a tuple for every role, or {role: tuple}; ko_rate[role] is the
+    knockout's deception rate (the full model's is 1.0)."""
     ref_nll_ko = ref_nll_ko or {"D": 1.5, "H": 1.0, "F": 1.2}
     distinct_ko = distinct_ko or {"D": 0.5, "H": 0.6, "F": 0.6}
+    ko_rate = ko_rate or {"D": 0.2, "H": 0.2, "F": 0.2}
     d = str(tmp_path / name)
     for r in ROLES:
         names = datasets[r] if isinstance(datasets, dict) else datasets
@@ -740,7 +742,7 @@ def make_eval5(tmp_path, ref_nll_ko=None, distinct_ko=None, name="eval5_format_f
                 "configs": {
                     "full": {"rates": {"deceptive": 1.0},
                              "coherence": {"ref_nll": 0.3, "distinct_n": 0.7}},
-                    "knockout": {"rates": {"deceptive": 0.2},
+                    "knockout": {"rates": {"deceptive": ko_rate[r]},
                                  "coherence": {"ref_nll": ko, "distinct_n": distinct_ko[r]}}},
                 "null": {"deceptive": {"p5": 0.05, "p50": 0.1}}}
         _dump(os.path.join(d, "cells", r, "far", "interchange", "benchmarks.json"),
@@ -839,8 +841,11 @@ def test_eval5_distinct2_collapse_is_verdict_c(tmp_path):
 # DIAGNOSTIC CAVEATS (real-suite round; none changes the rule)
 # ==============================================================================
 
-SATURATED = ("atomic knockouts saturate; the deception-drop condition is trivially "
-             "satisfied; eval 5 is the discriminating comparison")
+SATURATED = ("atomic knockouts saturate, so the eval 2 deception-drop condition is "
+             "trivially satisfied and cannot tell D from F; the rule still evaluates it on "
+             "eval 2 (eval 5's deception drop, when given, is informational and not in the "
+             "rule)")
+EVAL2_CHOICE = "not pre-registered; orchestrator choice 2026-10-15, researcher to confirm"
 
 
 def test_saturated_knockouts_on_d_data_are_caveated(tmp_path):
@@ -850,7 +855,45 @@ def test_saturated_knockouts_on_d_data_are_caveated(tmp_path):
     assert decision["diagnostics"]["saturated"] is True
     assert any(SATURATED in c for c in decision["caveats"])
     assert SATURATED in md
+    assert "eval 5 is the discriminating comparison" not in md
     assert decision["verdict"] == "a"                      # the rule is unchanged
+
+
+def test_eval2_reading_of_deception_drop_and_nulls_is_recorded_as_a_choice(tmp_path):
+    root, data = make_suite(tmp_path)
+    md, decision = run(root, data, eval5_dirs=[make_eval5(tmp_path)])
+    text = decision["decisions_taken"]["eval2_conditions"]
+    assert "deception-drop and outside-null conditions are evaluated on eval 2" in text
+    assert "even when --eval5-dir is given" in text
+    assert EVAL2_CHOICE in text
+    decided = md.split("## Decisions taken in applying the rule", 1)[1].split("##", 1)[0]
+    assert EVAL2_CHOICE in decided
+
+
+def test_eval5_deception_drop_is_an_informational_row_beside_the_rules_row(tmp_path):
+    # Full-model deception rate 1.0; knockout rates D 0.10, F 0.40 on both shared
+    # datasets -> eval 5 drops D 0.900, F 0.600 (F < 0.8 x D), yet the verdict stays
+    # the eval 2 rule's (a): the row is informational.
+    root, data = make_suite(tmp_path)
+    e5 = make_eval5(tmp_path, ko_rate={"D": 0.10, "H": 0.2, "F": 0.40})
+    md, decision = run(root, data, eval5_dirs=[e5])
+    info = decision["eval5_deception_drop"]
+    assert info["D"] == pytest.approx(0.9) and info["F"] == pytest.approx(0.6)
+    assert info["datasets"] == ["mask:known_facts", "sandbagging"]
+    assert info["in_rule"] is False
+    assert decision["verdict"] == "a"
+    rows = md.split("| condition | rule | D | F | result |", 1)[1].split("\n\n", 1)[0]
+    lines = rows.splitlines()
+    i = next(k for k, ln in enumerate(lines) if ln.startswith("| deception drop |"))
+    assert "deception drop, eval 5 (informational: not in the rule)" in lines[i + 1]
+    assert "| 0.900 | 0.600 |" in lines[i + 1]
+
+
+def test_no_eval5_deception_row_without_an_eval5_directory(tmp_path):
+    root, data = make_suite(tmp_path)
+    md, decision = run(root, data)
+    assert decision["eval5_deception_drop"] is None
+    assert "deception drop, eval 5" not in md
 
 
 def test_unsaturated_knockouts_are_not_caveated(tmp_path):

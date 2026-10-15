@@ -118,6 +118,13 @@ DECISIONS_TAKEN = {
                   f"(mean over all of F's datasets) when given, else word bigrams of eval 2's three "
                   f"greedy wikitext continuations ({UNREGISTERED})."),
     "null": "Outside the null = knockout accuracy strictly below the null's 5th percentile.",
+    "eval2_conditions": ("The deception-drop and outside-null conditions are evaluated on eval 2 "
+                         "(task accuracy and its task-side null) even when --eval5-dir is "
+                         "given; eval 5 enters the rule only through the collateral condition "
+                         "(reference-NLL rise) and the distinct-2 gate. Eval 5's deception "
+                         "drop is printed as an informational row, not in the rule (not "
+                         "pre-registered; orchestrator choice 2026-10-15, researcher to "
+                         "confirm)."),
     "missing": ("A condition whose inputs are missing is reported as missing; the verdict is "
                 "then undecided unless the (c) gate fires or another condition already "
                 "fails, which rules (a) out and gives (b). A missing (c) gate input (F's "
@@ -320,7 +327,10 @@ def eval5_aggregate(rows_by_dataset):
              if r["knockout_ref_nll"] is not None and r["full_ref_nll"] is not None]
     dfull = _mean([r["full_distinct_n"] for r in rows])
     dko = _mean([r["knockout_distinct_n"] for r in rows])
+    drops = [r["full_rate"] - r["knockout_rate"] for r in rows
+             if r["full_rate"] is not None and r["knockout_rate"] is not None]
     return {"ref_nll_rise": _mean(rises), "n_datasets": len(rises),
+            "deception_drop": _mean(drops),
             "distinct2_full": dfull, "distinct2_knockout": dko,
             "distinct2_ratio": dko / dfull if dko is not None and dfull else None}
 
@@ -753,6 +763,13 @@ def summarize(suite_root, *, data_dir="data/datasets", eval5_dirs=(), family=Non
                        "F_size": f_size, "eval5": bool(eval5_dirs),
                        "eval5_datasets": eval5_datasets}, honest_rows=honest_rows)
     diagnostics = diagnose(paired, decision)
+    # Eval 5's deception drop (full minus knockout deception rate under interchange,
+    # mean over the datasets D and F share): shown beside the rule's eval 2 row only.
+    eval5_drop = None
+    if eval5_dirs:
+        eval5_drop = {r: eval5_aggregate({k: (e5.get(r) or {})[k] for k in shared})
+                      ["deception_drop"] for r in ("D", "F")}
+        eval5_drop.update(datasets=shared, in_rule=False)
     null_sampling = null_sampling_of(suite, family)
 
     result = {"suite": os.path.basename(root), "root": root, "family": family, "task": task,
@@ -762,6 +779,7 @@ def summarize(suite_root, *, data_dir="data/datasets", eval5_dirs=(), family=Non
               "eval5_dirs": list(eval5_dirs or ()), "eval5": eval5,
               "inputs": sides, "decision": decision, "missing": missing,
               "diagnostics": diagnostics, "size_check": size_check,
+              "eval5_deception_drop": eval5_drop,
               "null_sampling": null_sampling}
     result["caveats"] = caveats(result)
     return result
@@ -968,10 +986,11 @@ def diagnostic_caveats(diag):
     out = []
     if diag.get("saturated"):
         ka = diag["knockout_acc_on_d_data"]
-        out.append("atomic knockouts saturate; the deception-drop condition is trivially "
-                   "satisfied; eval 5 is the discriminating comparison (knockout accuracy on "
-                   f"D data: D {ka['D']:.3f}, F {ka['F']:.3f}, both below "
-                   f"{diag['saturation_acc']:g}).")
+        out.append("atomic knockouts saturate, so the eval 2 deception-drop condition is "
+                   "trivially satisfied and cannot tell D from F; the rule still evaluates it "
+                   "on eval 2 (eval 5's deception drop, when given, is informational and not "
+                   f"in the rule). Knockout accuracy on D data: D {ka['D']:.3f}, "
+                   f"F {ka['F']:.3f}, both below {diag['saturation_acc']:g}.")
     flagged = [r for r in diag.get("honest_rows") or [] if r.get("non_discriminating")]
     if flagged:
         ns = sorted({r["n"] for r in flagged})
@@ -1086,6 +1105,13 @@ def render(res):
             if c.get("threshold") is not None:
                 rule += f"; threshold {_f(c['threshold'])}"
             L.append(_row([c["name"], rule, _f(c["D"]), _f(c["F"]), _pf(c["passed"])]))
+            e5 = res.get("eval5_deception_drop")
+            if c["name"] == "deception drop" and e5:
+                L.append(_row([
+                    "&nbsp;&nbsp;deception drop, eval 5 (informational: not in the rule)",
+                    "full minus knockout deception rate under interchange, mean over the "
+                    f"{len(e5['datasets'])} dataset(s) D and F share",
+                    _f(e5["D"]), _f(e5["F"]), "-"]))
     coll = next((c for c in d["conditions"] if c["name"] == "collateral"), {})
     if "datasets" in coll:
         exc = "; ".join(f"{r} {', '.join(v)}" for r, v in coll["excluded"].items() if v)
@@ -1245,6 +1271,7 @@ def decision_record(res):
             "manifest_indexed": res["manifest_indexed"],
             "pairing": res["pairing"], "caveats": res["caveats"],
             "diagnostics": res["diagnostics"], "size_check": res["size_check"],
+            "eval5_deception_drop": res["eval5_deception_drop"],
             "null_sampling": res["null_sampling"],
             "missing_inputs": d["missing"], "missing": res["missing"]}
 
