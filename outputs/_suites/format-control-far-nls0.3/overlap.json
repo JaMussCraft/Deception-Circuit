@@ -1,0 +1,67 @@
+{
+  "family": "fine",
+  "task": "far",
+  "mask_file": "active_nodes.json",
+  "runs": {
+    "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+    "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_honest_noedge_260819-084020",
+    "F": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.3_nopressure_noedge_261013-203424"
+  },
+  "pairs": [
+    {
+      "pair": "D/H",
+      "awaits": [],
+      "heads": {
+        "intersection": 34,
+        "union": 79,
+        "active_a": 48,
+        "active_b": 65,
+        "jaccard": 0.43037974683544306
+      },
+      "fine_units": {
+        "intersection": 2556,
+        "union": 13815,
+        "active_a": 5436,
+        "active_b": 10935,
+        "jaccard": 0.18501628664495115
+      }
+    },
+    {
+      "pair": "D/F",
+      "awaits": [],
+      "heads": {
+        "intersection": 33,
+        "union": 97,
+        "active_a": 48,
+        "active_b": 82,
+        "jaccard": 0.3402061855670103
+      },
+      "fine_units": {
+        "intersection": 2621,
+        "union": 15801,
+        "active_a": 5436,
+        "active_b": 12986,
+        "jaccard": 0.16587557749509524
+      }
+    },
+    {
+      "pair": "H/F",
+      "awaits": [],
+      "heads": {
+        "intersection": 58,
+        "union": 89,
+        "active_a": 65,
+        "active_b": 82,
+        "jaccard": 0.651685393258427
+      },
+      "fine_units": {
+        "intersection": 6917,
+        "union": 17004,
+        "active_a": 10935,
+        "active_b": 12986,
+        "jaccard": 0.4067866384380146
+      }
+    }
+  ],
+  "note": "fine units pool attention_neurons, mlp_hidden and mlp_output"
+}

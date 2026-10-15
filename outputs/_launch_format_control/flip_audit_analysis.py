@@ -459,8 +459,15 @@ def positional(pe, recs, variants_pe):
     s2, n2 = stay(True)
     pval = binom_two_sided(k_ko2, n, base)
     gap = s2 - s1 if (s1 == s1 and s2 == s2) else float("nan")
-    verdict = ("positional default" if abs(p_ko2 - base) >= POS_MARGIN and pval < POS_P
-               and gap == gap and abs(gap) >= POS_GAP else "content-driven flip")
+    n_flipped = sum(1 for r in rows if r["status"] == "flipped_honest")
+    if n_flipped == 0:
+        # Nothing flipped (e.g. a delta that leaves every item deceptive):
+        # there is no flip to call content-driven or positional.
+        verdict = "no flip"
+    elif abs(p_ko2 - base) >= POS_MARGIN and pval < POS_P and gap == gap and abs(gap) >= POS_GAP:
+        verdict = "positional default"
+    else:
+        verdict = "content-driven flip"
     out = {"n": n, "p_target_item_2": base, "always_item_2_accuracy": base,
            "p_ko_item_2": p_ko2, "p_ko_neither": sum(1 for x in ko2 if x is None) / n,
            "p_ko_item_2_given_target_1": cond(False), "p_ko_item_2_given_target_2": cond(True),
@@ -834,7 +841,11 @@ def positional_sentence(cells, label=""):
         txt += (". In these cells the knockout's accuracy is largely a position artefact: an always-item_2 "
                 "responder scores P(target = item_2) by construction, so a partial accuracy near that base "
                 "rate is not evidence of partial necessity")
-    rest = [c for c in pos if c["positional"]["verdict"] != "positional default"]
+    none = [c for c in pos if c["positional"]["verdict"] == "no flip"]
+    if none:
+        txt += (f". {len(none)} cell(s) flip no item at all (no flip: "
+                f"{', '.join(cname(c) for c in none)})")
+    rest = [c for c in pos if c["positional"]["verdict"] == "content-driven flip"]
     if rest:
         txt += (f". The other {len(rest)} are content-driven flips by this test (|P(item_2) - base| < "
                 f"{POS_MARGIN} or binomial p >= {POS_P}, or stay-rate gap < {POS_GAP})")
@@ -992,7 +1003,8 @@ POSITIONAL_NOTE = (
     "position. The full-model columns give P(full picks item_2) on the variant prompts, with its binomial p "
     "against the base rate, to show whether the model's own honest answer has a position bias. Verdict: "
     f"'positional default' when |P(KO item_2) - base| >= {POS_MARGIN}, binom p < {POS_P} and the stay-rate "
-    f"gap between target positions is >= {POS_GAP}; otherwise 'content-driven flip'.\n")
+    f"gap between target positions is >= {POS_GAP}; 'no flip' when the knockout flips no item; "
+    f"otherwise 'content-driven flip'.\n")
 
 
 def md_report(root, ablation, per_cell, cross, stub, ctrl, ctrl_rows, summary):

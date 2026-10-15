@@ -250,6 +250,64 @@ def submit(manifest: dict, *, dry: bool, accounts, partition: str, suites=None, 
     return lines
 
 
+SACCT_FIELDS = "JobID,Partition,NodeList,Timelimit,State"
+
+
+def parse_sacct(text: str) -> dict:
+    """`sacct -X -n -P -o JobID,Partition,NodeList,Timelimit,State` -> {id: row}."""
+    rows = {}
+    for line in text.splitlines():
+        parts = line.strip().split("|")
+        if len(parts) != 5:
+            continue
+        jid, partition, node, limit, state = parts
+        rows[jid] = {"partition": partition, "node": node, "timelimit": limit,
+                     "state": state.split()[0] if state else state}
+    return rows
+
+
+def _slurm_records(manifest: dict):
+    for suite in manifest["suites"].values():
+        for job in suite["jobs"]:
+            yield job["slurm"]
+    for sides in (manifest.get("side_jobs") or {}).values():
+        for job in sides:
+            yield job["slurm"]
+
+
+def apply_sacct(manifest: dict, rows: dict) -> int:
+    """Record each submitted job's final state, the partition and node it ran
+    on (sanity on H200 drifts by one tolerance step against A40-trained runs),
+    and a time limit changed in place after submission. Returns the number of
+    records updated."""
+    n = 0
+    for rec in _slurm_records(manifest):
+        row = rows.get(rec.get("job_id") or "")
+        if not row:
+            continue
+        rec["state"] = row["state"]
+        if row["state"] not in ("PENDING",) and row["node"] and row["node"] != "None assigned":
+            rec["ran_on"] = {"partition": row["partition"], "node": row["node"]}
+        if row["timelimit"] and row["timelimit"] != rec.get("time"):
+            rec["time_limit_actual"] = row["timelimit"]
+            rec["time_limit_note"] = ("lowered in place by the orchestrator (scontrol update) on "
+                                      "2026-10-14 to speed backfill; `time` is the limit at submission")
+        n += 1
+    return n
+
+
+def record_slurm(path: str = MANIFEST_PATH) -> int:
+    manifest = load_manifest(path)
+    ids = [r["job_id"] for r in _slurm_records(manifest) if r.get("job_id")]
+    if not ids:
+        return 0
+    out = subprocess.run(["sacct", "-X", "-n", "-P", "-o", SACCT_FIELDS, "-j", ",".join(ids)],
+                         check=True, capture_output=True, text=True).stdout
+    n = apply_sacct(manifest, parse_sacct(out))
+    save_manifest(manifest, path)
+    return n
+
+
 def time_stamp() -> str:
     return time.strftime("%Y-%m-%dT%H:%M:%S")
 
@@ -353,6 +411,8 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     sub = ap.add_subparsers(dest="cmd", required=True)
     sub.add_parser("plan", help="(re)write suite_manifest.json")
+    sub.add_parser("record-slurm", help="record each submitted job's state, partition/node "
+                                        "and actual time limit (sacct) in the manifest")
     sub.add_parser("testset", help="print the test set a job's --task-from resolves to "
                                    "(usage: testset <evaluate_circuit.py args>)")
     p = sub.add_parser("args", help="print one job's evaluate_circuit.py arguments")
@@ -383,7 +443,9 @@ def main(argv=None):
     p.add_argument("suite")
     a = ap.parse_args(argv)
 
-    if a.cmd == "plan":
+    if a.cmd == "record-slurm":
+        print(f"  {record_slurm()} job record(s) updated in {MANIFEST_PATH}")
+    elif a.cmd == "plan":
         m = refresh_manifest()
         for s, v in m["suites"].items():
             n_ready = sum(1 for j in v["jobs"] if not j["awaits"])

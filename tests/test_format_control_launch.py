@@ -394,6 +394,30 @@ def test_a_side_job_needs_its_own_dry_run_and_records_its_id(launch, tmp_path, m
     assert fc_cells  # the grid planner is untouched by side jobs
 
 
+def test_sacct_actuals_record_where_each_job_ran(launch):
+    """Partition and node each job actually ran on (sanity on H200 drifts by
+    one tolerance step against A40-trained runs), its final state, and any
+    time limit changed in place after submission."""
+    manifest = launch.build_manifest(CONFIG, side_jobs=SIDE)
+    far = manifest["suites"]["format-control-far-nls0.3"]["jobs"]
+    far[0]["slurm"] = {"job_id": "11", "partition": "gpuA40x4,gpuH200x8", "time": "04:00:00"}
+    far[1]["slurm"] = {"job_id": "12", "partition": "gpuA40x4,gpuH200x8", "time": "04:00:00"}
+    side = manifest["side_jobs"]["format-control-far-nls0.3"][0]
+    side["slurm"] = {"job_id": "13", "partition": "gpuA40x4,gpuH200x8", "time": "04:00:00"}
+    rows = "11|gpuH200x8|gpue07|02:30:00|COMPLETED\n12|gpuA40x4|gpub028|04:00:00|COMPLETED\n" \
+           "13|gpuA40x4,gpuH200x8|None assigned|02:30:00|PENDING\n"
+    n = launch.apply_sacct(manifest, launch.parse_sacct(rows))
+    assert n == 3
+    assert far[0]["slurm"]["ran_on"] == {"partition": "gpuH200x8", "node": "gpue07"}
+    assert far[0]["slurm"]["state"] == "COMPLETED"
+    assert far[0]["slurm"]["time_limit_actual"] == "02:30:00"
+    assert far[1]["slurm"]["ran_on"] == {"partition": "gpuA40x4", "node": "gpub028"}
+    assert "time_limit_actual" not in far[1]["slurm"]          # unchanged since submission
+    assert side["slurm"]["state"] == "PENDING" and "ran_on" not in side["slurm"]
+    again = launch.build_manifest(CONFIG, previous=manifest, side_jobs=SIDE)
+    assert again["suites"]["format-control-far-nls0.3"]["jobs"][0]["slurm"]["ran_on"]["node"] == "gpue07"
+
+
 def test_the_manifest_lists_every_cell_and_keeps_recorded_job_ids(launch):
     manifest = launch.build_manifest(CONFIG)
     suites = manifest["suites"]
@@ -574,6 +598,30 @@ def test_overlap_is_jaccard_over_heads_and_pooled_fine_units(tmp_path):
     assert len(paths) == 2
 
 
+def _recs(targets):
+    return [{"item_1": "a", "item_2": "b", "target": t, "answer_item": "item_1" if t == "a" else "item_2"}
+            for t in targets]
+
+
+def test_a_knockout_that_flips_nothing_reads_no_flip():
+    """A delta such as H-D-F leaves every item deceptive: there is no flip
+    to call content-driven or positional."""
+    flip = _launch_module("flip_audit_analysis")
+    recs = _recs(["a", "b"] * 50)
+    stayed = [{"example_id": i, "status": "stayed_deceptive", "knockout_choice": "deceptive",
+               "full_choice": "deceptive"} for i in range(100)]
+    assert flip.positional(stayed, recs, {})["verdict"] == "no flip"
+
+    # One flipped item is enough for the usual reading.
+    some = stayed[:99] + [{"example_id": 99, "status": "flipped_honest", "knockout_choice": "honest",
+                           "full_choice": "deceptive"}]
+    assert flip.positional(some, recs, {})["verdict"] == "content-driven flip"
+    cells = [{"circuit": "H_minus_D_minus_F__head", "task": "sdr",
+              "positional": flip.positional(stayed, recs, {})}]
+    assert "no flip" in flip.positional_sentence(cells)
+    assert "content-driven" not in flip.positional_sentence(cells)
+
+
 def test_the_allmlp_operand_has_the_runs_keys_no_heads_and_every_mlp_unit(tmp_path):
     """`m` of the coarse heads-only knockout `(X) - m`, built from a run's own
     expanded mask (the recipe of submit_headsko.sh)."""
@@ -734,6 +782,6 @@ def test_a_faithfulness_cell_and_a_delta_cell_run_merge_and_audit(
     for c in cells.values():
         assert c["rows_aligned"], c["notes"]          # read the right test set
         assert "positional" in c and c["positional"]["verdict"] in (
-            "positional default", "content-driven flip")
+            "positional default", "content-driven flip", "no flip")
     exprs = flip.suite_exprs(root)
     assert flip.is_delta("D_minus_F__head", exprs) and not flip.is_delta("D", exprs)

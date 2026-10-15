@@ -92,7 +92,7 @@ Full / knockout accuracy on the cell's labels, then the honest-answer drop. On D
 | D_and_F | `D & F` | head (composed at leaf) | 36 | 4608 | 0.002 | 0.998 | 0.305 / 0.720 / 0.947 | yes | content-driven flip; separable |
 | F_minus_D | `F - D` | head (composed at leaf) | 32 | 4096 | 0.598 | 0.402 | 0.627 / 0.889 / 0.972 | yes | content-driven flip; not separable |
 | D_minus_H_minus_F | `D - H - F` | head (composed at leaf) | 22 | 2816 | 0.782 | 0.218 | 0.733 / 0.920 / 0.999 | no | content-driven flip; not separable |
-| H_minus_D_minus_F | `H - D - F` | head (composed at leaf) | 2 | 256 | 1.000 | 0.000 | 0.986 / 1.000 / 1.000 | no | content-driven flip; not separable |
+| H_minus_D_minus_F | `H - D - F` | head (composed at leaf) | 2 | 256 | 1.000 | 0.000 | 0.986 / 1.000 / 1.000 | no | no flip; not separable |
 | F_minus_D_minus_H | `F - D - H` | head (composed at leaf) | 21 | 2688 | 0.965 | 0.035 | 0.530 / 0.863 / 0.983 | no | content-driven flip; not separable |
 
 ## Caveats

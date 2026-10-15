@@ -96,8 +96,8 @@ Full / knockout accuracy on the cell's labels, then the honest-answer drop. On D
 | F_minus_D | `F - D` | leaf | 72 | 6400 | 0.654 | 0.346 | 0.878 / 0.954 / 0.999 | yes | content-driven flip; separable |
 | D_minus_H_minus_F | `D - H - F` | head (primary) | 15 | 704 | 0.939 | 0.061 | 0.991 / 1.000 / 1.000 | yes | content-driven flip; separable |
 | D_minus_H_minus_F | `D - H - F` | leaf | 68 | 5263 | 0.229 | 0.771 | 0.934 / 0.978 / 0.999 | yes | content-driven flip; separable |
-| H_minus_D_minus_F | `H - D - F` | head (primary) | 6 | 328 | 1.000 | 0.000 | 1.000 / 1.000 / 1.000 | no | content-driven flip; not separable |
-| H_minus_D_minus_F | `H - D - F` | leaf | 66 | 1636 | 1.000 | 0.000 | 0.998 / 1.000 / 1.000 | no | content-driven flip; not separable |
+| H_minus_D_minus_F | `H - D - F` | head (primary) | 6 | 328 | 1.000 | 0.000 | 1.000 / 1.000 / 1.000 | no | no flip; not separable |
+| H_minus_D_minus_F | `H - D - F` | leaf | 66 | 1636 | 1.000 | 0.000 | 0.998 / 1.000 / 1.000 | no | no flip; not separable |
 | F_minus_D_minus_H | `F - D - H` | head (primary) | 9 | 523 | 0.996 | 0.004 | 1.000 / 1.000 / 1.000 | yes | content-driven flip; separable |
 | F_minus_D_minus_H | `F - D - H` | leaf | 70 | 3198 | 0.967 | 0.033 | 0.986 / 0.998 / 1.000 | yes | content-driven flip; separable |
 

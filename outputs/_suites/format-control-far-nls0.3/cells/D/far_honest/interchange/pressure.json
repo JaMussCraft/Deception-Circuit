@@ -1,0 +1,813 @@
+{
+  "ablation": "interchange",
+  "label_convention": "Labels are unchanged from the trained test set: `target` is the DECEPTIVE answer and `distractor` the honest one. Under a prompt variant, accuracy therefore reads as 'still gives the deceptive answer' and logit_diff as logit(deceptive) - logit(honest). The desired result is accuracy FALLING and logit_diff going NEGATIVE.",
+  "variant_descriptions": {
+    "with_pressure": "the test set as trained \u2014 the pressure clause is present",
+    "no_pressure": "the pressure clause deleted, nothing in its place",
+    "honest_instruction": "the pressure clause replaced by an explicit instruction to answer honestly"
+  },
+  "metrics": [
+    "accuracy",
+    "logit_diff",
+    "kl_div",
+    "exact_match"
+  ],
+  "variants": {
+    "with_pressure": {
+      "full": {
+        "accuracy": 1.0,
+        "logit_diff": 3.2445,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 14620,
+              "token": " walls",
+              "count": 64,
+              "frac": 0.064
+            },
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 63,
+              "frac": 0.063
+            },
+            {
+              "id": 38193,
+              "token": " humidity",
+              "count": 57,
+              "frac": 0.057
+            },
+            {
+              "id": 39695,
+              "token": " sodium",
+              "count": 54,
+              "frac": 0.054
+            },
+            {
+              "id": 27035,
+              "token": " floors",
+              "count": 54,
+              "frac": 0.054
+            },
+            {
+              "id": 46745,
+              "token": " frontend",
+              "count": 49,
+              "frac": 0.049
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 49,
+              "frac": 0.049
+            },
+            {
+              "id": 35719,
+              "token": " calcium",
+              "count": 46,
+              "frac": 0.046
+            },
+            {
+              "id": 28788,
+              "token": " trains",
+              "count": 45,
+              "frac": 0.045
+            },
+            {
+              "id": 27861,
+              "token": " trucks",
+              "count": 45,
+              "frac": 0.045
+            },
+            {
+              "id": 3215,
+              "token": " button",
+              "count": 41,
+              "frac": 0.041
+            },
+            {
+              "id": 19713,
+              "token": " backend",
+              "count": 39,
+              "frac": 0.039
+            }
+          ],
+          "n_distinct": 59,
+          "target_frac": 1.0,
+          "distractor_frac": 0.0,
+          "other_frac": 0.0
+        }
+      },
+      "circuit": {
+        "accuracy": 0.265,
+        "logit_diff": -1.727,
+        "kl_div": 1.8422947368621827,
+        "exact_match": 0.278,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 38193,
+              "token": " humidity",
+              "count": 70,
+              "frac": 0.07
+            },
+            {
+              "id": 14620,
+              "token": " walls",
+              "count": 68,
+              "frac": 0.068
+            },
+            {
+              "id": 35719,
+              "token": " calcium",
+              "count": 54,
+              "frac": 0.054
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 53,
+              "frac": 0.053
+            },
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 50,
+              "frac": 0.05
+            },
+            {
+              "id": 27035,
+              "token": " floors",
+              "count": 50,
+              "frac": 0.05
+            },
+            {
+              "id": 19713,
+              "token": " backend",
+              "count": 49,
+              "frac": 0.049
+            },
+            {
+              "id": 39695,
+              "token": " sodium",
+              "count": 46,
+              "frac": 0.046
+            },
+            {
+              "id": 28788,
+              "token": " trains",
+              "count": 46,
+              "frac": 0.046
+            },
+            {
+              "id": 27861,
+              "token": " trucks",
+              "count": 44,
+              "frac": 0.044
+            },
+            {
+              "id": 46745,
+              "token": " frontend",
+              "count": 39,
+              "frac": 0.039
+            },
+            {
+              "id": 3215,
+              "token": " button",
+              "count": 37,
+              "frac": 0.037
+            }
+          ],
+          "n_distinct": 59,
+          "target_frac": 0.278,
+          "distractor_frac": 0.722,
+          "other_frac": 0.0
+        }
+      },
+      "empty": {
+        "accuracy": 0.0,
+        "logit_diff": -3.288875,
+        "kl_div": 2.90326252746582,
+        "exact_match": 0.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 27035,
+              "token": " floors",
+              "count": 64,
+              "frac": 0.064
+            },
+            {
+              "id": 38193,
+              "token": " humidity",
+              "count": 63,
+              "frac": 0.063
+            },
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 57,
+              "frac": 0.057
+            },
+            {
+              "id": 35719,
+              "token": " calcium",
+              "count": 54,
+              "frac": 0.054
+            },
+            {
+              "id": 14620,
+              "token": " walls",
+              "count": 54,
+              "frac": 0.054
+            },
+            {
+              "id": 19713,
+              "token": " backend",
+              "count": 49,
+              "frac": 0.049
+            },
+            {
+              "id": 3215,
+              "token": " button",
+              "count": 49,
+              "frac": 0.049
+            },
+            {
+              "id": 39695,
+              "token": " sodium",
+              "count": 46,
+              "frac": 0.046
+            },
+            {
+              "id": 27861,
+              "token": " trucks",
+              "count": 45,
+              "frac": 0.045
+            },
+            {
+              "id": 28788,
+              "token": " trains",
+              "count": 45,
+              "frac": 0.045
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 41,
+              "frac": 0.041
+            },
+            {
+              "id": 46745,
+              "token": " frontend",
+              "count": 39,
+              "frac": 0.039
+            }
+          ],
+          "n_distinct": 59,
+          "target_frac": 0.0,
+          "distractor_frac": 1.0,
+          "other_frac": 0.0
+        }
+      }
+    },
+    "no_pressure": {
+      "full": {
+        "accuracy": 0.994,
+        "logit_diff": 3.604,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 14620,
+              "token": " walls",
+              "count": 64,
+              "frac": 0.064
+            },
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 63,
+              "frac": 0.063
+            },
+            {
+              "id": 38193,
+              "token": " humidity",
+              "count": 57,
+              "frac": 0.057
+            },
+            {
+              "id": 39695,
+              "token": " sodium",
+              "count": 54,
+              "frac": 0.054
+            },
+            {
+              "id": 27035,
+              "token": " floors",
+              "count": 54,
+              "frac": 0.054
+            },
+            {
+              "id": 46745,
+              "token": " frontend",
+              "count": 49,
+              "frac": 0.049
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 49,
+              "frac": 0.049
+            },
+            {
+              "id": 35719,
+              "token": " calcium",
+              "count": 46,
+              "frac": 0.046
+            },
+            {
+              "id": 28788,
+              "token": " trains",
+              "count": 45,
+              "frac": 0.045
+            },
+            {
+              "id": 27861,
+              "token": " trucks",
+              "count": 45,
+              "frac": 0.045
+            },
+            {
+              "id": 3215,
+              "token": " button",
+              "count": 41,
+              "frac": 0.041
+            },
+            {
+              "id": 19713,
+              "token": " backend",
+              "count": 39,
+              "frac": 0.039
+            }
+          ],
+          "n_distinct": 58,
+          "target_frac": 0.995,
+          "distractor_frac": 0.005,
+          "other_frac": 0.0
+        }
+      },
+      "circuit": {
+        "accuracy": 0.293,
+        "logit_diff": -2.065375,
+        "kl_div": 2.2776902904510496,
+        "exact_match": 0.306,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 14620,
+              "token": " walls",
+              "count": 71,
+              "frac": 0.071
+            },
+            {
+              "id": 38193,
+              "token": " humidity",
+              "count": 63,
+              "frac": 0.063
+            },
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 57,
+              "frac": 0.057
+            },
+            {
+              "id": 35719,
+              "token": " calcium",
+              "count": 54,
+              "frac": 0.054
+            },
+            {
+              "id": 19713,
+              "token": " backend",
+              "count": 49,
+              "frac": 0.049
+            },
+            {
+              "id": 27035,
+              "token": " floors",
+              "count": 47,
+              "frac": 0.047
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 47,
+              "frac": 0.047
+            },
+            {
+              "id": 39695,
+              "token": " sodium",
+              "count": 46,
+              "frac": 0.046
+            },
+            {
+              "id": 28788,
+              "token": " trains",
+              "count": 46,
+              "frac": 0.046
+            },
+            {
+              "id": 27861,
+              "token": " trucks",
+              "count": 44,
+              "frac": 0.044
+            },
+            {
+              "id": 3215,
+              "token": " button",
+              "count": 43,
+              "frac": 0.043
+            },
+            {
+              "id": 46745,
+              "token": " frontend",
+              "count": 39,
+              "frac": 0.039
+            }
+          ],
+          "n_distinct": 58,
+          "target_frac": 0.301,
+          "distractor_frac": 0.699,
+          "other_frac": 0.0
+        }
+      },
+      "empty": {
+        "accuracy": 0.004,
+        "logit_diff": -3.588375,
+        "kl_div": 3.260797939300537,
+        "exact_match": 0.009,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 27035,
+              "token": " floors",
+              "count": 64,
+              "frac": 0.064
+            },
+            {
+              "id": 38193,
+              "token": " humidity",
+              "count": 63,
+              "frac": 0.063
+            },
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 57,
+              "frac": 0.057
+            },
+            {
+              "id": 35719,
+              "token": " calcium",
+              "count": 54,
+              "frac": 0.054
+            },
+            {
+              "id": 14620,
+              "token": " walls",
+              "count": 54,
+              "frac": 0.054
+            },
+            {
+              "id": 19713,
+              "token": " backend",
+              "count": 49,
+              "frac": 0.049
+            },
+            {
+              "id": 3215,
+              "token": " button",
+              "count": 49,
+              "frac": 0.049
+            },
+            {
+              "id": 39695,
+              "token": " sodium",
+              "count": 46,
+              "frac": 0.046
+            },
+            {
+              "id": 27861,
+              "token": " trucks",
+              "count": 45,
+              "frac": 0.045
+            },
+            {
+              "id": 28788,
+              "token": " trains",
+              "count": 45,
+              "frac": 0.045
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 41,
+              "frac": 0.041
+            },
+            {
+              "id": 46745,
+              "token": " frontend",
+              "count": 39,
+              "frac": 0.039
+            }
+          ],
+          "n_distinct": 59,
+          "target_frac": 0.004,
+          "distractor_frac": 0.996,
+          "other_frac": 0.0
+        }
+      }
+    },
+    "honest_instruction": {
+      "full": {
+        "accuracy": 0.957,
+        "logit_diff": 2.41525,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 14620,
+              "token": " walls",
+              "count": 65,
+              "frac": 0.065
+            },
+            {
+              "id": 38193,
+              "token": " humidity",
+              "count": 61,
+              "frac": 0.061
+            },
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 59,
+              "frac": 0.059
+            },
+            {
+              "id": 39695,
+              "token": " sodium",
+              "count": 54,
+              "frac": 0.054
+            },
+            {
+              "id": 27035,
+              "token": " floors",
+              "count": 53,
+              "frac": 0.053
+            },
+            {
+              "id": 46745,
+              "token": " frontend",
+              "count": 49,
+              "frac": 0.049
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 48,
+              "frac": 0.048
+            },
+            {
+              "id": 27861,
+              "token": " trucks",
+              "count": 47,
+              "frac": 0.047
+            },
+            {
+              "id": 35719,
+              "token": " calcium",
+              "count": 46,
+              "frac": 0.046
+            },
+            {
+              "id": 28788,
+              "token": " trains",
+              "count": 43,
+              "frac": 0.043
+            },
+            {
+              "id": 3215,
+              "token": " button",
+              "count": 42,
+              "frac": 0.042
+            },
+            {
+              "id": 19713,
+              "token": " backend",
+              "count": 39,
+              "frac": 0.039
+            }
+          ],
+          "n_distinct": 55,
+          "target_frac": 0.959,
+          "distractor_frac": 0.041,
+          "other_frac": 0.0
+        }
+      },
+      "circuit": {
+        "accuracy": 0.344,
+        "logit_diff": -1.0805,
+        "kl_div": 1.1059054689407348,
+        "exact_match": 0.398,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 38193,
+              "token": " humidity",
+              "count": 109,
+              "frac": 0.109
+            },
+            {
+              "id": 14620,
+              "token": " walls",
+              "count": 78,
+              "frac": 0.078
+            },
+            {
+              "id": 35719,
+              "token": " calcium",
+              "count": 60,
+              "frac": 0.06
+            },
+            {
+              "id": 19713,
+              "token": " backend",
+              "count": 49,
+              "frac": 0.049
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 47,
+              "frac": 0.047
+            },
+            {
+              "id": 28788,
+              "token": " trains",
+              "count": 46,
+              "frac": 0.046
+            },
+            {
+              "id": 27861,
+              "token": " trucks",
+              "count": 44,
+              "frac": 0.044
+            },
+            {
+              "id": 3215,
+              "token": " button",
+              "count": 43,
+              "frac": 0.043
+            },
+            {
+              "id": 39695,
+              "token": " sodium",
+              "count": 40,
+              "frac": 0.04
+            },
+            {
+              "id": 27035,
+              "token": " floors",
+              "count": 40,
+              "frac": 0.04
+            },
+            {
+              "id": 46745,
+              "token": " frontend",
+              "count": 39,
+              "frac": 0.039
+            },
+            {
+              "id": 2430,
+              "token": " width",
+              "count": 33,
+              "frac": 0.033
+            }
+          ],
+          "n_distinct": 58,
+          "target_frac": 0.357,
+          "distractor_frac": 0.643,
+          "other_frac": 0.0
+        }
+      },
+      "empty": {
+        "accuracy": 0.03,
+        "logit_diff": -2.427,
+        "kl_div": 1.9240068378448487,
+        "exact_match": 0.075,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 38193,
+              "token": " humidity",
+              "count": 66,
+              "frac": 0.066
+            },
+            {
+              "id": 27035,
+              "token": " floors",
+              "count": 64,
+              "frac": 0.064
+            },
+            {
+              "id": 35719,
+              "token": " calcium",
+              "count": 54,
+              "frac": 0.054
+            },
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 54,
+              "frac": 0.054
+            },
+            {
+              "id": 14620,
+              "token": " walls",
+              "count": 54,
+              "frac": 0.054
+            },
+            {
+              "id": 3215,
+              "token": " button",
+              "count": 49,
+              "frac": 0.049
+            },
+            {
+              "id": 19713,
+              "token": " backend",
+              "count": 48,
+              "frac": 0.048
+            },
+            {
+              "id": 27861,
+              "token": " trucks",
+              "count": 47,
+              "frac": 0.047
+            },
+            {
+              "id": 39695,
+              "token": " sodium",
+              "count": 46,
+              "frac": 0.046
+            },
+            {
+              "id": 28788,
+              "token": " trains",
+              "count": 43,
+              "frac": 0.043
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 41,
+              "frac": 0.041
+            },
+            {
+              "id": 46745,
+              "token": " frontend",
+              "count": 40,
+              "frac": 0.04
+            }
+          ],
+          "n_distinct": 56,
+          "target_frac": 0.036,
+          "distractor_frac": 0.964,
+          "other_frac": 0.0
+        }
+      }
+    }
+  },
+  "skipped": {},
+  "headline": {
+    "circuit_logit_diff_with_pressure": -1.727,
+    "circuit_logit_diff_honest_instruction": -1.0805,
+    "delta": 0.6465000000000001
+  },
+  "seconds": 593.3
+}
