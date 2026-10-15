@@ -3,7 +3,7 @@
   "family": "fine",
   "task": "far",
   "verdict": "c",
-  "sentence": "(c) Uninformative. The format knockout destroys answering or coherence. The response is to retrain the Format Circuit at a lower NLS, never to reinterpret.",
+  "sentence": "(c) Uninformative: F is already oversized (+71% heads); the spec's remedy (lower NLS) enlarges it further (higher NLS = smaller circuit); the one allowed retune toward smaller (NLS 0.4) also failed the in-run gate (KL 0.214) and its side-job knockout KL is 2.317; researcher decides. Nothing is launched.",
   "spec_sentence": "(c) Uninformative. The format knockout destroys answering or coherence. The response is to retrain the Format Circuit at a lower NLS, never to reinterpret.",
   "evaluated_on": "eval 2 alone",
   "eval5_dirs": [],
@@ -88,7 +88,10 @@
     "fails": true,
     "assessed": true,
     "d_kl": 0.3265542514855042,
-    "d_fails_kl_gate": false
+    "h_kl": 2.784392097964883,
+    "d_fails_kl_gate": false,
+    "side_kl": 2.31673620082438,
+    "f_oversized": true
   },
   "rule_order": [
     "(c) first: F's knockout fails the wikitext KL gate (KL/token > 0.66) or its generations are degenerate (distinct-2 collapse) [order not pre-registered; orchestrator choice 2026-10-13, researcher to confirm]",

@@ -137,7 +137,7 @@ SDR_SIZE_CHECK = {"compared": ["heads", "fine_units"],
 
 
 def make_suite(tmp_path, family="fine", task="far", over=None, skip_cells=(),
-               f_nls=0.3, overlap=True, flip=True, size_check=None):
+               f_nls=0.3, overlap=True, flip=True, size_check=None, side_kl=None):
     """A merged format-control suite under tmp_path; returns (suite_root, data_dir)."""
     p = _merge(DEFAULTS, over)
     name = f"format-control-{task}{'-coarse' if family == 'coarse' else ''}-nls0.3"
@@ -211,6 +211,11 @@ def make_suite(tmp_path, family="fine", task="far", over=None, skip_cells=(),
             heads = 10 + i if g == "head" else {"active": 10 + i, "total": 1024}
             circuits.append({"label": label, "kind": "composed", "expr": lab,
                              "counts": {"attention_heads": heads}})
+    if side_kl is not None:
+        # The retuned F's side job (ticket 03/04): its knockout cell on the D test set.
+        _dump(os.path.join(root, "_side_F04", "cells", "F04", task, "interchange",
+                           "knockout.json"),
+              _knockout_json(p["full"][""], 0.0, (0.2, 0.7, 0.9), side_kl, None, "x"))
     _dump(os.path.join(root, "suite.json"),
           {"circuits": circuits, "tasks": tasks,
            "geometry": {"num_heads": 32, "head_dim": 128},
@@ -391,6 +396,76 @@ def test_rule_choices_that_were_not_pre_registered_are_labelled_as_such(tmp_path
     assert UNREGISTERED in gate_line
     order_line = next(ln for ln in md.splitlines() if ln.startswith("Rule order:"))
     assert UNREGISTERED in order_line
+
+
+OVERSIZED = ("F is already oversized (+71% heads); the spec's remedy (lower NLS) enlarges it "
+             "further (higher NLS = smaller circuit); the one allowed retune toward smaller "
+             "(NLS 0.4) also failed the in-run gate (KL 0.214)")
+
+
+def test_verdict_c_with_an_oversized_format_circuit_replaces_the_remedy(tmp_path):
+    # The real FAR case: F fails the gate (D passes), F is +71% heads, the NLS 0.4
+    # retune failed its in-run gate, and the retuned F's side job knocks out at KL 2.317.
+    root, data = make_suite(tmp_path, over={"kl": {"F": 0.9}}, size_check=FAR_SIZE_CHECK,
+                            side_kl=2.317)
+    md, decision = run(root, data)
+    assert decision["verdict"] == "c"
+    assert decision["gate"]["d_fails_kl_gate"] is False
+    want = OVERSIZED + " and its side-job knockout KL is 2.317; researcher decides"
+    assert want in decision["sentence"]
+    assert "retrain the Format Circuit at a lower NLS, never to reinterpret" not in \
+        decision["sentence"]
+    assert "retrain the Format Circuit at a lower NLS" in decision["spec_sentence"]
+    assert decision["gate"]["side_kl"] == pytest.approx(2.317)
+    assert want in md
+
+
+def test_oversized_remedy_omits_the_side_job_clause_without_its_cell(tmp_path):
+    root, data = make_suite(tmp_path, over={"kl": {"F": 0.9}}, size_check=FAR_SIZE_CHECK)
+    _, decision = run(root, data)
+    assert OVERSIZED + "; researcher decides" in decision["sentence"]
+    assert "side-job" not in decision["sentence"]
+
+
+def test_size_within_tolerance_keeps_the_spec_remedy(tmp_path):
+    root, data = make_suite(tmp_path, task="sdr", over={"kl": {"F": 0.9}},
+                            size_check=SDR_SIZE_CHECK)
+    _, decision = run(root, data)
+    assert decision["verdict"] == "c"
+    assert decision["sentence"] == decision["spec_sentence"]
+
+
+def test_gate_line_prints_every_circuits_kl_when_c_fires(tmp_path):
+    root, data = make_suite(tmp_path, over={"kl": {"D": 0.327, "H": 0.70, "F": 0.9}})
+    md, decision = run(root, data)
+    line = next(ln for ln in md.splitlines() if ln.startswith("(c) gate on F's knockout"))
+    assert ("Wikitext KL/token of every knockout: D 0.327 (passes), H 0.700 (FAILS), "
+            "F 0.900 (FAILS)") in line
+    assert decision["gate"]["h_kl"] == pytest.approx(0.70)
+    root2, data2 = make_suite(tmp_path / "a", over={"kl": {"H": 0.70}})     # verdict (a)
+    md2, _ = run(root2, data2)
+    line2 = next(ln for ln in md2.splitlines() if ln.startswith("(c) gate on F's knockout"))
+    assert "of every knockout" not in line2
+
+
+def test_leaf_positional_defaults_show_beside_primary_head_rows(tmp_path):
+    root, data = make_suite(tmp_path)
+    path = os.path.join(root, "flip_audit.json")
+    with open(path) as f:
+        audit = json.load(f)
+    audit["cells"] = [c for c in audit["cells"] if not c["circuit"].startswith("D_minus_F")]
+    audit["cells"] += [
+        {"circuit": "D_minus_F__head", "task": "far", "headline": {"separable": True},
+         "positional": {"verdict": "content-driven flip"}},
+        {"circuit": "D_minus_F__leaf", "task": "far", "headline": {"separable": True},
+         "positional": {"verdict": "positional default"}}]
+    _dump(path, audit)
+    md, _ = run(root, data)
+    deltas = md.split("## Delta cells", 1)[1].split("##", 1)[0]
+    head = next(ln for ln in deltas.splitlines() if "`D - F`" in ln and "head" in ln)
+    leaf = next(ln for ln in deltas.splitlines() if "`D - F`" in ln and "| leaf |" in ln)
+    assert "head (primary)" in head and "content-driven flip; separable" in head
+    assert "positional default; separable" in leaf
 
 
 def test_degenerate_format_generations_are_verdict_c(tmp_path):

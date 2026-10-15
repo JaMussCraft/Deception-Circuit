@@ -15,7 +15,7 @@
 
 ## Decision
 
-**Verdict: (c).** (c) Uninformative. The format knockout destroys answering or coherence. The response is to retrain the Format Circuit at a lower NLS, never to reinterpret.
+**Verdict: (c).** (c) Uninformative: F is already oversized (+71% heads); the spec's remedy (lower NLS) enlarges it further (higher NLS = smaller circuit); the one allowed retune toward smaller (NLS 0.4) also failed the in-run gate (KL 0.214) and its side-job knockout KL is 2.317; researcher decides. Nothing is launched.
 
 The rule is evaluated on eval 2 alone until an eval 5 directory is given (`--eval5-dir`).
 
@@ -32,7 +32,7 @@ The rule's honest-answer rows: `variants` (the eval 2 variant rows only; the H a
 | collateral | F <= D (wikitext KL/token (eval 2)) | 0.327 | 4.265 | FAIL |
 | outside nulls | knockout accuracy < null 5th percentile, for D and for F | 0.000 vs p5 0.440 | 0.000 vs p5 0.164 | PASS |
 
-(c) gate on F's knockout: wikitext KL/token 4.265 vs gate 0.66 (FAILS); distinct-2 knockout/full 1.142 vs collapse below 0.5 [threshold not pre-registered; orchestrator choice 2026-10-13, researcher to confirm] from eval 2 wikitext continuations (word bigrams) (not degenerate).
+(c) gate on F's knockout: wikitext KL/token 4.265 vs gate 0.66 (FAILS); distinct-2 knockout/full 1.142 vs collapse below 0.5 [threshold not pre-registered; orchestrator choice 2026-10-13, researcher to confirm] from eval 2 wikitext continuations (word bigrams) (not degenerate). Wikitext KL/token of every knockout: D 0.327 (passes), H 2.784 (FAILS), F 4.265 (FAILS) (gate 0.66).
 
 Rule order: (c) first: F's knockout fails the wikitext KL gate (KL/token > 0.66) or its generations are degenerate (distinct-2 collapse) [order not pre-registered; orchestrator choice 2026-10-13, researcher to confirm]; (a) when all four conditions pass: deception drop, honest-answer drop, collateral, both knockouts outside their nulls; (b) otherwise.
 

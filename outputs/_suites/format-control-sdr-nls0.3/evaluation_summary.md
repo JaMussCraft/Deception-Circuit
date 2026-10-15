@@ -32,7 +32,7 @@ The rule's honest-answer rows: `variants` (the eval 2 variant rows only; the H a
 | collateral | F <= D (wikitext KL/token (eval 2)) | 1.383 | 1.342 | PASS |
 | outside nulls | knockout accuracy < null 5th percentile, for D and for F | 0.000 vs p5 0.397 | 0.000 vs p5 0.238 | PASS |
 
-(c) gate on F's knockout: wikitext KL/token 1.342 vs gate 0.66 (FAILS); distinct-2 knockout/full 0.777 vs collapse below 0.5 [threshold not pre-registered; orchestrator choice 2026-10-13, researcher to confirm] from eval 2 wikitext continuations (word bigrams) (not degenerate).
+(c) gate on F's knockout: wikitext KL/token 1.342 vs gate 0.66 (FAILS); distinct-2 knockout/full 0.777 vs collapse below 0.5 [threshold not pre-registered; orchestrator choice 2026-10-13, researcher to confirm] from eval 2 wikitext continuations (word bigrams) (not degenerate). Wikitext KL/token of every knockout: D 1.383 (FAILS), H 0.694 (FAILS), F 1.342 (FAILS) (gate 0.66).
 
 Rule order: (c) first: F's knockout fails the wikitext KL gate (KL/token > 0.66) or its generations are degenerate (distinct-2 collapse) [order not pre-registered; orchestrator choice 2026-10-13, researcher to confirm]; (a) when all four conditions pass: deception drop, honest-answer drop, collateral, both knockouts outside their nulls; (b) otherwise.
 

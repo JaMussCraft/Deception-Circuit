@@ -80,7 +80,7 @@
     "kl": 1.341634364798665,
     "kl_gate": 0.66,
     "kl_fails": true,
-    "distinct2_ratio": 0.7769161499033336,
+    "distinct2_ratio": 0.7769161499033335,
     "distinct2_frac": 0.5,
     "distinct2_frac_status": "not pre-registered; orchestrator choice 2026-10-13, researcher to confirm",
     "distinct2_source": "eval 2 wikitext continuations (word bigrams)",
@@ -88,7 +88,10 @@
     "fails": true,
     "assessed": true,
     "d_kl": 1.3831517603248358,
-    "d_fails_kl_gate": true
+    "h_kl": 0.6942768816370517,
+    "d_fails_kl_gate": true,
+    "side_kl": null,
+    "f_oversized": false
   },
   "rule_order": [
     "(c) first: F's knockout fails the wikitext KL gate (KL/token > 0.66) or its generations are degenerate (distinct-2 collapse) [order not pre-registered; orchestrator choice 2026-10-13, researcher to confirm]",
@@ -139,7 +142,7 @@
       },
       "wikitext_kl": 1.341634364798665,
       "ref_nll_rise": null,
-      "distinct2_ratio": 0.7769161499033336,
+      "distinct2_ratio": 0.7769161499033335,
       "distinct2_source": "eval 2 wikitext continuations (word bigrams)"
     }
   },

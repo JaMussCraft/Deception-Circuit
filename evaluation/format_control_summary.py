@@ -546,14 +546,38 @@ def decide(inputs, honest_rows="variants"):
     spec_sentence = SENTENCES.get(verdict, "undecided: inputs missing")
     sentence = spec_sentence
     kl_d = D.get("wikitext_kl")
-    gate["d_kl"] = kl_d
+    kl_h = (inputs.get("H") or {}).get("wikitext_kl")
+    gate["d_kl"], gate["h_kl"] = kl_d, kl_h
     gate["d_fails_kl_gate"] = (kl_d > KL_GATE + TOL) if kl_d is not None else None
-    if verdict == "c" and gate["d_fails_kl_gate"]:
-        kl_h = (inputs.get("H") or {}).get("wikitext_kl")
-        sentence = both_fail_sentence(kl_d, kl_h, kl_f)
+    fs = inputs.get("F_size") or {}
+    gate["side_kl"] = fs.get("side_kl")
+    gate["f_oversized"] = (fs.get("gap_heads") is not None and fs.get("tol") is not None
+                           and fs["gap_heads"] > fs["tol"])
+    if verdict == "c":
+        if gate["d_fails_kl_gate"]:
+            sentence = both_fail_sentence(kl_d, kl_h, kl_f)
+            if gate["f_oversized"]:
+                sentence += " " + oversized_clause(fs)[0].upper() + oversized_clause(fs)[1:]
+        elif gate["f_oversized"]:
+            sentence = "(c) Uninformative: " + oversized_clause(fs) + " Nothing is launched."
     return {"verdict": verdict, "sentence": sentence, "spec_sentence": spec_sentence,
             "conditions": conditions, "gate": gate, "missing": missing,
             "honest_rows_mode": mode}
+
+
+def oversized_clause(fs):
+    """Why the spec's (c) remedy does not apply to an F already above the size rule:
+    a lower NLS enlarges it, and the one retune toward smaller is reported as run."""
+    text = (f"F is already oversized ({_gap(fs['gap_heads'])} heads); the spec's remedy (lower "
+            "NLS) enlarges it further (higher NLS = smaller circuit)")
+    if fs.get("retune_nls") is not None:
+        kl = fs.get("retune_gate_kl")
+        text += (f"; the one allowed retune toward smaller (NLS {fs['retune_nls']:g}) "
+                 f"{'passed' if fs.get('retune_gate_passes') else 'also failed'} the in-run "
+                 f"gate (KL {'-' if kl is None else format(kl, '.3f')})")
+        if fs.get("side_kl") is not None:
+            text += f" and its side-job knockout KL is {fs['side_kl']:.3f}"
+    return text + "; researcher decides."
 
 
 def both_fail_sentence(kl_d, kl_h, kl_f):
@@ -723,11 +747,12 @@ def summarize(suite_root, *, data_dir="data/datasets", eval5_dirs=(), family=Non
                     "ref_nll_rise": agg.get("ref_nll_rise"),
                     "distinct2_ratio": d2, "distinct2_source": src}
     h_kl = (paired[("H", "D")]["knockout"] or {}).get("wikitext_kl")
-    decision = decide({"D": sides["D"], "F": sides["F"], "H": {"wikitext_kl": h_kl},
-                       "eval5": bool(eval5_dirs), "eval5_datasets": eval5_datasets},
-                      honest_rows=honest_rows)
-    diagnostics = diagnose(paired, decision)
     size_check = (runs.get("F") or {}).get("size_check")
+    f_size = f_size_inputs(size_check, root)
+    decision = decide({"D": sides["D"], "F": sides["F"], "H": {"wikitext_kl": h_kl},
+                       "F_size": f_size, "eval5": bool(eval5_dirs),
+                       "eval5_datasets": eval5_datasets}, honest_rows=honest_rows)
+    diagnostics = diagnose(paired, decision)
     null_sampling = null_sampling_of(suite, family)
 
     result = {"suite": os.path.basename(root), "root": root, "family": family, "task": task,
@@ -826,6 +851,28 @@ def null_sampling_of(suite, family):
     text += (f"; n = {n}, knockout granularity `{cli.get('knockout_granularity', '-')}`, "
              "blocks held fixed (evaluation/masks.py `sample_random_masks`).")
     return {"unit": unit, "alloc": alloc, "n": n, "text": text}
+
+
+def f_size_inputs(sc, root):
+    """F's size-rule outcome for the (c) sentence, from its size_check.json, plus the
+    wikitext KL of the retuned F's side job when its knockout cell is in the suite
+    (`<suite>/_side_F<NLS x 10>/cells/*/*/*/knockout.json`, e.g. `_side_F04`)."""
+    if not sc:
+        return {}
+    rt = sc.get("retune") or {}
+    gate = rt.get("in_run_gate") or {}
+    out = {"gap_heads": _num(_get(sc, "gaps", "heads")), "tol": _num(sc.get("tol")),
+           "retune_nls": _num(rt.get("nls")), "retune_gate_passes": gate.get("passes"),
+           "retune_gate_kl": _num(gate.get("kl_div")), "side_kl": None, "side_cell": None}
+    if out["retune_nls"] is not None:
+        tag = f"_side_F{round(out['retune_nls'] * 10):02d}"
+        for path in sorted(glob.glob(os.path.join(root, tag, "cells", "*", "*", "*",
+                                                  "knockout.json"))):
+            kl = _num(_get(_load(path), "wikitext", "discovered", "kl_per_token"))
+            if kl is not None:
+                out["side_kl"], out["side_cell"] = kl, path
+                break
+    return out
 
 
 def _gap(x):
@@ -956,6 +1003,18 @@ def _row(cells):
     return "| " + " | ".join(str(c) for c in cells) + " |"
 
 
+def every_kl_text(g):
+    """All three knockouts against the KL gate, printed when (c) fires."""
+    def one(name, kl):
+        if kl is None:
+            return f"{name} -"
+        return f"{name} {kl:.3f} ({'FAILS' if kl > KL_GATE + TOL else 'passes'})"
+    return ("Wikitext KL/token of every knockout: "
+            + ", ".join(one(n, k) for n, k in (("D", g.get("d_kl")), ("H", g.get("h_kl")),
+                                                ("F", g.get("kl"))))
+            + f" (gate {KL_GATE:g}).")
+
+
 def _pairing_flag(res, dr):
     p = res["pairing"]
     if dr == "H":
@@ -1039,7 +1098,8 @@ def render(res):
               f"distinct-2 knockout/full {_f(g['distinct2_ratio'])} vs collapse below "
               f"{g['distinct2_frac']:g} [threshold {g['distinct2_frac_status']}] from "
               f"{g['distinct2_source']} "
-              f"({'DEGENERATE' if g['degenerate'] else 'not assessable' if g['degenerate'] is None else 'not degenerate'}).",
+              f"({'DEGENERATE' if g['degenerate'] else 'not assessable' if g['degenerate'] is None else 'not degenerate'})."
+              + (" " + every_kl_text(g) if d["verdict"] == "c" else ""),
           "", "Rule order: " + "; ".join(RULE_ORDER) + ".", ""]
     if d["missing"]:
         L += ["Rule inputs missing: " + ", ".join(d["missing"]) + ".", ""]
