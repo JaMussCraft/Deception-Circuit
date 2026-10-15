@@ -157,10 +157,14 @@ dedups repeats. Screens cached: 0 screen judge calls.
 | all six | 26,163 | 100.5 - 126.3 |
 
 The real-F dry-runs of 2026-10-15 (`dryrun_eval5/sdr*_{sm,lb}.log`) give the
-same numbers: F's size changes the random draws, not the counts. Gate status on
-that date: `sdr_coarse` passes (F_hko wikitext KL 0.279), and its two submit
-lines are printed but not run. `sdr` is refused (F wikitext KL 1.342). FAR's
-cells were still queued.
+same numbers: F's size changes the random draws, not the counts. Gate status
+(2026-10-15, all six real dry-runs passed on the evaluator side):
+
+| family | F knockout wikitext KL | gate | submit line |
+| --- | ---: | --- | --- |
+| `sdr_coarse` | 0.279 | passes | printed for sm and lb, not run |
+| `sdr` | 1.342 | refused | none |
+| `far` | 4.265 | refused | none |
 
 Anchored on wall time: the one-cell `eval5_sdr_coarse_nls0.3_nomb` (sm) ran
 3 h 51 min with cached screens, so a three-cell `sm` suite is plausibly about

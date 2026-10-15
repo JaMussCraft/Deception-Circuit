@@ -75,6 +75,85 @@
      "time": "2026-10-13T21:39:08",
      "family": "far",
      "group": "sm"
+    },
+    {
+     "event": "dry",
+     "standin": false,
+     "runs": {
+      "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_honest_noedge_260819-084020",
+      "F": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.3_nopressure_noedge_261013-203424"
+     },
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_honest_noedge_260819-084020",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.3_nopressure_noedge_261013-203424",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--evals",
+      "benchmarks",
+      "--ablation",
+      "interchange",
+      "--benchmarks",
+      "sandbagging",
+      "mask",
+      "--benchmark-n-per-dataset",
+      "50",
+      "--benchmark-n-random",
+      "6",
+      "--benchmark-screen-budget",
+      "600",
+      "--benchmark-screen-cache",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_eval5_format_cache/screens",
+      "--benchmark-repo-root",
+      "/projects/beto/swong2/Alignment",
+      "--output-dir",
+      "outputs/eval5_format_far"
+     ],
+     "log": "outputs/_launch_format_control/dryrun_eval5/far_sm.log",
+     "dry_run_passed": true,
+     "cost": {
+      "cells": 3,
+      "configs_judged_per_cell": 9,
+      "judge_calls_ablated": 4671,
+      "judge_calls_per_dataset": {
+       "sandbagging": 0,
+       "mask:continuations": 756,
+       "mask:disinformation": 324,
+       "mask:doubling_down_known_facts": 783,
+       "mask:known_facts": 1026,
+       "mask:provided_facts": 1350,
+       "mask:statistics": 432
+      },
+      "judge_calls_screen_max": 0,
+      "gpu_hours": [
+       24.3,
+       29.6
+      ],
+      "items_from": "known post-screen counts"
+     },
+     "cost_items_from": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/eval5_far",
+     "account": "bgrb-delta-gpu",
+     "partition": "gpuA40x4",
+     "job_id": null,
+     "gate_kl": {
+      "cells/F/far/interchange": 4.2654922641813755,
+      "cells/F/far_nopressure/interchange": 4.2654922641813755
+     },
+     "gate_reasons": [
+      "F knockout wikitext KL 4.265 > 0.66 in cells/F/far/interchange (deceptive test set): fails the eval 2 gate. The spec's alternative, fluent generations, is the researcher's call: read `generation.examples` in that knockout.json",
+      "F knockout wikitext KL 4.265 > 0.66 in cells/F/far_nopressure/interchange (nopressure test set): fails the eval 2 gate. The spec's alternative, fluent generations, is the researcher's call: read `generation.examples` in that knockout.json"
+     ],
+     "gate_override": null,
+     "gate_overridden": [],
+     "cache_reasons": [],
+     "allow_rescreen": null,
+     "time": "2026-10-15T14:00:22",
+     "family": "far",
+     "group": "sm"
     }
    ]
   },
@@ -476,6 +555,82 @@
      "cache_reasons": [],
      "allow_rescreen": null,
      "time": "2026-10-13T21:39:27",
+     "family": "far",
+     "group": "lb"
+    },
+    {
+     "event": "dry",
+     "standin": false,
+     "runs": {
+      "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_honest_noedge_260819-084020",
+      "F": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.3_nopressure_noedge_261013-203424"
+     },
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_honest_noedge_260819-084020",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.3_nopressure_noedge_261013-203424",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--evals",
+      "benchmarks",
+      "--ablation",
+      "interchange",
+      "--benchmarks",
+      "lb:instructed-deception",
+      "lb:harm-pressure-knowledge-report",
+      "lb:convincing-game",
+      "--benchmark-n-per-dataset",
+      "50",
+      "--benchmark-n-random",
+      "6",
+      "--benchmark-screen-budget",
+      "600",
+      "--benchmark-screen-cache",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_eval5_format_cache/screens",
+      "--benchmark-repo-root",
+      "/projects/beto/swong2/Alignment",
+      "--output-dir",
+      "outputs/eval5_format_far_lb"
+     ],
+     "log": "outputs/_launch_format_control/dryrun_eval5/far_lb.log",
+     "dry_run_passed": true,
+     "cost": {
+      "cells": 3,
+      "configs_judged_per_cell": 9,
+      "judge_calls_ablated": 4050,
+      "judge_calls_per_dataset": {
+       "lb:instructed-deception": 1350,
+       "lb:harm-pressure-knowledge-report": 1350,
+       "lb:convincing-game": 1350
+      },
+      "judge_calls_screen_max": 0,
+      "gpu_hours": [
+       9.2,
+       12.5
+      ],
+      "items_from": "known post-screen counts"
+     },
+     "cost_items_from": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/eval5_far_lb",
+     "account": "bgrb-delta-gpu",
+     "partition": "gpuA40x4",
+     "job_id": null,
+     "gate_kl": {
+      "cells/F/far/interchange": 4.2654922641813755,
+      "cells/F/far_nopressure/interchange": 4.2654922641813755
+     },
+     "gate_reasons": [
+      "F knockout wikitext KL 4.265 > 0.66 in cells/F/far/interchange (deceptive test set): fails the eval 2 gate. The spec's alternative, fluent generations, is the researcher's call: read `generation.examples` in that knockout.json",
+      "F knockout wikitext KL 4.265 > 0.66 in cells/F/far_nopressure/interchange (nopressure test set): fails the eval 2 gate. The spec's alternative, fluent generations, is the researcher's call: read `generation.examples` in that knockout.json"
+     ],
+     "gate_override": null,
+     "gate_overridden": [],
+     "cache_reasons": [],
+     "allow_rescreen": null,
+     "time": "2026-10-15T14:00:45",
      "family": "far",
      "group": "lb"
     }
