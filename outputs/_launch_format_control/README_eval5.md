@@ -109,6 +109,25 @@ this order, each naming its reason (exit 3; a failing dry-run exits 5):
 cost to the log, and prints the sbatch line only when refusals 1, 2 and 5
 clear ("no submit line" and the reasons otherwise). It records the dry run.
 
+## Keep this worktree until EVAL 5 has run
+
+The Format Circuit runs, the coarse operand `allmlp_nomb` and ticket 04's cells
+all name paths inside `.claude/worktrees/format-control/`: in `suites.json`, in
+`suite_manifest.json`, and in each cell's `summary.json` operands. The gate
+matches the configured F against the F that produced the cells. A run at
+another path counts as the same F when its `active_nodes.json` masks and
+`config.json` `deception_condition` are identical (`same_run` in
+`eval5_cmd.py`). That comparison has to read the recorded run directory.
+
+- **Keep the format-control worktree** until EVAL 5 has run and its summaries
+  are written. This is the supported path.
+- **After a merge**, `suites.json` may be repointed (F and `allmlp`) to the
+  merged copies in the main checkout. The gate then matches by mask content,
+  but only while the worktree's run directories still exist. Once they are
+  gone it refuses with "cannot compare masks ... keep the format-control
+  worktree". Do not change the paths before that; the cells were produced from
+  them.
+
 ## The two explicit overrides (researcher decisions, recorded)
 
 Neither weakens the default: without the flag the refusal stands, and each flag

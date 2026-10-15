@@ -417,6 +417,58 @@ def test_gate_refuses_a_cell_whose_F_cannot_be_verified(e5, tmp_path):
     assert any("cannot verify" in r for r in g["reasons"])
 
 
+def _f_run(root, name, masks=None, condition="nopressure"):
+    """A run directory with active_nodes.json and config.json."""
+    d = os.path.join(root, name)
+    os.makedirs(d, exist_ok=True)
+    with open(os.path.join(d, "active_nodes.json"), "w") as f:
+        json.dump({"masks": masks or {"attention_heads": [[1, 0], [0, 1]]}}, f)
+    with open(os.path.join(d, "config.json"), "w") as f:
+        json.dump({"deception_condition": condition}, f)
+    return d
+
+
+def _gate_on(e5, tmp_path, *, recorded, configured):
+    """Cells and manifest produced from `recorded`; suites.json names `configured`."""
+    root = str(tmp_path / "suite")
+    _write_knockout(root, "cells/F/far/interchange", 0.30, f_run=recorded)
+    _write_knockout(root, "cells/F/far_nopressure/interchange", 0.30, f_run=recorded)
+    return _gate(e5, root, _manifest_suite("far", f_run=recorded), f_run=configured)
+
+
+def test_gate_accepts_a_relocated_copy_of_the_configured_F(e5, tmp_path):
+    """After a merge the same run sits elsewhere: identical masks are the same F."""
+    old = _f_run(str(tmp_path / "worktree"), "nls0.3_nopressure_X")
+    new = _f_run(str(tmp_path / "main"), "nls0.3_nopressure_X")
+    g = _gate_on(e5, tmp_path, recorded=old, configured=new)
+    assert g["passed"] is True, g["reasons"]
+
+
+def test_gate_refuses_a_run_with_different_masks(e5, tmp_path):
+    old = _f_run(str(tmp_path / "a"), "run")
+    other = _f_run(str(tmp_path / "b"), "run", masks={"attention_heads": [[1, 1], [0, 1]]})
+    g = _gate_on(e5, tmp_path, recorded=old, configured=other)
+    assert g["passed"] is False
+    assert all("different masks" in r for r in g["reasons"]) and len(g["reasons"]) == 3
+
+
+def test_gate_refuses_identical_masks_under_another_condition(e5, tmp_path):
+    old = _f_run(str(tmp_path / "a"), "run")
+    other = _f_run(str(tmp_path / "b"), "run", condition="honest")
+    g = _gate_on(e5, tmp_path, recorded=old, configured=other)
+    assert g["passed"] is False and all("condition" in r for r in g["reasons"])
+
+
+def test_gate_says_to_keep_the_worktree_when_the_recorded_run_is_gone(e5, tmp_path):
+    old = _f_run(str(tmp_path / "worktree"), "run")
+    new = _f_run(str(tmp_path / "main"), "run")
+    shutil.rmtree(str(tmp_path / "worktree"))
+    g = _gate_on(e5, tmp_path, recorded=old, configured=new)
+    assert g["passed"] is False
+    assert all("cannot compare" in r and "keep the format-control worktree" in r
+               for r in g["reasons"])
+
+
 def test_gate_override_clears_only_the_KL_bar_and_is_reported(e5, tmp_path):
     root = str(tmp_path)
     _write_knockout(root, "cells/F/far/interchange", 0.70)

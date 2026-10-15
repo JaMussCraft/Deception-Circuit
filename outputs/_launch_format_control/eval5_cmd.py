@@ -159,6 +159,43 @@ def _same_path(a, b) -> bool:
     return norm(a) == norm(b) or os.path.realpath(a) == os.path.realpath(b)
 
 
+def same_run(a, b) -> tuple:
+    """(same, why): is run directory `b` the same circuit as run directory `a`?
+
+    The same path is the same run. Otherwise two run directories are the same
+    run when their parsed `active_nodes.json` masks are identical and their
+    `config.json` agree on `deception_condition`, so a run copied or merged
+    to another location (the format-control worktree into the main checkout)
+    still matches the cells it produced. If either directory cannot be read,
+    the masks cannot be compared and the answer is no.
+    """
+    if _same_path(a, b):
+        return True, "same path"
+    if not a or not b:
+        return False, "no run directory recorded"
+    try:
+        masks = [load_json(os.path.join(p, "active_nodes.json")).get("masks") for p in (a, b)]
+    except Exception as error:                                      # noqa: BLE001
+        return False, f"cannot compare masks ({type(error).__name__}: {error})"
+    if masks[0] is None or masks[0] != masks[1]:
+        return False, "different masks"
+    try:
+        conds = [load_json(os.path.join(p, "config.json")).get("deception_condition") for p in (a, b)]
+    except Exception as error:                                      # noqa: BLE001
+        return False, f"cannot compare conditions ({type(error).__name__}: {error})"
+    if conds[0] != conds[1]:
+        return False, f"identical masks but a different deception condition ({conds[0]} vs {conds[1]})"
+    return True, "identical masks and condition"
+
+
+def _mismatch_advice(why: str) -> str:
+    if why.startswith("cannot compare"):
+        return ("the recorded run directory cannot be read, so its masks cannot be compared: "
+                "keep the format-control worktree that produced the cells until EVAL 5 has run "
+                "(README_eval5.md)")
+    return "re-plan and re-run ticket 04's suite with this F"
+
+
 # ==============================================================================
 # THE COMMAND GENERATOR (pure)
 # ==============================================================================
@@ -350,10 +387,11 @@ def gate(suite_root: str, manifest_suite: dict, *, f_run: str, threshold: float 
     if not planned:
         reasons.append("suite_manifest.json records no F run for this suite (ticket 04's suite "
                        "was planned before F was configured: re-plan and re-run it)")
-    elif not _same_path(planned, f_run):
-        reasons.append(f"suite_manifest.json planned this suite with F = {planned}, but suites.json "
-                       f"now names F = {f_run}: its cells are not this F's (re-plan and re-run "
-                       f"ticket 04's suite)")
+    else:
+        same, why = same_run(planned, f_run)
+        if not same:
+            reasons.append(f"suite_manifest.json planned this suite with F = {planned}, but "
+                           f"suites.json now names F = {f_run} ({why}): {_mismatch_advice(why)}")
     cells = f_knockout_cells(manifest_suite)
     for cond in GATE_CONDITIONS:
         cell = cells.get(cond)
@@ -385,9 +423,10 @@ def gate(suite_root: str, manifest_suite: dict, *, f_run: str, threshold: float 
         if not cell_f:
             reasons.append(f"F knockout cell {path}: cannot verify which F produced it ({why})")
             continue
-        if not _same_path(cell_f, f_run):
+        same, why = same_run(cell_f, f_run)
+        if not same:
             reasons.append(f"F knockout cell {path} was produced by F = {cell_f}, not the configured "
-                           f"F = {f_run} (a stale cell: re-run ticket 04's suite)")
+                           f"F = {f_run} ({why}): {_mismatch_advice(why)}")
             continue
         kls[path] = kl
         if not kl <= threshold:
