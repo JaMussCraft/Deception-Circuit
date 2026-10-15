@@ -1,0 +1,577 @@
+{
+  "schema_version": 1,
+  "created": "2026-10-15T02:49:42",
+  "run_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+  "ablation": "interchange",
+  "model": "llama-8b-instruct",
+  "task": "sdr",
+  "metric_columns": [
+    [
+      "accuracy",
+      "Accuracy"
+    ],
+    [
+      "logit_diff",
+      "Logit Diff"
+    ],
+    [
+      "kl_div",
+      "KL Div"
+    ],
+    [
+      "exact_match",
+      "Exact Match"
+    ]
+  ],
+  "metric_better": {
+    "accuracy": "higher",
+    "logit_diff": "higher",
+    "exact_match": "higher",
+    "kl_div": "lower",
+    "prob_diff": "higher",
+    "cutoff_sharpness": "higher"
+  },
+  "geometry": {
+    "num_heads": 32,
+    "head_dim": 128,
+    "intermediate_size": 14336,
+    "hidden_size": 4096,
+    "num_layers": 32
+  },
+  "cli": {
+    "ablation": "interchange",
+    "all_pairs_delta": false,
+    "benchmark_belief_model": null,
+    "benchmark_belief_tokens": 128,
+    "benchmark_coherence_batch_size": null,
+    "benchmark_gen_batch_size": 8,
+    "benchmark_n_per_dataset": 100,
+    "benchmark_n_random": 5,
+    "benchmark_new_tokens": 512,
+    "benchmark_pool_size": null,
+    "benchmark_ref_pool": "honest",
+    "benchmark_refresh_screen": false,
+    "benchmark_repo_root": null,
+    "benchmark_screen_budget": 0,
+    "benchmark_screen_cache": null,
+    "benchmark_screen_seed": 0,
+    "benchmarks": [
+      "sandbagging",
+      "mask:continuations",
+      "mask:disinformation",
+      "mask:doubling_down_known_facts",
+      "mask:known_facts",
+      "mask:provided_facts",
+      "mask:statistics",
+      "lb:instructed-deception",
+      "lb:harm-pressure-choice",
+      "lb:harm-pressure-knowledge-report",
+      "lb:convincing-game"
+    ],
+    "circuit": [
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850"
+    ],
+    "compose_granularity": "both",
+    "data_dir": null,
+    "device": "cuda",
+    "dry_run": false,
+    "eval_batch_size": 32,
+    "evals": [
+      "sanity",
+      "null",
+      "pressure"
+    ],
+    "expr": null,
+    "gen_examples": 3,
+    "gen_new_tokens": 48,
+    "hf_token": null,
+    "judge_concurrency": 8,
+    "judge_dry_run": false,
+    "knockout_granularity": "finest",
+    "knockout_null_count": 20,
+    "lb_belief_templates": null,
+    "lb_harm_judge_model": null,
+    "lb_judge_model": null,
+    "legacy": false,
+    "mask_judge_model": null,
+    "mask_numeric_judge_model": null,
+    "mean_source": "pooled",
+    "n_random": 20,
+    "no_benchmark_screen_cache": false,
+    "no_kv_cache": false,
+    "null_alloc": "uniform",
+    "null_count": null,
+    "null_seed": 0,
+    "null_start": 0,
+    "output_dir": "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/F__sdr_honest",
+    "ref_cache_device": "cuda",
+    "reference": "separate",
+    "run_dir": null,
+    "sanity_granularity": "all",
+    "save_null_masks": false,
+    "skip_judge_check": false,
+    "skip_wikitext": false,
+    "std_variant": null,
+    "strict": false,
+    "suite_name": "format-control-sdr-coarse-nls0.3",
+    "task": null,
+    "task_from": [
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743"
+    ],
+    "test_samples": null,
+    "verify": true,
+    "wikitext_batch_size": 4,
+    "wikitext_block_size": 512,
+    "wikitext_blocks": 64,
+    "wikitext_seed": 0,
+    "xor": null
+  },
+  "circuit": {
+    "counts": {
+      "attention_blocks": {
+        "active": 12,
+        "total": 32,
+        "per_layer": {
+          "4": 1,
+          "8": 1,
+          "9": 1,
+          "10": 1,
+          "12": 1,
+          "13": 1,
+          "14": 1,
+          "15": 1,
+          "17": 1,
+          "18": 1,
+          "24": 1,
+          "30": 1
+        }
+      },
+      "attention_heads": {
+        "active": 68,
+        "total": 1024,
+        "per_layer": {
+          "4": 2,
+          "8": 6,
+          "9": 6,
+          "10": 5,
+          "12": 11,
+          "13": 10,
+          "14": 8,
+          "15": 4,
+          "17": 4,
+          "18": 4,
+          "24": 3,
+          "30": 5
+        }
+      },
+      "attention_neurons": {
+        "active": 8704,
+        "total": 131072,
+        "per_layer": {
+          "4": 256,
+          "8": 768,
+          "9": 768,
+          "10": 640,
+          "12": 1408,
+          "13": 1280,
+          "14": 1024,
+          "15": 512,
+          "17": 512,
+          "18": 512,
+          "24": 384,
+          "30": 640
+        }
+      },
+      "mlp_hidden": {
+        "active": 458752,
+        "total": 458752,
+        "per_layer": {
+          "0": 14336,
+          "1": 14336,
+          "2": 14336,
+          "3": 14336,
+          "4": 14336,
+          "5": 14336,
+          "6": 14336,
+          "7": 14336,
+          "8": 14336,
+          "9": 14336,
+          "10": 14336,
+          "11": 14336,
+          "12": 14336,
+          "13": 14336,
+          "14": 14336,
+          "15": 14336,
+          "16": 14336,
+          "17": 14336,
+          "18": 14336,
+          "19": 14336,
+          "20": 14336,
+          "21": 14336,
+          "22": 14336,
+          "23": 14336,
+          "24": 14336,
+          "25": 14336,
+          "26": 14336,
+          "27": 14336,
+          "28": 14336,
+          "29": 14336,
+          "30": 14336,
+          "31": 14336
+        }
+      },
+      "mlp_output": {
+        "active": 131072,
+        "total": 131072,
+        "per_layer": {
+          "0": 4096,
+          "1": 4096,
+          "2": 4096,
+          "3": 4096,
+          "4": 4096,
+          "5": 4096,
+          "6": 4096,
+          "7": 4096,
+          "8": 4096,
+          "9": 4096,
+          "10": 4096,
+          "11": 4096,
+          "12": 4096,
+          "13": 4096,
+          "14": 4096,
+          "15": 4096,
+          "16": 4096,
+          "17": 4096,
+          "18": 4096,
+          "19": 4096,
+          "20": 4096,
+          "21": 4096,
+          "22": 4096,
+          "23": 4096,
+          "24": 4096,
+          "25": 4096,
+          "26": 4096,
+          "27": 4096,
+          "28": 4096,
+          "29": 4096,
+          "30": 4096,
+          "31": 4096
+        }
+      }
+    }
+  },
+  "sanity_circuit": {
+    "granularity": "all",
+    "counts": {
+      "attention_blocks": {
+        "active": 12,
+        "total": 32,
+        "per_layer": {
+          "4": 1,
+          "8": 1,
+          "9": 1,
+          "10": 1,
+          "12": 1,
+          "13": 1,
+          "14": 1,
+          "15": 1,
+          "17": 1,
+          "18": 1,
+          "24": 1,
+          "30": 1
+        }
+      },
+      "attention_heads": {
+        "active": 68,
+        "total": 1024,
+        "per_layer": {
+          "4": 2,
+          "8": 6,
+          "9": 6,
+          "10": 5,
+          "12": 11,
+          "13": 10,
+          "14": 8,
+          "15": 4,
+          "17": 4,
+          "18": 4,
+          "24": 3,
+          "30": 5
+        }
+      },
+      "attention_neurons": {
+        "active": 8704,
+        "total": 131072,
+        "per_layer": {
+          "4": 256,
+          "8": 768,
+          "9": 768,
+          "10": 640,
+          "12": 1408,
+          "13": 1280,
+          "14": 1024,
+          "15": 512,
+          "17": 512,
+          "18": 512,
+          "24": 384,
+          "30": 640
+        }
+      },
+      "mlp_hidden": {
+        "active": 458752,
+        "total": 458752,
+        "per_layer": {
+          "0": 14336,
+          "1": 14336,
+          "2": 14336,
+          "3": 14336,
+          "4": 14336,
+          "5": 14336,
+          "6": 14336,
+          "7": 14336,
+          "8": 14336,
+          "9": 14336,
+          "10": 14336,
+          "11": 14336,
+          "12": 14336,
+          "13": 14336,
+          "14": 14336,
+          "15": 14336,
+          "16": 14336,
+          "17": 14336,
+          "18": 14336,
+          "19": 14336,
+          "20": 14336,
+          "21": 14336,
+          "22": 14336,
+          "23": 14336,
+          "24": 14336,
+          "25": 14336,
+          "26": 14336,
+          "27": 14336,
+          "28": 14336,
+          "29": 14336,
+          "30": 14336,
+          "31": 14336
+        }
+      },
+      "mlp_output": {
+        "active": 131072,
+        "total": 131072,
+        "per_layer": {
+          "0": 4096,
+          "1": 4096,
+          "2": 4096,
+          "3": 4096,
+          "4": 4096,
+          "5": 4096,
+          "6": 4096,
+          "7": 4096,
+          "8": 4096,
+          "9": 4096,
+          "10": 4096,
+          "11": 4096,
+          "12": 4096,
+          "13": 4096,
+          "14": 4096,
+          "15": 4096,
+          "16": 4096,
+          "17": 4096,
+          "18": 4096,
+          "19": 4096,
+          "20": 4096,
+          "21": 4096,
+          "22": 4096,
+          "23": 4096,
+          "24": 4096,
+          "25": 4096,
+          "26": 4096,
+          "27": 4096,
+          "28": 4096,
+          "29": 4096,
+          "30": 4096,
+          "31": 4096
+        }
+      }
+    }
+  },
+  "knockout": {
+    "granularity": "finest",
+    "counts": {
+      "attention_blocks": {
+        "active": 32,
+        "total": 32,
+        "per_layer": {
+          "0": 1,
+          "1": 1,
+          "2": 1,
+          "3": 1,
+          "4": 1,
+          "5": 1,
+          "6": 1,
+          "7": 1,
+          "8": 1,
+          "9": 1,
+          "10": 1,
+          "11": 1,
+          "12": 1,
+          "13": 1,
+          "14": 1,
+          "15": 1,
+          "16": 1,
+          "17": 1,
+          "18": 1,
+          "19": 1,
+          "20": 1,
+          "21": 1,
+          "22": 1,
+          "23": 1,
+          "24": 1,
+          "25": 1,
+          "26": 1,
+          "27": 1,
+          "28": 1,
+          "29": 1,
+          "30": 1,
+          "31": 1
+        }
+      },
+      "attention_heads": {
+        "active": 1024,
+        "total": 1024,
+        "per_layer": {
+          "0": 32,
+          "1": 32,
+          "2": 32,
+          "3": 32,
+          "4": 32,
+          "5": 32,
+          "6": 32,
+          "7": 32,
+          "8": 32,
+          "9": 32,
+          "10": 32,
+          "11": 32,
+          "12": 32,
+          "13": 32,
+          "14": 32,
+          "15": 32,
+          "16": 32,
+          "17": 32,
+          "18": 32,
+          "19": 32,
+          "20": 32,
+          "21": 32,
+          "22": 32,
+          "23": 32,
+          "24": 32,
+          "25": 32,
+          "26": 32,
+          "27": 32,
+          "28": 32,
+          "29": 32,
+          "30": 32,
+          "31": 32
+        }
+      },
+      "attention_neurons": {
+        "active": 122368,
+        "total": 131072,
+        "per_layer": {
+          "0": 4096,
+          "1": 4096,
+          "2": 4096,
+          "3": 4096,
+          "4": 3840,
+          "5": 4096,
+          "6": 4096,
+          "7": 4096,
+          "8": 3328,
+          "9": 3328,
+          "10": 3456,
+          "11": 4096,
+          "12": 2688,
+          "13": 2816,
+          "14": 3072,
+          "15": 3584,
+          "16": 4096,
+          "17": 3584,
+          "18": 3584,
+          "19": 4096,
+          "20": 4096,
+          "21": 4096,
+          "22": 4096,
+          "23": 4096,
+          "24": 3712,
+          "25": 4096,
+          "26": 4096,
+          "27": 4096,
+          "28": 4096,
+          "29": 4096,
+          "30": 3456,
+          "31": 4096
+        }
+      },
+      "mlp_hidden": {
+        "active": 0,
+        "total": 458752,
+        "per_layer": {}
+      },
+      "mlp_output": {
+        "active": 0,
+        "total": 131072,
+        "per_layer": {}
+      }
+    }
+  },
+  "reference_numbers": {
+    "source": "results.json:node_eval",
+    "node_eval": {
+      "accuracy": 0.9653846153846154,
+      "logit_diff": 2.5391826923076923,
+      "kl_div": 0.10201551364018367,
+      "exact_match": 0.9673076923076923
+    },
+    "baseline": {
+      "accuracy": 1.0,
+      "logit_diff": 3.012019230769231,
+      "kl_div": 0.0,
+      "exact_match": 1.0
+    }
+  },
+  "verification": {
+    "masks_roundtrip": true,
+    "null_circuits_size_matched": true
+  },
+  "circuit_spec": {
+    "label": "F",
+    "kind": "atomic",
+    "expr": null,
+    "operands": {
+      "F": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850"
+    },
+    "home_run_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+    "counts": {
+      "attention_blocks": 12,
+      "attention_heads": 68,
+      "attention_neurons": 8704,
+      "mlp_hidden": 458752,
+      "mlp_output": 131072
+    }
+  },
+  "task_spec": {
+    "label": "sdr",
+    "task": "sdr",
+    "home_run_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+    "dataset": {
+      "data_dir": "./data/datasets",
+      "std_variant": "azaria",
+      "deception_condition": "honest",
+      "test_samples": 1000
+    }
+  },
+  "failures": [],
+  "skipped": {
+    "sanity": "circuit 'F' was trained in /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850, but this cell evaluates task 'sdr', so there is no in-run number to reproduce"
+  }
+}

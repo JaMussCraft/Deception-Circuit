@@ -1,0 +1,756 @@
+{
+  "created": "2026-10-15T06:59:42",
+  "cells": [
+    {
+      "circuit": "D",
+      "circuit_kind": "atomic",
+      "expr": null,
+      "task": "sdr",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/format-control-sdr-coarse-nls0.3/cells/D/sdr/interchange",
+      "counts": {
+        "attention_blocks": 12,
+        "attention_heads": 69,
+        "attention_neurons": 8832,
+        "mlp_hidden": 458752,
+        "mlp_output": 131072
+      },
+      "headlines": {
+        "sanity": {
+          "accuracy": 0.967,
+          "logit_diff": 1.873375,
+          "kl_div": 0.054623142302036284,
+          "exact_match": 0.974
+        },
+        "null": {
+          "accuracy": 100.0,
+          "logit_diff": 100.0,
+          "kl_div": 100.0,
+          "exact_match": 100.0
+        },
+        "pressure": {
+          "circuit_logit_diff_with_pressure": 1.87675,
+          "circuit_logit_diff_honest_instruction": -0.1585,
+          "delta": -2.03525
+        }
+      },
+      "skipped": {},
+      "failures": [],
+      "task_name": "sdr",
+      "dataset_condition": "deceptive",
+      "shard": "D__sdr"
+    },
+    {
+      "circuit": "D_and_F_hko__leaf",
+      "circuit_kind": "leaf",
+      "expr": "(D & F) - m",
+      "task": "sdr",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/format-control-sdr-coarse-nls0.3/cells/D_and_F_hko__leaf/sdr/interchange",
+      "counts": {
+        "attention_neurons": 4608,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 36,
+        "attention_blocks": 9
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.002,
+          "wikitext_kl": 0.14962725827354006,
+          "honest_accuracy_drop": -0.522
+        }
+      },
+      "skipped": {},
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.639e-04, ppl ratio 1.000321)"
+      ],
+      "task_name": "sdr",
+      "dataset_condition": "deceptive",
+      "shard": "D_and_F_hko__sdr"
+    },
+    {
+      "circuit": "D_hko__leaf",
+      "circuit_kind": "leaf",
+      "expr": "(D) - m",
+      "task": "sdr",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/format-control-sdr-coarse-nls0.3/cells/D_hko__leaf/sdr/interchange",
+      "counts": {
+        "attention_neurons": 8832,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 69,
+        "attention_blocks": 12
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.002,
+          "wikitext_kl": 0.364369448099751,
+          "honest_accuracy_drop": -0.53
+        }
+      },
+      "skipped": {},
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.639e-04, ppl ratio 1.000321)"
+      ],
+      "task_name": "sdr",
+      "dataset_condition": "deceptive",
+      "shard": "D_hko__sdr"
+    },
+    {
+      "circuit": "D_minus_F_hko__leaf",
+      "circuit_kind": "leaf",
+      "expr": "(D - F) - m",
+      "task": "sdr",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/format-control-sdr-coarse-nls0.3/cells/D_minus_F_hko__leaf/sdr/interchange",
+      "counts": {
+        "attention_neurons": 4224,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 33,
+        "attention_blocks": 11
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.119,
+          "wikitext_kl": 0.13720582638052292,
+          "honest_accuracy_drop": -0.31500000000000006
+        }
+      },
+      "skipped": {},
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.639e-04, ppl ratio 1.000321)"
+      ],
+      "task_name": "sdr",
+      "dataset_condition": "deceptive",
+      "shard": "D_minus_F_hko__sdr"
+    },
+    {
+      "circuit": "D_minus_H_minus_F_hko__leaf",
+      "circuit_kind": "leaf",
+      "expr": "(D - H - F) - m",
+      "task": "sdr",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/format-control-sdr-coarse-nls0.3/cells/D_minus_H_minus_F_hko__leaf/sdr/interchange",
+      "counts": {
+        "attention_neurons": 2816,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 22,
+        "attention_blocks": 10
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.782,
+          "wikitext_kl": 0.09564903343562037,
+          "honest_accuracy_drop": -0.027999999999999997
+        }
+      },
+      "skipped": {},
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.639e-04, ppl ratio 1.000321)"
+      ],
+      "task_name": "sdr",
+      "dataset_condition": "deceptive",
+      "shard": "D_minus_H_minus_F_hko__sdr"
+    },
+    {
+      "circuit": "F",
+      "circuit_kind": "atomic",
+      "expr": null,
+      "task": "sdr",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/format-control-sdr-coarse-nls0.3/cells/F/sdr/interchange",
+      "counts": {
+        "attention_blocks": 12,
+        "attention_heads": 68,
+        "attention_neurons": 8704,
+        "mlp_hidden": 458752,
+        "mlp_output": 131072
+      },
+      "headlines": {
+        "null": {
+          "accuracy": 100.0,
+          "logit_diff": 100.0,
+          "kl_div": 100.0,
+          "exact_match": 100.0
+        },
+        "pressure": {
+          "circuit_logit_diff_with_pressure": -0.465625,
+          "circuit_logit_diff_honest_instruction": -1.18775,
+          "delta": -0.7221250000000001
+        }
+      },
+      "skipped": {
+        "sanity": "circuit 'F' was trained in /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850, but this cell evaluates task 'sdr', so there is no in-run number to reproduce"
+      },
+      "failures": [],
+      "task_name": "sdr",
+      "dataset_condition": "deceptive",
+      "shard": "F__sdr"
+    },
+    {
+      "circuit": "F_hko__leaf",
+      "circuit_kind": "leaf",
+      "expr": "(F) - m",
+      "task": "sdr",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/format-control-sdr-coarse-nls0.3/cells/F_hko__leaf/sdr/interchange",
+      "counts": {
+        "attention_neurons": 8704,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 68,
+        "attention_blocks": 12
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.0,
+          "wikitext_kl": 0.2793965663877316,
+          "honest_accuracy_drop": -0.519
+        }
+      },
+      "skipped": {},
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.639e-04, ppl ratio 1.000321)"
+      ],
+      "task_name": "sdr",
+      "dataset_condition": "deceptive",
+      "shard": "F_hko__sdr"
+    },
+    {
+      "circuit": "F_minus_D_hko__leaf",
+      "circuit_kind": "leaf",
+      "expr": "(F - D) - m",
+      "task": "sdr",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/format-control-sdr-coarse-nls0.3/cells/F_minus_D_hko__leaf/sdr/interchange",
+      "counts": {
+        "attention_neurons": 4096,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 32,
+        "attention_blocks": 10
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.598,
+          "wikitext_kl": 0.09075570938875899,
+          "honest_accuracy_drop": -0.277
+        }
+      },
+      "skipped": {},
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.639e-04, ppl ratio 1.000321)"
+      ],
+      "task_name": "sdr",
+      "dataset_condition": "deceptive",
+      "shard": "F_minus_D_hko__sdr"
+    },
+    {
+      "circuit": "F_minus_D_minus_H_hko__leaf",
+      "circuit_kind": "leaf",
+      "expr": "(F - D - H) - m",
+      "task": "sdr",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/format-control-sdr-coarse-nls0.3/cells/F_minus_D_minus_H_hko__leaf/sdr/interchange",
+      "counts": {
+        "attention_neurons": 2688,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 21,
+        "attention_blocks": 6
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.965,
+          "wikitext_kl": 0.04681984838680364,
+          "honest_accuracy_drop": -0.04400000000000001
+        }
+      },
+      "skipped": {},
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.639e-04, ppl ratio 1.000321)"
+      ],
+      "task_name": "sdr",
+      "dataset_condition": "deceptive",
+      "shard": "F_minus_D_minus_H_hko__sdr"
+    },
+    {
+      "circuit": "H",
+      "circuit_kind": "atomic",
+      "expr": null,
+      "task": "sdr",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/format-control-sdr-coarse-nls0.3/cells/H/sdr/interchange",
+      "counts": {
+        "attention_blocks": 12,
+        "attention_heads": 56,
+        "attention_neurons": 7168,
+        "mlp_hidden": 458752,
+        "mlp_output": 131072
+      },
+      "headlines": {
+        "null": {
+          "accuracy": 100.0,
+          "logit_diff": 100.0,
+          "kl_div": 100.0,
+          "exact_match": 100.0
+        },
+        "pressure": {
+          "circuit_logit_diff_with_pressure": 0.64125,
+          "circuit_logit_diff_honest_instruction": -0.976,
+          "delta": -1.6172499999999999
+        }
+      },
+      "skipped": {
+        "sanity": "circuit 'H' was trained in /projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743, but this cell evaluates task 'sdr', so there is no in-run number to reproduce"
+      },
+      "failures": [],
+      "task_name": "sdr",
+      "dataset_condition": "deceptive",
+      "shard": "H__sdr"
+    },
+    {
+      "circuit": "H_hko__leaf",
+      "circuit_kind": "leaf",
+      "expr": "(H) - m",
+      "task": "sdr",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/format-control-sdr-coarse-nls0.3/cells/H_hko__leaf/sdr/interchange",
+      "counts": {
+        "attention_neurons": 7168,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 56,
+        "attention_blocks": 12
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.002,
+          "wikitext_kl": 0.27521105913911015,
+          "honest_accuracy_drop": -0.519
+        }
+      },
+      "skipped": {},
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.639e-04, ppl ratio 1.000321)"
+      ],
+      "task_name": "sdr",
+      "dataset_condition": "deceptive",
+      "shard": "H_hko__sdr"
+    },
+    {
+      "circuit": "H_minus_D_minus_F_hko__leaf",
+      "circuit_kind": "leaf",
+      "expr": "(H - D - F) - m",
+      "task": "sdr",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/format-control-sdr-coarse-nls0.3/cells/H_minus_D_minus_F_hko__leaf/sdr/interchange",
+      "counts": {
+        "attention_neurons": 256,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 2,
+        "attention_blocks": 2
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 1.0,
+          "wikitext_kl": 0.007077900905642309,
+          "honest_accuracy_drop": -0.004999999999999977
+        }
+      },
+      "skipped": {},
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.639e-04, ppl ratio 1.000321)"
+      ],
+      "task_name": "sdr",
+      "dataset_condition": "deceptive",
+      "shard": "H_minus_D_minus_F_hko__sdr"
+    },
+    {
+      "circuit": "D",
+      "circuit_kind": "atomic",
+      "expr": null,
+      "task": "sdr_honest",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/format-control-sdr-coarse-nls0.3/cells/D/sdr_honest/interchange",
+      "counts": {
+        "attention_blocks": 12,
+        "attention_heads": 69,
+        "attention_neurons": 8832,
+        "mlp_hidden": 458752,
+        "mlp_output": 131072
+      },
+      "headlines": {
+        "null": {
+          "accuracy": 100.0,
+          "logit_diff": 100.0,
+          "kl_div": 100.0,
+          "exact_match": 100.0
+        },
+        "pressure": {
+          "circuit_logit_diff_with_pressure": 0.247625,
+          "circuit_logit_diff_honest_instruction": 0.147125,
+          "delta": -0.1005
+        }
+      },
+      "skipped": {
+        "sanity": "circuit 'D' was trained in /projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742, but this cell evaluates task 'sdr', so there is no in-run number to reproduce"
+      },
+      "failures": [],
+      "task_name": "sdr",
+      "dataset_condition": "honest",
+      "shard": "D__sdr_honest"
+    },
+    {
+      "circuit": "D_hko__leaf",
+      "circuit_kind": "leaf",
+      "expr": "(D) - m",
+      "task": "sdr_honest",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/format-control-sdr-coarse-nls0.3/cells/D_hko__leaf/sdr_honest/interchange",
+      "counts": {
+        "attention_neurons": 8832,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 69,
+        "attention_blocks": 12
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.0,
+          "wikitext_kl": 0.364369448099751,
+          "honest_accuracy_drop": 0.8919999999999999
+        }
+      },
+      "skipped": {},
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.639e-04, ppl ratio 1.000321)"
+      ],
+      "task_name": "sdr",
+      "dataset_condition": "honest",
+      "shard": "D_hko__sdr_honest"
+    },
+    {
+      "circuit": "F",
+      "circuit_kind": "atomic",
+      "expr": null,
+      "task": "sdr_honest",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/format-control-sdr-coarse-nls0.3/cells/F/sdr_honest/interchange",
+      "counts": {
+        "attention_blocks": 12,
+        "attention_heads": 68,
+        "attention_neurons": 8704,
+        "mlp_hidden": 458752,
+        "mlp_output": 131072
+      },
+      "headlines": {
+        "null": {
+          "accuracy": 100.0,
+          "logit_diff": 100.0,
+          "kl_div": 100.0,
+          "exact_match": 100.0
+        },
+        "pressure": {
+          "circuit_logit_diff_with_pressure": 2.85275,
+          "circuit_logit_diff_honest_instruction": 2.679625,
+          "delta": -0.17312499999999975
+        }
+      },
+      "skipped": {
+        "sanity": "circuit 'F' was trained in /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850, but this cell evaluates task 'sdr', so there is no in-run number to reproduce"
+      },
+      "failures": [],
+      "task_name": "sdr",
+      "dataset_condition": "honest",
+      "shard": "F__sdr_honest"
+    },
+    {
+      "circuit": "F_hko__leaf",
+      "circuit_kind": "leaf",
+      "expr": "(F) - m",
+      "task": "sdr_honest",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/format-control-sdr-coarse-nls0.3/cells/F_hko__leaf/sdr_honest/interchange",
+      "counts": {
+        "attention_neurons": 8704,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 68,
+        "attention_blocks": 12
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.0,
+          "wikitext_kl": 0.2793965663877316,
+          "honest_accuracy_drop": 0.9029999999999999
+        }
+      },
+      "skipped": {},
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.639e-04, ppl ratio 1.000321)"
+      ],
+      "task_name": "sdr",
+      "dataset_condition": "honest",
+      "shard": "F_hko__sdr_honest"
+    },
+    {
+      "circuit": "H",
+      "circuit_kind": "atomic",
+      "expr": null,
+      "task": "sdr_honest",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/format-control-sdr-coarse-nls0.3/cells/H/sdr_honest/interchange",
+      "counts": {
+        "attention_blocks": 12,
+        "attention_heads": 56,
+        "attention_neurons": 7168,
+        "mlp_hidden": 458752,
+        "mlp_output": 131072
+      },
+      "headlines": {
+        "sanity": {
+          "accuracy": 0.972,
+          "logit_diff": 2.25425,
+          "kl_div": 0.08726540552824735,
+          "exact_match": 0.972
+        },
+        "null": {
+          "accuracy": 100.0,
+          "logit_diff": 100.0,
+          "kl_div": 100.0,
+          "exact_match": 100.0
+        },
+        "pressure": {
+          "circuit_logit_diff_with_pressure": 2.25725,
+          "circuit_logit_diff_honest_instruction": 1.916,
+          "delta": -0.34125000000000005
+        }
+      },
+      "skipped": {},
+      "failures": [],
+      "task_name": "sdr",
+      "dataset_condition": "honest",
+      "shard": "H__sdr_honest"
+    },
+    {
+      "circuit": "H_hko__leaf",
+      "circuit_kind": "leaf",
+      "expr": "(H) - m",
+      "task": "sdr_honest",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/format-control-sdr-coarse-nls0.3/cells/H_hko__leaf/sdr_honest/interchange",
+      "counts": {
+        "attention_neurons": 7168,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 56,
+        "attention_blocks": 12
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.0,
+          "wikitext_kl": 0.27521105913911015,
+          "honest_accuracy_drop": 0.9089999999999999
+        }
+      },
+      "skipped": {},
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.639e-04, ppl ratio 1.000321)"
+      ],
+      "task_name": "sdr",
+      "dataset_condition": "honest",
+      "shard": "H_hko__sdr_honest"
+    },
+    {
+      "circuit": "D",
+      "circuit_kind": "atomic",
+      "expr": null,
+      "task": "sdr_nopressure",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/format-control-sdr-coarse-nls0.3/cells/D/sdr_nopressure/interchange",
+      "counts": {
+        "attention_blocks": 12,
+        "attention_heads": 69,
+        "attention_neurons": 8832,
+        "mlp_hidden": 458752,
+        "mlp_output": 131072
+      },
+      "headlines": {
+        "null": {
+          "accuracy": 100.0,
+          "logit_diff": 100.0,
+          "kl_div": 100.0,
+          "exact_match": 100.0
+        }
+      },
+      "skipped": {
+        "sanity": "circuit 'D' was trained in /projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742, but this cell evaluates task 'sdr', so there is no in-run number to reproduce",
+        "pressure": "sdr 'no_pressure' variant skipped: the dataset's condition is 'nopressure' (empty pressure), so it already is the no_pressure variant (the Pressure Clause was deleted at build time) and has no clause to replace with an honest instruction"
+      },
+      "failures": [],
+      "task_name": "sdr",
+      "dataset_condition": "nopressure",
+      "shard": "D__sdr_nopressure"
+    },
+    {
+      "circuit": "D_hko__leaf",
+      "circuit_kind": "leaf",
+      "expr": "(D) - m",
+      "task": "sdr_nopressure",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/format-control-sdr-coarse-nls0.3/cells/D_hko__leaf/sdr_nopressure/interchange",
+      "counts": {
+        "attention_neurons": 8832,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 69,
+        "attention_blocks": 12
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.0,
+          "wikitext_kl": 0.364369448099751,
+          "honest_accuracy_drop": null
+        }
+      },
+      "skipped": {},
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.639e-04, ppl ratio 1.000321)"
+      ],
+      "task_name": "sdr",
+      "dataset_condition": "nopressure",
+      "shard": "D_hko__sdr_nopressure"
+    },
+    {
+      "circuit": "F",
+      "circuit_kind": "atomic",
+      "expr": null,
+      "task": "sdr_nopressure",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/format-control-sdr-coarse-nls0.3/cells/F/sdr_nopressure/interchange",
+      "counts": {
+        "attention_blocks": 12,
+        "attention_heads": 68,
+        "attention_neurons": 8704,
+        "mlp_hidden": 458752,
+        "mlp_output": 131072
+      },
+      "headlines": {
+        "sanity": {
+          "accuracy": 0.9653846153846154,
+          "logit_diff": 2.5391826923076923,
+          "kl_div": 0.10191562393536935,
+          "exact_match": 0.9673076923076923
+        },
+        "null": {
+          "accuracy": 100.0,
+          "logit_diff": 100.0,
+          "kl_div": 100.0,
+          "exact_match": 100.0
+        }
+      },
+      "skipped": {
+        "pressure": "sdr 'no_pressure' variant skipped: the dataset's condition is 'nopressure' (empty pressure), so it already is the no_pressure variant (the Pressure Clause was deleted at build time) and has no clause to replace with an honest instruction"
+      },
+      "failures": [],
+      "task_name": "sdr",
+      "dataset_condition": "nopressure",
+      "shard": "F__sdr_nopressure"
+    },
+    {
+      "circuit": "F_hko__leaf",
+      "circuit_kind": "leaf",
+      "expr": "(F) - m",
+      "task": "sdr_nopressure",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/format-control-sdr-coarse-nls0.3/cells/F_hko__leaf/sdr_nopressure/interchange",
+      "counts": {
+        "attention_neurons": 8704,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 68,
+        "attention_blocks": 12
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.0,
+          "wikitext_kl": 0.2793965663877316,
+          "honest_accuracy_drop": null
+        }
+      },
+      "skipped": {},
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.639e-04, ppl ratio 1.000321)"
+      ],
+      "task_name": "sdr",
+      "dataset_condition": "nopressure",
+      "shard": "F_hko__sdr_nopressure"
+    },
+    {
+      "circuit": "H",
+      "circuit_kind": "atomic",
+      "expr": null,
+      "task": "sdr_nopressure",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/format-control-sdr-coarse-nls0.3/cells/H/sdr_nopressure/interchange",
+      "counts": {
+        "attention_blocks": 12,
+        "attention_heads": 56,
+        "attention_neurons": 7168,
+        "mlp_hidden": 458752,
+        "mlp_output": 131072
+      },
+      "headlines": {
+        "null": {
+          "accuracy": 100.0,
+          "logit_diff": 100.0,
+          "kl_div": 100.0,
+          "exact_match": 100.0
+        }
+      },
+      "skipped": {
+        "sanity": "circuit 'H' was trained in /projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743, but this cell evaluates task 'sdr', so there is no in-run number to reproduce",
+        "pressure": "sdr 'no_pressure' variant skipped: the dataset's condition is 'nopressure' (empty pressure), so it already is the no_pressure variant (the Pressure Clause was deleted at build time) and has no clause to replace with an honest instruction"
+      },
+      "failures": [],
+      "task_name": "sdr",
+      "dataset_condition": "nopressure",
+      "shard": "H__sdr_nopressure"
+    },
+    {
+      "circuit": "H_hko__leaf",
+      "circuit_kind": "leaf",
+      "expr": "(H) - m",
+      "task": "sdr_nopressure",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/format-control-sdr-coarse-nls0.3/cells/H_hko__leaf/sdr_nopressure/interchange",
+      "counts": {
+        "attention_neurons": 7168,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 56,
+        "attention_blocks": 12
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.0019230769230769232,
+          "wikitext_kl": 0.27521105913911015,
+          "honest_accuracy_drop": null
+        }
+      },
+      "skipped": {},
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.639e-04, ppl ratio 1.000321)"
+      ],
+      "task_name": "sdr",
+      "dataset_condition": "nopressure",
+      "shard": "H_hko__sdr_nopressure"
+    }
+  ]
+}

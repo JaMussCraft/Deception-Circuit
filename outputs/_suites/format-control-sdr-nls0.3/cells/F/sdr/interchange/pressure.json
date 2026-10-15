@@ -1,0 +1,813 @@
+{
+  "ablation": "interchange",
+  "label_convention": "Labels are unchanged from the trained test set: `target` is the DECEPTIVE answer and `distractor` the honest one. Under a prompt variant, accuracy therefore reads as 'still gives the deceptive answer' and logit_diff as logit(deceptive) - logit(honest). The desired result is accuracy FALLING and logit_diff going NEGATIVE.",
+  "variant_descriptions": {
+    "with_pressure": "the test set as trained \u2014 the pressure clause is present",
+    "no_pressure": "the pressure clause deleted, nothing in its place",
+    "honest_instruction": "the pressure clause replaced by an explicit instruction to answer honestly"
+  },
+  "metrics": [
+    "accuracy",
+    "logit_diff",
+    "kl_div",
+    "exact_match"
+  ],
+  "variants": {
+    "with_pressure": {
+      "full": {
+        "accuracy": 1.0,
+        "logit_diff": 1.757375,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 35719,
+              "token": " calcium",
+              "count": 92,
+              "frac": 0.092
+            },
+            {
+              "id": 39695,
+              "token": " sodium",
+              "count": 92,
+              "frac": 0.092
+            },
+            {
+              "id": 3215,
+              "token": " button",
+              "count": 63,
+              "frac": 0.063
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 55,
+              "frac": 0.055
+            },
+            {
+              "id": 18618,
+              "token": " gate",
+              "count": 47,
+              "frac": 0.047
+            },
+            {
+              "id": 25675,
+              "token": " fence",
+              "count": 42,
+              "frac": 0.042
+            },
+            {
+              "id": 2673,
+              "token": " height",
+              "count": 36,
+              "frac": 0.036
+            },
+            {
+              "id": 1179,
+              "token": " import",
+              "count": 33,
+              "frac": 0.033
+            },
+            {
+              "id": 2612,
+              "token": " output",
+              "count": 32,
+              "frac": 0.032
+            },
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 30,
+              "frac": 0.03
+            },
+            {
+              "id": 7637,
+              "token": " export",
+              "count": 30,
+              "frac": 0.03
+            },
+            {
+              "id": 4785,
+              "token": " weight",
+              "count": 29,
+              "frac": 0.029
+            }
+          ],
+          "n_distinct": 52,
+          "target_frac": 1.0,
+          "distractor_frac": 0.0,
+          "other_frac": 0.0
+        }
+      },
+      "circuit": {
+        "accuracy": 0.244,
+        "logit_diff": -2.856,
+        "kl_div": 2.4941077756881715,
+        "exact_match": 0.25,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 35719,
+              "token": " calcium",
+              "count": 124,
+              "frac": 0.124
+            },
+            {
+              "id": 3215,
+              "token": " button",
+              "count": 69,
+              "frac": 0.069
+            },
+            {
+              "id": 39695,
+              "token": " sodium",
+              "count": 60,
+              "frac": 0.06
+            },
+            {
+              "id": 25675,
+              "token": " fence",
+              "count": 59,
+              "frac": 0.059
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 49,
+              "frac": 0.049
+            },
+            {
+              "id": 4785,
+              "token": " weight",
+              "count": 45,
+              "frac": 0.045
+            },
+            {
+              "id": 1179,
+              "token": " import",
+              "count": 38,
+              "frac": 0.038
+            },
+            {
+              "id": 38193,
+              "token": " humidity",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 18618,
+              "token": " gate",
+              "count": 30,
+              "frac": 0.03
+            },
+            {
+              "id": 23730,
+              "token": " intake",
+              "count": 29,
+              "frac": 0.029
+            },
+            {
+              "id": 9042,
+              "token": " clock",
+              "count": 27,
+              "frac": 0.027
+            },
+            {
+              "id": 2612,
+              "token": " output",
+              "count": 27,
+              "frac": 0.027
+            }
+          ],
+          "n_distinct": 52,
+          "target_frac": 0.25,
+          "distractor_frac": 0.75,
+          "other_frac": 0.0
+        }
+      },
+      "empty": {
+        "accuracy": 0.0,
+        "logit_diff": -1.773875,
+        "kl_div": 1.2203568420410156,
+        "exact_match": 0.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 39695,
+              "token": " sodium",
+              "count": 92,
+              "frac": 0.092
+            },
+            {
+              "id": 35719,
+              "token": " calcium",
+              "count": 92,
+              "frac": 0.092
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 63,
+              "frac": 0.063
+            },
+            {
+              "id": 3215,
+              "token": " button",
+              "count": 55,
+              "frac": 0.055
+            },
+            {
+              "id": 25675,
+              "token": " fence",
+              "count": 47,
+              "frac": 0.047
+            },
+            {
+              "id": 18618,
+              "token": " gate",
+              "count": 42,
+              "frac": 0.042
+            },
+            {
+              "id": 4785,
+              "token": " weight",
+              "count": 36,
+              "frac": 0.036
+            },
+            {
+              "id": 7637,
+              "token": " export",
+              "count": 33,
+              "frac": 0.033
+            },
+            {
+              "id": 23730,
+              "token": " intake",
+              "count": 32,
+              "frac": 0.032
+            },
+            {
+              "id": 38193,
+              "token": " humidity",
+              "count": 30,
+              "frac": 0.03
+            },
+            {
+              "id": 1179,
+              "token": " import",
+              "count": 30,
+              "frac": 0.03
+            },
+            {
+              "id": 2673,
+              "token": " height",
+              "count": 29,
+              "frac": 0.029
+            }
+          ],
+          "n_distinct": 52,
+          "target_frac": 0.0,
+          "distractor_frac": 1.0,
+          "other_frac": 0.0
+        }
+      }
+    },
+    "no_pressure": {
+      "full": {
+        "accuracy": 0.224,
+        "logit_diff": -1.749875,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 39695,
+              "token": " sodium",
+              "count": 145,
+              "frac": 0.145
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 111,
+              "frac": 0.111
+            },
+            {
+              "id": 18618,
+              "token": " gate",
+              "count": 58,
+              "frac": 0.058
+            },
+            {
+              "id": 4785,
+              "token": " weight",
+              "count": 47,
+              "frac": 0.047
+            },
+            {
+              "id": 7637,
+              "token": " export",
+              "count": 41,
+              "frac": 0.041
+            },
+            {
+              "id": 2612,
+              "token": " output",
+              "count": 39,
+              "frac": 0.039
+            },
+            {
+              "id": 35719,
+              "token": " calcium",
+              "count": 39,
+              "frac": 0.039
+            },
+            {
+              "id": 25675,
+              "token": " fence",
+              "count": 31,
+              "frac": 0.031
+            },
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 31,
+              "frac": 0.031
+            },
+            {
+              "id": 9198,
+              "token": " timer",
+              "count": 31,
+              "frac": 0.031
+            },
+            {
+              "id": 4207,
+              "token": " hours",
+              "count": 30,
+              "frac": 0.03
+            },
+            {
+              "id": 2430,
+              "token": " width",
+              "count": 29,
+              "frac": 0.029
+            }
+          ],
+          "n_distinct": 52,
+          "target_frac": 0.231,
+          "distractor_frac": 0.769,
+          "other_frac": 0.0
+        }
+      },
+      "circuit": {
+        "accuracy": 0.22,
+        "logit_diff": -2.045,
+        "kl_div": 0.33902177023887636,
+        "exact_match": 0.758,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 39695,
+              "token": " sodium",
+              "count": 92,
+              "frac": 0.092
+            },
+            {
+              "id": 35719,
+              "token": " calcium",
+              "count": 92,
+              "frac": 0.092
+            },
+            {
+              "id": 3215,
+              "token": " button",
+              "count": 59,
+              "frac": 0.059
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 59,
+              "frac": 0.059
+            },
+            {
+              "id": 18618,
+              "token": " gate",
+              "count": 46,
+              "frac": 0.046
+            },
+            {
+              "id": 25675,
+              "token": " fence",
+              "count": 43,
+              "frac": 0.043
+            },
+            {
+              "id": 2673,
+              "token": " height",
+              "count": 41,
+              "frac": 0.041
+            },
+            {
+              "id": 38193,
+              "token": " humidity",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 7637,
+              "token": " export",
+              "count": 33,
+              "frac": 0.033
+            },
+            {
+              "id": 2612,
+              "token": " output",
+              "count": 31,
+              "frac": 0.031
+            },
+            {
+              "id": 1179,
+              "token": " import",
+              "count": 30,
+              "frac": 0.03
+            },
+            {
+              "id": 2430,
+              "token": " width",
+              "count": 29,
+              "frac": 0.029
+            }
+          ],
+          "n_distinct": 50,
+          "target_frac": 0.223,
+          "distractor_frac": 0.777,
+          "other_frac": 0.0
+        }
+      },
+      "empty": {
+        "accuracy": 0.76,
+        "logit_diff": 1.6655,
+        "kl_div": 1.4497450904846192,
+        "exact_match": 0.405,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 39695,
+              "token": " sodium",
+              "count": 139,
+              "frac": 0.139
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 111,
+              "frac": 0.111
+            },
+            {
+              "id": 18618,
+              "token": " gate",
+              "count": 60,
+              "frac": 0.06
+            },
+            {
+              "id": 35719,
+              "token": " calcium",
+              "count": 45,
+              "frac": 0.045
+            },
+            {
+              "id": 7637,
+              "token": " export",
+              "count": 43,
+              "frac": 0.043
+            },
+            {
+              "id": 4785,
+              "token": " weight",
+              "count": 42,
+              "frac": 0.042
+            },
+            {
+              "id": 2612,
+              "token": " output",
+              "count": 42,
+              "frac": 0.042
+            },
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 9198,
+              "token": " timer",
+              "count": 29,
+              "frac": 0.029
+            },
+            {
+              "id": 25675,
+              "token": " fence",
+              "count": 29,
+              "frac": 0.029
+            },
+            {
+              "id": 2430,
+              "token": " width",
+              "count": 29,
+              "frac": 0.029
+            },
+            {
+              "id": 4207,
+              "token": " hours",
+              "count": 25,
+              "frac": 0.025
+            }
+          ],
+          "n_distinct": 52,
+          "target_frac": 0.764,
+          "distractor_frac": 0.236,
+          "other_frac": 0.0
+        }
+      }
+    },
+    "honest_instruction": {
+      "full": {
+        "accuracy": 0.232,
+        "logit_diff": -1.3265,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 39695,
+              "token": " sodium",
+              "count": 147,
+              "frac": 0.147
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 117,
+              "frac": 0.117
+            },
+            {
+              "id": 18618,
+              "token": " gate",
+              "count": 61,
+              "frac": 0.061
+            },
+            {
+              "id": 4785,
+              "token": " weight",
+              "count": 41,
+              "frac": 0.041
+            },
+            {
+              "id": 7637,
+              "token": " export",
+              "count": 40,
+              "frac": 0.04
+            },
+            {
+              "id": 2612,
+              "token": " output",
+              "count": 39,
+              "frac": 0.039
+            },
+            {
+              "id": 35719,
+              "token": " calcium",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 9198,
+              "token": " timer",
+              "count": 32,
+              "frac": 0.032
+            },
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 31,
+              "frac": 0.031
+            },
+            {
+              "id": 4207,
+              "token": " hours",
+              "count": 30,
+              "frac": 0.03
+            },
+            {
+              "id": 2430,
+              "token": " width",
+              "count": 29,
+              "frac": 0.029
+            },
+            {
+              "id": 25675,
+              "token": " fence",
+              "count": 28,
+              "frac": 0.028
+            }
+          ],
+          "n_distinct": 51,
+          "target_frac": 0.235,
+          "distractor_frac": 0.765,
+          "other_frac": 0.0
+        }
+      },
+      "circuit": {
+        "accuracy": 0.242,
+        "logit_diff": -2.09275,
+        "kl_div": 0.44046044194698336,
+        "exact_match": 0.723,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 35719,
+              "token": " calcium",
+              "count": 113,
+              "frac": 0.113
+            },
+            {
+              "id": 39695,
+              "token": " sodium",
+              "count": 71,
+              "frac": 0.071
+            },
+            {
+              "id": 3215,
+              "token": " button",
+              "count": 62,
+              "frac": 0.062
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 56,
+              "frac": 0.056
+            },
+            {
+              "id": 25675,
+              "token": " fence",
+              "count": 45,
+              "frac": 0.045
+            },
+            {
+              "id": 18618,
+              "token": " gate",
+              "count": 44,
+              "frac": 0.044
+            },
+            {
+              "id": 38193,
+              "token": " humidity",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 4785,
+              "token": " weight",
+              "count": 36,
+              "frac": 0.036
+            },
+            {
+              "id": 7637,
+              "token": " export",
+              "count": 33,
+              "frac": 0.033
+            },
+            {
+              "id": 2612,
+              "token": " output",
+              "count": 31,
+              "frac": 0.031
+            },
+            {
+              "id": 1179,
+              "token": " import",
+              "count": 30,
+              "frac": 0.03
+            },
+            {
+              "id": 2673,
+              "token": " height",
+              "count": 29,
+              "frac": 0.029
+            }
+          ],
+          "n_distinct": 49,
+          "target_frac": 0.246,
+          "distractor_frac": 0.754,
+          "other_frac": 0.0
+        }
+      },
+      "empty": {
+        "accuracy": 0.755,
+        "logit_diff": 1.25175,
+        "kl_div": 0.9448163514137268,
+        "exact_match": 0.436,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 39695,
+              "token": " sodium",
+              "count": 141,
+              "frac": 0.141
+            },
+            {
+              "id": 3480,
+              "token": " switch",
+              "count": 115,
+              "frac": 0.115
+            },
+            {
+              "id": 18618,
+              "token": " gate",
+              "count": 62,
+              "frac": 0.062
+            },
+            {
+              "id": 35719,
+              "token": " calcium",
+              "count": 43,
+              "frac": 0.043
+            },
+            {
+              "id": 7637,
+              "token": " export",
+              "count": 43,
+              "frac": 0.043
+            },
+            {
+              "id": 2612,
+              "token": " output",
+              "count": 41,
+              "frac": 0.041
+            },
+            {
+              "id": 4785,
+              "token": " weight",
+              "count": 39,
+              "frac": 0.039
+            },
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 9198,
+              "token": " timer",
+              "count": 29,
+              "frac": 0.029
+            },
+            {
+              "id": 2430,
+              "token": " width",
+              "count": 29,
+              "frac": 0.029
+            },
+            {
+              "id": 25675,
+              "token": " fence",
+              "count": 27,
+              "frac": 0.027
+            },
+            {
+              "id": 4207,
+              "token": " hours",
+              "count": 26,
+              "frac": 0.026
+            }
+          ],
+          "n_distinct": 52,
+          "target_frac": 0.759,
+          "distractor_frac": 0.241,
+          "other_frac": 0.0
+        }
+      }
+    }
+  },
+  "skipped": {},
+  "headline": {
+    "circuit_logit_diff_with_pressure": -2.856,
+    "circuit_logit_diff_honest_instruction": -2.09275,
+    "delta": 0.7632499999999998
+  },
+  "seconds": 107.4
+}

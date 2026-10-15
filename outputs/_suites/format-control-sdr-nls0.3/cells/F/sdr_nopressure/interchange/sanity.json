@@ -1,0 +1,415 @@
+{
+  "batch_size": 7,
+  "n": 520,
+  "ablation": "interchange",
+  "granularity": "all",
+  "counts": {
+    "attention_blocks": {
+      "active": 14,
+      "total": 32,
+      "per_layer": {
+        "4": 1,
+        "8": 1,
+        "9": 1,
+        "10": 1,
+        "11": 1,
+        "12": 1,
+        "13": 1,
+        "14": 1,
+        "15": 1,
+        "17": 1,
+        "18": 1,
+        "24": 1,
+        "27": 1,
+        "30": 1
+      }
+    },
+    "mlp_blocks": {
+      "active": 3,
+      "total": 32,
+      "per_layer": {
+        "0": 1,
+        "14": 1,
+        "31": 1
+      }
+    },
+    "attention_heads": {
+      "active": 73,
+      "total": 1024,
+      "per_layer": {
+        "4": 2,
+        "8": 6,
+        "9": 7,
+        "10": 5,
+        "11": 6,
+        "12": 6,
+        "13": 7,
+        "14": 6,
+        "15": 6,
+        "17": 3,
+        "18": 4,
+        "24": 5,
+        "27": 6,
+        "30": 4
+      }
+    },
+    "attention_neurons": {
+      "active": 5326,
+      "total": 131072,
+      "per_layer": {
+        "4": 187,
+        "8": 366,
+        "9": 414,
+        "10": 383,
+        "11": 362,
+        "12": 390,
+        "13": 451,
+        "14": 456,
+        "15": 478,
+        "17": 312,
+        "18": 426,
+        "24": 391,
+        "27": 365,
+        "30": 345
+      }
+    },
+    "mlp_hidden": {
+      "active": 4433,
+      "total": 458752,
+      "per_layer": {
+        "0": 1763,
+        "14": 1781,
+        "31": 889
+      }
+    },
+    "mlp_output": {
+      "active": 2123,
+      "total": 131072,
+      "per_layer": {
+        "0": 571,
+        "14": 644,
+        "31": 908
+      }
+    }
+  },
+  "label": "discovered circuit",
+  "rows": {
+    "full_open": {
+      "accuracy": 0.9980769230769231,
+      "logit_diff": 3.0098557692307693,
+      "kl_div": 0.0,
+      "exact_match": 1.0,
+      "n": 520
+    },
+    "discovered": {
+      "accuracy": 0.9615384615384616,
+      "logit_diff": 3.474278846153846,
+      "kl_div": 0.1254541369011769,
+      "exact_match": 0.9615384615384616,
+      "n": 520,
+      "argmax": {
+        "top": [
+          {
+            "id": 39695,
+            "token": " sodium",
+            "count": 42,
+            "frac": 0.08076923076923077
+          },
+          {
+            "id": 35719,
+            "token": " calcium",
+            "count": 35,
+            "frac": 0.0673076923076923
+          },
+          {
+            "id": 25675,
+            "token": " fence",
+            "count": 31,
+            "frac": 0.05961538461538462
+          },
+          {
+            "id": 18618,
+            "token": " gate",
+            "count": 29,
+            "frac": 0.05576923076923077
+          },
+          {
+            "id": 1179,
+            "token": " import",
+            "count": 22,
+            "frac": 0.04230769230769231
+          },
+          {
+            "id": 38193,
+            "token": " humidity",
+            "count": 21,
+            "frac": 0.04038461538461539
+          },
+          {
+            "id": 7637,
+            "token": " export",
+            "count": 20,
+            "frac": 0.038461538461538464
+          },
+          {
+            "id": 4785,
+            "token": " weight",
+            "count": 19,
+            "frac": 0.03653846153846154
+          },
+          {
+            "id": 9198,
+            "token": " timer",
+            "count": 19,
+            "frac": 0.03653846153846154
+          },
+          {
+            "id": 2673,
+            "token": " height",
+            "count": 16,
+            "frac": 0.03076923076923077
+          },
+          {
+            "id": 48913,
+            "token": " vibration",
+            "count": 15,
+            "frac": 0.028846153846153848
+          },
+          {
+            "id": 9042,
+            "token": " clock",
+            "count": 14,
+            "frac": 0.026923076923076925
+          }
+        ],
+        "n_distinct": 47,
+        "target_frac": 0.9615384615384616,
+        "distractor_frac": 0.038461538461538464,
+        "other_frac": 0.0
+      }
+    },
+    "discovered_repo": {
+      "accuracy": 0.9615384615384616,
+      "logit_diff": 3.474278846153846,
+      "kl_div": 0.12546549760378323,
+      "exact_match": 0.9615384615384616
+    },
+    "empty": {
+      "accuracy": 0.0,
+      "logit_diff": -2.928125,
+      "kl_div": 2.5169863765056317,
+      "exact_match": 0.0,
+      "n": 520,
+      "argmax": {
+        "top": [
+          {
+            "id": 35719,
+            "token": " calcium",
+            "count": 42,
+            "frac": 0.08076923076923077
+          },
+          {
+            "id": 39695,
+            "token": " sodium",
+            "count": 35,
+            "frac": 0.0673076923076923
+          },
+          {
+            "id": 18618,
+            "token": " gate",
+            "count": 31,
+            "frac": 0.05961538461538462
+          },
+          {
+            "id": 25675,
+            "token": " fence",
+            "count": 29,
+            "frac": 0.05576923076923077
+          },
+          {
+            "id": 7637,
+            "token": " export",
+            "count": 22,
+            "frac": 0.04230769230769231
+          },
+          {
+            "id": 48913,
+            "token": " vibration",
+            "count": 21,
+            "frac": 0.04038461538461539
+          },
+          {
+            "id": 1179,
+            "token": " import",
+            "count": 20,
+            "frac": 0.038461538461538464
+          },
+          {
+            "id": 2673,
+            "token": " height",
+            "count": 20,
+            "frac": 0.038461538461538464
+          },
+          {
+            "id": 9042,
+            "token": " clock",
+            "count": 19,
+            "frac": 0.03653846153846154
+          },
+          {
+            "id": 38193,
+            "token": " humidity",
+            "count": 15,
+            "frac": 0.028846153846153848
+          },
+          {
+            "id": 4785,
+            "token": " weight",
+            "count": 15,
+            "frac": 0.028846153846153848
+          },
+          {
+            "id": 9198,
+            "token": " timer",
+            "count": 14,
+            "frac": 0.026923076923076925
+          }
+        ],
+        "n_distinct": 50,
+        "target_frac": 0.0,
+        "distractor_frac": 1.0,
+        "other_frac": 0.0
+      }
+    }
+  },
+  "reference": {
+    "node_eval": {
+      "accuracy": 0.9615384615384616,
+      "logit_diff": 3.4627403846153846,
+      "kl_div": 0.12671561883046076,
+      "exact_match": 0.9615384615384616
+    },
+    "baseline": {
+      "accuracy": 1.0,
+      "logit_diff": 3.012019230769231,
+      "kl_div": 0.0,
+      "exact_match": 1.0
+    }
+  },
+  "cross_check": {
+    "ran": true,
+    "ok": true,
+    "max_delta": 1.136070260632227e-05,
+    "per_metric": {
+      "accuracy": {
+        "generic": 0.9615384615384616,
+        "repo": 0.9615384615384616,
+        "delta": 0.0,
+        "tolerance": 1e-06,
+        "pass": true
+      },
+      "exact_match": {
+        "generic": 0.9615384615384616,
+        "repo": 0.9615384615384616,
+        "delta": 0.0,
+        "tolerance": 1e-06,
+        "pass": true
+      },
+      "logit_diff": {
+        "generic": 3.474278846153846,
+        "repo": 3.474278846153846,
+        "delta": 0.0,
+        "tolerance": 0.0001,
+        "pass": true
+      },
+      "kl_div": {
+        "generic": 0.1254541369011769,
+        "repo": 0.12546549760378323,
+        "delta": 1.136070260632227e-05,
+        "tolerance": 0.0001,
+        "pass": true
+      }
+    }
+  },
+  "all_open": {
+    "ok": true,
+    "kl_div": 0.0,
+    "exact_match": 1.0,
+    "tolerances": {
+      "kl_div": 0.0001,
+      "exact_match_min": 0.999
+    }
+  },
+  "delta": {
+    "ok": false,
+    "max_delta": 0.011538461538461497,
+    "rows": [
+      {
+        "metric": "accuracy",
+        "label": "Accuracy",
+        "expected": 0.9615384615384616,
+        "observed": 0.9615384615384616,
+        "delta": 0.0,
+        "tolerance": 0.002,
+        "pass": true
+      },
+      {
+        "metric": "logit_diff",
+        "label": "Logit Diff",
+        "expected": 3.4627403846153846,
+        "observed": 3.474278846153846,
+        "delta": 0.011538461538461497,
+        "tolerance": 0.01,
+        "pass": false
+      },
+      {
+        "metric": "kl_div",
+        "label": "KL Div",
+        "expected": 0.12671561883046076,
+        "observed": 0.1254541369011769,
+        "delta": -0.001261481929283853,
+        "tolerance": 0.005,
+        "pass": true
+      },
+      {
+        "metric": "exact_match",
+        "label": "Exact Match",
+        "expected": 0.9615384615384616,
+        "observed": 0.9615384615384616,
+        "delta": 0.0,
+        "tolerance": 0.002,
+        "pass": true
+      }
+    ]
+  },
+  "headline": {
+    "accuracy": 0.9615384615384616,
+    "logit_diff": 3.474278846153846,
+    "kl_div": 0.1254541369011769,
+    "exact_match": 0.9615384615384616
+  },
+  "verification": {
+    "masks_roundtrip": true,
+    "all_open_equals_full": true,
+    "generic_vs_task_evaluate_max_delta": 1.136070260632227e-05,
+    "granularity": "all",
+    "reference_numbers": {
+      "source": "results.json:node_eval",
+      "expected": {
+        "accuracy": 0.9615384615384616,
+        "logit_diff": 3.4627403846153846,
+        "kl_div": 0.12671561883046076,
+        "exact_match": 0.9615384615384616
+      },
+      "observed": {
+        "accuracy": 0.9615384615384616,
+        "logit_diff": 3.474278846153846,
+        "kl_div": 0.1254541369011769,
+        "exact_match": 0.9615384615384616
+      },
+      "max_delta": 0.011538461538461497,
+      "ok": false
+    }
+  },
+  "seconds": 27.3
+}

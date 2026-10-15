@@ -1,0 +1,112 @@
+circuit,circuit_kind,expr,task,ablation,eval,metric,value
+D,atomic,,sdr,interchange,null,accuracy,100.0
+D,atomic,,sdr,interchange,null,exact_match,100.0
+D,atomic,,sdr,interchange,null,kl_div,100.0
+D,atomic,,sdr,interchange,null,logit_diff,100.0
+D,atomic,,sdr,interchange,pressure,circuit_logit_diff_honest_instruction,-0.1585
+D,atomic,,sdr,interchange,pressure,circuit_logit_diff_with_pressure,1.87675
+D,atomic,,sdr,interchange,pressure,delta,-2.03525
+D,atomic,,sdr,interchange,sanity,accuracy,0.967
+D,atomic,,sdr,interchange,sanity,exact_match,0.974
+D,atomic,,sdr,interchange,sanity,kl_div,0.054623142302036284
+D,atomic,,sdr,interchange,sanity,logit_diff,1.873375
+D_and_F_hko__leaf,leaf,(D & F) - m,sdr,interchange,knockout,honest_accuracy_drop,-0.522
+D_and_F_hko__leaf,leaf,(D & F) - m,sdr,interchange,knockout,task_accuracy,0.002
+D_and_F_hko__leaf,leaf,(D & F) - m,sdr,interchange,knockout,wikitext_kl,0.14962725827354006
+D_hko__leaf,leaf,(D) - m,sdr,interchange,knockout,honest_accuracy_drop,-0.53
+D_hko__leaf,leaf,(D) - m,sdr,interchange,knockout,task_accuracy,0.002
+D_hko__leaf,leaf,(D) - m,sdr,interchange,knockout,wikitext_kl,0.364369448099751
+D_minus_F_hko__leaf,leaf,(D - F) - m,sdr,interchange,knockout,honest_accuracy_drop,-0.31500000000000006
+D_minus_F_hko__leaf,leaf,(D - F) - m,sdr,interchange,knockout,task_accuracy,0.119
+D_minus_F_hko__leaf,leaf,(D - F) - m,sdr,interchange,knockout,wikitext_kl,0.13720582638052292
+D_minus_H_minus_F_hko__leaf,leaf,(D - H - F) - m,sdr,interchange,knockout,honest_accuracy_drop,-0.027999999999999997
+D_minus_H_minus_F_hko__leaf,leaf,(D - H - F) - m,sdr,interchange,knockout,task_accuracy,0.782
+D_minus_H_minus_F_hko__leaf,leaf,(D - H - F) - m,sdr,interchange,knockout,wikitext_kl,0.09564903343562037
+F,atomic,,sdr,interchange,null,accuracy,100.0
+F,atomic,,sdr,interchange,null,exact_match,100.0
+F,atomic,,sdr,interchange,null,kl_div,100.0
+F,atomic,,sdr,interchange,null,logit_diff,100.0
+F,atomic,,sdr,interchange,pressure,circuit_logit_diff_honest_instruction,-1.18775
+F,atomic,,sdr,interchange,pressure,circuit_logit_diff_with_pressure,-0.465625
+F,atomic,,sdr,interchange,pressure,delta,-0.7221250000000001
+F_hko__leaf,leaf,(F) - m,sdr,interchange,knockout,honest_accuracy_drop,-0.519
+F_hko__leaf,leaf,(F) - m,sdr,interchange,knockout,task_accuracy,0.0
+F_hko__leaf,leaf,(F) - m,sdr,interchange,knockout,wikitext_kl,0.2793965663877316
+F_minus_D_hko__leaf,leaf,(F - D) - m,sdr,interchange,knockout,honest_accuracy_drop,-0.277
+F_minus_D_hko__leaf,leaf,(F - D) - m,sdr,interchange,knockout,task_accuracy,0.598
+F_minus_D_hko__leaf,leaf,(F - D) - m,sdr,interchange,knockout,wikitext_kl,0.09075570938875899
+F_minus_D_minus_H_hko__leaf,leaf,(F - D - H) - m,sdr,interchange,knockout,honest_accuracy_drop,-0.04400000000000001
+F_minus_D_minus_H_hko__leaf,leaf,(F - D - H) - m,sdr,interchange,knockout,task_accuracy,0.965
+F_minus_D_minus_H_hko__leaf,leaf,(F - D - H) - m,sdr,interchange,knockout,wikitext_kl,0.04681984838680364
+H,atomic,,sdr,interchange,null,accuracy,100.0
+H,atomic,,sdr,interchange,null,exact_match,100.0
+H,atomic,,sdr,interchange,null,kl_div,100.0
+H,atomic,,sdr,interchange,null,logit_diff,100.0
+H,atomic,,sdr,interchange,pressure,circuit_logit_diff_honest_instruction,-0.976
+H,atomic,,sdr,interchange,pressure,circuit_logit_diff_with_pressure,0.64125
+H,atomic,,sdr,interchange,pressure,delta,-1.6172499999999999
+H_hko__leaf,leaf,(H) - m,sdr,interchange,knockout,honest_accuracy_drop,-0.519
+H_hko__leaf,leaf,(H) - m,sdr,interchange,knockout,task_accuracy,0.002
+H_hko__leaf,leaf,(H) - m,sdr,interchange,knockout,wikitext_kl,0.27521105913911015
+H_minus_D_minus_F_hko__leaf,leaf,(H - D - F) - m,sdr,interchange,knockout,honest_accuracy_drop,-0.004999999999999977
+H_minus_D_minus_F_hko__leaf,leaf,(H - D - F) - m,sdr,interchange,knockout,task_accuracy,1.0
+H_minus_D_minus_F_hko__leaf,leaf,(H - D - F) - m,sdr,interchange,knockout,wikitext_kl,0.007077900905642309
+D,atomic,,sdr_honest,interchange,null,accuracy,100.0
+D,atomic,,sdr_honest,interchange,null,exact_match,100.0
+D,atomic,,sdr_honest,interchange,null,kl_div,100.0
+D,atomic,,sdr_honest,interchange,null,logit_diff,100.0
+D,atomic,,sdr_honest,interchange,pressure,circuit_logit_diff_honest_instruction,0.147125
+D,atomic,,sdr_honest,interchange,pressure,circuit_logit_diff_with_pressure,0.247625
+D,atomic,,sdr_honest,interchange,pressure,delta,-0.1005
+D_hko__leaf,leaf,(D) - m,sdr_honest,interchange,knockout,honest_accuracy_drop,0.8919999999999999
+D_hko__leaf,leaf,(D) - m,sdr_honest,interchange,knockout,task_accuracy,0.0
+D_hko__leaf,leaf,(D) - m,sdr_honest,interchange,knockout,wikitext_kl,0.364369448099751
+F,atomic,,sdr_honest,interchange,null,accuracy,100.0
+F,atomic,,sdr_honest,interchange,null,exact_match,100.0
+F,atomic,,sdr_honest,interchange,null,kl_div,100.0
+F,atomic,,sdr_honest,interchange,null,logit_diff,100.0
+F,atomic,,sdr_honest,interchange,pressure,circuit_logit_diff_honest_instruction,2.679625
+F,atomic,,sdr_honest,interchange,pressure,circuit_logit_diff_with_pressure,2.85275
+F,atomic,,sdr_honest,interchange,pressure,delta,-0.17312499999999975
+F_hko__leaf,leaf,(F) - m,sdr_honest,interchange,knockout,honest_accuracy_drop,0.9029999999999999
+F_hko__leaf,leaf,(F) - m,sdr_honest,interchange,knockout,task_accuracy,0.0
+F_hko__leaf,leaf,(F) - m,sdr_honest,interchange,knockout,wikitext_kl,0.2793965663877316
+H,atomic,,sdr_honest,interchange,null,accuracy,100.0
+H,atomic,,sdr_honest,interchange,null,exact_match,100.0
+H,atomic,,sdr_honest,interchange,null,kl_div,100.0
+H,atomic,,sdr_honest,interchange,null,logit_diff,100.0
+H,atomic,,sdr_honest,interchange,pressure,circuit_logit_diff_honest_instruction,1.916
+H,atomic,,sdr_honest,interchange,pressure,circuit_logit_diff_with_pressure,2.25725
+H,atomic,,sdr_honest,interchange,pressure,delta,-0.34125000000000005
+H,atomic,,sdr_honest,interchange,sanity,accuracy,0.972
+H,atomic,,sdr_honest,interchange,sanity,exact_match,0.972
+H,atomic,,sdr_honest,interchange,sanity,kl_div,0.08726540552824735
+H,atomic,,sdr_honest,interchange,sanity,logit_diff,2.25425
+H_hko__leaf,leaf,(H) - m,sdr_honest,interchange,knockout,honest_accuracy_drop,0.9089999999999999
+H_hko__leaf,leaf,(H) - m,sdr_honest,interchange,knockout,task_accuracy,0.0
+H_hko__leaf,leaf,(H) - m,sdr_honest,interchange,knockout,wikitext_kl,0.27521105913911015
+D,atomic,,sdr_nopressure,interchange,null,accuracy,100.0
+D,atomic,,sdr_nopressure,interchange,null,exact_match,100.0
+D,atomic,,sdr_nopressure,interchange,null,kl_div,100.0
+D,atomic,,sdr_nopressure,interchange,null,logit_diff,100.0
+D_hko__leaf,leaf,(D) - m,sdr_nopressure,interchange,knockout,honest_accuracy_drop,
+D_hko__leaf,leaf,(D) - m,sdr_nopressure,interchange,knockout,task_accuracy,0.0
+D_hko__leaf,leaf,(D) - m,sdr_nopressure,interchange,knockout,wikitext_kl,0.364369448099751
+F,atomic,,sdr_nopressure,interchange,null,accuracy,100.0
+F,atomic,,sdr_nopressure,interchange,null,exact_match,100.0
+F,atomic,,sdr_nopressure,interchange,null,kl_div,100.0
+F,atomic,,sdr_nopressure,interchange,null,logit_diff,100.0
+F,atomic,,sdr_nopressure,interchange,sanity,accuracy,0.9653846153846154
+F,atomic,,sdr_nopressure,interchange,sanity,exact_match,0.9673076923076923
+F,atomic,,sdr_nopressure,interchange,sanity,kl_div,0.10191562393536935
+F,atomic,,sdr_nopressure,interchange,sanity,logit_diff,2.5391826923076923
+F_hko__leaf,leaf,(F) - m,sdr_nopressure,interchange,knockout,honest_accuracy_drop,
+F_hko__leaf,leaf,(F) - m,sdr_nopressure,interchange,knockout,task_accuracy,0.0
+F_hko__leaf,leaf,(F) - m,sdr_nopressure,interchange,knockout,wikitext_kl,0.2793965663877316
+H,atomic,,sdr_nopressure,interchange,null,accuracy,100.0
+H,atomic,,sdr_nopressure,interchange,null,exact_match,100.0
+H,atomic,,sdr_nopressure,interchange,null,kl_div,100.0
+H,atomic,,sdr_nopressure,interchange,null,logit_diff,100.0
+H_hko__leaf,leaf,(H) - m,sdr_nopressure,interchange,knockout,honest_accuracy_drop,
+H_hko__leaf,leaf,(H) - m,sdr_nopressure,interchange,knockout,task_accuracy,0.0019230769230769232
+H_hko__leaf,leaf,(H) - m,sdr_nopressure,interchange,knockout,wikitext_kl,0.27521105913911015
