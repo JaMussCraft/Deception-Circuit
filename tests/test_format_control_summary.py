@@ -1034,11 +1034,53 @@ def test_dataset_conditions_come_from_the_manifest_index(tmp_path):
 def test_an_indexed_cell_outside_the_grid_is_still_reported_missing(tmp_path):
     root, data = make_suite(tmp_path)
     extra = [{"circuit": "D_or_F__head", "dataset": "far", "condition": "deceptive",
-              "roles": ["delta"]}]
+              "roles": ["knockout"]}]
     manifest = make_manifest(tmp_path, root, extra=extra)
     _, decision = run(root, data, manifest=manifest)
-    assert "cell D_or_F__head x far (delta)" in decision["missing"]
+    assert "cell D_or_F__head x far (knockout)" in decision["missing"]
     assert decision["verdict"] == "a"
+
+
+def test_an_indexed_extra_delta_becomes_a_delta_row(tmp_path):
+    """A suite's opt-in extra_deltas (fc_cells.py) reach the delta table through the
+    manifest's cells index (role `delta`), without a hardcoded label."""
+    root, data = make_suite(tmp_path)
+    extra = [{"circuit": f"D_or_F__{g}", "dataset": "far", "condition": "deceptive",
+              "roles": ["delta"]} for g in ("leaf", "head")]
+    manifest = make_manifest(tmp_path, root, extra=extra)
+    md, decision = run(root, data, manifest=manifest)
+    assert "delta cell D_or_F__head x far" in decision["missing"]
+    assert "delta cell D_or_F__leaf x far" in decision["missing"]
+    deltas = md.split("## Delta cells", 1)[1].split("##", 1)[0]
+    rows = [ln for ln in deltas.splitlines() if ln.startswith("| D_or_F |")]
+    assert len(rows) == 2 and "`D | F`" in rows[0] and "head (primary)" in rows[0]
+    assert "| leaf |" in rows[1]
+    assert decision["verdict"] == "a"
+
+
+def test_coarse_extra_delta_rows_read_their_cell_and_expression(tmp_path):
+    root, data = make_suite(tmp_path, family="coarse", task="sdr")
+    extra = [{"circuit": f"{b}_hko__leaf", "dataset": "sdr", "condition": "deceptive",
+              "roles": ["delta"]} for b in ("D_and_H_minus_F", "D_and_H_and_F")]
+    manifest = make_manifest(tmp_path, root, family="coarse", task="sdr", extra=extra)
+    # The first extra cell ran; the second did not.
+    _dump(os.path.join(root, "cells", "D_and_H_minus_F_hko__leaf", "sdr", "interchange",
+                       "knockout.json"),
+          _knockout_json(DEFAULTS["full"][""], 0.7, (0.6, 0.8, 0.9), 0.2, None, "x"))
+    with open(os.path.join(root, "suite.json")) as f:
+        suite = json.load(f)
+    suite["circuits"].append({"label": "D_and_H_minus_F_hko__leaf", "kind": "composed",
+                              "expr": "(((D & H) \\ F) \\ m)",
+                              "counts": {"attention_heads": {"active": 17, "total": 1024}}})
+    _dump(os.path.join(root, "suite.json"), suite)
+    md, decision = run(root, data, manifest=manifest)
+    assert decision["missing"] == ["delta cell D_and_H_and_F_hko__leaf x sdr"]
+    deltas = md.split("## Delta cells", 1)[1].split("##", 1)[0]
+    assert deltas.count("head (composed at leaf)") == 8
+    line = next(ln for ln in deltas.splitlines() if ln.startswith("| D_and_H_minus_F |"))
+    assert "`(D & H) - F`" in line and "| 17 |" in line and "0.700" in line
+    line = next(ln for ln in deltas.splitlines() if ln.startswith("| D_and_H_and_F |"))
+    assert "`D & H & F`" in line and "missing" in line
 
 
 REAL_MANIFEST = os.path.join(REPO, "outputs", "_launch_format_control", "suite_manifest.json")
@@ -1051,7 +1093,8 @@ def test_the_writers_grid_is_exactly_the_launchers_cell_index():
     assert suites
     for name, s in suites.items():
         indexed = {(c["circuit"], c["dataset"]) for c in s["cells"]}
-        assert fcs.expected_cells(s["family"], s["task"]) == indexed, name
+        index = {(c["circuit"], c["dataset"]): c for c in s["cells"]}
+        assert fcs.expected_cells(s["family"], s["task"], index) == indexed, name
 
 
 def test_a_manifest_without_this_suite_falls_back_to_the_grid(tmp_path):

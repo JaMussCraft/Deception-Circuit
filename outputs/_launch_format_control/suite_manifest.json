@@ -1,5 +1,5 @@
 {
- "created": "2026-10-15T13:50:44",
+ "created": "2026-10-16T12:26:26",
  "config": "outputs/_launch_format_control/suites.json",
  "suites": {
   "format-control-far-nls0.3": {
@@ -2697,6 +2697,66 @@
      ],
      "job": "F_minus_D_minus_H_hko__sdr",
      "path": "cells/F_minus_D_minus_H_hko__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "H_and_F_hko__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "xdeltas_a__sdr",
+     "path": "cells/H_and_F_hko__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "H_minus_F_hko__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "xdeltas_a__sdr",
+     "path": "cells/H_minus_F_hko__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "D_and_H_and_F_hko__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "xdeltas_a__sdr",
+     "path": "cells/D_and_H_and_F_hko__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "D_and_H_minus_F_hko__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "xdeltas_b__sdr",
+     "path": "cells/D_and_H_minus_F_hko__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "D_and_F_minus_H_hko__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "xdeltas_b__sdr",
+     "path": "cells/D_and_F_minus_H_hko__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "H_and_F_minus_D_hko__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "xdeltas_b__sdr",
+     "path": "cells/H_and_F_minus_D_hko__leaf/sdr/interchange"
     }
    ],
    "jobs": [
@@ -4186,6 +4246,160 @@
        "partition": "gpuA40x4",
        "node": "gpub065"
       }
+     }
+    },
+    {
+     "job": "xdeltas_a__sdr",
+     "cells": [
+      {
+       "circuit": "H_and_F_hko__leaf",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      },
+      {
+       "circuit": "H_minus_F_hko__leaf",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      },
+      {
+       "circuit": "D_and_H_and_F_hko__leaf",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+      "--circuit",
+      "m=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb",
+      "--expr",
+      "H_and_F_hko=(H & F) - m",
+      "--expr",
+      "H_minus_F_hko=(H - F) - m",
+      "--expr",
+      "D_and_H_and_F_hko=(D & H & F) - m",
+      "--compose-granularity",
+      "leaf",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/xdeltas_a__sdr"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/xdeltas_a__sdr.log",
+      "passed": true,
+      "estimate_min": 118.7
+     },
+     "slurm": {
+      "job_id": "22945587",
+      "account": "bgrb-delta-gpu",
+      "partition": "gpuH200x8-interactive",
+      "time": "01:00:00",
+      "submitted": "2026-10-16T12:26:23"
+     }
+    },
+    {
+     "job": "xdeltas_b__sdr",
+     "cells": [
+      {
+       "circuit": "D_and_H_minus_F_hko__leaf",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      },
+      {
+       "circuit": "D_and_F_minus_H_hko__leaf",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      },
+      {
+       "circuit": "H_and_F_minus_D_hko__leaf",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+      "--circuit",
+      "m=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb",
+      "--expr",
+      "D_and_H_minus_F_hko=((D & H) - F) - m",
+      "--expr",
+      "D_and_F_minus_H_hko=((D & F) - H) - m",
+      "--expr",
+      "H_and_F_minus_D_hko=((H & F) - D) - m",
+      "--compose-granularity",
+      "leaf",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/xdeltas_b__sdr"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/xdeltas_b__sdr.log",
+      "passed": true,
+      "estimate_min": 118.7
+     },
+     "slurm": {
+      "job_id": null
      }
     }
    ]

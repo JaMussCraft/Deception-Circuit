@@ -55,7 +55,7 @@ generations, eval 2 variant rows).
   pass `null` in the delta jobs' evals in `fc_cells.py` if delta sufficiency
   is wanted.
 
-**Coarse suite** (24 jobs, 24 cells):
+**Coarse suite** (26 jobs, 30 cells: 24 planned for every coarse suite, plus 6 extra deltas packed into 2 jobs):
 
 - 9 sufficiency jobs `X__<dataset>`: the atomic (expanded) circuit, evals
   sanity, null, pressure. No knockout: an expanded coarse mask contains every
@@ -72,6 +72,29 @@ generations, eval 2 variant rows).
   submit_headsko.sh` and `submit_composed.sh`. This is a deliberate deviation
   from the spec's literal "coarse at head" (orchestrator ruling 2026-10-13);
   summaries report these cells at head level.
+
+**Extra deltas** (researcher request 2026-10-16). A suite's `suites.json` entry
+may list `"extra_deltas": [[label, expr], ...]`; `fc_cells.plan_suite` plans
+them after the xor family exactly like the built-in deltas (fine: one job,
+`--compose-granularity both`, cells `<label>__leaf` / `<label>__head`; coarse:
+`--expr <label>_hko=(<expr>) - m` at leaf, cell `<label>_hko__leaf`), all
+knockout cells with role `delta` on the D test set. Only
+`format-control-sdr-coarse-nls0.3` lists any: `H_and_F` (`H & F`), `H_minus_F`
+(`H - F`), `D_and_H_minus_F` (`(D & H) - F`), `D_and_F_minus_H` (`(D & F) - H`),
+`H_and_F_minus_D` (`(H & F) - D`), `D_and_H_and_F` (`D & H & F`). A row's
+optional third element is a job group: rows sharing it run as ONE job
+`<group>__<D dataset>` with one `--expr` per row and one ordinary delta cell
+per row, so merge, flip audit and summary see ordinary delta cells. The coarse
+suite packs them as `xdeltas_a__sdr` (H_and_F, H_minus_F, D_and_H_and_F) and
+`xdeltas_b__sdr` (D_and_H_minus_F, D_and_F_minus_H, H_and_F_minus_D), because
+the H200 interactive partition allows one job per user at a time (scope
+refinement 2026-10-16). The evaluator writes each cell's `knockout.json` and
+`summary.json` as the cell finishes, but `matrix.json` only at the end of the
+job, and the merge takes a shard only once `matrix.json` exists. They are not
+in the global `DELTAS`, so the FAR and SDR-fine suites keep exactly their jobs
+and cells. The summary writer and the flip audit pick the new cells up from
+the manifest's cells index (role `delta`) and from the cells' operands, with
+no hardcoded labels.
 
 `suite_manifest.json` has a per-suite `cells` index (circuit, dataset,
 condition, roles, job, path) so a reader finds a cell by (circuit, test-set

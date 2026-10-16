@@ -50,6 +50,8 @@ DATASET_CONDITION = {"D": "deceptive", "H": "honest", "F": "nopressure"}
 
 #: Delta cells on the D test set (ticket 04's `fc_cells.py` labels; the xor
 #: family expanded to explicit expressions with the evaluator's own labels).
+#: A suite's opt-in `extra_deltas` (suites.json) are not listed here: they are
+#: read from the manifest's cells index (role `delta`) and follow these rows.
 DELTA_LABELS = ("D_minus_F", "D_and_F", "F_minus_D",
                 "D_minus_H_minus_F", "H_minus_D_minus_F", "F_minus_D_minus_H")
 DELTA_EXPR = {"D_minus_F": "D - F", "D_and_F": "D & F", "F_minus_D": "F - D",
@@ -168,22 +170,92 @@ def knockout_label(role, family):
     return role if family == "fine" else f"{role}_hko__leaf"
 
 
-def delta_cells(family):
-    """[(base label, granularity shown, cell label, primary)] for the delta rows."""
+def _delta_base(label, family):
+    """The delta's base label of a cell label: `H_and_F_hko__leaf` -> `H_and_F`."""
+    base = re.sub(r"__(leaf|head)$", "", label)
+    if family == "coarse" and base.endswith("_hko"):
+        base = base[:-len("_hko")]
+    return base
+
+
+def _delta_row(base, label, family):
     if family == "coarse":
-        return [(b, "head (composed at leaf)", f"{b}_hko__leaf", True) for b in DELTA_LABELS]
-    return [row for b in DELTA_LABELS
-            for row in ((b, "head", f"{b}__head", True), (b, "leaf", f"{b}__leaf", False))]
+        return (base, "head (composed at leaf)", label, True)
+    if label.endswith("__leaf"):
+        return (base, "leaf", label, False)
+    return (base, "head" if label.endswith("__head") else "n/a", label, True)
 
 
-def expected_cells(family, task):
+def delta_cells(family, index=None):
+    """[(base label, granularity shown, cell label, primary)] for the delta rows:
+    the built-in deltas, then every other cell of the manifest's cells index with
+    role `delta` (a suite's opt-in `extra_deltas`), in index order."""
+    if family == "coarse":
+        rows = [(b, "head (composed at leaf)", f"{b}_hko__leaf", True) for b in DELTA_LABELS]
+    else:
+        rows = [row for b in DELTA_LABELS
+                for row in ((b, "head", f"{b}__head", True), (b, "leaf", f"{b}__leaf", False))]
+    extra = {}
+    for (lab, _), entry in (index or {}).items():
+        base = _delta_base(lab, family)
+        if "delta" in (entry.get("roles") or []) and base not in DELTA_LABELS:
+            extra.setdefault(base, [])
+            if lab not in extra[base]:
+                extra[base].append(lab)
+    for base, labs in extra.items():
+        for lab in sorted(labs, key=lambda x: x.endswith("__leaf")):    # head first
+            rows.append(_delta_row(base, lab, family))
+    return rows
+
+
+_DIFF = "\\"     # the parser's difference node (`-` and a backslash both parse to it)
+
+
+def _render_expr(tree):
+    """A parsed expression with `-` for difference and only the parentheses the
+    left-associative grammar needs: `(D & H) - F`, `D & H & F`, `D - H - F`."""
+    if tree[0] == "name":
+        return tree[1]
+    left, right = _render_expr(tree[1]), _render_expr(tree[2])
+    if tree[1][0] not in ("name", tree[0]):
+        left = f"({left})"
+    if tree[2][0] != "name":
+        right = f"({right})"
+    return f"{left} {'-' if tree[0] == _DIFF else tree[0]} {right}"
+
+
+def delta_expr(base, spec=None, family=None):
+    """The delta's expression as the summary shows it (without the coarse
+    `- m`): the built-in table, else the evaluator's recorded `expr` of the
+    cell (suite.json), else read off the label's slug (`D_and_H_minus_F`)."""
+    if base in DELTA_EXPR:
+        return DELTA_EXPR[base]
+    from evaluation import algebra
+    text = (spec or {}).get("expr")
+    if text:
+        try:
+            tree = algebra.parse_expr(text)
+            if family == "coarse" and tree[0] == _DIFF and tree[2] == ("name", "m"):
+                tree = tree[1]
+            return _render_expr(tree)
+        except ValueError:
+            pass
+    parts = re.split(r"_(and|minus|or)_", base)
+    tree = ("name", parts[0])
+    for op, name in zip(parts[1::2], parts[2::2]):
+        tree = ({"and": "&", "minus": _DIFF, "or": "|"}[op], tree, ("name", name))
+    return _render_expr(tree)
+
+
+def expected_cells(family, task, index=None):
     """{(cell label, dataset dir)} a complete suite has: the grid this writer reads,
-    which must equal ticket 04's manifest cell index (a test pins that)."""
+    which must equal ticket 04's manifest cell index (a test pins that). `index`
+    (the manifest's cells index) adds a suite's opt-in extra delta cells."""
     datasets = [task + DATASET_SUFFIX[r] for r in ROLES]
     out = {(r, ds) for r in ROLES for ds in datasets}
     if family == "coarse":
         out |= {(knockout_label(r, family), ds) for r in ROLES for ds in datasets}
-    out |= {(lab, task) for _, _, lab, _ in delta_cells(family)}
+    out |= {(lab, task) for _, _, lab, _ in delta_cells(family, index)}
     return out
 
 
@@ -665,7 +737,7 @@ def summarize(suite_root, *, data_dir="data/datasets", eval5_dirs=(), family=Non
             if family == "coarse":
                 kl = knockout_label(r, family)
                 cells[(kl, ds)] = _cell(root, kl, ds, index)
-    for _, _, lab, _ in delta_cells(family):
+    for _, _, lab, _ in delta_cells(family, index):
         cells[(lab, datasets["D"])] = _cell(root, lab, datasets["D"], index)
 
     full = {dr: _full_accuracy(cells, datasets[dr]) for dr in ROLES}
@@ -689,11 +761,12 @@ def summarize(suite_root, *, data_dir="data/datasets", eval5_dirs=(), family=Non
     # ---- deltas
     deltas = []
     specs = {c.get("label"): c for c in suite.get("circuits") or []}
-    for base, gran, lab, primary in delta_cells(family):
+    for base, gran, lab, primary in delta_cells(family, index):
         cell = cells.get((lab, datasets["D"]))
         if cell is None or not cell.get("knockout"):
             missing.append(f"delta cell {lab} x {datasets['D']}")
-        deltas.append({"label": base, "expr": DELTA_EXPR[base], "cell": lab,
+        deltas.append({"label": base, "expr": delta_expr(base, specs.get(lab), family),
+                       "cell": lab,
                        "granularity": gran, "primary": primary,
                        "heads": _active(_get(specs.get(lab), "counts", "attention_heads")),
                        "knockout": knockout_row(cell, full["D"],

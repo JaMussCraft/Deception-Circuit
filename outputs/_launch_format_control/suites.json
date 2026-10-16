@@ -14,6 +14,7 @@
   ]
  },
  "_coarse_granularity": "Deliberate deviation from the spec's literal 'coarse at head' (orchestrator ruling 2026-10-13): every coarse knockout and delta cell composes at leaf as (expr) - m, the existing heads-only recipe (submit_headsko.sh). The heads-only runs have no mlp_blocks gate, so head composition ORs the operands' MLP units and keeps all 589,824 of them (the expansion artifact), whereas leaf keeps none and gives the same head sets, because every live head of these masks has all its neurons open. Summaries report these cells at head level.",
+ "_extra_deltas": "Researcher request 2026-10-16: six more D/H/F set combinations on the SDR coarse suite only (the FAR and SDR-fine suites keep their 15 jobs / 21 cells); each cell is planned exactly like the built-in deltas, <label>_hko=(<expr>) - m at leaf, knockout on the D test set. The third element packs rows into one job of three --expr (xdeltas_a__sdr, xdeltas_b__sdr), because only the H200 interactive partition starts quickly and it allows one job per user (scope refinement 2026-10-16).",
  "format-control-far-nls0.3": {
   "family": "fine",
   "task": "far",
@@ -40,6 +41,14 @@
    "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
    "F": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850"
   },
-  "allmlp": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb"
+  "allmlp": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb",
+  "extra_deltas": [
+   ["H_and_F", "H & F", "xdeltas_a"],
+   ["H_minus_F", "H - F", "xdeltas_a"],
+   ["D_and_H_and_F", "D & H & F", "xdeltas_a"],
+   ["D_and_H_minus_F", "(D & H) - F", "xdeltas_b"],
+   ["D_and_F_minus_H", "(D & F) - H", "xdeltas_b"],
+   ["H_and_F_minus_D", "(H & F) - D", "xdeltas_b"]
+  ]
  }
 }

@@ -12,6 +12,18 @@ each on three test sets, the datasets those runs were pruned on
 D, H and F run directories), plus the delta circuits D-F, D&F, F-D and the
 exclusive-or family of D, H, F as knockout cells on the D test set.
 
+A suite may opt into further delta cells with `"extra_deltas": [[label, expr],
+...]` in its suites.json entry (researcher request 2026-10-16: six more D/H/F
+set combinations on the SDR coarse suite). They are planned after the xor
+family exactly like the built-in deltas (fine: `--compose-granularity both`;
+coarse: `<label>_hko=(<expr>) - m` at leaf) and appear only in the suites that
+list them, so the other suites keep exactly their jobs and cells. A row may
+carry a third element, a job-group name (`[label, expr, "xdeltas_a"]`): rows
+sharing a group are packed into ONE job `<group>__<D dataset>` with one
+`--expr` per row and one ordinary delta cell per row (scope refinement
+2026-10-16: the H200 interactive partition allows one job per user at a time).
+Rows without a group stay one job each.
+
 `plan_suite` turns a suite configuration into a list of jobs (one Slurm job =
 one shard directory = one `evaluate_circuit.py` invocation) and `job_args`
 renders a job's exact argument list. Both are pure functions of the
@@ -121,7 +133,11 @@ def plan_suite(suite: str, cfg: dict) -> list:
 
     cfg = {"family": "fine"|"coarse", "task": "far"|"sdr",
            "runs": {"D": run_dir, "H": run_dir, "F": run_dir or None},
-           "allmlp": run_dir (coarse only)}
+           "allmlp": run_dir (coarse only),
+           "extra_deltas": [[label, expr] or [label, expr, group], ...]
+                           (optional, appended after the xor family; rows
+                           sharing a group form one job; see the module
+                           docstring)}
 
     A job whose run directory is not configured yet carries `awaits` (e.g.
     ["F"]) and has no arguments; everything else about it is planned.
@@ -161,18 +177,47 @@ def plan_suite(suite: str, cfg: dict) -> list:
                     task_role=data, evals=KNOCKOUT_EVALS,
                     cells=[cell(f"{label}__leaf", data, ["knockout"])]))
 
-    # Deltas on the D test set.
-    for label, expr in list(DELTAS) + xor_family():
-        binds = _names_in(expr)
-        if family == "fine":
-            exprs, gran = [(label, expr)], "both"
-            cells = [cell(f"{label}__{g}", "D", ["delta"]) for g in ("leaf", "head")]
-        else:
-            label = f"{label}{HKO}"
-            exprs, gran = [(label, f"({expr}) - {ALLMLP}")], "leaf"
-            cells = [cell(f"{label}__leaf", "D", ["delta"])]
-        jobs.append(_job(suite, cfg, job_id=f"{label}__{ds['D']}", binds=binds, exprs=exprs,
+    # Deltas on the D test set: one job per built-in delta and per ungrouped
+    # extra delta; one job per extra-delta group (placed at its first row).
+    builtin = list(DELTAS) + xor_family()
+    rows = [tuple(x) for x in cfg.get("extra_deltas") or []]
+    bad = [r for r in rows if len(r) not in (2, 3)]
+    if bad:
+        raise ValueError(f"suite {suite}: extra_deltas rows are [label, expr] or "
+                         f"[label, expr, group], got {bad}")
+    seen = [lab for lab, _ in builtin] + [r[0] for r in rows]
+    dup = sorted({lab for lab in seen if seen.count(lab) > 1})
+    if dup:
+        raise ValueError(f"suite {suite}: duplicate delta label(s) {', '.join(dup)}")
+    units = {}          # job stem -> [(label, expr)], in planning order
+    for label, expr in builtin:
+        units[label] = [(label, expr)]
+    for r in rows:
+        stem = r[2] if len(r) == 3 and r[2] else r[0]
+        if stem in units and (len(r) < 3 or not r[2] or stem in seen):
+            raise ValueError(f"suite {suite}: extra delta job {stem!r} clashes with another job")
+        units.setdefault(stem, []).append((r[0], r[1]))
+
+    for stem, members in units.items():
+        binds = [n for n in ROLES if any(n in _names_in(e) for _, e in members)]
+        exprs, cells = [], []
+        for label, expr in members:
+            if family == "fine":
+                exprs.append((label, expr))
+                cells += [cell(f"{label}__{g}", "D", ["delta"]) for g in ("leaf", "head")]
+            else:
+                exprs.append((f"{label}{HKO}", f"({expr}) - {ALLMLP}"))
+                cells.append(cell(f"{label}{HKO}__leaf", "D", ["delta"]))
+        gran = "both" if family == "fine" else "leaf"
+        # A single delta's job keeps its label's id (`<label>_hko` for coarse);
+        # a group's job is named after the group.
+        job_stem = exprs[0][0] if len(members) == 1 and stem == members[0][0] else stem
+        jobs.append(_job(suite, cfg, job_id=f"{job_stem}__{ds['D']}", binds=binds, exprs=exprs,
                          granularity=gran, task_role="D", evals=KNOCKOUT_EVALS, cells=cells))
+    ids = [j["job"] for j in jobs]
+    clash = sorted({i for i in ids if ids.count(i) > 1})
+    if clash:
+        raise ValueError(f"suite {suite}: duplicate job id(s) {', '.join(clash)}")
     return jobs
 
 

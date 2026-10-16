@@ -180,6 +180,123 @@ def test_every_combination_of_circuit_dataset_and_granularity_is_planned(fc):
         assert len(cells) == expected
 
 
+#: The SDR coarse suite's opt-in extra deltas (researcher request 2026-10-16),
+#: ungrouped (one job each) ...
+EXTRA = [["H_and_F", "H & F"], ["H_minus_F", "H - F"],
+         ["D_and_H_minus_F", "(D & H) - F"], ["D_and_F_minus_H", "(D & F) - H"],
+         ["H_and_F_minus_D", "(H & F) - D"], ["D_and_H_and_F", "D & H & F"]]
+#: ... and as suites.json packs them: two jobs of three --expr each.
+EXTRA_PACKED = [["H_and_F", "H & F", "xdeltas_a"], ["H_minus_F", "H - F", "xdeltas_a"],
+                ["D_and_H_and_F", "D & H & F", "xdeltas_a"],
+                ["D_and_H_minus_F", "(D & H) - F", "xdeltas_b"],
+                ["D_and_F_minus_H", "(D & F) - H", "xdeltas_b"],
+                ["H_and_F_minus_D", "(H & F) - D", "xdeltas_b"]]
+
+
+def test_coarse_extra_deltas_are_planned_after_the_xor_family_like_the_builtin_deltas(fc):
+    plain = fc.plan_suite("format-control-sdr-coarse-nls0.3", COARSE)
+    jobs = fc.plan_suite("format-control-sdr-coarse-nls0.3", dict(COARSE, extra_deltas=EXTRA))
+    assert len(plain) == 24 and len(jobs) == 30
+    assert sum(len(j["cells"]) for j in jobs) == 30
+    assert jobs[:24] == plain
+    new = [f"{lab}_hko__sdr" for lab, _ in EXTRA]
+    assert [j["job"] for j in jobs[24:]] == new
+    assert all(j["awaits"] == [] for j in jobs[24:])
+    job = by_id(jobs)["H_and_F_hko__sdr"]
+    assert job["cells"] == [{"circuit": "H_and_F_hko__leaf", "dataset": "sdr",
+                             "condition": "deceptive", "roles": ["delta"]}]
+    assert fc.job_args(job) == [
+        "--circuit", "H=/r/c_H", "--circuit", "F=/r/c_F", "--circuit", "m=/r/_allmlp_nomb",
+        "--expr", "H_and_F_hko=(H & F) - m", "--compose-granularity", "leaf",
+        "--task-from", "/r/c_D", "--evals", "knockout", *COMMON,
+        "--suite-name", "format-control-sdr-coarse-nls0.3",
+        "--output-dir", "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/H_and_F_hko__sdr"]
+    # Same shape as the built-in D_and_F delta: only the binds and the expression differ.
+    ref = fc.job_args(by_id(jobs)["D_and_F_hko__sdr"])
+    got = fc.job_args(by_id(jobs)["D_and_H_and_F_hko__sdr"])
+    assert got[got.index("--compose-granularity"):-1] == ref[ref.index("--compose-granularity"):-1]
+    assert "D_and_H_and_F_hko=(D & H & F) - m" in got
+    assert by_id(jobs)["D_and_H_minus_F_hko__sdr"]["binds"] == {"D": "/r/c_D", "H": "/r/c_H",
+                                                                  "F": "/r/c_F"}
+
+
+def test_grouped_extra_deltas_are_packed_into_one_job_per_group(fc):
+    plain = fc.plan_suite("format-control-sdr-coarse-nls0.3", COARSE)
+    jobs = fc.plan_suite("format-control-sdr-coarse-nls0.3",
+                         dict(COARSE, extra_deltas=EXTRA_PACKED))
+    assert len(jobs) == 26 and sum(len(j["cells"]) for j in jobs) == 30
+    assert jobs[:24] == plain
+    assert [j["job"] for j in jobs[24:]] == ["xdeltas_a__sdr", "xdeltas_b__sdr"]
+    a = by_id(jobs)["xdeltas_a__sdr"]
+    assert a["awaits"] == [] and a["evals"] == ["knockout"]
+    # Three ordinary delta cells from one shard, same shape as a single-delta job's.
+    assert a["cells"] == [{"circuit": f"{lab}_hko__leaf", "dataset": "sdr",
+                           "condition": "deceptive", "roles": ["delta"]}
+                          for lab in ("H_and_F", "H_minus_F", "D_and_H_and_F")]
+    assert fc.job_args(a) == [
+        "--circuit", "D=/r/c_D", "--circuit", "H=/r/c_H", "--circuit", "F=/r/c_F",
+        "--circuit", "m=/r/_allmlp_nomb",
+        "--expr", "H_and_F_hko=(H & F) - m", "--expr", "H_minus_F_hko=(H - F) - m",
+        "--expr", "D_and_H_and_F_hko=(D & H & F) - m",
+        "--compose-granularity", "leaf", "--task-from", "/r/c_D", "--evals", "knockout",
+        *COMMON, "--suite-name", "format-control-sdr-coarse-nls0.3",
+        "--output-dir", "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/xdeltas_a__sdr"]
+    b = by_id(jobs)["xdeltas_b__sdr"]
+    assert [e[0] for e in b["exprs"]] == ["D_and_H_minus_F_hko", "D_and_F_minus_H_hko",
+                                          "H_and_F_minus_D_hko"]
+    # The packed cells are exactly the unpacked plan's cells.
+    single = fc.plan_suite("format-control-sdr-coarse-nls0.3", dict(COARSE, extra_deltas=EXTRA))
+    assert (sorted(c["circuit"] for j in single[24:] for c in j["cells"])
+            == sorted(c["circuit"] for j in jobs[24:] for c in j["cells"]))
+
+
+def test_grouped_and_ungrouped_extra_deltas_mix(fc):
+    rows = [["H_and_F", "H & F", "g"], ["H_minus_F", "H - F"], ["D_and_H_and_F", "D & H & F", "g"]]
+    jobs = fc.plan_suite("format-control-sdr-coarse-nls0.3", dict(COARSE, extra_deltas=rows))
+    assert [j["job"] for j in jobs[24:]] == ["g__sdr", "H_minus_F_hko__sdr"]
+    assert by_id(jobs)["g__sdr"]["binds"] == {"D": "/r/c_D", "H": "/r/c_H", "F": "/r/c_F"}
+    fine = by_id(fc.plan_suite("format-control-far-nls0.3", dict(FINE, extra_deltas=rows)))
+    assert [c["circuit"] for c in fine["g__far"]["cells"]] == [
+        "H_and_F__leaf", "H_and_F__head", "D_and_H_and_F__leaf", "D_and_H_and_F__head"]
+    assert fine["g__far"]["compose_granularity"] == "both"
+
+
+@pytest.mark.parametrize("rows, match", [
+    ([["H_and_F", "H & F", "D_and_F"]], "clashes"),          # group named like a delta
+    ([["H_and_F", "H & F", "g"], ["g", "H - F"]], "clashes"),  # ungrouped label = group
+    ([["H_and_F", "H & F", "D_and_F_hko"]], "duplicate job id"),
+    ([["H_and_F"]], "rows are"),
+])
+def test_bad_extra_delta_groups_are_rejected(fc, rows, match):
+    with pytest.raises(ValueError, match=match):
+        fc.plan_suite("format-control-sdr-coarse-nls0.3", dict(COARSE, extra_deltas=rows))
+
+
+def test_fine_extra_deltas_run_at_both_granularities(fc):
+    jobs = by_id(fc.plan_suite("format-control-far-nls0.3",
+                               dict(FINE, extra_deltas=[["H_and_F", "H & F"]])))
+    assert len(jobs) == 16
+    job = jobs["H_and_F__far"]
+    assert [c["circuit"] for c in job["cells"]] == ["H_and_F__leaf", "H_and_F__head"]
+    assert fc.job_args(job)[:8] == ["--circuit", "H=/r/far_H", "--circuit", "F=/r/far_F",
+                                    "--expr", "H_and_F=H & F", "--compose-granularity", "both"]
+
+
+def test_an_extra_delta_may_not_reuse_a_builtin_label(fc):
+    with pytest.raises(ValueError, match="duplicate delta label.*D_and_F"):
+        fc.plan_suite("format-control-far-nls0.3", dict(FINE, extra_deltas=[["D_and_F", "D & F"]]))
+
+
+def test_the_real_config_opts_only_the_coarse_suite_into_extra_deltas():
+    """FAR and SDR-fine keep exactly their 15 jobs / 21 cells: `refresh_manifest`
+    rebuilds every suite, and merge --manifest expects exactly the planned cells."""
+    with open(os.path.join(LAUNCH, "suites.json")) as f:
+        raw = json.load(f)
+    assert raw["format-control-sdr-coarse-nls0.3"]["extra_deltas"] == EXTRA_PACKED
+    assert "extra_deltas" not in raw["format-control-far-nls0.3"]
+    assert "extra_deltas" not in raw["format-control-sdr-nls0.3"]
+
+
 # ==============================================================================
 # THE F RUNS ARE ONE CONFIGURATION POINT
 # ==============================================================================
