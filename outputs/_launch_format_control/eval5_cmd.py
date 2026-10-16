@@ -17,6 +17,13 @@ rows stay size-matched per circuit.
     sdr_coarse  format-control-sdr-coarse-nls0.3     D, H, F, m; knockouts
                                                      X_hko = X - m (heads only)
 
+A family may add composed circuits of D, H, F to the same invocation with
+`"eval5_extra_circuits": [[label, expr], ...]` in its suites.json entry
+(researcher request 2026-10-16: D - F on the coarse suite). Each becomes one
+more cell after D, H, F: `<label>_hko=(<expr>) - m` at leaf (coarse), or
+`<label>=<expr>` at head granularity beside explicit `--expr D/H/F` (fine;
+not launched). The gate and the refusals are unchanged: they concern F.
+
     group  benchmarks                                                    output
     sm     sandbagging mask                                              outputs/eval5_format_<family>
     lb     lb:instructed-deception lb:harm-pressure-knowledge-report     outputs/eval5_format_<family>_lb
@@ -119,6 +126,11 @@ ROLES = ("D", "H", "F")
 ALLMLP = "m"
 HKO = "_hko"
 
+#: suites.json key of a family's optional extra composed circuits.
+EXTRA_KEY = "eval5_extra_circuits"
+_LABEL_RE = re.compile(r"^[A-Za-z][A-Za-z0-9_]*$")
+_NAME_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
+
 #: outputs/_eval5_launch/eval5_args.sh, verbatim.
 SETTINGS = ("--evals", "benchmarks", "--ablation", "interchange")
 SIZES = ("--benchmark-n-per-dataset", "50", "--benchmark-n-random", "6",
@@ -212,17 +224,55 @@ def output_dir(family: str, group: str) -> str:
     return f"outputs/eval5_format_{family}{GROUP_SUFFIX[group]}"
 
 
-def cell_labels(family: str) -> dict:
-    """{role: the cell's circuit label} as the evaluator files it."""
+def extra_circuits(rows) -> list:
+    """Validate a family's `eval5_extra_circuits` rows -> [[label, expr], ...].
+
+    A label is an identifier, not a role, not the all-MLP operand, without the
+    `_hko` / `__leaf` / `__head` endings the evaluator and the summary add, and
+    unique. An expression names only D, H and F (never `m`: the coarse
+    heads-only `- m` is added here).
+    """
+    out, seen = [], set()
+    for row in rows or ():
+        if not isinstance(row, (list, tuple)) or len(row) != 2:
+            raise ValueError(f"{EXTRA_KEY} rows are [label, expr], got {row!r}")
+        label, expr = str(row[0]), str(row[1]).strip()
+        if (not _LABEL_RE.match(label) or label in ROLES or label == ALLMLP
+                or label.endswith(HKO) or re.search(r"__(leaf|head)$", label)):
+            raise ValueError(f"{EXTRA_KEY}: bad label {label!r} (an identifier, not D/H/F/m, "
+                             f"not ending in {HKO}, __leaf or __head)")
+        if label in seen:
+            raise ValueError(f"{EXTRA_KEY}: duplicate label {label!r}")
+        names = set(_NAME_RE.findall(expr))
+        if not expr or not names or not names <= set(ROLES):
+            raise ValueError(f"{EXTRA_KEY} {label}: the expression {expr!r} may name only "
+                             f"{', '.join(ROLES)}")
+        seen.add(label)
+        out.append([label, expr])
+    return out
+
+
+def cell_labels(family: str, extra=()) -> dict:
+    """{role: the cell's circuit label} as the evaluator files it; an extra
+    circuit's role is its label."""
+    extra = extra_circuits(extra)
     if family in COARSE:
-        return {r: f"{r}{HKO}__leaf" for r in ROLES}
-    return {r: r for r in ROLES}
+        out = {r: f"{r}{HKO}__leaf" for r in ROLES}
+        out.update({lab: f"{lab}{HKO}__leaf" for lab, _ in extra})
+        return out
+    out = {r: r for r in ROLES}
+    out.update({lab: f"{lab}__head" for lab, _ in extra})
+    return out
 
 
 def eval5_args(family: str, group: str, runs: dict, allmlp: str = None,
-               screen_cache: str = LOCAL_SCREEN_CACHE) -> list:
-    """The exact `evaluate_circuit.py` arguments of one EVAL 5 suite."""
+               screen_cache: str = LOCAL_SCREEN_CACHE, extra=()) -> list:
+    """The exact `evaluate_circuit.py` arguments of one EVAL 5 suite.
+
+    `extra` = the family's validated `eval5_extra_circuits`, bound after D, H,
+    F in the same invocation (see the module docstring)."""
     _check_family_group(family, group)
+    extra = extra_circuits(extra)
     for role in ROLES:
         if not runs.get(role):
             raise ValueError(f"the {role} run directory is not configured "
@@ -237,7 +287,18 @@ def eval5_args(family: str, group: str, runs: dict, allmlp: str = None,
         args += ["--circuit", f"{ALLMLP}={allmlp}"]
         for role in ROLES:
             args += ["--expr", f"{role}{HKO}={role} - {ALLMLP}"]
+        for label, expr in extra:
+            args += ["--expr", f"{label}{HKO}=({expr}) - {ALLMLP}"]
         args += ["--compose-granularity", "leaf"]
+    elif extra:
+        # Any --expr replaces the evaluator's default (every bound circuit on
+        # its own), so D, H, F are named explicitly; head is the primary fine
+        # reading (fc_cells.py) and one granularity keeps one cell per extra.
+        for role in ROLES:
+            args += ["--expr", f"{role}={role}"]
+        for label, expr in extra:
+            args += ["--expr", f"{label}={expr}"]
+        args += ["--compose-granularity", "head"]
     args += ["--task-from", runs["D"], *SETTINGS, "--benchmarks", *GROUPS[group], *SIZES,
              "--benchmark-screen-cache", screen_cache,
              "--benchmark-repo-root", BENCHMARK_REPO_ROOT,
@@ -443,7 +504,8 @@ def gate(suite_root: str, manifest_suite: dict, *, f_run: str, threshold: float 
 # ==============================================================================
 
 def family_runs(config: dict, family: str, standin: bool = False) -> dict:
-    """D, H, F and the coarse all-MLP operand of a family, from suites.json.
+    """D, H, F, the coarse all-MLP operand and the extra circuits
+    (`eval5_extra_circuits`, validated) of a family, from suites.json.
 
     With `standin`, a null F is replaced by H (ticket 04's `standin_config`
     default): plumbing only, never submitted. A stand-in with F configured is
@@ -459,7 +521,7 @@ def family_runs(config: dict, family: str, standin: bool = False) -> dict:
                              f"F = {runs['F']}: drop --standin")
         runs["F"] = runs["H"]
     return {"suite": FAMILIES[family], "runs": runs, "allmlp": cfg.get("allmlp"),
-            "standin": bool(standin)}
+            "extra": extra_circuits(cfg.get(EXTRA_KEY)), "standin": bool(standin)}
 
 
 def default_suite_root(family: str) -> str:
@@ -597,7 +659,8 @@ def known_item_counts(suite_dir: str) -> dict:
 
 
 def cost_estimate(parsed: dict, *, n_per_dataset: int = 50, n_random: int = 6,
-                  screen_budget: int = 600, known_n: dict = None) -> dict:
+                  screen_budget: int = 600, known_n: dict = None,
+                  expected_cells: int = None) -> dict:
     """Judge calls and GPU hours of one suite.
 
     Ablated judge calls: per cell and judged dataset, (knockout, circuit_only,
@@ -606,10 +669,12 @@ def cost_estimate(parsed: dict, *, n_per_dataset: int = 50, n_random: int = 6,
     `empty` is the same configuration in every cell. Items are the known
     post-screen counts when given, else min(n, pool). Screen judge calls are
     counted only for datasets whose screen is not cached (belief probes extra).
-    GPU hours are the dry-run's floor and ceiling on one GPU.
+    GPU hours are the dry-run's floor and ceiling on one GPU. Cells are the
+    dry-run's cell grid; `expected_cells` (D, H, F plus the configured extra
+    circuits) is reported beside it and used only when the log lists none.
     """
     known_n = known_n or {}
-    n_cells = max(1, len(parsed.get("cells") or ()))
+    n_cells = len(parsed.get("cells") or ()) or expected_cells or 1
     configs = 3 + n_random
     per_dataset, ablated, screen = {}, 0, 0
     for d in parsed.get("datasets") or ():
@@ -624,7 +689,8 @@ def cost_estimate(parsed: dict, *, n_per_dataset: int = 50, n_random: int = 6,
             screen += min(screen_budget, d["pool"])
     fl, ce = parsed.get("floor_min"), parsed.get("ceiling_min")
     hours = (None if fl is None else round(fl / 60, 1), None if ce is None else round(ce / 60, 1))
-    return {"cells": n_cells, "configs_judged_per_cell": configs,
+    return {"cells": n_cells, "cells_expected": expected_cells,
+            "configs_judged_per_cell": configs,
             "judge_calls_ablated": ablated, "judge_calls_per_dataset": per_dataset,
             "judge_calls_screen_max": screen, "gpu_hours": hours,
             "items_from": "known post-screen counts" if known_n else "min(n, pool)"}
@@ -640,14 +706,16 @@ ANCHOR_SUITES = {
 }
 
 
-def suite_cost(log_path: str, family: str = None, group: str = None, anchor: str = None):
+def suite_cost(log_path: str, family: str = None, group: str = None, anchor: str = None,
+               expected_cells: int = None):
     """(cost, parsed, anchor used) for a dry-run log."""
     with open(log_path, errors="replace") as f:
         parsed = parse_dryrun(f.read())
     if anchor is None and (family, group) in ANCHOR_SUITES:
         anchor = os.path.join(MAIN_CHECKOUT, "outputs", ANCHOR_SUITES[(family, group)])
     known = known_item_counts(anchor) if anchor and os.path.isdir(anchor) else None
-    return cost_estimate(parsed, known_n=known), parsed, (anchor if known else None)
+    return (cost_estimate(parsed, known_n=known, expected_cells=expected_cells), parsed,
+            (anchor if known else None))
 
 
 def render_cost(cost: dict, parsed: dict) -> str:
@@ -659,6 +727,10 @@ def render_cost(cost: dict, parsed: dict) -> str:
              f"        GPU hours (dry-run estimate, 1 GPU, very rough): {lo} - {hi}"]
     for name, n in cost["judge_calls_per_dataset"].items():
         lines.append(f"          {name:<34} {n:>6,}")
+    want = cost.get("cells_expected")
+    if want is not None and want != cost["cells"]:
+        lines.append(f"  WARNING: the dry-run lists {cost['cells']} cell(s) but suites.json "
+                     f"configures {want} (D, H, F and {EXTRA_KEY})")
     return "\n".join(lines)
 
 
@@ -716,7 +788,8 @@ def _common(p, *, paths=True):
 
 def _build_args(a):
     fam = family_runs(load_json(a.config), a.family, standin=a.standin)
-    return eval5_args(a.family, a.group, fam["runs"], fam["allmlp"], screen_cache=a.cache_dir)
+    return eval5_args(a.family, a.group, fam["runs"], fam["allmlp"], screen_cache=a.cache_dir,
+                      extra=fam["extra"])
 
 
 def main(argv=None) -> int:
@@ -752,6 +825,7 @@ def main(argv=None) -> int:
     _positionals(p, "log")
     p.add_argument("--family")
     p.add_argument("--group")
+    p.add_argument("--config", default=CONFIG_PATH)
     p.add_argument("--known-n-from", default=None,
                    help="an existing suite whose post-screen item counts to use "
                         "(default: the family's existing eval5_* suite)")
@@ -832,14 +906,21 @@ def main(argv=None) -> int:
                                        partition=a.partition)))
             return 0
         if a.cmd == "cost":
-            cost, parsed, anchor = suite_cost(a.log, a.family, a.group, a.known_n_from)
+            want = None
+            if a.family:
+                extra = family_runs(load_json(a.config), a.family)["extra"]
+                want = len(cell_labels(a.family, extra))
+            cost, parsed, anchor = suite_cost(a.log, a.family, a.group, a.known_n_from,
+                                              expected_cells=want)
             print(render_cost(cost, parsed))
             if anchor:
                 print(f"        (item counts from {anchor})")
             return 0
         if a.cmd == "record":
-            cost, parsed, anchor = suite_cost(a.log, a.family, a.group)
             fam = family_runs(load_json(a.config), a.family, standin=a.standin)
+            cost, parsed, anchor = suite_cost(
+                a.log, a.family, a.group,
+                expected_cells=len(cell_labels(a.family, fam["extra"])))
             g = None
             if not a.standin and fam["runs"]["F"]:
                 g = gate(a.suite_root or default_suite_root(a.family),
@@ -849,8 +930,10 @@ def main(argv=None) -> int:
                             allow_rescreen=a.allow_rescreen)
             record_event(a.record, a.family, a.group, {
                 "event": a.event, "standin": a.standin, "runs": fam["runs"],
+                "extra_circuits": fam["extra"],
+                "cell_labels": cell_labels(a.family, fam["extra"]),
                 "args": eval5_args(a.family, a.group, fam["runs"], fam["allmlp"],
-                                   screen_cache=a.cache_dir),
+                                   screen_cache=a.cache_dir, extra=fam["extra"]),
                 "log": a.log, "dry_run_passed": parsed["passed"], "cost": cost,
                 "cost_items_from": anchor, "account": a.account, "partition": a.partition,
                 "job_id": a.job_id,

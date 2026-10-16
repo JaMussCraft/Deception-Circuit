@@ -327,6 +327,208 @@
      "time": "2026-10-15T07:13:29",
      "family": "sdr_coarse",
      "group": "sm"
+    },
+    {
+     "event": "dry",
+     "standin": false,
+     "runs": {
+      "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "F": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850"
+     },
+     "extra_circuits": [
+      [
+       "D_minus_F",
+       "D - F"
+      ]
+     ],
+     "cell_labels": {
+      "D": "D_hko__leaf",
+      "H": "H_hko__leaf",
+      "F": "F_hko__leaf",
+      "D_minus_F": "D_minus_F_hko__leaf"
+     },
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+      "--circuit",
+      "m=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb",
+      "--expr",
+      "D_hko=D - m",
+      "--expr",
+      "H_hko=H - m",
+      "--expr",
+      "F_hko=F - m",
+      "--expr",
+      "D_minus_F_hko=(D - F) - m",
+      "--compose-granularity",
+      "leaf",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--evals",
+      "benchmarks",
+      "--ablation",
+      "interchange",
+      "--benchmarks",
+      "sandbagging",
+      "mask",
+      "--benchmark-n-per-dataset",
+      "50",
+      "--benchmark-n-random",
+      "6",
+      "--benchmark-screen-budget",
+      "600",
+      "--benchmark-screen-cache",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_eval5_format_cache/screens",
+      "--benchmark-repo-root",
+      "/projects/beto/swong2/Alignment",
+      "--output-dir",
+      "outputs/eval5_format_sdr_coarse"
+     ],
+     "log": "outputs/_launch_format_control/dryrun_eval5/sdr_coarse_sm.log",
+     "dry_run_passed": true,
+     "cost": {
+      "cells": 4,
+      "cells_expected": 4,
+      "configs_judged_per_cell": 9,
+      "judge_calls_ablated": 6228,
+      "judge_calls_per_dataset": {
+       "sandbagging": 0,
+       "mask:continuations": 1008,
+       "mask:disinformation": 432,
+       "mask:doubling_down_known_facts": 1044,
+       "mask:known_facts": 1368,
+       "mask:provided_facts": 1800,
+       "mask:statistics": 576
+      },
+      "judge_calls_screen_max": 0,
+      "gpu_hours": [
+       32.4,
+       37.7
+      ],
+      "items_from": "known post-screen counts"
+     },
+     "cost_items_from": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/eval5_sdr_coarse_nls0.3_nomb",
+     "account": "bgrb-delta-gpu",
+     "partition": "gpuA40x4",
+     "job_id": null,
+     "gate_kl": {
+      "cells/F_hko__leaf/sdr/interchange": 0.2793965663877316,
+      "cells/F_hko__leaf/sdr_nopressure/interchange": 0.2793965663877316
+     },
+     "gate_reasons": [],
+     "gate_override": null,
+     "gate_overridden": [],
+     "cache_reasons": [],
+     "allow_rescreen": null,
+     "time": "2026-10-16T17:06:37",
+     "family": "sdr_coarse",
+     "group": "sm"
+    },
+    {
+     "event": "submit",
+     "standin": false,
+     "runs": {
+      "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "F": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850"
+     },
+     "extra_circuits": [
+      [
+       "D_minus_F",
+       "D - F"
+      ]
+     ],
+     "cell_labels": {
+      "D": "D_hko__leaf",
+      "H": "H_hko__leaf",
+      "F": "F_hko__leaf",
+      "D_minus_F": "D_minus_F_hko__leaf"
+     },
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+      "--circuit",
+      "m=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb",
+      "--expr",
+      "D_hko=D - m",
+      "--expr",
+      "H_hko=H - m",
+      "--expr",
+      "F_hko=F - m",
+      "--expr",
+      "D_minus_F_hko=(D - F) - m",
+      "--compose-granularity",
+      "leaf",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--evals",
+      "benchmarks",
+      "--ablation",
+      "interchange",
+      "--benchmarks",
+      "sandbagging",
+      "mask",
+      "--benchmark-n-per-dataset",
+      "50",
+      "--benchmark-n-random",
+      "6",
+      "--benchmark-screen-budget",
+      "600",
+      "--benchmark-screen-cache",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_eval5_format_cache/screens",
+      "--benchmark-repo-root",
+      "/projects/beto/swong2/Alignment",
+      "--output-dir",
+      "outputs/eval5_format_sdr_coarse"
+     ],
+     "log": "outputs/_launch_format_control/dryrun_eval5/sdr_coarse_sm.log",
+     "dry_run_passed": true,
+     "cost": {
+      "cells": 4,
+      "cells_expected": 4,
+      "configs_judged_per_cell": 9,
+      "judge_calls_ablated": 6228,
+      "judge_calls_per_dataset": {
+       "sandbagging": 0,
+       "mask:continuations": 1008,
+       "mask:disinformation": 432,
+       "mask:doubling_down_known_facts": 1044,
+       "mask:known_facts": 1368,
+       "mask:provided_facts": 1800,
+       "mask:statistics": 576
+      },
+      "judge_calls_screen_max": 0,
+      "gpu_hours": [
+       32.4,
+       37.7
+      ],
+      "items_from": "known post-screen counts"
+     },
+     "cost_items_from": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/eval5_sdr_coarse_nls0.3_nomb",
+     "account": "beto-delta-gpu",
+     "partition": "gpuA40x4",
+     "job_id": "22947260",
+     "gate_kl": {
+      "cells/F_hko__leaf/sdr/interchange": 0.2793965663877316,
+      "cells/F_hko__leaf/sdr_nopressure/interchange": 0.2793965663877316
+     },
+     "gate_reasons": [],
+     "gate_override": null,
+     "gate_overridden": [],
+     "cache_reasons": [],
+     "allow_rescreen": null,
+     "time": "2026-10-16T17:12:03",
+     "family": "sdr_coarse",
+     "group": "sm"
     }
    ]
   },
@@ -881,6 +1083,202 @@
      "cache_reasons": [],
      "allow_rescreen": null,
      "time": "2026-10-15T07:13:53",
+     "family": "sdr_coarse",
+     "group": "lb"
+    },
+    {
+     "event": "dry",
+     "standin": false,
+     "runs": {
+      "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "F": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850"
+     },
+     "extra_circuits": [
+      [
+       "D_minus_F",
+       "D - F"
+      ]
+     ],
+     "cell_labels": {
+      "D": "D_hko__leaf",
+      "H": "H_hko__leaf",
+      "F": "F_hko__leaf",
+      "D_minus_F": "D_minus_F_hko__leaf"
+     },
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+      "--circuit",
+      "m=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb",
+      "--expr",
+      "D_hko=D - m",
+      "--expr",
+      "H_hko=H - m",
+      "--expr",
+      "F_hko=F - m",
+      "--expr",
+      "D_minus_F_hko=(D - F) - m",
+      "--compose-granularity",
+      "leaf",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--evals",
+      "benchmarks",
+      "--ablation",
+      "interchange",
+      "--benchmarks",
+      "lb:instructed-deception",
+      "lb:harm-pressure-knowledge-report",
+      "lb:convincing-game",
+      "--benchmark-n-per-dataset",
+      "50",
+      "--benchmark-n-random",
+      "6",
+      "--benchmark-screen-budget",
+      "600",
+      "--benchmark-screen-cache",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_eval5_format_cache/screens",
+      "--benchmark-repo-root",
+      "/projects/beto/swong2/Alignment",
+      "--output-dir",
+      "outputs/eval5_format_sdr_coarse_lb"
+     ],
+     "log": "outputs/_launch_format_control/dryrun_eval5/sdr_coarse_lb.log",
+     "dry_run_passed": true,
+     "cost": {
+      "cells": 4,
+      "cells_expected": 4,
+      "configs_judged_per_cell": 9,
+      "judge_calls_ablated": 5400,
+      "judge_calls_per_dataset": {
+       "lb:instructed-deception": 1800,
+       "lb:harm-pressure-knowledge-report": 1800,
+       "lb:convincing-game": 1800
+      },
+      "judge_calls_screen_max": 0,
+      "gpu_hours": [
+       12.2,
+       15.6
+      ],
+      "items_from": "known post-screen counts"
+     },
+     "cost_items_from": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/eval5_sdr_coarse_nls0.3_nomb_lb",
+     "account": "bgrb-delta-gpu",
+     "partition": "gpuA40x4",
+     "job_id": null,
+     "gate_kl": {
+      "cells/F_hko__leaf/sdr/interchange": 0.2793965663877316,
+      "cells/F_hko__leaf/sdr_nopressure/interchange": 0.2793965663877316
+     },
+     "gate_reasons": [],
+     "gate_override": null,
+     "gate_overridden": [],
+     "cache_reasons": [],
+     "allow_rescreen": null,
+     "time": "2026-10-16T17:06:39",
+     "family": "sdr_coarse",
+     "group": "lb"
+    },
+    {
+     "event": "submit",
+     "standin": false,
+     "runs": {
+      "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "F": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850"
+     },
+     "extra_circuits": [
+      [
+       "D_minus_F",
+       "D - F"
+      ]
+     ],
+     "cell_labels": {
+      "D": "D_hko__leaf",
+      "H": "H_hko__leaf",
+      "F": "F_hko__leaf",
+      "D_minus_F": "D_minus_F_hko__leaf"
+     },
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+      "--circuit",
+      "m=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb",
+      "--expr",
+      "D_hko=D - m",
+      "--expr",
+      "H_hko=H - m",
+      "--expr",
+      "F_hko=F - m",
+      "--expr",
+      "D_minus_F_hko=(D - F) - m",
+      "--compose-granularity",
+      "leaf",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--evals",
+      "benchmarks",
+      "--ablation",
+      "interchange",
+      "--benchmarks",
+      "lb:instructed-deception",
+      "lb:harm-pressure-knowledge-report",
+      "lb:convincing-game",
+      "--benchmark-n-per-dataset",
+      "50",
+      "--benchmark-n-random",
+      "6",
+      "--benchmark-screen-budget",
+      "600",
+      "--benchmark-screen-cache",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_eval5_format_cache/screens",
+      "--benchmark-repo-root",
+      "/projects/beto/swong2/Alignment",
+      "--output-dir",
+      "outputs/eval5_format_sdr_coarse_lb"
+     ],
+     "log": "outputs/_launch_format_control/dryrun_eval5/sdr_coarse_lb.log",
+     "dry_run_passed": true,
+     "cost": {
+      "cells": 4,
+      "cells_expected": 4,
+      "configs_judged_per_cell": 9,
+      "judge_calls_ablated": 5400,
+      "judge_calls_per_dataset": {
+       "lb:instructed-deception": 1800,
+       "lb:harm-pressure-knowledge-report": 1800,
+       "lb:convincing-game": 1800
+      },
+      "judge_calls_screen_max": 0,
+      "gpu_hours": [
+       12.2,
+       15.6
+      ],
+      "items_from": "known post-screen counts"
+     },
+     "cost_items_from": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/eval5_sdr_coarse_nls0.3_nomb_lb",
+     "account": "bgrb-delta-gpu",
+     "partition": "gpuA40x4",
+     "job_id": "22947270",
+     "gate_kl": {
+      "cells/F_hko__leaf/sdr/interchange": 0.2793965663877316,
+      "cells/F_hko__leaf/sdr_nopressure/interchange": 0.2793965663877316
+     },
+     "gate_reasons": [],
+     "gate_override": null,
+     "gate_overridden": [],
+     "cache_reasons": [],
+     "allow_rescreen": null,
+     "time": "2026-10-16T17:12:24",
      "family": "sdr_coarse",
      "group": "lb"
     }

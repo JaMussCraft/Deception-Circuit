@@ -1,7 +1,8 @@
 #!/bin/bash
-# EVAL 5 for one format-control family and benchmark group: D, H and F bound in
-# ONE evaluate_circuit.py invocation (one screen, one judge cache, identical
-# settings; random rows size-matched per circuit). See README_eval5.md.
+# EVAL 5 for one format-control family and benchmark group: D, H and F (plus the
+# family's eval5_extra_circuits, e.g. coarse D - F) bound in ONE evaluate_circuit.py
+# invocation (one screen, one judge cache, identical settings; random rows
+# size-matched per circuit). See README_eval5.md.
 #
 # usage: bash outputs/_launch_format_control/submit_eval5.sh <far|sdr|sdr_coarse> <sm|lb>
 #            [--dry] [--standin] [--account A] [--partition P] [--time HH:MM:SS]
@@ -96,7 +97,7 @@ if ! "$PY" "$EVALUATOR" "${ARGS[@]}" --dry-run >> "$LOG" 2>&1; then
     echo "DRY-RUN FAILED: see $LOG"; tail -3 "$LOG"; exit 5
 fi
 grep -E "^ +TOTAL .*min" "$LOG" | tail -1 || true
-"$PY" "$E5" cost "$LOG" --family "$FAMILY" --group "$GROUP" | tee -a "$LOG"
+"$PY" "$E5" cost "$LOG" --family "$FAMILY" --group "$GROUP" "${CFG[@]}" | tee -a "$LOG"
 echo "dry-run log: $LOG"
 
 TIME_ARG=(); [ -n "$TIME" ] && TIME_ARG=(--time "$TIME")

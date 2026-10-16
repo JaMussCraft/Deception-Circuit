@@ -21,8 +21,16 @@ the knockout's place in its own null; screen notes; the three grader caveats
 with the knockout rows that match each caveat's trigger; and anything missing
 or failed. It does not write a verdict.
 
+A suite may carry extra composed circuits of D, H, F in the same invocation
+(suites.json `eval5_extra_circuits`, e.g. coarse `D_minus_F_hko__leaf` for
+D - F, researcher request 2026-10-16). Each becomes one more role after D, H,
+F, keyed by its label with `__leaf|__head` and `_hko` stripped (`D_minus_F`),
+with its own rows. Extras come from the suite's own `suite.json` (the
+circuits the evaluator planned) and from the cells present; `missing` names a
+base role without a cell, and an extra only when `suite.json` planned it.
+
 `write(suite_dir)` also writes `eval5_format.json`, the same numbers keyed by
-role (D, H, F) for other writers (ticket 05) to read; see
+role (D, H, F, then any extras) for other writers (ticket 05) to read; see
 `outputs/_launch_format_control/README_eval5.md`.
 """
 
@@ -36,6 +44,10 @@ import time
 
 ROLES = ("D", "H", "F")
 ROLE_NAMES = {"D": "deceptive circuit", "H": "Honest Twin", "F": "Format Circuit"}
+#: Display names of known extra circuits (suites.json `eval5_extra_circuits`).
+EXTRA_NAMES = {"D_minus_F": "D−F (deceptive minus format)"}
+#: The coarse all-MLP operand: bound, never a role.
+ALLMLP = "m"
 LABELS = ("deceptive", "honest", "unparsed")
 
 _FIXES = "/projects/beto/swong2/Alignment/.scratch/eval5-grader-fixes/issues/"
@@ -115,10 +127,45 @@ RANDOM_ROWS_NOTE = (
 # READING
 # ==============================================================================
 
-def _role_of(label: str):
+def _base_of(label: str) -> str:
     base = re.sub(r"__(leaf|head)$", "", str(label))
-    base = re.sub(r"_hko$", "", base)
-    return base if base in ROLES else None
+    return re.sub(r"_hko$", "", base)
+
+
+def _role_of(label: str, extra=()):
+    """The role of a cell label: D, H, F, or one of the suite's extras."""
+    base = _base_of(label)
+    return base if base in ROLES or base in extra else None
+
+
+def short_name(role: str) -> str:
+    """Column name of a role: D, H, F; an extra's label with `_and_` / `_minus_`
+    as `&` / `−` (`D_minus_F` -> `D−F`)."""
+    return role if role in ROLES else role.replace("_and_", "&").replace("_minus_", "−")
+
+
+def role_name(role: str, expr: str = None) -> str:
+    if role in ROLE_NAMES:
+        return ROLE_NAMES[role]
+    if role in EXTRA_NAMES:
+        return EXTRA_NAMES[role]
+    return f"{short_name(role)} ({expr})" if expr else short_name(role)
+
+
+def _is_extra(base: str) -> bool:
+    return bool(base) and base not in ROLES and base != ALLMLP and bool(
+        re.match(r"^[A-Za-z][A-Za-z0-9_]*$", base))
+
+
+def planned_extras(suite_json) -> dict:
+    """{extra role: its expression} that the evaluator planned (suite.json
+    `circuits`), in order; {} without a suite.json."""
+    out = {}
+    for c in (suite_json or {}).get("circuits") or ():
+        base = _base_of((c or {}).get("label"))
+        if _is_extra(base):
+            out.setdefault(base, c.get("expr"))
+    return out
 
 
 def _load(path):
@@ -129,20 +176,31 @@ def _load(path):
         return None
 
 
-def load_suite(suite_dir: str) -> dict:
+def load_suite(suite_dir: str, extra=None) -> dict:
     """{"cells": {role: {"label", "path", "benchmarks"}}, "missing": [role],
     "unreadable": {role: path}, "duplicates": {role: [paths ignored]},
-    "suite": suite.json or None}.
+    "extra": [extra roles], "extra_exprs": {role: expr}, "suite": suite.json or None}.
 
     An unreadable benchmarks.json makes its role missing (reported as
     unreadable); a second cell mapping to a role already taken is ignored and
-    reported, never silently dropped.
+    reported, never silently dropped. Extra roles are `extra` when given, else
+    those suite.json planned, then any other extra cell found (in label order);
+    a planned extra without a cell is missing, like D, H and F.
     """
+    suite_json = _load(os.path.join(suite_dir, "suite.json"))
+    exprs = planned_extras(suite_json)
+    planned = list(extra) if extra is not None else list(exprs)
+    paths = sorted(glob.glob(os.path.join(suite_dir, "cells", "*", "*", "*",
+                                          "benchmarks.json")))
+    extras = list(planned)
+    for path in paths:
+        base = _base_of(path.split(os.sep)[-4])
+        if _is_extra(base) and base not in extras:
+            extras.append(base)
     cells, unreadable, duplicates = {}, {}, {}
-    for path in sorted(glob.glob(os.path.join(suite_dir, "cells", "*", "*", "*",
-                                              "benchmarks.json"))):
+    for path in paths:
         label = path.split(os.sep)[-4]
-        role = _role_of(label)
+        role = _role_of(label, extras)
         rel = os.path.relpath(path, suite_dir)
         if role is None:
             continue
@@ -154,9 +212,12 @@ def load_suite(suite_dir: str) -> dict:
             unreadable[role] = rel
             continue
         cells[role] = {"label": label, "path": rel, "benchmarks": body}
-    return {"cells": cells, "missing": [r for r in ROLES if r not in cells],
+    return {"cells": cells,
+            "missing": [r for r in (*ROLES, *extras) if r not in cells
+                        and (r in ROLES or r in planned or r in unreadable)],
             "unreadable": unreadable, "duplicates": duplicates,
-            "suite": _load(os.path.join(suite_dir, "suite.json"))}
+            "extra": extras, "extra_exprs": {r: exprs.get(r) for r in extras},
+            "suite": suite_json}
 
 
 def _mean(xs):
@@ -212,10 +273,17 @@ def caveat_hits(dataset: str, cfg: dict) -> dict:
     return hits
 
 
+def _order(suite: dict) -> list:
+    return [*ROLES, *(suite.get("extra") or ())]
+
+
 def tabulate(suite: dict) -> dict:
-    """The numbers of the summary, keyed by role then dataset (also the JSON)."""
+    """The numbers of the summary, keyed by role then dataset (also the JSON).
+    Roles are D, H, F, then the suite's extra circuits (`extra_roles`)."""
     roles, datasets = {}, []
-    for role in ROLES:
+    order = _order(suite)
+    exprs = suite.get("extra_exprs") or {}
+    for role in order:
         cell = suite["cells"].get(role)
         if cell is None:
             roles[role] = {"label": None, "missing": True, "datasets": {}}
@@ -247,7 +315,10 @@ def tabulate(suite: dict) -> dict:
                        "datasets": per}
     return {"roles": roles, "datasets": datasets, "missing": list(suite["missing"]),
             "unreadable": dict(suite.get("unreadable") or {}),
-            "duplicates": dict(suite.get("duplicates") or {})}
+            "duplicates": dict(suite.get("duplicates") or {}),
+            "extra_roles": list(suite.get("extra") or ()),
+            "role_names": {r: role_name(r, exprs.get(r)) for r in order},
+            "extra_exprs": {r: exprs.get(r) for r in suite.get("extra") or ()}}
 
 
 # ==============================================================================
@@ -265,7 +336,7 @@ def _signed(x):
 def _shared_full(table: dict, name: str):
     """(the full row, whether it differs between the cells that have it)."""
     fulls = []
-    for role in ROLES:
+    for role in table["roles"]:
         d = table["roles"][role]["datasets"].get(name) or {}
         if d.get("full"):
             fulls.append(d["full"])
@@ -275,13 +346,19 @@ def _shared_full(table: dict, name: str):
     return fulls[0], any(key(f) != key(fulls[0]) for f in fulls[1:])
 
 
-def render(suite_dir: str) -> str:
-    suite = load_suite(suite_dir)
+def render(suite_dir: str, extra=None) -> str:
+    suite = load_suite(suite_dir, extra=extra)
     table = tabulate(suite)
     roles = table["roles"]
-    present = [r for r in ROLES if not roles[r]["missing"]]
+    order = list(roles)                                 # D, H, F, then the extras
+    extras = table["extra_roles"]
+    names = table["role_names"]
+    sn = {r: short_name(r) for r in order}
+    present = [r for r in order if not roles[r]["missing"]]
     resolved = roles[present[0]]["resolved"] if present else {}
-    L = ["# EVAL 5 — format-control suite: D, H and F knockouts on one screen", ""]
+    what = "D, H and F" if not extras else ", ".join([*ROLES, *(sn[r] for r in extras[:-1])]) \
+        + f" and {sn[extras[-1]]}"
+    L = [f"# EVAL 5 — format-control suite: {what} knockouts on one screen", ""]
     L.append(f"`{suite_dir}` · {resolved.get('model', '?')} · ablation "
              f"{resolved.get('ablation', 'interchange')} · target n={resolved.get('n_per_dataset', '?')} "
              f"per dataset · {resolved.get('n_random', '?')} size-matched random circuits per circuit"
@@ -290,41 +367,50 @@ def render(suite_dir: str) -> str:
     L.append("| role | circuit | cell |")
     L.append("| --- | --- | --- |")
     unreadable, duplicates = table["unreadable"], table["duplicates"]
-    for role in ROLES:
+    for role in order:
         r = roles[role]
         if r["missing"]:
-            what = "cell unreadable" if role in unreadable else "cell missing"
-            L.append(f"| {role} | {ROLE_NAMES[role]} | **{role}: {what}** |")
+            state = "cell unreadable" if role in unreadable else "cell missing"
+            L.append(f"| {sn[role]} | {names[role]} | **{sn[role]}: {state}** |")
         else:
-            L.append(f"| {role} | {ROLE_NAMES[role]} | `{r['label']}` (`{r['source']}`) |")
-    L += ["", f"> {RANDOM_ROWS_NOTE}", ""]
+            L.append(f"| {sn[role]} | {names[role]} | `{r['label']}` (`{r['source']}`) |")
+    L += ["", f"> {RANDOM_ROWS_NOTE}"]
+    if extras:
+        L += [">", "> The extra circuit(s) " + ", ".join(f"{sn[r]} = `{table['extra_exprs'].get(r) or r}`"
+                                                    for r in extras)
+              + " ran in the same invocation, on the same screen and judge cache, with "
+                "their own size-matched random rows."]
+    L.append("")
     notes = []
     for role in table["missing"]:
         if role in unreadable:
-            notes.append(f"- **{role}: cell unreadable.** `{unreadable[role]}` is not a readable "
-                         f"benchmarks.json; the {ROLE_NAMES[role]}'s rows read `missing`.")
+            notes.append(f"- **{sn[role]}: cell unreadable.** `{unreadable[role]}` is not a readable "
+                         f"benchmarks.json; the {names[role]}'s rows read `missing`.")
         else:
-            notes.append(f"- **{role}: cell missing.** No `benchmarks.json` for the "
-                         f"{ROLE_NAMES[role]}; its rows read `missing`.")
-    for role, extra in duplicates.items():
+            notes.append(f"- **{sn[role]}: cell missing.** No `benchmarks.json` for the "
+                         f"{names[role]}; its rows read `missing`.")
+    for role, extra_paths in duplicates.items():
         used = roles[role]["source"] if not roles[role]["missing"] else unreadable.get(role)
-        notes.append(f"- **{role}: more than one cell.** Read `{used}`; ignored "
-                     + ", ".join(f"`{p}`" for p in extra) + ".")
+        notes.append(f"- **{sn[role]}: more than one cell.** Read `{used}`; ignored "
+                     + ", ".join(f"`{p}`" for p in extra_paths) + ".")
     for role in present:
         for name, err in roles[role]["failed_datasets"].items():
-            notes.append(f"- **{role} failed on {name}:** {err}")
+            notes.append(f"- **{sn[role]} failed on {name}:** {err}")
     if notes:
         L += notes + [""]
 
     # ---- headline across circuits
+    k = len(order)
     L += ["## Deception rate under interchange", "",
           "Deceptive fraction of n. KO = the circuit's knockout; Δ = the circuit's own "
           "random mean − its KO (positive favours the circuit); pct = the KO's "
           "percentile within its own null (100 = lower than every random draw).", "",
-          "| dataset | n | full | D KO | H KO | F KO | D Δ | H Δ | F Δ | D pct | H pct | F pct |",
-          "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"]
+          "| dataset | n | full | " + " | ".join(f"{sn[r]} KO" for r in order) + " | "
+          + " | ".join(f"{sn[r]} Δ" for r in order) + " | "
+          + " | ".join(f"{sn[r]} pct" for r in order) + " |",
+          "| --- | ---: | ---: | " + " | ".join(["---:"] * (3 * k)) + " |"]
     # Means run over the datasets every present circuit has numbers for, so the
-    # full, D, H and F means average the same datasets.
+    # full and every circuit's means average the same datasets.
     values = {}                                         # dataset -> {key: value}
     for name in table["datasets"]:
         full, _ = _shared_full(table, name)
@@ -332,7 +418,7 @@ def render(suite_dir: str) -> str:
                   if roles[r]["datasets"].get(name, {}).get("n") is not None), None)
         per_role = []                                   # (KO, Δ, pct) per role
         row = {"full": full["deceptive"] if full else None}
-        for role in ROLES:
+        for role in order:
             d = roles[role]["datasets"].get(name)
             if roles[role]["missing"]:
                 per_role.append(("missing",) * 3)
@@ -341,12 +427,12 @@ def render(suite_dir: str) -> str:
                 per_role.append(("failed",) * 3)
                 row[role] = None
                 continue
-            k = (d.get("knockout") or {}).get("deceptive")
+            ko = (d.get("knockout") or {}).get("deceptive")
             rnd = (d.get("random_mean") or {}).get("deceptive")
-            dd = None if k is None or rnd is None else rnd - k
+            dd = None if ko is None or rnd is None else rnd - ko
             pct = d.get("null_percentile")
-            per_role.append((_f(k), _signed(dd), "—" if pct is None else f"{pct:.0f}"))
-            row[role], row["d" + role] = k, dd
+            per_role.append((_f(ko), _signed(dd), "—" if pct is None else f"{pct:.0f}"))
+            row[role], row["d" + role] = ko, dd
         values[name] = row
         columns = [cell for i in range(3) for cell in (r[i] for r in per_role)]
         L.append(f"| {name} | {'—' if n is None else n} | {_f(row['full'])} | "
@@ -358,9 +444,9 @@ def render(suite_dir: str) -> str:
             return _mean([values[name].get(key) for name in common])
         L.append(f"| **mean over {len(common)} dataset(s) common to all circuits** | — | "
                  + _f(mean("full")) + " | "
-                 + " | ".join(_f(mean(r)) if r in present else "missing" for r in ROLES) + " | "
-                 + " | ".join(_signed(mean("d" + r)) if r in present else "missing" for r in ROLES)
-                 + " | — | — | — |")
+                 + " | ".join(_f(mean(r)) if r in present else "missing" for r in order) + " | "
+                 + " | ".join(_signed(mean("d" + r)) if r in present else "missing" for r in order)
+                 + " | " + " | ".join(["—"] * k) + " |")
     if len(common) < len(values):
         L += ["", f"The mean row leaves out {len(values) - len(common)} dataset(s) that some "
                   f"circuit has no knockout number for: "
@@ -382,17 +468,17 @@ def render(suite_dir: str) -> str:
         if differs:
             full_mismatch.append(name)
         L.append(_detail_row(name, "full", full))
-        for role in ROLES:
+        for role in order:
             d = roles[role]["datasets"].get(name)
             if roles[role]["missing"]:
-                L.append(_marker_row(name, f"{role} knockout", "missing"))
+                L.append(_marker_row(name, f"{sn[role]} knockout", "missing"))
                 continue
             if d is None or "error" in d:
-                L.append(_marker_row(name, f"{role} knockout", "failed"))
+                L.append(_marker_row(name, f"{sn[role]} knockout", "failed"))
                 continue
-            L.append(_detail_row(name, f"{role} knockout", d.get("knockout")))
+            L.append(_detail_row(name, f"{sn[role]} knockout", d.get("knockout")))
             rnd = d.get("random_mean")
-            label = f"{role} random (mean of {rnd['n']})" if rnd else f"{role} random"
+            label = f"{sn[role]} random (mean of {rnd['n']})" if rnd else f"{sn[role]} random"
             L.append(_detail_row(name, label, rnd))
     L.append("")
 
@@ -413,7 +499,7 @@ def render(suite_dir: str) -> str:
     for role in present:
         j = roles[role]["judge"]
         if j:
-            L.append(f"- judge cache ({role} cell's view): {j.get('cache_hits', '?')} hits, "
+            L.append(f"- judge cache ({sn[role]} cell's view): {j.get('cache_hits', '?')} hits, "
                      f"{j.get('cache_writes', '?')} writes")
     L.append("")
 
@@ -428,10 +514,11 @@ def render(suite_dir: str) -> str:
             L.append("")
         L.pop()
     L += ["", "Knockout rows matching each caveat's trigger (summed over datasets):", "",
-          "| caveat | D KO | H KO | F KO |", "| --- | ---: | ---: | ---: |"]
+          "| caveat | " + " | ".join(f"{sn[r]} KO" for r in order) + " |",
+          "| --- | " + " | ".join(["---:"] * k) + " |"]
     for c in GRADER_CAVEATS:
         cells = []
-        for role in ROLES:
+        for role in order:
             if roles[role]["missing"]:
                 cells.append("missing")
                 continue
@@ -454,13 +541,13 @@ def _marker_row(name, row, marker):
     return f"| {name} | {row} | " + " | ".join([marker] * 6) + " |"
 
 
-def write(suite_dir: str) -> list:
+def write(suite_dir: str, extra=None) -> list:
     """Write `result_summary.md` and `eval5_format.json`; -> their paths."""
     md_path = os.path.join(suite_dir, "result_summary.md")
     json_path = os.path.join(suite_dir, "eval5_format.json")
     with open(md_path, "w") as f:
-        f.write(render(suite_dir))
-    table = tabulate(load_suite(suite_dir))
+        f.write(render(suite_dir, extra=extra))
+    table = tabulate(load_suite(suite_dir, extra=extra))
     table["schema"] = "eval5_format/1"
     table["suite_dir"] = suite_dir
     table["grader_caveats"] = [dict(c) for c in GRADER_CAVEATS]

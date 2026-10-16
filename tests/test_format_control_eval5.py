@@ -15,7 +15,10 @@ Seams under test (the ticket's Testing Decisions plus the review round):
     stale F, explicit recorded override);
   * `submit_eval5.sh`'s refusals and its record, with stub sbatch / evaluator;
   * the `result_summary.md` writer on a fixture suite with three circuits, and
-    its grader caveats quoted from their source files.
+    its grader caveats quoted from their source files;
+  * the optional `eval5_extra_circuits` (coarse D - F, 2026-10-16): one more
+    expr in the same invocation, its cell label, the record, the cost's cell
+    count, and its own role in the summary.
 """
 
 from __future__ import annotations
@@ -1110,3 +1113,248 @@ def test_write_produces_the_summary_and_the_json_ticket_05_can_read(summ, tmp_pa
     assert ko["deceptive"] == 0.6 and ko["ref_nll"] == 0.5 and ko["distinct_n"] == 0.75
     assert data["roles"]["D"]["datasets"]["sandbagging"]["random_mean"]["deceptive"] == 0.7
     assert data["roles"]["H"]["label"] == "H"
+
+
+# ==============================================================================
+# EXTRA COMPOSED CIRCUITS (suites.json `eval5_extra_circuits`; researcher
+# request 2026-10-16: D, H, F and D - F on the SDR coarse suite)
+# ==============================================================================
+
+DMF = [["D_minus_F", "D - F"]]
+
+
+def test_coarse_extra_circuit_is_one_more_expr_after_D_H_F_in_the_same_invocation(e5):
+    base = e5.eval5_args("sdr_coarse", "sm", RUNS, allmlp=M_RUN)
+    args = e5.eval5_args("sdr_coarse", "sm", RUNS, allmlp=M_RUN, extra=DMF)
+    assert _flag_values(args, "--expr") == [["D_hko=D - m"], ["H_hko=H - m"], ["F_hko=F - m"],
+                                            ["D_minus_F_hko=(D - F) - m"]]
+    # same bindings, one granularity, one task, one output: one screen, one judge cache
+    assert _flag_values(args, "--circuit") == _flag_values(base, "--circuit")
+    assert _flag_values(args, "--compose-granularity") == [["leaf"]]
+    assert _flag_values(args, "--task-from") == [[D_RUN]]
+    assert _flag_values(args, "--output-dir") == [["outputs/eval5_format_sdr_coarse"]]
+    i = args.index("D_minus_F_hko=(D - F) - m")
+    assert args[:i - 1] == base[:i - 1] and args[i + 1:] == base[i - 1:]
+
+
+def test_fine_extra_circuit_names_D_H_F_explicitly_and_composes_at_head(e5):
+    """Any --expr replaces the evaluator's default (every bound circuit on its
+    own), so a fine suite with an extra must name D, H, F itself."""
+    args = e5.eval5_args("far", "sm", RUNS, extra=DMF)
+    assert _flag_values(args, "--circuit") == [[f"D={D_RUN}"], [f"H={H_RUN}"], [f"F={F_RUN}"]]
+    assert _flag_values(args, "--expr") == [["D=D"], ["H=H"], ["F=F"], ["D_minus_F=D - F"]]
+    assert _flag_values(args, "--compose-granularity") == [["head"]]
+
+
+def test_cell_labels_include_the_extra_circuit(e5):
+    assert e5.cell_labels("sdr_coarse", DMF) == {
+        "D": "D_hko__leaf", "H": "H_hko__leaf", "F": "F_hko__leaf",
+        "D_minus_F": "D_minus_F_hko__leaf"}
+    assert e5.cell_labels("far", DMF) == {"D": "D", "H": "H", "F": "F",
+                                          "D_minus_F": "D_minus_F__head"}
+    assert e5.cell_labels("sdr_coarse") == {r: f"{r}_hko__leaf" for r in "DHF"}
+    assert e5.cell_labels("far") == {"D": "D", "H": "H", "F": "F"}
+
+
+@pytest.mark.parametrize("rows, match", [
+    ([["D", "D - F"]], "bad label"),
+    ([["D_minus_F_hko", "D - F"]], "bad label"),
+    ([["m", "D - F"]], "bad label"),
+    ([["x__leaf", "D - F"]], "bad label"),
+    ([["D_minus_m", "D - m"]], "may name only"),
+    ([["blank", " "]], "may name only"),
+    ([["D_minus_F", "D - F"], ["D_minus_F", "D - H"]], "duplicate"),
+    ([["D_minus_F"]], r"\[label, expr\]"),
+])
+def test_bad_extra_circuits_are_refused(e5, rows, match):
+    with pytest.raises(ValueError, match=match):
+        e5.extra_circuits(rows)
+    with pytest.raises(ValueError, match=match):
+        e5.eval5_args("sdr_coarse", "sm", RUNS, allmlp=M_RUN, extra=rows)
+
+
+def test_a_config_without_the_key_is_unchanged(e5):
+    cfg = _config()
+    fam = e5.family_runs(cfg, "sdr_coarse")
+    assert fam["extra"] == []
+    assert e5.eval5_args("sdr_coarse", "lb", RUNS, allmlp=M_RUN, extra=fam["extra"]) \
+        == e5.eval5_args("sdr_coarse", "lb", RUNS, allmlp=M_RUN)
+    cfg["format-control-sdr-coarse-nls0.3"][e5.EXTRA_KEY] = DMF
+    assert e5.family_runs(cfg, "sdr_coarse")["extra"] == DMF
+    assert e5.family_runs(cfg, "far")["extra"] == []
+
+
+def test_the_real_config_asks_for_D_minus_F_on_the_coarse_suite_only(e5):
+    cfg = e5.load_json(e5.CONFIG_PATH)
+    assert e5.family_runs(cfg, "sdr_coarse")["extra"] == DMF
+    assert e5.family_runs(cfg, "far")["extra"] == []
+    assert e5.family_runs(cfg, "sdr")["extra"] == []
+
+
+def test_the_gate_and_refusals_ignore_the_extra_circuit(e5, tmp_path):
+    cfg = _config()
+    cfg[SUITE][e5.EXTRA_KEY] = DMF
+    manifest = _gated_suite(str(tmp_path))
+    assert e5.refusals("far", "sm", config=cfg, manifest=manifest, env={e5.GO_ENV: "1"},
+                       suite_root=str(tmp_path)) == []
+    bad = e5.refusals("far", "sm", config=cfg, manifest=_gated_suite(str(tmp_path), kl=0.9),
+                      env={e5.GO_ENV: "1"}, suite_root=str(tmp_path))
+    assert any("0.900" in x for x in bad)
+
+
+DRYRUN_LOG_4 = DRYRUN_LOG.replace(
+    "  outputs/eval5_format_far/cells/F/far/interchange\n",
+    "  outputs/eval5_format_far/cells/F/far/interchange\n"
+    "  outputs/eval5_format_far/cells/D_minus_F__head/far/interchange\n").replace(
+    "(3 cell(s))", "(4 cell(s))").replace("3 circuits x 1 tasks", "4 circuits x 1 tasks")
+
+
+def test_cost_counts_the_extra_cell(e5):
+    p = e5.parse_dryrun(DRYRUN_LOG_4)
+    assert len(p["cells"]) == 4
+    c = e5.cost_estimate(p, n_per_dataset=50, n_random=6, expected_cells=4)
+    assert c["cells"] == 4 and c["cells_expected"] == 4
+    assert c["judge_calls_ablated"] == 4 * 9 * 50 + 4 * 9 * 30
+    assert "WARNING" not in e5.render_cost(c, p)
+    # a log that lost the extra cell is flagged against the configuration
+    stale = e5.cost_estimate(e5.parse_dryrun(DRYRUN_LOG), expected_cells=4)
+    assert stale["cells"] == 3
+    assert "lists 3 cell(s) but suites.json configures 4" in e5.render_cost(
+        stale, e5.parse_dryrun(DRYRUN_LOG))
+
+
+def _fake_log_4(label="D_minus_F__head", family="far", task="far"):
+    return _fake_log().replace(
+        f"  outputs/eval5_format_{family}/cells/F/{task}/interchange\n",
+        f"  outputs/eval5_format_{family}/cells/F/{task}/interchange\n"
+        f"  outputs/eval5_format_{family}/cells/{label}/{task}/interchange\n").replace(
+        "(3 cell(s))", "(4 cell(s))")
+
+
+def test_the_record_carries_the_extra_circuit(harness):
+    cfg = _config()
+    cfg[SUITE]["eval5_extra_circuits"] = DMF
+    code, out, sbatched = harness("far", "sm", "--dry", config=cfg, log=_fake_log_4())
+    assert code == 0, out
+    assert "--expr D_minus_F=D - F" in out and "4 cell(s)" in out and "WARNING" not in out
+    ev = harness.record()["suites"]["eval5_format_far"]["events"][-1]
+    assert ev["extra_circuits"] == DMF
+    assert ev["cell_labels"]["D_minus_F"] == "D_minus_F__head"
+    assert "D_minus_F=D - F" in ev["args"]
+    assert ev["cost"]["cells"] == 4 and ev["cost"]["cells_expected"] == 4
+    assert sbatched == ""
+
+
+def test_a_coarse_stand_in_record_carries_the_extra_circuit(harness):
+    cfg = _config()
+    cfg["format-control-sdr-coarse-nls0.3"]["eval5_extra_circuits"] = DMF
+    log = _fake_log_4("D_minus_F_hko__leaf", "sdr_coarse", "sdr")
+    code, out, sbatched = harness("sdr_coarse", "sm", "--dry", "--standin", config=cfg, log=log)
+    assert code == 0, out
+    assert "--expr D_minus_F_hko=(D - F) - m" in out and sbatched == ""
+    ev = harness.record()["suites"]["eval5_format_sdr_coarse"]["events"][-1]
+    assert ev["extra_circuits"] == DMF and ev["standin"] is True
+
+
+def test_a_record_without_the_key_has_no_extra_circuit(harness):
+    code, out, _ = harness("far", "sm", "--dry")
+    assert code == 0, out
+    ev = harness.record()["suites"]["eval5_format_far"]["events"][-1]
+    assert ev["extra_circuits"] == [] and ev["cost"]["cells_expected"] == 3
+    assert "--expr" not in ev["args"]
+
+
+def _with_extra(summ, root, *, cell=True, planned=True, label="D_minus_F_hko__leaf",
+                task="sdr", ko=(1, 6, 3, 1.1, 0.55)):
+    """Add the D - F cell (a copy of D's with its own knockout) and plan it in suite.json."""
+    src = os.path.join(root, "cells", "D_hko__leaf", task, "interchange", "benchmarks.json")
+    if cell:
+        with open(src) as f:
+            body = json.load(f)
+        for ds in body["datasets"].values():
+            ds["configs"]["knockout"] = _bconfig(*ko)
+        d = os.path.join(root, "cells", label, task, "interchange")
+        os.makedirs(d, exist_ok=True)
+        with open(os.path.join(d, "benchmarks.json"), "w") as f:
+            json.dump(body, f)
+    with open(os.path.join(root, "suite.json")) as f:
+        sj = json.load(f)
+    if planned:
+        sj["circuits"].append({"label": label, "expr": "(D - F) - m", "operands": {}})
+    with open(os.path.join(root, "suite.json"), "w") as f:
+        json.dump(sj, f)
+    return root
+
+
+COARSE_LABELS = ("D_hko__leaf", "H_hko__leaf", "F_hko__leaf")
+
+
+def test_summary_tabulates_the_extra_role_after_D_H_F(summ, tmp_path):
+    root = _with_extra(summ, _write_suite(tmp_path, labels=COARSE_LABELS, task="sdr"))
+    table = summ.tabulate(summ.load_suite(root))
+    assert list(table["roles"]) == ["D", "H", "F", "D_minus_F"]
+    assert table["extra_roles"] == ["D_minus_F"] and table["missing"] == []
+    assert table["role_names"]["D_minus_F"] == "D−F (deceptive minus format)"
+    dmf = table["roles"]["D_minus_F"]
+    assert dmf["label"] == "D_minus_F_hko__leaf"
+    assert dmf["datasets"]["sandbagging"]["knockout"]["deceptive"] == 0.1
+    md = summ.render(root)
+    assert md.startswith("# EVAL 5 — format-control suite: D, H, F and D−F knockouts")
+    assert "D−F (deceptive minus format)" in md and "(D - F) - m" in md
+    assert _table_row(md, ["sandbagging", "D−F knockout"])[2:5] == ["0.100", "0.600", "0.300"]
+    assert _table_row(md, ["sandbagging", "D−F random (mean of 2)"])[2] == "0.700"
+    head = _table_row(md, ["dataset", "n", "full"])
+    assert head[3:7] == ["D KO", "H KO", "F KO", "D−F KO"]
+    assert head[7:11] == ["D Δ", "H Δ", "F Δ", "D−F Δ"]
+    h = _table_row(md, ["sandbagging", "10"])
+    assert h[2:7] == ["1.000", "0.200", "0.400", "0.600", "0.100"]
+    assert h[10] == "+0.600"                                  # D−F: random 0.7 - KO 0.1
+    assert len(_table_row(md, ["Empty generation scored honest"])) == 5
+    # the base roles' numbers do not move
+    base = summ.tabulate(summ.load_suite(_write_suite(tmp_path / "b", labels=COARSE_LABELS,
+                                                      task="sdr")))
+    for r in "DHF":
+        assert table["roles"][r]["datasets"] == base["roles"][r]["datasets"]
+
+
+def test_summary_json_carries_the_extra_role(summ, tmp_path):
+    root = _with_extra(summ, _write_suite(tmp_path, labels=COARSE_LABELS, task="sdr"))
+    summ.write(root)
+    data = json.load(open(os.path.join(root, "eval5_format.json")))
+    assert data["extra_roles"] == ["D_minus_F"]
+    assert data["roles"]["D_minus_F"]["datasets"]["sandbagging"]["knockout"]["deceptive"] == 0.1
+
+
+def test_a_planned_extra_without_a_cell_is_missing(summ, tmp_path):
+    root = _with_extra(summ, _write_suite(tmp_path, labels=COARSE_LABELS, task="sdr"), cell=False)
+    table = summ.tabulate(summ.load_suite(root))
+    assert table["missing"] == ["D_minus_F"]
+    md = summ.render(root)
+    assert "D−F: cell missing" in md
+    assert _table_row(md, ["sandbagging", "D−F knockout"])[2] == "missing"
+
+
+def test_an_unplanned_extra_cell_is_still_tabulated_but_never_missing(summ, tmp_path):
+    root = _with_extra(summ, _write_suite(tmp_path, labels=COARSE_LABELS, task="sdr"),
+                       planned=False)
+    table = summ.tabulate(summ.load_suite(root))
+    assert table["extra_roles"] == ["D_minus_F"] and table["missing"] == []
+
+
+def test_a_suite_without_extras_keeps_its_three_roles(summ, tmp_path):
+    root = _write_suite(tmp_path, labels=COARSE_LABELS, task="sdr")
+    table = summ.tabulate(summ.load_suite(root))
+    assert list(table["roles"]) == ["D", "H", "F"] and table["extra_roles"] == []
+    md = summ.render(root)
+    assert md.startswith("# EVAL 5 — format-control suite: D, H and F knockouts")
+    assert ("| dataset | n | full | D KO | H KO | F KO | D Δ | H Δ | F Δ | D pct | H pct | F pct |"
+            in md)
+    assert summ.tabulate(summ.load_suite(str(tmp_path / "empty")))["missing"] == ["D", "H", "F"]
+
+
+def test_ticket_05_loader_ignores_the_extra_cell(summ, tmp_path):
+    from evaluation import format_control_summary as fcs
+    root = _with_extra(summ, _write_suite(tmp_path, labels=COARSE_LABELS, task="sdr"))
+    rows = fcs.load_eval5([root])
+    assert set(rows) == {"D", "H", "F"}
+    assert rows["D"]["sandbagging"]["knockout_rate"] == 0.2

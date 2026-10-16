@@ -22,6 +22,52 @@ rows stay size-matched per circuit.
 Groups: `sm` = `sandbagging mask` (7 datasets), `lb` =
 `lb:instructed-deception lb:harm-pressure-knowledge-report lb:convincing-game`.
 
+## Extra composed circuits (`eval5_extra_circuits`)
+
+A family's `suites.json` entry may list extra composed circuits of D, H and F,
+`"eval5_extra_circuits": [[label, expr], ...]`. Each is one more cell in the
+**same** invocation as D, H and F (same screen, same judge cache, own
+size-matched random rows), bound after their exprs:
+
+- coarse: `--expr <label>_hko=(<expr>) - m` at leaf, filed as
+  `cells/<label>_hko__leaf/`;
+- fine (none configured, not launched): `--expr D=D --expr H=H --expr F=F
+  --expr <label>=<expr> --compose-granularity head`, filed as
+  `cells/<label>__head/`. The explicit D/H/F exprs are needed because any
+  `--expr` replaces the evaluator's default of every bound circuit on its own;
+  one granularity (head, the primary fine reading) keeps one cell per extra.
+
+A label is an identifier other than D, H, F and `m`, without the `_hko`,
+`__leaf` or `__head` endings; an expression names only D, H and F. The gate and
+every refusal are unchanged: they concern F. The record (`eval5_record.json`)
+carries `extra_circuits` and `cell_labels` in each event, and the cost block
+compares the dry-run's cell count with the configured one (a WARNING line if
+they differ). The summary gives each extra its own role after D, H, F (key =
+label without `__leaf|__head` and `_hko`, e.g. `D_minus_F`, shown as
+"D−F (deceptive minus format)"); ticket 05's `load_eval5` and its decision rule
+read D, H and F only and ignore it.
+
+**2026-10-16 request.** The researcher asked for EVAL 5 on D, H, F **and
+D−F** for `sdr_coarse`, so the coarse entry carries
+`"eval5_extra_circuits": [["D_minus_F", "D - F"]]`: four cells (`D_hko`,
+`H_hko`, `F_hko`, `D_minus_F_hko`) per group. FAR and SDR-fine keep three.
+D−F is 33 heads (4,224 fine units; D has 69, F 68, they share 36). The real
+dry-runs of 2026-10-16 (`dryrun_eval5/sdr_coarse_{sm,lb}.log`) passed with all
+screens `[cached]`, the gate passed, and both printed a submit line (not run):
+
+| group | cells | dry-run TOTAL (min) | judge calls | GPU hours | default `--time` |
+| --- | ---: | --- | ---: | --- | --- |
+| `sm` (3 cells, 2026-10-15) | 3 | 1460.5 - 1774.3 | 4,671 | 24.3 - 29.6 | 44:30:00 |
+| `sm` | 4 | 1946.3 - 2260.1 | 6,228 | 32.4 - 37.7 | **56:45:00** |
+| `lb` (3 cells, 2026-10-15) | 3 | 549.8 - 752.0 | 4,050 | 9.2 - 12.5 | 19:00:00 |
+| `lb` | 4 | 731.9 - 934.2 | 5,400 | 12.2 - 15.6 | 23:30:00 |
+
+**The 4-cell `sm` default `--time` (56:45:00) exceeds the gpuA40x4 MaxTime
+(2-00:00:00, `sinfo -p gpuA40x4 -o "%l"`).** The time rule is unchanged; pass
+an explicit `--time` of at most `48:00:00` for `sm`. The anchor (the one-cell
+coarse `sm` suite ran 3 h 51 min) puts four cells near 15 to 16 h, well
+inside that.
+
 ## Files
 
 | file | what |
@@ -157,7 +203,9 @@ FORMAT_CONTROL_EVAL5_GO=1 bash outputs/_launch_format_control/submit_eval5.sh fa
 ```
 
 `--time` defaults to the dry-run ceiling x 1.5 in quarter hours (ticket 04's
-rule): `44:30:00` for `sm`, `19:00:00` for `lb`. That is far above the anchored
+rule): `44:30:00` for `sm`, `19:00:00` for `lb` with three cells (`56:45:00`
+and `23:30:00` for the four-cell coarse suite, see "Extra composed circuits":
+the `sm` one is above the partition's 48 h MaxTime). That is far above the anchored
 runtime (the one-cell coarse suite the dry-run rates near 10 h ran in 3 h 51
 min), so a shorter `--time` (for example 18:00:00 for `sm`) backfills better;
 the default stays the safe one.
@@ -235,7 +283,9 @@ datasets each). For a reader that prefers one file, `eval5_format.json` is:
 {"schema": "eval5_format/1", "suite_dir": ..., "datasets": [names],
  "missing": [roles without a readable cell], "unreadable": {role: path},
  "duplicates": {role: [ignored paths]},
- "roles": {"D"|"H"|"F": {"label": cell label or null, "missing": bool, "source": path,
+ "extra_roles": [extra roles, e.g. "D_minus_F"], "extra_exprs": {role: expr},
+ "role_names": {role: display name},
+ "roles": {"D"|"H"|"F"|<extra role>: {"label": cell label or null, "missing": bool, "source": path,
             "failed_datasets": {name: error}, "judge": {...}, "resolved": {...},
             "datasets": {name: {"n": int, "screen": {...},
                                 "full" | "knockout" | "random_mean":
