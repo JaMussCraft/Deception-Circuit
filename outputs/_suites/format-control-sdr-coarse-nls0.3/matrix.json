@@ -1,5 +1,5 @@
 {
-  "created": "2026-10-15T06:59:42",
+  "created": "2026-10-16T15:45:02",
   "cells": [
     {
       "circuit": "D",
@@ -68,6 +68,93 @@
       "task_name": "sdr",
       "dataset_condition": "deceptive",
       "shard": "D_and_F_hko__sdr"
+    },
+    {
+      "circuit": "D_and_F_minus_H_hko__leaf",
+      "circuit_kind": "leaf",
+      "expr": "((D & F) - H) - m",
+      "task": "sdr",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/format-control-sdr-coarse-nls0.3/cells/D_and_F_minus_H_hko__leaf/sdr/interchange",
+      "counts": {
+        "attention_neurons": 512,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 4,
+        "attention_blocks": 3
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.591,
+          "wikitext_kl": 0.02060407901808503,
+          "honest_accuracy_drop": -0.152
+        }
+      },
+      "skipped": {},
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.422e-04, ppl ratio 0.999800)"
+      ],
+      "task_name": "sdr",
+      "dataset_condition": "deceptive",
+      "shard": "D_and_F_minus_H_hko__sdr"
+    },
+    {
+      "circuit": "D_and_H_and_F_hko__leaf",
+      "circuit_kind": "leaf",
+      "expr": "(D & H & F) - m",
+      "task": "sdr",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/format-control-sdr-coarse-nls0.3/cells/D_and_H_and_F_hko__leaf/sdr/interchange",
+      "counts": {
+        "attention_neurons": 4096,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 32,
+        "attention_blocks": 8
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.002,
+          "wikitext_kl": 0.11492902808822691,
+          "honest_accuracy_drop": -0.519
+        }
+      },
+      "skipped": {},
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.263e-04, ppl ratio 0.999744)"
+      ],
+      "task_name": "sdr",
+      "dataset_condition": "deceptive",
+      "shard": "xdeltas_a__sdr"
+    },
+    {
+      "circuit": "D_and_H_minus_F_hko__leaf",
+      "circuit_kind": "leaf",
+      "expr": "((D & H) - F) - m",
+      "task": "sdr",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/format-control-sdr-coarse-nls0.3/cells/D_and_H_minus_F_hko__leaf/sdr/interchange",
+      "counts": {
+        "attention_neurons": 1408,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 11,
+        "attention_blocks": 4
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.335,
+          "wikitext_kl": 0.029245802608784288,
+          "honest_accuracy_drop": -0.28600000000000003
+        }
+      },
+      "skipped": {},
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.639e-04, ppl ratio 1.000321)"
+      ],
+      "task_name": "sdr",
+      "dataset_condition": "deceptive",
+      "shard": "D_and_H_minus_F_hko__sdr"
     },
     {
       "circuit": "D_hko__leaf",
@@ -314,6 +401,64 @@
       "shard": "H__sdr"
     },
     {
+      "circuit": "H_and_F_hko__leaf",
+      "circuit_kind": "leaf",
+      "expr": "(H & F) - m",
+      "task": "sdr",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/format-control-sdr-coarse-nls0.3/cells/H_and_F_hko__leaf/sdr/interchange",
+      "counts": {
+        "attention_neurons": 5504,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 43,
+        "attention_blocks": 10
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.003,
+          "wikitext_kl": 0.21365951310144737,
+          "honest_accuracy_drop": -0.521
+        }
+      },
+      "skipped": {},
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.263e-04, ppl ratio 0.999744)"
+      ],
+      "task_name": "sdr",
+      "dataset_condition": "deceptive",
+      "shard": "xdeltas_a__sdr"
+    },
+    {
+      "circuit": "H_and_F_minus_D_hko__leaf",
+      "circuit_kind": "leaf",
+      "expr": "((H & F) - D) - m",
+      "task": "sdr",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/format-control-sdr-coarse-nls0.3/cells/H_and_F_minus_D_hko__leaf/sdr/interchange",
+      "counts": {
+        "attention_neurons": 1408,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 11,
+        "attention_blocks": 5
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.679,
+          "wikitext_kl": 0.04415854466788005,
+          "honest_accuracy_drop": -0.18199999999999997
+        }
+      },
+      "skipped": {},
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.639e-04, ppl ratio 1.000321)"
+      ],
+      "task_name": "sdr",
+      "dataset_condition": "deceptive",
+      "shard": "H_and_F_minus_D_hko__sdr"
+    },
+    {
       "circuit": "H_hko__leaf",
       "circuit_kind": "leaf",
       "expr": "(H) - m",
@@ -370,6 +515,35 @@
       "task_name": "sdr",
       "dataset_condition": "deceptive",
       "shard": "H_minus_D_minus_F_hko__sdr"
+    },
+    {
+      "circuit": "H_minus_F_hko__leaf",
+      "circuit_kind": "leaf",
+      "expr": "(H - F) - m",
+      "task": "sdr",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/format-control-sdr-coarse-nls0.3/cells/H_minus_F_hko__leaf/sdr/interchange",
+      "counts": {
+        "attention_neurons": 1664,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 13,
+        "attention_blocks": 4
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.307,
+          "wikitext_kl": 0.037061691749840975,
+          "honest_accuracy_drop": -0.29900000000000004
+        }
+      },
+      "skipped": {},
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.263e-04, ppl ratio 0.999744)"
+      ],
+      "task_name": "sdr",
+      "dataset_condition": "deceptive",
+      "shard": "xdeltas_a__sdr"
     },
     {
       "circuit": "D",

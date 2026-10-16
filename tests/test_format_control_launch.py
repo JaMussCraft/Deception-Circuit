@@ -292,7 +292,11 @@ def test_the_real_config_opts_only_the_coarse_suite_into_extra_deltas():
     rebuilds every suite, and merge --manifest expects exactly the planned cells."""
     with open(os.path.join(LAUNCH, "suites.json")) as f:
         raw = json.load(f)
-    assert raw["format-control-sdr-coarse-nls0.3"]["extra_deltas"] == EXTRA_PACKED
+    # As run on 2026-10-16: xdeltas_a stayed packed (H200-interactive, 18 min);
+    # the xdeltas_b rows were ungrouped into single-expr jobs after the packed
+    # job sat 90 min unstarted, so they fit the A40/A100 interactive caps.
+    as_run = [r if r[2] == "xdeltas_a" else r[:2] for r in EXTRA_PACKED]
+    assert raw["format-control-sdr-coarse-nls0.3"]["extra_deltas"] == as_run
     assert "extra_deltas" not in raw["format-control-far-nls0.3"]
     assert "extra_deltas" not in raw["format-control-sdr-nls0.3"]
 

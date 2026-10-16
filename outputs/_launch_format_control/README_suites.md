@@ -85,10 +85,12 @@ knockout cells with role `delta` on the D test set. Only
 optional third element is a job group: rows sharing it run as ONE job
 `<group>__<D dataset>` with one `--expr` per row and one ordinary delta cell
 per row, so merge, flip audit and summary see ordinary delta cells. The coarse
-suite packs them as `xdeltas_a__sdr` (H_and_F, H_minus_F, D_and_H_and_F) and
-`xdeltas_b__sdr` (D_and_H_minus_F, D_and_F_minus_H, H_and_F_minus_D), because
-the H200 interactive partition allows one job per user at a time (scope
-refinement 2026-10-16). The evaluator writes each cell's `knockout.json` and
+suite packs `xdeltas_a__sdr` (H_and_F, H_minus_F, D_and_H_and_F), which ran
+on the H200 interactive partition in 18 min (one job per user at a time
+there); the other three rows (D_and_H_minus_F, D_and_F_minus_H,
+H_and_F_minus_D) were planned as `xdeltas_b__sdr` but ungrouped into
+single-expr jobs after that packed job sat 90 min unstarted, so each fits the
+one-hour cap of the A40/A100 interactive partitions (2026-10-16). The evaluator writes each cell's `knockout.json` and
 `summary.json` as the cell finishes, but `matrix.json` only at the end of the
 job, and the merge takes a shard only once `matrix.json` exists. They are not
 in the global `DELTAS`, so the FAR and SDR-fine suites keep exactly their jobs

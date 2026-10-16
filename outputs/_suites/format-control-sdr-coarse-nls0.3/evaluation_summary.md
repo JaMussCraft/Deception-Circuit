@@ -94,6 +94,12 @@ Full / knockout accuracy on the cell's labels, then the honest-answer drop. On D
 | D_minus_H_minus_F | `D - H - F` | head (composed at leaf) | 22 | 2816 | 0.782 | 0.218 | 0.733 / 0.920 / 0.999 | no | content-driven flip; not separable |
 | H_minus_D_minus_F | `H - D - F` | head (composed at leaf) | 2 | 256 | 1.000 | 0.000 | 0.986 / 1.000 / 1.000 | no | no flip; not separable |
 | F_minus_D_minus_H | `F - D - H` | head (composed at leaf) | 21 | 2688 | 0.965 | 0.035 | 0.530 / 0.863 / 0.983 | no | content-driven flip; not separable |
+| H_and_F | `H & F` | head (composed at leaf) | 43 | 5504 | 0.003 | 0.997 | 0.315 / 0.671 / 0.910 | yes | content-driven flip; separable |
+| H_minus_F | `H - F` | head (composed at leaf) | 13 | 1664 | 0.307 | 0.693 | 0.944 / 0.990 / 1.000 | yes | content-driven flip; separable |
+| D_and_H_and_F | `D & H & F` | head (composed at leaf) | 32 | 4096 | 0.002 | 0.998 | 0.384 / 0.679 / 0.942 | yes | content-driven flip; separable |
+| D_and_H_minus_F | `(D & H) - F` | head (composed at leaf) | 11 | 1408 | 0.335 | 0.665 | 0.939 / 0.996 / 1.000 | yes | content-driven flip; separable |
+| D_and_F_minus_H | `(D & F) - H` | head (composed at leaf) | 4 | 512 | 0.591 | 0.409 | 0.790 / 0.998 / 1.000 | yes | content-driven flip; separable |
+| H_and_F_minus_D | `(H & F) - D` | head (composed at leaf) | 11 | 1408 | 0.679 | 0.321 | 0.724 / 0.997 / 1.000 | yes | content-driven flip; separable |
 
 ## Caveats
 
