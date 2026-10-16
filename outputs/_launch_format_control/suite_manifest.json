@@ -1,5 +1,5 @@
 {
- "created": "2026-10-16T12:26:26",
+ "created": "2026-10-16T14:40:14",
  "config": "outputs/_launch_format_control/suites.json",
  "suites": {
   "format-control-far-nls0.3": {
@@ -2735,7 +2735,7 @@
      "roles": [
       "delta"
      ],
-     "job": "xdeltas_b__sdr",
+     "job": "D_and_H_minus_F_hko__sdr",
      "path": "cells/D_and_H_minus_F_hko__leaf/sdr/interchange"
     },
     {
@@ -2745,7 +2745,7 @@
      "roles": [
       "delta"
      ],
-     "job": "xdeltas_b__sdr",
+     "job": "D_and_F_minus_H_hko__sdr",
      "path": "cells/D_and_F_minus_H_hko__leaf/sdr/interchange"
     },
     {
@@ -2755,7 +2755,7 @@
      "roles": [
       "delta"
      ],
-     "job": "xdeltas_b__sdr",
+     "job": "H_and_F_minus_D_hko__sdr",
      "path": "cells/H_and_F_minus_D_hko__leaf/sdr/interchange"
     }
    ],
@@ -4320,15 +4320,15 @@
       "estimate_min": 118.7
      },
      "slurm": {
-      "job_id": "22945587",
-      "account": "bgrb-delta-gpu",
+      "job_id": "22945674",
+      "account": "bimc-delta-gpu",
       "partition": "gpuH200x8-interactive",
       "time": "01:00:00",
-      "submitted": "2026-10-16T12:26:23"
+      "submitted": "2026-10-16T12:41:28"
      }
     },
     {
-     "job": "xdeltas_b__sdr",
+     "job": "D_and_H_minus_F_hko__sdr",
      "cells": [
       {
        "circuit": "D_and_H_minus_F_hko__leaf",
@@ -4337,7 +4337,58 @@
        "roles": [
         "delta"
        ]
-      },
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+      "--circuit",
+      "m=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb",
+      "--expr",
+      "D_and_H_minus_F_hko=((D & H) - F) - m",
+      "--compose-granularity",
+      "leaf",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/D_and_H_minus_F_hko__sdr"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/D_and_H_minus_F_hko__sdr.log",
+      "passed": true,
+      "estimate_min": 41.8
+     },
+     "slurm": {
+      "job_id": "22946213",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4-interactive",
+      "time": "01:00:00",
+      "submitted": "2026-10-16T14:40:06"
+     }
+    },
+    {
+     "job": "D_and_F_minus_H_hko__sdr",
+     "cells": [
       {
        "circuit": "D_and_F_minus_H_hko__leaf",
        "dataset": "sdr",
@@ -4345,7 +4396,58 @@
        "roles": [
         "delta"
        ]
-      },
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+      "--circuit",
+      "m=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb",
+      "--expr",
+      "D_and_F_minus_H_hko=((D & F) - H) - m",
+      "--compose-granularity",
+      "leaf",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/D_and_F_minus_H_hko__sdr"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/D_and_F_minus_H_hko__sdr.log",
+      "passed": true,
+      "estimate_min": 41.8
+     },
+     "slurm": {
+      "job_id": "22946214",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA100x4-interactive",
+      "time": "01:00:00",
+      "submitted": "2026-10-16T14:40:11"
+     }
+    },
+    {
+     "job": "H_and_F_minus_D_hko__sdr",
+     "cells": [
       {
        "circuit": "H_and_F_minus_D_hko__leaf",
        "dataset": "sdr",
@@ -4371,10 +4473,6 @@
       "--circuit",
       "m=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb",
       "--expr",
-      "D_and_H_minus_F_hko=((D & H) - F) - m",
-      "--expr",
-      "D_and_F_minus_H_hko=((D & F) - H) - m",
-      "--expr",
       "H_and_F_minus_D_hko=((H & F) - D) - m",
       "--compose-granularity",
       "leaf",
@@ -4391,15 +4489,19 @@
       "--suite-name",
       "format-control-sdr-coarse-nls0.3",
       "--output-dir",
-      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/xdeltas_b__sdr"
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/H_and_F_minus_D_hko__sdr"
      ],
      "dryrun": {
-      "log": "dryrun/format-control-sdr-coarse-nls0.3/xdeltas_b__sdr.log",
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/H_and_F_minus_D_hko__sdr.log",
       "passed": true,
-      "estimate_min": 118.7
+      "estimate_min": 41.8
      },
      "slurm": {
-      "job_id": null
+      "job_id": "22946215",
+      "account": "beto-delta-gpu",
+      "partition": "gpuH200x8-interactive",
+      "time": "01:00:00",
+      "submitted": "2026-10-16T14:40:16"
      }
     }
    ]

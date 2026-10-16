@@ -1,4 +1,4 @@
-# 2026-10-16T12:21:30  python evaluate_circuit.py --circuit D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742 --circuit H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743 --circuit F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850 --circuit m=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb --expr 'D_and_H_minus_F_hko=((D & H) - F) - m' --expr 'D_and_F_minus_H_hko=((D & F) - H) - m' --expr 'H_and_F_minus_D_hko=((H & F) - D) - m' --compose-granularity leaf --task-from /projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742 --evals knockout --ablation interchange --n-random 20 --knockout-null-count 20 --suite-name format-control-sdr-coarse-nls0.3 --output-dir outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/xdeltas_b__sdr --dry-run
+# 2026-10-16T14:38:58  python evaluate_circuit.py --circuit D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742 --circuit H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743 --circuit F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850 --circuit m=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb --expr 'D_and_F_minus_H_hko=((D & F) - H) - m' --compose-granularity leaf --task-from /projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742 --evals knockout --ablation interchange --n-random 20 --knockout-null-count 20 --suite-name format-control-sdr-coarse-nls0.3 --output-dir outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/D_and_F_minus_H_hko__sdr --dry-run
 
 ====================================================================================
   DRY RUN — no model loaded, no CUDA touched
@@ -6,7 +6,7 @@
   model                        llama-8b-instruct
   ablation                     interchange
   evaluations                  knockout
-  layout                       suite (outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/xdeltas_b__sdr)
+  layout                       suite (outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/D_and_F_minus_H_hko__sdr)
 
 ====================================================================================
   ABLATION SCHEME: interchange
@@ -20,9 +20,7 @@
   CIRCUITS
 ====================================================================================
 
-  D_and_H_minus_F_hko__leaf          leaf         1,408 fine units   condition=D:deceptive,H:honest,F:nopressure,m:nopressure   ((D & H) - F) - m
   D_and_F_minus_H_hko__leaf          leaf           512 fine units   condition=D:deceptive,F:nopressure,H:honest,m:nopressure   ((D & F) - H) - m
-  H_and_F_minus_D_hko__leaf          leaf         1,408 fine units   condition=H:honest,F:nopressure,D:deceptive,m:nopressure   ((H & F) - D) - m
 
 ====================================================================================
   TASKS
@@ -31,12 +29,10 @@
   sdr                  task=sdr      condition=deceptive  n=1000  data=./data/datasets  /projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742
 
 ====================================================================================
-  CELL GRID (3 circuits x 1 tasks)
+  CELL GRID (1 circuits x 1 tasks)
 ====================================================================================
 
-  outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/xdeltas_b__sdr/cells/D_and_H_minus_F_hko__leaf/sdr/interchange
-  outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/xdeltas_b__sdr/cells/D_and_F_minus_H_hko__leaf/sdr/interchange
-  outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/xdeltas_b__sdr/cells/H_and_F_minus_D_hko__leaf/sdr/interchange
+  outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/D_and_F_minus_H_hko__sdr/cells/D_and_F_minus_H_hko__leaf/sdr/interchange
 
 ====================================================================================
   DISCOVERED CIRCUIT
@@ -44,13 +40,13 @@
 
   Granularity                Active        Total    Kept %
   --------------------------------------------------------
-  attention_blocks                4           32   12.500%
-  attention_heads                11        1,024    1.074%
-  attention_neurons           1,408      131,072    1.074%
+  attention_blocks                3           32    9.375%
+  attention_heads                 4        1,024    0.391%
+  attention_neurons             512      131,072    0.391%
   mlp_hidden                      0      458,752    0.000%
   mlp_output                      0      131,072    0.000%
   --------------------------------------------------------
-  TOTAL                       1,423      721,952    0.197%
+  TOTAL                         519      721,952    0.072%
 
   Geometry: 32 layers x 32 heads x 128 dims, hidden 4096, intermediate 14336
 
@@ -60,20 +56,19 @@
 
   Layer        attention_heads   attention_neurons          mlp_hidden          mlp_output
   ----------------------------------------------------------------------------------------
-  7                          4                 512                   0                   0
-  8                          1                 128                   0                   0
-  11                         4                 512                   0                   0
-  24                         2                 256                   0                   0
+  14                         1                 128                   0                   0
+  15                         2                 256                   0                   0
+  17                         1                 128                   0                   0
   ----------------------------------------------------------------------------------------
-  TOTAL                     11               1,408                   0                   0
+  TOTAL                      4                 512                   0                   0
 
 ====================================================================================
   KNOCKOUT (finest)
 ====================================================================================
 
   complement verified: knockout ∧ circuit = 0, knockout ∪ circuit = 1
-  fine units ablated: 1,408
-    attention_neurons       129,664 live (98.93%)
+  fine units ablated: 512
+    attention_neurons       130,560 live (99.61%)
     mlp_hidden              458,752 live (100.00%)
     mlp_output              131,072 live (100.00%)
 
@@ -90,25 +85,24 @@
 
   Layer        attention_heads   attention_neurons          mlp_hidden          mlp_output
   ----------------------------------------------------------------------------------------
-  7                          4                 512                   0                   0
-  8                          1                 128                   0                   0
-  11                         4                 512                   0                   0
-  24                         2                 256                   0                   0
+  14                         1                 128                   0                   0
+  15                         2                 256                   0                   0
+  17                         1                 128                   0                   0
   ----------------------------------------------------------------------------------------
-  TOTAL                     11               1,408                   0                   0
+  TOTAL                      4                 512                   0                   0
 
 ====================================================================================
   ESTIMATED RUNTIME (1x A100, very rough)
 ====================================================================================
 
   model load                                                    3.3 min
-  eval 2 (task knockout)                                        5.5 min
-  eval 2 (wikitext, 22 configs)                                14.3 min
-  eval 2 (task null, 20 knockouts)                             55.0 min
-  eval 2 (prompt variants, 2 x 3 configs, live reference)      33.0 min
-  eval 2 (3 generation examples)                                7.6 min
+  eval 2 (task knockout)                                        1.8 min
+  eval 2 (wikitext, 22 configs)                                 4.8 min
+  eval 2 (task null, 20 knockouts)                             18.3 min
+  eval 2 (prompt variants, 2 x 3 configs, live reference)      11.0 min
+  eval 2 (3 generation examples)                                2.5 min
   ------------------------------------------------------------------
-  TOTAL                                                       118.7 min (3 cell(s))
+  TOTAL                                                        41.8 min (1 cell(s))
 
   Nothing was written. Drop --dry-run to run it.
   TEST SET  task=sdr  condition=deceptive  n_test=1000  dir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/data/datasets/sdr
