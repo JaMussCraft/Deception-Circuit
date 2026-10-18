@@ -1,0 +1,176 @@
+# 2026-10-13T21:39:19  python evaluate_circuit.py --circuit D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742 --circuit H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743 --circuit F=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743 --circuit m=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/_allmlp_nomb --expr D_hko=D - m --expr H_hko=H - m --expr F_hko=F - m --compose-granularity leaf --task-from /projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742 --evals benchmarks --ablation interchange --benchmarks lb:instructed-deception lb:harm-pressure-knowledge-report lb:convincing-game --benchmark-n-per-dataset 50 --benchmark-n-random 6 --benchmark-screen-budget 600 --benchmark-screen-cache /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_eval5_format_cache/screens --benchmark-repo-root /projects/beto/swong2/Alignment --output-dir outputs/eval5_format_sdr_coarse_lb --dry-run
+
+====================================================================================
+  DRY RUN — no model loaded, no CUDA touched
+====================================================================================
+  model                        llama-8b-instruct
+  ablation                     interchange
+  evaluations                  benchmarks
+  layout                       suite (outputs/eval5_format_sdr_coarse_lb)
+
+====================================================================================
+  ABLATION SCHEME: interchange
+====================================================================================
+
+  Ablated nodes take their value from the corrupted stream — the 
+  same reference the gates were trained against. This is the only 
+  scheme that can reproduce the in-run numbers.
+
+====================================================================================
+  CIRCUITS
+====================================================================================
+
+  D_hko__leaf                        leaf         8,832 fine units   condition=D:deceptive,m:deceptive   D - m
+  H_hko__leaf                        leaf         7,168 fine units   condition=H:honest,m:deceptive   H - m
+  F_hko__leaf                        leaf         7,168 fine units   condition=F:honest,m:deceptive   F - m
+
+====================================================================================
+  TASKS
+====================================================================================
+
+  sdr                  task=sdr      condition=deceptive  n=1000  data=./data/datasets  /projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742
+
+====================================================================================
+  CELL GRID (3 circuits x 1 tasks)
+====================================================================================
+
+  outputs/eval5_format_sdr_coarse_lb/cells/D_hko__leaf/sdr/interchange
+  outputs/eval5_format_sdr_coarse_lb/cells/H_hko__leaf/sdr/interchange
+  outputs/eval5_format_sdr_coarse_lb/cells/F_hko__leaf/sdr/interchange
+
+====================================================================================
+  DISCOVERED CIRCUIT
+====================================================================================
+
+  Granularity                Active        Total    Kept %
+  --------------------------------------------------------
+  attention_blocks               12           32   37.500%
+  attention_heads                69        1,024    6.738%
+  attention_neurons           8,832      131,072    6.738%
+  mlp_hidden                      0      458,752    0.000%
+  mlp_output                      0      131,072    0.000%
+  --------------------------------------------------------
+  TOTAL                       8,913      721,952    1.235%
+
+  Geometry: 32 layers x 32 heads x 128 dims, hidden 4096, intermediate 14336
+
+------------------------------------------------------------------------------------
+  PER-LAYER COUNTS
+------------------------------------------------------------------------------------
+
+  Layer        attention_heads   attention_neurons          mlp_hidden          mlp_output
+  ----------------------------------------------------------------------------------------
+  5                          6                 768                   0                   0
+  7                          7                 896                   0                   0
+  8                          8               1,024                   0                   0
+  9                          6                 768                   0                   0
+  10                         4                 512                   0                   0
+  11                         5                 640                   0                   0
+  12                         6                 768                   0                   0
+  13                         7                 896                   0                   0
+  14                         8               1,024                   0                   0
+  15                         3                 384                   0                   0
+  17                         4                 512                   0                   0
+  24                         5                 640                   0                   0
+  ----------------------------------------------------------------------------------------
+  TOTAL                     69               8,832                   0                   0
+
+====================================================================================
+  KNOCKOUT (finest)
+====================================================================================
+
+  complement verified: knockout ∧ circuit = 0, knockout ∪ circuit = 1
+  fine units ablated: 8,832
+    attention_neurons       122,240 live (93.26%)
+    mlp_hidden              458,752 live (100.00%)
+    mlp_output              131,072 live (100.00%)
+
+====================================================================================
+  RANDOM CIRCUITS (50 sampled, seed 0, alloc uniform)
+====================================================================================
+
+  hierarchy validated on every sample (no empty drawn head, no orphaned neuron)
+  all 50 samples size-matched to the discovered circuit at every granularity and layer
+
+------------------------------------------------------------------------------------
+  PER-LAYER COUNTS — random circuit 0 (must match above)
+------------------------------------------------------------------------------------
+
+  Layer        attention_heads   attention_neurons          mlp_hidden          mlp_output
+  ----------------------------------------------------------------------------------------
+  5                          6                 768                   0                   0
+  7                          7                 896                   0                   0
+  8                          8               1,024                   0                   0
+  9                          6                 768                   0                   0
+  10                         4                 512                   0                   0
+  11                         5                 640                   0                   0
+  12                         6                 768                   0                   0
+  13                         7                 896                   0                   0
+  14                         8               1,024                   0                   0
+  15                         3                 384                   0                   0
+  17                         4                 512                   0                   0
+  24                         5                 640                   0                   0
+  ----------------------------------------------------------------------------------------
+  TOTAL                     69               8,832                   0                   0
+
+====================================================================================
+  DECEPTION BENCHMARKS (EVAL 5) — 3 dataset(s)
+====================================================================================
+
+  dataset                            condition tokens     pool  judge
+  ----------------------------------------------------------------------------------------------------
+  lb:instructed-deception            prompt       512     3860  openrouter/anthropic/claude-sonnet-4.5
+  lb:harm-pressure-knowledge-report  outcome      512     5245  openrouter/anthropic/claude-haiku-4.5
+  lb:convincing-game                 outcome      512      191  openrouter/anthropic/claude-sonnet-4.5
+
+  OPENROUTER_API_KEY     set      needed by lb:instructed-deception, lb:harm-pressure-knowledge-report, lb:convincing-game
+
+  Target 50 items per dataset, drawn by screening the candidate pool
+  in load order until that many come back judged deceptive under the FULL model. The pool
+  column is therefore an upper bound: the exact post-screen count and the
+  judge-call total are only known after the generation pass.
+
+  Corrupt reference: --benchmark-ref-pool honest. Random null: 6 circuit(s).
+
+  Screen cache: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_eval5_format_cache/screens
+    lb:instructed-deception            nothing cached for this configuration
+    lb:harm-pressure-knowledge-report  nothing cached for this configuration
+    lb:convincing-game                 nothing cached for this configuration
+  The GPU is part of the key, because `full` reuses the screen's own tokens:
+  a screen made on another device would put 'which GPU' inside the delta this
+  evaluation measures. Switching hardware is a miss, and the screen is repaid.
+
+====================================================================================
+  ESTIMATED RUNTIME (1x A100, very rough)
+====================================================================================
+
+  model load                                                                     3.3 min
+  eval 5 lb:instructed-deception: screen (50-600 items) [cached]                 0.0 - 78.8 min
+  eval 5 lb:instructed-deception: reference pool                                 0.0 - 6.6 min
+  eval 5 lb:instructed-deception: 9 ablated configs                            177.2 min
+  eval 5 lb:instructed-deception: coherence x 10                                 5.0 min
+  eval 5 lb:harm-pressure-knowledge-report: screen (50-600 items) [cached]       0.0 - 78.8 min
+  eval 5 lb:harm-pressure-knowledge-report: reference pool                       0.0 - 6.6 min
+  eval 5 lb:harm-pressure-knowledge-report: 9 ablated configs                  177.2 min
+  eval 5 lb:harm-pressure-knowledge-report: coherence x 10                       5.0 min
+  eval 5 lb:convincing-game: screen (50-191 items) [cached]                      0.0 - 25.1 min
+  eval 5 lb:convincing-game: reference pool                                      0.0 - 6.6 min
+  eval 5 lb:convincing-game: 9 ablated configs                                 177.2 min
+  eval 5 lb:convincing-game: coherence x 10                                      5.0 min
+  -----------------------------------------------------------------------------------
+  TOTAL                                                                        549.8 - 752.0 min (3 cell(s))
+
+  The range is the screen: it stops as soon as it has --benchmark-n-per-dataset
+  items the full model is deceptive on, so the floor assumes every candidate
+  is deceptive and the ceiling assumes it walks the whole pool. Which end you
+  land on IS the full model's deception rate, which is what this evaluation
+  measures — so size the job against the ceiling.
+
+  Nothing was written. Drop --dry-run to run it.
+  cost: 3 cell(s); judge calls (ablated configs, upper bound, items from known post-screen counts): 4,050
+        judge calls for uncached screens (at most): 0  (cached screens: 3 of 3)
+        GPU hours (dry-run estimate, 1 GPU, very rough): 9.2 - 12.5
+          lb:instructed-deception             1,350
+          lb:harm-pressure-knowledge-report   1,350
+          lb:convincing-game                  1,350
+        (item counts from /projects/beto/swong2/Alignment/Deception-Circuit/outputs/eval5_sdr_coarse_nls0.3_nomb_lb)

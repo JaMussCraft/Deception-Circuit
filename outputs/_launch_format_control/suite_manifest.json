@@ -1,0 +1,4586 @@
+{
+ "created": "2026-10-16T15:44:43",
+ "config": "outputs/_launch_format_control/suites.json",
+ "suites": {
+  "format-control-far-nls0.3": {
+   "family": "fine",
+   "task": "far",
+   "runs": {
+    "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+    "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_honest_noedge_260819-084020",
+    "F": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.3_nopressure_noedge_261013-203424"
+   },
+   "allmlp": null,
+   "cells": [
+    {
+     "circuit": "D",
+     "dataset": "far",
+     "condition": "deceptive",
+     "roles": [
+      "faithfulness",
+      "knockout"
+     ],
+     "job": "D__far",
+     "path": "cells/D/far/interchange"
+    },
+    {
+     "circuit": "D",
+     "dataset": "far_honest",
+     "condition": "honest",
+     "roles": [
+      "faithfulness",
+      "knockout"
+     ],
+     "job": "D__far_honest",
+     "path": "cells/D/far_honest/interchange"
+    },
+    {
+     "circuit": "D",
+     "dataset": "far_nopressure",
+     "condition": "nopressure",
+     "roles": [
+      "faithfulness",
+      "knockout"
+     ],
+     "job": "D__far_nopressure",
+     "path": "cells/D/far_nopressure/interchange"
+    },
+    {
+     "circuit": "H",
+     "dataset": "far",
+     "condition": "deceptive",
+     "roles": [
+      "faithfulness",
+      "knockout"
+     ],
+     "job": "H__far",
+     "path": "cells/H/far/interchange"
+    },
+    {
+     "circuit": "H",
+     "dataset": "far_honest",
+     "condition": "honest",
+     "roles": [
+      "faithfulness",
+      "knockout"
+     ],
+     "job": "H__far_honest",
+     "path": "cells/H/far_honest/interchange"
+    },
+    {
+     "circuit": "H",
+     "dataset": "far_nopressure",
+     "condition": "nopressure",
+     "roles": [
+      "faithfulness",
+      "knockout"
+     ],
+     "job": "H__far_nopressure",
+     "path": "cells/H/far_nopressure/interchange"
+    },
+    {
+     "circuit": "F",
+     "dataset": "far",
+     "condition": "deceptive",
+     "roles": [
+      "faithfulness",
+      "knockout"
+     ],
+     "job": "F__far",
+     "path": "cells/F/far/interchange"
+    },
+    {
+     "circuit": "F",
+     "dataset": "far_honest",
+     "condition": "honest",
+     "roles": [
+      "faithfulness",
+      "knockout"
+     ],
+     "job": "F__far_honest",
+     "path": "cells/F/far_honest/interchange"
+    },
+    {
+     "circuit": "F",
+     "dataset": "far_nopressure",
+     "condition": "nopressure",
+     "roles": [
+      "faithfulness",
+      "knockout"
+     ],
+     "job": "F__far_nopressure",
+     "path": "cells/F/far_nopressure/interchange"
+    },
+    {
+     "circuit": "D_minus_F__leaf",
+     "dataset": "far",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "D_minus_F__far",
+     "path": "cells/D_minus_F__leaf/far/interchange"
+    },
+    {
+     "circuit": "D_minus_F__head",
+     "dataset": "far",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "D_minus_F__far",
+     "path": "cells/D_minus_F__head/far/interchange"
+    },
+    {
+     "circuit": "D_and_F__leaf",
+     "dataset": "far",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "D_and_F__far",
+     "path": "cells/D_and_F__leaf/far/interchange"
+    },
+    {
+     "circuit": "D_and_F__head",
+     "dataset": "far",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "D_and_F__far",
+     "path": "cells/D_and_F__head/far/interchange"
+    },
+    {
+     "circuit": "F_minus_D__leaf",
+     "dataset": "far",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "F_minus_D__far",
+     "path": "cells/F_minus_D__leaf/far/interchange"
+    },
+    {
+     "circuit": "F_minus_D__head",
+     "dataset": "far",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "F_minus_D__far",
+     "path": "cells/F_minus_D__head/far/interchange"
+    },
+    {
+     "circuit": "D_minus_H_minus_F__leaf",
+     "dataset": "far",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "D_minus_H_minus_F__far",
+     "path": "cells/D_minus_H_minus_F__leaf/far/interchange"
+    },
+    {
+     "circuit": "D_minus_H_minus_F__head",
+     "dataset": "far",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "D_minus_H_minus_F__far",
+     "path": "cells/D_minus_H_minus_F__head/far/interchange"
+    },
+    {
+     "circuit": "H_minus_D_minus_F__leaf",
+     "dataset": "far",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "H_minus_D_minus_F__far",
+     "path": "cells/H_minus_D_minus_F__leaf/far/interchange"
+    },
+    {
+     "circuit": "H_minus_D_minus_F__head",
+     "dataset": "far",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "H_minus_D_minus_F__far",
+     "path": "cells/H_minus_D_minus_F__head/far/interchange"
+    },
+    {
+     "circuit": "F_minus_D_minus_H__leaf",
+     "dataset": "far",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "F_minus_D_minus_H__far",
+     "path": "cells/F_minus_D_minus_H__leaf/far/interchange"
+    },
+    {
+     "circuit": "F_minus_D_minus_H__head",
+     "dataset": "far",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "F_minus_D_minus_H__far",
+     "path": "cells/F_minus_D_minus_H__head/far/interchange"
+    }
+   ],
+   "jobs": [
+    {
+     "job": "D__far",
+     "cells": [
+      {
+       "circuit": "D",
+       "dataset": "far",
+       "condition": "deceptive",
+       "roles": [
+        "faithfulness",
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--evals",
+      "sanity",
+      "knockout",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-far-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-far-nls0.3/_shards/D__far"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-far-nls0.3/D__far.log",
+      "passed": true,
+      "estimate_min": 81.2
+     },
+     "slurm": {
+      "job_id": "22906787",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T18:04:05",
+      "time_limit_actual": "01:30:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub031"
+      }
+     }
+    },
+    {
+     "job": "D__far_honest",
+     "cells": [
+      {
+       "circuit": "D",
+       "dataset": "far_honest",
+       "condition": "honest",
+       "roles": [
+        "faithfulness",
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "H",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_honest_noedge_260819-084020",
+      "--evals",
+      "sanity",
+      "knockout",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-far-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-far-nls0.3/_shards/D__far_honest"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-far-nls0.3/D__far_honest.log",
+      "passed": true,
+      "estimate_min": 76.6
+     },
+     "slurm": {
+      "job_id": "22906788",
+      "account": "bgrb-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T18:04:07",
+      "time_limit_actual": "01:30:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub092"
+      }
+     }
+    },
+    {
+     "job": "D__far_nopressure",
+     "cells": [
+      {
+       "circuit": "D",
+       "dataset": "far_nopressure",
+       "condition": "nopressure",
+       "roles": [
+        "faithfulness",
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "F",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.3_nopressure_noedge_261013-203424",
+      "--evals",
+      "sanity",
+      "knockout",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-far-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-far-nls0.3/_shards/D__far_nopressure"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-far-nls0.3/D__far_nopressure.log",
+      "passed": true,
+      "estimate_min": 76.6
+     },
+     "slurm": {
+      "job_id": "22906789",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T18:04:07",
+      "time_limit_actual": "01:30:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub030"
+      }
+     }
+    },
+    {
+     "job": "H__far",
+     "cells": [
+      {
+       "circuit": "H",
+       "dataset": "far",
+       "condition": "deceptive",
+       "roles": [
+        "faithfulness",
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_honest_noedge_260819-084020",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--evals",
+      "sanity",
+      "knockout",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-far-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-far-nls0.3/_shards/H__far"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-far-nls0.3/H__far.log",
+      "passed": true,
+      "estimate_min": 76.6
+     },
+     "slurm": {
+      "job_id": "22906790",
+      "account": "bgrb-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T18:04:07",
+      "time_limit_actual": "01:30:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub079"
+      }
+     }
+    },
+    {
+     "job": "H__far_honest",
+     "cells": [
+      {
+       "circuit": "H",
+       "dataset": "far_honest",
+       "condition": "honest",
+       "roles": [
+        "faithfulness",
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "H",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_honest_noedge_260819-084020",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_honest_noedge_260819-084020",
+      "--evals",
+      "sanity",
+      "knockout",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-far-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-far-nls0.3/_shards/H__far_honest"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-far-nls0.3/H__far_honest.log",
+      "passed": true,
+      "estimate_min": 81.2
+     },
+     "slurm": {
+      "job_id": "22906791",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T18:04:10",
+      "time_limit_actual": "01:30:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub067"
+      }
+     }
+    },
+    {
+     "job": "H__far_nopressure",
+     "cells": [
+      {
+       "circuit": "H",
+       "dataset": "far_nopressure",
+       "condition": "nopressure",
+       "roles": [
+        "faithfulness",
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "F",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_honest_noedge_260819-084020",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.3_nopressure_noedge_261013-203424",
+      "--evals",
+      "sanity",
+      "knockout",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-far-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-far-nls0.3/_shards/H__far_nopressure"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-far-nls0.3/H__far_nopressure.log",
+      "passed": true,
+      "estimate_min": 76.6
+     },
+     "slurm": {
+      "job_id": "22906792",
+      "account": "bgrb-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T18:04:10",
+      "time_limit_actual": "01:30:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub030"
+      }
+     }
+    },
+    {
+     "job": "F__far",
+     "cells": [
+      {
+       "circuit": "F",
+       "dataset": "far",
+       "condition": "deceptive",
+       "roles": [
+        "faithfulness",
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.3_nopressure_noedge_261013-203424",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--evals",
+      "sanity",
+      "knockout",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-far-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-far-nls0.3/_shards/F__far"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-far-nls0.3/F__far.log",
+      "passed": true,
+      "estimate_min": 76.6
+     },
+     "slurm": {
+      "job_id": "22906793",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T18:04:10",
+      "time_limit_actual": "01:30:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub056"
+      }
+     }
+    },
+    {
+     "job": "F__far_honest",
+     "cells": [
+      {
+       "circuit": "F",
+       "dataset": "far_honest",
+       "condition": "honest",
+       "roles": [
+        "faithfulness",
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "H",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.3_nopressure_noedge_261013-203424",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_honest_noedge_260819-084020",
+      "--evals",
+      "sanity",
+      "knockout",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-far-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-far-nls0.3/_shards/F__far_honest"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-far-nls0.3/F__far_honest.log",
+      "passed": true,
+      "estimate_min": 76.6
+     },
+     "slurm": {
+      "job_id": "22906794",
+      "account": "bgrb-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T18:04:10",
+      "time_limit_actual": "01:30:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub085"
+      }
+     }
+    },
+    {
+     "job": "F__far_nopressure",
+     "cells": [
+      {
+       "circuit": "F",
+       "dataset": "far_nopressure",
+       "condition": "nopressure",
+       "roles": [
+        "faithfulness",
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "F",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.3_nopressure_noedge_261013-203424",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.3_nopressure_noedge_261013-203424",
+      "--evals",
+      "sanity",
+      "knockout",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-far-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-far-nls0.3/_shards/F__far_nopressure"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-far-nls0.3/F__far_nopressure.log",
+      "passed": true,
+      "estimate_min": 81.2
+     },
+     "slurm": {
+      "job_id": "22906795",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T18:04:12",
+      "time_limit_actual": "01:30:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub074"
+      }
+     }
+    },
+    {
+     "job": "D_minus_F__far",
+     "cells": [
+      {
+       "circuit": "D_minus_F__leaf",
+       "dataset": "far",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      },
+      {
+       "circuit": "D_minus_F__head",
+       "dataset": "far",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "both",
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.3_nopressure_noedge_261013-203424",
+      "--expr",
+      "D_minus_F=D - F",
+      "--compose-granularity",
+      "both",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-far-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-far-nls0.3/_shards/D_minus_F__far"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-far-nls0.3/D_minus_F__far.log",
+      "passed": true,
+      "estimate_min": 80.2
+     },
+     "slurm": {
+      "job_id": "22906796",
+      "account": "bgrb-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T18:04:12",
+      "time_limit_actual": "01:30:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub064"
+      }
+     }
+    },
+    {
+     "job": "D_and_F__far",
+     "cells": [
+      {
+       "circuit": "D_and_F__leaf",
+       "dataset": "far",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      },
+      {
+       "circuit": "D_and_F__head",
+       "dataset": "far",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "both",
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.3_nopressure_noedge_261013-203424",
+      "--expr",
+      "D_and_F=D & F",
+      "--compose-granularity",
+      "both",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-far-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-far-nls0.3/_shards/D_and_F__far"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-far-nls0.3/D_and_F__far.log",
+      "passed": true,
+      "estimate_min": 80.2
+     },
+     "slurm": {
+      "job_id": "22906797",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T18:04:12",
+      "time_limit_actual": "01:30:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub030"
+      }
+     }
+    },
+    {
+     "job": "F_minus_D__far",
+     "cells": [
+      {
+       "circuit": "F_minus_D__leaf",
+       "dataset": "far",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      },
+      {
+       "circuit": "F_minus_D__head",
+       "dataset": "far",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "both",
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.3_nopressure_noedge_261013-203424",
+      "--expr",
+      "F_minus_D=F - D",
+      "--compose-granularity",
+      "both",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-far-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-far-nls0.3/_shards/F_minus_D__far"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-far-nls0.3/F_minus_D__far.log",
+      "passed": true,
+      "estimate_min": 80.2
+     },
+     "slurm": {
+      "job_id": "22906798",
+      "account": "bgrb-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T18:04:12",
+      "time_limit_actual": "01:30:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub013"
+      }
+     }
+    },
+    {
+     "job": "D_minus_H_minus_F__far",
+     "cells": [
+      {
+       "circuit": "D_minus_H_minus_F__leaf",
+       "dataset": "far",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      },
+      {
+       "circuit": "D_minus_H_minus_F__head",
+       "dataset": "far",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "both",
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_honest_noedge_260819-084020",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.3_nopressure_noedge_261013-203424",
+      "--expr",
+      "D_minus_H_minus_F=D - H - F",
+      "--compose-granularity",
+      "both",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-far-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-far-nls0.3/_shards/D_minus_H_minus_F__far"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-far-nls0.3/D_minus_H_minus_F__far.log",
+      "passed": true,
+      "estimate_min": 80.2
+     },
+     "slurm": {
+      "job_id": "22906799",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T18:04:15",
+      "time_limit_actual": "01:30:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub089"
+      }
+     }
+    },
+    {
+     "job": "H_minus_D_minus_F__far",
+     "cells": [
+      {
+       "circuit": "H_minus_D_minus_F__leaf",
+       "dataset": "far",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      },
+      {
+       "circuit": "H_minus_D_minus_F__head",
+       "dataset": "far",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "both",
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_honest_noedge_260819-084020",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.3_nopressure_noedge_261013-203424",
+      "--expr",
+      "H_minus_D_minus_F=H - D - F",
+      "--compose-granularity",
+      "both",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-far-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-far-nls0.3/_shards/H_minus_D_minus_F__far"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-far-nls0.3/H_minus_D_minus_F__far.log",
+      "passed": true,
+      "estimate_min": 80.2
+     },
+     "slurm": {
+      "job_id": "22906800",
+      "account": "bgrb-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T18:04:15",
+      "time_limit_actual": "01:30:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub033"
+      }
+     }
+    },
+    {
+     "job": "F_minus_D_minus_H__far",
+     "cells": [
+      {
+       "circuit": "F_minus_D_minus_H__leaf",
+       "dataset": "far",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      },
+      {
+       "circuit": "F_minus_D_minus_H__head",
+       "dataset": "far",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "both",
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_honest_noedge_260819-084020",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.3_nopressure_noedge_261013-203424",
+      "--expr",
+      "F_minus_D_minus_H=F - D - H",
+      "--compose-granularity",
+      "both",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-far-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-far-nls0.3/_shards/F_minus_D_minus_H__far"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-far-nls0.3/F_minus_D_minus_H__far.log",
+      "passed": true,
+      "estimate_min": 80.2
+     },
+     "slurm": {
+      "job_id": "22906801",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T18:04:17",
+      "time_limit_actual": "01:30:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub038"
+      }
+     }
+    }
+   ]
+  },
+  "format-control-sdr-nls0.3": {
+   "family": "fine",
+   "task": "sdr",
+   "runs": {
+    "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+    "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525",
+    "F": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr/nls0.3_nopressure_noedge_261013-204850"
+   },
+   "allmlp": null,
+   "cells": [
+    {
+     "circuit": "D",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "faithfulness",
+      "knockout"
+     ],
+     "job": "D__sdr",
+     "path": "cells/D/sdr/interchange"
+    },
+    {
+     "circuit": "D",
+     "dataset": "sdr_honest",
+     "condition": "honest",
+     "roles": [
+      "faithfulness",
+      "knockout"
+     ],
+     "job": "D__sdr_honest",
+     "path": "cells/D/sdr_honest/interchange"
+    },
+    {
+     "circuit": "D",
+     "dataset": "sdr_nopressure",
+     "condition": "nopressure",
+     "roles": [
+      "faithfulness",
+      "knockout"
+     ],
+     "job": "D__sdr_nopressure",
+     "path": "cells/D/sdr_nopressure/interchange"
+    },
+    {
+     "circuit": "H",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "faithfulness",
+      "knockout"
+     ],
+     "job": "H__sdr",
+     "path": "cells/H/sdr/interchange"
+    },
+    {
+     "circuit": "H",
+     "dataset": "sdr_honest",
+     "condition": "honest",
+     "roles": [
+      "faithfulness",
+      "knockout"
+     ],
+     "job": "H__sdr_honest",
+     "path": "cells/H/sdr_honest/interchange"
+    },
+    {
+     "circuit": "H",
+     "dataset": "sdr_nopressure",
+     "condition": "nopressure",
+     "roles": [
+      "faithfulness",
+      "knockout"
+     ],
+     "job": "H__sdr_nopressure",
+     "path": "cells/H/sdr_nopressure/interchange"
+    },
+    {
+     "circuit": "F",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "faithfulness",
+      "knockout"
+     ],
+     "job": "F__sdr",
+     "path": "cells/F/sdr/interchange"
+    },
+    {
+     "circuit": "F",
+     "dataset": "sdr_honest",
+     "condition": "honest",
+     "roles": [
+      "faithfulness",
+      "knockout"
+     ],
+     "job": "F__sdr_honest",
+     "path": "cells/F/sdr_honest/interchange"
+    },
+    {
+     "circuit": "F",
+     "dataset": "sdr_nopressure",
+     "condition": "nopressure",
+     "roles": [
+      "faithfulness",
+      "knockout"
+     ],
+     "job": "F__sdr_nopressure",
+     "path": "cells/F/sdr_nopressure/interchange"
+    },
+    {
+     "circuit": "D_minus_F__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "D_minus_F__sdr",
+     "path": "cells/D_minus_F__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "D_minus_F__head",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "D_minus_F__sdr",
+     "path": "cells/D_minus_F__head/sdr/interchange"
+    },
+    {
+     "circuit": "D_and_F__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "D_and_F__sdr",
+     "path": "cells/D_and_F__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "D_and_F__head",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "D_and_F__sdr",
+     "path": "cells/D_and_F__head/sdr/interchange"
+    },
+    {
+     "circuit": "F_minus_D__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "F_minus_D__sdr",
+     "path": "cells/F_minus_D__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "F_minus_D__head",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "F_minus_D__sdr",
+     "path": "cells/F_minus_D__head/sdr/interchange"
+    },
+    {
+     "circuit": "D_minus_H_minus_F__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "D_minus_H_minus_F__sdr",
+     "path": "cells/D_minus_H_minus_F__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "D_minus_H_minus_F__head",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "D_minus_H_minus_F__sdr",
+     "path": "cells/D_minus_H_minus_F__head/sdr/interchange"
+    },
+    {
+     "circuit": "H_minus_D_minus_F__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "H_minus_D_minus_F__sdr",
+     "path": "cells/H_minus_D_minus_F__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "H_minus_D_minus_F__head",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "H_minus_D_minus_F__sdr",
+     "path": "cells/H_minus_D_minus_F__head/sdr/interchange"
+    },
+    {
+     "circuit": "F_minus_D_minus_H__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "F_minus_D_minus_H__sdr",
+     "path": "cells/F_minus_D_minus_H__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "F_minus_D_minus_H__head",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "F_minus_D_minus_H__sdr",
+     "path": "cells/F_minus_D_minus_H__head/sdr/interchange"
+    }
+   ],
+   "jobs": [
+    {
+     "job": "D__sdr",
+     "cells": [
+      {
+       "circuit": "D",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "faithfulness",
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "--evals",
+      "sanity",
+      "knockout",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-nls0.3/_shards/D__sdr"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-nls0.3/D__sdr.log",
+      "passed": true,
+      "estimate_min": 81.2
+     },
+     "slurm": {
+      "job_id": "22895954",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T08:24:56",
+      "time_limit_actual": "02:30:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuH200x8",
+       "node": "gpue07"
+      }
+     }
+    },
+    {
+     "job": "D__sdr_honest",
+     "cells": [
+      {
+       "circuit": "D",
+       "dataset": "sdr_honest",
+       "condition": "honest",
+       "roles": [
+        "faithfulness",
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "H",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525",
+      "--evals",
+      "sanity",
+      "knockout",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-nls0.3/_shards/D__sdr_honest"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-nls0.3/D__sdr_honest.log",
+      "passed": true,
+      "estimate_min": 76.6
+     },
+     "slurm": {
+      "job_id": "22895955",
+      "account": "bgrb-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T08:24:56",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub028"
+      }
+     }
+    },
+    {
+     "job": "D__sdr_nopressure",
+     "cells": [
+      {
+       "circuit": "D",
+       "dataset": "sdr_nopressure",
+       "condition": "nopressure",
+       "roles": [
+        "faithfulness",
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "F",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr/nls0.3_nopressure_noedge_261013-204850",
+      "--evals",
+      "sanity",
+      "knockout",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-nls0.3/_shards/D__sdr_nopressure"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-nls0.3/D__sdr_nopressure.log",
+      "passed": true,
+      "estimate_min": 76.6
+     },
+     "slurm": {
+      "job_id": "22895956",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T08:24:56",
+      "time_limit_actual": "02:30:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuH200x8",
+       "node": "gpue07"
+      }
+     }
+    },
+    {
+     "job": "H__sdr",
+     "cells": [
+      {
+       "circuit": "H",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "faithfulness",
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "--evals",
+      "sanity",
+      "knockout",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-nls0.3/_shards/H__sdr"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-nls0.3/H__sdr.log",
+      "passed": true,
+      "estimate_min": 76.6
+     },
+     "slurm": {
+      "job_id": "22895957",
+      "account": "bgrb-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T08:24:56",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub092"
+      }
+     }
+    },
+    {
+     "job": "H__sdr_honest",
+     "cells": [
+      {
+       "circuit": "H",
+       "dataset": "sdr_honest",
+       "condition": "honest",
+       "roles": [
+        "faithfulness",
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "H",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525",
+      "--evals",
+      "sanity",
+      "knockout",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-nls0.3/_shards/H__sdr_honest"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-nls0.3/H__sdr_honest.log",
+      "passed": true,
+      "estimate_min": 81.2
+     },
+     "slurm": {
+      "job_id": "22895958",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T08:24:57",
+      "time_limit_actual": "02:30:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuH200x8",
+       "node": "gpue07"
+      }
+     }
+    },
+    {
+     "job": "H__sdr_nopressure",
+     "cells": [
+      {
+       "circuit": "H",
+       "dataset": "sdr_nopressure",
+       "condition": "nopressure",
+       "roles": [
+        "faithfulness",
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "F",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr/nls0.3_nopressure_noedge_261013-204850",
+      "--evals",
+      "sanity",
+      "knockout",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-nls0.3/_shards/H__sdr_nopressure"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-nls0.3/H__sdr_nopressure.log",
+      "passed": true,
+      "estimate_min": 76.6
+     },
+     "slurm": {
+      "job_id": "22895959",
+      "account": "bgrb-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T08:24:57",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuH200x8",
+       "node": "gpue07"
+      }
+     }
+    },
+    {
+     "job": "F__sdr",
+     "cells": [
+      {
+       "circuit": "F",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "faithfulness",
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr/nls0.3_nopressure_noedge_261013-204850",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "--evals",
+      "sanity",
+      "knockout",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-nls0.3/_shards/F__sdr"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-nls0.3/F__sdr.log",
+      "passed": true,
+      "estimate_min": 76.6
+     },
+     "slurm": {
+      "job_id": "22895960",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T08:24:57",
+      "time_limit_actual": "02:30:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuH200x8",
+       "node": "gpue07"
+      }
+     }
+    },
+    {
+     "job": "F__sdr_honest",
+     "cells": [
+      {
+       "circuit": "F",
+       "dataset": "sdr_honest",
+       "condition": "honest",
+       "roles": [
+        "faithfulness",
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "H",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr/nls0.3_nopressure_noedge_261013-204850",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525",
+      "--evals",
+      "sanity",
+      "knockout",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-nls0.3/_shards/F__sdr_honest"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-nls0.3/F__sdr_honest.log",
+      "passed": true,
+      "estimate_min": 76.6
+     },
+     "slurm": {
+      "job_id": "22895961",
+      "account": "bgrb-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T08:24:57",
+      "time_limit_actual": "02:30:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuH200x8",
+       "node": "gpue07"
+      }
+     }
+    },
+    {
+     "job": "F__sdr_nopressure",
+     "cells": [
+      {
+       "circuit": "F",
+       "dataset": "sdr_nopressure",
+       "condition": "nopressure",
+       "roles": [
+        "faithfulness",
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "knockout",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "F",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr/nls0.3_nopressure_noedge_261013-204850",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr/nls0.3_nopressure_noedge_261013-204850",
+      "--evals",
+      "sanity",
+      "knockout",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-nls0.3/_shards/F__sdr_nopressure"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-nls0.3/F__sdr_nopressure.log",
+      "passed": true,
+      "estimate_min": 81.2
+     },
+     "slurm": {
+      "job_id": "22895962",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T08:24:57",
+      "time_limit_actual": "02:30:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuH200x8",
+       "node": "gpue07"
+      }
+     }
+    },
+    {
+     "job": "D_minus_F__sdr",
+     "cells": [
+      {
+       "circuit": "D_minus_F__leaf",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      },
+      {
+       "circuit": "D_minus_F__head",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "both",
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr/nls0.3_nopressure_noedge_261013-204850",
+      "--expr",
+      "D_minus_F=D - F",
+      "--compose-granularity",
+      "both",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-nls0.3/_shards/D_minus_F__sdr"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-nls0.3/D_minus_F__sdr.log",
+      "passed": true,
+      "estimate_min": 80.2
+     },
+     "slurm": {
+      "job_id": "22895963",
+      "account": "bgrb-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T08:24:57",
+      "time_limit_actual": "02:30:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuH200x8",
+       "node": "gpue07"
+      }
+     }
+    },
+    {
+     "job": "D_and_F__sdr",
+     "cells": [
+      {
+       "circuit": "D_and_F__leaf",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      },
+      {
+       "circuit": "D_and_F__head",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "both",
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr/nls0.3_nopressure_noedge_261013-204850",
+      "--expr",
+      "D_and_F=D & F",
+      "--compose-granularity",
+      "both",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-nls0.3/_shards/D_and_F__sdr"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-nls0.3/D_and_F__sdr.log",
+      "passed": true,
+      "estimate_min": 80.2
+     },
+     "slurm": {
+      "job_id": "22895964",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T08:24:57",
+      "time_limit_actual": "02:30:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuH200x8",
+       "node": "gpue07"
+      }
+     }
+    },
+    {
+     "job": "F_minus_D__sdr",
+     "cells": [
+      {
+       "circuit": "F_minus_D__leaf",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      },
+      {
+       "circuit": "F_minus_D__head",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "both",
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr/nls0.3_nopressure_noedge_261013-204850",
+      "--expr",
+      "F_minus_D=F - D",
+      "--compose-granularity",
+      "both",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-nls0.3/_shards/F_minus_D__sdr"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-nls0.3/F_minus_D__sdr.log",
+      "passed": true,
+      "estimate_min": 80.2
+     },
+     "slurm": {
+      "job_id": "22895965",
+      "account": "bgrb-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T08:24:57",
+      "time_limit_actual": "02:30:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuH200x8",
+       "node": "gpue07"
+      }
+     }
+    },
+    {
+     "job": "D_minus_H_minus_F__sdr",
+     "cells": [
+      {
+       "circuit": "D_minus_H_minus_F__leaf",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      },
+      {
+       "circuit": "D_minus_H_minus_F__head",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "both",
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr/nls0.3_nopressure_noedge_261013-204850",
+      "--expr",
+      "D_minus_H_minus_F=D - H - F",
+      "--compose-granularity",
+      "both",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-nls0.3/_shards/D_minus_H_minus_F__sdr"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-nls0.3/D_minus_H_minus_F__sdr.log",
+      "passed": true,
+      "estimate_min": 80.2
+     },
+     "slurm": {
+      "job_id": "22895966",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T08:24:57",
+      "time_limit_actual": "02:30:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuH200x8",
+       "node": "gpue07"
+      }
+     }
+    },
+    {
+     "job": "H_minus_D_minus_F__sdr",
+     "cells": [
+      {
+       "circuit": "H_minus_D_minus_F__leaf",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      },
+      {
+       "circuit": "H_minus_D_minus_F__head",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "both",
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr/nls0.3_nopressure_noedge_261013-204850",
+      "--expr",
+      "H_minus_D_minus_F=H - D - F",
+      "--compose-granularity",
+      "both",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-nls0.3/_shards/H_minus_D_minus_F__sdr"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-nls0.3/H_minus_D_minus_F__sdr.log",
+      "passed": true,
+      "estimate_min": 80.2
+     },
+     "slurm": {
+      "job_id": "22895967",
+      "account": "bgrb-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T08:24:57",
+      "time_limit_actual": "02:30:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub065"
+      }
+     }
+    },
+    {
+     "job": "F_minus_D_minus_H__sdr",
+     "cells": [
+      {
+       "circuit": "F_minus_D_minus_H__leaf",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      },
+      {
+       "circuit": "F_minus_D_minus_H__head",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "both",
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr/nls0.3_nopressure_noedge_261013-204850",
+      "--expr",
+      "F_minus_D_minus_H=F - D - H",
+      "--compose-granularity",
+      "both",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-nls0.3/_shards/F_minus_D_minus_H__sdr"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-nls0.3/F_minus_D_minus_H__sdr.log",
+      "passed": true,
+      "estimate_min": 80.2
+     },
+     "slurm": {
+      "job_id": "22895968",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "04:00:00",
+      "submitted": "2026-10-14T08:24:57",
+      "time_limit_actual": "02:30:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuH200x8",
+       "node": "gpue07"
+      }
+     }
+    }
+   ]
+  },
+  "format-control-sdr-coarse-nls0.3": {
+   "family": "coarse",
+   "task": "sdr",
+   "runs": {
+    "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+    "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+    "F": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850"
+   },
+   "allmlp": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb",
+   "cells": [
+    {
+     "circuit": "D",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "faithfulness"
+     ],
+     "job": "D__sdr",
+     "path": "cells/D/sdr/interchange"
+    },
+    {
+     "circuit": "D",
+     "dataset": "sdr_honest",
+     "condition": "honest",
+     "roles": [
+      "faithfulness"
+     ],
+     "job": "D__sdr_honest",
+     "path": "cells/D/sdr_honest/interchange"
+    },
+    {
+     "circuit": "D",
+     "dataset": "sdr_nopressure",
+     "condition": "nopressure",
+     "roles": [
+      "faithfulness"
+     ],
+     "job": "D__sdr_nopressure",
+     "path": "cells/D/sdr_nopressure/interchange"
+    },
+    {
+     "circuit": "H",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "faithfulness"
+     ],
+     "job": "H__sdr",
+     "path": "cells/H/sdr/interchange"
+    },
+    {
+     "circuit": "H",
+     "dataset": "sdr_honest",
+     "condition": "honest",
+     "roles": [
+      "faithfulness"
+     ],
+     "job": "H__sdr_honest",
+     "path": "cells/H/sdr_honest/interchange"
+    },
+    {
+     "circuit": "H",
+     "dataset": "sdr_nopressure",
+     "condition": "nopressure",
+     "roles": [
+      "faithfulness"
+     ],
+     "job": "H__sdr_nopressure",
+     "path": "cells/H/sdr_nopressure/interchange"
+    },
+    {
+     "circuit": "F",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "faithfulness"
+     ],
+     "job": "F__sdr",
+     "path": "cells/F/sdr/interchange"
+    },
+    {
+     "circuit": "F",
+     "dataset": "sdr_honest",
+     "condition": "honest",
+     "roles": [
+      "faithfulness"
+     ],
+     "job": "F__sdr_honest",
+     "path": "cells/F/sdr_honest/interchange"
+    },
+    {
+     "circuit": "F",
+     "dataset": "sdr_nopressure",
+     "condition": "nopressure",
+     "roles": [
+      "faithfulness"
+     ],
+     "job": "F__sdr_nopressure",
+     "path": "cells/F/sdr_nopressure/interchange"
+    },
+    {
+     "circuit": "D_hko__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "knockout"
+     ],
+     "job": "D_hko__sdr",
+     "path": "cells/D_hko__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "D_hko__leaf",
+     "dataset": "sdr_honest",
+     "condition": "honest",
+     "roles": [
+      "knockout"
+     ],
+     "job": "D_hko__sdr_honest",
+     "path": "cells/D_hko__leaf/sdr_honest/interchange"
+    },
+    {
+     "circuit": "D_hko__leaf",
+     "dataset": "sdr_nopressure",
+     "condition": "nopressure",
+     "roles": [
+      "knockout"
+     ],
+     "job": "D_hko__sdr_nopressure",
+     "path": "cells/D_hko__leaf/sdr_nopressure/interchange"
+    },
+    {
+     "circuit": "H_hko__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "knockout"
+     ],
+     "job": "H_hko__sdr",
+     "path": "cells/H_hko__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "H_hko__leaf",
+     "dataset": "sdr_honest",
+     "condition": "honest",
+     "roles": [
+      "knockout"
+     ],
+     "job": "H_hko__sdr_honest",
+     "path": "cells/H_hko__leaf/sdr_honest/interchange"
+    },
+    {
+     "circuit": "H_hko__leaf",
+     "dataset": "sdr_nopressure",
+     "condition": "nopressure",
+     "roles": [
+      "knockout"
+     ],
+     "job": "H_hko__sdr_nopressure",
+     "path": "cells/H_hko__leaf/sdr_nopressure/interchange"
+    },
+    {
+     "circuit": "F_hko__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "knockout"
+     ],
+     "job": "F_hko__sdr",
+     "path": "cells/F_hko__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "F_hko__leaf",
+     "dataset": "sdr_honest",
+     "condition": "honest",
+     "roles": [
+      "knockout"
+     ],
+     "job": "F_hko__sdr_honest",
+     "path": "cells/F_hko__leaf/sdr_honest/interchange"
+    },
+    {
+     "circuit": "F_hko__leaf",
+     "dataset": "sdr_nopressure",
+     "condition": "nopressure",
+     "roles": [
+      "knockout"
+     ],
+     "job": "F_hko__sdr_nopressure",
+     "path": "cells/F_hko__leaf/sdr_nopressure/interchange"
+    },
+    {
+     "circuit": "D_minus_F_hko__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "D_minus_F_hko__sdr",
+     "path": "cells/D_minus_F_hko__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "D_and_F_hko__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "D_and_F_hko__sdr",
+     "path": "cells/D_and_F_hko__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "F_minus_D_hko__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "F_minus_D_hko__sdr",
+     "path": "cells/F_minus_D_hko__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "D_minus_H_minus_F_hko__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "D_minus_H_minus_F_hko__sdr",
+     "path": "cells/D_minus_H_minus_F_hko__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "H_minus_D_minus_F_hko__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "H_minus_D_minus_F_hko__sdr",
+     "path": "cells/H_minus_D_minus_F_hko__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "F_minus_D_minus_H_hko__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "F_minus_D_minus_H_hko__sdr",
+     "path": "cells/F_minus_D_minus_H_hko__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "H_and_F_hko__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "xdeltas_a__sdr",
+     "path": "cells/H_and_F_hko__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "H_minus_F_hko__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "xdeltas_a__sdr",
+     "path": "cells/H_minus_F_hko__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "D_and_H_and_F_hko__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "xdeltas_a__sdr",
+     "path": "cells/D_and_H_and_F_hko__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "D_and_H_minus_F_hko__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "D_and_H_minus_F_hko__sdr",
+     "path": "cells/D_and_H_minus_F_hko__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "D_and_F_minus_H_hko__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "D_and_F_minus_H_hko__sdr",
+     "path": "cells/D_and_F_minus_H_hko__leaf/sdr/interchange"
+    },
+    {
+     "circuit": "H_and_F_minus_D_hko__leaf",
+     "dataset": "sdr",
+     "condition": "deceptive",
+     "roles": [
+      "delta"
+     ],
+     "job": "H_and_F_minus_D_hko__sdr",
+     "path": "cells/H_and_F_minus_D_hko__leaf/sdr/interchange"
+    }
+   ],
+   "jobs": [
+    {
+     "job": "D__sdr",
+     "cells": [
+      {
+       "circuit": "D",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "faithfulness"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--evals",
+      "sanity",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/D__sdr"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/D__sdr.log",
+      "passed": true,
+      "estimate_min": 42.8
+     },
+     "slurm": {
+      "job_id": "22895970",
+      "account": "bgrb-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "02:30:00",
+      "submitted": "2026-10-14T08:25:06",
+      "time_limit_actual": "02:00:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub080"
+      }
+     }
+    },
+    {
+     "job": "D__sdr_honest",
+     "cells": [
+      {
+       "circuit": "D",
+       "dataset": "sdr_honest",
+       "condition": "honest",
+       "roles": [
+        "faithfulness"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "H",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--evals",
+      "sanity",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/D__sdr_honest"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/D__sdr_honest.log",
+      "passed": true,
+      "estimate_min": 38.2
+     },
+     "slurm": {
+      "job_id": "22895971",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "02:30:00",
+      "submitted": "2026-10-14T08:25:06",
+      "time_limit_actual": "02:00:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub085"
+      }
+     }
+    },
+    {
+     "job": "D__sdr_nopressure",
+     "cells": [
+      {
+       "circuit": "D",
+       "dataset": "sdr_nopressure",
+       "condition": "nopressure",
+       "roles": [
+        "faithfulness"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "F",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+      "--evals",
+      "sanity",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/D__sdr_nopressure"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/D__sdr_nopressure.log",
+      "passed": true,
+      "estimate_min": 38.2
+     },
+     "slurm": {
+      "job_id": "22895972",
+      "account": "bgrb-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "02:30:00",
+      "submitted": "2026-10-14T08:25:06",
+      "time_limit_actual": "02:00:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub087"
+      }
+     }
+    },
+    {
+     "job": "H__sdr",
+     "cells": [
+      {
+       "circuit": "H",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "faithfulness"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--evals",
+      "sanity",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/H__sdr"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/H__sdr.log",
+      "passed": true,
+      "estimate_min": 38.2
+     },
+     "slurm": {
+      "job_id": "22895973",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "02:30:00",
+      "submitted": "2026-10-14T08:25:06",
+      "time_limit_actual": "02:00:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub080"
+      }
+     }
+    },
+    {
+     "job": "H__sdr_honest",
+     "cells": [
+      {
+       "circuit": "H",
+       "dataset": "sdr_honest",
+       "condition": "honest",
+       "roles": [
+        "faithfulness"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "H",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--evals",
+      "sanity",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/H__sdr_honest"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/H__sdr_honest.log",
+      "passed": true,
+      "estimate_min": 42.8
+     },
+     "slurm": {
+      "job_id": "22895977",
+      "account": "bgrb-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "02:30:00",
+      "submitted": "2026-10-14T08:25:06",
+      "time_limit_actual": "02:00:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub087"
+      }
+     }
+    },
+    {
+     "job": "H__sdr_nopressure",
+     "cells": [
+      {
+       "circuit": "H",
+       "dataset": "sdr_nopressure",
+       "condition": "nopressure",
+       "roles": [
+        "faithfulness"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "F",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+      "--evals",
+      "sanity",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/H__sdr_nopressure"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/H__sdr_nopressure.log",
+      "passed": true,
+      "estimate_min": 38.2
+     },
+     "slurm": {
+      "job_id": "22895978",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "02:30:00",
+      "submitted": "2026-10-14T08:25:06",
+      "time_limit_actual": "02:00:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub059"
+      }
+     }
+    },
+    {
+     "job": "F__sdr",
+     "cells": [
+      {
+       "circuit": "F",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "faithfulness"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--evals",
+      "sanity",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/F__sdr"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/F__sdr.log",
+      "passed": true,
+      "estimate_min": 38.2
+     },
+     "slurm": {
+      "job_id": "22895979",
+      "account": "bgrb-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "02:30:00",
+      "submitted": "2026-10-14T08:25:06",
+      "time_limit_actual": "02:00:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub034"
+      }
+     }
+    },
+    {
+     "job": "F__sdr_honest",
+     "cells": [
+      {
+       "circuit": "F",
+       "dataset": "sdr_honest",
+       "condition": "honest",
+       "roles": [
+        "faithfulness"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "H",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--evals",
+      "sanity",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/F__sdr_honest"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/F__sdr_honest.log",
+      "passed": true,
+      "estimate_min": 38.2
+     },
+     "slurm": {
+      "job_id": "22895980",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "02:30:00",
+      "submitted": "2026-10-14T08:25:06",
+      "time_limit_actual": "02:00:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub029"
+      }
+     }
+    },
+    {
+     "job": "F__sdr_nopressure",
+     "cells": [
+      {
+       "circuit": "F",
+       "dataset": "sdr_nopressure",
+       "condition": "nopressure",
+       "roles": [
+        "faithfulness"
+       ]
+      }
+     ],
+     "evals": [
+      "sanity",
+      "null",
+      "pressure"
+     ],
+     "compose_granularity": null,
+     "task_from_role": "F",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+      "--evals",
+      "sanity",
+      "null",
+      "pressure",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/F__sdr_nopressure"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/F__sdr_nopressure.log",
+      "passed": true,
+      "estimate_min": 42.8
+     },
+     "slurm": {
+      "job_id": "22895981",
+      "account": "bgrb-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "02:30:00",
+      "submitted": "2026-10-14T08:25:09",
+      "time_limit_actual": "02:00:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub090"
+      }
+     }
+    },
+    {
+     "job": "D_hko__sdr",
+     "cells": [
+      {
+       "circuit": "D_hko__leaf",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--circuit",
+      "m=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb",
+      "--expr",
+      "D_hko=(D) - m",
+      "--compose-granularity",
+      "leaf",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/D_hko__sdr"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/D_hko__sdr.log",
+      "passed": true,
+      "estimate_min": 41.8
+     },
+     "slurm": {
+      "job_id": "22895982",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "02:30:00",
+      "submitted": "2026-10-14T08:25:09",
+      "time_limit_actual": "02:00:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub029"
+      }
+     }
+    },
+    {
+     "job": "D_hko__sdr_honest",
+     "cells": [
+      {
+       "circuit": "D_hko__leaf",
+       "dataset": "sdr_honest",
+       "condition": "honest",
+       "roles": [
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "H",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--circuit",
+      "m=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb",
+      "--expr",
+      "D_hko=(D) - m",
+      "--compose-granularity",
+      "leaf",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/D_hko__sdr_honest"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/D_hko__sdr_honest.log",
+      "passed": true,
+      "estimate_min": 41.8
+     },
+     "slurm": {
+      "job_id": "22895983",
+      "account": "bgrb-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "02:30:00",
+      "submitted": "2026-10-14T08:25:09",
+      "time_limit_actual": "02:00:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub090"
+      }
+     }
+    },
+    {
+     "job": "D_hko__sdr_nopressure",
+     "cells": [
+      {
+       "circuit": "D_hko__leaf",
+       "dataset": "sdr_nopressure",
+       "condition": "nopressure",
+       "roles": [
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "F",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--circuit",
+      "m=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb",
+      "--expr",
+      "D_hko=(D) - m",
+      "--compose-granularity",
+      "leaf",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/D_hko__sdr_nopressure"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/D_hko__sdr_nopressure.log",
+      "passed": true,
+      "estimate_min": 41.8
+     },
+     "slurm": {
+      "job_id": "22895984",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "02:30:00",
+      "submitted": "2026-10-14T08:25:09",
+      "time_limit_actual": "02:00:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub084"
+      }
+     }
+    },
+    {
+     "job": "H_hko__sdr",
+     "cells": [
+      {
+       "circuit": "H_hko__leaf",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--circuit",
+      "m=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb",
+      "--expr",
+      "H_hko=(H) - m",
+      "--compose-granularity",
+      "leaf",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/H_hko__sdr"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/H_hko__sdr.log",
+      "passed": true,
+      "estimate_min": 41.8
+     },
+     "slurm": {
+      "job_id": "22895985",
+      "account": "bgrb-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "02:30:00",
+      "submitted": "2026-10-14T08:25:09",
+      "time_limit_actual": "02:00:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub034"
+      }
+     }
+    },
+    {
+     "job": "H_hko__sdr_honest",
+     "cells": [
+      {
+       "circuit": "H_hko__leaf",
+       "dataset": "sdr_honest",
+       "condition": "honest",
+       "roles": [
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "H",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--circuit",
+      "m=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb",
+      "--expr",
+      "H_hko=(H) - m",
+      "--compose-granularity",
+      "leaf",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/H_hko__sdr_honest"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/H_hko__sdr_honest.log",
+      "passed": true,
+      "estimate_min": 41.8
+     },
+     "slurm": {
+      "job_id": "22895986",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "02:30:00",
+      "submitted": "2026-10-14T08:25:09",
+      "time_limit_actual": "02:00:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub084"
+      }
+     }
+    },
+    {
+     "job": "H_hko__sdr_nopressure",
+     "cells": [
+      {
+       "circuit": "H_hko__leaf",
+       "dataset": "sdr_nopressure",
+       "condition": "nopressure",
+       "roles": [
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "F",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--circuit",
+      "m=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb",
+      "--expr",
+      "H_hko=(H) - m",
+      "--compose-granularity",
+      "leaf",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/H_hko__sdr_nopressure"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/H_hko__sdr_nopressure.log",
+      "passed": true,
+      "estimate_min": 41.8
+     },
+     "slurm": {
+      "job_id": "22895987",
+      "account": "bgrb-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "02:30:00",
+      "submitted": "2026-10-14T08:25:09",
+      "time_limit_actual": "02:00:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub036"
+      }
+     }
+    },
+    {
+     "job": "F_hko__sdr",
+     "cells": [
+      {
+       "circuit": "F_hko__leaf",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+      "--circuit",
+      "m=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb",
+      "--expr",
+      "F_hko=(F) - m",
+      "--compose-granularity",
+      "leaf",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/F_hko__sdr"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/F_hko__sdr.log",
+      "passed": true,
+      "estimate_min": 41.8
+     },
+     "slurm": {
+      "job_id": "22895988",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "02:30:00",
+      "submitted": "2026-10-14T08:25:09",
+      "time_limit_actual": "02:00:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub065"
+      }
+     }
+    },
+    {
+     "job": "F_hko__sdr_honest",
+     "cells": [
+      {
+       "circuit": "F_hko__leaf",
+       "dataset": "sdr_honest",
+       "condition": "honest",
+       "roles": [
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "H",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+      "--circuit",
+      "m=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb",
+      "--expr",
+      "F_hko=(F) - m",
+      "--compose-granularity",
+      "leaf",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/F_hko__sdr_honest"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/F_hko__sdr_honest.log",
+      "passed": true,
+      "estimate_min": 41.8
+     },
+     "slurm": {
+      "job_id": "22895989",
+      "account": "bgrb-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "02:30:00",
+      "submitted": "2026-10-14T08:25:11",
+      "time_limit_actual": "02:00:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub066"
+      }
+     }
+    },
+    {
+     "job": "F_hko__sdr_nopressure",
+     "cells": [
+      {
+       "circuit": "F_hko__leaf",
+       "dataset": "sdr_nopressure",
+       "condition": "nopressure",
+       "roles": [
+        "knockout"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "F",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+      "--circuit",
+      "m=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb",
+      "--expr",
+      "F_hko=(F) - m",
+      "--compose-granularity",
+      "leaf",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/F_hko__sdr_nopressure"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/F_hko__sdr_nopressure.log",
+      "passed": true,
+      "estimate_min": 41.8
+     },
+     "slurm": {
+      "job_id": "22895990",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "02:30:00",
+      "submitted": "2026-10-14T08:25:11",
+      "time_limit_actual": "02:00:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub076"
+      }
+     }
+    },
+    {
+     "job": "D_minus_F_hko__sdr",
+     "cells": [
+      {
+       "circuit": "D_minus_F_hko__leaf",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+      "--circuit",
+      "m=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb",
+      "--expr",
+      "D_minus_F_hko=(D - F) - m",
+      "--compose-granularity",
+      "leaf",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/D_minus_F_hko__sdr"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/D_minus_F_hko__sdr.log",
+      "passed": true,
+      "estimate_min": 41.8
+     },
+     "slurm": {
+      "job_id": "22895991",
+      "account": "bgrb-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "02:30:00",
+      "submitted": "2026-10-14T08:25:11",
+      "time_limit_actual": "02:00:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub032"
+      }
+     }
+    },
+    {
+     "job": "D_and_F_hko__sdr",
+     "cells": [
+      {
+       "circuit": "D_and_F_hko__leaf",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+      "--circuit",
+      "m=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb",
+      "--expr",
+      "D_and_F_hko=(D & F) - m",
+      "--compose-granularity",
+      "leaf",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/D_and_F_hko__sdr"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/D_and_F_hko__sdr.log",
+      "passed": true,
+      "estimate_min": 41.8
+     },
+     "slurm": {
+      "job_id": "22895992",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "02:30:00",
+      "submitted": "2026-10-14T08:25:11",
+      "time_limit_actual": "02:00:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub087"
+      }
+     }
+    },
+    {
+     "job": "F_minus_D_hko__sdr",
+     "cells": [
+      {
+       "circuit": "F_minus_D_hko__leaf",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+      "--circuit",
+      "m=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb",
+      "--expr",
+      "F_minus_D_hko=(F - D) - m",
+      "--compose-granularity",
+      "leaf",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/F_minus_D_hko__sdr"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/F_minus_D_hko__sdr.log",
+      "passed": true,
+      "estimate_min": 41.8
+     },
+     "slurm": {
+      "job_id": "22895993",
+      "account": "bgrb-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "02:30:00",
+      "submitted": "2026-10-14T08:25:11",
+      "time_limit_actual": "02:00:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub011"
+      }
+     }
+    },
+    {
+     "job": "D_minus_H_minus_F_hko__sdr",
+     "cells": [
+      {
+       "circuit": "D_minus_H_minus_F_hko__leaf",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+      "--circuit",
+      "m=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb",
+      "--expr",
+      "D_minus_H_minus_F_hko=(D - H - F) - m",
+      "--compose-granularity",
+      "leaf",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/D_minus_H_minus_F_hko__sdr"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/D_minus_H_minus_F_hko__sdr.log",
+      "passed": true,
+      "estimate_min": 41.8
+     },
+     "slurm": {
+      "job_id": "22895994",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "02:30:00",
+      "submitted": "2026-10-14T08:25:11",
+      "time_limit_actual": "02:00:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub087"
+      }
+     }
+    },
+    {
+     "job": "H_minus_D_minus_F_hko__sdr",
+     "cells": [
+      {
+       "circuit": "H_minus_D_minus_F_hko__leaf",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+      "--circuit",
+      "m=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb",
+      "--expr",
+      "H_minus_D_minus_F_hko=(H - D - F) - m",
+      "--compose-granularity",
+      "leaf",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/H_minus_D_minus_F_hko__sdr"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/H_minus_D_minus_F_hko__sdr.log",
+      "passed": true,
+      "estimate_min": 41.8
+     },
+     "slurm": {
+      "job_id": "22895995",
+      "account": "bgrb-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "02:30:00",
+      "submitted": "2026-10-14T08:25:12",
+      "time_limit_actual": "02:00:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub012"
+      }
+     }
+    },
+    {
+     "job": "F_minus_D_minus_H_hko__sdr",
+     "cells": [
+      {
+       "circuit": "F_minus_D_minus_H_hko__leaf",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+      "--circuit",
+      "m=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb",
+      "--expr",
+      "F_minus_D_minus_H_hko=(F - D - H) - m",
+      "--compose-granularity",
+      "leaf",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/F_minus_D_minus_H_hko__sdr"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/F_minus_D_minus_H_hko__sdr.log",
+      "passed": true,
+      "estimate_min": 41.8
+     },
+     "slurm": {
+      "job_id": "22895996",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4,gpuH200x8",
+      "time": "02:30:00",
+      "submitted": "2026-10-14T08:25:12",
+      "time_limit_actual": "02:00:00",
+      "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4",
+       "node": "gpub065"
+      }
+     }
+    },
+    {
+     "job": "xdeltas_a__sdr",
+     "cells": [
+      {
+       "circuit": "H_and_F_hko__leaf",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      },
+      {
+       "circuit": "H_minus_F_hko__leaf",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      },
+      {
+       "circuit": "D_and_H_and_F_hko__leaf",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+      "--circuit",
+      "m=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb",
+      "--expr",
+      "H_and_F_hko=(H & F) - m",
+      "--expr",
+      "H_minus_F_hko=(H - F) - m",
+      "--expr",
+      "D_and_H_and_F_hko=(D & H & F) - m",
+      "--compose-granularity",
+      "leaf",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/xdeltas_a__sdr"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/xdeltas_a__sdr.log",
+      "passed": true,
+      "estimate_min": 118.7
+     },
+     "slurm": {
+      "job_id": "22945674",
+      "account": "bimc-delta-gpu",
+      "partition": "gpuH200x8-interactive",
+      "time": "01:00:00",
+      "submitted": "2026-10-16T12:41:28",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuH200x8-interactive",
+       "node": "gpue06"
+      }
+     }
+    },
+    {
+     "job": "D_and_H_minus_F_hko__sdr",
+     "cells": [
+      {
+       "circuit": "D_and_H_minus_F_hko__leaf",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+      "--circuit",
+      "m=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb",
+      "--expr",
+      "D_and_H_minus_F_hko=((D & H) - F) - m",
+      "--compose-granularity",
+      "leaf",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/D_and_H_minus_F_hko__sdr"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/D_and_H_minus_F_hko__sdr.log",
+      "passed": true,
+      "estimate_min": 41.8
+     },
+     "slurm": {
+      "job_id": "22946213",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA40x4-interactive",
+      "time": "01:00:00",
+      "submitted": "2026-10-16T14:40:06",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4-interactive",
+       "node": "gpub040"
+      }
+     }
+    },
+    {
+     "job": "D_and_F_minus_H_hko__sdr",
+     "cells": [
+      {
+       "circuit": "D_and_F_minus_H_hko__leaf",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+      "--circuit",
+      "m=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb",
+      "--expr",
+      "D_and_F_minus_H_hko=((D & F) - H) - m",
+      "--compose-granularity",
+      "leaf",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/D_and_F_minus_H_hko__sdr"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/D_and_F_minus_H_hko__sdr.log",
+      "passed": true,
+      "estimate_min": 41.8
+     },
+     "slurm": {
+      "job_id": "22946214",
+      "account": "beto-delta-gpu",
+      "partition": "gpuA100x4-interactive",
+      "time": "01:00:00",
+      "submitted": "2026-10-16T14:40:11",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA100x4-interactive",
+       "node": "gpua043"
+      }
+     }
+    },
+    {
+     "job": "H_and_F_minus_D_hko__sdr",
+     "cells": [
+      {
+       "circuit": "H_and_F_minus_D_hko__leaf",
+       "dataset": "sdr",
+       "condition": "deceptive",
+       "roles": [
+        "delta"
+       ]
+      }
+     ],
+     "evals": [
+      "knockout"
+     ],
+     "compose_granularity": "leaf",
+     "task_from_role": "D",
+     "awaits": [],
+     "args": [
+      "--circuit",
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--circuit",
+      "H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "--circuit",
+      "F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+      "--circuit",
+      "m=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb",
+      "--expr",
+      "H_and_F_minus_D_hko=((H & F) - D) - m",
+      "--compose-granularity",
+      "leaf",
+      "--task-from",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "--evals",
+      "knockout",
+      "--ablation",
+      "interchange",
+      "--n-random",
+      "20",
+      "--knockout-null-count",
+      "20",
+      "--suite-name",
+      "format-control-sdr-coarse-nls0.3",
+      "--output-dir",
+      "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/H_and_F_minus_D_hko__sdr"
+     ],
+     "dryrun": {
+      "log": "dryrun/format-control-sdr-coarse-nls0.3/H_and_F_minus_D_hko__sdr.log",
+      "passed": true,
+      "estimate_min": 41.8
+     },
+     "slurm": {
+      "job_id": "22946215",
+      "account": "beto-delta-gpu",
+      "partition": "gpuH200x8-interactive",
+      "time": "01:00:00",
+      "submitted": "2026-10-16T14:40:16",
+      "state": "COMPLETED",
+      "ran_on": {
+       "partition": "gpuA40x4-interactive",
+       "node": "gpub040"
+      }
+     }
+    }
+   ]
+  }
+ },
+ "side_jobs": {
+  "format-control-far-nls0.3": [
+   {
+    "job": "F04__far",
+    "circuit": "F04",
+    "run": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.4_nopressure_noedge_261014-081312",
+    "task_from_role": "D",
+    "evals": [
+     "sanity",
+     "knockout"
+    ],
+    "output_dir": "_side_F04",
+    "why": "Retune sensitivity: the FAR NLS 0.4 Format Circuit (failed the in-run gate, KL 0.214, not carried) on the FAR D test set, evals 1 and 2. Outside the suite grid and the cells index.",
+    "awaits": [],
+    "cells": [],
+    "args": [
+     "--circuit",
+     "F04=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.4_nopressure_noedge_261014-081312",
+     "--task-from",
+     "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+     "--evals",
+     "sanity",
+     "knockout",
+     "--ablation",
+     "interchange",
+     "--n-random",
+     "20",
+     "--knockout-null-count",
+     "20",
+     "--suite-name",
+     "format-control-far-nls0.3",
+     "--output-dir",
+     "outputs/_suites/format-control-far-nls0.3/_side_F04"
+    ],
+    "dryrun": {
+     "log": "dryrun/format-control-far-nls0.3/F04__far.log",
+     "passed": true,
+     "estimate_min": 41.8
+    },
+    "slurm": {
+     "job_id": "22906802",
+     "account": "bgrb-delta-gpu",
+     "partition": "gpuA40x4,gpuH200x8",
+     "time": "04:00:00",
+     "submitted": "2026-10-14T18:04:17",
+     "time_limit_actual": "01:30:00",
+     "time_limit_note": "lowered in place by the orchestrator (scontrol update) on 2026-10-14 to speed backfill; `time` is the limit at submission",
+     "state": "COMPLETED",
+     "ran_on": {
+      "partition": "gpuA40x4",
+      "node": "gpub057"
+     }
+    }
+   }
+  ]
+ }
+}

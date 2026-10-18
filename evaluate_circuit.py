@@ -56,6 +56,7 @@ from evaluation.benchmark_eval import SCREEN_MAX_FACTOR
 from evaluation.benchmarks.base import DECEPTIVE
 from evaluation.benchmarks import (DEFAULT_BENCHMARKS, GROUPS, expand,
                                    list_benchmarks, list_choices, required_keys)
+from evaluation.circuits import circuit_condition, condition_of
 from evaluation.context import build_session
 from evaluation.knockout import VARIANTS as KNOCKOUT_VARIANTS
 from evaluation.knockout import resolve_null_count
@@ -685,7 +686,8 @@ def dry_run(session) -> int:
                    ("attention_neurons", "mlp_hidden", "mlp_output")
                    if k in spec.counts)
         source = spec.expr or (spec.home_run_dir or "")
-        print(f"  {spec.label:<34} {spec.kind:<7} {fine:>10,} fine units   {source}")
+        print(f"  {spec.label:<34} {spec.kind:<7} {fine:>10,} fine units   "
+              f"condition={circuit_condition(spec)}   {source}")
         warning = _emptiness(spec)
         if warning:
             print(warning)
@@ -694,6 +696,7 @@ def dry_run(session) -> int:
     print()
     for spec in session.tasks:
         print(f"  {spec.label:<20} task={spec.name:<8} "
+              f"condition={condition_of(spec.args)}  "
               f"n={spec.args.test_samples}  data={spec.args.data_dir}  "
               f"{spec.home_run_dir or '(defaults)'}")
 

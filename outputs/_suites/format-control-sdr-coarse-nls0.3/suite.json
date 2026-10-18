@@ -1,0 +1,535 @@
+{
+  "schema_version": 1,
+  "created": "2026-10-16T15:45:02",
+  "root": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_suites/format-control-sdr-coarse-nls0.3",
+  "argv": [
+    "evaluate_circuit.py",
+    "--circuit",
+    "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+    "--task-from",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+    "--evals",
+    "sanity",
+    "null",
+    "pressure",
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20",
+    "--suite-name",
+    "format-control-sdr-coarse-nls0.3",
+    "--output-dir",
+    "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/D__sdr"
+  ],
+  "ablation": "interchange",
+  "evals": [
+    "sanity",
+    "null",
+    "pressure"
+  ],
+  "model": "llama-8b-instruct",
+  "geometry": {
+    "num_heads": 32,
+    "head_dim": 128,
+    "intermediate_size": 14336,
+    "hidden_size": 4096,
+    "num_layers": 32
+  },
+  "compose_granularity": "both",
+  "membership_convention": {
+    "leaf": "attention_neurons / mlp_hidden / mlp_output",
+    "head": "attention_heads + mlp_blocks",
+    "embedding": "not a set member; the OR of the operands' gates",
+    "coarse_gates": "re-derived bottom-up from the fine gates"
+  },
+  "circuits": [
+    {
+      "label": "D",
+      "kind": "atomic",
+      "expr": null,
+      "operands": {
+        "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742"
+      },
+      "home_run_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "counts": {
+        "attention_blocks": 12,
+        "attention_heads": 69,
+        "attention_neurons": 8832,
+        "mlp_hidden": 458752,
+        "mlp_output": 131072
+      }
+    },
+    {
+      "label": "D_and_F_hko__leaf",
+      "kind": "leaf",
+      "expr": "(D & F) - m",
+      "operands": {
+        "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+        "F": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+        "m": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb"
+      },
+      "home_run_dir": null,
+      "counts": {
+        "attention_neurons": 4608,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 36,
+        "attention_blocks": 9
+      }
+    },
+    {
+      "label": "D_and_F_minus_H_hko__leaf",
+      "kind": "leaf",
+      "expr": "((D & F) - H) - m",
+      "operands": {
+        "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+        "F": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+        "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+        "m": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb"
+      },
+      "home_run_dir": null,
+      "counts": {
+        "attention_neurons": 512,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 4,
+        "attention_blocks": 3
+      }
+    },
+    {
+      "label": "D_and_H_minus_F_hko__leaf",
+      "kind": "leaf",
+      "expr": "((D & H) - F) - m",
+      "operands": {
+        "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+        "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+        "F": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+        "m": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb"
+      },
+      "home_run_dir": null,
+      "counts": {
+        "attention_neurons": 1408,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 11,
+        "attention_blocks": 4
+      }
+    },
+    {
+      "label": "D_hko__leaf",
+      "kind": "leaf",
+      "expr": "(D) - m",
+      "operands": {
+        "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+        "m": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb"
+      },
+      "home_run_dir": null,
+      "counts": {
+        "attention_neurons": 8832,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 69,
+        "attention_blocks": 12
+      }
+    },
+    {
+      "label": "D_minus_F_hko__leaf",
+      "kind": "leaf",
+      "expr": "(D - F) - m",
+      "operands": {
+        "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+        "F": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+        "m": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb"
+      },
+      "home_run_dir": null,
+      "counts": {
+        "attention_neurons": 4224,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 33,
+        "attention_blocks": 11
+      }
+    },
+    {
+      "label": "D_minus_H_minus_F_hko__leaf",
+      "kind": "leaf",
+      "expr": "(D - H - F) - m",
+      "operands": {
+        "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+        "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+        "F": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+        "m": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb"
+      },
+      "home_run_dir": null,
+      "counts": {
+        "attention_neurons": 2816,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 22,
+        "attention_blocks": 10
+      }
+    },
+    {
+      "label": "F",
+      "kind": "atomic",
+      "expr": null,
+      "operands": {
+        "F": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850"
+      },
+      "home_run_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+      "counts": {
+        "attention_blocks": 12,
+        "attention_heads": 68,
+        "attention_neurons": 8704,
+        "mlp_hidden": 458752,
+        "mlp_output": 131072
+      }
+    },
+    {
+      "label": "F_hko__leaf",
+      "kind": "leaf",
+      "expr": "(F) - m",
+      "operands": {
+        "F": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+        "m": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb"
+      },
+      "home_run_dir": null,
+      "counts": {
+        "attention_neurons": 8704,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 68,
+        "attention_blocks": 12
+      }
+    },
+    {
+      "label": "F_minus_D_hko__leaf",
+      "kind": "leaf",
+      "expr": "(F - D) - m",
+      "operands": {
+        "F": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+        "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+        "m": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb"
+      },
+      "home_run_dir": null,
+      "counts": {
+        "attention_neurons": 4096,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 32,
+        "attention_blocks": 10
+      }
+    },
+    {
+      "label": "F_minus_D_minus_H_hko__leaf",
+      "kind": "leaf",
+      "expr": "(F - D - H) - m",
+      "operands": {
+        "F": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+        "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+        "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+        "m": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb"
+      },
+      "home_run_dir": null,
+      "counts": {
+        "attention_neurons": 2688,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 21,
+        "attention_blocks": 6
+      }
+    },
+    {
+      "label": "H",
+      "kind": "atomic",
+      "expr": null,
+      "operands": {
+        "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743"
+      },
+      "home_run_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "counts": {
+        "attention_blocks": 12,
+        "attention_heads": 56,
+        "attention_neurons": 7168,
+        "mlp_hidden": 458752,
+        "mlp_output": 131072
+      }
+    },
+    {
+      "label": "H_and_F_minus_D_hko__leaf",
+      "kind": "leaf",
+      "expr": "((H & F) - D) - m",
+      "operands": {
+        "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+        "F": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+        "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+        "m": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb"
+      },
+      "home_run_dir": null,
+      "counts": {
+        "attention_neurons": 1408,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 11,
+        "attention_blocks": 5
+      }
+    },
+    {
+      "label": "H_hko__leaf",
+      "kind": "leaf",
+      "expr": "(H) - m",
+      "operands": {
+        "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+        "m": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb"
+      },
+      "home_run_dir": null,
+      "counts": {
+        "attention_neurons": 7168,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 56,
+        "attention_blocks": 12
+      }
+    },
+    {
+      "label": "H_minus_D_minus_F_hko__leaf",
+      "kind": "leaf",
+      "expr": "(H - D - F) - m",
+      "operands": {
+        "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+        "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+        "F": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+        "m": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb"
+      },
+      "home_run_dir": null,
+      "counts": {
+        "attention_neurons": 256,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 2,
+        "attention_blocks": 2
+      }
+    },
+    {
+      "label": "H_and_F_hko__leaf",
+      "kind": "leaf",
+      "expr": "(H & F) - m",
+      "operands": {
+        "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+        "F": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+        "m": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb"
+      },
+      "home_run_dir": null,
+      "counts": {
+        "attention_neurons": 5504,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 43,
+        "attention_blocks": 10
+      }
+    },
+    {
+      "label": "H_minus_F_hko__leaf",
+      "kind": "leaf",
+      "expr": "(H - F) - m",
+      "operands": {
+        "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+        "F": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+        "m": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb"
+      },
+      "home_run_dir": null,
+      "counts": {
+        "attention_neurons": 1664,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 13,
+        "attention_blocks": 4
+      }
+    },
+    {
+      "label": "D_and_H_and_F_hko__leaf",
+      "kind": "leaf",
+      "expr": "(D & H & F) - m",
+      "operands": {
+        "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+        "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+        "F": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+        "m": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb"
+      },
+      "home_run_dir": null,
+      "counts": {
+        "attention_neurons": 4096,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 32,
+        "attention_blocks": 8
+      }
+    }
+  ],
+  "tasks": [
+    {
+      "label": "sdr",
+      "task": "sdr",
+      "home_run_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+      "dataset": {
+        "data_dir": "./data/datasets",
+        "std_variant": "azaria",
+        "deception_condition": "deceptive",
+        "test_samples": 1000
+      },
+      "evaluator_label": "sdr"
+    },
+    {
+      "label": "sdr_honest",
+      "task": "sdr",
+      "home_run_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+      "dataset": {
+        "data_dir": "./data/datasets",
+        "std_variant": "azaria",
+        "deception_condition": "honest",
+        "test_samples": 1000
+      },
+      "evaluator_label": "sdr"
+    },
+    {
+      "label": "sdr_nopressure",
+      "task": "sdr",
+      "home_run_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850",
+      "dataset": {
+        "data_dir": "./data/datasets",
+        "std_variant": "azaria",
+        "deception_condition": "nopressure",
+        "test_samples": 1000
+      },
+      "evaluator_label": "sdr"
+    }
+  ],
+  "cli": {
+    "ablation": "interchange",
+    "all_pairs_delta": false,
+    "benchmark_belief_model": null,
+    "benchmark_belief_tokens": 128,
+    "benchmark_coherence_batch_size": null,
+    "benchmark_gen_batch_size": 8,
+    "benchmark_n_per_dataset": 100,
+    "benchmark_n_random": 5,
+    "benchmark_new_tokens": 512,
+    "benchmark_pool_size": null,
+    "benchmark_ref_pool": "honest",
+    "benchmark_refresh_screen": false,
+    "benchmark_repo_root": null,
+    "benchmark_screen_budget": 0,
+    "benchmark_screen_cache": null,
+    "benchmark_screen_seed": 0,
+    "benchmarks": [
+      "sandbagging",
+      "mask:continuations",
+      "mask:disinformation",
+      "mask:doubling_down_known_facts",
+      "mask:known_facts",
+      "mask:provided_facts",
+      "mask:statistics",
+      "lb:instructed-deception",
+      "lb:harm-pressure-choice",
+      "lb:harm-pressure-knowledge-report",
+      "lb:convincing-game"
+    ],
+    "circuit": [
+      "D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742"
+    ],
+    "compose_granularity": "both",
+    "data_dir": null,
+    "device": "cuda",
+    "dry_run": false,
+    "eval_batch_size": 32,
+    "evals": [
+      "sanity",
+      "null",
+      "pressure"
+    ],
+    "expr": null,
+    "gen_examples": 3,
+    "gen_new_tokens": 48,
+    "hf_token": null,
+    "judge_concurrency": 8,
+    "judge_dry_run": false,
+    "knockout_granularity": "finest",
+    "knockout_null_count": 20,
+    "lb_belief_templates": null,
+    "lb_harm_judge_model": null,
+    "lb_judge_model": null,
+    "legacy": false,
+    "mask_judge_model": null,
+    "mask_numeric_judge_model": null,
+    "mean_source": "pooled",
+    "n_random": 20,
+    "no_benchmark_screen_cache": false,
+    "no_kv_cache": false,
+    "null_alloc": "uniform",
+    "null_count": null,
+    "null_seed": 0,
+    "null_start": 0,
+    "output_dir": "outputs/_suites/format-control-sdr-coarse-nls0.3/_shards/D__sdr",
+    "ref_cache_device": "cuda",
+    "reference": "separate",
+    "run_dir": null,
+    "sanity_granularity": "all",
+    "save_null_masks": false,
+    "skip_judge_check": false,
+    "skip_wikitext": false,
+    "std_variant": null,
+    "strict": false,
+    "suite_name": "format-control-sdr-coarse-nls0.3",
+    "task": null,
+    "task_from": [
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742"
+    ],
+    "test_samples": null,
+    "verify": true,
+    "wikitext_batch_size": 4,
+    "wikitext_block_size": 512,
+    "wikitext_blocks": 64,
+    "wikitext_seed": 0,
+    "xor": null
+  },
+  "versions": {
+    "mask_algorithm": 1,
+    "numpy": "2.5.1",
+    "python": "3.12.13"
+  },
+  "merged_from": [
+    "D__sdr",
+    "D__sdr_honest",
+    "D__sdr_nopressure",
+    "D_and_F_hko__sdr",
+    "D_and_F_minus_H_hko__sdr",
+    "D_and_H_minus_F_hko__sdr",
+    "D_hko__sdr",
+    "D_hko__sdr_honest",
+    "D_hko__sdr_nopressure",
+    "D_minus_F_hko__sdr",
+    "D_minus_H_minus_F_hko__sdr",
+    "F__sdr",
+    "F__sdr_honest",
+    "F__sdr_nopressure",
+    "F_hko__sdr",
+    "F_hko__sdr_honest",
+    "F_hko__sdr_nopressure",
+    "F_minus_D_hko__sdr",
+    "F_minus_D_minus_H_hko__sdr",
+    "H__sdr",
+    "H__sdr_honest",
+    "H__sdr_nopressure",
+    "H_and_F_minus_D_hko__sdr",
+    "H_hko__sdr",
+    "H_hko__sdr_honest",
+    "H_hko__sdr_nopressure",
+    "H_minus_D_minus_F_hko__sdr",
+    "xdeltas_a__sdr"
+  ],
+  "shards_pending": [],
+  "shards_missing": [],
+  "note": "merged from per-job shards by _launch_format_control/merge_shards.py; task labels are test-set directory names; argv/cli are the first shard's"
+}

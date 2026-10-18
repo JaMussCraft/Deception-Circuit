@@ -1,0 +1,458 @@
+{
+  "batch_size": 7,
+  "n": 1000,
+  "ablation": "interchange",
+  "granularity": "all",
+  "counts": {
+    "attention_blocks": {
+      "active": 12,
+      "total": 32,
+      "per_layer": {
+        "5": 1,
+        "7": 1,
+        "8": 1,
+        "9": 1,
+        "10": 1,
+        "11": 1,
+        "12": 1,
+        "13": 1,
+        "14": 1,
+        "15": 1,
+        "17": 1,
+        "24": 1
+      }
+    },
+    "attention_heads": {
+      "active": 69,
+      "total": 1024,
+      "per_layer": {
+        "5": 6,
+        "7": 7,
+        "8": 8,
+        "9": 6,
+        "10": 4,
+        "11": 5,
+        "12": 6,
+        "13": 7,
+        "14": 8,
+        "15": 3,
+        "17": 4,
+        "24": 5
+      }
+    },
+    "attention_neurons": {
+      "active": 8832,
+      "total": 131072,
+      "per_layer": {
+        "5": 768,
+        "7": 896,
+        "8": 1024,
+        "9": 768,
+        "10": 512,
+        "11": 640,
+        "12": 768,
+        "13": 896,
+        "14": 1024,
+        "15": 384,
+        "17": 512,
+        "24": 640
+      }
+    },
+    "mlp_hidden": {
+      "active": 458752,
+      "total": 458752,
+      "per_layer": {
+        "0": 14336,
+        "1": 14336,
+        "2": 14336,
+        "3": 14336,
+        "4": 14336,
+        "5": 14336,
+        "6": 14336,
+        "7": 14336,
+        "8": 14336,
+        "9": 14336,
+        "10": 14336,
+        "11": 14336,
+        "12": 14336,
+        "13": 14336,
+        "14": 14336,
+        "15": 14336,
+        "16": 14336,
+        "17": 14336,
+        "18": 14336,
+        "19": 14336,
+        "20": 14336,
+        "21": 14336,
+        "22": 14336,
+        "23": 14336,
+        "24": 14336,
+        "25": 14336,
+        "26": 14336,
+        "27": 14336,
+        "28": 14336,
+        "29": 14336,
+        "30": 14336,
+        "31": 14336
+      }
+    },
+    "mlp_output": {
+      "active": 131072,
+      "total": 131072,
+      "per_layer": {
+        "0": 4096,
+        "1": 4096,
+        "2": 4096,
+        "3": 4096,
+        "4": 4096,
+        "5": 4096,
+        "6": 4096,
+        "7": 4096,
+        "8": 4096,
+        "9": 4096,
+        "10": 4096,
+        "11": 4096,
+        "12": 4096,
+        "13": 4096,
+        "14": 4096,
+        "15": 4096,
+        "16": 4096,
+        "17": 4096,
+        "18": 4096,
+        "19": 4096,
+        "20": 4096,
+        "21": 4096,
+        "22": 4096,
+        "23": 4096,
+        "24": 4096,
+        "25": 4096,
+        "26": 4096,
+        "27": 4096,
+        "28": 4096,
+        "29": 4096,
+        "30": 4096,
+        "31": 4096
+      }
+    }
+  },
+  "label": "discovered circuit",
+  "rows": {
+    "full_open": {
+      "accuracy": 1.0,
+      "logit_diff": 1.76875,
+      "kl_div": 0.0,
+      "exact_match": 1.0,
+      "n": 1000
+    },
+    "discovered": {
+      "accuracy": 0.967,
+      "logit_diff": 1.873375,
+      "kl_div": 0.054623142302036284,
+      "exact_match": 0.974,
+      "n": 1000,
+      "argmax": {
+        "top": [
+          {
+            "id": 35719,
+            "token": " calcium",
+            "count": 92,
+            "frac": 0.092
+          },
+          {
+            "id": 39695,
+            "token": " sodium",
+            "count": 92,
+            "frac": 0.092
+          },
+          {
+            "id": 3215,
+            "token": " button",
+            "count": 60,
+            "frac": 0.06
+          },
+          {
+            "id": 3480,
+            "token": " switch",
+            "count": 58,
+            "frac": 0.058
+          },
+          {
+            "id": 18618,
+            "token": " gate",
+            "count": 47,
+            "frac": 0.047
+          },
+          {
+            "id": 25675,
+            "token": " fence",
+            "count": 42,
+            "frac": 0.042
+          },
+          {
+            "id": 2673,
+            "token": " height",
+            "count": 36,
+            "frac": 0.036
+          },
+          {
+            "id": 1179,
+            "token": " import",
+            "count": 33,
+            "frac": 0.033
+          },
+          {
+            "id": 2612,
+            "token": " output",
+            "count": 32,
+            "frac": 0.032
+          },
+          {
+            "id": 48913,
+            "token": " vibration",
+            "count": 30,
+            "frac": 0.03
+          },
+          {
+            "id": 7637,
+            "token": " export",
+            "count": 30,
+            "frac": 0.03
+          },
+          {
+            "id": 4785,
+            "token": " weight",
+            "count": 29,
+            "frac": 0.029
+          }
+        ],
+        "n_distinct": 51,
+        "target_frac": 0.974,
+        "distractor_frac": 0.026,
+        "other_frac": 0.0
+      }
+    },
+    "discovered_repo": {
+      "accuracy": 0.967,
+      "logit_diff": 1.873375,
+      "kl_div": 0.054654979944229125,
+      "exact_match": 0.974
+    },
+    "empty": {
+      "accuracy": 0.0,
+      "logit_diff": -1.78325,
+      "kl_div": 1.230900025367737,
+      "exact_match": 0.0,
+      "n": 1000,
+      "argmax": {
+        "top": [
+          {
+            "id": 39695,
+            "token": " sodium",
+            "count": 92,
+            "frac": 0.092
+          },
+          {
+            "id": 35719,
+            "token": " calcium",
+            "count": 92,
+            "frac": 0.092
+          },
+          {
+            "id": 3480,
+            "token": " switch",
+            "count": 63,
+            "frac": 0.063
+          },
+          {
+            "id": 3215,
+            "token": " button",
+            "count": 55,
+            "frac": 0.055
+          },
+          {
+            "id": 25675,
+            "token": " fence",
+            "count": 47,
+            "frac": 0.047
+          },
+          {
+            "id": 18618,
+            "token": " gate",
+            "count": 42,
+            "frac": 0.042
+          },
+          {
+            "id": 4785,
+            "token": " weight",
+            "count": 36,
+            "frac": 0.036
+          },
+          {
+            "id": 7637,
+            "token": " export",
+            "count": 33,
+            "frac": 0.033
+          },
+          {
+            "id": 23730,
+            "token": " intake",
+            "count": 32,
+            "frac": 0.032
+          },
+          {
+            "id": 38193,
+            "token": " humidity",
+            "count": 30,
+            "frac": 0.03
+          },
+          {
+            "id": 1179,
+            "token": " import",
+            "count": 30,
+            "frac": 0.03
+          },
+          {
+            "id": 2673,
+            "token": " height",
+            "count": 29,
+            "frac": 0.029
+          }
+        ],
+        "n_distinct": 52,
+        "target_frac": 0.0,
+        "distractor_frac": 1.0,
+        "other_frac": 0.0
+      }
+    }
+  },
+  "reference": {
+    "node_eval": {
+      "accuracy": 0.967,
+      "logit_diff": 1.873375,
+      "kl_div": 0.054654979944229125,
+      "exact_match": 0.974
+    },
+    "baseline": {
+      "accuracy": 1.0,
+      "logit_diff": 1.76875,
+      "kl_div": 0.0,
+      "exact_match": 1.0
+    }
+  },
+  "cross_check": {
+    "ran": true,
+    "ok": true,
+    "max_delta": 3.183764219284041e-05,
+    "per_metric": {
+      "accuracy": {
+        "generic": 0.967,
+        "repo": 0.967,
+        "delta": 0.0,
+        "tolerance": 1e-06,
+        "pass": true
+      },
+      "exact_match": {
+        "generic": 0.974,
+        "repo": 0.974,
+        "delta": 0.0,
+        "tolerance": 1e-06,
+        "pass": true
+      },
+      "logit_diff": {
+        "generic": 1.873375,
+        "repo": 1.873375,
+        "delta": 0.0,
+        "tolerance": 0.0001,
+        "pass": true
+      },
+      "kl_div": {
+        "generic": 0.054623142302036284,
+        "repo": 0.054654979944229125,
+        "delta": 3.183764219284041e-05,
+        "tolerance": 0.0001,
+        "pass": true
+      }
+    }
+  },
+  "all_open": {
+    "ok": true,
+    "kl_div": 0.0,
+    "exact_match": 1.0,
+    "tolerances": {
+      "kl_div": 0.0001,
+      "exact_match_min": 0.999
+    }
+  },
+  "delta": {
+    "ok": true,
+    "max_delta": 3.183764219284041e-05,
+    "rows": [
+      {
+        "metric": "accuracy",
+        "label": "Accuracy",
+        "expected": 0.967,
+        "observed": 0.967,
+        "delta": 0.0,
+        "tolerance": 0.002,
+        "pass": true
+      },
+      {
+        "metric": "logit_diff",
+        "label": "Logit Diff",
+        "expected": 1.873375,
+        "observed": 1.873375,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "pass": true
+      },
+      {
+        "metric": "kl_div",
+        "label": "KL Div",
+        "expected": 0.054654979944229125,
+        "observed": 0.054623142302036284,
+        "delta": -3.183764219284041e-05,
+        "tolerance": 0.005,
+        "pass": true
+      },
+      {
+        "metric": "exact_match",
+        "label": "Exact Match",
+        "expected": 0.974,
+        "observed": 0.974,
+        "delta": 0.0,
+        "tolerance": 0.002,
+        "pass": true
+      }
+    ]
+  },
+  "headline": {
+    "accuracy": 0.967,
+    "logit_diff": 1.873375,
+    "kl_div": 0.054623142302036284,
+    "exact_match": 0.974
+  },
+  "verification": {
+    "masks_roundtrip": true,
+    "all_open_equals_full": true,
+    "generic_vs_task_evaluate_max_delta": 3.183764219284041e-05,
+    "granularity": "all",
+    "reference_numbers": {
+      "source": "results.json:node_eval",
+      "expected": {
+        "accuracy": 0.967,
+        "logit_diff": 1.873375,
+        "kl_div": 0.054654979944229125,
+        "exact_match": 0.974
+      },
+      "observed": {
+        "accuracy": 0.967,
+        "logit_diff": 1.873375,
+        "kl_div": 0.054623142302036284,
+        "exact_match": 0.974
+      },
+      "max_delta": 3.183764219284041e-05,
+      "ok": true
+    }
+  },
+  "seconds": 237.4
+}

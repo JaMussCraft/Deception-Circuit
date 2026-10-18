@@ -38,6 +38,7 @@ import time
 import traceback
 
 from evaluation import get_evaluation, report
+from evaluation.circuits import circuit_condition, condition_of
 from evaluation.context import SCHEMA_VERSION, baseline_numbers, reference_numbers
 from evaluation.masks import ALGORITHM_VERSION, count_masks, save_packed_masks
 from run_io import tee_stdout_stderr
@@ -329,8 +330,15 @@ def run(session) -> int:
             write_json(os.path.join(root, "suite.json"), suite_record(session, root))
             report.banner("SUITE")
             report.kv("root", root)
-            report.kv("circuits", ", ".join(s.label for s in session.circuits))
-            report.kv("tasks", ", ".join(s.label for s in session.tasks))
+            # Which condition each circuit was pruned on and each task's test
+            # set is: D, H and F circuits share a task, so the labels alone
+            # do not say which is which.
+            report.kv("circuits", ", ".join(
+                f"{s.label} [condition={circuit_condition(s)}]"
+                for s in session.circuits))
+            report.kv("tasks", ", ".join(
+                f"{s.label} [condition={condition_of(s.args)}]"
+                for s in session.tasks))
             report.kv("cells", len(session.circuits) * len(session.tasks))
 
         # Task-outer / circuit-inner: one dataloader, mean bank and reference

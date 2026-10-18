@@ -122,6 +122,14 @@ deceptive split's marginals. Exact per-example twinning is impossible — a give
 instance either lied or it didn't — so marginal matching is what makes
 `Δ = C_deceptive − C_honest` interpretable.
 
+**Format Circuit**:
+The circuit pruned on a mechanism task's `nopressure` condition
+(`<task>_nopressure`, `train.py --deception-condition nopressure`): the
+**Scaffold** with the **Pressure Clause** deleted and honest labels. It is what
+the task format recruits absent any motive to deceive. It is a condition of an
+existing task, not a new task.
+_Avoid_: control circuit, template circuit
+
 **Stipulation**:
 The truth value the system turn asserts for a statement. The honest answer
 agrees with it; the deceptive answer contradicts it.
@@ -129,7 +137,8 @@ agrees with it; the deceptive answer contradicts it.
 **Pressure Clause**:
 The sentence in the system turn giving the model a motive to deceive. Present
 in both the deceptive and the honest condition — it is not the thing that
-varies between them.
+varies between them. Only the `nopressure` condition (the **Format Circuit**'s
+dataset) deletes it.
 
 **Readout**:
 The single next-token prediction where a task's answer is read. Shared
@@ -211,6 +220,10 @@ no signal.
 The same prompts under the same pressure, where the model answers honestly. Its
 circuit is subtracted from the deceptive circuit so comparisons are between
 deception-specific components rather than whole task circuits.
+Not to be confused with the `nopressure` condition: the **Honest Twin** keeps
+the pressure and the model answers honestly anyway; `nopressure` removes the
+pressure, so there is no motive to resist (its circuit is the **Format
+Circuit**).
 _Avoid_: control, baseline (ambiguous — the random-circuit null is also a
 baseline)
 

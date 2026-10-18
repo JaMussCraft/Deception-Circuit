@@ -1,0 +1,85 @@
+{
+ "_comment": "The one configuration point of the format-control suites. Set each F to its Format Circuit run directory once ticket 03 lands (expected slugs: outputs/llama-8b-instruct_far/nls0.3_nopressure_noedge_<stamp>, outputs/llama-8b-instruct_sdr/nls0.3_nopressure_noedge_<stamp>, outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_<stamp>), then run `fc_launch.py plan`. D and H are the main checkout's runs (read-only). allmlp is the all-MLP, no-head operand of the coarse heads-only knockout, built by build_allmlp.py from the coarse F run's expanded mask (same keys as D and H; same recipe as outputs/llama-8b-instruct_sdr_coarse/_launch/submit_headsko.sh). Its config.json is the coarse F run's, so plans print m's condition as nopressure; m is not a circuit of the suite. FAR F is the NLS 0.3 run: the size rule's NLS 0.4 retune failed the in-run gate (KL 0.214) and is not carried (orchestrator ruling 2026-10-14); it is evaluated as a side job only.",
+ "_side_jobs": {
+  "format-control-far-nls0.3": [
+   {
+    "job": "F04__far",
+    "circuit": "F04",
+    "run": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.4_nopressure_noedge_261014-081312",
+    "task_from_role": "D",
+    "evals": [
+     "sanity",
+     "knockout"
+    ],
+    "output_dir": "_side_F04",
+    "why": "Retune sensitivity: the FAR NLS 0.4 Format Circuit (failed the in-run gate, KL 0.214, not carried) on the FAR D test set, evals 1 and 2. Outside the suite grid and the cells index."
+   }
+  ]
+ },
+ "_coarse_granularity": "Deliberate deviation from the spec's literal 'coarse at head' (orchestrator ruling 2026-10-13): every coarse knockout and delta cell composes at leaf as (expr) - m, the existing heads-only recipe (submit_headsko.sh). The heads-only runs have no mlp_blocks gate, so head composition ORs the operands' MLP units and keeps all 589,824 of them (the expansion artifact), whereas leaf keeps none and gives the same head sets, because every live head of these masks has all its neurons open. Summaries report these cells at head level.",
+ "_extra_deltas": "Researcher request 2026-10-16: six more D/H/F set combinations on the SDR coarse suite only (the FAR and SDR-fine suites keep their 15 jobs / 21 cells); each cell is planned exactly like the built-in deltas, <label>_hko=(<expr>) - m at leaf, knockout on the D test set. The third element packs rows into one job of three --expr (xdeltas_a__sdr, xdeltas_b__sdr), because only the H200 interactive partition starts quickly and it allows one job per user (scope refinement 2026-10-16). 2026-10-16 14:40: the xdeltas_b group was ungrouped into three single-expr jobs after the packed job (22946115) sat 90 min in the H200-interactive queue; single 30-min cells fit the A40/A100 interactive caps.",
+ "_eval5_extra_circuits": "Researcher request 2026-10-16: EVAL 5 on D, H, F and D-F for the SDR coarse suite. Each [label, expr] row of a suite's eval5_extra_circuits is one more cell in the SAME evaluate_circuit.py invocation as D, H, F (same screen, same judge cache): coarse <label>_hko=(<expr>) - m at leaf, filed as <label>_hko__leaf. The FAR and SDR-fine suites carry no extra and keep their three cells. The gate and the refusals are about F and are unchanged (README_eval5.md).",
+ "format-control-far-nls0.3": {
+  "family": "fine",
+  "task": "far",
+  "runs": {
+   "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+   "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_honest_noedge_260819-084020",
+   "F": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.3_nopressure_noedge_261013-203424"
+  }
+ },
+ "format-control-sdr-nls0.3": {
+  "family": "fine",
+  "task": "sdr",
+  "runs": {
+   "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414",
+   "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525",
+   "F": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr/nls0.3_nopressure_noedge_261013-204850"
+  }
+ },
+ "format-control-sdr-coarse-nls0.3": {
+  "family": "coarse",
+  "task": "sdr",
+  "runs": {
+   "D": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742",
+   "H": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_260922-092743",
+   "F": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr_coarse/nls0.3_nopressure_noedge_noan_nomh_nomo_nomb_261013-204850"
+  },
+  "allmlp": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_launch_format_control/allmlp_nomb",
+  "extra_deltas": [
+   [
+    "H_and_F",
+    "H & F",
+    "xdeltas_a"
+   ],
+   [
+    "H_minus_F",
+    "H - F",
+    "xdeltas_a"
+   ],
+   [
+    "D_and_H_and_F",
+    "D & H & F",
+    "xdeltas_a"
+   ],
+   [
+    "D_and_H_minus_F",
+    "(D & H) - F"
+   ],
+   [
+    "D_and_F_minus_H",
+    "(D & F) - H"
+   ],
+   [
+    "H_and_F_minus_D",
+    "(H & F) - D"
+   ]
+  ],
+  "eval5_extra_circuits": [
+   [
+    "D_minus_F",
+    "D - F"
+   ]
+  ]
+ }
+}

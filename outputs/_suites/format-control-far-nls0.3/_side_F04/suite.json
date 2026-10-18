@@ -1,0 +1,169 @@
+{
+  "schema_version": 1,
+  "created": "2026-10-15T12:40:36",
+  "root": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/_suites/format-control-far-nls0.3/_side_F04",
+  "argv": [
+    "evaluate_circuit.py",
+    "--circuit",
+    "F04=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.4_nopressure_noedge_261014-081312",
+    "--task-from",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+    "--evals",
+    "sanity",
+    "knockout",
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20",
+    "--suite-name",
+    "format-control-far-nls0.3",
+    "--output-dir",
+    "outputs/_suites/format-control-far-nls0.3/_side_F04"
+  ],
+  "ablation": "interchange",
+  "evals": [
+    "sanity",
+    "knockout"
+  ],
+  "model": "llama-8b-instruct",
+  "geometry": {
+    "num_heads": 32,
+    "head_dim": 128,
+    "intermediate_size": 14336,
+    "hidden_size": 4096,
+    "num_layers": 32
+  },
+  "compose_granularity": "both",
+  "membership_convention": {
+    "leaf": "attention_neurons / mlp_hidden / mlp_output",
+    "head": "attention_heads + mlp_blocks",
+    "embedding": "not a set member; the OR of the operands' gates",
+    "coarse_gates": "re-derived bottom-up from the fine gates"
+  },
+  "circuits": [
+    {
+      "label": "F04",
+      "kind": "atomic",
+      "expr": null,
+      "operands": {
+        "F04": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.4_nopressure_noedge_261014-081312"
+      },
+      "home_run_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.4_nopressure_noedge_261014-081312",
+      "counts": {
+        "attention_blocks": 13,
+        "mlp_blocks": 2,
+        "attention_heads": 72,
+        "attention_neurons": 5540,
+        "mlp_hidden": 3481,
+        "mlp_output": 1708
+      }
+    }
+  ],
+  "tasks": [
+    {
+      "label": "far",
+      "task": "far",
+      "home_run_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914",
+      "dataset": {
+        "data_dir": "./data/datasets",
+        "std_variant": "azaria",
+        "deception_condition": "deceptive",
+        "test_samples": 1000
+      }
+    }
+  ],
+  "cli": {
+    "ablation": "interchange",
+    "all_pairs_delta": false,
+    "benchmark_belief_model": null,
+    "benchmark_belief_tokens": 128,
+    "benchmark_coherence_batch_size": null,
+    "benchmark_gen_batch_size": 8,
+    "benchmark_n_per_dataset": 100,
+    "benchmark_n_random": 5,
+    "benchmark_new_tokens": 512,
+    "benchmark_pool_size": null,
+    "benchmark_ref_pool": "honest",
+    "benchmark_refresh_screen": false,
+    "benchmark_repo_root": null,
+    "benchmark_screen_budget": 0,
+    "benchmark_screen_cache": null,
+    "benchmark_screen_seed": 0,
+    "benchmarks": [
+      "sandbagging",
+      "mask:continuations",
+      "mask:disinformation",
+      "mask:doubling_down_known_facts",
+      "mask:known_facts",
+      "mask:provided_facts",
+      "mask:statistics",
+      "lb:instructed-deception",
+      "lb:harm-pressure-choice",
+      "lb:harm-pressure-knowledge-report",
+      "lb:convincing-game"
+    ],
+    "circuit": [
+      "F04=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_far/nls0.4_nopressure_noedge_261014-081312"
+    ],
+    "compose_granularity": "both",
+    "data_dir": null,
+    "device": "cuda",
+    "dry_run": false,
+    "eval_batch_size": 32,
+    "evals": [
+      "sanity",
+      "knockout"
+    ],
+    "expr": null,
+    "gen_examples": 3,
+    "gen_new_tokens": 48,
+    "hf_token": null,
+    "judge_concurrency": 8,
+    "judge_dry_run": false,
+    "knockout_granularity": "finest",
+    "knockout_null_count": 20,
+    "lb_belief_templates": null,
+    "lb_harm_judge_model": null,
+    "lb_judge_model": null,
+    "legacy": false,
+    "mask_judge_model": null,
+    "mask_numeric_judge_model": null,
+    "mean_source": "pooled",
+    "n_random": 20,
+    "no_benchmark_screen_cache": false,
+    "no_kv_cache": false,
+    "null_alloc": "uniform",
+    "null_count": null,
+    "null_seed": 0,
+    "null_start": 0,
+    "output_dir": "outputs/_suites/format-control-far-nls0.3/_side_F04",
+    "ref_cache_device": "cuda",
+    "reference": "separate",
+    "run_dir": null,
+    "sanity_granularity": "all",
+    "save_null_masks": false,
+    "skip_judge_check": false,
+    "skip_wikitext": false,
+    "std_variant": null,
+    "strict": false,
+    "suite_name": "format-control-far-nls0.3",
+    "task": null,
+    "task_from": [
+      "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_far/nls0.3_noedge_260819-083914"
+    ],
+    "test_samples": null,
+    "verify": true,
+    "wikitext_batch_size": 4,
+    "wikitext_block_size": 512,
+    "wikitext_blocks": 64,
+    "wikitext_seed": 0,
+    "xor": null
+  },
+  "versions": {
+    "mask_algorithm": 1,
+    "numpy": "2.5.1",
+    "python": "3.12.13"
+  }
+}

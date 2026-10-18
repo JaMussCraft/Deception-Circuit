@@ -1,0 +1,135 @@
+# 2026-10-14T08:21:21  python evaluate_circuit.py --circuit D=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414 --circuit H=/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525 --circuit F=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr/nls0.3_nopressure_noedge_261013-204850 --expr 'D_minus_H_minus_F=D - H - F' --compose-granularity both --task-from /projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414 --evals knockout --ablation interchange --n-random 20 --knockout-null-count 20 --suite-name format-control-sdr-nls0.3 --output-dir outputs/_suites/format-control-sdr-nls0.3/_shards/D_minus_H_minus_F__sdr --dry-run
+
+====================================================================================
+  DRY RUN — no model loaded, no CUDA touched
+====================================================================================
+  model                        llama-8b-instruct
+  ablation                     interchange
+  evaluations                  knockout
+  layout                       suite (outputs/_suites/format-control-sdr-nls0.3/_shards/D_minus_H_minus_F__sdr)
+
+====================================================================================
+  ABLATION SCHEME: interchange
+====================================================================================
+
+  Ablated nodes take their value from the corrupted stream — the 
+  same reference the gates were trained against. This is the only 
+  scheme that can reproduce the in-run numbers.
+
+====================================================================================
+  CIRCUITS
+====================================================================================
+
+  D_minus_H_minus_F__leaf            leaf         5,263 fine units   condition=D:deceptive,H:honest,F:nopressure   D - H - F
+  D_minus_H_minus_F__head            head           704 fine units   condition=D:deceptive,H:honest,F:nopressure   D - H - F
+
+====================================================================================
+  TASKS
+====================================================================================
+
+  sdr                  task=sdr      condition=deceptive  n=1000  data=./data/datasets  /projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414
+
+====================================================================================
+  CELL GRID (2 circuits x 1 tasks)
+====================================================================================
+
+  outputs/_suites/format-control-sdr-nls0.3/_shards/D_minus_H_minus_F__sdr/cells/D_minus_H_minus_F__leaf/sdr/interchange
+  outputs/_suites/format-control-sdr-nls0.3/_shards/D_minus_H_minus_F__sdr/cells/D_minus_H_minus_F__head/sdr/interchange
+
+====================================================================================
+  DISCOVERED CIRCUIT
+====================================================================================
+
+  Granularity                Active        Total    Kept %
+  --------------------------------------------------------
+  attention_blocks               13           32   40.625%
+  mlp_blocks                      3           32    9.375%
+  attention_heads                68        1,024    6.641%
+  attention_neurons           1,533      131,072    1.170%
+  mlp_hidden                  2,490      458,752    0.543%
+  mlp_output                  1,240      131,072    0.946%
+  --------------------------------------------------------
+  TOTAL                       5,347      721,984    0.741%
+
+  Geometry: 32 layers x 32 heads x 128 dims, hidden 4096, intermediate 14336
+
+------------------------------------------------------------------------------------
+  PER-LAYER COUNTS
+------------------------------------------------------------------------------------
+
+  Layer        attention_heads   attention_neurons          mlp_hidden          mlp_output
+  ----------------------------------------------------------------------------------------
+  0                          0                   0                 532                 154
+  4                          2                  12                   0                   0
+  5                          5                 244                   0                   0
+  8                          8                 166                   0                   0
+  9                          7                 129                   0                   0
+  10                         5                  83                   0                   0
+  11                         5                  92                   0                   0
+  12                         5                 117                   0                   0
+  13                         6                 166                   0                   0
+  14                         7                 175               1,328                 438
+  15                         4                  46                   0                   0
+  17                         3                  27                   0                   0
+  24                         7                 191                   0                   0
+  27                         4                  85                   0                   0
+  31                         0                   0                 630                 648
+  ----------------------------------------------------------------------------------------
+  TOTAL                     68               1,533               2,490               1,240
+
+====================================================================================
+  KNOCKOUT (finest)
+====================================================================================
+
+  complement verified: knockout ∧ circuit = 0, knockout ∪ circuit = 1
+  fine units ablated: 5,263
+    attention_neurons       129,539 live (98.83%)
+    mlp_hidden              456,262 live (99.46%)
+    mlp_output              129,832 live (99.05%)
+
+====================================================================================
+  RANDOM CIRCUITS (20 sampled, seed 0, alloc uniform)
+====================================================================================
+
+  hierarchy validated on every sample (no empty drawn head, no orphaned neuron)
+  all 20 samples size-matched to the discovered circuit at every granularity and layer
+
+------------------------------------------------------------------------------------
+  PER-LAYER COUNTS — random circuit 0 (must match above)
+------------------------------------------------------------------------------------
+
+  Layer        attention_heads   attention_neurons          mlp_hidden          mlp_output
+  ----------------------------------------------------------------------------------------
+  0                          0                   0                 532                 154
+  4                          2                  12                   0                   0
+  5                          5                 244                   0                   0
+  8                          8                 166                   0                   0
+  9                          7                 129                   0                   0
+  10                         5                  83                   0                   0
+  11                         5                  92                   0                   0
+  12                         5                 117                   0                   0
+  13                         6                 166                   0                   0
+  14                         7                 175               1,328                 438
+  15                         4                  46                   0                   0
+  17                         3                  27                   0                   0
+  24                         7                 191                   0                   0
+  27                         4                  85                   0                   0
+  31                         0                   0                 630                 648
+  ----------------------------------------------------------------------------------------
+  TOTAL                     68               1,533               2,490               1,240
+
+====================================================================================
+  ESTIMATED RUNTIME (1x A100, very rough)
+====================================================================================
+
+  model load                                                    3.3 min
+  eval 2 (task knockout)                                        3.7 min
+  eval 2 (wikitext, 22 configs)                                 9.5 min
+  eval 2 (task null, 20 knockouts)                             36.7 min
+  eval 2 (prompt variants, 2 x 3 configs, live reference)      22.0 min
+  eval 2 (3 generation examples)                                5.0 min
+  ------------------------------------------------------------------
+  TOTAL                                                        80.2 min (2 cell(s))
+
+  Nothing was written. Drop --dry-run to run it.
+  TEST SET  task=sdr  condition=deceptive  n_test=1000  dir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/data/datasets/sdr

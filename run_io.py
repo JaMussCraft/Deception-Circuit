@@ -133,12 +133,13 @@ def build_run_slug(args, node_cfg, max_len: int = 90) -> str:
             if val != 42:
                 parts.append(f"{abbr}{_fmt_num(val)}")
 
-    # far/sdr/ser train BOTH conditions with otherwise identical flags, so
-    # without this the deceptive run and its honest twin land in the same
-    # directory name and are told apart only by opening config.json — and
-    # mixing them up inverts Δ = C_deceptive − C_honest.
-    if getattr(args, "deception_condition", "deceptive") == "honest":
-        parts.append("honest")
+    # far/sdr/ser train every condition with otherwise identical flags, so
+    # without this the deceptive run, its honest twin and its no-pressure run
+    # land in the same directory name and are told apart only by opening
+    # config.json — and mixing them up inverts Δ = C_deceptive − C_honest.
+    condition = getattr(args, "deception_condition", None) or "deceptive"
+    if condition != "deceptive":
+        parts.append(condition)
 
     if args.task == "joint" and getattr(args, "joint_tasks", None):
         jt = "_".join(args.joint_tasks)

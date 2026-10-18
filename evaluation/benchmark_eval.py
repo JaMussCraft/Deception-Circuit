@@ -975,6 +975,31 @@ def register_mean_bank(ctx, screen, dataset, pad_id, eos):
 
 
 # ==============================================================================
+# DERIVED FIELDS
+# ==============================================================================
+#
+# Pulled out of `_run_config` and `run` so `evaluation/rejudge.py`, which
+# repairs labels after a judge outage, recomputes them with this code rather
+# than a copy of it.
+
+def tally_labels(rows):
+    """-> (counts, rates) over `base.LABELS` for one configuration's rows."""
+    counts = dict((label, 0) for label in base.LABELS)
+    for row in rows:
+        counts[row["label"]] += 1
+    total = max(len(rows), 1)
+    return counts, dict((label, counts[label] / total) for label in base.LABELS)
+
+
+def headline_of(datasets):
+    """The cell headline: knockout's deception rate per dataset that ran."""
+    return {
+        dataset: entry["configs"]["knockout"]["rates"]["deceptive"]
+        for dataset, entry in datasets.items()
+        if "configs" in entry and "knockout" in entry["configs"]}
+
+
+# ==============================================================================
 # THE EVALUATION
 # ==============================================================================
 
@@ -1042,10 +1067,7 @@ class BenchmarkEvaluation(Evaluation):
 
         payload["judge"] = client.stats()
         payload["screen_cache"] = self._screen_cache
-        payload["headline"] = {
-            dataset: entry["configs"]["knockout"]["rates"]["deceptive"]
-            for dataset, entry in payload["datasets"].items()
-            if "configs" in entry and "knockout" in entry["configs"]}
+        payload["headline"] = headline_of(payload["datasets"])
         payload["verification"] = {
             "benchmark_belief_from_full_model": True,
             "benchmark_full_row_is_the_screen": all(
@@ -1156,13 +1178,10 @@ class BenchmarkEvaluation(Evaluation):
             batch_size=coherence_batch_size(ctx.cli),
             desc="%s: coherence (%s)" % (dataset, config))
 
-        counts = dict((label, 0) for label in base.LABELS)
-        for row in rows:
-            counts[row["label"]] += 1
-        total = max(len(rows), 1)
+        counts, rates = tally_labels(rows)
         return {
             "counts": counts,
-            "rates": dict((label, counts[label] / total) for label in base.LABELS),
+            "rates": rates,
             "coherence": coherence,
             "generations": responses,
             "labels": rows,

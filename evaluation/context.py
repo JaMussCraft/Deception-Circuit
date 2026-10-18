@@ -47,7 +47,8 @@ _RUN_CONFIG_KEYS = (
     "node_lambda_sparsity", "edge_lambda_sparsity", "data_dir",
     # Recorded only by runs trained after the std_variant fix; see below.
     "std_variant", "std_runtime_filter", "std_margin_loss",
-    # far / sdr / ser: which of <task> and <task>_honest the run was trained on.
+    # far / sdr / ser: which of <task>, <task>_honest and <task>_nopressure the
+    # run was trained on.
     "deception_condition", "deception_runtime_filter", "deception_margin_loss",
     "joint_tasks", "joint_scale_epochs",
 )
@@ -159,11 +160,13 @@ def resolve_train_args(run_config: dict, cli):
 
     if args.task in ("far", "sdr", "ser") and not run_config.get("deception_condition"):
         # Same failure mode as std_variant: evaluating a deceptive-condition run
-        # against <task>_honest silently reports the wrong numbers.
+        # against <task>_honest or <task>_nopressure silently reports the
+        # wrong numbers.
         print(f"\n  !! --deception-condition is not recorded in this run's "
               f"config.json; defaulting to '{args.deception_condition}'.")
-        print("     If the run was trained on the honest twin, every number "
-              "below is against the WRONG dataset.\n")
+        print("     If the run was trained on another condition (honest, "
+              "nopressure), every number below is against the WRONG "
+              "dataset.\n")
 
     node_cfg = NodePruningConfig(**run_config["node_config"])
     return args, node_cfg
@@ -292,6 +295,17 @@ class Session:
                 if loader is None:
                     result = (None, f"{task.name} does not implement the "
                                     f"'{variant}' prompt variant")
+                elif len(loader.dataset) == 0:
+                    # e.g. a nopressure test set, which already is the
+                    # no_pressure variant. The metrics divide by n, so an empty
+                    # loader is a skip with a reason, not a section to run.
+                    from evaluation.variants import empty_variant_reason
+                    try:
+                        dataset_dir = task.dataset_dir(task_spec.args)
+                    except Exception:                      # noqa: BLE001
+                        dataset_dir = None
+                    result = (None, empty_variant_reason(task.name, variant,
+                                                         dataset_dir))
                 else:
                     # Same rebatching as loader_for: variant sections are not
                     # reproducing an in-run number, so they get --eval-batch-size.

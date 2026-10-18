@@ -1,0 +1,491 @@
+#!/usr/bin/env python3
+"""
+fc_launch.py — plan, dry-run, submit, merge and post-process the three
+format-control evaluation suites.
+
+    suites.json            the ONE configuration point: D, H, F run directories
+                           per suite (F is null until ticket 03's runs exist)
+    suite_manifest.json    every job and cell, its arguments, its dry-run
+                           verdict and estimate, and its Slurm job id
+
+Run every subcommand from the repo (worktree) root:
+
+    python outputs/_launch_format_control/fc_launch.py plan
+    python outputs/_launch_format_control/fc_launch.py args <suite> <job>
+    python outputs/_launch_format_control/fc_launch.py dryrun [--suite S] [--job J] [--parallel N]
+    python outputs/_launch_format_control/fc_launch.py submit --dry --accounts A [B ...] --partition P
+    python outputs/_launch_format_control/fc_launch.py merge <suite>
+    python outputs/_launch_format_control/fc_launch.py overlap <suite>
+    python outputs/_launch_format_control/fc_launch.py standin-dryrun [--suite S]
+
+`cell_cmd.sh` and `submit.sh` are thin wrappers over `args` and `submit`.
+A job is submitted only after its login-node `--dry-run` passed (log under
+dryrun/<suite>/<job>.log); --time is the dry-run estimate x 1.5 in quarter
+hours (at least one hour) unless --time is given.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import re
+import shlex
+import subprocess
+import sys
+import time
+from concurrent.futures import ThreadPoolExecutor
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+sys.path.insert(0, os.getcwd())
+
+from fc_cells import (job_args, parse_dryrun_log, plan_suite, side_job_args,  # noqa: E402
+                      walltime)
+
+LAUNCH_REL = "outputs/_launch_format_control"
+CONFIG_PATH = os.path.join(HERE, "suites.json")
+MANIFEST_PATH = os.path.join(HERE, "suite_manifest.json")
+DRYRUN_DIR = os.path.join(HERE, "dryrun")
+STANDIN_DIR = os.path.join(HERE, "dryrun_standin")
+
+
+# ==============================================================================
+# CONFIG AND MANIFEST
+# ==============================================================================
+
+def load_config(path: str = CONFIG_PATH) -> dict:
+    with open(path) as f:
+        raw = json.load(f)
+    return {k: v for k, v in raw.items() if not k.startswith("_")}
+
+
+def load_side_jobs(path: str = CONFIG_PATH) -> dict:
+    """suites.json `_side_jobs`: {suite: [{job, circuit, run, task_from_role,
+    evals, output_dir, why}]}. Side jobs are extra evaluations outside the
+    suite grid (e.g. a retune of F); they are never in the cells index."""
+    with open(path) as f:
+        return json.load(f).get("_side_jobs") or {}
+
+
+def planned_jobs(config: dict, side_jobs: dict = None):
+    """(suite, job id, args or None, awaits) for every grid job and side job."""
+    for sname, cfg in config.items():
+        for job in plan_suite(sname, cfg):
+            yield sname, job["job"], (None if job["awaits"] else job_args(job)), job["awaits"]
+        for side in (side_jobs or {}).get(sname, []):
+            yield sname, side["job"], side_job_args(sname, cfg, side), []
+
+
+def build_manifest(config: dict, previous: dict = None, dryruns: dict = None,
+                   side_jobs: dict = None) -> dict:
+    """Every suite's jobs and cells, plus `side_jobs` kept apart from the
+    cells index. `previous` carries Slurm records forward; `dryruns` maps
+    (suite, job) -> {"log", "passed", "estimate_min"}."""
+    prev = {}
+    for sname, s in ((previous or {}).get("suites") or {}).items():
+        for j in s.get("jobs", []):
+            prev[(sname, j["job"])] = j
+    for sname, sides in ((previous or {}).get("side_jobs") or {}).items():
+        for j in sides:
+            prev[(sname, j["job"])] = j
+
+    def records(sname, job_id, args):
+        old = prev.get((sname, job_id), {})
+        dr = (dryruns or {}).get((sname, job_id))
+        if dr is None and old.get("args") == args:
+            dr = old.get("dryrun")
+        return {"args": args,
+                "dryrun": dr or {"log": None, "passed": None, "estimate_min": None},
+                "slurm": old.get("slurm") or {"job_id": None}}
+
+    side_out = {}
+    for sname, sides in (side_jobs or {}).items():
+        if sname not in config:
+            continue
+        side_out[sname] = [dict(side, awaits=[], cells=[],
+                                **records(sname, side["job"],
+                                          side_job_args(sname, config[sname], side)))
+                           for side in sides]
+    suites = {}
+    for sname, cfg in config.items():
+        jobs = []
+        for job in plan_suite(sname, cfg):
+            args = None if job["awaits"] else job_args(job)
+            jobs.append({
+                "job": job["job"], "cells": job["cells"], "evals": job["evals"],
+                "compose_granularity": job["compose_granularity"],
+                "task_from_role": job["task_from_role"], "awaits": job["awaits"],
+                **records(sname, job["job"], args),
+            })
+        # Flat index for readers (ticket 05's summary writer): find a cell by
+        # (circuit label, test-set condition) and read it at `path` under the
+        # suite root, which is where merge_shards.py files it.
+        cells = [dict(c, job=j["job"], path=f"cells/{c['circuit']}/{c['dataset']}/interchange")
+                 for j in jobs for c in j["cells"]]
+        suites[sname] = {"family": cfg["family"], "task": cfg["task"], "runs": cfg["runs"],
+                         "allmlp": cfg.get("allmlp"), "cells": cells, "jobs": jobs}
+    return {"created": time.strftime("%Y-%m-%dT%H:%M:%S"),
+            "config": os.path.join(LAUNCH_REL, "suites.json"), "suites": suites,
+            "side_jobs": side_out}
+
+
+_LOG_HEADER = re.compile(r"^# \S+\s+python evaluate_circuit\.py (.*) --dry-run$")
+
+
+def dryrun_log_args(first_line: str):
+    """The argument string a dry-run log's header records, or None."""
+    m = _LOG_HEADER.match(first_line.rstrip("\n"))
+    return m.group(1) if m else None
+
+
+def read_dryruns(config: dict, dryrun_dir: str = DRYRUN_DIR, side_jobs: dict = None) -> dict:
+    """(suite, job) -> dry-run verdict. A log counts only when its header
+    records exactly the job's current arguments; a log for other arguments
+    (an F retune, a corrected path, changed common settings) is `stale` and
+    the job counts as not dry-run."""
+    out = {}
+    for sname, job_id, args, awaits in planned_jobs(config, side_jobs):
+        path = os.path.join(dryrun_dir, sname, f"{job_id}.log")
+        if not os.path.exists(path) or awaits:
+            continue
+        with open(path, errors="replace") as f:
+            text = f.read()
+        rel = os.path.relpath(path, HERE)
+        if dryrun_log_args(text.split("\n", 1)[0]) != shlex.join(args):
+            out[(sname, job_id)] = {"log": rel, "passed": None, "estimate_min": None,
+                                    "stale": True}
+            continue
+        passed, est = parse_dryrun_log(text)
+        out[(sname, job_id)] = {"log": rel, "passed": passed, "estimate_min": est}
+    return out
+
+
+def load_manifest(path: str = MANIFEST_PATH):
+    if not os.path.exists(path):
+        return None
+    with open(path) as f:
+        return json.load(f)
+
+
+def save_manifest(manifest: dict, path: str = MANIFEST_PATH) -> None:
+    tmp = path + ".tmp"
+    with open(tmp, "w") as f:
+        json.dump(manifest, f, indent=1)
+    os.replace(tmp, path)
+
+
+def refresh_manifest() -> dict:
+    config, side = load_config(), load_side_jobs()
+    manifest = build_manifest(config, previous=load_manifest(),
+                              dryruns=read_dryruns(config, side_jobs=side), side_jobs=side)
+    save_manifest(manifest)
+    return manifest
+
+
+# ==============================================================================
+# SUBMISSION
+# ==============================================================================
+
+def short_name(suite: str) -> str:
+    return re.sub(r"-nls[0-9.]+$", "", suite.replace("format-control-", ""))
+
+
+def sbatch_cmd(suite: str, job: dict, *, account: str, partition: str, time_: str) -> list:
+    return ["sbatch", f"--account={account}", f"--partition={partition}", f"--time={time_}",
+            f"--job-name=fc-{short_name(suite)}-{job['job']}",
+            f"--output={LAUNCH_REL}/logs/{suite}/{job['job']}_%j.out",
+            "scripts/evaluate_circuit.sbatch", *job["args"]]
+
+
+def _default_run(cmd: list) -> str:
+    return subprocess.run(cmd, check=True, capture_output=True, text=True).stdout
+
+
+def submit(manifest: dict, *, dry: bool, accounts, partition: str, suites=None, jobs=None,
+           time: str = None, resubmit: bool = False, run=_default_run, save=None) -> list:
+    """Submit (or with dry=True print) one sbatch per ready job. Returns the
+    printed lines; records job ids in `manifest` in place and calls
+    `save(manifest)` after every successful sbatch, so a failure later in the
+    loop never loses an id that Slurm already holds. A job that already has an
+    id is skipped unless `resubmit`."""
+    lines, i = [], 0
+    for sname, suite in manifest["suites"].items():
+        if suites and sname not in suites:
+            continue
+        lines.append(f"# {sname}")
+        for job in suite["jobs"] + (manifest.get("side_jobs") or {}).get(sname, []):
+            if jobs and job["job"] not in jobs:
+                continue
+            jid = (job.get("slurm") or {}).get("job_id")
+            if job["awaits"]:
+                lines.append(f"# skip {job['job']}: awaits {', '.join(job['awaits'])}")
+                continue
+            if jid and not resubmit:
+                lines.append(f"# skip {job['job']}: submitted as {jid}")
+                continue
+            dr = job.get("dryrun") or {}
+            if dr.get("stale"):
+                lines.append(f"# skip {job['job']}: dry-run log is for other arguments; "
+                             f"dry-run it again")
+                continue
+            if not dr.get("passed"):
+                lines.append(f"# skip {job['job']}: no passing dry-run")
+                continue
+            t = time or walltime(dr.get("estimate_min") or 60.0)
+            account = accounts[i % len(accounts)]
+            i += 1
+            cmd = sbatch_cmd(sname, job, account=account, partition=partition, time_=t)
+            lines.append(" ".join(shlex.quote(c) for c in cmd))
+            if dry:
+                continue
+            os.makedirs(os.path.join(LAUNCH_REL, "logs", sname), exist_ok=True)
+            out = run(cmd)
+            new_id = out.strip().split()[-1]
+            job["slurm"] = {"job_id": new_id, "account": account, "partition": partition,
+                            "time": t, "submitted": time_stamp()}
+            lines.append(f"#   -> {new_id}")
+            if save is not None:
+                save(manifest)
+    return lines
+
+
+SACCT_FIELDS = "JobID,Partition,NodeList,Timelimit,State"
+
+
+def parse_sacct(text: str) -> dict:
+    """`sacct -X -n -P -o JobID,Partition,NodeList,Timelimit,State` -> {id: row}."""
+    rows = {}
+    for line in text.splitlines():
+        parts = line.strip().split("|")
+        if len(parts) != 5:
+            continue
+        jid, partition, node, limit, state = parts
+        rows[jid] = {"partition": partition, "node": node, "timelimit": limit,
+                     "state": state.split()[0] if state else state}
+    return rows
+
+
+def _slurm_records(manifest: dict):
+    for suite in manifest["suites"].values():
+        for job in suite["jobs"]:
+            yield job["slurm"]
+    for sides in (manifest.get("side_jobs") or {}).values():
+        for job in sides:
+            yield job["slurm"]
+
+
+def apply_sacct(manifest: dict, rows: dict) -> int:
+    """Record each submitted job's final state, the partition and node it ran
+    on (sanity on H200 drifts by one tolerance step against A40-trained runs),
+    and a time limit changed in place after submission. Returns the number of
+    records updated."""
+    n = 0
+    for rec in _slurm_records(manifest):
+        row = rows.get(rec.get("job_id") or "")
+        if not row:
+            continue
+        rec["state"] = row["state"]
+        if row["state"] not in ("PENDING",) and row["node"] and row["node"] != "None assigned":
+            rec["ran_on"] = {"partition": row["partition"], "node": row["node"]}
+        if row["timelimit"] and row["timelimit"] != rec.get("time"):
+            rec["time_limit_actual"] = row["timelimit"]
+            rec["time_limit_note"] = ("lowered in place by the orchestrator (scontrol update) on "
+                                      "2026-10-14 to speed backfill; `time` is the limit at submission")
+        n += 1
+    return n
+
+
+def record_slurm(path: str = MANIFEST_PATH) -> int:
+    manifest = load_manifest(path)
+    ids = [r["job_id"] for r in _slurm_records(manifest) if r.get("job_id")]
+    if not ids:
+        return 0
+    out = subprocess.run(["sacct", "-X", "-n", "-P", "-o", SACCT_FIELDS, "-j", ",".join(ids)],
+                         check=True, capture_output=True, text=True).stdout
+    n = apply_sacct(manifest, parse_sacct(out))
+    save_manifest(manifest, path)
+    return n
+
+
+def time_stamp() -> str:
+    return time.strftime("%Y-%m-%dT%H:%M:%S")
+
+
+# ==============================================================================
+# DRY RUNS
+# ==============================================================================
+
+def describe_test_set(args: list) -> dict:
+    """The test set a job's `--task-from` resolves to, as the evaluator
+    resolves it (the run's config.json through `resolve_train_args`, then the
+    task's `dataset_dir`), with its absolute directory and loaded size.
+    `evaluate_circuit.py --dry-run` prints only the configured cap
+    (`test_samples`) and the relative data_dir, so this is the proof that the
+    condition was inherited and the directory resolved in this checkout."""
+    import evaluate_circuit
+    from datasets import load_from_disk
+    from evaluation.circuits import _args_from_run, norm_run_dir
+    from tasks import get_task
+
+    cli = evaluate_circuit.build_parser().parse_args(list(args) + ["--dry-run"])
+    task_args = _args_from_run(norm_run_dir(cli.task_from[0]), cli)
+    directory = os.path.abspath(get_task(task_args.task).dataset_dir(task_args))
+    n = len(load_from_disk(os.path.join(directory, "test")))
+    cap = getattr(task_args, "test_samples", None)
+    return {"task": task_args.task, "condition": task_args.deception_condition or "deceptive",
+            "dataset_dir": directory, "n_test": min(n, cap) if cap else n}
+
+
+def _dryrun_one(args: list, log_path: str, timeout: int) -> tuple:
+    os.makedirs(os.path.dirname(log_path), exist_ok=True)
+    env = dict(os.environ, OMP_NUM_THREADS="1", MKL_NUM_THREADS="1", OPENBLAS_NUM_THREADS="1")
+    with open(log_path, "w") as f:
+        f.write(f"# {time_stamp()}  python evaluate_circuit.py {shlex.join(args)} --dry-run\n")
+        f.flush()
+        try:
+            subprocess.run([sys.executable, "evaluate_circuit.py", *args, "--dry-run"],
+                           stdout=f, stderr=subprocess.STDOUT, env=env, timeout=timeout)
+        except subprocess.TimeoutExpired:
+            f.write(f"\nDRY-RUN TIMED OUT after {timeout} s\n")
+        f.flush()
+        # The test set actually resolved and its loaded size (the dry-run
+        # itself prints only the configured cap).
+        try:
+            subprocess.run([sys.executable, os.path.join(HERE, "fc_launch.py"), "testset", *args],
+                           stdout=f, stderr=subprocess.STDOUT, env=env, timeout=timeout)
+        except subprocess.TimeoutExpired:
+            f.write("\nTEST SET CHECK TIMED OUT\n")
+    with open(log_path, errors="replace") as f:
+        return parse_dryrun_log(f.read())
+
+
+def dryrun(config: dict, out_dir: str, *, suites=None, jobs=None, parallel: int = 2,
+           timeout: int = 1800, log=print, side_jobs: dict = None) -> dict:
+    todo = []
+    for sname, job_id, args, awaits in planned_jobs(config, side_jobs):
+        if (suites and sname not in suites) or (jobs and job_id not in jobs):
+            continue
+        if awaits:
+            log(f"  {sname} {job_id}: awaits {', '.join(awaits)}")
+            continue
+        todo.append((sname, job_id, args, os.path.join(out_dir, sname, f"{job_id}.log")))
+    results = {}
+    with ThreadPoolExecutor(max_workers=max(1, parallel)) as pool:
+        futs = {pool.submit(_dryrun_one, a, p, timeout): (s, j, p) for s, j, a, p in todo}
+        for fut, (s, j, p) in futs.items():
+            passed, est = fut.result()
+            results[(s, j)] = (passed, est)
+            log(f"  {s} {j}: {'PASS' if passed else 'FAIL'}"
+                f"{f'  est {est} min' if est else ''}  ({os.path.relpath(p, HERE)})")
+    return results
+
+
+def standin_config(config: dict, f_runs: dict = None) -> dict:
+    """A plumbing-only dry-run of the F-dependent jobs before the Format
+    Circuits exist. F is `f_runs[suite]` when given (e.g. a copy of the H run
+    with `deception_condition: nopressure`, so the F test set really is
+    `<task>_nopressure`), else the H run itself (then the "F test set" is the
+    H test set)."""
+    out = {}
+    for sname, cfg in config.items():
+        runs = dict(cfg["runs"])
+        runs["F"] = runs["F"] or (f_runs or {}).get(sname) or runs["H"]
+        out[sname] = dict(cfg, runs=runs)
+    return out
+
+
+# ==============================================================================
+# CLI
+# ==============================================================================
+
+def main(argv=None):
+    argv = list(sys.argv[1:] if argv is None else argv)
+    if argv[:1] == ["testset"]:
+        # Its arguments are evaluate_circuit.py flags, which argparse's
+        # subparsers would try to parse, so dispatch before them.
+        d = describe_test_set(argv[1:])
+        print(f"  TEST SET  task={d['task']}  condition={d['condition']}  "
+              f"n_test={d['n_test']}  dir={d['dataset_dir']}")
+        return 0
+    ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
+    sub = ap.add_subparsers(dest="cmd", required=True)
+    sub.add_parser("plan", help="(re)write suite_manifest.json")
+    sub.add_parser("record-slurm", help="record each submitted job's state, partition/node "
+                                        "and actual time limit (sacct) in the manifest")
+    sub.add_parser("testset", help="print the test set a job's --task-from resolves to "
+                                   "(usage: testset <evaluate_circuit.py args>)")
+    p = sub.add_parser("args", help="print one job's evaluate_circuit.py arguments")
+    p.add_argument("suite")
+    p.add_argument("job")
+    for name in ("dryrun", "standin-dryrun"):
+        p = sub.add_parser(name)
+        p.add_argument("--suite", action="append")
+        p.add_argument("--job", action="append")
+        p.add_argument("--parallel", type=int, default=2)
+        p.add_argument("--timeout", type=int, default=1800)
+        if name == "standin-dryrun":
+            p.add_argument("--f-run", action="append", default=[], metavar="SUITE=RUN_DIR",
+                           help="stand-in F run per suite (default: the suite's H run)")
+    p = sub.add_parser("submit")
+    p.add_argument("--dry", action="store_true", help="print the sbatch lines, submit nothing")
+    p.add_argument("--accounts", nargs="+", default=["bgrb-delta-gpu"])
+    p.add_argument("--partition", default="gpuA40x4,gpuA100x4,gpuA100x8")
+    p.add_argument("--time", default=None, help="override the per-job estimate")
+    p.add_argument("--suite", action="append")
+    p.add_argument("--job", action="append")
+    p.add_argument("--resubmit", "--force", dest="resubmit", action="store_true",
+                   help="also submit jobs that already have a Slurm job id")
+    p = sub.add_parser("merge")
+    p.add_argument("suite")
+    p.add_argument("--force", action="store_true")
+    p = sub.add_parser("overlap")
+    p.add_argument("suite")
+    a = ap.parse_args(argv)
+
+    if a.cmd == "record-slurm":
+        print(f"  {record_slurm()} job record(s) updated in {MANIFEST_PATH}")
+    elif a.cmd == "plan":
+        m = refresh_manifest()
+        for s, v in m["suites"].items():
+            n_ready = sum(1 for j in v["jobs"] if not j["awaits"])
+            print(f"  {s}: {len(v['jobs'])} jobs ({n_ready} ready), "
+                  f"{sum(len(j['cells']) for j in v['jobs'])} cells")
+        print(f"  wrote {MANIFEST_PATH}")
+    elif a.cmd == "args":
+        cfg = load_config()[a.suite]
+        job = {j["job"]: j for j in plan_suite(a.suite, cfg)}[a.job]
+        print(shlex.join(job_args(job)))
+    elif a.cmd == "dryrun":
+        dryrun(load_config(), DRYRUN_DIR, suites=a.suite, jobs=a.job, parallel=a.parallel,
+               timeout=a.timeout, side_jobs=load_side_jobs())
+        refresh_manifest()
+    elif a.cmd == "standin-dryrun":
+        # Only the jobs the real configuration cannot dry-run yet.
+        config = load_config()
+        waiting = {j["job"] for s, c in config.items() for j in plan_suite(s, c) if j["awaits"]}
+        jobs = [j for j in (a.job or sorted(waiting)) if j in waiting]
+        f_runs = dict(x.split("=", 1) for x in a.f_run)
+        dryrun(standin_config(config, f_runs), STANDIN_DIR, suites=a.suite, jobs=jobs,
+               parallel=a.parallel, timeout=a.timeout)
+    elif a.cmd == "submit":
+        m = refresh_manifest()
+        lines = submit(m, dry=a.dry, accounts=a.accounts, partition=a.partition,
+                       suites=a.suite, jobs=a.job, time=a.time, resubmit=a.resubmit,
+                       save=None if a.dry else save_manifest)
+        print("\n".join(lines))
+    elif a.cmd == "merge":
+        from merge_shards import expected_from_manifest, merge_suite
+        refresh_manifest()
+        merge_suite(os.path.join("outputs", "_suites", a.suite),
+                    expected_from_manifest(MANIFEST_PATH, a.suite), force=a.force)
+    elif a.cmd == "overlap":
+        from overlap import write_overlap
+        cfg = load_config()[a.suite]
+        for p in write_overlap(os.path.join("outputs", "_suites", a.suite), cfg):
+            print(f"  wrote {p}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

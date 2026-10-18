@@ -1,0 +1,1126 @@
+{
+  "task": "far",
+  "condition": "nopressure",
+  "margin_thresh": 0.3,
+  "met_minimums": false,
+  "minimums": {
+    "train": 150,
+    "validation": 150,
+    "test": 500
+  },
+  "thresholds_tried": [
+    {
+      "threshold": 0.7,
+      "survivors": {
+        "train": 0,
+        "validation": 0,
+        "test": 1
+      },
+      "meets_minimums": false
+    },
+    {
+      "threshold": 0.5,
+      "survivors": {
+        "train": 0,
+        "validation": 0,
+        "test": 3
+      },
+      "meets_minimums": false
+    },
+    {
+      "threshold": 0.3,
+      "survivors": {
+        "train": 1,
+        "validation": 0,
+        "test": 8
+      },
+      "meets_minimums": false
+    }
+  ],
+  "per_threshold": [
+    {
+      "threshold": 0.7,
+      "survivors": {
+        "train": 0,
+        "validation": 0,
+        "test": 1
+      },
+      "meets_minimums": false
+    },
+    {
+      "threshold": 0.5,
+      "survivors": {
+        "train": 0,
+        "validation": 0,
+        "test": 3
+      },
+      "meets_minimums": false
+    },
+    {
+      "threshold": 0.3,
+      "survivors": {
+        "train": 1,
+        "validation": 0,
+        "test": 8
+      },
+      "meets_minimums": false
+    }
+  ],
+  "honest_split_per_threshold": [
+    {
+      "threshold": 0.7,
+      "survivors": {
+        "train": 191,
+        "validation": 187,
+        "test": 946
+      }
+    },
+    {
+      "threshold": 0.5,
+      "survivors": {
+        "train": 192,
+        "validation": 192,
+        "test": 969
+      }
+    },
+    {
+      "threshold": 0.3,
+      "survivors": {
+        "train": 196,
+        "validation": 193,
+        "test": 977
+      }
+    }
+  ],
+  "splits": {
+    "train": {
+      "input": 200,
+      "survived": 1,
+      "pass_rate": 0.005,
+      "kept": 150,
+      "from_honest_split": 149,
+      "clean_margin": {
+        "n": 200,
+        "mean": -1.551875,
+        "std": 1.53761572227101,
+        "p1": -5.5,
+        "p5": -4.875,
+        "p25": -2.5,
+        "p50": -1.125,
+        "p75": -0.625,
+        "p95": 0.375,
+        "p99": 1.125
+      },
+      "corrupt_margin": {
+        "n": 200,
+        "mean": -1.55875,
+        "std": 1.5582396919280423,
+        "p1": -5.625,
+        "p5": -4.75,
+        "p25": -2.25,
+        "p50": -1.25,
+        "p75": -0.625,
+        "p95": 0.625,
+        "p99": 1.0
+      },
+      "unexpected_argmax_tokens": {}
+    },
+    "validation": {
+      "input": 200,
+      "survived": 0,
+      "pass_rate": 0.0,
+      "kept": 150,
+      "from_honest_split": 150,
+      "clean_margin": {
+        "n": 200,
+        "mean": -1.4425,
+        "std": 1.5061249948128475,
+        "p1": -5.25,
+        "p5": -4.625,
+        "p25": -2.125,
+        "p50": -1.125,
+        "p75": -0.5,
+        "p95": 0.5,
+        "p99": 1.375
+      },
+      "corrupt_margin": {
+        "n": 200,
+        "mean": -1.496875,
+        "std": 1.420521333657119,
+        "p1": -4.875,
+        "p5": -4.375,
+        "p25": -2.375,
+        "p50": -1.125,
+        "p75": -0.5,
+        "p95": 0.375,
+        "p99": 1.25
+      },
+      "unexpected_argmax_tokens": {}
+    },
+    "test": {
+      "input": 1000,
+      "survived": 8,
+      "pass_rate": 0.008,
+      "kept": 500,
+      "from_honest_split": 492,
+      "clean_margin": {
+        "n": 1000,
+        "mean": -1.454875,
+        "std": 1.457066182222002,
+        "p1": -5.375,
+        "p5": -4.625,
+        "p25": -2.25,
+        "p50": -1.125,
+        "p75": -0.5,
+        "p95": 0.5,
+        "p99": 1.125
+      },
+      "corrupt_margin": {
+        "n": 1000,
+        "mean": -1.427875,
+        "std": 1.4250552127461589,
+        "p1": -5.5,
+        "p5": -4.5,
+        "p25": -2.0,
+        "p50": -1.125,
+        "p75": -0.5,
+        "p95": 0.375,
+        "p99": 1.125
+      },
+      "unexpected_argmax_tokens": {}
+    }
+  },
+  "overall": {
+    "input": 1400,
+    "survived": 9,
+    "pass_rate": 0.0064285714285714285,
+    "clean_margin": {
+      "n": 1400,
+      "mean": -1.4669642857142857,
+      "std": 1.4763092490140708,
+      "p1": -5.5,
+      "p5": -4.625,
+      "p25": -2.25,
+      "p50": -1.125,
+      "p75": -0.5,
+      "p95": 0.5,
+      "p99": 1.25
+    },
+    "corrupt_margin": {
+      "n": 1400,
+      "mean": -1.4564285714285714,
+      "std": 1.4449955864631419,
+      "p1": -5.5,
+      "p5": -4.5,
+      "p25": -2.125,
+      "p50": -1.125,
+      "p75": -0.5,
+      "p95": 0.5,
+      "p99": 1.125
+    },
+    "unexpected_argmax_tokens": {}
+  },
+  "pass_rate_by_item_pair": {
+    "beams/joints": {
+      "passed": 0,
+      "total": 54,
+      "rate": 0.0
+    },
+    "bids/asks": {
+      "passed": 0,
+      "total": 9,
+      "rate": 0.0
+    },
+    "budget/timeline": {
+      "passed": 0,
+      "total": 19,
+      "rate": 0.0
+    },
+    "button/switch": {
+      "passed": 0,
+      "total": 182,
+      "rate": 0.0
+    },
+    "capacity/coverage": {
+      "passed": 0,
+      "total": 83,
+      "rate": 0.0
+    },
+    "client/server": {
+      "passed": 1,
+      "total": 3,
+      "rate": 0.3333333333333333
+    },
+    "clock/timer": {
+      "passed": 0,
+      "total": 7,
+      "rate": 0.0
+    },
+    "color/finish": {
+      "passed": 6,
+      "total": 61,
+      "rate": 0.09836065573770492
+    },
+    "desk/chair": {
+      "passed": 0,
+      "total": 53,
+      "rate": 0.0
+    },
+    "doors/windows": {
+      "passed": 0,
+      "total": 1,
+      "rate": 0.0
+    },
+    "fence/gate": {
+      "passed": 1,
+      "total": 12,
+      "rate": 0.08333333333333333
+    },
+    "funds/trusts": {
+      "passed": 0,
+      "total": 61,
+      "rate": 0.0
+    },
+    "import/export": {
+      "passed": 0,
+      "total": 14,
+      "rate": 0.0
+    },
+    "intake/output": {
+      "passed": 0,
+      "total": 1,
+      "rate": 0.0
+    },
+    "lobby/garage": {
+      "passed": 1,
+      "total": 1,
+      "rate": 1.0
+    },
+    "queries/updates": {
+      "passed": 0,
+      "total": 117,
+      "rate": 0.0
+    },
+    "reads/writes": {
+      "passed": 0,
+      "total": 34,
+      "rate": 0.0
+    },
+    "screen/camera": {
+      "passed": 0,
+      "total": 6,
+      "rate": 0.0
+    },
+    "shares/options": {
+      "passed": 0,
+      "total": 9,
+      "rate": 0.0
+    },
+    "size/shape": {
+      "passed": 0,
+      "total": 20,
+      "rate": 0.0
+    },
+    "stocks/bonds": {
+      "passed": 0,
+      "total": 135,
+      "rate": 0.0
+    },
+    "trucks/trains": {
+      "passed": 0,
+      "total": 254,
+      "rate": 0.0
+    },
+    "walls/floors": {
+      "passed": 0,
+      "total": 215,
+      "rate": 0.0
+    },
+    "wire/cable": {
+      "passed": 0,
+      "total": 49,
+      "rate": 0.0
+    }
+  },
+  "pass_rate_by_pressure": {
+    "far_00": {
+      "passed": 0,
+      "total": 25,
+      "rate": 0.0
+    },
+    "far_01": {
+      "passed": 0,
+      "total": 35,
+      "rate": 0.0
+    },
+    "far_02": {
+      "passed": 0,
+      "total": 65,
+      "rate": 0.0
+    },
+    "far_03": {
+      "passed": 0,
+      "total": 35,
+      "rate": 0.0
+    },
+    "far_04": {
+      "passed": 1,
+      "total": 100,
+      "rate": 0.01
+    },
+    "far_05": {
+      "passed": 0,
+      "total": 39,
+      "rate": 0.0
+    },
+    "far_06": {
+      "passed": 0,
+      "total": 66,
+      "rate": 0.0
+    },
+    "far_07": {
+      "passed": 0,
+      "total": 33,
+      "rate": 0.0
+    },
+    "far_08": {
+      "passed": 0,
+      "total": 107,
+      "rate": 0.0
+    },
+    "far_09": {
+      "passed": 0,
+      "total": 68,
+      "rate": 0.0
+    },
+    "far_10": {
+      "passed": 0,
+      "total": 52,
+      "rate": 0.0
+    },
+    "far_11": {
+      "passed": 0,
+      "total": 49,
+      "rate": 0.0
+    },
+    "far_12": {
+      "passed": 0,
+      "total": 51,
+      "rate": 0.0
+    },
+    "far_13": {
+      "passed": 0,
+      "total": 32,
+      "rate": 0.0
+    },
+    "far_14": {
+      "passed": 3,
+      "total": 90,
+      "rate": 0.03333333333333333
+    },
+    "far_15": {
+      "passed": 0,
+      "total": 23,
+      "rate": 0.0
+    },
+    "far_16": {
+      "passed": 0,
+      "total": 28,
+      "rate": 0.0
+    },
+    "far_17": {
+      "passed": 0,
+      "total": 28,
+      "rate": 0.0
+    },
+    "far_18": {
+      "passed": 0,
+      "total": 46,
+      "rate": 0.0
+    },
+    "far_19": {
+      "passed": 0,
+      "total": 36,
+      "rate": 0.0
+    },
+    "shared_00": {
+      "passed": 1,
+      "total": 45,
+      "rate": 0.022222222222222223
+    },
+    "shared_01": {
+      "passed": 0,
+      "total": 77,
+      "rate": 0.0
+    },
+    "shared_02": {
+      "passed": 3,
+      "total": 114,
+      "rate": 0.02631578947368421
+    },
+    "shared_03": {
+      "passed": 1,
+      "total": 67,
+      "rate": 0.014925373134328358
+    },
+    "shared_04": {
+      "passed": 0,
+      "total": 89,
+      "rate": 0.0
+    }
+  },
+  "pass_rate_by_entity": {
+    "Alcove Property": {
+      "passed": 0,
+      "total": 21,
+      "rate": 0.0
+    },
+    "Aldervest Financial": {
+      "passed": 0,
+      "total": 17,
+      "rate": 0.0
+    },
+    "Aldrix Platform": {
+      "passed": 0,
+      "total": 10,
+      "rate": 0.0
+    },
+    "Ambrix Clinic": {
+      "passed": 0,
+      "total": 27,
+      "rate": 0.0
+    },
+    "Ashgate Facilities": {
+      "passed": 0,
+      "total": 13,
+      "rate": 0.0
+    },
+    "Axtem Industries": {
+      "passed": 0,
+      "total": 17,
+      "rate": 0.0
+    },
+    "Brackton Bank": {
+      "passed": 0,
+      "total": 21,
+      "rate": 0.0
+    },
+    "Braddox Gear": {
+      "passed": 0,
+      "total": 25,
+      "rate": 0.0
+    },
+    "Bramwell Construction": {
+      "passed": 0,
+      "total": 30,
+      "rate": 0.0
+    },
+    "Brellow Estates": {
+      "passed": 0,
+      "total": 39,
+      "rate": 0.0
+    },
+    "Brinby Transit": {
+      "passed": 0,
+      "total": 20,
+      "rate": 0.0
+    },
+    "Brindal Manufacturing": {
+      "passed": 0,
+      "total": 22,
+      "rate": 0.0
+    },
+    "Calmet Industrial": {
+      "passed": 0,
+      "total": 24,
+      "rate": 0.0
+    },
+    "Camborne Finance": {
+      "passed": 0,
+      "total": 20,
+      "rate": 0.0
+    },
+    "Casden Diagnostics": {
+      "passed": 1,
+      "total": 11,
+      "rate": 0.09090909090909091
+    },
+    "Corvane Software": {
+      "passed": 0,
+      "total": 20,
+      "rate": 0.0
+    },
+    "Crestbay Services": {
+      "passed": 0,
+      "total": 23,
+      "rate": 0.0
+    },
+    "Denmar Software": {
+      "passed": 0,
+      "total": 19,
+      "rate": 0.0
+    },
+    "Drayton Freight": {
+      "passed": 0,
+      "total": 17,
+      "rate": 0.0
+    },
+    "Dunmar Fabrication": {
+      "passed": 0,
+      "total": 17,
+      "rate": 0.0
+    },
+    "Dunmore Property": {
+      "passed": 0,
+      "total": 12,
+      "rate": 0.0
+    },
+    "Elderton Works": {
+      "passed": 0,
+      "total": 23,
+      "rate": 0.0
+    },
+    "Farrow Audio": {
+      "passed": 0,
+      "total": 13,
+      "rate": 0.0
+    },
+    "Ferrolane Works": {
+      "passed": 0,
+      "total": 15,
+      "rate": 0.0
+    },
+    "Halbrook Medical": {
+      "passed": 0,
+      "total": 22,
+      "rate": 0.0
+    },
+    "Harkstone Builders": {
+      "passed": 0,
+      "total": 19,
+      "rate": 0.0
+    },
+    "Idlewood Partners": {
+      "passed": 0,
+      "total": 22,
+      "rate": 0.0
+    },
+    "Ivorra Tech": {
+      "passed": 0,
+      "total": 7,
+      "rate": 0.0
+    },
+    "Kelmoor Construction": {
+      "passed": 0,
+      "total": 29,
+      "rate": 0.0
+    },
+    "Kelmore Cargo": {
+      "passed": 0,
+      "total": 20,
+      "rate": 0.0
+    },
+    "Kelvane Freight": {
+      "passed": 0,
+      "total": 18,
+      "rate": 0.0
+    },
+    "Kestral Devices": {
+      "passed": 3,
+      "total": 20,
+      "rate": 0.15
+    },
+    "Lumeni Electronics": {
+      "passed": 0,
+      "total": 23,
+      "rate": 0.0
+    },
+    "Marnick Builders": {
+      "passed": 0,
+      "total": 21,
+      "rate": 0.0
+    },
+    "Merrivale Holdings": {
+      "passed": 0,
+      "total": 25,
+      "rate": 0.0
+    },
+    "Mistvale Systems": {
+      "passed": 0,
+      "total": 15,
+      "rate": 0.0
+    },
+    "Nerrin Health": {
+      "passed": 0,
+      "total": 21,
+      "rate": 0.0
+    },
+    "Nordvane Shipping": {
+      "passed": 0,
+      "total": 16,
+      "rate": 0.0
+    },
+    "Norvell Trust": {
+      "passed": 0,
+      "total": 17,
+      "rate": 0.0
+    },
+    "Nubex Systems": {
+      "passed": 0,
+      "total": 12,
+      "rate": 0.0
+    },
+    "Orbik Devices": {
+      "passed": 0,
+      "total": 16,
+      "rate": 0.0
+    },
+    "Ordway Carriers": {
+      "passed": 0,
+      "total": 16,
+      "rate": 0.0
+    },
+    "Orlune Freight": {
+      "passed": 0,
+      "total": 18,
+      "rate": 0.0
+    },
+    "Orvane Structures": {
+      "passed": 0,
+      "total": 23,
+      "rate": 0.0
+    },
+    "Ostara Clinic": {
+      "passed": 0,
+      "total": 11,
+      "rate": 0.0
+    },
+    "Ovren Metalworks": {
+      "passed": 0,
+      "total": 12,
+      "rate": 0.0
+    },
+    "Pelhurst Medical": {
+      "passed": 0,
+      "total": 21,
+      "rate": 0.0
+    },
+    "Pellam Contracting": {
+      "passed": 0,
+      "total": 22,
+      "rate": 0.0
+    },
+    "Perlon Suite": {
+      "passed": 0,
+      "total": 17,
+      "rate": 0.0
+    },
+    "Pindle Audio": {
+      "passed": 0,
+      "total": 12,
+      "rate": 0.0
+    },
+    "Pinevale Trust": {
+      "passed": 0,
+      "total": 26,
+      "rate": 0.0
+    },
+    "Quilby Electronics": {
+      "passed": 0,
+      "total": 18,
+      "rate": 0.0
+    },
+    "Quorral Data": {
+      "passed": 0,
+      "total": 24,
+      "rate": 0.0
+    },
+    "Rensmith Works": {
+      "passed": 0,
+      "total": 15,
+      "rate": 0.0
+    },
+    "Ridgeport Facilities": {
+      "passed": 0,
+      "total": 21,
+      "rate": 0.0
+    },
+    "Sable Ridge Capital": {
+      "passed": 0,
+      "total": 14,
+      "rate": 0.0
+    },
+    "Selby Grounds": {
+      "passed": 1,
+      "total": 23,
+      "rate": 0.043478260869565216
+    },
+    "Stonecleft Group": {
+      "passed": 0,
+      "total": 14,
+      "rate": 0.0
+    },
+    "Talvern Logistics": {
+      "passed": 0,
+      "total": 15,
+      "rate": 0.0
+    },
+    "Tamsel Tech": {
+      "passed": 0,
+      "total": 27,
+      "rate": 0.0
+    },
+    "Tenmark Services": {
+      "passed": 0,
+      "total": 16,
+      "rate": 0.0
+    },
+    "Thessin Cloud": {
+      "passed": 0,
+      "total": 33,
+      "rate": 0.0
+    },
+    "Trellin Health": {
+      "passed": 0,
+      "total": 22,
+      "rate": 0.0
+    },
+    "Turnbrook Mills": {
+      "passed": 0,
+      "total": 17,
+      "rate": 0.0
+    },
+    "Verrick Buildings": {
+      "passed": 0,
+      "total": 26,
+      "rate": 0.0
+    },
+    "Vessik Lines": {
+      "passed": 2,
+      "total": 27,
+      "rate": 0.07407407407407407
+    },
+    "Voltar Forge": {
+      "passed": 0,
+      "total": 12,
+      "rate": 0.0
+    },
+    "Vossridge Build": {
+      "passed": 0,
+      "total": 9,
+      "rate": 0.0
+    },
+    "Weldam Care": {
+      "passed": 0,
+      "total": 21,
+      "rate": 0.0
+    },
+    "Wexbourne Capital": {
+      "passed": 1,
+      "total": 34,
+      "rate": 0.029411764705882353
+    },
+    "Wyndel Home": {
+      "passed": 0,
+      "total": 16,
+      "rate": 0.0
+    },
+    "Yarrow Medical": {
+      "passed": 1,
+      "total": 19,
+      "rate": 0.05263157894736842
+    }
+  },
+  "pass_rate_by_domain": {
+    "construction": {
+      "passed": 0,
+      "total": 190,
+      "rate": 0.0
+    },
+    "consumer hardware": {
+      "passed": 3,
+      "total": 170,
+      "rate": 0.01764705882352941
+    },
+    "enterprise software": {
+      "passed": 0,
+      "total": 157,
+      "rate": 0.0
+    },
+    "facilities": {
+      "passed": 1,
+      "total": 194,
+      "rate": 0.005154639175257732
+    },
+    "finance": {
+      "passed": 1,
+      "total": 196,
+      "rate": 0.00510204081632653
+    },
+    "healthcare": {
+      "passed": 2,
+      "total": 175,
+      "rate": 0.011428571428571429
+    },
+    "logistics": {
+      "passed": 2,
+      "total": 167,
+      "rate": 0.011976047904191617
+    },
+    "manufacturing": {
+      "passed": 0,
+      "total": 151,
+      "rate": 0.0
+    }
+  },
+  "pass_rate_by_designation_polarity": {
+    "identity": {
+      "passed": 9,
+      "total": 1400,
+      "rate": 0.0064285714285714285
+    }
+  },
+  "pass_rate_by_item_polarity": {
+    "1": {
+      "passed": 5,
+      "total": 715,
+      "rate": 0.006993006993006993
+    },
+    "2": {
+      "passed": 4,
+      "total": 685,
+      "rate": 0.00583941605839416
+    }
+  },
+  "pass_rate_by_template_variant": {
+    "audit": {
+      "passed": 9,
+      "total": 1340,
+      "rate": 0.006716417910447761
+    },
+    "lab": {
+      "passed": 0,
+      "total": 60,
+      "rate": 0.0
+    }
+  },
+  "fallback": {
+    "used": true,
+    "size": 791,
+    "threshold": 0.3,
+    "per_split": {
+      "train": {
+        "short_by": 149,
+        "honest_survivors": 196,
+        "appended": 149,
+        "still_short_by": 0
+      },
+      "validation": {
+        "short_by": 150,
+        "honest_survivors": 193,
+        "appended": 150,
+        "still_short_by": 0
+      },
+      "test": {
+        "short_by": 492,
+        "honest_survivors": 977,
+        "appended": 492,
+        "still_short_by": 0
+      }
+    }
+  },
+  "survivor_mix": {
+    "train": {
+      "item_pair": {
+        "client/server": 4,
+        "humidity/vibration": 12,
+        "desk/chair": 6,
+        "trucks/trains": 18,
+        "calcium/sodium": 9,
+        "screen/camera": 2,
+        "stocks/bonds": 10,
+        "funds/trusts": 3,
+        "frontend/backend": 12,
+        "walls/floors": 17,
+        "capacity/coverage": 7,
+        "length/width": 11,
+        "button/switch": 12,
+        "lobby/garage": 1,
+        "vision/hearing": 8,
+        "color/finish": 1,
+        "density/hardness": 1,
+        "audio/charging": 2,
+        "clock/timer": 1,
+        "fence/gate": 2,
+        "queries/updates": 5,
+        "import/export": 3,
+        "beams/joints": 1,
+        "size/shape": 1,
+        "wire/cable": 1
+      },
+      "item_polarity": {
+        "1": 71,
+        "2": 79
+      },
+      "designation_polarity": {
+        "identity": 96,
+        "inversion": 54
+      },
+      "template_variant": {
+        "audit": 99,
+        "lab": 51
+      },
+      "source": {
+        "deceptive_split": 1,
+        "honest_split": 149
+      }
+    },
+    "validation": {
+      "item_pair": {
+        "humidity/vibration": 13,
+        "button/switch": 14,
+        "queries/updates": 8,
+        "vision/hearing": 7,
+        "screen/camera": 4,
+        "miles/hours": 6,
+        "calcium/sodium": 15,
+        "trucks/trains": 12,
+        "size/shape": 2,
+        "lobby/garage": 2,
+        "walls/floors": 13,
+        "color/finish": 3,
+        "wire/cable": 4,
+        "shares/options": 1,
+        "length/width": 8,
+        "capacity/coverage": 3,
+        "stocks/bonds": 11,
+        "frontend/backend": 7,
+        "reads/writes": 2,
+        "client/server": 1,
+        "desk/chair": 2,
+        "fence/gate": 4,
+        "inbound/outbound": 1,
+        "import/export": 3,
+        "budget/timeline": 1,
+        "beams/joints": 1,
+        "funds/trusts": 1,
+        "clock/timer": 1
+      },
+      "item_polarity": {
+        "2": 79,
+        "1": 71
+      },
+      "designation_polarity": {
+        "identity": 90,
+        "inversion": 60
+      },
+      "template_variant": {
+        "audit": 96,
+        "lab": 54
+      },
+      "source": {
+        "honest_split": 150
+      }
+    },
+    "test": {
+      "item_pair": {
+        "color/finish": 10,
+        "lobby/garage": 11,
+        "fence/gate": 6,
+        "vision/hearing": 21,
+        "length/width": 24,
+        "button/switch": 50,
+        "import/export": 3,
+        "calcium/sodium": 48,
+        "frontend/backend": 43,
+        "queries/updates": 21,
+        "budget/timeline": 6,
+        "capacity/coverage": 15,
+        "walls/floors": 60,
+        "trucks/trains": 44,
+        "humidity/vibration": 56,
+        "stocks/bonds": 25,
+        "density/hardness": 5,
+        "miles/hours": 7,
+        "desk/chair": 8,
+        "clock/timer": 7,
+        "screen/camera": 3,
+        "wire/cable": 11,
+        "beams/joints": 4,
+        "shares/options": 2,
+        "client/server": 4,
+        "size/shape": 1,
+        "funds/trusts": 1,
+        "reads/writes": 1,
+        "bids/asks": 2,
+        "inbound/outbound": 1
+      },
+      "item_polarity": {
+        "1": 259,
+        "2": 241
+      },
+      "designation_polarity": {
+        "identity": 339,
+        "inversion": 161
+      },
+      "template_variant": {
+        "audit": 330,
+        "lab": 170
+      },
+      "source": {
+        "deceptive_split": 8,
+        "honest_split": 492
+      }
+    }
+  },
+  "sample_pairs": [
+    {
+      "instance_id": "0e2ef79f6b8e",
+      "source": "honest_split",
+      "item_pair": "length/width",
+      "template_variant": "lab",
+      "designation_polarity": "identity",
+      "item_polarity": 1,
+      "clean_item_d": "length",
+      "corrupt_item_d": "width",
+      "target": "width",
+      "distractor": "length",
+      "clean_margin": 3.0,
+      "corrupt_margin": 2.5,
+      "clean_prompt": "<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\nThe lab report for Selby Grounds covers length and width. The length reading came back ready, and the other came back delayed.<|eot_id|><|start_header_id|>user<|end_header_id|>\n\nWhich reading is delayed, length or width? Only respond with \"The reading that is delayed is length\" or \"The reading that is delayed is width\".<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\nThe reading that is delayed is",
+      "corrupt_prompt": "<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\nThe lab report for Selby Grounds covers length and width. The width reading came back ready, and the other came back delayed.<|eot_id|><|start_header_id|>user<|end_header_id|>\n\nWhich reading is delayed, length or width? Only respond with \"The reading that is delayed is length\" or \"The reading that is delayed is width\".<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\nThe reading that is delayed is"
+    },
+    {
+      "instance_id": "009f28ec688a",
+      "source": "honest_split",
+      "item_pair": "stocks/bonds",
+      "template_variant": "audit",
+      "designation_polarity": "inversion",
+      "item_polarity": 2,
+      "clean_item_d": "bonds",
+      "corrupt_item_d": "stocks",
+      "target": "bonds",
+      "distractor": "stocks",
+      "clean_margin": 4.5,
+      "corrupt_margin": 5.25,
+      "clean_prompt": "<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\nPellam Contracting's audit reviewed stocks and bonds. The bonds result is the one that is delayed, and the other is ready.<|eot_id|><|start_header_id|>user<|end_header_id|>\n\nWhich result is delayed, stocks or bonds? Only respond with \"The result that is delayed is stocks\" or \"The result that is delayed is bonds\".<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\nThe result that is delayed is",
+      "corrupt_prompt": "<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\nPellam Contracting's audit reviewed stocks and bonds. The stocks result is the one that is delayed, and the other is ready.<|eot_id|><|start_header_id|>user<|end_header_id|>\n\nWhich result is delayed, stocks or bonds? Only respond with \"The result that is delayed is stocks\" or \"The result that is delayed is bonds\".<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\nThe result that is delayed is"
+    },
+    {
+      "instance_id": "200adbc8e4f9",
+      "source": "honest_split",
+      "item_pair": "stocks/bonds",
+      "template_variant": "audit",
+      "designation_polarity": "inversion",
+      "item_polarity": 1,
+      "clean_item_d": "stocks",
+      "corrupt_item_d": "bonds",
+      "target": "stocks",
+      "distractor": "bonds",
+      "clean_margin": 5.375,
+      "corrupt_margin": 5.125,
+      "clean_prompt": "<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\nOrlune Freight's audit reviewed stocks and bonds. The stocks result is the one that is delayed, and the other is ready.<|eot_id|><|start_header_id|>user<|end_header_id|>\n\nWhich result is delayed, stocks or bonds? Only respond with \"The result that is delayed is stocks\" or \"The result that is delayed is bonds\".<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\nThe result that is delayed is",
+      "corrupt_prompt": "<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\nOrlune Freight's audit reviewed stocks and bonds. The bonds result is the one that is delayed, and the other is ready.<|eot_id|><|start_header_id|>user<|end_header_id|>\n\nWhich result is delayed, stocks or bonds? Only respond with \"The result that is delayed is stocks\" or \"The result that is delayed is bonds\".<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\nThe result that is delayed is"
+    }
+  ]
+}
