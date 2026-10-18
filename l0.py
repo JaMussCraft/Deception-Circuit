@@ -1,3 +1,5 @@
+from typing import Optional
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -34,6 +36,7 @@ class HardConcreteGate(nn.Module):
         super().__init__()
         
         # Register buffers for distribution parameters
+        self.register_buffer("eligibility", None)
         self.register_buffer("beta", torch.tensor(beta))
         self.register_buffer("gamma", torch.tensor(gamma))
         self.register_buffer("zeta", torch.tensor(zeta))
@@ -52,6 +55,18 @@ class HardConcreteGate(nn.Module):
         with torch.no_grad():
             self.log_alpha.uniform_(init_min, init_max)
     
+    def set_eligibility(self, eligible: Optional[torch.Tensor]) -> None:
+        """Opt in to exact hard-open noneligible entries.
+
+        Configure before loading an opted-in checkpoint. None retains the
+        legacy state-dict schema, so existing checkpoints load strictly.
+        """
+        if eligible is not None:
+            if eligible.dtype != torch.bool or eligible.shape != self.log_alpha.shape:
+                raise ValueError('eligibility must be bool with the gate logits shape')
+            eligible = eligible.detach().to(self.log_alpha.device).clone()
+        self.eligibility = eligible
+
     def forward(self) -> torch.Tensor:
         # 1. Training with Noise
         if self.training:
@@ -62,7 +77,9 @@ class HardConcreteGate(nn.Module):
             
             # STE: Binary 0/1 during training
             gate_hard = (gate_soft > 0.5).float()
-            return (gate_hard - gate_soft).detach() + gate_soft
+            sampled_keep = (gate_hard - gate_soft).detach() + gate_soft
+            return (sampled_keep if self.eligibility is None else
+                    torch.where(self.eligibility, sampled_keep, torch.ones_like(sampled_keep)))
 
         # 2. Final Mode / Eval (Deterministic)
         else:
@@ -71,12 +88,9 @@ class HardConcreteGate(nn.Module):
             s_stretched = s * (self.zeta - self.gamma) + self.gamma
             gate_soft = F.hardtanh(s_stretched, min_val=0, max_val=1)
             
-            if self.final_mode:
-                # MATCH TRAINING: Use the exact same threshold logic (Value > 0.5)
-                # This is equivalent to checking if log_alpha > 0
-                return (gate_soft > 0.5).float()
-            else:
-                return (gate_soft > 0.5).float()
+            sampled_keep = (gate_soft > 0.5).float()
+            return (sampled_keep if self.eligibility is None else
+                    torch.where(self.eligibility, sampled_keep, torch.ones_like(sampled_keep)))
 
     def num_gates(self) -> int:
         """Return the number of independent gate logits."""
