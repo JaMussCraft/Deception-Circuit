@@ -332,3 +332,36 @@ def test_cli_context_uses_existing_session_and_shared_tiny_model(api, tmp_path, 
            'labels': {'D': {'token_id': 6}, 'H': {'token_id': 7}}}
     result = api.score_row(ctx, row, api.safe_knockout(masks))
     assert isinstance(result['D_logit'], float)
+
+
+@pytest.mark.parametrize('activation_status', [0, 23])
+def test_slurm_startup_tolerates_rc_failure_but_requires_activation(tmp_path, activation_status):
+    import shlex
+    import subprocess
+    from pathlib import Path
+
+    # A noninteractive rc may contain an incidental failing command before it
+    # defines conda. Only successful activation authorizes the runner entry.
+    rc = tmp_path / 'fixture.bashrc'
+    rc.write_text('false\n'
+                  'conda() {\n'
+                  '  test "$1" = activate && test "$2" = mgnp || return 97\n'
+                  + ('  export SELECTIVE_TEST_ACTIVATED=ready\n' if activation_status == 0 else '')
+                  + '  return %d\n}\n' % activation_status)
+    original = (Path(__file__).resolve().parents[1] / 'scripts/selective_deception.sbatch').read_text()
+    source = 'source ~/.bashrc'
+    entry = 'python evaluate_selective_deception.py "$@"'
+    assert original.count(source) == original.count(entry) == 1
+    probe = ('test "${SELECTIVE_TEST_ACTIVATED:-}" = ready\n'
+             'printf "runner-entry:%s\\n" "$*"')
+    wrapper = tmp_path / 'startup.sh'
+    wrapper.write_text(original.replace(source, 'source ' + shlex.quote(str(rc)), 1).replace(entry, probe, 1))
+    result = subprocess.run(['bash', str(wrapper), '--manifest', 'fixture.json'],
+                            cwd=tmp_path, capture_output=True, text=True, timeout=10)
+    if activation_status == 0:
+        assert result.returncode == 0, result.stderr
+        assert result.stdout == 'runner-entry:--manifest fixture.json\n'
+    else:
+        assert result.returncode != 0
+        assert 'Environment initialization failed' in result.stderr
+        assert 'runner-entry:' not in result.stdout
