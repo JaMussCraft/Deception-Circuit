@@ -34,7 +34,6 @@ import pytest
 
 LAUNCH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                       "outputs", "_launch_format_control")
-MAIN_OUTPUTS = "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/"
 
 D_RUN = "/runs/far/nls0.3_noedge_A"
 H_RUN = "/runs/far/nls0.3_honest_noedge_B"
@@ -104,32 +103,17 @@ def test_groups_select_the_benchmarks_and_the_output_directory(e5):
     assert _flag_values(lb, "--output-dir") == [["outputs/eval5_format_sdr_lb"]]
 
 
-def test_screens_come_from_the_worktree_local_copy(e5):
+def test_screens_come_from_the_checkout_local_copy(e5):
+    # The launcher's screen cache lives under its own checkout. The former
+    # assertion that this checkout is not the main one was retired when
+    # format-control merged into main (2026-10-18).
     args = e5.eval5_args("far", "lb", RUNS)
     assert _flag_values(args, "--benchmark-screen-cache") == [[e5.LOCAL_SCREEN_CACHE]]
     assert e5.LOCAL_SCREEN_CACHE.startswith(e5.WORKTREE + os.sep)
-    assert not e5.LOCAL_SCREEN_CACHE.startswith(MAIN_OUTPUTS)
     assert _flag_values(e5.eval5_args("far", "lb", RUNS, screen_cache=CACHE),
                         "--benchmark-screen-cache") == [[CACHE]]
-    # read-only benchmark sources beside the main checkout
+    # read-only benchmark sources beside the checkout
     assert _flag_values(args, "--benchmark-repo-root") == [["/projects/beto/swong2/Alignment"]]
-
-
-@pytest.mark.parametrize("family", ["far", "sdr", "sdr_coarse"])
-@pytest.mark.parametrize("group", ["sm", "lb"])
-def test_no_path_in_the_command_is_writable_under_the_main_checkout(e5, family, group):
-    """Only the read-only circuit run directories may sit under the main
-    checkout's outputs/; the screen cache, output dir and logs may not."""
-    runs = {r: MAIN_OUTPUTS + f"llama-8b-instruct_x/run_{r}" for r in ("D", "H", "F")}
-    allmlp = MAIN_OUTPUTS + "llama-8b-instruct_sdr_coarse/_allmlp_nomb"
-    allowed = set(runs.values()) | {allmlp}
-    args = e5.eval5_args(family, group, runs, allmlp=allmlp)
-    cmd = e5.sbatch_cmd(family, group, args, account="a", ceiling_min=100.0)
-    for token in cmd:
-        for piece in token.split("="):
-            path = os.path.abspath(os.path.join(e5.WORKTREE, piece)) if piece else ""
-            if path.startswith(MAIN_OUTPUTS):
-                assert path in allowed, (token, path)
 
 
 def test_coarse_family_knocks_out_heads_only_against_the_all_mlp_operand(e5):
