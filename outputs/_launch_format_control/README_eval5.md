@@ -301,3 +301,39 @@ datasets each). For a reader that prefers one file, `eval5_format.json` is:
 
 `evaluation.eval5_format_summary.tabulate(load_suite(dir))` returns the same
 dict without writing.
+
+## PENDING: re-score the sm suite's judge calls (as of 2026-10-18)
+
+Both `sdr_coarse` suites ran on 2026-10-17 (lb 22947270, sm 22947260; D, H,
+F and D−F in one invocation each). The OpenRouter key ran out of credits
+between the two jobs, so in `outputs/eval5_format_sdr_coarse` (sandbagging +
+MASK) 6,032 of ~6,228 scoring judge calls returned HTTP 402 and every
+knockout / random row reads 0.0 deception with the rows marked
+`raw: "judge-failed"`. `outputs/eval5_format_sdr_coarse_lb` is sound (8 empty
+judge completions on one word-salad generation; they will stay unparsed).
+The generations and judge prompts are stored per config, so the fix is a
+judge-only re-score on the login node, no GPU:
+
+```
+cd /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control   # or wherever the suite dirs live
+export OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+python rejudge_benchmarks.py outputs/eval5_format_sdr_coarse --dry           # 4,661 calls (gpt-4o 4,162; o3-mini 499), ~$20-40
+nohup python rejudge_benchmarks.py outputs/eval5_format_sdr_coarse --max-calls 5000 > outputs/eval5_format_sdr_coarse/rejudge.log 2>&1
+python rejudge_benchmarks.py outputs/eval5_format_sdr_coarse_lb              # 1 call; exit 1 or 3 on the hopeless row is expected
+python outputs/_launch_format_control/write_eval5_format_summary.py outputs/eval5_format_sdr_coarse outputs/eval5_format_sdr_coarse_lb
+python write_format_control_summary.py outputs/_suites/format-control-sdr-coarse-nls0.3 --data-dir data/datasets \
+    --eval5-dir outputs/eval5_format_sdr_coarse --eval5-dir outputs/eval5_format_sdr_coarse_lb
+```
+
+Needs `OPENROUTER_API_KEY` with credit (check
+`curl -s https://openrouter.ai/api/v1/credits -H "Authorization: Bearer $OPENROUTER_API_KEY"`).
+Restart-safe: verdicts land in the suite's `judge_cache.jsonl` as they arrive,
+and a second run only sends what is still missing. The tool refuses a dataset
+whose rebuilt prompt differs from the stored one and a cell whose stored
+numbers do not reproduce from its labels; a one-time
+`benchmarks.json.pre_rejudge` backup is kept. One known stale field after the
+re-score: each cell's top-level `judge` block (cache hits / writes) and the
+"judge cache (X cell's view)" line in `result_summary.md`; the fresh stats are
+in the `rejudge` block. The EVAL 5 output directories, `_shards/`, Slurm logs
+and the screen cache are untracked: move them with the worktree if it is
+removed.
