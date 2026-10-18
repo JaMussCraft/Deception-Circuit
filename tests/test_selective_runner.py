@@ -365,3 +365,60 @@ def test_slurm_startup_tolerates_rc_failure_but_requires_activation(tmp_path, ac
         assert result.returncode != 0
         assert 'Environment initialization failed' in result.stderr
         assert 'runner-entry:' not in result.stdout
+
+
+@pytest.mark.parametrize('kind', ['score', 'donor_score'])
+def test_no_donor_scores_use_identical_dual_stream_with_all_gates_open(api, kind):
+    from l0 import HardConcreteGate
+    _, model = build_tiny_pair(attn_implementation='sdpa')
+    ctx = StubContext(model, torch.tensor([[3, 4, 5]]))
+    ctx.task = api.FrozenTask()
+    ctx.cli.reference = 'shared'
+    observed = []
+    def record_forward(module, args, kwargs):
+        corrupt = kwargs.get('corrupted_input_ids')
+        observed.append({'self_donor': corrupt is not None and torch.equal(corrupt, kwargs['input_ids']),
+                         'uncached': kwargs['use_cache'] is False,
+                         'all_open': all(torch.all(gate() == 1).item() for gate in module.modules()
+                                         if isinstance(gate, HardConcreteGate))})
+    handle = model.register_forward_pre_hook(record_forward, with_kwargs=True)
+    row = {'kind': kind, 'recipient': endpoint([3, 4, 5]), 'donor': None,
+           'labels': {'D': {'token_id': 6}, 'H': {'token_id': 7}}}
+    try:
+        api.score_row(ctx, row, None)
+    finally:
+        handle.remove()
+    assert observed == [{'self_donor': True, 'uncached': True, 'all_open': True}]
+
+
+@pytest.mark.parametrize('length', [113, 116])
+def test_bf16_scoring_baseline_and_self_knockout_match_full_vocabulary_exactly(api, length):
+    _, model = build_tiny_pair(attn_implementation='sdpa')
+    model = model.to(torch.bfloat16)
+    ids = (torch.arange(length) % 97 + 2).tolist()
+    ctx = StubContext(model, torch.tensor([ids]))
+    ctx.task = api.FrozenTask()
+    ctx.cli.reference = 'shared'
+    masks = circuit_masks_for(model)
+    for key in ('mlp_hidden', 'mlp_output'):
+        for value in masks[key].values(): value[:] = 0
+    masks['mlp_blocks'][:] = 0
+    observed = []
+    def record_logits(module, args, kwargs, output):
+        corrupt = kwargs.get('corrupted_input_ids')
+        observed.append((corrupt is not None and torch.equal(corrupt, kwargs['input_ids']),
+                         output.logits[0, -1].detach().clone()))
+    handle = model.register_forward_hook(record_logits, with_kwargs=True)
+    row = {'recipient': endpoint(ids), 'donor': None,
+           'labels': {'D': {'token_id': 6}, 'H': {'token_id': 7}}}
+    try:
+        intact = api.score_row(ctx, row, None)
+        row['donor'] = row['recipient']
+        ablated = api.score_row(ctx, row, api.safe_knockout(masks))
+    finally:
+        handle.remove()
+    assert len(observed) == 2 and all(self_donor for self_donor, _ in observed)
+    assert observed[0][1].dtype == torch.bfloat16
+    assert torch.isfinite(observed[0][1]).all()
+    assert torch.equal(observed[0][1], observed[1][1])
+    assert intact == ablated
