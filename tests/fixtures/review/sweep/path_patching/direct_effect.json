@@ -1,0 +1,185 @@
+{
+  "title": "Direct effect on the Readout, by sender (item_swap)",
+  "counterfactual": "item_swap",
+  "receiver": "readout",
+  "senders": [
+    {
+      "sender": "embed",
+      "receiver": "readout",
+      "cell": "embed->readout",
+      "mean": 0.0,
+      "se": 0.0,
+      "n": 64,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.5.5",
+      "receiver": "readout",
+      "cell": "head.5.5->readout",
+      "mean": 0.0005486510573291525,
+      "se": 0.00023608800705700984,
+      "n": 64,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.5.6",
+      "receiver": "readout",
+      "cell": "head.5.6->readout",
+      "mean": 1.7429760490017543e-05,
+      "se": 0.00012595035318340613,
+      "n": 64,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.5.8",
+      "receiver": "readout",
+      "cell": "head.5.8->readout",
+      "mean": -0.0003747900178865393,
+      "se": 0.00017064791593537668,
+      "n": 64,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.5.9",
+      "receiver": "readout",
+      "cell": "head.5.9->readout",
+      "mean": 6.45041551479153e-05,
+      "se": 0.00011913812555176122,
+      "n": 64,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.5.11",
+      "receiver": "readout",
+      "cell": "head.5.11->readout",
+      "mean": 0.00011096407119026708,
+      "se": 0.00017224697101899145,
+      "n": 64,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.8.12",
+      "receiver": "readout",
+      "cell": "head.8.12->readout",
+      "mean": 0.00016144002627527243,
+      "se": 0.00011925913273483093,
+      "n": 64,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.8.14",
+      "receiver": "readout",
+      "cell": "head.8.14->readout",
+      "mean": -1.9878368647141542e-05,
+      "se": 0.00015174990681653664,
+      "n": 64,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.8.15",
+      "receiver": "readout",
+      "cell": "head.8.15->readout",
+      "mean": 5.0753469906794635e-06,
+      "se": 0.0001344335009516548,
+      "n": 64,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.9.12",
+      "receiver": "readout",
+      "cell": "head.9.12->readout",
+      "mean": 0.0005336772034354453,
+      "se": 0.00023439054551023172,
+      "n": 64,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.13.17",
+      "receiver": "readout",
+      "cell": "head.13.17->readout",
+      "mean": 0.00042491690498991375,
+      "se": 0.0004967216231603875,
+      "n": 64,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.14.7",
+      "receiver": "readout",
+      "cell": "head.14.7->readout",
+      "mean": 0.0005438761534151126,
+      "se": 0.00036719437041422023,
+      "n": 64,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.14.21",
+      "receiver": "readout",
+      "cell": "head.14.21->readout",
+      "mean": 0.0011163826962388157,
+      "se": 0.000445483925090224,
+      "n": 64,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.14.22",
+      "receiver": "readout",
+      "cell": "head.14.22->readout",
+      "mean": 0.0003587297971989756,
+      "se": 0.0005009175659007718,
+      "n": 64,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.17.25",
+      "receiver": "readout",
+      "cell": "head.17.25->readout",
+      "mean": -0.020671878362918505,
+      "se": 0.0016672703052034883,
+      "n": 64,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.24.18",
+      "receiver": "readout",
+      "cell": "head.24.18->readout",
+      "mean": -0.023896984357747897,
+      "se": 0.006512641890445476,
+      "n": 64,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.24.25",
+      "receiver": "readout",
+      "cell": "head.24.25->readout",
+      "mean": -0.01623353328045596,
+      "se": 0.005710032381780984,
+      "n": 64,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.27.4",
+      "receiver": "readout",
+      "cell": "head.27.4->readout",
+      "mean": 0.0018570302499938407,
+      "se": 0.0009351081222865794,
+      "n": 64,
+      "n_excluded": 0
+    },
+    {
+      "sender": "mlp.31.0",
+      "receiver": "readout",
+      "cell": "mlp.31.0->readout",
+      "mean": -0.11367056705057621,
+      "se": 0.01883620202292746,
+      "n": 64,
+      "n_excluded": 0
+    }
+  ],
+  "metric": {
+    "quantity": "logit(Target) - logit(Distractor) at the Readout, fp32",
+    "effect": "(patched - clean) / (clean - corrupt), per instance",
+    "counterfactual": "item_swap",
+    "sign": "negative means the path carries the item_swap counterfactual; -1 is the whole clean-minus-counterfactual gap. Knockout (ticket 07) uses the opposite sign.",
+    "min_gap": 0.001
+  }
+}

@@ -382,6 +382,153 @@ outputs/_suites/<suite-name>/
 The per-cell body is the same code either way, so a suite cell's JSON is
 byte-comparable with a legacy run's.
 
+## Component-level analysis
+
+Circuit evaluation says a circuit matters; component analysis says which heads
+and MLP blocks inside it do what. `analyze_components.py` takes the same
+circuit bindings and set-algebra expressions as `evaluate_circuit.py`, coarsens
+the circuit to Components (attention heads and MLP blocks), and runs the
+registered analyses in the full, unmodified model through nnsight.
+
+```bash
+# Validate circuits, Segments, sample and the sender-receiver grid, and print a
+# cost estimate. Seconds on a login node; loads no model and never touches CUDA.
+python analyze_components.py \
+    --circuit sdr=outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414 \
+    --circuit honest_c=outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525 \
+    --reference honest=outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525 \
+    --expr 'delta=sdr \ honest_c' --compose-granularity head \
+    --suite-name my-suite --dry-run
+
+# The same run on a GPU, through the scheduler.
+sbatch scripts/analyze_components.sbatch --circuit ... --expr ... --suite-name my-suite
+```
+
+`--analyses NAME[,NAME]` picks which of the registered analyses run;
+`--dry-run` never writes anything an analysis would write.
+
+`scripts/analyze_components.sbatch` mirrors `scripts/evaluate_circuit.sbatch`.
+Submit it from the repository root: it `cd`s to `SLURM_SUBMIT_DIR`, so every
+relative path in the arguments resolves where you typed them. It activates
+`mgnp` and passes every argument straight through to `analyze_components.py`,
+which is why a circuit is composed by name there exactly as it is on the
+command line. Its defaults are one A40 (`--partition=gpuA40x4`,
+`--gpus-per-node=1`, account `beto-delta-gpu`), 64 GB and four hours. **Those
+are a starting point, not a budget**: multi-hour jobs and the A100
+(`gpuA100x4`, `gpuA100x8`) and H200 (`gpuH200x8`) partitions are all allowed
+whenever they make a run simpler or faster. Override them on the `sbatch`
+command line, before the script name, and always give `--time` there:
+
+```bash
+sbatch --time=02:30:00 --partition=gpuA100x4 scripts/analyze_components.sbatch \
+    --circuit ... --expr ... --analyses path_patching --path-counterfactual both \
+    --path-completeness-sweep --suite-name my-suite
+```
+
+Size `--time` from the `--dry-run` estimate; on an A40 the descriptive trio is
+about 11 minutes, each position-agnostic path-patching grid over 100 instances
+13 to 18 minutes, and the completeness sweep 29 minutes over 64 instances
+(ticket 12). On an A100 the sweep over the grid's 100 instances took 23 minutes,
+and the whole `--path-counterfactual both` job with the Segment pass and the
+sweep 40 minutes (ticket 14). The sweep runs on the grid's own causal sample
+(`--n-causal`, 100 by default), so its columns and the grid's cover one
+instance set. It flags Components outside the circuit at
+`--path-sweep-threshold`, default 0.05 of the gap, which does not follow
+`--path-position-threshold` (that one is tuned by hand per run).
+The knockout completeness sweep (`--knockout-completeness-sweep`, every head
+and MLP block of the model knocked out on the same 100 instances as the single
+knockouts) is 1058 forwards per batch; `--dry-run` prints its estimate.
+A shorter `--time` backfills sooner on a busy queue. Logs land in
+`logs/analyze_components_<jobid>.out`. Run `--dry-run` on the login node before
+every submission: it resolves the circuits, the Segments and the causal sample,
+says how much of the sample has an Honest-Instruction Counterfactual, and
+prints a cost estimate per analysis, all without a GPU.
+
+### The results layout
+
+One **cell** per (circuit, task):
+
+```
+outputs/_analyses/<suite-name>/<circuit-label>/<task-label>/
+  head_table.csv / head_table.json   one row per Component, columns namespaced
+                                     by the analysis that wrote them
+  segmentation.json                  the Segment spans actually used, per instance
+  sample.json                        the fixed-seed causal sample and its strata
+  attention/                         patterns*.json/.png, top_heads.json/.png
+  dla/                               dla.*, logit_lens.*, the paired twins
+  knockout/                          knockout.json/.png, knockout_families.*,
+                                     sweep.json/.png (--knockout-completeness-sweep)
+  path_patching/                     agnostic, segments, sweep, and their figures
+```
+
+Every figure has a JSON twin holding exactly what it drew, so an agent with no
+browser reads the same result the researcher sees.
+
+**A cell is assembled by running jobs into it.** Point several runs at the same
+`--suite-name` (or `--output-dir`) and each one replaces the head-table columns
+of the analyses it runs and carries every other column forward — the other
+analyses', the roles pass's `roles.*` and the researcher's `role_confirmed`
+alike. A `--dry-run` into a cell replaces nothing. So the descriptive trio in
+one job and path patching in another leave one table with all four analyses.
+**A rerun replaces its analysis's whole namespace**, not only the columns that
+run writes: a `path_patching` job with `--path-counterfactual item_swap` and no
+`--path-completeness-sweep` into a cell that held both counterfactuals and the
+sweep leaves the `*_honest_instruction_paired` and `sweep_*` columns empty.
+The same holds for `knockout` without `--knockout-completeness-sweep`, and in
+both cases the earlier run's `sweep.json` and its figure stay on disk and still
+render in the notebook, describing numbers the head table no longer carries.
+Rerun an analysis with every option the cell already holds, or into a new
+suite. **After any analysis reruns, rerun the roles pass** (`analyze_components.py
+roles <cell>`): the carried `roles.*` columns, and the `roles` block of the
+meta, were proposed from the old numbers. A run into a cell written before
+2026-10-13 also writes its table back
+under the current column names, and records the translation in the meta's
+`renamed_columns`.
+
+**Column names say what they compare.** A column computed over the same
+instance ids on both sides of a contrast carries `paired` in its name
+(`dla.differential_paired`,
+`path_patching.direct_support_honest_instruction_paired`); one computed over the
+unpaired Honest Twin carries `descriptive`. Cells written before 2026-10-13
+use older names, which every reader translates through
+`head_table.LEGACY_COLUMNS`. **How many instances a column covers is in the
+table's meta**, not its name: `head_table.json`'s `meta.coverage[<column>]`
+gives `n` and an instance-set id, `meta.instance_sets[<id>]` lists the ids,
+and `head_table.coverage_of(meta, column)` reads both — so a paired column
+over the 71 instances with a Matched Honest Instruction is told apart from its
+neighbour over the 100-instance causal sample.
+
+**Positive helps deception, in knockout and path patching alike.** Since
+2026-10-13 a path-patching cell is `(clean - patched) / (clean -
+counterfactual)`, the sign of knockout's drop, and its signed head-table
+columns are `path_patching.*_support`. A cell written before keeps the opposite
+sign under its old `path_patching.*_effect` names, which are deliberately not
+translated; every path-patching JSON says which in `metric.convention` (absent
+on a legacy file), every figure says so in its subtitle, and the roles pass
+reads either (ADR-0002).
+
+### The review notebook
+
+`review_components.ipynb` at the repository root renders one cell. Its first
+code cell holds `RESULTS_DIR`, `LIVE` and `REPO_ROOT`; set the first to a cell
+directory and run the notebook top to bottom. Every section above the live one
+reads only JSON and CSV, so it runs on a login node, and an analysis the cell
+does not contain prints a note rather than raising.
+
+With `LIVE = True` the last section loads the model once through
+`component_analysis.hooks` and offers three drill-downs — one head's attention
+on one instance, direct logit attribution on a hand-typed prompt, and one
+off-grid path patch — calling the same library functions the CLI calls. **It
+needs a GPU**: run the notebook inside a Slurm job on `gpuA100x4` or
+`gpuA40x4`, never on a login node.
+
+The notebook's extra dependencies are in `requirements-notebook.txt`, which is
+deliberately separate from `requirements.txt`: they belong in the `mgnp`
+environment only, and one of them pins torch, so installing them into the
+login-node base environment would move the torch everything else runs on. That
+file carries the exact install commands. The CLI, the Slurm jobs and both test
+suites run without any of them.
+
 ## Tests
 
 ```bash

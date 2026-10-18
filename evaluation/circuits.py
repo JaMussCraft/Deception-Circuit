@@ -15,12 +15,20 @@ A suite is the cartesian product, one cell per (circuit, task).
 Circuits come from `--circuit NAME=RUN_DIR` bindings plus `--expr`
 expressions (see evaluation/algebra.py); tasks come from `--task-from RUN_DIR`
 (inheriting that run's dataset args) or `--task NAME`.
+
+Resolution is deliberately free of the evaluator's `Session`: `build_session`
+calls `resolve_circuits` before it loads anything heavy, and
+`analyze_components.py` calls it with no Session at all. `add_circuit_args` /
+`add_task_args` register the flags so that both CLIs spell them identically,
+and `resolve_circuit_specs` is the same resolution addressed by keyword, for
+callers (a notebook, a test) that have no argparse namespace to hand.
 """
 
 from __future__ import annotations
 
 import os
 from dataclasses import dataclass, field
+from types import SimpleNamespace
 
 from config import default_hyperparams
 from evaluation import algebra
@@ -77,6 +85,51 @@ class TaskSpec:
         return {"label": self.label, "task": self.name,
                 "home_run_dir": self.home_run_dir,
                 "dataset": {k: getattr(self.args, k, None) for k in _DATASET_KEYS}}
+
+
+# ==============================================================================
+# CLI FLAGS
+# ==============================================================================
+
+def add_circuit_args(parser):
+    """Register the circuit-binding and set-algebra flags on a parser.
+
+    `evaluate_circuit.py` and `analyze_components.py` both take circuits this
+    way, and a circuit expression that resolves for one has to resolve the same
+    way for the other, so the flags are declared once here rather than copied.
+    """
+    g = parser.add_argument_group("circuits")
+    g.add_argument("--circuit", action="append", metavar="NAME=RUN_DIR",
+                   help="Bind a saved circuit to a name that expressions can "
+                        "refer to. Repeatable.")
+    g.add_argument("--expr", action="append", metavar="[LABEL=]EXPR",
+                   help="A circuit expression over the bound names: '|' union, "
+                        "'&' intersection, '\\' (or '-') difference, parentheses. "
+                        "Repeatable. Default: every bound circuit on its own.")
+    g.add_argument("--xor", default=None, metavar="A,B,C",
+                   help="Shorthand for the exclusive family A\\B\\C, B\\A\\C, C\\A\\B.")
+    g.add_argument("--all-pairs-delta", action="store_true",
+                   help="Shorthand for every ordered difference X\\Y.")
+    g.add_argument("--compose-granularity", default="both",
+                   choices=["leaf", "head", "both"],
+                   help="What set membership means for composed circuits: 'leaf' "
+                        "is the finest gates, 'head' is heads + MLP blocks. "
+                        "'both' evaluates each composition twice, as separate cells.")
+    return g
+
+
+def add_task_args(parser):
+    """Register the task-selection flags on a parser."""
+    g = parser.add_argument_group("tasks")
+    g.add_argument("--task", action="append", metavar="NAME",
+                   help="Evaluate on this registered task, with its default "
+                        "hyperparameters and the bound circuits' model/data-dir. "
+                        "Repeatable.")
+    g.add_argument("--task-from", action="append", metavar="RUN_DIR",
+                   help="Evaluate on the task this run was trained on, inheriting "
+                        "its dataset args. Repeatable. Default: each bound "
+                        "circuit's own task.")
+    return g
 
 
 # ==============================================================================
@@ -232,6 +285,21 @@ def resolve_circuits(cli):
                 operands={n: bindings[n] for n in algebra.expr_names(tree)}))
 
     return specs, bindings, operands, configs, geometry
+
+
+def resolve_circuit_specs(*, run_dir=None, circuit=None, expr=None, xor=None,
+                          all_pairs_delta=False, compose_granularity="both"):
+    """`resolve_circuits` addressed by keyword instead of by CLI namespace.
+
+    The same resolution, reachable without argparse and without the
+    evaluator's Session: the component-analysis CLI, its tests and the
+    parameterized notebook all need circuits resolved from bindings and an
+    expression, and none of them have an `evaluate_circuit.py` namespace.
+    """
+    return resolve_circuits(SimpleNamespace(
+        run_dir=run_dir, circuit=list(circuit or []), expr=list(expr or []),
+        xor=xor, all_pairs_delta=all_pairs_delta,
+        compose_granularity=compose_granularity))
 
 
 # ==============================================================================

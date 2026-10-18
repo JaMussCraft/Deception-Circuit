@@ -27,3 +27,8 @@ openai>=1.40
 
 # Tests.
 pytest
+
+# The component-analysis review notebook has its own file,
+# requirements-notebook.txt, and is deliberately not installed from here: one
+# of its packages pins torch, and `pip install -r requirements.txt` is the
+# documented way to set up the login-node base environment.

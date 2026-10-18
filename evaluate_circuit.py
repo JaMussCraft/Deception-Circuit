@@ -50,6 +50,7 @@ import sys
 
 from evaluation import default_evaluations, list_evaluations
 from evaluation import report
+from evaluation import circuits
 from evaluation import suite
 from evaluation.ablation import ABLATION_SCHEMES
 from evaluation.benchmark_eval import SCREEN_MAX_FACTOR
@@ -95,33 +96,8 @@ def build_parser():
                    help="Run directory holding config.json and active_nodes.json. "
                         "Equivalent to --circuit self=<run_dir>.")
 
-    g = p.add_argument_group("circuits")
-    g.add_argument("--circuit", action="append", metavar="NAME=RUN_DIR",
-                   help="Bind a saved circuit to a name that expressions can "
-                        "refer to. Repeatable.")
-    g.add_argument("--expr", action="append", metavar="[LABEL=]EXPR",
-                   help="A circuit expression over the bound names: '|' union, "
-                        "'&' intersection, '\\' (or '-') difference, parentheses. "
-                        "Repeatable. Default: every bound circuit on its own.")
-    g.add_argument("--xor", default=None, metavar="A,B,C",
-                   help="Shorthand for the exclusive family A\\B\\C, B\\A\\C, C\\A\\B.")
-    g.add_argument("--all-pairs-delta", action="store_true",
-                   help="Shorthand for every ordered difference X\\Y.")
-    g.add_argument("--compose-granularity", default="both",
-                   choices=["leaf", "head", "both"],
-                   help="What set membership means for composed circuits: 'leaf' "
-                        "is the finest gates, 'head' is heads + MLP blocks. "
-                        "'both' evaluates each composition twice, as separate cells.")
-
-    g = p.add_argument_group("tasks")
-    g.add_argument("--task", action="append", metavar="NAME",
-                   help="Evaluate on this registered task, with its default "
-                        "hyperparameters and the bound circuits' model/data-dir. "
-                        "Repeatable.")
-    g.add_argument("--task-from", action="append", metavar="RUN_DIR",
-                   help="Evaluate on the task this run was trained on, inheriting "
-                        "its dataset args. Repeatable. Default: each bound "
-                        "circuit's own task.")
+    circuits.add_circuit_args(p)
+    circuits.add_task_args(p)
 
     g = p.add_argument_group("what to run")
     g.add_argument("--evals", nargs="+", default=default_evaluations(),
