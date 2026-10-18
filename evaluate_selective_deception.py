@@ -96,6 +96,7 @@ def prepare_identity(args):
     masks, mask_identity, resolved = resolve_masks(dict(args.circuit) if args.circuit else DEFAULT_BINDINGS)
     provenance = {'model': snapshot_identity(snapshot), 'source': source_identity(),
                   'dtype': 'bfloat16', 'reference': 'shared', 'ablation': 'interchange',
+                  'scoring_baseline_path': 'dual_stream_self_donor_all_gates_open_uncached',
                   'tokenizer_settings': {'pad_token_id': tokenizer.pad_token_id,
                                          'eos_token_id': tokenizer.eos_token_id,
                                          'padding_side': tokenizer.padding_side, 'add_special_tokens': False},

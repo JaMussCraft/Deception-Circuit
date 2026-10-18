@@ -213,8 +213,10 @@ def score_row(ctx, row, masks):
     batch = {'input_ids': ids, 'attention_mask': attention,
              'target': torch.tensor([row['labels']['D']['token_id']]),
              'distractor': torch.tensor([row['labels']['H']['token_id']])}
-    if row['donor'] is not None:
-        batch['corrupted_input_ids'] = torch.tensor([row['donor']['input_ids']])
+    # Match the intervention's uncached dual-stream path for all-open
+    # baselines; single-stream BF16 attention dispatch can shift logits.
+    batch['corrupted_input_ids'] = (ids if row['donor'] is None else
+                                    torch.tensor([row['donor']['input_ids']]))
     with (ctx.all_gates_open() if masks is None else ctx.circuit(masks)):
         out = evaluate_pred_position(ctx, [batch], use_reference=False,
                                      collect_per_example=True, desc='Frozen score')
