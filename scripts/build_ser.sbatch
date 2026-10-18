@@ -24,7 +24,7 @@
 #SBATCH --gpus-per-node=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=64G
-#SBATCH --time=10:00:00
+#SBATCH --time=12:00:00
 #SBATCH --output=logs/build_ser_%j.out
 
 set -euo pipefail
@@ -36,7 +36,7 @@ source ~/.bashrc && conda activate mgnp
 set -u
 
 SEED=${SEED:-42}
-OVERGEN=${OVERGEN:-300}
+OVERGEN=${OVERGEN:-320}
 
 for TASK in ser; do
   python dataset/build_deception_dataset.py \
