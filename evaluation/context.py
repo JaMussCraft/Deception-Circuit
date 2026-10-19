@@ -35,7 +35,7 @@ from evaluation.masks import (assert_complement, coarsen_masks, count_masks,
                               knockout_masks, load_circuit_masks,
                               sample_random_mask_set, validate_hierarchy)
 from models import MODEL_REGISTRY, ModelAdapter
-from tasks import get_task
+from tasks import DECEPTION_TASKS_V2, get_task
 
 SCHEMA_VERSION = 1
 
@@ -158,7 +158,8 @@ def resolve_train_args(run_config: dict, cli):
                   "below is against the WRONG dataset.")
             print("     Pass --std-variant explicitly to be sure.\n")
 
-    if args.task in ("far", "sdr", "ser") and not run_config.get("deception_condition"):
+    if (args.task in ("far", "sdr", "ser") + tuple(DECEPTION_TASKS_V2)
+            and not run_config.get("deception_condition")):
         # Same failure mode as std_variant: evaluating a deceptive-condition run
         # against <task>_honest or <task>_nopressure silently reports the
         # wrong numbers.

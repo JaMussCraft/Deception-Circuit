@@ -132,6 +132,11 @@ _HYPERPARAMS = {
                              train_samples=200, val_samples=200, test_samples=1000),
 }
 
+# v2 mechanism tasks (mechanism-datasets): copies of ("llama", "sdr") on purpose,
+# so v2 runs are trained exactly like the v1 SDR reference runs.
+_HYPERPARAMS.update({("llama", task): dict(_HYPERPARAMS[("llama", "sdr")])
+                     for task in ("far_v2", "sdr_v2", "ser_v2")})
+
 
 def default_node_config(family: str, task: str) -> NodePruningConfig:
     """Default node config: every structural lambda is 1.0. Override individual

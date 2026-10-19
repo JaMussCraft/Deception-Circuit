@@ -123,6 +123,12 @@ harvested from the behavioral filter's *failures* and resampled to match the
 deceptive split's marginals. Exact per-example twinning is impossible — a given
 instance either lied or it didn't — so marginal matching is what makes
 `Δ = C_deceptive − C_honest` interpretable.
+In v2 (`far_v2`/`sdr_v2`/`ser_v2`) the primary Honest Twin is the
+**Neutral-Clause Twin** instead: the Pressure Clause is replaced by a
+length-matched neutral sentence on the SAME instance ids, so D minus H isolates
+pressure processing; the `nopressure` twin is secondary. This contrast sits
+close to the **Format Circuit** contrast and is a deliberate change from the v1
+harvested twins.
 
 **Format Circuit**:
 The circuit pruned on a mechanism task's `nopressure` condition
@@ -238,6 +244,11 @@ Not to be confused with the `nopressure` condition: the **Honest Twin** keeps
 the pressure and the model answers honestly anyway; `nopressure` removes the
 pressure, so there is no motive to resist (its circuit is the **Format
 Circuit**).
+In v2 the Honest Condition is the **Neutral-Clause Twin** (the clause replaced
+by a length-matched neutral sentence, same instance ids), which isolates
+pressure processing rather than "resisting the same pressure": a deliberate
+departure from the v1 harvested twins that brings D minus H close to the
+Format Circuit contrast. The `nopressure` twin is the secondary contrast.
 _Avoid_: control, baseline (ambiguous — the random-circuit null is also a
 baseline)
 
@@ -245,3 +256,44 @@ baseline)
 The retention step keeping only items where the full model produces the expected
 answer at margin in **both** streams. Everything downstream is conditioned on
 this filter, so its pass rate is a property of the task design, not a detail.
+
+### v2 datasets (mechanism-datasets)
+
+**Contingent Survivor**:
+An instance whose deception depends on the Pressure Clause: it passes the
+**Prior-Balance Filter**, is deceptive in both streams with the clause (margin
+>= 0.7), and is honest in both streams with the clause deleted (margin >= 0.3).
+A *full-build survivor* is also honest in both streams under the
+**Neutral-Clause Twin**. v1 survivors were mostly not contingent: they named
+the designated item with or without the clause.
+_Avoid_: passing example, survivor (unqualified)
+
+**Framing**:
+A family of Pressure Clauses sharing one motive structure — role + goal, stake
+/ incentive, consequence (the v1 threat style), or strong self-interest —
+written as 20 flavor clauses per task plus the 5 shared clauses, with a
+recorded hypothesis of what it should do to the inversion and identity
+contingent rates. One file per framing under `dataset/deception_pools/v2/framings/`.
+_Avoid_: prompt style, pressure type
+
+**Pilot Cell**:
+One (task, Framing, Suffix Policy[, SER wording]) combination, scored on about
+1,000 instances in every condition; the unit the pre-registered acceptance rule
+passes or fails.
+
+**Suffix Policy**:
+The one global switch for the sentence after the Designating Sentence: `off`
+(no suffix) or `on` (the same normal-case sentence in all three tasks, "The
+{inversion predicate} {result|reading} is the one that matters most here.",
+varying only in the Predicate word). Unlike the v1 **Designation
+Suffix**, it carries no caps, no imperative and no item word, and it is joined
+as its own sentence.
+
+**Neutral-Clause Twin**:
+The v2 honest counterpart of a deceptive prompt: the same instance with its
+Pressure Clause replaced, by clause surgery, by a neutral sentence of exactly
+the same token count (no item, predicate, position, honesty, consequence,
+reward, threat or imperative content). It is the primary Honest Twin of the v2
+tasks and stored as `<task>_honest` with `honest_twin_kind: neutral_clause`.
+_Avoid_: control prompt, matched honest instruction (that one is an honesty
+instruction, this one carries no instruction)

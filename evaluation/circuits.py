@@ -34,7 +34,7 @@ from config import default_hyperparams
 from evaluation import algebra
 from evaluation.context import geometry_from_masks, load_run_config, resolve_train_args
 from evaluation.masks import count_masks, load_circuit_masks, validate_hierarchy
-from tasks import DECEPTION_TASKS, get_task, list_tasks
+from tasks import DECEPTION_TASKS, DECEPTION_TASKS_V2, get_task, list_tasks
 
 #: Hyperparameters that belong to the *task*, not to the run, and so must be
 #: re-derived when `--task NAME` borrows another run's config as a template.
@@ -314,7 +314,8 @@ def condition_of(config) -> str:
     """
     get = config.get if isinstance(config, dict) else (
         lambda key, default=None: getattr(config, key, default))
-    if get("task") not in tuple(DECEPTION_TASKS) + ("joint",):
+    if get("task") not in (tuple(DECEPTION_TASKS) + tuple(DECEPTION_TASKS_V2)
+                           + ("joint",)):
         return "-"
     return get("deception_condition") or "deceptive"
 

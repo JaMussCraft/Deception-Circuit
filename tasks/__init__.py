@@ -140,6 +140,15 @@ def get_task(name: str) -> Task:
         elif name == "ser":
             from tasks.ser import SERTask
             _TASKS[name] = SERTask
+        elif name == "far_v2":
+            from tasks.deception_v2 import FARv2Task
+            _TASKS[name] = FARv2Task
+        elif name == "sdr_v2":
+            from tasks.deception_v2 import SDRv2Task
+            _TASKS[name] = SDRv2Task
+        elif name == "ser_v2":
+            from tasks.deception_v2 import SERv2Task
+            _TASKS[name] = SERv2Task
         elif name == "joint":
             from tasks.joint_deception import JointDeceptionTask
             _TASKS[name] = JointDeceptionTask
@@ -149,12 +158,19 @@ def get_task(name: str) -> Task:
 
 
 def list_tasks():
-    return ["ioi", "gp", "gt", "std", "far", "sdr", "ser", "joint"]
+    return ["ioi", "gp", "gt", "std", "far", "sdr", "ser", "joint",
+            "far_v2", "sdr_v2", "ser_v2"]
 
 
 #: The deception-mechanism family: one task per mechanism, built from one shared
 #: content pool so their circuits can be compared (see dataset/deception_common.py).
 DECEPTION_TASKS = ["far", "sdr", "ser"]
+
+#: The v2 side build of the same three mechanisms on the aligned v2 Scaffold
+#: (dataset/deception_v2.py). Deliberately NOT in DECEPTION_TASKS: that list is
+#: the joint run's default subtask set and its --joint-tasks choices, and
+#: adding the v2 ids there would silently make `--task joint` train six tasks.
+DECEPTION_TASKS_V2 = ["far_v2", "sdr_v2", "ser_v2"]
 
 #: Which dataset of a mechanism task a run trains on: `<task>` (deceptive),
 #: `<task>_honest` (the Honest Twin) or `<task>_nopressure` (the Pressure Clause
