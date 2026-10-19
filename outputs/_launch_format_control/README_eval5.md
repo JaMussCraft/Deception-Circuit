@@ -302,7 +302,33 @@ datasets each). For a reader that prefers one file, `eval5_format.json` is:
 `evaluation.eval5_format_summary.tabulate(load_suite(dir))` returns the same
 dict without writing.
 
-## PENDING: re-score the sm suite's judge calls (as of 2026-10-18)
+## DONE 2026-10-19: sm suite re-scored; verdict (b)
+
+The re-score below ran on 2026-10-19 after the credit top-up: 4,661 calls,
+all 6,032 failed rows fixed, 0 still failing, `matrix.json/csv` synced. lb
+exited 3 as expected (preflight got an empty completion on the word-salad
+row; nothing written, lb numbers unchanged). Both writers then ran, and the
+coarse SDR suite's `decision.json` now reads **(b) on eval 2 + eval 5**. The
+only failing condition is collateral: mean reference-NLL rise F 0.668 vs D
+0.611. F is lower on 6 of 10 datasets; the gap comes from
+lb:instructed-deception (+0.384) and sandbagging (+0.306, where every
+knockout is 80-84% unparsed). The informational eval 5 deception drop still
+has F >= D (0.777 vs 0.723). sm mean deception under knockout: full 1.000 /
+D 0.312 / H 0.172 / F 0.273 / D−F 0.650 (D−F mean Δ −0.032, inert).
+
+**Run it under `mgnp`, not the login base env.** The base env failed twice:
+`openai` 1.3.5 cannot build a client against the installed httpx
+(`TypeError: unexpected keyword argument 'proxies'`; the preflight caught it,
+nothing was written), and the consistency check falsely reports
+`sandbagging.null` as not reproducing on the F and D−F cells, which would
+skip them. Under `/u/swong2/.conda/envs/mgnp/bin/python` (the env that wrote
+the suite) the plan is clean. Read `python` below as that interpreter.
+
+The worktree was removed on 2026-10-19; every directory named here now lives
+in the primary checkout at the same relative path, and `suites.json` points
+there.
+
+The original pending note follows for the record.
 
 Both `sdr_coarse` suites ran on 2026-10-17 (lb 22947270, sm 22947260; D, H,
 F and D−F in one invocation each). The OpenRouter key ran out of credits
