@@ -8,7 +8,7 @@
 | evaluated on | eval 2 alone |
 | circuit D | condition `deceptive`, NLS 0.30, `/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_noedge_260819-083414` |
 | circuit H | condition `honest`, NLS 0.30, `/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_honest_noedge_260819-083525` |
-| circuit F | condition `nopressure`, NLS 0.30, `/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/format-control/outputs/llama-8b-instruct_sdr/nls0.3_nopressure_noedge_261013-204850` |
+| circuit F | condition `nopressure`, NLS 0.30, `/projects/beto/swong2/Alignment/Deception-Circuit/outputs/llama-8b-instruct_sdr/nls0.3_nopressure_noedge_261013-204850` |
 | D data | `sdr` (condition `deceptive`, from the manifest), full-model accuracy 1.000; paired with F data by instance |
 | H data | `sdr_honest` (condition `honest`, from the manifest), full-model accuracy 1.000; unpaired (disjoint instances) |
 | F data | `sdr_nopressure` (condition `nopressure`, from the manifest), full-model accuracy 0.998; paired with D data by instance |
