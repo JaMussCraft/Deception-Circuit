@@ -1,5 +1,7 @@
 #!/bin/bash
 # Root reserves each concrete GPU walltime in the ledger and overrides --time.
+# amendment-v2: one frozen arm/rho per invocation; --calibrate is disposable.
+# A40/H200 only for backward; --dry-run reads frozen manifests without weights.
 #SBATCH --job-name=selective-mask
 #SBATCH --account=beto-delta-gpu
 #SBATCH --partition=gpuA40x4
