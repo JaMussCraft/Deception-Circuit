@@ -389,6 +389,26 @@ def test_neutral_selection_raises_when_nothing_fits(tok, framing, tmp_path):
                    v2.load_neutral_pool(str(p)))
 
 
+def test_realization_is_reproducible_across_independent_generations(llama_tok):
+    """Two independent generations with the same seed realize to identical
+    records (prompts, clause and neutral choice); a different seed gives a
+    different instance list and therefore different neutral choices."""
+    framing = v2.load_framing(v2.FRAMINGS_DIR + "/r1_stake.json")
+    pool = v2.load_neutral_pool()
+    spec = spec_for("ser_v2", True)
+
+    def run(seed):
+        insts = v2.generate_instances_v2(30, seed=seed)
+        return [v2.realize(llama_tok, spec, framing, i, pool) for i in insts]
+
+    a, b, c = run(7), run(7), run(8)
+    keys = ("instance_id", "clean_prompt", "corrupt_prompt", "pressure_id",
+            "neutral_id", "conditions")
+    assert [{k: r[k] for k in keys} for r in a] == [{k: r[k] for k in keys} for r in b]
+    assert [r["instance_id"] for r in a] != [r["instance_id"] for r in c]
+    assert [r["neutral_id"] for r in a] != [r["neutral_id"] for r in c]
+
+
 def test_neutral_token_count_equals_pressure_with_real_pools(llama_tok):
     framing = v2.load_framing(v2.FRAMINGS_DIR + "/r1_consequence.json")
     pool = v2.load_neutral_pool()
