@@ -950,7 +950,6 @@ def _amended_plan(args,m):
     if (getattr(args,'policy',None)!=a['policy'] or args.collateral_arm!=a['collateral_arm']
             or args.candidate_space!=a['candidate_space'] or args.max_updates!=a['max_updates']
             or args.checkpoint_every!=64 or args.seed!=0 or args.rho not in ((0.,) if v3 else (0.,.01))
-            or (v3 and args.resume)
             or args.joint_pairs!=1 or wt['manifest_hash']!=a['wikitext_manifest_hash']):
         raise ValueError('CLI differs from frozen amendment')
     enabled=args.collateral_arm in ('W','HW')
@@ -1151,8 +1150,6 @@ def _amended_update(model,m,cache,args,ids,wblock,wfp,optimizer,*,measure_gradie
 
 
 def _train_amended(args,m,identity,ctx,cache,wm,wfp):
-    if getattr(args,'policy',None)=='amendment-v3' and args.resume:
-        raise ValueError('amendment-v3 requires fresh fits; checkpoint resume/migration forbidden')
     from evaluation import selective_wikitext as wt
     model=ctx.node_model;params=sm.configure_candidate_gates(model,m['candidate_heads'])
     optimizer=_optimizer(params);fp=sd.content_hash(identity);latest=args.output_dir/'latest.pt'

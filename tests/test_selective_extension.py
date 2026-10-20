@@ -55,8 +55,8 @@ def test_manifest_rejects_cross_policy_or_extra_axes(policy,changes):
         r._validate_amendment(m)
 
 
-@pytest.mark.parametrize('changes',[{'rho':.01},{'max_updates':512},{'seed':1},{'joint_pairs':2},{'resume':True}])
-def test_v3_cli_rejects_unapproved_settings_and_resume(changes):
+@pytest.mark.parametrize('changes',[{'rho':.01},{'max_updates':512},{'seed':1},{'joint_pairs':2}])
+def test_v3_cli_rejects_unapproved_settings(changes):
     m=manifest();args=args_for(m)
     for k,v in changes.items():setattr(args,k,v)
     with patch.object(r,'CANDIDATE_HASH',r.sd.content_hash(m['amendment']['union_heads'])),\
@@ -97,10 +97,56 @@ def test_v3_cache_shares_only_arm_space_and_rejects_old_policy_or_source(tmp_pat
             r._load_cache(path,r._baseline_fingerprint(stale))
 
 
-def test_v3_training_rejects_resume_before_loading_any_checkpoint(tmp_path):
-    model,m,cache,args=_tiny_training_inputs(tmp_path);args.policy='amendment-v3';args.resume=True
-    with pytest.raises(ValueError,match='fresh'):
-        r._train_amended(args,m,{},SimpleNamespace(node_model=model),cache,{},'wt')
+def test_v3_plan_accepts_explicit_same_horizon_resume():
+    m=manifest();args=args_for(m);args.resume=True
+    with patch.object(r,'CANDIDATE_HASH',r.sd.content_hash(m['amendment']['union_heads'])),\
+         patch.object(r,'_wt_manifest',return_value={'manifest_hash':'wt'}):
+        plan=r._amended_plan(args,m)
+    assert plan['updates']==1536 and plan['settings']['max_updates']==1536
+
+
+def test_v3_same_1536_horizon_resume_restores_exact_state_and_rejects_identity_drift(tmp_path):
+    import torch
+    from evaluation import selective_wikitext as wt
+    from tests.test_selective_mask_runner import tiny
+    identity=dict(policy='amendment-v3',source_files_hash='new-source',manifest_hash='new-manifest',
+        settings=dict(max_updates=1536,checkpoint_every=64,seed=0,rho=0.,collateral_arm='HW'))
+    fingerprint=r.sd.content_hash(identity)
+    block=dict(block_id='train-000000',input_ids=torch.tensor([[1,2,3]]),
+        corrupted_input_ids=torch.tensor([[4,5,6]]),attention_mask=torch.ones(1,3,dtype=torch.long),n_tokens=2)
+    original_update=r._amended_update
+    def run(directory,resume,stop_after):
+        directory.mkdir(exist_ok=True)
+        model,m,cache,args=_tiny_training_inputs(directory)
+        args.policy='amendment-v3';args.max_updates=1536;args.checkpoint_every=64
+        args.collateral_arm='HW';args.rho=0.;args.resume=resume
+        if not resume:
+            wt.write_reference_block(args.wikitext_cache,fingerprint='a'*64,block_id=block['block_id'],
+                logits=r._wt_logits(model,block).detach(),input_ids=block['input_ids'])
+        calls=0
+        def bounded_update(*a,**kw):
+            nonlocal calls
+            if calls==stop_after:raise RuntimeError('test interruption at completed update boundary')
+            calls+=1
+            return original_update(*a,**kw)
+        with patch.object(wt,'iter_blocks',side_effect=lambda manifest,split:iter([block])),\
+             patch.object(r,'_amended_update',side_effect=bounded_update),\
+             pytest.raises(RuntimeError,match='test interruption'):
+            r._train_amended(args,m,identity,SimpleNamespace(node_model=model),cache,{'fixture':True},'a'*64)
+        return r._load_tensor(directory/'latest.pt',fingerprint)
+    continuous=run(tmp_path/'continuous',False,4)
+    interrupted=run(tmp_path/'resumed',False,2)
+    assert interrupted['cursor']['update']==2
+    resumed=run(tmp_path/'resumed',True,2)
+    assert resumed['cursor']['update']==4
+    assert r._tensor_digest(continuous)==r._tensor_digest(resumed)
+    for changed in (dict(identity,source_files_hash='old-source'),dict(identity,policy='amendment-v2'),
+                    dict(identity,manifest_hash='different-manifest'),
+                    dict(identity,settings=dict(identity['settings'],max_updates=512)),
+                    dict(identity,settings=dict(identity['settings'],rho=.01))):
+        model,heads,params=tiny()
+        with pytest.raises(ValueError,match='fingerprint'):
+            r._restore(tmp_path/'resumed'/'latest.pt',model,r._optimizer(params),r.sd.content_hash(changed))
 
 
 @pytest.mark.parametrize('policy',['report18-v1','amendment-v2','amendment-v3'])
