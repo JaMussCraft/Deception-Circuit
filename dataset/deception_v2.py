@@ -319,13 +319,23 @@ def make_spec(task: str, suffix: Union[bool, str],
                            stems={**pieces.stems, key: ov["stem"]})
         pieces = dataclasses.replace(pieces, **changes)
         if "desig_inversion" in ov:
-            old = {SPECS_V2[task].desig_inversion, SPECS_V2[task].desig_identity}
-            text = f"{pieces.question(key)} {pieces.stem(key)}".lower()
-            stale = sorted(w for w in old if w in re.findall(r"[a-z]+", text))
+            reg = SPECS_V2[task]
+            old = {reg.desig_inversion, reg.desig_identity}
+            new = {ov["desig_inversion"], ov["desig_identity"]}
+            words = re.findall(r"[a-z]+", f"{pieces.question(key)} {pieces.stem(key)}".lower())
+            # A word of the old pair that is not in the new pair is stale. A role
+            # swap of the registry pair (round 6, spec 14.G9) leaves nothing stale,
+            # but its question must then name the new inversion word.
+            stale = sorted(w for w in old - new if w in words)
             if stale:
                 raise ValueError(f"predicate override leaves the old predicate "
                                  f"word(s) {stale} in the question/stem; override "
                                  f"them too")
+            reg_words = re.findall(r"[a-z]+", f"{reg.question(key) if key in reg.questions else ''}"
+                                              f" {reg.stem(key) if key in reg.stems else ''}".lower())
+            if reg.desig_inversion in reg_words and ov["desig_inversion"] not in words:
+                raise ValueError(f"the question/stem must name the overriding inversion "
+                                 f"predicate {ov['desig_inversion']!r}")
     return SpecV2(pieces, _suffix_flag(suffix), ser_wording,
                   frame=ov.get("frame", ""), overrides=ov)
 

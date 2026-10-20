@@ -655,3 +655,35 @@ def test_frame_opens_every_condition_and_survives_clause_surgery(
         assert rec["frame"] == FRAME
         plain = v2.realize(tok, spec_for(t, True), framing, inst(), neutral_pool)
         assert rec["clean_prompt"].replace(FRAME + " ", "", 1) == plain["clean_prompt"]
+
+
+# ==============================================================================
+# Round 6 (spec 14.G9): FAR question swap as a predicate-role override
+# ==============================================================================
+
+FAR_SWAP = {"desig_inversion": "passing", "desig_identity": "failing",
+            "question": "is passing", "stem": "The {noun} that is passing is"}
+
+
+def test_far_question_swap_targets_the_failing_item(tok, framing, neutral_pool):
+    spec = v2.make_spec("far_v2", False, None, overrides=FAR_SWAP)
+    # inversion: the designated item is the one the question asks about ("passing"),
+    # so the honest answer is the designated item and the deceptive one the failing item
+    rec = v2.realize(tok, spec, framing, inst(designation="inversion"), neutral_pool)
+    assert "The budget result came back passing, and the other came back failing." \
+        in rec["clean_prompt"]
+    assert "Which result is passing, budget or timeline?" in rec["clean_prompt"]
+    assert rec["clean_prompt"].endswith("The result that is passing is")
+    assert rec["distractor"] == "budget" and rec["target"] == "timeline"
+    rec = v2.realize(tok, spec, framing, inst(designation="identity"), neutral_pool)
+    assert "The budget result came back failing, and the other came back passing." \
+        in rec["clean_prompt"]
+    assert rec["target"] == "budget"          # deceptive: name the failing item
+    assert v2.SPECS_V2["far_v2"].desig_inversion == "failing"
+
+
+def test_a_role_swap_must_also_swap_the_question():
+    with pytest.raises(ValueError, match="must name the overriding inversion"):
+        v2.make_spec("far_v2", False, None, overrides={
+            "desig_inversion": "passing", "desig_identity": "failing",
+            "question": "is failing", "stem": "The {noun} that is failing is"})
