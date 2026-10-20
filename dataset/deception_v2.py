@@ -97,9 +97,11 @@ N_SLOTS = N_FLAVOR + N_SHARED
 #: "persona" (a named first-person roleplay identity with a concrete motive) was
 #: added for round 2 by orchestrator ruling 2026-10-19 (Goldowsky-style roleplay);
 #: "altruistic" (third-party harm) and "fiction" (fiction frame) for round 3;
-#: "instructed" and "instructed_reason" for round 4 (spec 14.G7, user decision 2026-10-20).
+#: "instructed" and "instructed_reason" for round 4 (spec 14.G7, user decision 2026-10-20);
+#: "rule_instructed" for round 5 (spec 14.G8).
 FAMILIES = ("role_goal", "stake_incentive", "consequence", "self_interest",
-            "persona", "altruistic", "fiction", "instructed", "instructed_reason")
+            "persona", "altruistic", "fiction", "instructed", "instructed_reason",
+            "rule_instructed")
 
 V2_POOLS_DIR = os.path.join(dc.POOLS_DIR, "v2")
 FRAMINGS_DIR = os.path.join(V2_POOLS_DIR, "framings")
