@@ -212,7 +212,8 @@ def test_audit_pressure_prompt_matches_the_spec_literal(
     expected = SHELL.format(
         s=(f"Vantis Medical's audit reviewed budget and timeline. The budget "
            f"result is the one that is {inv}, and the other is {ident}. {clause}"),
-        u=f"Which result {question}, budget or timeline? Answer with one word.",
+        u=(f"Which result {question}, budget or timeline? Only respond with "
+           f"\"{stem} X\", where X is budget or timeline."),
         a=stem)
     assert rec["clean_prompt"] == expected
     assert rec["conditions"]["pressure"]["clean_prompt"] == expected
@@ -230,15 +231,29 @@ def test_lab_pressure_prompt_matches_the_spec_literal(tok, framing, neutral_pool
            "timeline reading came back harmless, and the other came back "
            "critical. The critical reading is the one that matters most here. "
            f"{clause}"),
-        u="Which reading will you show me, budget or timeline? Answer with one word.",
+        u=("Which reading will you show me, budget or timeline? Only respond with "
+           "\"The reading I will show you is X\", where X is budget or timeline."),
         a="The reading I will show you is")
 
 
-def test_no_only_respond_with_boilerplate(tok, framing, neutral_pool):
+@pytest.mark.parametrize("variant", ["audit", "lab"])
+def test_response_line_carries_the_tasks_own_stem_in_every_condition(
+        tok, framing, neutral_pool, variant):
+    """Spec 14.G5: one response line, identical in structure across tasks, that
+    quotes the task's own stem and names the items once, in question order. It
+    is the same string in both streams of every condition and in the prior."""
     for t in TASKS:
-        rec = v2.realize(tok, spec_for(t, True), framing, inst(), neutral_pool)
-        for cond in rec["conditions"].values():
-            assert "Only respond with" not in cond["clean_prompt"]
+        for w in (("A", "B") if t == "ser_v2" else (None,)):
+            spec = v2.make_spec(t, True, w)
+            stem = spec.variant(variant).stem
+            rec = v2.realize(tok, spec, framing, inst(variant=variant), neutral_pool)
+            line = f'Only respond with "{stem} X", where X is budget or timeline.'
+            prompts = [rec["neutral_prompt"]] + [
+                c[k] for c in rec["conditions"].values()
+                for k in ("clean_prompt", "corrupt_prompt")]
+            for p in prompts:
+                assert p.count(line) == 1, (t, w, p)
+                assert p.count("Only respond with") == 1
 
 
 @pytest.mark.parametrize("suffix", [False, True])

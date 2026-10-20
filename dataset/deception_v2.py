@@ -24,9 +24,11 @@ The designating sentence is the stored SDR v1 wording, the only one that ever
 produced inversion survivors (spec 14.G2); the intros and neutral designations
 are v1's.
 
-User turn: ``Which {noun} {question}, {item_1} or {item_2}? Answer with one
-word.`` ({noun} = result / reading, items unquoted, spec 14.G3), and no "Only
-respond with" boilerplate.
+User turn: ``Which {noun} {question}, {item_1} or {item_2}? Only respond with
+"{stem} X", where X is {item_1} or {item_2}.`` ({noun} = result / reading,
+{stem} = the task's stem, items unquoted, spec 14.G3). The response line
+replaced round 1's "Answer with one word." in round 0 (spec 14.G5): without it
+the readout argmax was a non-item token in most rows.
 
 Suffix Policy (one global factor, spec 4). ``SUFFIX_CANDIDATES`` holds two
 normal-case, non-imperative sentences sharing one frame, "The {inv_word} {noun}
@@ -116,7 +118,14 @@ VARIANT_PIECES: Dict[str, Dict[str, str]] = {
     },
 }
 
-USER_TURN = "Which {noun} {question}, {item_1} or {item_2}? Answer with one word."
+# Response line (spec 14.G5, orchestrator ruling 2026-10-19, round 0b): the round-1
+# "Answer with one word." left the full-vocabulary argmax on a non-item token
+# (" the", ":", ...) in 52-98% of rows; this frame takes it to <= 1% in every task,
+# condition and stream while naming the items only once, in question order (a line
+# naming both items as full answers biased the prior toward the first one named).
+# {stem} is the task's own stem, so the line is identical in structure across tasks.
+USER_TURN = ('Which {noun} {question}, {item_1} or {item_2}? '
+             'Only respond with "{stem} X", where X is {item_1} or {item_2}.')
 
 SUFFIX_CANDIDATES = (
     "The {inv_word} {noun} is the one that matters most here.",
@@ -203,7 +212,8 @@ class SpecV2(dc.TaskSpec):
             variants.append(dc.TemplateVariant(
                 name=name, intro=vp["intro"], designation=vp["designation"],
                 neutral_designation=vp["neutral_designation"],
-                user=USER_TURN.replace("{noun}", noun).replace(
+                user=USER_TURN.replace("{stem}", pieces.stem(ser_wording))
+                .replace("{noun}", noun).replace(
                     "{question}", pieces.question(ser_wording)),
                 stem=pieces.stem(ser_wording).format(noun=noun)))
         super().__init__(task=pieces.task, display_name=pieces.display_name,
