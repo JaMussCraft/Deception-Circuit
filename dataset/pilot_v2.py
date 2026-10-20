@@ -148,8 +148,13 @@ def parse_cells(path: str) -> List[Dict]:
         if suffix is None:
             raise ValueError(f"cell {c['cell_id']!r}: suffix must be on/off")
         wording = c.get("ser_wording")
-        if c["task"] == "ser_v2" and wording not in ("A", "B"):
-            raise ValueError(f"cell {c['cell_id']!r}: ser_v2 needs ser_wording A or B")
+        overrides = c.get("overrides") or {}
+        if not isinstance(overrides, dict):
+            raise ValueError(f"cell {c['cell_id']!r}: overrides must be an object")
+        if c["task"] == "ser_v2" and wording not in ("A", "B") and not (
+                "question" in overrides and isinstance(wording, str) and wording):
+            raise ValueError(f"cell {c['cell_id']!r}: ser_v2 needs ser_wording A or B "
+                             f"(or a new label with a question/stem override)")
         if c["task"] != "ser_v2" and wording is not None:
             raise ValueError(f"cell {c['cell_id']!r}: ser_wording is SER-only")
         if int(c["n"]) < 1:
@@ -157,6 +162,7 @@ def parse_cells(path: str) -> List[Dict]:
         cells.append({"cell_id": c["cell_id"], "task": c["task"],
                       "framing": _resolve(c["framing"]), "suffix": suffix,
                       "ser_wording": wording, "n": int(c["n"]),
+                      "overrides": dict(overrides),
                       "neutral_pool": _resolve(c["neutral_pool"])
                       if c.get("neutral_pool") else None})
     return cells
@@ -206,8 +212,12 @@ def prepare_cell(cell: Dict, instances: Sequence[Dict], tokenizer, backend, *,
     failure (a spec, framing or pool that does not load, a misaligned or
     over-length prompt) aborts this cell only."""
     try:
-        spec = backend.make_spec(cell["task"], cell["suffix"] == "on",
-                                 cell["ser_wording"])
+        ov = cell.get("overrides") or {}
+        # Overrides (round 3) only reach backends that take them.
+        spec = (backend.make_spec(cell["task"], cell["suffix"] == "on",
+                                  cell["ser_wording"], overrides=ov) if ov else
+                backend.make_spec(cell["task"], cell["suffix"] == "on",
+                                  cell["ser_wording"]))
         framing = backend.load_framing(cell["framing"])
         pool = backend.load_neutral_pool(cell.get("neutral_pool") or neutral_pool_path)
     except Exception as e:  # any load failure aborts this cell only
@@ -328,6 +338,7 @@ def cell_report(prepared: Dict, *, tokenizer, round_id, seed: int,
             "framing_round": framing.round, "framing_hypothesis": framing.hypothesis,
             "framing_path": cell["framing"], "suffix": cell["suffix"],
             "ser_wording": cell["ser_wording"], "seed": seed,
+            "overrides": dict(cell.get("overrides") or {}),
             "n_generated": len(records), "scored": scores is not None}
     if scores is None:
         report = {**meta, "thresholds": dict(ct.THRESHOLDS), "seconds_per_forward": None,

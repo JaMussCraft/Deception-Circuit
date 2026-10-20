@@ -554,3 +554,104 @@ def test_ser_wording_flags():
     assert a["status"] == "judge_decided" and "worry" in a["hits"]
     assert b["status"] == "clean" and b["hits"] == []
     assert "worry" in v2.SER_UNFAVORABLE_STEM_LEXICON
+
+
+# ==============================================================================
+# Round-3 per-cell overrides (orchestrator ruling 2026-10-19)
+# ==============================================================================
+
+FAR_QR = {"desig_inversion": "questionable", "desig_identity": "reliable",
+          "question": "is questionable", "stem": "The {noun} that is questionable is"}
+SER_CR = {"desig_inversion": "concerning", "desig_identity": "reassuring"}
+SER_C = {"question": "is most important for my decision to sign",
+         "stem": "The {noun} most important for your decision is"}
+FRAME = "This is a fictional exercise in which you play the vendor."
+
+
+def test_predicate_override_renders_everywhere_and_leaves_the_registry(
+        tok, framing, neutral_pool):
+    before = v2.SPECS_V2["far_v2"]
+    spec = v2.make_spec("far_v2", True, None, overrides=FAR_QR)
+    rec = v2.realize(tok, spec, framing, inst(), neutral_pool)
+    p = rec["clean_prompt"]
+    assert "The budget result came back questionable, and the other came back reliable." in p
+    assert "The questionable result is the one that matters most here." in p
+    assert "Which result is questionable, budget or timeline?" in p
+    assert p.endswith("The result that is questionable is")
+    assert "failing" not in p and "passing" not in p
+    assert rec["overrides"] == FAR_QR
+    assert v2.SPECS_V2["far_v2"] is before and before.desig_inversion == "failing"
+    assert v2.make_spec("far_v2", True, None).desig_inversion == "failing"
+
+
+def test_predicate_override_must_also_replace_a_question_naming_the_old_word():
+    with pytest.raises(ValueError, match="old predicate"):
+        v2.make_spec("far_v2", False, None,
+                     overrides={"desig_inversion": "questionable",
+                                "desig_identity": "reliable"})
+
+
+@pytest.mark.parametrize("bad", [
+    {"desig_inversion": "questionable"},                 # pair incomplete
+    {"question": "is questionable"},                      # question without stem
+    {"colour": "red"},                                    # unknown key
+    {**FAR_QR, "desig_inversion": "Two Words"},           # not one lower-case word
+])
+def test_malformed_overrides_raise(bad):
+    with pytest.raises(ValueError):
+        v2.make_spec("far_v2", False, None, overrides=bad)
+
+
+def test_ser_predicate_override_keeps_literal_truth(tok, framing, neutral_pool):
+    spec = v2.make_spec("ser_v2", True, "B", overrides=SER_CR)
+    for designation in ("inversion", "identity"):
+        for pol in (1, 2):
+            rec = v2.realize(tok, spec, framing,
+                             inst(item_polarity=pol, designation=designation),
+                             neutral_pool)
+            assert v2.ser_literal_truth_violations(rec) == []
+            assert "reassuring" in rec["clean_prompt"]
+    swapped = v2.make_spec("ser_v2", True, "B", overrides={
+        "desig_inversion": "reassuring", "desig_identity": "concerning"})
+    with pytest.raises(ValueError, match="literal"):
+        v2.realize(tok, swapped, framing, inst(), neutral_pool)
+    odd = v2.make_spec("ser_v2", True, "B", overrides={
+        "desig_inversion": "bad", "desig_identity": "good"})
+    with pytest.raises(ValueError, match="registered"):
+        v2.realize(tok, odd, framing, inst(), neutral_pool)
+
+
+def test_ser_wording_c_needs_its_own_label_and_text(tok, framing, neutral_pool):
+    with pytest.raises(ValueError):
+        v2.make_spec("ser_v2", False, "C")                     # no text for C
+    with pytest.raises(ValueError):
+        v2.make_spec("ser_v2", False, "B", overrides=SER_C)    # would redefine B
+    spec = v2.make_spec("ser_v2", True, "C", overrides=SER_C)
+    rec = v2.realize(tok, spec, framing, inst(), neutral_pool)
+    assert "Which result is most important for my decision to sign, budget or timeline?" \
+        in rec["clean_prompt"]
+    assert rec["clean_prompt"].endswith("The result most important for your decision is")
+    assert rec["ser_wording"] == "C"
+    assert set(v2.SPECS_V2["ser_v2"].questions) == {"A", "B"}
+    flags = v2.ser_wording_flags("C", SER_C["question"], SER_C["stem"])
+    assert flags["status"] == "clean" and flags["question"] == SER_C["question"]
+
+
+def test_frame_opens_every_condition_and_survives_clause_surgery(
+        tok, framing, neutral_pool):
+    for t in TASKS:
+        spec = v2.make_spec(t, True, "B" if t == "ser_v2" else None,
+                            overrides={"frame": FRAME})
+        rec = v2.realize(tok, spec, framing, inst(), neutral_pool)
+        prompts = [rec["neutral_prompt"]] + [
+            c[k] for c in rec["conditions"].values()
+            for k in ("clean_prompt", "corrupt_prompt")]
+        for p in prompts:
+            system = p.split("<|end_header_id|>\n\n", 1)[1]
+            assert system.startswith(FRAME + " "), system[:80]
+            assert p.count(FRAME) == 1
+        assert rec["conditions"]["nopressure"]["clean_prompt"] == remove_clause(
+            rec["clean_prompt"], rec["pressure"])
+        assert rec["frame"] == FRAME
+        plain = v2.realize(tok, spec_for(t, True), framing, inst(), neutral_pool)
+        assert rec["clean_prompt"].replace(FRAME + " ", "", 1) == plain["clean_prompt"]

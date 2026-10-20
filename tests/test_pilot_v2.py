@@ -583,3 +583,21 @@ def test_sbatch_wrapper_guards_env_init_and_passes_every_argument():
             "{ echo \"Environment initialization failed\" >&2; exit 1; }") in text
     assert 'python dataset/pilot_v2.py "$@"' in text
     assert "--no-model" in text and "--test-only" in text
+
+
+def test_parse_cells_carries_overrides_and_a_new_ser_label_only_with_text(tmp_path):
+    p = tmp_path / "c.json"
+    base = {"cell_id": "a", "task": "ser_v2", "framing": "f.json", "suffix": "on", "n": 10}
+    ov = {"question": "is most important for my decision to sign",
+          "stem": "The {noun} most important for your decision is"}
+    p.write_text(json.dumps([{**base, "ser_wording": "C", "overrides": ov}]))
+    cell = pilot_v2.parse_cells(str(p))[0]
+    assert cell["ser_wording"] == "C" and cell["overrides"] == ov
+    p.write_text(json.dumps([{**base, "ser_wording": "B"}]))
+    assert pilot_v2.parse_cells(str(p))[0]["overrides"] == {}
+    for bad in ({"ser_wording": "C"},                                    # no text
+                {"ser_wording": "C", "overrides": {"frame": "F."}},      # still no text
+                {"ser_wording": "B", "overrides": ["not", "a", "dict"]}):
+        p.write_text(json.dumps([{**base, **bad}]))
+        with pytest.raises(ValueError):
+            pilot_v2.parse_cells(str(p))

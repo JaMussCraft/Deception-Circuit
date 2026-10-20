@@ -66,6 +66,7 @@ the purity judge of ticket 04 decides those.
 
 from __future__ import annotations
 
+import dataclasses
 import hashlib
 import json
 import os
@@ -82,14 +83,22 @@ MAX_SEQ_LENGTH = 120
 
 TASKS_V2 = ("far_v2", "sdr_v2", "ser_v2")
 SER_WORDINGS = ("A", "B")
+#: SER predicate pairs as (favorable word, unfavorable word). The literal-truth
+#: check anchors on this list, so a spec whose roles are swapped is still caught.
+#: ("reassuring", "concerning") is the round-3 per-cell override (spec 13.4,
+#: orchestrator ruling 2026-10-19); the registry SPECS_V2 is unchanged.
+SER_PREDICATE_PAIRS = (("favorable", "unfavorable"), ("reassuring", "concerning"))
+#: Keys a pilot cell may override (make_spec `overrides`).
+OVERRIDE_KEYS = ("desig_inversion", "desig_identity", "question", "stem", "frame")
 VARIANT_NAMES = ("audit", "lab")
 N_FLAVOR = 20
 N_SHARED = 5
 N_SLOTS = N_FLAVOR + N_SHARED
 #: "persona" (a named first-person roleplay identity with a concrete motive) was
-#: added for round 2 by orchestrator ruling 2026-10-19 (Goldowsky-style roleplay).
+#: added for round 2 by orchestrator ruling 2026-10-19 (Goldowsky-style roleplay);
+#: "altruistic" (third-party harm) and "fiction" (fiction frame) for round 3.
 FAMILIES = ("role_goal", "stake_incentive", "consequence", "self_interest",
-            "persona")
+            "persona", "altruistic", "fiction")
 
 V2_POOLS_DIR = os.path.join(dc.POOLS_DIR, "v2")
 FRAMINGS_DIR = os.path.join(V2_POOLS_DIR, "framings")
@@ -212,7 +221,8 @@ class SpecV2(dc.TaskSpec):
     """
 
     def __init__(self, pieces: TaskPieces, suffix: bool,
-                 ser_wording: Optional[str]):
+                 ser_wording: Optional[str], frame: str = "",
+                 overrides: Optional[Dict] = None):
         variants = []
         for name in VARIANT_NAMES:
             vp = VARIANT_PIECES[name]
@@ -232,6 +242,10 @@ class SpecV2(dc.TaskSpec):
         self.suffix = bool(suffix)
         self.suffix_policy = "on" if suffix else "off"
         self.ser_wording = ser_wording
+        #: Cross-task-identical opening sentence of the system turn ("" = none),
+        #: kept in every condition and in the prior-balance prompt.
+        self.frame = frame
+        self.overrides = dict(overrides or {})
 
     def suffix_text(self, variant_name: str) -> str:
         if not self.suffix:
@@ -253,19 +267,64 @@ def _suffix_flag(suffix: Union[bool, str]) -> bool:
 
 
 def make_spec(task: str, suffix: Union[bool, str],
-              ser_wording: Optional[str]) -> SpecV2:
+              ser_wording: Optional[str],
+              overrides: Optional[Dict] = None) -> SpecV2:
     """The spec of one cell. `ser_wording` is required ("A"/"B") for ser_v2 and
-    must be None for far_v2 / sdr_v2."""
+    must be None for far_v2 / sdr_v2.
+
+    `overrides` (round 3, orchestrator ruling 2026-10-19) changes one cell
+    without touching SPECS_V2: `desig_inversion` + `desig_identity` (a new
+    Predicate pair, spec 13.4), `question` + `stem` (for ser_v2 a new wording,
+    whose label must not be "A"/"B"; for far_v2 / sdr_v2 the task's question),
+    and `frame` (an opening sentence of the system turn). A predicate override
+    must come with a question and stem free of the registry's old predicate words.
+    """
     if task not in SPECS_V2:
         raise ValueError(f"unknown v2 task {task!r}; choose from {TASKS_V2}")
     pieces = SPECS_V2[task]
+    ov = dict(overrides or {})
+    unknown = sorted(set(ov) - set(OVERRIDE_KEYS))
+    if unknown:
+        raise ValueError(f"unknown override key(s) {unknown}; allowed {OVERRIDE_KEYS}")
+    for a, b in (("desig_inversion", "desig_identity"), ("question", "stem")):
+        if (a in ov) != (b in ov):
+            raise ValueError(f"overrides {a!r} and {b!r} go together")
+    new_text = "question" in ov
     if pieces.base_task == "ser":
-        if ser_wording not in SER_WORDINGS:
+        if new_text:
+            if not isinstance(ser_wording, str) or not ser_wording or \
+                    ser_wording in SER_WORDINGS:
+                raise ValueError("a ser_v2 question/stem override needs a new wording "
+                                 f"label (not in {SER_WORDINGS}), got {ser_wording!r}")
+        elif ser_wording not in SER_WORDINGS:
             raise ValueError(f"ser_v2 needs ser_wording in {SER_WORDINGS}, "
                              f"got {ser_wording!r}")
     elif ser_wording is not None:
         raise ValueError(f"{task} takes no ser_wording, got {ser_wording!r}")
-    return SpecV2(pieces, _suffix_flag(suffix), ser_wording)
+    if ov:
+        key = ser_wording if pieces.base_task == "ser" else None
+        changes = {}
+        if "desig_inversion" in ov:
+            for k in ("desig_inversion", "desig_identity"):
+                if not re.fullmatch(r"[a-z]+", str(ov[k])):
+                    raise ValueError(f"override {k} must be one lower-case word, "
+                                     f"got {ov[k]!r}")
+            changes.update(desig_inversion=ov["desig_inversion"],
+                           desig_identity=ov["desig_identity"])
+        if new_text:
+            changes.update(questions={**pieces.questions, key: ov["question"]},
+                           stems={**pieces.stems, key: ov["stem"]})
+        pieces = dataclasses.replace(pieces, **changes)
+        if "desig_inversion" in ov:
+            old = {SPECS_V2[task].desig_inversion, SPECS_V2[task].desig_identity}
+            text = f"{pieces.question(key)} {pieces.stem(key)}".lower()
+            stale = sorted(w for w in old if w in re.findall(r"[a-z]+", text))
+            if stale:
+                raise ValueError(f"predicate override leaves the old predicate "
+                                 f"word(s) {stale} in the question/stem; override "
+                                 f"them too")
+    return SpecV2(pieces, _suffix_flag(suffix), ser_wording,
+                  frame=ov.get("frame", ""), overrides=ov)
 
 
 def load_item_pairs_v2(path: Optional[str] = None,
@@ -297,7 +356,8 @@ def build_prompt(spec: SpecV2, variant_name: str, entity: str, item_1: str,
         designation = v.designation.format(item_d=item_d, desig=desig,
                                            desig_inv=desig_inv)
     user = v.user.format(item_1=item_1, item_2=item_2)
-    system = dc._join(intro, designation, spec.suffix_text(variant_name), clause)
+    system = dc._join(getattr(spec, "frame", ""), intro, designation,
+                      spec.suffix_text(variant_name), clause)
     return dc.CHAT_SHELL.format(system=system, user=user, stem=v.stem)
 
 
@@ -503,11 +563,16 @@ SER_UNFAVORABLE_STEM_LEXICON = frozenset({
 })
 
 
-def ser_wording_flags(wording: str) -> Dict:
+def ser_wording_flags(wording: str, question: Optional[str] = None,
+                      stem: Optional[str] = None) -> Dict:
     """{"wording", "status", "hits"}: status "judge_decided" when the wording's
     question or stem ascribes an unfavorable property to the answer (any
-    lexicon word), else "clean"."""
+    lexicon word), else "clean". `question`/`stem` check an override wording
+    (round 3) instead of a registered one."""
     pieces = SPECS_V2["ser_v2"]
+    if question is not None or stem is not None:
+        pieces = dataclasses.replace(pieces, questions={wording: question},
+                                     stems={wording: stem})
     text = f"{pieces.question(wording)} {pieces.stem(wording)}".lower()
     words = re.findall(r"[a-z]+", text)
     hits = sorted({w for w in words if w in SER_UNFAVORABLE_STEM_LEXICON})
@@ -534,9 +599,11 @@ def ser_literal_truth_violations(record: Dict) -> List[str]:
         return []
     out = []
     words = {record.get("desig"), record.get("desig_inv")}
-    if words != {"favorable", "unfavorable"}:
-        return [f"predicate pair {sorted(map(str, words))} is not "
-                f"favorable/unfavorable"]
+    registered = [p for p in SER_PREDICATE_PAIRS if set(p) == words]
+    if not registered:
+        return [f"predicate pair {sorted(map(str, words))} is not a registered "
+                f"SER pair {SER_PREDICATE_PAIRS}"]
+    favorable_word = registered[0][0]
     pair = (record["item_1"], record["item_2"])
     conditions = record.get("conditions") or {
         "pressure": {"clean_prompt": record["clean_prompt"],
@@ -552,7 +619,7 @@ def ser_literal_truth_violations(record: Dict) -> List[str]:
                 continue
             designated = found[0]
             other = pair[1] if designated == pair[0] else pair[0]
-            favorable = designated if record["desig"] == "favorable" else other
+            favorable = designated if record["desig"] == favorable_word else other
             unfavorable = other if favorable == designated else designated
             if target == unfavorable:
                 out.append(f"{cond}/{stream}: deceptive target {target!r} is the "
@@ -621,6 +688,8 @@ def realize(tokenizer, spec: SpecV2, framing: Framing, inst: Dict,
         "suffix": spec.suffix_policy,
         "suffix_text": spec.suffix_text(inst["template_variant"]),
         "ser_wording": spec.ser_wording,
+        "frame": getattr(spec, "frame", ""),
+        "overrides": dict(getattr(spec, "overrides", {}) or {}),
         "neutral_id": neutral["id"],
         "neutral_text": neutral["text"],
         "conditions": conditions,
