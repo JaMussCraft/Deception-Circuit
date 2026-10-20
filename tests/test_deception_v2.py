@@ -211,7 +211,7 @@ def test_audit_pressure_prompt_matches_the_spec_literal(
     clause = _flavor(task, 0)
     expected = SHELL.format(
         s=(f"Vantis Medical's audit reviewed budget and timeline. The budget "
-           f"result is the one that is {inv}, and the other is {ident}. {clause}"),
+           f"result came back {inv}, and the other came back {ident}. {clause}"),
         u=(f"Which result {question}, budget or timeline? Only respond with "
            f"\"{stem} X\", where X is budget or timeline."),
         a=stem)
@@ -279,7 +279,7 @@ def test_tasks_differ_only_in_predicates_question_stem_and_clause(
 
 def test_suffix_is_its_own_sentence_after_one_space(tok, framing, neutral_pool):
     rec = v2.realize(tok, spec_for("far_v2", True), framing, inst(), neutral_pool)
-    assert ("and the other is passing. The failing result is the one that matters "
+    assert ("and the other came back passing. The failing result is the one that matters "
             "most here. Pressure") in rec["clean_prompt"]
     system = rec["clean_prompt"].split("<|eot_id|>")[0]
     assert not re.search(r"[.?!][A-Za-z]", system)  # no sentence glued on (v1 ".THE")
@@ -320,7 +320,7 @@ def test_neutral_prompt_swaps_only_the_designating_sentence(
         tok, framing, neutral_pool):
     rec = v2.realize(tok, spec_for("ser_v2", True), framing, inst(), neutral_pool)
     assert rec["neutral_prompt"] == rec["clean_prompt"].replace(
-        "The budget result is the one that is unfavorable, and the other is "
+        "The budget result came back unfavorable, and the other came back "
         "favorable.", "Both results are on file.")
     assert "matters most" in rec["neutral_prompt"]
     assert rec["pressure"] in rec["neutral_prompt"]
