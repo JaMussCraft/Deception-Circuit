@@ -89,7 +89,11 @@ SER_WORDINGS = ("A", "B")
 #: orchestrator ruling 2026-10-19); the registry SPECS_V2 is unchanged.
 SER_PREDICATE_PAIRS = (("favorable", "unfavorable"), ("reassuring", "concerning"))
 #: Keys a pilot cell may override (make_spec `overrides`).
-OVERRIDE_KEYS = ("desig_inversion", "desig_identity", "question", "stem", "frame")
+OVERRIDE_KEYS = ("desig_inversion", "desig_identity", "question", "stem", "frame",
+                 "demo")
+#: Keys of overrides["demo"] (round 7, spec 14.G9): one prior user/assistant
+#: exchange on its own entity and item pair whose system turn carries `rule`.
+DEMO_KEYS = ("entity", "item_pair", "rule")
 VARIANT_NAMES = ("audit", "lab")
 N_FLAVOR = 20
 N_SHARED = 5
@@ -249,6 +253,8 @@ class SpecV2(dc.TaskSpec):
         #: kept in every condition and in the prior-balance prompt.
         self.frame = frame
         self.overrides = dict(overrides or {})
+        #: In-context demonstration (round 7): {"entity", "item_pair", "rule"} or None.
+        self.demo = self.overrides.get("demo")
 
     def suffix_text(self, variant_name: str) -> str:
         if not self.suffix:
@@ -289,6 +295,15 @@ def make_spec(task: str, suffix: Union[bool, str],
     unknown = sorted(set(ov) - set(OVERRIDE_KEYS))
     if unknown:
         raise ValueError(f"unknown override key(s) {unknown}; allowed {OVERRIDE_KEYS}")
+    if "demo" in ov:
+        demo = ov["demo"]
+        if not isinstance(demo, dict) or set(demo) != set(DEMO_KEYS):
+            raise ValueError(f"overrides['demo'] needs exactly the keys {DEMO_KEYS}")
+        if (len(demo["item_pair"]) != 2 or len(set(demo["item_pair"])) != 2
+                or not all(isinstance(w, str) and w for w in demo["item_pair"])):
+            raise ValueError("overrides['demo']['item_pair'] must be two distinct words")
+        if not str(demo["rule"]).strip() or not str(demo["entity"]).strip():
+            raise ValueError("overrides['demo'] needs a non-empty entity and rule")
     for a, b in (("desig_inversion", "desig_identity"), ("question", "stem")):
         if (a in ov) != (b in ov):
             raise ValueError(f"overrides {a!r} and {b!r} go together")
@@ -355,13 +370,54 @@ def load_item_pairs_v2(path: Optional[str] = None,
 # PROMPTS
 # ==============================================================================
 
+_BOS = "<|begin_of_text|>"
+
+
+def demo_exchange(spec: SpecV2, variant_name: str, instance_id: str) -> Dict:
+    """The in-context demonstration for one instance (round 7, spec 14.G9).
+
+    One complete prior exchange in the SAME scaffold as the main prompt (frame,
+    intro, designating sentence, suffix), on the demo's own entity and item
+    pair, whose system turn ends with the demo `rule` and whose assistant turn
+    answers the rule-following (deceptive) item in the stem's own words. Its
+    designation polarity and item polarity come from sha1(instance_id), so the
+    demo is deterministic per instance and balanced over instances, and it is
+    the same string in both streams and in every condition.
+    """
+    demo = spec.demo
+    h = int(hashlib.sha1(f"demo:{instance_id}".encode()).hexdigest(), 16)
+    pol = "inversion" if h % 2 == 0 else "identity"
+    ipol = 1 if (h >> 1) % 2 == 0 else 2
+    a, b = demo["item_pair"]
+    designated = (a, b)[ipol - 1]
+    other = (a, b)[2 - ipol]
+    answer = other if pol == "inversion" else designated
+    desig, desig_inv = spec.designation_word(pol)
+    v = spec.variant(variant_name)
+    system = dc._join(getattr(spec, "frame", ""),
+                      v.intro.format(entity=demo["entity"], item_1=a, item_2=b),
+                      v.designation.format(item_d=designated, desig=desig,
+                                           desig_inv=desig_inv),
+                      spec.suffix_text(variant_name), demo["rule"])
+    user = v.user.format(item_1=a, item_2=b)
+    text = (f"{_BOS}<|start_header_id|>system<|end_header_id|>\n\n{system}<|eot_id|>"
+            f"<|start_header_id|>user<|end_header_id|>\n\n{user}<|eot_id|>"
+            f"<|start_header_id|>assistant<|end_header_id|>\n\n{v.stem} {answer}.<|eot_id|>")
+    return {"text": text, "entity": demo["entity"], "item_pair": [a, b],
+            "rule": demo["rule"], "designation_polarity": pol, "item_polarity": ipol,
+            "answer": answer}
+
+
 def build_prompt(spec: SpecV2, variant_name: str, entity: str, item_1: str,
                  item_2: str, item_d: str, desig: str, desig_inv: str,
-                 clause: str, designation: Optional[str] = None) -> str:
+                 clause: str, designation: Optional[str] = None,
+                 demo: str = "") -> str:
     """One chat-formatted v2 prompt: _join(intro, designation, suffix, clause).
 
     `designation` overrides the designating sentence (the prior-balance
-    prompt); the suffix and clause stay.
+    prompt); the suffix and clause stay. `demo` (round 7) is a complete prior
+    exchange placed before the main one; the main exchange then drops its own
+    begin-of-text token, so the main system turn is the final one.
     """
     v = spec.variant(variant_name)
     intro = v.intro.format(entity=entity, item_1=item_1, item_2=item_2)
@@ -371,12 +427,17 @@ def build_prompt(spec: SpecV2, variant_name: str, entity: str, item_1: str,
     user = v.user.format(item_1=item_1, item_2=item_2)
     system = dc._join(getattr(spec, "frame", ""), intro, designation,
                       spec.suffix_text(variant_name), clause)
-    return dc.CHAT_SHELL.format(system=system, user=user, stem=v.stem)
+    main = dc.CHAT_SHELL.format(system=system, user=user, stem=v.stem)
+    if demo:
+        assert main.startswith(_BOS)
+        return demo + main[len(_BOS):]
+    return main
 
 
 def build_prompt_pair(spec: SpecV2, variant_name: str, entity: str,
                       item_pair: Sequence[str], item_polarity: int,
-                      designation_polarity: str, clause: str) -> Dict:
+                      designation_polarity: str, clause: str,
+                      demo: str = "") -> Dict:
     """The clean/corrupt/neutral prompts and answer words, with the same keys
     and target mapping as `dc.build_prompt_pair`."""
     if item_polarity not in (1, 2):
@@ -390,7 +451,7 @@ def build_prompt_pair(spec: SpecV2, variant_name: str, entity: str,
 
     common = dict(spec=spec, variant_name=variant_name, entity=entity,
                   item_1=item_1, item_2=item_2, desig=desig,
-                  desig_inv=desig_inv, clause=clause)
+                  desig_inv=desig_inv, clause=clause, demo=demo)
     return {
         "clean_prompt": build_prompt(item_d=designated, **common),
         "corrupt_prompt": build_prompt(item_d=other, **common),
@@ -656,10 +717,24 @@ def realize(tokenizer, spec: SpecV2, framing: Framing, inst: Dict,
     clauses = framing.clauses[spec.task]
     pressure = clauses[inst["pressure_slot"]]
     clause = pressure["text"]
+    demo = None
+    if getattr(spec, "demo", None):
+        d = spec.demo
+        if set(d["item_pair"]) & {inst["item_1"], inst["item_2"]} or \
+                d["entity"] == inst["entity"]:
+            raise ValueError(f"instance {inst['instance_id']} shares the demo's entity or an "
+                             f"item ({d['entity']!r}, {d['item_pair']}); exclude it")
+        if clause == d["rule"]:
+            raise ValueError("the pressure clause equals the demo rule; clause surgery "
+                             "would be ambiguous")
+        demo = demo_exchange(spec, inst["template_variant"], inst["instance_id"])
+        if clause in demo["text"]:
+            raise ValueError("the pressure clause occurs inside the demo exchange; clause "
+                             "surgery must act on the final system turn only")
     built = build_prompt_pair(spec, inst["template_variant"], inst["entity"],
                               (inst["item_1"], inst["item_2"]),
                               inst["item_polarity"], inst["designation_polarity"],
-                              clause)
+                              clause, demo=demo["text"] if demo else "")
     streams = ("clean_prompt", "corrupt_prompt")
     pressure_prompts = {s: built[s] for s in streams}
 
@@ -702,6 +777,7 @@ def realize(tokenizer, spec: SpecV2, framing: Framing, inst: Dict,
         "suffix_text": spec.suffix_text(inst["template_variant"]),
         "ser_wording": spec.ser_wording,
         "frame": getattr(spec, "frame", ""),
+        "demo": ({k: v for k, v in demo.items() if k != "text"} if demo else None),
         "overrides": dict(getattr(spec, "overrides", {}) or {}),
         "neutral_id": neutral["id"],
         "neutral_text": neutral["text"],
