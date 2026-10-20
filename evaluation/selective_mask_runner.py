@@ -462,7 +462,7 @@ def _identity(args, m, receipt):
         tokenizer_identity=_wt_manifest(args)['tokenizer_identity']
         if (str(snapshot)!=tokenizer_identity['snapshot'] or any(files.get(k)!=v for k,v in tokenizer_identity['files'].items())):
             raise ValueError('WikiText tokenizer/model snapshot identity differs')
-        result.update(policy='amendment-v2', amendment=m['amendment'],
+        result.update(policy=m['amendment']['policy'], amendment=m['amendment'],
             original_manifest_hash=m['amendment']['original_manifest_hash'],
             wikitext_manifest_hash=_wt_manifest(args)['manifest_hash'],
             settings=_amended_settings(args))
@@ -514,7 +514,7 @@ def _plan(args, m):
 
 
 def _baseline_fingerprint(identity):
-    if identity.get('policy') == 'amendment-v2':
+    if identity.get('policy') in ('amendment-v2','amendment-v3'):
         return sd.content_hash({k:v for k,v in identity.items() if k not in ('receipt','settings','optimizer','manifest_hash','amendment')})
     return sd.content_hash({k:v for k,v in identity.items() if k not in ('receipt','settings','optimizer')})
 
@@ -552,7 +552,7 @@ def _checked_cache(args, identity):
     if receipt['baseline_fingerprint'] != fp or _hash_file(args.reference_cache) != receipt['baseline_cache_sha256']:
         raise ValueError('baseline cache fingerprint/hash differs from passed receipt')
     cache = _load_cache(args.reference_cache,fp)
-    if identity.get('policy') != 'amendment-v2' and not all(x['capability']['usable'] for x in cache['splits'].values()):
+    if identity.get('policy') not in ('amendment-v2','amendment-v3') and not all(x['capability']['usable'] for x in cache['splits'].values()):
         raise ValueError('global capable-H control unusable; stop without filtering')
     return cache
 
@@ -727,7 +727,7 @@ def _calibrate(args,m,identity,ctx,cache):
 
 
 def _prepare(args):
-    if getattr(args,'policy','report18-v1') == 'amendment-v2':
+    if getattr(args,'policy','report18-v1') in ('amendment-v2','amendment-v3'):
         _prepare_amended(args); return
     from datasets import load_from_disk
     from transformers import AutoTokenizer
@@ -893,11 +893,12 @@ def _amended_settings(args):
 
 def _validate_amendment(m):
     a=m['amendment']; heads=m['candidate_heads']
+    v3=a.get('policy')=='amendment-v3'
     expected=[[l,h] for l in range(32) for h in range(32)]
-    if (a.get('policy')!='amendment-v2' or a.get('candidate_space') not in ('union','all')
-            or a.get('collateral_arm') not in ('H','W','HW') or not a.get('original_manifest_hash')
+    if (a.get('policy') not in ('amendment-v2','amendment-v3') or a.get('candidate_space') not in ('union','all')
+            or a.get('collateral_arm') not in (('W','HW') if v3 else ('H','W','HW')) or not a.get('original_manifest_hash')
             or not a.get('wikitext_manifest_hash') or not a.get('protocol_hash')
-            or a.get('max_updates')!=512 or a.get('checkpoint_every')!=64 or a.get('pairs_per_update')!=8):
+            or a.get('max_updates')!=(1536 if v3 else 512) or a.get('checkpoint_every')!=64 or a.get('pairs_per_update')!=8):
         raise ValueError('amendment protocol mismatch')
     if a['candidate_space']=='union':
         if len(heads)!=103 or sd.content_hash(heads)!=CANDIDATE_HASH:
@@ -932,7 +933,7 @@ def _prepare_amended(args):
     if m.get('amendment'): raise ValueError('source must be immutable original pilot manifest')
     wt=_wt_manifest(args); protocol=json.loads(args.freeze_record.read_text())
     original=m['manifest_hash']
-    m['amendment']=dict(policy='amendment-v2',original_manifest_hash=original,union_heads=copy.deepcopy(m['candidate_heads']),
+    m['amendment']=dict(policy=args.policy,original_manifest_hash=original,union_heads=copy.deepcopy(m['candidate_heads']),
         candidate_space=args.candidate_space,collateral_arm=args.collateral_arm,
         wikitext_manifest_hash=wt['manifest_hash'],protocol_hash=sd.content_hash(protocol),
         max_updates=args.max_updates,checkpoint_every=args.checkpoint_every,pairs_per_update=8)
@@ -945,29 +946,33 @@ def _prepare_amended(args):
 
 def _amended_plan(args,m):
     _validate_amendment(m);a=m['amendment'];wt=_wt_manifest(args)
-    if (getattr(args,'policy',None)!='amendment-v2' or args.collateral_arm!=a['collateral_arm']
-            or args.candidate_space!=a['candidate_space'] or args.max_updates!=512
-            or args.checkpoint_every!=64 or args.seed!=0 or args.rho not in (0.,.01)
+    v3=a['policy']=='amendment-v3'
+    if (getattr(args,'policy',None)!=a['policy'] or args.collateral_arm!=a['collateral_arm']
+            or args.candidate_space!=a['candidate_space'] or args.max_updates!=a['max_updates']
+            or args.checkpoint_every!=64 or args.seed!=0 or args.rho not in ((0.,) if v3 else (0.,.01))
+            or (v3 and args.resume)
             or args.joint_pairs!=1 or wt['manifest_hash']!=a['wikitext_manifest_hash']):
         raise ValueError('CLI differs from frozen amendment')
     enabled=args.collateral_arm in ('W','HW')
-    schedule=amended_schedule(119,seed=args.seed)
+    updates=a['max_updates'];validations=updates//64
+    schedule=amended_schedule(119,seed=args.seed,updates=updates)
     order=list(range(32));random.Random(args.seed).shuffle(order)
-    return dict(policy='amendment-v2',manifest_hash=m['manifest_hash'],source_files_hash=sd.content_hash(_source_files()),
+    return dict(policy=a['policy'],manifest_hash=m['manifest_hash'],source_files_hash=sd.content_hash(_source_files()),
         settings=_amended_settings(args),effective_candidate_count=len(m['candidate_heads']),
-        updates=512,pair_presentations=4096,full_sdr_cycles=34,additional_pairs=50,
-        row_schedule_hash=sd.content_hash(schedule),w_block_order=order,w_block_cycles=16,
-        train_joint_forwards=4096,train_w_forwards=512 if enabled else 0,
-        validation_checkpoints=8,validation_joint_forwards=8*119,validation_w_forwards=8*16,
+        updates=updates,pair_presentations=updates*8,full_sdr_cycles=(updates*8)//119,additional_pairs=(updates*8)%119,
+        row_schedule_hash=sd.content_hash(schedule),w_block_order=order,w_block_cycles=updates//32,
+        train_joint_forwards=updates*8,train_w_forwards=updates if enabled else 0,
+        validation_checkpoints=validations,validation_joint_forwards=validations*119,validation_w_forwards=validations*16,
         baseline_joint_forwards=238,baseline_w_forwards=48,test_reference_forwards=0,
         baseline_generation_completions=0,training_generation_completions=0,
         reference_cache_fp32_bytes_expression='(238 + 48*127)*vocab_size*4',
-        per_block_cpu_cache=True,max_gpu_reference_blocks=1,checkpoint_every=64,max_checkpoints=9,checkpoint_writes=521,
+        per_block_cpu_cache=True,max_gpu_reference_blocks=1,checkpoint_every=64,max_checkpoints=validations+1,checkpoint_writes=updates+validations+1,
         measured_cost_required=True,generation_timing_is_training_estimate=False)
 
 
 def _amended_receipt(record,m,mode):
-    if (record.get('version')!=2 or record.get('policy')!='amendment-v2'
+    policy=m['amendment']['policy']
+    if (record.get('version')!=(3 if policy=='amendment-v3' else 2) or record.get('policy')!=policy
             or record.get('manifest_hash')!=m['manifest_hash'] or record.get('baseline_path')!=BASELINE_PATH
             or not record.get('root_decision') or not record.get('source_revision')
             or not record.get('source_files_hash') or not record.get('model_revision')
@@ -1047,7 +1052,7 @@ def _amended_baseline(args,m,identity,ctx,load_seconds=0.):
                         logits=_wt_logits(ctx.node_model,block,self_donor=True),input_ids=block['input_ids'].to(next(ctx.node_model.parameters()).device))
                 totals.append(payload['base_nll_sum']/block['n_tokens'])
             means[split]=sum(totals)/len(totals)
-    sr.atomic_json(args.output_dir/'baseline.json',dict(policy='amendment-v2',fingerprint=fingerprint,
+    sr.atomic_json(args.output_dir/'baseline.json',dict(policy=identity['policy'],fingerprint=fingerprint,
         baseline_cache_sha256=_hash_file(path),wikitext_cache_fingerprint=wfp,
         wikitext_cache_inventory_hash=_wt_inventory(args,wm,wfp),w_nll=means,
         capability={s:c['capability'] for s,c in cache['splits'].items()},
@@ -1146,6 +1151,8 @@ def _amended_update(model,m,cache,args,ids,wblock,wfp,optimizer,*,measure_gradie
 
 
 def _train_amended(args,m,identity,ctx,cache,wm,wfp):
+    if getattr(args,'policy',None)=='amendment-v3' and args.resume:
+        raise ValueError('amendment-v3 requires fresh fits; checkpoint resume/migration forbidden')
     from evaluation import selective_wikitext as wt
     model=ctx.node_model;params=sm.configure_candidate_gates(model,m['candidate_heads'])
     optimizer=_optimizer(params);fp=sd.content_hash(identity);latest=args.output_dir/'latest.pt'
@@ -1186,7 +1193,7 @@ def _train_amended(args,m,identity,ctx,cache,wm,wfp):
             cursor['history'].append(metrics);_checkpoint(checkpoint,model,optimizer,cursor,fp)
         _checkpoint(latest,model,optimizer,cursor,fp)
     selected=select_amended_checkpoint(cursor['history'],baseline,args.collateral_arm)
-    sr.atomic_json(args.output_dir/'frontier.json',dict(policy='amendment-v2',history=cursor['history'],baseline=baseline,
+    sr.atomic_json(args.output_dir/'frontier.json',dict(policy=getattr(args,'policy','amendment-v2'),history=cursor['history'],baseline=baseline,
         selected=selected,status='admissible' if selected and selected['admissible'] else 'failed_frontier',
         compact_useful_finding=has_compact_amended_finding(cursor['history'],baseline,args.collateral_arm),automatic_retry=False))
     if selected:
@@ -1275,7 +1282,7 @@ def _amended_calibrate(args,m,identity,ctx,cache,wm,wfp,load_seconds):
                     gradient_isolation=isolated,candidate_nonzero_gradient=nonzero))
                 model.zero_grad(set_to_none=True)
             # Profile each actual arm under each eligibility; discard warmup/state.
-            for arm in ('H','W','HW'):
+            for arm in (('W','HW') if getattr(args,'policy',None)=='amendment-v3' else ('H','W','HW')):
                 sm.configure_candidate_gates(model,heads);optimizer=_optimizer([p for p in model.parameters() if p.requires_grad])
                 profile_args=copy.copy(args);profile_args.collateral_arm=arm
                 local_m=dict(m,candidate_heads=heads)
@@ -1314,7 +1321,10 @@ def _amended_calibrate(args,m,identity,ctx,cache,wm,wfp,load_seconds):
                 profile.append(dict(candidate_space=space,collateral_arm=arm,warmup_updates=1,disposable_updates=args.profile_updates,
                     update_seconds=durations,priced_update_seconds=priced,validation_119pairs_16blocks_seconds=validation_seconds,
                     checkpoint_seconds=io_seconds,checkpoint_bytes=io_bytes,validation_no_op=no_op,
-                    estimated_512_update_run_seconds=(load_seconds+512*sum(priced)/len(priced)+8*validation_seconds+521*io_seconds),
+                    **{('estimated_1536_update_run_seconds' if getattr(args,'policy',None)=='amendment-v3' else 'estimated_512_update_run_seconds'):
+                        load_seconds+args.max_updates*sum(priced)/len(priced)
+                        +(args.max_updates//args.checkpoint_every)*validation_seconds
+                        +(args.max_updates+args.max_updates//args.checkpoint_every+1)*io_seconds},
                     peak_cuda_bytes=torch.cuda.max_memory_allocated() if torch.cuda.is_available() else 0,
                     export_equivalent=equivalent,export_probe_removed_heads=len(export['removed_heads']),raw_components_and_gradient_contributions=logs[0],
                     all_updates_finite=True,actual_nonself_candidate_gradient=bool(logs[0]['gradient_component_norms'].get('T',0.)>0) and all(x['candidate_nonzero_gradient'] for x in logs)))
@@ -1329,7 +1339,7 @@ def _amended_calibrate(args,m,identity,ctx,cache,wm,wfp,load_seconds):
         and (c['domain']=='WT' or v['max_abs_label_logits']<=.02) for v in c['comparisons'].values()) for c in checks)
     no_op_pass=all(p['validation_no_op']['removed']==0 and p['validation_no_op']['all_h_argmax_preserved']
         and p['validation_no_op']['all_d_argmax_preserved'] and p['validation_no_op']['max_abs_label_logits']<=.02 for p in profile)
-    sr.atomic_json(args.output_dir/'calibration.json',dict(policy='amendment-v2',numerical_checks=checks,
+    sr.atomic_json(args.output_dir/'calibration.json',dict(policy=getattr(args,'policy','amendment-v2'),numerical_checks=checks,
         numerical_gate_passed=finite and no_op_pass and all(p['actual_nonself_candidate_gradient'] and p['export_equivalent'] for p in profile),
         fixed_semantic_label_logit_tolerance=.02,wikitext_distributional_floor_requires_root_review=True,model_load_seconds=load_seconds,source_files_hash=identity['source_files_hash'],
         baseline_fingerprint=_baseline_fingerprint(identity),wikitext_cache_fingerprint=wfp,
@@ -1367,7 +1377,7 @@ def _verify_amended_evidence(receipt,m):
     if _hash_file(path)!=evidence['calibration_sha256'] or receipt['measured_budget']['profile_sha256']!=evidence['calibration_sha256']:
         raise ValueError('measured calibration/profile artifact SHA mismatch')
     report=json.loads(path.read_text())
-    if (report.get('policy')!='amendment-v2' or report.get('numerical_gate_passed') is not True
+    if (report.get('policy')!=m['amendment'].get('policy','amendment-v2') or report.get('numerical_gate_passed') is not True
             or report.get('source_files_hash')!=receipt['source_files_hash']
             or report.get('baseline_fingerprint')!=receipt['baseline_fingerprint']
             or report.get('wikitext_cache_fingerprint')!=receipt['wikitext_cache_fingerprint']
