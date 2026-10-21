@@ -212,9 +212,8 @@ def test_bootstrap_resamples_story_not_rows():
     assert summary['effects']['candidate6/readout/discovery']['mean']==5.
     assert summary['bootstrap_reps']==2000
 
-def test_stage2_refused_until_implemented(tmp_path):
-    m=pilot();args=m.parse_args(['--stage','stage2','--output',str(tmp_path)])
-    with pytest.raises(ValueError,match='not implemented'):m.run_stage1(args)
+def test_stage2_refused_without_prior_reservation(tmp_path):
+    with pytest.raises(SystemExit):pilot().parse_args(['--stage','stage2','--output',str(tmp_path)])
 
 def test_saved_lab_grammar_and_leading_space_offsets():
     m=pilot();r=record();r['clean_prompt']=r['clean_prompt'].replace('result is the one that is damaging, and the other is harmless.', 'reading came back harmless, and the other came back damaging.')
@@ -332,3 +331,161 @@ def test_spooled_slurm_wrapper_resolves_submit_worktree_from_unrelated_cwd(tmp_p
     assert manifest['semantic_pass'] and len(manifest['groups'])==48
     assert manifest['code_sha256'][str(root/'scripts/sdr_routing_pilot.py')]
     assert json.loads((output/'cost.json').read_text())['actual_gpu_seconds']==0
+
+
+def test_grid_has_39_cells_and_6_shared_pass1_calls():
+    m=pilot();grid=m.focused_grid({'n_heads':32,'n_kv_heads':8})
+    assert len(grid)==39
+    assert len({tuple(c['sender']) for c in grid})==6
+    assert len({tuple(c['receiver']) for c in grid})==7
+    assert all(c['sender'][1]<c['receiver'][1] for c in grid if c['receiver'][0]!='readout')
+    for cell in grid:
+        if cell['receiver'][0] in ('k','v'):assert cell['affected_query_heads']==[24,25,26,27]
+
+
+def test_grid_deduplicates_gqa_by_layer_and_enforces_order():
+    grid=pilot().focused_grid({'n_heads':32,'n_kv_heads':8})
+    cells={(tuple(c['sender']),tuple(c['receiver'])) for c in grid}
+    assert len(cells)==39
+    assert (('head',17,26),('k',17,6)) not in cells
+    assert (('head',17,26),('k',24,6)) in cells
+
+
+def test_stage2_requires_matching_passed_gate(tmp_path):
+    m=pilot();manifest={'sources':{},'tokenizer_files':{},'code_sha256':{'old.py':'old'},'panel':[{'variant_id':'a'}], 'model_cache':str(m.CACHE),'seed':m.SEED}
+    manifest['manifest_hash']=m.digest(manifest)
+    mp=tmp_path/'manifest.json';gp=tmp_path/'gate.json'
+    m.atomic_json(mp,manifest)
+    m.write_jsonl(tmp_path/'baseline.jsonl',[{'variant_id':'a'}])
+    args=m.parse_args(['--stage','stage2','--output',str(tmp_path/'new'),'--prior-reserved-gpu-seconds','3600'])
+    for gate in ({'stage2_go':False},{'stage2_go':True,'manifest_hash':'wrong','baseline_complete':True}):
+        m.atomic_json(gp,gate)
+        with pytest.raises(ValueError):m.stage2_provenance(str(mp),str(gp),args)
+
+
+def test_stage2_provenance_preserves_stage1_manifest_bytes(tmp_path):
+    m=pilot();manifest={'sources':{},'tokenizer_files':{},'code_sha256':{'old.py':'old'},'panel':[{'variant_id':'a'}], 'model_cache':str(m.CACHE),'seed':m.SEED}
+    manifest['manifest_hash']=m.digest(manifest)
+    mp=tmp_path/'manifest.json';gp=tmp_path/'gate.json';m.atomic_json(mp,manifest)
+    m.write_jsonl(tmp_path/'baseline.jsonl',[{'variant_id':'a'}])
+    m.atomic_json(gp,{'stage2_go':True,'manifest_hash':manifest['manifest_hash'],'baseline_complete':True,'semantic_pass':True,'numerical_pass':True})
+    before=mp.read_bytes();args=m.parse_args(['--stage','stage2','--output',str(tmp_path/'new'),'--prior-reserved-gpu-seconds','3600'])
+    provenance=m.stage2_provenance(str(mp),str(gp),args)
+    assert mp.read_bytes()==before
+    assert provenance['parent_code_sha256']=={'old.py':'old'}
+    assert provenance['parent_manifest_sha256']==m.file_hash(mp)
+    assert provenance['stage2_code_sha256']!=manifest['code_sha256']
+    manifest['code_sha256']={'old.py':'new'};m.atomic_json(mp,manifest)
+    with pytest.raises(ValueError,match='manifest hash'):m.stage2_provenance(str(mp),str(gp),args)
+
+
+def test_variable_length_semantic_two_pass_matches_manual_reference():
+    m=pilot();pytest.importorskip('nnsight')
+    from nnsight import NNsight
+    from transformers import LlamaForCausalLM
+    from tests.helpers import tiny_config
+    from component_analysis import hooks,path_patching as pp
+    torch.manual_seed(93)
+    model=NNsight(LlamaForCausalLM(tiny_config(attn_implementation='sdpa')).eval())
+    def v(name,ids):return dict(variant_id=name,ids=ids,length=len(ids),truth_id=3,other_id=4,segments={'designation':[2,3],'item:intro':[0,1]})
+    recipients=[v('r0',[3,8,7,9,11,6,4,13,2]),v('r1',[5,7,8,1,4,6])]
+    donors=[v('d0',[4,12,8,3,9,2]),v('d1',[2,8,9,4,13,7,6,12,1,4])]
+    maps=[[(0,0),(1,1),(5,2),(6,3),(8,5)],[(0,0),(2,5),(3,6),(5,9)]]
+    senders=[('head',0,0),('head',1,1)]
+    streams=m.assemble_path_streams(model,recipients,donors,maps,senders=senders,scope='common')
+    ids,mask=m.batch_inputs(recipients,'cpu');dids,dmask=m.batch_inputs(donors,'cpu')
+    keys=hooks.all_component_keys(model)
+    baseline=hooks.capture_forward(model,ids,mask,components=keys+[hooks.READOUT_KEY])
+    saved={k:t.clone() for k,t in baseline.outputs.items()}
+    donor=hooks.capture_forward(model,dids,dmask,components=senders)
+    assert set(streams.clean_outputs)==set(keys)
+    manual={k:t.clone() for k,t in baseline.outputs.items() if k!=hooks.READOUT_KEY}
+    for key in senders:
+        for i,mapping in enumerate(maps):
+            for r,d in mapping:manual[key][i,r]=donor.outputs[key][i,d]
+        assert torch.equal(streams.corrupt_outputs[key],manual[key])
+        for i,mapping in enumerate(maps):
+            unmapped=set(range(128))-{r for r,d in mapping}
+            assert torch.equal(streams.corrupt_outputs[key][i,list(unmapped)],saved[key][i,list(unmapped)])
+        assert torch.equal(streams.corrupt_outputs[key][2:],saved[key][2:])
+    assert not torch.equal(donor.outputs[senders[0]][0,8],streams.corrupt_outputs[senders[0]][0,8])
+    receivers=[('q',1,1),('k',1,0),('v',1,0),hooks.READOUT_KEY]
+    capture=pp.receiver_inputs(model,streams,senders=senders,receivers=receivers)
+    reference=hooks.capture_forward(model,ids,mask,components=receivers+keys,replacements=manual)
+    for key in keys:
+        assert torch.equal(reference.outputs[key],manual[key])
+    for key in receivers:
+        assert torch.equal(capture.outputs[key],reference.outputs[key])
+        patched=pp.readout_from_receivers(model,streams,{key:capture.outputs[key]})
+        direct=hooks.capture_forward(model,ids,mask,components=[hooks.READOUT_KEY],replacements={key:reference.outputs[key]})
+        assert m.numerical_receipt(patched,m.capture_logits(model,direct))['pass']
+    for key in keys:assert torch.equal(baseline.outputs[key],saved[key])
+    # Full-freeze no-sender and identity-sender controls use full vocabulary.
+    for selected in ([],senders):
+        original=streams.corrupt_outputs
+        streams.corrupt_outputs={key:streams.clean_outputs[key] for key in senders}
+        no_op=pp.receiver_inputs(model,streams,senders=selected,receivers=receivers)
+        for key in receivers:
+            logits=pp.readout_from_receivers(model,streams,{key:no_op.outputs[key]})
+            assert m.numerical_receipt(streams.clean_readout,logits)['pass']
+        streams.corrupt_outputs=original
+    qmask=m.receiver_position_mask(recipients,receivers[0],'cpu')
+    kmask=m.receiver_position_mask(recipients,receivers[1],'cpu')
+    assert qmask[0].nonzero().flatten().tolist()==[8]
+    assert kmask[0].nonzero().flatten().tolist()==[0,1,2,3]
+
+
+def test_zero_gap_rows_retained_with_finite_raw_effect():
+    m=pilot();row={'family':'path','scope':'common','split':'discovery','story_id':'s','status':'completed','effect':m.raw_margin(torch.tensor([0.,0.]),0,1),'gap':0.}
+    result=m.summarize_by_story([row],bootstrap_reps=10)
+    assert result['effects']['path/common/discovery']['n_rows']==1
+    assert result['effects']['path/common/discovery']['mean']==0.
+    margins=dict(baseline=2.,candidate6=3.,selector2=4.,outsider2=1.,**{'candidate6+selector2':7.,'candidate6+outsider2':5.})
+    assert m.interaction_effect(margins,'selector2')==2.
+    assert m.interaction_effect(margins,'outsider2')==3.
+
+
+def test_stage2_dry_run_counts_and_requires_parent(tmp_path):
+    m=pilot();args=m.parse_args(['--stage','stage2','--output',str(tmp_path),'--prior-reserved-gpu-seconds','3600','--dry-run'])
+    with pytest.raises(ValueError,match='parent manifest and gate'):m.run_stage2(args,{})
+
+
+def test_interaction_union_and_half_dose_preserve_unmapped_current_values():
+    m=pilot();from component_analysis import hooks
+    base={('head',0,0):torch.ones((8,128,2)),('head',1,0):torch.ones((8,128,2))*2}
+    donor={k:t*3 for k,t in base.items()}
+    maps=[[(5,2)]]
+    replacements=m.family_replacements(base,donor,maps,[('head',0,0),('head',1,0)],dose=.5)
+    for key,rep in replacements.items():
+        assert isinstance(rep,hooks.Replacement)
+        assert rep.positions.sum()==1
+        assert torch.equal(rep.value[0,5],base[key][0,5]+.5*(donor[key][0,2]-base[key][0,5]))
+        assert not rep.positions[0,4] and not rep.positions[1:].any()
+
+
+def test_stage2_retains_missing_donor_proposal_as_excluded():
+    m=pilot()
+    proposal={'recipient_id':'a','donor_id':None,'exclusion':'no matched cross-story donor'}
+    pairs,excluded=m.stage2_pairs({'patch_plan':[proposal]},[])
+    assert not pairs
+    assert excluded[0]['donor_id'] is None
+    assert excluded[0]['status']=='excluded'
+
+
+def test_kv_patch_group_only_and_q_single_head():
+    from nnsight import NNsight
+    from transformers import LlamaForCausalLM
+    from tests.helpers import tiny_config
+    from component_analysis import hooks
+    torch.manual_seed(94)
+    model=NNsight(LlamaForCausalLM(tiny_config(attn_implementation='sdpa')).eval())
+    variants=[dict(ids=[3,7,9,4],length=4)]
+    ids,mask=pilot().batch_inputs(variants,'cpu')
+    keys=[('k',0,0),('k',0,1),('q',0,0),('q',0,1),('q',0,2),('q',0,3)]
+    baseline=hooks.capture_forward(model,ids,mask,components=keys)
+    for patched_key in (keys[0],keys[2]):
+        value=baseline.outputs[patched_key]+.3
+        changed=hooks.capture_forward(model,ids,mask,components=keys,replacements={patched_key:value})
+        for key in keys:
+            assert torch.equal(changed.outputs[key],value if key==patched_key else baseline.outputs[key])
+    assert hooks.heads_of_kv_group(model,0)==[0,1]

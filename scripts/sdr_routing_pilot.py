@@ -2,7 +2,7 @@
 """Bounded existing-SDR donor diagnostic. All interventions use component hooks.
 
 Freeze with --dry-run; inspect manifest/gate before running --stage stage1.
-Stage2 is deliberately refused by this implementation. No inference downloads.
+Stage2 requires an immutable passed Stage1 gate. No inference downloads.
 """
 from __future__ import annotations
 
@@ -610,11 +610,102 @@ def pad_replacements(values, masks):
     return joined,positions
 
 
+def focused_grid(model_geometry: dict) -> list:
+    """Only the approved candidate-to-selector/readout cells, in actual GQA units."""
+    heads=model_geometry.get('num_heads',model_geometry.get('n_heads'))
+    kv=model_geometry.get('num_kv_heads',model_geometry.get('n_kv_heads'))
+    if heads!=32 or kv!=8:raise ValueError('approved grid requires32 query heads and8 KV heads')
+    per_group=heads//kv;receivers={}
+    for layer,head in FAMILIES['selector2']:
+        for kind,index in (('q',head),('k',head//per_group),('v',head//per_group)):
+            key=(kind,layer,index)
+            receivers[key]=[head] if kind=='q' else list(range(index*per_group,(index+1)*per_group))
+    receivers[('readout',0,0)]=[]
+    return [{'sender':('head',layer,head),'receiver':key,'affected_query_heads':affected}
+            for layer,head in FAMILIES['candidate6'] for key,affected in receivers.items()
+            if key[0]=='readout' or layer<key[1]]
+
+
+def stage2_provenance(parent_manifest_path: str, gate_path: str, args) -> dict:
+    """Verify immutable parent identities without comparing old code to new code."""
+    path=Path(parent_manifest_path);manifest=json.loads(path.read_text())
+    body={k:v for k,v in manifest.items() if k!='manifest_hash'}
+    if digest(body)!=manifest.get('manifest_hash'):raise ValueError('parent manifest hash mismatch')
+    gate=json.loads(Path(gate_path).read_text())
+    if not all(gate.get(k) for k in ('stage2_go','baseline_complete','semantic_pass','numerical_pass')):
+        raise ValueError('Stage2 requires passed complete semantic/numerical/support gate')
+    if gate.get('manifest_hash')!=manifest['manifest_hash']:raise ValueError('gate manifest hash mismatch')
+    if manifest.get('model_cache')!=args.model_cache or manifest.get('seed')!=args.seed:
+        raise ValueError('parent model/seed identity mismatch')
+    for source,expected in {**manifest.get('sources',{}),**manifest.get('tokenizer_files',{})}.items():
+        if file_hash(source)!=expected:raise ValueError('frozen parent source changed: '+source)
+    baseline_path=path.parent/'baseline.jsonl'
+    baseline=[json.loads(line) for line in baseline_path.read_text().splitlines() if line]
+    expected={v['variant_id'] for v in manifest['panel'] if v.get('valid',True) and v.get('story_id') not in {e['story_id'] for e in manifest.get('exclusions',[])}}
+    if {v['variant_id'] for v in baseline}!=expected or len(baseline)!=len(expected):raise ValueError('parent baseline identity/completion mismatch')
+    return {'parent_manifest':str(path.resolve()),'parent_manifest_hash':manifest['manifest_hash'],
+            'parent_manifest_sha256':file_hash(path),'parent_gate':str(Path(gate_path).resolve()),
+            'parent_gate_sha256':file_hash(gate_path),'parent_baseline_sha256':file_hash(baseline_path),
+            'parent_code_sha256':manifest.get('code_sha256',{}),
+            'stage2_code_sha256':{str(CODE_ROOT/p):file_hash(CODE_ROOT/p) for p in ('scripts/sdr_routing_pilot.py','tests/test_sdr_routing_pilot.py','scripts/sdr_routing_pilot.sbatch')},
+            'stage2_scope':gate.get('stage2_scope','answer_content_diagnostic'),
+            'pressure_mediation_identified':False,'seed':args.seed,'model_cache':args.model_cache,'software':{p:importlib.metadata.version(p) for p in ('torch','transformers','nnsight')}}
+
+
+def assemble_path_streams(model, recipient_batch: list, donor_batch: list, maps: list, *, senders: list, scope: str):
+    """Full recipient freeze; sender tensors use recipient coordinates everywhere."""
+    import torch
+    from component_analysis import hooks,path_patching as pp
+    device,_=hooks.device_and_dtype(model)
+    ids,mask=batch_inputs(recipient_batch,device);donor_ids,donor_mask=batch_inputs(donor_batch,device)
+    component_keys=hooks.all_component_keys(model)
+    clean=hooks.capture_forward(model,ids,mask,components=component_keys+[hooks.READOUT_KEY])
+    donor=hooks.capture_forward(model,donor_ids,donor_mask,components=list(senders)+[hooks.READOUT_KEY])
+    corrupt={}
+    for key in senders:
+        filled=clean.outputs[key].clone()
+        for i,mapping in enumerate(maps):
+            mapped,valid=remap_capture(donor.outputs[key][i:i+1],mapping,128)
+            filled[i]=torch.where(valid.to(device)[:,None],mapped[0].to(device),filled[i])
+        corrupt[key]=filled
+    target=torch.tensor([v['truth_id'] for v in recipient_batch]+[0]*(8-len(recipient_batch)),device=device)
+    distractor=torch.tensor([v['other_id'] for v in recipient_batch]+[1]*(8-len(recipient_batch)),device=device)
+    clean_logits=capture_logits(model,clean);donor_logits=capture_logits(model,donor)
+    rows=torch.arange(8,device=device)
+    cm=clean_logits[rows,target]-clean_logits[rows,distractor]
+    dm=donor_logits[rows,target]-donor_logits[rows,distractor]
+    return pp.Streams(ids,mask,clean.readout,target,distractor,
+                      {k:clean.outputs[k] for k in component_keys},corrupt,
+                      clean_logits,donor_logits,cm,dm,cm-dm,
+                      ids=[v['variant_id'] for v in recipient_batch],rows=list(range(len(recipient_batch))))
+
+
+def receiver_position_mask(recipient_batch, receiver, device):
+    """Declared recipient query/key sites; independent of donor sender alignment."""
+    import torch
+    mask=torch.zeros((8,128),dtype=torch.bool,device=device)
+    for i,v in enumerate(recipient_batch):
+        if receiver[0] in ('q','readout'):mask[i,v['length']-1]=True
+        else:
+            for name,positions in v['segments'].items():
+                if name.startswith('item') or name=='designation':mask[i,positions]=True
+    return mask
+
+
+def raw_margin(logits, truth, other):
+    return float(logits[truth].float()-logits[other].float())
+
+
+def interaction_effect(margins, other):
+    return (margins['candidate6+'+other]-margins['candidate6'])-(margins[other]-margins['baseline'])
+
+
 def parse_args(argv=None):
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--dataset-dir',default=str(ROOT/'data/datasets/sdr'))
     parser.add_argument('--output',required=True)
     parser.add_argument('--manifest')
+    parser.add_argument('--gate')
     parser.add_argument('--model-cache',default=str(CACHE))
     parser.add_argument('--stage',choices=('stage1','stage2'),default='stage1')
     parser.add_argument('--dry-run',action='store_true')
@@ -628,7 +719,9 @@ def parse_args(argv=None):
     if not 60<=args.max_seconds<=3300:parser.error('--max-seconds must be60..3300')
     if args.max_seconds>args.allocated_seconds-60:parser.error('deadline must leave >=60s allocation safety margin')
     if args.allocated_seconds>3600 or args.allocated_seconds<120:parser.error('Stage1 allocation must be120..3600s')
-    if args.prior_reserved_gpu_seconds+args.reserved_gpu_seconds>3600:parser.error('Stage1 reserved cap exceeded (failed reservations count)')
+    cap=3600 if args.stage=='stage1' else 7200
+    if args.prior_reserved_gpu_seconds<0 or args.prior_reserved_gpu_seconds+args.reserved_gpu_seconds>cap:parser.error('reserved cap exceeded (failed reservations count)')
+    if args.stage=='stage2' and args.prior_reserved_gpu_seconds<3600:parser.error('Stage2 must count prior Stage1 reservations')
     if args.reserved_gpu_seconds<args.allocated_seconds:parser.error('reservation must cover allocation')
     return args
 
@@ -862,7 +955,210 @@ def run_stage1(args) -> dict:
         for number,handler in previous_handlers.items():signal.signal(number,handler)
 
 
+def family_replacements(clean_outputs, donor_outputs, maps, keys, *, dose=1.):
+    """Ordinary family intervention: outside mapped sites current values stay free."""
+    import torch
+    from component_analysis import hooks
+    replacements={}
+    for key in set(keys):
+        value=clean_outputs[key].clone();positions=torch.zeros(value.shape[:2],dtype=torch.bool,device=value.device)
+        for i,mapping in enumerate(maps):
+            for recipient,donor in mapping:
+                value[i,recipient]=clean_outputs[key][i,recipient]+dose*(donor_outputs[key][i,donor]-clean_outputs[key][i,recipient])
+                positions[i,recipient]=True
+        replacements[key]=hooks.Replacement(value,positions)
+    return replacements
+
+
+def stage2_pairs(manifest, baselines):
+    comparisons={r['comparison_id']:r for r in build_comparisons(manifest,baselines)}
+    pairs=[];excluded=[]
+    for proposal in manifest['patch_plan']:
+        cid=str(proposal['recipient_id'])+'|'+str(proposal['donor_id'])
+        row={**comparisons.get(cid,{}),**proposal,'comparison_id':cid}
+        if proposal['exclusion'] or cid not in comparisons:excluded.append({**row,'status':'excluded','reason':proposal['exclusion'] or 'baseline unavailable'})
+        else:pairs.append(row)
+    return pairs,excluded
+
+
+def run_stage2(args, gate: dict) -> dict:
+    """Conditional bounded paths and interactions, preserving the Stage1 panel."""
+    if not args.manifest or not args.gate:raise ValueError('Stage2 requires parent manifest and gate')
+    provenance=stage2_provenance(args.manifest,args.gate,args)
+    parent_gate=json.loads(Path(args.gate).read_text())
+    if gate and gate!=parent_gate:raise ValueError('supplied gate differs from parent gate')
+    manifest=json.loads(Path(args.manifest).read_text())
+    parent_dir=Path(args.manifest).parent
+    baseline={r['variant_id']:r for r in (json.loads(line) for line in (parent_dir/'baseline.jsonl').read_text().splitlines())}
+    pairs,excluded=stage2_pairs(manifest,list(baseline.values()))
+    # Interleave immutable split order to retain both splits if a deadline interrupts.
+    splits={split:sorted([r for r in pairs if r['split']==split],key=lambda r:r['comparison_id']) for split in ('discovery','confirmation')}
+    pairs=[splits[split][i] for i in range(max(map(len,splits.values()),default=0)) for split in ('discovery','confirmation') if i<len(splits[split])]
+    grid=focused_grid({'num_heads':32,'num_kv_heads':8})
+    path_families={tuple(c['sender']):[] for c in grid}
+    for cell in grid:path_families[cell['sender']].append(cell)
+    families={name:[('head',l,h) for l,h in heads] for name,heads in manifest['grid']['families'].items() if name in ('candidate6','selector2','outsider2','shared32')}
+    families['candidate6+selector2']=sorted(set(families['candidate6'])|set(families['selector2']))
+    families['candidate6+outsider2']=sorted(set(families['candidate6'])|set(families['outsider2']))
+    names=[('path:'+':'.join(map(str,c['sender']))+'->'+':'.join(map(str,c['receiver'])),c) for c in grid]
+    names += [(name,None) for name in families]
+    names += [('interaction:selector2',None),('interaction:outsider2',None)]
+    planned=[{**row,'family':name,'scope':scope,'status':'pending'} for row in pairs for scope in PRIMARY_SCOPES for name,cell in names]
+    batches=(len(pairs)+7)//8
+    estimate={'pairs':len(pairs),'excluded_pairs':len(excluded),'path_cells':len(grid),'shared_pass1_per_batch_scope':6,
+              'pass2_per_batch_scope':39,'interaction_forwards_per_batch_scope':6,
+              'recipient_donor_capture_forwards_per_batch_scope':3,'physical_batch_size':8,'physical_sequence_length':128,
+              'scopes':list(PRIMARY_SCOPES),'pair_batches':batches,'planned_rows':len(planned),
+              'planned_forwards':batches*len(PRIMARY_SCOPES)*(3+6+39+6)+16,
+              'optional_followups':0,'receiver_position_policy':'primary full recipient positions; no optional position followups'}
+    output=Path(args.output)
+    if output.resolve()==parent_dir.resolve():raise ValueError('Stage2 output must differ from immutable parent')
+    if (output/'provenance.json').exists():raise ValueError('refuse overwriting attempted Stage2; choose new output')
+    output.mkdir(parents=True,exist_ok=True)
+    provenance['grid']=estimate
+    atomic_json(output/'provenance.json',provenance)
+    atomic_json(output/'grid.json',{'cells':grid,'estimate':estimate})
+    if args.dry_run:
+        result={'status':'cpu_dry_run','stage2_go':True,'stage2_scope':provenance['stage2_scope'],'reasons':[], 'grid':estimate}
+        atomic_json(output/'gate.json',result)
+        atomic_json(output/'cost.json',{'reserved_gpu_seconds':0,'actual_gpu_seconds':0,'paid_api_calls':0})
+        return result
+    import torch
+    from component_analysis import hooks,path_patching as pp
+    started=time.monotonic();deadline=started+args.max_seconds
+    atomic_json(output/'cost.json',{'status':'initializing','job_id':os.environ.get('SLURM_JOB_ID'),'allocated_seconds':args.allocated_seconds,'reserved_gpu_seconds':args.reserved_gpu_seconds,'prior_reserved_gpu_seconds':args.prior_reserved_gpu_seconds,'remaining_pilot_reserved_gpu_seconds':7200-args.prior_reserved_gpu_seconds-args.reserved_gpu_seconds,'actual_gpu_seconds':0,'paid_api_calls':0})
+    if not os.environ.get('SLURM_JOB_ID') or not torch.cuda.is_available() or torch.cuda.device_count()!=1 or 'H200' not in torch.cuda.get_device_name(0):
+        raise ValueError('Stage2 requires exactly one Slurm-allocated H200')
+    os.environ['HF_HUB_OFFLINE']='1';os.environ['TRANSFORMERS_OFFLINE']='1'
+    for package in ('torch','transformers','nnsight'):
+        if manifest.get('software',{}).get(package)!=importlib.metadata.version(package):raise ValueError('Stage2 software differs from Stage1: '+package)
+    cache=Path(args.model_cache);parent_calibration=json.loads((parent_dir/'calibration.json').read_text())
+    if file_hash(cache/'model.safetensors.index.json')!=parent_calibration['cache_index_sha256']:raise ValueError('parent model index changed')
+    if any((cache/name).stat().st_size!=size for name,size in parent_calibration['weights'].items()):raise ValueError('parent model shards changed')
+    model=hooks.load_analysis_model(args.model_cache,device='cuda')
+    focused_grid(hooks.geometry(model))
+    device,_=hooks.device_and_dtype(model)
+    calibration={'model_load_seconds':time.monotonic()-started,'forwards':0,'batch_size':8,'grid':estimate}
+    cost={'job_id':os.environ.get('SLURM_JOB_ID'),'allocated_seconds':args.allocated_seconds,'reserved_gpu_seconds':args.reserved_gpu_seconds,
+          'prior_reserved_gpu_seconds':args.prior_reserved_gpu_seconds,'remaining_pilot_reserved_gpu_seconds':7200-args.prior_reserved_gpu_seconds-args.reserved_gpu_seconds,
+          'gpu_count':1,'paid_api_calls':0,'internal_deadline_seconds':args.max_seconds}
+    controls={'pass':True,'receipts':[],'stage1_baseline_checks':0}
+    measurements=[];status='running';stop={'requested':False}
+    handlers={}
+    for number in (signal.SIGTERM,signal.SIGINT):
+        handlers[number]=signal.signal(number,lambda number,frame:stop.update(requested=True))
+    def should_stop():return stop['requested'] or time.monotonic()>=deadline-60
+    def counted(call,*a,**kw):
+        result=call(*a,**kw);torch.cuda.synchronize();calibration['forwards']+=1;return result
+    def checkpoint(final=False):
+        cost.update(actual_gpu_seconds=time.monotonic()-started,checkpoint_complete=True)
+        calibration['peak_memory_bytes']=torch.cuda.max_memory_allocated()
+        result={'status':status,'stage2_go':controls['pass'],'stage2_scope':provenance['stage2_scope'],'reasons':[] if controls['pass'] else ['Stage2 numerical control failed'],
+                'completed_rows':len(measurements),'planned_rows':len(planned),'unmeasured_rows':len(planned)-len(measurements),'pressure_mediation_identified':False}
+        for name,value in (('gate',result),('cost',cost),('calibration',calibration),('numerical_controls',controls)):atomic_json(output/(name+'.json'),value)
+        if final:
+            summary=summarize_by_story(measurements,planned_rows=planned)
+            atomic_json(output/'story_bootstrap.json',summary)
+            (output/'summary.md').write_text('# SDR routing pilot Stage2\n\n'+f'Status: {status}; completed {len(measurements)}/{len(planned)} rows.\n\n'
+                'Answer/content diagnostic in the intact model. Changed designation and cross-story donors confound pressure mediation. Discovery and confirmation retain the original48-story split. Raw truth-margin effects and paired story-bootstrap uncertainty, including directional strata and missing cells, are in story_bootstrap.json. All MLPs remain intact for pass2 and ordinary interactions. Direct paths freeze embedding/every head/every MLP only during pass1. No completeness or pressure-routing claim. Primary receivers use all recipient positions; optional position followups omitted.\n')
+        return result
+    write_jsonl(output/'comparisons.jsonl',excluded)
+    all_senders=sorted(set(k for heads in families.values() for k in heads))
+    by_id={v['variant_id']:v for v in manifest['panel']}
+    try:
+        with (output/'comparisons.jsonl').open('a') as out:
+            for start in range(0,len(pairs),8):
+                batch=pairs[start:start+8]
+                recipients=[by_id[r['recipient_id']] for r in batch];donors=[by_id[r['donor_id']] for r in batch]
+                for scope in PRIMARY_SCOPES:
+                    if should_stop():status='completed_partial_deadline';return checkpoint(True)
+                    maps=[manifest['maps'][r['comparison_id']][scope] for r in batch]
+                    tick=time.monotonic()
+                    streams=assemble_path_streams(model,recipients,donors,maps,senders=all_senders,scope=scope)
+                    torch.cuda.synchronize();calibration['forwards']+=2
+                    # Every recaptured full-vocabulary baseline must match the immutable same-path Stage1 checksum.
+                    for i,r in enumerate(batch):
+                        observed=digest(streams.clean_readout[i].cpu().contiguous().numpy().tobytes())
+                        if observed!=baseline[r['recipient_id']]['fp32_checksum']:
+                            controls['pass']=False;raise ValueError('Stage2 recaptured Stage1 full-vocabulary baseline mismatch')
+                        controls['stage1_baseline_checks']+=1
+                    if start==0 and scope==PRIMARY_SCOPES[0]:
+                        receivers=list(dict.fromkeys(tuple(c['receiver']) for c in grid))
+                        originals=streams.corrupt_outputs
+                        control_started=time.monotonic()
+                        for selected,label in (([],'no_sender'),(list(path_families),'identity_sender')):
+                            streams.corrupt_outputs={key:streams.clean_outputs[key] for key in selected}
+                            capture=counted(pp.receiver_inputs,model,streams,senders=selected,receivers=receivers)
+                            for receiver in receivers:
+                                logits=counted(pp.readout_from_receivers,model,streams,{receiver:capture.outputs[receiver]})
+                                receipt={'control':label,'receiver':receiver,**numerical_receipt(streams.clean_readout,logits)}
+                                controls['receipts'].append(receipt);controls['pass'] &= receipt['pass']
+                        streams.corrupt_outputs=originals
+                        calibration['control_seconds']=time.monotonic()-control_started
+                        if not controls['pass']:raise ValueError('full-freeze full-vocabulary no-op control failed')
+                    def attempted(name):
+                        for row in batch:out.write(json.dumps({**row,'family':name,'scope':scope,'status':'attempted'})+'\n')
+                        out.flush()
+                    def emit(name,logits=None,effects=None):
+                        probabilities=None if logits is None else logits.float().softmax(-1)
+                        for i,row in enumerate(batch):
+                            base=baseline[row['recipient_id']]
+                            effect=effects[i] if effects is not None else raw_margin(logits[i],recipients[i]['truth_id'],recipients[i]['other_id'])-base['truth_margin']
+                            result={**row,'family':name,'scope':scope,'map_hash':digest(maps[i]),'status':'completed','effect':effect,
+                                    'baseline_truth_margin':base['truth_margin'],'truth_accessible':base['accessible'],
+                                    'no_op_receipt':{'same_path_full_vocab_pass':controls['pass']},'alignment':'semantic_partial'}
+                            if logits is not None:
+                                result.update(patched_truth_margin=effect+base['truth_margin'],patched_emitted_id=int(logits[i].argmax()),harms_accessible_truth=base['accessible'] and int(logits[i].argmax())!=recipients[i]['truth_id'])
+                                truth=recipients[i]['truth_id'];other=recipients[i]['other_id'];donor_id=row['donor_emitted_id']
+                                top=torch.topk(logits[i],min(10,logits.shape[-1]))
+                                result['patched']={'truth_margin':effect+base['truth_margin'],'emitted_id':int(logits[i].argmax()),'p_truth':float(probabilities[i,truth]),'p_other':float(probabilities[i,other]),'other_mass':float(1-probabilities[i,truth]-probabilities[i,other]),'p_donor':float(probabilities[i,donor_id]),'donor_margin':float(logits[i,donor_id]-logits[i,truth if donor_id!=truth else other]),'fp32_checksum':digest(logits[i].cpu().contiguous().numpy().tobytes()),'top_k':[{'id':int(k),'logit':float(v),'p':float(probabilities[i,k])} for k,v in zip(top.indices,top.values)]}
+                            measurements.append(result);out.write(json.dumps(result)+'\n')
+                        out.flush()
+                    for sender,cells in path_families.items():
+                        if should_stop():status='completed_partial_deadline';return checkpoint(True)
+                        for cell in cells:attempted('path:'+':'.join(map(str,sender))+'->'+':'.join(map(str,cell['receiver'])))
+                        capture=counted(pp.receiver_inputs,model,streams,senders=[sender],receivers=[c['receiver'] for c in cells])
+                        for cell in cells:
+                            if should_stop():status='completed_partial_deadline';return checkpoint(True)
+                            receiver=cell['receiver']
+                            logits=counted(pp.readout_from_receivers,model,streams,{receiver:capture.outputs[receiver]})
+                            name='path:'+':'.join(map(str,sender))+'->'+':'.join(map(str,receiver))
+                            emit(name,logits)
+                        del capture
+                    # Recapture donor families once for ordinary masked interactions.
+                    # The full donor sender tensors below are already baseline-filled;
+                    # recover donor-coordinate values in one dedicated capture.
+                    dids,dmask=batch_inputs(donors,device)
+                    donor_capture=counted(hooks.capture_forward,model,dids,dmask,components=all_senders)
+                    margins={name:[] for name in ['baseline']+list(families)}
+                    margins['baseline']=[baseline[r['recipient_id']]['truth_margin'] for r in batch]
+                    for name,keys in families.items():
+                        if should_stop():status='completed_partial_deadline';return checkpoint(True)
+                        attempted(name)
+                        replacements=family_replacements(streams.clean_outputs,donor_capture.outputs,maps,keys,dose=.5 if name=='shared32' else 1.)
+                        capture=counted(hooks.capture_forward,model,streams.input_ids,streams.attention_mask,components=[hooks.READOUT_KEY],replacements=replacements)
+                        logits=capture_logits(model,capture)
+                        margins[name]=[raw_margin(logits[i],r['truth_id'],r['other_id']) for i,r in enumerate(recipients)]
+                        emit(name,logits)
+                    for other in ('selector2','outsider2'):
+                        emit('interaction:'+other,effects=[interaction_effect({name:values[i] for name,values in margins.items()},other) for i in range(len(batch))])
+                    if start==0 and scope==PRIMARY_SCOPES[0]:
+                        calibration.update(first_full_freeze_batch_seconds=time.monotonic()-tick,
+                                           estimated_grid_seconds=(time.monotonic()-tick-calibration.get('control_seconds',0))*batches*len(PRIMARY_SCOPES)+calibration.get('control_seconds',0))
+                        calibration['estimated_total_run_seconds']=calibration['model_load_seconds']+calibration['estimated_grid_seconds']+60
+                        if calibration['estimated_total_run_seconds']>args.max_seconds:
+                            status='stopped_calibration_projection';return checkpoint(True)
+                    del streams,donor_capture
+                    checkpoint()
+            status='completed'
+            return checkpoint(True)
+    except Exception as error:
+        status='failed';calibration['error']=type(error).__name__+': '+str(error);checkpoint(True);raise
+    finally:
+        for number,handler in handlers.items():signal.signal(number,handler)
+
+
 if __name__=='__main__':
     args=parse_args()
-    result=run_stage1(args)
+    result=run_stage1(args) if args.stage=='stage1' else run_stage2(args,{})
     print(json.dumps({k:result[k] for k in ('status','stage2_go','stage2_scope','reasons')},indent=1))

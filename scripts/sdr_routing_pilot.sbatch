@@ -37,8 +37,12 @@ if (( remaining < 120 || remaining > 3600 )); then
 fi
 allocated_seconds="${SDR_ALLOCATED_SECONDS:?lead must set SDR_ALLOCATED_SECONDS to full reserved walltime}"
 prior_seconds="${SDR_PRIOR_RESERVED_GPU_SECONDS:-0}"
-if (( allocated_seconds > 3600 || allocated_seconds < remaining || allocated_seconds + prior_seconds > 3600 )); then
-    echo 'Reservation ledger or allocation exceeds Stage1 cap' >&2
+stage_cap=3600
+for argument in "$@"; do
+    if [[ "$argument" == stage2 ]]; then stage_cap=7200; fi
+done
+if (( allocated_seconds > 3600 || allocated_seconds < remaining || prior_seconds < 0 || allocated_seconds + prior_seconds > stage_cap )); then
+    echo 'Reservation ledger or allocation exceeds pilot/stage cap' >&2
     exit 2
 fi
 max_seconds=$((remaining - 90))
