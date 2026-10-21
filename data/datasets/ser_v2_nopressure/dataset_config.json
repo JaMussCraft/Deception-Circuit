@@ -1,0 +1,35 @@
+{
+ "task": "ser_v2",
+ "mechanism": "pragmatic_distortion",
+ "condition": "nopressure",
+ "honest_twin_kind": "nopressure",
+ "model": "meta-llama/Llama-3.1-8B-Instruct",
+ "margin_thresh": 0.3,
+ "prior_eps": 0.5,
+ "max_seq_length": 120,
+ "designation_words": [
+  "unfavorable",
+  "favorable"
+ ],
+ "template_variants": [
+  "audit",
+  "lab"
+ ],
+ "framing_id": "r9_rule_unified",
+ "framing_family": "rule_instructed",
+ "pilot_cell": "r9_ser_unified_on_B",
+ "suffix": "on",
+ "ser_wording": "B",
+ "seed": 42,
+ "overgen_factor": 81.58707142857143,
+ "cap_used": 0.15,
+ "length_window": [
+  94,
+  106
+ ],
+ "train_samples": 200,
+ "val_samples": 200,
+ "test_samples": 1000,
+ "filtered": true,
+ "created": "2026-10-21"
+}

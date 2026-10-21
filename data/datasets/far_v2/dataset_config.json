@@ -1,0 +1,34 @@
+{
+ "task": "far_v2",
+ "mechanism": "fabrication",
+ "condition": "deceptive",
+ "model": "meta-llama/Llama-3.1-8B-Instruct",
+ "margin_thresh": 0.7,
+ "prior_eps": 0.5,
+ "max_seq_length": 120,
+ "designation_words": [
+  "failing",
+  "passing"
+ ],
+ "template_variants": [
+  "audit",
+  "lab"
+ ],
+ "framing_id": "r8_rule_strong",
+ "framing_family": "rule_instructed",
+ "pilot_cell": "r8_far_strong_on",
+ "suffix": "on",
+ "ser_wording": null,
+ "seed": 42,
+ "overgen_factor": 162.5,
+ "cap_used": 0.15,
+ "length_window": [
+  94,
+  106
+ ],
+ "train_samples": 200,
+ "val_samples": 200,
+ "test_samples": 1000,
+ "filtered": true,
+ "created": "2026-10-21"
+}

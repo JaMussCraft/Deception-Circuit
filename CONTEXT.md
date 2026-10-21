@@ -316,3 +316,16 @@ This residual within-family difference in wording style across tasks is a record
 comparisons. The deception in all three is instruction-following under an operator rule (spec §14.G7/G8), not
 motive-driven.
 _Avoid_: calling the three tasks matched in inducement wording
+
+**Mechanism purity (v2): construction-defined; LLM judges do not separate SDR/SER from one-word answers**:
+The v2 datasets assign the mechanism by construction, on every row (spec §14.G11, user decision 2026-10-21).
+- FAR: the deceptive answer contradicts the record.
+- SER: it is literally true.
+- SDR: it is a true disclosure commitment that leaves the critical result unshown.
+The builder asserts these checks per row and reports them in each `filter_report.json`. LLM judges were run as a
+gate and failed, and their results are recorded as a limitation in each `provenance.json`.
+- The pre-registered v1 judge (label first, instruction clause visible) failed FAR and SDR.
+- Judge v2 (clause removed, reasoning before the label, Sonnet 4.5 and Gemini 2.5 Pro) passed FAR under both
+  raters. It failed SDR and SER under both, with near-chance agreement (kappa 0.00 and 0.08).
+- Reports: `Alignment/.scratch/mechanism-datasets/reports/04-purity-diagnostics.md`.
+_Avoid_: citing a judge-measured purity for the v2 SDR/SER datasets

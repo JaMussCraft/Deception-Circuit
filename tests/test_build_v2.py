@@ -479,3 +479,45 @@ def test_score_runs_on_disjoint_splits_equal_one_run(env, tok):
     one_run, _, _ = bv.load_work(str(other / "sdr_v2"))
     key = lambda o: o["instance_id"]
     assert sorted(split_run, key=key) == sorted(one_run, key=key)
+
+
+
+def _real_record(task, designation="inversion", wording=None):
+    """A rendered v2 record with the real scaffold (no tokenizer needed)."""
+    spec = v2.make_spec(task, True, wording)
+    inst = {"entity": "Acme", "domain": "health", "item_1": "alpha", "item_2": "beta",
+            "item_pair": "alpha/beta", "item_polarity": 1,
+            "designation_polarity": designation, "pressure_slot": 0,
+            "template_variant": "audit"}
+    inst["instance_id"] = dc.instance_id(inst)
+    built = v2.build_prompt_pair(spec, "audit", "Acme", ("alpha", "beta"), 1, designation,
+                                 "Pressure clause ends this pilot.")
+    return {**inst, **built, "task": task, "overrides": {}}
+
+
+@pytest.mark.parametrize("task,wording", [("far_v2", None), ("sdr_v2", None), ("ser_v2", "B")])
+@pytest.mark.parametrize("designation", ["inversion", "identity"])
+def test_construction_check_holds_for_the_deceptive_target_and_fails_for_the_other(
+        task, wording, designation):
+    rec = _real_record(task, designation, wording)
+    assert bv.construction_check(rec)["pass"]
+    swapped = dict(rec, target=rec["distractor"], distractor=rec["target"])
+    assert not bv.construction_check(swapped)["pass"]
+
+
+def test_filter_report_and_provenance_record_construction_purity_and_the_judge_limit(env, tok):
+    judge = env.tmp / "purity_v2.json"
+    judge.write_text(json.dumps({"judge_model": "m", "confusion": {"far_v2": {"fabrication": 1}},
+                                 "purity": {"far_v2": 1.0},
+                                 "gate": {"pass": False, "failures": ["x"], "notes": []}}))
+    _build(env, tok, "far_v2", extra=SMALL + ("--purity-report", str(judge)))
+    base = os.path.join(env.data, "far_v2")
+    rep = json.load(open(base + "/filter_report.json"))
+    cc = rep["construction_checks"]
+    assert all(v["passed"] == v["total"] > 0 for v in cc["selected_rows"].values())
+    assert cc["all_full_build_survivors"]["passed"] == cc["all_full_build_survivors"]["total"]
+    prov = json.load(open(base + "/provenance.json"))
+    mp = prov["mechanism_purity"]
+    assert mp["basis"].startswith("construction") and "do not separate" in mp["limitation"]
+    assert mp["judge_reports"][0]["gate"]["pass"] is False
+    assert mp["judge_reports"][0]["sha256"] == bv.sha256_file(str(judge))

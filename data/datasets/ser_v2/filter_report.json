@@ -1,0 +1,2794 @@
+{
+ "task": "ser_v2",
+ "mechanism": "pragmatic_distortion",
+ "cell_id": "r9_ser_unified_on_B",
+ "round": 9,
+ "framing_id": "r9_rule_unified",
+ "framing_family": "rule_instructed",
+ "suffix": "on",
+ "ser_wording": "B",
+ "thresholds": {
+  "margin_thresh": 0.7,
+  "honest_margin": 0.3,
+  "prior_eps": 0.5,
+  "max_seq_length": 120
+ },
+ "overgen_factor": 81.58707142857143,
+ "plan": {
+  "n_generate_pilot": {
+   "far_v2": 175000.0,
+   "sdr_v2": 58334.0,
+   "ser_v2": 87863.0
+  },
+  "factor": {
+   "far_v2": 162.5,
+   "sdr_v2": 54.16728571428571,
+   "ser_v2": 81.58707142857143
+  },
+  "topup_scale": 1.0,
+  "targets": {
+   "train": 200,
+   "validation": 200,
+   "test": 1000
+  },
+  "per_task": {
+   "far_v2": {
+    "train": 32500,
+    "validation": 32500,
+    "test": 162500
+   },
+   "sdr_v2": {
+    "train": 10834,
+    "validation": 10834,
+    "test": 54168
+   },
+   "ser_v2": {
+    "train": 16318,
+    "validation": 16318,
+    "test": 81588
+   }
+  },
+  "shared": {
+   "train": 32500,
+   "validation": 32500,
+   "test": 162500
+  }
+ },
+ "cap_used": 0.15,
+ "cap_reason": "Ticket 04 must use clause/pair cap 0.15 for FAR (r8_far_strong_on) and SER (r9_ser_unified_on_B): the 10% cap is infeasible for both. SDR (r9_sdr_unified_on) is feasible at 0.10.",
+ "length_window": {
+  "window": [
+   94,
+   106
+  ],
+  "excluded_instances": 0,
+  "excluded_by_clause": {},
+  "clauses_fully_excluded": [],
+  "note": "spec 14.G6: the cross-task D-prompt band is met by excluding out-of-window rows before scoring; clauses with no in-window row are listed as excluded"
+ },
+ "splits": {
+  "train": {
+   "generated": 16318,
+   "in_window": 16318,
+   "prior_kept": 5300,
+   "deceptive_pressure": 1011,
+   "contingent": 814,
+   "full_build": 701,
+   "selected": 200,
+   "keep_rate": {
+    "in_window": 1.0,
+    "prior_kept": 0.32479470523348447,
+    "deceptive_pressure": 0.19075471698113208,
+    "contingent": 0.8051434223541049,
+    "full_build": 0.8611793611793612
+   },
+   "selection": {
+    "target": 200,
+    "selected": 200,
+    "shortfall": 0,
+    "strategy": "instance_id_order",
+    "cap": 0.15,
+    "cap_count": 30,
+    "available": {
+     "inversion/item1/audit": 110,
+     "inversion/item1/lab": 79,
+     "inversion/item2/audit": 113,
+     "inversion/item2/lab": 77,
+     "identity/item1/audit": 71,
+     "identity/item1/lab": 85,
+     "identity/item2/audit": 72,
+     "identity/item2/lab": 94
+    },
+    "per_stratum": {
+     "inversion/item1": 50,
+     "inversion/item2": 50,
+     "identity/item1": 50,
+     "identity/item2": 50
+    },
+    "per_stratum_variant": {
+     "inversion/item1/audit": 25,
+     "inversion/item1/lab": 25,
+     "inversion/item2/audit": 25,
+     "inversion/item2/lab": 25,
+     "identity/item1/audit": 25,
+     "identity/item1/lab": 25,
+     "identity/item2/audit": 25,
+     "identity/item2/lab": 25
+    },
+    "per_variant": {
+     "audit": 100,
+     "lab": 100
+    },
+    "variant_floor_ok": true,
+    "variant_deviation": 0,
+    "max_clause_count": 30,
+    "max_pair_count": 22,
+    "n_clauses": 16,
+    "n_pairs": 27
+   }
+  },
+  "validation": {
+   "generated": 16318,
+   "in_window": 16318,
+   "prior_kept": 5243,
+   "deceptive_pressure": 998,
+   "contingent": 783,
+   "full_build": 669,
+   "selected": 200,
+   "keep_rate": {
+    "in_window": 1.0,
+    "prior_kept": 0.32130163010172813,
+    "deceptive_pressure": 0.19034903681098608,
+    "contingent": 0.7845691382765531,
+    "full_build": 0.8544061302681992
+   },
+   "selection": {
+    "target": 200,
+    "selected": 200,
+    "shortfall": 0,
+    "strategy": "instance_id_order",
+    "cap": 0.15,
+    "cap_count": 30,
+    "available": {
+     "inversion/item1/audit": 104,
+     "inversion/item1/lab": 81,
+     "inversion/item2/audit": 99,
+     "inversion/item2/lab": 73,
+     "identity/item1/audit": 66,
+     "identity/item1/lab": 90,
+     "identity/item2/audit": 65,
+     "identity/item2/lab": 91
+    },
+    "per_stratum": {
+     "inversion/item1": 50,
+     "inversion/item2": 50,
+     "identity/item1": 50,
+     "identity/item2": 50
+    },
+    "per_stratum_variant": {
+     "inversion/item1/audit": 25,
+     "inversion/item1/lab": 25,
+     "inversion/item2/audit": 25,
+     "inversion/item2/lab": 25,
+     "identity/item1/audit": 25,
+     "identity/item1/lab": 25,
+     "identity/item2/audit": 25,
+     "identity/item2/lab": 25
+    },
+    "per_variant": {
+     "audit": 100,
+     "lab": 100
+    },
+    "variant_floor_ok": true,
+    "variant_deviation": 0,
+    "max_clause_count": 30,
+    "max_pair_count": 22,
+    "n_clauses": 16,
+    "n_pairs": 31
+   }
+  },
+  "test": {
+   "generated": 81588,
+   "in_window": 81588,
+   "prior_kept": 26350,
+   "deceptive_pressure": 5204,
+   "contingent": 4141,
+   "full_build": 3496,
+   "selected": 1000,
+   "keep_rate": {
+    "in_window": 1.0,
+    "prior_kept": 0.32296416139628376,
+    "deceptive_pressure": 0.19749525616698294,
+    "contingent": 0.7957340507302075,
+    "full_build": 0.8442405216131369
+   },
+   "selection": {
+    "target": 1000,
+    "selected": 1000,
+    "shortfall": 0,
+    "strategy": "instance_id_order",
+    "cap": 0.15,
+    "cap_count": 150,
+    "available": {
+     "inversion/item1/audit": 520,
+     "inversion/item1/lab": 404,
+     "inversion/item2/audit": 524,
+     "inversion/item2/lab": 427,
+     "identity/item1/audit": 343,
+     "identity/item1/lab": 473,
+     "identity/item2/audit": 328,
+     "identity/item2/lab": 477
+    },
+    "per_stratum": {
+     "inversion/item1": 250,
+     "inversion/item2": 250,
+     "identity/item1": 250,
+     "identity/item2": 250
+    },
+    "per_stratum_variant": {
+     "inversion/item1/audit": 125,
+     "inversion/item1/lab": 125,
+     "inversion/item2/audit": 125,
+     "inversion/item2/lab": 125,
+     "identity/item1/audit": 125,
+     "identity/item1/lab": 125,
+     "identity/item2/audit": 125,
+     "identity/item2/lab": 125
+    },
+    "per_variant": {
+     "audit": 500,
+     "lab": 500
+    },
+    "variant_floor_ok": true,
+    "variant_deviation": 0,
+    "max_clause_count": 150,
+    "max_pair_count": 99,
+    "n_clauses": 17,
+    "n_pairs": 33
+   }
+  }
+ },
+ "overall": {
+  "generated": 114224,
+  "in_window": 114224,
+  "prior_kept": 36893,
+  "deceptive_pressure": 7213,
+  "contingent": 5738,
+  "full_build": 4866,
+  "selected": 1400,
+  "keep_rate": {
+   "in_window": 1.0,
+   "prior_kept": 0.32298816360834853,
+   "deceptive_pressure": 0.19551134361531997,
+   "contingent": 0.7955081103563011,
+   "full_build": 0.8480306727082607
+  }
+ },
+ "at_margin_1_0": {
+  "pressure_margin": 1.0,
+  "contingent": 4600,
+  "full_build": 3938
+ },
+ "per_stratum": {
+  "train": {
+   "inversion/item1/audit": {
+    "generated": 2042,
+    "contingent": 125,
+    "full_build": 110,
+    "full_build_rate": 0.05386875612144956,
+    "selected": 25
+   },
+   "inversion/item1/lab": {
+    "generated": 2033,
+    "contingent": 81,
+    "full_build": 79,
+    "full_build_rate": 0.03885882931628136,
+    "selected": 25
+   },
+   "inversion/item2/audit": {
+    "generated": 2041,
+    "contingent": 122,
+    "full_build": 113,
+    "full_build_rate": 0.05536501714845664,
+    "selected": 25
+   },
+   "inversion/item2/lab": {
+    "generated": 2041,
+    "contingent": 77,
+    "full_build": 77,
+    "full_build_rate": 0.037726604605585495,
+    "selected": 25
+   },
+   "identity/item1/audit": {
+    "generated": 2043,
+    "contingent": 88,
+    "full_build": 71,
+    "full_build_rate": 0.034752814488497305,
+    "selected": 25
+   },
+   "identity/item1/lab": {
+    "generated": 2036,
+    "contingent": 114,
+    "full_build": 85,
+    "full_build_rate": 0.04174852652259332,
+    "selected": 25
+   },
+   "identity/item2/audit": {
+    "generated": 2040,
+    "contingent": 88,
+    "full_build": 72,
+    "full_build_rate": 0.03529411764705882,
+    "selected": 25
+   },
+   "identity/item2/lab": {
+    "generated": 2042,
+    "contingent": 119,
+    "full_build": 94,
+    "full_build_rate": 0.04603330068560235,
+    "selected": 25
+   }
+  },
+  "validation": {
+   "inversion/item1/audit": {
+    "generated": 2039,
+    "contingent": 117,
+    "full_build": 104,
+    "full_build_rate": 0.05100539480137322,
+    "selected": 25
+   },
+   "inversion/item1/lab": {
+    "generated": 2039,
+    "contingent": 84,
+    "full_build": 81,
+    "full_build_rate": 0.039725355566454144,
+    "selected": 25
+   },
+   "inversion/item2/audit": {
+    "generated": 2040,
+    "contingent": 106,
+    "full_build": 99,
+    "full_build_rate": 0.04852941176470588,
+    "selected": 25
+   },
+   "inversion/item2/lab": {
+    "generated": 2042,
+    "contingent": 77,
+    "full_build": 73,
+    "full_build_rate": 0.03574926542605289,
+    "selected": 25
+   },
+   "identity/item1/audit": {
+    "generated": 2044,
+    "contingent": 85,
+    "full_build": 66,
+    "full_build_rate": 0.03228962818003914,
+    "selected": 25
+   },
+   "identity/item1/lab": {
+    "generated": 2036,
+    "contingent": 114,
+    "full_build": 90,
+    "full_build_rate": 0.04420432220039293,
+    "selected": 25
+   },
+   "identity/item2/audit": {
+    "generated": 2040,
+    "contingent": 82,
+    "full_build": 65,
+    "full_build_rate": 0.031862745098039214,
+    "selected": 25
+   },
+   "identity/item2/lab": {
+    "generated": 2038,
+    "contingent": 118,
+    "full_build": 91,
+    "full_build_rate": 0.04465161923454367,
+    "selected": 25
+   }
+  },
+  "test": {
+   "inversion/item1/audit": {
+    "generated": 10203,
+    "contingent": 579,
+    "full_build": 520,
+    "full_build_rate": 0.050965402332647264,
+    "selected": 125
+   },
+   "inversion/item1/lab": {
+    "generated": 10193,
+    "contingent": 428,
+    "full_build": 404,
+    "full_build_rate": 0.039635043657411946,
+    "selected": 125
+   },
+   "inversion/item2/audit": {
+    "generated": 10188,
+    "contingent": 584,
+    "full_build": 524,
+    "full_build_rate": 0.05143305850019631,
+    "selected": 125
+   },
+   "inversion/item2/lab": {
+    "generated": 10202,
+    "contingent": 441,
+    "full_build": 427,
+    "full_build_rate": 0.041854538325818466,
+    "selected": 125
+   },
+   "identity/item1/audit": {
+    "generated": 10206,
+    "contingent": 448,
+    "full_build": 343,
+    "full_build_rate": 0.033607681755829906,
+    "selected": 125
+   },
+   "identity/item1/lab": {
+    "generated": 10202,
+    "contingent": 603,
+    "full_build": 473,
+    "full_build_rate": 0.046363458145461674,
+    "selected": 125
+   },
+   "identity/item2/audit": {
+    "generated": 10196,
+    "contingent": 439,
+    "full_build": 328,
+    "full_build_rate": 0.03216947822675559,
+    "selected": 125
+   },
+   "identity/item2/lab": {
+    "generated": 10198,
+    "contingent": 619,
+    "full_build": 477,
+    "full_build_rate": 0.046773877230829576,
+    "selected": 125
+   }
+  }
+ },
+ "pass_rate_by_pressure": {
+  "r9_rule_unified_ser_v2_00": {
+   "generated": 4570,
+   "contingent": 875,
+   "full_build": 774,
+   "contingent_rate": 0.19146608315098468,
+   "full_build_rate": 0.16936542669584245
+  },
+  "r9_rule_unified_ser_v2_01": {
+   "generated": 4574,
+   "contingent": 201,
+   "full_build": 176,
+   "contingent_rate": 0.04394403148229121,
+   "full_build_rate": 0.038478355924792304
+  },
+  "r9_rule_unified_ser_v2_02": {
+   "generated": 4572,
+   "contingent": 263,
+   "full_build": 221,
+   "contingent_rate": 0.05752405949256343,
+   "full_build_rate": 0.048337707786526685
+  },
+  "r9_rule_unified_ser_v2_03": {
+   "generated": 4565,
+   "contingent": 223,
+   "full_build": 197,
+   "contingent_rate": 0.048849945235487406,
+   "full_build_rate": 0.04315443592552026
+  },
+  "r9_rule_unified_ser_v2_04": {
+   "generated": 4570,
+   "contingent": 129,
+   "full_build": 108,
+   "contingent_rate": 0.02822757111597374,
+   "full_build_rate": 0.02363238512035011
+  },
+  "r9_rule_unified_ser_v2_05": {
+   "generated": 4568,
+   "contingent": 3,
+   "full_build": 2,
+   "contingent_rate": 0.0006567425569176883,
+   "full_build_rate": 0.00043782837127845885
+  },
+  "r9_rule_unified_ser_v2_06": {
+   "generated": 4569,
+   "contingent": 15,
+   "full_build": 11,
+   "contingent_rate": 0.003282994090610637,
+   "full_build_rate": 0.0024075289997811337
+  },
+  "r9_rule_unified_ser_v2_07": {
+   "generated": 4568,
+   "contingent": 0,
+   "full_build": 0,
+   "contingent_rate": 0.0,
+   "full_build_rate": 0.0
+  },
+  "r9_rule_unified_ser_v2_08": {
+   "generated": 4565,
+   "contingent": 1,
+   "full_build": 0,
+   "contingent_rate": 0.0002190580503833516,
+   "full_build_rate": 0.0
+  },
+  "r9_rule_unified_ser_v2_09": {
+   "generated": 4567,
+   "contingent": 1,
+   "full_build": 0,
+   "contingent_rate": 0.0002189621195533173,
+   "full_build_rate": 0.0
+  },
+  "r9_rule_unified_ser_v2_10": {
+   "generated": 4561,
+   "contingent": 440,
+   "full_build": 375,
+   "contingent_rate": 0.09647007235255427,
+   "full_build_rate": 0.08221881166410874
+  },
+  "r9_rule_unified_ser_v2_11": {
+   "generated": 4568,
+   "contingent": 271,
+   "full_build": 241,
+   "contingent_rate": 0.059325744308231176,
+   "full_build_rate": 0.05275831873905429
+  },
+  "r9_rule_unified_ser_v2_12": {
+   "generated": 4574,
+   "contingent": 405,
+   "full_build": 362,
+   "contingent_rate": 0.08854394403148229,
+   "full_build_rate": 0.07914298207258418
+  },
+  "r9_rule_unified_ser_v2_13": {
+   "generated": 4571,
+   "contingent": 300,
+   "full_build": 229,
+   "contingent_rate": 0.0656311529205863,
+   "full_build_rate": 0.05009844672938088
+  },
+  "r9_rule_unified_ser_v2_14": {
+   "generated": 4557,
+   "contingent": 131,
+   "full_build": 99,
+   "contingent_rate": 0.028746982664033357,
+   "full_build_rate": 0.021724818959842
+  },
+  "r9_rule_unified_ser_v2_15": {
+   "generated": 4567,
+   "contingent": 1369,
+   "full_build": 1152,
+   "contingent_rate": 0.2997591416684913,
+   "full_build_rate": 0.25224436172542153
+  },
+  "r9_rule_unified_ser_v2_16": {
+   "generated": 4564,
+   "contingent": 212,
+   "full_build": 193,
+   "contingent_rate": 0.04645048203330412,
+   "full_build_rate": 0.0422874671340929
+  },
+  "r9_rule_unified_ser_v2_17": {
+   "generated": 4578,
+   "contingent": 239,
+   "full_build": 204,
+   "contingent_rate": 0.05220620358235037,
+   "full_build_rate": 0.04456094364351245
+  },
+  "r9_rule_unified_ser_v2_18": {
+   "generated": 4570,
+   "contingent": 378,
+   "full_build": 302,
+   "contingent_rate": 0.08271334792122538,
+   "full_build_rate": 0.06608315098468272
+  },
+  "r9_rule_unified_ser_v2_19": {
+   "generated": 4570,
+   "contingent": 282,
+   "full_build": 220,
+   "contingent_rate": 0.061706783369803064,
+   "full_build_rate": 0.04814004376367615
+  },
+  "shared_00": {
+   "generated": 4572,
+   "contingent": 0,
+   "full_build": 0,
+   "contingent_rate": 0.0,
+   "full_build_rate": 0.0
+  },
+  "shared_01": {
+   "generated": 4565,
+   "contingent": 0,
+   "full_build": 0,
+   "contingent_rate": 0.0,
+   "full_build_rate": 0.0
+  },
+  "shared_02": {
+   "generated": 4574,
+   "contingent": 0,
+   "full_build": 0,
+   "contingent_rate": 0.0,
+   "full_build_rate": 0.0
+  },
+  "shared_03": {
+   "generated": 4574,
+   "contingent": 0,
+   "full_build": 0,
+   "contingent_rate": 0.0,
+   "full_build_rate": 0.0
+  },
+  "shared_04": {
+   "generated": 4571,
+   "contingent": 0,
+   "full_build": 0,
+   "contingent_rate": 0.0,
+   "full_build_rate": 0.0
+  }
+ },
+ "pass_rate_by_item_pair": {
+  "audio/charging": {
+   "generated": 2780,
+   "contingent": 44,
+   "full_build": 39,
+   "contingent_rate": 0.015827338129496403,
+   "full_build_rate": 0.014028776978417265
+  },
+  "beams/joints": {
+   "generated": 2790,
+   "contingent": 392,
+   "full_build": 328,
+   "contingent_rate": 0.14050179211469535,
+   "full_build_rate": 0.11756272401433691
+  },
+  "bids/asks": {
+   "generated": 2781,
+   "contingent": 0,
+   "full_build": 0,
+   "contingent_rate": 0.0,
+   "full_build_rate": 0.0
+  },
+  "brick/stone": {
+   "generated": 2786,
+   "contingent": 314,
+   "full_build": 283,
+   "contingent_rate": 0.11270638908829864,
+   "full_build_rate": 0.10157932519741565
+  },
+  "budget/timeline": {
+   "generated": 2786,
+   "contingent": 128,
+   "full_build": 117,
+   "contingent_rate": 0.04594400574300072,
+   "full_build_rate": 0.04199569274946159
+  },
+  "button/switch": {
+   "generated": 2788,
+   "contingent": 20,
+   "full_build": 18,
+   "contingent_rate": 0.007173601147776184,
+   "full_build_rate": 0.006456241032998565
+  },
+  "calcium/sodium": {
+   "generated": 2783,
+   "contingent": 0,
+   "full_build": 0,
+   "contingent_rate": 0.0,
+   "full_build_rate": 0.0
+  },
+  "capacity/coverage": {
+   "generated": 2785,
+   "contingent": 0,
+   "full_build": 0,
+   "contingent_rate": 0.0,
+   "full_build_rate": 0.0
+  },
+  "chip/board": {
+   "generated": 2785,
+   "contingent": 559,
+   "full_build": 445,
+   "contingent_rate": 0.2007181328545781,
+   "full_build_rate": 0.15978456014362658
+  },
+  "client/server": {
+   "generated": 2785,
+   "contingent": 290,
+   "full_build": 289,
+   "contingent_rate": 0.10412926391382406,
+   "full_build_rate": 0.10377019748653502
+  },
+  "clock/timer": {
+   "generated": 2791,
+   "contingent": 151,
+   "full_build": 85,
+   "contingent_rate": 0.05410247223217485,
+   "full_build_rate": 0.03045503403797922
+  },
+  "color/finish": {
+   "generated": 2783,
+   "contingent": 31,
+   "full_build": 27,
+   "contingent_rate": 0.011139058569888609,
+   "full_build_rate": 0.009701760689902982
+  },
+  "density/hardness": {
+   "generated": 2785,
+   "contingent": 1,
+   "full_build": 1,
+   "contingent_rate": 0.0003590664272890485,
+   "full_build_rate": 0.0003590664272890485
+  },
+  "desk/chair": {
+   "generated": 2785,
+   "contingent": 385,
+   "full_build": 378,
+   "contingent_rate": 0.13824057450628366,
+   "full_build_rate": 0.13572710951526032
+  },
+  "doors/windows": {
+   "generated": 2788,
+   "contingent": 334,
+   "full_build": 300,
+   "contingent_rate": 0.11979913916786226,
+   "full_build_rate": 0.10760401721664276
+  },
+  "fence/gate": {
+   "generated": 2786,
+   "contingent": 16,
+   "full_build": 16,
+   "contingent_rate": 0.00574300071787509,
+   "full_build_rate": 0.00574300071787509
+  },
+  "frontend/backend": {
+   "generated": 2789,
+   "contingent": 168,
+   "full_build": 164,
+   "contingent_rate": 0.06023664395840803,
+   "full_build_rate": 0.05880243814987451
+  },
+  "funds/trusts": {
+   "generated": 2794,
+   "contingent": 89,
+   "full_build": 52,
+   "contingent_rate": 0.03185397279885469,
+   "full_build_rate": 0.018611309949892626
+  },
+  "humidity/vibration": {
+   "generated": 2782,
+   "contingent": 3,
+   "full_build": 3,
+   "contingent_rate": 0.0010783608914450035,
+   "full_build_rate": 0.0010783608914450035
+  },
+  "import/export": {
+   "generated": 2775,
+   "contingent": 0,
+   "full_build": 0,
+   "contingent_rate": 0.0,
+   "full_build_rate": 0.0
+  },
+  "inbound/outbound": {
+   "generated": 2792,
+   "contingent": 8,
+   "full_build": 8,
+   "contingent_rate": 0.0028653295128939827,
+   "full_build_rate": 0.0028653295128939827
+  },
+  "intake/output": {
+   "generated": 2787,
+   "contingent": 1,
+   "full_build": 1,
+   "contingent_rate": 0.0003588087549336204,
+   "full_build_rate": 0.0003588087549336204
+  },
+  "lawn/patio": {
+   "generated": 2785,
+   "contingent": 278,
+   "full_build": 260,
+   "contingent_rate": 0.09982046678635548,
+   "full_build_rate": 0.0933572710951526
+  },
+  "length/width": {
+   "generated": 2784,
+   "contingent": 0,
+   "full_build": 0,
+   "contingent_rate": 0.0,
+   "full_build_rate": 0.0
+  },
+  "lights/blinds": {
+   "generated": 2787,
+   "contingent": 32,
+   "full_build": 25,
+   "contingent_rate": 0.011481880157875853,
+   "full_build_rate": 0.00897021887334051
+  },
+  "lobby/garage": {
+   "generated": 2785,
+   "contingent": 215,
+   "full_build": 188,
+   "contingent_rate": 0.07719928186714542,
+   "full_build_rate": 0.06750448833034112
+  },
+  "miles/hours": {
+   "generated": 2787,
+   "contingent": 71,
+   "full_build": 68,
+   "contingent_rate": 0.025475421600287047,
+   "full_build_rate": 0.024398995335486187
+  },
+  "queries/updates": {
+   "generated": 2788,
+   "contingent": 60,
+   "full_build": 50,
+   "contingent_rate": 0.021520803443328552,
+   "full_build_rate": 0.017934002869440458
+  },
+  "rail/road": {
+   "generated": 2791,
+   "contingent": 472,
+   "full_build": 440,
+   "contingent_rate": 0.16911501254030814,
+   "full_build_rate": 0.15764958796130418
+  },
+  "reads/writes": {
+   "generated": 2786,
+   "contingent": 167,
+   "full_build": 131,
+   "contingent_rate": 0.05994256999282125,
+   "full_build_rate": 0.047020818377602296
+  },
+  "screen/camera": {
+   "generated": 2787,
+   "contingent": 124,
+   "full_build": 93,
+   "contingent_rate": 0.04449228561176893,
+   "full_build_rate": 0.03336921420882669
+  },
+  "shares/options": {
+   "generated": 2787,
+   "contingent": 164,
+   "full_build": 121,
+   "contingent_rate": 0.05884463580911374,
+   "full_build_rate": 0.043415859346968066
+  },
+  "size/shape": {
+   "generated": 2787,
+   "contingent": 141,
+   "full_build": 115,
+   "contingent_rate": 0.05059203444564048,
+   "full_build_rate": 0.041263006817366346
+  },
+  "steel/glass": {
+   "generated": 2785,
+   "contingent": 137,
+   "full_build": 92,
+   "contingent_rate": 0.04919210053859964,
+   "full_build_rate": 0.03303411131059246
+  },
+  "stocks/bonds": {
+   "generated": 2789,
+   "contingent": 170,
+   "full_build": 96,
+   "contingent_rate": 0.060953746862674796,
+   "full_build_rate": 0.03442093940480459
+  },
+  "trucks/trains": {
+   "generated": 2786,
+   "contingent": 32,
+   "full_build": 17,
+   "contingent_rate": 0.01148600143575018,
+   "full_build_rate": 0.006101938262742283
+  },
+  "users/roles": {
+   "generated": 2788,
+   "contingent": 454,
+   "full_build": 375,
+   "contingent_rate": 0.16284074605451937,
+   "full_build_rate": 0.13450502152080343
+  },
+  "vision/hearing": {
+   "generated": 2787,
+   "contingent": 117,
+   "full_build": 101,
+   "contingent_rate": 0.04198062432723358,
+   "full_build_rate": 0.036239684248295656
+  },
+  "walls/floors": {
+   "generated": 2784,
+   "contingent": 31,
+   "full_build": 28,
+   "contingent_rate": 0.011135057471264368,
+   "full_build_rate": 0.010057471264367816
+  },
+  "weight/height": {
+   "generated": 2781,
+   "contingent": 71,
+   "full_build": 71,
+   "contingent_rate": 0.025530384753685725,
+   "full_build_rate": 0.025530384753685725
+  },
+  "wire/cable": {
+   "generated": 2784,
+   "contingent": 68,
+   "full_build": 41,
+   "contingent_rate": 0.02442528735632184,
+   "full_build_rate": 0.014727011494252873
+  }
+ },
+ "pass_rate_by_entity": {
+  "Alcove Property": {
+   "generated": 1569,
+   "contingent": 55,
+   "full_build": 50,
+   "contingent_rate": 0.03505417463352454,
+   "full_build_rate": 0.03186743148502231
+  },
+  "Aldervest Financial": {
+   "generated": 1556,
+   "contingent": 66,
+   "full_build": 56,
+   "contingent_rate": 0.042416452442159386,
+   "full_build_rate": 0.03598971722365039
+  },
+  "Aldrix Platform": {
+   "generated": 1605,
+   "contingent": 90,
+   "full_build": 77,
+   "contingent_rate": 0.056074766355140186,
+   "full_build_rate": 0.047975077881619935
+  },
+  "Ambrix Clinic": {
+   "generated": 1598,
+   "contingent": 99,
+   "full_build": 80,
+   "contingent_rate": 0.06195244055068836,
+   "full_build_rate": 0.05006257822277847
+  },
+  "Ashgate Facilities": {
+   "generated": 1571,
+   "contingent": 71,
+   "full_build": 61,
+   "contingent_rate": 0.04519414385741566,
+   "full_build_rate": 0.03882877148313176
+  },
+  "Axtem Industries": {
+   "generated": 1552,
+   "contingent": 73,
+   "full_build": 66,
+   "contingent_rate": 0.047036082474226804,
+   "full_build_rate": 0.04252577319587629
+  },
+  "Brackton Bank": {
+   "generated": 1585,
+   "contingent": 60,
+   "full_build": 57,
+   "contingent_rate": 0.03785488958990536,
+   "full_build_rate": 0.03596214511041009
+  },
+  "Braddox Gear": {
+   "generated": 1582,
+   "contingent": 90,
+   "full_build": 76,
+   "contingent_rate": 0.056890012642225034,
+   "full_build_rate": 0.04804045512010114
+  },
+  "Bramwell Construction": {
+   "generated": 1575,
+   "contingent": 66,
+   "full_build": 59,
+   "contingent_rate": 0.0419047619047619,
+   "full_build_rate": 0.03746031746031746
+  },
+  "Brellow Estates": {
+   "generated": 1568,
+   "contingent": 82,
+   "full_build": 73,
+   "contingent_rate": 0.05229591836734694,
+   "full_build_rate": 0.046556122448979595
+  },
+  "Brinby Transit": {
+   "generated": 1591,
+   "contingent": 62,
+   "full_build": 50,
+   "contingent_rate": 0.03896920175989944,
+   "full_build_rate": 0.03142677561282212
+  },
+  "Brindal Manufacturing": {
+   "generated": 1607,
+   "contingent": 79,
+   "full_build": 72,
+   "contingent_rate": 0.049159925326695705,
+   "full_build_rate": 0.044803982576229
+  },
+  "Calmet Industrial": {
+   "generated": 1661,
+   "contingent": 52,
+   "full_build": 47,
+   "contingent_rate": 0.031306441902468396,
+   "full_build_rate": 0.028296207104154123
+  },
+  "Camborne Finance": {
+   "generated": 1569,
+   "contingent": 69,
+   "full_build": 57,
+   "contingent_rate": 0.04397705544933078,
+   "full_build_rate": 0.036328871892925434
+  },
+  "Casden Diagnostics": {
+   "generated": 1577,
+   "contingent": 94,
+   "full_build": 80,
+   "contingent_rate": 0.05960684844641725,
+   "full_build_rate": 0.05072923272035511
+  },
+  "Corvane Software": {
+   "generated": 1598,
+   "contingent": 95,
+   "full_build": 79,
+   "contingent_rate": 0.05944931163954944,
+   "full_build_rate": 0.04943679599499374
+  },
+  "Crestbay Services": {
+   "generated": 1524,
+   "contingent": 68,
+   "full_build": 55,
+   "contingent_rate": 0.04461942257217848,
+   "full_build_rate": 0.03608923884514436
+  },
+  "Denmar Software": {
+   "generated": 1589,
+   "contingent": 102,
+   "full_build": 89,
+   "contingent_rate": 0.06419131529263687,
+   "full_build_rate": 0.05601006922592826
+  },
+  "Drayton Freight": {
+   "generated": 1550,
+   "contingent": 59,
+   "full_build": 48,
+   "contingent_rate": 0.03806451612903226,
+   "full_build_rate": 0.03096774193548387
+  },
+  "Dunmar Fabrication": {
+   "generated": 1561,
+   "contingent": 94,
+   "full_build": 86,
+   "contingent_rate": 0.06021780909673286,
+   "full_build_rate": 0.05509288917360666
+  },
+  "Dunmore Property": {
+   "generated": 1567,
+   "contingent": 54,
+   "full_build": 48,
+   "contingent_rate": 0.03446075303126994,
+   "full_build_rate": 0.03063178047223995
+  },
+  "Elderton Works": {
+   "generated": 1619,
+   "contingent": 73,
+   "full_build": 62,
+   "contingent_rate": 0.045089561457689935,
+   "full_build_rate": 0.03829524397776405
+  },
+  "Farrow Audio": {
+   "generated": 1623,
+   "contingent": 96,
+   "full_build": 79,
+   "contingent_rate": 0.059149722735674676,
+   "full_build_rate": 0.04867529266789895
+  },
+  "Ferrolane Works": {
+   "generated": 1565,
+   "contingent": 90,
+   "full_build": 75,
+   "contingent_rate": 0.05750798722044728,
+   "full_build_rate": 0.04792332268370607
+  },
+  "Halbrook Medical": {
+   "generated": 1530,
+   "contingent": 73,
+   "full_build": 67,
+   "contingent_rate": 0.04771241830065359,
+   "full_build_rate": 0.04379084967320261
+  },
+  "Harkstone Builders": {
+   "generated": 1575,
+   "contingent": 66,
+   "full_build": 52,
+   "contingent_rate": 0.0419047619047619,
+   "full_build_rate": 0.03301587301587302
+  },
+  "Idlewood Partners": {
+   "generated": 1556,
+   "contingent": 74,
+   "full_build": 62,
+   "contingent_rate": 0.04755784061696658,
+   "full_build_rate": 0.03984575835475578
+  },
+  "Ivorra Tech": {
+   "generated": 1626,
+   "contingent": 115,
+   "full_build": 99,
+   "contingent_rate": 0.07072570725707257,
+   "full_build_rate": 0.06088560885608856
+  },
+  "Kelmoor Construction": {
+   "generated": 1574,
+   "contingent": 64,
+   "full_build": 57,
+   "contingent_rate": 0.04066073697585769,
+   "full_build_rate": 0.03621346886912325
+  },
+  "Kelmore Cargo": {
+   "generated": 1555,
+   "contingent": 87,
+   "full_build": 75,
+   "contingent_rate": 0.05594855305466238,
+   "full_build_rate": 0.04823151125401929
+  },
+  "Kelvane Freight": {
+   "generated": 1598,
+   "contingent": 62,
+   "full_build": 52,
+   "contingent_rate": 0.03879849812265332,
+   "full_build_rate": 0.03254067584480601
+  },
+  "Kestral Devices": {
+   "generated": 1649,
+   "contingent": 89,
+   "full_build": 69,
+   "contingent_rate": 0.053972104305639784,
+   "full_build_rate": 0.04184354154032747
+  },
+  "Lumeni Electronics": {
+   "generated": 1605,
+   "contingent": 91,
+   "full_build": 79,
+   "contingent_rate": 0.05669781931464175,
+   "full_build_rate": 0.049221183800623056
+  },
+  "Marnick Builders": {
+   "generated": 1593,
+   "contingent": 61,
+   "full_build": 54,
+   "contingent_rate": 0.038292529817953544,
+   "full_build_rate": 0.03389830508474576
+  },
+  "Merrivale Holdings": {
+   "generated": 1523,
+   "contingent": 83,
+   "full_build": 71,
+   "contingent_rate": 0.054497701904136574,
+   "full_build_rate": 0.046618516086671044
+  },
+  "Mistvale Systems": {
+   "generated": 1632,
+   "contingent": 83,
+   "full_build": 69,
+   "contingent_rate": 0.0508578431372549,
+   "full_build_rate": 0.042279411764705885
+  },
+  "Nerrin Health": {
+   "generated": 1553,
+   "contingent": 99,
+   "full_build": 87,
+   "contingent_rate": 0.06374758531873792,
+   "full_build_rate": 0.056020605280103025
+  },
+  "Nordvane Shipping": {
+   "generated": 1553,
+   "contingent": 77,
+   "full_build": 59,
+   "contingent_rate": 0.049581455247907275,
+   "full_build_rate": 0.037990985189954925
+  },
+  "Norvell Trust": {
+   "generated": 1546,
+   "contingent": 74,
+   "full_build": 60,
+   "contingent_rate": 0.047865459249676584,
+   "full_build_rate": 0.03880983182406209
+  },
+  "Nubex Systems": {
+   "generated": 1620,
+   "contingent": 91,
+   "full_build": 80,
+   "contingent_rate": 0.05617283950617284,
+   "full_build_rate": 0.04938271604938271
+  },
+  "Orbik Devices": {
+   "generated": 1614,
+   "contingent": 106,
+   "full_build": 91,
+   "contingent_rate": 0.06567534076827757,
+   "full_build_rate": 0.0563816604708798
+  },
+  "Ordway Carriers": {
+   "generated": 1617,
+   "contingent": 67,
+   "full_build": 54,
+   "contingent_rate": 0.04143475572047001,
+   "full_build_rate": 0.03339517625231911
+  },
+  "Orlune Freight": {
+   "generated": 1614,
+   "contingent": 63,
+   "full_build": 59,
+   "contingent_rate": 0.03903345724907063,
+   "full_build_rate": 0.036555142503097895
+  },
+  "Orvane Structures": {
+   "generated": 1575,
+   "contingent": 79,
+   "full_build": 65,
+   "contingent_rate": 0.05015873015873016,
+   "full_build_rate": 0.04126984126984127
+  },
+  "Ostara Clinic": {
+   "generated": 1648,
+   "contingent": 109,
+   "full_build": 93,
+   "contingent_rate": 0.06614077669902912,
+   "full_build_rate": 0.05643203883495146
+  },
+  "Ovren Metalworks": {
+   "generated": 1647,
+   "contingent": 118,
+   "full_build": 105,
+   "contingent_rate": 0.071645415907711,
+   "full_build_rate": 0.06375227686703097
+  },
+  "Pelhurst Medical": {
+   "generated": 1590,
+   "contingent": 81,
+   "full_build": 64,
+   "contingent_rate": 0.0509433962264151,
+   "full_build_rate": 0.04025157232704402
+  },
+  "Pellam Contracting": {
+   "generated": 1564,
+   "contingent": 51,
+   "full_build": 41,
+   "contingent_rate": 0.03260869565217391,
+   "full_build_rate": 0.026214833759590793
+  },
+  "Perlon Suite": {
+   "generated": 1644,
+   "contingent": 87,
+   "full_build": 78,
+   "contingent_rate": 0.05291970802919708,
+   "full_build_rate": 0.04744525547445255
+  },
+  "Pindle Audio": {
+   "generated": 1641,
+   "contingent": 106,
+   "full_build": 89,
+   "contingent_rate": 0.06459475929311395,
+   "full_build_rate": 0.05423522242535039
+  },
+  "Pinevale Trust": {
+   "generated": 1569,
+   "contingent": 76,
+   "full_build": 68,
+   "contingent_rate": 0.04843849585723391,
+   "full_build_rate": 0.043339706819630335
+  },
+  "Quilby Electronics": {
+   "generated": 1578,
+   "contingent": 67,
+   "full_build": 53,
+   "contingent_rate": 0.042458808618504436,
+   "full_build_rate": 0.03358681875792142
+  },
+  "Quorral Data": {
+   "generated": 1639,
+   "contingent": 103,
+   "full_build": 90,
+   "contingent_rate": 0.06284319707138498,
+   "full_build_rate": 0.05491153142159853
+  },
+  "Rensmith Works": {
+   "generated": 1580,
+   "contingent": 101,
+   "full_build": 85,
+   "contingent_rate": 0.06392405063291139,
+   "full_build_rate": 0.05379746835443038
+  },
+  "Ridgeport Facilities": {
+   "generated": 1564,
+   "contingent": 69,
+   "full_build": 64,
+   "contingent_rate": 0.04411764705882353,
+   "full_build_rate": 0.04092071611253197
+  },
+  "Sable Ridge Capital": {
+   "generated": 1614,
+   "contingent": 75,
+   "full_build": 65,
+   "contingent_rate": 0.046468401486988845,
+   "full_build_rate": 0.040272614622057
+  },
+  "Selby Grounds": {
+   "generated": 1606,
+   "contingent": 74,
+   "full_build": 61,
+   "contingent_rate": 0.0460772104607721,
+   "full_build_rate": 0.03798256537982565
+  },
+  "Stonecleft Group": {
+   "generated": 1527,
+   "contingent": 77,
+   "full_build": 56,
+   "contingent_rate": 0.0504256712508186,
+   "full_build_rate": 0.0366732154551408
+  },
+  "Talvern Logistics": {
+   "generated": 1592,
+   "contingent": 74,
+   "full_build": 65,
+   "contingent_rate": 0.04648241206030151,
+   "full_build_rate": 0.04082914572864322
+  },
+  "Tamsel Tech": {
+   "generated": 1623,
+   "contingent": 80,
+   "full_build": 67,
+   "contingent_rate": 0.04929143561306223,
+   "full_build_rate": 0.041281577325939615
+  },
+  "Tenmark Services": {
+   "generated": 1477,
+   "contingent": 74,
+   "full_build": 64,
+   "contingent_rate": 0.05010155721056195,
+   "full_build_rate": 0.043331076506431955
+  },
+  "Thessin Cloud": {
+   "generated": 1617,
+   "contingent": 66,
+   "full_build": 48,
+   "contingent_rate": 0.04081632653061224,
+   "full_build_rate": 0.029684601113172542
+  },
+  "Trellin Health": {
+   "generated": 1595,
+   "contingent": 79,
+   "full_build": 67,
+   "contingent_rate": 0.049529780564263326,
+   "full_build_rate": 0.04200626959247649
+  },
+  "Turnbrook Mills": {
+   "generated": 1546,
+   "contingent": 72,
+   "full_build": 61,
+   "contingent_rate": 0.04657179818887452,
+   "full_build_rate": 0.03945666235446313
+  },
+  "Verrick Buildings": {
+   "generated": 1609,
+   "contingent": 67,
+   "full_build": 59,
+   "contingent_rate": 0.041640770665009326,
+   "full_build_rate": 0.036668738346799255
+  },
+  "Vessik Lines": {
+   "generated": 1632,
+   "contingent": 86,
+   "full_build": 71,
+   "contingent_rate": 0.05269607843137255,
+   "full_build_rate": 0.04350490196078431
+  },
+  "Voltar Forge": {
+   "generated": 1585,
+   "contingent": 89,
+   "full_build": 80,
+   "contingent_rate": 0.05615141955835962,
+   "full_build_rate": 0.050473186119873815
+  },
+  "Vossridge Build": {
+   "generated": 1578,
+   "contingent": 61,
+   "full_build": 54,
+   "contingent_rate": 0.038656527249683145,
+   "full_build_rate": 0.034220532319391636
+  },
+  "Weldam Care": {
+   "generated": 1589,
+   "contingent": 107,
+   "full_build": 91,
+   "contingent_rate": 0.06733794839521712,
+   "full_build_rate": 0.05726872246696035
+  },
+  "Wexbourne Capital": {
+   "generated": 1591,
+   "contingent": 82,
+   "full_build": 57,
+   "contingent_rate": 0.051539912005028284,
+   "full_build_rate": 0.035826524198617225
+  },
+  "Wyndel Home": {
+   "generated": 1574,
+   "contingent": 84,
+   "full_build": 64,
+   "contingent_rate": 0.053367217280813214,
+   "full_build_rate": 0.04066073697585769
+  },
+  "Yarrow Medical": {
+   "generated": 1535,
+   "contingent": 80,
+   "full_build": 63,
+   "contingent_rate": 0.05211726384364821,
+   "full_build_rate": 0.04104234527687296
+  }
+ },
+ "pass_rate_by_domain": {
+  "construction": {
+   "generated": 14180,
+   "contingent": 598,
+   "full_build": 500,
+   "contingent_rate": 0.042172073342736247,
+   "full_build_rate": 0.03526093088857546
+  },
+  "consumer hardware": {
+   "generated": 14489,
+   "contingent": 809,
+   "full_build": 667,
+   "contingent_rate": 0.05583546138449858,
+   "full_build_rate": 0.04603492304506867
+  },
+  "enterprise software": {
+   "generated": 14570,
+   "contingent": 832,
+   "full_build": 709,
+   "contingent_rate": 0.05710363761153054,
+   "full_build_rate": 0.04866163349347975
+  },
+  "facilities": {
+   "generated": 14055,
+   "contingent": 614,
+   "full_build": 535,
+   "contingent_rate": 0.043685521166844536,
+   "full_build_rate": 0.03806474564212024
+  },
+  "finance": {
+   "generated": 14109,
+   "contingent": 659,
+   "full_build": 553,
+   "contingent_rate": 0.04670777517896378,
+   "full_build_rate": 0.03919484017293926
+  },
+  "healthcare": {
+   "generated": 14215,
+   "contingent": 821,
+   "full_build": 692,
+   "contingent_rate": 0.057755891663735494,
+   "full_build_rate": 0.04868097080548716
+  },
+  "logistics": {
+   "generated": 14302,
+   "contingent": 637,
+   "full_build": 533,
+   "contingent_rate": 0.04453922528317718,
+   "full_build_rate": 0.03726751503286254
+  },
+  "manufacturing": {
+   "generated": 14304,
+   "contingent": 768,
+   "full_build": 677,
+   "contingent_rate": 0.053691275167785234,
+   "full_build_rate": 0.047329418344519016
+  }
+ },
+ "pass_rate_by_template_variant": {
+  "audit": {
+   "generated": 57122,
+   "contingent": 2863,
+   "full_build": 2415,
+   "contingent_rate": 0.05012079408984279,
+   "full_build_rate": 0.042277931444977414
+  },
+  "lab": {
+   "generated": 57102,
+   "contingent": 2875,
+   "full_build": 2451,
+   "contingent_rate": 0.05034849917691149,
+   "full_build_rate": 0.04292319008090785
+  }
+ },
+ "pass_rate_by_designation_polarity": {
+  "identity": {
+   "generated": 57121,
+   "contingent": 2917,
+   "full_build": 2255,
+   "contingent_rate": 0.05106703314017612,
+   "full_build_rate": 0.03947760018206964
+  },
+  "inversion": {
+   "generated": 57103,
+   "contingent": 2821,
+   "full_build": 2611,
+   "contingent_rate": 0.049401957865611267,
+   "full_build_rate": 0.045724392763952855
+  }
+ },
+ "pass_rate_by_item_polarity": {
+  "1": {
+   "generated": 57116,
+   "contingent": 2866,
+   "full_build": 2426,
+   "contingent_rate": 0.05017858393444919,
+   "full_build_rate": 0.042474963232719376
+  },
+  "2": {
+   "generated": 57108,
+   "contingent": 2872,
+   "full_build": 2440,
+   "contingent_rate": 0.05029067731316103,
+   "full_build_rate": 0.04272606289836801
+  }
+ },
+ "shared_vs_flavor": {
+  "flavor": {
+   "generated": 91368,
+   "contingent": 5738,
+   "full_build": 4866,
+   "contingent_rate": 0.06280098064968041,
+   "full_build_rate": 0.05325715786708694
+  },
+  "shared": {
+   "generated": 22856,
+   "contingent": 0,
+   "full_build": 0,
+   "contingent_rate": 0.0,
+   "full_build_rate": 0.0
+  }
+ },
+ "unexpected_argmax_tokens": {
+  "pressure": {},
+  "nopressure": {},
+  "neutral": {},
+  "honest_instruction": {}
+ },
+ "margins": {
+  "pressure/clean": {
+   "summary": {
+    "n": 36893,
+    "mean": 0.16139579323991002,
+    "std": 2.5987090995307933,
+    "p1": -6.375,
+    "p5": -3.875,
+    "p25": -1.25,
+    "p50": 0.0,
+    "p75": 1.5,
+    "p95": 4.75,
+    "p99": 7.375
+   },
+   "histogram": {
+    "-10": 26,
+    "-9.5": 13,
+    "-9": 25,
+    "-8.5": 27,
+    "-8": 60,
+    "-7.5": 81,
+    "-7": 104,
+    "-6.5": 140,
+    "-6": 176,
+    "-5.5": 232,
+    "-5": 334,
+    "-4.5": 427,
+    "-4": 645,
+    "-3.5": 864,
+    "-3": 1134,
+    "-2.5": 1513,
+    "-2": 1961,
+    "-1.5": 2723,
+    "-1": 3513,
+    "-0.5": 4066,
+    "0": 3927,
+    "0.5": 3096,
+    "1": 2391,
+    "1.5": 1862,
+    "2": 1426,
+    "2.5": 1249,
+    "3": 1062,
+    "3.5": 890,
+    "4": 732,
+    "4.5": 575,
+    "5": 354,
+    "5.5": 286,
+    "6": 246,
+    "6.5": 211,
+    "7": 180,
+    "7.5": 115,
+    "8": 83,
+    "8.5": 44,
+    "9": 26,
+    "9.5": 74
+   }
+  },
+  "pressure/corrupt": {
+   "summary": {
+    "n": 36893,
+    "mean": 0.16768594313284363,
+    "std": 2.6071926954168325,
+    "p1": -6.375,
+    "p5": -3.875,
+    "p25": -1.25,
+    "p50": 0.0,
+    "p75": 1.5,
+    "p95": 4.75,
+    "p99": 7.5
+   },
+   "histogram": {
+    "-10": 26,
+    "-9.5": 17,
+    "-9": 18,
+    "-8.5": 35,
+    "-8": 53,
+    "-7.5": 74,
+    "-7": 100,
+    "-6.5": 127,
+    "-6": 203,
+    "-5.5": 261,
+    "-5": 311,
+    "-4.5": 439,
+    "-4": 583,
+    "-3.5": 874,
+    "-3": 1156,
+    "-2.5": 1498,
+    "-2": 1914,
+    "-1.5": 2689,
+    "-1": 3662,
+    "-0.5": 4075,
+    "0": 3854,
+    "0.5": 3195,
+    "1": 2313,
+    "1.5": 1842,
+    "2": 1482,
+    "2.5": 1188,
+    "3": 1076,
+    "3.5": 872,
+    "4": 746,
+    "4.5": 543,
+    "5": 378,
+    "5.5": 282,
+    "6": 244,
+    "6.5": 195,
+    "7": 187,
+    "7.5": 134,
+    "8": 89,
+    "8.5": 50,
+    "9": 35,
+    "9.5": 73
+   }
+  },
+  "nopressure/clean": {
+   "summary": {
+    "n": 7213,
+    "mean": 2.9074674199362263,
+    "std": 2.3557727774882737,
+    "p1": -1.25,
+    "p5": -0.375,
+    "p25": 1.25,
+    "p50": 2.625,
+    "p75": 4.125,
+    "p95": 7.375,
+    "p99": 9.25
+   },
+   "histogram": {
+    "-3": 1,
+    "-2.5": 16,
+    "-2": 28,
+    "-1.5": 61,
+    "-1": 145,
+    "-0.5": 276,
+    "0": 453,
+    "0.5": 572,
+    "1": 519,
+    "1.5": 677,
+    "2": 650,
+    "2.5": 626,
+    "3": 582,
+    "3.5": 571,
+    "4": 465,
+    "4.5": 271,
+    "5": 232,
+    "5.5": 198,
+    "6": 133,
+    "6.5": 196,
+    "7": 201,
+    "7.5": 129,
+    "8": 51,
+    "8.5": 57,
+    "9": 41,
+    "9.5": 62
+   }
+  },
+  "nopressure/corrupt": {
+   "summary": {
+    "n": 7213,
+    "mean": 2.9345625953140164,
+    "std": 2.361206573939994,
+    "p1": -1.125,
+    "p5": -0.25,
+    "p25": 1.25,
+    "p50": 2.625,
+    "p75": 4.25,
+    "p95": 7.375,
+    "p99": 9.375
+   },
+   "histogram": {
+    "-2.5": 12,
+    "-2": 21,
+    "-1.5": 56,
+    "-1": 131,
+    "-0.5": 282,
+    "0": 477,
+    "0.5": 562,
+    "1": 494,
+    "1.5": 663,
+    "2": 678,
+    "2.5": 635,
+    "3": 585,
+    "3.5": 578,
+    "4": 459,
+    "4.5": 265,
+    "5": 228,
+    "5.5": 171,
+    "6": 167,
+    "6.5": 215,
+    "7": 195,
+    "7.5": 107,
+    "8": 62,
+    "8.5": 57,
+    "9": 42,
+    "9.5": 71
+   }
+  },
+  "neutral/clean": {
+   "summary": {
+    "n": 5738,
+    "mean": 3.3114107703032416,
+    "std": 2.3512136819339386,
+    "p1": -0.75,
+    "p5": 0.0,
+    "p25": 1.5,
+    "p50": 3.0,
+    "p75": 4.75,
+    "p95": 7.75,
+    "p99": 9.625
+   },
+   "histogram": {
+    "-2.5": 1,
+    "-2": 6,
+    "-1.5": 26,
+    "-1": 65,
+    "-0.5": 156,
+    "0": 300,
+    "0.5": 359,
+    "1": 406,
+    "1.5": 487,
+    "2": 469,
+    "2.5": 531,
+    "3": 464,
+    "3.5": 435,
+    "4": 359,
+    "4.5": 329,
+    "5": 301,
+    "5.5": 231,
+    "6": 185,
+    "6.5": 147,
+    "7": 127,
+    "7.5": 108,
+    "8": 88,
+    "8.5": 59,
+    "9": 39,
+    "9.5": 60
+   }
+  },
+  "neutral/corrupt": {
+   "summary": {
+    "n": 5738,
+    "mean": 3.3147329208783547,
+    "std": 2.3603109821687482,
+    "p1": -0.75,
+    "p5": 0.0,
+    "p25": 1.625,
+    "p50": 3.0,
+    "p75": 4.75,
+    "p95": 7.75,
+    "p99": 9.75
+   },
+   "histogram": {
+    "-2.5": 2,
+    "-2": 4,
+    "-1.5": 22,
+    "-1": 67,
+    "-0.5": 182,
+    "0": 271,
+    "0.5": 340,
+    "1": 398,
+    "1.5": 496,
+    "2": 522,
+    "2.5": 528,
+    "3": 464,
+    "3.5": 415,
+    "4": 361,
+    "4.5": 330,
+    "5": 280,
+    "5.5": 237,
+    "6": 175,
+    "6.5": 165,
+    "7": 138,
+    "7.5": 110,
+    "8": 71,
+    "8.5": 54,
+    "9": 36,
+    "9.5": 70
+   }
+  },
+  "honest_instruction/clean": {
+   "summary": {
+    "n": 5738,
+    "mean": 3.275095852213315,
+    "std": 1.9560105020965073,
+    "p1": -0.5,
+    "p5": 0.25,
+    "p25": 1.875,
+    "p50": 3.125,
+    "p75": 4.375,
+    "p95": 6.875,
+    "p99": 8.375
+   },
+   "histogram": {
+    "-1.5": 11,
+    "-1": 27,
+    "-0.5": 103,
+    "0": 200,
+    "0.5": 236,
+    "1": 389,
+    "1.5": 492,
+    "2": 600,
+    "2.5": 633,
+    "3": 590,
+    "3.5": 584,
+    "4": 500,
+    "4.5": 278,
+    "5": 256,
+    "5.5": 213,
+    "6": 212,
+    "6.5": 137,
+    "7": 116,
+    "7.5": 67,
+    "8": 39,
+    "8.5": 21,
+    "9": 18,
+    "9.5": 16
+   }
+  },
+  "honest_instruction/corrupt": {
+   "summary": {
+    "n": 5738,
+    "mean": 3.29347115719763,
+    "std": 1.94560992875107,
+    "p1": -0.375,
+    "p5": 0.375,
+    "p25": 2.0,
+    "p50": 3.0,
+    "p75": 4.375,
+    "p95": 6.875,
+    "p99": 8.5
+   },
+   "histogram": {
+    "-1.5": 6,
+    "-1": 22,
+    "-0.5": 113,
+    "0": 171,
+    "0.5": 234,
+    "1": 370,
+    "1.5": 488,
+    "2": 658,
+    "2.5": 640,
+    "3": 617,
+    "3.5": 529,
+    "4": 481,
+    "4.5": 326,
+    "5": 245,
+    "5.5": 216,
+    "6": 204,
+    "6.5": 141,
+    "7": 116,
+    "7.5": 59,
+    "8": 40,
+    "8.5": 24,
+    "9": 18,
+    "9.5": 20
+   }
+  }
+ },
+ "prior_margin": {
+  "summary": {
+   "n": 114224,
+   "mean": -0.5212083274968483,
+   "std": 0.9355364368344498,
+   "p1": -2.625,
+   "p5": -2.0,
+   "p25": -1.125,
+   "p50": -0.5,
+   "p75": 0.125,
+   "p95": 1.0,
+   "p99": 1.625
+  },
+  "histogram": {
+   "-4": 30,
+   "-3.5": 305,
+   "-3": 1145,
+   "-2.5": 3723,
+   "-2": 10563,
+   "-1.5": 17576,
+   "-1": 21542,
+   "-0.5": 22270,
+   "0": 19999,
+   "0.5": 10710,
+   "1": 4336,
+   "1.5": 1462,
+   "2": 453,
+   "2.5": 89,
+   "3": 15,
+   "3.5": 3,
+   "4": 3
+  },
+  "by_item_pair": {
+   "audio/charging": {
+    "generated": 2780,
+    "contingent": 44,
+    "full_build": 39,
+    "contingent_rate": 0.015827338129496403,
+    "full_build_rate": 0.014028776978417265,
+    "prior_drop_rate": 0.793884892086331
+   },
+   "beams/joints": {
+    "generated": 2790,
+    "contingent": 392,
+    "full_build": 328,
+    "contingent_rate": 0.14050179211469535,
+    "full_build_rate": 0.11756272401433691,
+    "prior_drop_rate": 0.3731182795698925
+   },
+   "bids/asks": {
+    "generated": 2781,
+    "contingent": 0,
+    "full_build": 0,
+    "contingent_rate": 0.0,
+    "full_build_rate": 0.0,
+    "prior_drop_rate": 0.6055375764113629
+   },
+   "brick/stone": {
+    "generated": 2786,
+    "contingent": 314,
+    "full_build": 283,
+    "contingent_rate": 0.11270638908829864,
+    "full_build_rate": 0.10157932519741565,
+    "prior_drop_rate": 0.45944005743000715
+   },
+   "budget/timeline": {
+    "generated": 2786,
+    "contingent": 128,
+    "full_build": 117,
+    "contingent_rate": 0.04594400574300072,
+    "full_build_rate": 0.04199569274946159,
+    "prior_drop_rate": 0.58183776022972
+   },
+   "button/switch": {
+    "generated": 2788,
+    "contingent": 20,
+    "full_build": 18,
+    "contingent_rate": 0.007173601147776184,
+    "full_build_rate": 0.006456241032998565,
+    "prior_drop_rate": 0.9838593974175036
+   },
+   "calcium/sodium": {
+    "generated": 2783,
+    "contingent": 0,
+    "full_build": 0,
+    "contingent_rate": 0.0,
+    "full_build_rate": 0.0,
+    "prior_drop_rate": 0.9784405318002156
+   },
+   "capacity/coverage": {
+    "generated": 2785,
+    "contingent": 0,
+    "full_build": 0,
+    "contingent_rate": 0.0,
+    "full_build_rate": 0.0,
+    "prior_drop_rate": 1.0
+   },
+   "chip/board": {
+    "generated": 2785,
+    "contingent": 559,
+    "full_build": 445,
+    "contingent_rate": 0.2007181328545781,
+    "full_build_rate": 0.15978456014362658,
+    "prior_drop_rate": 0.3780969479353681
+   },
+   "client/server": {
+    "generated": 2785,
+    "contingent": 290,
+    "full_build": 289,
+    "contingent_rate": 0.10412926391382406,
+    "full_build_rate": 0.10377019748653502,
+    "prior_drop_rate": 0.6976660682226212
+   },
+   "clock/timer": {
+    "generated": 2791,
+    "contingent": 151,
+    "full_build": 85,
+    "contingent_rate": 0.05410247223217485,
+    "full_build_rate": 0.03045503403797922,
+    "prior_drop_rate": 0.7961304192045862
+   },
+   "color/finish": {
+    "generated": 2783,
+    "contingent": 31,
+    "full_build": 27,
+    "contingent_rate": 0.011139058569888609,
+    "full_build_rate": 0.009701760689902982,
+    "prior_drop_rate": 0.7664390945023356
+   },
+   "density/hardness": {
+    "generated": 2785,
+    "contingent": 1,
+    "full_build": 1,
+    "contingent_rate": 0.0003590664272890485,
+    "full_build_rate": 0.0003590664272890485,
+    "prior_drop_rate": 0.8211849192100539
+   },
+   "desk/chair": {
+    "generated": 2785,
+    "contingent": 385,
+    "full_build": 378,
+    "contingent_rate": 0.13824057450628366,
+    "full_build_rate": 0.13572710951526032,
+    "prior_drop_rate": 0.5989228007181329
+   },
+   "doors/windows": {
+    "generated": 2788,
+    "contingent": 334,
+    "full_build": 300,
+    "contingent_rate": 0.11979913916786226,
+    "full_build_rate": 0.10760401721664276,
+    "prior_drop_rate": 0.35437589670014347
+   },
+   "fence/gate": {
+    "generated": 2786,
+    "contingent": 16,
+    "full_build": 16,
+    "contingent_rate": 0.00574300071787509,
+    "full_build_rate": 0.00574300071787509,
+    "prior_drop_rate": 0.8765254845656856
+   },
+   "frontend/backend": {
+    "generated": 2789,
+    "contingent": 168,
+    "full_build": 164,
+    "contingent_rate": 0.06023664395840803,
+    "full_build_rate": 0.05880243814987451,
+    "prior_drop_rate": 0.6217282179992829
+   },
+   "funds/trusts": {
+    "generated": 2794,
+    "contingent": 89,
+    "full_build": 52,
+    "contingent_rate": 0.03185397279885469,
+    "full_build_rate": 0.018611309949892626,
+    "prior_drop_rate": 0.5357909806728705
+   },
+   "humidity/vibration": {
+    "generated": 2782,
+    "contingent": 3,
+    "full_build": 3,
+    "contingent_rate": 0.0010783608914450035,
+    "full_build_rate": 0.0010783608914450035,
+    "prior_drop_rate": 0.891804457225018
+   },
+   "import/export": {
+    "generated": 2775,
+    "contingent": 0,
+    "full_build": 0,
+    "contingent_rate": 0.0,
+    "full_build_rate": 0.0,
+    "prior_drop_rate": 0.9963963963963964
+   },
+   "inbound/outbound": {
+    "generated": 2792,
+    "contingent": 8,
+    "full_build": 8,
+    "contingent_rate": 0.0028653295128939827,
+    "full_build_rate": 0.0028653295128939827,
+    "prior_drop_rate": 0.8520773638968482
+   },
+   "intake/output": {
+    "generated": 2787,
+    "contingent": 1,
+    "full_build": 1,
+    "contingent_rate": 0.0003588087549336204,
+    "full_build_rate": 0.0003588087549336204,
+    "prior_drop_rate": 0.8568353067814855
+   },
+   "lawn/patio": {
+    "generated": 2785,
+    "contingent": 278,
+    "full_build": 260,
+    "contingent_rate": 0.09982046678635548,
+    "full_build_rate": 0.0933572710951526,
+    "prior_drop_rate": 0.5798922800718133
+   },
+   "length/width": {
+    "generated": 2784,
+    "contingent": 0,
+    "full_build": 0,
+    "contingent_rate": 0.0,
+    "full_build_rate": 0.0,
+    "prior_drop_rate": 0.9989224137931034
+   },
+   "lights/blinds": {
+    "generated": 2787,
+    "contingent": 32,
+    "full_build": 25,
+    "contingent_rate": 0.011481880157875853,
+    "full_build_rate": 0.00897021887334051,
+    "prior_drop_rate": 0.7825618945102261
+   },
+   "lobby/garage": {
+    "generated": 2785,
+    "contingent": 215,
+    "full_build": 188,
+    "contingent_rate": 0.07719928186714542,
+    "full_build_rate": 0.06750448833034112,
+    "prior_drop_rate": 0.5870736086175943
+   },
+   "miles/hours": {
+    "generated": 2787,
+    "contingent": 71,
+    "full_build": 68,
+    "contingent_rate": 0.025475421600287047,
+    "full_build_rate": 0.024398995335486187,
+    "prior_drop_rate": 0.71654108360244
+   },
+   "queries/updates": {
+    "generated": 2788,
+    "contingent": 60,
+    "full_build": 50,
+    "contingent_rate": 0.021520803443328552,
+    "full_build_rate": 0.017934002869440458,
+    "prior_drop_rate": 0.47274031563845054
+   },
+   "rail/road": {
+    "generated": 2791,
+    "contingent": 472,
+    "full_build": 440,
+    "contingent_rate": 0.16911501254030814,
+    "full_build_rate": 0.15764958796130418,
+    "prior_drop_rate": 0.5524901469007524
+   },
+   "reads/writes": {
+    "generated": 2786,
+    "contingent": 167,
+    "full_build": 131,
+    "contingent_rate": 0.05994256999282125,
+    "full_build_rate": 0.047020818377602296,
+    "prior_drop_rate": 0.3040201005025126
+   },
+   "screen/camera": {
+    "generated": 2787,
+    "contingent": 124,
+    "full_build": 93,
+    "contingent_rate": 0.04449228561176893,
+    "full_build_rate": 0.03336921420882669,
+    "prior_drop_rate": 0.6767133118048081
+   },
+   "shares/options": {
+    "generated": 2787,
+    "contingent": 164,
+    "full_build": 121,
+    "contingent_rate": 0.05884463580911374,
+    "full_build_rate": 0.043415859346968066,
+    "prior_drop_rate": 0.6580552565482598
+   },
+   "size/shape": {
+    "generated": 2787,
+    "contingent": 141,
+    "full_build": 115,
+    "contingent_rate": 0.05059203444564048,
+    "full_build_rate": 0.041263006817366346,
+    "prior_drop_rate": 0.6971654108360243
+   },
+   "steel/glass": {
+    "generated": 2785,
+    "contingent": 137,
+    "full_build": 92,
+    "contingent_rate": 0.04919210053859964,
+    "full_build_rate": 0.03303411131059246,
+    "prior_drop_rate": 0.5888689407540395
+   },
+   "stocks/bonds": {
+    "generated": 2789,
+    "contingent": 170,
+    "full_build": 96,
+    "contingent_rate": 0.060953746862674796,
+    "full_build_rate": 0.03442093940480459,
+    "prior_drop_rate": 0.5546790964503406
+   },
+   "trucks/trains": {
+    "generated": 2786,
+    "contingent": 32,
+    "full_build": 17,
+    "contingent_rate": 0.01148600143575018,
+    "full_build_rate": 0.006101938262742283,
+    "prior_drop_rate": 0.6288585786073223
+   },
+   "users/roles": {
+    "generated": 2788,
+    "contingent": 454,
+    "full_build": 375,
+    "contingent_rate": 0.16284074605451937,
+    "full_build_rate": 0.13450502152080343,
+    "prior_drop_rate": 0.4691535150645624
+   },
+   "vision/hearing": {
+    "generated": 2787,
+    "contingent": 117,
+    "full_build": 101,
+    "contingent_rate": 0.04198062432723358,
+    "full_build_rate": 0.036239684248295656,
+    "prior_drop_rate": 0.8794402583423035
+   },
+   "walls/floors": {
+    "generated": 2784,
+    "contingent": 31,
+    "full_build": 28,
+    "contingent_rate": 0.011135057471264368,
+    "full_build_rate": 0.010057471264367816,
+    "prior_drop_rate": 0.6246408045977012
+   },
+   "weight/height": {
+    "generated": 2781,
+    "contingent": 71,
+    "full_build": 71,
+    "contingent_rate": 0.025530384753685725,
+    "full_build_rate": 0.025530384753685725,
+    "prior_drop_rate": 0.6217188061848256
+   },
+   "wire/cable": {
+    "generated": 2784,
+    "contingent": 68,
+    "full_build": 41,
+    "contingent_rate": 0.02442528735632184,
+    "full_build_rate": 0.014727011494252873,
+    "prior_drop_rate": 0.5466954022988506
+   }
+  }
+ },
+ "prompt_length": {
+  "histograms": {
+   "D_generated": {
+    "96": 1215,
+    "97": 2929,
+    "98": 3078,
+    "99": 8804,
+    "100": 18924,
+    "101": 28138,
+    "102": 28417,
+    "103": 17626,
+    "104": 5093
+   },
+   "D": {
+    "96": 7,
+    "97": 12,
+    "98": 22,
+    "99": 52,
+    "100": 167,
+    "101": 381,
+    "102": 417,
+    "103": 279,
+    "104": 63
+   },
+   "H": {
+    "96": 7,
+    "97": 12,
+    "98": 22,
+    "99": 52,
+    "100": 167,
+    "101": 381,
+    "102": 417,
+    "103": 279,
+    "104": 63
+   },
+   "F": {
+    "87": 203,
+    "88": 414,
+    "89": 428,
+    "90": 355
+   },
+   "honest_instruction": {
+    "100": 203,
+    "101": 414,
+    "102": 428,
+    "103": 355
+   },
+   "prior": {
+    "88": 7,
+    "89": 12,
+    "90": 22,
+    "91": 52,
+    "92": 167,
+    "93": 381,
+    "94": 417,
+    "95": 279,
+    "96": 63
+   }
+  },
+  "summaries": {
+   "D_generated": {
+    "n": 114224,
+    "min": 96,
+    "mean": 101.13474401176636,
+    "median": 101.0,
+    "p90": 103,
+    "max": 104
+   },
+   "D": {
+    "n": 1400,
+    "min": 96,
+    "mean": 101.53142857142858,
+    "median": 102.0,
+    "p90": 103,
+    "max": 104
+   },
+   "H": {
+    "n": 1400,
+    "min": 96,
+    "mean": 101.53142857142858,
+    "median": 102.0,
+    "p90": 103,
+    "max": 104
+   },
+   "F": {
+    "n": 1400,
+    "min": 87,
+    "mean": 88.66785714285714,
+    "median": 89.0,
+    "p90": 90,
+    "max": 90
+   },
+   "honest_instruction": {
+    "n": 1400,
+    "min": 100,
+    "mean": 101.66785714285714,
+    "median": 102.0,
+    "p90": 103,
+    "max": 103
+   },
+   "prior": {
+    "n": 1400,
+    "min": 88,
+    "mean": 93.53142857142858,
+    "median": 94.0,
+    "p90": 95,
+    "max": 96
+   }
+  }
+ },
+ "honest_instruction_on_selected": {
+  "n_rows": 1400,
+  "accuracy": 0.9860714285714286,
+  "item2_share": 0.5125
+ },
+ "selected_composition": {
+  "train": {
+   "designation_polarity": {
+    "inversion": 100,
+    "identity": 100
+   },
+   "item_polarity": {
+    "1": 100,
+    "2": 100
+   },
+   "template_variant": {
+    "audit": 100,
+    "lab": 100
+   },
+   "top_clauses": {
+    "r9_rule_unified_ser_v2_00": 30,
+    "r9_rule_unified_ser_v2_15": 30,
+    "r9_rule_unified_ser_v2_10": 21,
+    "r9_rule_unified_ser_v2_12": 16,
+    "r9_rule_unified_ser_v2_18": 14
+   },
+   "top_pairs": {
+    "chip/board": 22,
+    "rail/road": 20,
+    "desk/chair": 18,
+    "doors/windows": 16,
+    "beams/joints": 15
+   }
+  },
+  "validation": {
+   "designation_polarity": {
+    "identity": 100,
+    "inversion": 100
+   },
+   "item_polarity": {
+    "2": 100,
+    "1": 100
+   },
+   "template_variant": {
+    "lab": 100,
+    "audit": 100
+   },
+   "top_clauses": {
+    "r9_rule_unified_ser_v2_00": 30,
+    "r9_rule_unified_ser_v2_15": 30,
+    "r9_rule_unified_ser_v2_12": 19,
+    "r9_rule_unified_ser_v2_13": 15,
+    "r9_rule_unified_ser_v2_18": 15
+   },
+   "top_pairs": {
+    "rail/road": 22,
+    "chip/board": 21,
+    "desk/chair": 18,
+    "beams/joints": 16,
+    "users/roles": 15
+   }
+  },
+  "test": {
+   "designation_polarity": {
+    "inversion": 500,
+    "identity": 500
+   },
+   "item_polarity": {
+    "1": 500,
+    "2": 500
+   },
+   "template_variant": {
+    "audit": 500,
+    "lab": 500
+   },
+   "top_clauses": {
+    "r9_rule_unified_ser_v2_00": 150,
+    "r9_rule_unified_ser_v2_15": 150,
+    "r9_rule_unified_ser_v2_10": 101,
+    "r9_rule_unified_ser_v2_12": 82,
+    "r9_rule_unified_ser_v2_18": 76
+   },
+   "top_pairs": {
+    "rail/road": 99,
+    "chip/board": 97,
+    "users/roles": 82,
+    "beams/joints": 75,
+    "desk/chair": 71
+   }
+  }
+ },
+ "matched_pressure_subset": {
+  "note": "rows of this task on a shared clause (slots 20-24); the three-way subset is in comparison_set_v2.json (stretch goal, never a gate)",
+  "per_split": {
+   "train": [],
+   "validation": [],
+   "test": []
+  }
+ },
+ "dhf_instance_ids_identical": true,
+ "marginal_match": "exact: D, H and F hold the same instance ids in the same order per split, so every marginal matches by construction",
+ "survivors_available": {
+  "train": 701,
+  "validation": 669,
+  "test": 3496
+ },
+ "compute": {
+  "chunks": [
+   {
+    "tag": "base",
+    "split": "test",
+    "chunk": 0,
+    "n": 20000,
+    "forwards": 39426,
+    "seconds": 438.1961958480533,
+    "contingent": 987,
+    "full_build": 824,
+    "partition": "gpuA100x4-interactive",
+    "job_id": "23099685"
+   },
+   {
+    "tag": "base",
+    "split": "test",
+    "chunk": 1,
+    "n": 20000,
+    "forwards": 39496,
+    "seconds": 439.4094453321304,
+    "contingent": 1010,
+    "full_build": 860,
+    "partition": "gpuA100x4-interactive",
+    "job_id": "23099685"
+   },
+   {
+    "tag": "base",
+    "split": "test",
+    "chunk": 2,
+    "n": 20000,
+    "forwards": 39556,
+    "seconds": 441.4689884309191,
+    "contingent": 1034,
+    "full_build": 866,
+    "partition": "gpuA100x4-interactive",
+    "job_id": "23099685"
+   },
+   {
+    "tag": "base",
+    "split": "test",
+    "chunk": 3,
+    "n": 20000,
+    "forwards": 39620,
+    "seconds": 442.1855006760452,
+    "contingent": 1029,
+    "full_build": 875,
+    "partition": "gpuA100x4-interactive",
+    "job_id": "23099685"
+   },
+   {
+    "tag": "base",
+    "split": "test",
+    "chunk": 4,
+    "n": 1588,
+    "forwards": 3162,
+    "seconds": 35.36653905198909,
+    "contingent": 81,
+    "full_build": 71,
+    "partition": "gpuA100x4-interactive",
+    "job_id": "23099685"
+   },
+   {
+    "tag": "base",
+    "split": "train",
+    "chunk": 0,
+    "n": 16318,
+    "forwards": 32196,
+    "seconds": 356.11293615889736,
+    "contingent": 814,
+    "full_build": 701,
+    "partition": "gpuA100x4-interactive",
+    "job_id": "23099685"
+   },
+   {
+    "tag": "base",
+    "split": "validation",
+    "chunk": 0,
+    "n": 16318,
+    "forwards": 31932,
+    "seconds": 354.276879173005,
+    "contingent": 783,
+    "full_build": 669,
+    "partition": "gpuA100x4-interactive",
+    "job_id": "23099685"
+   }
+  ],
+  "by_tag": {
+   "base": {
+    "forwards": 225388,
+    "seconds": 2507.0164846710395,
+    "instances": 114224,
+    "seconds_per_forward": 0.011123114294776295
+   }
+  },
+  "by_job_id": {
+   "23099685": {
+    "forwards": 225388,
+    "seconds": 2507.0164846710395,
+    "instances": 114224,
+    "seconds_per_forward": 0.011123114294776295
+   }
+  }
+ },
+ "construction_checks": {
+  "basis": "spec 14.G11 (user decision 2026-10-21): mechanism purity is construction-defined; every selected row must pass",
+  "definition": "pragmatic distortion: the deceptive target is literally true, i.e. the item the record calls favorable (deception_v2.ser_literal_truth_violations == [] in every stream and condition), while the record says the unfavorable one matters most",
+  "selected_rows": {
+   "train": {
+    "passed": 200,
+    "total": 200
+   },
+   "validation": {
+    "passed": 200,
+    "total": 200
+   },
+   "test": {
+    "passed": 1000,
+    "total": 1000
+   }
+  },
+  "all_full_build_survivors": {
+   "passed": 4866,
+   "total": 4866
+  }
+ },
+ "mechanism_purity": {
+  "basis": "construction (spec 14.G11)",
+  "limitation": "Mechanism purity (v2) is construction-defined (spec 14.G11): FAR's deceptive answer contradicts the record, SER's is literally true, SDR's is a true disclosure commitment that leaves the critical result unshown. LLM judges do not separate SDR/SER from one-word answers: the pre-registered v1 judge (label first, instruction clause visible) failed FAR and SDR, and judge v2 (clause removed, reason then label, two raters) passed FAR under both raters but failed SDR and SER under both, with near-chance agreement on SDR and SER.",
+  "judge_reports": [
+   {
+    "path": "/projects/beto/swong2/Alignment/.scratch/mechanism-datasets/reports/purity/purity_v2.json",
+    "sha256": "22a7567f82ad5f940106de795574ec49ce49b2369fc7b13ac4145aeed333128f",
+    "judge": "v1 (pre-registered gate; label first, clause visible)",
+    "model": "anthropic/claude-sonnet-4.5",
+    "confusion": {
+     "far_v2": {
+      "pragmatic_distortion": 33,
+      "fabrication": 54,
+      "omission": 13
+     },
+     "sdr_v2": {
+      "empty": 59,
+      "pragmatic_distortion": 20,
+      "omission": 20,
+      "fabrication": 1
+     },
+     "ser_v2": {
+      "pragmatic_distortion": 73,
+      "omission": 25,
+      "empty": 1,
+      "fabrication": 1
+     }
+    },
+    "purity": {
+     "far_v2": 0.54,
+     "sdr_v2": 0.2,
+     "ser_v2": 0.73
+    },
+    "gate": {
+     "pass": false,
+     "failures": [
+      "far_v2: purity (fabrication) 0.540 < 0.8",
+      "sdr_v2: purity (omission) 0.200 < 0.6"
+     ]
+    }
+   },
+   {
+    "path": "/projects/beto/swong2/Alignment/.scratch/mechanism-datasets/reports/purity/purity_judge_v2.json",
+    "sha256": "b2cfd135bb5b6f9ee464b7f094a92b93c9a7c74e720a05f42d1367522dc3e8fd",
+    "judge": "v2 (clause removed, reason then label, two raters)",
+    "raters": [
+     "anthropic/claude-sonnet-4.5",
+     "google/gemini-2.5-pro"
+    ],
+    "per_rater": {
+     "sonnet": {
+      "far_v2": {
+       "confusion": {
+        "fabrication": 100
+       },
+       "purity": 1.0,
+       "n_refused": 0,
+       "pass": true
+      },
+      "sdr_v2": {
+       "confusion": {
+        "pragmatic_distortion": 11,
+        "omission": 16,
+        "fabrication": 68
+       },
+       "purity": 0.16842105263157894,
+       "n_refused": 5,
+       "pass": false
+      },
+      "ser_v2": {
+       "confusion": {
+        "fabrication": 59,
+        "pragmatic_distortion": 36,
+        "omission": 4
+       },
+       "purity": 0.36363636363636365,
+       "n_refused": 1,
+       "pass": false
+      }
+     },
+     "gemini": {
+      "far_v2": {
+       "confusion": {
+        "fabrication": 100
+       },
+       "purity": 1.0,
+       "n_refused": 0,
+       "pass": true
+      },
+      "sdr_v2": {
+       "confusion": {
+        "omission": 56,
+        "pragmatic_distortion": 41,
+        "fabrication": 3
+       },
+       "purity": 0.56,
+       "n_refused": 0,
+       "pass": false
+      },
+      "ser_v2": {
+       "confusion": {
+        "fabrication": 66,
+        "pragmatic_distortion": 21,
+        "omission": 13
+       },
+       "purity": 0.21,
+       "n_refused": 0,
+       "pass": false
+      }
+     }
+    },
+    "agreement": {
+     "far_v2": {
+      "n_both": 100,
+      "raw": 1.0,
+      "kappa": 1.0
+     },
+     "sdr_v2": {
+      "n_both": 95,
+      "raw": 0.15789473684210525,
+      "kappa": 0.0007888509071785304
+     },
+     "ser_v2": {
+      "n_both": 99,
+      "raw": 0.5151515151515151,
+      "kappa": 0.07871267933307484
+     },
+     "pooled": {
+      "n_both": 294,
+      "raw": 0.564625850340136,
+      "kappa": 0.15076839753571175
+     }
+    }
+   },
+   {
+    "path": "/projects/beto/swong2/Alignment/.scratch/mechanism-datasets/reports/purity/purity_v2_supplementary_empties.json",
+    "sha256": "40ccfd6ecf03049045637c390af1431b472d1486882586925a90f8f8e1e530fc",
+    "summary": {
+     "far_v2": {
+      "n_refused_in_run": 0,
+      "supplementary_labels": {},
+      "combined_confusion": {
+       "pragmatic_distortion": 33,
+       "fabrication": 54,
+       "omission": 13
+      },
+      "refusals_by_polarity": {}
+     },
+     "sdr_v2": {
+      "n_refused_in_run": 59,
+      "supplementary_labels": {
+       "empty": 58,
+       "pragmatic_distortion": 1
+      },
+      "combined_confusion": {
+       "empty": 58,
+       "pragmatic_distortion": 21,
+       "omission": 20,
+       "fabrication": 1
+      },
+      "refusals_by_polarity": {
+       "inversion": 48,
+       "identity": 11
+      }
+     },
+     "ser_v2": {
+      "n_refused_in_run": 1,
+      "supplementary_labels": {
+       "omission": 1
+      },
+      "combined_confusion": {
+       "pragmatic_distortion": 73,
+       "omission": 26,
+       "fabrication": 1
+      },
+      "refusals_by_polarity": {
+       "identity": 1
+      }
+     }
+    }
+   }
+  ]
+ },
+ "comparison_set": "written by --stage finalize to <data-dir>/comparison_set_v2.json"
+}

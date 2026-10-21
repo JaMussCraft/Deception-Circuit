@@ -1,0 +1,35 @@
+{
+ "task": "sdr_v2",
+ "mechanism": "omission",
+ "condition": "nopressure",
+ "honest_twin_kind": "nopressure",
+ "model": "meta-llama/Llama-3.1-8B-Instruct",
+ "margin_thresh": 0.3,
+ "prior_eps": 0.5,
+ "max_seq_length": 120,
+ "designation_words": [
+  "critical",
+  "harmless"
+ ],
+ "template_variants": [
+  "audit",
+  "lab"
+ ],
+ "framing_id": "r9_rule_unified",
+ "framing_family": "rule_instructed",
+ "pilot_cell": "r9_sdr_unified_on",
+ "suffix": "on",
+ "ser_wording": null,
+ "seed": 42,
+ "overgen_factor": 54.16728571428571,
+ "cap_used": 0.1,
+ "length_window": [
+  94,
+  106
+ ],
+ "train_samples": 200,
+ "val_samples": 200,
+ "test_samples": 1000,
+ "filtered": true,
+ "created": "2026-10-21"
+}

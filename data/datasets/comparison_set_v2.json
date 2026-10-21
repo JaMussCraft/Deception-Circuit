@@ -1,0 +1,107 @@
+{
+ "tasks_available": [
+  "far_v2",
+  "sdr_v2",
+  "ser_v2"
+ ],
+ "complete": true,
+ "note": "stretch goal (spec 8.4), never a gate",
+ "splits": {
+  "train": {
+   "per_task_sizes": {
+    "far_v2": 200,
+    "sdr_v2": 200,
+    "ser_v2": 200
+   },
+   "intersection_size": 5,
+   "instance_ids": [
+    "0b19c700f50f",
+    "0c63dfe6705f",
+    "0cb7355b905c",
+    "143ff30e38e8",
+    "173a886ea00a"
+   ],
+   "shared_clause_subset": []
+  },
+  "validation": {
+   "per_task_sizes": {
+    "far_v2": 200,
+    "sdr_v2": 200,
+    "ser_v2": 200
+   },
+   "intersection_size": 0,
+   "instance_ids": [],
+   "shared_clause_subset": []
+  },
+  "test": {
+   "per_task_sizes": {
+    "far_v2": 1000,
+    "sdr_v2": 1000,
+    "ser_v2": 1000
+   },
+   "intersection_size": 8,
+   "instance_ids": [
+    "00057d62f464",
+    "0113fbe24429",
+    "026cc1c6dc2a",
+    "040ed84f237d",
+    "076c1455cf93",
+    "094ffe9d4446",
+    "0d48339d37be",
+    "0fa5abbe6bfa"
+   ],
+   "shared_clause_subset": []
+  }
+ },
+ "d_prompt_band": {
+  "min": 94,
+  "max": 106,
+  "width": 12,
+  "limit": 12,
+  "ok": true
+ },
+ "median_gap": {
+  "medians": {
+   "far_v2": 97.0,
+   "sdr_v2": 102.0,
+   "ser_v2": 102.0
+  },
+  "gap": 5.0,
+  "limit": 6,
+  "ok": true
+ },
+ "d_prompt_histograms": {
+  "far_v2": {
+   "94": 32,
+   "95": 138,
+   "96": 238,
+   "97": 313,
+   "98": 313,
+   "99": 185,
+   "100": 79,
+   "101": 102
+  },
+  "sdr_v2": {
+   "98": 22,
+   "99": 93,
+   "100": 179,
+   "101": 272,
+   "102": 292,
+   "103": 248,
+   "104": 180,
+   "105": 87,
+   "106": 27
+  },
+  "ser_v2": {
+   "96": 7,
+   "97": 12,
+   "98": 22,
+   "99": 52,
+   "100": 167,
+   "101": 381,
+   "102": 417,
+   "103": 279,
+   "104": 63
+  }
+ }
+}
