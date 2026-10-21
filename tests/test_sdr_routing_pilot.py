@@ -312,3 +312,23 @@ def test_self_replacements_mask_padding_and_dummy_rows():
     patch=replacements[('head',0,0)]
     assert patch.positions.sum()==3 and patch.positions.shape==(8,128)
     assert not patch.positions[1:].any() and not patch.positions[0,3:].any()
+
+def test_spooled_slurm_wrapper_resolves_submit_worktree_from_unrelated_cwd(tmp_path):
+    import os
+    import shutil
+    import subprocess
+    import json
+    root=PATH.parents[1]
+    spool=tmp_path/'slurm-spool'/'job23066915'
+    spool.mkdir(parents=True)
+    wrapper=spool/'slurm_script'
+    shutil.copyfile(root/'scripts/sdr_routing_pilot.sbatch',wrapper)
+    unrelated=tmp_path/'unrelated-cwd';unrelated.mkdir()
+    output=tmp_path/'cpu-spooled-run'
+    env={**os.environ,'SLURM_JOB_ID':'cpu-spool-regression','SLURM_SUBMIT_DIR':str(root),'CUDA_VISIBLE_DEVICES':'','HF_HUB_OFFLINE':'1','TRANSFORMERS_OFFLINE':'1'}
+    result=subprocess.run(['bash',str(wrapper),'--dry-run','--output',str(output)],cwd=unrelated,env=env,text=True,capture_output=True,timeout=150)
+    assert result.returncode==0,result.stdout+result.stderr
+    manifest=json.loads((output/'manifest.json').read_text())
+    assert manifest['semantic_pass'] and len(manifest['groups'])==48
+    assert manifest['code_sha256'][str(root/'scripts/sdr_routing_pilot.py')]
+    assert json.loads((output/'cost.json').read_text())['actual_gpu_seconds']==0

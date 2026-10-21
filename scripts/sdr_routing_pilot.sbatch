@@ -6,7 +6,18 @@
 #SBATCH --gres=gpu:h200:1
 # Time/account/partition/output MUST be specified by the lead at submission.
 set -euo pipefail
-SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+# Slurm executes a spooled copy, so BASH_SOURCE is not the repository path.
+# Submit from the intended worktree (and use sbatch --chdir there explicitly).
+if [[ -n "${SLURM_JOB_ID:-}" ]]; then
+    : "${SLURM_SUBMIT_DIR:?submit from the pilot worktree}"
+    SCRIPT_DIR="$(cd -- "$SLURM_SUBMIT_DIR/scripts" && pwd -P)"
+else
+    SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+fi
+if [[ ! -r "$SCRIPT_DIR/sdr_routing_pilot.py" ]]; then
+    echo "Pilot runner missing from verified scripts directory: $SCRIPT_DIR" >&2
+    exit 2
+fi
 export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1
 export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 TOKENIZERS_PARALLELISM=false
 PYTHON=/u/swong2/.conda/envs/mgnp/bin/python
