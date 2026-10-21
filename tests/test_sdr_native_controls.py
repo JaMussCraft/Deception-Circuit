@@ -259,3 +259,239 @@ def test_allocation_deadline_binding_preserves_science_and_binds_proposal():
     assert bound['proposal_hash']==n.digest(proposal)
     assert bound['reserved_seconds']==600
     assert proposal['deadline_utc'].startswith('2099')
+
+# Sharding amendment: timing-only ranges and a single shared decoding path.
+def shard_inputs(protocol,tmp_path,monkeypatch):
+    p=copy.deepcopy(protocol);p['provenance']['code_commit']='a'*40;p['provenance_hash']=n.digest(p['provenance'])
+    hardware={'class':'A100','name':'NVIDIA A100-SXM4-40GB','capability':[8,0],'memory':42405855232,'count':1}
+    cal={'mode':'calibration','status':'completed','completed_rows':64,'controls_rows':64,'numerical_pass':True,'binding':n.runtime_binding(p,hardware),'max_forward_seconds':.5001186539884657,'max_active_checkpoint_seconds':.2579433477949351,'max_panel_checkpoint_seconds':.3328207810409367,'startup_seconds':26.179541178047657,'control_seconds':6.894779563648626,'io_seconds':9.83199412515387,'premodel_seconds':52.}
+    cancel=tmp_path/'cancel.json';cancel.write_text(json.dumps({'job_id':'23101635','state':'TERMINAL_CANCELLED_ZERO_ATTEMPTS','model_attempts':0,'source_unlock_evidence':True}))
+    ops={'hardware_class':'A100','reserved_seconds':3600,'deadline_utc':'2099-01-01T00:00:00+00:00','startup_buffer_seconds':120,'io_buffer_seconds':120,'shutdown_buffer_seconds':90,'registry_root':str((tmp_path/'registry').resolve()),'zero_attempt_receipt':str(cancel)}
+    monkeypatch.setattr(n,'SHARD_RELEASE_PATH',tmp_path/'release.json')
+    return p,cal,ops
+
+
+def test_shard_timing_plan_exact_ranges_science_and_no_outcomes(protocol,tmp_path,monkeypatch):
+    p,cal,ops=shard_inputs(protocol,tmp_path,monkeypatch)
+    before=copy.deepcopy(p['payload']);plan=n.build_shard_plan(p,cal,ops)
+    assert plan['batch_size']==30 and len(plan['ranges'])==13
+    assert [r['batch_range'] for r in plan['ranges']]==[[i,min(i+30,384)] for i in range(0,384,30)]
+    assert [rowid for r in plan['ranges'] for rowid in r['row_ids']]==[r['id'] for r in p['main']]
+    assert plan['premodel_headroom_seconds']==120 and plan['release_margin_seconds']==60
+    assert p['payload']==before
+    assert plan['ranges'][0]['forecast']['panel_payload_growth_factor']==48
+    altered={**cal,'irrelevant_responses':['different response'],'mean_tokens':1}
+    assert n.build_shard_plan(p,altered,ops)['ranges']==plan['ranges']
+    cal2={**cal,'premodel_seconds':200}
+    assert n.build_shard_plan(p,cal2,ops)['batch_size']<30
+    with pytest.raises(ValueError,match='fit'): n.build_shard_plan(p,{**cal,'max_forward_seconds':99999},ops)
+    n.verify_shard_plan(p,cal,plan)
+    bad=copy.deepcopy(plan);bad['ranges'][1]['batch_range'][0]-=1
+    with pytest.raises(ValueError): n.verify_shard_plan(p,cal,bad)
+
+
+def activate_plan(p,plan,tmp_path):
+    registry=Path(plan['registry_root']);registry.mkdir()
+    inventory=registry/'operator-inventory.json'
+    inventory.write_text(json.dumps({'scientific_hash':p['scientific_hash'],'plan_hash':plan['plan_hash'],'monolithic_submissions':[],'outputs':[]}))
+    n.SHARD_RELEASE_PATH.write_text(json.dumps({'status':'activated','scientific_hash':p['scientific_hash'],'provenance_hash':p['provenance_hash'],'plan_hash':plan['plan_hash'],'registry_root':plan['registry_root'],'operator_inventory_path':str(inventory)}))
+    return inventory
+
+
+def test_claim_exclusive_across_output_paths_and_orphan_blocks(protocol,tmp_path,monkeypatch):
+    p,cal,ops=shard_inputs(protocol,tmp_path,monkeypatch);plan=n.build_shard_plan(p,cal,ops)
+    inventory=activate_plan(p,plan,tmp_path)
+    outs=[str((tmp_path/name).resolve()) for name in ('first','alternate')]
+    inv=json.loads(inventory.read_text());inv['outputs']=outs;inventory.write_text(json.dumps(inv))
+    claim=n.claim_main_shard(p,plan,0,{'output':outs[0],'job_id':'test1','operations_hash':'ops'})
+    assert claim['batch_range']==[0,30]
+    with pytest.raises(ValueError,match='claim'): n.claim_main_shard(p,copy.deepcopy(plan),0,{'output':outs[1],'job_id':'test2','operations_hash':'ops'})
+    assert len(list((Path(plan['registry_root'])/'invocations').glob('*.json')))==2
+    assert len(list((Path(plan['registry_root'])/'claims').glob('*.json')))==1
+    with pytest.raises(ValueError,match='activated'): n.run_main(p,tmp_path/'monolith',ops)
+
+
+def completed_shards(p,cal,plan,tmp_path,inventory):
+    outputs=[]
+    for segment in plan['ranges']:
+        index=segment['index'];out=tmp_path/f'shard-{index}';out.mkdir();outputs.append(out)
+        inv=json.loads(inventory.read_text());inv['outputs'].append(str(out.resolve()));inventory.write_text(json.dumps(inv))
+        ops={**plan['policy'],'deadline_utc':'2099-01-01T00:00:00+00:00'};n.atomic_json(out/'operations.json',ops)
+        claim=n.claim_main_shard(p,plan,index,{'output':str(out),'job_id':f'cpu-{index}','operations_hash':n.digest(ops)})
+        first,stop=segment['batch_range'];gens=[]
+        for position,row in enumerate(p['main'][8*first:8*stop]):
+            controls=[{'control':name,'pass':True,'finite':True,'max_abs_error':0.,'identical_greedy':True,'tolerance':1e-5,'bitwise':True} for name in ('repeat','empty_hook')]
+            gens.append({'id':row['id'],'protocol_hash':p['scientific_hash'],'plan_hash':plan['plan_hash'],'global_batch_index':first+position//8,'physical_slot':position%8,'shard_index':index,'attempt_number':1,'generated_ids':[p['payload']['eos'][0]],'logical_readouts':[row['length']-1],'text':row['stem']+' answer','finish':'eos','status':'completed','controls':controls})
+        n.atomic_json(out/'generations.json',gens)
+        receipt={'mode':'main-shard','status':'completed','numerical_pass':True,'completed_rows':len(gens),'controls_rows':len(gens),'binding':cal['binding'],'plan_hash':plan['plan_hash'],'shard_index':index,'batch_range':[first,stop],'claim_hash':n.digest(claim),'predecessor_hash':claim['predecessor_hash'],'physical_forwards':3*(stop-first),'actual_gpu_seconds':10.,'allocation_elapsed_seconds':15.,'operations_hash':n.digest(ops)}
+        n.atomic_json(out/'receipt.json',receipt);(out/'attempts').mkdir()
+        for batch in range(first,stop):
+            n.atomic_json(out/'attempts'/f'{batch:03d}.json',{'global_batch_index':batch,'row_ids':[r['id'] for r in p['main'][8*batch:8*(batch+1)]],'claim_hash':n.digest(claim),'attempt_number':1})
+        n._claim_outcome(plan,claim,'completed',artifact_hashes={name:n.file_hash(out/name) for name in ('receipt.json','generations.json','operations.json')},attempt_hashes={f.name:n.file_hash(f) for f in (out/'attempts').glob('*.json')})
+    return outputs
+
+
+def test_merge_requires_complete_registry_not_selected_good_outputs(protocol,tmp_path,monkeypatch):
+    p,cal,ops=shard_inputs(protocol,tmp_path,monkeypatch);plan=n.build_shard_plan(p,cal,ops);inventory=activate_plan(p,plan,tmp_path)
+    outputs=completed_shards(p,cal,plan,tmp_path,inventory)
+    result=n.merge_shards(p,cal,plan,list(reversed(outputs)),tmp_path/'merged')
+    assert result['status']=='completed' and result['planned_rows']==result['completed_rows']==3072
+    merged=json.loads((tmp_path/'merged/generations.json').read_text())
+    assert [r['id'] for r in merged]==[r['id'] for r in p['main']]
+    assert len(n.export_blind_views(p,merged))>0
+    with pytest.raises(ValueError): n.merge_shards(p,cal,plan,outputs[:-1],tmp_path/'missing')
+    assert not (tmp_path/'missing/generations.json').exists()
+    # A failed extra invocation cannot be hidden by passing only the good dirs.
+    n._exclusive_json(Path(plan['registry_root'])/'invocations'/'extra.json',{'output':str(tmp_path/'unknown'),'shard_index':0})
+    with pytest.raises(ValueError): n.merge_shards(p,cal,plan,outputs,tmp_path/'bad')
+
+
+def test_merge_rejects_changed_bytes_controls_slots_and_attempts(protocol,tmp_path,monkeypatch):
+    p,cal,ops=shard_inputs(protocol,tmp_path,monkeypatch);plan=n.build_shard_plan(p,cal,ops);inventory=activate_plan(p,plan,tmp_path)
+    outputs=completed_shards(p,cal,plan,tmp_path,inventory)
+    genpath=outputs[0]/'generations.json';original=genpath.read_text();gens=json.loads(original);gens[0]['physical_slot']=7;genpath.write_text(json.dumps(gens))
+    with pytest.raises(ValueError): n.merge_shards(p,cal,plan,outputs,tmp_path/'slot')
+    genpath.write_text(original)
+    attempt=outputs[0]/'attempts/000.json';attempt.write_text('{}')
+    with pytest.raises(ValueError): n.merge_shards(p,cal,plan,outputs,tmp_path/'attempt')
+
+
+def fake_execution(monkeypatch,p,cal):
+    import torch
+    from types import SimpleNamespace
+    from component_analysis import hooks
+    hf=SimpleNamespace(config=SimpleNamespace(use_cache=True),training=False)
+    hf.eval=lambda:None
+    monkeypatch.setattr(n,'runtime_identity',lambda _:cal['binding']['hardware'])
+    monkeypatch.setattr(hooks,'load_analysis_model',lambda *a,**kw:object())
+    monkeypatch.setattr(hooks,'_hf',lambda _:hf)
+    monkeypatch.setattr(hooks,'device_and_dtype',lambda _:('cuda',torch.bfloat16))
+    monkeypatch.setattr(hooks,'attention_implementation',lambda _:'sdpa')
+    monkeypatch.setattr(torch.cuda,'max_memory_allocated',lambda:0)
+    monkeypatch.setattr(torch.cuda,'max_memory_reserved',lambda:0)
+    calls=[]
+    def complete(model,rows,protocol):
+        calls.append([r['id'] for r in rows]);result=[]
+        for slot,r in enumerate(rows):
+            result.append({'id':r['id'],'protocol_hash':p['scientific_hash'],'physical_slot':slot,'generated_ids':[p['payload']['eos'][0]],'logical_readouts':[r['length']-1],'finish':'eos','text':r['stem'],'status':'completed','controls':[{'control':name,'pass':True,'finite':True,'max_abs_error':0.,'identical_greedy':True,'tolerance':1e-5,'bitwise':True} for name in ('repeat','empty_hook')],'runtime':{'physical_forwards':3,'max_forward_seconds':.01,'control_seconds':.001}})
+        return result
+    monkeypatch.setattr(n,'complete_batch',complete)
+    return calls
+
+
+def test_shared_runtime_exact_global_slots_successor_and_tamper_stop(protocol,tmp_path,monkeypatch):
+    p,cal,ops=shard_inputs(protocol,tmp_path,monkeypatch);plan=n.build_shard_plan(p,cal,ops);inventory=activate_plan(p,plan,tmp_path)
+    calpath=tmp_path/'cal.json';calpath.write_text(json.dumps(cal));ops={**ops,'calibration_path':str(calpath)}
+    out=tmp_path/'actual-shard';inv=json.loads(inventory.read_text());inv['outputs']=[str(out.resolve())];inventory.write_text(json.dumps(inv))
+    calls=fake_execution(monkeypatch,p,cal)
+    receipt=n.run_main_shard(p,out,ops,plan,0)
+    assert receipt['completed_rows']==240 and len(calls)==30
+    assert calls==[[r['id'] for r in p['main'][i:i+8]] for i in range(0,240,8)]
+    rows=json.loads((out/'generations.json').read_text())
+    assert [(r['global_batch_index'],r['physical_slot']) for r in rows]==[(i//8,i%8) for i in range(240)]
+    assert (out/'attempts/029.json').exists()
+    # Changed predecessor bytes must stop successor before model/rows, not only merge.
+    (out/'generations.json').write_text('[]')
+    second=tmp_path/'second';inv['outputs'].append(str(second.resolve()));inventory.write_text(json.dumps(inv))
+    with pytest.raises(ValueError,match='drift'): n.run_main_shard(p,second,ops,plan,1)
+    assert len(calls)==30 and not second.exists()
+
+
+def test_runtime_attempted_failure_retains_ids_and_blocks_successors(protocol,tmp_path,monkeypatch):
+    p,cal,ops=shard_inputs(protocol,tmp_path,monkeypatch);plan=n.build_shard_plan(p,cal,ops);inventory=activate_plan(p,plan,tmp_path)
+    calpath=tmp_path/'cal.json';calpath.write_text(json.dumps(cal));ops={**ops,'calibration_path':str(calpath)}
+    out=tmp_path/'failed';inv=json.loads(inventory.read_text());inv['outputs']=[str(out.resolve())];inventory.write_text(json.dumps(inv));fake_execution(monkeypatch,p,cal)
+    def interrupted(model,rows,protocol):
+        partial=[{'id':r['id'],'generated_ids':[7],'controls':[],'finish':'pending'} for r in rows]
+        protocol['_checkpoint_batch'](partial,{'physical_forwards':1,'max_forward_seconds':.1,'control_seconds':0.})
+        raise TimeoutError('test allocation deadline')
+    monkeypatch.setattr(n,'complete_batch',interrupted)
+    with pytest.raises(TimeoutError): n.run_main_shard(p,out,ops,plan,0)
+    rows=json.loads((out/'generations.json').read_text())
+    assert len(rows)==240 and sum(r['status']=='error' for r in rows)==8
+    assert rows[0]['generated_ids']==[7] and rows[0]['global_batch_index']==0
+    assert sum(r['status']=='unattempted' for r in rows)==232
+    later=str((tmp_path/'later').resolve());inv['outputs'].append(later);inventory.write_text(json.dumps(inv))
+    with pytest.raises(ValueError,match='failed'): n.claim_main_shard(p,plan,1,{'output':later,'operations_hash':'ops'})
+
+
+def test_concurrent_claims_at_most_one_and_all_conflicts_recorded(protocol,tmp_path,monkeypatch):
+    from concurrent.futures import ThreadPoolExecutor
+    p,cal,ops=shard_inputs(protocol,tmp_path,monkeypatch);plan=n.build_shard_plan(p,cal,ops);inventory=activate_plan(p,plan,tmp_path)
+    outputs=[str((tmp_path/f'out{i}').resolve()) for i in range(2)]
+    inv=json.loads(inventory.read_text());inv['outputs']=outputs;inventory.write_text(json.dumps(inv))
+    def attempt(path):
+        try: return n.claim_main_shard(p,plan,0,{'output':path,'operations_hash':'ops'})
+        except ValueError: return None
+    with ThreadPoolExecutor(max_workers=2) as executor: result=list(executor.map(attempt,outputs))
+    assert sum(r is not None for r in result)==1
+    assert len(n._registry_records(plan,'invocations'))==2
+    assert len(n._registry_records(plan,'claims'))==1
+    assert len(n._registry_records(plan,'outcomes'))==1
+
+
+def test_shard_cli_dryrun_no_claim_and_merge_dryrun_no_generations(protocol,tmp_path,monkeypatch):
+    p,cal,ops=shard_inputs(protocol,tmp_path,monkeypatch);plan=n.build_shard_plan(p,cal,ops);activate_plan(p,plan,tmp_path)
+    paths={}
+    for name,obj in [('protocol',p),('calibration',cal),('operations',ops),('plan',plan)]:
+        path=tmp_path/(name+'.json');path.write_text(json.dumps(obj));paths[name]=path
+    n.main(['--mode','main-shard','--protocol',str(paths['protocol']),'--operations',str(paths['operations']),'--calibration',str(paths['calibration']),'--shard-plan',str(paths['plan']),'--shard-index','0','--output',str(tmp_path/'dry'),'--dry-run'])
+    assert not (Path(plan['registry_root'])/'claims').exists()
+    dry=json.loads((tmp_path/'dry/dry-run.json').read_text())
+    assert dry['model_loaded'] is False and dry['rows']==240
+    assert dry['release_status']=='blocked_pending_actual_GPU_identity_verification'
+
+
+def test_cli_source_preflight_failure_is_durably_registered(protocol,tmp_path,monkeypatch):
+    p,cal,ops=shard_inputs(protocol,tmp_path,monkeypatch);plan=n.build_shard_plan(p,cal,ops);inventory=activate_plan(p,plan,tmp_path)
+    out=tmp_path/'preflight';inv=json.loads(inventory.read_text());inv['outputs']=[str(out.resolve())];inventory.write_text(json.dumps(inv))
+    # Source/protocol validation must happen after registration for an approved plan.
+    p['main'][0]['truth_name']='drift'
+    paths={}
+    for name,obj in [('protocol',p),('calibration',cal),('operations',ops),('plan',plan)]:
+        path=tmp_path/(name+'.json');path.write_text(json.dumps(obj));paths[name]=path
+    with pytest.raises(ValueError):
+        n.main(['--mode','main-shard','--protocol',str(paths['protocol']),'--operations',str(paths['operations']),'--calibration',str(paths['calibration']),'--shard-plan',str(paths['plan']),'--shard-index','0','--output',str(out)])
+    assert len(n._registry_records(plan,'invocations'))==1
+    assert list(n._registry_records(plan,'outcomes').values())[0]['status']=='failed'
+    assert not out.exists()
+
+
+def test_same_existing_output_cli_attempt_still_registers_conflict(protocol,tmp_path,monkeypatch):
+    p,cal,ops=shard_inputs(protocol,tmp_path,monkeypatch);plan=n.build_shard_plan(p,cal,ops);inventory=activate_plan(p,plan,tmp_path)
+    out=tmp_path/'existing';out.mkdir();inv=json.loads(inventory.read_text());inv['outputs']=[str(out.resolve())];inventory.write_text(json.dumps(inv))
+    n.claim_main_shard(p,plan,0,{'output':str(out),'operations_hash':'old'})
+    paths={}
+    for name,obj in [('protocol',p),('calibration',cal),('operations',ops),('plan',plan)]:
+        path=tmp_path/(name+'.json');path.write_text(json.dumps(obj));paths[name]=path
+    with pytest.raises(ValueError): n.main(['--mode','main-shard','--protocol',str(paths['protocol']),'--operations',str(paths['operations']),'--calibration',str(paths['calibration']),'--shard-plan',str(paths['plan']),'--shard-index','0','--output',str(out)])
+    assert len(n._registry_records(plan,'invocations'))==2
+    assert len(n._registry_records(plan,'outcomes'))==1
+
+
+@pytest.mark.parametrize('failure',['headroom','remaining'])
+def test_shard_time_gates_stop_before_model(protocol,tmp_path,monkeypatch,failure):
+    from datetime import datetime,timedelta,timezone
+    from component_analysis import hooks
+    p,cal,ops=shard_inputs(protocol,tmp_path,monkeypatch);plan=n.build_shard_plan(p,cal,ops);inventory=activate_plan(p,plan,tmp_path)
+    calpath=tmp_path/'cal.json';calpath.write_text(json.dumps(cal));ops={**ops,'calibration_path':str(calpath)}
+    if failure=='headroom': ops['allocation_start_utc']=(datetime.now(timezone.utc)-timedelta(seconds=1000)).isoformat()
+    else: ops['deadline_utc']=(datetime.now(timezone.utc)+timedelta(seconds=60)).isoformat()
+    out=tmp_path/'timeblocked';inv=json.loads(inventory.read_text());inv['outputs']=[str(out.resolve())];inventory.write_text(json.dumps(inv));fake_execution(monkeypatch,p,cal)
+    monkeypatch.setattr(hooks,'load_analysis_model',lambda *a,**kw:pytest.fail('time gate must precede model loading'))
+    with pytest.raises(ValueError,match='headroom' if failure=='headroom' else 'forecast'): n.run_main_shard(p,out,ops,plan,0)
+    assert not (out/'attempts').exists()
+    assert list(n._registry_records(plan,'outcomes').values())[0]['status']=='failed'
+
+
+def test_wrapper_binds_scheduler_start_instead_of_wrapper_entry(tmp_path):
+    import os,subprocess,sys
+    from datetime import datetime,timezone
+    bindir=tmp_path/'bin';bindir.mkdir();scontrol=bindir/'scontrol';scontrol.write_text("#!/bin/sh\necho 'JobId=stub StartTime=2026-10-21T11:00:00 EndTime=2026-10-21T12:00:00'\n");scontrol.chmod(0o755)
+    stub=tmp_path/'python-stub';stub.write_text('#!'+sys.executable+'\nimport os,json\nprint(json.dumps({k:os.environ[k] for k in ["SDR_NATIVE_ALLOCATION_START","SDR_NATIVE_ALLOCATION_END","SDR_NATIVE_WRAPPER_ENTRY"]}))\n');stub.chmod(0o755)
+    env={**os.environ,'PATH':str(bindir)+':'+os.environ['PATH'],'SLURM_JOB_ID':'stub','SDR_NATIVE_PYTHON':str(stub),'TZ':'UTC'}
+    env.pop('SLURM_JOB_START_TIME',None);env.pop('SLURM_JOB_END_TIME',None)
+    result=subprocess.run(['bash',str(ROOT/'scripts/jobs/run_sdr_native_controls.sh'),'--dry-run'],cwd=ROOT,env=env,check=True,capture_output=True,text=True)
+    timing=json.loads(result.stdout)
+    assert int(timing['SDR_NATIVE_ALLOCATION_START'])==int(datetime(2026,10,21,11,tzinfo=timezone.utc).timestamp())
+    assert int(timing['SDR_NATIVE_ALLOCATION_END'])-int(timing['SDR_NATIVE_ALLOCATION_START'])==3600

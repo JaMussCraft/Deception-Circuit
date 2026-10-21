@@ -15,10 +15,12 @@ import random
 import signal
 import sys
 import time
+import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
+SHARD_RELEASE_PATH = Path("/projects/beto/swong2/Alignment/.scratch/sdr-native-controls/operator/sharding-release.json")
 SEED = 20261021
 FACTORS = {'wording':['A','B'], 'truth':[0,1], 'order':[0,1], 'favored':[0,1], 'condition':['C','A','N'], 'task':['report','retrieval']}
 CLAUSES = {
@@ -273,11 +275,13 @@ def check_deadline(protocol):
     if protocol.get('_stop',{}).get('requested'): raise TimeoutError('termination requested')
     if '_deadline' in protocol and time.time()>=protocol['_deadline']: raise TimeoutError('operational deadline')
 
-def forecast_main(protocol,calibration,operations):
+def forecast_main(protocol,calibration,operations,*,batch_count=None):
     verify_operations(operations)
-    batches=math.ceil(len(protocol['main'])/protocol['payload']['batch_size'])
+    total=math.ceil(len(protocol['main'])/protocol['payload']['batch_size'])
+    batches=total if batch_count is None else batch_count
+    if type(batches) is not int or not 1<=batches<=total: raise ValueError('invalid global batch count')
     generation=batches*protocol['payload']['max_new_tokens'];controls=batches*2
-    io_scale=batches/8
+    io_scale=48
     active_checkpoints=batches*(protocol['payload']['max_new_tokens']*2+2)
     panel_checkpoints=batches*2+4
     # Calibration maxima, never mean output lengths: worst-cap active writes plus
@@ -298,13 +302,206 @@ def runtime_identity(operations):
 def runtime_binding(protocol,hardware):
     return {'scientific_hash':protocol['scientific_hash'],'provenance_hash':protocol['provenance_hash'],'source_hashes':source_hashes(),'cache_hashes':cache_hashes(protocol['provenance']['cache']),'software':software(),'hardware':hardware,'batch_size':protocol['payload']['batch_size'],'sequence_length':protocol['payload']['sequence_length']}
 
+def _calibration_matches(protocol, calibration):
+    if calibration.get('mode')!='calibration' or calibration.get('status')!='completed' or calibration.get('numerical_pass') is not True or calibration.get('completed_rows')!=64 or calibration.get('controls_rows')!=64:
+        raise ValueError('incomplete matching calibration required')
+    hardware=calibration['binding']['hardware']
+    if calibration['binding']!=runtime_binding(protocol,hardware): raise ValueError('calibration source/provenance binding mismatch')
+
+
+def build_shard_plan(protocol, calibration, operations):
+    verify_protocol(protocol);verify_operations(operations);_calibration_matches(protocol,calibration)
+    if operations['reserved_seconds']!=3600 or [operations[k] for k in ('startup_buffer_seconds','io_buffer_seconds','shutdown_buffer_seconds')]!=[120,120,90]:
+        raise ValueError('shard policy requires3600 allocation and120/120/90 buffers')
+    for key in ('max_forward_seconds','max_active_checkpoint_seconds','max_panel_checkpoint_seconds','startup_seconds','control_seconds','io_seconds','premodel_seconds'):
+        if not math.isfinite(calibration[key]) or calibration[key]<0: raise ValueError('invalid calibration timing '+key)
+    if calibration['max_forward_seconds']<=0: raise ValueError('positive forward timing required')
+    registry=str(Path(operations['registry_root']).resolve())
+    if registry!=operations['registry_root']: raise ValueError('registry root must be canonical absolute path')
+    cancellation=Path(operations['zero_attempt_receipt']).resolve();cancel=read_json(cancellation)
+    if cancel.get('job_id')!='23101635' or cancel.get('state')!='TERMINAL_CANCELLED_ZERO_ATTEMPTS' or cancel.get('model_attempts')!=0 or cancel.get('source_unlock_evidence') is not True: raise ValueError('terminal cancellation and zero attempts required')
+    headroom=max(120,math.ceil(2*calibration['premodel_seconds']));margin=60
+    fitting=[n for n in range(1,385) if forecast_main(protocol,calibration,operations,batch_count=n)['required_seconds']+headroom+margin<=3600]
+    if not fitting: raise ValueError('no complete physical batch fits full-cap allocation')
+    size=max(fitting);ranges=[]
+    for index,start in enumerate(range(0,384,size)):
+        stop=min(start+size,384)
+        ranges.append({'index':index,'batch_range':[start,stop],'row_ids':[r['id'] for r in protocol['main'][8*start:8*stop]],'forecast':forecast_main(protocol,calibration,operations,batch_count=stop-start)})
+    plan={'schema':'native-controls-shards-v1','scientific_hash':protocol['scientific_hash'],'provenance_hash':protocol['provenance_hash'],'calibration_hash':digest(calibration),'binding':calibration['binding'],'registry_root':registry,'release_path':str(SHARD_RELEASE_PATH.resolve()),'zero_attempt_receipt':str(cancellation),'zero_attempt_receipt_hash':file_hash(cancellation),'premodel_headroom_seconds':headroom,'release_margin_seconds':margin,'allocation_seconds':3600,'batch_size':size,'policy':{k:operations[k] for k in ('hardware_class','reserved_seconds','startup_buffer_seconds','io_buffer_seconds','shutdown_buffer_seconds')},'ranges':ranges}
+    return {**plan,'plan_hash':digest(plan)}
+
+
+def verify_shard_plan(protocol, calibration, plan):
+    if digest({k:v for k,v in plan.items() if k!='plan_hash'})!=plan.get('plan_hash'): raise ValueError('shard plan hash mismatch')
+    operations={**plan['policy'],'deadline_utc':'2099-01-01T00:00:00+00:00','registry_root':plan['registry_root'],'zero_attempt_receipt':plan['zero_attempt_receipt']}
+    if build_shard_plan(protocol,calibration,operations)!=plan: raise ValueError('shard plan partition/binding mismatch')
+
+
+def _release(protocol, plan=None):
+    release=read_json(SHARD_RELEASE_PATH) if SHARD_RELEASE_PATH.is_file() else None
+    if plan is None:
+        if release and release.get('status')=='activated' and release.get('scientific_hash')==protocol['scientific_hash']: raise ValueError('activated shard study rejects monolithic main')
+        return None
+    if not release or release.get('status')!='activated' or any(release.get(k)!=v for k,v in {'scientific_hash':protocol['scientific_hash'],'provenance_hash':protocol['provenance_hash'],'plan_hash':plan['plan_hash'],'registry_root':plan['registry_root']}.items()): raise ValueError('root-approved canonical shard release required')
+    if str(SHARD_RELEASE_PATH.resolve())!=plan['release_path']: raise ValueError('relocated release/registry forbidden')
+    inventory=read_json(release['operator_inventory_path'])
+    if inventory.get('scientific_hash')!=protocol['scientific_hash'] or inventory.get('plan_hash')!=plan['plan_hash'] or inventory.get('monolithic_submissions')!=[]: raise ValueError('operator inventory contains unapproved/monolithic main')
+    return release,inventory
+
+
+def _exclusive_json(path, value):
+    path=Path(path);path.parent.mkdir(parents=True,exist_ok=True)
+    try: descriptor=os.open(str(path),os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)
+    except FileExistsError: raise ValueError('exclusive claim/record already exists: '+str(path))
+    with os.fdopen(descriptor,'w') as stream:
+        stream.write(canonical(value));stream.flush();os.fsync(stream.fileno())
+    directory=os.open(str(path.parent),os.O_RDONLY)
+    try: os.fsync(directory)
+    finally: os.close(directory)
+
+
+def _registry_records(plan, kind):
+    path=Path(plan['registry_root'])/kind
+    return {p.stem:read_json(p) for p in sorted(path.glob('*.json'))} if path.exists() else {}
+
+
+def _claim_outcome(plan, claim, status, **extra):
+    _exclusive_json(Path(plan['registry_root'])/'outcomes'/(claim['invocation_id']+'.json'),{'invocation_id':claim['invocation_id'],'shard_index':claim['shard_index'],'claim_hash':digest(claim),'status':status,**extra})
+
+
+def claim_main_shard(protocol, plan, shard_index, invocation):
+    _,inventory=_release(protocol,plan)
+    valid_index=type(shard_index) is int and 0<=shard_index<len(plan['ranges'])
+    spec=plan['ranges'][shard_index] if valid_index else {'batch_range':None,'row_ids':[]}
+    output=str(Path(invocation['output']).resolve());identifier=uuid.uuid4().hex
+    claim={'invocation_id':identifier,'scientific_hash':protocol['scientific_hash'],'provenance_hash':protocol['provenance_hash'],'calibration_hash':plan['calibration_hash'],'plan_hash':plan['plan_hash'],'shard_index':shard_index,'batch_range':spec['batch_range'],'row_ids':spec['row_ids'],'output':output,'job_id':invocation.get('job_id'),'operations_hash':invocation['operations_hash'],'created_utc':datetime.now(timezone.utc).isoformat()}
+    _exclusive_json(Path(plan['registry_root'])/'invocations'/(identifier+'.json'),claim)
+    try:
+        if not valid_index: raise ValueError('invalid shard index')
+        if output not in inventory['outputs']: raise ValueError('unregistered operator output')
+        previous=_registry_records(plan,'outcomes')
+        for record in previous.values():
+            if record['status']!='completed': raise ValueError('failed/conflicting claim blocks study')
+        claim['predecessor_hash']=_validate_predecessors(protocol,plan,shard_index)
+        _exclusive_json(Path(plan['registry_root'])/'claims'/f'{shard_index:03d}.json',claim)
+        return claim
+    except Exception as error:
+        _claim_outcome(plan,claim,'failed',error=type(error).__name__+': '+str(error))
+        raise
+
+
+def _check_active_claim(protocol, plan, claim):
+    _,inventory=_release(protocol,plan)
+    invocations=_registry_records(plan,'invocations');outcomes=_registry_records(plan,'outcomes')
+    if set(inventory['outputs'])!={r['output'] for r in invocations.values()} or len(inventory['outputs'])!=len(set(inventory['outputs'])): raise ValueError('all-output operator/registry inventory mismatch')
+    for identifier,record in invocations.items():
+        if identifier!=claim['invocation_id'] and (identifier not in outcomes or outcomes[identifier]['status']!='completed'): raise ValueError('orphan/failed/conflicting main invocation')
+    actual=read_json(Path(plan['registry_root'])/'claims'/f"{claim['shard_index']:03d}.json")
+    if actual!=claim: raise ValueError('exclusive claim drift')
+
+
+def _validate_shard_artifacts(protocol, plan, index, claim, outcome, invocation):
+    segment=plan['ranges'][index];first,stop=segment['batch_range'];out=Path(claim['output'])
+    expected={'scientific_hash':protocol['scientific_hash'],'provenance_hash':protocol['provenance_hash'],'calibration_hash':plan['calibration_hash'],'plan_hash':plan['plan_hash'],'shard_index':index,'batch_range':segment['batch_range'],'row_ids':segment['row_ids']}
+    if any(claim.get(k)!=v for k,v in expected.items()) or any(claim.get(k)!=v for k,v in invocation.items()): raise ValueError('claim/invocation ownership mismatch')
+    if str(out.resolve())!=claim['output'] or outcome.get('status')!='completed' or outcome.get('claim_hash')!=digest(claim): raise ValueError('incomplete/failed/orphan claimed range')
+    if set(outcome.get('artifact_hashes',{}))!={'receipt.json','generations.json','operations.json'}: raise ValueError('missing artifact hashes')
+    for name,sha in outcome['artifact_hashes'].items():
+        if file_hash(out/name)!=sha: raise ValueError('shard artifact drift: '+name)
+    receipt=read_json(out/'receipt.json');ops=read_json(out/'operations.json')
+    if receipt.get('mode')!='main-shard' or receipt.get('status')!='completed' or receipt.get('numerical_pass') is not True or receipt.get('binding')!=plan['binding']: raise ValueError('shard numerical/provenance receipt failure')
+    for key in ('plan_hash','shard_index','batch_range','predecessor_hash'):
+        if receipt.get(key)!=claim.get(key): raise ValueError('shard receipt ownership mismatch')
+    if receipt.get('claim_hash')!=digest(claim) or receipt.get('operations_hash')!=claim['operations_hash'] or digest(ops)!=claim['operations_hash']: raise ValueError('operational receipt mismatch')
+    if not 0<ops['reserved_seconds']<=3600 or any(ops.get(k)!=plan['policy'][k] for k in ('hardware_class','startup_buffer_seconds','io_buffer_seconds','shutdown_buffer_seconds')): raise ValueError('allocation policy mismatch')
+    rows=read_json(out/'generations.json');expected_rows=protocol['main'][8*first:8*stop]
+    if len(rows)!=len(expected_rows) or [r['id'] for r in rows]!=segment['row_ids'] or receipt.get('completed_rows')!=len(rows) or receipt.get('controls_rows')!=len(rows): raise ValueError('shard generation coverage mismatch')
+    for position,(row,original) in enumerate(zip(rows,expected_rows)):
+        fields={'protocol_hash':protocol['scientific_hash'],'plan_hash':plan['plan_hash'],'global_batch_index':first+position//8,'physical_slot':position%8,'shard_index':index,'attempt_number':1,'status':'completed'}
+        if any(row.get(k)!=v for k,v in fields.items()) or row.get('finish') not in ('eos','capped'): raise ValueError('shard row/slot/finish mismatch')
+        tokens=row.get('generated_ids',[])
+        if not 1<=len(tokens)<=64 or any(type(t) is not int or t<0 for t in tokens) or any(t in protocol['payload']['eos'] for t in tokens[:-1]): raise ValueError('invalid complete token record')
+        if (row['finish']=='eos')!=(tokens[-1] in protocol['payload']['eos']) or (row['finish']=='capped' and len(tokens)!=64): raise ValueError('EOS/cap record mismatch')
+        if row.get('logical_readouts')!=list(range(original['length']-1,original['length']-1+len(tokens))): raise ValueError('logical readout mismatch')
+        controls=row.get('controls',[])
+        if len(controls)!=2 or {c.get('control') for c in controls}!={'repeat','empty_hook'}: raise ValueError('missing/duplicate main controls')
+        if any(c.get('pass') is not True or c.get('finite') is not True or c.get('identical_greedy') is not True or c.get('tolerance')!=1e-5 or not isinstance(c.get('max_abs_error'),(float,int)) or not 0<=c['max_abs_error']<=1e-5 for c in controls): raise ValueError('failed numerical receipt')
+    expected_names={f'{b:03d}.json' for b in range(first,stop)}
+    actual_names={path.name for path in (out/'attempts').iterdir()}
+    if actual_names!=expected_names or set(outcome.get('attempt_hashes',{}))!=expected_names: raise ValueError('attempt inventory coverage')
+    for batch in range(first,stop):
+        name=f'{batch:03d}.json';path=out/'attempts'/name
+        if file_hash(path)!=outcome['attempt_hashes'][name]: raise ValueError('attempt record drift')
+        if read_json(path)!={'global_batch_index':batch,'row_ids':[r['id'] for r in protocol['main'][8*batch:8*(batch+1)]],'claim_hash':digest(claim),'attempt_number':1}: raise ValueError('duplicate/mismatched batch attempt')
+    forwards=sum(max(len(r['generated_ids']) for r in rows[i:i+8])+2 for i in range(0,len(rows),8))
+    if receipt.get('physical_forwards')!=forwards: raise ValueError('physical forward coverage mismatch')
+    return rows,{'output':str(out),'claim_hash':digest(claim),'outcome_hash':digest(outcome),'artifact_hashes':outcome['artifact_hashes'],'reserved_gpu_seconds':ops['reserved_seconds'],'main_runtime_seconds':receipt['actual_gpu_seconds'],'actual_gpu_seconds':receipt['allocation_elapsed_seconds']}
+
+
+def _validate_predecessors(protocol, plan, upto):
+    previous=plan['zero_attempt_receipt_hash']
+    if not upto: return previous
+    invocations=_registry_records(plan,'invocations');outcomes=_registry_records(plan,'outcomes');claims=_registry_records(plan,'claims')
+    for index in range(upto):
+        claim=claims.get(f'{index:03d}')
+        if not claim: raise ValueError('successful complete predecessor claim required')
+        identifier=claim['invocation_id'];outcome=outcomes.get(identifier)
+        if not outcome or identifier not in invocations or claim.get('predecessor_hash')!=previous: raise ValueError('predecessor chain mismatch')
+        _validate_shard_artifacts(protocol,plan,index,claim,outcome,invocations[identifier]);previous=digest(outcome)
+    return previous
+
+
+def merge_shards(protocol, calibration, plan, shard_outputs, output,*,dry_run=False):
+    out=fresh_output(output);validated=[]
+    try:
+        verify_shard_plan(protocol,calibration,plan);_,inventory=_release(protocol,plan)
+        claims=_registry_records(plan,'claims');invocations=_registry_records(plan,'invocations');outcomes=_registry_records(plan,'outcomes')
+        count=len(plan['ranges']);expected_claims={f'{i:03d}' for i in range(count)}
+        if set(claims)!=expected_claims or len(invocations)!=count or set(invocations)!=set(outcomes): raise ValueError('full registry has missing/extra/orphan/conflicting claims')
+        supplied=[str(Path(p).resolve()) for p in shard_outputs];registered=[r['output'] for r in invocations.values()]
+        if len(supplied)!=count or len(set(supplied))!=count or set(supplied)!=set(registered) or set(supplied)!=set(inventory['outputs']) or len(inventory['outputs'])!=count: raise ValueError('all-output registry/operator/input inventory mismatch')
+        previous=plan['zero_attempt_receipt_hash'];rows=[];resources=[]
+        for index in range(count):
+            claim=claims[f'{index:03d}'];identifier=claim['invocation_id']
+            if identifier not in invocations or claim.get('predecessor_hash')!=previous: raise ValueError('predecessor chain mismatch')
+            selected,resource=_validate_shard_artifacts(protocol,plan,index,claim,outcomes[identifier],invocations[identifier]);rows.extend(selected);resources.append(resource);validated.extend(r['id'] for r in selected);previous=digest(outcomes[identifier])
+        if [r['id'] for r in rows]!=[r['id'] for r in protocol['main']] or len({r['id'] for r in rows})!=3072: raise ValueError('global3072-row once/order mismatch')
+        result={'status':'completed','scientific_release':True,'scientific_hash':protocol['scientific_hash'],'provenance_hash':protocol['provenance_hash'],'plan_hash':plan['plan_hash'],'planned_rows':3072,'attempted_rows':3072,'completed_rows':3072,'error_rows':0,'missing_rows':0,'control_receipts':6144,'shards':resources,'reserved_gpu_seconds':sum(r['reserved_gpu_seconds'] for r in resources),'actual_gpu_seconds':sum(r['actual_gpu_seconds'] for r in resources),'main_runtime_seconds':sum(r['main_runtime_seconds'] for r in resources),'allocation_timing_scope':'actual allocation start through last worker checkpoint; final scheduler shutdown/accounting remains operator-ledger authoritative','ledger_note':'main shard allocations only; original cancellation/calibration and new calibration remain separately preserved in operator ledger'}
+        if dry_run:
+            result.update(status='cpu_dry_run',scientific_release=False,model_loaded=False,jobs_submitted=False,claims_created=False);atomic_json(out/'dry-run.json',result)
+        else:
+            atomic_json(out/'generations.json',rows);atomic_json(out/'merge-report.json',result)
+        return result
+    except Exception as error:
+        atomic_json(out/'merge-report.json',{'status':'blocked','scientific_release':False,'planned_rows':3072,'validated_rows':len(validated),'row_statuses':[{'id':r['id'],'status':'verified_completed' if r['id'] in validated else 'unverified_or_missing'} for r in protocol['main']],'error':type(error).__name__+': '+str(error)})
+        raise
+
+
+def run_main_shard(protocol, output, operations, plan, shard_index):
+    claim=claim_main_shard(protocol,plan,shard_index,{'output':str(output),'job_id':os.environ.get('SLURM_JOB_ID'),'operations_hash':digest(operations)})
+    try:
+        calibration=read_json(operations['calibration_path']);verify_shard_plan(protocol,calibration,plan)
+        if operations['reserved_seconds']>3600 or any(operations[k]!=plan['policy'][k] for k in ('hardware_class','startup_buffer_seconds','io_buffer_seconds','shutdown_buffer_seconds')): raise ValueError('shard allocation/policy differs from plan')
+        receipt=_run(protocol,output,operations,calibration=False,shard={'plan':plan,'claim':claim})
+        artifact_hashes={name:file_hash(Path(output)/name) for name in ('receipt.json','generations.json','operations.json')}
+        attempts={p.name:file_hash(p) for p in sorted((Path(output)/'attempts').glob('*.json'))}
+        _claim_outcome(plan,claim,'completed',artifact_hashes=artifact_hashes,attempt_hashes=attempts)
+        return receipt
+    except Exception as error:
+        _claim_outcome(plan,claim,'failed',error=type(error).__name__+': '+str(error))
+        raise
+
+
 def run_calibration(protocol:dict,output:Path,operations:dict)->dict:
     return _run(protocol,output,operations,calibration=True)
 
 def run_main(protocol:dict,output:Path,operations:dict)->dict:
+    _release(protocol)
     return _run(protocol,output,operations,calibration=False)
 
-def _run(protocol,output,operations,*,calibration):
+def _run(protocol,output,operations,*,calibration,shard=None):
+    entry_epoch=time.time()
+    allocation_start=datetime.fromisoformat(operations['allocation_start_utc']).timestamp() if operations.get('allocation_start_utc') else entry_epoch
     verify_protocol(protocol);verify_operations(operations)
     if software()!=protocol['provenance']['software']: raise ValueError('runtime software differs from frozen provenance')
     hardware=runtime_identity(operations);binding=runtime_binding(protocol,hardware)
@@ -312,22 +509,34 @@ def _run(protocol,output,operations,*,calibration):
     if not calibration:
         receipt=read_json(operations['calibration_path'])
         if receipt['mode']!='calibration' or receipt['status']!='completed' or not receipt['numerical_pass'] or receipt['completed_rows']!=64 or receipt['binding']!=binding: raise ValueError('calibration mismatch or incomplete controls')
-        forecast=forecast_main(protocol,receipt,operations)
+        forecast=forecast_main(protocol,receipt,operations,batch_count=(shard['claim']['batch_range'][1]-shard['claim']['batch_range'][0]) if shard else None)
+        margin=shard['plan']['release_margin_seconds'] if shard else 0
         available=min(operations['reserved_seconds'],datetime.fromisoformat(operations['deadline_utc']).timestamp()-time.time())
-        if forecast['required_seconds']>available: raise ValueError('full-cap forecast exceeds allocation/deadline')
+        if forecast['required_seconds']+margin>available: raise ValueError('full-cap forecast exceeds allocation/deadline')
     commit=protocol['provenance'].get('code_commit','UNCOMMITTED')
     if len(commit)!=40 or any(c not in '0123456789abcdef' for c in commit): raise ValueError('GPU execution requires root-supplied committed source; UNCOMMITTED freeze is CPU-only')
     out=fresh_output(output)
     atomic_json(out/'protocol.json',protocol);atomic_json(out/'operations.json',operations)
     if forecast: atomic_json(out/'forecast.json',forecast)
     rows=protocol['calibration'] if calibration else protocol['main']
+    global_start=0
+    if shard:
+        global_start,global_stop=shard['claim']['batch_range'];rows=rows[8*global_start:8*global_stop]
+        atomic_json(out/'shard-plan.json',shard['plan']);atomic_json(out/'claim.json',shard['claim'])
     statuses={r['id']:{'id':r['id'],'status':'unattempted','finish':'error_missing','protocol_hash':protocol['scientific_hash']} for r in rows}
+    ownership={}
+    if shard:
+        ownership={r['id']:{'global_batch_index':global_start+i//8,'physical_slot':i%8,'shard_index':shard['claim']['shard_index'],'plan_hash':shard['plan']['plan_hash'],'attempt_number':1} for i,r in enumerate(rows)}
+        for identifier,metadata in ownership.items(): statuses[identifier].update({**metadata,'attempt_number':0})
     receipt={'mode':'calibration' if calibration else 'main','binding':binding,'operations_hash':digest(operations),'status':'initializing','completed_rows':0,'numerical_pass':False,'max_forward_seconds':0.,'control_seconds':0.,'startup_seconds':0.,'io_seconds':0.,'max_active_checkpoint_seconds':0.,'max_panel_checkpoint_seconds':0.,'active_checkpoint_count':0,'panel_checkpoint_count':0,'physical_forwards':0,'paid_api_calls':0}
+    if shard: receipt.update(mode='main-shard',plan_hash=shard['plan']['plan_hash'],shard_index=shard['claim']['shard_index'],batch_range=shard['claim']['batch_range'],claim_hash=digest(shard['claim']),predecessor_hash=shard['claim']['predecessor_hash'])
     started=time.monotonic();model=None;stop={'requested':False};previous={}
     protocol={**protocol,'_calibration':calibration,'_stop':stop,'_deadline':datetime.fromisoformat(operations['deadline_utc']).timestamp()-operations['shutdown_buffer_seconds']}
     def checkpoint():
         tick=time.monotonic();atomic_json(out/'generations.json',list(statuses.values()))
         receipt['actual_gpu_seconds']=time.monotonic()-started
+        receipt['allocation_elapsed_seconds']=time.time()-allocation_start
+        receipt['allocation_start_utc']=datetime.fromtimestamp(allocation_start,timezone.utc).isoformat()
         if model is not None:
             import torch
             receipt['peak_memory_allocated_bytes']=torch.cuda.max_memory_allocated()
@@ -341,6 +550,9 @@ def _run(protocol,output,operations,*,calibration):
         from component_analysis import hooks
         import torch
         os.environ['HF_HUB_OFFLINE']='1';os.environ['TRANSFORMERS_OFFLINE']='1'
+        receipt['premodel_seconds']=time.time()-allocation_start
+        receipt['model_load_start_utc']=datetime.now(timezone.utc).isoformat()
+        if shard and receipt['premodel_seconds']>shard['plan']['premodel_headroom_seconds']: raise ValueError('measured premodel time exceeds frozen headroom')
         tick=time.monotonic();model=hooks.load_analysis_model(protocol['provenance']['cache'],device='cuda',dtype=torch.bfloat16)
         hf=hooks._hf(model);hf.eval();original_cache=hf.config.use_cache;hf.config.use_cache=False
         device,dtype=hooks.device_and_dtype(model)
@@ -348,10 +560,15 @@ def _run(protocol,output,operations,*,calibration):
         receipt['startup_seconds']=time.monotonic()-tick;receipt['status']='running'
         for start in range(0,len(rows),8):
             check_deadline(protocol);batch=rows[start:start+8]
-            for r in batch: statuses[r['id']]['status']='attempted'
+            if shard:
+                _check_active_claim(protocol,shard['plan'],shard['claim'])
+                _exclusive_json(out/'attempts'/f'{global_start+start//8:03d}.json',{'global_batch_index':global_start+start//8,'row_ids':[r['id'] for r in batch],'claim_hash':digest(shard['claim']),'attempt_number':1})
+            for r in batch:
+                statuses[r['id']]['status']='attempted'
+                if shard: statuses[r['id']]['attempt_number']=1
             checkpoint()
             def batch_checkpoint(partial,stats):
-                for row in partial: statuses[row['id']]={**row,'status':'attempted','runtime':stats.copy()}
+                for row in partial: statuses[row['id']]={**row,**ownership.get(row['id'],{}),'status':'attempted','runtime':stats.copy()}
                 receipt['current_batch_runtime']=stats.copy()
                 io_tick=time.monotonic()
                 atomic_json(out/'active-batch.json',{'rows':partial,'runtime':stats,'all_row_statuses':'generations.json','operations_hash':digest(operations)})
@@ -363,7 +580,9 @@ def _run(protocol,output,operations,*,calibration):
                 for r in batch: statuses[r['id']]['status']='error'
                 raise
             stats=completed[0]['runtime']
-            for r in completed: statuses[r['id']]=r
+            for slot,r in enumerate(completed):
+                if shard: r.update(global_batch_index=global_start+start//8,physical_slot=slot,shard_index=shard['claim']['shard_index'],plan_hash=shard['plan']['plan_hash'],attempt_number=1)
+                statuses[r['id']]=r
             receipt['max_forward_seconds']=max(receipt['max_forward_seconds'],stats['max_forward_seconds'])
             receipt['control_seconds']+=stats['control_seconds'];receipt['physical_forwards']+=stats['physical_forwards'];receipt['completed_rows']+=len(completed)
             checkpoint()
@@ -513,14 +732,68 @@ def analyze_panel(protocol:dict,joined:list[dict])->dict:
     return {'behavior_go':not failed,'failed_criteria':failed,'gates':gates,'denominators':{'planned':3072,'neutral_report':len(neutral),'retrieval':len(retrieval),'conflicting_report_per_condition':len(conflicting)//3},'capability_blocks':blocks,'report_contrasts':overall,'descriptive_strata':strata,'descriptive_stratum_intervals':{name:{c:[sorted(values)[249],sorted(values)[9749]] for c,values in contrasts_boot.items()} for name,contrasts_boot in descriptive_boot.items()},'counts':counts,'template_results':template_results,'paired_transitions':transitions,'leave_one_pair_out':loo,'unique_pairs':len({tuple(f['pair']) for f in fixtures}),'unique_entities':len({f['entity'] for f in fixtures}),'bootstrap':{'replicates':10000,'seed':SEED,'index_sha256':index_hash.hexdigest(),'quantile_index':9499,'simultaneous_q':q,'bands':bands,'pointwise_intervals':{c:[sorted(v[c] for v in boot)[249],sorted(v[c] for v in boot)[9749]] for c in ('A','N')}},'scope':'conditional designed-fixture uncertainty; familiar base; non-relevant reporting commitment does not establish omission, false factual assertion, intent, OOD, or circuitry','next_stage_authorized':False}
 
 
+def _shard_cli(args, protocol):
+    if args.mode=='main-shard' and not args.dry_run:
+        if not args.shard_plan or args.shard_index is None or not args.operations or not args.calibration: raise ValueError('main-shard requires plan/index/operations/calibration')
+        plan=read_json(args.shard_plan);operations=read_json(args.operations)
+        if os.environ.get('SLURM_JOB_ID'):
+            if not os.environ.get('SDR_NATIVE_ALLOCATION_END'): raise ValueError('wrapper must bind actual Slurm allocation end')
+            operations=bind_allocation_operations(operations,allocation_end=os.environ['SDR_NATIVE_ALLOCATION_END'],allocation_start=os.environ.get('SDR_NATIVE_ALLOCATION_START',time.time()))
+        operations={**operations,'calibration_path':str(args.calibration.resolve())}
+        return run_main_shard(protocol,args.output,operations,plan,args.shard_index)
+    if not args.calibration: raise ValueError('shard modes require --calibration')
+    blocked=None;plan=None;calibration=None
+    if not args.calibration.is_file():
+        if not args.dry_run: raise ValueError('missing new matching calibration')
+        blocked='blocked_pending_new_matching_calibration'
+    else:
+        calibration=read_json(args.calibration)
+    if args.mode=='merge-shards':
+        if not args.shard_plan or not args.shard_plan.is_file() or calibration is None: raise ValueError('merge requires complete plan/calibration and shard outputs')
+        plan=read_json(args.shard_plan)
+        return merge_shards(protocol,calibration,plan,args.shard_output,args.output,dry_run=args.dry_run)
+    if not args.operations: raise ValueError('shard planning/execution requires --operations')
+    operations=read_json(args.operations)
+    if os.environ.get('SLURM_JOB_ID') and not args.dry_run and args.mode=='main-shard':
+        if not os.environ.get('SDR_NATIVE_ALLOCATION_END'): raise ValueError('wrapper must bind actual Slurm allocation end')
+        operations=bind_allocation_operations(operations,allocation_end=os.environ['SDR_NATIVE_ALLOCATION_END'],allocation_start=os.environ.get('SDR_NATIVE_ALLOCATION_START',time.time()))
+    verify_operations(operations)
+    operations={**operations,'calibration_path':str(args.calibration.resolve())}
+    if args.mode=='plan-shards':
+        if calibration is not None: plan=build_shard_plan(protocol,calibration,operations)
+        if not args.dry_run:
+            out=fresh_output(args.output);atomic_json(out/'shard-plan.json',plan)
+            atomic_json(out/'release-proposal.json',{'status':'PROPOSAL_ONLY','scientific_hash':protocol['scientific_hash'],'provenance_hash':protocol['provenance_hash'],'plan_hash':plan['plan_hash'],'registry_root':plan['registry_root'],'operator_inventory_path':str(Path(plan['registry_root'])/'operator-inventory.json')})
+            return {'status':'cpu_plan_frozen','plan_hash':plan['plan_hash'],'shards':len(plan['ranges'])}
+    else:
+        if args.shard_index is None or not args.shard_plan: raise ValueError('main-shard requires --shard-plan and --shard-index')
+        if not args.shard_plan.is_file():
+            if not args.dry_run: raise ValueError('missing frozen shard plan')
+            blocked=blocked or 'blocked_pending_frozen_shard_plan'
+        elif calibration is not None:
+            plan=read_json(args.shard_plan);verify_shard_plan(protocol,calibration,plan)
+            if type(args.shard_index) is not int or not 0<=args.shard_index<len(plan['ranges']): raise ValueError('invalid shard index')
+        if not args.dry_run: return run_main_shard(protocol,args.output,operations,plan,args.shard_index)
+    result={'status':'cpu_dry_run','mode':args.mode,'scientific_hash':protocol['scientific_hash'],'provenance_hash':protocol['provenance_hash'],'model_loaded':False,'jobs_submitted':False,'claims_created':False,'release_status':blocked or 'blocked_pending_actual_GPU_identity_verification','operations_hash':digest(operations)}
+    if plan:
+        result.update(plan_hash=plan['plan_hash'],shards=len(plan['ranges']),premodel_headroom_seconds=plan['premodel_headroom_seconds'])
+        if args.mode=='main-shard':
+            result.update(rows=len(plan['ranges'][args.shard_index]['row_ids']),batch_range=plan['ranges'][args.shard_index]['batch_range'],forecast=plan['ranges'][args.shard_index]['forecast'])
+            try: _release(protocol,plan)
+            except (ValueError,KeyError,FileNotFoundError): result['release_status']='blocked_pending_root_execution_release'
+    out=fresh_output(args.output);atomic_json(out/'dry-run.json',result)
+    return result
+
+
 def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--mode',required=True,choices=['freeze','calibration','main','export-labels','analyze']);parser.add_argument('--output',type=Path,required=True)
-    for name in ('cache','pool-root','protocol','operations','calibration','generations','adjudication'): parser.add_argument('--'+name,type=Path)
+    parser.add_argument('--mode',required=True,choices=['freeze','calibration','main','export-labels','analyze','plan-shards','main-shard','merge-shards']);parser.add_argument('--output',type=Path,required=True)
+    for name in ('cache','pool-root','protocol','operations','calibration','generations','adjudication','shard-plan'): parser.add_argument('--'+name,type=Path)
     parser.add_argument('--source-commit',help='Root-supplied full source commit for final freeze; omitted means UNCOMMITTED CPU-only');
+    parser.add_argument('--shard-index',type=int);parser.add_argument('--shard-output',type=Path,action='append',default=[])
     parser.add_argument('--annotations',type=Path,action='append',default=[]);parser.add_argument('--dry-run',action='store_true')
     args=parser.parse_args(argv)
-    if args.output.exists(): raise ValueError('occupied output')
+    if args.output.exists() and not (args.mode=='main-shard' and not args.dry_run): raise ValueError('occupied output')
     if args.dry_run and args.mode in ('export-labels','analyze'): parser.error('--dry-run applies only to freeze/calibration/main')
     if args.mode=='freeze':
         if not args.cache or not args.pool_root: parser.error('freeze requires --cache and --pool-root')
@@ -531,7 +804,11 @@ def main(argv=None):
         output=fresh_output(args.output);atomic_json(output/('dry-run-protocol.json' if args.dry_run else 'protocol.json'),protocol)
         print(canonical({'status':'cpu_frozen','scientific_hash':protocol['scientific_hash'],'provenance_hash':protocol['provenance_hash'],'shape':[8,protocol['payload']['sequence_length']],'main':3072,'calibration':64,'code_commit':protocol['provenance']['code_commit']}));return
     if not args.protocol: parser.error('--protocol required')
-    protocol=read_json(args.protocol);verify_protocol(protocol)
+    protocol=read_json(args.protocol)
+    if not (args.mode=='main-shard' and not args.dry_run): verify_protocol(protocol)
+    if args.mode in ('plan-shards','main-shard','merge-shards'):
+        result=_shard_cli(args,protocol);print(canonical({k:v for k,v in result.items() if k not in ('shards','row_statuses')}));return
+    if args.mode=='main': _release(protocol)
     if args.mode in ('calibration','main'):
         if not args.operations: parser.error('--operations required')
         operations=read_json(args.operations)
