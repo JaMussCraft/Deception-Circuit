@@ -466,6 +466,8 @@ def _identity(args, m, receipt):
             original_manifest_hash=m['amendment']['original_manifest_hash'],
             wikitext_manifest_hash=_wt_manifest(args)['manifest_hash'],
             settings=_amended_settings(args))
+        if m['amendment']['policy']=='amendment-v4':
+            result['optimizer']['expected_initial_removed']=args.initial_expected_removed
     return result
 
 
@@ -552,7 +554,7 @@ def _checked_cache(args, identity):
     if receipt['baseline_fingerprint'] != fp or _hash_file(args.reference_cache) != receipt['baseline_cache_sha256']:
         raise ValueError('baseline cache fingerprint/hash differs from passed receipt')
     cache = _load_cache(args.reference_cache,fp)
-    if identity.get('policy') not in ('amendment-v2','amendment-v3') and not all(x['capability']['usable'] for x in cache['splits'].values()):
+    if identity.get('policy') not in ('amendment-v2','amendment-v3','amendment-v4') and not all(x['capability']['usable'] for x in cache['splits'].values()):
         raise ValueError('global capable-H control unusable; stop without filtering')
     return cache
 
@@ -727,7 +729,7 @@ def _calibrate(args,m,identity,ctx,cache):
 
 
 def _prepare(args):
-    if getattr(args,'policy','report18-v1') in ('amendment-v2','amendment-v3'):
+    if getattr(args,'policy','report18-v1') in ('amendment-v2','amendment-v3','amendment-v4'):
         _prepare_amended(args); return
     from datasets import load_from_disk
     from transformers import AutoTokenizer
@@ -887,19 +889,25 @@ def compact_amended_finding(row, baseline, arm):
 
 
 def _amended_settings(args):
-    return {k:getattr(args,k) for k in ('rho','seed','joint_pairs','collateral_arm','candidate_space',
+    settings={k:getattr(args,k) for k in ('rho','seed','joint_pairs','collateral_arm','candidate_space',
             'max_updates','checkpoint_every')}
+    if getattr(args,'policy',None)=='amendment-v4':
+        settings['initial_expected_removed']=args.initial_expected_removed
+    return settings
 
 
 def _validate_amendment(m):
     a=m['amendment']; heads=m['candidate_heads']
-    v3=a.get('policy')=='amendment-v3'
+    v3=a.get('policy')=='amendment-v3';v4=a.get('policy')=='amendment-v4'
     expected=[[l,h] for l in range(32) for h in range(32)]
-    if (a.get('policy') not in ('amendment-v2','amendment-v3') or a.get('candidate_space') not in ('union','all')
-            or a.get('collateral_arm') not in (('W','HW') if v3 else ('H','W','HW')) or not a.get('original_manifest_hash')
+    if (a.get('policy') not in ('amendment-v2','amendment-v3','amendment-v4') or a.get('candidate_space') not in ('union','all')
+            or a.get('collateral_arm') not in (('W',) if v4 else ('W','HW') if v3 else ('H','W','HW')) or not a.get('original_manifest_hash')
             or not a.get('wikitext_manifest_hash') or not a.get('protocol_hash')
-            or a.get('max_updates')!=(1536 if v3 else 512) or a.get('checkpoint_every')!=64 or a.get('pairs_per_update')!=8):
+            or a.get('max_updates')!=(3072 if v4 else 1536 if v3 else 512) or a.get('checkpoint_every')!=64 or a.get('pairs_per_update')!=8):
         raise ValueError('amendment protocol mismatch')
+    if (v4 and (a.get('candidate_space')!='all' or a.get('initial_expected_removed') not in (1.,10.))
+            or not v4 and a.get('initial_expected_removed',1.)!=1.):
+        raise ValueError('amendment initialization/candidate space mismatch')
     if a['candidate_space']=='union':
         if len(heads)!=103 or sd.content_hash(heads)!=CANDIDATE_HASH:
             raise ValueError('frozen union mismatch')
@@ -937,6 +945,8 @@ def _prepare_amended(args):
         candidate_space=args.candidate_space,collateral_arm=args.collateral_arm,
         wikitext_manifest_hash=wt['manifest_hash'],protocol_hash=sd.content_hash(protocol),
         max_updates=args.max_updates,checkpoint_every=args.checkpoint_every,pairs_per_update=8)
+    if args.policy=='amendment-v4':m['amendment']['initial_expected_removed']=args.initial_expected_removed
+    elif getattr(args,'initial_expected_removed',1.)!=1.:raise ValueError('legacy initialization must remain 1')
     if args.candidate_space=='all': m['candidate_heads']=[[l,h] for l in range(32) for h in range(32)]
     m['candidate_heads_hash']=sd.content_hash(m['candidate_heads']);m['manifest_hash']=sd.manifest_hash(m)
     sm.validate_pilot_manifest(m);_validate_amendment(m)
@@ -946,10 +956,11 @@ def _prepare_amended(args):
 
 def _amended_plan(args,m):
     _validate_amendment(m);a=m['amendment'];wt=_wt_manifest(args)
-    v3=a['policy']=='amendment-v3'
+    v3=a['policy']=='amendment-v3';v4=a['policy']=='amendment-v4'
     if (getattr(args,'policy',None)!=a['policy'] or args.collateral_arm!=a['collateral_arm']
             or args.candidate_space!=a['candidate_space'] or args.max_updates!=a['max_updates']
-            or args.checkpoint_every!=64 or args.seed!=0 or args.rho not in ((0.,) if v3 else (0.,.01))
+            or args.checkpoint_every!=64 or args.seed!=0 or args.rho not in ((0.,) if v3 or v4 else (0.,.01))
+            or getattr(args,'initial_expected_removed',1.)!=a.get('initial_expected_removed',1.)
             or args.joint_pairs!=1 or wt['manifest_hash']!=a['wikitext_manifest_hash']):
         raise ValueError('CLI differs from frozen amendment')
     enabled=args.collateral_arm in ('W','HW')
@@ -971,13 +982,15 @@ def _amended_plan(args,m):
 
 def _amended_receipt(record,m,mode):
     policy=m['amendment']['policy']
-    if (record.get('version')!=(3 if policy=='amendment-v3' else 2) or record.get('policy')!=policy
+    if (record.get('version')!=(4 if policy=='amendment-v4' else 3 if policy=='amendment-v3' else 2) or record.get('policy')!=policy
             or record.get('manifest_hash')!=m['manifest_hash'] or record.get('baseline_path')!=BASELINE_PATH
             or not record.get('root_decision') or not record.get('source_revision')
             or not record.get('source_files_hash') or not record.get('model_revision')
             or record.get('user_authorized_fit') is not True or not isinstance(record.get('prior_behavior'),dict)
             or not record.get('wikitext_manifest_hash')):
         raise ValueError('amended root receipt identity/authorization missing')
+    if policy=='amendment-v4' and record.get('initial_expected_removed')!=m['amendment']['initial_expected_removed']:
+        raise ValueError('root receipt initialization differs')
     if m['amendment'].get('protocol_hash') and record.get('protocol_hash')!=m['amendment']['protocol_hash']:
         raise ValueError('amendment scientific protocol hash differs')
     if mode!='baseline' and any(not record.get(k) for k in ('baseline_fingerprint','baseline_cache_sha256',
@@ -1052,6 +1065,8 @@ def _amended_baseline(args,m,identity,ctx,load_seconds=0.):
                 totals.append(payload['base_nll_sum']/block['n_tokens'])
             means[split]=sum(totals)/len(totals)
     sr.atomic_json(args.output_dir/'baseline.json',dict(policy=identity['policy'],fingerprint=fingerprint,
+        **(dict(manifest_hash=m['manifest_hash'],initial_expected_removed=args.initial_expected_removed,
+                source_files_hash=identity['source_files_hash']) if identity['policy']=='amendment-v4' else {}),
         baseline_cache_sha256=_hash_file(path),wikitext_cache_fingerprint=wfp,
         wikitext_cache_inventory_hash=_wt_inventory(args,wm,wfp),w_nll=means,
         capability={s:c['capability'] for s,c in cache['splits'].items()},
@@ -1151,7 +1166,8 @@ def _amended_update(model,m,cache,args,ids,wblock,wfp,optimizer,*,measure_gradie
 
 def _train_amended(args,m,identity,ctx,cache,wm,wfp):
     from evaluation import selective_wikitext as wt
-    model=ctx.node_model;params=sm.configure_candidate_gates(model,m['candidate_heads'])
+    model=ctx.node_model;params=sm.configure_candidate_gates(model,m['candidate_heads'],
+        expected_initial_removed=getattr(args,'initial_expected_removed',1.))
     optimizer=_optimizer(params);fp=sd.content_hash(identity);latest=args.output_dir/'latest.pt'
     schedule=amended_schedule(len(m['splits']['train']['clusters']),seed=args.seed,updates=args.max_updates)
     blocks=list(wt.iter_blocks(wm,'train')) if wm else []
@@ -1211,6 +1227,18 @@ def _comparison(a,b):
         argmax_flips=int((a.detach().cpu().argmax(-1)!=b.detach().cpu().argmax(-1)).sum()))
 
 
+def _v4_exact_calibration(checks,profile):
+    """V4 no-op comparisons must match every vocabulary entry exactly."""
+    def exact(value):
+        return (value is not None and value['finite'] and value['changed_entries']==0
+                and value['max_abs_full_vocab']==0.)
+    return (bool(checks) and bool(profile)
+        and all(all(exact(v) for v in c['comparisons'].values()) and exact(c['reference']) for c in checks)
+        and all(p['max_updates']==3072 and p['initial_expected_removed'] in (1.,10.)
+                and math.isclose(p['initial_expected_removed_measured'],p['initial_expected_removed'],rel_tol=1e-6)
+                for p in profile))
+
+
 def _amended_calibrate(args,m,identity,ctx,cache,wm,wfp,load_seconds):
     """Disposable A/B/C and warmed optimizer measurements; restores all state."""
     from analysis import open_all_gates
@@ -1219,6 +1247,7 @@ def _amended_calibrate(args,m,identity,ctx,cache,wm,wfp,load_seconds):
     original_heads=m['candidate_heads'];cpu_rng=torch.get_rng_state()
     cuda_rng=torch.cuda.get_rng_state_all() if torch.cuda.is_available() else []
     training=model.training;checks=[];profile=[];hooks=[]
+    v4=getattr(args,'policy',None)=='amendment-v4';initial=getattr(args,'initial_expected_removed',1.)
     blocks=list(wt.iter_blocks(wm,'train'));schedule=amended_schedule(119,seed=args.seed)
     def forced(module,inputs,out):return out+(torch.ones_like(out)-out).detach()
     try:
@@ -1227,12 +1256,12 @@ def _amended_calibrate(args,m,identity,ctx,cache,wm,wfp,load_seconds):
         for i,c in enumerate(m['splits']['train']['clusters']):
             representatives.setdefault(len(c['prompts']['original']['D']['clean']['input_ids']),i)
         cases=[('SDR',i) for i in representatives.values()]+[('WT',b) for b in blocks[:2]]
-        for space in ('union','all'):
+        for space in (('all',) if v4 else ('union','all')):
             heads=original_heads if space==m['amendment']['candidate_space'] else (
                 [[l,h] for l in range(32) for h in range(32)] if space=='all' else m['amendment'].get('union_heads',[]))
             if not heads:
                 raise ValueError('all-head profiling needs frozen union head list in amendment')
-            params=sm.configure_candidate_gates(model,heads)
+            params=sm.configure_candidate_gates(model,heads,**({'expected_initial_removed':initial} if v4 else {}))
             for domain,item in cases:
                 def forward(self_donor):
                     if domain=='WT':return _wt_logits(model,item,self_donor=self_donor)
@@ -1279,8 +1308,10 @@ def _amended_calibrate(args,m,identity,ctx,cache,wm,wfp,load_seconds):
                     gradient_isolation=isolated,candidate_nonzero_gradient=nonzero))
                 model.zero_grad(set_to_none=True)
             # Profile each actual arm under each eligibility; discard warmup/state.
-            for arm in (('W','HW') if getattr(args,'policy',None)=='amendment-v3' else ('H','W','HW')):
-                sm.configure_candidate_gates(model,heads);optimizer=_optimizer([p for p in model.parameters() if p.requires_grad])
+            for arm in (('W',) if v4 else ('W','HW') if getattr(args,'policy',None)=='amendment-v3' else ('H','W','HW')):
+                sm.configure_candidate_gates(model,heads,**({'expected_initial_removed':initial} if v4 else {}))
+                initial_count=float(torch.sigmoid(-_candidate_logits(model)).sum().detach())
+                optimizer=_optimizer([p for p in model.parameters() if p.requires_grad])
                 profile_args=copy.copy(args);profile_args.collateral_arm=arm
                 local_m=dict(m,candidate_heads=heads)
                 model.train();_amended_update(model,local_m,cache,profile_args,schedule[0],blocks[0],wfp,optimizer)
@@ -1318,16 +1349,17 @@ def _amended_calibrate(args,m,identity,ctx,cache,wm,wfp,load_seconds):
                 profile.append(dict(candidate_space=space,collateral_arm=arm,warmup_updates=1,disposable_updates=args.profile_updates,
                     update_seconds=durations,priced_update_seconds=priced,validation_119pairs_16blocks_seconds=validation_seconds,
                     checkpoint_seconds=io_seconds,checkpoint_bytes=io_bytes,validation_no_op=no_op,
-                    **{('estimated_1536_update_run_seconds' if getattr(args,'policy',None)=='amendment-v3' else 'estimated_512_update_run_seconds'):
+                    **{('estimated_3072_update_run_seconds' if v4 else 'estimated_1536_update_run_seconds' if getattr(args,'policy',None)=='amendment-v3' else 'estimated_512_update_run_seconds'):
                         load_seconds+args.max_updates*sum(priced)/len(priced)
                         +(args.max_updates//args.checkpoint_every)*validation_seconds
                         +(args.max_updates+args.max_updates//args.checkpoint_every+1)*io_seconds},
                     peak_cuda_bytes=torch.cuda.max_memory_allocated() if torch.cuda.is_available() else 0,
                     export_equivalent=equivalent,export_probe_removed_heads=len(export['removed_heads']),raw_components_and_gradient_contributions=logs[0],
+                    **(dict(initial_expected_removed=initial,initial_expected_removed_measured=initial_count,max_updates=3072) if v4 else {}),
                     all_updates_finite=True,actual_nonself_candidate_gradient=bool(logs[0]['gradient_component_norms'].get('T',0.)>0) and all(x['candidate_nonzero_gradient'] for x in logs)))
     finally:
         for hook in hooks:hook.remove()
-        sm.configure_candidate_gates(model,original_heads)
+        sm.configure_candidate_gates(model,original_heads,**({'expected_initial_removed':initial} if v4 else {}))
         with torch.no_grad():
             for k,v in _gate_state(model).items():v.copy_(original[k])
         model.zero_grad(set_to_none=True);model.train(training);torch.set_rng_state(cpu_rng)
@@ -1336,6 +1368,7 @@ def _amended_calibrate(args,m,identity,ctx,cache,wm,wfp,load_seconds):
         and (c['domain']=='WT' or v['max_abs_label_logits']<=.02) for v in c['comparisons'].values()) for c in checks)
     no_op_pass=all(p['validation_no_op']['removed']==0 and p['validation_no_op']['all_h_argmax_preserved']
         and p['validation_no_op']['all_d_argmax_preserved'] and p['validation_no_op']['max_abs_label_logits']<=.02 for p in profile)
+    if v4:finite=finite and _v4_exact_calibration(checks,profile)
     sr.atomic_json(args.output_dir/'calibration.json',dict(policy=getattr(args,'policy','amendment-v2'),numerical_checks=checks,
         numerical_gate_passed=finite and no_op_pass and all(p['actual_nonself_candidate_gradient'] and p['export_equivalent'] for p in profile),
         fixed_semantic_label_logit_tolerance=.02,wikitext_distributional_floor_requires_root_review=True,model_load_seconds=load_seconds,source_files_hash=identity['source_files_hash'],
@@ -1362,7 +1395,7 @@ def _run_amended(args,m,receipt,mode):
     wfp=wt.cache_fingerprint(wm,_wt_reference_identity(identity))
     if receipt['wikitext_cache_fingerprint']!=wfp or receipt['wikitext_cache_inventory_hash']!=_wt_inventory(args,wm,wfp):
         raise ValueError('root WikiText reference identity/inventory differs')
-    sm.configure_candidate_gates(ctx.node_model,m['candidate_heads'])
+    sm.configure_candidate_gates(ctx.node_model,m['candidate_heads'],expected_initial_removed=getattr(args,'initial_expected_removed',1.))
     if mode=='calibrate':_amended_calibrate(args,m,identity,ctx,cache,wm,wfp,load_seconds)
     else:_train_amended(args,m,identity,ctx,cache,wm,wfp)
     return 0
@@ -1381,7 +1414,10 @@ def _verify_amended_evidence(receipt,m):
             or report.get('production_optimizer_steps')!=0 or report.get('all_smoke_states_discarded') is not True):
         raise ValueError('measured calibration/profile content differs from root receipt')
     matches=[row for row in report.get('profile',[]) if row['candidate_space']==m['amendment']['candidate_space']
-             and row['collateral_arm']==m['amendment']['collateral_arm']]
+             and row['collateral_arm']==m['amendment']['collateral_arm']
+             and (m['amendment']['policy']!='amendment-v4' or
+                  row.get('initial_expected_removed')==m['amendment']['initial_expected_removed']
+                  and row.get('max_updates')==3072)]
     if len(matches)!=1 or not matches[0]['actual_nonself_candidate_gradient'] or not matches[0]['export_equivalent']:
         raise ValueError('matching measured candidate-space/arm profile missing')
 
