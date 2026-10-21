@@ -392,6 +392,7 @@ def build_validation_manifest(tokenizer, *, primary_root: Path, seed: int=SEED) 
         population_claim='compositional fixtures; familiar entities/items/templates; native historically exposed',
         code_sha256=code,tokenizer_files=tokenizer_files,model_files=cache_files,model_cache=str(CACHE),model_revision=CACHE.name,
         software={name:importlib.metadata.version(name) for name in ('torch','transformers','datasets','nnsight')},
+        allowed_gpu_classes=['A100','H200'],path_hardware_requirement='same GPU class as baseline; numerical controls remain mandatory',
         dtype='bfloat16',attention='sdpa',scoring='hooks.capture_forward/READOUT/fp32 readout_logits',
         forecast={'baseline_rows':1280,'baseline_batches':160,'minimum_baseline_forwards':320,'path_rows':45824,'path_forwards_upper_bound':4*((45824+7)//8),'required_eight_story_calibration':8})
     manifest['payload_hashes']={key:digest(manifest[key]) for key in ('panel','maps','pairs','grid')}
@@ -525,9 +526,27 @@ def parse_args(argv=None):
     return parser.parse_args(argv)
 
 
+def validation_gpu_identity(cuda):
+    """Validate the single allocated device and retain its actual hardware class."""
+    if not cuda.is_available() or cuda.device_count()!=1:
+        raise ValueError('exactly one allocated A100 or H200 required')
+    name=cuda.get_device_name(0)
+    match=re.search(r'\b(A100|H200)\b',name)
+    if match is None:raise ValueError('allocated GPU must be A100 or H200: '+name)
+    return {'name':name,'class':match[1],'compute_capability':list(cuda.get_device_capability(0)),
+            'total_memory_bytes':int(cuda.get_device_properties(0).total_memory),'count':1}
+
+
+def baseline_provenance(manifest,identity):
+    """Bind later recapture to the baseline's actual GPU class/scoring path."""
+    manifest=manifest or {}
+    return {**{k:manifest.get(k) for k in ('manifest_hash','dtype','attention','scoring')},
+            'gpu_identity':identity,'required_path_gpu_class':identity['class'] if identity else None}
+
+
 def run_baselines(args) -> dict:
     started=time.monotonic();output=validated_output(args.output);output.mkdir(parents=True,exist_ok=True)
-    cost=dict(status='initializing',reserved_gpu_seconds=0 if args.dry_run else args.allocation_seconds,prior_reserved_gpu_seconds=args.prior_reserved_gpu_seconds,actual_gpu_seconds=0,paid_api_calls=0,job_id=os.environ.get('SLURM_JOB_ID'))
+    cost=dict(status='initializing',reserved_gpu_seconds=0 if args.dry_run else args.allocation_seconds,prior_reserved_gpu_seconds=args.prior_reserved_gpu_seconds,actual_gpu_seconds=0,paid_api_calls=0,job_id=os.environ.get('SLURM_JOB_ID'),gpu_identity=None,gpu_seconds_basis='unweighted single-GPU reserved wall seconds; actual hardware class recorded explicitly')
     if (output/'cost.json').exists():raise ValueError('refuse overwriting attempted run; use a new output directory')
     atomic_json(output/'cost.json',cost)
     if args.stage!='baselines':raise ValueError('paths require independently reviewed Task2 after written baseline gate')
@@ -539,7 +558,8 @@ def run_baselines(args) -> dict:
         tokenizer=AutoTokenizer.from_pretrained(str(CACHE),local_files_only=True)
         manifest=build_validation_manifest(tokenizer,primary_root=ROOT)
         atomic_json(output/'manifest.json',manifest)
-        gate=evaluate_validity(manifest,[],[]);gate['status']='cpu_dry_run'
+        gate=evaluate_validity(manifest,[],[]);gate.update(status='cpu_dry_run',gpu_identity=None,required_path_gpu_class=None)
+        atomic_json(output/'baseline-provenance.json',baseline_provenance(manifest,None))
         atomic_json(output/'validity-gate.json',gate)
         for name in ('baseline.jsonl','numerical.jsonl','comparisons.jsonl'):write_jsonl(output/name,[])
         atomic_json(output/'calibration.json',{'status':'cpu_only','forecast':manifest['forecast']})
@@ -553,7 +573,9 @@ def run_baselines(args) -> dict:
         atomic_json(output/'cost.json',cost);atomic_json(output/'calibration.json',calibration)
         write_jsonl(output/'baseline.jsonl',rows);write_jsonl(output/'numerical.jsonl',controls);write_jsonl(output/'comparisons.jsonl',attempted)
         gate=evaluate_validity(manifest,rows,controls) if manifest else {'paths_go':False,'reasons':['no verified manifest']}
-        gate.update(status=status,error=stop['reason']);atomic_json(output/'validity-gate.json',gate)
+        provenance=baseline_provenance(manifest,cost['gpu_identity'])
+        atomic_json(output/'baseline-provenance.json',provenance)
+        gate.update(status=status,error=stop['reason'],gpu_identity=provenance['gpu_identity'],required_path_gpu_class=provenance['required_path_gpu_class']);atomic_json(output/'validity-gate.json',gate)
         (output/'summary.md').write_text(f'Baseline status: {status}. Completed {len(rows)}/1280. Paths gate: {gate["paths_go"]}.\n'+json.dumps(gate,sort_keys=True)+'\n')
         return gate
     def on_signal(number,frame):stop['reason']='signal '+str(number)
@@ -570,7 +592,8 @@ def run_baselines(args) -> dict:
         import torch
         from component_analysis import hooks
         from component_analysis import path_patching as pp
-        if not torch.cuda.is_available() or torch.cuda.device_count()!=1 or 'H200' not in torch.cuda.get_device_name(0):raise ValueError('exactly one allocated H200 required')
+        cost['gpu_identity']=validation_gpu_identity(torch.cuda)
+        checkpoint()  # persist actual class/capability before model loading or OOM
         index=CACHE/'model.safetensors.index.json';weight_map=json.loads(index.read_text())['weight_map']
         if not all((CACHE/name).is_file() for name in set(weight_map.values())):raise ValueError('missing cached model shards')
         if stop['reason'] or time.monotonic()>=deadline-30:

@@ -16,7 +16,7 @@ python_bin=/u/swong2/.conda/envs/mgnp/bin/python
 for arg in "$@"; do
     if [[ "$arg" == --dry-run ]]; then exec "$python_bin" "$runner" "$@"; fi
 done
-: "${SLURM_JOB_ID:?oneH200Slurm allocation required}"
+: "${SLURM_JOB_ID:?oneA100orH200Slurm allocation required}"
 : "${SLURM_JOB_END_TIME:?allocation deadline required}"
 : "${SDR_VALIDATION_ALLOCATED_SECONDS:?operator must set full reservation seconds}"
 prior="${SDR_VALIDATION_PRIOR_RESERVED_GPU_SECONDS:-0}"

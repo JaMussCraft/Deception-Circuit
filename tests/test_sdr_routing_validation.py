@@ -288,3 +288,32 @@ def test_neutral_reporting_truth_failure_is_visible_without_affecting_retrieval_
     assert gate['neutral_reporting_strata']['A:truth0']=={'correct':0,'total':64,'accuracy':0.,'non_item_count':32}
     assert gate['neutral_reporting_strata']['A:truth1']=={'correct':64,'total':64,'accuracy':1.,'non_item_count':0}
     assert all(s['pass'] for s in gate['neutral_retrieval_strata'].values())
+
+
+@pytest.mark.parametrize('name,capability,expected_class',[
+    ('NVIDIA A100-SXM4-40GB',(8,0),'A100'),('NVIDIA H200',(9,0),'H200')])
+def test_allocated_gpu_identity_accepts_authorized_classes(runner,name,capability,expected_class):
+    from types import SimpleNamespace
+    cuda=SimpleNamespace(is_available=lambda:True,device_count=lambda:1,
+                         get_device_name=lambda index:name,get_device_capability=lambda index:capability,
+                         get_device_properties=lambda index:SimpleNamespace(total_memory=40*1024**3))
+    assert hasattr(runner,'validation_gpu_identity'), 'GPU class guard/identity receipt missing'
+    assert runner.validation_gpu_identity(cuda)=={'name':name,'class':expected_class,'compute_capability':list(capability),'total_memory_bytes':40*1024**3,'count':1}
+
+
+def test_allocated_gpu_identity_rejects_unexpected_class_and_multiple_devices(runner):
+    from types import SimpleNamespace
+    assert hasattr(runner,'validation_gpu_identity'), 'GPU class guard/identity receipt missing'
+    cuda=SimpleNamespace(is_available=lambda:True,device_count=lambda:1,
+                         get_device_name=lambda index:'NVIDIA A40',get_device_capability=lambda index:(8,6))
+    with pytest.raises(ValueError,match='A100|H200'):runner.validation_gpu_identity(cuda)
+    cuda.device_count=lambda:2
+    with pytest.raises(ValueError,match='one'):runner.validation_gpu_identity(cuda)
+
+
+def test_baseline_provenance_binds_actual_gpu_class_for_path_recapture(runner):
+    identity={'name':'NVIDIA A100-SXM4-40GB','class':'A100','compute_capability':[8,0],'total_memory_bytes':40*1024**3,'count':1}
+    assert hasattr(runner,'baseline_provenance'), 'device-bound baseline provenance receipt missing'
+    provenance=runner.baseline_provenance({'manifest_hash':'frozen','dtype':'bfloat16','attention':'sdpa','scoring':'fp32 READOUT'},identity)
+    assert provenance['gpu_identity']==identity and provenance['required_path_gpu_class']=='A100'
+    assert provenance['manifest_hash']=='frozen' and provenance['dtype']=='bfloat16'
