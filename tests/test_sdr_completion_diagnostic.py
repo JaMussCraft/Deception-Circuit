@@ -242,8 +242,8 @@ def test_interruption_retains_cached_firsttoken_and_partial_rows(tiny,monkeypatc
 
 def test_budget_envelope_counts_prior_failed_reservations():
     r=runner()
-    args=SimpleNamespace(stage='main',allocation_seconds=3000,prior_reserved_gpu_seconds=4200,
-        initial_reserved_gpu_seconds=600,max_seconds=2900)
+    args=SimpleNamespace(stage='main',allocation_seconds=3600,prior_reserved_gpu_seconds=4200,
+        initial_reserved_gpu_seconds=600,max_seconds=3500)
     r.validate_budget(args)
     args.initial_reserved_gpu_seconds=601
     with pytest.raises(ValueError):r.validate_budget(args)
@@ -300,7 +300,7 @@ def test_all1280_last_checksum_failure_prevents_every_continuation(tiny,monkeypa
     with pytest.raises(r.DiagnosticStop):
         r.greedy_complete_batch(model,panel[:8],r.FirstSteps(state['firststep_receipts'][:8],runtime=state))
 
-@pytest.mark.parametrize('stage,allocated,initial',[('calibration',600,0),('main',3000,600)])
+@pytest.mark.parametrize('stage,allocated,initial',[('calibration',600,0),('main',3600,600)])
 def test_actual_wrapper_forwards_full_reservation_ledger(tmp_path,stage,allocated,initial):
     import os
     import subprocess
@@ -325,7 +325,7 @@ def test_actual_wrapper_forwards_full_reservation_ledger(tmp_path,stage,allocate
     assert argv[argv.index('--allocation-seconds')+1]==str(allocated)
     assert argv[argv.index('--initial-reserved-gpu-seconds')+1]==str(initial)
     assert argv[argv.index('--prior-reserved-gpu-seconds')+1]=='4200'
-    env['SDR_COMPLETION_INITIAL_RESERVED_GPU_SECONDS']='3600'
+    env['SDR_COMPLETION_INITIAL_RESERVED_GPU_SECONDS']='4200'
     recorded.unlink()
     rejected=subprocess.run(['bash',str(ROOT/'scripts/sdr_completion_diagnostic.sbatch')],env=env,capture_output=True,text=True)
     assert rejected.returncode==2 and not recorded.exists()
@@ -377,3 +377,39 @@ def test_EOS_on_token32_is_terminated_not_capped(tiny,monkeypatch):
     assert calls['n']==31
     assert all(len(row['generated_ids'])==32 and row['stop_reason']=='eos'
         and row['terminal_eos_id']==128008 and row['status']=='completed' for row in got)
+
+CALIBRATION=ROOT/'outputs/_analyses/sdr-completion-diagnostic/calibration-962cdd8-20261021T142417Z'
+
+@pytest.fixture(scope='module')
+def amended_release():
+    r=runner()
+    original=json.loads((CALIBRATION/'manifest.json').read_text())
+    return r,original,r.amend_completion_manifest(CALIBRATION/'manifest.json')
+
+def test_operational_amendment_preserves_science_and_old_provenance(amended_release):
+    r,old,new=amended_release
+    assert new['budget']['main_reserved_seconds_max']==3600
+    assert new['budget']['initial_total_reserved_seconds_max']==4200
+    assert new['budget']['overall_reserved_seconds_max']==14400
+    assert r.scientific_payload_hash(old)==r.scientific_payload_hash(new)
+    assert new['operational_amendment']['prior_manifest_hash']==old['manifest_hash']
+    assert new['operational_amendment']['prior_manifest_file_sha256']==r.file_hash(CALIBRATION/'manifest.json')
+    assert new['operational_amendment']['prior_code_sha256']==old['new_code_sha256']
+    assert old==json.loads((CALIBRATION/'manifest.json').read_text())
+
+def test_amended_main_accepts_measured3208_but_retains_historical_3000_fail(amended_release):
+    r,old,new=amended_release
+    audit=r.validate_calibration_receipt(CALIBRATION/'calibration.json',new,3600)
+    assert audit['fits_allocated_seconds'] is True
+    assert audit['historical_forecast']['fits_3000'] is False
+    assert 3200<audit['historical_forecast']['forecast_seconds']<3210
+    with pytest.raises(r.DiagnosticStop):r.validate_calibration_receipt(CALIBRATION/'calibration.json',new,3000)
+
+def test_operational_amendment_rejects_changed_scientific_payload(amended_release):
+    r,old,new=amended_release
+    bad=copy.deepcopy(new);bad['panel'][0]['ids'][0]+=1
+    with pytest.raises(ValueError):r.validate_calibration_receipt(CALIBRATION/'calibration.json',bad,3600)
+    bad=copy.deepcopy(new);bad['rubric_hash']='changed'
+    with pytest.raises(ValueError):r.validate_calibration_receipt(CALIBRATION/'calibration.json',bad,3600)
+    bad=copy.deepcopy(new);bad['operational_amendment']['prior_code_sha256']={}
+    with pytest.raises(ValueError):r.validate_calibration_receipt(CALIBRATION/'calibration.json',bad,3600)

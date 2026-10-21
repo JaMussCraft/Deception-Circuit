@@ -28,10 +28,10 @@ allocated="$SDR_COMPLETION_ALLOCATED_SECONDS"
 remaining=$((SLURM_JOB_END_TIME - $(date +%s)))
 case "$SDR_COMPLETION_STAGE" in
     calibration) ceiling=600 ;;
-    main) ceiling=3000 ;;
+    main) ceiling=3600 ;;
     *) echo 'Only calibration/main GPU stages supported' >&2; exit 2 ;;
 esac
-if (( remaining < 120 || allocated < remaining || allocated > ceiling || prior < 0 || initial < 0 || initial + allocated > 3600 || allocated + prior > 14400 )); then
+if (( remaining < 120 || allocated < remaining || allocated > ceiling || prior < 0 || initial < 0 || initial + allocated > 4200 || allocated + prior > 14400 )); then
     echo 'Invalid bounded calibration/main reservation ledger or deadline' >&2; exit 2
 fi
 bound=$((remaining - 90))

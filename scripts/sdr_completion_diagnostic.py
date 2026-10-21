@@ -159,8 +159,8 @@ def build_completion_manifest(parent_dir: Path, tokenizer, *, seed: int = 202610
         'calibration_excluded_from_main':True,'calibration_batches':8,
         'rubric':RUBRIC,'rubric_hash':digest(RUBRIC),
         'annotation_recipe_hash':digest(RUBRIC['annotation_recipe']),
-        'budget':{'calibration_reserved_seconds_max':600,'main_reserved_seconds_max':3000,
-            'initial_total_reserved_seconds_max':3600,'overall_reserved_seconds_max':14400,
+        'budget':{'calibration_reserved_seconds_max':600,'main_reserved_seconds_max':3600,
+            'initial_total_reserved_seconds_max':4200,'overall_reserved_seconds_max':14400,
             'generation_forwards_main_max':5120,'main_replay_forwards':160,
             'main_continuation_forwards_max':4960,'generated_tokens_main_max':40960,
             'calibration_replay_forwards':160,'calibration_continuation_forwards_max':248,
@@ -182,6 +182,93 @@ def verify_completion_manifest(manifest):
         for path,expected in manifest[category].items():
             if file_hash(path)!=expected:raise ValueError('frozen file changed: '+path)
     check_prefixes(manifest['panel'])
+
+
+# The only historical source accepted by this allocation-only amendment is the
+# reviewed962cdd8 calibration release. This is not a general source bypass.
+ORIGINAL_COMPLETION_HASH='486fd9563b23ccd58d6fdd353b11a467171bad57d8c25ee6c480df1762faba2e'
+ORIGINAL_CODE={
+    str(CODE_ROOT/'scripts/sdr_completion_diagnostic.py'):'57cd2be1755f3f13e74093fdab3612695064e41bcf38e763b97853fd88d8b17f',
+    str(CODE_ROOT/'scripts/sdr_completion_diagnostic.sbatch'):'ef36917e616453f18ad28835463194a50854696c8117b1f36b600a4759ae85da',
+}
+
+
+def scientific_payload_hash(manifest):
+    body={k:v for k,v in manifest.items() if k not in
+        ('manifest_hash','new_code_sha256','operational_amendment','_runtime','_private_join')}
+    body['budget']={k:v for k,v in manifest['budget'].items() if k not in
+        ('main_reserved_seconds_max','initial_total_reserved_seconds_max')}
+    return digest(body)
+
+
+def original_amendment_source(path):
+    original=json.loads(Path(path).read_text())
+    if (original.get('manifest_hash')!=ORIGINAL_COMPLETION_HASH
+            or digest({k:v for k,v in original.items() if k!='manifest_hash'})!=ORIGINAL_COMPLETION_HASH
+            or original.get('new_code_sha256')!=ORIGINAL_CODE
+            or original['budget']['main_reserved_seconds_max']!=3000
+            or original['budget']['initial_total_reserved_seconds_max']!=3600):
+        raise ValueError('amendment accepts only the reviewed original calibration manifest/source')
+    return original
+
+
+def amend_completion_manifest(path):
+    path=Path(path).resolve()
+    original=original_amendment_source(path)
+    amended=json.loads(json.dumps(original))
+    amended['budget']['main_reserved_seconds_max']=3600
+    amended['budget']['initial_total_reserved_seconds_max']=4200
+    amended['new_code_sha256']={p:file_hash(p) for p in ORIGINAL_CODE}
+    amended['operational_amendment']={
+        'kind':'allocation-only-3000-to-3600-v1',
+        'rationale':'Measured fullcap forecast3207.80sec exceeds3000; root authorized3600 main plus600 calibration, global14400 unchanged.',
+        'prior_manifest_hash':original['manifest_hash'],
+        'prior_manifest_file_sha256':file_hash(path),
+        'prior_manifest_path':str(path),'prior_code_sha256':original['new_code_sha256'],
+        'scientific_payload_hash':scientific_payload_hash(original),
+    }
+    amended.pop('manifest_hash')
+    amended['manifest_hash']=digest(amended)
+    verify_completion_manifest(amended)
+    return amended
+
+
+def validate_calibration_receipt(path,manifest,allocated_seconds):
+    path=Path(path).resolve()
+    if NAMESPACE.resolve() not in path.parents:
+        raise ValueError('calibration receipt outside diagnostic namespace')
+    receipt=json.loads(path.read_text())
+    if (receipt.get('status')!='calibration_complete'
+            or receipt.get('rubric_hash')!=manifest['rubric_hash']):
+        raise ValueError('calibration incomplete or different frozen rubric')
+    binding='same_manifest'
+    if receipt.get('manifest_hash')!=manifest['manifest_hash']:
+        amendment=manifest.get('operational_amendment',{})
+        original_path=path.parent/'manifest.json'
+        original=original_amendment_source(original_path)
+        if (amendment.get('kind')!='allocation-only-3000-to-3600-v1'
+                or amendment.get('prior_manifest_hash')!=receipt['manifest_hash']
+                or amendment.get('prior_manifest_hash')!=original['manifest_hash']
+                or amendment.get('prior_manifest_file_sha256')!=file_hash(original_path)
+                or amendment.get('prior_code_sha256')!=ORIGINAL_CODE
+                or amendment.get('scientific_payload_hash')!=scientific_payload_hash(original)
+                or scientific_payload_hash(manifest)!=scientific_payload_hash(original)
+                or manifest['budget']['main_reserved_seconds_max']!=3600
+                or manifest['budget']['initial_total_reserved_seconds_max']!=4200):
+            raise ValueError('calibration does not match narrow allocation-only amendment')
+        binding='reviewed_allocation_only_amendment'
+    recalculated=forecast_main(receipt)  # Preserve exact historical forecast/fit3000.
+    if receipt.get('forecast')!=recalculated:
+        raise ValueError('calibration measured forecast changed')
+    fits=recalculated['forecast_seconds']<=allocated_seconds
+    if not fits:
+        raise DiagnosticStop('measured full-cap forecast plus buffer cannot fit actual main allocation')
+    if receipt.get('firststep_checks')!=1280 or not receipt.get('firststep_gate_pass'):
+        raise DiagnosticStop('calibration did not pass all1280 checksums')
+    return {'binding':binding,'calibration_receipt_sha256':file_hash(path),
+        'allocated_seconds':allocated_seconds,'fits_allocated_seconds':fits,
+        'historical_forecast':recalculated,'manifest_hash':manifest['manifest_hash'],
+        'calibration_manifest_hash':receipt['manifest_hash']}
 
 
 def check_running(runtime):
@@ -566,12 +653,12 @@ def run_annotations(args):
 
 
 def validate_budget(args):
-    bound=600 if args.stage=='calibration' else 3000
+    bound=600 if args.stage=='calibration' else 3600
     if (not 120<=args.allocation_seconds<=bound or args.prior_reserved_gpu_seconds<0
             or args.prior_reserved_gpu_seconds+args.allocation_seconds>14400
             or args.initial_reserved_gpu_seconds is None
             or args.initial_reserved_gpu_seconds<0
-            or args.initial_reserved_gpu_seconds+args.allocation_seconds>3600):
+            or args.initial_reserved_gpu_seconds+args.allocation_seconds>4200):
         raise ValueError('operator reservation bounds invalid, including failed initial attempts')
     if not 1<=args.max_seconds<=args.allocation_seconds-60:
         raise ValueError('internal deadline invalid')
@@ -615,7 +702,10 @@ def run_diagnostic(args):
         os.environ['HF_HUB_OFFLINE']='1';os.environ['TRANSFORMERS_OFFLINE']='1'
         from transformers import AutoTokenizer
         tokenizer=AutoTokenizer.from_pretrained(str(CACHE),local_files_only=True)
-        if args.manifest:
+        if args.amend_manifest:
+            if not args.dry_run:raise ValueError('manifest amendment is CPU-only; review its output before inference')
+            manifest=amend_completion_manifest(args.amend_manifest)
+        elif args.manifest:
             manifest=json.loads(Path(args.manifest).read_text());verify_completion_manifest(manifest)
             if Path(args.parent).resolve()!=Path(manifest['parent_dir']):raise ValueError('parent argument differs from freeze')
         elif args.dry_run:
@@ -639,17 +729,10 @@ def run_diagnostic(args):
         for number in (signal.SIGTERM,signal.SIGINT):old_handlers[number]=signal.signal(number,stop)
         if kind=='main':
             if not args.calibration_receipt:raise ValueError('measured reviewed calibration receipt required')
-            receipt_path=Path(args.calibration_receipt).resolve()
-            if NAMESPACE.resolve() not in receipt_path.parents:raise ValueError('calibration receipt outside diagnostic namespace')
-            receipt=json.loads(receipt_path.read_text())
-            if receipt.get('status')!='calibration_complete' or receipt.get('manifest_hash')!=manifest['manifest_hash'] or receipt.get('rubric_hash')!=manifest['rubric_hash']:
-                raise ValueError('calibration incomplete or different frozen protocol')
-            recalculated=forecast_main(receipt)
-            if receipt.get('forecast')!=recalculated or not recalculated['fits_3000'] or recalculated['forecast_seconds']>args.allocation_seconds:
-                raise DiagnosticStop('measured full-cap forecast plus buffer cannot fit main allocation')
-            if receipt.get('firststep_checks')!=1280 or not receipt.get('firststep_gate_pass'):
-                raise DiagnosticStop('calibration did not pass all1280 checksums')
-            cost['calibration_receipt_sha256']=file_hash(receipt_path)
+            calibration_binding=validate_calibration_receipt(args.calibration_receipt,manifest,args.allocation_seconds)
+            cost['calibration_receipt_sha256']=calibration_binding['calibration_receipt_sha256']
+            cost['fits_allocated_seconds']=calibration_binding['fits_allocated_seconds']
+            atomic_json(output/'calibration-binding.json',calibration_binding)
         parent=json.loads((Path(manifest['parent_dir'])/'manifest.json').read_text())
         verify_validation_manifest(parent,check_files=True)
         import torch
@@ -734,7 +817,9 @@ def parse_args(argv=None):
     parser.add_argument('--stage',choices=('calibration','main','annotate'),default='calibration')
     parser.add_argument('--parent',default=str(PARENT))
     parser.add_argument('--output',required=True)
-    parser.add_argument('--manifest')
+    frozen=parser.add_mutually_exclusive_group()
+    frozen.add_argument('--manifest')
+    frozen.add_argument('--amend-manifest',help='CPU-only reviewed allocation amendment of original calibration release')
     parser.add_argument('--dry-run',action='store_true')
     parser.add_argument('--calibration-receipt')
     parser.add_argument('--allocation-seconds',type=int,default=0)
