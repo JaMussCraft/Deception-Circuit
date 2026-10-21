@@ -169,10 +169,12 @@ def test_tiny_same_path_full_vocab_and_mapped_head_isolation(family):
     from component_analysis import hooks
     torch.manual_seed(71)
     model=NNsight(LlamaForCausalLM(tiny_config(attn_implementation='sdpa')).eval())
-    ids=torch.randint(0,64,(1,9));mask=torch.ones_like(ids)
+    ids=torch.randint(0,64,(1,9));mask=torch.ones_like(ids);mask[0,-2:]=0
     keys=[family,('head',family[1],2),('mlp',family[1],0),hooks.READOUT_KEY]
     a=hooks.capture_forward(model,ids,mask,components=keys)
-    b=hooks.capture_forward(model,ids,mask,components=keys,replacements={family:a.outputs[family]})
+    self_values=m.self_replacements(a.outputs,[{'length':7}],ids.device)
+    assert not self_values[family].positions[0,7:].any()
+    b=hooks.capture_forward(model,ids,mask,components=keys,replacements=self_values)
     va=m.capture_logits(model,a);vb=m.capture_logits(model,b)
     assert m.numerical_receipt(va,vb)['pass']
     assert m.numerical_receipt(va,m.capture_logits(model,hooks.capture_forward(model,ids,mask,components=keys)))['pass']
@@ -274,3 +276,39 @@ def test_gate_answer_coverage_normalizes_positions_across_item_pairs():
     gate=m.evaluate_gate(manifest,rows,m.build_comparisons({},rows),{'self_patch_pass':True,'mapping_pass':True})
     assert gate['stage2_go'],gate['reasons']
     assert gate['support']['P↔N']['required_class_coverage']['same_answer_changed_pressure']['answers']==[0,1]
+
+def test_opposite_directions_remain_visible_with_net_zero_and_story_resampling():
+    m=pilot();rows=[]
+    for sid,value in [('a',2.),('b',4.)]:
+        for recipient,donor,sign in [('P','H',1),('H','P',-1)]:
+            row=dict(story_id=sid,split='discovery',family='candidate6',scope='readout',status='completed',effect=sign*value,recipient_condition=recipient,donor_condition=donor,recipient_truth=0,truth_change=True,content_change=True,donor_matches_recipient_truth=True,donor_matches_recipient_emission=False,own_story=True,truth_accessible=recipient=='H')
+            rows.extend([row]* (100 if sid=='a' else 1))
+    summary=m.summarize_by_story(rows)
+    assert summary['effects']['candidate6/readout/discovery']['mean']==0.
+    cells=summary['diagnostics']['candidate6/readout/discovery']
+    ph=next(cell for cell in cells if cell['stratum']['recipient_condition']=='P')
+    hp=next(cell for cell in cells if cell['stratum']['recipient_condition']=='H')
+    assert ph['mean']==3. and hp['mean']==-3.
+    assert ph['n_rows']==101 and ph['n_stories']==2
+    assert ph['ci95']==[2.,4.] and hp['ci95']==[-4.,-2.]
+    pending={**rows[0],'recipient_condition':'N','status':'pending'}
+    incomplete=m.summarize_by_story(rows,planned_rows=rows+[pending])
+    unsupported=next(c for c in incomplete['diagnostics']['candidate6/readout/discovery'] if c['stratum']['recipient_condition']=='N')
+    assert unsupported['status']=='unsupported' and unsupported['n_rows']==0 and unsupported['n_proposed']==1
+
+def test_schedule_interleaves_homogeneous_family_scope_batches():
+    m=pilot();rows=[dict(family=f,scope=s,comparison_id=str(i)) for f in ('candidate6','selector2') for s in ('readout','common') for i in range(19)]
+    batches=m.interleaved_batches(rows)
+    assert len(batches)==12
+    assert len({(batch[0]['family'],batch[0]['scope']) for batch in batches[:4]})==4
+    assert all(len({(r['family'],r['scope']) for r in batch})==1 for batch in batches)
+    assert sorted(r['comparison_id']+r['family']+r['scope'] for batch in batches for r in batch)==sorted(r['comparison_id']+r['family']+r['scope'] for r in rows)
+
+def test_self_replacements_mask_padding_and_dummy_rows():
+    m=pilot();variants=[{'ids':[1,2,3],'length':3}]
+    from component_analysis import hooks
+    value=torch.randn(8,128,2)
+    replacements=m.self_replacements({('head',0,0):value,hooks.READOUT_KEY:value},variants,'cpu')
+    patch=replacements[('head',0,0)]
+    assert patch.positions.sum()==3 and patch.positions.shape==(8,128)
+    assert not patch.positions[1:].any() and not patch.positions[0,3:].any()

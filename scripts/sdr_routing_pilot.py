@@ -375,7 +375,8 @@ def build_manifest(dataset_dir: str, tokenizer, *, seed=SEED, max_stories=48) ->
     grid['pair_recipe']="b=within-split rank by SHA256(['counterbalance',20261020,story_id]), firsthalf0 secondhalf1; P[b]↔H[b], P[1-b]↔H[b], P[1-b]↔N[1-b], P[b]↔N[1-b], native P0↔P1, N0/N1→frozen pairedstory N0/N1; alternatives baseline-only"
     grid['max_selected_donor_pairs']=len(patch_plan)
     grid['max_patch_rows']=grid['max_selected_donor_pairs']*len(families)*len(PRIMARY_SCOPES)
-    grid['max_patch_batch8_forwards']=(grid['max_patch_rows']+7)//8+len(families)-1
+    grid['batch_order']='round-robin family/scope homogeneous batch8, comparison_id order within group'
+    grid['max_patch_batch8_forwards']=((len(patch_plan)+7)//8)*len(families)*len(PRIMARY_SCOPES)
     grid['max_total_forwards']=grid['max_patch_batch8_forwards']+2*((len(panel)+7)//8)+1
     grid['runtime_seconds']='unmeasured: model load + 8-story calibration required; deadline truncates pending grid'
     manifest=dict(schema=1,seed=seed,dataset_dir=str(directory),sources=sources,groups=groups,valid_groups=valid_groups,panel=panel,donor_plan=donor_plan,patch_plan=patch_plan,maps=maps,exclusions=exclusions,semantic_pass=len(valid_groups)>=24,grid=grid,families_hash=digest(families),tokenizer=str(tokenizer.name_or_path),max_seconds=3300,first_checkpoint_seconds=1800,batch_size=8,planned_baseline_forwards=2*((len(panel)+7)//8),weaker_precision=len(valid_groups)<48,original_component_overlap=[])
@@ -466,7 +467,7 @@ def build_comparisons(manifest: dict, baselines: list) -> list:
             if same_answer and truth_change:classes.append('fixed_answer_changed_truth')
             if r['story_id']!=d['story_id'] and not pressure_change and same_answer:classes.append('nonself_same_pressure_same_answer')
             if not classes:classes=['unsupported']
-            candidates.append(dict(comparison_id=r['variant_id']+'|'+d['variant_id'],recipient_id=r['variant_id'],donor_id=d['variant_id'],story_id=r['story_id'],donor_story_id=d['story_id'],split=r['split'],recipient_truth=r['truth'],recipient_truthful_item=r['truthful_item'],donor_truthful_item=d['truthful_item'],recipient_emitted_class=ri,donor_emitted_class=di,donor_answer_position=r.get('item_positions',{word:index for index,word in enumerate(r['item_pair'].split('/'))}).get(di),donor_emitted_id=d['emitted_id'],pressure_pair=pressure_pair(r,d),pressure_change=pressure_change,truth_change=truth_change,content_change=content_change,confounded=content_change or truth_change,own_story=r['story_id']==d['story_id'],support_classes=classes,recipient_hash=r['prompt_hash'],donor_hash=d['prompt_hash'],status='planned'))
+            candidates.append(dict(comparison_id=r['variant_id']+'|'+d['variant_id'],recipient_id=r['variant_id'],donor_id=d['variant_id'],story_id=r['story_id'],donor_story_id=d['story_id'],split=r['split'],recipient_condition=r['condition'],donor_condition=d['condition'],donor_matches_recipient_truth=d['emitted_id']==r['truth_id'],donor_matches_recipient_emission=d['emitted_id']==r['emitted_id'],truth_accessible=r.get('accessible',False),recipient_truth=r['truth'],recipient_truthful_item=r['truthful_item'],donor_truthful_item=d['truthful_item'],recipient_emitted_class=ri,donor_emitted_class=di,donor_answer_position=r.get('item_positions',{word:index for index,word in enumerate(r['item_pair'].split('/'))}).get(di),donor_emitted_id=d['emitted_id'],pressure_pair=pressure_pair(r,d),pressure_change=pressure_change,truth_change=truth_change,content_change=content_change,confounded=content_change or truth_change,own_story=r['story_id']==d['story_id'],support_classes=classes,recipient_hash=r['prompt_hash'],donor_hash=d['prompt_hash'],status='planned'))
     fixed={(p['recipient_id'],p['donor_id']) for p in manifest.get('patch_plan',[])}
     for c in candidates:c['scheduled']=(c['recipient_id'],c['donor_id']) in fixed
     return candidates
@@ -527,20 +528,64 @@ def evaluate_gate(manifest: dict, baselines: list, comparisons: list, controls: 
     return dict(stage2_go=not reasons,stage2_scope='answer_content_diagnostic',pressure_mediation_identified=False,pressure_limit='deterministic native prompts lack fixed-content answer variation; changed designation donors confound pressure mediation',reasons=reasons,story_counts=split_counts,truth_accessible_stories=access,diagnostic_stories=len(qualified),diagnostic_by_split=diagnostic_splits,support=support,semantic_pass=semantic,numerical_pass=numerical,effect_size_gate=False)
 
 
-def summarize_by_story(rows, *, seed=SEED, bootstrap_reps=2000):
+DIAGNOSTIC_STRATA = ('recipient_condition', 'donor_condition', 'recipient_truth',
+                     'truth_change', 'content_change', 'donor_matches_recipient_truth',
+                     'donor_matches_recipient_emission', 'own_story', 'truth_accessible')
+
+
+def summarize_by_story(rows, *, seed=SEED, bootstrap_reps=2000, planned_rows=()):
+    """Net effects and prespecified directional cells, clustered by story."""
     import numpy as np
-    grouped=defaultdict(lambda:defaultdict(list))
+    grouped=defaultdict(list);diagnostics=defaultdict(lambda:defaultdict(list))
+    proposed=defaultdict(Counter)
+    def stratum(row):return tuple(row.get(key,'unknown') for key in DIAGNOSTIC_STRATA)
+    def labels(row):return [f"{row['family']}/{row['scope']}/{split}" for split in (row['split'],'all')]
+    for row in planned_rows:
+        for label in labels(row):proposed[label][stratum(row)]+=1
     for row in rows:
         if row.get('status')!='completed' or 'effect' not in row:continue
-        for split in (row['split'],'all'):
-            grouped[f"{row['family']}/{row['scope']}/{split}"][row['story_id']].append(row['effect'])
-    result={'bootstrap_reps':bootstrap_reps,'unit':'independent story group (row effects averaged within story)','effects':{},'row_status_counts':dict(Counter(r.get('status','unknown') for r in rows))}
-    rng=np.random.default_rng(seed)
-    for label,stories in sorted(grouped.items()):
-        values=np.array([np.mean(v) for k,v in sorted(stories.items())])
-        bootstrap=values[rng.integers(0,len(values),size=(bootstrap_reps,len(values)))].mean(-1)
-        result['effects'][label]={'n_stories':len(values),'mean':float(values.mean()),'ci95':np.quantile(bootstrap,[.025,.975]).tolist()}
+        for label in labels(row):
+            grouped[label].append(row);diagnostics[label][stratum(row)].append(row)
+    def statistics(cell, label):
+        stories=defaultdict(list)
+        for row in cell:stories[row['story_id']].append(row['effect'])
+        out={'n_rows':len(cell),'n_stories':len(stories),'mean':None,'ci95':None}
+        if stories:
+            values=np.array([np.mean(v) for k,v in sorted(stories.items())])
+            rng=np.random.default_rng(int(digest([seed,label])[:16],16))
+            bootstrap=values[rng.integers(0,len(values),size=(bootstrap_reps,len(values)))].mean(-1)
+            out.update(mean=float(values.mean()),ci95=np.quantile(bootstrap,[.025,.975]).tolist())
+        out['n_harms_accessible_truth']=sum(bool(r.get('harms_accessible_truth',False)) for r in cell)
+        return out
+    result={'bootstrap_reps':bootstrap_reps,'unit':'independent story group (row effects averaged within each diagnostic cell and story)', 'aggregate_label':'net effect across all diagnostic directions; opposite transfers can cancel','effects':{},'diagnostic_dimensions':list(DIAGNOSTIC_STRATA),'diagnostics':{},'row_status_counts':dict(Counter(r.get('status','unknown') for r in rows))}
+    for label,cell in sorted(grouped.items()):result['effects'][label]=statistics(cell,label)
+    for label in sorted(set(diagnostics)|set(proposed)):
+        result['diagnostics'][label]=[]
+        for key in sorted(set(diagnostics[label])|set(proposed[label]),key=lambda x:json.dumps(x)):
+            cell=diagnostics[label].get(key,[])
+            count=proposed[label].get(key,len(cell))
+            stats=statistics(cell,[label,key])
+            stats.update(stratum=dict(zip(DIAGNOSTIC_STRATA,key)),n_proposed=count,n_uncompleted=max(0,count-len(cell)),status='unsupported' if not cell else ('incomplete' if len(cell)<count else 'completed'))
+            result['diagnostics'][label].append(stats)
     return result
+
+
+def interleaved_batches(rows):
+    """Round-robin homogeneous family/scope batches, before any inference."""
+    groups=defaultdict(list)
+    for row in rows:groups[(row['family'],row['scope'])].append(row)
+    groups={key:sorted(cell,key=lambda r:r['comparison_id']) for key,cell in groups.items()}
+    return [groups[key][start:start+8] for start in range(0,max((len(v) for v in groups.values()),default=0),8) for key in sorted(groups) if start<len(groups[key])]
+
+
+def self_replacements(outputs, variants, device):
+    from component_analysis import hooks
+    import torch
+    shape=next(iter(outputs.values())).shape[:2]
+    positions=torch.zeros(shape,dtype=torch.bool,device=device)
+    for index,variant in enumerate(variants):positions[index,:variant['length']]=True
+    # Padding and dummy rows exist for physical shape only and are not patched.
+    return {key:hooks.Replacement(value,positions.bool()) for key,value in outputs.items() if key!=hooks.READOUT_KEY}
 
 
 def batch_inputs(variants, device):
@@ -633,7 +678,7 @@ def run_stage1(args) -> dict:
     if (output/'baseline.jsonl').exists() and (output/'baseline.jsonl').stat().st_size:
         raise ValueError('refuse overwriting existing attempted run; use a new run output with --manifest')
     atomic_json(output/'manifest.json',manifest)
-    baselines=[];measurements=[];comparisons=[];captures={};baseline_vectors={}
+    baselines=[];measurements=[];comparisons=[];captures={};baseline_vectors={};schedule=[]
     controls={'self_patch_pass':False,'mapping_pass':True,'receipts':[]}
     calibration={'status':'before_load','forwards':0,'batches':0,'batch_size':8,'model_load_seconds':None}
     cost={'internal_deadline_seconds':args.max_seconds,'job_id':os.environ.get('SLURM_JOB_ID'),'allocated_seconds':args.allocated_seconds,'gpu_count':1,'reserved_gpu_seconds':args.reserved_gpu_seconds,'prior_reserved_gpu_seconds':args.prior_reserved_gpu_seconds,'remaining_stage1_reserved_gpu_seconds':3600-args.prior_reserved_gpu_seconds-args.reserved_gpu_seconds,'remaining_pilot_reserved_gpu_seconds':7200-args.prior_reserved_gpu_seconds-args.reserved_gpu_seconds,'actual_gpu_seconds':0,'paid_api_calls':0}
@@ -655,9 +700,9 @@ def run_stage1(args) -> dict:
         atomic_json(output/'calibration.json',calibration)
         atomic_json(output/'cost.json',cost)
         atomic_json(output/'numerical_controls.json',controls)
-        summary=summarize_by_story(measurements)
+        summary=summarize_by_story(measurements,planned_rows=schedule)
         atomic_json(output/'story_bootstrap.json',summary)
-        lines=['# SDR routing pilot Stage1','',f'Status: {status}. Stage2 gate: {gate["stage2_go"]}.', '', 'Estimand: answer/content donor diagnostic in the intact full-model background; all MLPs intact. Changed designation or cross-story content confounds pure pressure mediation. H adds an instruction; N deletes pressure. Prospective splits reuse the behaviorally filtered SDR test pool and are not independent out-of-distribution confirmation.', '', 'Exact all-token mapping is available only on identical token vectors; primary interventions are partial semantic positions. Unsupported/non-item donors and all attempted rows are retained. No effect-size selection or significance claim.', '', 'Gate/support tables: `gate.json`. Paired story-group bootstrap (2000 replicates): `story_bootstrap.json`.', '',f"Baseline variants {len(baselines)}/{len(manifest['panel'])}; completed patches {sum(r.get('status')=='completed' for r in measurements)}; attempted patches {sum(r.get('status') in ('attempted','completed') for r in measurements)}; excluded proposals {sum(r.get('status')=='excluded' for r in measurements)}; primary proposed rows {manifest['grid'].get('max_patch_rows',0)}. Missing cells remain unmeasured.", '', '```json',json.dumps(summary,indent=1),'```','']
+        lines=['# SDR routing pilot Stage1','',f'Status: {status}. Stage2 gate: {gate["stage2_go"]}.', '', 'Estimand: answer/content donor diagnostic in the intact full-model background; all MLPs intact. Changed designation or cross-story content confounds pure pressure mediation. H adds an instruction; N deletes pressure. Prospective splits reuse the behaviorally filtered SDR test pool and are not independent out-of-distribution confirmation.', '', 'Exact all-token mapping is available only on identical token vectors; primary interventions are partial semantic positions. Unsupported/non-item donors and all attempted rows are retained. No effect-size selection or significance claim.', '', 'Gate/support tables: `gate.json`. Paired story-group bootstrap (2000 replicates): `story_bootstrap.json`.', '',f"Baseline variants {len(baselines)}/{len(manifest['panel'])}; completed patches {sum(r.get('status')=='completed' for r in measurements)}; attempted patches {sum(r.get('status') in ('attempted','completed') for r in measurements)}; excluded proposals {sum(r.get('status')=='excluded' for r in measurements)}; primary proposed rows {manifest['grid'].get('max_patch_rows',0)}. Missing cells remain unmeasured.", '', 'The net effects below pool reciprocal directions and can cancel. Direction, truth/content changes, actual donor-answer matches, own/cross-story controls and accessibility are preserved separately in `story_bootstrap.json` → `diagnostics`. Cells report proposed/completed rows, independent stories and story-clustered CIs; unsupported/incomplete cells remain explicit.', '', '| Family/scope/split (net) | Rows | Stories | Mean | 95% story CI |', '|---|---:|---:|---:|---|']+[f"| {label} | {cell['n_rows']} | {cell['n_stories']} | {cell['mean']:.5g} | {cell['ci95']} |" for label,cell in summary['effects'].items()]+['']
         (output/'summary.md').write_text('\n'.join(lines))
         return gate
     write_jsonl(output/'baseline.jsonl',[]);write_jsonl(output/'comparisons.jsonl',[])
@@ -704,8 +749,8 @@ def run_stage1(args) -> dict:
             variants=panel[start:start+8]
             result=forward(variants)
             scored=score_capture(model,result,[v['truth_id'] for v in variants],[v['other_id'] for v in variants])
-            self_replacements={k:result.outputs[k] for k in keys if k!=hooks.READOUT_KEY}
-            self_result=forward(variants,replacements=self_replacements,components=[hooks.READOUT_KEY])
+            self_values=self_replacements(result.outputs,variants,device)
+            self_result=forward(variants,replacements=self_values,components=[hooks.READOUT_KEY])
             receipt=numerical_receipt(scored['logits'],capture_logits(model,self_result))
             receipt['variant_ids']=[v['variant_id'] for v in variants]
             controls['receipts'].append(receipt)
@@ -757,13 +802,12 @@ def run_stage1(args) -> dict:
         calibration['projected_grid_exceeds_remaining']=calibration['estimated_patch_seconds']>deadline-time.monotonic()-30
         # Deterministic family/scope interleaving keeps incomplete grids visible;
         # no outcome-dependent priority. Batches can have different lengths/maps.
-        schedule.sort(key=lambda row:(row['family'],row['scope'],row['comparison_id']))
+        batches=interleaved_batches(schedule)
         status='family_patches';checkpoint()
         with (output/'comparisons.jsonl').open('a') as f:
-            for start in range(0,len(schedule),8):
+            for start,batch in enumerate(batches):
                 if stop['requested'] or time.monotonic()>=deadline-30:
                     status='completed_partial_deadline';break
-                batch=schedule[start:start+8]
                 variants=[by_id.get(c['recipient_id']) for c in batch]
                 # Homogeneous family/scope chunks avoid writing unrequested
                 # heads on rows at a boundary; process boundaries separately.
