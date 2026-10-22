@@ -1,0 +1,20 @@
+far_v2_D_coarse far_v2 deceptive outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323 23105387 beto-delta-gpu gpuH200x8 01:30:00 2026-10-21T14:03:23
+far_v2_H_coarse far_v2 honest outputs/llama-8b-instruct_far_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323 23105388 beto-delta-gpu gpuH200x8 01:30:00 2026-10-21T14:03:23
+sdr_v2_D_coarse sdr_v2 deceptive outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323 23105389 beto-delta-gpu gpuH200x8 01:30:00 2026-10-21T14:03:23
+sdr_v2_H_coarse sdr_v2 honest outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323 23105390 beto-delta-gpu gpuH200x8 01:30:00 2026-10-21T14:03:23
+ser_v2_D_coarse ser_v2 deceptive outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323 23105391 beto-delta-gpu gpuH200x8 01:30:00 2026-10-21T14:03:23
+ser_v2_H_coarse ser_v2 honest outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323 23105392 beto-delta-gpu gpuH200x8 01:30:00 2026-10-21T14:03:23
+far_v2_D_coarse far_v2 deceptive outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717 23105421 beto-delta-gpu gpuH200x8-interactive 01:00:00 2026-10-21T14:07:17
+far_v2_H_coarse far_v2 honest outputs/llama-8b-instruct_far_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-165158 23108699 beto-delta-gpu gpuH200x8-interactive 01:00:00 2026-10-21T16:51:58
+# 2026-10-21 ~15:40 the user moved backups 23105387-23105392 with scontrol update: Account=bjhz-delta-gpu Partition=gpuH200x8,gpuA40x4 TimeLimit=03:00:00 (their lines above still show the submit-time beto/gpuH200x8/01:30:00)
+# 2026-10-21 16:48 far_v2_D_coarse: interactive 23105421 COMPLETED 00:29:41 with results.json (stamp 261021-140717); backup 23105387 cancelled while PENDING
+# 2026-10-21 ~17:00 QOS fixed to bjhz-delta-gpu on 23105388 (agent) and 23105389-23105392 (user); they had Reason=InvalidQOS after the account move
+# 2026-10-21 16:58 far_v2_H_coarse: backup 23105388 RUNNING on gpuA40x4 (gpub056) since 16:53; interactive 23108699 cancelled while PENDING (projected 2026-10-22 01:16), stamp 261021-165158 unused
+sdr_v2_D_coarse sdr_v2 deceptive outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-165938 23108737 beto-delta-gpu gpuH200x8-interactive 01:00:00 2026-10-21T16:59:39
+ser_v2_D_coarse ser_v2 deceptive outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173002 23109191 bjhz-delta-gpu gpuH200x8,gpuA40x4 03:00:00 2026-10-21T17:30:02
+# 2026-10-21 17:30 ser_v2_D_coarse: backup 23105391 FAILED after 122 s (transient HF-cache read on gpub011 in build_node_model's from_pretrained; 3 siblings passed the same point); the ticket's one resubmission is the line above
+# 2026-10-21 sdr_v2_D_coarse: interactive 23108737 cancelled while PENDING (lead-approved swap to ser_v2 D); stamp 261021-165938 unused
+ser_v2_D_coarse ser_v2 deceptive outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101 23109196 beto-delta-gpu gpuH200x8-interactive 01:00:00 2026-10-21T17:31:01
+# 2026-10-21 19:18-19:29 backups 23105388 (far H), 23105389 (sdr D), 23105390 (sdr H), 23105392 (ser H) COMPLETED on gpuA40x4 in 2:25-2:27 with results.json (stamp 261021-140323)
+# 2026-10-22 11:20 ser_v2_D_coarse: interactive 23109196 COMPLETED 00:30:11 with results.json (stamp 261021-173101); resubmission 23109191 cancelled while PENDING
+# FAILED run dir kept, not used: outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323 (job 23105391)
