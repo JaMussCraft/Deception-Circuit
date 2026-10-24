@@ -1,0 +1,31 @@
+{
+  "created": "2026-10-24T14:34:42",
+  "cells": [
+    {
+      "circuit": "headsko__leaf",
+      "circuit_kind": "leaf",
+      "expr": "c - m",
+      "task": "sdr",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/mechanism-v2-coarse/control/drift_sdr_coarse_D_headsko/cells/headsko__leaf/sdr/interchange",
+      "counts": {
+        "attention_neurons": 8832,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 69,
+        "attention_blocks": 12
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.003,
+          "wikitext_kl": 0.36409192899009213,
+          "honest_accuracy_drop": -0.528
+        }
+      },
+      "skipped": {},
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.263e-04, ppl ratio 0.999744)"
+      ]
+    }
+  ]
+}

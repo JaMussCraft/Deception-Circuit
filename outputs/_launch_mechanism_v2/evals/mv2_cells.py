@@ -80,10 +80,13 @@ CONDITION_SUFFIX = {"deceptive": "", "honest": "_honest", "nopressure": "_nopres
 A40_CELL_MIN = {"sufficiency": 27.0, "knockout": 26.0,
                 "sufficiency_nopressure": 8.0, "knockout_nopressure": 11.5}
 #: Cell-time speed-up over an A40. A100 from 22879998/22881288 (15 min per KO job), H200 from 22945674
-#: (3 KO exprs in 18 min). H100 cell time is NOT measured: assumed 0.85 x H200 until the drift control measures it.
-SPEEDUP = {"A40": 1.0, "L40S": 1.0, "A100": 2.26, "H200": 5.4, "H100": 4.6}
-#: Model load per job. H100 is the Bridges-2 smoke job 49773269 (ticket 07): 458 s from /ocean.
-LOAD_MIN = {"A40": 3.5, "L40S": 3.5, "A100": 3.5, "H200": 3.5, "H100": 7.7}
+#: (3 KO exprs in 18 min). H100 from the Bridges-2 drift control (2026-10-24): one coarse SDR KO cell took
+#: 401 s (49774554) and 367 s (49774563), i.e. 26 / 6.4 = 4.0x. Sufficiency cells on an H100 are not
+#: measured yet and are assumed to scale the same way.
+SPEEDUP = {"A40": 1.0, "L40S": 1.0, "A100": 2.26, "H200": 5.4, "H100": 4.0}
+#: Model load and start-up per job (job start to suite created). H100: 10.4 min cold from /ocean (49774554);
+#: 0.4 min when the node's page cache was warm (49774563, same node w010 right after). Cold is used.
+LOAD_MIN = {"A40": 3.5, "L40S": 3.5, "A100": 3.5, "H200": 3.5, "H100": 10.5}
 #: Walltime = estimate x 1.5, rounded up to a quarter hour, at least one hour (fc_cells' rule; orchestrator
 #: ruling 2026-10-24: 01:00:00 for the drift control and the first stage-1 wave, tighten from measured
 #: times with gen_cells.py --walltime-floor afterwards).

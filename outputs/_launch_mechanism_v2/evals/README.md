@@ -116,7 +116,7 @@ The run's test set `data/datasets/sdr` is byte-identical between this worktree a
 unchanged since 2026-08-18. Both drift cells bind `m` to the on-branch `../_launch_format_control/allmlp_nomb`.
 Its masks equal the SDR wave's `llama-8b-instruct_sdr_coarse/_allmlp_nomb`.
 
-## Drift control (2 cells, about 0.45 H100 GPU-h)
+## Drift control (2 cells; ran 2026-10-24, 0.41 H100 GPU-h actual)
 
 Each drift cell reproduces one Delta reference with that job's own argv, apart from paths, the output dir
 and the suite name. A test compares each against the reference job's recorded `suite.json` argv.
@@ -254,25 +254,28 @@ Here is how the cost model works:
 - Cell minutes on an A40 come from sacct of past coarse cells (recon A1/A3). KO is 26 min, suff 27 min,
   nopressure suff 8 min and nopressure KO 11.5 min, plus a 3.5 min load per job.
 - The A100 speed-up is 2.26x and H200 is 5.4x, both measured.
-- **The H100 cell time is not measured.** It is assumed to be 4.6x, or 0.85 x H200, and the drift-control
-  jobs measure it. The H100 model load is measured: 458 s (7.7 min) from /ocean, in ticket 07's smoke job
-  49773269. That is twice Delta's, so packing matters more there.
+- **H100, measured by the drift control** (2026-10-24, node w010):
+  - one coarse KO cell took 401 s and 367 s, so the speed-up is 26 / 6.4 = 4.0x an A40;
+  - start-up from job start to suite creation, covering env, imports and model load from /ocean, took
+    10.4 min cold and 21 s when the node's page cache was warm (the second job ran on the same node right
+    after the first);
+  - the estimates use the cold 10.5 min;
+  - H100 sufficiency cells are not measured yet and are assumed to scale like KO.
 
 Reserved means `--time` x GPUs.
 
-| stage | cells | jobs | A40 elapsed | A40 reserved | H100 elapsed | H100 reserved (floor 60) | H100 reserved (floor 30) |
+| stage | cells | jobs | A40 elapsed | A40 reserved | H100 elapsed (cold loads) | H100 reserved (floor 60) | H100 reserved (floor 30) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| control | 2 | 2 | 0.98 | 2.00 | 0.45 | 2.00 | 1.00 |
-| 1 | 24 | 12 | 11.25 | 18.75 | 3.83 | 12.00 | 7.50 |
-| 2 | 33 | 12 | 13.57 | 25.50 | 4.34 | 12.00 | 9.00 |
-| 2 + conditional | 39 | 12 | 16.18 | 29.25 | 4.90 | 12.75 | 9.75 |
+| control | 2 | 2 | 0.98 | 2.00 | 0.57 (actual 0.41) | 2.00 | 1.00 |
+| 1 | 24 | 12 | 11.25 | 18.75 | 4.74 | 12.00 | 8.25 |
+| 2 | 33 | 12 | 13.57 | 25.50 | 5.32 | 12.75 | 9.75 |
+| 2 + conditional | 39 | 12 | 16.18 | 29.25 | 5.97 | 13.50 | 10.50 |
 
-**Elapsed.** The whole suite is about 9.2 H100 GPU-h: control, stage 1, and stage 2 with the conditional
-cells. That leaves about 2.8 h of the 12 H100 GPU-h allocation for reruns. Model loads alone are about
-1.5 h of stage 1 (12 jobs x 7.7 min).
+**Elapsed.** With cold loads everywhere the suite is about 11.3 H100 GPU-h. The drift control took 0.75
+reconciled, stage 1 about 4.7 and stage 2 with the conditional cells about 6.0. That leaves almost no
+room in the 12 h allocation. Loads are 12 x 10.5 min, about 2.1 h per stage, and warm loads, with jobs
+sharing a node's page cache, remove most of that.
 
-**Reservations.** These bind first. The drift control reserves 2.0 h and should reconcile to about 0.5 h.
-With a 60 min floor, stage 1 reserves 12.0 h, so its first wave holds at most 11 jobs; `--submit` says how
-many fit. Tighten the floor after the drift jobs. For example, at 30 min stage 1 reserves 7.5 h and stage 2
-with conditional cells 9.75 h. Stage 2 then needs stage 1 reconciled first, and probably two waves, to stay
-under 12.
+**Reservations.** Use `--walltime-floor 30` from stage 1 on, now that the timing is measured. Stage 1 then
+reserves 8.25 h in one wave, within the 11.25 h left after the drift control. Stage 2 has to wait for
+stage 1 to reconcile.

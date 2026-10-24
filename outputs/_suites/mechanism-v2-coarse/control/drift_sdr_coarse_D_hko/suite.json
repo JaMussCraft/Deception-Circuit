@@ -1,0 +1,175 @@
+{
+  "schema_version": 1,
+  "created": "2026-10-24T14:18:37",
+  "root": "/ocean/projects/cis260361p/swong2/Deception-Circuit/outputs/_suites/mechanism-v2-coarse/control/drift_sdr_coarse_D_hko",
+  "argv": [
+    "evaluate_circuit.py",
+    "--circuit",
+    "D=outputs/_launch_mechanism_v2/evals/drift_control/sdr_coarse_D_260922-092742",
+    "--circuit",
+    "m=outputs/_launch_format_control/allmlp_nomb",
+    "--expr",
+    "D_hko=(D) - m",
+    "--compose-granularity",
+    "leaf",
+    "--task-from",
+    "outputs/_launch_mechanism_v2/evals/drift_control/sdr_coarse_D_260922-092742",
+    "--evals",
+    "knockout",
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20",
+    "--suite-name",
+    "drift_sdr_coarse_D_hko",
+    "--output-dir",
+    "outputs/_suites/mechanism-v2-coarse/control/drift_sdr_coarse_D_hko"
+  ],
+  "ablation": "interchange",
+  "evals": [
+    "knockout"
+  ],
+  "model": "llama-8b-instruct",
+  "geometry": {
+    "num_heads": 32,
+    "head_dim": 128,
+    "intermediate_size": 14336,
+    "hidden_size": 4096,
+    "num_layers": 32
+  },
+  "compose_granularity": "leaf",
+  "membership_convention": {
+    "leaf": "attention_neurons / mlp_hidden / mlp_output",
+    "head": "attention_heads + mlp_blocks",
+    "embedding": "not a set member; the OR of the operands' gates",
+    "coarse_gates": "re-derived bottom-up from the fine gates"
+  },
+  "circuits": [
+    {
+      "label": "D_hko__leaf",
+      "kind": "leaf",
+      "expr": "(D) - m",
+      "operands": {
+        "D": "/ocean/projects/cis260361p/swong2/Deception-Circuit/outputs/_launch_mechanism_v2/evals/drift_control/sdr_coarse_D_260922-092742",
+        "m": "/ocean/projects/cis260361p/swong2/Deception-Circuit/outputs/_launch_format_control/allmlp_nomb"
+      },
+      "home_run_dir": null,
+      "counts": {
+        "attention_neurons": 8832,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 69,
+        "attention_blocks": 12
+      }
+    }
+  ],
+  "tasks": [
+    {
+      "label": "sdr",
+      "task": "sdr",
+      "home_run_dir": "/ocean/projects/cis260361p/swong2/Deception-Circuit/outputs/_launch_mechanism_v2/evals/drift_control/sdr_coarse_D_260922-092742",
+      "dataset": {
+        "data_dir": "./data/datasets",
+        "std_variant": "azaria",
+        "deception_condition": "deceptive",
+        "test_samples": 1000
+      }
+    }
+  ],
+  "cli": {
+    "ablation": "interchange",
+    "all_pairs_delta": false,
+    "benchmark_belief_model": null,
+    "benchmark_belief_tokens": 128,
+    "benchmark_coherence_batch_size": null,
+    "benchmark_gen_batch_size": 8,
+    "benchmark_n_per_dataset": 100,
+    "benchmark_n_random": 5,
+    "benchmark_new_tokens": 512,
+    "benchmark_pool_size": null,
+    "benchmark_ref_pool": "honest",
+    "benchmark_refresh_screen": false,
+    "benchmark_repo_root": null,
+    "benchmark_screen_budget": 0,
+    "benchmark_screen_cache": null,
+    "benchmark_screen_seed": 0,
+    "benchmarks": [
+      "sandbagging",
+      "mask:continuations",
+      "mask:disinformation",
+      "mask:doubling_down_known_facts",
+      "mask:known_facts",
+      "mask:provided_facts",
+      "mask:statistics",
+      "lb:instructed-deception",
+      "lb:harm-pressure-choice",
+      "lb:harm-pressure-knowledge-report",
+      "lb:convincing-game"
+    ],
+    "circuit": [
+      "D=outputs/_launch_mechanism_v2/evals/drift_control/sdr_coarse_D_260922-092742",
+      "m=outputs/_launch_format_control/allmlp_nomb"
+    ],
+    "compose_granularity": "leaf",
+    "data_dir": null,
+    "device": "cuda",
+    "dry_run": false,
+    "eval_batch_size": 32,
+    "evals": [
+      "knockout"
+    ],
+    "expr": [
+      "D_hko=(D) - m"
+    ],
+    "gen_examples": 3,
+    "gen_new_tokens": 48,
+    "hf_token": null,
+    "judge_concurrency": 8,
+    "judge_dry_run": false,
+    "knockout_granularity": "finest",
+    "knockout_null_count": 20,
+    "lb_belief_templates": null,
+    "lb_harm_judge_model": null,
+    "lb_judge_model": null,
+    "legacy": false,
+    "mask_judge_model": null,
+    "mask_numeric_judge_model": null,
+    "mean_source": "pooled",
+    "n_random": 20,
+    "no_benchmark_screen_cache": false,
+    "no_kv_cache": false,
+    "null_alloc": "uniform",
+    "null_count": null,
+    "null_seed": 0,
+    "null_start": 0,
+    "output_dir": "outputs/_suites/mechanism-v2-coarse/control/drift_sdr_coarse_D_hko",
+    "ref_cache_device": "cuda",
+    "reference": "separate",
+    "run_dir": null,
+    "sanity_granularity": "all",
+    "save_null_masks": false,
+    "skip_judge_check": false,
+    "skip_wikitext": false,
+    "std_variant": null,
+    "strict": false,
+    "suite_name": "drift_sdr_coarse_D_hko",
+    "task": null,
+    "task_from": [
+      "outputs/_launch_mechanism_v2/evals/drift_control/sdr_coarse_D_260922-092742"
+    ],
+    "test_samples": null,
+    "verify": true,
+    "wikitext_batch_size": 4,
+    "wikitext_block_size": 512,
+    "wikitext_blocks": 64,
+    "wikitext_seed": 0,
+    "xor": null
+  },
+  "versions": {
+    "mask_algorithm": 1,
+    "numpy": "2.5.1",
+    "python": "3.12.13"
+  }
+}

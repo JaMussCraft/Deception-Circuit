@@ -327,7 +327,7 @@ def test_walltime_floor_tightens_estimated_times(tmp_path):
     assert r.returncode == 0, r.stderr
     lines = _sbatch_lines(r.stdout)
     by_job = {a[a.index("scripts/evaluate_circuit.sbatch") - 1].split("mv2-1-")[1]: a[5] for a in lines}
-    assert by_job["s1_far__D_ko"] == "--time=01:00:00"      # 7.7 + 4 x 26 / 4.6 = 30.3 min, x 1.5 = 45.5 -> 60
+    assert by_job["s1_far__D_ko"] == "--time=01:00:00"      # 10.5 + 4 x 26 / 4.0 = 36.5 min, x 1.5 -> 60
     assert by_job["s1_far__H_ko"] == "--time=00:30:00"
 
 

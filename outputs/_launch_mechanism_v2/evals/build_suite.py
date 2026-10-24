@@ -113,8 +113,8 @@ def build(main_checkout: str = MAIN_CHECKOUT) -> dict:
         "cost_model": {"a40_cell_min": mc.A40_CELL_MIN, "speedup_vs_a40": mc.SPEEDUP,
                        "load_min": mc.LOAD_MIN, "walltime_factor": mc.WALLTIME_FACTOR,
                        "walltime_floor_min": mc.WALLTIME_FLOOR_MIN,
-                       "h100_note": "H100 cell time is assumed (0.85 x H200), not measured; the drift-control "
-                                    "jobs measure it. H100 model load 458 s from /ocean (smoke job 49773269)"},
+                       "h100_note": "H100 KO cell 4.0x an A40 and cold load 10.5 min, measured by the drift control "
+                                    "(49774554 / 49774563); H100 sufficiency cells assumed to scale the same"},
         "stages": {s: stage_block(cells, s) for s in mc.STAGE_DIR},
         "drift_control": drift_block(cells, main_checkout),
         "cells": cells,
