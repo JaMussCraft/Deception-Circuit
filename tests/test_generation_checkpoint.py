@@ -332,3 +332,26 @@ def test_failed_batch_commit_aborts_without_next_generation(tmp_path,monkeypatch
     with pytest.raises(C.GenerationCheckpointError,match='commit failed'):
         invoke(tmp_path,monkeypatch,maximum=1,calls=calls)
     assert len(calls)==1 and not list(tmp_path.rglob('batch-*.json'))
+
+
+@pytest.mark.parametrize('opt_in',[False,True])
+def test_public_main_checkpoint_runtime_settings_leave_stock_untouched(tmp_path,monkeypatch,opt_in):
+    import evaluate_circuit as E
+    cli=SimpleNamespace(evals=[],dry_run=False,judge_dry_run=False,
+        benchmark_generation_checkpoint_dir=str(tmp_path) if opt_in else None,
+        benchmark_stop_after_generation_batches=1)
+    monkeypatch.setattr(E,'build_parser',lambda:SimpleNamespace(parse_args=lambda:cli))
+    monkeypatch.setattr(E,'resolve_cli',lambda x:x)
+    monkeypatch.setattr(E,'build_session',lambda x:SimpleNamespace())
+    calls=[]
+    monkeypatch.setattr(torch,'manual_seed',lambda seed:calls.append(('seed',seed)))
+    monkeypatch.setattr(torch,'use_deterministic_algorithms',lambda enabled:calls.append(('deterministic',enabled)))
+    monkeypatch.setattr(torch.backends.cuda.matmul,'allow_tf32',True)
+    monkeypatch.setattr(torch.backends.cudnn,'allow_tf32',True)
+    def checked(session):
+        assert calls==([('seed',0),('deterministic',True)] if opt_in else [])
+        assert torch.backends.cuda.matmul.allow_tf32 is (not opt_in)
+        assert torch.backends.cudnn.allow_tf32 is (not opt_in)
+        return 0
+    monkeypatch.setattr(E.suite,'run',checked)
+    assert E.main()==0

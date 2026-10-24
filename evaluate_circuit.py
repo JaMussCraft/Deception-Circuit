@@ -991,6 +991,9 @@ def main():
         # runtime identity must also be stable across fresh Python processes.
         import torch
         torch.manual_seed(0)
+        torch.use_deterministic_algorithms(True)
+        torch.backends.cuda.matmul.allow_tf32 = False
+        torch.backends.cudnn.allow_tf32 = False
     session = build_session(cli)
     if cli.dry_run:
         return dry_run(session)
