@@ -150,6 +150,14 @@ def via_argv(job, via: str, time: str) -> list:
             *mc.job_args(job)]
 
 
+def via_command(job, via: str, time: str) -> list:
+    """via_argv as executed: a dispatcher without the execute bit (a checkout that lost +x) runs under bash."""
+    argv = via_argv(job, via, time)
+    if os.path.isfile(via) and not os.access(via, os.X_OK):
+        return ["/bin/bash", *argv]
+    return argv
+
+
 # ------------------------------------------------------------------ the compute ledger
 
 def _read_json(path):
@@ -319,7 +327,7 @@ def submit(jobs, profile: dict, name: str, path: str, a) -> int:
     sources = sources_sha256(path)
     for job, t, h in zip(jobs, times, hours):
         stamp = datetime.datetime.now().isoformat(timespec="seconds")
-        rid = f"06-{job['stage']}-{job['job']}-{stamp}"
+        rid = f"06-{job['stage']}-{job['job']}-{stamp}-pid{os.getpid()}"
         res = {"reservation_id": rid, "ticket": ticket,
                "purpose": f"ticket 06 stage {job['stage']} job {job['job']}: "
                           + ", ".join(c["label"] for c in job["cells"]),
@@ -333,10 +341,14 @@ def submit(jobs, profile: dict, name: str, path: str, a) -> int:
             budget_check(sec, ticket, [res["reserved_gpu_hours"]])     # re-check on the fresh read
             sec["reservations"].append(res)
         edit_ledger(a.ledger, section, reserve)
-        cmd = sbatch_argv(job, profile, name, t) if local else via_argv(job, a.via, t)
-        r = subprocess.run(cmd, cwd=repo, capture_output=True, text=True)
-        m = re.search(r"Submitted batch job (\d+)", r.stdout)
-        ok = r.returncode == 0 and m is not None
+        cmd = sbatch_argv(job, profile, name, t) if local else via_command(job, a.via, t)
+        try:
+            r = subprocess.run(cmd, cwd=repo, capture_output=True, text=True)
+            out, err, code = r.stdout, r.stderr, r.returncode
+        except OSError as e:           # the launcher itself did not start: nothing was submitted
+            out, err, code = "", f"{cmd[0]}: {e}", 127
+        m = re.search(r"Submitted batch job (\d+)", out)
+        ok = code == 0 and m is not None
 
         def record(sec, rid=rid, ok=ok, m=m):
             for row in sec["reservations"]:
@@ -347,7 +359,8 @@ def submit(jobs, profile: dict, name: str, path: str, a) -> int:
                         row["reserved_gpu_hours"], row["status"] = 0.0, "submit-failed"
         edit_ledger(a.ledger, section, record)
         if not ok:
-            print(f"sbatch failed for {job['job']}: {r.stdout.strip()} {r.stderr.strip()}", file=sys.stderr)
+            print(f"submission failed for {job['job']} (reservation zeroed): {out.strip()} {err.strip()}",
+                  file=sys.stderr)
             return 1
         row = [stamp, name, job["stage"], job["job"], m.group(1), t, job["output_dir"]]
         with open(a.jobs_file, "a") as f:

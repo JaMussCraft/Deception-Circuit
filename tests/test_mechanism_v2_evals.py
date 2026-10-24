@@ -528,6 +528,25 @@ def test_submit_to_another_cluster_goes_through_the_dispatcher(tmp_path):
     assert res["job_id"] == "77" and "via" in res["notes"]
 
 
+def test_dispatcher_without_execute_bit_runs_through_bash_and_a_failed_launch_frees_its_reservation(tmp_path):
+    env, _ = _fake_sbatch(tmp_path)
+    via = tmp_path / "noexec.sh"                                   # mode 0644, like a checkout without +x
+    via.write_text('echo "Submitted batch job 78"\n')
+    via.chmod(0o644)
+    led = _ledger(tmp_path)
+    prof = _profile(tmp_path, DC_REPO_ROOT="/remote/repo")
+    common = ["--profile-file", prof, "--stage", "control", "--only", "drift_sdr_coarse_D_hko", "--submit",
+              "--ledger", str(led), "--jobs-file", str(tmp_path / "j.txt")]
+    r = _gen(*common, "--via", str(via), env=env)
+    assert r.returncode == 0, r.stdout + r.stderr
+    r = _gen(*common, "--via", str(tmp_path / "missing.sh"), env=env)
+    assert r.returncode == 1 and "missing.sh" in r.stderr
+    ok, failed = json.loads(led.read_text())["fakeb2"]["reservations"]
+    assert (ok["job_id"], ok["status"], ok["reserved_gpu_hours"]) == ("78", "submitted", 1.0)
+    assert (failed["job_id"], failed["status"], failed["reserved_gpu_hours"]) == (None, "submit-failed", 0.0)
+    assert json.loads(led.read_text())["fakeb2"]["totals"]["reserved_gpu_hours_in_flight"] == 1.0
+
+
 # ---------------------------------------------------------------- check_cells.py
 
 def test_every_generated_command_checks_clean_on_this_checkout(cells):
