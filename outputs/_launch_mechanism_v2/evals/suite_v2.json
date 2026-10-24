@@ -1,0 +1,2962 @@
+{
+ "schema": 1,
+ "suite": "mechanism-v2-coarse",
+ "ticket": "06-evaluate-coarse-v2-circuits",
+ "spec": "spec.md 14.G14",
+ "generated_by": "outputs/_launch_mechanism_v2/evals/build_suite.py",
+ "paths": "every path is relative to the repository root (DC_REPO_ROOT)",
+ "runs": {
+  "far": {
+   "D": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+   "H": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323"
+  },
+  "sdr": {
+   "D": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "H": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323"
+  },
+  "ser": {
+   "D": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+   "H": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323"
+  }
+ },
+ "operands": {
+  "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2",
+  "standins": {
+   "far": "outputs/_launch_mechanism_v2/evals/standins/far_v2_nopressure",
+   "sdr": "outputs/_launch_mechanism_v2/evals/standins/sdr_v2_nopressure",
+   "ser": "outputs/_launch_mechanism_v2/evals/standins/ser_v2_nopressure"
+  },
+  "drift_D": "outputs/_launch_mechanism_v2/evals/drift_control/sdr_coarse_D_260922-092742",
+  "drift_m": "outputs/_launch_format_control/allmlp_nomb"
+ },
+ "suite_root": "outputs/_suites/mechanism-v2-coarse",
+ "compose_granularity": "leaf",
+ "common_args": [
+  "--ablation",
+  "interchange",
+  "--n-random",
+  "20",
+  "--knockout-null-count",
+  "20"
+ ],
+ "operand_rule": "The evaluator takes every test set from --task-from (the run's config.json: task, deception_condition, data_dir); an operand's config is never read for the task. Every job passes exactly one --task-from (checked by check_cells.py), so the far_v2 config of m never names a test set, on any task.",
+ "cost_model": {
+  "a40_cell_min": {
+   "sufficiency": 27.0,
+   "knockout": 26.0,
+   "sufficiency_nopressure": 8.0,
+   "knockout_nopressure": 11.5
+  },
+  "speedup_vs_a40": {
+   "A40": 1.0,
+   "L40S": 1.0,
+   "A100": 2.26,
+   "H200": 5.4,
+   "H100": 4.6
+  },
+  "load_min": {
+   "A40": 3.5,
+   "L40S": 3.5,
+   "A100": 3.5,
+   "H200": 3.5,
+   "H100": 7.7
+  },
+  "walltime_factor": 1.5,
+  "walltime_floor_min": 60,
+  "h100_note": "H100 cell time is assumed (0.85 x H200), not measured; the drift-control jobs measure it. H100 model load 458 s from /ocean (smoke job 49773269)"
+ },
+ "stages": {
+  "control": {
+   "note": "drift control (2 cells, one per Delta reference): run first on the remote cluster; stage 1 only after the orchestrator accepts the per-metric deltas",
+   "n_cells": 2,
+   "n_conditional": 0,
+   "jobs_packed": [
+    {
+     "job": "drift_sdr_coarse_D_hko",
+     "output_dir": "outputs/_suites/mechanism-v2-coarse/control/drift_sdr_coarse_D_hko",
+     "task_from": "outputs/_launch_mechanism_v2/evals/drift_control/sdr_coarse_D_260922-092742",
+     "evals": [
+      "knockout"
+     ],
+     "cells": [
+      "D_hko"
+     ],
+     "conditional_cells": [],
+     "results": {
+      "D_hko": "outputs/_suites/mechanism-v2-coarse/control/drift_sdr_coarse_D_hko/cells/D_hko__leaf/sdr/interchange"
+     },
+     "est_min": {
+      "A40": 29.5,
+      "H100": 13.4
+     }
+    },
+    {
+     "job": "drift_sdr_coarse_D_headsko",
+     "output_dir": "outputs/_suites/mechanism-v2-coarse/control/drift_sdr_coarse_D_headsko",
+     "task_from": "outputs/_launch_mechanism_v2/evals/drift_control/sdr_coarse_D_260922-092742",
+     "evals": [
+      "knockout"
+     ],
+     "cells": [
+      "headsko"
+     ],
+     "conditional_cells": [],
+     "results": {
+      "headsko": "outputs/_suites/mechanism-v2-coarse/control/drift_sdr_coarse_D_headsko/cells/headsko__leaf/sdr/interchange"
+     },
+     "est_min": {
+      "A40": 29.5,
+      "H100": 13.4
+     }
+    }
+   ]
+  },
+  "1": {
+   "note": "G14 stage 1 (24 cells); HARD STOP after it: results table to the orchestrator",
+   "n_cells": 24,
+   "n_conditional": 0,
+   "jobs_packed": [
+    {
+     "job": "s1_far__D_suff",
+     "output_dir": "outputs/_suites/mechanism-v2-coarse/stage1/s1_far__D_suff",
+     "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+     "evals": [
+      "sanity",
+      "null",
+      "pressure"
+     ],
+     "cells": [
+      "D_far",
+      "D_far_and_H_far_suff"
+     ],
+     "conditional_cells": [],
+     "results": {
+      "D_far": "outputs/_suites/mechanism-v2-coarse/stage1/s1_far__D_suff/cells/D_far/far_v2/interchange",
+      "D_far_and_H_far_suff": "outputs/_suites/mechanism-v2-coarse/stage1/s1_far__D_suff/cells/D_far_and_H_far_suff__leaf/far_v2/interchange"
+     },
+     "est_min": {
+      "A40": 57.5,
+      "H100": 19.4
+     }
+    },
+    {
+     "job": "s1_far__D_ko",
+     "output_dir": "outputs/_suites/mechanism-v2-coarse/stage1/s1_far__D_ko",
+     "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+     "evals": [
+      "knockout"
+     ],
+     "cells": [
+      "D_far_hko",
+      "D_far_and_H_far_hko",
+      "D_far_minus_H_far_hko",
+      "H_far_minus_D_far_hko"
+     ],
+     "conditional_cells": [],
+     "results": {
+      "D_far_hko": "outputs/_suites/mechanism-v2-coarse/stage1/s1_far__D_ko/cells/D_far_hko__leaf/far_v2/interchange",
+      "D_far_and_H_far_hko": "outputs/_suites/mechanism-v2-coarse/stage1/s1_far__D_ko/cells/D_far_and_H_far_hko__leaf/far_v2/interchange",
+      "D_far_minus_H_far_hko": "outputs/_suites/mechanism-v2-coarse/stage1/s1_far__D_ko/cells/D_far_minus_H_far_hko__leaf/far_v2/interchange",
+      "H_far_minus_D_far_hko": "outputs/_suites/mechanism-v2-coarse/stage1/s1_far__D_ko/cells/H_far_minus_D_far_hko__leaf/far_v2/interchange"
+     },
+     "est_min": {
+      "A40": 107.5,
+      "H100": 30.3
+     }
+    },
+    {
+     "job": "s1_far__H_suff",
+     "output_dir": "outputs/_suites/mechanism-v2-coarse/stage1/s1_far__H_suff",
+     "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+     "evals": [
+      "sanity",
+      "null",
+      "pressure"
+     ],
+     "cells": [
+      "H_far"
+     ],
+     "conditional_cells": [],
+     "results": {
+      "H_far": "outputs/_suites/mechanism-v2-coarse/stage1/s1_far__H_suff/cells/H_far/far_v2/interchange"
+     },
+     "est_min": {
+      "A40": 30.5,
+      "H100": 13.6
+     }
+    },
+    {
+     "job": "s1_far__H_ko",
+     "output_dir": "outputs/_suites/mechanism-v2-coarse/stage1/s1_far__H_ko",
+     "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+     "evals": [
+      "knockout"
+     ],
+     "cells": [
+      "H_far_hko"
+     ],
+     "conditional_cells": [],
+     "results": {
+      "H_far_hko": "outputs/_suites/mechanism-v2-coarse/stage1/s1_far__H_ko/cells/H_far_hko__leaf/far_v2/interchange"
+     },
+     "est_min": {
+      "A40": 29.5,
+      "H100": 13.4
+     }
+    },
+    {
+     "job": "s1_sdr__D_suff",
+     "output_dir": "outputs/_suites/mechanism-v2-coarse/stage1/s1_sdr__D_suff",
+     "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+     "evals": [
+      "sanity",
+      "null",
+      "pressure"
+     ],
+     "cells": [
+      "D_sdr",
+      "D_sdr_and_H_sdr_suff"
+     ],
+     "conditional_cells": [],
+     "results": {
+      "D_sdr": "outputs/_suites/mechanism-v2-coarse/stage1/s1_sdr__D_suff/cells/D_sdr/sdr_v2/interchange",
+      "D_sdr_and_H_sdr_suff": "outputs/_suites/mechanism-v2-coarse/stage1/s1_sdr__D_suff/cells/D_sdr_and_H_sdr_suff__leaf/sdr_v2/interchange"
+     },
+     "est_min": {
+      "A40": 57.5,
+      "H100": 19.4
+     }
+    },
+    {
+     "job": "s1_sdr__D_ko",
+     "output_dir": "outputs/_suites/mechanism-v2-coarse/stage1/s1_sdr__D_ko",
+     "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+     "evals": [
+      "knockout"
+     ],
+     "cells": [
+      "D_sdr_hko",
+      "D_sdr_and_H_sdr_hko",
+      "D_sdr_minus_H_sdr_hko",
+      "H_sdr_minus_D_sdr_hko"
+     ],
+     "conditional_cells": [],
+     "results": {
+      "D_sdr_hko": "outputs/_suites/mechanism-v2-coarse/stage1/s1_sdr__D_ko/cells/D_sdr_hko__leaf/sdr_v2/interchange",
+      "D_sdr_and_H_sdr_hko": "outputs/_suites/mechanism-v2-coarse/stage1/s1_sdr__D_ko/cells/D_sdr_and_H_sdr_hko__leaf/sdr_v2/interchange",
+      "D_sdr_minus_H_sdr_hko": "outputs/_suites/mechanism-v2-coarse/stage1/s1_sdr__D_ko/cells/D_sdr_minus_H_sdr_hko__leaf/sdr_v2/interchange",
+      "H_sdr_minus_D_sdr_hko": "outputs/_suites/mechanism-v2-coarse/stage1/s1_sdr__D_ko/cells/H_sdr_minus_D_sdr_hko__leaf/sdr_v2/interchange"
+     },
+     "est_min": {
+      "A40": 107.5,
+      "H100": 30.3
+     }
+    },
+    {
+     "job": "s1_sdr__H_suff",
+     "output_dir": "outputs/_suites/mechanism-v2-coarse/stage1/s1_sdr__H_suff",
+     "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+     "evals": [
+      "sanity",
+      "null",
+      "pressure"
+     ],
+     "cells": [
+      "H_sdr"
+     ],
+     "conditional_cells": [],
+     "results": {
+      "H_sdr": "outputs/_suites/mechanism-v2-coarse/stage1/s1_sdr__H_suff/cells/H_sdr/sdr_v2/interchange"
+     },
+     "est_min": {
+      "A40": 30.5,
+      "H100": 13.6
+     }
+    },
+    {
+     "job": "s1_sdr__H_ko",
+     "output_dir": "outputs/_suites/mechanism-v2-coarse/stage1/s1_sdr__H_ko",
+     "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+     "evals": [
+      "knockout"
+     ],
+     "cells": [
+      "H_sdr_hko"
+     ],
+     "conditional_cells": [],
+     "results": {
+      "H_sdr_hko": "outputs/_suites/mechanism-v2-coarse/stage1/s1_sdr__H_ko/cells/H_sdr_hko__leaf/sdr_v2/interchange"
+     },
+     "est_min": {
+      "A40": 29.5,
+      "H100": 13.4
+     }
+    },
+    {
+     "job": "s1_ser__D_suff",
+     "output_dir": "outputs/_suites/mechanism-v2-coarse/stage1/s1_ser__D_suff",
+     "task_from": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+     "evals": [
+      "sanity",
+      "null",
+      "pressure"
+     ],
+     "cells": [
+      "D_ser",
+      "D_ser_and_H_ser_suff"
+     ],
+     "conditional_cells": [],
+     "results": {
+      "D_ser": "outputs/_suites/mechanism-v2-coarse/stage1/s1_ser__D_suff/cells/D_ser/ser_v2/interchange",
+      "D_ser_and_H_ser_suff": "outputs/_suites/mechanism-v2-coarse/stage1/s1_ser__D_suff/cells/D_ser_and_H_ser_suff__leaf/ser_v2/interchange"
+     },
+     "est_min": {
+      "A40": 57.5,
+      "H100": 19.4
+     }
+    },
+    {
+     "job": "s1_ser__D_ko",
+     "output_dir": "outputs/_suites/mechanism-v2-coarse/stage1/s1_ser__D_ko",
+     "task_from": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+     "evals": [
+      "knockout"
+     ],
+     "cells": [
+      "D_ser_hko",
+      "D_ser_and_H_ser_hko",
+      "D_ser_minus_H_ser_hko",
+      "H_ser_minus_D_ser_hko"
+     ],
+     "conditional_cells": [],
+     "results": {
+      "D_ser_hko": "outputs/_suites/mechanism-v2-coarse/stage1/s1_ser__D_ko/cells/D_ser_hko__leaf/ser_v2/interchange",
+      "D_ser_and_H_ser_hko": "outputs/_suites/mechanism-v2-coarse/stage1/s1_ser__D_ko/cells/D_ser_and_H_ser_hko__leaf/ser_v2/interchange",
+      "D_ser_minus_H_ser_hko": "outputs/_suites/mechanism-v2-coarse/stage1/s1_ser__D_ko/cells/D_ser_minus_H_ser_hko__leaf/ser_v2/interchange",
+      "H_ser_minus_D_ser_hko": "outputs/_suites/mechanism-v2-coarse/stage1/s1_ser__D_ko/cells/H_ser_minus_D_ser_hko__leaf/ser_v2/interchange"
+     },
+     "est_min": {
+      "A40": 107.5,
+      "H100": 30.3
+     }
+    },
+    {
+     "job": "s1_ser__H_suff",
+     "output_dir": "outputs/_suites/mechanism-v2-coarse/stage1/s1_ser__H_suff",
+     "task_from": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+     "evals": [
+      "sanity",
+      "null",
+      "pressure"
+     ],
+     "cells": [
+      "H_ser"
+     ],
+     "conditional_cells": [],
+     "results": {
+      "H_ser": "outputs/_suites/mechanism-v2-coarse/stage1/s1_ser__H_suff/cells/H_ser/ser_v2/interchange"
+     },
+     "est_min": {
+      "A40": 30.5,
+      "H100": 13.6
+     }
+    },
+    {
+     "job": "s1_ser__H_ko",
+     "output_dir": "outputs/_suites/mechanism-v2-coarse/stage1/s1_ser__H_ko",
+     "task_from": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+     "evals": [
+      "knockout"
+     ],
+     "cells": [
+      "H_ser_hko"
+     ],
+     "conditional_cells": [],
+     "results": {
+      "H_ser_hko": "outputs/_suites/mechanism-v2-coarse/stage1/s1_ser__H_ko/cells/H_ser_hko__leaf/ser_v2/interchange"
+     },
+     "est_min": {
+      "A40": 29.5,
+      "H100": 13.4
+     }
+    }
+   ]
+  },
+  "2": {
+   "note": "G14 stage 2 (33 cells + 6 conditional); starts only after the user has seen stage 1",
+   "n_cells": 33,
+   "n_conditional": 6,
+   "jobs_packed": [
+    {
+     "job": "s2_far__D_suff",
+     "output_dir": "outputs/_suites/mechanism-v2-coarse/stage2/s2_far__D_suff",
+     "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+     "evals": [
+      "sanity",
+      "null",
+      "pressure"
+     ],
+     "cells": [
+      "D_sdr",
+      "D_ser",
+      "D_core_suff",
+      "H_far"
+     ],
+     "conditional_cells": [],
+     "results": {
+      "D_sdr": "outputs/_suites/mechanism-v2-coarse/stage2/s2_far__D_suff/cells/D_sdr/far_v2/interchange",
+      "D_ser": "outputs/_suites/mechanism-v2-coarse/stage2/s2_far__D_suff/cells/D_ser/far_v2/interchange",
+      "D_core_suff": "outputs/_suites/mechanism-v2-coarse/stage2/s2_far__D_suff/cells/D_core_suff__leaf/far_v2/interchange",
+      "H_far": "outputs/_suites/mechanism-v2-coarse/stage2/s2_far__D_suff/cells/H_far/far_v2/interchange"
+     },
+     "est_min": {
+      "A40": 111.5,
+      "H100": 31.2
+     }
+    },
+    {
+     "job": "s2_far__D_ko",
+     "output_dir": "outputs/_suites/mechanism-v2-coarse/stage2/s2_far__D_ko",
+     "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+     "evals": [
+      "knockout"
+     ],
+     "cells": [
+      "D_sdr_hko",
+      "D_ser_hko",
+      "D_core_hko",
+      "D_far_minus_D_sdr_minus_D_ser_hko",
+      "H_far_hko",
+      "D_sdr_minus_H_sdr_hko",
+      "D_ser_minus_H_ser_hko"
+     ],
+     "conditional_cells": [
+      "D_sdr_minus_H_sdr_hko",
+      "D_ser_minus_H_ser_hko"
+     ],
+     "results": {
+      "D_sdr_hko": "outputs/_suites/mechanism-v2-coarse/stage2/s2_far__D_ko/cells/D_sdr_hko__leaf/far_v2/interchange",
+      "D_ser_hko": "outputs/_suites/mechanism-v2-coarse/stage2/s2_far__D_ko/cells/D_ser_hko__leaf/far_v2/interchange",
+      "D_core_hko": "outputs/_suites/mechanism-v2-coarse/stage2/s2_far__D_ko/cells/D_core_hko__leaf/far_v2/interchange",
+      "D_far_minus_D_sdr_minus_D_ser_hko": "outputs/_suites/mechanism-v2-coarse/stage2/s2_far__D_ko/cells/D_far_minus_D_sdr_minus_D_ser_hko__leaf/far_v2/interchange",
+      "H_far_hko": "outputs/_suites/mechanism-v2-coarse/stage2/s2_far__D_ko/cells/H_far_hko__leaf/far_v2/interchange",
+      "D_sdr_minus_H_sdr_hko": "outputs/_suites/mechanism-v2-coarse/stage2/s2_far__D_ko/cells/D_sdr_minus_H_sdr_hko__leaf/far_v2/interchange",
+      "D_ser_minus_H_ser_hko": "outputs/_suites/mechanism-v2-coarse/stage2/s2_far__D_ko/cells/D_ser_minus_H_ser_hko__leaf/far_v2/interchange"
+     },
+     "est_min": {
+      "A40": 185.5,
+      "H100": 47.3
+     }
+    },
+    {
+     "job": "s2_far__np_suff",
+     "output_dir": "outputs/_suites/mechanism-v2-coarse/stage2/s2_far__np_suff",
+     "task_from": "outputs/_launch_mechanism_v2/evals/standins/far_v2_nopressure",
+     "evals": [
+      "sanity",
+      "null",
+      "pressure"
+     ],
+     "cells": [
+      "D_far"
+     ],
+     "conditional_cells": [],
+     "results": {
+      "D_far": "outputs/_suites/mechanism-v2-coarse/stage2/s2_far__np_suff/cells/D_far/far_v2/interchange"
+     },
+     "est_min": {
+      "A40": 11.5,
+      "H100": 9.4
+     }
+    },
+    {
+     "job": "s2_far__np_ko",
+     "output_dir": "outputs/_suites/mechanism-v2-coarse/stage2/s2_far__np_ko",
+     "task_from": "outputs/_launch_mechanism_v2/evals/standins/far_v2_nopressure",
+     "evals": [
+      "knockout"
+     ],
+     "cells": [
+      "D_far_hko"
+     ],
+     "conditional_cells": [],
+     "results": {
+      "D_far_hko": "outputs/_suites/mechanism-v2-coarse/stage2/s2_far__np_ko/cells/D_far_hko__leaf/far_v2/interchange"
+     },
+     "est_min": {
+      "A40": 15.0,
+      "H100": 10.2
+     }
+    },
+    {
+     "job": "s2_sdr__D_suff",
+     "output_dir": "outputs/_suites/mechanism-v2-coarse/stage2/s2_sdr__D_suff",
+     "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+     "evals": [
+      "sanity",
+      "null",
+      "pressure"
+     ],
+     "cells": [
+      "D_far",
+      "D_ser",
+      "D_core_suff",
+      "H_sdr"
+     ],
+     "conditional_cells": [],
+     "results": {
+      "D_far": "outputs/_suites/mechanism-v2-coarse/stage2/s2_sdr__D_suff/cells/D_far/sdr_v2/interchange",
+      "D_ser": "outputs/_suites/mechanism-v2-coarse/stage2/s2_sdr__D_suff/cells/D_ser/sdr_v2/interchange",
+      "D_core_suff": "outputs/_suites/mechanism-v2-coarse/stage2/s2_sdr__D_suff/cells/D_core_suff__leaf/sdr_v2/interchange",
+      "H_sdr": "outputs/_suites/mechanism-v2-coarse/stage2/s2_sdr__D_suff/cells/H_sdr/sdr_v2/interchange"
+     },
+     "est_min": {
+      "A40": 111.5,
+      "H100": 31.2
+     }
+    },
+    {
+     "job": "s2_sdr__D_ko",
+     "output_dir": "outputs/_suites/mechanism-v2-coarse/stage2/s2_sdr__D_ko",
+     "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+     "evals": [
+      "knockout"
+     ],
+     "cells": [
+      "D_far_hko",
+      "D_ser_hko",
+      "D_core_hko",
+      "D_sdr_minus_D_far_minus_D_ser_hko",
+      "H_sdr_hko",
+      "D_far_minus_H_far_hko",
+      "D_ser_minus_H_ser_hko"
+     ],
+     "conditional_cells": [
+      "D_far_minus_H_far_hko",
+      "D_ser_minus_H_ser_hko"
+     ],
+     "results": {
+      "D_far_hko": "outputs/_suites/mechanism-v2-coarse/stage2/s2_sdr__D_ko/cells/D_far_hko__leaf/sdr_v2/interchange",
+      "D_ser_hko": "outputs/_suites/mechanism-v2-coarse/stage2/s2_sdr__D_ko/cells/D_ser_hko__leaf/sdr_v2/interchange",
+      "D_core_hko": "outputs/_suites/mechanism-v2-coarse/stage2/s2_sdr__D_ko/cells/D_core_hko__leaf/sdr_v2/interchange",
+      "D_sdr_minus_D_far_minus_D_ser_hko": "outputs/_suites/mechanism-v2-coarse/stage2/s2_sdr__D_ko/cells/D_sdr_minus_D_far_minus_D_ser_hko__leaf/sdr_v2/interchange",
+      "H_sdr_hko": "outputs/_suites/mechanism-v2-coarse/stage2/s2_sdr__D_ko/cells/H_sdr_hko__leaf/sdr_v2/interchange",
+      "D_far_minus_H_far_hko": "outputs/_suites/mechanism-v2-coarse/stage2/s2_sdr__D_ko/cells/D_far_minus_H_far_hko__leaf/sdr_v2/interchange",
+      "D_ser_minus_H_ser_hko": "outputs/_suites/mechanism-v2-coarse/stage2/s2_sdr__D_ko/cells/D_ser_minus_H_ser_hko__leaf/sdr_v2/interchange"
+     },
+     "est_min": {
+      "A40": 185.5,
+      "H100": 47.3
+     }
+    },
+    {
+     "job": "s2_sdr__np_suff",
+     "output_dir": "outputs/_suites/mechanism-v2-coarse/stage2/s2_sdr__np_suff",
+     "task_from": "outputs/_launch_mechanism_v2/evals/standins/sdr_v2_nopressure",
+     "evals": [
+      "sanity",
+      "null",
+      "pressure"
+     ],
+     "cells": [
+      "D_sdr"
+     ],
+     "conditional_cells": [],
+     "results": {
+      "D_sdr": "outputs/_suites/mechanism-v2-coarse/stage2/s2_sdr__np_suff/cells/D_sdr/sdr_v2/interchange"
+     },
+     "est_min": {
+      "A40": 11.5,
+      "H100": 9.4
+     }
+    },
+    {
+     "job": "s2_sdr__np_ko",
+     "output_dir": "outputs/_suites/mechanism-v2-coarse/stage2/s2_sdr__np_ko",
+     "task_from": "outputs/_launch_mechanism_v2/evals/standins/sdr_v2_nopressure",
+     "evals": [
+      "knockout"
+     ],
+     "cells": [
+      "D_sdr_hko"
+     ],
+     "conditional_cells": [],
+     "results": {
+      "D_sdr_hko": "outputs/_suites/mechanism-v2-coarse/stage2/s2_sdr__np_ko/cells/D_sdr_hko__leaf/sdr_v2/interchange"
+     },
+     "est_min": {
+      "A40": 15.0,
+      "H100": 10.2
+     }
+    },
+    {
+     "job": "s2_ser__D_suff",
+     "output_dir": "outputs/_suites/mechanism-v2-coarse/stage2/s2_ser__D_suff",
+     "task_from": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+     "evals": [
+      "sanity",
+      "null",
+      "pressure"
+     ],
+     "cells": [
+      "D_far",
+      "D_sdr",
+      "D_core_suff",
+      "H_ser"
+     ],
+     "conditional_cells": [],
+     "results": {
+      "D_far": "outputs/_suites/mechanism-v2-coarse/stage2/s2_ser__D_suff/cells/D_far/ser_v2/interchange",
+      "D_sdr": "outputs/_suites/mechanism-v2-coarse/stage2/s2_ser__D_suff/cells/D_sdr/ser_v2/interchange",
+      "D_core_suff": "outputs/_suites/mechanism-v2-coarse/stage2/s2_ser__D_suff/cells/D_core_suff__leaf/ser_v2/interchange",
+      "H_ser": "outputs/_suites/mechanism-v2-coarse/stage2/s2_ser__D_suff/cells/H_ser/ser_v2/interchange"
+     },
+     "est_min": {
+      "A40": 111.5,
+      "H100": 31.2
+     }
+    },
+    {
+     "job": "s2_ser__D_ko",
+     "output_dir": "outputs/_suites/mechanism-v2-coarse/stage2/s2_ser__D_ko",
+     "task_from": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+     "evals": [
+      "knockout"
+     ],
+     "cells": [
+      "D_far_hko",
+      "D_sdr_hko",
+      "D_core_hko",
+      "D_ser_minus_D_far_minus_D_sdr_hko",
+      "H_ser_hko",
+      "D_far_minus_H_far_hko",
+      "D_sdr_minus_H_sdr_hko"
+     ],
+     "conditional_cells": [
+      "D_far_minus_H_far_hko",
+      "D_sdr_minus_H_sdr_hko"
+     ],
+     "results": {
+      "D_far_hko": "outputs/_suites/mechanism-v2-coarse/stage2/s2_ser__D_ko/cells/D_far_hko__leaf/ser_v2/interchange",
+      "D_sdr_hko": "outputs/_suites/mechanism-v2-coarse/stage2/s2_ser__D_ko/cells/D_sdr_hko__leaf/ser_v2/interchange",
+      "D_core_hko": "outputs/_suites/mechanism-v2-coarse/stage2/s2_ser__D_ko/cells/D_core_hko__leaf/ser_v2/interchange",
+      "D_ser_minus_D_far_minus_D_sdr_hko": "outputs/_suites/mechanism-v2-coarse/stage2/s2_ser__D_ko/cells/D_ser_minus_D_far_minus_D_sdr_hko__leaf/ser_v2/interchange",
+      "H_ser_hko": "outputs/_suites/mechanism-v2-coarse/stage2/s2_ser__D_ko/cells/H_ser_hko__leaf/ser_v2/interchange",
+      "D_far_minus_H_far_hko": "outputs/_suites/mechanism-v2-coarse/stage2/s2_ser__D_ko/cells/D_far_minus_H_far_hko__leaf/ser_v2/interchange",
+      "D_sdr_minus_H_sdr_hko": "outputs/_suites/mechanism-v2-coarse/stage2/s2_ser__D_ko/cells/D_sdr_minus_H_sdr_hko__leaf/ser_v2/interchange"
+     },
+     "est_min": {
+      "A40": 185.5,
+      "H100": 47.3
+     }
+    },
+    {
+     "job": "s2_ser__np_suff",
+     "output_dir": "outputs/_suites/mechanism-v2-coarse/stage2/s2_ser__np_suff",
+     "task_from": "outputs/_launch_mechanism_v2/evals/standins/ser_v2_nopressure",
+     "evals": [
+      "sanity",
+      "null",
+      "pressure"
+     ],
+     "cells": [
+      "D_ser"
+     ],
+     "conditional_cells": [],
+     "results": {
+      "D_ser": "outputs/_suites/mechanism-v2-coarse/stage2/s2_ser__np_suff/cells/D_ser/ser_v2/interchange"
+     },
+     "est_min": {
+      "A40": 11.5,
+      "H100": 9.4
+     }
+    },
+    {
+     "job": "s2_ser__np_ko",
+     "output_dir": "outputs/_suites/mechanism-v2-coarse/stage2/s2_ser__np_ko",
+     "task_from": "outputs/_launch_mechanism_v2/evals/standins/ser_v2_nopressure",
+     "evals": [
+      "knockout"
+     ],
+     "cells": [
+      "D_ser_hko"
+     ],
+     "conditional_cells": [],
+     "results": {
+      "D_ser_hko": "outputs/_suites/mechanism-v2-coarse/stage2/s2_ser__np_ko/cells/D_ser_hko__leaf/ser_v2/interchange"
+     },
+     "est_min": {
+      "A40": 15.0,
+      "H100": 10.2
+     }
+    }
+   ]
+  }
+ },
+ "drift_control": {
+  "cells": [
+   {
+    "stage": "control",
+    "job": "drift_sdr_coarse_D_hko",
+    "label": "D_hko",
+    "expr": "(D) - m",
+    "kind": "knockout",
+    "cell_dir": "D_hko__leaf",
+    "block": "drift_control",
+    "conditional": false,
+    "home_task": "sdr",
+    "test_task": "sdr",
+    "condition": "deceptive",
+    "dataset": "sdr",
+    "task_from": "outputs/_launch_mechanism_v2/evals/drift_control/sdr_coarse_D_260922-092742",
+    "evals": [
+     "knockout"
+    ],
+    "operands": {
+     "D": "outputs/_launch_mechanism_v2/evals/drift_control/sdr_coarse_D_260922-092742",
+     "m": "outputs/_launch_format_control/allmlp_nomb"
+    },
+    "common_args": [
+     "--ablation",
+     "interchange",
+     "--n-random",
+     "20",
+     "--knockout-null-count",
+     "20"
+    ],
+    "expected_heads": 69,
+    "reference_job": 22895982
+   },
+   {
+    "stage": "control",
+    "job": "drift_sdr_coarse_D_headsko",
+    "label": "headsko",
+    "expr": "c - m",
+    "kind": "knockout",
+    "cell_dir": "headsko__leaf",
+    "block": "drift_control",
+    "conditional": false,
+    "home_task": "sdr",
+    "test_task": "sdr",
+    "condition": "deceptive",
+    "dataset": "sdr",
+    "task_from": "outputs/_launch_mechanism_v2/evals/drift_control/sdr_coarse_D_260922-092742",
+    "evals": [
+     "knockout"
+    ],
+    "operands": {
+     "c": "outputs/_launch_mechanism_v2/evals/drift_control/sdr_coarse_D_260922-092742",
+     "m": "outputs/_launch_format_control/allmlp_nomb"
+    },
+    "common_args": [
+     "--n-random",
+     "20"
+    ],
+    "expected_heads": 69,
+    "reference_job": 22316469
+   }
+  ],
+  "references": [
+   {
+    "slurm_job": 22895982,
+    "gpu": "A40",
+    "role": "primary",
+    "cell_job": "drift_sdr_coarse_D_hko",
+    "why": "format-control coarse suite D_hko on sdr (--ablation interchange --knockout-null-count 20), the newer evaluator code; the yardstick for every row including the pressure variants",
+    "path": "outputs/_suites/format-control-sdr-coarse-nls0.3/cells/D_hko__leaf/sdr/interchange/knockout.json",
+    "source_checkout": "/projects/beto/swong2/Alignment/Deception-Circuit",
+    "created": "2026-10-15T02:53:08",
+    "result": "outputs/_suites/mechanism-v2-coarse/control/drift_sdr_coarse_D_hko/cells/D_hko__leaf/sdr/interchange/knockout.json",
+    "metrics": {
+     "task.knockout.accuracy": 0.002,
+     "task.knockout.logit_diff": -1.731875,
+     "task.knockout.kl_div": 1.2111327238082885,
+     "task.knockout.exact_match": 0.002,
+     "task.circuit.accuracy": 0.0,
+     "task.circuit.logit_diff": -1.731625,
+     "task.circuit.kl_div": 1.1964045524597169,
+     "task.circuit.exact_match": 0.0,
+     "task.null.accuracy.mean": 0.3897,
+     "task.null.accuracy.percentile": 0.0,
+     "task.null.accuracy.z": -1.5326321241524998,
+     "task.null.logit_diff.mean": -0.24591249999999998,
+     "task.null.logit_diff.percentile": 0.0,
+     "task.null.logit_diff.z": -2.1680757589097506,
+     "task.null.kl_div.mean": 0.4838259112209082,
+     "task.null.kl_div.percentile": 0.0,
+     "task.null.kl_div.z": -2.769339157458885,
+     "task.null.exact_match.mean": 0.41295000000000004,
+     "task.null.exact_match.percentile": 0.0,
+     "task.null.exact_match.z": -1.5791078276198487,
+     "task.null.separated": 2,
+     "task.flip.n_flipped_honest": 998,
+     "wikitext.kl_per_token": 0.364369448099751,
+     "wikitext.ppl_ratio": 1.430633777048496,
+     "wikitext.null.kl_per_token.mean": 0.39725733062659857,
+     "wikitext.null.kl_per_token.percentile": 45.0,
+     "variants.honest_instruction.full_accuracy": 0.234,
+     "variants.honest_instruction.knockout_accuracy": 0.764,
+     "variants.no_pressure.full_accuracy": 0.228,
+     "variants.no_pressure.knockout_accuracy": 0.788
+    }
+   },
+   {
+    "slurm_job": 22316469,
+    "gpu": "A40",
+    "role": "secondary",
+    "cell_job": "drift_sdr_coarse_D_headsko",
+    "why": "the coarse SDR wave's heads-only KO cell (submit_headsko.sh argv, evaluations_headsko/); its pressure-variant rows predate an evaluator change and differ from the primary",
+    "path": "outputs/llama-8b-instruct_sdr_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_260922-092742/evaluations_headsko/cells/headsko__leaf/sdr/interchange/knockout.json",
+    "source_checkout": "/projects/beto/swong2/Alignment/Deception-Circuit",
+    "created": "2026-09-22T16:42:08",
+    "result": "outputs/_suites/mechanism-v2-coarse/control/drift_sdr_coarse_D_headsko/cells/headsko__leaf/sdr/interchange/knockout.json",
+    "metrics": {
+     "task.knockout.accuracy": 0.002,
+     "task.knockout.logit_diff": -1.731875,
+     "task.knockout.kl_div": 1.2111327238082885,
+     "task.knockout.exact_match": 0.002,
+     "task.circuit.accuracy": 0.0,
+     "task.circuit.logit_diff": -1.731625,
+     "task.circuit.kl_div": 1.1964045524597169,
+     "task.circuit.exact_match": 0.0,
+     "task.null.accuracy.mean": 0.3897,
+     "task.null.accuracy.percentile": 0.0,
+     "task.null.accuracy.z": -1.5326321241524998,
+     "task.null.logit_diff.mean": -0.24591249999999998,
+     "task.null.logit_diff.percentile": 0.0,
+     "task.null.logit_diff.z": -2.1680757589097506,
+     "task.null.kl_div.mean": 0.4838259112209082,
+     "task.null.kl_div.percentile": 0.0,
+     "task.null.kl_div.z": -2.769339157458885,
+     "task.null.exact_match.mean": 0.41295000000000004,
+     "task.null.exact_match.percentile": 0.0,
+     "task.null.exact_match.z": -1.5791078276198487,
+     "task.null.separated": 2,
+     "task.flip.n_flipped_honest": 998,
+     "wikitext.kl_per_token": 0.364369448099751,
+     "wikitext.ppl_ratio": 1.430633777048496,
+     "wikitext.null.kl_per_token.mean": 0.39725733062659857,
+     "wikitext.null.kl_per_token.percentile": 45.0,
+     "variants.honest_instruction.full_accuracy": 0.231,
+     "variants.honest_instruction.knockout_accuracy": 0.765,
+     "variants.no_pressure.full_accuracy": 0.169,
+     "variants.no_pressure.knockout_accuracy": 0.855
+    }
+   }
+  ],
+  "between_references": {
+   "task.knockout.accuracy": 0.0,
+   "task.knockout.logit_diff": 0.0,
+   "task.knockout.kl_div": 0.0,
+   "task.knockout.exact_match": 0.0,
+   "task.circuit.accuracy": 0.0,
+   "task.circuit.logit_diff": 0.0,
+   "task.circuit.kl_div": 0.0,
+   "task.circuit.exact_match": 0.0,
+   "task.null.accuracy.mean": 0.0,
+   "task.null.accuracy.percentile": 0.0,
+   "task.null.accuracy.z": 0.0,
+   "task.null.logit_diff.mean": 0.0,
+   "task.null.logit_diff.percentile": 0.0,
+   "task.null.logit_diff.z": 0.0,
+   "task.null.kl_div.mean": 0.0,
+   "task.null.kl_div.percentile": 0.0,
+   "task.null.kl_div.z": 0.0,
+   "task.null.exact_match.mean": 0.0,
+   "task.null.exact_match.percentile": 0.0,
+   "task.null.exact_match.z": 0.0,
+   "task.null.separated": 0,
+   "task.flip.n_flipped_honest": 0,
+   "wikitext.kl_per_token": 0.0,
+   "wikitext.ppl_ratio": 0.0,
+   "wikitext.null.kl_per_token.mean": 0.0,
+   "wikitext.null.kl_per_token.percentile": 0.0,
+   "variants.honest_instruction.full_accuracy": -0.0030000000000000027,
+   "variants.honest_instruction.knockout_accuracy": 0.0010000000000000009,
+   "variants.no_pressure.full_accuracy": -0.059,
+   "variants.no_pressure.knockout_accuracy": 0.06699999999999995
+  },
+  "reading": "Both references ran on A40s three weeks apart: task and wikitext rows agree exactly, so on one GPU type the cell is bit-stable. The pressure-variant rows differ (no_pressure full accuracy 0.169 vs 0.228) because of an evaluator change between 2026-09-22 and 2026-10-15, not the GPU; compare variants with the primary only. A cross-GPU run is not expected to be bit-exact (bf16 kernels differ by architecture). Acceptance is the orchestrator's call; no threshold is pre-registered."
+ },
+ "cells": [
+  {
+   "stage": "control",
+   "job": "drift_sdr_coarse_D_hko",
+   "label": "D_hko",
+   "expr": "(D) - m",
+   "kind": "knockout",
+   "cell_dir": "D_hko__leaf",
+   "block": "drift_control",
+   "conditional": false,
+   "home_task": "sdr",
+   "test_task": "sdr",
+   "condition": "deceptive",
+   "dataset": "sdr",
+   "task_from": "outputs/_launch_mechanism_v2/evals/drift_control/sdr_coarse_D_260922-092742",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D": "outputs/_launch_mechanism_v2/evals/drift_control/sdr_coarse_D_260922-092742",
+    "m": "outputs/_launch_format_control/allmlp_nomb"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 69,
+   "reference_job": 22895982
+  },
+  {
+   "stage": "control",
+   "job": "drift_sdr_coarse_D_headsko",
+   "label": "headsko",
+   "expr": "c - m",
+   "kind": "knockout",
+   "cell_dir": "headsko__leaf",
+   "block": "drift_control",
+   "conditional": false,
+   "home_task": "sdr",
+   "test_task": "sdr",
+   "condition": "deceptive",
+   "dataset": "sdr",
+   "task_from": "outputs/_launch_mechanism_v2/evals/drift_control/sdr_coarse_D_260922-092742",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "c": "outputs/_launch_mechanism_v2/evals/drift_control/sdr_coarse_D_260922-092742",
+    "m": "outputs/_launch_format_control/allmlp_nomb"
+   },
+   "common_args": [
+    "--n-random",
+    "20"
+   ],
+   "expected_heads": 69,
+   "reference_job": 22316469
+  },
+  {
+   "stage": "1",
+   "job": "s1_far__D_suff",
+   "label": "D_far",
+   "expr": "D_far",
+   "kind": "sufficiency",
+   "cell_dir": "D_far",
+   "block": "pair",
+   "conditional": false,
+   "home_task": "far_v2",
+   "test_task": "far_v2",
+   "condition": "deceptive",
+   "dataset": "far_v2",
+   "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+   "evals": [
+    "sanity",
+    "null",
+    "pressure"
+   ],
+   "operands": {
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 58
+  },
+  {
+   "stage": "1",
+   "job": "s1_far__D_suff",
+   "label": "D_far_and_H_far_suff",
+   "expr": "(D_far & H_far) | m",
+   "kind": "sufficiency",
+   "cell_dir": "D_far_and_H_far_suff__leaf",
+   "block": "composition",
+   "conditional": false,
+   "home_task": "far_v2",
+   "test_task": "far_v2",
+   "condition": "deceptive",
+   "dataset": "far_v2",
+   "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+   "evals": [
+    "sanity",
+    "null",
+    "pressure"
+   ],
+   "operands": {
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "H_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 32
+  },
+  {
+   "stage": "1",
+   "job": "s1_far__D_ko",
+   "label": "D_far_hko",
+   "expr": "(D_far) - m",
+   "kind": "knockout",
+   "cell_dir": "D_far_hko__leaf",
+   "block": "pair",
+   "conditional": false,
+   "home_task": "far_v2",
+   "test_task": "far_v2",
+   "condition": "deceptive",
+   "dataset": "far_v2",
+   "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 58
+  },
+  {
+   "stage": "1",
+   "job": "s1_far__D_ko",
+   "label": "D_far_and_H_far_hko",
+   "expr": "(D_far & H_far) - m",
+   "kind": "knockout",
+   "cell_dir": "D_far_and_H_far_hko__leaf",
+   "block": "composition",
+   "conditional": false,
+   "home_task": "far_v2",
+   "test_task": "far_v2",
+   "condition": "deceptive",
+   "dataset": "far_v2",
+   "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "H_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 32
+  },
+  {
+   "stage": "1",
+   "job": "s1_far__D_ko",
+   "label": "D_far_minus_H_far_hko",
+   "expr": "(D_far - H_far) - m",
+   "kind": "knockout",
+   "cell_dir": "D_far_minus_H_far_hko__leaf",
+   "block": "composition",
+   "conditional": false,
+   "home_task": "far_v2",
+   "test_task": "far_v2",
+   "condition": "deceptive",
+   "dataset": "far_v2",
+   "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "H_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 26
+  },
+  {
+   "stage": "1",
+   "job": "s1_far__D_ko",
+   "label": "H_far_minus_D_far_hko",
+   "expr": "(H_far - D_far) - m",
+   "kind": "knockout",
+   "cell_dir": "H_far_minus_D_far_hko__leaf",
+   "block": "composition",
+   "conditional": false,
+   "home_task": "far_v2",
+   "test_task": "far_v2",
+   "condition": "deceptive",
+   "dataset": "far_v2",
+   "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "H_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 28
+  },
+  {
+   "stage": "1",
+   "job": "s1_far__H_suff",
+   "label": "H_far",
+   "expr": "H_far",
+   "kind": "sufficiency",
+   "cell_dir": "H_far",
+   "block": "pair",
+   "conditional": false,
+   "home_task": "far_v2",
+   "test_task": "far_v2",
+   "condition": "honest",
+   "dataset": "far_v2_honest",
+   "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "evals": [
+    "sanity",
+    "null",
+    "pressure"
+   ],
+   "operands": {
+    "H_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 60
+  },
+  {
+   "stage": "1",
+   "job": "s1_far__H_ko",
+   "label": "H_far_hko",
+   "expr": "(H_far) - m",
+   "kind": "knockout",
+   "cell_dir": "H_far_hko__leaf",
+   "block": "pair",
+   "conditional": false,
+   "home_task": "far_v2",
+   "test_task": "far_v2",
+   "condition": "honest",
+   "dataset": "far_v2_honest",
+   "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "H_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 60
+  },
+  {
+   "stage": "1",
+   "job": "s1_sdr__D_suff",
+   "label": "D_sdr",
+   "expr": "D_sdr",
+   "kind": "sufficiency",
+   "cell_dir": "D_sdr",
+   "block": "pair",
+   "conditional": false,
+   "home_task": "sdr_v2",
+   "test_task": "sdr_v2",
+   "condition": "deceptive",
+   "dataset": "sdr_v2",
+   "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "evals": [
+    "sanity",
+    "null",
+    "pressure"
+   ],
+   "operands": {
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 60
+  },
+  {
+   "stage": "1",
+   "job": "s1_sdr__D_suff",
+   "label": "D_sdr_and_H_sdr_suff",
+   "expr": "(D_sdr & H_sdr) | m",
+   "kind": "sufficiency",
+   "cell_dir": "D_sdr_and_H_sdr_suff__leaf",
+   "block": "composition",
+   "conditional": false,
+   "home_task": "sdr_v2",
+   "test_task": "sdr_v2",
+   "condition": "deceptive",
+   "dataset": "sdr_v2",
+   "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "evals": [
+    "sanity",
+    "null",
+    "pressure"
+   ],
+   "operands": {
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "H_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 39
+  },
+  {
+   "stage": "1",
+   "job": "s1_sdr__D_ko",
+   "label": "D_sdr_hko",
+   "expr": "(D_sdr) - m",
+   "kind": "knockout",
+   "cell_dir": "D_sdr_hko__leaf",
+   "block": "pair",
+   "conditional": false,
+   "home_task": "sdr_v2",
+   "test_task": "sdr_v2",
+   "condition": "deceptive",
+   "dataset": "sdr_v2",
+   "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 60
+  },
+  {
+   "stage": "1",
+   "job": "s1_sdr__D_ko",
+   "label": "D_sdr_and_H_sdr_hko",
+   "expr": "(D_sdr & H_sdr) - m",
+   "kind": "knockout",
+   "cell_dir": "D_sdr_and_H_sdr_hko__leaf",
+   "block": "composition",
+   "conditional": false,
+   "home_task": "sdr_v2",
+   "test_task": "sdr_v2",
+   "condition": "deceptive",
+   "dataset": "sdr_v2",
+   "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "H_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 39
+  },
+  {
+   "stage": "1",
+   "job": "s1_sdr__D_ko",
+   "label": "D_sdr_minus_H_sdr_hko",
+   "expr": "(D_sdr - H_sdr) - m",
+   "kind": "knockout",
+   "cell_dir": "D_sdr_minus_H_sdr_hko__leaf",
+   "block": "composition",
+   "conditional": false,
+   "home_task": "sdr_v2",
+   "test_task": "sdr_v2",
+   "condition": "deceptive",
+   "dataset": "sdr_v2",
+   "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "H_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 21
+  },
+  {
+   "stage": "1",
+   "job": "s1_sdr__D_ko",
+   "label": "H_sdr_minus_D_sdr_hko",
+   "expr": "(H_sdr - D_sdr) - m",
+   "kind": "knockout",
+   "cell_dir": "H_sdr_minus_D_sdr_hko__leaf",
+   "block": "composition",
+   "conditional": false,
+   "home_task": "sdr_v2",
+   "test_task": "sdr_v2",
+   "condition": "deceptive",
+   "dataset": "sdr_v2",
+   "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "H_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 19
+  },
+  {
+   "stage": "1",
+   "job": "s1_sdr__H_suff",
+   "label": "H_sdr",
+   "expr": "H_sdr",
+   "kind": "sufficiency",
+   "cell_dir": "H_sdr",
+   "block": "pair",
+   "conditional": false,
+   "home_task": "sdr_v2",
+   "test_task": "sdr_v2",
+   "condition": "honest",
+   "dataset": "sdr_v2_honest",
+   "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "evals": [
+    "sanity",
+    "null",
+    "pressure"
+   ],
+   "operands": {
+    "H_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 58
+  },
+  {
+   "stage": "1",
+   "job": "s1_sdr__H_ko",
+   "label": "H_sdr_hko",
+   "expr": "(H_sdr) - m",
+   "kind": "knockout",
+   "cell_dir": "H_sdr_hko__leaf",
+   "block": "pair",
+   "conditional": false,
+   "home_task": "sdr_v2",
+   "test_task": "sdr_v2",
+   "condition": "honest",
+   "dataset": "sdr_v2_honest",
+   "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "H_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 58
+  },
+  {
+   "stage": "1",
+   "job": "s1_ser__D_suff",
+   "label": "D_ser",
+   "expr": "D_ser",
+   "kind": "sufficiency",
+   "cell_dir": "D_ser",
+   "block": "pair",
+   "conditional": false,
+   "home_task": "ser_v2",
+   "test_task": "ser_v2",
+   "condition": "deceptive",
+   "dataset": "ser_v2",
+   "task_from": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+   "evals": [
+    "sanity",
+    "null",
+    "pressure"
+   ],
+   "operands": {
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 55
+  },
+  {
+   "stage": "1",
+   "job": "s1_ser__D_suff",
+   "label": "D_ser_and_H_ser_suff",
+   "expr": "(D_ser & H_ser) | m",
+   "kind": "sufficiency",
+   "cell_dir": "D_ser_and_H_ser_suff__leaf",
+   "block": "composition",
+   "conditional": false,
+   "home_task": "ser_v2",
+   "test_task": "ser_v2",
+   "condition": "deceptive",
+   "dataset": "ser_v2",
+   "task_from": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+   "evals": [
+    "sanity",
+    "null",
+    "pressure"
+   ],
+   "operands": {
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "H_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 36
+  },
+  {
+   "stage": "1",
+   "job": "s1_ser__D_ko",
+   "label": "D_ser_hko",
+   "expr": "(D_ser) - m",
+   "kind": "knockout",
+   "cell_dir": "D_ser_hko__leaf",
+   "block": "pair",
+   "conditional": false,
+   "home_task": "ser_v2",
+   "test_task": "ser_v2",
+   "condition": "deceptive",
+   "dataset": "ser_v2",
+   "task_from": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 55
+  },
+  {
+   "stage": "1",
+   "job": "s1_ser__D_ko",
+   "label": "D_ser_and_H_ser_hko",
+   "expr": "(D_ser & H_ser) - m",
+   "kind": "knockout",
+   "cell_dir": "D_ser_and_H_ser_hko__leaf",
+   "block": "composition",
+   "conditional": false,
+   "home_task": "ser_v2",
+   "test_task": "ser_v2",
+   "condition": "deceptive",
+   "dataset": "ser_v2",
+   "task_from": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "H_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 36
+  },
+  {
+   "stage": "1",
+   "job": "s1_ser__D_ko",
+   "label": "D_ser_minus_H_ser_hko",
+   "expr": "(D_ser - H_ser) - m",
+   "kind": "knockout",
+   "cell_dir": "D_ser_minus_H_ser_hko__leaf",
+   "block": "composition",
+   "conditional": false,
+   "home_task": "ser_v2",
+   "test_task": "ser_v2",
+   "condition": "deceptive",
+   "dataset": "ser_v2",
+   "task_from": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "H_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 19
+  },
+  {
+   "stage": "1",
+   "job": "s1_ser__D_ko",
+   "label": "H_ser_minus_D_ser_hko",
+   "expr": "(H_ser - D_ser) - m",
+   "kind": "knockout",
+   "cell_dir": "H_ser_minus_D_ser_hko__leaf",
+   "block": "composition",
+   "conditional": false,
+   "home_task": "ser_v2",
+   "test_task": "ser_v2",
+   "condition": "deceptive",
+   "dataset": "ser_v2",
+   "task_from": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "H_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 33
+  },
+  {
+   "stage": "1",
+   "job": "s1_ser__H_suff",
+   "label": "H_ser",
+   "expr": "H_ser",
+   "kind": "sufficiency",
+   "cell_dir": "H_ser",
+   "block": "pair",
+   "conditional": false,
+   "home_task": "ser_v2",
+   "test_task": "ser_v2",
+   "condition": "honest",
+   "dataset": "ser_v2_honest",
+   "task_from": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "evals": [
+    "sanity",
+    "null",
+    "pressure"
+   ],
+   "operands": {
+    "H_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 69
+  },
+  {
+   "stage": "1",
+   "job": "s1_ser__H_ko",
+   "label": "H_ser_hko",
+   "expr": "(H_ser) - m",
+   "kind": "knockout",
+   "cell_dir": "H_ser_hko__leaf",
+   "block": "pair",
+   "conditional": false,
+   "home_task": "ser_v2",
+   "test_task": "ser_v2",
+   "condition": "honest",
+   "dataset": "ser_v2_honest",
+   "task_from": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "H_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 69
+  },
+  {
+   "stage": "2",
+   "job": "s2_far__D_suff",
+   "label": "D_sdr",
+   "expr": "D_sdr",
+   "kind": "sufficiency",
+   "cell_dir": "D_sdr",
+   "block": "cross_task",
+   "conditional": false,
+   "home_task": "sdr_v2",
+   "test_task": "far_v2",
+   "condition": "deceptive",
+   "dataset": "far_v2",
+   "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+   "evals": [
+    "sanity",
+    "null",
+    "pressure"
+   ],
+   "operands": {
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 60
+  },
+  {
+   "stage": "2",
+   "job": "s2_far__D_suff",
+   "label": "D_ser",
+   "expr": "D_ser",
+   "kind": "sufficiency",
+   "cell_dir": "D_ser",
+   "block": "cross_task",
+   "conditional": false,
+   "home_task": "ser_v2",
+   "test_task": "far_v2",
+   "condition": "deceptive",
+   "dataset": "far_v2",
+   "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+   "evals": [
+    "sanity",
+    "null",
+    "pressure"
+   ],
+   "operands": {
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 55
+  },
+  {
+   "stage": "2",
+   "job": "s2_far__D_suff",
+   "label": "D_core_suff",
+   "expr": "(D_far & D_sdr & D_ser) | m",
+   "kind": "sufficiency",
+   "cell_dir": "D_core_suff__leaf",
+   "block": "core",
+   "conditional": false,
+   "home_task": "core",
+   "test_task": "far_v2",
+   "condition": "deceptive",
+   "dataset": "far_v2",
+   "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+   "evals": [
+    "sanity",
+    "null",
+    "pressure"
+   ],
+   "operands": {
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 31
+  },
+  {
+   "stage": "2",
+   "job": "s2_far__D_suff",
+   "label": "H_far",
+   "expr": "H_far",
+   "kind": "sufficiency",
+   "cell_dir": "H_far",
+   "block": "H_on_D_test_set",
+   "conditional": false,
+   "home_task": "far_v2",
+   "test_task": "far_v2",
+   "condition": "deceptive",
+   "dataset": "far_v2",
+   "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+   "evals": [
+    "sanity",
+    "null",
+    "pressure"
+   ],
+   "operands": {
+    "H_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 60
+  },
+  {
+   "stage": "2",
+   "job": "s2_far__D_ko",
+   "label": "D_sdr_hko",
+   "expr": "(D_sdr) - m",
+   "kind": "knockout",
+   "cell_dir": "D_sdr_hko__leaf",
+   "block": "cross_task",
+   "conditional": false,
+   "home_task": "sdr_v2",
+   "test_task": "far_v2",
+   "condition": "deceptive",
+   "dataset": "far_v2",
+   "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 60
+  },
+  {
+   "stage": "2",
+   "job": "s2_far__D_ko",
+   "label": "D_ser_hko",
+   "expr": "(D_ser) - m",
+   "kind": "knockout",
+   "cell_dir": "D_ser_hko__leaf",
+   "block": "cross_task",
+   "conditional": false,
+   "home_task": "ser_v2",
+   "test_task": "far_v2",
+   "condition": "deceptive",
+   "dataset": "far_v2",
+   "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 55
+  },
+  {
+   "stage": "2",
+   "job": "s2_far__D_ko",
+   "label": "D_core_hko",
+   "expr": "(D_far & D_sdr & D_ser) - m",
+   "kind": "knockout",
+   "cell_dir": "D_core_hko__leaf",
+   "block": "core",
+   "conditional": false,
+   "home_task": "core",
+   "test_task": "far_v2",
+   "condition": "deceptive",
+   "dataset": "far_v2",
+   "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 31
+  },
+  {
+   "stage": "2",
+   "job": "s2_far__D_ko",
+   "label": "D_far_minus_D_sdr_minus_D_ser_hko",
+   "expr": "(D_far - D_sdr - D_ser) - m",
+   "kind": "knockout",
+   "cell_dir": "D_far_minus_D_sdr_minus_D_ser_hko__leaf",
+   "block": "exclusive",
+   "conditional": false,
+   "home_task": "far_v2",
+   "test_task": "far_v2",
+   "condition": "deceptive",
+   "dataset": "far_v2",
+   "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 8
+  },
+  {
+   "stage": "2",
+   "job": "s2_far__D_ko",
+   "label": "H_far_hko",
+   "expr": "(H_far) - m",
+   "kind": "knockout",
+   "cell_dir": "H_far_hko__leaf",
+   "block": "H_on_D_test_set",
+   "conditional": false,
+   "home_task": "far_v2",
+   "test_task": "far_v2",
+   "condition": "deceptive",
+   "dataset": "far_v2",
+   "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "H_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 60
+  },
+  {
+   "stage": "2",
+   "job": "s2_far__D_ko",
+   "label": "D_sdr_minus_H_sdr_hko",
+   "expr": "(D_sdr - H_sdr) - m",
+   "kind": "knockout",
+   "cell_dir": "D_sdr_minus_H_sdr_hko__leaf",
+   "block": "conditional_D_minus_H_cross_task",
+   "conditional": true,
+   "home_task": "sdr_v2",
+   "test_task": "far_v2",
+   "condition": "deceptive",
+   "dataset": "far_v2",
+   "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "H_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 21
+  },
+  {
+   "stage": "2",
+   "job": "s2_far__D_ko",
+   "label": "D_ser_minus_H_ser_hko",
+   "expr": "(D_ser - H_ser) - m",
+   "kind": "knockout",
+   "cell_dir": "D_ser_minus_H_ser_hko__leaf",
+   "block": "conditional_D_minus_H_cross_task",
+   "conditional": true,
+   "home_task": "ser_v2",
+   "test_task": "far_v2",
+   "condition": "deceptive",
+   "dataset": "far_v2",
+   "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "H_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 19
+  },
+  {
+   "stage": "2",
+   "job": "s2_far__np_suff",
+   "label": "D_far",
+   "expr": "D_far",
+   "kind": "sufficiency",
+   "cell_dir": "D_far",
+   "block": "D_on_nopressure",
+   "conditional": false,
+   "home_task": "far_v2",
+   "test_task": "far_v2",
+   "condition": "nopressure",
+   "dataset": "far_v2_nopressure",
+   "task_from": "outputs/_launch_mechanism_v2/evals/standins/far_v2_nopressure",
+   "evals": [
+    "sanity",
+    "null",
+    "pressure"
+   ],
+   "operands": {
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 58
+  },
+  {
+   "stage": "2",
+   "job": "s2_far__np_ko",
+   "label": "D_far_hko",
+   "expr": "(D_far) - m",
+   "kind": "knockout",
+   "cell_dir": "D_far_hko__leaf",
+   "block": "D_on_nopressure",
+   "conditional": false,
+   "home_task": "far_v2",
+   "test_task": "far_v2",
+   "condition": "nopressure",
+   "dataset": "far_v2_nopressure",
+   "task_from": "outputs/_launch_mechanism_v2/evals/standins/far_v2_nopressure",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 58
+  },
+  {
+   "stage": "2",
+   "job": "s2_sdr__D_suff",
+   "label": "D_far",
+   "expr": "D_far",
+   "kind": "sufficiency",
+   "cell_dir": "D_far",
+   "block": "cross_task",
+   "conditional": false,
+   "home_task": "far_v2",
+   "test_task": "sdr_v2",
+   "condition": "deceptive",
+   "dataset": "sdr_v2",
+   "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "evals": [
+    "sanity",
+    "null",
+    "pressure"
+   ],
+   "operands": {
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 58
+  },
+  {
+   "stage": "2",
+   "job": "s2_sdr__D_suff",
+   "label": "D_ser",
+   "expr": "D_ser",
+   "kind": "sufficiency",
+   "cell_dir": "D_ser",
+   "block": "cross_task",
+   "conditional": false,
+   "home_task": "ser_v2",
+   "test_task": "sdr_v2",
+   "condition": "deceptive",
+   "dataset": "sdr_v2",
+   "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "evals": [
+    "sanity",
+    "null",
+    "pressure"
+   ],
+   "operands": {
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 55
+  },
+  {
+   "stage": "2",
+   "job": "s2_sdr__D_suff",
+   "label": "D_core_suff",
+   "expr": "(D_far & D_sdr & D_ser) | m",
+   "kind": "sufficiency",
+   "cell_dir": "D_core_suff__leaf",
+   "block": "core",
+   "conditional": false,
+   "home_task": "core",
+   "test_task": "sdr_v2",
+   "condition": "deceptive",
+   "dataset": "sdr_v2",
+   "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "evals": [
+    "sanity",
+    "null",
+    "pressure"
+   ],
+   "operands": {
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 31
+  },
+  {
+   "stage": "2",
+   "job": "s2_sdr__D_suff",
+   "label": "H_sdr",
+   "expr": "H_sdr",
+   "kind": "sufficiency",
+   "cell_dir": "H_sdr",
+   "block": "H_on_D_test_set",
+   "conditional": false,
+   "home_task": "sdr_v2",
+   "test_task": "sdr_v2",
+   "condition": "deceptive",
+   "dataset": "sdr_v2",
+   "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "evals": [
+    "sanity",
+    "null",
+    "pressure"
+   ],
+   "operands": {
+    "H_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 58
+  },
+  {
+   "stage": "2",
+   "job": "s2_sdr__D_ko",
+   "label": "D_far_hko",
+   "expr": "(D_far) - m",
+   "kind": "knockout",
+   "cell_dir": "D_far_hko__leaf",
+   "block": "cross_task",
+   "conditional": false,
+   "home_task": "far_v2",
+   "test_task": "sdr_v2",
+   "condition": "deceptive",
+   "dataset": "sdr_v2",
+   "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 58
+  },
+  {
+   "stage": "2",
+   "job": "s2_sdr__D_ko",
+   "label": "D_ser_hko",
+   "expr": "(D_ser) - m",
+   "kind": "knockout",
+   "cell_dir": "D_ser_hko__leaf",
+   "block": "cross_task",
+   "conditional": false,
+   "home_task": "ser_v2",
+   "test_task": "sdr_v2",
+   "condition": "deceptive",
+   "dataset": "sdr_v2",
+   "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 55
+  },
+  {
+   "stage": "2",
+   "job": "s2_sdr__D_ko",
+   "label": "D_core_hko",
+   "expr": "(D_far & D_sdr & D_ser) - m",
+   "kind": "knockout",
+   "cell_dir": "D_core_hko__leaf",
+   "block": "core",
+   "conditional": false,
+   "home_task": "core",
+   "test_task": "sdr_v2",
+   "condition": "deceptive",
+   "dataset": "sdr_v2",
+   "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 31
+  },
+  {
+   "stage": "2",
+   "job": "s2_sdr__D_ko",
+   "label": "D_sdr_minus_D_far_minus_D_ser_hko",
+   "expr": "(D_sdr - D_far - D_ser) - m",
+   "kind": "knockout",
+   "cell_dir": "D_sdr_minus_D_far_minus_D_ser_hko__leaf",
+   "block": "exclusive",
+   "conditional": false,
+   "home_task": "sdr_v2",
+   "test_task": "sdr_v2",
+   "condition": "deceptive",
+   "dataset": "sdr_v2",
+   "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 14
+  },
+  {
+   "stage": "2",
+   "job": "s2_sdr__D_ko",
+   "label": "H_sdr_hko",
+   "expr": "(H_sdr) - m",
+   "kind": "knockout",
+   "cell_dir": "H_sdr_hko__leaf",
+   "block": "H_on_D_test_set",
+   "conditional": false,
+   "home_task": "sdr_v2",
+   "test_task": "sdr_v2",
+   "condition": "deceptive",
+   "dataset": "sdr_v2",
+   "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "H_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 58
+  },
+  {
+   "stage": "2",
+   "job": "s2_sdr__D_ko",
+   "label": "D_far_minus_H_far_hko",
+   "expr": "(D_far - H_far) - m",
+   "kind": "knockout",
+   "cell_dir": "D_far_minus_H_far_hko__leaf",
+   "block": "conditional_D_minus_H_cross_task",
+   "conditional": true,
+   "home_task": "far_v2",
+   "test_task": "sdr_v2",
+   "condition": "deceptive",
+   "dataset": "sdr_v2",
+   "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "H_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 26
+  },
+  {
+   "stage": "2",
+   "job": "s2_sdr__D_ko",
+   "label": "D_ser_minus_H_ser_hko",
+   "expr": "(D_ser - H_ser) - m",
+   "kind": "knockout",
+   "cell_dir": "D_ser_minus_H_ser_hko__leaf",
+   "block": "conditional_D_minus_H_cross_task",
+   "conditional": true,
+   "home_task": "ser_v2",
+   "test_task": "sdr_v2",
+   "condition": "deceptive",
+   "dataset": "sdr_v2",
+   "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "H_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 19
+  },
+  {
+   "stage": "2",
+   "job": "s2_sdr__np_suff",
+   "label": "D_sdr",
+   "expr": "D_sdr",
+   "kind": "sufficiency",
+   "cell_dir": "D_sdr",
+   "block": "D_on_nopressure",
+   "conditional": false,
+   "home_task": "sdr_v2",
+   "test_task": "sdr_v2",
+   "condition": "nopressure",
+   "dataset": "sdr_v2_nopressure",
+   "task_from": "outputs/_launch_mechanism_v2/evals/standins/sdr_v2_nopressure",
+   "evals": [
+    "sanity",
+    "null",
+    "pressure"
+   ],
+   "operands": {
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 60
+  },
+  {
+   "stage": "2",
+   "job": "s2_sdr__np_ko",
+   "label": "D_sdr_hko",
+   "expr": "(D_sdr) - m",
+   "kind": "knockout",
+   "cell_dir": "D_sdr_hko__leaf",
+   "block": "D_on_nopressure",
+   "conditional": false,
+   "home_task": "sdr_v2",
+   "test_task": "sdr_v2",
+   "condition": "nopressure",
+   "dataset": "sdr_v2_nopressure",
+   "task_from": "outputs/_launch_mechanism_v2/evals/standins/sdr_v2_nopressure",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 60
+  },
+  {
+   "stage": "2",
+   "job": "s2_ser__D_suff",
+   "label": "D_far",
+   "expr": "D_far",
+   "kind": "sufficiency",
+   "cell_dir": "D_far",
+   "block": "cross_task",
+   "conditional": false,
+   "home_task": "far_v2",
+   "test_task": "ser_v2",
+   "condition": "deceptive",
+   "dataset": "ser_v2",
+   "task_from": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+   "evals": [
+    "sanity",
+    "null",
+    "pressure"
+   ],
+   "operands": {
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 58
+  },
+  {
+   "stage": "2",
+   "job": "s2_ser__D_suff",
+   "label": "D_sdr",
+   "expr": "D_sdr",
+   "kind": "sufficiency",
+   "cell_dir": "D_sdr",
+   "block": "cross_task",
+   "conditional": false,
+   "home_task": "sdr_v2",
+   "test_task": "ser_v2",
+   "condition": "deceptive",
+   "dataset": "ser_v2",
+   "task_from": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+   "evals": [
+    "sanity",
+    "null",
+    "pressure"
+   ],
+   "operands": {
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 60
+  },
+  {
+   "stage": "2",
+   "job": "s2_ser__D_suff",
+   "label": "D_core_suff",
+   "expr": "(D_far & D_sdr & D_ser) | m",
+   "kind": "sufficiency",
+   "cell_dir": "D_core_suff__leaf",
+   "block": "core",
+   "conditional": false,
+   "home_task": "core",
+   "test_task": "ser_v2",
+   "condition": "deceptive",
+   "dataset": "ser_v2",
+   "task_from": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+   "evals": [
+    "sanity",
+    "null",
+    "pressure"
+   ],
+   "operands": {
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 31
+  },
+  {
+   "stage": "2",
+   "job": "s2_ser__D_suff",
+   "label": "H_ser",
+   "expr": "H_ser",
+   "kind": "sufficiency",
+   "cell_dir": "H_ser",
+   "block": "H_on_D_test_set",
+   "conditional": false,
+   "home_task": "ser_v2",
+   "test_task": "ser_v2",
+   "condition": "deceptive",
+   "dataset": "ser_v2",
+   "task_from": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+   "evals": [
+    "sanity",
+    "null",
+    "pressure"
+   ],
+   "operands": {
+    "H_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 69
+  },
+  {
+   "stage": "2",
+   "job": "s2_ser__D_ko",
+   "label": "D_far_hko",
+   "expr": "(D_far) - m",
+   "kind": "knockout",
+   "cell_dir": "D_far_hko__leaf",
+   "block": "cross_task",
+   "conditional": false,
+   "home_task": "far_v2",
+   "test_task": "ser_v2",
+   "condition": "deceptive",
+   "dataset": "ser_v2",
+   "task_from": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 58
+  },
+  {
+   "stage": "2",
+   "job": "s2_ser__D_ko",
+   "label": "D_sdr_hko",
+   "expr": "(D_sdr) - m",
+   "kind": "knockout",
+   "cell_dir": "D_sdr_hko__leaf",
+   "block": "cross_task",
+   "conditional": false,
+   "home_task": "sdr_v2",
+   "test_task": "ser_v2",
+   "condition": "deceptive",
+   "dataset": "ser_v2",
+   "task_from": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 60
+  },
+  {
+   "stage": "2",
+   "job": "s2_ser__D_ko",
+   "label": "D_core_hko",
+   "expr": "(D_far & D_sdr & D_ser) - m",
+   "kind": "knockout",
+   "cell_dir": "D_core_hko__leaf",
+   "block": "core",
+   "conditional": false,
+   "home_task": "core",
+   "test_task": "ser_v2",
+   "condition": "deceptive",
+   "dataset": "ser_v2",
+   "task_from": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 31
+  },
+  {
+   "stage": "2",
+   "job": "s2_ser__D_ko",
+   "label": "D_ser_minus_D_far_minus_D_sdr_hko",
+   "expr": "(D_ser - D_far - D_sdr) - m",
+   "kind": "knockout",
+   "cell_dir": "D_ser_minus_D_far_minus_D_sdr_hko__leaf",
+   "block": "exclusive",
+   "conditional": false,
+   "home_task": "ser_v2",
+   "test_task": "ser_v2",
+   "condition": "deceptive",
+   "dataset": "ser_v2",
+   "task_from": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 10
+  },
+  {
+   "stage": "2",
+   "job": "s2_ser__D_ko",
+   "label": "H_ser_hko",
+   "expr": "(H_ser) - m",
+   "kind": "knockout",
+   "cell_dir": "H_ser_hko__leaf",
+   "block": "H_on_D_test_set",
+   "conditional": false,
+   "home_task": "ser_v2",
+   "test_task": "ser_v2",
+   "condition": "deceptive",
+   "dataset": "ser_v2",
+   "task_from": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "H_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 69
+  },
+  {
+   "stage": "2",
+   "job": "s2_ser__D_ko",
+   "label": "D_far_minus_H_far_hko",
+   "expr": "(D_far - H_far) - m",
+   "kind": "knockout",
+   "cell_dir": "D_far_minus_H_far_hko__leaf",
+   "block": "conditional_D_minus_H_cross_task",
+   "conditional": true,
+   "home_task": "far_v2",
+   "test_task": "ser_v2",
+   "condition": "deceptive",
+   "dataset": "ser_v2",
+   "task_from": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "H_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 26
+  },
+  {
+   "stage": "2",
+   "job": "s2_ser__D_ko",
+   "label": "D_sdr_minus_H_sdr_hko",
+   "expr": "(D_sdr - H_sdr) - m",
+   "kind": "knockout",
+   "cell_dir": "D_sdr_minus_H_sdr_hko__leaf",
+   "block": "conditional_D_minus_H_cross_task",
+   "conditional": true,
+   "home_task": "sdr_v2",
+   "test_task": "ser_v2",
+   "condition": "deceptive",
+   "dataset": "ser_v2",
+   "task_from": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "H_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 21
+  },
+  {
+   "stage": "2",
+   "job": "s2_ser__np_suff",
+   "label": "D_ser",
+   "expr": "D_ser",
+   "kind": "sufficiency",
+   "cell_dir": "D_ser",
+   "block": "D_on_nopressure",
+   "conditional": false,
+   "home_task": "ser_v2",
+   "test_task": "ser_v2",
+   "condition": "nopressure",
+   "dataset": "ser_v2_nopressure",
+   "task_from": "outputs/_launch_mechanism_v2/evals/standins/ser_v2_nopressure",
+   "evals": [
+    "sanity",
+    "null",
+    "pressure"
+   ],
+   "operands": {
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 55
+  },
+  {
+   "stage": "2",
+   "job": "s2_ser__np_ko",
+   "label": "D_ser_hko",
+   "expr": "(D_ser) - m",
+   "kind": "knockout",
+   "cell_dir": "D_ser_hko__leaf",
+   "block": "D_on_nopressure",
+   "conditional": false,
+   "home_task": "ser_v2",
+   "test_task": "ser_v2",
+   "condition": "nopressure",
+   "dataset": "ser_v2_nopressure",
+   "task_from": "outputs/_launch_mechanism_v2/evals/standins/ser_v2_nopressure",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 55
+  }
+ ]
+}
