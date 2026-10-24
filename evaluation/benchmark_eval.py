@@ -80,6 +80,8 @@ from evaluation.benchmarks.judge import JudgeClient, validate_study_cache
 from evaluation.benchmarks.judge_budget import JudgeBudget, BudgetExceeded
 from evaluation.coherence import coherence_metrics, completion_mask
 from evaluation.gen_engine import generate_bucketed, resolve_pad_id
+from evaluation.generation_checkpoint import (phase_store, tensor_identity,
+    GenerationSegmentComplete, GenerationCheckpointError)
 from evaluation.masks import knockout_masks, zeros_like
 from evaluation.metrics import summarize_null
 
@@ -330,13 +332,14 @@ def assign_partners(n_items, pool_size, seed, forbidden=None):
 # ==============================================================================
 
 def generate_under(ctx, *, clean_ids, clean_mask, corrupt_ids, hook,
-                   new_tokens, eos, desc):
+                   new_tokens, eos, desc, batch_store=None):
     return generate_bucketed(
         ctx,
         clean_ids=clean_ids, corrupt_ids=corrupt_ids,
         attention_mask=clean_mask, hook=hook, new_tokens=new_tokens,
         eos_ids=eos, batch_size=ctx.cli.benchmark_gen_batch_size,
-        use_cache=not ctx.cli.no_kv_cache, desc=desc).cpu()
+        use_cache=not ctx.cli.no_kv_cache, desc=desc,
+        **({"batch_store": batch_store} if batch_store is not None else {})).cpu()
 
 
 def decode_completions(tokenizer, ids, prompt_width, eos):
@@ -405,7 +408,8 @@ def fixed_cohort_screen(ctx, bench, client, dataset):
     with ctx.all_gates_open():
         screen.full_ids = generate_under(ctx, clean_ids=screen.clean_ids,
             clean_mask=screen.clean_mask, corrupt_ids=corrupt, hook=None,
-            new_tokens=screen.new_tokens, eos=eos, desc=dataset + ": fresh intact")
+            new_tokens=screen.new_tokens, eos=eos, desc=dataset + ": fresh intact",
+            batch_store=phase_store(ctx, dataset, 'recipient-intact', donor=data))
     full_completions = completion_tokens(screen.full_ids, screen.prompt_width, eos)
     known = {render_messages(ctx.tokenizer, item.messages):
              (screen.clean_ids[i][screen.clean_mask[i].bool()].tolist(), full_completions[i])
@@ -419,7 +423,10 @@ def fixed_cohort_screen(ctx, bench, client, dataset):
         with ctx.all_gates_open():
             out = generate_under(ctx, clean_ids=ids, clean_mask=mask,
                 corrupt_ids=corrupt, hook=None, new_tokens=screen.new_tokens,
-                eos=eos, desc=dataset + ": fresh native donors")
+                eos=eos, desc=dataset + ": fresh native donors",
+                batch_store=phase_store(ctx, dataset, 'native-donors', donor={
+                    'cohort': data, 'missing': [item.to_json() for item in missing],
+                    'recipient_tokens': tensor_identity(screen.full_ids)}))
         completions = completion_tokens(out, ids.shape[1], eos)
         for i, prompt in enumerate(prompts):
             known[prompt] = (ids[i][mask[i].bool()].tolist(), completions[i])
@@ -1164,6 +1171,8 @@ class BenchmarkEvaluation(Evaluation):
             started = time.time()
             try:
                 entry = self._run_dataset(ctx, dataset, client)
+            except (GenerationSegmentComplete, GenerationCheckpointError):
+                raise
             except BudgetExceeded as error:
                 payload["datasets"][dataset] = {
                     "error": str(error), "complete": False,
@@ -1363,7 +1372,11 @@ class BenchmarkEvaluation(Evaluation):
                     ctx, clean_ids=screen.clean_ids,
                     clean_mask=screen.clean_mask, corrupt_ids=corrupt,
                     hook=hook, new_tokens=screen.new_tokens, eos=eos,
-                    desc="%s: %s" % (dataset, config))
+                    desc="%s: %s" % (dataset, config),
+                    batch_store=phase_store(
+                        ctx, dataset, 'mask:' + config, masks=masks, donor={
+                            'partner_index': screen.partner_index,
+                            'partner_ids': screen.partner_ids, 'pool_refs': screen.pool_refs}))
             responses = decode_completions(tok, ids, screen.prompt_width, eos)
             _save_partial(ctx, dataset, config, {"generations": responses,
                 "item_ids": [item.item_id for item in screen.items], "judging_complete": False})

@@ -700,6 +700,7 @@ def test_every_benchmark_flag_is_either_keyed_or_deliberately_not(monkeypatch):
         # Historical fixed cohorts select a different, explicit loader. They
         # bypass stock screen-cache lookup/save rather than relaxing its key.
         "benchmark_fixed_cohort",
+        "benchmark_generation_checkpoint_dir", "benchmark_stop_after_generation_batches",
         # The cache's own controls.
         "benchmark_screen_cache", "benchmark_refresh_screen",
         "no_benchmark_screen_cache",

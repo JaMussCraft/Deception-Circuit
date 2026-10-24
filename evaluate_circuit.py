@@ -219,6 +219,10 @@ def build_parser():
     g.add_argument("--benchmark-configs", nargs="+", default=None,
                    choices=["full", "knockout", "circuit_only", "empty"],
                    help="Run exactly these EVAL 5 states (must include full).")
+    g.add_argument("--benchmark-generation-checkpoint-dir", default=None,
+                   help="Explicit frozen-pilot raw-token resume directory (exclusive writer).")
+    g.add_argument("--benchmark-stop-after-generation-batches", type=int, default=None,
+                   help="Positive maximum NEW batches per segment; durable stop exits 75.")
     g.add_argument("--benchmark-fixed-cohort", default=None,
                    help="Validated historical fixed-cohort JSON; no screening or refill.")
     g.add_argument("--benchmark-frozen-masks", default=None,
@@ -324,6 +328,14 @@ def build_parser():
 
 
 def resolve_cli(cli):
+    checkpoint = getattr(cli, 'benchmark_generation_checkpoint_dir', None)
+    limit = getattr(cli, 'benchmark_stop_after_generation_batches', None)
+    if checkpoint or limit is not None:
+        if not checkpoint or limit is None or limit <= 0:
+            raise ValueError('checkpoint directory and positive new-generation-batch limit are required together')
+        if (not getattr(cli, 'benchmark_fixed_cohort', None) or
+                not getattr(cli, 'benchmark_frozen_masks', None) or cli.ablation != 'interchange'):
+            raise ValueError('generation resume is restricted to the frozen fixed-cohort interchange pilot')
     if cli.device is None:
         import torch
         cli.device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -974,13 +986,35 @@ def main():
         check_benchmark_keys(cli)
         if not cli.skip_judge_check:
             check_judges_answer(cli)
+    if getattr(cli, 'benchmark_generation_checkpoint_dir', None):
+        # Greedy frozen replay has no stochastic sampling, but the immutable
+        # runtime identity must also be stable across fresh Python processes.
+        import torch
+        torch.manual_seed(0)
     session = build_session(cli)
     if cli.dry_run:
         return dry_run(session)
     if cli.judge_dry_run:
         from evaluation.benchmark_eval import judge_dry_run
         return judge_dry_run(session)
-    return suite.run(session)
+    checkpoint = getattr(cli, 'benchmark_generation_checkpoint_dir', None)
+    if not checkpoint:
+        return suite.run(session)
+    from evaluation.generation_checkpoint import (GenerationCheckpoint,
+        GenerationSegmentComplete, SEGMENT_EXIT_CODE, atomic_json)
+    with GenerationCheckpoint(checkpoint, cli.benchmark_stop_after_generation_batches) as store:
+        session._generation_checkpoint = store
+        try:
+            return suite.run(session)
+        except GenerationSegmentComplete as error:
+            atomic_json(os.path.join(checkpoint, 'segment-%s.json' % os.getpid()), {
+                'status': 'segment_complete', 'evaluation_complete': False,
+                'headline_available': False, 'reason': str(error),
+                'new_generation_batches': store.new_batches, 'segment': store.provenance})
+            print(str(error))
+            return SEGMENT_EXIT_CODE
+        finally:
+            del session._generation_checkpoint
 
 
 if __name__ == "__main__":
