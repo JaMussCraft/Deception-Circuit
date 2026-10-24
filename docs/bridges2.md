@@ -8,7 +8,7 @@ rsynced back to Delta. Every transfer starts on Delta.
 
 - **Delta is canonical.** Edit code only on Delta, push, then `b2.sh sync-code`. Never edit or commit on
   Bridges-2. Results count once they are fetched into the Delta checkout.
-- **One GPU type.** Use only `GPU-shared` with `--gpus=h100-80:1`, and keep a whole suite on it. V100 cannot
+- **One GPU type.** Use only `GPU-shared` with one H100 80 GB (`--gpus-per-node=h100-80:1`), and keep a whole suite on it. V100 cannot
   run the mgnp torch build (no sm_70 kernels, no native bf16). Results are not bit-exact with Delta's A40,
   A100 and H200 runs, so re-run one Delta reference cell on Bridges-2 as a drift control before trusting a
   suite.
@@ -40,6 +40,11 @@ sources `scripts/cluster/${DC_CLUSTER:-delta}.env` after it changes to the submi
 
 `#SBATCH` lines cannot read variables, so the wrapper's header keeps Delta's defaults. Any other cluster
 passes account, partition, GPU option and time on the `sbatch` command line, and `b2.sh submit` does this.
+
+Bridges-2 login nodes set `SBATCH_EXPORT=NONE`, so a variable set before `sbatch` never reaches the job.
+Smoke job 49772768 failed on exactly this. Every Bridges-2 submission therefore carries
+`--export=ALL,DC_CLUSTER=bridges2,DC_B2_ALLOC=<alloc>`, which is what `b2.sh submit` writes. A suite
+generator that builds its own sbatch lines must add the same option.
 Inside the job, the profile decides only three things: the activation command, `HF_HOME`, and the offline
 flags.
 
@@ -82,7 +87,10 @@ scripts/remote/b2.sh fetch [--ignore-existing] [REPO_RELATIVE_PATH...]
   `outputs/_suites` and `outputs/_launch_mechanism_v2/evals`, and the Slurm logs. It never deletes. It
   compares checksums, keeps any Delta file newer than the Bridges-2 copy (`--update`), and saves a Delta file
   it does replace as `<name>.pre-b2fetch`. Pass `--ignore-existing` to keep every Delta file that already
-  exists, which suits immutable cell outputs.
+  exists, which suits immutable cell outputs. Fetch copies no permissions, times, group or owner from
+  Bridges-2, so identical Delta files stay untouched. New files get Delta's default group permissions.
+- The model load takes about 8 minutes per job from /ocean: 458 s in the smoke job, on a cold cache. Pack
+  many cells into one job rather than one cell per job.
 - `suite.json` and `summary.json` written on Bridges-2 record absolute `/ocean/...` run dirs
   (`evaluation/circuits.py` `norm_run_dir`). Delta-side merges that match run dirs against a Delta-path
   manifest, such as `merge_shards.py --manifest`, must compare repo-relative paths. Alternatively, do the
@@ -99,14 +107,27 @@ does this. Jobs activate the env with `source <prefix>/bin/activate`, with no `m
 The fallback is `requirements-bridges2.txt`, a `pip freeze` of mgnp. Install it into a fresh Python 3.12.13
 env with the cu128 index, as described in that file's header.
 
-## Known checks before the first real job
+## GPU request and host-side numerics
 
-- Run `sbatch --test-only` through `b2.sh submit --test-only`. The wrapper header carries Delta's
-  `--gpus-per-node=1` and `--mem=64G`, while the command line adds `--gpus=h100-80:1`. If GPU-shared rejects
-  that mix, override on the command line, for example with `--gpus-per-node=h100-80:1` in `DC_GPU_SPEC` or a
-  `--mem` that fits the per-GPU share. Do not edit the Delta header.
-- The smoke job prints `nvidia-smi` and the driver version. torch+cu128 needs a recent driver, so read the
-  driver version first if CUDA does not initialise.
+`DC_GPU_SPEC` on Bridges-2 is `--gpus-per-node=h100-80:1 --cpus-per-task=1 --mem=64G`. It was settled
+with `sbatch --test-only` on 2026-10-24.
+
+- **Use `--gpus-per-node`, not `--gpus`.** The wrapper header carries Delta's untyped
+  `--gpus-per-node=1`. Adding `--gpus=h100-80:1` next to it fails with "Invalid GRES specification (with
+  and without type identification)". The typed `--gpus-per-node` on the command line replaces the header
+  option instead.
+- **CPU and memory match the Delta header.** The spec asks for 1 core and 64 GB. GPU-shared defaults to
+  63,000 MB per GPU and caps cores at 12 per GPU. Charging is per GPU-hour, at 2 SU on H100.
+
+Both profiles export `OMP_NUM_THREADS`, `MKL_NUM_THREADS` and `OPENBLAS_NUM_THREADS` as 1. Every Delta
+launcher already exported these values, so CPU-side math is the same on both clusters.
+
+## Transfer host
+
+data.bridges2.psc.edu runs rsync without a shell, so a `--rsync-path="mkdir -p ... && rsync"` call fails
+with "mkdir: unrecognized option '--server'". b2.sh therefore creates target dirs through the login host,
+which mounts the same /ocean. The smoke job also prints `nvidia-smi` and the driver version. torch+cu128
+needs a recent driver, so read the driver version first if CUDA does not initialise.
 
 ## Relocation
 

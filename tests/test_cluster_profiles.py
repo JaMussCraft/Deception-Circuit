@@ -60,11 +60,23 @@ def test_delta_profile_reproduces_the_sbatch_header_defaults():
 def test_bridges2_profile_is_offline_h100_and_never_sources_bashrc():
     got = _profile("bridges2")
     assert got["DC_PARTITION"] == "GPU-shared"
-    assert got["DC_GPU_SPEC"] == "--gpus=h100-80:1"
+    # --gpus-per-node (not --gpus) so it overrides the wrapper header's --gpus-per-node=1: Bridges-2 rejects
+    # a typed --gpus next to an untyped --gpus-per-node ("Invalid GRES specification", sbatch --test-only).
+    assert got["DC_GPU_SPEC"] == "--gpus-per-node=h100-80:1 --cpus-per-task=1 --mem=64G"
+    assert got["DC_TIME_DEFAULT"] == "01:00:00"
     assert got["DC_HF_OFFLINE"] == "1"
     assert ".bashrc" not in got["DC_ACTIVATE"]
     assert got["DC_REPO_ROOT"].startswith("/ocean/projects/")
     assert got["DC_HF_HOME"].startswith("/ocean/projects/")
+
+
+@pytest.mark.parametrize("name", ["delta", "bridges2"])
+def test_profiles_pin_blas_threads_to_what_the_delta_launchers_used(name):
+    path = os.path.join(REPO, "scripts", "cluster", f"{name}.env")
+    out = _bash(f"set -euo pipefail; source {path}; env")
+    got = dict(line.split("=", 1) for line in out.stdout.splitlines() if "=" in line)
+    for var in ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS"):
+        assert got.get(var) == "1", (name, var)
 
 
 # ---------------------------------------------------------------------------------------------------------
@@ -79,6 +91,7 @@ echo "HF_HUB_OFFLINE=${HF_HUB_OFFLINE-<unset>}"
 echo "HF_DATASETS_OFFLINE=${HF_DATASETS_OFFLINE-<unset>}"
 echo "TRANSFORMERS_OFFLINE=${TRANSFORMERS_OFFLINE-<unset>}"
 echo "ACTIVATED=${ACTIVATED-<unset>}"
+echo "OMP_NUM_THREADS=${OMP_NUM_THREADS-<unset>}"
 """
 
 FAKE_BASHRC = """export HF_HOME=/work/nvme/beto/swong2
@@ -120,7 +133,8 @@ def test_sbatch_without_dc_cluster_runs_exactly_as_the_pre_profile_wrapper(tmp_p
     out = _run_job(submit, env, "outputs/run_a", "--evals", "sanity")
     assert out.returncode == 0, out.stderr
     # What the wrapper did before profiles existed: cd to the submit dir, activate mgnp through ~/.bashrc
-    # (which sets HF_HOME), set no offline flag, pass the arguments through untouched.
+    # (which sets HF_HOME), set no offline flag, pass the arguments through untouched. One addition
+    # (orchestrator, 2026-10-24): BLAS threads pinned to 1, which every Delta launcher already exported.
     assert out.stdout.splitlines() == [
         f"cwd={submit}",
         "argv=evaluate_circuit.py outputs/run_a --evals sanity",
@@ -129,6 +143,7 @@ def test_sbatch_without_dc_cluster_runs_exactly_as_the_pre_profile_wrapper(tmp_p
         "HF_DATASETS_OFFLINE=<unset>",
         "TRANSFORMERS_OFFLINE=<unset>",
         "ACTIVATED=conda:mgnp",
+        "OMP_NUM_THREADS=1",
     ]
     assert out.stderr.strip() == "conda activate mgnp"
 
@@ -175,7 +190,11 @@ B2 = os.path.join(REPO, "scripts", "remote", "b2.sh")
 
 def _b2_profile(tmp_path, alloc="abc123p"):
     path = tmp_path / "b2.env"
-    path.write_text(_read("bridges2").replace('DC_B2_ALLOC="${DC_B2_ALLOC:-__ALLOC__}"', f'DC_B2_ALLOC="{alloc}"'))
+    text = _read("bridges2")
+    marker = 'export DC_B2_ALLOC="${DC_B2_ALLOC:-'
+    start = text.index(marker)
+    end = text.index('}"', start) + 2
+    path.write_text(text[:start] + f'export DC_B2_ALLOC="{alloc}"' + text[end:])
     return str(path)
 
 
@@ -203,7 +222,10 @@ def test_b2_submit_dry_puts_the_bridges2_profile_on_the_sbatch_command_line(tmp_
     [cmd] = _commands(out)
     assert "ssh -o BatchMode=yes bridges2" in cmd
     assert "cd /ocean/projects/abc123p/swong2/Deception-Circuit" in cmd
-    assert ("DC_CLUSTER=bridges2 DC_B2_ALLOC=abc123p sbatch -A abc123p -p GPU-shared --gpus=h100-80:1 -t 01:00:00 "
+    # Bridges-2 login nodes set SBATCH_EXPORT=NONE, so the profile selection travels in --export, not in
+    # the submit environment (smoke job 49772768 failed on exactly that).
+    assert ("sbatch --export=ALL,DC_CLUSTER=bridges2,DC_B2_ALLOC=abc123p -A abc123p -p GPU-shared "
+            "--gpus-per-node=h100-80:1 --cpus-per-task=1 --mem=64G -t 01:00:00 "
             "scripts/evaluate_circuit.sbatch outputs/run_a --evals sanity") in cmd
 
 
@@ -224,6 +246,11 @@ def test_b2_fetch_dry_never_overwrites_newer_delta_files_and_never_deletes(tmp_p
         assert "--delete" not in c
         assert "--backup" in c, "a Delta file that is replaced anyway must be kept"
         assert "--checksum" in c, "identical bytes with a fresh Bridges-2 mtime must not be re-copied"
+        # Never copy Bridges-2 metadata onto Delta files: -a would reset perms/mtimes of identical tracked files
+        # (the first live fetch turned 989 tracked 660 files into 644 with today's mtime).
+        words = c.split()
+        assert "-a" not in words and "-rl" in words
+        assert "--no-perms" in words and "--no-times" in words
         assert "b2dtn:/ocean/projects/abc123p/swong2/Deception-Circuit/" in c
         assert str(tmp_path / "delta_repo") in c
     assert any("evaluations*/***" in c for c in cmds)

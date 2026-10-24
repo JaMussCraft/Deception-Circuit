@@ -105,8 +105,9 @@ need_alloc() {
 }
 
 SSH=(ssh -o BatchMode=yes)
-RSYNC=(rsync -a --partial --human-readable --itemize-changes -e "ssh -o BatchMode=yes"
-       --exclude=token --exclude=.bashrc "--exclude=*.lock")
+RSYNC_COMMON=(--partial --human-readable --itemize-changes -e "ssh -o BatchMode=yes"
+              --exclude=token --exclude=.bashrc "--exclude=*.lock")
+RSYNC=(rsync -a "${RSYNC_COMMON[@]}")
 
 # Refuse anything that looks like a credential, an absolute path or a path out of the repo.
 check_manifest_path() {
@@ -139,19 +140,21 @@ sync-code)
 sync-data)
     [ "$DRY" = 1 ] || need_alloc
     need_master "$DTN_HOST"
+    need_master "$LOGIN_HOST"
+    # The transfer host runs rsync without a shell (no `mkdir && rsync` via --rsync-path), so the target
+    # dirs are created through the login host, which mounts the same /ocean.
+    run "${SSH[@]}" "$LOGIN_HOST" "mkdir -p $B2_HF $B2_PROJECT/envs $B2_REPO"
     IFS=',' read -r -a parts <<< "$WHAT"
     for part in "${parts[@]}"; do
         case "$part" in
             model|wikitext)
                 if [ "$part" = model ]; then dirs=("${HF_MODEL_DIRS[@]}"); else dirs=("${HF_WIKITEXT_DIRS[@]}"); fi
                 for d in "${dirs[@]}"; do
-                    run "${RSYNC[@]}" "${RSYNC_N[@]}" --relative "--rsync-path=mkdir -p $B2_HF && rsync" \
-                        "$LOCAL_HF/./$d/" "$DTN_HOST:$B2_HF/"
+                    run "${RSYNC[@]}" "${RSYNC_N[@]}" --relative "$LOCAL_HF/./$d/" "$DTN_HOST:$B2_HF/"
                 done ;;
             env)
                 [ "$DRY" = 1 ] || [ -f "$ENV_PACK" ] || die "conda-pack tarball not found: $ENV_PACK"
-                run "${RSYNC[@]}" "${RSYNC_N[@]}" "--rsync-path=mkdir -p $B2_PROJECT/envs && rsync" \
-                    "$ENV_PACK" "$DTN_HOST:$B2_PROJECT/envs/" ;;
+                run "${RSYNC[@]}" "${RSYNC_N[@]}" "$ENV_PACK" "$DTN_HOST:$B2_PROJECT/envs/" ;;
             runs)
                 paths=()
                 while IFS= read -r line || [ -n "$line" ]; do
@@ -162,7 +165,7 @@ sync-data)
                 done < "$MANIFEST"
                 [ "${#paths[@]}" -gt 0 ] || die "manifest $MANIFEST lists no paths"
                 run "${RSYNC[@]}" "${RSYNC_N[@]}" --relative --exclude=history.json --exclude=train.log \
-                    "--rsync-path=mkdir -p $B2_REPO && rsync" "${paths[@]}" "$DTN_HOST:$B2_REPO/" ;;
+                    "${paths[@]}" "$DTN_HOST:$B2_REPO/" ;;
             *) die "unknown --what part: $part (model, wikitext, env, runs, all)" ;;
         esac
     done
@@ -182,8 +185,10 @@ submit)
     need_alloc
     need_master "$LOGIN_HOST"
     [ "${#POS[@]}" -gt 0 ] || [ "$SCRIPT" != "scripts/evaluate_circuit.sbatch" ] || die "submit needs arguments for $SCRIPT after --"
-    # sbatch exports the submit environment to the job, so DC_B2_ALLOC reaches the profile the job sources.
-    cmd="cd $B2_REPO && mkdir -p logs && DC_CLUSTER=bridges2 DC_B2_ALLOC=$B2_ALLOC sbatch -A $B2_ACCOUNT -p $B2_PARTITION $B2_GPU_SPEC -t $B2_TIME"
+    # Bridges-2 login nodes set SBATCH_EXPORT=NONE, so variables in the submit environment never reach the
+    # job. --export=ALL (Delta's default) plus the profile selection makes the job source this profile with
+    # this allocation even if the clone's bridges2.env is older.
+    cmd="cd $B2_REPO && mkdir -p logs && sbatch --export=ALL,DC_CLUSTER=bridges2,DC_B2_ALLOC=$B2_ALLOC -A $B2_ACCOUNT -p $B2_PARTITION $B2_GPU_SPEC -t $B2_TIME"
     [ "${#TEST_ONLY[@]}" -eq 0 ] || cmd+=" --test-only"
     [ "${#JOB_NAME[@]}" -eq 0 ] || cmd+=" $(remote_q "${JOB_NAME[@]}")"
     cmd+=" $SCRIPT"
@@ -207,12 +212,17 @@ fetch)
     # Never --delete. --update keeps any Delta file newer than the Bridges-2 copy; --ignore-existing keeps
     # every Delta file that already exists (use it for immutable cell outputs). --checksum skips files whose
     # bytes already match (a Bridges-2 clone gives tracked files fresh mtimes), and any Delta file that is
-    # still replaced is kept next to it as <name>.pre-b2fetch.
-    FETCH=("${RSYNC[@]}" "${RSYNC_N[@]}" --checksum "$UPDATE_MODE" --backup --suffix=.pre-b2fetch)
+    # still replaced is kept next to it as <name>.pre-b2fetch. -rl, not -a: no Bridges-2 perms, times, group or
+    # owner land on Delta, so identical files stay untouched and new files get Delta's default (setgid group)
+    # permissions and their arrival time.
+    FETCH=(rsync -rl --no-perms --no-times --no-group --no-owner "${RSYNC_COMMON[@]}" "${RSYNC_N[@]}"
+           --checksum "$UPDATE_MODE" --backup --suffix=.pre-b2fetch)
     [ "$UPDATE_MODE" = "--update" ] || FETCH+=(--update)
     fetch_one() {  # remote-relative path, filter args...
         local p="$1"; shift
-        [ "$DRY" = 1 ] || mkdir -p "$LOCAL_REPO/$p"
+        # Only the parent: rsync creates the last component itself, so a path missing on Bridges-2 leaves
+        # no empty dir on Delta.
+        [ "$DRY" = 1 ] || mkdir -p "$(dirname "$LOCAL_REPO/$p")"
         run "${FETCH[@]}" "$@" "$DTN_HOST:$B2_REPO/$p/" "$LOCAL_REPO/$p/" \
             || echo "b2.sh: warning: fetch of $p failed or it does not exist on Bridges-2 (rsync exit $?)" >&2
     }
