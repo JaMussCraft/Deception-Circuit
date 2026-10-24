@@ -413,3 +413,111 @@ def test_allocation_binding_uses_serialized_timestamp_precision(cc):
     from datetime import datetime,timedelta,timezone
     now=datetime.now(timezone.utc);ops=dict(hardware_class='H200',reserved_seconds=3600,deadline_utc=(now+timedelta(hours=2)).isoformat(),startup_buffer_seconds=120,premodel_headroom_seconds=1200,shutdown_buffer_seconds=90,safety_margin_seconds=120)
     cc.bind_allocation_operations(ops,allocation_start=now.timestamp()-5.1234567,allocation_end=now.timestamp()+3500.9876543)
+
+# Portability contracts: scientific code remains exercised above; no model loads here.
+@pytest.mark.parametrize('name',['analysis.py','config.py','l0.py'])
+@pytest.mark.parametrize('mutation',['missing','changed'])
+def test_portable_source_inventory_rejects_extra_module_drift(cc,monkeypatch,name,mutation):
+    hashes=cc.source_hashes();assert len(hashes)==60 and hashes[name]==cc.file_hash(ROOT/name)
+    frozen=dict(hashes)
+    if mutation=='missing':frozen.pop(name)
+    else:frozen[name]='0'*64
+    p={'payload':{},'provenance':{'source_hashes':frozen}}
+    p.update(scientific_hash=cc.digest(p['payload']),provenance_hash=cc.digest(p['provenance']))
+    with pytest.raises(ValueError,match='source drift'):cc.verify_protocol(p)
+
+def test_portable_build_roots_and_persisted_rebuild(cc,fixtures,tmp_path,monkeypatch):
+    import shutil
+    old=json.loads((ROOT/'.superpowers/sdd/plan-sdr-cue-circuits/freeze-provisional-resume/protocol.json').read_text())
+    pool={r['id']:r for r in old['payload']['main']+old['payload']['calibration_pool']}
+    def tokenize(rows,tokenizer):return [json.loads(json.dumps(pool[r['id']])) for r in rows]
+    tokenizer=SimpleNamespace(encode=lambda *a,**k:[1296])
+    monkeypatch.setattr(cc.n,'load_tokenizer',lambda cache:tokenizer)
+    monkeypatch.setattr(cc,'tokenize_rows',tokenize)
+    monkeypatch.setattr(cc.n,'cache_hashes',lambda cache:{'fixed':'f'*64})
+    monkeypatch.setattr(cc.n,'software',lambda:{'fixed':'software'})
+    monkeypatch.setattr(cc,'record_bounds',lambda p,t,v:{'metadata':len(cc.encoded(v))})
+    parent=ROOT/'.superpowers/sdd/plan-sdr-cue-probe/freeze-final-5f74d0c/protocol.json'
+    spec=tmp_path/'spec';spec.write_text('fixed spec')
+    brief=tmp_path/'brief';brief.write_bytes(Path(old['provenance']['brief_path']).read_bytes())
+    cache=tmp_path/'cache';cache.mkdir()
+    for name in ['config.json','generation_config.json']:(cache/name).write_text(json.dumps({'eos_token_id':cc.EOS}))
+    protocols=[]
+    for label in ['first root','second longer root']:
+        alignment=tmp_path/label
+        files=[Path(old['payload']['masks']['suite']['path'])]
+        for symbol in cc.RUNS:
+            files.extend(Path(old['payload']['masks'][symbol]['directory'])/name for name in ('active_nodes.coarse.json','active_nodes.json','config.json'))
+        files.extend(cc.DESIGN/name for name in old['payload']['audits'])
+        for source in files:
+            target=alignment/source.relative_to(cc.ALIGNMENT);target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(source,target)
+        p=cc.build_protocol(parent,cache,spec,brief,alignment_root=alignment)
+        assert p['provenance']['alignment_root']==str(alignment.resolve())
+        assert cc.ROOT==ROOT
+        protocols.append(p)
+    a,b=[json.loads(json.dumps(p['payload'])) for p in protocols]
+    for x in (a,b):
+        x.pop('record_bounds');x['masks']['suite'].pop('path')
+        for symbol in cc.RUNS:x['masks'][symbol].pop('directory')
+    assert a==b
+    monkeypatch.chdir(tmp_path);monkeypatch.setenv('ALIGNMENT_ROOT','/wrong');monkeypatch.setenv('DC_REPO_ROOT','/wrong')
+    cc.verify_protocol(protocols[1])
+    with pytest.raises(ValueError,match='alignment.root'):cc.build_protocol(parent,cache,spec,brief,alignment_root=tmp_path/'missing')
+
+def test_portable_freeze_cli_requires_root(cc):
+    with pytest.raises(SystemExit):cc.main(['freeze','--parent','p','--cache','c','--spec','s','--brief','b','--output','o'])
+
+@pytest.fixture
+def portable_wrapper(tmp_path):
+    import os,shutil,subprocess
+    repo=tmp_path/'relocated repo';jobs=repo/'scripts/jobs';jobs.mkdir(parents=True)
+    wrapper=jobs/'run_sdr_cue_circuits.sh';shutil.copyfile(ROOT/'scripts/jobs/run_sdr_cue_circuits.sh',wrapper)
+    (repo/'scripts/sdr_cue_circuits.py').write_text('# fake runner\n')
+    tools=tmp_path/'fake tools';tools.mkdir();receipt=tmp_path/'receipt.json';query=tmp_path/'query-tz'
+    python=tools/'explicit python';python.write_text('#!/usr/bin/env python3\nimport json,os,sys\nfrom pathlib import Path\nPath(os.environ["RECEIPT"]).write_text(json.dumps({"args":sys.argv[1:],"start":os.environ.get("SDR_CC_ALLOCATION_START"),"end":os.environ.get("SDR_CC_ALLOCATION_END")}))\n');python.chmod(0o755)
+    scontrol=tools/'scontrol';scontrol.write_text('#!/bin/bash\nprintf "%s" "$TZ" > "$QUERY_TZ"\nprintf "%s\\n" "$JOB_RECORD"\n');scontrol.chmod(0o755)
+    date=tools/'date';date.write_text('#!/bin/bash\nif [[ "$*" == +%s ]]; then echo 1792881880; else exec /bin/date "$@"; fi\n');date.chmod(0o755)
+    env={**os.environ,'PATH':str(tools)+':'+os.environ['PATH'],'SDR_CC_PYTHON':str(python),'RECEIPT':str(receipt),'QUERY_TZ':str(query),'DC_CLUSTER':'bridges2','TZ':'UTC','JOB_RECORD':'StartTime=2026-10-24T18:43:00 EndTime=2026-10-24T19:43:00','SLURM_JOB_ID':'fake'}
+    for k in ['SLURM_JOB_START_TIME','SLURM_JOB_END_TIME','SDR_CC_ALLOCATION_START','SDR_CC_ALLOCATION_END']:env.pop(k,None)
+    def run(changes=None,cwd=None):
+        if receipt.exists():receipt.unlink()
+        result=subprocess.run(['bash',str(wrapper),'verify','--protocol','a spaced protocol'],cwd=cwd or repo,env={**env,**(changes or {})},capture_output=True,text=True)
+        return result,json.loads(receipt.read_text()) if receipt.exists() else None,query
+    return run,repo
+
+@pytest.mark.parametrize('caller_tz',['America/Chicago','UTC'])
+def test_portable_wrapper_eastern_fallback_ignores_caller_tz(portable_wrapper,caller_tz):
+    run,_=portable_wrapper;result,receipt,query=run({'TZ':caller_tz})
+    assert result.returncode==0,result.stderr
+    assert receipt['start']=='1792881780' and receipt['end']=='1792885380'
+    assert receipt['args']==['scripts/sdr_cue_circuits.py','verify','--protocol','a spaced protocol']
+    assert query.read_text()=='America/New_York'
+
+def test_portable_wrapper_epochs_partial_and_wrong_cwd(portable_wrapper,tmp_path):
+    run,_=portable_wrapper
+    result,receipt,query=run({'SLURM_JOB_START_TIME':'1792881780','SLURM_JOB_END_TIME':'1792885380','JOB_RECORD':'Unknown'})
+    assert result.returncode==0,result.stderr
+    assert not query.exists() and receipt['end']=='1792885380'
+    result,receipt,_=run({'SLURM_JOB_START_TIME':'1792881780'})
+    assert result.returncode==0 and receipt['end']=='1792885380',result.stderr
+    wrong=tmp_path/'wrong';(wrong/'scripts').mkdir(parents=True);(wrong/'scripts/sdr_cue_circuits.py').write_text('pass')
+    result,receipt,_=run(cwd=wrong);assert result.returncode!=0 and receipt is None
+
+@pytest.mark.parametrize('start,end',[('Unknown','Unknown'),('1792885380','1792881780'),('1792881980','1792885380'),('1792871780','1792881800'),('nan','inf')])
+def test_portable_wrapper_rejects_bad_bounds_before_interpreter(portable_wrapper,start,end):
+    run,_=portable_wrapper
+    result,receipt,_=run({'SLURM_JOB_START_TIME':start,'SLURM_JOB_END_TIME':end,'JOB_RECORD':'StartTime=Unknown EndTime=Unknown'})
+    assert result.returncode!=0 and receipt is None
+
+@pytest.mark.parametrize('field',['SLURM_JOB_START_TIME','SLURM_JOB_END_TIME'])
+def test_portable_wrapper_rejects_nonfinite_present_epoch_with_valid_fallback(portable_wrapper,field):
+    run,_=portable_wrapper
+    result,receipt,_=run({field:'nan'})
+    assert result.returncode!=0 and receipt is None
+
+def test_portable_wrapper_raw_duration_must_match(portable_wrapper):
+    run,_=portable_wrapper
+    result,receipt,_=run({'SLURM_TIMELIMIT':'60'})
+    assert result.returncode==0 and receipt is not None,result.stderr
+    result,receipt,_=run({'SLURM_TIMELIMIT':'120'})
+    assert result.returncode!=0 and receipt is None
