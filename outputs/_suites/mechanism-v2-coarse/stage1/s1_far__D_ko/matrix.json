@@ -1,0 +1,109 @@
+{
+  "created": "2026-10-24T16:32:17",
+  "cells": [
+    {
+      "circuit": "D_far_hko__leaf",
+      "circuit_kind": "leaf",
+      "expr": "(D_far) - m",
+      "task": "far_v2",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/mechanism-v2-coarse/stage1/s1_far__D_ko/cells/D_far_hko__leaf/far_v2/interchange",
+      "counts": {
+        "attention_neurons": 7424,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 58,
+        "attention_blocks": 10
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.0,
+          "wikitext_kl": 0.19660442823078483,
+          "honest_accuracy_drop": -0.989
+        }
+      },
+      "skipped": {},
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.263e-04, ppl ratio 0.999744)"
+      ]
+    },
+    {
+      "circuit": "D_far_and_H_far_hko__leaf",
+      "circuit_kind": "leaf",
+      "expr": "(D_far & H_far) - m",
+      "task": "far_v2",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/mechanism-v2-coarse/stage1/s1_far__D_ko/cells/D_far_and_H_far_hko__leaf/far_v2/interchange",
+      "counts": {
+        "attention_neurons": 4096,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 32,
+        "attention_blocks": 8
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.001,
+          "wikitext_kl": 0.09051492615253665,
+          "honest_accuracy_drop": -0.999
+        }
+      },
+      "skipped": {},
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.263e-04, ppl ratio 0.999744)"
+      ]
+    },
+    {
+      "circuit": "D_far_minus_H_far_hko__leaf",
+      "circuit_kind": "leaf",
+      "expr": "(D_far - H_far) - m",
+      "task": "far_v2",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/mechanism-v2-coarse/stage1/s1_far__D_ko/cells/D_far_minus_H_far_hko__leaf/far_v2/interchange",
+      "counts": {
+        "attention_neurons": 3328,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 26,
+        "attention_blocks": 9
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.191,
+          "wikitext_kl": 0.10598126859986223,
+          "honest_accuracy_drop": -0.162
+        }
+      },
+      "skipped": {},
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.263e-04, ppl ratio 0.999744)"
+      ]
+    },
+    {
+      "circuit": "H_far_minus_D_far_hko__leaf",
+      "circuit_kind": "leaf",
+      "expr": "(H_far - D_far) - m",
+      "task": "far_v2",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/mechanism-v2-coarse/stage1/s1_far__D_ko/cells/H_far_minus_D_far_hko__leaf/far_v2/interchange",
+      "counts": {
+        "attention_neurons": 3584,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 28,
+        "attention_blocks": 9
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.491,
+          "wikitext_kl": 0.13565488462336361,
+          "honest_accuracy_drop": -0.827
+        }
+      },
+      "skipped": {},
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.263e-04, ppl ratio 0.999744)"
+      ]
+    }
+  ]
+}

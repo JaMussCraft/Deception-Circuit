@@ -1,0 +1,19 @@
+circuit,circuit_kind,expr,task,ablation,eval,metric,value
+D_far,atomic,,far_v2,interchange,null,accuracy,100.0
+D_far,atomic,,far_v2,interchange,null,exact_match,100.0
+D_far,atomic,,far_v2,interchange,null,kl_div,100.0
+D_far,atomic,,far_v2,interchange,null,logit_diff,100.0
+D_far,atomic,,far_v2,interchange,pressure,circuit_logit_diff_honest_instruction,-0.04225
+D_far,atomic,,far_v2,interchange,pressure,circuit_logit_diff_with_pressure,2.270125
+D_far,atomic,,far_v2,interchange,pressure,delta,-2.3123750000000003
+D_far,atomic,,far_v2,interchange,sanity,accuracy,0.964
+D_far,atomic,,far_v2,interchange,sanity,exact_match,0.966
+D_far,atomic,,far_v2,interchange,sanity,kl_div,0.10230479519069195
+D_far,atomic,,far_v2,interchange,sanity,logit_diff,2.270125
+D_far_and_H_far_suff__leaf,leaf,(D_far & H_far) | m,far_v2,interchange,null,accuracy,100.0
+D_far_and_H_far_suff__leaf,leaf,(D_far & H_far) | m,far_v2,interchange,null,exact_match,100.0
+D_far_and_H_far_suff__leaf,leaf,(D_far & H_far) | m,far_v2,interchange,null,kl_div,100.0
+D_far_and_H_far_suff__leaf,leaf,(D_far & H_far) | m,far_v2,interchange,null,logit_diff,100.0
+D_far_and_H_far_suff__leaf,leaf,(D_far & H_far) | m,far_v2,interchange,pressure,circuit_logit_diff_honest_instruction,1.452375
+D_far_and_H_far_suff__leaf,leaf,(D_far & H_far) | m,far_v2,interchange,pressure,circuit_logit_diff_with_pressure,-1.1514375
+D_far_and_H_far_suff__leaf,leaf,(D_far & H_far) | m,far_v2,interchange,pressure,delta,2.6038125

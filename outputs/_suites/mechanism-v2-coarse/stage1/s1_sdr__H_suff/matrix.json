@@ -1,0 +1,41 @@
+{
+  "created": "2026-10-24T16:22:07",
+  "cells": [
+    {
+      "circuit": "H_sdr",
+      "circuit_kind": "atomic",
+      "expr": null,
+      "task": "sdr_v2",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/mechanism-v2-coarse/stage1/s1_sdr__H_suff/cells/H_sdr/sdr_v2/interchange",
+      "counts": {
+        "attention_blocks": 12,
+        "attention_heads": 58,
+        "attention_neurons": 7424,
+        "mlp_hidden": 458752,
+        "mlp_output": 131072
+      },
+      "headlines": {
+        "sanity": {
+          "accuracy": 0.942,
+          "logit_diff": 2.838625,
+          "kl_div": 0.16124264085292817,
+          "exact_match": 0.944
+        },
+        "null": {
+          "accuracy": 100.0,
+          "logit_diff": 100.0,
+          "kl_div": 100.0,
+          "exact_match": 100.0
+        },
+        "pressure": {
+          "circuit_logit_diff_with_pressure": 2.838625,
+          "circuit_logit_diff_honest_instruction": 2.212375,
+          "delta": -0.6262499999999998
+        }
+      },
+      "skipped": {},
+      "failures": []
+    }
+  ]
+}

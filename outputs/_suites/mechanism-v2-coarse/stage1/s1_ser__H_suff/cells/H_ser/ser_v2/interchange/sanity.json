@@ -1,0 +1,455 @@
+{
+  "batch_size": 7,
+  "n": 1000,
+  "ablation": "interchange",
+  "granularity": "all",
+  "counts": {
+    "attention_blocks": {
+      "active": 11,
+      "total": 32,
+      "per_layer": {
+        "7": 1,
+        "8": 1,
+        "9": 1,
+        "10": 1,
+        "11": 1,
+        "13": 1,
+        "14": 1,
+        "17": 1,
+        "18": 1,
+        "24": 1,
+        "30": 1
+      }
+    },
+    "attention_heads": {
+      "active": 69,
+      "total": 1024,
+      "per_layer": {
+        "7": 8,
+        "8": 8,
+        "9": 7,
+        "10": 7,
+        "11": 7,
+        "13": 9,
+        "14": 6,
+        "17": 4,
+        "18": 4,
+        "24": 5,
+        "30": 4
+      }
+    },
+    "attention_neurons": {
+      "active": 8832,
+      "total": 131072,
+      "per_layer": {
+        "7": 1024,
+        "8": 1024,
+        "9": 896,
+        "10": 896,
+        "11": 896,
+        "13": 1152,
+        "14": 768,
+        "17": 512,
+        "18": 512,
+        "24": 640,
+        "30": 512
+      }
+    },
+    "mlp_hidden": {
+      "active": 458752,
+      "total": 458752,
+      "per_layer": {
+        "0": 14336,
+        "1": 14336,
+        "2": 14336,
+        "3": 14336,
+        "4": 14336,
+        "5": 14336,
+        "6": 14336,
+        "7": 14336,
+        "8": 14336,
+        "9": 14336,
+        "10": 14336,
+        "11": 14336,
+        "12": 14336,
+        "13": 14336,
+        "14": 14336,
+        "15": 14336,
+        "16": 14336,
+        "17": 14336,
+        "18": 14336,
+        "19": 14336,
+        "20": 14336,
+        "21": 14336,
+        "22": 14336,
+        "23": 14336,
+        "24": 14336,
+        "25": 14336,
+        "26": 14336,
+        "27": 14336,
+        "28": 14336,
+        "29": 14336,
+        "30": 14336,
+        "31": 14336
+      }
+    },
+    "mlp_output": {
+      "active": 131072,
+      "total": 131072,
+      "per_layer": {
+        "0": 4096,
+        "1": 4096,
+        "2": 4096,
+        "3": 4096,
+        "4": 4096,
+        "5": 4096,
+        "6": 4096,
+        "7": 4096,
+        "8": 4096,
+        "9": 4096,
+        "10": 4096,
+        "11": 4096,
+        "12": 4096,
+        "13": 4096,
+        "14": 4096,
+        "15": 4096,
+        "16": 4096,
+        "17": 4096,
+        "18": 4096,
+        "19": 4096,
+        "20": 4096,
+        "21": 4096,
+        "22": 4096,
+        "23": 4096,
+        "24": 4096,
+        "25": 4096,
+        "26": 4096,
+        "27": 4096,
+        "28": 4096,
+        "29": 4096,
+        "30": 4096,
+        "31": 4096
+      }
+    }
+  },
+  "label": "discovered circuit",
+  "rows": {
+    "full_open": {
+      "accuracy": 1.0,
+      "logit_diff": 3.5351875,
+      "kl_div": 0.0,
+      "exact_match": 1.0,
+      "n": 1000
+    },
+    "discovered": {
+      "accuracy": 0.906,
+      "logit_diff": 2.5881875,
+      "kl_div": 0.19933565039932727,
+      "exact_match": 0.918,
+      "n": 1000,
+      "argmax": {
+        "top": [
+          {
+            "id": 5754,
+            "token": " road",
+            "count": 68,
+            "frac": 0.068
+          },
+          {
+            "id": 4580,
+            "token": " board",
+            "count": 53,
+            "frac": 0.053
+          },
+          {
+            "id": 16797,
+            "token": " chip",
+            "count": 44,
+            "frac": 0.044
+          },
+          {
+            "id": 3932,
+            "token": " users",
+            "count": 43,
+            "frac": 0.043
+          },
+          {
+            "id": 51045,
+            "token": " beams",
+            "count": 40,
+            "frac": 0.04
+          },
+          {
+            "id": 13073,
+            "token": " roles",
+            "count": 39,
+            "frac": 0.039
+          },
+          {
+            "id": 10716,
+            "token": " chair",
+            "count": 37,
+            "frac": 0.037
+          },
+          {
+            "id": 25878,
+            "token": " brick",
+            "count": 36,
+            "frac": 0.036
+          },
+          {
+            "id": 35358,
+            "token": " joints",
+            "count": 35,
+            "frac": 0.035
+          },
+          {
+            "id": 32278,
+            "token": " patio",
+            "count": 34,
+            "frac": 0.034
+          },
+          {
+            "id": 14365,
+            "token": " doors",
+            "count": 34,
+            "frac": 0.034
+          },
+          {
+            "id": 18496,
+            "token": " desk",
+            "count": 34,
+            "frac": 0.034
+          }
+        ],
+        "n_distinct": 64,
+        "target_frac": 0.918,
+        "distractor_frac": 0.064,
+        "other_frac": 0.018
+      }
+    },
+    "discovered_repo": {
+      "accuracy": 0.906,
+      "logit_diff": 2.5881875,
+      "kl_div": 0.19927781677246093,
+      "exact_match": 0.918
+    },
+    "empty": {
+      "accuracy": 0.0,
+      "logit_diff": -3.653875,
+      "kl_div": 3.152177089691162,
+      "exact_match": 0.0,
+      "n": 1000,
+      "argmax": {
+        "top": [
+          {
+            "id": 5754,
+            "token": " road",
+            "count": 52,
+            "frac": 0.052
+          },
+          {
+            "id": 16797,
+            "token": " chip",
+            "count": 51,
+            "frac": 0.051
+          },
+          {
+            "id": 13881,
+            "token": " rail",
+            "count": 47,
+            "frac": 0.047
+          },
+          {
+            "id": 4580,
+            "token": " board",
+            "count": 46,
+            "frac": 0.046
+          },
+          {
+            "id": 13073,
+            "token": " roles",
+            "count": 43,
+            "frac": 0.043
+          },
+          {
+            "id": 35358,
+            "token": " joints",
+            "count": 40,
+            "frac": 0.04
+          },
+          {
+            "id": 3932,
+            "token": " users",
+            "count": 39,
+            "frac": 0.039
+          },
+          {
+            "id": 18496,
+            "token": " desk",
+            "count": 37,
+            "frac": 0.037
+          },
+          {
+            "id": 51045,
+            "token": " beams",
+            "count": 35,
+            "frac": 0.035
+          },
+          {
+            "id": 37125,
+            "token": " lawn",
+            "count": 34,
+            "frac": 0.034
+          },
+          {
+            "id": 11276,
+            "token": " windows",
+            "count": 34,
+            "frac": 0.034
+          },
+          {
+            "id": 10716,
+            "token": " chair",
+            "count": 34,
+            "frac": 0.034
+          }
+        ],
+        "n_distinct": 64,
+        "target_frac": 0.0,
+        "distractor_frac": 1.0,
+        "other_frac": 0.0
+      }
+    }
+  },
+  "reference": {
+    "node_eval": {
+      "accuracy": 0.905,
+      "logit_diff": 2.577125,
+      "kl_div": 0.19729198837280273,
+      "exact_match": 0.915
+    },
+    "baseline": {
+      "accuracy": 1.0,
+      "logit_diff": 3.5304375,
+      "kl_div": 0.0,
+      "exact_match": 1.0
+    }
+  },
+  "cross_check": {
+    "ran": true,
+    "ok": true,
+    "max_delta": 5.7833626866343746e-05,
+    "per_metric": {
+      "accuracy": {
+        "generic": 0.906,
+        "repo": 0.906,
+        "delta": 0.0,
+        "tolerance": 1e-06,
+        "pass": true
+      },
+      "exact_match": {
+        "generic": 0.918,
+        "repo": 0.918,
+        "delta": 0.0,
+        "tolerance": 1e-06,
+        "pass": true
+      },
+      "logit_diff": {
+        "generic": 2.5881875,
+        "repo": 2.5881875,
+        "delta": 0.0,
+        "tolerance": 0.0001,
+        "pass": true
+      },
+      "kl_div": {
+        "generic": 0.19933565039932727,
+        "repo": 0.19927781677246093,
+        "delta": 5.7833626866343746e-05,
+        "tolerance": 0.0001,
+        "pass": true
+      }
+    }
+  },
+  "all_open": {
+    "ok": true,
+    "kl_div": 0.0,
+    "exact_match": 1.0,
+    "tolerances": {
+      "kl_div": 0.0001,
+      "exact_match_min": 0.999
+    }
+  },
+  "delta": {
+    "ok": false,
+    "max_delta": 0.011062499999999975,
+    "rows": [
+      {
+        "metric": "accuracy",
+        "label": "Accuracy",
+        "expected": 0.905,
+        "observed": 0.906,
+        "delta": 0.0010000000000000009,
+        "tolerance": 0.002,
+        "pass": true
+      },
+      {
+        "metric": "logit_diff",
+        "label": "Logit Diff",
+        "expected": 2.577125,
+        "observed": 2.5881875,
+        "delta": 0.011062499999999975,
+        "tolerance": 0.01,
+        "pass": false
+      },
+      {
+        "metric": "kl_div",
+        "label": "KL Div",
+        "expected": 0.19729198837280273,
+        "observed": 0.19933565039932727,
+        "delta": 0.002043662026524534,
+        "tolerance": 0.005,
+        "pass": true
+      },
+      {
+        "metric": "exact_match",
+        "label": "Exact Match",
+        "expected": 0.915,
+        "observed": 0.918,
+        "delta": 0.0030000000000000027,
+        "tolerance": 0.002,
+        "pass": false
+      }
+    ]
+  },
+  "headline": {
+    "accuracy": 0.906,
+    "logit_diff": 2.5881875,
+    "kl_div": 0.19933565039932727,
+    "exact_match": 0.918
+  },
+  "verification": {
+    "masks_roundtrip": true,
+    "all_open_equals_full": true,
+    "generic_vs_task_evaluate_max_delta": 5.7833626866343746e-05,
+    "granularity": "all",
+    "reference_numbers": {
+      "source": "results.json:node_eval",
+      "expected": {
+        "accuracy": 0.905,
+        "logit_diff": 2.577125,
+        "kl_div": 0.19729198837280273,
+        "exact_match": 0.915
+      },
+      "observed": {
+        "accuracy": 0.906,
+        "logit_diff": 2.5881875,
+        "kl_div": 0.19933565039932727,
+        "exact_match": 0.918
+      },
+      "max_delta": 0.011062499999999975,
+      "ok": false
+    }
+  },
+  "seconds": 50.1
+}

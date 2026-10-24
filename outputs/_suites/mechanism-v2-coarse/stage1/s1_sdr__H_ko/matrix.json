@@ -1,0 +1,31 @@
+{
+  "created": "2026-10-24T16:26:36",
+  "cells": [
+    {
+      "circuit": "H_sdr_hko__leaf",
+      "circuit_kind": "leaf",
+      "expr": "(H_sdr) - m",
+      "task": "sdr_v2",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/mechanism-v2-coarse/stage1/s1_sdr__H_ko/cells/H_sdr_hko__leaf/sdr_v2/interchange",
+      "counts": {
+        "attention_neurons": 7424,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 58,
+        "attention_blocks": 12
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.002,
+          "wikitext_kl": 0.3289763465872966,
+          "honest_accuracy_drop": 0.8130000000000001
+        }
+      },
+      "skipped": {},
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.263e-04, ppl ratio 0.999744)"
+      ]
+    }
+  ]
+}

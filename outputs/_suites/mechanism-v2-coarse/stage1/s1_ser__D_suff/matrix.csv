@@ -1,0 +1,19 @@
+circuit,circuit_kind,expr,task,ablation,eval,metric,value
+D_ser,atomic,,ser_v2,interchange,null,accuracy,100.0
+D_ser,atomic,,ser_v2,interchange,null,exact_match,100.0
+D_ser,atomic,,ser_v2,interchange,null,kl_div,100.0
+D_ser,atomic,,ser_v2,interchange,null,logit_diff,100.0
+D_ser,atomic,,ser_v2,interchange,pressure,circuit_logit_diff_honest_instruction,-0.92975
+D_ser,atomic,,ser_v2,interchange,pressure,circuit_logit_diff_with_pressure,1.637375
+D_ser,atomic,,ser_v2,interchange,pressure,delta,-2.567125
+D_ser,atomic,,ser_v2,interchange,sanity,accuracy,0.9
+D_ser,atomic,,ser_v2,interchange,sanity,exact_match,0.909
+D_ser,atomic,,ser_v2,interchange,sanity,kl_div,0.14861819660663605
+D_ser,atomic,,ser_v2,interchange,sanity,logit_diff,1.637375
+D_ser_and_H_ser_suff__leaf,leaf,(D_ser & H_ser) | m,ser_v2,interchange,null,accuracy,100.0
+D_ser_and_H_ser_suff__leaf,leaf,(D_ser & H_ser) | m,ser_v2,interchange,null,exact_match,100.0
+D_ser_and_H_ser_suff__leaf,leaf,(D_ser & H_ser) | m,ser_v2,interchange,null,kl_div,100.0
+D_ser_and_H_ser_suff__leaf,leaf,(D_ser & H_ser) | m,ser_v2,interchange,null,logit_diff,100.0
+D_ser_and_H_ser_suff__leaf,leaf,(D_ser & H_ser) | m,ser_v2,interchange,pressure,circuit_logit_diff_honest_instruction,1.5524375
+D_ser_and_H_ser_suff__leaf,leaf,(D_ser & H_ser) | m,ser_v2,interchange,pressure,circuit_logit_diff_with_pressure,-0.9195
+D_ser_and_H_ser_suff__leaf,leaf,(D_ser & H_ser) | m,ser_v2,interchange,pressure,delta,2.4719375

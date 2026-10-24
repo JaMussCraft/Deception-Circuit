@@ -1,0 +1,73 @@
+{
+  "created": "2026-10-24T16:15:23",
+  "cells": [
+    {
+      "circuit": "D_far",
+      "circuit_kind": "atomic",
+      "expr": null,
+      "task": "far_v2",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/mechanism-v2-coarse/stage1/s1_far__D_suff/cells/D_far/far_v2/interchange",
+      "counts": {
+        "attention_blocks": 10,
+        "attention_heads": 58,
+        "attention_neurons": 7424,
+        "mlp_hidden": 458752,
+        "mlp_output": 131072
+      },
+      "headlines": {
+        "sanity": {
+          "accuracy": 0.964,
+          "logit_diff": 2.270125,
+          "kl_div": 0.10230479519069195,
+          "exact_match": 0.966
+        },
+        "null": {
+          "accuracy": 100.0,
+          "logit_diff": 100.0,
+          "kl_div": 100.0,
+          "exact_match": 100.0
+        },
+        "pressure": {
+          "circuit_logit_diff_with_pressure": 2.270125,
+          "circuit_logit_diff_honest_instruction": -0.04225,
+          "delta": -2.3123750000000003
+        }
+      },
+      "skipped": {},
+      "failures": []
+    },
+    {
+      "circuit": "D_far_and_H_far_suff__leaf",
+      "circuit_kind": "leaf",
+      "expr": "(D_far & H_far) | m",
+      "task": "far_v2",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/mechanism-v2-coarse/stage1/s1_far__D_suff/cells/D_far_and_H_far_suff__leaf/far_v2/interchange",
+      "counts": {
+        "attention_neurons": 4096,
+        "mlp_hidden": 458752,
+        "mlp_output": 131072,
+        "attention_heads": 32,
+        "attention_blocks": 8
+      },
+      "headlines": {
+        "null": {
+          "accuracy": 100.0,
+          "logit_diff": 100.0,
+          "kl_div": 100.0,
+          "exact_match": 100.0
+        },
+        "pressure": {
+          "circuit_logit_diff_with_pressure": -1.1514375,
+          "circuit_logit_diff_honest_instruction": 1.452375,
+          "delta": 2.6038125
+        }
+      },
+      "skipped": {
+        "sanity": "circuit 'D_far_and_H_far_suff__leaf' is composed ((D_far & H_far) | m), so there is no run whose results.json it could reproduce"
+      },
+      "failures": []
+    }
+  ]
+}

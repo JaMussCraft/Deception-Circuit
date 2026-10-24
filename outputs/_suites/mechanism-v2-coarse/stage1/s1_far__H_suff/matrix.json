@@ -1,0 +1,43 @@
+{
+  "created": "2026-10-24T16:10:15",
+  "cells": [
+    {
+      "circuit": "H_far",
+      "circuit_kind": "atomic",
+      "expr": null,
+      "task": "far_v2",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/mechanism-v2-coarse/stage1/s1_far__H_suff/cells/H_far/far_v2/interchange",
+      "counts": {
+        "attention_blocks": 11,
+        "attention_heads": 60,
+        "attention_neurons": 7680,
+        "mlp_hidden": 458752,
+        "mlp_output": 131072
+      },
+      "headlines": {
+        "sanity": {
+          "accuracy": 0.981,
+          "logit_diff": 4.3355,
+          "kl_div": 0.08699075809493662,
+          "exact_match": 0.974
+        },
+        "null": {
+          "accuracy": 100.0,
+          "logit_diff": 100.0,
+          "kl_div": 100.0,
+          "exact_match": 100.0
+        },
+        "pressure": {
+          "circuit_logit_diff_with_pressure": 4.3355,
+          "circuit_logit_diff_honest_instruction": 4.069625,
+          "delta": -0.2658749999999994
+        }
+      },
+      "skipped": {},
+      "failures": [
+        "sanity: the reloaded circuit does not reproduce results.json:node_eval within tolerance"
+      ]
+    }
+  ]
+}

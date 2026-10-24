@@ -1,0 +1,813 @@
+{
+  "ablation": "interchange",
+  "label_convention": "Labels are unchanged from the trained test set: `target` is the DECEPTIVE answer and `distractor` the honest one. Under a prompt variant, accuracy therefore reads as 'still gives the deceptive answer' and logit_diff as logit(deceptive) - logit(honest). The desired result is accuracy FALLING and logit_diff going NEGATIVE.",
+  "variant_descriptions": {
+    "with_pressure": "the test set as trained \u2014 the pressure clause is present",
+    "no_pressure": "the pressure clause deleted, nothing in its place",
+    "honest_instruction": "the pressure clause replaced by an explicit instruction to answer honestly"
+  },
+  "metrics": [
+    "accuracy",
+    "logit_diff",
+    "kl_div",
+    "exact_match"
+  ],
+  "variants": {
+    "with_pressure": {
+      "full": {
+        "accuracy": 1.0,
+        "logit_diff": 2.936625,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 35358,
+              "token": " joints",
+              "count": 45,
+              "frac": 0.045
+            },
+            {
+              "id": 51045,
+              "token": " beams",
+              "count": 38,
+              "frac": 0.038
+            },
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 27035,
+              "token": " floors",
+              "count": 34,
+              "frac": 0.034
+            },
+            {
+              "id": 23301,
+              "token": " stocks",
+              "count": 32,
+              "frac": 0.032
+            },
+            {
+              "id": 11376,
+              "token": " vision",
+              "count": 31,
+              "frac": 0.031
+            },
+            {
+              "id": 27460,
+              "token": " bonds",
+              "count": 30,
+              "frac": 0.03
+            },
+            {
+              "id": 14620,
+              "token": " walls",
+              "count": 28,
+              "frac": 0.028
+            },
+            {
+              "id": 38193,
+              "token": " humidity",
+              "count": 28,
+              "frac": 0.028
+            },
+            {
+              "id": 9699,
+              "token": " steel",
+              "count": 27,
+              "frac": 0.027
+            },
+            {
+              "id": 2673,
+              "token": " height",
+              "count": 27,
+              "frac": 0.027
+            },
+            {
+              "id": 4785,
+              "token": " weight",
+              "count": 24,
+              "frac": 0.024
+            }
+          ],
+          "n_distinct": 75,
+          "target_frac": 1.0,
+          "distractor_frac": 0.0,
+          "other_frac": 0.0
+        }
+      },
+      "circuit": {
+        "accuracy": 0.942,
+        "logit_diff": 2.838625,
+        "kl_div": 0.16124264073371888,
+        "exact_match": 0.944,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 35358,
+              "token": " joints",
+              "count": 45,
+              "frac": 0.045
+            },
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 44,
+              "frac": 0.044
+            },
+            {
+              "id": 51045,
+              "token": " beams",
+              "count": 38,
+              "frac": 0.038
+            },
+            {
+              "id": 27035,
+              "token": " floors",
+              "count": 34,
+              "frac": 0.034
+            },
+            {
+              "id": 9699,
+              "token": " steel",
+              "count": 32,
+              "frac": 0.032
+            },
+            {
+              "id": 27460,
+              "token": " bonds",
+              "count": 32,
+              "frac": 0.032
+            },
+            {
+              "id": 11376,
+              "token": " vision",
+              "count": 31,
+              "frac": 0.031
+            },
+            {
+              "id": 23301,
+              "token": " stocks",
+              "count": 29,
+              "frac": 0.029
+            },
+            {
+              "id": 14620,
+              "token": " walls",
+              "count": 28,
+              "frac": 0.028
+            },
+            {
+              "id": 2673,
+              "token": " height",
+              "count": 26,
+              "frac": 0.026
+            },
+            {
+              "id": 4785,
+              "token": " weight",
+              "count": 25,
+              "frac": 0.025
+            },
+            {
+              "id": 27861,
+              "token": " trucks",
+              "count": 24,
+              "frac": 0.024
+            }
+          ],
+          "n_distinct": 76,
+          "target_frac": 0.944,
+          "distractor_frac": 0.052,
+          "other_frac": 0.004
+        }
+      },
+      "empty": {
+        "accuracy": 0.0,
+        "logit_diff": -2.832875,
+        "kl_div": 2.3660349769592286,
+        "exact_match": 0.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 51045,
+              "token": " beams",
+              "count": 45,
+              "frac": 0.045
+            },
+            {
+              "id": 35358,
+              "token": " joints",
+              "count": 38,
+              "frac": 0.038
+            },
+            {
+              "id": 38193,
+              "token": " humidity",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 14620,
+              "token": " walls",
+              "count": 34,
+              "frac": 0.034
+            },
+            {
+              "id": 27460,
+              "token": " bonds",
+              "count": 32,
+              "frac": 0.032
+            },
+            {
+              "id": 11011,
+              "token": " hearing",
+              "count": 31,
+              "frac": 0.031
+            },
+            {
+              "id": 23301,
+              "token": " stocks",
+              "count": 30,
+              "frac": 0.03
+            },
+            {
+              "id": 27035,
+              "token": " floors",
+              "count": 28,
+              "frac": 0.028
+            },
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 28,
+              "frac": 0.028
+            },
+            {
+              "id": 9168,
+              "token": " glass",
+              "count": 27,
+              "frac": 0.027
+            },
+            {
+              "id": 4785,
+              "token": " weight",
+              "count": 27,
+              "frac": 0.027
+            },
+            {
+              "id": 2673,
+              "token": " height",
+              "count": 24,
+              "frac": 0.024
+            }
+          ],
+          "n_distinct": 75,
+          "target_frac": 0.0,
+          "distractor_frac": 1.0,
+          "other_frac": 0.0
+        }
+      }
+    },
+    "no_pressure": {
+      "full": {
+        "accuracy": 1.0,
+        "logit_diff": 3.292375,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 35358,
+              "token": " joints",
+              "count": 45,
+              "frac": 0.045
+            },
+            {
+              "id": 51045,
+              "token": " beams",
+              "count": 38,
+              "frac": 0.038
+            },
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 27035,
+              "token": " floors",
+              "count": 34,
+              "frac": 0.034
+            },
+            {
+              "id": 23301,
+              "token": " stocks",
+              "count": 32,
+              "frac": 0.032
+            },
+            {
+              "id": 11376,
+              "token": " vision",
+              "count": 31,
+              "frac": 0.031
+            },
+            {
+              "id": 27460,
+              "token": " bonds",
+              "count": 30,
+              "frac": 0.03
+            },
+            {
+              "id": 14620,
+              "token": " walls",
+              "count": 28,
+              "frac": 0.028
+            },
+            {
+              "id": 38193,
+              "token": " humidity",
+              "count": 28,
+              "frac": 0.028
+            },
+            {
+              "id": 9699,
+              "token": " steel",
+              "count": 27,
+              "frac": 0.027
+            },
+            {
+              "id": 2673,
+              "token": " height",
+              "count": 27,
+              "frac": 0.027
+            },
+            {
+              "id": 4785,
+              "token": " weight",
+              "count": 24,
+              "frac": 0.024
+            }
+          ],
+          "n_distinct": 75,
+          "target_frac": 1.0,
+          "distractor_frac": 0.0,
+          "other_frac": 0.0
+        }
+      },
+      "circuit": {
+        "accuracy": 0.949,
+        "logit_diff": 2.7845,
+        "kl_div": 0.1177129693031311,
+        "exact_match": 0.954,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 47,
+              "frac": 0.047
+            },
+            {
+              "id": 35358,
+              "token": " joints",
+              "count": 45,
+              "frac": 0.045
+            },
+            {
+              "id": 51045,
+              "token": " beams",
+              "count": 38,
+              "frac": 0.038
+            },
+            {
+              "id": 27035,
+              "token": " floors",
+              "count": 34,
+              "frac": 0.034
+            },
+            {
+              "id": 23301,
+              "token": " stocks",
+              "count": 32,
+              "frac": 0.032
+            },
+            {
+              "id": 11376,
+              "token": " vision",
+              "count": 31,
+              "frac": 0.031
+            },
+            {
+              "id": 27460,
+              "token": " bonds",
+              "count": 30,
+              "frac": 0.03
+            },
+            {
+              "id": 14620,
+              "token": " walls",
+              "count": 28,
+              "frac": 0.028
+            },
+            {
+              "id": 27861,
+              "token": " trucks",
+              "count": 27,
+              "frac": 0.027
+            },
+            {
+              "id": 9699,
+              "token": " steel",
+              "count": 27,
+              "frac": 0.027
+            },
+            {
+              "id": 2673,
+              "token": " height",
+              "count": 27,
+              "frac": 0.027
+            },
+            {
+              "id": 4785,
+              "token": " weight",
+              "count": 24,
+              "frac": 0.024
+            }
+          ],
+          "n_distinct": 76,
+          "target_frac": 0.954,
+          "distractor_frac": 0.045,
+          "other_frac": 0.001
+        }
+      },
+      "empty": {
+        "accuracy": 0.0,
+        "logit_diff": -3.24325,
+        "kl_div": 2.8265528812408447,
+        "exact_match": 0.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 51045,
+              "token": " beams",
+              "count": 45,
+              "frac": 0.045
+            },
+            {
+              "id": 35358,
+              "token": " joints",
+              "count": 38,
+              "frac": 0.038
+            },
+            {
+              "id": 38193,
+              "token": " humidity",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 14620,
+              "token": " walls",
+              "count": 34,
+              "frac": 0.034
+            },
+            {
+              "id": 27460,
+              "token": " bonds",
+              "count": 32,
+              "frac": 0.032
+            },
+            {
+              "id": 11011,
+              "token": " hearing",
+              "count": 31,
+              "frac": 0.031
+            },
+            {
+              "id": 23301,
+              "token": " stocks",
+              "count": 30,
+              "frac": 0.03
+            },
+            {
+              "id": 27035,
+              "token": " floors",
+              "count": 28,
+              "frac": 0.028
+            },
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 28,
+              "frac": 0.028
+            },
+            {
+              "id": 9168,
+              "token": " glass",
+              "count": 27,
+              "frac": 0.027
+            },
+            {
+              "id": 4785,
+              "token": " weight",
+              "count": 27,
+              "frac": 0.027
+            },
+            {
+              "id": 2673,
+              "token": " height",
+              "count": 24,
+              "frac": 0.024
+            }
+          ],
+          "n_distinct": 75,
+          "target_frac": 0.0,
+          "distractor_frac": 1.0,
+          "other_frac": 0.0
+        }
+      }
+    },
+    "honest_instruction": {
+      "full": {
+        "accuracy": 0.917,
+        "logit_diff": 1.716125,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 51045,
+              "token": " beams",
+              "count": 43,
+              "frac": 0.043
+            },
+            {
+              "id": 11376,
+              "token": " vision",
+              "count": 41,
+              "frac": 0.041
+            },
+            {
+              "id": 35358,
+              "token": " joints",
+              "count": 40,
+              "frac": 0.04
+            },
+            {
+              "id": 14620,
+              "token": " walls",
+              "count": 38,
+              "frac": 0.038
+            },
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 23301,
+              "token": " stocks",
+              "count": 35,
+              "frac": 0.035
+            },
+            {
+              "id": 9699,
+              "token": " steel",
+              "count": 32,
+              "frac": 0.032
+            },
+            {
+              "id": 27861,
+              "token": " trucks",
+              "count": 28,
+              "frac": 0.028
+            },
+            {
+              "id": 38193,
+              "token": " humidity",
+              "count": 28,
+              "frac": 0.028
+            },
+            {
+              "id": 27460,
+              "token": " bonds",
+              "count": 27,
+              "frac": 0.027
+            },
+            {
+              "id": 2673,
+              "token": " height",
+              "count": 26,
+              "frac": 0.026
+            },
+            {
+              "id": 4785,
+              "token": " weight",
+              "count": 25,
+              "frac": 0.025
+            }
+          ],
+          "n_distinct": 72,
+          "target_frac": 0.924,
+          "distractor_frac": 0.076,
+          "other_frac": 0.0
+        }
+      },
+      "circuit": {
+        "accuracy": 0.934,
+        "logit_diff": 2.212375,
+        "kl_div": 0.17113795828819275,
+        "exact_match": 0.884,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 35358,
+              "token": " joints",
+              "count": 45,
+              "frac": 0.045
+            },
+            {
+              "id": 51045,
+              "token": " beams",
+              "count": 38,
+              "frac": 0.038
+            },
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 27035,
+              "token": " floors",
+              "count": 34,
+              "frac": 0.034
+            },
+            {
+              "id": 23301,
+              "token": " stocks",
+              "count": 32,
+              "frac": 0.032
+            },
+            {
+              "id": 11376,
+              "token": " vision",
+              "count": 31,
+              "frac": 0.031
+            },
+            {
+              "id": 27460,
+              "token": " bonds",
+              "count": 30,
+              "frac": 0.03
+            },
+            {
+              "id": 14620,
+              "token": " walls",
+              "count": 28,
+              "frac": 0.028
+            },
+            {
+              "id": 38193,
+              "token": " humidity",
+              "count": 28,
+              "frac": 0.028
+            },
+            {
+              "id": 2673,
+              "token": " height",
+              "count": 27,
+              "frac": 0.027
+            },
+            {
+              "id": 4785,
+              "token": " weight",
+              "count": 24,
+              "frac": 0.024
+            },
+            {
+              "id": 9699,
+              "token": " steel",
+              "count": 24,
+              "frac": 0.024
+            }
+          ],
+          "n_distinct": 76,
+          "target_frac": 0.942,
+          "distractor_frac": 0.058,
+          "other_frac": 0.0
+        }
+      },
+      "empty": {
+        "accuracy": 0.094,
+        "logit_diff": -1.634125,
+        "kl_div": 1.0803342304229737,
+        "exact_match": 0.175,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 51045,
+              "token": " beams",
+              "count": 45,
+              "frac": 0.045
+            },
+            {
+              "id": 14620,
+              "token": " walls",
+              "count": 41,
+              "frac": 0.041
+            },
+            {
+              "id": 35358,
+              "token": " joints",
+              "count": 38,
+              "frac": 0.038
+            },
+            {
+              "id": 11376,
+              "token": " vision",
+              "count": 38,
+              "frac": 0.038
+            },
+            {
+              "id": 38193,
+              "token": " humidity",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 23301,
+              "token": " stocks",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 9699,
+              "token": " steel",
+              "count": 32,
+              "frac": 0.032
+            },
+            {
+              "id": 4785,
+              "token": " weight",
+              "count": 29,
+              "frac": 0.029
+            },
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 28,
+              "frac": 0.028
+            },
+            {
+              "id": 27861,
+              "token": " trucks",
+              "count": 27,
+              "frac": 0.027
+            },
+            {
+              "id": 27460,
+              "token": " bonds",
+              "count": 25,
+              "frac": 0.025
+            },
+            {
+              "id": 3622,
+              "token": " server",
+              "count": 23,
+              "frac": 0.023
+            }
+          ],
+          "n_distinct": 73,
+          "target_frac": 0.103,
+          "distractor_frac": 0.897,
+          "other_frac": 0.0
+        }
+      }
+    }
+  },
+  "skipped": {},
+  "headline": {
+    "circuit_logit_diff_with_pressure": 2.838625,
+    "circuit_logit_diff_honest_instruction": 2.212375,
+    "delta": -0.6262499999999998
+  },
+  "seconds": 110.8
+}

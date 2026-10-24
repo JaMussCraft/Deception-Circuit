@@ -1,0 +1,19 @@
+circuit,circuit_kind,expr,task,ablation,eval,metric,value
+D_sdr,atomic,,sdr_v2,interchange,null,accuracy,100.0
+D_sdr,atomic,,sdr_v2,interchange,null,exact_match,100.0
+D_sdr,atomic,,sdr_v2,interchange,null,kl_div,100.0
+D_sdr,atomic,,sdr_v2,interchange,null,logit_diff,100.0
+D_sdr,atomic,,sdr_v2,interchange,pressure,circuit_logit_diff_honest_instruction,-0.609
+D_sdr,atomic,,sdr_v2,interchange,pressure,circuit_logit_diff_with_pressure,2.49475
+D_sdr,atomic,,sdr_v2,interchange,pressure,delta,-3.10375
+D_sdr,atomic,,sdr_v2,interchange,sanity,accuracy,0.924
+D_sdr,atomic,,sdr_v2,interchange,sanity,exact_match,0.926
+D_sdr,atomic,,sdr_v2,interchange,sanity,kl_div,0.13685121408849954
+D_sdr,atomic,,sdr_v2,interchange,sanity,logit_diff,2.49475
+D_sdr_and_H_sdr_suff__leaf,leaf,(D_sdr & H_sdr) | m,sdr_v2,interchange,null,accuracy,100.0
+D_sdr_and_H_sdr_suff__leaf,leaf,(D_sdr & H_sdr) | m,sdr_v2,interchange,null,exact_match,100.0
+D_sdr_and_H_sdr_suff__leaf,leaf,(D_sdr & H_sdr) | m,sdr_v2,interchange,null,kl_div,100.0
+D_sdr_and_H_sdr_suff__leaf,leaf,(D_sdr & H_sdr) | m,sdr_v2,interchange,null,logit_diff,100.0
+D_sdr_and_H_sdr_suff__leaf,leaf,(D_sdr & H_sdr) | m,sdr_v2,interchange,pressure,circuit_logit_diff_honest_instruction,0.281875
+D_sdr_and_H_sdr_suff__leaf,leaf,(D_sdr & H_sdr) | m,sdr_v2,interchange,pressure,circuit_logit_diff_with_pressure,0.309625
+D_sdr_and_H_sdr_suff__leaf,leaf,(D_sdr & H_sdr) | m,sdr_v2,interchange,pressure,delta,-0.027749999999999997

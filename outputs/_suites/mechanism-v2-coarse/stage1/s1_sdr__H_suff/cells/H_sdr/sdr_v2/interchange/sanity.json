@@ -1,0 +1,458 @@
+{
+  "batch_size": 7,
+  "n": 1000,
+  "ablation": "interchange",
+  "granularity": "all",
+  "counts": {
+    "attention_blocks": {
+      "active": 12,
+      "total": 32,
+      "per_layer": {
+        "7": 1,
+        "8": 1,
+        "9": 1,
+        "10": 1,
+        "11": 1,
+        "12": 1,
+        "13": 1,
+        "14": 1,
+        "17": 1,
+        "18": 1,
+        "24": 1,
+        "30": 1
+      }
+    },
+    "attention_heads": {
+      "active": 58,
+      "total": 1024,
+      "per_layer": {
+        "7": 5,
+        "8": 5,
+        "9": 6,
+        "10": 5,
+        "11": 7,
+        "12": 4,
+        "13": 7,
+        "14": 5,
+        "17": 1,
+        "18": 3,
+        "24": 6,
+        "30": 4
+      }
+    },
+    "attention_neurons": {
+      "active": 7424,
+      "total": 131072,
+      "per_layer": {
+        "7": 640,
+        "8": 640,
+        "9": 768,
+        "10": 640,
+        "11": 896,
+        "12": 512,
+        "13": 896,
+        "14": 640,
+        "17": 128,
+        "18": 384,
+        "24": 768,
+        "30": 512
+      }
+    },
+    "mlp_hidden": {
+      "active": 458752,
+      "total": 458752,
+      "per_layer": {
+        "0": 14336,
+        "1": 14336,
+        "2": 14336,
+        "3": 14336,
+        "4": 14336,
+        "5": 14336,
+        "6": 14336,
+        "7": 14336,
+        "8": 14336,
+        "9": 14336,
+        "10": 14336,
+        "11": 14336,
+        "12": 14336,
+        "13": 14336,
+        "14": 14336,
+        "15": 14336,
+        "16": 14336,
+        "17": 14336,
+        "18": 14336,
+        "19": 14336,
+        "20": 14336,
+        "21": 14336,
+        "22": 14336,
+        "23": 14336,
+        "24": 14336,
+        "25": 14336,
+        "26": 14336,
+        "27": 14336,
+        "28": 14336,
+        "29": 14336,
+        "30": 14336,
+        "31": 14336
+      }
+    },
+    "mlp_output": {
+      "active": 131072,
+      "total": 131072,
+      "per_layer": {
+        "0": 4096,
+        "1": 4096,
+        "2": 4096,
+        "3": 4096,
+        "4": 4096,
+        "5": 4096,
+        "6": 4096,
+        "7": 4096,
+        "8": 4096,
+        "9": 4096,
+        "10": 4096,
+        "11": 4096,
+        "12": 4096,
+        "13": 4096,
+        "14": 4096,
+        "15": 4096,
+        "16": 4096,
+        "17": 4096,
+        "18": 4096,
+        "19": 4096,
+        "20": 4096,
+        "21": 4096,
+        "22": 4096,
+        "23": 4096,
+        "24": 4096,
+        "25": 4096,
+        "26": 4096,
+        "27": 4096,
+        "28": 4096,
+        "29": 4096,
+        "30": 4096,
+        "31": 4096
+      }
+    }
+  },
+  "label": "discovered circuit",
+  "rows": {
+    "full_open": {
+      "accuracy": 1.0,
+      "logit_diff": 2.936625,
+      "kl_div": 0.0,
+      "exact_match": 1.0,
+      "n": 1000
+    },
+    "discovered": {
+      "accuracy": 0.942,
+      "logit_diff": 2.838625,
+      "kl_div": 0.16124264085292817,
+      "exact_match": 0.944,
+      "n": 1000,
+      "argmax": {
+        "top": [
+          {
+            "id": 35358,
+            "token": " joints",
+            "count": 45,
+            "frac": 0.045
+          },
+          {
+            "id": 48913,
+            "token": " vibration",
+            "count": 44,
+            "frac": 0.044
+          },
+          {
+            "id": 51045,
+            "token": " beams",
+            "count": 38,
+            "frac": 0.038
+          },
+          {
+            "id": 27035,
+            "token": " floors",
+            "count": 34,
+            "frac": 0.034
+          },
+          {
+            "id": 9699,
+            "token": " steel",
+            "count": 32,
+            "frac": 0.032
+          },
+          {
+            "id": 27460,
+            "token": " bonds",
+            "count": 32,
+            "frac": 0.032
+          },
+          {
+            "id": 11376,
+            "token": " vision",
+            "count": 31,
+            "frac": 0.031
+          },
+          {
+            "id": 23301,
+            "token": " stocks",
+            "count": 29,
+            "frac": 0.029
+          },
+          {
+            "id": 14620,
+            "token": " walls",
+            "count": 28,
+            "frac": 0.028
+          },
+          {
+            "id": 2673,
+            "token": " height",
+            "count": 26,
+            "frac": 0.026
+          },
+          {
+            "id": 4785,
+            "token": " weight",
+            "count": 25,
+            "frac": 0.025
+          },
+          {
+            "id": 27861,
+            "token": " trucks",
+            "count": 24,
+            "frac": 0.024
+          }
+        ],
+        "n_distinct": 76,
+        "target_frac": 0.944,
+        "distractor_frac": 0.052,
+        "other_frac": 0.004
+      }
+    },
+    "discovered_repo": {
+      "accuracy": 0.942,
+      "logit_diff": 2.838625,
+      "kl_div": 0.1612792568206787,
+      "exact_match": 0.944
+    },
+    "empty": {
+      "accuracy": 0.0,
+      "logit_diff": -2.832875,
+      "kl_div": 2.3660349884033205,
+      "exact_match": 0.0,
+      "n": 1000,
+      "argmax": {
+        "top": [
+          {
+            "id": 51045,
+            "token": " beams",
+            "count": 45,
+            "frac": 0.045
+          },
+          {
+            "id": 35358,
+            "token": " joints",
+            "count": 38,
+            "frac": 0.038
+          },
+          {
+            "id": 38193,
+            "token": " humidity",
+            "count": 37,
+            "frac": 0.037
+          },
+          {
+            "id": 14620,
+            "token": " walls",
+            "count": 34,
+            "frac": 0.034
+          },
+          {
+            "id": 27460,
+            "token": " bonds",
+            "count": 32,
+            "frac": 0.032
+          },
+          {
+            "id": 11011,
+            "token": " hearing",
+            "count": 31,
+            "frac": 0.031
+          },
+          {
+            "id": 23301,
+            "token": " stocks",
+            "count": 30,
+            "frac": 0.03
+          },
+          {
+            "id": 27035,
+            "token": " floors",
+            "count": 28,
+            "frac": 0.028
+          },
+          {
+            "id": 48913,
+            "token": " vibration",
+            "count": 28,
+            "frac": 0.028
+          },
+          {
+            "id": 9168,
+            "token": " glass",
+            "count": 27,
+            "frac": 0.027
+          },
+          {
+            "id": 4785,
+            "token": " weight",
+            "count": 27,
+            "frac": 0.027
+          },
+          {
+            "id": 2673,
+            "token": " height",
+            "count": 24,
+            "frac": 0.024
+          }
+        ],
+        "n_distinct": 75,
+        "target_frac": 0.0,
+        "distractor_frac": 1.0,
+        "other_frac": 0.0
+      }
+    }
+  },
+  "reference": {
+    "node_eval": {
+      "accuracy": 0.942,
+      "logit_diff": 2.832375,
+      "kl_div": 0.16297016906738282,
+      "exact_match": 0.944
+    },
+    "baseline": {
+      "accuracy": 0.999,
+      "logit_diff": 2.934125,
+      "kl_div": 0.0,
+      "exact_match": 1.0
+    }
+  },
+  "cross_check": {
+    "ran": true,
+    "ok": true,
+    "max_delta": 3.6615967750536216e-05,
+    "per_metric": {
+      "accuracy": {
+        "generic": 0.942,
+        "repo": 0.942,
+        "delta": 0.0,
+        "tolerance": 1e-06,
+        "pass": true
+      },
+      "exact_match": {
+        "generic": 0.944,
+        "repo": 0.944,
+        "delta": 0.0,
+        "tolerance": 1e-06,
+        "pass": true
+      },
+      "logit_diff": {
+        "generic": 2.838625,
+        "repo": 2.838625,
+        "delta": 0.0,
+        "tolerance": 0.0001,
+        "pass": true
+      },
+      "kl_div": {
+        "generic": 0.16124264085292817,
+        "repo": 0.1612792568206787,
+        "delta": 3.6615967750536216e-05,
+        "tolerance": 0.0001,
+        "pass": true
+      }
+    }
+  },
+  "all_open": {
+    "ok": true,
+    "kl_div": 0.0,
+    "exact_match": 1.0,
+    "tolerances": {
+      "kl_div": 0.0001,
+      "exact_match_min": 0.999
+    }
+  },
+  "delta": {
+    "ok": true,
+    "max_delta": 0.006250000000000089,
+    "rows": [
+      {
+        "metric": "accuracy",
+        "label": "Accuracy",
+        "expected": 0.942,
+        "observed": 0.942,
+        "delta": 0.0,
+        "tolerance": 0.002,
+        "pass": true
+      },
+      {
+        "metric": "logit_diff",
+        "label": "Logit Diff",
+        "expected": 2.832375,
+        "observed": 2.838625,
+        "delta": 0.006250000000000089,
+        "tolerance": 0.01,
+        "pass": true
+      },
+      {
+        "metric": "kl_div",
+        "label": "KL Div",
+        "expected": 0.16297016906738282,
+        "observed": 0.16124264085292817,
+        "delta": -0.0017275282144546544,
+        "tolerance": 0.005,
+        "pass": true
+      },
+      {
+        "metric": "exact_match",
+        "label": "Exact Match",
+        "expected": 0.944,
+        "observed": 0.944,
+        "delta": 0.0,
+        "tolerance": 0.002,
+        "pass": true
+      }
+    ]
+  },
+  "headline": {
+    "accuracy": 0.942,
+    "logit_diff": 2.838625,
+    "kl_div": 0.16124264085292817,
+    "exact_match": 0.944
+  },
+  "verification": {
+    "masks_roundtrip": true,
+    "all_open_equals_full": true,
+    "generic_vs_task_evaluate_max_delta": 3.6615967750536216e-05,
+    "granularity": "all",
+    "reference_numbers": {
+      "source": "results.json:node_eval",
+      "expected": {
+        "accuracy": 0.942,
+        "logit_diff": 2.832375,
+        "kl_div": 0.16297016906738282,
+        "exact_match": 0.944
+      },
+      "observed": {
+        "accuracy": 0.942,
+        "logit_diff": 2.838625,
+        "kl_div": 0.16124264085292817,
+        "exact_match": 0.944
+      },
+      "max_delta": 0.006250000000000089,
+      "ok": true
+    }
+  },
+  "seconds": 51.2
+}

@@ -599,3 +599,44 @@ def test_test_set_comes_from_task_from_never_from_the_operand_config(cells, monk
     _, bindings, _, configs, _ = circuits.resolve_circuits(cli)
     (spec,) = circuits.resolve_tasks(cli, bindings, configs)
     assert (spec.args.task, circuits.condition_of(spec.args)) == ("sdr_v2", "honest")
+
+
+# ---------------------------------------------------------------- stage1_results.py
+
+FC_SUFF = os.path.join(MAIN, "outputs/_suites/format-control-sdr-coarse-nls0.3/cells/D/sdr/interchange")
+DRIFT_KO = os.path.join(REPO, "outputs/_suites/mechanism-v2-coarse/control/drift_sdr_coarse_D_hko/cells/D_hko__leaf/"
+                        "sdr/interchange")
+
+
+@pytest.mark.skipif(not os.path.isdir(FC_SUFF), reason="main-checkout format-control cell not available")
+def test_sufficiency_metrics_read_a_real_coarse_cell():
+    s = _mod("stage1_results").suff_metrics(FC_SUFF)
+    # literals from that cell's null.json / pressure.json / sanity.json (v1 coarse SDR D, format-control suite)
+    assert s["circuit"]["accuracy"] == 0.967 and s["circuit"]["exact_match"] == 0.974
+    assert s["full"]["accuracy"] == 1.0 and s["empty"]["accuracy"] == 0.0
+    assert s["null_mean"]["accuracy"] == 0.0 and s["null_beats_all"] == 4
+    assert s["pressure"]["no_pressure"]["circuit_accuracy"] == 0.357
+    assert s["sanity"]["ok"] is True
+
+
+@pytest.mark.skipif(not os.path.isdir(DRIFT_KO), reason="drift-control result not fetched")
+def test_knockout_metrics_read_the_drift_cell():
+    k = _mod("stage1_results").ko_metrics(DRIFT_KO)
+    assert k["knockout"]["accuracy"] == 0.003 and k["separated"] == 2 and k["flipped_honest"] == 997
+    assert k["wikitext"]["null_percentile"] == 45.0
+    assert k["variants"]["no_pressure.full_accuracy"] == 0.224
+
+
+def test_dh_call_is_strong_only_on_4_of_4_separation():
+    sr = _mod("stage1_results")
+    base = [{"label": "D_far", "present": True, "full": {"accuracy": 1.0}},
+            {"label": "D_far_hko", "present": True, "knockout": {"accuracy": 0.0}, "separated": 4}]
+
+    def dmh(acc, sep):
+        return {"label": "D_far_minus_H_far_hko", "present": True, "heads": 26, "knockout": {"accuracy": acc},
+                "null_mean": {"accuracy": 0.6}, "separated": sep, "flipped_honest": 700}
+    strong = sr.dh_call(base + [dmh(0.25, 4)], "far")
+    assert strong["strong"] and strong["recommend_conditional"] and strong["share_of_D_effect"] == 0.75
+    weak = sr.dh_call(base + [dmh(0.25, 3)], "far")
+    assert not weak["strong"] and not weak["recommend_conditional"]
+    assert sr.dh_call(base, "far")["status"] == "missing"
