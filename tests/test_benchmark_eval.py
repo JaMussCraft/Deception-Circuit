@@ -1512,3 +1512,110 @@ def test_a_genuine_5xx_is_still_transient(monkeypatch, capsys):
     _judge_gate(monkeypatch,
                 "InternalServerError: Error code: 503 - upstream unavailable")
     assert "transient" in capsys.readouterr().out
+
+
+def test_opt_in_lean_configs_have_no_hidden_states():
+    ctx = SimpleNamespace(cli=SimpleNamespace(benchmark_configs=['full','knockout']),
+                          knockout_masks={'x':'ko'})
+    configs=list(B.BenchmarkEvaluation()._configs(ctx))
+    assert configs == [('full',None),('knockout',{'x':'ko'})]
+
+
+def test_explicit_judge_cache_path(tmp_path):
+    ctx=SimpleNamespace(cli=SimpleNamespace(benchmark_judge_cache=str(tmp_path/'fixed.jsonl')))
+    assert B.judge_cache_path(ctx)==str(tmp_path/'fixed.jsonl')
+
+
+def test_incomplete_block_has_no_headline():
+    assert B.headline_of({'x':{'complete':False,'configs':{'knockout':{
+        'rates':{'deceptive':0}}}}})=={}
+
+
+def test_paid_preflight_uses_same_reviewed_ledger(monkeypatch, tmp_path):
+    import evaluate_circuit as E
+    import evaluation.benchmarks as benchmarks
+    import evaluation.benchmarks.judge as judge
+    path=tmp_path/'ledger.jsonl'
+    path.write_text(json.dumps(dict(schema=1,reviewed=True,max_usd=20,max_paid_attempts=5000))+'\n')
+    bench=SimpleNamespace(judge_spec=lambda: {'provider':'openrouter','model':'openai/gpt-4o'})
+    monkeypatch.setattr(E,'expand',lambda _: ['fake'])
+    monkeypatch.setattr(benchmarks,'get_benchmark',lambda _: bench)
+    seen=[]
+    def run(client, requests):
+        seen.append(client.budget.path if client.budget else None)
+        return [judge.JudgeResult(text='ok') for _ in requests]
+    monkeypatch.setattr(judge.JudgeClient,'run',run)
+    E.check_judges_answer(make_cli(judge_budget_ledger=str(path)))
+    assert seen==[str(path)]
+
+
+@pytest.mark.parametrize("cli_tokens", [NEW_TOKENS, 1])
+def test_fixed_cohort_regenerates_intact_and_used_native_donors_without_screen(monkeypatch, cli_tokens):
+    from contextlib import nullcontext
+    import evaluation.fixed_benchmark_cohort as cohort
+    recipient=base.BenchmarkItem('recipient',[{'role':'user','content':'pressure'}],
+                                condition=base.DECEPTIVE,belief='known')
+    donor=base.BenchmarkItem('donor',[{'role':'user','content':'honest'}])
+    data=dict(items=[recipient.to_json()],prompts=[B.render_messages(FakeTokenizer(),recipient.messages)],pool_items=[donor.to_json()],
+              partner_index=[0],pairing='derangement',new_tokens=NEW_TOKENS,
+              selection_provenance={'historical_gpu':'A40'})
+    monkeypatch.setattr(cohort,'load_fixed_cohort',lambda path,dataset:data)
+    monkeypatch.setattr(B,'run_screen',lambda *a: pytest.fail('must not rescreen'))
+    monkeypatch.setattr(B,'eos_ids_for',lambda model:[EOS])
+    monkeypatch.setattr('evaluation.screen_cache.device_stamp',lambda cli:{'name':'H200'})
+    calls=[]
+    def generate(ctx, **kwargs):
+        calls.append(kwargs)
+        return torch.cat([kwargs['clean_ids'],torch.full((len(kwargs['clean_ids']),NEW_TOKENS),3)],dim=1)
+    monkeypatch.setattr(B,'generate_under',generate)
+    ctx=SimpleNamespace(cli=make_cli(benchmark_fixed_cohort='fixed.json',benchmark_new_tokens=cli_tokens),
+                        tokenizer=FakeTokenizer(),node_model=None,
+                        all_gates_open=nullcontext)
+    bench=SimpleNamespace(new_tokens=NEW_TOKENS)
+    screen=B.fixed_cohort_screen(ctx,bench,None,'fake')
+    assert len(calls)==2
+    assert len(screen.items)==1
+    assert screen.items[0].belief=='known'
+    assert screen.partner_ids==['donor']
+    assert screen.selection_provenance=={'historical_gpu':'A40'}
+    assert screen.execution_provenance['device']=={'name':'H200'}
+    assert screen.cache_provenance['hit'] is False
+    assert screen.stats['screened']==0
+    assert screen.full_rows==[]
+    data['prompts']=['changed historical chat template']
+    with pytest.raises(ValueError, match='rendered recipient prompts'):
+        B.fixed_cohort_screen(ctx,bench,None,'fake')
+    assert len(calls)==2
+
+
+def test_frozen_runtime_has_exactly_five_effective_configs(monkeypatch):
+    import evaluation.frozen_head_masks as frozen
+    masks={name:{'attention_heads':np.array([1,0],dtype=np.uint8)}
+           for name in ['oldD69','new-allW23','new-allW30','random30']}
+    monkeypatch.setattr(frozen,'load_frozen_masks',lambda path:masks)
+    ctx=SimpleNamespace(cli=make_cli(benchmark_frozen_masks='frozen.json'))
+    configs=list(B.BenchmarkEvaluation()._configs(ctx))
+    assert [name for name,_ in configs]==['full','oldD69','new-allW23','new-allW30','random30']
+    assert configs[0][1] is None
+
+
+def test_frozen_headline_uses_only_predeclared_primary_after_complete_coverage():
+    rates=lambda x: {'rates':{'deceptive':x}}
+    complete={'complete':True,'requested_configs':['full','oldD69','new-allW23','new-allW30','random30'],
+              'configs':{'full':rates(.9),'oldD69':rates(.4),'new-allW23':rates(.2),
+                         'new-allW30':rates(.3),'random30':rates(.1)}}
+    assert B.headline_of({'fixed':complete})=={'fixed':.3}
+    complete['complete']=False
+    assert B.headline_of({'fixed':complete})=={}
+
+
+def test_scoring_coverage_separates_model_nonassertion_from_missing_judgement():
+    rows=[{'label':'unparsed','raw':'evasive:D'},
+          {'label':'unparsed','raw':'empty_response'},
+          {'label':'unparsed','raw':'invalid_judge'},
+          {'label':'unparsed','raw':'judge-failed','judge_error':'timeout'}]
+    coverage=B.scoring_coverage(rows,4)
+    assert coverage['complete'] is False
+    assert coverage['judge_errors']==1
+    assert coverage['unscored']==2
+    assert B.scoring_coverage(rows[:2],2)['complete'] is True

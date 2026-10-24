@@ -694,11 +694,21 @@ def test_every_benchmark_flag_is_either_keyed_or_deliberately_not(monkeypatch):
         # Configuration-side only: these shape the ablated passes, not the
         # screen, which runs with every gate open.
         "benchmark_n_random", "benchmark_coherence_batch_size",
+        # Frozen masks / explicit config lists alter only ablated passes;
+        # the stock screen remains all-open, independent of those removals.
+        "benchmark_configs", "benchmark_frozen_masks",
+        # Historical fixed cohorts select a different, explicit loader. They
+        # bypass stock screen-cache lookup/save rather than relaxing its key.
+        "benchmark_fixed_cohort",
         # The cache's own controls.
         "benchmark_screen_cache", "benchmark_refresh_screen",
         "no_benchmark_screen_cache",
         # Judge plumbing and dry runs: no effect on a generated screen.
         "judge_dry_run", "judge_concurrency", "skip_judge_check",
+        # Verdict storage / spend authorization do not alter official judge
+        # request fingerprints. Frozen mode binds its imported cache separately;
+        # stock budget stops raise before save, never cache a shortened screen.
+        "benchmark_judge_cache", "judge_budget_ledger",
         # Read by no adapter; see the note on --benchmark-belief-model.
         "benchmark_belief_model",
     }
@@ -842,3 +852,71 @@ def test_the_run_survives_a_dataset_it_cannot_fingerprint(tmp_path,
     assert screen.cache_provenance["hit"] is False
     assert "unfingerprintable" in screen.cache_provenance["reason"]
     assert not os.path.exists(str(tmp_path / "screens" / "fake"))
+
+
+@pytest.mark.parametrize("flag,value", [
+    ("benchmark_configs", ["full", "knockout"]),
+    ("benchmark_frozen_masks", "/study/frozen-masks.json"),
+    ("benchmark_fixed_cohort", "/study/fixed-cohort.json"),
+    ("benchmark_judge_cache", "/study/imported-cache.jsonl"),
+    ("judge_budget_ledger", "/study/reviewed-budget.jsonl"),
+])
+def test_frozen_control_flags_do_not_relax_stock_screen_key(tmp_path, flag, value):
+    original = cache_cli(tmp_path)
+    changed = cache_cli(tmp_path, **{flag: value})
+    assert getattr(original, flag, None) != value
+    assert screen_cache.key_hash(a_key(original)) == screen_cache.key_hash(a_key(changed))
+
+
+def test_fixed_cohort_consumer_dispatch_never_consults_stock_screen_cache(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+    bench = FakeBench(make_items(4), _even_are_deceptive)
+    monkeypatch.setattr(B, "get_benchmark", lambda name: bench)
+    def forbidden(*args, **kwargs):
+        pytest.fail("fixed cohort must not consult stock screening/cache")
+    monkeypatch.setattr(B, "cached_screen", forbidden)
+    monkeypatch.setattr(B, "run_screen", forbidden)
+    monkeypatch.setattr(screen_cache, "load", forbidden)
+    monkeypatch.setattr(screen_cache, "save", forbidden)
+    selected = []
+    def screen_for(dataset, loader, *args):
+        selected.append(loader)
+        assert loader is B.fixed_cohort_screen
+        raise RuntimeError("fixed loader selected before generation")
+    ctx = SimpleNamespace(cli=cache_cli(tmp_path, benchmark_fixed_cohort="frozen.json"),
+                          session=SimpleNamespace(screen_for=screen_for))
+    with pytest.raises(RuntimeError, match="fixed loader selected"):
+        B.BenchmarkEvaluation()._run_dataset(ctx, "fake", None)
+    assert selected == [B.fixed_cohort_screen]
+
+
+def test_budget_stop_after_partial_stock_screen_propagates_without_saving(tmp_path, monkeypatch):
+    from evaluation.benchmarks.judge_budget import BudgetExceeded
+    # One deceptive row per first eight-item chunk leaves the target unfilled;
+    # the second judging call then stops after genuine partial screen progress.
+    judged_deceptive = []
+    def rare_deception(item, response):
+        # i4 is in the first shuffled chunk under the fixed screen seed0.
+        deceptive = item.item_id == "i4"
+        if deceptive:
+            judged_deceptive.append(item.item_id)
+        return (base.DECEPTIVE if deceptive else base.HONEST), "local"
+    bench = FakeBench(make_items(20), rare_deception)
+    cli = cache_cli(tmp_path, benchmark_n_per_dataset=4,
+                    judge_budget_ledger="reviewed-budget.jsonl")
+    ctx = make_ctx(cli)
+    calls = []
+    class StopOnSecondChunk:
+        def run(self, requests):
+            calls.append(len(requests))
+            if len(calls) == 2:
+                raise BudgetExceeded("paid-attempt cap")
+            return [None] * len(requests)
+    def forbidden_save(*args, **kwargs):
+        pytest.fail("budget-stopped partial screen must never be cached")
+    monkeypatch.setattr(screen_cache, "save", forbidden_save)
+    with pytest.raises(BudgetExceeded, match="paid-attempt cap"):
+        B.cached_screen(ctx, bench, StopOnSecondChunk(), "fake")
+    assert calls == [8, 8]
+    assert judged_deceptive == ["i4"], "fixture must reach a genuinely selected partial cohort"
+    assert not list((tmp_path / "screens").rglob("*.pt"))

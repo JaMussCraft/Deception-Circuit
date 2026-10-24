@@ -29,6 +29,8 @@ import json
 import os
 import sys
 
+from .judge_budget import BudgetExceeded, routing_body
+
 
 BASE_URLS = {"openai": None,                                # library default
              "openrouter": "https://openrouter.ai/api/v1"}
@@ -67,13 +69,31 @@ def is_transient(exc):
     return status == 429 or (isinstance(status, int) and status >= 500)
 
 
+class JudgeCompletion:
+    """Transport text plus billing metadata (plain text transports still work)."""
+    def __init__(self, text, usage=None, response_id=None):
+        self.text, self.usage, self.response_id = text, usage, response_id
+
+
+def _completion(text, completion):
+    usage = getattr(completion, "usage", None)
+    if usage is not None and hasattr(usage, "model_dump"):
+        usage = usage.model_dump(mode="json")
+    elif usage is not None and hasattr(usage, "dict"):
+        usage = usage.dict()
+    if not isinstance(usage, dict):
+        usage = None
+    return JudgeCompletion(text, usage, getattr(completion, "id", None))
+
+
 class JudgeResult(object):
     """One judge verdict. `text` is None exactly when `error` is set."""
 
-    __slots__ = ("text", "error", "cached", "model", "provider")
+    __slots__ = ("text", "error", "cached", "model", "provider", "usage", "response_id")
 
     def __init__(self, text=None, error=None, cached=False,
-                 model=None, provider=None):
+                 model=None, provider=None, usage=None, response_id=None):
+        self.usage, self.response_id = usage, response_id
         self.text = text
         self.error = error
         self.cached = cached
@@ -86,7 +106,8 @@ class JudgeResult(object):
 
     def to_json(self):
         return {"text": self.text, "error": self.error, "cached": self.cached,
-                "model": self.model, "provider": self.provider}
+                "model": self.model, "provider": self.provider,
+                "usage": self.usage, "response_id": self.response_id}
 
     def __repr__(self):
         if self.error:
@@ -104,6 +125,43 @@ def request_key(request):
     blob = json.dumps(request.cache_payload(), sort_keys=True,
                       ensure_ascii=False)
     return hashlib.sha256(blob.encode("utf-8")).hexdigest()
+
+
+def validate_study_cache(cohort_path, cache_path):
+    """Require the frozen imported copy; resume only by append to its prefix."""
+    from evaluation.frozen_head_masks import read_json, digest
+    try:
+        data = read_json(cohort_path)
+        if data.get("content_sha256") != digest({k:v for k,v in data.items()
+                                                 if k != "content_sha256"}):
+            raise ValueError("cohort receipt hash differs")
+        receipt = data["judge_cache_import"]
+        expected = receipt["output"]
+        size = receipt["imported_bytes"]
+        if type(size) is not int or size <= 0:
+            raise ValueError("missing imported cache byte count")
+        if os.path.realpath(cache_path) != os.path.realpath(expected["path"]):
+            raise ValueError("study cache differs from frozen imported output path")
+        for row in receipt["sources"]:
+            source = row["source"]["path"]
+            if os.path.samefile(cache_path, source):
+                raise ValueError("refusing to append to a historical cache")
+        with open(cache_path, "rb") as handle:
+            prefix = handle.read(size)
+            appended = handle.read()
+        if (len(prefix) != size or hashlib.sha256(prefix).hexdigest() != expected["sha256"]
+                or not prefix.endswith(b"\n")):
+            raise ValueError("frozen imported cache prefix differs")
+        if appended and not appended.endswith(b"\n"):
+            raise ValueError("torn appended cache row")
+        for line in appended.decode("utf-8").splitlines():
+            row = json.loads(line)
+            if (set(row) != {"key", "text"} or not isinstance(row["text"], str)
+                    or not isinstance(row["key"], str) or len(row["key"]) != 64
+                    or any(c not in "0123456789abcdef" for c in row["key"])):
+                raise ValueError("invalid appended study cache row")
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        raise BudgetExceeded("study cache import/append lineage validation failed: %s" % exc) from exc
 
 
 class JudgeCache(object):
@@ -163,7 +221,9 @@ class JudgeClient(object):
     """
 
     def __init__(self, cache_path=None, concurrency=8, max_retries=6,
-                 initial_delay=2.0, verbose=True, transport=None):
+                 initial_delay=2.0, verbose=True, transport=None, budget=None):
+        self.budget = budget
+        self._budget_stopped = False
         self.cache = JudgeCache(cache_path)
         self.concurrency = max(1, int(concurrency))
         self.max_retries = max(1, int(max_retries))
@@ -187,6 +247,8 @@ class JudgeClient(object):
                 "%s is not set; it is required to judge with provider %r"
                 % (KEY_ENV[provider], provider))
         kwargs = {"api_key": key}
+        if self.budget is not None:
+            kwargs["max_retries"] = 0  # every physical attempt must reserve first
         if BASE_URLS[provider]:
             kwargs["base_url"] = BASE_URLS[provider]
         client = AsyncOpenAI(**kwargs)
@@ -199,13 +261,22 @@ class JudgeClient(object):
             return await self._transport(request)
         client = self._client(request.provider)
         kwargs = dict(request.kwargs)
+        if self.budget is not None:
+            kwargs["extra_body"] = routing_body(request)
         if request.schema is not None:
-            return await _structured_call(client, request, kwargs)
-        kwargs = adapt_kwargs(client, kwargs)
+            if self.budget is not None and not supports_structured_parse(client):
+                raise BudgetExceeded("guarded structured judging requires SDK parse support")
+            return await _structured_call(client, request, kwargs,
+                                          return_metadata=self.budget is not None)
+        adapted = adapt_kwargs(client, kwargs)
+        if self.budget is not None and adapted != kwargs:
+            raise BudgetExceeded("SDK cannot preserve guarded request parameters")
+        kwargs = adapted
         completion = await client.chat.completions.create(
             model=request.model, messages=request.messages, **kwargs)
         text = completion.choices[0].message.content
-        return (text or "").strip()
+        text = (text or "").strip()
+        return _completion(text, completion) if self.budget is not None else text
 
     async def _one(self, request, semaphore):
         key = request_key(request)
@@ -218,12 +289,29 @@ class JudgeClient(object):
         for attempt in range(self.max_retries):
             try:
                 async with semaphore:
-                    text = await self._call(request)
+                    if self._budget_stopped:
+                        raise BudgetExceeded("global judge budget stopped")
+                    reservation = (self.budget.reserve(request, key)
+                                   if self.budget is not None else None)
+                    completion = None
+                    try:
+                        value = await self._call(request)
+                        completion = (value if isinstance(value, JudgeCompletion)
+                                      else JudgeCompletion(value))
+                    finally:
+                        if reservation is not None:
+                            self.budget.settle(reservation,
+                                completion.usage if completion else None,
+                                completion.response_id if completion else None)
+                    text = completion.text
                 if not text:
                     # An empty completion is a failure, not a verdict: parsed
                     # as text it would fall through to `unparsed` and look like
                     # a model-behaviour result instead of an API one.
                     raise RuntimeError("empty judge completion")
+            except BudgetExceeded:
+                self._budget_stopped = True
+                raise
             except Exception as exc:                # noqa: BLE001 — reported
                 last = "%s: %s" % (type(exc).__name__, exc)
                 if attempt == self.max_retries - 1 or not is_transient(exc):
@@ -235,7 +323,8 @@ class JudgeClient(object):
                 delay *= 2
                 continue
             result = JudgeResult(text=text, model=request.model,
-                                 provider=request.provider)
+                                 provider=request.provider, usage=completion.usage,
+                                 response_id=completion.response_id)
             try:
                 # Outside the try above on purpose. A read-only scratch mount
                 # or a full quota must not be mistaken for an API failure and
@@ -286,8 +375,23 @@ class JudgeClient(object):
         try:
             # gather preserves input order, which is what lets the caller zip
             # the results straight back onto its items.
-            return await asyncio.gather(*[self._one(r, semaphore)
-                                          for r in requests])
+            tasks = []
+            pending = {}
+            for request in requests:
+                key = request_key(request)
+                if self.budget is not None and key in pending:
+                    tasks.append(pending[key])
+                else:
+                    task = asyncio.create_task(self._one(request, semaphore))
+                    tasks.append(task)
+                    pending[key] = task
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+            # Drain paid pending calls before propagating the stop, preserving
+            # their cache/usage records rather than cancelling billed work.
+            for result in results:
+                if isinstance(result, BaseException):
+                    raise result
+            return results
         finally:
             await self._aclose_clients()
 
@@ -320,8 +424,11 @@ class JudgeClient(object):
         return out
 
     def stats(self):
-        return {"cache_hits": self.cache.hits, "cache_writes": self.cache.writes,
-                "cache_path": self.cache.path, "concurrency": self.concurrency}
+        out = {"cache_hits": self.cache.hits, "cache_writes": self.cache.writes,
+               "cache_path": self.cache.path, "concurrency": self.concurrency}
+        if self.budget is not None:
+            out["budget"] = self.budget.stats()
+        return out
 
 
 def _run_sync(coro):
@@ -409,7 +516,7 @@ def supports_structured_parse(client):
     return completions is not None and hasattr(completions, "parse")
 
 
-async def _structured_call(client, request, kwargs):
+async def _structured_call(client, request, kwargs, return_metadata=False):
     if request.schema != "numerical_range":
         raise ValueError("unknown judge schema %r" % (request.schema,))
     if supports_structured_parse(client):
@@ -424,8 +531,11 @@ async def _structured_call(client, request, kwargs):
             model=request.model, messages=request.messages,
             response_format=NumericalRange, **kwargs)
         parsed = completion.choices[0].message.parsed
-        return json.dumps({"lower_bound": parsed.lower_bound,
+        if parsed is None and return_metadata:
+            return _completion("", completion)
+        text = json.dumps({"lower_bound": parsed.lower_bound,
                            "upper_bound": parsed.upper_bound})
+        return _completion(text, completion) if return_metadata else text
     messages = list(request.messages)
     messages.append({"role": "user",
                      "content": STRUCTURED_FALLBACK_INSTRUCTION})
@@ -433,4 +543,5 @@ async def _structured_call(client, request, kwargs):
     plain.pop("reasoning_effort", None)      # rejected by non-reasoning models
     completion = await client.chat.completions.create(
         model=request.model, messages=messages, **plain)
-    return (completion.choices[0].message.content or "").strip()
+    text = (completion.choices[0].message.content or "").strip()
+    return _completion(text, completion) if return_metadata else text
