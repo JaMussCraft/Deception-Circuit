@@ -41,8 +41,22 @@ if [ "$#" -lt 1 ]; then
     exit 2
 fi
 
-# Activate your environment here if needed, e.g.:
+# Cluster profile (scripts/cluster/<name>.env). Unset DC_CLUSTER means Delta, whose
+# profile reproduces this wrapper's behaviour from before profiles existed. #SBATCH
+# lines cannot read variables, so the header above stays Delta's; other clusters put
+# -A/-p/the GPU option/-t on the sbatch command line (scripts/remote/b2.sh does).
+profile="scripts/cluster/${DC_CLUSTER:-delta}.env"
+if [ ! -f "$profile" ]; then
+    echo "unknown cluster profile: $profile (DC_CLUSTER=${DC_CLUSTER:-})" >&2
+    exit 2
+fi
+source "$profile"
+
 set +u
-source ~/.bashrc && conda activate mgnp
+eval "$DC_ACTIVATE"
 set -u
+export HF_HOME="$DC_HF_HOME"
+if [ "$DC_HF_OFFLINE" = "1" ]; then
+    export HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 TRANSFORMERS_OFFLINE=1
+fi
 python evaluate_circuit.py "$@"
