@@ -85,16 +85,53 @@ from dataset.report_utils import margin_summary  # noqa: E402
 
 TASKS = ("far_v2", "sdr_v2", "ser_v2")
 FORMS = ("act", "predicate", "other")
+#: The primary pool (R22): directive transparent clauses, instructions to the assistant inside an
+#: explicit game frame ("For this quiz, answer with the wrong result.").
 POOL_PATH = os.path.join(v2.V2_POOLS_DIR, "inversion_v2.json")
-#: The condition id (impl-02a binds `deception_condition: inversion` -> `<task>_inversion`).
+#: The secondary pool (R20, kept by R22 as a finding): a reported wish of the asker ("In this quiz
+#: the reviewer wants the wrong result."). Byte-identical to the pool scored by Bridges-2 job
+#: 49824662, so the style is recorded here and not in the file.
+REPORTED_POOL_PATH = os.path.join(v2.V2_POOLS_DIR, "inversion_v2_reported.json")
+#: The primary condition id (impl-02a binds `deception_condition: inversion` -> `<task>_inversion`).
 CONDITION = "inversion"
+#: Condition id -> its pool, the pool's style, its work subdirectory and its dataset suffix.
+CONDITIONS = {
+    "inversion": {"pool": POOL_PATH, "style": "directive", "work_subdir": "directive",
+                  "name": "Instructed-Inversion Condition (I), directive pool"},
+    "inversion_reported": {"pool": REPORTED_POOL_PATH, "style": "reported",
+                           "work_subdir": "reported",
+                           "name": "Instructed-Inversion Condition, reported-wish pool "
+                                   "(secondary, R22)"},
+}
+STYLES = ("directive", "reported")
 SLOT_KIND = "transparent"
 
-#: R20: every clause carries a knowledge marker (the asker knows the answer) or an intent / game
-#: marker, so that naming the requested item cannot work as misleading advice. "openly" alone
-#: does not count.
+#: R20: every reported clause carries a knowledge marker (the asker knows the answer) or an
+#: intent / game marker, so that naming the requested item cannot work as misleading advice.
+#: "openly" alone does not count.
 TRANSPARENCY_MARKERS = ("knows", "knowingly", "already knows", "already has",
                         "on purpose", "drill", "quiz", "quizzing", "game", "testing")
+#: R22: a directive clause needs an explicit game / intent frame; a knowledge marker frames a
+#: reported wish and is not enough.
+GAME_MARKERS = ("on purpose", "drill", "quiz", "quizzing", "game", "testing")
+#: R22: a directive clause instructs the assistant, like D's clauses: its first word, or the first
+#: word after the frame's comma (optionally after "so"), is one of these verbs.
+DIRECTIVE_VERBS = frozenset({
+    "answer", "name", "give", "show", "point", "steer", "direct", "guide", "send", "reply",
+    "respond", "pick", "choose", "recommend", "state", "put", "offer",
+})
+#: A directive clause reports no wish of the asker (that is the reported style).
+REPORTED_WISH_WORDS = frozenset({
+    "want", "wants", "wanted", "ask", "asks", "asked", "request", "requests", "requested",
+    "wish", "wishes", "wished", "knows", "knew", "knowingly",
+})
+#: R22: no motive to mislead anyone: the neutral-sentence consequence / reward / threat /
+#: conditional lists of `clause_screen`, plus the motive words of the D clauses.
+MOTIVE_WORDS = (cs.CONSEQUENCE_WORDS | cs.REWARD_WORDS | cs.THREAT_WORDS | cs.CONDITIONAL_WORDS
+                | frozenset({"protect", "protects", "reputation", "firm", "company", "deal",
+                             "sale", "sell", "profit", "blame", "trouble", "worry", "worried",
+                             "alarm", "image", "management", "boss", "manager", "impress",
+                             "please", "upset", "best", "good", "looks"}))
 #: No clause may tell the model to mislead, hide or pretend.
 MISLEAD_WORDS = frozenset({
     "mislead", "misleading", "misled", "deceive", "deceiving", "deception", "deceptive",
@@ -168,14 +205,43 @@ def check_clause_forms(table: Dict, task: str, d_rows: Sequence[Dict]) -> None:
 _POOL_KEYS = ("id", "task", "form", "wording", "text")
 
 
-def pool_violations(entry: Dict) -> List[str]:
-    """Rule violations of one pool entry; [] is clean.
+def _has_marker(low: str, markers: Sequence[str]) -> bool:
+    return any(re.search(r"\b" + re.escape(m) + r"\b", low) for m in markers)
 
-    Rules: a known task and form; the form label equals the text rule; one transparency
-    marker (R20); no mislead word; and `clause_screen.screen_clause` for the task (one sentence,
-    no all-caps word, no item or position word; SDR / SER no truth words, so act-naming says
-    only "wrong"; SER no disclosure words; FAR its forbidden list) minus the Predicate-word and
-    imperative-start rules."""
+
+def _directive_violations(text: str, words: set) -> List[str]:
+    """R22's directive rules: an instruction verb first, or first after the frame's comma
+    (optionally after "so"); no reported wish; no motive word."""
+    out = []
+    heads = [text]
+    if "," in text:
+        heads.append(text.split(",", 1)[1])
+    firsts = []
+    for head in heads:
+        ws = [w.lower() for w in _WORD.findall(head)]
+        if ws and ws[0] == "so":
+            ws = ws[1:]
+        if ws:
+            firsts.append(ws[0])
+    if not any(w in DIRECTIVE_VERBS for w in firsts):
+        out.append("directive:no instruction verb to the assistant")
+    out += [f"directive:reported wish {w}" for w in sorted(words & REPORTED_WISH_WORDS)]
+    out += [f"motive:{w}" for w in sorted(words & MOTIVE_WORDS)]
+    return out
+
+
+def pool_violations(entry: Dict, style: str = "reported") -> List[str]:
+    """Rule violations of one pool entry of a `style` pool; [] is clean.
+
+    Rules for both styles: a known task and form; the form label equals the text rule; no
+    mislead word; and `clause_screen.screen_clause` for the task (one sentence, no all-caps
+    word, no item or position word; SDR / SER no truth words, so act-naming says only "wrong";
+    SER no disclosure words; FAR its forbidden list) minus the Predicate-word and
+    imperative-start rules. "reported" (R20): one transparency marker. "directive" (R22): one
+    game / intent marker, an instruction verb to the assistant, no reported wish, no motive
+    word."""
+    if style not in STYLES:
+        raise ValueError(f"unknown pool style {style!r}; choose from {STYLES}")
     missing = [k for k in _POOL_KEYS if not entry.get(k)]
     if missing:
         return [f"missing:{','.join(missing)}"]
@@ -189,22 +255,34 @@ def pool_violations(entry: Dict) -> List[str]:
         out.append(f"form:labelled {entry['form']} but the text rule says "
                    f"{clause_form(text, task)}")
     low = text.lower()
-    if not any(re.search(r"\b" + re.escape(m) + r"\b", low) for m in TRANSPARENCY_MARKERS):
+    markers = TRANSPARENCY_MARKERS if style == "reported" else GAME_MARKERS
+    if not _has_marker(low, markers):
         out.append("transparency:no marker")
     words = {w.lower() for w in _WORD.findall(text)}
     out += [f"mislead:{w}" for w in sorted(words & MISLEAD_WORDS)]
+    if style == "directive":
+        out += _directive_violations(text, words)
     out += [v for v in cs.screen_clause(text, task) if not v.startswith(_ALLOWED_SCREEN_RULES)]
     return out
 
 
-def load_pool(path: Optional[str] = None) -> List[Dict]:
-    """The validated entries of a pool file ({"clauses": [...]}), in file order. Raises
-    ValueError on any rule violation and on a duplicate id or text."""
+def load_pool(path: Optional[str] = None, style: Optional[str] = None) -> List[Dict]:
+    """The validated entries of a pool file ({"style": ..., "clauses": [...]}), in file order,
+    checked under `style`. The file's own "style" must agree with `style` when both are given;
+    one of them is required. Raises ValueError on a style conflict, any rule violation and a
+    duplicate id or text."""
     with open(path or POOL_PATH) as f:
-        pool = json.load(f)["clauses"]
+        data = json.load(f)
+    file_style = data.get("style")
+    if style and file_style and style != file_style:
+        raise ValueError(f"pool {path} has style {file_style!r}, but {style!r} is required")
+    style = style or file_style
+    if style is None:
+        raise ValueError(f"pool {path} names no style; pass one of {STYLES}")
+    pool = data["clauses"]
     errors, ids, texts = [], set(), set()
     for entry in pool:
-        bad = pool_violations(entry)
+        bad = pool_violations(entry, style)
         if bad:
             errors.append(f"{entry.get('id')}: {bad}")
         for key, seen in (("id", ids), ("text", texts)):
@@ -266,7 +344,7 @@ def select(fits: Sequence[Dict], instance_id: str) -> Dict:
     return fits[k]
 
 
-def inversion_row(d: Dict, chosen: Dict) -> Dict:
+def inversion_row(d: Dict, chosen: Dict, condition: str = CONDITION) -> Dict:
     """The I row: D's row, every column kept, with the clause replaced in every stored prompt
     that holds it and the I clause in `pressure` (the column segmentation and the eval variants
     locate the clause by). D's clause and margins move to `i_source_*`."""
@@ -276,7 +354,7 @@ def inversion_row(d: Dict, chosen: Dict) -> Dict:
         if key in d:
             row[key] = replace_clause(d[key], clause, text)
     row.update({
-        "condition": CONDITION, "pressure": text, "slot_kind": SLOT_KIND,
+        "condition": condition, "pressure": text, "slot_kind": SLOT_KIND,
         "honest_twin_kind": None,
         "instructed_inversion_id": chosen["id"],
         "instructed_inversion_form": chosen["form"],
@@ -290,10 +368,14 @@ def inversion_row(d: Dict, chosen: Dict) -> Dict:
 
 
 def derive_task(tokenizer, task: str, d_rows: Sequence[Dict], h_rows: Sequence[Dict],
-                pool: Sequence[Dict], max_seq_length: int) -> Tuple[List[Dict], Dict]:
+                pool: Sequence[Dict], max_seq_length: int,
+                condition: str = CONDITION) -> Tuple[List[Dict], Dict]:
     """(I rows in D's order, report). Every D row is paired with its Neutral-Clause Twin by
     `instance_id` (same `pressure_id` required). A row with no fitting clause is dropped and
-    counted under its `pressure_id`. Raises ValueError on bad input data."""
+    counted under its `pressure_id`. `condition` is written into every row. Raises ValueError
+    on bad input data."""
+    if condition not in CONDITIONS:
+        raise ValueError(f"unknown condition {condition!r}; choose from {sorted(CONDITIONS)}")
     if not __debug__:
         raise RuntimeError("run without -O: the pinned alignment checks (matched_honest, "
                            "deception_common) are assert statements")
@@ -316,7 +398,7 @@ def derive_task(tokenizer, task: str, d_rows: Sequence[Dict], h_rows: Sequence[D
             dropped[d["pressure_id"]] += 1
             by_form[form]["dropped"] += 1
             continue
-        row = inversion_row(d, select(fits, d["instance_id"]))
+        row = inversion_row(d, select(fits, d["instance_id"]), condition)
         dc.assert_aligned_pair(tokenizer, row["clean_prompt"], row["corrupt_prompt"],
                                row["clean_item_d"], row["corrupt_item_d"], max_seq_length)
         n = len(tokenizer.encode(row["neutral_prompt"], add_special_tokens=False))
@@ -416,7 +498,8 @@ def filter_scored(rows: Sequence[Dict], scores: Sequence[Dict]) -> Tuple[List[Di
 # IO
 # ==============================================================================
 
-DEFAULT_WORK_DIR = os.path.join(REPO_ROOT, "outputs", "_build_inversion_v2")
+#: Scores go to <work-root>/<condition's work_subdir>/<task>/.
+DEFAULT_WORK_ROOT = os.path.join(REPO_ROOT, "outputs", "_build_inversion_v2")
 DEFAULT_DATA_DIR = os.path.join(REPO_ROOT, "data", "datasets")
 #: Spec / ticket 08: fewer kept test ids than this for a task is a hand-back before phase 1C.
 MIN_KEPT = 300
@@ -425,8 +508,9 @@ SCORES_FILE = "scores.jsonl"
 META_FILE = "meta.json"
 #: What the added row columns hold (written into every dataset_config.json, R20).
 FIELD_NOTES = {
-    "condition": "the condition id 'inversion' (the Instructed-Inversion Condition, I); not the "
-                 "Designation Polarity value of the same spelling",
+    "condition": "the condition id: 'inversion' (the Instructed-Inversion Condition, I, directive "
+                 "pool) or 'inversion_reported' (its reported-wish pool, secondary); neither is "
+                 "the Designation Polarity value 'inversion'",
     "pressure": "the I clause (transparent, from the pool)",
     "slot_kind": "'transparent'",
     "instructed_inversion_id/_form/_wording": "the chosen pool clause",
@@ -476,7 +560,7 @@ def _task_context(args, task: str, tokenizer, pool: Sequence[Dict]) -> Dict:
     d_rows = dc.load_or_generate_deception_data(d_dir, "test")
     h_rows = dc.load_or_generate_deception_data(h_dir, "test")
     check_clause_forms(load_clause_forms(args.clause_forms), task, d_rows)
-    rows, report = derive_task(tokenizer, task, d_rows, h_rows, pool, max_len)
+    rows, report = derive_task(tokenizer, task, d_rows, h_rows, pool, max_len, args.condition)
     return {"task": task, "d_dir": d_dir, "h_dir": h_dir, "d_config": d_config,
             "max_seq_length": max_len, "rows": rows, "derive": report}
 
@@ -491,7 +575,7 @@ def run_score(args, tokenizer, model_loader) -> int:
     """Derive every task's I rows (CPU checks first, for every task), then score them on one
     loaded model and write <work-dir>/<task>/{scores.jsonl, meta.json}. --no-model stops after
     the derivation and writes nothing."""
-    pool = load_pool(args.pool)
+    pool = load_pool(args.pool, style=args.style)
     contexts = [_task_context(args, t, tokenizer, pool) for t in args.tasks]
     for ctx in contexts:
         _print_derivation(ctx)
@@ -520,7 +604,8 @@ def run_score(args, tokenizer, model_loader) -> int:
              "instructed_inversion_id": r["instructed_inversion_id"], **s}
             for r, s in zip(ctx["rows"], scores)])
         _write_json(os.path.join(out, META_FILE), {
-            "task": ctx["task"], "n": len(scores), "forwards": 2 * len(scores),
+            "task": ctx["task"], "condition": args.condition, "pool_style": args.style,
+            "n": len(scores), "forwards": 2 * len(scores),
             "seconds": seconds, "model": args.model, "max_seq_length": v2.MAX_SEQ_LENGTH,
             "job_id": os.environ.get("SLURM_JOB_ID"),
             "cluster": os.environ.get("DC_CLUSTER", "delta"),
@@ -551,15 +636,16 @@ def _compact(row: Dict, scores: Dict, kept: bool) -> Dict:
 
 def run_assemble(args, tokenizer) -> int:
     """Read the scores, re-derive the rows (deterministic), apply the behaviour filter and write
-    <data-dir>/<task>_inversion/ (for example `far_v2_inversion`; test split only) with
-    dataset_config.json and filter_report.json. Returns EXIT_BELOW_MIN_KEPT if a task keeps
-    fewer than --min-kept."""
+    <data-dir>/<task>_<condition>/ (for example `far_v2_inversion`, `far_v2_inversion_reported`;
+    test split only) with dataset_config.json and filter_report.json. A task that keeps no row
+    gets only those two files: an empty split saves without an arrow file and does not load.
+    Returns EXIT_BELOW_MIN_KEPT if a task keeps fewer than --min-kept."""
     from dataset.build_deception_dataset import save_splits
     pool_sha = sha256_file(args.pool)
-    pool = load_pool(args.pool)
+    pool = load_pool(args.pool, style=args.style)
     status = 0
     for task in args.tasks:
-        out_dir = os.path.join(args.data_dir, f"{task}_{CONDITION}")
+        out_dir = os.path.join(args.data_dir, f"{task}_{args.condition}")
         if os.path.exists(out_dir):
             raise SystemExit(f"output directory exists, refusing to overwrite: {out_dir}")
         work = os.path.join(args.work_dir, task)
@@ -568,6 +654,10 @@ def run_assemble(args, tokenizer) -> int:
         if meta["pool_sha256"] != pool_sha:
             raise SystemExit(f"{task}: the scores were made with another pool "
                              f"({meta['pool_sha256'][:12]} vs {pool_sha[:12]} of {args.pool})")
+        # Scores from before R22 carry no condition; their pool hash identifies them.
+        if meta.get("condition", args.condition) != args.condition:
+            raise SystemExit(f"{task}: the scores are for condition {meta['condition']!r}, not "
+                             f"{args.condition!r}")
         ctx = _task_context(args, task, tokenizer, pool)
         scored = _read_jsonl(os.path.join(work, SCORES_FILE))
         want = [(r["instance_id"], r["instructed_inversion_id"]) for r in ctx["rows"]]
@@ -578,11 +668,15 @@ def run_assemble(args, tokenizer) -> int:
         kept, freport = filter_scored(ctx["rows"], scores)
         kept_ids = {r["instance_id"] for r in kept}
         meets = len(kept) >= args.min_kept
-        save_splits({"test": kept}, out_dir)
+        if kept:
+            save_splits({"test": kept}, out_dir)
+        else:
+            os.makedirs(out_dir)
         config = {
             "task": task, "mechanism": ctx["d_config"].get("mechanism"),
-            "condition": CONDITION, "condition_name": "Instructed-Inversion Condition (I)",
-            "splits": ["test"],
+            "condition": args.condition, "condition_name": CONDITIONS[args.condition]["name"],
+            "pool_style": args.style,
+            "splits": ["test"] if kept else [],
             "model": ctx["d_config"].get("model"), "max_seq_length": ctx["max_seq_length"],
             "margin_thresh": ct.MARGIN, "filter_rule": freport["rule"],
             "n_margin_only_kept": freport["margin_only_kept"],
@@ -603,8 +697,8 @@ def run_assemble(args, tokenizer) -> int:
             "bridges2_delivery": bridges2_delivery(out_dir),
             "field_notes": FIELD_NOTES,
             "derivation": ("D test rows with the Pressure Clause replaced by clause surgery with "
-                           "a form-matched, token-matched transparent clause "
-                           "(dataset/deception_pools/v2/inversion_v2.json); D's instance ids, "
+                           f"a form-matched, token-matched transparent {args.style} clause "
+                           f"({os.path.relpath(args.pool, REPO_ROOT)}); D's instance ids, "
                            "pressure_id, target and distractor kept; the I clause is in "
                            "`pressure`, D's in `i_source_pressure`; paired with <task>_honest "
                            "by instance_id"),
@@ -635,10 +729,14 @@ def build_parser():
                     "Pressure Clause.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     p.add_argument("--stage", choices=("score", "assemble"), required=True)
+    p.add_argument("--condition", choices=sorted(CONDITIONS), default=CONDITION,
+                   help="'inversion' (primary, directive pool) or 'inversion_reported' "
+                        "(secondary, reported-wish pool)")
     p.add_argument("--tasks", nargs="+", choices=TASKS, default=list(TASKS))
     p.add_argument("--data-dir", default=DEFAULT_DATA_DIR)
-    p.add_argument("--work-dir", default=DEFAULT_WORK_DIR)
-    p.add_argument("--pool", default=POOL_PATH)
+    p.add_argument("--work-root", default=DEFAULT_WORK_ROOT,
+                   help="scores go to <work-root>/<directive|reported>/<task>/")
+    p.add_argument("--pool", default=None, help="default: the condition's pool")
     p.add_argument("--clause-forms", default=CLAUSE_FORMS_PATH,
                    help="ticket 02a's clause-form table; every D test clause must be in it and "
                         "agree with the text rule")
@@ -666,6 +764,10 @@ def _default_model_loader(tokenizer):
 
 def main(argv=None, tokenizer=None, model_loader=None) -> int:
     args = build_parser().parse_args(argv)
+    spec = CONDITIONS[args.condition]
+    args.style = spec["style"]
+    args.pool = args.pool or spec["pool"]
+    args.work_dir = os.path.join(args.work_root, spec["work_subdir"])
     tokenizer = tokenizer if tokenizer is not None else _load_tokenizer(args)
     if args.stage == "score":
         return run_score(args, tokenizer, model_loader or _default_model_loader(tokenizer))
