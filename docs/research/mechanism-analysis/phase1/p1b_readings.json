@@ -1,0 +1,615 @@
+{
+ "class_counts": {
+  "far": {
+   "core": {
+    "opposes": 1,
+    "shared": 16,
+    "deception-leaning": 8,
+    "honest-leaning": 2,
+    "none": 4,
+    "n": 31
+   },
+   "excl": {
+    "opposes": 1,
+    "shared": 1,
+    "deception-leaning": 3,
+    "honest-leaning": 0,
+    "none": 3,
+    "n": 8
+   },
+   "D-H": {
+    "opposes": 1,
+    "shared": 5,
+    "deception-leaning": 12,
+    "honest-leaning": 0,
+    "none": 8,
+    "n": 26
+   },
+   "(D-H)-core": {
+    "opposes": 1,
+    "shared": 2,
+    "deception-leaning": 6,
+    "honest-leaning": 0,
+    "none": 6,
+    "n": 15
+   },
+   "H-D": {
+    "opposes": 4,
+    "shared": 12,
+    "deception-leaning": 1,
+    "honest-leaning": 11,
+    "none": 0,
+    "n": 28
+   },
+   "outside every circuit": {
+    "opposes": 105,
+    "shared": 71,
+    "deception-leaning": 12,
+    "honest-leaning": 101,
+    "none": 644,
+    "n": 933
+   }
+  },
+  "sdr": {
+   "core": {
+    "opposes": 1,
+    "shared": 25,
+    "deception-leaning": 2,
+    "honest-leaning": 1,
+    "none": 2,
+    "n": 31
+   },
+   "excl": {
+    "opposes": 0,
+    "shared": 7,
+    "deception-leaning": 0,
+    "honest-leaning": 5,
+    "none": 2,
+    "n": 14
+   },
+   "D-H": {
+    "opposes": 0,
+    "shared": 13,
+    "deception-leaning": 2,
+    "honest-leaning": 4,
+    "none": 2,
+    "n": 21
+   },
+   "(D-H)-core": {
+    "opposes": 0,
+    "shared": 9,
+    "deception-leaning": 0,
+    "honest-leaning": 4,
+    "none": 2,
+    "n": 15
+   },
+   "H-D": {
+    "opposes": 1,
+    "shared": 11,
+    "deception-leaning": 0,
+    "honest-leaning": 5,
+    "none": 2,
+    "n": 19
+   },
+   "outside every circuit": {
+    "opposes": 125,
+    "shared": 101,
+    "deception-leaning": 6,
+    "honest-leaning": 98,
+    "none": 603,
+    "n": 933
+   }
+  },
+  "ser": {
+   "core": {
+    "opposes": 1,
+    "shared": 18,
+    "deception-leaning": 1,
+    "honest-leaning": 8,
+    "none": 3,
+    "n": 31
+   },
+   "excl": {
+    "opposes": 0,
+    "shared": 6,
+    "deception-leaning": 1,
+    "honest-leaning": 0,
+    "none": 3,
+    "n": 10
+   },
+   "D-H": {
+    "opposes": 0,
+    "shared": 11,
+    "deception-leaning": 1,
+    "honest-leaning": 2,
+    "none": 5,
+    "n": 19
+   },
+   "(D-H)-core": {
+    "opposes": 0,
+    "shared": 11,
+    "deception-leaning": 1,
+    "honest-leaning": 2,
+    "none": 5,
+    "n": 19
+   },
+   "H-D": {
+    "opposes": 3,
+    "shared": 14,
+    "deception-leaning": 0,
+    "honest-leaning": 8,
+    "none": 8,
+    "n": 33
+   },
+   "outside every circuit": {
+    "opposes": 100,
+    "shared": 77,
+    "deception-leaning": 9,
+    "honest-leaning": 139,
+    "none": 608,
+    "n": 933
+   }
+  }
+ },
+ "rqa": {
+  "far": {
+   "core_shared": 16,
+   "core_n": 31,
+   "core_holds": false,
+   "excl_deception_leaning": 3,
+   "excl_n": 8,
+   "excl_holds": false
+  },
+  "sdr": {
+   "core_shared": 25,
+   "core_n": 31,
+   "core_holds": true,
+   "excl_deception_leaning": 0,
+   "excl_n": 14,
+   "excl_holds": false
+  },
+  "ser": {
+   "core_shared": 18,
+   "core_n": 31,
+   "core_holds": false,
+   "excl_deception_leaning": 1,
+   "excl_n": 10,
+   "excl_holds": false
+  }
+ },
+ "positive_control": {
+  "v1_sdr_dh_core_kosweep": {
+   "drop": 3.046127510070801,
+   "clean": 1.615319061279297,
+   "rank": 1,
+   "signed_rank": 1,
+   "ko_accuracy": 0.01,
+   "source": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_analyses/sdr-dh-core-kosweep/dh_core__leaf/sdr/knockout/sweep.json"
+  },
+  "far": {
+   "drop": 4.745001125335693,
+   "se": 0.2407103667890506,
+   "clean": 2.5491507911682127,
+   "d": 1.8614046457256366,
+   "rank": 1,
+   "signed_rank": 1,
+   "ko_accuracy": 0.05,
+   "positive_control_flag": true,
+   "as_in_v1": true
+  },
+  "sdr": {
+   "drop": 7.40566930770874,
+   "se": 0.2901186196067139,
+   "clean": 3.934134044647217,
+   "d": 1.8824140773202414,
+   "rank": 1,
+   "signed_rank": 1,
+   "ko_accuracy": 0.0,
+   "positive_control_flag": true,
+   "as_in_v1": true
+  },
+  "ser": {
+   "drop": 4.635803432464599,
+   "se": 0.2503065379380436,
+   "clean": 2.3547460556030275,
+   "d": 1.968706316094631,
+   "rank": 1,
+   "signed_rank": 1,
+   "ko_accuracy": 0.02,
+   "positive_control_flag": true,
+   "as_in_v1": true
+  }
+ },
+ "c_own": {
+  "far": {
+   "own": {
+    "head.11.24": true,
+    "head.11.9": true,
+    "head.12.22": true,
+    "head.13.10": true,
+    "head.14.22": true,
+    "head.14.27": true,
+    "head.14.6": true,
+    "head.9.19": false
+   },
+   "k": 7,
+   "n": 8,
+   "p": 0.03515625,
+   "d": {
+    "head.11.24": {
+     "far": 0.04930931090148677,
+     "sdr": 0.030806291264795563,
+     "ser": 0.025497501103830002
+    },
+    "head.11.9": {
+     "far": 0.04927394211507154,
+     "sdr": 0.01717643702611195,
+     "ser": 0.00397370296633203
+    },
+    "head.12.22": {
+     "far": 0.06557536863542261,
+     "sdr": 0.006272815438207363,
+     "ser": -0.0017207274043304801
+    },
+    "head.13.10": {
+     "far": 0.005113846152602943,
+     "sdr": -0.00027663854803412167,
+     "ser": 0.0037221973956658907
+    },
+    "head.14.22": {
+     "far": -0.05588562307616754,
+     "sdr": -0.10682999194514459,
+     "ser": -0.11956583739488504
+    },
+    "head.14.27": {
+     "far": 0.05715138716761918,
+     "sdr": 0.007531894143508123,
+     "ser": -0.022274989791951836
+    },
+    "head.14.6": {
+     "far": 0.37238673621275964,
+     "sdr": 0.009015493198606643,
+     "ser": -0.05952268940698226
+    },
+    "head.9.19": {
+     "far": -0.006876404393160927,
+     "sdr": -0.00627457533643618,
+     "ser": -0.006789901156285724
+    }
+   },
+   "p_holm": 0.10546875,
+   "holds": false
+  },
+  "sdr": {
+   "own": {
+    "head.13.11": false,
+    "head.24.18": false,
+    "head.24.25": true,
+    "head.4.13": false,
+    "head.4.16": true,
+    "head.5.11": false,
+    "head.5.19": false,
+    "head.5.4": true,
+    "head.5.5": false,
+    "head.5.8": false,
+    "head.5.9": false,
+    "head.7.4": false,
+    "head.9.12": true,
+    "head.9.23": true
+   },
+   "k": 5,
+   "n": 14,
+   "p": 0.91021728515625,
+   "d": {
+    "head.13.11": {
+     "far": 0.027904737903712305,
+     "sdr": 0.023031230577032283,
+     "ser": 0.00847453082871045
+    },
+    "head.24.18": {
+     "far": 0.010322620122690557,
+     "sdr": 0.009622241141963151,
+     "ser": -0.0003589928145546962
+    },
+    "head.24.25": {
+     "far": -0.003917876865399516,
+     "sdr": 0.01904314604798587,
+     "ser": -0.008096660921323629
+    },
+    "head.4.13": {
+     "far": 0.043530790451523076,
+     "sdr": 0.027414026826191727,
+     "ser": 0.04653955469824961
+    },
+    "head.4.16": {
+     "far": 0.07052955019455938,
+     "sdr": 0.07430588486647853,
+     "ser": 0.05862223061384127
+    },
+    "head.5.11": {
+     "far": 0.0685749440079638,
+     "sdr": 0.05390762203050687,
+     "ser": 0.03694684063238139
+    },
+    "head.5.19": {
+     "far": 0.010064765433153492,
+     "sdr": 0.005494290761668293,
+     "ser": 0.006200985270035577
+    },
+    "head.5.4": {
+     "far": 0.001765453886917767,
+     "sdr": 0.0025485411081221983,
+     "ser": -0.0005313490556310071
+    },
+    "head.5.5": {
+     "far": 0.020212696523384473,
+     "sdr": 0.009168788576284368,
+     "ser": 0.0209072368885205
+    },
+    "head.5.8": {
+     "far": 0.008858500514448614,
+     "sdr": 0.006498053322269213,
+     "ser": 0.017997430836170565
+    },
+    "head.5.9": {
+     "far": 0.006338061085822342,
+     "sdr": -5.667551045423909e-06,
+     "ser": 0.00026821590858189655
+    },
+    "head.7.4": {
+     "far": 0.02534573475069761,
+     "sdr": 0.01850915995757181,
+     "ser": 0.023366361968275302
+    },
+    "head.9.12": {
+     "far": 0.02655067530401313,
+     "sdr": 0.03472856141792954,
+     "ser": 0.012680805572747844
+    },
+    "head.9.23": {
+     "far": 0.006343650356702853,
+     "sdr": 0.006800678246354209,
+     "ser": -0.0028141245852486836
+    }
+   },
+   "p_holm": 1.0,
+   "holds": false
+  },
+  "ser": {
+   "own": {
+    "head.12.14": true,
+    "head.13.8": false,
+    "head.15.11": false,
+    "head.15.3": false,
+    "head.15.8": true,
+    "head.15.9": true,
+    "head.16.1": false,
+    "head.16.22": true,
+    "head.16.28": true,
+    "head.7.2": false
+   },
+   "k": 5,
+   "n": 10,
+   "p": 0.623046875,
+   "d": {
+    "head.12.14": {
+     "far": -0.024857447965702557,
+     "sdr": -0.009583925781901573,
+     "ser": 0.008964958591491044
+    },
+    "head.13.8": {
+     "far": 0.0035609267226609856,
+     "sdr": 0.00838036871438712,
+     "ser": 0.0035855379355855753
+    },
+    "head.15.11": {
+     "far": 0.015521764385116566,
+     "sdr": 0.24431465725615953,
+     "ser": 0.20963788786836757
+    },
+    "head.15.3": {
+     "far": 0.01617489350848986,
+     "sdr": -0.009386259636757878,
+     "ser": 0.004254222802831539
+    },
+    "head.15.8": {
+     "far": 0.541583692743279,
+     "sdr": 0.5337711210271007,
+     "ser": 0.7375556299137241
+    },
+    "head.15.9": {
+     "far": 0.005065495592455867,
+     "sdr": 0.035114405772035666,
+     "ser": 0.05094095483502652
+    },
+    "head.16.1": {
+     "far": 0.04408108297652723,
+     "sdr": 0.15102441566930574,
+     "ser": 0.10694055339811566
+    },
+    "head.16.22": {
+     "far": 0.013926382957521459,
+     "sdr": 0.04534644437797771,
+     "ser": 0.15487655936491318
+    },
+    "head.16.28": {
+     "far": 0.10914345830426744,
+     "sdr": 0.0977272989406329,
+     "ser": 0.13857407357457294
+    },
+    "head.7.2": {
+     "far": 0.007808982095979126,
+     "sdr": -0.0015484340937045545,
+     "ser": 0.0016974601015369703
+    }
+   },
+   "p_holm": 1.0,
+   "holds": false
+  }
+ },
+ "c_v1": {
+  "per_head": {
+   "head.5.8": {
+    "far": "none",
+    "sdr": "none",
+    "ser": "none"
+   },
+   "head.5.9": {
+    "far": "none",
+    "sdr": "honest-leaning",
+    "ser": "honest-leaning"
+   },
+   "head.5.11": {
+    "far": "shared",
+    "sdr": "shared",
+    "ser": "shared"
+   },
+   "head.9.12": {
+    "far": "none",
+    "sdr": "shared",
+    "ser": "honest-leaning"
+   }
+  },
+  "meeting": [],
+  "holds": false
+ },
+ "lens": {
+  "status": "EXPLORATORY (R12): raw lens, uncalibrated; CIs clustered by pressure_id",
+  "per_task": {
+   "far": {
+    "pressure": {
+     "n": 1000,
+     "rate_honest_first": 0.932
+    },
+    "pressure_by_form": {
+     "act-naming": {
+      "n": 1000,
+      "rate": 0.932
+     }
+    },
+    "neutral_twin": {
+     "n": 1000,
+     "rate_honest_first": 0.0
+    },
+    "pressure_neutral_twin_paired": {
+     "n": 1000,
+     "rate_honest_first": 0.932
+    }
+   },
+   "sdr": {
+    "pressure": {
+     "n": 1000,
+     "rate_honest_first": 0.907
+    },
+    "pressure_by_form": {
+     "predicate-naming": {
+      "n": 603,
+      "rate": 0.8971807628524047
+     },
+     "act-naming": {
+      "n": 216,
+      "rate": 0.9537037037037037
+     },
+     "other": {
+      "n": 181,
+      "rate": 0.8839779005524862
+     }
+    },
+    "neutral_twin": {
+     "n": 1000,
+     "rate_honest_first": 0.0
+    },
+    "pressure_neutral_twin_paired": {
+     "n": 1000,
+     "rate_honest_first": 0.907
+    }
+   },
+   "ser": {
+    "pressure": {
+     "n": 1000,
+     "rate_honest_first": 0.853
+    },
+    "pressure_by_form": {
+     "predicate-naming": {
+      "n": 695,
+      "rate": 0.8647482014388489
+     },
+     "act-naming": {
+      "n": 72,
+      "rate": 0.9305555555555556
+     },
+     "other": {
+      "n": 233,
+      "rate": 0.7939914163090128
+     }
+    },
+    "neutral_twin": {
+     "n": 1000,
+     "rate_honest_first": 0.0
+    },
+    "pressure_neutral_twin_paired": {
+     "n": 1000,
+     "rate_honest_first": 0.853
+    }
+   }
+  },
+  "contrasts": {
+   "far - sdr act-naming": {
+    "diff": -0.02170370370370367,
+    "ci": [
+     -0.05327755439458714,
+     0.008703046243810911
+    ],
+    "n_boot": 2000,
+    "seed": 0,
+    "n_clusters": [
+     12,
+     7
+    ],
+    "n": [
+     1000,
+     216
+    ]
+   },
+   "far - ser act-naming": {
+    "diff": 0.0014444444444444704,
+    "ci": [
+     -0.08902447345676202,
+     0.05457259879734806
+    ],
+    "n_boot": 2000,
+    "seed": 0,
+    "n_clusters": [
+     12,
+     4
+    ],
+    "n": [
+     1000,
+     72
+    ]
+   }
+  },
+  "expected": "FAR's honest-first rate exceeds the act-naming subsets of SDR and SER by >= 0.2"
+ },
+ "c_mlp": {
+  "falsifiers": [
+   "mlp.11.0",
+   "mlp.13.0",
+   "mlp.16.0"
+  ],
+  "late": {
+   "mlp.30.0": {
+    "far": "opposes",
+    "sdr": "opposes",
+    "ser": "opposes"
+   },
+   "mlp.31.0": {
+    "far": "shared",
+    "sdr": "shared",
+    "ser": "shared"
+   }
+  },
+  "late_shared_all": false,
+  "holds": false
+ }
+}

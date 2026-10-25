@@ -250,6 +250,25 @@ def c1_matrix(sweeps, cls, all_labels, lab, sets):
 GROUP_ORDER = ("core", "excl_far", "excl_sdr", "excl_ser", "other D", "H only", "MLP", "outside")
 
 
+def row_order(r):
+    """Group, then layer and index as numbers (head.9.x before head.10.x; mlp.2 before mlp.10)."""
+    _, layer, index = r["label"].split(".")
+    return GROUP_ORDER.index(r["group"]), int(layer), int(index)
+
+
+def c1_summary(cols, rows):
+    """Mean d per composition group and test set, and the group sizes (the figure in numbers)."""
+    names = [f"{t}:{c}" for t, c in cols]
+    out = {}
+    for g in GROUP_ORDER:
+        rs = [r for r in rows if r["group"] == g]
+        if not rs:
+            continue
+        out[g] = {"n": len(rs), **{n: (sum(r[n] for r in rs if r[n] is not None) /
+                                       max(1, sum(r[n] is not None for r in rs))) for n in names}}
+    return {"columns": names, "groups": out}
+
+
 def group_of(lb, sets, lab):
     if lb.startswith("mlp."):
         return "MLP"
@@ -271,7 +290,7 @@ def c1_figure(cols, rows, path):
     import matplotlib.pyplot as plt
     import numpy as np
     keep = [r for r in rows if r["group"] != "outside"]
-    keep.sort(key=lambda r: (GROUP_ORDER.index(r["group"]), r["label"]))
+    keep.sort(key=row_order)
     names = [f"{t}:{c}" for t, c in cols]
     M = np.array([[np.nan if r[n] is None else r[n] for n in names] for r in keep], dtype=float)
     fig, ax = plt.subplots(figsize=(9, max(6, 0.11 * len(keep))))
@@ -400,6 +419,17 @@ def markdown(res) -> str:
         if "_overlap" in tl:
             L += ["Overlap of the three top-20 lists: " + "; ".join(f"{k}: {len(v)} ({', '.join(v) or '-'})"
                                                                    for k, v in tl["_overlap"].items()), ""]
+    c1 = res.get("c1")
+    if c1:
+        short = {"s1": "D swap", "s5": "H swap", "s6": "F swap", "s2": "D twin", "s4": "D mean"}
+        heads = [f"{n.split(':')[0]} {short[n.split(':')[1]]}" for n in c1["columns"]]
+        L += ["## C1: Components x 9 item-swap test sets, plus D under neutral twin and mean", "",
+              "Full matrix with R-cls per task: `docs/research/mechanism-analysis/phase1/c1_matrix.csv`; figure "
+              "`c1_matrix.png` (rows grouped by composition set, ordered by layer). Mean d per group:", "",
+              "| group | n | " + " | ".join(heads) + " |", "| --- " * (len(heads) + 2) + "|"]
+        for g, v in c1["groups"].items():
+            L.append(f"| {g} | {v['n']} | " + " | ".join(_f(v[n], 2) for n in c1["columns"]) + " |")
+        L.append("")
     co = res["c_own"]
     L += ["## C-own (R-own): one-sided sign test over each exclusive set, Holm over tasks", "",
           "| task | heads | own | p | p Holm | holds |", "| --- | --- | --- | --- | --- | --- |"]
@@ -438,7 +468,10 @@ def markdown(res) -> str:
     L += ["", "| contrast | diff | 95% CI (clustered by pressure_id) | clusters |", "| --- | --- | --- | --- |"]
     for k, v in ln["contrasts"].items():
         L.append(f"| {k} | {_f(v['diff'])} | [{_f(v['ci'][0])}, {_f(v['ci'][1])}] | {v['n_clusters']} |")
-    L += ["", f"Expected direction (not gated): {ln['expected']}.", ""]
+    L += ["", f"Expected direction (not gated): {ln['expected']}.", "",
+          "The neutral twin's rate is 0 by construction: the rule needs a positive final margin (deceptive answer), "
+          "and the full model answers the twin honestly. `pressure_neutral_twin_paired` repeats the pressure rows "
+          "paired with a twin.", ""]
     return "\n".join(L)
 
 
@@ -465,6 +498,7 @@ def main(argv=None) -> int:
            "lens": lens(a.root), "sets": {k: sorted(v) for k, v in sets.items()},
            "reading": open(a.reading).read() if a.reading else ""}
     cols, rows = c1_matrix(sweeps, cls, all_labels, lab, sets)
+    res["c1"] = c1_summary(cols, rows)
     os.makedirs(a.reports, exist_ok=True)
     os.makedirs(a.curated, exist_ok=True)
     with open(os.path.join(a.reports, "03-1b-results.json"), "w") as f:
