@@ -562,6 +562,7 @@ def preflight(protocol,operations,*,dry_run=False):
     except (KeyError,ValueError): raise ValueError('actual Slurm allocation start/end from wrapper required')
     if not start < time.time() < end: raise ValueError('invalid actual allocation bounds')
     operations=cc.bind_allocation_operations(operations,allocation_start=start,allocation_end=end)
+    if min(operations['reserved_seconds'],datetime.fromisoformat(operations['deadline_utc']).timestamp()-time.time())<=minimum: raise ValueError('actual allocation cannot fit preflight/startup/shutdown buffers')
     hardware=n.runtime_identity(operations)
     binding=dict(scientific_hash=protocol['scientific_hash'],provenance_hash=protocol['provenance_hash'],source_hashes=protocol['provenance']['source_hashes'],software=protocol['provenance']['software'],cache_hashes=protocol['provenance']['cache_hashes'],hardware=hardware,shape=[8,224],cap=64,precision='BF16 SDPA eval; use_cache=False; actual FP32 full vocabulary')
     return operations,binding
@@ -677,6 +678,18 @@ def validate_calibration(protocol,directory,binding):
     return receipt
 
 
+def _finish_main_invocation(protocol,output,verified,invocation,invocation_id,peak_memory_bytes):
+    status='stopped' if verified['remaining_ids'] else 'completed'
+    if status=='completed':
+        assembly=assemble(protocol,output);path=output/'generations.json'
+        if path.exists():
+            if encoded(read_json(path))!=encoded(assembly): raise ValueError('existing generation assembly conflicts with verified terminal rows')
+        else: publish(path,assembly,protocol['payload']['record_bounds']['generation_bytes_upper_bound'])
+    receipt=dict(status=status,accepted=verified['accepted'],remaining_ids=verified['remaining_ids'],numerical_pass=status=='completed',invocation_hash=invocation['sha256'],peak_memory_bytes=peak_memory_bytes)
+    publish(output/'invocations'/f'{invocation_id}.result',seal(receipt))
+    return receipt
+
+
 def run_main(protocol: dict, calibration_dir: Path, operations: dict, output: Path, *, resume=False, dry_run=False) -> dict:
     operations,binding=preflight(protocol,operations,dry_run=dry_run);output=Path(output)
     if dry_run:
@@ -706,8 +719,7 @@ def run_main(protocol: dict, calibration_dir: Path, operations: dict, output: Pa
         invocation=seal(dict(id=invocation_id,run_hash=verified['run_hash'],binding=binding,operations=operations,allocation=_allocation(operations),accepted=verified['accepted'],remaining_ids=verified['remaining_ids'],forecast=forecast,incomplete_attempts=verified['incomplete_attempts'],wasted_attempts=[dict(attempt_hash=v['attempt_hash'],reason=v['reason'],observed_decode_seconds=(v['partial'] or {}).get('elapsed_seconds'),evidence=v['evidence']) for v in (unseal(read_json(f)) for f in sorted((output/'interruptions').glob('*.json')))]))
         publish(output/'invocations'/f'{invocation_id}.json',invocation)
         if not verified['remaining_ids']:
-            assemble(protocol,output)
-            return dict(status='completed',accepted=verified['accepted'],remaining_ids=[],numerical_pass=True)
+            return _finish_main_invocation(protocol,output,verified,invocation,invocation_id,0)
         runtime=_runtime(protocol,operations);hf=None;previous_cache=None;active=None;attempt=None;state={}
         with termination_handlers(runtime):
             try:
@@ -724,12 +736,7 @@ def run_main(protocol: dict, calibration_dir: Path, operations: dict, output: Pa
                     terminal=make_terminal(protocol,active,state,attempt,binding,verified['run_hash']);commit_terminal(protocol,output,active,terminal)
                     active=None;attempt=None
                 verified=verify_completed_batches(protocol,output,binding)
-                status='stopped' if verified['remaining_ids'] else 'completed'
-                if status=='completed':
-                    assembly=assemble(protocol,output)
-                    if not (output/'generations.json').exists(): publish(output/'generations.json',assembly,protocol['payload']['record_bounds']['generation_bytes_upper_bound'])
-                receipt=dict(status=status,accepted=verified['accepted'],remaining_ids=verified['remaining_ids'],numerical_pass=status=='completed',invocation_hash=invocation['sha256'],peak_memory_bytes=peak_memory())
-                publish(output/'invocations'/f'{invocation_id}.result',seal(receipt));return receipt
+                return _finish_main_invocation(protocol,output,verified,invocation,invocation_id,peak_memory())
             except BaseException as error:
                 if active is not None and attempt is not None:
                     record_interruption(output,active['id'],attempt['payload']['number'],'deadline' if isinstance(error,TimeoutError) else 'numerical' if isinstance(error,ValueError) else 'failure',{'error':cc._bounded_error(error),'allocation':_allocation(operations)},state)

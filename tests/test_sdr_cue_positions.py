@@ -581,3 +581,73 @@ def test_publication_measures_serialization_separately_from_write(pos,tmp_path):
     assert set(receipt)=={'serialization_seconds','write_seconds','bytes'}
     assert receipt['serialization_seconds']>=0 and receipt['write_seconds']>=0
     assert receipt['bytes']==len((tmp_path/'record.json').read_bytes())
+
+@pytest.mark.parametrize('entrypoint', ['preflight', 'calibration'])
+def test_actual_allocation_buffers_rechecked_before_model(pos,frozen,tmp_path,monkeypatch,entrypoint):
+    import time
+    from datetime import datetime,timezone,timedelta
+    monkeypatch.setattr(pos,'verify_protocol',lambda p:None)
+    monkeypatch.setattr(pos.n,'runtime_identity',lambda op:{'class':'A100','name':'A100','memory':10**12})
+    monkeypatch.setattr(pos.n,'load_tokenizer',lambda cache:object())
+    monkeypatch.setattr(pos,'_device_uuid',lambda:'CPU-regression')
+    calls=[]
+    monkeypatch.setattr(pos.cue,'_load_model',lambda p:calls.append(p) or pytest.fail('short actual allocation reached model loader'))
+    now=time.time();monkeypatch.setenv('SDR_POS_ALLOCATION_START',str(now-1110));monkeypatch.setenv('SDR_POS_ALLOCATION_END',str(now+90))
+    op=dict(hardware_class='A100',reserved_seconds=1200,deadline_utc=(datetime.now(timezone.utc)+timedelta(seconds=1200)).isoformat(),startup_buffer_seconds=60,premodel_headroom_seconds=180,shutdown_buffer_seconds=60,safety_margin_seconds=60)
+    with pytest.raises(ValueError,match='allocation cannot fit'):
+        if entrypoint=='preflight':pos.preflight(frozen,op)
+        else:pos.calibrate(frozen,op,tmp_path/'must-not-load')
+    assert not calls and not(tmp_path/'must-not-load').exists()
+
+@pytest.fixture
+def final_terminal_panel(pos,frozen,tmp_path,monkeypatch):
+    p=deepcopy(frozen);p['payload'].update(main=p['payload']['main'][:8],batches=p['payload']['batches'][:1],pairs=[],interventions=[]);p['scientific_hash']=pos.digest(p['payload'])
+    op=operations();binding={'cpu':'final-terminal-regression','hardware':{'memory':10**12}}
+    monkeypatch.setattr(pos,'preflight',lambda *a,**kw:(op,binding))
+    cal=fake_calibration(pos,p);cal['binding']=binding
+    monkeypatch.setattr(pos,'validate_calibration',lambda *a,**kw:cal)
+    monkeypatch.setattr(pos,'batch_fits',lambda *a:True)
+    monkeypatch.setattr(pos,'_allocation',lambda *a:{'job_id':'CPU-final-terminal'})
+    path=tmp_path/'run';run=pos.initialize_run(p,path,binding);batch=p['payload']['batches'][0]
+    pos.publish(path/'invocations/initial.json',pos.seal(dict(id='initial',run_hash=run['sha256'],binding=binding,operations=op,allocation={'job_id':'CPU-final-terminal'},accepted={},remaining_ids=[batch['id']],forecast={},incomplete_attempts=0,wasted_attempts=[])))
+    attempt=pos.begin_attempt(p,path,batch,binding,run['sha256'],'initial')
+    terminal=baseline_terminal(pos,p,batch,binding,run['sha256'],attempt['sha256']);pos.commit_terminal(p,path,batch,terminal)
+    original={str(f.relative_to(path)):f.read_bytes() for sub in ('attempts','terminals') for f in (path/sub).glob('*.json')}
+    def forbidden(*a,**kw):pytest.fail('completed resume attempted model/decoding/attempt work')
+    monkeypatch.setattr(pos.cue,'_load_model',forbidden);monkeypatch.setattr(pos,'decode_batch',forbidden);monkeypatch.setattr(pos,'begin_attempt',forbidden);monkeypatch.setattr(pos.n,'load_tokenizer',forbidden);monkeypatch.setattr(pos,'peak_memory',forbidden)
+    return SimpleNamespace(protocol=p,path=path,operations=op,original=original)
+
+@pytest.mark.parametrize('assembly_published', [False,True])
+def test_final_terminal_before_assembly_resume_recovers_outputs(pos,final_terminal_panel,assembly_published):
+    f=final_terminal_panel;assert not(f.path/'generations.json').exists()
+    if assembly_published:pos.publish(f.path/'generations.json',pos.assemble(f.protocol,f.path))
+    result=pos.run_main(f.protocol,f.path/'unused-calibration',f.operations,f.path,resume=True)
+    assert result['status']=='completed' and result['remaining_ids']==[] and result['numerical_pass'] is True
+    assert pos.read_json(f.path/'generations.json')==pos.assemble(f.protocol,f.path)
+    receipts=[pos.unseal(pos.read_json(path)) for path in (f.path/'invocations').glob('*.result')]
+    assert receipts==[result] and result['invocation_hash'] and result['peak_memory_bytes']==0
+    assert {str(path.relative_to(f.path)):path.read_bytes() for sub in ('attempts','terminals') for path in (f.path/sub).glob('*.json')}==f.original
+
+def test_completed_resume_is_idempotent_and_validates_existing_assembly(pos,final_terminal_panel):
+    f=final_terminal_panel
+    first=pos.run_main(f.protocol,f.path/'unused-calibration',f.operations,f.path,resume=True)
+    assert (f.path/'generations.json').exists()
+    assembly=pos.read_json(f.path/'generations.json');(f.path/'generations.json').write_text(json.dumps(assembly,indent=2))
+    before=(f.path/'generations.json').read_bytes()
+    second=pos.run_main(f.protocol,f.path/'unused-calibration',f.operations,f.path,resume=True)
+    assert first['status']==second['status']=='completed' and first['accepted']==second['accepted']
+    assert (f.path/'generations.json').read_bytes()==before
+    assert len(list((f.path/'invocations').glob('*.result')))==2
+    assert {str(path.relative_to(f.path)):path.read_bytes() for sub in ('attempts','terminals') for path in (f.path/sub).glob('*.json')}==f.original
+
+@pytest.mark.parametrize('conflict_kind', ['foreign_row','boolean_slot'])
+def test_completed_resume_rejects_conflicting_assembly_without_overwrite(pos,final_terminal_panel,conflict_kind):
+    f=final_terminal_panel
+    if conflict_kind=='foreign_row':conflict=b'[{"id":"foreign scientific row"}]'
+    else:
+        rows=pos.assemble(f.protocol,f.path);rows[1]['physical_slot']=True;conflict=pos.encoded(rows)
+    (f.path/'generations.json').write_bytes(conflict)
+    with pytest.raises(ValueError,match='assembly'):pos.run_main(f.protocol,f.path/'unused-calibration',f.operations,f.path,resume=True)
+    assert (f.path/'generations.json').read_bytes()==conflict
+    assert not list((f.path/'invocations').glob('*.result'))
+    assert {str(path.relative_to(f.path)):path.read_bytes() for sub in ('attempts','terminals') for path in (f.path/sub).glob('*.json')}==f.original
