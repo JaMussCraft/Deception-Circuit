@@ -52,7 +52,8 @@ from evaluation import default_evaluations, list_evaluations
 from evaluation import report
 from evaluation import circuits
 from evaluation import suite
-from evaluation.ablation import ABLATION_SCHEMES
+from evaluation.ablation import (ABLATION_SCHEMES, matched_variants,
+                                 variant_bank_name)
 from evaluation.benchmark_eval import SCREEN_MAX_FACTOR
 from evaluation.benchmarks.base import DECEPTIVE
 from evaluation.benchmarks import (DEFAULT_BENCHMARKS, GROUPS, expand,
@@ -110,6 +111,15 @@ def build_parser():
                         "reproduce the in-run numbers.")
     g.add_argument("--mean-source", default="pooled", choices=["pooled", "clean", "corrupt"],
                    help="Which prompt stream(s) enter the mean bank under --ablation mean.")
+    # default=SUPPRESS: when the flag is absent the namespace has no such entry, so the `cli` record of every
+    # existing invocation (suite.json, summary.json) is unchanged. Read it with getattr(cli, ..., None).
+    g.add_argument("--variant-mean-bank", nargs="+", choices=["no_pressure"], default=argparse.SUPPRESS,
+                   metavar="VARIANT",
+                   help="Under --ablation mean, run the knockout's rows of this prompt variant twice: with the "
+                        "task bank, as without the flag (knockout.json `variants`), and with a bank collected "
+                        "over those very rows (the variant-matched bank, R13; `variants_matched_bank`). For the "
+                        "v2 tasks the no_pressure rows are <t>_v2_nopressure's test split. Only no_pressure; "
+                        "without the flag every row group uses the task bank and nothing new is written.")
     g.add_argument("--sanity-granularity", default="all", choices=["all", "coarse"],
                    help="Which gates the sanity eval loads. 'all' is the "
                         "discovered circuit; 'coarse' loads only the block and "
@@ -380,6 +390,13 @@ def estimate_runtime(session, ctx) -> dict:
         stages.extend(benchmark_stages(cli, session.base_args.model))
     if cli.ablation == "mean":
         stages.append(("mean bank", 2 * test_pass))
+    for variant in matched_variants(cli):
+        # The variant's bank, then its rows again under that bank (eval 2
+        # writes both runs): 3 configs, each with a live reference pass.
+        stages.append((f"mean bank ({variant_bank_name(variant)})", 2 * test_pass))
+        if "knockout" in cli.evals:
+            stages.append((f"eval 2 ({variant} under its own mean bank, 3 configs, "
+                           f"live reference)", 6 * test_pass))
 
     stages = scale_stages(stages, n_cells)
     stages.insert(0, ("model load", SEC_MODEL_LOAD, SEC_MODEL_LOAD))

@@ -44,6 +44,29 @@ from models.llama_node import (ABLATION_SITES, clear_ablation_hook,
 
 ABLATION_SCHEMES = ("interchange", "zero", "mean")
 
+#: A mean bank named `variant:<v>` is collected over prompt variant v's rows of
+#: the task (--variant-mean-bank, R13), not over the task's test split.
+VARIANT_BANK_PREFIX = "variant:"
+
+
+def variant_bank_name(variant: str) -> str:
+    """The mean bank collected over one prompt variant's rows."""
+    return VARIANT_BANK_PREFIX + variant
+
+
+def is_variant_bank(name) -> bool:
+    return str(name).startswith(VARIANT_BANK_PREFIX)
+
+
+def matched_variants(cli) -> tuple:
+    """The prompt variants given to --variant-mean-bank, or () without the flag.
+
+    The flag is argparse.SUPPRESS when absent (so the recorded CLI of every
+    existing run is unchanged), hence the getattr; this is the one place that
+    reads it.
+    """
+    return tuple(getattr(cli, "variant_mean_bank", None) or ())
+
 
 # ==============================================================================
 # WHICH SITES A MODEL ACTUALLY USES
@@ -234,7 +257,8 @@ def _forward_for_bank(model, collector, input_ids, corrupted_input_ids, attentio
 
 
 def collect_mean_bank(model, stream_batches, *, device, source: str = "pooled",
-                      desc: str = "Mean bank", verbose: bool = True) -> dict:
+                      desc: str = "Mean bank", verbose: bool = True,
+                      stats=None) -> dict:
     """Site means over the corrupted stream of `stream_batches`.
 
     `stream_batches` is an iterable of dicts with input_ids / corrupted_input_ids
@@ -251,6 +275,9 @@ def collect_mean_bank(model, stream_batches, *, device, source: str = "pooled",
 
     Gate values never touch the corrupted stream, so the bank does not depend on
     which circuit is loaded.
+
+    `stats`, when a dict is passed, receives `n_tokens`: the token count behind
+    every mean, summed over the passes (so a pooled bank counts each token twice).
     """
     if source not in ("pooled", "clean", "corrupt"):
         raise ValueError(f"mean source must be pooled/clean/corrupt, got {source!r}")
@@ -271,4 +298,6 @@ def collect_mean_bank(model, stream_batches, *, device, source: str = "pooled",
                     clean, corrupt = corrupt, clean
                 _forward_for_bank(model, collector, clean, corrupt, mask)
 
+    if stats is not None:
+        stats["n_tokens"] = collector.n_tokens()
     return collector.bank()

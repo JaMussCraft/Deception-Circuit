@@ -30,7 +30,9 @@ from torch.utils.data import DataLoader
 
 from analysis import apply_node_masks, open_all_gates
 from config import NodePruningConfig
-from evaluation.ablation import ABLATION_SCHEMES, collect_mean_bank, make_hook
+from evaluation.ablation import (ABLATION_SCHEMES, VARIANT_BANK_PREFIX,
+                                 collect_mean_bank, is_variant_bank, make_hook,
+                                 matched_variants)
 from evaluation.masks import (assert_complement, coarsen_masks, count_masks,
                               knockout_masks, load_circuit_masks,
                               sample_random_mask_set, validate_hierarchy)
@@ -206,6 +208,7 @@ class Session:
         self._loaders = {}          # task label -> (test, fast, state)
         self._tasks = {}            # task label -> Task after build_dataloaders
         self._mean_banks = {}       # (task label | "-", bank name) -> bank
+        self._mean_bank_meta = {}   # same key -> what the bank was collected on
         self._ref_caches = {}       # task label -> [N, vocab]
         self._variant_loaders = {}  # (task label, variant) -> (loader, reason)
         self._random_sets = {}      # circuit label -> (indices, masks)
@@ -348,16 +351,36 @@ class Session:
             self._screens[dataset] = builder(*args)
         return self._screens[dataset]
 
-    def mean_bank(self, ctx, name="task"):
+    def _bank_key(self, ctx, name):
         # A benchmark bank is keyed globally, like wikitext: its prompt
-        # distribution is the benchmark's, not the circuit task's.
-        key = ((ctx.task_spec.label, name)
-               if name == "task" else ("-", name))
+        # distribution is the benchmark's, not the circuit task's. A
+        # `variant:<v>` bank is the task's prompts under variant v, so it is
+        # keyed per task like the task bank.
+        per_task = name == "task" or is_variant_bank(name)
+        return (ctx.task_spec.label, name) if per_task else ("-", name)
+
+    def mean_bank(self, ctx, name="task"):
+        key = self._bank_key(ctx, name)
         if key in self._mean_banks:
             return self._mean_banks[key]
+        meta = None
         if name == "task":
             batches = [ctx.task.model_inputs(b) for b in ctx.test_loader]
             desc = f"Mean bank (task: {ctx.task_spec.label})"
+        elif is_variant_bank(name):
+            # The variant-matched bank (R13): collected over the very rows the
+            # variant section ablates. For the v2 tasks the no_pressure rows
+            # (the clause removed from both streams of D's test split) are
+            # <t>_v2_nopressure's test split, row for row.
+            variant = name[len(VARIANT_BANK_PREFIX):]
+            loader, reason = ctx.variant_loader(variant)
+            if loader is None:
+                raise ValueError(f"mean bank {name!r}: task {ctx.task_spec.label} has no "
+                                 f"{variant} rows ({reason})")
+            batches = [ctx.task.model_inputs(b) for b in loader]
+            desc = f"Mean bank ({name}: {ctx.task_spec.label})"
+            meta = {"bank": name, "task": ctx.task_spec.label, "rows": variant,
+                    "n_rows": len(loader.dataset), "source": self.cli.mean_source}
         elif name == "wikitext":
             from evaluation.wikitext import wikitext_stream_batches
             batches = wikitext_stream_batches(ctx)
@@ -367,10 +390,19 @@ class Session:
             desc = f"Mean bank ({name})"
         else:
             raise ValueError(f"unknown mean bank {name!r}")
+        stats = {}
         bank = collect_mean_bank(self.node_model, batches, device=self.device,
-                                 source=self.cli.mean_source, desc=desc)
+                                 source=self.cli.mean_source, desc=desc,
+                                 stats=stats)
         self._mean_banks[key] = bank
+        if meta is not None:
+            self._mean_bank_meta[key] = dict(meta, n_tokens=stats["n_tokens"])
         return bank
+
+    def mean_bank_meta(self, ctx, name):
+        """What a collected `variant:<v>` bank was collected on (rows, tokens), or None."""
+        meta = self._mean_bank_meta.get(self._bank_key(ctx, name))
+        return dict(meta) if meta is not None else None
 
     def ref_cache_for(self, ctx):
         label = ctx.task_spec.label
@@ -634,6 +666,9 @@ class EvalContext:
         """
         return self.session.mean_bank(self, name)
 
+    def mean_bank_meta(self, name):
+        return self.session.mean_bank_meta(self, name)
+
     # ---- reference model --------------------------------------------------
     def reference_logits(self, input_ids, attention_mask):
         """Full-model logits [B, S, V] — the faithfulness reference."""
@@ -686,6 +721,10 @@ def build_session(cli) -> Session:
 
     if cli.ablation not in ABLATION_SCHEMES:
         raise ValueError(f"--ablation must be one of {list(ABLATION_SCHEMES)}")
+    if matched_variants(cli) and cli.ablation != "mean":
+        raise ValueError(f"--variant-mean-bank picks a mean bank, which only "
+                         f"--ablation mean reads; this run is --ablation "
+                         f"{cli.ablation}")
 
     circuits, bindings, _operands, configs, geometry = resolve_circuits(cli)
     tasks = resolve_tasks(cli, bindings, configs)

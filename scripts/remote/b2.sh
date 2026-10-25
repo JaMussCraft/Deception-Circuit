@@ -3,7 +3,7 @@
 # pushed branch, data by rsync pushed from Delta, and results come back by rsync pulled from Delta.
 # Every transfer runs on Delta; nothing on Bridges-2 ever writes to Delta. See docs/bridges2.md.
 #
-#   scripts/remote/b2.sh sync-code  [--dry]
+#   scripts/remote/b2.sh sync-code  [--dry] [--branch NAME]
 #   scripts/remote/b2.sh sync-data  [--dry] [-n] [--what model,wikitext,env,runs|all]
 #   scripts/remote/b2.sh unpack-env [--dry]
 #   scripts/remote/b2.sh submit     [--dry] [--test-only] [--time HH:MM:SS] [--script PATH] [--job-name N] -- ARGS...
@@ -12,6 +12,7 @@
 #
 # --dry prints each command ('+ ...') and runs nothing, not even the SSH master check.
 # -n passes --dry-run to rsync (needs the masters; shows what would transfer).
+# The branch sync-code checks out is --branch, else DC_B2_BRANCH, else mechanism-datasets.
 #
 # SSH: the aliases `bridges2` (login, Slurm) and `b2dtn` (data.bridges2.psc.edu, transfers) multiplex over
 # ControlMaster sockets the user opens by hand. This script never authenticates: it checks the master with
@@ -22,7 +23,7 @@
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-BRANCH="mechanism-datasets"
+BRANCH="${DC_B2_BRANCH:-mechanism-datasets}"
 REMOTE_URL="https://github.com/JaMussCraft/Deception-Circuit.git"
 LOGIN_HOST="bridges2"
 DTN_HOST="b2dtn"
@@ -33,9 +34,21 @@ HF_MODEL_DIRS=("hub/models--meta-llama--Llama-3.1-8B-Instruct")
 HF_WIKITEXT_DIRS=("hub/datasets--Salesforce--wikitext" "datasets/Salesforce___wikitext")
 # Suite output roots that `fetch` brings back whole (ticket 06 writes its suites under the second).
 FETCH_SUITE_ROOTS=("outputs/_suites" "outputs/_launch_mechanism_v2/evals")
+# Analysis cells under outputs/_analyses that `fetch` brings back (git-ignored, so a fetch is their only way
+# to Delta). Only these: the v1 cells of record in the same directory are never touched.
+FETCH_ANALYSIS_GLOBS=("mechanism-analysis-*")
 
 usage() {
-    sed -n '6,11p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//' >&2
+    cat >&2 <<'EOF'
+usage: scripts/remote/b2.sh sync-code  [--dry] [--branch NAME]
+       scripts/remote/b2.sh sync-data  [--dry] [-n] [--what model,wikitext,env,runs|all]
+       scripts/remote/b2.sh unpack-env [--dry]
+       scripts/remote/b2.sh submit     [--dry] [--test-only] [--time HH:MM:SS] [--script PATH] [--job-name N] -- ARGS...
+       scripts/remote/b2.sh status     [--dry] [JOBID...]
+       scripts/remote/b2.sh fetch      [--dry] [-n] [--ignore-existing] [REPO_RELATIVE_PATH...]
+The branch sync-code checks out is --branch, else DC_B2_BRANCH, else mechanism-datasets.
+See docs/bridges2.md.
+EOF
     exit 2
 }
 
@@ -69,6 +82,7 @@ while [ "$#" -gt 0 ]; do
         --script) SCRIPT="$2"; shift ;;
         --job-name) JOB_NAME=("--job-name=$2"); shift ;;
         --ignore-existing) UPDATE_MODE="--ignore-existing" ;;
+        --branch) BRANCH="$2"; shift ;;
         --) shift; POS+=("$@"); break ;;
         -h|--help) usage ;;
         *) POS+=("$1") ;;
@@ -76,6 +90,11 @@ while [ "$#" -gt 0 ]; do
     shift
 done
 [ "$WHAT" = "all" ] && WHAT="model,wikitext,env,runs"
+# The branch goes into a remote shell command: a plain ref name only.
+if ! [[ "$BRANCH" =~ ^[A-Za-z0-9][A-Za-z0-9._/-]*$ ]]; then
+    echo "b2.sh: branch '$BRANCH' is not a plain ref name (letters, digits, . _ / -)" >&2
+    exit 2
+fi
 
 # --- helpers ---------------------------------------------------------------------------------------------
 die() { echo "b2.sh: $*" >&2; exit 1; }
@@ -128,7 +147,21 @@ sync-code)
     need_master "$LOGIN_HOST"
     parent="$(dirname "$B2_REPO")"
     cmd="export GIT_TERMINAL_PROMPT=0; set -e; if [ -d $B2_REPO/.git ]; then"
-    cmd+=" git -C $B2_REPO fetch origin $BRANCH && git -C $B2_REPO checkout $BRANCH && git -C $B2_REPO merge --ff-only origin/$BRANCH;"
+    # Forced refspec (+): a force-pushed branch still updates the remote-tracking ref.
+    cmd+=" git -C $B2_REPO fetch origin +$BRANCH:refs/remotes/origin/$BRANCH;"
+    # A clone that has never had the branch makes a tracking branch from the one just fetched. Whether the
+    # branch exists is asked first, so a checkout that fails for a real reason (local edits in the way) stops
+    # here with git's own message.
+    cmd+=" if git -C $B2_REPO show-ref --verify --quiet refs/heads/$BRANCH;"
+    cmd+=" then git -C $B2_REPO checkout $BRANCH;"
+    cmd+=" else git -C $B2_REPO checkout -b $BRANCH --track origin/$BRANCH; fi;"
+    # Fast-forward. After a force-push that is impossible: the clone never carries commits of its own (code
+    # reaches it only from origin), so the branch moves to origin's head with reset --keep, which keeps
+    # uncommitted edits and refuses if they are in the way. The old head is printed for recovery.
+    cmd+=" if ! git -C $B2_REPO merge --ff-only origin/$BRANCH; then"
+    cmd+=" echo \"b2.sh: origin/$BRANCH is not a fast-forward of $BRANCH (force-pushed?); moving $BRANCH from"
+    cmd+=" \$(git -C $B2_REPO rev-parse HEAD) to \$(git -C $B2_REPO rev-parse origin/$BRANCH)\" >&2;"
+    cmd+=" git -C $B2_REPO reset --keep origin/$BRANCH; fi;"
     cmd+=" else mkdir -p $parent && git clone --branch $BRANCH $REMOTE_URL $B2_REPO; fi;"
     cmd+=" git -C $B2_REPO status --short --untracked-files=no; echo remote_head=\$(git -C $B2_REPO rev-parse HEAD)"
     run "${SSH[@]}" "$LOGIN_HOST" "$cmd"
@@ -236,6 +269,9 @@ fetch)
             fetch_one "$line" --prune-empty-dirs "--include=evaluations*/***" "--exclude=*"
         done < "$MANIFEST"
         for root in "${FETCH_SUITE_ROOTS[@]}"; do fetch_one "$root"; done
+        ana_filter=()
+        for glob in "${FETCH_ANALYSIS_GLOBS[@]}"; do ana_filter+=("--include=/$glob/***"); done
+        fetch_one "outputs/_analyses" --prune-empty-dirs "${ana_filter[@]}" "--exclude=*"
         [ "$DRY" = 1 ] || mkdir -p "$LOCAL_REPO/logs/bridges2"
         run "${FETCH[@]}" "$DTN_HOST:$B2_REPO/logs/" "$LOCAL_REPO/logs/bridges2/" \
             || echo "b2.sh: warning: fetch of logs/ failed (rsync exit $?)" >&2

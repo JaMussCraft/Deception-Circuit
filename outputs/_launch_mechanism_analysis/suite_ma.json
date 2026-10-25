@@ -1,0 +1,1540 @@
+{
+ "schema": 1,
+ "suite": "mechanism-analysis",
+ "ticket": "03-phase1-ablation-replication-and-sweeps",
+ "built_by": "01-infra-bridges2-and-ablation-launcher",
+ "spec": "spec.md section 4 (phase 1A), section 2.5 (R-A1), R13",
+ "generated_by": "outputs/_launch_mechanism_analysis/ma_build_suite.py",
+ "paths": "every path is relative to the repository root (DC_REPO_ROOT)",
+ "runs": {
+  "far": {
+   "D": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+   "H": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323"
+  },
+  "sdr": {
+   "D": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "H": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323"
+  },
+  "ser": {
+   "D": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+   "H": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323"
+  }
+ },
+ "operands": {
+  "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+ },
+ "suite_root": "outputs/_suites/mechanism-analysis",
+ "compose_granularity": "leaf",
+ "chain_script": "scripts/evaluate_chain.sbatch",
+ "scheme_args": {
+  "mean": [
+   "--ablation",
+   "mean",
+   "--variant-mean-bank",
+   "no_pressure"
+  ],
+  "zero": [
+   "--ablation",
+   "zero"
+  ],
+  "interchange": [
+   "--ablation",
+   "interchange"
+  ]
+ },
+ "null_args": [
+  "--n-random",
+  "20",
+  "--knockout-null-count",
+  "20"
+ ],
+ "scheme_sets": {
+  "mean": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "zero": [
+   3,
+   4,
+   5,
+   6
+  ],
+  "interchange": [
+   6
+  ]
+ },
+ "cost_model": {
+  "a40_ko_cell_min": 26.0,
+  "speedup_vs_a40": {
+   "A40": 1.0,
+   "L40S": 1.0,
+   "A100": 2.26,
+   "H200": 5.4,
+   "H100": 4.0
+  },
+  "cold_load_min": {
+   "A40": 3.5,
+   "L40S": 3.5,
+   "A100": 3.5,
+   "H200": 3.5,
+   "H100": 10.5
+  },
+  "warm_load_min": {
+   "H100": 0.4
+  },
+  "a40_pass_min": 0.65,
+  "a40_bank_min": 2.0,
+  "mean_banks_per_group": 3,
+  "a40_matched_run_min_per_mean_cell": 4.0,
+  "walltime_factor": 1.5,
+  "walltime_floor_min": 30,
+  "note": "KO cell rate, speed-ups and the H100 cold (10.5) and warm (0.4) loads are ticket 06's measurements; the pass, bank and matched-run costs are derived, not measured"
+ },
+ "dropped_cells": {
+  "ruling": "R21 (spec section 9): set 6 = (D_t - H_t) - core equals set 5 = D_t - H_t when D_t - H_t holds no core head, so its cells repeat set 5's (mean, zero) or ticket 06's interchange cell of record; they are dropped",
+  "cells": [
+   {
+    "home": "ser",
+    "scheme": "mean",
+    "set": 6,
+    "label": "D_ser_minus_H_ser_minus_D_core_hko",
+    "identity": {
+     "set_5": "D_ser - H_ser",
+     "set_6": "(D_ser - H_ser) - (D_far & D_sdr & D_ser)",
+     "heads_set_5": 19,
+     "heads_set_6": 19,
+     "core_heads_in_set_5": 0
+    },
+    "repeats": "p1a_ser__mean/D_ser_minus_H_ser_hko",
+    "cell_of_record": null
+   },
+   {
+    "home": "ser",
+    "scheme": "zero",
+    "set": 6,
+    "label": "D_ser_minus_H_ser_minus_D_core_hko",
+    "identity": {
+     "set_5": "D_ser - H_ser",
+     "set_6": "(D_ser - H_ser) - (D_far & D_sdr & D_ser)",
+     "heads_set_5": 19,
+     "heads_set_6": 19,
+     "core_heads_in_set_5": 0
+    },
+    "repeats": "p1a_ser__zero/D_ser_minus_H_ser_hko",
+    "cell_of_record": null
+   },
+   {
+    "home": "ser",
+    "scheme": "interchange",
+    "set": 6,
+    "label": "D_ser_minus_H_ser_minus_D_core_hko",
+    "identity": {
+     "set_5": "D_ser - H_ser",
+     "set_6": "(D_ser - H_ser) - (D_far & D_sdr & D_ser)",
+     "heads_set_5": 19,
+     "heads_set_6": 19,
+     "core_heads_in_set_5": 0
+    },
+    "repeats": null,
+    "cell_of_record": "outputs/_suites/mechanism-v2-coarse/stage1/s1_ser__D_ko/cells/D_ser_minus_H_ser_hko__leaf/ser_v2/interchange"
+   }
+  ]
+ },
+ "stages": {
+  "1a": {
+   "note": "phase 1A (spec section 4, R21): 33 knockout cells (ser's set 6 equals its set 5 and is dropped), one job per task chaining mean, zero and interchange; ticket 03 submits it once ticket 01 has landed and the branch is pushed and synced (R3)",
+   "n_cells": 33,
+   "jobs": [
+    {
+     "job": "p1a_far",
+     "cells": 12,
+     "groups": [
+      {
+       "group": "p1a_far__mean",
+       "scheme": "mean",
+       "output_dir": "outputs/_suites/mechanism-analysis/phase1a/p1a_far__mean",
+       "suite_name": "p1a_far__mean",
+       "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+       "cells": [
+        "D_far_hko",
+        "H_far_hko",
+        "D_core_hko",
+        "D_far_minus_D_sdr_minus_D_ser_hko",
+        "D_far_minus_H_far_hko",
+        "D_far_minus_H_far_minus_D_core_hko",
+        "D_far_and_H_far_hko"
+       ],
+       "results": {
+        "D_far_hko": "outputs/_suites/mechanism-analysis/phase1a/p1a_far__mean/cells/D_far_hko__leaf/far_v2/mean",
+        "H_far_hko": "outputs/_suites/mechanism-analysis/phase1a/p1a_far__mean/cells/H_far_hko__leaf/far_v2/mean",
+        "D_core_hko": "outputs/_suites/mechanism-analysis/phase1a/p1a_far__mean/cells/D_core_hko__leaf/far_v2/mean",
+        "D_far_minus_D_sdr_minus_D_ser_hko": "outputs/_suites/mechanism-analysis/phase1a/p1a_far__mean/cells/D_far_minus_D_sdr_minus_D_ser_hko__leaf/far_v2/mean",
+        "D_far_minus_H_far_hko": "outputs/_suites/mechanism-analysis/phase1a/p1a_far__mean/cells/D_far_minus_H_far_hko__leaf/far_v2/mean",
+        "D_far_minus_H_far_minus_D_core_hko": "outputs/_suites/mechanism-analysis/phase1a/p1a_far__mean/cells/D_far_minus_H_far_minus_D_core_hko__leaf/far_v2/mean",
+        "D_far_and_H_far_hko": "outputs/_suites/mechanism-analysis/phase1a/p1a_far__mean/cells/D_far_and_H_far_hko__leaf/far_v2/mean"
+       }
+      },
+      {
+       "group": "p1a_far__zero",
+       "scheme": "zero",
+       "output_dir": "outputs/_suites/mechanism-analysis/phase1a/p1a_far__zero",
+       "suite_name": "p1a_far__zero",
+       "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+       "cells": [
+        "D_core_hko",
+        "D_far_minus_D_sdr_minus_D_ser_hko",
+        "D_far_minus_H_far_hko",
+        "D_far_minus_H_far_minus_D_core_hko"
+       ],
+       "results": {
+        "D_core_hko": "outputs/_suites/mechanism-analysis/phase1a/p1a_far__zero/cells/D_core_hko__leaf/far_v2/zero",
+        "D_far_minus_D_sdr_minus_D_ser_hko": "outputs/_suites/mechanism-analysis/phase1a/p1a_far__zero/cells/D_far_minus_D_sdr_minus_D_ser_hko__leaf/far_v2/zero",
+        "D_far_minus_H_far_hko": "outputs/_suites/mechanism-analysis/phase1a/p1a_far__zero/cells/D_far_minus_H_far_hko__leaf/far_v2/zero",
+        "D_far_minus_H_far_minus_D_core_hko": "outputs/_suites/mechanism-analysis/phase1a/p1a_far__zero/cells/D_far_minus_H_far_minus_D_core_hko__leaf/far_v2/zero"
+       }
+      },
+      {
+       "group": "p1a_far__interchange",
+       "scheme": "interchange",
+       "output_dir": "outputs/_suites/mechanism-analysis/phase1a/p1a_far__interchange",
+       "suite_name": "p1a_far__interchange",
+       "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+       "cells": [
+        "D_far_minus_H_far_minus_D_core_hko"
+       ],
+       "results": {
+        "D_far_minus_H_far_minus_D_core_hko": "outputs/_suites/mechanism-analysis/phase1a/p1a_far__interchange/cells/D_far_minus_H_far_minus_D_core_hko__leaf/far_v2/interchange"
+       }
+      }
+     ],
+     "est_min": {
+      "A40": 356.5,
+      "H200": 74.6,
+      "H100": 97.8
+     },
+     "walltime": {
+      "A40": "09:00:00",
+      "H200": "02:00:00",
+      "H100": "02:30:00"
+     }
+    },
+    {
+     "job": "p1a_sdr",
+     "cells": 12,
+     "groups": [
+      {
+       "group": "p1a_sdr__mean",
+       "scheme": "mean",
+       "output_dir": "outputs/_suites/mechanism-analysis/phase1a/p1a_sdr__mean",
+       "suite_name": "p1a_sdr__mean",
+       "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+       "cells": [
+        "D_sdr_hko",
+        "H_sdr_hko",
+        "D_core_hko",
+        "D_sdr_minus_D_far_minus_D_ser_hko",
+        "D_sdr_minus_H_sdr_hko",
+        "D_sdr_minus_H_sdr_minus_D_core_hko",
+        "D_sdr_and_H_sdr_hko"
+       ],
+       "results": {
+        "D_sdr_hko": "outputs/_suites/mechanism-analysis/phase1a/p1a_sdr__mean/cells/D_sdr_hko__leaf/sdr_v2/mean",
+        "H_sdr_hko": "outputs/_suites/mechanism-analysis/phase1a/p1a_sdr__mean/cells/H_sdr_hko__leaf/sdr_v2/mean",
+        "D_core_hko": "outputs/_suites/mechanism-analysis/phase1a/p1a_sdr__mean/cells/D_core_hko__leaf/sdr_v2/mean",
+        "D_sdr_minus_D_far_minus_D_ser_hko": "outputs/_suites/mechanism-analysis/phase1a/p1a_sdr__mean/cells/D_sdr_minus_D_far_minus_D_ser_hko__leaf/sdr_v2/mean",
+        "D_sdr_minus_H_sdr_hko": "outputs/_suites/mechanism-analysis/phase1a/p1a_sdr__mean/cells/D_sdr_minus_H_sdr_hko__leaf/sdr_v2/mean",
+        "D_sdr_minus_H_sdr_minus_D_core_hko": "outputs/_suites/mechanism-analysis/phase1a/p1a_sdr__mean/cells/D_sdr_minus_H_sdr_minus_D_core_hko__leaf/sdr_v2/mean",
+        "D_sdr_and_H_sdr_hko": "outputs/_suites/mechanism-analysis/phase1a/p1a_sdr__mean/cells/D_sdr_and_H_sdr_hko__leaf/sdr_v2/mean"
+       }
+      },
+      {
+       "group": "p1a_sdr__zero",
+       "scheme": "zero",
+       "output_dir": "outputs/_suites/mechanism-analysis/phase1a/p1a_sdr__zero",
+       "suite_name": "p1a_sdr__zero",
+       "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+       "cells": [
+        "D_core_hko",
+        "D_sdr_minus_D_far_minus_D_ser_hko",
+        "D_sdr_minus_H_sdr_hko",
+        "D_sdr_minus_H_sdr_minus_D_core_hko"
+       ],
+       "results": {
+        "D_core_hko": "outputs/_suites/mechanism-analysis/phase1a/p1a_sdr__zero/cells/D_core_hko__leaf/sdr_v2/zero",
+        "D_sdr_minus_D_far_minus_D_ser_hko": "outputs/_suites/mechanism-analysis/phase1a/p1a_sdr__zero/cells/D_sdr_minus_D_far_minus_D_ser_hko__leaf/sdr_v2/zero",
+        "D_sdr_minus_H_sdr_hko": "outputs/_suites/mechanism-analysis/phase1a/p1a_sdr__zero/cells/D_sdr_minus_H_sdr_hko__leaf/sdr_v2/zero",
+        "D_sdr_minus_H_sdr_minus_D_core_hko": "outputs/_suites/mechanism-analysis/phase1a/p1a_sdr__zero/cells/D_sdr_minus_H_sdr_minus_D_core_hko__leaf/sdr_v2/zero"
+       }
+      },
+      {
+       "group": "p1a_sdr__interchange",
+       "scheme": "interchange",
+       "output_dir": "outputs/_suites/mechanism-analysis/phase1a/p1a_sdr__interchange",
+       "suite_name": "p1a_sdr__interchange",
+       "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+       "cells": [
+        "D_sdr_minus_H_sdr_minus_D_core_hko"
+       ],
+       "results": {
+        "D_sdr_minus_H_sdr_minus_D_core_hko": "outputs/_suites/mechanism-analysis/phase1a/p1a_sdr__interchange/cells/D_sdr_minus_H_sdr_minus_D_core_hko__leaf/sdr_v2/interchange"
+       }
+      }
+     ],
+     "est_min": {
+      "A40": 356.5,
+      "H200": 74.6,
+      "H100": 97.8
+     },
+     "walltime": {
+      "A40": "09:00:00",
+      "H200": "02:00:00",
+      "H100": "02:30:00"
+     }
+    },
+    {
+     "job": "p1a_ser",
+     "cells": 9,
+     "groups": [
+      {
+       "group": "p1a_ser__mean",
+       "scheme": "mean",
+       "output_dir": "outputs/_suites/mechanism-analysis/phase1a/p1a_ser__mean",
+       "suite_name": "p1a_ser__mean",
+       "task_from": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+       "cells": [
+        "D_ser_hko",
+        "H_ser_hko",
+        "D_core_hko",
+        "D_ser_minus_D_far_minus_D_sdr_hko",
+        "D_ser_minus_H_ser_hko",
+        "D_ser_and_H_ser_hko"
+       ],
+       "results": {
+        "D_ser_hko": "outputs/_suites/mechanism-analysis/phase1a/p1a_ser__mean/cells/D_ser_hko__leaf/ser_v2/mean",
+        "H_ser_hko": "outputs/_suites/mechanism-analysis/phase1a/p1a_ser__mean/cells/H_ser_hko__leaf/ser_v2/mean",
+        "D_core_hko": "outputs/_suites/mechanism-analysis/phase1a/p1a_ser__mean/cells/D_core_hko__leaf/ser_v2/mean",
+        "D_ser_minus_D_far_minus_D_sdr_hko": "outputs/_suites/mechanism-analysis/phase1a/p1a_ser__mean/cells/D_ser_minus_D_far_minus_D_sdr_hko__leaf/ser_v2/mean",
+        "D_ser_minus_H_ser_hko": "outputs/_suites/mechanism-analysis/phase1a/p1a_ser__mean/cells/D_ser_minus_H_ser_hko__leaf/ser_v2/mean",
+        "D_ser_and_H_ser_hko": "outputs/_suites/mechanism-analysis/phase1a/p1a_ser__mean/cells/D_ser_and_H_ser_hko__leaf/ser_v2/mean"
+       }
+      },
+      {
+       "group": "p1a_ser__zero",
+       "scheme": "zero",
+       "output_dir": "outputs/_suites/mechanism-analysis/phase1a/p1a_ser__zero",
+       "suite_name": "p1a_ser__zero",
+       "task_from": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+       "cells": [
+        "D_core_hko",
+        "D_ser_minus_D_far_minus_D_sdr_hko",
+        "D_ser_minus_H_ser_hko"
+       ],
+       "results": {
+        "D_core_hko": "outputs/_suites/mechanism-analysis/phase1a/p1a_ser__zero/cells/D_core_hko__leaf/ser_v2/zero",
+        "D_ser_minus_D_far_minus_D_sdr_hko": "outputs/_suites/mechanism-analysis/phase1a/p1a_ser__zero/cells/D_ser_minus_D_far_minus_D_sdr_hko__leaf/ser_v2/zero",
+        "D_ser_minus_H_ser_hko": "outputs/_suites/mechanism-analysis/phase1a/p1a_ser__zero/cells/D_ser_minus_H_ser_hko__leaf/ser_v2/zero"
+       }
+      }
+     ],
+     "est_min": {
+      "A40": 271.0,
+      "H200": 55.9,
+      "H100": 76.9
+     },
+     "walltime": {
+      "A40": "07:00:00",
+      "H200": "01:30:00",
+      "H100": "02:00:00"
+     }
+    }
+   ]
+  }
+ },
+ "cells": [
+  {
+   "stage": "1a",
+   "job": "p1a_far",
+   "group": "p1a_far__mean",
+   "scheme": "mean",
+   "set": 1,
+   "cell_id": "p1a_far__mean/D_far_hko",
+   "label": "D_far_hko",
+   "expr": "(D_far) - m",
+   "kind": "knockout",
+   "cell_dir": "D_far_hko__leaf",
+   "home": "far",
+   "test_task": "far_v2",
+   "condition": "deceptive",
+   "dataset": "far_v2",
+   "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "mean",
+    "--variant-mean-bank",
+    "no_pressure",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 58
+  },
+  {
+   "stage": "1a",
+   "job": "p1a_far",
+   "group": "p1a_far__mean",
+   "scheme": "mean",
+   "set": 2,
+   "cell_id": "p1a_far__mean/H_far_hko",
+   "label": "H_far_hko",
+   "expr": "(H_far) - m",
+   "kind": "knockout",
+   "cell_dir": "H_far_hko__leaf",
+   "home": "far",
+   "test_task": "far_v2",
+   "condition": "deceptive",
+   "dataset": "far_v2",
+   "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "H_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "mean",
+    "--variant-mean-bank",
+    "no_pressure",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 60
+  },
+  {
+   "stage": "1a",
+   "job": "p1a_far",
+   "group": "p1a_far__mean",
+   "scheme": "mean",
+   "set": 3,
+   "cell_id": "p1a_far__mean/D_core_hko",
+   "label": "D_core_hko",
+   "expr": "(D_far & D_sdr & D_ser) - m",
+   "kind": "knockout",
+   "cell_dir": "D_core_hko__leaf",
+   "home": "far",
+   "test_task": "far_v2",
+   "condition": "deceptive",
+   "dataset": "far_v2",
+   "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "mean",
+    "--variant-mean-bank",
+    "no_pressure",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 31
+  },
+  {
+   "stage": "1a",
+   "job": "p1a_far",
+   "group": "p1a_far__mean",
+   "scheme": "mean",
+   "set": 4,
+   "cell_id": "p1a_far__mean/D_far_minus_D_sdr_minus_D_ser_hko",
+   "label": "D_far_minus_D_sdr_minus_D_ser_hko",
+   "expr": "(D_far - D_sdr - D_ser) - m",
+   "kind": "knockout",
+   "cell_dir": "D_far_minus_D_sdr_minus_D_ser_hko__leaf",
+   "home": "far",
+   "test_task": "far_v2",
+   "condition": "deceptive",
+   "dataset": "far_v2",
+   "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "mean",
+    "--variant-mean-bank",
+    "no_pressure",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 8
+  },
+  {
+   "stage": "1a",
+   "job": "p1a_far",
+   "group": "p1a_far__mean",
+   "scheme": "mean",
+   "set": 5,
+   "cell_id": "p1a_far__mean/D_far_minus_H_far_hko",
+   "label": "D_far_minus_H_far_hko",
+   "expr": "(D_far - H_far) - m",
+   "kind": "knockout",
+   "cell_dir": "D_far_minus_H_far_hko__leaf",
+   "home": "far",
+   "test_task": "far_v2",
+   "condition": "deceptive",
+   "dataset": "far_v2",
+   "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "H_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "mean",
+    "--variant-mean-bank",
+    "no_pressure",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 26
+  },
+  {
+   "stage": "1a",
+   "job": "p1a_far",
+   "group": "p1a_far__mean",
+   "scheme": "mean",
+   "set": 6,
+   "cell_id": "p1a_far__mean/D_far_minus_H_far_minus_D_core_hko",
+   "label": "D_far_minus_H_far_minus_D_core_hko",
+   "expr": "((D_far - H_far) - (D_far & D_sdr & D_ser)) - m",
+   "kind": "knockout",
+   "cell_dir": "D_far_minus_H_far_minus_D_core_hko__leaf",
+   "home": "far",
+   "test_task": "far_v2",
+   "condition": "deceptive",
+   "dataset": "far_v2",
+   "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "H_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "mean",
+    "--variant-mean-bank",
+    "no_pressure",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 15
+  },
+  {
+   "stage": "1a",
+   "job": "p1a_far",
+   "group": "p1a_far__mean",
+   "scheme": "mean",
+   "set": 7,
+   "cell_id": "p1a_far__mean/D_far_and_H_far_hko",
+   "label": "D_far_and_H_far_hko",
+   "expr": "(D_far & H_far) - m",
+   "kind": "knockout",
+   "cell_dir": "D_far_and_H_far_hko__leaf",
+   "home": "far",
+   "test_task": "far_v2",
+   "condition": "deceptive",
+   "dataset": "far_v2",
+   "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "H_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "mean",
+    "--variant-mean-bank",
+    "no_pressure",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 32
+  },
+  {
+   "stage": "1a",
+   "job": "p1a_far",
+   "group": "p1a_far__zero",
+   "scheme": "zero",
+   "set": 3,
+   "cell_id": "p1a_far__zero/D_core_hko",
+   "label": "D_core_hko",
+   "expr": "(D_far & D_sdr & D_ser) - m",
+   "kind": "knockout",
+   "cell_dir": "D_core_hko__leaf",
+   "home": "far",
+   "test_task": "far_v2",
+   "condition": "deceptive",
+   "dataset": "far_v2",
+   "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "zero",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 31
+  },
+  {
+   "stage": "1a",
+   "job": "p1a_far",
+   "group": "p1a_far__zero",
+   "scheme": "zero",
+   "set": 4,
+   "cell_id": "p1a_far__zero/D_far_minus_D_sdr_minus_D_ser_hko",
+   "label": "D_far_minus_D_sdr_minus_D_ser_hko",
+   "expr": "(D_far - D_sdr - D_ser) - m",
+   "kind": "knockout",
+   "cell_dir": "D_far_minus_D_sdr_minus_D_ser_hko__leaf",
+   "home": "far",
+   "test_task": "far_v2",
+   "condition": "deceptive",
+   "dataset": "far_v2",
+   "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "zero",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 8
+  },
+  {
+   "stage": "1a",
+   "job": "p1a_far",
+   "group": "p1a_far__zero",
+   "scheme": "zero",
+   "set": 5,
+   "cell_id": "p1a_far__zero/D_far_minus_H_far_hko",
+   "label": "D_far_minus_H_far_hko",
+   "expr": "(D_far - H_far) - m",
+   "kind": "knockout",
+   "cell_dir": "D_far_minus_H_far_hko__leaf",
+   "home": "far",
+   "test_task": "far_v2",
+   "condition": "deceptive",
+   "dataset": "far_v2",
+   "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "H_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "zero",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 26
+  },
+  {
+   "stage": "1a",
+   "job": "p1a_far",
+   "group": "p1a_far__zero",
+   "scheme": "zero",
+   "set": 6,
+   "cell_id": "p1a_far__zero/D_far_minus_H_far_minus_D_core_hko",
+   "label": "D_far_minus_H_far_minus_D_core_hko",
+   "expr": "((D_far - H_far) - (D_far & D_sdr & D_ser)) - m",
+   "kind": "knockout",
+   "cell_dir": "D_far_minus_H_far_minus_D_core_hko__leaf",
+   "home": "far",
+   "test_task": "far_v2",
+   "condition": "deceptive",
+   "dataset": "far_v2",
+   "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "H_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "zero",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 15
+  },
+  {
+   "stage": "1a",
+   "job": "p1a_far",
+   "group": "p1a_far__interchange",
+   "scheme": "interchange",
+   "set": 6,
+   "cell_id": "p1a_far__interchange/D_far_minus_H_far_minus_D_core_hko",
+   "label": "D_far_minus_H_far_minus_D_core_hko",
+   "expr": "((D_far - H_far) - (D_far & D_sdr & D_ser)) - m",
+   "kind": "knockout",
+   "cell_dir": "D_far_minus_H_far_minus_D_core_hko__leaf",
+   "home": "far",
+   "test_task": "far_v2",
+   "condition": "deceptive",
+   "dataset": "far_v2",
+   "task_from": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "H_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 15
+  },
+  {
+   "stage": "1a",
+   "job": "p1a_sdr",
+   "group": "p1a_sdr__mean",
+   "scheme": "mean",
+   "set": 1,
+   "cell_id": "p1a_sdr__mean/D_sdr_hko",
+   "label": "D_sdr_hko",
+   "expr": "(D_sdr) - m",
+   "kind": "knockout",
+   "cell_dir": "D_sdr_hko__leaf",
+   "home": "sdr",
+   "test_task": "sdr_v2",
+   "condition": "deceptive",
+   "dataset": "sdr_v2",
+   "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "mean",
+    "--variant-mean-bank",
+    "no_pressure",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 60
+  },
+  {
+   "stage": "1a",
+   "job": "p1a_sdr",
+   "group": "p1a_sdr__mean",
+   "scheme": "mean",
+   "set": 2,
+   "cell_id": "p1a_sdr__mean/H_sdr_hko",
+   "label": "H_sdr_hko",
+   "expr": "(H_sdr) - m",
+   "kind": "knockout",
+   "cell_dir": "H_sdr_hko__leaf",
+   "home": "sdr",
+   "test_task": "sdr_v2",
+   "condition": "deceptive",
+   "dataset": "sdr_v2",
+   "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "H_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "mean",
+    "--variant-mean-bank",
+    "no_pressure",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 58
+  },
+  {
+   "stage": "1a",
+   "job": "p1a_sdr",
+   "group": "p1a_sdr__mean",
+   "scheme": "mean",
+   "set": 3,
+   "cell_id": "p1a_sdr__mean/D_core_hko",
+   "label": "D_core_hko",
+   "expr": "(D_far & D_sdr & D_ser) - m",
+   "kind": "knockout",
+   "cell_dir": "D_core_hko__leaf",
+   "home": "sdr",
+   "test_task": "sdr_v2",
+   "condition": "deceptive",
+   "dataset": "sdr_v2",
+   "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "mean",
+    "--variant-mean-bank",
+    "no_pressure",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 31
+  },
+  {
+   "stage": "1a",
+   "job": "p1a_sdr",
+   "group": "p1a_sdr__mean",
+   "scheme": "mean",
+   "set": 4,
+   "cell_id": "p1a_sdr__mean/D_sdr_minus_D_far_minus_D_ser_hko",
+   "label": "D_sdr_minus_D_far_minus_D_ser_hko",
+   "expr": "(D_sdr - D_far - D_ser) - m",
+   "kind": "knockout",
+   "cell_dir": "D_sdr_minus_D_far_minus_D_ser_hko__leaf",
+   "home": "sdr",
+   "test_task": "sdr_v2",
+   "condition": "deceptive",
+   "dataset": "sdr_v2",
+   "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "mean",
+    "--variant-mean-bank",
+    "no_pressure",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 14
+  },
+  {
+   "stage": "1a",
+   "job": "p1a_sdr",
+   "group": "p1a_sdr__mean",
+   "scheme": "mean",
+   "set": 5,
+   "cell_id": "p1a_sdr__mean/D_sdr_minus_H_sdr_hko",
+   "label": "D_sdr_minus_H_sdr_hko",
+   "expr": "(D_sdr - H_sdr) - m",
+   "kind": "knockout",
+   "cell_dir": "D_sdr_minus_H_sdr_hko__leaf",
+   "home": "sdr",
+   "test_task": "sdr_v2",
+   "condition": "deceptive",
+   "dataset": "sdr_v2",
+   "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "H_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "mean",
+    "--variant-mean-bank",
+    "no_pressure",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 21
+  },
+  {
+   "stage": "1a",
+   "job": "p1a_sdr",
+   "group": "p1a_sdr__mean",
+   "scheme": "mean",
+   "set": 6,
+   "cell_id": "p1a_sdr__mean/D_sdr_minus_H_sdr_minus_D_core_hko",
+   "label": "D_sdr_minus_H_sdr_minus_D_core_hko",
+   "expr": "((D_sdr - H_sdr) - (D_far & D_sdr & D_ser)) - m",
+   "kind": "knockout",
+   "cell_dir": "D_sdr_minus_H_sdr_minus_D_core_hko__leaf",
+   "home": "sdr",
+   "test_task": "sdr_v2",
+   "condition": "deceptive",
+   "dataset": "sdr_v2",
+   "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "H_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "mean",
+    "--variant-mean-bank",
+    "no_pressure",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 15
+  },
+  {
+   "stage": "1a",
+   "job": "p1a_sdr",
+   "group": "p1a_sdr__mean",
+   "scheme": "mean",
+   "set": 7,
+   "cell_id": "p1a_sdr__mean/D_sdr_and_H_sdr_hko",
+   "label": "D_sdr_and_H_sdr_hko",
+   "expr": "(D_sdr & H_sdr) - m",
+   "kind": "knockout",
+   "cell_dir": "D_sdr_and_H_sdr_hko__leaf",
+   "home": "sdr",
+   "test_task": "sdr_v2",
+   "condition": "deceptive",
+   "dataset": "sdr_v2",
+   "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "H_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "mean",
+    "--variant-mean-bank",
+    "no_pressure",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 39
+  },
+  {
+   "stage": "1a",
+   "job": "p1a_sdr",
+   "group": "p1a_sdr__zero",
+   "scheme": "zero",
+   "set": 3,
+   "cell_id": "p1a_sdr__zero/D_core_hko",
+   "label": "D_core_hko",
+   "expr": "(D_far & D_sdr & D_ser) - m",
+   "kind": "knockout",
+   "cell_dir": "D_core_hko__leaf",
+   "home": "sdr",
+   "test_task": "sdr_v2",
+   "condition": "deceptive",
+   "dataset": "sdr_v2",
+   "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "zero",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 31
+  },
+  {
+   "stage": "1a",
+   "job": "p1a_sdr",
+   "group": "p1a_sdr__zero",
+   "scheme": "zero",
+   "set": 4,
+   "cell_id": "p1a_sdr__zero/D_sdr_minus_D_far_minus_D_ser_hko",
+   "label": "D_sdr_minus_D_far_minus_D_ser_hko",
+   "expr": "(D_sdr - D_far - D_ser) - m",
+   "kind": "knockout",
+   "cell_dir": "D_sdr_minus_D_far_minus_D_ser_hko__leaf",
+   "home": "sdr",
+   "test_task": "sdr_v2",
+   "condition": "deceptive",
+   "dataset": "sdr_v2",
+   "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "zero",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 14
+  },
+  {
+   "stage": "1a",
+   "job": "p1a_sdr",
+   "group": "p1a_sdr__zero",
+   "scheme": "zero",
+   "set": 5,
+   "cell_id": "p1a_sdr__zero/D_sdr_minus_H_sdr_hko",
+   "label": "D_sdr_minus_H_sdr_hko",
+   "expr": "(D_sdr - H_sdr) - m",
+   "kind": "knockout",
+   "cell_dir": "D_sdr_minus_H_sdr_hko__leaf",
+   "home": "sdr",
+   "test_task": "sdr_v2",
+   "condition": "deceptive",
+   "dataset": "sdr_v2",
+   "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "H_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "zero",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 21
+  },
+  {
+   "stage": "1a",
+   "job": "p1a_sdr",
+   "group": "p1a_sdr__zero",
+   "scheme": "zero",
+   "set": 6,
+   "cell_id": "p1a_sdr__zero/D_sdr_minus_H_sdr_minus_D_core_hko",
+   "label": "D_sdr_minus_H_sdr_minus_D_core_hko",
+   "expr": "((D_sdr - H_sdr) - (D_far & D_sdr & D_ser)) - m",
+   "kind": "knockout",
+   "cell_dir": "D_sdr_minus_H_sdr_minus_D_core_hko__leaf",
+   "home": "sdr",
+   "test_task": "sdr_v2",
+   "condition": "deceptive",
+   "dataset": "sdr_v2",
+   "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "H_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "zero",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 15
+  },
+  {
+   "stage": "1a",
+   "job": "p1a_sdr",
+   "group": "p1a_sdr__interchange",
+   "scheme": "interchange",
+   "set": 6,
+   "cell_id": "p1a_sdr__interchange/D_sdr_minus_H_sdr_minus_D_core_hko",
+   "label": "D_sdr_minus_H_sdr_minus_D_core_hko",
+   "expr": "((D_sdr - H_sdr) - (D_far & D_sdr & D_ser)) - m",
+   "kind": "knockout",
+   "cell_dir": "D_sdr_minus_H_sdr_minus_D_core_hko__leaf",
+   "home": "sdr",
+   "test_task": "sdr_v2",
+   "condition": "deceptive",
+   "dataset": "sdr_v2",
+   "task_from": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "H_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "interchange",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 15
+  },
+  {
+   "stage": "1a",
+   "job": "p1a_ser",
+   "group": "p1a_ser__mean",
+   "scheme": "mean",
+   "set": 1,
+   "cell_id": "p1a_ser__mean/D_ser_hko",
+   "label": "D_ser_hko",
+   "expr": "(D_ser) - m",
+   "kind": "knockout",
+   "cell_dir": "D_ser_hko__leaf",
+   "home": "ser",
+   "test_task": "ser_v2",
+   "condition": "deceptive",
+   "dataset": "ser_v2",
+   "task_from": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "mean",
+    "--variant-mean-bank",
+    "no_pressure",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 55
+  },
+  {
+   "stage": "1a",
+   "job": "p1a_ser",
+   "group": "p1a_ser__mean",
+   "scheme": "mean",
+   "set": 2,
+   "cell_id": "p1a_ser__mean/H_ser_hko",
+   "label": "H_ser_hko",
+   "expr": "(H_ser) - m",
+   "kind": "knockout",
+   "cell_dir": "H_ser_hko__leaf",
+   "home": "ser",
+   "test_task": "ser_v2",
+   "condition": "deceptive",
+   "dataset": "ser_v2",
+   "task_from": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "H_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "mean",
+    "--variant-mean-bank",
+    "no_pressure",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 69
+  },
+  {
+   "stage": "1a",
+   "job": "p1a_ser",
+   "group": "p1a_ser__mean",
+   "scheme": "mean",
+   "set": 3,
+   "cell_id": "p1a_ser__mean/D_core_hko",
+   "label": "D_core_hko",
+   "expr": "(D_far & D_sdr & D_ser) - m",
+   "kind": "knockout",
+   "cell_dir": "D_core_hko__leaf",
+   "home": "ser",
+   "test_task": "ser_v2",
+   "condition": "deceptive",
+   "dataset": "ser_v2",
+   "task_from": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "mean",
+    "--variant-mean-bank",
+    "no_pressure",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 31
+  },
+  {
+   "stage": "1a",
+   "job": "p1a_ser",
+   "group": "p1a_ser__mean",
+   "scheme": "mean",
+   "set": 4,
+   "cell_id": "p1a_ser__mean/D_ser_minus_D_far_minus_D_sdr_hko",
+   "label": "D_ser_minus_D_far_minus_D_sdr_hko",
+   "expr": "(D_ser - D_far - D_sdr) - m",
+   "kind": "knockout",
+   "cell_dir": "D_ser_minus_D_far_minus_D_sdr_hko__leaf",
+   "home": "ser",
+   "test_task": "ser_v2",
+   "condition": "deceptive",
+   "dataset": "ser_v2",
+   "task_from": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "mean",
+    "--variant-mean-bank",
+    "no_pressure",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 10
+  },
+  {
+   "stage": "1a",
+   "job": "p1a_ser",
+   "group": "p1a_ser__mean",
+   "scheme": "mean",
+   "set": 5,
+   "cell_id": "p1a_ser__mean/D_ser_minus_H_ser_hko",
+   "label": "D_ser_minus_H_ser_hko",
+   "expr": "(D_ser - H_ser) - m",
+   "kind": "knockout",
+   "cell_dir": "D_ser_minus_H_ser_hko__leaf",
+   "home": "ser",
+   "test_task": "ser_v2",
+   "condition": "deceptive",
+   "dataset": "ser_v2",
+   "task_from": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "H_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "mean",
+    "--variant-mean-bank",
+    "no_pressure",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 19
+  },
+  {
+   "stage": "1a",
+   "job": "p1a_ser",
+   "group": "p1a_ser__mean",
+   "scheme": "mean",
+   "set": 7,
+   "cell_id": "p1a_ser__mean/D_ser_and_H_ser_hko",
+   "label": "D_ser_and_H_ser_hko",
+   "expr": "(D_ser & H_ser) - m",
+   "kind": "knockout",
+   "cell_dir": "D_ser_and_H_ser_hko__leaf",
+   "home": "ser",
+   "test_task": "ser_v2",
+   "condition": "deceptive",
+   "dataset": "ser_v2",
+   "task_from": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "H_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "mean",
+    "--variant-mean-bank",
+    "no_pressure",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 36
+  },
+  {
+   "stage": "1a",
+   "job": "p1a_ser",
+   "group": "p1a_ser__zero",
+   "scheme": "zero",
+   "set": 3,
+   "cell_id": "p1a_ser__zero/D_core_hko",
+   "label": "D_core_hko",
+   "expr": "(D_far & D_sdr & D_ser) - m",
+   "kind": "knockout",
+   "cell_dir": "D_core_hko__leaf",
+   "home": "ser",
+   "test_task": "ser_v2",
+   "condition": "deceptive",
+   "dataset": "ser_v2",
+   "task_from": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "zero",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 31
+  },
+  {
+   "stage": "1a",
+   "job": "p1a_ser",
+   "group": "p1a_ser__zero",
+   "scheme": "zero",
+   "set": 4,
+   "cell_id": "p1a_ser__zero/D_ser_minus_D_far_minus_D_sdr_hko",
+   "label": "D_ser_minus_D_far_minus_D_sdr_hko",
+   "expr": "(D_ser - D_far - D_sdr) - m",
+   "kind": "knockout",
+   "cell_dir": "D_ser_minus_D_far_minus_D_sdr_hko__leaf",
+   "home": "ser",
+   "test_task": "ser_v2",
+   "condition": "deceptive",
+   "dataset": "ser_v2",
+   "task_from": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "D_far": "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717",
+    "D_sdr": "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "zero",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 10
+  },
+  {
+   "stage": "1a",
+   "job": "p1a_ser",
+   "group": "p1a_ser__zero",
+   "scheme": "zero",
+   "set": 5,
+   "cell_id": "p1a_ser__zero/D_ser_minus_H_ser_hko",
+   "label": "D_ser_minus_H_ser_hko",
+   "expr": "(D_ser - H_ser) - m",
+   "kind": "knockout",
+   "cell_dir": "D_ser_minus_H_ser_hko__leaf",
+   "home": "ser",
+   "test_task": "ser_v2",
+   "condition": "deceptive",
+   "dataset": "ser_v2",
+   "task_from": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+   "evals": [
+    "knockout"
+   ],
+   "operands": {
+    "D_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101",
+    "H_ser": "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323",
+    "m": "outputs/_launch_mechanism_v2/evals/operands/allmlp_nomb_v2"
+   },
+   "common_args": [
+    "--ablation",
+    "zero",
+    "--n-random",
+    "20",
+    "--knockout-null-count",
+    "20"
+   ],
+   "expected_heads": 19
+  }
+ ]
+}

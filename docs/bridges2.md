@@ -22,7 +22,7 @@ rsynced back to Delta. Every transfer starts on Delta.
 
 | what | Delta | Bridges-2 |
 |---|---|---|
-| repo | the mechanism-datasets worktree (`DC_REPO_ROOT` in `scripts/cluster/delta.env`) | `/ocean/projects/<alloc>/swong2/Deception-Circuit` (git clone of branch `mechanism-datasets`) |
+| repo | the mechanism-analysis worktree (`DC_REPO_ROOT` in `scripts/cluster/delta.env`; `DC_DELTA_REPO_ROOT` overrides it) | `/ocean/projects/<alloc>/swong2/Deception-Circuit` (git clone; `sync-code` checks out `DC_B2_BRANCH` or `--branch`, default `mechanism-datasets`) |
 | HF cache | `/work/nvme/beto/swong2` | `/ocean/projects/<alloc>/swong2/hf`, holding only the Llama-3.1-8B-Instruct snapshot and the wikitext caches |
 | env | conda env `mgnp` | `/ocean/projects/<alloc>/swong2/envs/mgnp`, unpacked from `/work/nvme/beto/swong2/envs/mgnp-conda-pack.tar.gz` |
 | Slurm logs | `logs/` | `logs/` in the clone, fetched to Delta's `logs/bridges2/` |
@@ -70,7 +70,9 @@ error rather than a password prompt.
 Every subcommand takes `--dry`, which prints the commands and runs nothing. `-n` passes `--dry-run` to rsync.
 
 ```bash
-scripts/remote/b2.sh sync-code                 # clone or fast-forward branch mechanism-datasets on Bridges-2
+scripts/remote/b2.sh sync-code                 # clone or fast-forward branch mechanism-datasets on Bridges-2;
+                                               # after a force-push it moves the branch to origin's head (reset --keep)
+DC_B2_BRANCH=mechanism-analysis scripts/remote/b2.sh sync-code   # another pushed branch (or: sync-code --branch NAME)
 scripts/remote/b2.sh sync-data --what all      # model + wikitext caches, packed env, manifest run dirs (via b2dtn)
 scripts/remote/b2.sh unpack-env                # untar the env, run conda-unpack, print the package versions
 scripts/remote/b2.sh submit --test-only --script scripts/cluster/bridges2_smoke.sbatch --time 00:15:00
@@ -84,7 +86,9 @@ scripts/remote/b2.sh fetch [--ignore-existing] [REPO_RELATIVE_PATH...]
   the nopressure stand-ins there once ticket 06 builds them. The manifest refuses absolute paths, `..` and
   anything that looks like a credential.
 - `fetch` with no paths brings back `evaluations*/` under every manifest run dir, the suite roots
-  `outputs/_suites` and `outputs/_launch_mechanism_v2/evals`, and the Slurm logs. It never deletes. It
+  `outputs/_suites` and `outputs/_launch_mechanism_v2/evals`, the component-analysis cells
+  `outputs/_analyses/mechanism-analysis-*` (git-ignored, so a fetch is their only way back), and the Slurm
+  logs. Nothing else under `outputs/_analyses` is touched. It never deletes. It
   compares checksums, keeps any Delta file newer than the Bridges-2 copy (`--update`), and saves a Delta file
   it does replace as `<name>.pre-b2fetch`. Pass `--ignore-existing` to keep every Delta file that already
   exists, which suits immutable cell outputs. Fetch copies no permissions, times, group or owner from

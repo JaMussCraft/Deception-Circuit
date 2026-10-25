@@ -60,6 +60,7 @@ import os
 from evaluation import Evaluation
 from evaluation import report
 from evaluation import variants
+from evaluation.ablation import matched_variants, variant_bank_name
 from evaluation.masks import knockout_masks, ones_like
 from evaluation.metrics import (evaluate_task_metrics, summarize_metrics,
                                 summarize_null)
@@ -97,6 +98,26 @@ def resolve_null_count(cli, n_random: int) -> int:
     if requested is None:
         return n_random
     return max(0, min(int(requested), n_random))
+
+
+def section_banks(payload) -> dict:
+    """{payload section: mean bank it was ablated with}, for the sections that ran.
+
+    Written to knockout.json only under --variant-mean-bank, so every other
+    cell keeps its exact layout. `variants` are ablated with the task bank (D's
+    test split, under pressure); `variants_matched_bank` re-runs a variant's
+    rows with a bank collected over those very rows (R13). Only --ablation mean
+    reads a bank at all.
+    """
+    banks = {"task": "task"}
+    if payload.get("wikitext") is not None:
+        banks["wikitext"] = "wikitext"
+    for key in ("variants", "variants_matched_bank"):
+        if key not in payload:
+            continue
+        banks[key] = {variant: ("task" if key == "variants" else variant_bank_name(variant))
+                      for variant, section in payload[key].items() if "skipped" not in section}
+    return banks
 
 
 def _choice(token_id, target_id, distractor_id) -> str:
@@ -218,8 +239,9 @@ class KnockoutEvaluation(Evaluation):
         payload["task"] = self._task_side(ctx)
         payload["wikitext"] = (None if ctx.cli.skip_wikitext
                                else self._wikitext_side(ctx))
-        payload["variants"] = {variant: self._variant_side(ctx, variant)
-                               for variant in VARIANTS}
+        payload.update(self._variant_sections(ctx))
+        if matched_variants(ctx.cli):
+            payload["mean_banks"] = section_banks(payload)
         # Kept as an alias: knockout.json readers written against the
         # honest-only layout still find their section where it was. The
         # per-example lists are dropped from the copy — they can be a thousand
@@ -309,8 +331,27 @@ class KnockoutEvaluation(Evaluation):
         return {"n": len(rows), "granularity": ctx.cli.knockout_granularity,
                 "rows": rows, "stats": stats}
 
-    def _variant_side(self, ctx, variant):
-        """The same three configurations on one prompt variant's prompts."""
+    def _variant_sections(self, ctx) -> dict:
+        """`variants`: every prompt variant under the task bank, as always.
+
+        Under --variant-mean-bank, also `variants_matched_bank`: each named
+        variant's rows again, ablated with the bank collected over those rows
+        (R13, R19(2)), so both results are written side by side. A variant
+        whose rows could not be built is not re-run and names no bank.
+        """
+        out = {"variants": {variant: self._variant_side(ctx, variant)
+                            for variant in VARIANTS}}
+        matched = matched_variants(ctx.cli)
+        if matched:
+            out["variants_matched_bank"] = {
+                variant: self._variant_side(ctx, variant, variant_bank_name(variant))
+                for variant in VARIANTS
+                if variant in matched and "skipped" not in out["variants"][variant]}
+        return out
+
+    def _variant_side(self, ctx, variant, bank="task"):
+        """The same three configurations on one prompt variant's prompts,
+        ablated with mean bank `bank` (read only under --ablation mean)."""
         loader, reason = ctx.variant_loader(variant)
         if loader is None:
             print(f"\n  {variant} knockout skipped: {reason}")
@@ -322,7 +363,7 @@ class KnockoutEvaluation(Evaluation):
         # batch, which is the only reference the KL column here can mean — and
         # it is also what makes `ref_argmax_id` the full model's choice on the
         # variant prompt, so the flip audit works here unchanged.
-        common = dict(hook=ctx.hook_for("task"), ref_cache=None,
+        common = dict(hook=ctx.hook_for(bank), ref_cache=None,
                       collect_argmax=True)
         with ctx.all_gates_open():
             full = evaluate_task_metrics(ctx, loader,
@@ -337,7 +378,7 @@ class KnockoutEvaluation(Evaluation):
 
         per_example, flip_summary, flip_reason = self._flip_audit(
             ctx, loader, knocked)
-        return {
+        section = {
             "variant": variant,
             "description": variants.VARIANT_DESCRIPTIONS[variant],
             "label_convention": variants.LABEL_CONVENTION,
@@ -351,6 +392,10 @@ class KnockoutEvaluation(Evaluation):
                 "full_minus_knockout": full["accuracy"] - knocked["accuracy"],
             },
         }
+        if matched_variants(ctx.cli):
+            section["mean_bank"] = ({"bank": "task"} if bank == "task"
+                                    else ctx.mean_bank_meta(bank))
+        return section
 
     def _generation_side(self, ctx):
         """Three wikitext continuations per configuration, or a skip reason."""
@@ -436,6 +481,7 @@ class KnockoutEvaluation(Evaluation):
         self._report_task_null(payload, ctx)
         for variant in VARIANTS:
             self._report_variant(payload, ctx, variant)
+            self._report_variant(payload, ctx, variant, key="variants_matched_bank")
         self._report_generation(payload, ctx)
 
     # ------------------------------------------------------------------
@@ -551,8 +597,10 @@ class KnockoutEvaluation(Evaluation):
                     (row["example_id"], " ".join(row["prompt_excerpt"].split())))
         return out
 
-    def _report_variant(self, payload, ctx, variant) -> None:
-        section = (payload.get("variants") or {}).get(variant)
+    def _report_variant(self, payload, ctx, variant, key="variants") -> None:
+        """One variant section; `key` is `variants` (task bank) or
+        `variants_matched_bank` (the variant's own mean bank, R13)."""
+        section = (payload.get(key) or {}).get(variant)
         if section is None:
             return
         if "skipped" in section:
@@ -560,14 +608,22 @@ class KnockoutEvaluation(Evaluation):
             return
 
         rows = section["rows"]
+        title = VARIANT_TITLES[variant]
+        if key == "variants_matched_bank":
+            title += " — VARIANT-MATCHED MEAN BANK"
         report.metric_table(
             [("full model (all gates open)", rows["full"]),
              ("discovered circuit", rows["circuit"]),
              (f"knockout ({payload['granularity']})", rows["knockout"])],
             ctx.task.metric_columns,
-            title=VARIANT_TITLES[variant])
+            title=title)
 
         print(f"\n  Prompts: {section['description']}.")
+        bank = section.get("mean_bank")
+        if bank:
+            where = (f"{bank['n_rows']} rows of this variant, {bank['n_tokens']:.0f} tokens, "
+                     f"{bank['source']} streams" if "n_rows" in bank else "the task's test split")
+            print(f"  Mean bank for these rows: {bank['bank']} ({where}).")
         print("\n  Labels are NOT rebuilt with the prompts: 'accuracy' is the "
               "rate at which the\n  model still gives the DECEPTIVE answer, so "
               "here a LOW number is the good one\n  and the knockout has less "
