@@ -139,6 +139,30 @@ DIFFERENTIAL = "differential"
 #: the pair.
 PAIRED_CONDITIONS = (PRESSURE_PAIRED, HONEST_INSTRUCTION)
 
+#: v2 (mechanism-analysis 02a, spec R1): the Neutral-Clause Twin, paired by
+#: instance id over the WHOLE test split. Measured on the twin's prompt with
+#: the pressure prompt's labels, so it reads logit(deceptive) - logit(honest)
+#: with no sign change (unlike `honest_twin`, whose split swaps the labels).
+#: Selectable with `--dla-conditions`, and added by default on a v2 cell only,
+#: so a v1 cell measures, writes and declares exactly what it always did.
+NEUTRAL_TWIN = "neutral_twin"
+ALL_CONDITIONS = CONDITIONS + (NEUTRAL_TWIN,)
+#: Its two derived conditions, the left term and the per-instance difference.
+PRESSURE_NEUTRAL_TWIN_PAIRED = "pressure_neutral_twin_paired"
+DIFFERENTIAL_NEUTRAL_TWIN = "differential_neutral_twin"
+PAIRED_NEUTRAL_TWIN_CONDITIONS = (PRESSURE_NEUTRAL_TWIN_PAIRED, NEUTRAL_TWIN)
+PAIRED_SCATTER_TWIN_JSON_NAME = "dla_paired_scatter_neutral_twin.json"
+PAIRED_SCATTER_TWIN_PNG_NAME = "dla_paired_scatter_neutral_twin.png"
+PAIRED_LENS_TWIN_JSON_NAME = "logit_lens_paired_neutral_twin.json"
+PAIRED_LENS_TWIN_PNG_NAME = "logit_lens_paired_neutral_twin.png"
+
+#: R-lens (spec §2.6, EXPLORATORY per R12): an instance is honest-first if its
+#: lens margin logit(deceptive) - logit(honest) falls below `LENS_MARGIN` at
+#: some decoder layer in `LENS_LAYERS` (inclusive) and its final margin is
+#: positive. Conventions, not calibrations (R0, R17).
+LENS_LAYERS = (8, 28)
+LENS_MARGIN = -0.5
+
 #: How far below zero a mean has to sit to be called suppression, in logits.
 #: Read it against the two scales it sits between. The whole model's Readout
 #: logit difference on SDR nls0.3 is about +1.75 and the clean-minus-corrupt
@@ -179,8 +203,8 @@ def direction_sign(condition: str) -> int:
     look like a suppressor and the honest and pressure columns could not be
     compared.
     """
-    if condition not in CONDITIONS:
-        raise ValueError(f"{condition!r} is not one of {', '.join(CONDITIONS)}")
+    if condition not in ALL_CONDITIONS:
+        raise ValueError(f"{condition!r} is not one of {', '.join(ALL_CONDITIONS)}")
     return -1 if condition == HONEST_TWIN else 1
 
 
@@ -257,6 +281,73 @@ def sign_change_rows(values: Sequence[Optional[float]]) -> List[int]:
         if (before > 0) != (after > 0) and before != 0 and after != 0:
             out.append(index)
     return out
+
+
+def lens_crossing(rows: Sequence[float], *, layers=LENS_LAYERS,
+                  margin: float = LENS_MARGIN) -> dict:
+    """One instance's R-lens record, from its lens rows in the deception direction.
+
+    `rows` is row 0 (the embedding) then one row per decoder layer, each
+    logit(deceptive) - logit(honest). Returns the first layer in `layers`
+    (inclusive) whose margin is strictly below `margin`, the final margin and
+    its sign, whether the instance is honest-first (such a layer exists and the
+    final margin is positive), and the last row where the sign changes.
+    """
+    values = [float(one) for one in rows]
+    first_row = next((row for row in range(layers[0] + 1, min(layers[1] + 1,
+                                                               len(values) - 1) + 1)
+                      if values[row] < margin), None)
+    final = values[-1]
+    sign = 1 if final > 0 else -1 if final < 0 else 0
+    changes = sign_change_rows(values)
+    last = changes[-1] if changes else None
+    return {"first_row_below": first_row,
+            "first_layer_below": layer_of_row(first_row),
+            "final_margin": final, "final_sign": sign,
+            "honest_first": first_row is not None and sign > 0,
+            "last_sign_change_row": last,
+            "last_sign_change_layer": layer_of_row(last)}
+
+
+#: The record `condition`s whose dataset Target is the honest item.
+HONEST_TARGET_CONDITIONS = ("honest", "nopressure")
+
+
+def lens_crossing_summary(tallies: Dict[str, "Tally"]) -> dict:
+    """`logit_lens.json`'s `crossing` block: per condition, per instance.
+
+    Every value is turned into logit(deceptive) - logit(honest) first: a tally
+    stores `sign * (target - distractor)`, and the raw direction is honest on
+    rows whose `condition` is honest or nopressure (H, F, the honest-twin
+    split), so the factor is `sign * (-1 if honest-target else 1)`.
+    """
+    out = {}
+    for name, tally in tallies.items():
+        rows = tally.lens.get(ALL) or []
+        if not rows or name in (DIFFERENTIAL, DIFFERENTIAL_NEUTRAL_TWIN):
+            continue
+        instances = []
+        for index, values in enumerate(rows):
+            meta = tally.instance_meta[index] if index < len(tally.instance_meta) else {}
+            factor = tally.sign * (-1 if meta.get("condition")
+                                   in HONEST_TARGET_CONDITIONS else 1)
+            record = lens_crossing([factor * one for one in values])
+            instances.append({"instance_id": tally.ids[index],
+                              "pressure_id": meta.get("pressure_id"),
+                              "condition": meta.get("condition"), **record})
+        honest_first = sum(1 for one in instances if one["honest_first"])
+        out[name] = {"n": len(instances), "n_honest_first": honest_first,
+                     "rate_honest_first": honest_first / len(instances),
+                     "instances": instances}
+    return {"rule": (f"honest-first: the lens margin logit(deceptive) - "
+                     f"logit(honest) is < {LENS_MARGIN} at some decoder layer in "
+                     f"{LENS_LAYERS[0]}..{LENS_LAYERS[1]} (inclusive) and the "
+                     f"final layer's margin is positive"),
+            "status": ("EXPLORATORY (spec R12): the raw lens is uncalibrated; "
+                       "between-task CIs are bootstraps clustered by pressure_id"),
+            "direction": "logit(deceptive answer) - logit(honest answer), every condition",
+            "layers": list(LENS_LAYERS), "margin": LENS_MARGIN,
+            "conditions": out}
 
 
 def layer_of_row(row: Optional[int]) -> Optional[int]:
@@ -435,10 +526,17 @@ class Tally:
         self.lens: Dict[str, list] = {}
         self.totals: Dict[str, Dict[str, list]] = {}
         self.ids: List[str] = []
+        #: Per instance, in `ids` order: its `pressure_id` and `condition`, for
+        #: the lens crossing summary (clustered by clause, read in the
+        #: deception direction).
+        self.instance_meta: List[dict] = []
 
     def add(self, records, ids, per_component, lens, total, circuit_sum,
             embedding) -> None:
         """One batch's per-instance values, already read out of the model."""
+        for record in records:
+            self.instance_meta.append({"pressure_id": record.get("pressure_id"),
+                                       "condition": record.get("condition")})
         for row, record in enumerate(records):
             strata = {ALL}
             if self.factors:
@@ -515,6 +613,7 @@ def paired_difference(left: Tally, right: Tally) -> Tally:
             f"{len(right.ids)}")
     out = Tally(left.keys, factors=left.factors)
     out.ids = list(left.ids)
+    out.instance_meta = list(left.instance_meta)
     for key in out.keys:
         for stratum, values in left.components[key].items():
             other = right.components[key][stratum]
@@ -649,6 +748,51 @@ def measure_paired(model, batches, keys, *, factors=(), max_batches: int = 0):
     return pressure, honest, paired_difference(pressure, honest), unpaired
 
 
+def measure_paired_neutral_twin(model, batches, keys, *, factors=(),
+                                max_batches: int = 0):
+    """(pressure tally, twin tally, differential, unpaired ids), v2's pairing.
+
+    `measure_paired` with the Neutral-Clause Twin in place of the Matched
+    Honest Instruction: each row of the split that has a twin is measured on
+    its own prompt and on its twin's, both read with the pressure prompt's
+    Target and Distractor, so the differential is pressure minus twin per
+    instance, in the deception direction.
+    """
+    import torch
+
+    pressure = Tally(keys, factors=factors)
+    twin = Tally(keys, factors=factors)
+    unpaired: List[str] = []
+
+    for index, batch in enumerate(batches):
+        if max_batches and index >= max_batches:
+            break
+        pair = getattr(batch, "neutral_twin", None)
+        if pair is None:
+            unpaired.extend(batch.ids)
+            continue
+        rows = list(pair.rows)
+        unpaired.extend(one for row, one in enumerate(batch.ids)
+                        if row not in set(rows))
+        selector = torch.tensor(rows, dtype=torch.long)
+        readout = batch.readout[selector]
+        if not torch.equal(pair.attention_mask.sum(-1).long() - 1, readout):
+            raise ValueError("a Neutral-Clause Twin does not end at its pressure "
+                             "prompt's Readout")
+        records = [batch.records[row] for row in rows]
+        ids = [batch.ids[row] for row in rows]
+        target, distractor = batch.target_token[selector], \
+            batch.distractor_token[selector]
+        _add_batch(pressure, records, ids, *measure_batch(
+            model, keys, *_to_device(model, batch.input_ids[selector],
+                                     batch.attention_mask[selector], readout,
+                                     target, distractor)))
+        _add_batch(twin, records, ids, *measure_batch(
+            model, keys, *_to_device(model, pair.input_ids, pair.attention_mask,
+                                     readout, target, distractor)))
+    return pressure, twin, paired_difference(pressure, twin), unpaired
+
+
 def sum_check(model, batch, keys) -> dict:
     """Does the invariant hold on the real model, at bfloat16, on one batch?
 
@@ -708,13 +852,13 @@ def parse_conditions(value) -> List[str]:
               if isinstance(value, str) else [str(one) for one in value])
     if not wanted:
         return list(CONDITIONS)
-    unknown = [one for one in wanted if one not in CONDITIONS]
+    unknown = [one for one in wanted if one not in ALL_CONDITIONS]
     if unknown:
         raise UnknownCondition(
             f"--dla-conditions names {', '.join(unknown)}, which "
             f"{'is' if len(unknown) == 1 else 'are'} not a DLA condition. "
-            f"Choose from {', '.join(CONDITIONS)}.")
-    return [one for one in CONDITIONS if one in wanted]
+            f"Choose from {', '.join(ALL_CONDITIONS)}.")
+    return [one for one in ALL_CONDITIONS if one in wanted]
 
 
 def wanted_conditions(cli) -> List[str]:
@@ -725,19 +869,45 @@ def wanted_conditions(cli) -> List[str]:
     return parse_conditions(value)
 
 
+def is_v2(ctx) -> bool:
+    from component_analysis.dataloaders import V2_TASKS
+
+    return getattr(ctx.task_spec, "name", None) in V2_TASKS
+
+
+def wanted_conditions_for(ctx) -> List[str]:
+    """The conditions this cell measures.
+
+    `--dla-conditions` when given; otherwise v1's three, plus `neutral_twin`
+    on a v2 cell (skipped with its reason on an H or F test set).
+    """
+    if getattr(ctx.cli, "dla_conditions", None) is not None:
+        return wanted_conditions(ctx.cli)
+    return list(CONDITIONS) + ([NEUTRAL_TWIN] if is_v2(ctx) else [])
+
+
 def honest_twin_dir(ctx) -> str:
     """Where the Honest Twin split lives: `<dataset>_honest`, or the flag.
 
     The twin is a second dataset directory rather than a flag on the loader —
     a different population of instances under the same Scaffold — which is
     exactly why its column is descriptive and not paired.
+
+    On v2 it is `<data_dir>/<task>_honest` from the dataset's own task name, so
+    an I cell (`<task>_inversion`) finds the same twin split D does.
     """
     from component_analysis import instances
 
     override = getattr(ctx.cli, "dla_honest_twin_dir", None)
     if override:
         return override
-    return instances.dataset_dir(ctx.task_spec) + "_honest"
+    directory = instances.dataset_dir(ctx.task_spec)
+    if is_v2(ctx):
+        from component_analysis.dataloaders import neutral_twin_dir
+        from dataset.deception_common import load_dataset_config
+
+        return neutral_twin_dir(directory, load_dataset_config(directory))
+    return directory + "_honest"
 
 
 def dataset_of(ctx, condition: str) -> str:
@@ -799,6 +969,13 @@ def condition_batches(ctx, condition: str):
 
     if condition == PRESSURE:
         return ctx.descriptive_batches()
+    if condition == NEUTRAL_TWIN:
+        batches = ctx.neutral_twin_batches()
+        if not batches.report.get("n_with_neutral_twin"):
+            raise dataloaders.LoaderUnavailable(
+                f"no row of this test set has a Neutral-Clause Twin "
+                f"({batches.report.get('neutral_twin_source')})")
+        return batches
     if condition == HONEST_INSTRUCTION:
         reason = dataloaders.uncovered_reason(ctx.task_spec.name)
         if reason:
@@ -829,10 +1006,12 @@ def condition_batches(ctx, condition: str):
 
 def add_arguments(group) -> None:
     group.add_argument("--dla-conditions", type=parse_conditions,
-                       default=list(CONDITIONS), metavar="NAME[,NAME]",
+                       default=None, metavar="NAME[,NAME]",
                        help="Which conditions to measure: "
-                            f"{', '.join(CONDITIONS)}. A condition whose data "
-                            f"this cell does not have is reported and skipped.")
+                            f"{', '.join(ALL_CONDITIONS)}. Default: "
+                            f"{', '.join(CONDITIONS)}, plus {NEUTRAL_TWIN} on a "
+                            f"v2 cell. A condition whose data this cell does "
+                            f"not have is reported and skipped.")
     group.add_argument("--dla-split", default="none", choices=sorted(SPLITS),
                        help="Group instances by this factor set before "
                             "averaging. The head-table columns are always the "
@@ -860,7 +1039,7 @@ def estimate(ctx) -> str:
     from component_analysis import dataloaders
 
     parts = []
-    for condition in wanted_conditions(ctx.cli):
+    for condition in wanted_conditions_for(ctx):
         try:
             batches = condition_batches(ctx, condition)
         except dataloaders.LoaderUnavailable as unavailable:
@@ -870,6 +1049,12 @@ def estimate(ctx) -> str:
             continue
         n_instances = batches.n_instances
         n_batches = len(batches)
+        if condition == NEUTRAL_TWIN:
+            parts.append(f"{condition} {batches.report['n_with_neutral_twin']} "
+                         f"paired instance(s) of {n_instances} in the split, 2 "
+                         f"forward passes each, from "
+                         f"{batches.report['neutral_twin_source']}")
+            continue
         if condition == HONEST_INSTRUCTION:
             n_instances = batches.report["n_with_honest"]
             parts.append(f"{condition} {n_instances} paired instance(s) of "
@@ -899,14 +1084,23 @@ def run(ctx) -> dict:
     unpaired: List[str] = []
     checked = None
 
-    for condition in wanted_conditions(ctx.cli):
+    for condition in wanted_conditions_for(ctx):
         try:
             batches = condition_batches(ctx, condition)
         except dataloaders.LoaderUnavailable as unavailable:
             skipped[condition] = str(unavailable)
             continue
         sources[condition] = dict(batches.report, dataset_dir=dataset_of(
-            ctx, condition), paired=(condition == HONEST_INSTRUCTION))
+            ctx, condition), paired=(condition in (HONEST_INSTRUCTION,
+                                                   NEUTRAL_TWIN)))
+        if condition == NEUTRAL_TWIN:
+            pressure, twin, difference, twin_unpaired = measure_paired_neutral_twin(
+                ctx.model, batches, keys, factors=factors, max_batches=max_batches)
+            tallies[NEUTRAL_TWIN] = twin
+            tallies[PRESSURE_NEUTRAL_TWIN_PAIRED] = pressure
+            tallies[DIFFERENTIAL_NEUTRAL_TWIN] = difference
+            sources[condition]["unpaired_instance_ids"] = twin_unpaired
+            continue
         if condition == HONEST_INSTRUCTION:
             paired, honest, difference, unpaired = measure_paired(
                 ctx.model, batches, keys, factors=factors,
@@ -927,6 +1121,8 @@ def run(ctx) -> dict:
                           factors=factors, unpaired=unpaired,
                           sum_check_result=checked)
     lens = lens_payload(ctx, tallies)
+    if is_v2(ctx):
+        lens["crossing"] = lens_crossing_summary(tallies)
     table = columns(payload)
     ctx.write_json(SUBDIR, JSON_NAME, payload)
     ctx.write_json(SUBDIR, LENS_JSON_NAME, lens)
@@ -947,6 +1143,20 @@ def run(ctx) -> dict:
               title=f"Paired logit lens at the Readout — {payload['circuit']} "
                     f"x {payload['task']}",
               empty_message=NOT_PAIRED)
+
+    # The neutral-twin pair of figures, on a cell that asked for the twin.
+    if NEUTRAL_TWIN in payload["conditions"] or NEUTRAL_TWIN in skipped:
+        scatter = paired_scatter_payload(payload, pair=TWIN_PAIR)
+        ctx.write_json(SUBDIR, PAIRED_SCATTER_TWIN_JSON_NAME, scatter)
+        plot_paired_scatter(os.path.join(directory, PAIRED_SCATTER_TWIN_PNG_NAME),
+                            scatter)
+        paired_lens = paired_lens_payload(lens, pair=TWIN_PAIR)
+        ctx.write_json(SUBDIR, PAIRED_LENS_TWIN_JSON_NAME, paired_lens)
+        plot_lens(os.path.join(directory, PAIRED_LENS_TWIN_PNG_NAME),
+                  paired_lens_figure_payload(paired_lens),
+                  title=f"Paired logit lens, pressure vs Neutral-Clause Twin — "
+                        f"{payload['circuit']} x {payload['task']}",
+                  empty_message=TWIN_PAIR["not_paired"])
     declare_coverage(ctx, payload)
     return table
 
@@ -1072,7 +1282,30 @@ NOT_PAIRED = (f"this cell has no paired condition: {HONEST_INSTRUCTION} did "
               f"ids on both sides. See 'skipped' in " + JSON_NAME + ".")
 
 
-def paired_scatter_payload(payload: dict) -> dict:
+NOT_PAIRED_TWIN = (f"this cell has no neutral-twin pair: {NEUTRAL_TWIN} did not "
+                   f"run (an H or F test set, or a v1 cell). See 'skipped' in "
+                   + JSON_NAME + ".")
+
+#: The two paired contrasts the paired figures can show. Every string of the
+#: honest-instruction pair is the one these figures always carried.
+HONEST_PAIR = {
+    "x": PRESSURE_PAIRED, "y": HONEST_INSTRUCTION, "differential": DIFFERENTIAL,
+    "figure": PAIRED_SCATTER_PNG_NAME, "lens_figure": PAIRED_LENS_PNG_NAME,
+    "y_label": "the Matched Honest Instruction",
+    "y_short": "the instruction", "column": "dla.differential_paired",
+    "not_paired": NOT_PAIRED,
+}
+TWIN_PAIR = {
+    "x": PRESSURE_NEUTRAL_TWIN_PAIRED, "y": NEUTRAL_TWIN,
+    "differential": DIFFERENTIAL_NEUTRAL_TWIN,
+    "figure": PAIRED_SCATTER_TWIN_PNG_NAME, "lens_figure": PAIRED_LENS_TWIN_PNG_NAME,
+    "y_label": "the Neutral-Clause Twin",
+    "y_short": "the twin", "column": "dla.differential_neutral_twin_paired",
+    "not_paired": NOT_PAIRED_TWIN,
+}
+
+
+def paired_scatter_payload(payload: dict, pair: dict = None) -> dict:
     """`dla/dla_paired_scatter.json`: one point per Component, both paired axes.
 
     x is the paired subset's pressure DLA and y is the same instances' DLA
@@ -1084,17 +1317,20 @@ def paired_scatter_payload(payload: dict) -> dict:
     scatter of it against the honest column would be a population contrast
     drawn to look like a paired one.
     """
+    pair = pair or HONEST_PAIR
+    x_name, y_name = pair["x"], pair["y"]
     conditions = payload["conditions"]
-    left = conditions.get(PRESSURE_PAIRED)
-    right = conditions.get(HONEST_INSTRUCTION)
+    left = conditions.get(x_name)
+    right = conditions.get(y_name)
+    their = pair["y_label"].replace("the ", "their ", 1)
 
     twin = {
-        "figure": PAIRED_SCATTER_PNG_NAME,
+        "figure": pair["figure"],
         "shows": (f"per-Component direct logit attribution at the Readout "
-                  f"under pressure (x) against the same instances under their "
-                  f"Matched Honest Instruction (y)"),
-        "x": PRESSURE_PAIRED,
-        "y": HONEST_INSTRUCTION,
+                  f"under pressure (x) against the same instances under "
+                  f"{their} (y)"),
+        "x": x_name,
+        "y": y_name,
         "paired": True,
         "metric": METRIC,
         "circuit": payload["circuit"],
@@ -1103,9 +1339,9 @@ def paired_scatter_payload(payload: dict) -> dict:
         "instance_ids": [],
         "diagonal": ("y = x means the Component writes the same thing under "
                      "both conditions; one below the line writes more towards "
-                     "the deceptive answer under pressure than under the "
-                     "instruction, and its signed distance from the line is "
-                     "dla.differential_paired"),
+                     "the deceptive answer under pressure than under "
+                     f"{pair['y_short']}, and its signed distance from the line is "
+                     f"{pair['column']}"),
         "points": [],
         "zoom": None,
         "panels": ("one panel over every Component, unless an outlier makes "
@@ -1114,21 +1350,21 @@ def paired_scatter_payload(payload: dict) -> dict:
         "skipped": None,
     }
     if left is None or right is None:
-        twin["skipped"] = NOT_PAIRED
+        twin["skipped"] = pair["not_paired"]
         return twin
 
     twin["n_instances"] = right["n_instances"]
     twin["instance_ids"] = right["instance_ids"]
     difference = {tuple(row["key"]): row["levels"].get(ALL, {})
-                  for row in conditions.get(DIFFERENTIAL, {})
+                  for row in conditions.get(pair["differential"], {})
                   .get("components", [])}
     by_key = {name: {tuple(row["key"]): row for row in conditions[name]["components"]}
-              for name in (PRESSURE_PAIRED, HONEST_INSTRUCTION)}
+              for name in (x_name, y_name)}
 
     for row in left["components"]:
         key = tuple(row["key"])
-        x = by_key[PRESSURE_PAIRED][key]["levels"].get(ALL, {})
-        y = by_key[HONEST_INSTRUCTION].get(key, {}).get("levels", {}).get(ALL, {})
+        x = by_key[x_name][key]["levels"].get(ALL, {})
+        y = by_key[y_name].get(key, {}).get("levels", {}).get(ALL, {})
         twin["points"].append({
             "key": list(key), "label": row["label"], "layer": row["layer"],
             "kind": row["kind"],
@@ -1167,10 +1403,11 @@ def panel_of(point: dict, zoom: Optional[float]) -> str:
     return ZOOM_PANEL if magnitude < zoom else FULL_PANEL
 
 
-def paired_lens_conditions(lens: dict) -> dict:
+def paired_lens_conditions(lens: dict, pair: dict = None) -> dict:
     """The two paired conditions of `logit_lens.json`, flattened for the twin."""
+    pair = pair or HONEST_PAIR
     out = {}
-    for name in PAIRED_CONDITIONS:
+    for name in (pair["x"], pair["y"]):
         condition = lens["conditions"].get(name)
         level = (condition or {}).get("levels", {}).get(ALL)
         if not level:
@@ -1186,7 +1423,7 @@ def paired_lens_conditions(lens: dict) -> dict:
     return out
 
 
-def paired_lens_payload(lens: dict) -> dict:
+def paired_lens_payload(lens: dict, pair: dict = None) -> dict:
     """`dla/logit_lens_paired.json`: the two paired conditions and nothing else.
 
     `logit_lens.json` carries every condition the cell measured, the two
@@ -1195,11 +1432,12 @@ def paired_lens_payload(lens: dict) -> dict:
     deceptive answer overtakes the honest one is a claim about *those*
     instances and the full-split curve is not evidence for it.
     """
-    conditions = paired_lens_conditions(lens)
+    pair = pair or HONEST_PAIR
+    conditions = paired_lens_conditions(lens, pair)
     return {
-        "figure": PAIRED_LENS_PNG_NAME,
+        "figure": pair["lens_figure"],
         "shows": ("the cumulative-residual logit lens at the Readout under "
-                  "pressure and under the Matched Honest Instruction, over "
+                  f"pressure and under {pair['y_label']}, over "
                   "the same instances"),
         "paired": True,
         "metric": METRIC,
@@ -1207,7 +1445,7 @@ def paired_lens_payload(lens: dict) -> dict:
         "task": lens["task"],
         "rows": lens["rows"],
         "conditions": conditions,
-        "skipped": None if conditions else NOT_PAIRED,
+        "skipped": None if conditions else pair["not_paired"],
     }
 
 
@@ -1261,10 +1499,11 @@ def columns(payload) -> dict:
             if tuple(row["key"]) not in ordered:
                 ordered.append(tuple(row["key"]))
 
+    sources = column_sources(payload)
     out = {}
     for key in ordered:
         out[key] = {column: value(condition, key, field)
-                    for column, (condition, field) in COLUMN_SOURCES.items()}
+                    for column, (condition, field) in sources.items()}
         out[key]["suppression"] = is_suppressing(out[key]["pressure"],
                                                  margin=margin)
     return out
@@ -1287,6 +1526,26 @@ COLUMN_SOURCES = {
     "honest_twin_descriptive_se": (HONEST_TWIN, "se"),
 }
 
+#: The neutral-twin columns (v2), written only on a cell that asked for the
+#: twin, so a v1 head table gains no column. Paired, and named so.
+TWIN_COLUMN_SOURCES = {
+    "neutral_twin_paired": (NEUTRAL_TWIN, "mean"),
+    "pressure_neutral_twin_paired": (PRESSURE_NEUTRAL_TWIN_PAIRED, "mean"),
+    "differential_neutral_twin_paired": (DIFFERENTIAL_NEUTRAL_TWIN, "mean"),
+    "differential_neutral_twin_paired_se": (DIFFERENTIAL_NEUTRAL_TWIN, "se"),
+}
+
+
+def asked_for_twin(payload) -> bool:
+    return NEUTRAL_TWIN in payload["conditions"] or \
+        NEUTRAL_TWIN in (payload.get("skipped") or {})
+
+
+def column_sources(payload) -> dict:
+    """`COLUMN_SOURCES`, plus the twin's columns on a cell that asked for it."""
+    return {**COLUMN_SOURCES, **(TWIN_COLUMN_SOURCES if asked_for_twin(payload) else {})}
+
+
 #: The instance set each condition is measured over, by name, for the head
 #: table's coverage meta. The three paired conditions share one: the same ids.
 INSTANCE_SETS = {
@@ -1295,6 +1554,9 @@ INSTANCE_SETS = {
     HONEST_INSTRUCTION: ht.PAIRED_HONEST_INSTRUCTION,
     DIFFERENTIAL: ht.PAIRED_HONEST_INSTRUCTION,
     HONEST_TWIN: ht.HONEST_TWIN_SPLIT,
+    NEUTRAL_TWIN: ht.PAIRED_NEUTRAL_TWIN,
+    PRESSURE_NEUTRAL_TWIN_PAIRED: ht.PAIRED_NEUTRAL_TWIN,
+    DIFFERENTIAL_NEUTRAL_TWIN: ht.PAIRED_NEUTRAL_TWIN,
 }
 
 
@@ -1309,7 +1571,7 @@ def declare_coverage(ctx, payload) -> None:
     conditions = payload["conditions"]
     sources = payload.get("sources") or {}
     columns_of = {}
-    for column, (condition, _field) in COLUMN_SOURCES.items():
+    for column, (condition, _field) in column_sources(payload).items():
         columns_of.setdefault(condition, []).append(column)
     columns_of[PRESSURE].append("suppression")
     for condition, columns_here in columns_of.items():
@@ -1364,7 +1626,8 @@ def plot_components(path: str, payload: dict, *, table: dict = None) -> str:
     """
     plt = _pyplot()
 
-    series = [name for name in (PRESSURE, HONEST_INSTRUCTION, HONEST_TWIN)
+    series = [name for name in (PRESSURE, HONEST_INSTRUCTION, HONEST_TWIN,
+                                NEUTRAL_TWIN)
               if name in payload["conditions"]]
     if not series:
         return _empty_figure(
@@ -1450,7 +1713,9 @@ def zoom_limit(points: Sequence[dict]) -> Optional[float]:
     return cut * ZOOM_MARGIN
 
 
-def _scatter_panel(axes, points, limit, *, names: Sequence[str]):
+def _scatter_panel(axes, points, limit, *, names: Sequence[str],
+                   x_name: str = PRESSURE_PAIRED, y_name: str = HONEST_INSTRUCTION,
+                   y_label: str = "the Matched Honest Instruction"):
     """One square panel of the scatter: the diagonal, the axes and the labels.
 
     Every panel draws every point; only the labels differ. `names` is the set
@@ -1480,9 +1745,9 @@ def _scatter_panel(axes, points, limit, *, names: Sequence[str]):
     axes.axvline(0.0, color="black", linewidth=0.8, zorder=2)
     axes.set_xlim(-limit, limit)
     axes.set_ylim(-limit, limit)
-    axes.set_xlabel(f"DLA under pressure ({PRESSURE_PAIRED})")
-    axes.set_ylabel(f"DLA under the Matched Honest Instruction "
-                    f"({HONEST_INSTRUCTION})", fontsize=9)
+    axes.set_xlabel(f"DLA under pressure ({x_name})")
+    axes.set_ylabel(f"DLA under {y_label} "
+                    f"({y_name})", fontsize=9)
     return len(labelled)
 
 
@@ -1504,11 +1769,13 @@ def plot_paired_scatter(path: str, twin: dict) -> str:
     full = max([abs(one["x"]) for one in points]
                + [abs(one["y"]) for one in points] + [1e-3]) * 1.25
     zoom = twin.get("zoom")
+    pair = TWIN_PAIR if twin.get("y") == NEUTRAL_TWIN else HONEST_PAIR
+    labels = {"x_name": pair["x"], "y_name": pair["y"], "y_label": pair["y_label"]}
 
     figure, axes = plt.subplots(1, 2 if zoom else 1, squeeze=False,
                                 figsize=(11.6 if zoom else 6.4, 6.2))
     named = _scatter_panel(axes[0][0], points, full,
-                           names=(FULL_PANEL, SINGLE_PANEL))
+                           names=(FULL_PANEL, SINGLE_PANEL), **labels)
     axes[0][0].set_title(
         f"all {len(points)} Component(s)" if not zoom else
         f"all {len(points)} drawn; the {named} at or above +/-{zoom:.3f} "
@@ -1518,7 +1785,8 @@ def plot_paired_scatter(path: str, twin: dict) -> str:
         # The outliers set the first panel's scale, so the Components that sit
         # near the origin are unreadable there and get a panel of their own.
         # The labels divide between the two panels; the points do not.
-        shown = _scatter_panel(axes[0][1], points, zoom, names=(ZOOM_PANEL,))
+        shown = _scatter_panel(axes[0][1], points, zoom, names=(ZOOM_PANEL,),
+                               **labels)
         axes[0][1].set_title(f"zoomed to +/-{zoom:.3f}: the other {shown} "
                              f"Component(s), named here", fontsize=9)
 

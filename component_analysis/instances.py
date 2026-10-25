@@ -39,8 +39,26 @@ def _header() -> dict:
 # RECORDS
 # ==============================================================================
 
+#: The instructed-inversion control condition of the v2 tasks
+#: (mechanism-analysis ticket 08, R15): `<data_dir>/<task>_inversion`. Not one
+#: of `tasks.DECEPTION_CONDITIONS`, because nothing trains on it; the analyses
+#: bind it through a config-only stand-in whose `deception_condition` is this.
+INVERSION_CONDITION = "inversion"
+
+
 def dataset_dir(task_spec) -> str:
-    """Where this task's built dataset lives, asked of the task itself."""
+    """Where this task's built dataset lives, asked of the task itself.
+
+    The one exception is the v2 I condition, which the task classes do not
+    know (they refuse a condition they cannot train on), so it is resolved
+    here with the same `<data_dir>/<task>_<condition>` rule they use.
+    """
+    from component_analysis.dataloaders import V2_TASKS
+
+    if task_spec.name in V2_TASKS and \
+            getattr(task_spec.args, "deception_condition", None) == INVERSION_CONDITION:
+        return os.path.join(task_spec.args.data_dir,
+                            f"{task_spec.name}_{INVERSION_CONDITION}")
     task = task_spec.build()
     if hasattr(task, "dataset_dir"):
         return task.dataset_dir(task_spec.args)

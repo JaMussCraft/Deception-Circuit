@@ -70,6 +70,11 @@ TEST_SPLIT = "test_split"
 CAUSAL_SAMPLE = "causal_sample"
 PAIRED_HONEST_INSTRUCTION = "paired_honest_instruction"
 HONEST_TWIN_SPLIT = "honest_twin_split"
+#: v2 (mechanism-analysis 02a): the rows of the test split paired with their
+#: Neutral-Clause Twin (DLA), and the causal sample's rows that have one (a
+#: neutral-twin knockout).
+PAIRED_NEUTRAL_TWIN = "paired_neutral_twin"
+CAUSAL_SAMPLE_NEUTRAL_TWIN = "causal_sample_neutral_twin_paired"
 
 #: The bare names `path_patching` wrote per counterfactual before its sign
 #: flipped (2026-10-13). Spelled here only to derive their pre-`paired` legacy
@@ -275,7 +280,8 @@ def instance_set_id(name: str, instance_ids, dataset: str = None):
 
 
 def add_coverage(meta, columns, instance_ids, *, instance_set: str,
-                 namespace: str = None, dataset: str = None) -> dict:
+                 namespace: str = None, dataset: str = None,
+                 details: dict = None) -> dict:
     """Declare which instances some columns were computed over.
 
     `columns` are bare names, namespaced like `merge_columns` namespaces them;
@@ -283,6 +289,10 @@ def add_coverage(meta, columns, instance_ids, *, instance_set: str,
     `paired_honest_instruction`, ...) and the id adds a digest of the ids, so a
     name is never mistaken for a guarantee that two sets are equal. Returns a
     new meta; the input is not mutated. Redeclaring a column replaces it.
+
+    `details` (the sample seed and id filters a v2 cell draws with) is stored
+    on the column's coverage entry, so two columns over one instance set can
+    still say how each was produced; absent, the entry is what it always was.
     """
     meta = dict(meta or {})
     coverage = dict(meta.get(COVERAGE_KEY) or {})
@@ -292,9 +302,10 @@ def add_coverage(meta, columns, instance_ids, *, instance_set: str,
     if set_id is not None and set_id not in sets:
         sets[set_id] = {"name": instance_set, "n": len(ids),
                         "dataset": dataset, "instance_ids": ids}
+    extra = {"details": dict(details)} if details else {}
     for column in columns:
         name = f"{namespace}.{column}" if namespace else column
-        coverage[name] = {"n": len(ids), "instance_set": set_id}
+        coverage[name] = {"n": len(ids), "instance_set": set_id, **extra}
     meta[COVERAGE_KEY] = coverage
     meta[INSTANCE_SETS_KEY] = sets
     return meta
@@ -309,7 +320,8 @@ def add_declarations(meta, declarations, *, namespace: str) -> dict:
     for one in declarations:
         meta = add_coverage(meta, one["columns"], one["instance_ids"],
                             instance_set=one["instance_set"],
-                            namespace=namespace, dataset=one.get("dataset"))
+                            namespace=namespace, dataset=one.get("dataset"),
+                            details=one.get("details"))
     return meta
 
 

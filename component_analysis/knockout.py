@@ -42,8 +42,11 @@ node, which has no 0.7.0.
 from __future__ import annotations
 
 import argparse
+import hashlib
+import json
 import math
 import os
+import re
 import time
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
@@ -66,9 +69,32 @@ SUBDIR = "knockout"
 JSON_NAME = "knockout.json"
 PNG_NAME = "knockout.png"
 
-#: The only ablation scheme that exists, and the two that do not yet.
+#: The default ablation scheme, and every scheme built (mechanism-analysis
+#: 02a added mean and zero). `mean` has the evaluator's semantics
+#: (`evaluation/ablation.py` `MeanCollector` / `MeanHook`): one mean per site
+#: over every unpadded position of the cell's own test split, clean and corrupt
+#: prompts pooled with equal token weight, accumulated in fp32, cast to the
+#: model's dtype and written at every position the plan names. `zero` writes
+#: zeros there.
 SCHEME = "interchange"
-FUTURE_SCHEMES = ("mean", "zero")
+SCHEMES = ("interchange", "mean", "zero")
+
+#: Which stream an interchange knockout copies from. `item_swap` is the
+#: dataset's corrupt prompt (the default, v1's only one); `neutral_twin` is
+#: the v2 Neutral-Clause Twin's clean prompt, with the pressure prompt's labels
+#: (`dataloaders.NeutralTwinPair`).
+COUNTERFACTUAL = "item_swap"
+COUNTERFACTUALS = ("item_swap", "neutral_twin")
+
+#: Where a knockout writes: `all` (the default), `readout`, a Segment's name,
+#: or the range form `after=<Segment>[,exclude=readout]` (R11(a)); the spec's
+#: "post-clause" is `after=pressure_clause,exclude=readout`.
+POSITIONS = "all"
+
+#: Seconds per forward on an H100, extrapolated (not measured) from the H200
+#: sweep of job 22899543 (0.0368 s) by the evaluator's H200/H100 ratio
+#: 5.4 / 4.0. Ticket 02a's Bridges-2 smoke replaces it with a measurement.
+SECONDS_PER_FORWARD_H100 = 0.0368 * 5.4 / 4.0
 
 #: What of the loader's report belongs in this analysis's JSON. The
 #: Honest-Instruction counts it also carries are the paired analyses' business:
@@ -83,27 +109,197 @@ SECONDS_PER_FORWARD = 0.19
 
 
 class UnsupportedScheme(argparse.ArgumentTypeError, ValueError):
-    """A knockout scheme that is not built.
+    """A knockout scheme, counterfactual or positions value that is not built.
 
     Two bases on purpose: argparse prints an `ArgumentTypeError` verbatim, so
-    `--knockout-scheme zero` fails on the login node with the sentence below
-    rather than "invalid value", and a library caller still catches the
-    `ValueError` it would expect.
+    a bad flag fails on the login node with the sentence below rather than
+    "invalid value", and a library caller still catches the `ValueError` it
+    would expect.
     """
 
 
 def resolve_scheme(value) -> str:
-    """`interchange`, or a refusal that says what is and is not built."""
+    """One of `SCHEMES`, or a refusal that names them."""
     scheme = str(value).strip().lower()
-    if scheme == SCHEME:
+    if scheme in SCHEMES:
         return scheme
-    later = " and ".join(FUTURE_SCHEMES)
     raise UnsupportedScheme(
-        f"knockout scheme {scheme!r} is not implemented. {SCHEME!r} is the "
-        f"only scheme built: it replaces the Component's output with the value "
-        f"it carried on the item-swap corrupt stream. {later} ablation are "
-        f"future work — the flag exists so they can be added without this "
-        f"analysis's interface changing.")
+        f"knockout scheme {scheme!r} is not one of {', '.join(SCHEMES)}: "
+        f"interchange copies the counterfactual stream's value, mean writes the "
+        f"site's mean over the cell's test split, zero writes zeros")
+
+
+def resolve_counterfactual(value) -> str:
+    """One of `COUNTERFACTUALS`, or a refusal that names them."""
+    counterfactual = str(value).strip().lower()
+    if counterfactual in COUNTERFACTUALS:
+        return counterfactual
+    raise UnsupportedScheme(
+        f"knockout counterfactual {counterfactual!r} is not one of "
+        f"{', '.join(COUNTERFACTUALS)}")
+
+
+_SEGMENT_NAME = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
+
+
+def parse_positions(value) -> dict:
+    """`--knockout-positions`, parsed: `{"form", "segment"?, "exclude_readout"?, "text"}`.
+
+    Wired as the flag's `type=`, so a malformed value is refused at parse time.
+    Whether the named Segment exists is a property of the cell's segmentation
+    and is checked by `position_mask` (and so by `--dry-run`).
+    """
+    text = str(value).strip()
+    if text in ("all", "readout"):
+        return {"form": text, "text": text}
+    if _SEGMENT_NAME.fullmatch(text):
+        return {"form": "segment", "segment": text, "text": text}
+    if text.startswith("after="):
+        parts = text[len("after="):].split(",")
+        segment = parts[0]
+        rest = parts[1:]
+        if _SEGMENT_NAME.fullmatch(segment) and rest in ([], ["exclude=readout"]):
+            return {"form": "after", "segment": segment,
+                    "exclude_readout": bool(rest), "text": text}
+    raise UnsupportedScheme(
+        f"--knockout-positions {text!r} is not one of: all, readout, a Segment "
+        f"name, or after=<Segment>[,exclude=readout]")
+
+
+def positions_slug(parsed: dict) -> str:
+    """The positions part of a column suffix; empty for every position."""
+    form = parsed["form"]
+    if form == "all":
+        return ""
+    if form == "readout":
+        return "at_readout"
+    if form == "segment":
+        return f"at_{parsed['segment']}"
+    return f"after_{parsed['segment']}" + ("_excl_readout"
+                                           if parsed["exclude_readout"] else "")
+
+
+@dataclass(frozen=True)
+class KnockoutPlan:
+    """Every choice a knockout makes, recorded in the JSON it writes.
+
+    The default plan is v1's knockout (interchange from the item-swap corrupt
+    stream, at every position) and writes v1's column names. Any other plan
+    writes its head-table columns under a suffix that says what it measured,
+    so a later reader of `knockout.logit_diff_drop` (the roles pass, say) can
+    never take a neutral-twin or a mean-ablation drop for an item-swap one.
+    """
+
+    scheme: str = SCHEME
+    counterfactual: str = COUNTERFACTUAL
+    positions: str = POSITIONS
+
+    def __post_init__(self):
+        object.__setattr__(self, "scheme", resolve_scheme(self.scheme))
+        object.__setattr__(self, "counterfactual",
+                           resolve_counterfactual(self.counterfactual))
+        object.__setattr__(self, "positions", parse_positions(self.positions)["text"])
+        if self.scheme != "interchange" and self.counterfactual != COUNTERFACTUAL:
+            raise ValueError(
+                f"--knockout-counterfactual {self.counterfactual} names a stream "
+                f"to copy from, which only interchange ablation reads; "
+                f"{self.scheme} ablation takes none")
+
+    @property
+    def is_default(self) -> bool:
+        return (self.scheme, self.counterfactual, self.positions) == \
+            (SCHEME, COUNTERFACTUAL, POSITIONS)
+
+    @property
+    def parsed_positions(self) -> dict:
+        return parse_positions(self.positions)
+
+    @property
+    def column_suffix(self) -> str:
+        parts = []
+        if self.scheme != SCHEME:
+            parts.append(self.scheme)
+        if self.counterfactual == "neutral_twin":
+            parts.append("neutral_twin_paired")
+        slug = positions_slug(self.parsed_positions)
+        if slug:
+            parts.append(slug)
+        return "".join(f"_{part}" for part in parts)
+
+    def describe(self) -> dict:
+        return {"scheme": self.scheme,
+                "counterfactual": (self.counterfactual if self.scheme == "interchange"
+                                   else None),
+                "positions": self.positions,
+                "column_suffix": self.column_suffix}
+
+
+def ablation_sentence(plan: KnockoutPlan) -> str:
+    """What `metric.ablation` says, for this plan. v1's sentence for v1's plan."""
+    if plan.is_default:
+        return ("the Component's output at every position is replaced by the "
+                "value it carried on the item-swap corrupt stream")
+    where = {"all": "at every position", "readout": "at the Readout only",
+             "segment": f"at the {plan.parsed_positions.get('segment')} Segment's tokens",
+             "after": (f"at every token after the "
+                       f"{plan.parsed_positions.get('segment')} Segment"
+                       + (", the Readout excluded"
+                          if plan.parsed_positions.get("exclude_readout") else ""))
+             }[plan.parsed_positions["form"]]
+    what = {"interchange": (
+                "the value it carried on the item-swap corrupt stream"
+                if plan.counterfactual == "item_swap" else
+                "the value it carried on the instance's Neutral-Clause Twin "
+                "(the clause replaced by a token-matched neutral sentence; the "
+                "pressure prompt's labels)"),
+            "mean": ("its mean over every unpadded position of the cell's test "
+                     "split, clean and corrupt prompts pooled (fp32, the "
+                     "evaluator's mean-ablation semantics)"),
+            "zero": "zeros"}[plan.scheme]
+    return f"the Component's output {where} is replaced by {what}"
+
+
+def position_mask(parsed: dict, ids, segmentations, readout, seq_len: int):
+    """`[batch, seq]` bool mask of where a knockout writes, or None for all.
+
+    `segmentations` maps instance id to its `Segmentation` (spans over the
+    clean prompt; the item-swap and twin streams are token-aligned with it).
+    A Segment absent on a row is refused by name: a post-clause knockout on a
+    prompt with no clause (the nopressure condition) is not a smaller
+    knockout, it is a different question.
+    """
+    import torch
+
+    form = parsed["form"]
+    if form == "all":
+        return None
+    readout = torch.as_tensor(readout).long().tolist()
+    mask = torch.zeros((len(ids), seq_len), dtype=torch.bool)
+    for row, one in enumerate(ids):
+        if form == "readout":
+            mask[row, readout[row]] = True
+            continue
+        name = parsed["segment"]
+        segmentation = segmentations.get(one) if segmentations else None
+        if segmentation is None:
+            raise ValueError(f"instance {one} has no segmentation, so "
+                             f"--knockout-positions {parsed['text']} cannot be placed")
+        if name not in segmentation.segments:
+            raise ValueError(f"instance {one} has no Segment {name!r}; its "
+                             f"Segments are {', '.join(segmentation.segments)}")
+        tokens = segmentation.segments[name].token_indices()
+        if not tokens:
+            raise ValueError(f"Segment {name!r} is absent on instance {one}, so "
+                             f"--knockout-positions {parsed['text']} has no tokens "
+                             f"there")
+        if form == "segment":
+            mask[row, tokens] = True
+            continue
+        last = readout[row] if not parsed["exclude_readout"] else readout[row] - 1
+        start = max(tokens) + 1
+        if start <= last:
+            mask[row, start:last + 1] = True
+    return mask
 
 
 # ==============================================================================
@@ -130,6 +326,21 @@ class Effects:
     scheme: str = SCHEME
     #: What the loader said about the sample it built; carried into the JSON.
     report: dict = field(default_factory=dict)
+    #: The counterfactual stream's own full-model logit difference per
+    #: instance, read with the CLEAN stream's labels (R19(1): the twin's margin
+    #: is the denominator of R-AB's f_D). Empty under mean and zero, which run
+    #: no counterfactual stream.
+    counterfactual_logit_difference: List[float] = field(default_factory=list)
+    #: `KnockoutPlan.describe()` of the run.
+    plan: dict = field(default_factory=dict)
+    #: Instances the loader gave but the plan could not run on (no twin).
+    unpaired: List[str] = field(default_factory=list)
+    #: R19(1): the Neutral-Clause Twin's own full-model logit difference per
+    #: instance, in `ids` order and with the clean stream's labels, whenever
+    #: the batches carry a twin (v2 D and I), whatever the plan; None for a
+    #: row with no twin. Under a neutral-twin plan it is the counterfactual
+    #: run itself. Empty when no batch carried a twin (v1, H, F).
+    neutral_twin_logit_difference: List[Optional[float]] = field(default_factory=list)
 
     def drops(self, key) -> List[float]:
         """Clean minus knocked-out, per instance. Positive helps deception."""
@@ -156,7 +367,12 @@ class Effects:
                        knocked_logit_difference={
                            key: list(self.knocked_logit_difference[key])
                            for key in keys},
-                       scheme=self.scheme, report=dict(self.report))
+                       scheme=self.scheme, report=dict(self.report),
+                       counterfactual_logit_difference=list(
+                           self.counterfactual_logit_difference),
+                       plan=dict(self.plan), unpaired=list(self.unpaired),
+                       neutral_twin_logit_difference=list(
+                           self.neutral_twin_logit_difference))
 
 
 def _accuracy(values) -> Optional[float]:
@@ -264,15 +480,54 @@ def columns(rows) -> dict:
     } for row in rows}
 
 
+def plan_of_effects(effects: Effects) -> "KnockoutPlan":
+    """The plan an `Effects` was measured under (v1's when it does not say)."""
+    plan = effects.plan or {}
+    return KnockoutPlan(scheme=plan.get("scheme", effects.scheme),
+                        counterfactual=plan.get("counterfactual") or COUNTERFACTUAL,
+                        positions=plan.get("positions", POSITIONS))
+
+
+#: The direction a cell's Target points, by the records' `condition`. On H and
+#: F the Target is the honest item, so a positive drop there means the
+#: Component supports the HONEST answer (ADR-0002 native sign; spec §2.2).
+TARGET_DIRECTION = {"deceptive": "deceptive", "inversion": "deceptive",
+                    "honest": "honest", "nopressure": "honest"}
+
+
 def payload(effects: Effects, *, circuit: str, task: str, components=None,
-            rows=None) -> dict:
+            rows=None, target_direction: Optional[str] = None,
+            extra: Optional[dict] = None, record_plan: bool = False) -> dict:
     """`knockout.json`: the ranked table, the clean run, and what it all means.
 
     `rows` is the ranking when the caller already has it, so that the table in
     the file and the table the head-table columns and the figure are built from
     are one object rather than three rankings that could disagree.
+
+    `record_plan` (a v2 cell or a non-default plan, `records_more`) adds
+    `plan`, `target_direction`, `counterfactual_run` and
+    `unpaired_instance_ids` (mechanism-analysis 02a), states the sign in the
+    cell's own target direction, and lets `extra` add a caller's own record
+    (the mean bank, the per-instance sidecar's name). Without it the payload
+    is the one v1 always wrote, key for key.
     """
     rows = summarize(effects, components) if rows is None else list(rows)
+    plan = plan_of_effects(effects)
+    recorded = {}
+    if record_plan:
+        recorded = {"plan": plan.describe(),
+                    "target_direction": target_direction,
+                    "counterfactual_run": counterfactual_run(effects),
+                    "unpaired_instance_ids": list(effects.unpaired),
+                    **(extra or {})}
+    sign = ("drop = clean logit difference - knocked-out logit "
+            "difference, so a positive drop means the Component helps "
+            "deception and a negative one means it opposes it")
+    if record_plan:
+        sign = ("drop = clean logit difference - knocked-out logit "
+                "difference, in the cell's own target direction "
+                "(target_direction: deceptive on D and I, honest on H and F), "
+                "so a positive drop means the Component supports the Target")
     return {
         "analysis": NAME,
         "circuit": circuit,
@@ -281,15 +536,11 @@ def payload(effects: Effects, *, circuit: str, task: str, components=None,
         "metric": {
             "name": "logit(Target) - logit(Distractor) at the Readout",
             "readout": "fp32 final norm and unembedding (ADR-0001)",
-            "sign": ("drop = clean logit difference - knocked-out logit "
-                     "difference, so a positive drop means the Component helps "
-                     "deception and a negative one means it opposes it"),
+            "sign": sign,
             "accuracy": ("share of sampled instances whose Target still "
                          "outscores its Distractor; not a full-vocabulary "
                          "argmax"),
-            "ablation": ("the Component's output at every position is replaced "
-                         "by the value it carried on the item-swap corrupt "
-                         "stream"),
+            "ablation": ablation_sentence(plan),
             "figure": PNG_NAME,
         },
         "n_components": len(rows),
@@ -300,6 +551,7 @@ def payload(effects: Effects, *, circuit: str, task: str, components=None,
         # JSON keys are strings, so a key is written as a list and read back
         # with `head_table.row_key`.
         "components": [{**row, "key": list(row["key"])} for row in rows],
+        **recorded,
     }
 
 
@@ -308,7 +560,8 @@ def payload(effects: Effects, *, circuit: str, task: str, components=None,
 # ==============================================================================
 
 def knockout_effects(model, batches, components, *,
-                     scheme=SCHEME) -> Effects:
+                     scheme=SCHEME, plan=None, segmentations=None,
+                     mean_bank=None) -> Effects:
     """Knock out each Component alone, over every batch, and keep every number.
 
     Three kinds of forward per batch: one clean run to measure against, one
@@ -322,10 +575,39 @@ def knockout_effects(model, batches, components, *,
     """
     keys = [row_key(one) for one in components]
     return knock_out_groups(model, batches, [(key, [key]) for key in keys],
-                            scheme=scheme)
+                            scheme=scheme, plan=plan, segmentations=segmentations,
+                            mean_bank=mean_bank)
 
 
-def knock_out_groups(model, batches, groups, *, scheme=SCHEME) -> Effects:
+def _by_id(segmentations) -> Optional[dict]:
+    """`{instance id: Segmentation}` from a list or a dict, or None."""
+    if segmentations is None:
+        return None
+    if isinstance(segmentations, dict):
+        return segmentations
+    return {one.record_id: one for one in segmentations}
+
+
+def _fill(key, *, scheme, mean_bank, n, seq, shape, dtype, device):
+    """The `[n, seq, dim]` value a mean or zero knockout writes at `key`."""
+    import torch
+
+    dim = shape["head_dim"] if key[0] == "head" else shape["hidden_size"]
+    if scheme == "zero":
+        return torch.zeros((n, seq, dim), dtype=dtype, device=device)
+    if key not in mean_bank:
+        raise KeyError(f"the mean bank has no entry for {key}; collect it over "
+                       f"every Component the run knocks out")
+    mean = mean_bank[key]
+    if mean.shape != (dim,):
+        raise ValueError(f"the mean bank's {key} has shape {tuple(mean.shape)}, "
+                         f"expected ({dim},)")
+    return mean.to(dtype=dtype, device=device).reshape(1, 1, dim) \
+        .expand(n, seq, dim).contiguous()
+
+
+def knock_out_groups(model, batches, groups, *, scheme=SCHEME, plan=None,
+                     segmentations=None, mean_bank=None) -> Effects:
     """Knock out each *group* of Components together, and keep every number.
 
     `groups` is `[(label, [component key, ...]), ...]`. A single-Component
@@ -349,12 +631,29 @@ def knock_out_groups(model, batches, groups, *, scheme=SCHEME) -> Effects:
     Per batch: one clean run, one corrupt run capturing every member of every
     group, and one run per group. `Effects.keys` holds the labels in the order
     they were given.
+
+    `plan` (a `KnockoutPlan`; default: `scheme` alone, which is v1's
+    knockout) picks the counterfactual stream, the scheme and the positions.
+    Under `neutral_twin` only the rows with a twin run, and the others are
+    listed in `Effects.unpaired`. A positions plan needs `segmentations`
+    (`{id: Segmentation}` or the cell's list) and a mean plan a `mean_bank`
+    (`collect_mean_bank`). With the default plan the forwards are exactly the
+    ones this function always ran.
     """
     import torch
 
     from component_analysis import hooks
 
-    scheme = resolve_scheme(scheme)
+    plan = plan or KnockoutPlan(scheme=scheme)
+    scheme = plan.scheme
+    parsed = plan.parsed_positions
+    by_id = _by_id(segmentations)
+    if parsed["form"] != "all" and by_id is None:
+        raise ValueError(f"--knockout-positions {plan.positions} needs the cell's "
+                         f"segmentation")
+    if scheme == "mean" and mean_bank is None:
+        raise ValueError("a mean knockout needs a mean bank (collect_mean_bank)")
+    twin = plan.counterfactual == "neutral_twin" and scheme == "interchange"
     groups = [(label, [row_key(one) for one in members])
               for label, members in groups]
     labels = [label for label, _members in groups]
@@ -376,39 +675,141 @@ def knock_out_groups(model, batches, groups, *, scheme=SCHEME) -> Effects:
 
     ids: List[str] = []
     clean_logit_difference: List[float] = []
+    counterfactual_logit_difference: List[float] = []
+    twin_margins: List[Optional[float]] = []
+    unpaired: List[str] = []
     knocked: Dict[tuple, List[float]] = {label: [] for label in labels}
+    shape = hooks.geometry(model) if scheme != "interchange" else None
+    model_dtype = hooks.device_and_dtype(model)[1]
 
     for batch in batches:
-        clean_ids = batch.input_ids.to(device)
-        clean_mask = batch.attention_mask.to(device)
-        corrupt_ids = batch.corrupt_input_ids.to(device)
-        corrupt_mask = batch.corrupt_attention_mask.to(device)
-        readout = batch.readout.to(device)
+        batch_ids = list(batch.ids)
+        clean_ids, clean_mask = batch.input_ids, batch.attention_mask
+        other_ids, other_mask = batch.corrupt_input_ids, batch.corrupt_attention_mask
+        readout = batch.readout
+        target, distractor = batch.target_token, batch.distractor_token
+        if twin:
+            pair = getattr(batch, "neutral_twin", None)
+            rows = list(pair.rows) if pair is not None else []
+            unpaired.extend(one for row, one in enumerate(batch_ids)
+                            if row not in set(rows))
+            if not rows:
+                continue
+            select = torch.tensor(rows, dtype=torch.long)
+            batch_ids = [batch_ids[row] for row in rows]
+            clean_ids, clean_mask = clean_ids[select], clean_mask[select]
+            readout = readout[select]
+            target, distractor = target[select], distractor[select]
+            other_ids, other_mask = pair.input_ids, pair.attention_mask
+            if not torch.equal(other_mask.sum(-1).long() - 1, readout):
+                raise ValueError("a Neutral-Clause Twin does not end at its "
+                                 "pressure prompt's Readout")
+        mask = position_mask(parsed, batch_ids, by_id, readout, clean_ids.shape[1])
+
+        clean_ids, clean_mask = clean_ids.to(device), clean_mask.to(device)
+        readout = readout.to(device)
         # The clean stream's assignment on every run: which word is the Target
         # flips between the streams, and a drop measured against the flipped
         # one would be a difference of two different questions.
-        target = batch.target_token.to(device)
-        distractor = batch.distractor_token.to(device)
+        target = target.to(device)
+        distractor = distractor.to(device)
 
         with torch.no_grad():
             clean = hooks.capture_forward(model, clean_ids, clean_mask,
                                           components=[], positions=readout)
-            corrupt = hooks.capture_forward(model, corrupt_ids, corrupt_mask,
-                                            components=keys, positions=readout)
-            ids.extend(batch.ids)
+            if scheme == "interchange":
+                corrupt = hooks.capture_forward(model, other_ids.to(device),
+                                                other_mask.to(device),
+                                                components=keys, positions=readout)
+                values = corrupt.outputs
+                counterfactual_logit_difference.extend(
+                    logit_difference(corrupt, target, distractor))
+            else:
+                values = {key: _fill(key, scheme=scheme, mean_bank=mean_bank,
+                                     n=clean_ids.shape[0], seq=clean_ids.shape[1],
+                                     shape=shape, dtype=model_dtype, device=device)
+                          for key in keys}
+            ids.extend(batch_ids)
             clean_logit_difference.extend(logit_difference(clean, target, distractor))
+            if twin:
+                twin_margins.extend(counterfactual_logit_difference[-len(batch_ids):])
+            elif getattr(batch, "neutral_twin", None) is not None:
+                # R19(1): the twin's own margin beside every plan's numbers,
+                # one forward per batch; rows without a twin read None.
+                pair = batch.neutral_twin
+                select = torch.tensor(list(pair.rows), dtype=torch.long,
+                                      device=device)
+                own = hooks.capture_forward(
+                    model, pair.input_ids.to(device), pair.attention_mask.to(device),
+                    components=[], positions=readout[select])
+                by_row = dict(zip(pair.rows, logit_difference(
+                    own, target[select], distractor[select])))
+                twin_margins.extend(by_row.get(row) for row in range(len(batch_ids)))
+            else:
+                twin_margins.extend([None] * len(batch_ids))
+            where = None if mask is None else mask.to(device)
 
             for label, members in groups:
                 patched = hooks.capture_forward(
                     model, clean_ids, clean_mask, components=[],
                     positions=readout,
-                    replacements={key: corrupt.outputs[key] for key in members})
+                    replacements={key: (values[key] if where is None else
+                                        hooks.Replacement(values[key], positions=where))
+                                  for key in members})
                 knocked[label].extend(logit_difference(patched, target,
                                                        distractor))
     return Effects(ids=ids, keys=labels,
                    clean_logit_difference=clean_logit_difference,
                    knocked_logit_difference=knocked, scheme=scheme,
-                   report=dict(getattr(batches, "report", {}) or {}))
+                   report=dict(getattr(batches, "report", {}) or {}),
+                   counterfactual_logit_difference=counterfactual_logit_difference,
+                   plan=plan.describe(), unpaired=unpaired,
+                   neutral_twin_logit_difference=(
+                       twin_margins if any(one is not None for one in twin_margins)
+                       else []))
+
+
+def collect_mean_bank(model, batches, keys) -> tuple:
+    """`({key: [dim] fp32 mean}, info)`: every key's mean over a whole split.
+
+    The evaluator's semantics (`evaluation/ablation.py` `collect_mean_bank`,
+    source `pooled`): every unpadded position of every instance, the clean
+    prompts and the corrupt prompts both, equal token weight, summed in fp32
+    and divided by the token count. `batches` is the cell's descriptive loader
+    (its whole test split), so the bank is the cell's own task bank.
+    """
+    import torch
+
+    from component_analysis import hooks
+
+    keys = [row_key(one) for one in keys]
+    device, _dtype = hooks.device_and_dtype(model)
+    sums: Dict[tuple, "torch.Tensor"] = {}
+    tokens = 0.0
+    instances = 0
+    for batch in batches:
+        instances += len(batch.ids)
+        for stream_ids, stream_mask in ((batch.input_ids, batch.attention_mask),
+                                        (batch.corrupt_input_ids,
+                                         batch.corrupt_attention_mask)):
+            stream_mask = stream_mask.to(device)
+            with torch.no_grad():
+                capture = hooks.capture_forward(model, stream_ids.to(device),
+                                                stream_mask, components=keys)
+            weight = stream_mask.float().unsqueeze(-1)
+            tokens += float(stream_mask.sum())
+            for key in keys:
+                contribution = (capture.outputs[key].float() * weight).sum(dim=(0, 1))
+                sums[key] = contribution if key not in sums else sums[key] + contribution
+    if not tokens:
+        raise ValueError("the mean bank saw no token; the split is empty")
+    bank = {key: total / tokens for key, total in sums.items()}
+    return bank, {"source": "pooled", "n_instances": instances,
+                  "n_tokens": tokens, "n_keys": len(keys),
+                  "semantics": ("per site, every unpadded position of the cell's "
+                                "test split, clean and corrupt prompts pooled with "
+                                "equal token weight, fp32 accumulation; written "
+                                "in the model's dtype (evaluation/ablation.py)")}
 
 
 # ==============================================================================
@@ -456,10 +857,12 @@ def families_from_rows(rows) -> Dict[str, List[tuple]]:
     return families
 
 
-def family_effects(model, batches, families, *, scheme=SCHEME) -> Effects:
-    """Interchange-ablate every Component of a role, together, one role at a time."""
+def family_effects(model, batches, families, *, scheme=SCHEME, plan=None,
+                   segmentations=None, mean_bank=None) -> Effects:
+    """Ablate every Component of a role, together, one role at a time."""
     return knock_out_groups(model, batches, list(families.items()),
-                            scheme=scheme)
+                            scheme=scheme, plan=plan, segmentations=segmentations,
+                            mean_bank=mean_bank)
 
 
 def summarize_families(effects: Effects, families) -> List[dict]:
@@ -501,10 +904,14 @@ def family_columns(rows) -> dict:
 
 
 def family_payload(effects: Effects, families, *, circuit: str, task: str,
-                   rows=None, roles_from: str = None, dropped=()) -> dict:
+                   rows=None, roles_from: str = None, dropped=(),
+                   target_direction: Optional[str] = None,
+                   extra: Optional[dict] = None, record_plan: bool = False) -> dict:
     """`knockout_families.json`: the same shape and the same signs as the singles."""
     rows = summarize_families(effects, families) if rows is None else list(rows)
-    single = payload(effects, circuit=circuit, task=task, rows=[])
+    single = payload(effects, circuit=circuit, task=task, rows=[],
+                     target_direction=target_direction, extra=extra,
+                     record_plan=record_plan)
     return {
         **{key: value for key, value in single.items()
            if key not in ("components", "n_components")},
@@ -521,11 +928,14 @@ def family_payload(effects: Effects, families, *, circuit: str, task: str,
             "outside_this_circuit": [list(one) for one in sorted(dropped)],
         },
         "metric": {**single["metric"],
-                   "ablation": ("every Component of the role has its output at "
-                                "every position replaced by the value it "
-                                "carried on the item-swap corrupt stream, all "
-                                "in one forward, so the number is the family's "
-                                "joint effect and not the sum of its members'"),
+                   "ablation": (("every Component of the role has its output at "
+                                 "every position replaced by the value it "
+                                 "carried on the item-swap corrupt stream, all "
+                                 "in one forward, so the number is the family's "
+                                 "joint effect and not the sum of its members'")
+                                if plan_of_effects(effects).is_default else
+                                (f"every Component of the role, jointly in one "
+                                 f"forward: {ablation_sentence(plan_of_effects(effects))}")),
                    "figure": FAMILY_PNG_NAME},
         "n_families": len(rows),
         "families": rows,
@@ -605,7 +1015,8 @@ def sweep_components(model) -> List[tuple]:
             if key[0] in ("head", "mlp")]
 
 
-def sweep_effects(model, batches, *, scheme=SCHEME) -> Effects:
+def sweep_effects(model, batches, *, scheme=SCHEME, plan=None, segmentations=None,
+                  mean_bank=None) -> Effects:
     """Knock out every head and MLP block of the model, one at a time.
 
     `knock_out_groups` with one-member groups, as `knockout_effects` calls it:
@@ -613,11 +1024,27 @@ def sweep_effects(model, batches, *, scheme=SCHEME) -> Effects:
     one pass per Component.
     """
     return knockout_effects(model, batches, sweep_components(model),
-                            scheme=scheme)
+                            scheme=scheme, plan=plan, segmentations=segmentations,
+                            mean_bank=mean_bank)
+
+
+def parse_component_labels(value) -> List[tuple]:
+    """`head.17.24,mlp.0.0` (the sweep's own spelling) as Component keys."""
+    out = []
+    for text in [one.strip() for one in str(value).split(",") if one.strip()]:
+        parts = text.split(".")
+        if len(parts) != 3 or parts[0] not in ("head", "mlp") or \
+                not parts[1].isdigit() or not parts[2].isdigit():
+            raise UnsupportedScheme(
+                f"{text!r} is not a Component label; write head.<layer>.<index> "
+                f"or mlp.<layer>.0, as sweep.json does")
+        out.append((parts[0], int(parts[1]), int(parts[2])))
+    return out
 
 
 def summarize_sweep(effects: Effects, circuit_keys, *, threshold: float,
-                    heads_per_group: Optional[int] = None) -> List[dict]:
+                    heads_per_group: Optional[int] = None,
+                    exclude_from_ranking=()) -> List[dict]:
     """Every Component, ranked by the size of its drop, circuit marked.
 
     Ranked by **|drop|**, not by the signed drop `knockout.rank` uses: the
@@ -627,7 +1054,13 @@ def summarize_sweep(effects: Effects, circuit_keys, *, threshold: float,
     ranking of the same rows. `flagged` is a Component outside the circuit
     whose |drop| is at least `threshold` and that is not a positive control
     (`POSITIVE_CONTROLS`); a positive control stays ranked and is marked.
+
+    `exclude_from_ranking` (R11(a): the layer-0 MLP of a neutral-twin sweep)
+    keeps a Component's numbers and takes it out of the ranking: `rank` None,
+    never flagged, `excluded_from_ranking` true. Without it the rows are the
+    rows this function always wrote.
     """
+    excluded = {row_key(one) for one in exclude_from_ranking}
     inside = {row_key(one) for one in circuit_keys}
     signed = summarize(effects)
     for row in signed:
@@ -641,13 +1074,19 @@ def summarize_sweep(effects: Effects, circuit_keys, *, threshold: float,
     by_key = {row["key"]: row for row in signed}
     rows = sorted((by_key[key] for key in effects.keys), key=strength,
                   reverse=True)
-    for rank, row in enumerate(rows, start=1):
+    if excluded:
+        rows = ([row for row in rows if row["key"] not in excluded]
+                + [row for row in rows if row["key"] in excluded])
+    rank = 0
+    for row in rows:
         key = row["key"]
         measured = row["mean_drop"] is not None
+        ranked = measured and key not in excluded
+        rank += 1 if ranked else 0
         se = row["standard_error"]
         row.update({
             "label": component_label(key),
-            "rank": rank if measured else None,
+            "rank": rank if ranked else None,
             "kv_group": (key[2] // heads_per_group
                          if heads_per_group and key[0] == "head" else None),
             "in_circuit": key in inside,
@@ -656,6 +1095,9 @@ def summarize_sweep(effects: Effects, circuit_keys, *, threshold: float,
             "clears_threshold": measured and abs(row["mean_drop"]) >= threshold,
         })
         row["flagged"] = row["clears_threshold"] and counts_as_outsider(row)
+        if excluded:
+            row["excluded_from_ranking"] = key in excluded
+            row["flagged"] = row["flagged"] and key not in excluded
     return rows
 
 
@@ -696,9 +1138,13 @@ def threshold_counts(rows, ladder=THRESHOLD_LADDER) -> List[dict]:
 
 
 def sweep_payload(effects: Effects, rows, *, circuit: str, task: str,
-                  threshold: float, cost: Optional[dict] = None) -> dict:
+                  threshold: float, cost: Optional[dict] = None,
+                  target_direction: Optional[str] = None,
+                  extra: Optional[dict] = None, record_plan: bool = False) -> dict:
     """`sweep.json`: every Component ranked, and the twin of `sweep.png`."""
-    single = payload(effects, circuit=circuit, task=task, rows=[])
+    single = payload(effects, circuit=circuit, task=task, rows=[],
+                     target_direction=target_direction, extra=extra,
+                     record_plan=record_plan)
     rows = list(rows)
     shown = [row for row in rows if row["rank"] is not None][:SWEEP_BAR_TOP]
     as_json = [{**row, "key": list(row["key"])} for row in rows]
@@ -765,6 +1211,178 @@ def sweep_payload(effects: Effects, rows, *, circuit: str, task: str,
                             f"hatched and labelled"},
         "cost": cost or {},
         "components": as_json,
+    }
+
+
+# ==============================================================================
+# NAMED GROUPS AND GREEDY SELECTION (mechanism-analysis 02a, R11, R16)
+# ==============================================================================
+
+GROUPS_JSON_NAME = "groups.json"
+GREEDY_JSON_NAME = "greedy.json"
+
+#: Per-instance sidecars (R19(1)), one per pass that writes them, so the
+#: summary files keep their shapes: per instance the clean margin, the
+#: knocked margin per group and the counterfactual stream's own margin.
+INSTANCES_SUFFIX = "_instances.json"
+
+#: Greedy defaults (spec §2.3): the top 50 of the S2p ranking, up to k = 20.
+DEFAULT_GREEDY_POOL_SIZE = 50
+DEFAULT_GREEDY_K_MAX = 20
+
+
+def load_groups(path: str) -> List[tuple]:
+    """`[(name, [key, ...]), ...]` from `{name: [[kind, layer, index], ...]}`.
+
+    Keys are written in `head_table.row_key` order, (kind, layer, index), and
+    each group is knocked out jointly. Refused by name: an empty group, a
+    malformed key, a kind that is not a Component, a key named twice.
+    """
+    with open(path) as handle:
+        raw = json.load(handle)
+    if not isinstance(raw, dict) or not raw:
+        raise ValueError(f"{path}: a groups file is a non-empty JSON object "
+                         f"{{name: [[kind, layer, index], ...]}}")
+    out = []
+    for name, members in raw.items():
+        if not isinstance(members, list) or not members:
+            raise ValueError(f"{path}: group {name!r} names no Component")
+        keys = []
+        for member in members:
+            if not isinstance(member, list) or len(member) != 3:
+                raise ValueError(f"{path}: group {name!r} has {member!r}; each "
+                                 f"member is [kind, layer, index]")
+            key = row_key(tuple(member))
+            if key[0] not in ("head", "mlp"):
+                raise ValueError(f"{path}: group {name!r} has {member!r}; a "
+                                 f"Component is a head or mlp")
+            if key in keys:
+                raise ValueError(f"{path}: group {name!r} names {member!r} twice")
+            keys.append(key)
+        out.append((str(name), keys))
+    return out
+
+
+def check_groups(groups, geometry: dict) -> None:
+    """Every member must be a Component of this model (layers, heads, MLP 0)."""
+    for name, keys in groups:
+        for kind, layer, index in keys:
+            if not 0 <= layer < geometry["num_layers"]:
+                raise ValueError(f"group {name!r}: layer {layer} is outside the "
+                                 f"model's {geometry['num_layers']} layers")
+            limit = geometry["num_heads"] if kind == "head" else 1
+            if not 0 <= index < limit:
+                raise ValueError(f"group {name!r}: {kind} index {index} is "
+                                 f"outside 0..{limit - 1}")
+
+
+def file_digest(path: str) -> str:
+    with open(path, "rb") as handle:
+        return hashlib.sha256(handle.read()).hexdigest()
+
+
+def _model_order(key) -> tuple:
+    return (key[1], 0 if key[0] == "head" else 1, key[2])
+
+
+def greedy_pool(sweep_path: str, *, size: int) -> List[tuple]:
+    """The top `size` Components of a sweep, by signed drop, strongest first.
+
+    Signed, because R-AB looks for Components whose knockout REMOVES the
+    deceptive margin (positive drop); a strong negative drop is not a
+    mediator. The layer-0 MLP (the Positive Control) and any row the sweep
+    excluded from ranking never enter. Ties go to model order.
+    """
+    with open(sweep_path) as handle:
+        sweep = json.load(handle)
+    rows = [row for row in sweep["components"]
+            if row.get("mean_drop") is not None
+            and not row.get("excluded_from_ranking")
+            and row_key(tuple(row["key"])) not in POSITIVE_CONTROLS]
+    rows.sort(key=lambda row: (-row["mean_drop"],
+                               _model_order(row_key(tuple(row["key"])))))
+    return [row_key(tuple(row["key"])) for row in rows[:size]]
+
+
+def greedy_select(pool, evaluate, *, k_max: int) -> List[dict]:
+    """Greedy joint selection: each step adds the Component with the largest
+    joint drop together with the ones already chosen.
+
+    `evaluate(groups)` takes a list of member lists and returns one
+    `(joint drop, payload)` per group, in order; the payload of the chosen
+    group is kept on its step (the real evaluator passes the run's per-instance
+    numbers). Ties go to the earlier Component in `pool`. Stops at `k_max` or
+    when the pool is spent.
+    """
+    pool = [row_key(one) for one in pool]
+    chosen: List[tuple] = []
+    steps = []
+    while len(chosen) < min(k_max, len(pool)):
+        remaining = [key for key in pool if key not in chosen]
+        results = evaluate([chosen + [key] for key in remaining])
+        best = max(range(len(remaining)), key=lambda i: (results[i][0], -i))
+        chosen = chosen + [remaining[best]]
+        steps.append({"k": len(chosen), "added": remaining[best],
+                      "members": list(chosen), "joint_drop": results[best][0],
+                      "payload": results[best][1],
+                      "candidates": [{"key": key, "joint_drop": result[0]}
+                                     for key, result in zip(remaining, results)]})
+    return steps
+
+
+def group_rows(effects: Effects, groups) -> List[dict]:
+    """One row per named group: the single knockout's statistics, joint."""
+    clean_accuracy = _accuracy(effects.clean_logit_difference)
+    members = dict(groups)
+    rows = []
+    for label in effects.keys:
+        drops = effects.drops(label)
+        knocked = effects.knocked_logit_difference[label]
+        accuracy = _accuracy(knocked)
+        rows.append({
+            "name": label, "n_components": len(members.get(label, [])),
+            "members": [component_label(key) for key in members.get(label, [])],
+            "n": len(drops), "mean_drop": _mean(drops),
+            "standard_error": _standard_error(drops),
+            "knocked_logit_difference": _mean(knocked), "accuracy": accuracy,
+            "accuracy_drop": (None if accuracy is None or clean_accuracy is None
+                              else clean_accuracy - accuracy)})
+    return rows
+
+
+def counterfactual_run(effects: Effects) -> dict:
+    """The counterfactual stream's own margin, in the clean labels' direction."""
+    values = effects.counterfactual_logit_difference
+    return {"mean_logit_difference": _mean(values),
+            "standard_error": _standard_error(values),
+            "accuracy": _accuracy(values), "n_instances": len(values),
+            "means": ("the full model on the counterfactual stream (item-swap "
+                      "corrupt prompt, or the Neutral-Clause Twin) read with the "
+                      "clean stream's Target and Distractor; empty under mean and "
+                      "zero, which run no counterfactual stream")}
+
+
+def instances_payload(effects: Effects, *, what: str, label=str) -> dict:
+    """A per-instance sidecar: every number the summaries were computed from."""
+    return {
+        "analysis": NAME, "pass": what, "plan": effects.plan,
+        "sign": ("drop = clean - knocked, in the cell's own target direction "
+                 "(deceptive on D and I, honest on H and F)"),
+        "instance_ids": list(effects.ids),
+        "clean_logit_difference": list(effects.clean_logit_difference),
+        "counterfactual_logit_difference": list(
+            effects.counterfactual_logit_difference),
+        "neutral_twin_logit_difference": list(effects.neutral_twin_logit_difference),
+        "margins": ("every list is per instance in instance_ids order and reads "
+                    "logit(Target) - logit(Distractor) with the clean stream's "
+                    "labels: clean = the cell's own prompt; knocked = under each "
+                    "knockout; counterfactual = the stream an interchange copies "
+                    "from (empty under mean and zero); neutral_twin = the "
+                    "Neutral-Clause Twin's own margin (R19(1); null for a row "
+                    "with no twin, empty on a cell with none)"),
+        "knocked_logit_difference": {label(key): list(values) for key, values
+                                     in effects.knocked_logit_difference.items()},
+        "unpaired_instance_ids": list(effects.unpaired),
     }
 
 
@@ -984,11 +1602,37 @@ def _non_negative(value) -> float:
     return number
 
 
+def _positive_int(value) -> int:
+    number = int(value)
+    if number < 1:
+        raise argparse.ArgumentTypeError(f"expected a positive integer, got {value}")
+    return number
+
+
 def add_arguments(group) -> None:
     group.add_argument("--knockout-scheme", type=resolve_scheme, default=SCHEME,
-                       help=f"How a Component is ablated. {SCHEME!r} is the "
-                            f"only scheme built; {' and '.join(FUTURE_SCHEMES)} "
-                            f"are future work and are refused by name.")
+                       help="How a Component is ablated: interchange (copy the "
+                            "counterfactual stream's value), mean (the site's "
+                            "mean over the cell's test split, clean and corrupt "
+                            "pooled; the evaluator's semantics) or zero.")
+    group.add_argument("--knockout-counterfactual", type=resolve_counterfactual,
+                       default=COUNTERFACTUAL,
+                       help="The stream an interchange knockout copies from: "
+                            "item_swap (the corrupt prompt) or neutral_twin "
+                            "(the v2 Neutral-Clause Twin, D's labels kept; D "
+                            "and I cells only).")
+    group.add_argument("--knockout-positions", type=parse_positions,
+                       default=parse_positions(POSITIONS),
+                       metavar="all|readout|SEGMENT|after=SEGMENT[,exclude=readout]",
+                       help="Where the knockout writes. 'after=pressure_clause,"
+                            "exclude=readout' is the spec's post-clause range. "
+                            "Applies to every pass of the run.")
+    group.add_argument("--knockout-singles", choices=["on", "off"], default="on",
+                       help="Run the per-Component pass over the circuit's "
+                            "Components (knockout.json and the head-table "
+                            "columns). 'off' for a run that only does --knockout-"
+                            "groups or --knockout-greedy-pool; a sweep always "
+                            "writes the singles, read from its own forwards.")
     group.add_argument("--knockout-families", action="store_true",
                        help="Also knock out every Component of a Component "
                             "Role together, one role at a time. Roles come "
@@ -1028,6 +1672,43 @@ def add_arguments(group) -> None:
                             "ranked list of "
                             "every Component is always written to sweep.json, "
                             "so the cut hides nothing.")
+    group.add_argument("--knockout-sweep-exclude", type=parse_component_labels,
+                       default=[], metavar="LABEL[,LABEL]",
+                       help="Components the sweep measures but leaves out of its "
+                            "ranking and its flags, e.g. mlp.0.0 (the Positive "
+                            "Control, R11(a)). Their numbers stay in sweep.json.")
+    group.add_argument("--knockout-groups", default=None, metavar="FILE",
+                       help="Knock out each named set jointly: JSON "
+                            "{name: [[kind, layer, index], ...]}. Writes "
+                            "knockout/groups.json and a per-instance sidecar.")
+    group.add_argument("--knockout-greedy-pool", default=None, metavar="SWEEP_JSON",
+                       help="Greedy joint selection over the top of this "
+                            "sweep.json (signed drop, layer-0 MLP and excluded "
+                            "rows left out): each step adds the Component with "
+                            "the largest joint drop. Writes knockout/greedy.json.")
+    group.add_argument("--knockout-greedy-pool-size", type=_positive_int,
+                       default=DEFAULT_GREEDY_POOL_SIZE,
+                       help="How many of the sweep's top Components the greedy "
+                            "search draws from.")
+    group.add_argument("--knockout-greedy-k-max", type=_positive_int,
+                       default=DEFAULT_GREEDY_K_MAX,
+                       help="The largest set the greedy search builds.")
+    group.add_argument("--knockout-per-instance", action="store_true",
+                       help="Write the per-instance sidecar of the singles and "
+                            "the sweep. Always on for a v2 cell and for any "
+                            "non-default scheme, counterfactual or positions; "
+                            "groups and greedy always write theirs.")
+
+
+def plan_of(ctx) -> KnockoutPlan:
+    """The scheme, counterfactual and positions this run asked for."""
+    positions = getattr(ctx.cli, "knockout_positions", POSITIONS)
+    if isinstance(positions, dict):
+        positions = positions["text"]
+    return KnockoutPlan(scheme=getattr(ctx.cli, "knockout_scheme", SCHEME),
+                        counterfactual=getattr(ctx.cli, "knockout_counterfactual",
+                                               COUNTERFACTUAL),
+                        positions=positions)
 
 
 def scheme_of(ctx) -> str:
@@ -1040,6 +1721,10 @@ def sweeping(ctx) -> bool:
     return bool(getattr(ctx.cli, "knockout_completeness_sweep", False))
 
 
+def singles_on(ctx) -> bool:
+    return getattr(ctx.cli, "knockout_singles", "on") == "on" or sweeping(ctx)
+
+
 def sweep_threshold(ctx) -> float:
     """Which Components outside the circuit the sweep flags, in logits.
 
@@ -1047,6 +1732,24 @@ def sweep_threshold(ctx) -> float:
     """
     return float(getattr(ctx.cli, "knockout_sweep_threshold",
                          DEFAULT_SWEEP_THRESHOLD_LOGITS))
+
+
+def sweep_exclusions(ctx) -> List[tuple]:
+    return list(getattr(ctx.cli, "knockout_sweep_exclude", None) or [])
+
+
+def is_v2_cell(ctx) -> bool:
+    from component_analysis.dataloaders import V2_TASKS
+
+    return getattr(ctx.task_spec, "name", None) in V2_TASKS
+
+
+def records_more(ctx, plan: KnockoutPlan) -> bool:
+    """A v2 cell or a non-default plan: write the sidecars, the coverage
+    details and the H100 estimate. A v1 cell under v1's plan writes exactly
+    the files and the meta it always did."""
+    return is_v2_cell(ctx) or not plan.is_default or \
+        bool(getattr(ctx.cli, "knockout_per_instance", False))
 
 
 def roles_source(ctx) -> str:
@@ -1104,8 +1807,72 @@ def families_for(ctx) -> tuple:
     return kept, dropped
 
 
+def groups_for(ctx) -> Optional[List[tuple]]:
+    """The `--knockout-groups` file, parsed and checked against the model."""
+    path = getattr(ctx.cli, "knockout_groups", None)
+    if not path:
+        return None
+    groups = load_groups(path)
+    check_groups(groups, ctx.intake.geometry)
+    return groups
+
+
+def check_plan(ctx, plan: KnockoutPlan, batches) -> None:
+    """Refuse a plan this cell cannot run, before any forward.
+
+    A neutral-twin knockout on a cell with no twin (H, F, v1), or one whose
+    positions name a Segment some sampled row lacks (post-clause on F), is a
+    misconfigured cell, not a smaller measurement.
+    """
+    if plan.scheme == "interchange" and plan.counterfactual == "neutral_twin":
+        report = batches.report
+        if not report.get("n_with_neutral_twin"):
+            raise ValueError(
+                f"--knockout-counterfactual neutral_twin on "
+                f"{ctx.task_spec.name!r}: no instance of the causal sample has a "
+                f"Neutral-Clause Twin ("
+                f"{report.get('neutral_twin_source', 'not a v2 task')})")
+        if report.get("without_neutral_twin"):
+            print(f"    knockout: {len(report['without_neutral_twin'])} sampled "
+                  f"instance(s) have no twin and are left out of the "
+                  f"neutral-twin knockout")
+    parsed = plan.parsed_positions
+    if parsed["form"] != "all":
+        by_id = _by_id(ctx.segmentations)
+        for batch in batches:
+            position_mask(parsed, list(batch.ids), by_id, batch.readout,
+                          batch.input_ids.shape[1])
+
+
+def target_direction_of(batches) -> Optional[str]:
+    """`deceptive` or `honest`, from the records' `condition`."""
+    for batch in batches:
+        conditions = {record.get("condition") for record in batch.records}
+        directions = {TARGET_DIRECTION.get(one) for one in conditions}
+        return directions.pop() if len(directions) == 1 else None
+    return None
+
+
+def _greedy_settings(ctx) -> Optional[dict]:
+    path = getattr(ctx.cli, "knockout_greedy_pool", None)
+    if not path:
+        return None
+    return {"path": path,
+            "size": int(getattr(ctx.cli, "knockout_greedy_pool_size",
+                                DEFAULT_GREEDY_POOL_SIZE)),
+            "k_max": int(getattr(ctx.cli, "knockout_greedy_k_max",
+                                 DEFAULT_GREEDY_K_MAX))}
+
+
+def _greedy_forwards(n_batches: int, pool_size: int, k_max: int) -> int:
+    return sum(n_batches * (pool_size - step + 2)
+               for step in range(min(k_max, pool_size)))
+
+
 def estimate(ctx) -> str:
     batches = ctx.causal_batches()
+    plan = plan_of(ctx)
+    check_plan(ctx, plan, batches)
     passes = len(batches) * (len(ctx.components) + 2)
     line = (f"{len(ctx.components)} Component(s) x {len(batches)} batch(es) of "
             f"{batches.report['batch_size']} (+2 clean and corrupt passes per "
@@ -1113,10 +1880,14 @@ def estimate(ctx) -> str:
             f"{passes * SECONDS_PER_FORWARD / 60:.1f} min on an A40, over "
             f"{batches.n_instances} instance(s); scheme "
             f"{scheme_of(ctx)}")
+    total = passes if singles_on(ctx) else 0
+    if not singles_on(ctx):
+        line = "per-Component pass off (--knockout-singles off)"
     if sweeping(ctx):
         shape = ctx.intake.geometry
         n_swept = sweep_size(shape)
         swept = len(batches) * (n_swept + 2)
+        total = swept
         line = (f"completeness sweep: {n_swept} Component(s) of the model "
                 f"({shape['num_layers']} layers x ({shape['num_heads']} heads "
                 f"+ 1 MLP block)) x {len(batches)} batch(es) of "
@@ -1129,25 +1900,98 @@ def estimate(ctx) -> str:
                 f"and is not swept; flagged outside the circuit at "
                 f"threshold {sweep_threshold(ctx):g} logits; scheme "
                 f"{scheme_of(ctx)}")
-    if not getattr(ctx.cli, "knockout_families", False):
-        return line
-    families, dropped = families_for(ctx)
-    family_passes = len(batches) * (len(families) + 2)
-    return (line + f"; plus {len(families)} role famil"
-            f"{'y' if len(families) == 1 else 'ies'} "
-            f"({', '.join(f'{role} x{len(members)}' for role, members in families.items())}) "
-            f"from {roles_source(ctx)} = {family_passes} more forward pass(es), "
-            f"about {family_passes * SECONDS_PER_FORWARD / 60:.1f} min")
+        if sweep_exclusions(ctx):
+            line += (f"; excluded from ranking: "
+                     f"{', '.join(component_label(k) for k in sweep_exclusions(ctx))}")
+    if getattr(ctx.cli, "knockout_families", False):
+        families, dropped = families_for(ctx)
+        family_passes = len(batches) * (len(families) + 2)
+        total += family_passes
+        line += (f"; plus {len(families)} role famil"
+                 f"{'y' if len(families) == 1 else 'ies'} "
+                 f"({', '.join(f'{role} x{len(members)}' for role, members in families.items())}) "
+                 f"from {roles_source(ctx)} = {family_passes} more forward pass(es), "
+                 f"about {family_passes * SECONDS_PER_FORWARD / 60:.1f} min")
+    groups = groups_for(ctx)
+    if groups is not None:
+        group_passes = len(batches) * (len(groups) + 2)
+        total += group_passes
+        sizes = sorted({len(keys) for _name, keys in groups})
+        line += (f"; plus {len(groups)} named group(s) from "
+                 f"{ctx.cli.knockout_groups} (sizes {sizes[0]}-{sizes[-1]}) = "
+                 f"{group_passes} more forward pass(es)")
+    greedy = _greedy_settings(ctx)
+    if greedy is not None:
+        if os.path.exists(greedy["path"]):
+            pool = greedy_pool(greedy["path"], size=greedy["size"])
+            pool_note = (f"pool {len(pool)} from {greedy['path']} (top: "
+                         f"{', '.join(component_label(k) for k in pool[:3])})")
+            size = len(pool)
+        else:
+            pool_note = (f"!! pool file {greedy['path']} does not exist yet; "
+                         f"costed at {greedy['size']}")
+            size = greedy["size"]
+        greedy_passes = _greedy_forwards(len(batches), size, greedy["k_max"])
+        total += greedy_passes
+        line += (f"; plus greedy to k={min(greedy['k_max'], size)} over a {pool_note}"
+                 f" = {greedy_passes} more forward pass(es)")
+    if plan.scheme == "mean":
+        bank_passes = 2 * len(ctx.descriptive_batches())
+        total += bank_passes
+        line += (f"; plus the mean bank over the whole test split, both streams "
+                 f"= {bank_passes} forward pass(es)")
+    if records_more(ctx, plan):
+        line += (f"; plan {plan.describe()}; in total {total} forward pass(es), "
+                 f"about {total * SECONDS_PER_FORWARD_H100 / 60:.1f} min on an "
+                 f"H100 (extrapolated)")
+    return line
 
 
-def _write_sweep(ctx, swept: Effects, wall: float, *, scheme: str) -> dict:
+def _rename(updates: dict, suffix: str) -> dict:
+    return {key: {f"{column}{suffix}": value for column, value in values.items()}
+            for key, values in updates.items()}
+
+
+def _declare(ctx, columns, plan, effects, *, details) -> None:
+    from component_analysis.head_table import CAUSAL_SAMPLE_NEUTRAL_TWIN
+
+    instance_set = (CAUSAL_SAMPLE_NEUTRAL_TWIN
+                    if plan.counterfactual == "neutral_twin"
+                    and plan.scheme == "interchange" else INSTANCE_SET)
+    ctx.declare_coverage([f"{column}{plan.column_suffix}" for column in columns],
+                         instance_ids=effects.ids, instance_set=instance_set,
+                         **({"details": details} if details else {}))
+
+
+def _coverage_details(ctx, plan) -> Optional[dict]:
+    if not records_more(ctx, plan) or ctx.sample is None:
+        return None
+    return {"sample_seed": ctx.sample.seed,
+            "id_filters": {name: {key: value for key, value in record.items()
+                                  if key != "not_in_split"}
+                           for name, record in ctx.sample.id_filters.items()},
+            "plan": plan.describe()}
+
+
+def _write_instances(ctx, name: str, effects: Effects, *, what: str,
+                     label=component_label) -> str:
+    filename = f"{name}{INSTANCES_SUFFIX}"
+    ctx.write_json(SUBDIR, filename, instances_payload(effects, what=what,
+                                                       label=label))
+    return filename
+
+
+def _write_sweep(ctx, swept: Effects, wall: float, *, scheme: str,
+                 plan: KnockoutPlan, direction, extra: dict) -> dict:
     """Write `sweep.json` and `sweep.png`; return the circuit rows' columns."""
     from component_analysis import hooks
 
     threshold = sweep_threshold(ctx)
     per_group = hooks.geometry(ctx.model)["heads_per_group"]
+    excluded = sweep_exclusions(ctx)
     rows = summarize_sweep(swept, ctx.keys, threshold=threshold,
-                           heads_per_group=per_group)
+                           heads_per_group=per_group,
+                           exclude_from_ranking=excluded)
     n_batches = len(ctx.causal_batches())
     forwards = n_batches * (len(swept.keys) + 2)
     cost = {"forwards": forwards, "n_batches": n_batches,
@@ -1157,79 +2001,227 @@ def _write_sweep(ctx, swept: Effects, wall: float, *, scheme: str) -> dict:
             "note": ("per batch one clean pass, one corrupt pass capturing "
                      "every Component, and one pass per Component; the "
                      "circuit's single knockouts are among them")}
+    extra = dict(extra)
+    if excluded:
+        extra["excluded_from_ranking"] = [component_label(k) for k in excluded]
+    if records_more(ctx, plan):
+        extra["instances_file"] = _write_instances(ctx, "sweep", swept,
+                                                   what="completeness_sweep")
     ctx.write_json(SUBDIR, SWEEP_JSON_NAME,
                    sweep_payload(swept, rows, circuit=ctx.circuit_spec.label,
                                  task=ctx.task_spec.name, threshold=threshold,
-                                 cost=cost))
+                                 cost=cost, target_direction=direction,
+                                 extra=extra,
+                                 record_plan=records_more(ctx, plan) or bool(excluded)))
     write_sweep_figure(
         os.path.join(ctx.subdir(SUBDIR), SWEEP_PNG_NAME), rows,
         threshold=threshold,
         title=f"{ctx.circuit_spec.label} x {ctx.task_spec.name}: {scheme} "
               f"knockout of every Component of the model\nstrongest "
               f"{min(SWEEP_BAR_TOP, len(rows))} of {len(rows)} by |drop|")
-    ctx.declare_coverage(SWEEP_COLUMNS, instance_ids=swept.ids,
-                         instance_set=INSTANCE_SET)
+    _declare(ctx, SWEEP_COLUMNS, plan, swept, details=_coverage_details(ctx, plan))
     flagged = [row["label"] for row in rows if row["flagged"]]
     print(f"    knockout sweep: {len(rows)} Component(s) in {wall:.0f} s; "
           f"{len(flagged)} outside the circuit (positive controls aside) "
           f"clear {threshold:g}"
           + (f": {', '.join(flagged[:10])}{' ...' if len(flagged) > 10 else ''}"
              if flagged else ""))
-    return sweep_columns(rows)
+    return _rename(sweep_columns(rows), plan.column_suffix)
+
+
+def _metric_block(plan: KnockoutPlan, figure: Optional[str]) -> dict:
+    return {"name": "logit(Target) - logit(Distractor) at the Readout",
+            "readout": "fp32 final norm and unembedding (ADR-0001)",
+            "sign": ("drop = clean logit difference - knocked-out logit "
+                     "difference, in the cell's own target direction (see "
+                     "target_direction): positive means the group supports the "
+                     "Target"),
+            "accuracy": ("share of sampled instances whose Target still "
+                         "outscores its Distractor; not a full-vocabulary argmax"),
+            "ablation": ablation_sentence(plan) + ", jointly for every member",
+            "figure": figure}
+
+
+def _write_groups(ctx, batches, groups, plan, common, direction) -> None:
+    path = ctx.cli.knockout_groups
+    started = time.perf_counter()
+    grouped = knock_out_groups(ctx.model, batches, groups, **common)
+    wall = time.perf_counter() - started
+    instances = _write_instances(ctx, "groups", grouped, what="groups", label=str)
+    forwards = len(batches) * (len(groups) + 2)
+    ctx.write_json(SUBDIR, GROUPS_JSON_NAME, {
+        "analysis": NAME, "pass": "groups", "circuit": ctx.circuit_spec.label,
+        "task": ctx.task_spec.name, "plan": plan.describe(),
+        "metric": _metric_block(plan, None), "target_direction": direction,
+        "source": {"path": path, "sha256": file_digest(path)},
+        "instances": grouped.ids, "instances_file": instances,
+        "unpaired_instance_ids": list(grouped.unpaired),
+        "clean_run": clean_run(grouped), "counterfactual_run": counterfactual_run(grouped),
+        "n_groups": len(groups), "groups": group_rows(grouped, groups),
+        "cost": {"forwards": forwards, "wall_seconds": wall,
+                 "seconds_per_forward": wall / forwards if forwards else None,
+                 "seconds_per_group": wall / len(groups) if groups else None},
+    })
+    print(f"    knockout groups: {len(groups)} group(s) in {wall:.0f} s")
+
+
+def _write_greedy(ctx, batches, settings, plan, common, direction) -> None:
+    pool = greedy_pool(settings["path"], size=settings["size"])
+    if not pool:
+        raise ValueError(f"{settings['path']} gives an empty greedy pool")
+    with open(settings["path"]) as handle:
+        source = json.load(handle)
+    sweep_drop = {row_key(tuple(row["key"])): row.get("mean_drop")
+                  for row in source.get("components", [])}
+    started = time.perf_counter()
+    forwards = [0]
+
+    def evaluate(member_lists):
+        labelled = [(f"candidate_{i}", members) for i, members in enumerate(member_lists)]
+        effects = knock_out_groups(ctx.model, batches, labelled, **common)
+        forwards[0] += len(batches) * (len(labelled) + 2)
+        return [(_mean(effects.drops(label)), (effects, label))
+                for label, _members in labelled]
+
+    steps = greedy_select(pool, evaluate, k_max=settings["k_max"])
+    wall = time.perf_counter() - started
+    first = steps[0]["payload"][0]
+    chosen = Effects(ids=list(first.ids), keys=[f"k={step['k']}" for step in steps],
+                     clean_logit_difference=list(first.clean_logit_difference),
+                     knocked_logit_difference={
+                         f"k={step['k']}": list(step["payload"][0]
+                                                .knocked_logit_difference[step["payload"][1]])
+                         for step in steps},
+                     counterfactual_logit_difference=list(
+                         first.counterfactual_logit_difference),
+                     plan=first.plan, unpaired=list(first.unpaired),
+                     neutral_twin_logit_difference=list(
+                         first.neutral_twin_logit_difference))
+    instances = _write_instances(ctx, "greedy", chosen, what="greedy", label=str)
+    out_steps = []
+    for step in steps:
+        effects, label = step["payload"]
+        drops = effects.drops(label)
+        knocked = effects.knocked_logit_difference[label]
+        out_steps.append({
+            "k": step["k"], "added": component_label(step["added"]),
+            "members": [component_label(key) for key in step["members"]],
+            "joint_drop": step["joint_drop"], "standard_error": _standard_error(drops),
+            "knocked_logit_difference": _mean(knocked), "accuracy": _accuracy(knocked),
+            "candidates": [{"label": component_label(one["key"]),
+                            "joint_drop": one["joint_drop"]}
+                           for one in step["candidates"]]})
+    ctx.write_json(SUBDIR, GREEDY_JSON_NAME, {
+        "analysis": NAME, "pass": "greedy", "circuit": ctx.circuit_spec.label,
+        "task": ctx.task_spec.name, "plan": plan.describe(),
+        "metric": _metric_block(plan, None), "target_direction": direction,
+        "rule": ("start from the empty set; at each step add the pool Component "
+                 "whose addition gives the largest mean joint drop on this "
+                 "sample; ties to the earlier pool Component"),
+        "pool_source": {"path": settings["path"], "sha256": file_digest(settings["path"]),
+                        "plan": source.get("plan"), "task": source.get("task"),
+                        "pool_rule": ("top by signed mean_drop, the layer-0 MLP "
+                                      "and excluded rows left out, ties in model "
+                                      "order")},
+        "pool": [{"label": component_label(key), "sweep_drop": sweep_drop.get(key)}
+                 for key in pool],
+        "k_max": settings["k_max"], "instances": chosen.ids,
+        "instances_file": instances, "clean_run": clean_run(chosen),
+        "counterfactual_run": counterfactual_run(chosen), "steps": out_steps,
+        "cost": {"forwards": forwards[0], "wall_seconds": wall,
+                 "group_knockouts": sum(len(step["candidates"]) for step in steps),
+                 "seconds_per_forward": wall / forwards[0] if forwards[0] else None},
+    })
+    print(f"    knockout greedy: k={len(steps)} from a pool of {len(pool)} in "
+          f"{wall:.0f} s; order {', '.join(o['added'] for o in out_steps[:5])}"
+          f"{' ...' if len(out_steps) > 5 else ''}")
 
 
 def run(ctx) -> dict:
     """Knock out every Component, write the JSON and the PNG, return the columns."""
-    scheme = scheme_of(ctx)
-    # Read before the forwards, so a missing role column fails in seconds
-    # rather than after the per-Component pass has already run.
+    plan = plan_of(ctx)
+    scheme = plan.scheme
+    # Read before the forwards, so a missing role column or a bad groups file
+    # fails in seconds rather than after the per-Component pass has run.
     families, dropped = families_for(ctx) \
         if getattr(ctx.cli, "knockout_families", False) else (None, [])
+    groups = groups_for(ctx)
+    greedy = _greedy_settings(ctx)
     batches = ctx.causal_batches()
+    check_plan(ctx, plan, batches)
+    direction = target_direction_of(batches)
+
+    extra = {}
+    bank = None
+    if scheme == "mean":
+        started = time.perf_counter()
+        bank, info = collect_mean_bank(ctx.model, ctx.descriptive_batches(),
+                                       sweep_components(ctx.model))
+        info["wall_seconds"] = time.perf_counter() - started
+        extra["mean_bank"] = info
+    common = {"plan": plan, "segmentations": ctx.segmentations, "mean_bank": bank}
+    details = _coverage_details(ctx, plan)
+
+    updates: dict = {}
     swept = None
+    effects = None
     if sweeping(ctx):
         # One loop over every Component of the model; the circuit's singles
         # are read out of it, so the two files share their clean and corrupt
         # passes and agree to the bit.
         started = time.perf_counter()
-        swept = sweep_effects(ctx.model, batches, scheme=scheme)
+        swept = sweep_effects(ctx.model, batches, **common)
         wall = time.perf_counter() - started
         effects = swept.restrict(ctx.keys)
-    else:
-        effects = knockout_effects(ctx.model, batches, ctx.components,
-                                   scheme=scheme)
+    elif singles_on(ctx):
+        effects = knockout_effects(ctx.model, batches, ctx.components, **common)
 
-    rows = summarize(effects, ctx.components)
-    ctx.write_json(SUBDIR, JSON_NAME,
-                   payload(effects, circuit=ctx.circuit_spec.label,
-                           task=ctx.task_spec.name, rows=rows))
-    write_figure(os.path.join(ctx.subdir(SUBDIR), PNG_NAME), rows,
-                 title=f"{ctx.circuit_spec.label} x {ctx.task_spec.name}: "
-                       f"per-Component {scheme} knockout")
-    updates = columns(rows)
-    ctx.declare_coverage(COLUMNS, instance_ids=effects.ids,
-                         instance_set=INSTANCE_SET)
+    if effects is not None:
+        rows = summarize(effects, ctx.components)
+        single_extra = dict(extra)
+        if records_more(ctx, plan):
+            single_extra["instances_file"] = _write_instances(
+                ctx, "knockout", effects, what="singles")
+        ctx.write_json(SUBDIR, JSON_NAME,
+                       payload(effects, circuit=ctx.circuit_spec.label,
+                               task=ctx.task_spec.name, rows=rows,
+                               target_direction=direction, extra=single_extra,
+                               record_plan=records_more(ctx, plan)))
+        write_figure(os.path.join(ctx.subdir(SUBDIR), PNG_NAME), rows,
+                     title=f"{ctx.circuit_spec.label} x {ctx.task_spec.name}: "
+                           f"per-Component {scheme} knockout")
+        updates = _rename(columns(rows), plan.column_suffix)
+        _declare(ctx, COLUMNS, plan, effects, details=details)
     if swept is not None:
-        for key, values in _write_sweep(ctx, swept, wall,
-                                        scheme=scheme).items():
+        for key, values in _write_sweep(ctx, swept, wall, scheme=scheme, plan=plan,
+                                        direction=direction, extra=extra).items():
             updates.setdefault(key, {}).update(values)
-    if families is None:
-        return updates
-
-    grouped = family_effects(ctx.model, batches, families, scheme=scheme)
-    family_rows = summarize_families(grouped, families)
-    ctx.write_json(SUBDIR, FAMILY_JSON_NAME,
-                   family_payload(grouped, families,
-                                  circuit=ctx.circuit_spec.label,
-                                  task=ctx.task_spec.name, rows=family_rows,
-                                  roles_from=roles_source(ctx),
-                                  dropped=dropped))
-    write_family_figure(os.path.join(ctx.subdir(SUBDIR), FAMILY_PNG_NAME),
-                        family_rows,
-                        title=f"{ctx.circuit_spec.label} x {ctx.task_spec.name}: "
-                              f"{scheme} knockout by Component Role family")
-    for key, values in family_columns(family_rows).items():
-        updates.setdefault(key, {}).update(values)
-    ctx.declare_coverage(FAMILY_COLUMNS, instance_ids=grouped.ids,
-                         instance_set=INSTANCE_SET)
+    if families is not None:
+        grouped = family_effects(ctx.model, batches, families, **common)
+        family_rows = summarize_families(grouped, families)
+        family_extra = dict(extra)
+        if records_more(ctx, plan):
+            # R19(1): every joint knockout keeps its per-instance rows.
+            family_extra["instances_file"] = _write_instances(
+                ctx, "knockout_families", grouped, what="families", label=str)
+        ctx.write_json(SUBDIR, FAMILY_JSON_NAME,
+                       family_payload(grouped, families,
+                                      circuit=ctx.circuit_spec.label,
+                                      task=ctx.task_spec.name, rows=family_rows,
+                                      roles_from=roles_source(ctx),
+                                      dropped=dropped, target_direction=direction,
+                                      extra=family_extra,
+                                      record_plan=records_more(ctx, plan)))
+        write_family_figure(os.path.join(ctx.subdir(SUBDIR), FAMILY_PNG_NAME),
+                            family_rows,
+                            title=f"{ctx.circuit_spec.label} x {ctx.task_spec.name}: "
+                                  f"{scheme} knockout by Component Role family")
+        for key, values in _rename(family_columns(family_rows),
+                                   plan.column_suffix).items():
+            updates.setdefault(key, {}).update(values)
+        _declare(ctx, FAMILY_COLUMNS, plan, grouped, details=details)
+    if groups is not None:
+        _write_groups(ctx, batches, groups, plan, common, direction)
+    if greedy is not None:
+        _write_greedy(ctx, batches, greedy, plan, common, direction)
     return updates

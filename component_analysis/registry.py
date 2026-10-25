@@ -148,7 +148,8 @@ class AnalysisContext:
     _coverage: List[dict] = field(default_factory=list, repr=False)
 
     def declare_coverage(self, columns, *, instance_ids, instance_set: str,
-                         dataset: Optional[str] = None) -> None:
+                         dataset: Optional[str] = None,
+                         details: Optional[dict] = None) -> None:
         """Say which instances some of this analysis's columns were computed over.
 
         `columns` are the bare names `run` returns; `instance_set` names the
@@ -157,9 +158,13 @@ class AnalysisContext:
         the cell's own task. An empty id list is a column computed over nothing,
         which the table records as n = 0 rather than leaving unrecorded.
         """
-        self._coverage.append({"columns": list(columns),
-                               "instance_ids": [str(one) for one in instance_ids or ()],
-                               "instance_set": instance_set, "dataset": dataset})
+        entry = {"columns": list(columns),
+                 "instance_ids": [str(one) for one in instance_ids or ()],
+                 "instance_set": instance_set, "dataset": dataset}
+        if details:
+            # How the instances were drawn (seed, id filters, plan): v2 cells.
+            entry["details"] = dict(details)
+        self._coverage.append(entry)
 
     def take_coverage(self) -> List[dict]:
         """The declarations made since the last call, emptied. The CLI's half."""
@@ -198,6 +203,17 @@ class AnalysisContext:
     def descriptive_batches(self):
         """The whole test split, item-swap pair only."""
         return self._batches("descriptive", None)
+
+    def neutral_twin_batches(self):
+        """The whole test split, each row with its Neutral-Clause Twin (v2)."""
+        from component_analysis import dataloaders
+
+        if "neutral_twin" not in self._loaders:
+            self._loaders["neutral_twin"] = dataloaders.batches_for_task(
+                self.task_spec, self.tokenizer, ids=None, neutral_twin=True,
+                batch_size=getattr(self.cli, "batch_size",
+                                   dataloaders.DEFAULT_BATCH_SIZE))
+        return self._loaders["neutral_twin"]
 
     def subdir(self, analysis) -> str:
         """The analysis's own directory inside the cell, created on demand.

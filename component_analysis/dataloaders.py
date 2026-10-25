@@ -69,7 +69,19 @@ class LoaderUnavailable(ValueError):
 #: than an item, and its answer words ("accurate" / "inaccurate") are several
 #: tokens each, which `DeceptionDatasetLlama` drops on sight — all 1000 of them.
 #: A causal loader for STD is its own piece of work, not a silent empty batch.
-MECHANISM_TASKS = ("far", "sdr", "ser")
+#:
+#: The v2 ids (mechanism-datasets) are the same three mechanisms on the aligned
+#: v2 Scaffold, with the same item-swap Corruption and single-token answers.
+#: Their paired honest counterpart is the Neutral-Clause Twin (`neutral_twin`
+#: below), not a Matched Honest Instruction: v2 has no matched pools.
+V2_TASKS = ("far_v2", "sdr_v2", "ser_v2")
+MECHANISM_TASKS = ("far", "sdr", "ser") + V2_TASKS
+
+#: The record `condition`s whose prompts carry a Pressure Clause that the
+#: Neutral-Clause Twin replaces: D, and the instructed-inversion control I.
+TWINNED_CONDITIONS = ("deceptive", "inversion")
+#: What the twin split must say it is.
+NEUTRAL_TWIN_KIND = "neutral_clause"
 
 #: Instances per forward. Sized for a 128-token prompt on a 40 GB card under
 #: bfloat16; the analyses that need eager attention pay a
@@ -95,6 +107,26 @@ class HonestPair:
 
 
 @dataclass
+class NeutralTwinPair:
+    """The Neutral-Clause Twin of the rows of a v2 batch that have one.
+
+    `rows` are positions within the batch. Both streams of the twin are kept
+    (its clean prompt pairs with the batch's clean prompt, its corrupt prompt
+    with the corrupt one), each clause-aligned with its partner: identical
+    tokens outside `clause_span`, the same length, the same Readout. The
+    batch's Target and Distractor are the pressure prompt's (D's labels), so a
+    number read on the twin is in the same direction as one read on D.
+    """
+
+    rows: List[int]
+    input_ids: torch.Tensor              # [k, max_length], the twin's clean prompt
+    attention_mask: torch.Tensor
+    corrupt_input_ids: torch.Tensor      # the twin's corrupt prompt
+    corrupt_attention_mask: torch.Tensor
+    clause_span: torch.Tensor            # [k, 2], half-open token range
+
+
+@dataclass
 class Batch:
     """One forward's worth of instances, with both counterfactual pairs."""
 
@@ -108,6 +140,8 @@ class Batch:
     distractor_token: torch.Tensor
     readout: torch.Tensor            # [batch], prefix_length - 1
     honest: Optional[HonestPair]
+    #: v2 only: the Neutral-Clause Twin (None on v1, and on H and F cells).
+    neutral_twin: Optional[NeutralTwinPair] = None
 
     def __len__(self) -> int:
         return len(self.ids)
@@ -177,6 +211,18 @@ def _collate(items: Sequence[dict]) -> Batch:
                                       for row in honest_rows], dtype=torch.long),
             instructions=[items[row]["honest"]["instruction"]
                           for row in honest_rows])
+    twin_rows = [row for row, item in enumerate(items) if item.get("neutral_twin")]
+    twin = None
+    if twin_rows:
+        def stack(field):
+            return torch.stack([items[row]["neutral_twin"][field] for row in twin_rows])
+        twin = NeutralTwinPair(
+            rows=twin_rows, input_ids=stack("input_ids"),
+            attention_mask=stack("attention_mask"),
+            corrupt_input_ids=stack("corrupt_input_ids"),
+            corrupt_attention_mask=stack("corrupt_attention_mask"),
+            clause_span=torch.tensor([items[row]["neutral_twin"]["clause_span"]
+                                      for row in twin_rows], dtype=torch.long))
     return Batch(
         ids=[item["instance_id"] for item in items],
         records=[item["record"] for item in items],
@@ -190,7 +236,7 @@ def _collate(items: Sequence[dict]) -> Batch:
         distractor_token=torch.tensor([item["distractor_token"] for item in items],
                                       dtype=torch.long),
         readout=torch.tensor([item["readout"] for item in items], dtype=torch.long),
-        honest=honest)
+        honest=honest, neutral_twin=twin)
 
 
 def _honest_by_id(dataset_dir: str, tokenizer, *, split: str, task: Optional[str],
@@ -225,10 +271,103 @@ def _honest_by_id(dataset_dir: str, tokenizer, *, split: str, task: Optional[str
     return out, mh.SURVIVORS_FILE
 
 
+def neutral_twin_dir(dataset_dir: str, config: dict) -> str:
+    """`<data_dir>/<task>_honest`, from the dataset's own task name.
+
+    Not `dataset_dir + "_honest"`: the I condition lives at
+    `<task>_inversion`, and its twin is the same `<task>_honest` D's is.
+    """
+    return os.path.join(os.path.dirname(os.path.abspath(dataset_dir)),
+                        f"{config['task']}_honest")
+
+
+def neutral_twin_reason(task: Optional[str], config: dict) -> Optional[str]:
+    """Why this dataset has no Neutral-Clause Twin pairing, or None when it has."""
+    if task not in V2_TASKS:
+        return f"task {task!r} is not a v2 task; only v2 has a Neutral-Clause Twin"
+    condition = config.get("condition") or "deceptive"
+    if condition == "honest":
+        return ("not applicable: this test set is the Neutral-Clause Twin "
+                "itself (condition honest)")
+    if condition == "nopressure":
+        return ("not applicable: the nopressure condition has no Pressure "
+                "Clause for a twin to replace")
+    if condition not in TWINNED_CONDITIONS:
+        return f"not applicable: condition {condition!r} has no twin"
+    return None
+
+
+def _neutral_twins_by_id(dataset_dir: str, tokenizer, kept: dict, *, config: dict,
+                         split: str, max_length: int):
+    """({instance id: twin item}, twin directory), for the kept pressure rows.
+
+    Every pairing is checked rather than trusted: the split must say it is the
+    Neutral-Clause Twin, each twin row must carry the pressure row's
+    `pressure_id`, and both streams must be clause-aligned with their partner
+    (`matched_honest.assert_clause_aligned_pair`, the pressure row's own clause
+    locating the span). The twin is read from the `_honest` split's
+    `clean_prompt` / `corrupt_prompt`; the pressure rows' `neutral_prompt`
+    column is the Prior-Balance prompt and is never read here.
+    """
+    from dataset import deception_common as dc
+    from dataset.matched_honest import assert_clause_aligned_pair
+
+    directory = neutral_twin_dir(dataset_dir, config)
+    twin_config = dc.load_dataset_config(directory)
+    if twin_config.get("honest_twin_kind") != NEUTRAL_TWIN_KIND:
+        raise ValueError(
+            f"{directory} is not a Neutral-Clause Twin split: its "
+            f"dataset_config.json says honest_twin_kind "
+            f"{twin_config.get('honest_twin_kind')!r}, not {NEUTRAL_TWIN_KIND!r}")
+    twins = {}
+    for index, row in enumerate(dc.load_or_generate_deception_data(directory, split=split)):
+        twins[sampling.record_id(row, index)] = row
+
+    out = {}
+    for one, record in kept.items():
+        twin = twins.get(one)
+        if twin is None:
+            continue
+        if twin.get("honest_twin_kind") != NEUTRAL_TWIN_KIND or \
+                twin.get("condition") != "honest":
+            raise ValueError(
+                f"instance {one}: the row in {directory} is condition "
+                f"{twin.get('condition')!r}, kind {twin.get('honest_twin_kind')!r}, "
+                f"not an honest {NEUTRAL_TWIN_KIND} twin")
+        if twin.get("pressure_id") != record.get("pressure_id"):
+            raise ValueError(
+                f"instance {one}: the twin's pressure_id {twin.get('pressure_id')!r} "
+                f"is not the pressure row's {record.get('pressure_id')!r}")
+        spans = []
+        for stream in ("clean_prompt", "corrupt_prompt"):
+            try:
+                _p, _h, span = assert_clause_aligned_pair(
+                    tokenizer, record[stream], twin[stream], record["pressure"],
+                    max_length)
+            except (AssertionError, ValueError) as exc:
+                raise ValueError(
+                    f"instance {one}: its Neutral-Clause Twin is not clause-aligned "
+                    f"on the {stream.split('_')[0]} stream: {exc}") from exc
+            spans.append(tuple(span))
+        if spans[0] != spans[1]:
+            raise ValueError(f"instance {one}: the clause spans of the two streams "
+                             f"differ ({spans[0]} vs {spans[1]})")
+        input_ids, attention_mask = _encode(tokenizer, twin["clean_prompt"], max_length)
+        corrupt_ids, corrupt_mask = _encode(tokenizer, twin["corrupt_prompt"], max_length)
+        out[one] = {"input_ids": input_ids, "attention_mask": attention_mask,
+                    "corrupt_input_ids": corrupt_ids,
+                    "corrupt_attention_mask": corrupt_mask,
+                    "clause_span": list(spans[0])}
+    return out, directory
+
+
 def _batches(dataset_dir: str, tokenizer, *, ids: Optional[Sequence[str]],
              task: Optional[str], split: str, batch_size: int,
              max_length: Optional[int], pools_dir: Optional[str],
-             honest_streams: Optional[str], with_honest: bool) -> Batches:
+             honest_streams: Optional[str], with_honest: bool,
+             with_neutral_twin: Optional[bool] = None) -> Batches:
+    """`with_neutral_twin`: None pairs v2 tasks and leaves v1 untouched (its
+    report gains no key), True asks for the pairing, False never pairs."""
     from dataset import deception_common as dc
 
     config = dc.load_dataset_config(dataset_dir)
@@ -267,7 +406,18 @@ def _batches(dataset_dir: str, tokenizer, *, ids: Optional[Sequence[str]],
             dataset_dir, tokenizer, split=split, task=task, pools_dir=pools_dir,
             max_length=max_length, honest_streams=honest_streams)
 
-    items, without_honest = [], []
+    if with_neutral_twin is None:
+        with_neutral_twin = task in V2_TASKS
+    twins, twin_source, pairing = {}, None, False
+    if with_neutral_twin:
+        twin_source = neutral_twin_reason(task, config)
+        pairing = twin_source is None
+        if pairing:
+            twins, twin_source = _neutral_twins_by_id(
+                dataset_dir, tokenizer, kept, config=config, split=split,
+                max_length=max_length)
+
+    items, without_honest, without_twin = [], [], []
     for one in wanted:
         item = kept.get(one)
         if item is None:
@@ -287,6 +437,12 @@ def _batches(dataset_dir: str, tokenizer, *, ids: Optional[Sequence[str]],
         pair = honest.get(one)
         if with_honest and pair is None:
             without_honest.append(one)
+        twin = twins.get(one)
+        if pairing and twin is None:
+            without_twin.append(one)
+        if twin is not None and not torch.equal(twin["attention_mask"], attention_mask):
+            raise ValueError(f"instance {one}: the Neutral-Clause Twin's attention "
+                             f"mask is not the pressure prompt's")
         items.append({
             "instance_id": one, "record": item,
             "input_ids": input_ids, "attention_mask": attention_mask,
@@ -294,7 +450,7 @@ def _batches(dataset_dir: str, tokenizer, *, ids: Optional[Sequence[str]],
             "corrupt_attention_mask": corrupt_mask,
             "target_token": int(item["target_token"]),
             "distractor_token": int(item["distractor_token"]),
-            "readout": readout, "honest": pair})
+            "readout": readout, "honest": pair, "neutral_twin": twin})
 
     report = {
         "task": task, "split": split, "batch_size": batch_size,
@@ -307,6 +463,14 @@ def _batches(dataset_dir: str, tokenizer, *, ids: Optional[Sequence[str]],
         "n_with_honest": len(items) - len(without_honest) if with_honest else 0,
         "without_honest": without_honest,
     }
+    if with_neutral_twin:
+        # Only when asked for (every v2 loader), so a v1 report, which
+        # `dla.json` copies whole, keeps exactly the keys it always had.
+        report.update({
+            "neutral_twin_source": twin_source,
+            "n_with_neutral_twin": sum(1 for item in items if item["neutral_twin"]),
+            "without_neutral_twin": without_twin,
+        })
     return Batches(items, batch_size=batch_size, report=report)
 
 
@@ -344,7 +508,24 @@ def descriptive_batches(dataset_dir: str, tokenizer, *, task: Optional[str] = No
     """
     return _batches(dataset_dir, tokenizer, ids=None, task=task, split=split,
                     batch_size=batch_size, max_length=max_length,
-                    pools_dir=None, honest_streams=None, with_honest=False)
+                    pools_dir=None, honest_streams=None, with_honest=False,
+                    with_neutral_twin=False)
+
+
+def neutral_twin_batches(dataset_dir: str, tokenizer, *, task: Optional[str] = None,
+                         split: str = "test",
+                         batch_size: int = DEFAULT_BATCH_SIZE,
+                         max_length: Optional[int] = None) -> Batches:
+    """The whole split, each row with its Neutral-Clause Twin (v2 D or I).
+
+    The descriptive half of the `neutral_twin` paired kind: DLA's paired
+    neutral-twin condition reads every row of the split, not the causal sample.
+    On an H or F test set the report says why there is no pairing.
+    """
+    return _batches(dataset_dir, tokenizer, ids=None, task=task, split=split,
+                    batch_size=batch_size, max_length=max_length,
+                    pools_dir=None, honest_streams=None, with_honest=False,
+                    with_neutral_twin=True)
 
 
 def batches_for_task(task_spec, tokenizer, *, ids: Optional[Sequence[str]] = None,
@@ -352,15 +533,21 @@ def batches_for_task(task_spec, tokenizer, *, ids: Optional[Sequence[str]] = Non
                      batch_size: int = DEFAULT_BATCH_SIZE,
                      max_length: Optional[int] = None,
                      pools_dir: Optional[str] = None,
-                     honest_streams: Optional[str] = None) -> Batches:
+                     honest_streams: Optional[str] = None,
+                     neutral_twin: bool = False) -> Batches:
     """The CLI's entry point: ask the task where its dataset is, then load it.
 
     `ids=None` gives the descriptive loader over the whole split; an id list
-    gives the causal one with both counterfactual pairs.
+    gives the causal one with both counterfactual pairs. `neutral_twin=True`
+    with `ids=None` gives the whole split paired with its Neutral-Clause Twin.
     """
     from component_analysis import instances
 
     directory = instances.dataset_dir(task_spec)
+    if ids is None and neutral_twin:
+        return neutral_twin_batches(directory, tokenizer, task=task_spec.name,
+                                    split=split, batch_size=batch_size,
+                                    max_length=max_length)
     if ids is None:
         return descriptive_batches(directory, tokenizer, task=task_spec.name,
                                    split=split, batch_size=batch_size,
@@ -391,5 +578,13 @@ def summarize(batches: Batches) -> List[str]:
         lines.append(f"honest-instruction pair on {report['n_with_honest']} of "
                      f"{report['n_instances']} ({report['honest_streams']} "
                      f"criterion); {len(report['without_honest'])} without")
+    if "neutral_twin_source" in report:
+        if report["n_with_neutral_twin"] or report["without_neutral_twin"]:
+            lines.append(f"neutral-clause twin on {report['n_with_neutral_twin']} "
+                         f"of {report['n_instances']}, from "
+                         f"{report['neutral_twin_source']}; "
+                         f"{len(report['without_neutral_twin'])} without")
+        else:
+            lines.append(f"neutral-clause twin: {report['neutral_twin_source']}")
     return lines
 

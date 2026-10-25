@@ -316,6 +316,25 @@ MECHANISM_SEGMENTS = (
     "stem", "readout", UNSEGMENTED,
 )
 
+#: The v2 mechanism tasks (mechanism-datasets). Same Scaffold anatomy as v1, so
+#: the same segmenter, plus one Segment v1 does not have (below).
+V2_TASKS = ("far_v2", "sdr_v2", "ser_v2")
+
+#: The v2 Segments: v1's, with `response_line` after `question`. The v2 user
+#: turn ends in the G5 response line ('Only respond with "<stem> X", where X is
+#: A or B.'), which v1's segmenter leaves inside `question`. It is carved out
+#: as its own frame Segment (mechanism-analysis R7) so a read of "the question"
+#: and a read of the answer format are not pooled. On v2 the
+#: `item_N_question_option` mentions are the response line's mentions of the
+#: items (there is no quoted option), and they stay Item Mentions of their own,
+#: carved out of the line exactly as they are carved out of the question.
+MECHANISM_V2_SEGMENTS = (MECHANISM_SEGMENTS[:MECHANISM_SEGMENTS.index("question") + 1]
+                         + ("response_line",)
+                         + MECHANISM_SEGMENTS[MECHANISM_SEGMENTS.index("question") + 1:])
+
+#: Where the response line starts, literal in `deception_v2.USER_TURN`.
+RESPONSE_LINE_ANCHOR = "Only respond with"
+
 #: The two Item Mentions the user question carries, per item, in prompt order.
 #: The question names the pair ("staffing or pricing?") and then names each
 #: item again inside its quoted option ('"...I will show you is staffing"'), so
@@ -332,10 +351,19 @@ def _mechanism_intro(prompt: str, record: dict, system: Tuple[int, int]) -> int:
     datasets, so it is matched exactly. A mismatch is raised rather than
     guessed around: `--dry-run` exists to fail on the login node, and a
     sentence-splitting fallback would silently move every span in the prompt.
-    """
-    from dataset.deception_common import SPECS
 
-    spec = SPECS[record["task"]]
+    A v2 record (`far_v2`, ...) takes its intro from the v2 Scaffold the
+    dataset was built with (`deception_v2.make_spec` with the record's own
+    Suffix Policy and SER wording); `dc.SPECS` holds the v1 tasks only.
+    """
+    if record["task"] in V2_TASKS:
+        from dataset.deception_v2 import make_spec
+
+        spec = make_spec(record["task"], record["suffix"], record.get("ser_wording"))
+    else:
+        from dataset.deception_common import SPECS
+
+        spec = SPECS[record["task"]]
     variant = spec.variant(record["template_variant"])
     intro = variant.intro.format(entity=record["entity"],
                                  item_1=record["item_1"],
@@ -352,6 +380,28 @@ def _mechanism_intro(prompt: str, record: dict, system: Tuple[int, int]) -> int:
 
 def segment_mechanism(record: dict, index: TokenIndex) -> _Builder:
     """Default Segments of a FAR / SDR / SER prompt."""
+    return _segment_mechanism(record, index, response_line=False)
+
+
+def segment_mechanism_v2(record: dict, index: TokenIndex) -> _Builder:
+    """Default Segments of a v2 prompt: v1's, plus `response_line`."""
+    return _segment_mechanism(record, index, response_line=True)
+
+
+def _response_line_span(prompt: str, record: dict, user: Tuple[int, int]):
+    start, end = user
+    found = [m.start() for m in re.finditer(re.escape(RESPONSE_LINE_ANCHOR),
+                                            prompt[start:end])]
+    if len(found) != 1:
+        raise SegmentationError(
+            f"record {record.get('instance_id')!r}: the v2 response line "
+            f"({RESPONSE_LINE_ANCHOR!r}) occurs {len(found)} times in the user "
+            f"turn; it must occur exactly once")
+    return (start + found[0], end)
+
+
+def _segment_mechanism(record: dict, index: TokenIndex, *,
+                       response_line: bool) -> _Builder:
     prompt = record["clean_prompt"]
     regions = _chat_regions(prompt)
     system_start, system_end = regions["system"]
@@ -453,6 +503,10 @@ def segment_mechanism(record: dict, index: TokenIndex) -> _Builder:
                   [(region_start, region_start + sentence_end)])
     builder.claim("designation_suffix", [suffix_span] if suffix_span else [])
     builder.claim("pressure_clause", [pressure_span] if pressure_span else [])
+    if response_line:
+        # Before `question`, so the question is the frame left around it.
+        builder.claim("response_line",
+                      [_response_line_span(prompt, record, regions["user"])])
     builder.claim("question", [(user_start, user_end)])
     builder.claim("stem", [(stem_start, stem_end)])
     builder.claim_remainder()
@@ -532,12 +586,17 @@ def segment_std(record: dict, index: TokenIndex) -> _Builder:
 # ==============================================================================
 
 _SEGMENTERS = {"far": segment_mechanism, "sdr": segment_mechanism,
-               "ser": segment_mechanism, "std": segment_std}
+               "ser": segment_mechanism, "std": segment_std,
+               **{task: segment_mechanism_v2 for task in V2_TASKS}}
 
 _SCHEMES = {"far": "mechanism", "sdr": "mechanism", "ser": "mechanism",
-            "std": "std"}
+            "std": "std", **{task: "mechanism_v2" for task in V2_TASKS}}
 
-_SCHEME_SEGMENTS = {"mechanism": MECHANISM_SEGMENTS, "std": STD_SEGMENTS}
+_SCHEME_SEGMENTS = {"mechanism": MECHANISM_SEGMENTS, "std": STD_SEGMENTS,
+                    "mechanism_v2": MECHANISM_V2_SEGMENTS}
+
+#: The schemes whose Designation Positions and Item Mentions are validated.
+MECHANISM_SCHEMES = ("mechanism", "mechanism_v2")
 
 
 def is_segmentable(task: str) -> bool:
@@ -704,7 +763,7 @@ def validate_segmentation(segmentation: Segmentation, record: dict,
             else:
                 owner[i] = name
 
-    if segmentation.scheme == "mechanism":
+    if segmentation.scheme in MECHANISM_SCHEMES:
         for name in DESIGNATION_POSITIONS:
             segment = segmentation.segments[name]
             if len(segment.spans) != 1:

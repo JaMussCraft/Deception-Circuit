@@ -117,35 +117,36 @@ def test_the_clean_run_is_reported_beside_the_knockouts():
 # THE SCHEME FLAG
 # ==============================================================================
 
-def test_interchange_is_the_scheme_that_exists():
+def test_interchange_is_the_default_scheme():
     assert knockout.resolve_scheme("interchange") == "interchange"
+    assert knockout.SCHEME == "interchange"
 
 
 @pytest.mark.parametrize("scheme", ["mean", "zero"])
-def test_mean_and_zero_are_refused_by_name_as_future_work(scheme):
+def test_mean_and_zero_are_built(scheme):
+    """Built by mechanism-analysis 02a; they were refused as future work."""
+    assert knockout.resolve_scheme(scheme) == scheme
+
+
+def test_an_unknown_scheme_is_refused_by_name():
     with pytest.raises(ValueError) as refused:
-        knockout.resolve_scheme(scheme)
-
-    message = str(refused.value)
-    assert scheme in message and "future work" in message
-    assert "interchange" in message
-
-
-def test_an_unknown_scheme_is_refused_too():
-    with pytest.raises(ValueError, match="nonsense"):
         knockout.resolve_scheme("nonsense")
 
+    message = str(refused.value)
+    assert "nonsense" in message
+    assert all(one in message for one in ("interchange", "mean", "zero"))
 
-def test_the_cli_refuses_the_scheme_before_a_gpu_is_touched(capsys):
-    """argparse, so `--knockout-scheme zero` fails on the login node."""
+
+def test_the_cli_refuses_an_unknown_scheme_before_a_gpu_is_touched(capsys):
+    """argparse, so a bad `--knockout-scheme` fails on the login node."""
     import analyze_components
 
     with pytest.raises(SystemExit):
         analyze_components.build_parser().parse_args(
-            ["run", "--knockout-scheme", "zero"])
+            ["run", "--knockout-scheme", "nonsense"])
 
     stderr = capsys.readouterr().err
-    assert "zero" in stderr and "future work" in stderr
+    assert "nonsense" in stderr and "interchange" in stderr
 
 
 def test_the_cli_takes_interchange():

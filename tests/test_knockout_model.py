@@ -149,10 +149,10 @@ def test_the_effects_are_per_instance_over_every_batch(model, batch):
     assert knockout.summarize(effects)[0]["n"] == 2 * BATCH
 
 
-def test_an_unbuilt_scheme_is_refused_before_any_forward_runs(model, batch):
-    with pytest.raises(ValueError, match="future work"):
+def test_an_unknown_scheme_is_refused_before_any_forward_runs(model, batch):
+    with pytest.raises(ValueError, match="not one of"):
         knockout.knockout_effects(model, [batch], [("head", 0, 0)],
-                                  scheme="zero")
+                                  scheme="nonsense")
 
 
 # ==============================================================================

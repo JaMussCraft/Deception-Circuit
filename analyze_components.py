@@ -86,7 +86,9 @@ ANALYSIS_SPLIT = "test"
 #: needs no model, no circuit binding and no task: it is not a registered
 #: analysis because a registered analysis runs inside one invocation, from the
 #: intake's fresh rows, and never sees the columns a previous run wrote.
-SUBCOMMANDS = {"roles": "component_analysis.roles"}
+SUBCOMMANDS = {"roles": "component_analysis.roles",
+               # Several invocations in one job, one model load (mechanism-analysis 02a).
+               "batch": "component_analysis.batch"}
 
 
 # ==============================================================================
@@ -141,6 +143,17 @@ def build_parser():
     g.add_argument("--seed", type=int, default=sampling.DEFAULT_SEED,
                    help="Seed for the causal sample. Does not touch the run's "
                         "own training seed.")
+    g.add_argument("--exclude-ids", default=None, metavar="FILE",
+                   help="Draw the causal sample without these instances: a "
+                        "sample.json (the selection cell's), a JSON list or one "
+                        "id per line. The held-out sample is --seed 1 with the "
+                        "seed-0 sample excluded. Recorded in sample.json.")
+    g.add_argument("--include-ids", default=None, metavar="FILE",
+                   help="Draw the causal sample only from these instances (same "
+                        "file forms). With --n-causal at or above their number "
+                        "the sample is exactly them, which is how a paired "
+                        "comparison across test sets fixes its ids. Ids not in "
+                        "the split are reported in sample.json.")
 
     g = p.add_argument_group("analyses")
     g.add_argument("--analyses", default=None, metavar="NAME[,NAME]",
@@ -342,9 +355,25 @@ def resolve_instances(cli, resolved, *, tokenizer=None) -> dict:
     resolve fails here, which is what `--dry-run` is for.
     """
     overrides = segments.parse_segment_overrides(getattr(cli, "segment", None))
+    # A mechanism task (v1 or v2) always has a segmentation; skipping one
+    # would run its causal analyses on no sample and say nothing, so it is
+    # refused by name instead (mechanism-analysis 02a).
+    unsegmented = [spec.name for spec in resolved.tasks
+                   if spec.name in dataloaders.MECHANISM_TASKS
+                   and not segments.is_segmentable(spec.name)]
+    if unsegmented:
+        raise SystemExit(
+            f"task(s) {', '.join(unsegmented)} are mechanism tasks with no default "
+            f"segmentation; they would be skipped silently, so the run stops here")
     wanted = [spec for spec in resolved.tasks if segments.is_segmentable(spec.name)]
     if not wanted:
         return {}
+    filters = {}
+    for option, flag in (("exclude_ids", "--exclude-ids"),
+                         ("include_ids", "--include-ids")):
+        path = getattr(cli, option, None)
+        if path:
+            filters[option] = (path, sampling.read_id_file(path))
 
     if tokenizer is None:
         tokenizer = instances.load_analysis_tokenizer(
@@ -356,8 +385,12 @@ def resolve_instances(cli, resolved, *, tokenizer=None) -> dict:
         ids = sampling.record_ids(records)
         segmentations, report = instances.resolve_split_segmentation(
             task_spec.name, records, tokenizer, overrides=overrides, ids=ids)
-        sample = sampling.draw_sample(records, n=cli.n_causal, seed=cli.seed,
-                                      ids=ids)
+        sample = sampling.draw_sample(
+            records, n=cli.n_causal, seed=cli.seed, ids=ids,
+            **{option: listed for option, (_path, listed) in filters.items()})
+        for option, (path, _listed) in filters.items():
+            key = "id_exclusion" if option == "exclude_ids" else "id_inclusion"
+            sample.id_filters[key]["source"] = path
         out[task_spec.label] = TaskInstances(task_spec, segmentations, report,
                                              sample, overrides, tokenizer)
     return out
@@ -380,6 +413,13 @@ def print_instances(task_instances: TaskInstances) -> None:
               f"{len(overlapping)} instance(s)")
     print(f"    sample: {sample.n_drawn} of {sample.n_requested} requested, "
           f"seed {sample.seed}")
+    for name, value in sample.id_filters.items():
+        detail = (f"{value['n_removed_from_pool']} removed from the pool"
+                  if name == "id_exclusion" else
+                  f"{value['n_kept_in_split']} in the split, "
+                  f"{len(value['not_in_split'])} not")
+        print(f"      {name.replace('_', ' ')}: {value['n_ids']} id(s) from "
+              f"{value.get('source')}; {detail}")
     if sample.factors:
         print(f"      stratified over {', '.join(sample.factors)} "
               f"({len(sample.strata)} strata)")

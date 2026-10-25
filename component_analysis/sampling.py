@@ -107,6 +107,10 @@ class Sample:
     ids: List[str]
     indices: List[int]        # positions in the split AS LOADED (see as_json)
     marginals: Dict[str, Dict[str, int]]
+    #: `{"id_exclusion": {...}, "id_inclusion": {...}}`, each present only when
+    #: that option was used, so a draw without either writes the same
+    #: `sample.json` it always did. The CLI adds each file's `source`.
+    id_filters: Dict[str, dict] = field(default_factory=dict)
 
     @property
     def n_drawn(self) -> int:
@@ -114,6 +118,7 @@ class Sample:
 
     def as_json(self) -> dict:
         return {
+            **{name: dict(value) for name, value in self.id_filters.items()},
             "n_requested": self.n_requested, "n_drawn": self.n_drawn,
             "seed": self.seed, "factors": list(self.factors),
             "inactive_factors": dict(self.inactive_factors),
@@ -214,17 +219,95 @@ def allocate(sizes: Sequence[int], n: int) -> Tuple[List[int], List[int]]:
     return targets, counts
 
 
+def read_id_file(path: str) -> List[str]:
+    """The instance ids in `path`, in file order.
+
+    Three forms, so the held-out draw can name the selection cell's own file:
+    a `sample.json` (its `instance_ids`), a JSON list of ids, or one id per
+    line. An empty file is refused: a filter that names nothing would silently
+    mean "no filter" for an exclusion and "no sample" for an inclusion.
+    """
+    import json
+
+    with open(path) as handle:
+        text = handle.read()
+    try:
+        parsed = json.loads(text)
+    except ValueError:
+        parsed = None
+    if isinstance(parsed, dict):
+        if "instance_ids" not in parsed:
+            raise ValueError(f"{path} is a JSON object without 'instance_ids'")
+        ids = parsed["instance_ids"]
+    elif isinstance(parsed, list):
+        ids = parsed
+    else:
+        ids = [line.strip() for line in text.splitlines()]
+    ids = [str(one) for one in ids if str(one).strip()]
+    if not ids:
+        raise ValueError(f"{path} names no instance ids")
+    return ids
+
+
+def _id_filters(split_ids: Sequence[str], exclude_ids, include_ids):
+    """(the split positions the draw may use, the `id_filters` record)."""
+    keep = set(range(len(split_ids)))
+    filters: Dict[str, dict] = {}
+    present = set(split_ids)
+    if include_ids is not None:
+        wanted = list(dict.fromkeys(str(one) for one in include_ids))
+        allowed = set(wanted)
+        keep = {i for i in keep if split_ids[i] in allowed}
+        filters["id_inclusion"] = {
+            "n_ids": len(wanted), "n_kept_in_split": len(keep),
+            "not_in_split": [one for one in wanted if one not in present],
+            "rule": "the draw is restricted to these ids; with n at or above "
+                    "their number it is exactly them"}
+    if exclude_ids is not None:
+        unwanted = list(dict.fromkeys(str(one) for one in exclude_ids))
+        barred = set(unwanted)
+        before = len(keep)
+        keep = {i for i in keep if split_ids[i] not in barred}
+        filters["id_exclusion"] = {
+            "n_ids": len(unwanted),
+            "n_removed_from_split": sum(1 for one in unwanted if one in present),
+            "n_removed_from_pool": before - len(keep),
+            "rule": "these ids are removed before the strata are built; an "
+                    "exclusion wins over an inclusion"}
+    return keep, filters
+
+
 def draw_sample(records: Sequence[dict], *, n: int = DEFAULT_N_CAUSAL,
                 seed: int = DEFAULT_SEED,
                 factors: Sequence[str] = DEFAULT_FACTORS,
-                ids: Optional[Sequence[str]] = None) -> Sample:
-    """N instances, stratified over every factor with more than one level."""
+                ids: Optional[Sequence[str]] = None,
+                exclude_ids: Optional[Sequence[str]] = None,
+                include_ids: Optional[Sequence[str]] = None) -> Sample:
+    """N instances, stratified over every factor with more than one level.
+
+    `exclude_ids` removes instances before the strata are built (the held-out
+    draw: seed 1 with the selection sample's ids excluded); `include_ids`
+    restricts the draw to those instances (R-inv's paired ids). Without either
+    the draw is the one this function always made, bit for bit.
+    """
     if n < 0:
         raise ValueError(f"--n-causal must not be negative, got {n}")
     records = list(records)
     ids = list(ids) if ids is not None else record_ids(records)
     if len(ids) != len(records):
         raise ValueError(f"{len(ids)} ids for {len(records)} records")
+    if exclude_ids is not None or include_ids is not None:
+        keep, filters = _id_filters(ids, exclude_ids, include_ids)
+        positions = sorted(keep)
+        sample = draw_sample([records[i] for i in positions], n=n, seed=seed,
+                             factors=factors, ids=[ids[i] for i in positions])
+        # Back to positions in the split as loaded, which is what `indices`
+        # and `split_indices` promise.
+        for stratum in sample.strata:
+            stratum.indices = [positions[i] for i in stratum.indices]
+        sample.indices = [positions[i] for i in sample.indices]
+        sample.id_filters = filters
+        return sample
 
     active, inactive = _active_factors(records, factors)
 

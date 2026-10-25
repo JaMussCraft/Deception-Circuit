@@ -113,10 +113,10 @@ def test_a_family_covering_every_component_is_the_whole_circuit_knocked_out(
     assert any(abs(one) > 1e-3 for one in family.drops("unknown"))
 
 
-def test_an_unbuilt_scheme_is_refused_before_any_forward_runs(model, batch):
-    with pytest.raises(ValueError, match="future work"):
+def test_an_unknown_scheme_is_refused_before_any_forward_runs(model, batch):
+    with pytest.raises(ValueError, match="not one of"):
         knockout.family_effects(model, [batch], {"mover": [("head", 0, 0)]},
-                                scheme="zero")
+                                scheme="nonsense")
 
 
 # ==============================================================================
