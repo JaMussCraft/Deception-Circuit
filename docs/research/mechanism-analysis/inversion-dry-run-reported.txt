@@ -1,3 +1,7 @@
+# NOTE (R22, 2026-10-25): this log is for the secondary condition `inversion_reported`. The pool it names,
+# dataset/deception_pools/v2/inversion_v2.json, was renamed byte-identical to inversion_v2_reported.json (same
+# sha256 below); its builder hash is that of the round-1 builder. The directive pool's log is
+# inversion-dry-run-directive.txt.
 # CPU dry run of the Instructed-Inversion Condition builder (mechanism-analysis ticket 08), 2026-10-25.
 # Command, from the worktree root, mgnp env (Llama-3.1-8B-Instruct tokenizer from the HF cache):
 #   HF_HUB_OFFLINE=1 python -I dataset/build_inversion_v2.py --stage score --no-model

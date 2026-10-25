@@ -299,15 +299,18 @@ _Avoid_: control prompt, matched honest instruction (that one is an honesty
 instruction, this one carries no instruction)
 
 **Instructed-Inversion Condition (I)**:
-A v2 condition built from the deceptive test rows (mechanism-analysis spec §2.4, R15, R19(4), R20). The Pressure
-Clause is replaced, by clause surgery, with a transparent clause of the same token count and clause form. In it the
-asker openly asks for the same item, as a quiz or game or knowing the answer ("In this quiz the reviewer wants the
-wrong result."). The instance, target and labels are D's, so naming the target misleads no one. Rows are kept when
-the target is the argmax with margin >= 0.7 in both streams. The Neutral-Clause Twin with the same `instance_id` is
-its paired honest stream. A component that mediates both D and I is generic instructed-inversion machinery, not
-deception-specific. Stored as `<task>_inversion` (for example `far_v2_inversion`, test split only); condition id
-`inversion`, `slot_kind: transparent`, added columns `instructed_inversion_*` and `i_source_*`. Built by
-`dataset/build_inversion_v2.py`.
+A v2 condition built from the deceptive test rows (mechanism-analysis spec §2.4, R15, R19(4), R20, R22). The
+Pressure Clause is replaced, by clause surgery, with a transparent clause of the same token count and clause form.
+The clause instructs the assistant, like D's clauses, but inside an explicit game frame and with no motive to
+mislead anyone ("For this quiz, answer with the wrong result."). The instance, target and labels are D's, so naming
+the target misleads no one. Rows are kept when the target is the argmax with margin >= 0.7 in both streams. The
+Neutral-Clause Twin with the same `instance_id` is its paired honest stream. A component that mediates both D and I
+is generic instructed-inversion machinery, not deception-specific. Stored as `<task>_inversion` (for example
+`far_v2_inversion`, test split only); condition id `inversion`, `slot_kind: transparent`, added columns
+`instructed_inversion_*` and `i_source_*`. Built by `dataset/build_inversion_v2.py`.
+A secondary form, `<task>_inversion_reported` (condition id `inversion_reported`), reports the asker's wish
+instead ("In this quiz the reviewer wants the wrong result."). Under it the model keeps naming the true item in
+FAR and SER, which R22 records as a finding.
 This is unrelated to the Designation Polarity value `inversion`, which names the bad Predicate.
 _Avoid_: inversion control, control condition, bare "inversion" for this condition in prose
 

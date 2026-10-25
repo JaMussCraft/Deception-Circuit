@@ -1,0 +1,62 @@
+{
+ "task": "sdr_v2",
+ "mechanism": "omission",
+ "condition": "inversion",
+ "condition_name": "Instructed-Inversion Condition (I), directive pool",
+ "pool_style": "directive",
+ "splits": [
+  "test"
+ ],
+ "model": "meta-llama/Llama-3.1-8B-Instruct",
+ "max_seq_length": 120,
+ "margin_thresh": 0.7,
+ "filter_rule": "argmax = I target and -h >= contingency.MARGIN in both streams (contingency._deceptive, D's pressure rule)",
+ "n_margin_only_kept": 788,
+ "min_kept": 300,
+ "meets_min_kept": true,
+ "n_input": 1000,
+ "n_derived": 1000,
+ "n_kept": 788,
+ "source_datasets": {
+  "deceptive": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/mechanism-analysis/data/datasets/sdr_v2",
+  "neutral_twin": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/mechanism-analysis/data/datasets/sdr_v2_honest"
+ },
+ "source_cell": {
+  "framing_id": "r9_rule_unified",
+  "framing_family": "rule_instructed",
+  "pilot_cell": "r9_sdr_unified_on",
+  "suffix": "on",
+  "ser_wording": null
+ },
+ "pool_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/mechanism-analysis/dataset/deception_pools/v2/inversion_v2.json",
+ "pool_sha256": "9cf3994ab57fa444e6002865b7b637a12389d8795f734a461f99323b91eb730c",
+ "select_salt": "inversion:",
+ "clause_forms_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/mechanism-analysis/docs/research/mechanism-analysis/clause-forms.csv",
+ "clause_forms_sha256": "0b239b03b51fa090e772a3c9533aecb65ce3fb3cb1fae846eb0aad662b884cd6",
+ "builder_sha256": "6aacfde804edc9603e56c627a88f5b5cfb450133b1315814a518e48d6a89e207",
+ "scoring": {
+  "job_id": "49825105",
+  "cluster": "bridges2",
+  "partition": "GPU-shared",
+  "host": "w004.ib.bridges2.psc.edu",
+  "gpu": "NVIDIA H100 80GB HBM3",
+  "seconds": 8.353213787078857,
+  "forwards": 2000,
+  "model": "meta-llama/Llama-3.1-8B-Instruct",
+  "builder_sha256": "6aacfde804edc9603e56c627a88f5b5cfb450133b1315814a518e48d6a89e207",
+  "created": "2026-10-25T16:52:01"
+ },
+ "bridges2_delivery": "branch",
+ "field_notes": {
+  "condition": "the condition id: 'inversion' (the Instructed-Inversion Condition, I, directive pool) or 'inversion_reported' (its reported-wish pool, secondary); neither is the Designation Polarity value 'inversion'",
+  "pressure": "the I clause (transparent, from the pool)",
+  "slot_kind": "'transparent'",
+  "instructed_inversion_id/_form/_wording": "the chosen pool clause",
+  "i_source_*": "renamed from D: D's clause (i_source_pressure), its form, and D's clean/corrupt target margins",
+  "clean_margin/corrupt_margin": "the I target's margins (-h) on the I prompts",
+  "h_instructed_inversion_clean/corrupt": "h = logit(honest) - logit(I target) on the I prompts",
+  "other columns": "D's values, unchanged (h_*, honest_instruction_*, prior_margin, neutral_id, ...)"
+ },
+ "derivation": "D test rows with the Pressure Clause replaced by clause surgery with a form-matched, token-matched transparent directive clause (dataset/deception_pools/v2/inversion_v2.json); D's instance ids, pressure_id, target and distractor kept; the I clause is in `pressure`, D's in `i_source_pressure`; paired with <task>_honest by instance_id",
+ "created": "2026-10-25"
+}
