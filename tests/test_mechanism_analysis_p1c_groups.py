@@ -94,3 +94,22 @@ def test_paired_strata_counts_the_sampler_strata_and_lists_the_inversion_polarit
     assert s["item_polarity"] == {"1": 1, "2": 2}
     assert s["template_variant"] == {"lab": 2, "audit": 1}
     assert s["inversion_polarity_ids"] == ["c", "a"]
+
+
+def test_rinv_union_keeps_option_b_order_then_adds_the_r19_ids_not_already_there(g):
+    assert g.rinv_union(["a", "b", "c"], ["c", "d", "a", "e"]) == ["a", "b", "c", "d", "e"]
+
+
+def test_rinv_lines_take_every_listed_id(g):
+    text = g.batch_b("OUT", "GROUPS")
+    rinv = [ln for ln in text.splitlines() if "--include-ids" in ln]
+    assert len(rinv) == 6 and all("--n-causal 1000" in ln for ln in rinv)
+
+
+def test_u_only_sets_take_the_signed_top_k_among_u_heads_only(g):
+    r = _ranking()
+    U = {k for k in r if k[0] == "head" and k[1] % 2 == 0}
+    S = g.u_only_sets(r, U, ks=(1, 3))
+    inU = [k for k in r if k in U]
+    assert S[1] == inU[:1] and S[3] == inU[:3]
+    assert all(k in U for k in S[3])

@@ -11,7 +11,11 @@ greedy.json, both fetched to Delta, and writes under docs/research/mechanism-ana
                          candidate's preliminary C_t; the named groups core, excl_t, (D_t - H_t) - core
     <t>_heldout_HF.json  every S_k with k <= 20 of both selectors, plus the named groups (item-swap on H and F)
     <t>_rinv.json        every S_k with k <= 20 of both selectors (neutral twin, post-clause, on D and on I)
-    <t>_rinv_ids.txt     D's held-out ids that survive I's filter (R19(3): R-inv is paired on these)
+    <t>_rinv_ids.txt     the ids the paired R-inv lines run on (R23): option B's ids (I's own held-out sample, seed 1,
+                         the selection ids excluded; D on the same ids) followed by the R19(3) robustness ids (D's
+                         held-out ids that survive I's filter) not already listed
+    <t>_rinv_ids_optionB.txt, <t>_rinv_ids_r19.txt   the two id sets, read back separately
+    <t>_heldout_D_sample.json, <t>_heldout_I_sample.json   the seed-1 samples the id sets came from
     meta.json            selectors, k grids, the null RNG seed, C_t rule, sizes, sources (sha256)
 
 and docs/research/mechanism-analysis/jobs/03-p1c-b.batch (held-out D, H, F; paired D and I; one model load).
@@ -23,8 +27,9 @@ block per layer). C_t (spec 4, phase 3) = core | excl_t | ((D_t - H_t) - core) |
 (S_k's MLPs first, then by S2p rank; layer-0 MLP never).
 
 usage (from the repository root, after 1B and 1C-a are fetched):
-    python outputs/_launch_mechanism_analysis/p1c_groups.py --heldout-root DIR
-        (DIR holds a dry-run or real held-out D sample: <DIR>/U__leaf/<t>_v2/sample.json)
+    python outputs/_launch_mechanism_analysis/p1c_groups.py --heldout-root DIR_D --rinv-sample-root DIR_I
+        (DIR_D holds the held-out D sample and DIR_I I's own held-out sample, each <DIR>/U__leaf/<t>_v2/sample.json,
+         from a login dry-run: seed 1, the S1 selection ids excluded)
 """
 
 from __future__ import annotations
@@ -56,6 +61,12 @@ MAX_MLPS = 10
 def single_sets(ranking, ks=SINGLE_KS):
     """{k: top k of the signed ranking}, the positive control skipped."""
     r = [k for k in ranking if k != POSITIVE_CONTROL]
+    return {k: r[:k] for k in ks if k <= len(r)}
+
+
+def u_only_sets(ranking, U, ks=SINGLE_KS):
+    """R24 (descriptive arm): {k: top k of the signed ranking among U's heads only}."""
+    r = [k for k in ranking if k in U]
     return {k: r[:k] for k in ks if k <= len(r)}
 
 
@@ -141,16 +152,30 @@ def named_sets(t):
 
 # ------------------------------------------------------------------ build
 
-def build_task(t, ranking, steps):
+def u_heads():
+    """U's 123 heads as (head, layer, index) keys: the union of the six coarse v2 circuits' heads."""
+    import ma_cells as mc
+    return {("head", l, h) for hs in mc._head_sets(mc.REPO).values() for l, h in hs}
+
+
+def build_task(t, ranking, steps, U=None):
     named = named_sets(t)
     named_heads = set().union(*map(set, named.values()))
     cands = {f"single_k{k}": s for k, s in single_sets(ranking).items()}
     cands.update({f"greedy_k{k}": s for k, s in greedy_sets(steps).items()})
+    uonly = {f"uonly_k{k}": s for k, s in u_only_sets(ranking, U).items()} if U else {}
     D, HF, RINV, meta = {}, {}, {}, {"candidates": {}}
-    for i, (name, S) in enumerate(cands.items()):
+    for i, (name, S) in enumerate(list(cands.items()) + list(uonly.items())):
         D[name] = S
         for j, draw in enumerate(layer_matched_nulls(S, seed=NULL_SEED + 1000 * i)):
             D[f"null_{name}_d{j:02d}"] = draw
+        if name.startswith("uonly_"):
+            # R24: descriptive arm only -- held-out D with its nulls, and H/F for k <= 20; no routing, no R-inv.
+            if len(S) <= 20:
+                HF[name] = S
+            meta["candidates"][name] = {"k": len(S), "members": [".".join(map(str, x)) for x in S],
+                                        "null_seed": NULL_SEED + 1000 * i, "arm": "uonly (R24, descriptive)"}
+            continue
         C = grid_circuit(named_heads, S, ranking)
         _, b, c = routing_groups(C)
         D[f"route_b_{name}"] = b
@@ -197,6 +222,12 @@ def paired_strata(ids, rows_by_id):
     return out
 
 
+def rinv_union(ids_b, ids_r19):
+    """Option B's ids in order, then the R19(3) ids not already among them (R23: one paired run serves both)."""
+    seen = set(ids_b)
+    return list(ids_b) + [i for i in ids_r19 if i not in seen]
+
+
 def batch_b(out_root, groups_dir):
     import p1b_jobs as pb
     import p1c_jobs as pc
@@ -219,9 +250,11 @@ def batch_b(out_root, groups_dir):
                                                        "--output-dir", f"{out_root}/heldout_h"]),
             ("heldout_F", ["--task-from", f] + held + ["--knockout-groups", f"{groups_dir}/{t}_heldout_HF.json",
                                                        "--output-dir", f"{out_root}/heldout_f"]),
-            ("rinv_D", ["--task-from", d, "--include-ids", ids, "--analyses", "knockout", "--knockout-singles", "off"]
+            ("rinv_D", ["--task-from", d, "--include-ids", ids, "--n-causal", "1000", "--analyses", "knockout",
+                        "--knockout-singles", "off"]
              + post + ["--knockout-groups", f"{groups_dir}/{t}_rinv.json", "--output-dir", f"{out_root}/rinv_d"]),
-            ("rinv_I", ["--task-from", i, "--include-ids", ids, "--analyses", "knockout", "--knockout-singles", "off"]
+            ("rinv_I", ["--task-from", i, "--include-ids", ids, "--n-causal", "1000", "--analyses", "knockout",
+                        "--knockout-singles", "off"]
              + post + ["--knockout-groups", f"{groups_dir}/{t}_rinv.json", "--output-dir", f"{out_root}/rinv_i"]),
         ]
         for name, argv in cells:
@@ -234,6 +267,9 @@ def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--root", default=os.path.join(pb.REPO, pb.OUT_ROOT), help="fetched 1B/1C-a cells (Delta)")
     p.add_argument("--heldout-root", required=True, help="a held-out D sample: <DIR>/U__leaf/<t>_v2/sample.json")
+    p.add_argument("--rinv-sample-root", required=True,
+                   help="I's own held-out sample (R23 option B; seed 1, selection ids excluded): "
+                        "<DIR>/U__leaf/<t>_v2/sample.json")
     p.add_argument("--groups-dir", default="docs/research/mechanism-analysis/phase1/groups")
     p.add_argument("--jobs-dir", default=os.path.join(pb.REPO, pb.JOBS_DIR))
     p.add_argument("--out-root", default=pb.OUT_ROOT, help="cell output root written into the batch lines")
@@ -242,26 +278,43 @@ def main(argv=None) -> int:
     os.makedirs(gdir, exist_ok=True)
     meta = {"null_seed_base": NULL_SEED, "single_ks": SINGLE_KS, "greedy_ks": GREEDY_KS, "n_null": N_NULL,
             "max_mlps": MAX_MLPS, "ranking": "sweep.json signed_rank of 1B S2p, layer-0 MLP excluded", "tasks": {}}
+    U = u_heads()
+    meta["uonly_arm"] = {"ruling": "R24", "U_heads": len(U), "ks": SINGLE_KS,
+                         "rule": "single selector restricted to U's heads; descriptive, outside the R-AB reading"}
     for t in pb.RUNS:
         s2p = os.path.join(a.root, "s2p", "U__leaf", f"{t}_v2", "knockout", "sweep.json")
         greedy = os.path.join(a.root, "greedy", "U__leaf", f"{t}_v2", "knockout", "greedy.json")
-        D, HF, RINV, m = build_task(t, signed_ranking(s2p), greedy_steps(greedy))
+        D, HF, RINV, m = build_task(t, signed_ranking(s2p), greedy_steps(greedy), U=U)
         for name, groups in (("heldout_D", D), ("heldout_HF", HF), ("rinv", RINV)):
             with open(os.path.join(gdir, f"{t}_{name}.json"), "w") as f:
                 json.dump(to_json(groups), f)
-        ids = paired_ids(os.path.join(a.heldout_root, "U__leaf", f"{t}_v2", "sample.json"),
-                         os.path.join(pb.REPO, "data", "datasets", f"{t}_v2_inversion"))
-        with open(os.path.join(gdir, f"{t}_rinv_ids.txt"), "w") as f:
-            f.write("\n".join(ids) + "\n")
+        inv_ds = os.path.join(pb.REPO, "data", "datasets", f"{t}_v2_inversion")
+        d_sample = os.path.join(a.heldout_root, "U__leaf", f"{t}_v2", "sample.json")
+        i_sample = os.path.join(a.rinv_sample_root, "U__leaf", f"{t}_v2", "sample.json")
+        ids_b, ids_r19 = paired_ids(i_sample, inv_ds), paired_ids(d_sample, inv_ds)
+        ids = rinv_union(ids_b, ids_r19)
+        for suffix, xs in (("", ids), ("_optionB", ids_b), ("_r19", ids_r19)):
+            with open(os.path.join(gdir, f"{t}_rinv_ids{suffix}.txt"), "w") as f:
+                f.write("\n".join(xs) + "\n")
+        for name, src in (("D", d_sample), ("I", i_sample)):
+            with open(src) as fi, open(os.path.join(gdir, f"{t}_heldout_{name}_sample.json"), "w") as fo:
+                fo.write(fi.read())
         from datasets import load_from_disk
-        inv_rows = {r["instance_id"]: r for r in
-                    load_from_disk(os.path.join(pb.REPO, "data", "datasets", f"{t}_v2_inversion"))["test"]}
-        strata = paired_strata(ids, inv_rows)
+        inv_rows = {r["instance_id"]: r for r in load_from_disk(inv_ds)["test"]}
+        strata_b, strata_r19 = paired_strata(ids_b, inv_rows), paired_strata(ids_r19, inv_rows)
         m.update({"sources": {"s2p": {"path": s2p, "sha256": _sha(s2p)}, "greedy": {"path": greedy,
                                                                                    "sha256": _sha(greedy)}},
-                  "rinv_paired_ids": len(ids), "rinv_paired_strata": strata})
+                  "rinv_rule": ("R23: option B (I's own held-out sample, seed 1, the selection ids excluded; D on the "
+                                "same ids) primary; R19(3) subset (D's held-out ids surviving I's filter) as a "
+                                "robustness row; one paired run on their union"),
+                  "rinv_seed": 1, "rinv_union_ids": len(ids), "rinv_paired_ids": len(ids_b),
+                  "rinv_paired_strata": strata_b,
+                  "rinv_sets": {"optionB": {"file": f"{t}_rinv_ids_optionB.txt", "sample": f"{t}_heldout_I_sample.json",
+                                            **strata_b},
+                                "r19": {"file": f"{t}_rinv_ids_r19.txt", "sample": f"{t}_heldout_D_sample.json",
+                                        **strata_r19}}})
         meta["tasks"][t] = m
-        print(t, m["n_groups"], "paired ids", len(ids))
+        print(t, m["n_groups"], "R-inv ids: option B", len(ids_b), "R19(3)", len(ids_r19), "union", len(ids))
     with open(os.path.join(gdir, "meta.json"), "w") as f:
         json.dump(meta, f, indent=1)
     path = os.path.join(a.jobs_dir, "03-p1c-b.batch")
