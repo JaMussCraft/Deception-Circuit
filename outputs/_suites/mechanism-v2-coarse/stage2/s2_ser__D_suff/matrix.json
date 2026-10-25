@@ -1,0 +1,133 @@
+{
+  "created": "2026-10-24T19:05:46",
+  "cells": [
+    {
+      "circuit": "D_far",
+      "circuit_kind": "atomic",
+      "expr": null,
+      "task": "ser_v2",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/mechanism-v2-coarse/stage2/s2_ser__D_suff/cells/D_far/ser_v2/interchange",
+      "counts": {
+        "attention_blocks": 10,
+        "attention_heads": 58,
+        "attention_neurons": 7424,
+        "mlp_hidden": 458752,
+        "mlp_output": 131072
+      },
+      "headlines": {
+        "null": {
+          "accuracy": 100.0,
+          "logit_diff": 100.0,
+          "kl_div": 100.0,
+          "exact_match": 100.0
+        },
+        "pressure": {
+          "circuit_logit_diff_with_pressure": 0.343,
+          "circuit_logit_diff_honest_instruction": -0.53175,
+          "delta": -0.8747499999999999
+        }
+      },
+      "skipped": {
+        "sanity": "circuit 'D_far' was trained in /ocean/projects/cis260361p/swong2/Deception-Circuit/outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717, but this cell evaluates task 'ser_v2', so there is no in-run number to reproduce"
+      },
+      "failures": []
+    },
+    {
+      "circuit": "D_sdr",
+      "circuit_kind": "atomic",
+      "expr": null,
+      "task": "ser_v2",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/mechanism-v2-coarse/stage2/s2_ser__D_suff/cells/D_sdr/ser_v2/interchange",
+      "counts": {
+        "attention_blocks": 11,
+        "attention_heads": 60,
+        "attention_neurons": 7680,
+        "mlp_hidden": 458752,
+        "mlp_output": 131072
+      },
+      "headlines": {
+        "null": {
+          "accuracy": 100.0,
+          "logit_diff": 100.0,
+          "kl_div": 100.0,
+          "exact_match": 100.0
+        },
+        "pressure": {
+          "circuit_logit_diff_with_pressure": 0.97975,
+          "circuit_logit_diff_honest_instruction": -0.907375,
+          "delta": -1.8871250000000002
+        }
+      },
+      "skipped": {
+        "sanity": "circuit 'D_sdr' was trained in /ocean/projects/cis260361p/swong2/Deception-Circuit/outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323, but this cell evaluates task 'ser_v2', so there is no in-run number to reproduce"
+      },
+      "failures": []
+    },
+    {
+      "circuit": "D_core_suff__leaf",
+      "circuit_kind": "leaf",
+      "expr": "(D_far & D_sdr & D_ser) | m",
+      "task": "ser_v2",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/mechanism-v2-coarse/stage2/s2_ser__D_suff/cells/D_core_suff__leaf/ser_v2/interchange",
+      "counts": {
+        "attention_neurons": 3968,
+        "mlp_hidden": 458752,
+        "mlp_output": 131072,
+        "attention_heads": 31,
+        "attention_blocks": 8
+      },
+      "headlines": {
+        "null": {
+          "accuracy": 100.0,
+          "logit_diff": 100.0,
+          "kl_div": 100.0,
+          "exact_match": 100.0
+        },
+        "pressure": {
+          "circuit_logit_diff_with_pressure": -1.179,
+          "circuit_logit_diff_honest_instruction": 1.8293125,
+          "delta": 3.0083124999999997
+        }
+      },
+      "skipped": {
+        "sanity": "circuit 'D_core_suff__leaf' is composed ((D_far & D_sdr & D_ser) | m), so there is no run whose results.json it could reproduce"
+      },
+      "failures": []
+    },
+    {
+      "circuit": "H_ser",
+      "circuit_kind": "atomic",
+      "expr": null,
+      "task": "ser_v2",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/mechanism-v2-coarse/stage2/s2_ser__D_suff/cells/H_ser/ser_v2/interchange",
+      "counts": {
+        "attention_blocks": 11,
+        "attention_heads": 69,
+        "attention_neurons": 8832,
+        "mlp_hidden": 458752,
+        "mlp_output": 131072
+      },
+      "headlines": {
+        "null": {
+          "accuracy": 100.0,
+          "logit_diff": 100.0,
+          "kl_div": 100.0,
+          "exact_match": 100.0
+        },
+        "pressure": {
+          "circuit_logit_diff_with_pressure": 1.935375,
+          "circuit_logit_diff_honest_instruction": -2.44275,
+          "delta": -4.378125000000001
+        }
+      },
+      "skipped": {
+        "sanity": "circuit 'H_ser' was trained in /ocean/projects/cis260361p/swong2/Deception-Circuit/outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323, but this cell evaluates task 'ser_v2', so there is no in-run number to reproduce"
+      },
+      "failures": []
+    }
+  ]
+}

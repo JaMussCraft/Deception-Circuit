@@ -640,3 +640,22 @@ def test_dh_call_is_strong_only_on_4_of_4_separation():
     weak = sr.dh_call(base + [dmh(0.25, 3)], "far")
     assert not weak["strong"] and not weak["recommend_conditional"]
     assert sr.dh_call(base, "far")["status"] == "missing"
+
+
+STAGE2_DIR = os.path.join(REPO, "outputs/_suites/mechanism-v2-coarse/stage2")
+
+
+@pytest.mark.skipif(not os.path.isdir(STAGE2_DIR), reason="stage-2 results not fetched")
+def test_stage2_collect_and_transfer_matrix_read_the_fetched_cells(cells):
+    s2 = _mod("stage2_results")
+    rows = s2.collect(cells, "2", include_conditional=True)
+    assert len(rows) == 39 and all(r["present"] for r in rows)
+    s1rows = s2.collect(cells, "1")
+    ko = dict(s2.transfer_matrix(s1rows + rows, "knockout"))
+    # literals from the fetched knockout.json files (D_far heads removed on sdr_v2; home cell from stage 1)
+    assert ko["D_far_hko"]["sdr_v2"]["accuracy"] == 0.003 and ko["D_far_hko"]["sdr_v2"]["separated"] == 2
+    assert ko["D_far_hko"]["far_v2"]["accuracy"] == 0.0
+    core = [r for r in rows if r["label"] == "D_core_hko"]
+    assert len(core) == 3 and all(r["heads"] == 31 and r["separated"] == 4 for r in core)
+    np_rows = [r for r in rows if r["block"] == "D_on_nopressure"]
+    assert {r["dataset"] for r in np_rows} == {"far_v2_nopressure", "sdr_v2_nopressure", "ser_v2_nopressure"}

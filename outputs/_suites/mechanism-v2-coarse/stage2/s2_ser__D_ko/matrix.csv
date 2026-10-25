@@ -1,0 +1,22 @@
+circuit,circuit_kind,expr,task,ablation,eval,metric,value
+D_far_hko__leaf,leaf,(D_far) - m,ser_v2,interchange,knockout,honest_accuracy_drop,-0.989
+D_far_hko__leaf,leaf,(D_far) - m,ser_v2,interchange,knockout,task_accuracy,0.003
+D_far_hko__leaf,leaf,(D_far) - m,ser_v2,interchange,knockout,wikitext_kl,0.19660442823078483
+D_sdr_hko__leaf,leaf,(D_sdr) - m,ser_v2,interchange,knockout,honest_accuracy_drop,-0.986
+D_sdr_hko__leaf,leaf,(D_sdr) - m,ser_v2,interchange,knockout,task_accuracy,0.005
+D_sdr_hko__leaf,leaf,(D_sdr) - m,ser_v2,interchange,knockout,wikitext_kl,0.27729664178332314
+D_core_hko__leaf,leaf,(D_far & D_sdr & D_ser) - m,ser_v2,interchange,knockout,honest_accuracy_drop,-0.989
+D_core_hko__leaf,leaf,(D_far & D_sdr & D_ser) - m,ser_v2,interchange,knockout,task_accuracy,0.001
+D_core_hko__leaf,leaf,(D_far & D_sdr & D_ser) - m,ser_v2,interchange,knockout,wikitext_kl,0.07582954422105104
+D_ser_minus_D_far_minus_D_sdr_hko__leaf,leaf,(D_ser - D_far - D_sdr) - m,ser_v2,interchange,knockout,honest_accuracy_drop,-0.318
+D_ser_minus_D_far_minus_D_sdr_hko__leaf,leaf,(D_ser - D_far - D_sdr) - m,ser_v2,interchange,knockout,task_accuracy,0.496
+D_ser_minus_D_far_minus_D_sdr_hko__leaf,leaf,(D_ser - D_far - D_sdr) - m,ser_v2,interchange,knockout,wikitext_kl,0.051033660158282146
+H_ser_hko__leaf,leaf,(H_ser) - m,ser_v2,interchange,knockout,honest_accuracy_drop,-0.978
+H_ser_hko__leaf,leaf,(H_ser) - m,ser_v2,interchange,knockout,task_accuracy,0.0
+H_ser_hko__leaf,leaf,(H_ser) - m,ser_v2,interchange,knockout,wikitext_kl,0.4306109382305294
+D_far_minus_H_far_hko__leaf,leaf,(D_far - H_far) - m,ser_v2,interchange,knockout,honest_accuracy_drop,-0.475
+D_far_minus_H_far_hko__leaf,leaf,(D_far - H_far) - m,ser_v2,interchange,knockout,task_accuracy,0.631
+D_far_minus_H_far_hko__leaf,leaf,(D_far - H_far) - m,ser_v2,interchange,knockout,wikitext_kl,0.10598126859986223
+D_sdr_minus_H_sdr_hko__leaf,leaf,(D_sdr - H_sdr) - m,ser_v2,interchange,knockout,honest_accuracy_drop,-0.27899999999999997
+D_sdr_minus_H_sdr_hko__leaf,leaf,(D_sdr - H_sdr) - m,ser_v2,interchange,knockout,task_accuracy,0.578
+D_sdr_minus_H_sdr_hko__leaf,leaf,(D_sdr - H_sdr) - m,ser_v2,interchange,knockout,wikitext_kl,0.06955685799766798

@@ -1,0 +1,813 @@
+{
+  "ablation": "interchange",
+  "label_convention": "Labels are unchanged from the trained test set: `target` is the DECEPTIVE answer and `distractor` the honest one. Under a prompt variant, accuracy therefore reads as 'still gives the deceptive answer' and logit_diff as logit(deceptive) - logit(honest). The desired result is accuracy FALLING and logit_diff going NEGATIVE.",
+  "variant_descriptions": {
+    "with_pressure": "the test set as trained \u2014 the pressure clause is present",
+    "no_pressure": "the pressure clause deleted, nothing in its place",
+    "honest_instruction": "the pressure clause replaced by an explicit instruction to answer honestly"
+  },
+  "metrics": [
+    "accuracy",
+    "logit_diff",
+    "kl_div",
+    "exact_match"
+  ],
+  "variants": {
+    "with_pressure": {
+      "full": {
+        "accuracy": 1.0,
+        "logit_diff": 2.539,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 32278,
+              "token": " patio",
+              "count": 49,
+              "frac": 0.049
+            },
+            {
+              "id": 9699,
+              "token": " steel",
+              "count": 47,
+              "frac": 0.047
+            },
+            {
+              "id": 37125,
+              "token": " lawn",
+              "count": 47,
+              "frac": 0.047
+            },
+            {
+              "id": 19865,
+              "token": " lobby",
+              "count": 43,
+              "frac": 0.043
+            },
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 41,
+              "frac": 0.041
+            },
+            {
+              "id": 19833,
+              "token": " garage",
+              "count": 40,
+              "frac": 0.04
+            },
+            {
+              "id": 11011,
+              "token": " hearing",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 4785,
+              "token": " weight",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 2673,
+              "token": " height",
+              "count": 34,
+              "frac": 0.034
+            },
+            {
+              "id": 11376,
+              "token": " vision",
+              "count": 34,
+              "frac": 0.034
+            },
+            {
+              "id": 38193,
+              "token": " humidity",
+              "count": 33,
+              "frac": 0.033
+            },
+            {
+              "id": 9168,
+              "token": " glass",
+              "count": 30,
+              "frac": 0.03
+            }
+          ],
+          "n_distinct": 75,
+          "target_frac": 1.0,
+          "distractor_frac": 0.0,
+          "other_frac": 0.0
+        }
+      },
+      "circuit": {
+        "accuracy": 0.219,
+        "logit_diff": -2.32275,
+        "kl_div": 2.2228273963928222,
+        "exact_match": 0.222,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 32278,
+              "token": " patio",
+              "count": 56,
+              "frac": 0.056
+            },
+            {
+              "id": 9168,
+              "token": " glass",
+              "count": 51,
+              "frac": 0.051
+            },
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 49,
+              "frac": 0.049
+            },
+            {
+              "id": 19833,
+              "token": " garage",
+              "count": 47,
+              "frac": 0.047
+            },
+            {
+              "id": 11011,
+              "token": " hearing",
+              "count": 43,
+              "frac": 0.043
+            },
+            {
+              "id": 2673,
+              "token": " height",
+              "count": 43,
+              "frac": 0.043
+            },
+            {
+              "id": 37125,
+              "token": " lawn",
+              "count": 40,
+              "frac": 0.04
+            },
+            {
+              "id": 23468,
+              "token": " charging",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 19865,
+              "token": " lobby",
+              "count": 36,
+              "frac": 0.036
+            },
+            {
+              "id": 35358,
+              "token": " joints",
+              "count": 33,
+              "frac": 0.033
+            },
+            {
+              "id": 11376,
+              "token": " vision",
+              "count": 28,
+              "frac": 0.028
+            },
+            {
+              "id": 4785,
+              "token": " weight",
+              "count": 28,
+              "frac": 0.028
+            }
+          ],
+          "n_distinct": 69,
+          "target_frac": 0.222,
+          "distractor_frac": 0.778,
+          "other_frac": 0.0
+        }
+      },
+      "empty": {
+        "accuracy": 0.0,
+        "logit_diff": -2.5308125,
+        "kl_div": 2.039123083114624,
+        "exact_match": 0.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 37125,
+              "token": " lawn",
+              "count": 49,
+              "frac": 0.049
+            },
+            {
+              "id": 9168,
+              "token": " glass",
+              "count": 47,
+              "frac": 0.047
+            },
+            {
+              "id": 32278,
+              "token": " patio",
+              "count": 47,
+              "frac": 0.047
+            },
+            {
+              "id": 19833,
+              "token": " garage",
+              "count": 43,
+              "frac": 0.043
+            },
+            {
+              "id": 38193,
+              "token": " humidity",
+              "count": 41,
+              "frac": 0.041
+            },
+            {
+              "id": 19865,
+              "token": " lobby",
+              "count": 40,
+              "frac": 0.04
+            },
+            {
+              "id": 11376,
+              "token": " vision",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 2673,
+              "token": " height",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 4785,
+              "token": " weight",
+              "count": 34,
+              "frac": 0.034
+            },
+            {
+              "id": 11011,
+              "token": " hearing",
+              "count": 34,
+              "frac": 0.034
+            },
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 33,
+              "frac": 0.033
+            },
+            {
+              "id": 9699,
+              "token": " steel",
+              "count": 30,
+              "frac": 0.03
+            }
+          ],
+          "n_distinct": 75,
+          "target_frac": 0.0,
+          "distractor_frac": 1.0,
+          "other_frac": 0.0
+        }
+      }
+    },
+    "no_pressure": {
+      "full": {
+        "accuracy": 0.0,
+        "logit_diff": -5.8381875,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 37125,
+              "token": " lawn",
+              "count": 49,
+              "frac": 0.049
+            },
+            {
+              "id": 9168,
+              "token": " glass",
+              "count": 47,
+              "frac": 0.047
+            },
+            {
+              "id": 32278,
+              "token": " patio",
+              "count": 47,
+              "frac": 0.047
+            },
+            {
+              "id": 19833,
+              "token": " garage",
+              "count": 43,
+              "frac": 0.043
+            },
+            {
+              "id": 38193,
+              "token": " humidity",
+              "count": 41,
+              "frac": 0.041
+            },
+            {
+              "id": 19865,
+              "token": " lobby",
+              "count": 40,
+              "frac": 0.04
+            },
+            {
+              "id": 11376,
+              "token": " vision",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 2673,
+              "token": " height",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 4785,
+              "token": " weight",
+              "count": 34,
+              "frac": 0.034
+            },
+            {
+              "id": 11011,
+              "token": " hearing",
+              "count": 34,
+              "frac": 0.034
+            },
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 33,
+              "frac": 0.033
+            },
+            {
+              "id": 9699,
+              "token": " steel",
+              "count": 30,
+              "frac": 0.03
+            }
+          ],
+          "n_distinct": 75,
+          "target_frac": 0.0,
+          "distractor_frac": 1.0,
+          "other_frac": 0.0
+        }
+      },
+      "circuit": {
+        "accuracy": 0.012,
+        "logit_diff": -4.263125,
+        "kl_div": 0.06384115406870843,
+        "exact_match": 0.987,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 37125,
+              "token": " lawn",
+              "count": 49,
+              "frac": 0.049
+            },
+            {
+              "id": 9168,
+              "token": " glass",
+              "count": 47,
+              "frac": 0.047
+            },
+            {
+              "id": 32278,
+              "token": " patio",
+              "count": 47,
+              "frac": 0.047
+            },
+            {
+              "id": 38193,
+              "token": " humidity",
+              "count": 41,
+              "frac": 0.041
+            },
+            {
+              "id": 19833,
+              "token": " garage",
+              "count": 41,
+              "frac": 0.041
+            },
+            {
+              "id": 19865,
+              "token": " lobby",
+              "count": 41,
+              "frac": 0.041
+            },
+            {
+              "id": 11376,
+              "token": " vision",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 2673,
+              "token": " height",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 4785,
+              "token": " weight",
+              "count": 34,
+              "frac": 0.034
+            },
+            {
+              "id": 11011,
+              "token": " hearing",
+              "count": 34,
+              "frac": 0.034
+            },
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 33,
+              "frac": 0.033
+            },
+            {
+              "id": 9699,
+              "token": " steel",
+              "count": 30,
+              "frac": 0.03
+            }
+          ],
+          "n_distinct": 76,
+          "target_frac": 0.012,
+          "distractor_frac": 0.987,
+          "other_frac": 0.001
+        }
+      },
+      "empty": {
+        "accuracy": 1.0,
+        "logit_diff": 5.8769375,
+        "kl_div": 5.695364631652832,
+        "exact_match": 0.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 32278,
+              "token": " patio",
+              "count": 49,
+              "frac": 0.049
+            },
+            {
+              "id": 9699,
+              "token": " steel",
+              "count": 47,
+              "frac": 0.047
+            },
+            {
+              "id": 37125,
+              "token": " lawn",
+              "count": 47,
+              "frac": 0.047
+            },
+            {
+              "id": 19865,
+              "token": " lobby",
+              "count": 43,
+              "frac": 0.043
+            },
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 41,
+              "frac": 0.041
+            },
+            {
+              "id": 19833,
+              "token": " garage",
+              "count": 40,
+              "frac": 0.04
+            },
+            {
+              "id": 11011,
+              "token": " hearing",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 4785,
+              "token": " weight",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 2673,
+              "token": " height",
+              "count": 34,
+              "frac": 0.034
+            },
+            {
+              "id": 11376,
+              "token": " vision",
+              "count": 34,
+              "frac": 0.034
+            },
+            {
+              "id": 38193,
+              "token": " humidity",
+              "count": 33,
+              "frac": 0.033
+            },
+            {
+              "id": 9168,
+              "token": " glass",
+              "count": 30,
+              "frac": 0.03
+            }
+          ],
+          "n_distinct": 75,
+          "target_frac": 1.0,
+          "distractor_frac": 0.0,
+          "other_frac": 0.0
+        }
+      }
+    },
+    "honest_instruction": {
+      "full": {
+        "accuracy": 0.0,
+        "logit_diff": -4.8143125,
+        "kl_div": 0.0,
+        "exact_match": 1.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 37125,
+              "token": " lawn",
+              "count": 49,
+              "frac": 0.049
+            },
+            {
+              "id": 9168,
+              "token": " glass",
+              "count": 47,
+              "frac": 0.047
+            },
+            {
+              "id": 32278,
+              "token": " patio",
+              "count": 47,
+              "frac": 0.047
+            },
+            {
+              "id": 19833,
+              "token": " garage",
+              "count": 43,
+              "frac": 0.043
+            },
+            {
+              "id": 38193,
+              "token": " humidity",
+              "count": 41,
+              "frac": 0.041
+            },
+            {
+              "id": 19865,
+              "token": " lobby",
+              "count": 40,
+              "frac": 0.04
+            },
+            {
+              "id": 11376,
+              "token": " vision",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 2673,
+              "token": " height",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 4785,
+              "token": " weight",
+              "count": 34,
+              "frac": 0.034
+            },
+            {
+              "id": 11011,
+              "token": " hearing",
+              "count": 34,
+              "frac": 0.034
+            },
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 33,
+              "frac": 0.033
+            },
+            {
+              "id": 9699,
+              "token": " steel",
+              "count": 30,
+              "frac": 0.03
+            }
+          ],
+          "n_distinct": 75,
+          "target_frac": 0.0,
+          "distractor_frac": 1.0,
+          "other_frac": 0.0
+        }
+      },
+      "circuit": {
+        "accuracy": 0.007,
+        "logit_diff": -4.069625,
+        "kl_div": 0.06729355376958847,
+        "exact_match": 0.989,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 37125,
+              "token": " lawn",
+              "count": 49,
+              "frac": 0.049
+            },
+            {
+              "id": 9168,
+              "token": " glass",
+              "count": 47,
+              "frac": 0.047
+            },
+            {
+              "id": 32278,
+              "token": " patio",
+              "count": 47,
+              "frac": 0.047
+            },
+            {
+              "id": 38193,
+              "token": " humidity",
+              "count": 41,
+              "frac": 0.041
+            },
+            {
+              "id": 19865,
+              "token": " lobby",
+              "count": 40,
+              "frac": 0.04
+            },
+            {
+              "id": 19833,
+              "token": " garage",
+              "count": 40,
+              "frac": 0.04
+            },
+            {
+              "id": 11376,
+              "token": " vision",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 2673,
+              "token": " height",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 4785,
+              "token": " weight",
+              "count": 34,
+              "frac": 0.034
+            },
+            {
+              "id": 11011,
+              "token": " hearing",
+              "count": 34,
+              "frac": 0.034
+            },
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 33,
+              "frac": 0.033
+            },
+            {
+              "id": 9699,
+              "token": " steel",
+              "count": 30,
+              "frac": 0.03
+            }
+          ],
+          "n_distinct": 76,
+          "target_frac": 0.007,
+          "distractor_frac": 0.989,
+          "other_frac": 0.004
+        }
+      },
+      "empty": {
+        "accuracy": 1.0,
+        "logit_diff": 4.8156875,
+        "kl_div": 4.508443214416504,
+        "exact_match": 0.0,
+        "n": 1000,
+        "argmax": {
+          "top": [
+            {
+              "id": 32278,
+              "token": " patio",
+              "count": 49,
+              "frac": 0.049
+            },
+            {
+              "id": 9699,
+              "token": " steel",
+              "count": 47,
+              "frac": 0.047
+            },
+            {
+              "id": 37125,
+              "token": " lawn",
+              "count": 47,
+              "frac": 0.047
+            },
+            {
+              "id": 19865,
+              "token": " lobby",
+              "count": 43,
+              "frac": 0.043
+            },
+            {
+              "id": 48913,
+              "token": " vibration",
+              "count": 41,
+              "frac": 0.041
+            },
+            {
+              "id": 19833,
+              "token": " garage",
+              "count": 40,
+              "frac": 0.04
+            },
+            {
+              "id": 11011,
+              "token": " hearing",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 4785,
+              "token": " weight",
+              "count": 37,
+              "frac": 0.037
+            },
+            {
+              "id": 2673,
+              "token": " height",
+              "count": 34,
+              "frac": 0.034
+            },
+            {
+              "id": 11376,
+              "token": " vision",
+              "count": 34,
+              "frac": 0.034
+            },
+            {
+              "id": 38193,
+              "token": " humidity",
+              "count": 33,
+              "frac": 0.033
+            },
+            {
+              "id": 9168,
+              "token": " glass",
+              "count": 30,
+              "frac": 0.03
+            }
+          ],
+          "n_distinct": 75,
+          "target_frac": 1.0,
+          "distractor_frac": 0.0,
+          "other_frac": 0.0
+        }
+      }
+    }
+  },
+  "skipped": {},
+  "headline": {
+    "circuit_logit_diff_with_pressure": -2.32275,
+    "circuit_logit_diff_honest_instruction": -4.069625,
+    "delta": -1.7468750000000002
+  },
+  "seconds": 112.9
+}

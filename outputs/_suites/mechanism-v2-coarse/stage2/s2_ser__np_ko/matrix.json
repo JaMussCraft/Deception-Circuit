@@ -1,0 +1,31 @@
+{
+  "created": "2026-10-24T19:17:32",
+  "cells": [
+    {
+      "circuit": "D_ser_hko__leaf",
+      "circuit_kind": "leaf",
+      "expr": "(D_ser) - m",
+      "task": "ser_v2",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/mechanism-v2-coarse/stage2/s2_ser__np_ko/cells/D_ser_hko__leaf/ser_v2/interchange",
+      "counts": {
+        "attention_neurons": 7040,
+        "mlp_hidden": 0,
+        "mlp_output": 0,
+        "attention_heads": 55,
+        "attention_blocks": 11
+      },
+      "headlines": {
+        "knockout": {
+          "task_accuracy": 0.0,
+          "wikitext_kl": 0.22001808910863474,
+          "honest_accuracy_drop": null
+        }
+      },
+      "skipped": {},
+      "failures": [
+        "knockout: the all-gates-open wikitext floor is not zero (KL 6.263e-04, ppl ratio 0.999744)"
+      ]
+    }
+  ]
+}

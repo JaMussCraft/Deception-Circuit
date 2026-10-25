@@ -1,0 +1,29 @@
+circuit,circuit_kind,expr,task,ablation,eval,metric,value
+D_far,atomic,,sdr_v2,interchange,null,accuracy,100.0
+D_far,atomic,,sdr_v2,interchange,null,exact_match,100.0
+D_far,atomic,,sdr_v2,interchange,null,kl_div,100.0
+D_far,atomic,,sdr_v2,interchange,null,logit_diff,100.0
+D_far,atomic,,sdr_v2,interchange,pressure,circuit_logit_diff_honest_instruction,-0.403125
+D_far,atomic,,sdr_v2,interchange,pressure,circuit_logit_diff_with_pressure,1.60075
+D_far,atomic,,sdr_v2,interchange,pressure,delta,-2.003875
+D_ser,atomic,,sdr_v2,interchange,null,accuracy,100.0
+D_ser,atomic,,sdr_v2,interchange,null,exact_match,100.0
+D_ser,atomic,,sdr_v2,interchange,null,kl_div,100.0
+D_ser,atomic,,sdr_v2,interchange,null,logit_diff,100.0
+D_ser,atomic,,sdr_v2,interchange,pressure,circuit_logit_diff_honest_instruction,0.20125
+D_ser,atomic,,sdr_v2,interchange,pressure,circuit_logit_diff_with_pressure,2.188625
+D_ser,atomic,,sdr_v2,interchange,pressure,delta,-1.9873750000000001
+D_core_suff__leaf,leaf,(D_far & D_sdr & D_ser) | m,sdr_v2,interchange,null,accuracy,100.0
+D_core_suff__leaf,leaf,(D_far & D_sdr & D_ser) | m,sdr_v2,interchange,null,exact_match,100.0
+D_core_suff__leaf,leaf,(D_far & D_sdr & D_ser) | m,sdr_v2,interchange,null,kl_div,100.0
+D_core_suff__leaf,leaf,(D_far & D_sdr & D_ser) | m,sdr_v2,interchange,null,logit_diff,100.0
+D_core_suff__leaf,leaf,(D_far & D_sdr & D_ser) | m,sdr_v2,interchange,pressure,circuit_logit_diff_honest_instruction,0.86225
+D_core_suff__leaf,leaf,(D_far & D_sdr & D_ser) | m,sdr_v2,interchange,pressure,circuit_logit_diff_with_pressure,-1.22525
+D_core_suff__leaf,leaf,(D_far & D_sdr & D_ser) | m,sdr_v2,interchange,pressure,delta,2.0875
+H_sdr,atomic,,sdr_v2,interchange,null,accuracy,100.0
+H_sdr,atomic,,sdr_v2,interchange,null,exact_match,100.0
+H_sdr,atomic,,sdr_v2,interchange,null,kl_div,100.0
+H_sdr,atomic,,sdr_v2,interchange,null,logit_diff,100.0
+H_sdr,atomic,,sdr_v2,interchange,pressure,circuit_logit_diff_honest_instruction,-2.212375
+H_sdr,atomic,,sdr_v2,interchange,pressure,circuit_logit_diff_with_pressure,3.21675
+H_sdr,atomic,,sdr_v2,interchange,pressure,delta,-5.429125000000001

@@ -1,0 +1,29 @@
+circuit,circuit_kind,expr,task,ablation,eval,metric,value
+D_sdr,atomic,,far_v2,interchange,null,accuracy,100.0
+D_sdr,atomic,,far_v2,interchange,null,exact_match,100.0
+D_sdr,atomic,,far_v2,interchange,null,kl_div,100.0
+D_sdr,atomic,,far_v2,interchange,null,logit_diff,100.0
+D_sdr,atomic,,far_v2,interchange,pressure,circuit_logit_diff_honest_instruction,-0.96575
+D_sdr,atomic,,far_v2,interchange,pressure,circuit_logit_diff_with_pressure,1.79075
+D_sdr,atomic,,far_v2,interchange,pressure,delta,-2.7565
+D_ser,atomic,,far_v2,interchange,null,accuracy,100.0
+D_ser,atomic,,far_v2,interchange,null,exact_match,100.0
+D_ser,atomic,,far_v2,interchange,null,kl_div,100.0
+D_ser,atomic,,far_v2,interchange,null,logit_diff,100.0
+D_ser,atomic,,far_v2,interchange,pressure,circuit_logit_diff_honest_instruction,-1.41225
+D_ser,atomic,,far_v2,interchange,pressure,circuit_logit_diff_with_pressure,-1.227125
+D_ser,atomic,,far_v2,interchange,pressure,delta,-0.18512499999999998
+D_core_suff__leaf,leaf,(D_far & D_sdr & D_ser) | m,far_v2,interchange,null,accuracy,100.0
+D_core_suff__leaf,leaf,(D_far & D_sdr & D_ser) | m,far_v2,interchange,null,exact_match,100.0
+D_core_suff__leaf,leaf,(D_far & D_sdr & D_ser) | m,far_v2,interchange,null,kl_div,100.0
+D_core_suff__leaf,leaf,(D_far & D_sdr & D_ser) | m,far_v2,interchange,null,logit_diff,100.0
+D_core_suff__leaf,leaf,(D_far & D_sdr & D_ser) | m,far_v2,interchange,pressure,circuit_logit_diff_honest_instruction,2.7606875
+D_core_suff__leaf,leaf,(D_far & D_sdr & D_ser) | m,far_v2,interchange,pressure,circuit_logit_diff_with_pressure,-1.185
+D_core_suff__leaf,leaf,(D_far & D_sdr & D_ser) | m,far_v2,interchange,pressure,delta,3.9456875
+H_far,atomic,,far_v2,interchange,null,accuracy,100.0
+H_far,atomic,,far_v2,interchange,null,exact_match,100.0
+H_far,atomic,,far_v2,interchange,null,kl_div,0.0
+H_far,atomic,,far_v2,interchange,null,logit_diff,100.0
+H_far,atomic,,far_v2,interchange,pressure,circuit_logit_diff_honest_instruction,-4.069625
+H_far,atomic,,far_v2,interchange,pressure,circuit_logit_diff_with_pressure,-2.32275
+H_far,atomic,,far_v2,interchange,pressure,delta,-1.7468750000000002

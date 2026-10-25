@@ -1,0 +1,33 @@
+{
+  "created": "2026-10-24T18:16:01",
+  "cells": [
+    {
+      "circuit": "D_sdr",
+      "circuit_kind": "atomic",
+      "expr": null,
+      "task": "sdr_v2",
+      "ablation": "interchange",
+      "out_dir": "outputs/_suites/mechanism-v2-coarse/stage2/s2_sdr__np_suff/cells/D_sdr/sdr_v2/interchange",
+      "counts": {
+        "attention_blocks": 11,
+        "attention_heads": 60,
+        "attention_neurons": 7680,
+        "mlp_hidden": 458752,
+        "mlp_output": 131072
+      },
+      "headlines": {
+        "null": {
+          "accuracy": 100.0,
+          "logit_diff": 100.0,
+          "kl_div": 100.0,
+          "exact_match": 100.0
+        }
+      },
+      "skipped": {
+        "sanity": "circuit 'D_sdr' was trained in /ocean/projects/cis260361p/swong2/Deception-Circuit/outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323, but this cell evaluates task 'sdr_v2', so there is no in-run number to reproduce",
+        "pressure": "sdr_v2 'no_pressure' variant skipped: the dataset's condition is 'nopressure' (empty pressure), so it already is the no_pressure variant (the Pressure Clause was deleted at build time) and has no clause to replace with an honest instruction"
+      },
+      "failures": []
+    }
+  ]
+}
