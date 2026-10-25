@@ -1,0 +1,789 @@
+{
+ "rule": "R-A1 (spec 2.5, R13): mean D-test KO acc x zero no-pressure KO deceptive rate",
+ "readings": {
+  "far/set1": {
+   "set_name": "D_t",
+   "ra1": null,
+   "robustness": null,
+   "same_as_set": null
+  },
+  "far/set2": {
+   "set_name": "H_t (on D's test set)",
+   "ra1": null,
+   "robustness": null,
+   "same_as_set": null
+  },
+  "far/set3": {
+   "set_name": "core",
+   "ra1": "answer machinery",
+   "robustness": {
+    "mean_task_bank": "answer machinery",
+    "mean_matched_bank": "answer machinery"
+   },
+   "same_as_set": null
+  },
+  "far/set4": {
+   "set_name": "excl_t",
+   "ra1": "partial or none",
+   "robustness": {
+    "mean_task_bank": "partial or none",
+    "mean_matched_bank": "partial or none"
+   },
+   "same_as_set": null
+  },
+  "far/set5": {
+   "set_name": "D_t - H_t",
+   "ra1": "partial or none",
+   "robustness": {
+    "mean_task_bank": "partial or none",
+    "mean_matched_bank": "partial or none"
+   },
+   "same_as_set": null
+  },
+  "far/set6": {
+   "set_name": "(D_t - H_t) - core",
+   "ra1": "partial or none",
+   "robustness": {
+    "mean_task_bank": "partial or none",
+    "mean_matched_bank": "partial or none"
+   },
+   "same_as_set": null
+  },
+  "far/set7": {
+   "set_name": "D_t & H_t",
+   "ra1": null,
+   "robustness": null,
+   "same_as_set": null
+  },
+  "sdr/set1": {
+   "set_name": "D_t",
+   "ra1": null,
+   "robustness": null,
+   "same_as_set": null
+  },
+  "sdr/set2": {
+   "set_name": "H_t (on D's test set)",
+   "ra1": null,
+   "robustness": null,
+   "same_as_set": null
+  },
+  "sdr/set3": {
+   "set_name": "core",
+   "ra1": "answer machinery",
+   "robustness": {
+    "mean_task_bank": "answer machinery",
+    "mean_matched_bank": "answer machinery"
+   },
+   "same_as_set": null
+  },
+  "sdr/set4": {
+   "set_name": "excl_t",
+   "ra1": "partial or none",
+   "robustness": {
+    "mean_task_bank": "partial or none",
+    "mean_matched_bank": "partial or none"
+   },
+   "same_as_set": null
+  },
+  "sdr/set5": {
+   "set_name": "D_t - H_t",
+   "ra1": "partial or none",
+   "robustness": {
+    "mean_task_bank": "partial or none",
+    "mean_matched_bank": "partial or none"
+   },
+   "same_as_set": null
+  },
+  "sdr/set6": {
+   "set_name": "(D_t - H_t) - core",
+   "ra1": "partial or none",
+   "robustness": {
+    "mean_task_bank": "partial or none",
+    "mean_matched_bank": "partial or none"
+   },
+   "same_as_set": null
+  },
+  "sdr/set7": {
+   "set_name": "D_t & H_t",
+   "ra1": null,
+   "robustness": null,
+   "same_as_set": null
+  },
+  "ser/set1": {
+   "set_name": "D_t",
+   "ra1": null,
+   "robustness": null,
+   "same_as_set": null
+  },
+  "ser/set2": {
+   "set_name": "H_t (on D's test set)",
+   "ra1": null,
+   "robustness": null,
+   "same_as_set": null
+  },
+  "ser/set3": {
+   "set_name": "core",
+   "ra1": "answer machinery",
+   "robustness": {
+    "mean_task_bank": "answer machinery",
+    "mean_matched_bank": "answer machinery"
+   },
+   "same_as_set": null
+  },
+  "ser/set4": {
+   "set_name": "excl_t",
+   "ra1": "partial or none",
+   "robustness": {
+    "mean_task_bank": "partial or none",
+    "mean_matched_bank": "partial or none"
+   },
+   "same_as_set": null
+  },
+  "ser/set5": {
+   "set_name": "D_t - H_t",
+   "ra1": "answer machinery",
+   "robustness": {
+    "mean_task_bank": "answer machinery",
+    "mean_matched_bank": "answer machinery"
+   },
+   "same_as_set": null
+  },
+  "ser/set6": {
+   "set_name": "(D_t - H_t) - core",
+   "ra1": "answer machinery",
+   "robustness": {
+    "mean_task_bank": "answer machinery",
+    "mean_matched_bank": "answer machinery"
+   },
+   "same_as_set": 5
+  },
+  "ser/set7": {
+   "set_name": "D_t & H_t",
+   "ra1": null,
+   "robustness": null,
+   "same_as_set": null
+  }
+ },
+ "flip_audit": [
+  {
+   "task": "far",
+   "set": 1,
+   "scheme": "mean",
+   "label": "D_far_hko",
+   "ko_accuracy": 0.513,
+   "audit_required": true,
+   "audit": {
+    "verdict": "positional default",
+    "p_ko_item_2": 0.893,
+    "p_target_item_2": 0.5,
+    "binom_p": 4.8122300877082576e-155,
+    "stay_gap": 0.786,
+    "p_ko_neither": 0.0,
+    "stay_rate": 0.519,
+    "separable": false,
+    "rows_aligned": true,
+    "source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/mechanism-analysis/outputs/_suites/mechanism-analysis/phase1a/flip_audit/p1a_far__mean.json"
+   }
+  },
+  {
+   "task": "far",
+   "set": 2,
+   "scheme": "mean",
+   "label": "H_far_hko",
+   "ko_accuracy": 0.516,
+   "audit_required": true,
+   "audit": {
+    "verdict": "content-driven flip",
+    "p_ko_item_2": 0.478,
+    "p_target_item_2": 0.5,
+    "binom_p": 0.17386931679888018,
+    "stay_gap": 0.052148486667570326,
+    "p_ko_neither": 0.091,
+    "stay_rate": 0.5401540154015402,
+    "separable": false,
+    "rows_aligned": true,
+    "source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/mechanism-analysis/outputs/_suites/mechanism-analysis/phase1a/flip_audit/p1a_far__mean.json"
+   }
+  },
+  {
+   "task": "far",
+   "set": 3,
+   "scheme": "mean",
+   "label": "D_core_hko",
+   "ko_accuracy": 0.492,
+   "audit_required": true,
+   "audit": {
+    "verdict": "positional default",
+    "p_ko_item_2": 0.803,
+    "p_target_item_2": 0.5,
+    "binom_p": 2.4975373753121923e-87,
+    "stay_gap": 0.6156723668869024,
+    "p_ko_neither": 0.006,
+    "stay_rate": 0.506036217303823,
+    "separable": false,
+    "rows_aligned": true,
+    "source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/mechanism-analysis/outputs/_suites/mechanism-analysis/phase1a/flip_audit/p1a_far__mean.json"
+   }
+  },
+  {
+   "task": "far",
+   "set": 3,
+   "scheme": "zero",
+   "label": "D_core_hko",
+   "ko_accuracy": 0.496,
+   "audit_required": true,
+   "audit": {
+    "verdict": "positional default",
+    "p_ko_item_2": 0.859,
+    "p_target_item_2": 0.5,
+    "binom_p": 3.695604504408758e-126,
+    "stay_gap": 0.718,
+    "p_ko_neither": 0.0,
+    "stay_rate": 0.521,
+    "separable": false,
+    "rows_aligned": true,
+    "source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/mechanism-analysis/outputs/_suites/mechanism-analysis/phase1a/flip_audit/p1a_far__zero.json"
+   }
+  },
+  {
+   "task": "far",
+   "set": 4,
+   "scheme": "mean",
+   "label": "D_far_minus_D_sdr_minus_D_ser_hko",
+   "ko_accuracy": 0.837,
+   "audit_required": false,
+   "audit": {
+    "verdict": "content-driven flip",
+    "p_ko_item_2": 0.465,
+    "p_target_item_2": 0.5,
+    "binom_p": 0.029061117875606855,
+    "stay_gap": -0.07000000000000006,
+    "p_ko_neither": 0.0,
+    "stay_rate": 0.853,
+    "separable": false,
+    "rows_aligned": true,
+    "source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/mechanism-analysis/outputs/_suites/mechanism-analysis/phase1a/flip_audit/p1a_far__mean.json"
+   }
+  },
+  {
+   "task": "far",
+   "set": 4,
+   "scheme": "zero",
+   "label": "D_far_minus_D_sdr_minus_D_ser_hko",
+   "ko_accuracy": 0.688,
+   "audit_required": true,
+   "audit": {
+    "verdict": "content-driven flip",
+    "p_ko_item_2": 0.487,
+    "p_target_item_2": 0.5,
+    "binom_p": 0.42920977720902304,
+    "stay_gap": -0.026000000000000023,
+    "p_ko_neither": 0.0,
+    "stay_rate": 0.711,
+    "separable": false,
+    "rows_aligned": true,
+    "source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/mechanism-analysis/outputs/_suites/mechanism-analysis/phase1a/flip_audit/p1a_far__zero.json"
+   }
+  },
+  {
+   "task": "far",
+   "set": 5,
+   "scheme": "mean",
+   "label": "D_far_minus_H_far_hko",
+   "ko_accuracy": 0.331,
+   "audit_required": true,
+   "audit": {
+    "verdict": "content-driven flip",
+    "p_ko_item_2": 0.473,
+    "p_target_item_2": 0.5,
+    "binom_p": 0.09368729147547196,
+    "stay_gap": -0.05399999999999999,
+    "p_ko_neither": 0.0,
+    "stay_rate": 0.353,
+    "separable": false,
+    "rows_aligned": true,
+    "source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/mechanism-analysis/outputs/_suites/mechanism-analysis/phase1a/flip_audit/p1a_far__mean.json"
+   }
+  },
+  {
+   "task": "far",
+   "set": 5,
+   "scheme": "zero",
+   "label": "D_far_minus_H_far_hko",
+   "ko_accuracy": 0.32,
+   "audit_required": true,
+   "audit": {
+    "verdict": "content-driven flip",
+    "p_ko_item_2": 0.578,
+    "p_target_item_2": 0.5,
+    "binom_p": 9.060485571321764e-07,
+    "stay_gap": 0.15599999999999997,
+    "p_ko_neither": 0.0,
+    "stay_rate": 0.338,
+    "separable": false,
+    "rows_aligned": true,
+    "source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/mechanism-analysis/outputs/_suites/mechanism-analysis/phase1a/flip_audit/p1a_far__zero.json"
+   }
+  },
+  {
+   "task": "far",
+   "set": 6,
+   "scheme": "mean",
+   "label": "D_far_minus_H_far_minus_D_core_hko",
+   "ko_accuracy": 0.506,
+   "audit_required": true,
+   "audit": {
+    "verdict": "positional default",
+    "p_ko_item_2": 0.264,
+    "p_target_item_2": 0.5,
+    "binom_p": 3.9261268126863134e-52,
+    "stay_gap": -0.47200000000000003,
+    "p_ko_neither": 0.0,
+    "stay_rate": 0.528,
+    "separable": false,
+    "rows_aligned": true,
+    "source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/mechanism-analysis/outputs/_suites/mechanism-analysis/phase1a/flip_audit/p1a_far__mean.json"
+   }
+  },
+  {
+   "task": "far",
+   "set": 6,
+   "scheme": "zero",
+   "label": "D_far_minus_H_far_minus_D_core_hko",
+   "ko_accuracy": 0.363,
+   "audit_required": true,
+   "audit": {
+    "verdict": "positional default",
+    "p_ko_item_2": 0.298,
+    "p_target_item_2": 0.5,
+    "binom_p": 3.197620179904337e-38,
+    "stay_gap": -0.4039999999999999,
+    "p_ko_neither": 0.0,
+    "stay_rate": 0.372,
+    "separable": false,
+    "rows_aligned": true,
+    "source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/mechanism-analysis/outputs/_suites/mechanism-analysis/phase1a/flip_audit/p1a_far__zero.json"
+   }
+  },
+  {
+   "task": "far",
+   "set": 7,
+   "scheme": "mean",
+   "label": "D_far_and_H_far_hko",
+   "ko_accuracy": 0.506,
+   "audit_required": true,
+   "audit": {
+    "verdict": "positional default",
+    "p_ko_item_2": 0.812,
+    "p_target_item_2": 0.5,
+    "binom_p": 6.203977647386462e-93,
+    "stay_gap": 0.624,
+    "p_ko_neither": 0.0,
+    "stay_rate": 0.528,
+    "separable": false,
+    "rows_aligned": true,
+    "source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/mechanism-analysis/outputs/_suites/mechanism-analysis/phase1a/flip_audit/p1a_far__mean.json"
+   }
+  },
+  {
+   "task": "sdr",
+   "set": 1,
+   "scheme": "mean",
+   "label": "D_sdr_hko",
+   "ko_accuracy": 0.464,
+   "audit_required": true,
+   "audit": {
+    "verdict": "content-driven flip",
+    "p_ko_item_2": 0.37,
+    "p_target_item_2": 0.5,
+    "binom_p": 1.772784981341886e-16,
+    "stay_gap": -0.21753746021528447,
+    "p_ko_neither": 0.054,
+    "stay_rate": 0.4883720930232558,
+    "separable": false,
+    "rows_aligned": true,
+    "source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/mechanism-analysis/outputs/_suites/mechanism-analysis/phase1a/flip_audit/p1a_sdr__mean.json"
+   }
+  },
+  {
+   "task": "sdr",
+   "set": 2,
+   "scheme": "mean",
+   "label": "H_sdr_hko",
+   "ko_accuracy": 0.48,
+   "audit_required": true,
+   "audit": {
+    "verdict": "content-driven flip",
+    "p_ko_item_2": 0.398,
+    "p_target_item_2": 0.5,
+    "binom_p": 1.184856175325817e-10,
+    "stay_gap": 0.23409226390785143,
+    "p_ko_neither": 0.355,
+    "stay_rate": 0.5054263565891473,
+    "separable": false,
+    "rows_aligned": true,
+    "source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/mechanism-analysis/outputs/_suites/mechanism-analysis/phase1a/flip_audit/p1a_sdr__mean.json"
+   }
+  },
+  {
+   "task": "sdr",
+   "set": 3,
+   "scheme": "mean",
+   "label": "D_core_hko",
+   "ko_accuracy": 0.443,
+   "audit_required": true,
+   "audit": {
+    "verdict": "content-driven flip",
+    "p_ko_item_2": 0.599,
+    "p_target_item_2": 0.5,
+    "binom_p": 4.1151698141350234e-10,
+    "stay_gap": 0.19799999999999995,
+    "p_ko_neither": 0.0,
+    "stay_rate": 0.485,
+    "separable": true,
+    "rows_aligned": true,
+    "source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/mechanism-analysis/outputs/_suites/mechanism-analysis/phase1a/flip_audit/p1a_sdr__mean.json"
+   }
+  },
+  {
+   "task": "sdr",
+   "set": 3,
+   "scheme": "zero",
+   "label": "D_core_hko",
+   "ko_accuracy": 0.453,
+   "audit_required": true,
+   "audit": {
+    "verdict": "content-driven flip",
+    "p_ko_item_2": 0.646,
+    "p_target_item_2": 0.5,
+    "binom_p": 1.8888284227588876e-20,
+    "stay_gap": 0.29200000000000004,
+    "p_ko_neither": 0.0,
+    "stay_rate": 0.49,
+    "separable": true,
+    "rows_aligned": true,
+    "source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/mechanism-analysis/outputs/_suites/mechanism-analysis/phase1a/flip_audit/p1a_sdr__zero.json"
+   }
+  },
+  {
+   "task": "sdr",
+   "set": 4,
+   "scheme": "mean",
+   "label": "D_sdr_minus_D_far_minus_D_ser_hko",
+   "ko_accuracy": 0.933,
+   "audit_required": false,
+   "audit": {
+    "verdict": "content-driven flip",
+    "p_ko_item_2": 0.48,
+    "p_target_item_2": 0.5,
+    "binom_p": 0.2174482932040879,
+    "stay_gap": -0.03982329317269073,
+    "p_ko_neither": 0.002,
+    "stay_rate": 0.935871743486974,
+    "separable": false,
+    "rows_aligned": true,
+    "source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/mechanism-analysis/outputs/_suites/mechanism-analysis/phase1a/flip_audit/p1a_sdr__mean.json"
+   }
+  },
+  {
+   "task": "sdr",
+   "set": 4,
+   "scheme": "zero",
+   "label": "D_sdr_minus_D_far_minus_D_ser_hko",
+   "ko_accuracy": 0.885,
+   "audit_required": false,
+   "audit": {
+    "verdict": "content-driven flip",
+    "p_ko_item_2": 0.45,
+    "p_target_item_2": 0.5,
+    "binom_p": 0.0017305360849759473,
+    "stay_gap": -0.09976706827309245,
+    "p_ko_neither": 0.002,
+    "stay_rate": 0.8917835671342685,
+    "separable": false,
+    "rows_aligned": true,
+    "source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/mechanism-analysis/outputs/_suites/mechanism-analysis/phase1a/flip_audit/p1a_sdr__zero.json"
+   }
+  },
+  {
+   "task": "sdr",
+   "set": 5,
+   "scheme": "mean",
+   "label": "D_sdr_minus_H_sdr_hko",
+   "ko_accuracy": 0.813,
+   "audit_required": false,
+   "audit": {
+    "verdict": "content-driven flip",
+    "p_ko_item_2": 0.483,
+    "p_target_item_2": 0.5,
+    "binom_p": 0.2966893507731924,
+    "stay_gap": -0.03399999999999992,
+    "p_ko_neither": 0.0,
+    "stay_rate": 0.825,
+    "separable": false,
+    "rows_aligned": true,
+    "source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/mechanism-analysis/outputs/_suites/mechanism-analysis/phase1a/flip_audit/p1a_sdr__mean.json"
+   }
+  },
+  {
+   "task": "sdr",
+   "set": 5,
+   "scheme": "zero",
+   "label": "D_sdr_minus_H_sdr_hko",
+   "ko_accuracy": 0.767,
+   "audit_required": false,
+   "audit": {
+    "verdict": "content-driven flip",
+    "p_ko_item_2": 0.468,
+    "p_target_item_2": 0.5,
+    "binom_p": 0.04629119736048858,
+    "stay_gap": -0.06400000000000006,
+    "p_ko_neither": 0.0,
+    "stay_rate": 0.778,
+    "separable": false,
+    "rows_aligned": true,
+    "source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/mechanism-analysis/outputs/_suites/mechanism-analysis/phase1a/flip_audit/p1a_sdr__zero.json"
+   }
+  },
+  {
+   "task": "sdr",
+   "set": 6,
+   "scheme": "mean",
+   "label": "D_sdr_minus_H_sdr_minus_D_core_hko",
+   "ko_accuracy": 0.933,
+   "audit_required": false,
+   "audit": {
+    "verdict": "content-driven flip",
+    "p_ko_item_2": 0.488,
+    "p_target_item_2": 0.5,
+    "binom_p": 0.46704512165266354,
+    "stay_gap": -0.02399999999999991,
+    "p_ko_neither": 0.0,
+    "stay_rate": 0.938,
+    "separable": false,
+    "rows_aligned": true,
+    "source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/mechanism-analysis/outputs/_suites/mechanism-analysis/phase1a/flip_audit/p1a_sdr__mean.json"
+   }
+  },
+  {
+   "task": "sdr",
+   "set": 6,
+   "scheme": "zero",
+   "label": "D_sdr_minus_H_sdr_minus_D_core_hko",
+   "ko_accuracy": 0.896,
+   "audit_required": false,
+   "audit": {
+    "verdict": "content-driven flip",
+    "p_ko_item_2": 0.474,
+    "p_target_item_2": 0.5,
+    "binom_p": 0.10674954203430141,
+    "stay_gap": -0.052000000000000046,
+    "p_ko_neither": 0.0,
+    "stay_rate": 0.904,
+    "separable": false,
+    "rows_aligned": true,
+    "source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/mechanism-analysis/outputs/_suites/mechanism-analysis/phase1a/flip_audit/p1a_sdr__zero.json"
+   }
+  },
+  {
+   "task": "sdr",
+   "set": 7,
+   "scheme": "mean",
+   "label": "D_sdr_and_H_sdr_hko",
+   "ko_accuracy": 0.484,
+   "audit_required": true,
+   "audit": {
+    "verdict": "content-driven flip",
+    "p_ko_item_2": 0.448,
+    "p_target_item_2": 0.5,
+    "binom_p": 0.0011150491792686833,
+    "stay_gap": -0.0521286889211417,
+    "p_ko_neither": 0.055,
+    "stay_rate": 0.5142857142857142,
+    "separable": true,
+    "rows_aligned": true,
+    "source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/mechanism-analysis/outputs/_suites/mechanism-analysis/phase1a/flip_audit/p1a_sdr__mean.json"
+   }
+  },
+  {
+   "task": "ser",
+   "set": 1,
+   "scheme": "mean",
+   "label": "D_ser_hko",
+   "ko_accuracy": 0.496,
+   "audit_required": true,
+   "audit": {
+    "verdict": "positional default",
+    "p_ko_item_2": 0.81,
+    "p_target_item_2": 0.5,
+    "binom_p": 1.1422041994321085e-91,
+    "stay_gap": 0.6199999999999999,
+    "p_ko_neither": 0.0,
+    "stay_rate": 0.506,
+    "separable": false,
+    "rows_aligned": true,
+    "source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/mechanism-analysis/outputs/_suites/mechanism-analysis/phase1a/flip_audit/p1a_ser__mean.json"
+   }
+  },
+  {
+   "task": "ser",
+   "set": 2,
+   "scheme": "mean",
+   "label": "H_ser_hko",
+   "ko_accuracy": 0.486,
+   "audit_required": true,
+   "audit": {
+    "verdict": "positional default",
+    "p_ko_item_2": 0.857,
+    "p_target_item_2": 0.5,
+    "binom_p": 1.3457036137871348e-124,
+    "stay_gap": 0.745345788809982,
+    "p_ko_neither": 0.018,
+    "stay_rate": 0.49185336048879835,
+    "separable": false,
+    "rows_aligned": true,
+    "source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/mechanism-analysis/outputs/_suites/mechanism-analysis/phase1a/flip_audit/p1a_ser__mean.json"
+   }
+  },
+  {
+   "task": "ser",
+   "set": 3,
+   "scheme": "mean",
+   "label": "D_core_hko",
+   "ko_accuracy": 0.478,
+   "audit_required": true,
+   "audit": {
+    "verdict": "positional default",
+    "p_ko_item_2": 0.723,
+    "p_target_item_2": 0.5,
+    "binom_p": 1.6058905000389023e-46,
+    "stay_gap": 0.446,
+    "p_ko_neither": 0.0,
+    "stay_rate": 0.513,
+    "separable": true,
+    "rows_aligned": true,
+    "source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/mechanism-analysis/outputs/_suites/mechanism-analysis/phase1a/flip_audit/p1a_ser__mean.json"
+   }
+  },
+  {
+   "task": "ser",
+   "set": 3,
+   "scheme": "zero",
+   "label": "D_core_hko",
+   "ko_accuracy": 0.486,
+   "audit_required": true,
+   "audit": {
+    "verdict": "positional default",
+    "p_ko_item_2": 0.794,
+    "p_target_item_2": 0.5,
+    "binom_p": 6.035578752495634e-82,
+    "stay_gap": 0.5880000000000001,
+    "p_ko_neither": 0.0,
+    "stay_rate": 0.514,
+    "separable": false,
+    "rows_aligned": true,
+    "source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/mechanism-analysis/outputs/_suites/mechanism-analysis/phase1a/flip_audit/p1a_ser__zero.json"
+   }
+  },
+  {
+   "task": "ser",
+   "set": 4,
+   "scheme": "mean",
+   "label": "D_ser_minus_D_far_minus_D_sdr_hko",
+   "ko_accuracy": 0.749,
+   "audit_required": true,
+   "audit": {
+    "verdict": "content-driven flip",
+    "p_ko_item_2": 0.606,
+    "p_target_item_2": 0.5,
+    "binom_p": 2.1273796861991732e-11,
+    "stay_gap": 0.22464850452407692,
+    "p_ko_neither": 0.014,
+    "stay_rate": 0.781947261663286,
+    "separable": true,
+    "rows_aligned": true,
+    "source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/mechanism-analysis/outputs/_suites/mechanism-analysis/phase1a/flip_audit/p1a_ser__mean.json"
+   }
+  },
+  {
+   "task": "ser",
+   "set": 4,
+   "scheme": "zero",
+   "label": "D_ser_minus_D_far_minus_D_sdr_hko",
+   "ko_accuracy": 0.66,
+   "audit_required": true,
+   "audit": {
+    "verdict": "content-driven flip",
+    "p_ko_item_2": 0.566,
+    "p_target_item_2": 0.5,
+    "binom_p": 3.3510307908912013e-05,
+    "stay_gap": 0.15250905371873114,
+    "p_ko_neither": 0.023,
+    "stay_rate": 0.7011258955987717,
+    "separable": true,
+    "rows_aligned": true,
+    "source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/mechanism-analysis/outputs/_suites/mechanism-analysis/phase1a/flip_audit/p1a_ser__zero.json"
+   }
+  },
+  {
+   "task": "ser",
+   "set": 5,
+   "scheme": "mean",
+   "label": "D_ser_minus_H_ser_hko",
+   "ko_accuracy": 0.542,
+   "audit_required": true,
+   "audit": {
+    "verdict": "content-driven flip",
+    "p_ko_item_2": 0.644,
+    "p_target_item_2": 0.5,
+    "binom_p": 6.292666098682292e-20,
+    "stay_gap": 0.29058116232464937,
+    "p_ko_neither": 0.002,
+    "stay_rate": 0.5701402805611222,
+    "separable": true,
+    "rows_aligned": true,
+    "source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/mechanism-analysis/outputs/_suites/mechanism-analysis/phase1a/flip_audit/p1a_ser__mean.json"
+   }
+  },
+  {
+   "task": "ser",
+   "set": 5,
+   "scheme": "zero",
+   "label": "D_ser_minus_H_ser_hko",
+   "ko_accuracy": 0.502,
+   "audit_required": true,
+   "audit": {
+    "verdict": "content-driven flip",
+    "p_ko_item_2": 0.545,
+    "p_target_item_2": 0.5,
+    "binom_p": 0.0048617363918734635,
+    "stay_gap": 0.0943775100401606,
+    "p_ko_neither": 0.004,
+    "stay_rate": 0.5291164658634538,
+    "separable": true,
+    "rows_aligned": true,
+    "source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/mechanism-analysis/outputs/_suites/mechanism-analysis/phase1a/flip_audit/p1a_ser__zero.json"
+   }
+  },
+  {
+   "task": "ser",
+   "set": 7,
+   "scheme": "mean",
+   "label": "D_ser_and_H_ser_hko",
+   "ko_accuracy": 0.475,
+   "audit_required": true,
+   "audit": {
+    "verdict": "positional default",
+    "p_ko_item_2": 0.675,
+    "p_target_item_2": 0.5,
+    "binom_p": 6.951248519766341e-29,
+    "stay_gap": 0.35000000000000003,
+    "p_ko_neither": 0.0,
+    "stay_rate": 0.501,
+    "separable": true,
+    "rows_aligned": true,
+    "source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/mechanism-analysis/outputs/_suites/mechanism-analysis/phase1a/flip_audit/p1a_ser__mean.json"
+   }
+  }
+ ]
+}
