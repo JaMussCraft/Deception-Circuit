@@ -2,15 +2,11 @@
 """
 p2_roles.py -- the roles pass on the phase-2 cells (ticket 04; spec section 4 phase 2, R7/R10), on CPU.
 
-Phase 2 runs no single-Component knockout (R16), so each cell's "depends, whether" view is merged from the phase-1
-single-knockout cell on the same test set (`--roles-merge-from`; the rows are keyed by Component, and U' = U plus
-the operand, so every U row finds its knockout columns and the operand's extra heads stay unmeasured on that view):
-
-    d  <- s1 (D, item swap, all positions) and s2p (D, neutral twin, post-clause: rule 4b's knockout column)
-    h  <- s5 (H, item swap)        f <- s6 (F, item swap)        i <- s7 (I, neutral twin, post-clause)
-
-No phase-2 cell has path patching (phase 3 brings it on C_t), so `--roles-allow-missing-views` is passed and
-every role proposed here is read as "without the where-clause"; roles.json records the missing view.
+Phase 2 runs no single-Component knockout (R16), so each cell's "depends, whether" view is merged from the table
+p2_merge.py builds from the phase-1 sweeps on the same test set over the U' rows (`--roles-merge-from
+<root>/_merge/<t>_<cell>`): d <- s1 + s2p, h <- s5, f <- s6, i <- s7 (twin post-clause only: on I just rule 4b
+can fire). No phase-2 cell has path patching (phase 3 brings it on C_t), so `--roles-allow-missing-views` is passed
+and every role proposed here is read as "without the where-clause"; roles.json records the missing view.
 
 usage (from the repository root, after the cells are fetched):
     python outputs/_launch_mechanism_analysis/p2_roles.py [--root DIR] [--dry-run] [--tasks far,sdr,ser]
@@ -31,19 +27,20 @@ for _p in (HERE, REPO):
 
 import p2_jobs  # noqa: E402
 
+import p2_merge  # noqa: E402
+
 TASKS = ("far", "sdr", "ser")
 ROOT = "outputs/_analyses/mechanism-analysis-p2"
-P1_CELL = "outputs/_analyses/mechanism-analysis-p1/{s}/U__leaf/{t}_v2"
-MERGE = {"d": ("s1", "s2p"), "h": ("s5",), "f": ("s6",), "i": ("s7",)}
+MERGE = p2_merge.SOURCES
 B2_FLOOR = "0.05"
 
 
-def roles_argv(t: str, cell: str, *, cell_dir: str) -> list:
-    argv = ["roles", cell_dir]
-    for s in MERGE[cell]:
-        argv += ["--roles-merge-from", P1_CELL.format(s=s, t=t)]
-    argv += ["--roles-b2-floor", B2_FLOOR, "--roles-allow-missing-views"]
-    return argv
+def roles_argv(t: str, cell: str, *, cell_dir: str, root: str = ROOT) -> list:
+    """The roles command for one cell: merge the sweep-built knockout table (p2_merge.py) for that test set."""
+    if cell not in MERGE:
+        raise KeyError(f"no roles pass on cell {cell!r}; the head cells are {sorted(MERGE)}")
+    return ["roles", cell_dir, "--roles-merge-from", p2_merge.merge_dir(root, t, cell),
+            "--roles-b2-floor", B2_FLOOR, "--roles-allow-missing-views"]
 
 
 def cell_dir(root: str, cell: str, t: str) -> str:
@@ -73,7 +70,7 @@ def main(argv=None) -> int:
                 print("  skip:", exc)
                 failures.append((t, cell, "missing"))
                 continue
-            args = roles_argv(t, cell, cell_dir=os.path.relpath(cdir, REPO)) + (["--dry-run"] if a.dry_run else [])
+            args = roles_argv(t, cell, cell_dir=os.path.relpath(cdir, REPO), root=a.root) + (["--dry-run"] if a.dry_run else [])
             print("\n$ analyze_components.py", " ".join(args))
             code = analyze_components.main(args)
             if code:

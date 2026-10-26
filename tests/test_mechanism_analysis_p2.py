@@ -218,8 +218,9 @@ def test_one_sided_binomial_is_the_upper_tail(res):
 
 def test_membership_columns_come_from_the_six_head_sets_and_the_operand(res):
     sets = _head_sets()
-    prov = {"heads": ["head.9.19", "head.3.3"], "mlp_layers": [6, 7]}
+    prov = {"heads": ["head.9.19", "head.3.3"], "members": ["head.9.19", "mlp.6.0", "head.3.3"], "mlp_layers": [6, 7]}
     m = res.membership("far", sets, prov)
+    assert m[("mlp", 6, 0)]["S_k"] and not m[("mlp", 7, 0)]["S_k"]                  # the deciding set's own MLP
     assert m[("head", 17, 24)] == {"U": True, "S_k": False, "C_t": False, "core": True, "excl_t": False,
                                    "DmH_t": False, "DmH_minus_core_t": False, "HmD_t": False, "late_HmD_t": False}
     assert m[("head", 9, 19)]["S_k"] and m[("head", 9, 19)]["excl_t"] and m[("head", 9, 19)]["U"]
@@ -300,7 +301,11 @@ def test_c_honest_reads_the_late_h_minus_d_heads_in_the_honest_direction(res):
     h30 = out["heads"]["head.30.3"]
     # on D the metric is deceptive-positive, so the honest direction is the negation
     assert h30 == {"dla_H": 0.15, "dla_F": 0.11, "honest_dla_D_pressure": 0.02, "honest_dla_D_twin": 0.10,
-                   "suppression": pytest.approx(0.8), "writes_honest_on_H_and_F": True, "suppressed": True}
+                   "suppression": pytest.approx(0.8), "writes_honest_on_H_and_F": True, "suppressed": True,
+                   "sign_only": True}                      # no SE column in this fixture: sign-only, and said so
+    with_se = [_row(30, 3, **{d: 0.15, "dla.pressure_se": 0.10})]
+    weak = res.c_honest({("head", 30, 3)}, rows_d, with_se, with_se)["heads"]["head.30.3"]
+    assert weak["writes_honest_on_H_and_F"] is False and "sign_only" not in weak     # 1.5 SE is not >= 2 SE
     assert out["heads"]["head.22.7"]["suppressed"] is False
     assert out["heads"]["head.22.7"]["writes_honest_on_H_and_F"] is False
     assert out["n"] == 2 and out["n_writes_honest"] == 1 and out["n_suppressed"] == 1
@@ -323,15 +328,15 @@ def test_roles_argv_merges_the_phase_1_single_knockout_cells_per_test_set(res):
     import p2_roles
     d = p2_roles.roles_argv("far", "d", cell_dir="outputs/_analyses/mechanism-analysis-p2/d/Up__leaf/far_v2")
     assert d[:2] == ["roles", "outputs/_analyses/mechanism-analysis-p2/d/Up__leaf/far_v2"]
-    assert d.count("--roles-merge-from") == 2
-    assert "outputs/_analyses/mechanism-analysis-p1/s1/U__leaf/far_v2" in d
-    assert "outputs/_analyses/mechanism-analysis-p1/s2p/U__leaf/far_v2" in d
+    assert d.count("--roles-merge-from") == 1
+    assert "outputs/_analyses/mechanism-analysis-p2/_merge/far_d" in d        # the sweep-built table (p2_merge.py)
     assert "--roles-b2-floor" in d and d[d.index("--roles-b2-floor") + 1] == "0.05"
     assert "--roles-allow-missing-views" in d                       # phase 2 has no path patching (phase 3 does)
-    for cell, p1 in (("h", "s5"), ("f", "s6"), ("i", "s7")):
-        argv = p2_roles.roles_argv("sdr", cell, cell_dir=f"x/{cell}")
-        assert argv.count("--roles-merge-from") == 1
-        assert f"outputs/_analyses/mechanism-analysis-p1/{p1}/U__leaf/sdr_v2" in argv
+    for cell in ("h", "f", "i"):
+        argv = p2_roles.roles_argv("sdr", cell, cell_dir=f"x/{cell}", root="r")
+        assert argv.count("--roles-merge-from") == 1 and f"r/_merge/sdr_{cell}" in argv
+    with pytest.raises(KeyError):
+        p2_roles.roles_argv("sdr", "seg_intro", cell_dir="x")
 
 
 def test_cell_dir_picks_the_tasks_test_set_under_a_shared_cell_root(res, tmp_path):
@@ -342,3 +347,45 @@ def test_cell_dir_picks_the_tasks_test_set_under_a_shared_cell_root(res, tmp_pat
     assert res.cell_dir(str(tmp_path), "f", "far") == str(tmp_path / "f" / "Up__leaf" / "far_v2_nopressure")
     with pytest.raises(FileNotFoundError):
         res.cell_dir(str(tmp_path), "f", "sdr")
+
+
+# ------------------------------------------------------------------ the knockout merge tables built from the sweeps
+
+def _sweep(components, *, suffix="", ids=("a1", "a2", "a3")):
+    rows = [{"key": [k, l, i], "kind": k, "layer": l, "index": i, "label": f"{k}.{l}.{i}", "mean_drop": d,
+             "standard_error": s, "accuracy": 1.0, "n": len(ids), "signed_rank": r + 1}
+            for r, (k, l, i, d, s) in enumerate(components)]
+    sweep = {"components": rows, "plan": {"scheme": "interchange", "counterfactual": "x", "positions": "all",
+                                           "column_suffix": suffix}, "task": "far_v2",
+             "clean_run": {"mean_logit_difference": 2.0}, "sample": {"seed": 0}}
+    inst = {"instance_ids": list(ids), "plan": sweep["plan"]}
+    return sweep, inst
+
+
+def test_merge_table_carries_the_sweep_values_for_u_prime_rows_under_the_roles_column_names(res, tmp_path):
+    import p2_merge
+    s1, s1_inst = _sweep([("head", 9, 29, 1.0, 0.1), ("head", 3, 3, 0.2, 0.05), ("mlp", 6, 0, 0.5, 0.02),
+                          ("mlp", 5, 0, 0.1, 0.01)])
+    s2p, s2p_inst = _sweep([("head", 9, 29, 0.7, 0.1), ("head", 3, 3, 0.1, 0.05), ("mlp", 6, 0, 0.3, 0.02),
+                            ("mlp", 5, 0, 0.0, 0.01)], suffix="_neutral_twin_paired_after_pressure_clause_excl_readout",
+                           ids=("b1", "b2"))
+    keys = [("head", 9, 29), ("head", 3, 3), ("mlp", 6, 0)]          # U' rows; mlp.5.0 is outside U'
+    out = p2_merge.build_merge_table(str(tmp_path / "m"), keys, [(s1, s1_inst), (s2p, s2p_inst)])
+    from component_analysis.head_table import load_head_table, load_head_table_meta
+    rows = load_head_table(out)
+    assert [(r["kind"], r["layer"], r["index"]) for r in rows] == keys
+    assert rows[0]["knockout.logit_diff_drop"] == 1.0 and rows[0]["knockout.standard_error"] == 0.1
+    twin = "knockout.logit_diff_drop_neutral_twin_paired_after_pressure_clause_excl_readout"
+    assert rows[2][twin] == 0.3 and rows[2]["knockout.standard_error_neutral_twin_paired_after_pressure_clause_excl_readout"] == 0.02
+    meta = load_head_table_meta(out)
+    assert meta["coverage"]["knockout.logit_diff_drop"]["n"] == 3
+    assert meta["coverage"][twin]["n"] == 2
+    assert meta["coverage"]["knockout.logit_diff_drop"]["instance_set"] != meta["coverage"][twin]["instance_set"]
+    assert "sweep" in meta["coverage"]["knockout.logit_diff_drop"]["details"]["source"]
+
+
+def test_merge_sources_per_cell_follow_the_phase_1_single_knockout_cells(res):
+    import p2_merge
+    assert p2_merge.SOURCES == {"d": ("s1", "s2p"), "h": ("s5",), "f": ("s6",), "i": ("s7",)}
+    assert p2_merge.merge_dir("outputs/_analyses/mechanism-analysis-p2", "far", "d") == \
+        "outputs/_analyses/mechanism-analysis-p2/_merge/far_d"
