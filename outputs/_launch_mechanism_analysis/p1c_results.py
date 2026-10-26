@@ -60,11 +60,11 @@ def two_way_accuracy(knocked) -> float:
 
 
 def test_i(*, acc, f, null_fs) -> bool:
-    return acc <= ACC_MAX + EPS and f + EPS >= F_MIN and all(f > n for n in null_fs)
+    return bool(acc <= ACC_MAX + EPS and f + EPS >= F_MIN and all(f > n for n in null_fs))
 
 
 def test_ii_one(*, clean_acc, ko_acc, clean_margin, ko_margin) -> bool:
-    return (abs(clean_acc - ko_acc) <= II_ACC + EPS
+    return bool(abs(clean_acc - ko_acc) <= II_ACC + EPS
             and abs(clean_margin - ko_margin) <= II_MARGIN * abs(clean_margin) + EPS)
 
 
@@ -319,6 +319,11 @@ def b_share(root, t, classes):
 
 # ------------------------------------------------------------------ outputs
 
+def _jsonable(o):
+    """numpy scalars to Python, anything else iterable to a list (json.dump default)."""
+    return o.item() if hasattr(o, "item") else list(o)
+
+
 def _f(x, nd=3):
     if x is None:
         return "-"
@@ -537,7 +542,7 @@ def main(argv=None) -> int:
                                    {k: (far_counts.get(k) or {}).get("deception-leaning") for k in ("D-H", "(D-H)-core")})
     os.makedirs(a.curated, exist_ok=True)
     with open(os.path.join(a.reports, "03-1c-results.json"), "w") as f:
-        json.dump(res, f, indent=1, default=list)
+        json.dump(res, f, indent=1, default=_jsonable)
     with open(os.path.join(a.reports, "03-1c-results.md"), "w") as f:
         f.write(markdown(res))
     with open(os.path.join(a.curated, "rab_curves.csv"), "w", newline="") as f:
@@ -583,7 +588,7 @@ def main(argv=None) -> int:
             "s7": {t: {k: v[k] for k in ("n_D_positive", "n_both_positive", "n_inversion_shared",
                                          "top20_inversion_shared")} for t, v in res["s7"].items() if v}}
     with open(os.path.join(a.curated, "p1c_readings.json"), "w") as f:
-        json.dump(slim, f, indent=1, default=list)
+        json.dump(slim, f, indent=1, default=_jsonable)
     print(f"tasks {sorted(res['rab'])}; missing {res['missing']}; wrote {a.reports}/03-1c-results.{{md,json}} and "
           f"{a.curated}/")
     return 0
