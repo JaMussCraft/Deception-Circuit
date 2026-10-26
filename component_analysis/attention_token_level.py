@@ -87,11 +87,14 @@ TWIN_PROMPTS = "honest_twin_prompts"
 #: its prompt is its pressure prompt with the clause replaced, so it reads the
 #: pressure prompt's labels, and inside the Pressure Clause its own tokens are
 #: the Matched Honest Instruction's rather than the label shown.
-LABEL_CONDITIONS = (ap.PRESSURE, ap.PRESSURE_PAIRED, ap.HONEST_TWIN)
+LABEL_CONDITIONS = (ap.PRESSURE, ap.PRESSURE_PAIRED, ap.HONEST_TWIN,
+                    ap.PRESSURE_NEUTRAL_TWIN_PAIRED)
 
-#: Every condition, in the order rows are drawn.
+#: Every condition, in the order rows are drawn. The two v2 twin rows (ticket
+#: 02b) come last and exist only on a v2 cell; the twin is token-matched to
+#: its pressure prompt, so it is a task-prompt row like the honest instruction.
 ROW_ORDER = (ap.PRESSURE, ap.PRESSURE_PAIRED, ap.HONEST_INSTRUCTION,
-             ap.HONEST_TWIN)
+             ap.HONEST_TWIN, ap.PRESSURE_NEUTRAL_TWIN_PAIRED, ap.NEUTRAL_TWIN)
 
 #: What a record says when it carries no `template_variant`.
 NO_VARIANT = "-"

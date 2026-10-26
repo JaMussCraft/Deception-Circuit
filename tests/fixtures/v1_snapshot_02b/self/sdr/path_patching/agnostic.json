@@ -1,0 +1,420 @@
+{
+  "analysis": "path_patching",
+  "pass": "position_agnostic",
+  "circuit": "self",
+  "task": "sdr",
+  "counterfactual": "item_swap",
+  "metric": {
+    "quantity": "logit(Target) - logit(Distractor) at the Readout, fp32",
+    "effect": "(clean - patched) / (clean - counterfactual), per instance",
+    "counterfactual": "item_swap",
+    "convention": "positive_helps_deception",
+    "convention_version": 2,
+    "sign": "positive means the path carries the clean stream (the prompt under its Pressure Clause) toward the deceptive answer, against the Corruption (the item swap); +1 is the whole clean-minus-counterfactual gap. Knockout's drop has the same sign (positive helps deception).",
+    "min_gap": 0.001
+  },
+  "grid": {
+    "senders": 4,
+    "receivers": 8,
+    "cells": 13
+  },
+  "senders": [
+    "embed",
+    "head.0.0",
+    "head.0.2",
+    "mlp.1.0"
+  ],
+  "receivers": [
+    {
+      "key": "q.0.0",
+      "kind": "q",
+      "layer": 0,
+      "index": 0,
+      "covers_heads": [
+        0
+      ],
+      "circuit_heads": [
+        0
+      ]
+    },
+    {
+      "key": "q.0.2",
+      "kind": "q",
+      "layer": 0,
+      "index": 2,
+      "covers_heads": [
+        2
+      ],
+      "circuit_heads": [
+        2
+      ]
+    },
+    {
+      "key": "k.0.0",
+      "kind": "k",
+      "layer": 0,
+      "index": 0,
+      "covers_heads": [
+        0,
+        1
+      ],
+      "circuit_heads": [
+        0
+      ]
+    },
+    {
+      "key": "v.0.0",
+      "kind": "v",
+      "layer": 0,
+      "index": 0,
+      "covers_heads": [
+        0,
+        1
+      ],
+      "circuit_heads": [
+        0
+      ]
+    },
+    {
+      "key": "k.0.1",
+      "kind": "k",
+      "layer": 0,
+      "index": 1,
+      "covers_heads": [
+        2,
+        3
+      ],
+      "circuit_heads": [
+        2
+      ]
+    },
+    {
+      "key": "v.0.1",
+      "kind": "v",
+      "layer": 0,
+      "index": 1,
+      "covers_heads": [
+        2,
+        3
+      ],
+      "circuit_heads": [
+        2
+      ]
+    },
+    {
+      "key": "mlp_in.1.0",
+      "kind": "mlp_in",
+      "layer": 1,
+      "index": 0,
+      "covers_heads": [],
+      "circuit_heads": []
+    },
+    {
+      "key": "readout",
+      "kind": "readout",
+      "layer": 0,
+      "index": 0,
+      "covers_heads": [],
+      "circuit_heads": []
+    }
+  ],
+  "cells": [
+    {
+      "sender": "embed",
+      "receiver": "q.0.0",
+      "cell": "embed->q.0.0",
+      "mean": 0.00277985095067379,
+      "se": 0.0013973024524909599,
+      "n": 16,
+      "n_excluded": 0
+    },
+    {
+      "sender": "embed",
+      "receiver": "q.0.2",
+      "cell": "embed->q.0.2",
+      "mean": -0.0002512959545128979,
+      "se": 0.0010145907826067844,
+      "n": 16,
+      "n_excluded": 0
+    },
+    {
+      "sender": "embed",
+      "receiver": "k.0.0",
+      "cell": "embed->k.0.0",
+      "mean": -0.004385505174809623,
+      "se": 0.004634679067568302,
+      "n": 16,
+      "n_excluded": 0
+    },
+    {
+      "sender": "embed",
+      "receiver": "v.0.0",
+      "cell": "embed->v.0.0",
+      "mean": 1.598500823136419,
+      "se": 0.4316765051963765,
+      "n": 16,
+      "n_excluded": 0
+    },
+    {
+      "sender": "embed",
+      "receiver": "k.0.1",
+      "cell": "embed->k.0.1",
+      "mean": 0.0020798048572032712,
+      "se": 0.003691146380652448,
+      "n": 16,
+      "n_excluded": 0
+    },
+    {
+      "sender": "embed",
+      "receiver": "v.0.1",
+      "cell": "embed->v.0.1",
+      "mean": -0.5038029027637094,
+      "se": 0.39715309592835196,
+      "n": 16,
+      "n_excluded": 0
+    },
+    {
+      "sender": "embed",
+      "receiver": "mlp_in.1.0",
+      "cell": "embed->mlp_in.1.0",
+      "mean": 0.0,
+      "se": 0.0,
+      "n": 16,
+      "n_excluded": 0
+    },
+    {
+      "sender": "embed",
+      "receiver": "readout",
+      "cell": "embed->readout",
+      "mean": 0.0,
+      "se": 0.0,
+      "n": 16,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.0.0",
+      "receiver": "mlp_in.1.0",
+      "cell": "head.0.0->mlp_in.1.0",
+      "mean": 0.012232863926328719,
+      "se": 0.02213539003753536,
+      "n": 16,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.0.0",
+      "receiver": "readout",
+      "cell": "head.0.0->readout",
+      "mean": -0.6435744888149202,
+      "se": 0.18949011775844707,
+      "n": 16,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.0.2",
+      "receiver": "mlp_in.1.0",
+      "cell": "head.0.2->mlp_in.1.0",
+      "mean": -0.0744771397439763,
+      "se": 0.02438574081282153,
+      "n": 16,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.0.2",
+      "receiver": "readout",
+      "cell": "head.0.2->readout",
+      "mean": 0.32954344246536493,
+      "se": 0.1342089837362046,
+      "n": 16,
+      "n_excluded": 0
+    },
+    {
+      "sender": "mlp.1.0",
+      "receiver": "readout",
+      "cell": "mlp.1.0->readout",
+      "mean": -0.5056882090866566,
+      "se": 0.14646455020224314,
+      "n": 16,
+      "n_excluded": 0
+    }
+  ],
+  "strongest": [
+    {
+      "sender": "embed",
+      "receiver": "v.0.0",
+      "cell": "embed->v.0.0",
+      "mean": 1.598500823136419,
+      "se": 0.4316765051963765,
+      "n": 16,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.0.0",
+      "receiver": "readout",
+      "cell": "head.0.0->readout",
+      "mean": -0.6435744888149202,
+      "se": 0.18949011775844707,
+      "n": 16,
+      "n_excluded": 0
+    },
+    {
+      "sender": "mlp.1.0",
+      "receiver": "readout",
+      "cell": "mlp.1.0->readout",
+      "mean": -0.5056882090866566,
+      "se": 0.14646455020224314,
+      "n": 16,
+      "n_excluded": 0
+    },
+    {
+      "sender": "embed",
+      "receiver": "v.0.1",
+      "cell": "embed->v.0.1",
+      "mean": -0.5038029027637094,
+      "se": 0.39715309592835196,
+      "n": 16,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.0.2",
+      "receiver": "readout",
+      "cell": "head.0.2->readout",
+      "mean": 0.32954344246536493,
+      "se": 0.1342089837362046,
+      "n": 16,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.0.2",
+      "receiver": "mlp_in.1.0",
+      "cell": "head.0.2->mlp_in.1.0",
+      "mean": -0.0744771397439763,
+      "se": 0.02438574081282153,
+      "n": 16,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.0.0",
+      "receiver": "mlp_in.1.0",
+      "cell": "head.0.0->mlp_in.1.0",
+      "mean": 0.012232863926328719,
+      "se": 0.02213539003753536,
+      "n": 16,
+      "n_excluded": 0
+    },
+    {
+      "sender": "embed",
+      "receiver": "k.0.0",
+      "cell": "embed->k.0.0",
+      "mean": -0.004385505174809623,
+      "se": 0.004634679067568302,
+      "n": 16,
+      "n_excluded": 0
+    },
+    {
+      "sender": "embed",
+      "receiver": "q.0.0",
+      "cell": "embed->q.0.0",
+      "mean": 0.00277985095067379,
+      "se": 0.0013973024524909599,
+      "n": 16,
+      "n_excluded": 0
+    },
+    {
+      "sender": "embed",
+      "receiver": "k.0.1",
+      "cell": "embed->k.0.1",
+      "mean": 0.0020798048572032712,
+      "se": 0.003691146380652448,
+      "n": 16,
+      "n_excluded": 0
+    }
+  ],
+  "direct_effect_on_readout": [
+    {
+      "sender": "embed",
+      "receiver": "readout",
+      "cell": "embed->readout",
+      "mean": 0.0,
+      "se": 0.0,
+      "n": 16,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.0.0",
+      "receiver": "readout",
+      "cell": "head.0.0->readout",
+      "mean": -0.6435744888149202,
+      "se": 0.18949011775844707,
+      "n": 16,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.0.2",
+      "receiver": "readout",
+      "cell": "head.0.2->readout",
+      "mean": 0.32954344246536493,
+      "se": 0.1342089837362046,
+      "n": 16,
+      "n_excluded": 0
+    },
+    {
+      "sender": "mlp.1.0",
+      "receiver": "readout",
+      "cell": "mlp.1.0->readout",
+      "mean": -0.5056882090866566,
+      "se": 0.14646455020224314,
+      "n": 16,
+      "n_excluded": 0
+    }
+  ],
+  "cells_without_a_mean": [],
+  "sample": {
+    "n_instances": 16,
+    "n_batches": 2,
+    "batch_size": 8,
+    "instance_ids": [
+      "46402eeda70f",
+      "3cd797bbe086",
+      "e690f4860a24",
+      "9b2ea23303b5",
+      "ee4c88e3d4a7",
+      "57d7bf78e403",
+      "e56c4f19a415",
+      "ce60a2a0e743",
+      "500ecfc036ae",
+      "1aa7d042bae4",
+      "11783a8fab13",
+      "bc2705f38763",
+      "9a1ee917d473",
+      "6524378ce6da",
+      "1e9e37a41255",
+      "caa076f09092"
+    ],
+    "n_without_a_counterpart": 0,
+    "without_a_counterpart": [],
+    "n_excluded_by_gap": 0,
+    "excluded_by_gap": []
+  },
+  "gap": {
+    "mean": 8.885050192475319e-05,
+    "min": -0.009303472936153412,
+    "max": 0.01092664897441864,
+    "n_positive": 8
+  },
+  "cost": {
+    "estimated": {
+      "forwards": 38,
+      "seconds": 7.022399999999999,
+      "minutes": 0.11703999999999999,
+      "seconds_per_forward": "<volatile>",
+      "n_batches": 2,
+      "batch_size": 8,
+      "senders": 4,
+      "receivers": 8,
+      "cells": 13
+    },
+    "forwards": 38,
+    "wall_seconds": "<volatile>",
+    "seconds_per_forward": "<volatile>"
+  }
+}

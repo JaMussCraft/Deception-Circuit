@@ -1,0 +1,37 @@
+{
+  "analysis": "path_patching",
+  "pass": "position_agnostic",
+  "circuit": "self",
+  "task": "sdr",
+  "counterfactual": "honest_instruction",
+  "metric": {
+    "quantity": "logit(Target) - logit(Distractor) at the Readout, fp32",
+    "effect": "(clean - patched) / (clean - counterfactual), per instance",
+    "counterfactual": "honest_instruction",
+    "convention": "positive_helps_deception",
+    "convention_version": 2,
+    "sign": "positive means the path carries the clean stream (the prompt under its Pressure Clause) toward the deceptive answer, against the Matched Honest Instruction; +1 is the whole clean-minus-counterfactual gap. Knockout's drop has the same sign (positive helps deception).",
+    "min_gap": 0.001
+  },
+  "skipped": "no instance of the causal sample has a honest_instruction counterpart",
+  "n_without_a_counterpart": 16,
+  "without_a_counterpart": [
+    "46402eeda70f",
+    "3cd797bbe086",
+    "e690f4860a24",
+    "9b2ea23303b5",
+    "ee4c88e3d4a7",
+    "57d7bf78e403",
+    "e56c4f19a415",
+    "ce60a2a0e743",
+    "500ecfc036ae",
+    "1aa7d042bae4",
+    "11783a8fab13",
+    "bc2705f38763",
+    "9a1ee917d473",
+    "6524378ce6da",
+    "1e9e37a41255",
+    "caa076f09092"
+  ],
+  "cells": []
+}

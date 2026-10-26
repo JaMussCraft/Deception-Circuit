@@ -1,0 +1,141 @@
+{
+  "title": "Position-agnostic path patching, normalized effect (item_swap)",
+  "counterfactual": "item_swap",
+  "rows": [
+    "embed",
+    "head.0.0",
+    "head.0.2",
+    "mlp.1.0"
+  ],
+  "columns": [
+    {
+      "key": "q.0.0",
+      "kind": "q",
+      "layer": 0,
+      "index": 0,
+      "covers_heads": [
+        0
+      ]
+    },
+    {
+      "key": "q.0.2",
+      "kind": "q",
+      "layer": 0,
+      "index": 2,
+      "covers_heads": [
+        2
+      ]
+    },
+    {
+      "key": "k.0.0",
+      "kind": "k",
+      "layer": 0,
+      "index": 0,
+      "covers_heads": [
+        0,
+        1
+      ]
+    },
+    {
+      "key": "k.0.1",
+      "kind": "k",
+      "layer": 0,
+      "index": 1,
+      "covers_heads": [
+        2,
+        3
+      ]
+    },
+    {
+      "key": "v.0.0",
+      "kind": "v",
+      "layer": 0,
+      "index": 0,
+      "covers_heads": [
+        0,
+        1
+      ]
+    },
+    {
+      "key": "v.0.1",
+      "kind": "v",
+      "layer": 0,
+      "index": 1,
+      "covers_heads": [
+        2,
+        3
+      ]
+    },
+    {
+      "key": "mlp_in.1.0",
+      "kind": "mlp_in",
+      "layer": 1,
+      "index": 0,
+      "covers_heads": []
+    },
+    {
+      "key": "readout",
+      "kind": "readout",
+      "layer": 0,
+      "index": 0,
+      "covers_heads": []
+    }
+  ],
+  "values": [
+    [
+      0.00277985095067379,
+      -0.0002512959545128979,
+      -0.004385505174809623,
+      0.0020798048572032712,
+      1.598500823136419,
+      -0.5038029027637094,
+      0.0,
+      0.0
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      0.012232863926328719,
+      -0.6435744888149202
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      -0.0744771397439763,
+      0.32954344246536493
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      -0.5056882090866566
+    ]
+  ],
+  "missing": "null where the sender is not strictly upstream of the receiver",
+  "colour_scale": {
+    "percentile": 98.0,
+    "extent": 1.3693185028992592,
+    "cells_beyond_the_scale": 1
+  },
+  "metric": {
+    "quantity": "logit(Target) - logit(Distractor) at the Readout, fp32",
+    "effect": "(clean - patched) / (clean - counterfactual), per instance",
+    "counterfactual": "item_swap",
+    "convention": "positive_helps_deception",
+    "convention_version": 2,
+    "sign": "positive means the path carries the clean stream (the prompt under its Pressure Clause) toward the deceptive answer, against the Corruption (the item swap); +1 is the whole clean-minus-counterfactual gap. Knockout's drop has the same sign (positive helps deception).",
+    "min_gap": 0.001
+  }
+}

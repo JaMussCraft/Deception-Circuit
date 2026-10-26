@@ -1,0 +1,443 @@
+{
+  "schema_version": 1,
+  "created": "<volatile>",
+  "columns": [
+    "kind",
+    "layer",
+    "index",
+    "kv_group",
+    "head_gate_active",
+    "active_neuron_count",
+    "attention_patterns.query_position",
+    "attention_patterns.pressure_top_segment",
+    "attention_patterns.pressure_top_mass",
+    "attention_patterns.pressure_paired_top_segment",
+    "attention_patterns.pressure_paired_top_mass",
+    "attention_patterns.honest_instruction_paired_top_segment",
+    "attention_patterns.honest_instruction_paired_top_mass",
+    "attention_patterns.honest_twin_descriptive_top_segment",
+    "attention_patterns.honest_twin_descriptive_top_mass",
+    "path_patching.strongest_incoming",
+    "path_patching.strongest_incoming_support",
+    "path_patching.strongest_outgoing",
+    "path_patching.strongest_outgoing_support",
+    "path_patching.direct_support",
+    "path_patching.direct_support_se",
+    "path_patching.strongest_incoming_honest_instruction_paired",
+    "path_patching.strongest_incoming_support_honest_instruction_paired",
+    "path_patching.strongest_outgoing_honest_instruction_paired",
+    "path_patching.strongest_outgoing_support_honest_instruction_paired",
+    "path_patching.direct_support_honest_instruction_paired",
+    "path_patching.direct_support_honest_instruction_paired_se",
+    "roles.role_proposed",
+    "roles.role_notes",
+    "roles.reads_group",
+    "roles.direct_support",
+    "roles.direct_support_se",
+    "roles.direct_support_honest_instruction_paired"
+  ],
+  "meta": {
+    "coverage": {
+      "attention_patterns.pressure_top_segment": {
+        "n": 48,
+        "instance_set": "test_split:<digest>"
+      },
+      "attention_patterns.pressure_top_mass": {
+        "n": 48,
+        "instance_set": "test_split:<digest>"
+      },
+      "attention_patterns.pressure_paired_top_segment": {
+        "n": 0,
+        "instance_set": null
+      },
+      "attention_patterns.pressure_paired_top_mass": {
+        "n": 0,
+        "instance_set": null
+      },
+      "attention_patterns.honest_instruction_paired_top_segment": {
+        "n": 0,
+        "instance_set": null
+      },
+      "attention_patterns.honest_instruction_paired_top_mass": {
+        "n": 0,
+        "instance_set": null
+      },
+      "attention_patterns.honest_twin_descriptive_top_segment": {
+        "n": 48,
+        "instance_set": "honest_twin_split:<digest>"
+      },
+      "attention_patterns.honest_twin_descriptive_top_mass": {
+        "n": 48,
+        "instance_set": "honest_twin_split:<digest>"
+      },
+      "path_patching.strongest_incoming": {
+        "n": 16,
+        "instance_set": "causal_sample:<digest>"
+      },
+      "path_patching.strongest_incoming_support": {
+        "n": 16,
+        "instance_set": "causal_sample:<digest>"
+      },
+      "path_patching.strongest_outgoing": {
+        "n": 16,
+        "instance_set": "causal_sample:<digest>"
+      },
+      "path_patching.strongest_outgoing_support": {
+        "n": 16,
+        "instance_set": "causal_sample:<digest>"
+      },
+      "path_patching.direct_support": {
+        "n": 16,
+        "instance_set": "causal_sample:<digest>"
+      },
+      "path_patching.direct_support_se": {
+        "n": 16,
+        "instance_set": "causal_sample:<digest>"
+      },
+      "path_patching.strongest_incoming_honest_instruction_paired": {
+        "n": 0,
+        "instance_set": null
+      },
+      "path_patching.strongest_incoming_support_honest_instruction_paired": {
+        "n": 0,
+        "instance_set": null
+      },
+      "path_patching.strongest_outgoing_honest_instruction_paired": {
+        "n": 0,
+        "instance_set": null
+      },
+      "path_patching.strongest_outgoing_support_honest_instruction_paired": {
+        "n": 0,
+        "instance_set": null
+      },
+      "path_patching.direct_support_honest_instruction_paired": {
+        "n": 0,
+        "instance_set": null
+      },
+      "path_patching.direct_support_honest_instruction_paired_se": {
+        "n": 0,
+        "instance_set": null
+      },
+      "roles.direct_support": {
+        "n": 16,
+        "instance_set": "causal_sample:<digest>"
+      },
+      "roles.direct_support_se": {
+        "n": 16,
+        "instance_set": "causal_sample:<digest>"
+      },
+      "roles.direct_support_honest_instruction_paired": {
+        "n": 0,
+        "instance_set": null
+      }
+    },
+    "instance_sets": {
+      "test_split:<digest>": {
+        "name": "test_split",
+        "n": 48,
+        "dataset": null,
+        "instance_ids": [
+          "46402eeda70f",
+          "3cd797bbe086",
+          "e690f4860a24",
+          "9b2ea23303b5",
+          "ee4c88e3d4a7",
+          "f67ecf8b6b19",
+          "e4ff27eef936",
+          "da72066ef848",
+          "57d7bf78e403",
+          "8e6d39b3796a",
+          "f508184ee04c",
+          "e56c4f19a415",
+          "151d67190c90",
+          "efb1a0c9fd93",
+          "e2a35e0a2001",
+          "0a4238f3ed97",
+          "294b6063ff83",
+          "ce60a2a0e743",
+          "5aef9ad805be",
+          "500ecfc036ae",
+          "3e6cfe97825a",
+          "d0da53cd6cc1",
+          "1aa7d042bae4",
+          "6ff221983c72",
+          "f4460c2acdfa",
+          "58993310fd39",
+          "11783a8fab13",
+          "2981df6df9f2",
+          "52a214f51e5d",
+          "739737453b70",
+          "bc2705f38763",
+          "f4f3f2870d67",
+          "f0ac3f3a78eb",
+          "85f8acce853a",
+          "6fff25ad8489",
+          "3ab6fdf2644f",
+          "33d18eaffa39",
+          "9a1ee917d473",
+          "519daca38ffd",
+          "60049c37d8f1",
+          "6524378ce6da",
+          "1f316cdecc8f",
+          "003f9adefbef",
+          "1e9e37a41255",
+          "f3f6c0ad739a",
+          "38c5d415e590",
+          "ae34d96ab737",
+          "caa076f09092"
+        ]
+      },
+      "honest_twin_split:<digest>": {
+        "name": "honest_twin_split",
+        "n": 48,
+        "dataset": "<TMP>/datasets/sdr_honest",
+        "instance_ids": [
+          "46402eeda70f",
+          "3cd797bbe086",
+          "e690f4860a24",
+          "9b2ea23303b5",
+          "ee4c88e3d4a7",
+          "f67ecf8b6b19",
+          "e4ff27eef936",
+          "da72066ef848",
+          "57d7bf78e403",
+          "8e6d39b3796a",
+          "f508184ee04c",
+          "e56c4f19a415",
+          "151d67190c90",
+          "efb1a0c9fd93",
+          "e2a35e0a2001",
+          "0a4238f3ed97",
+          "294b6063ff83",
+          "ce60a2a0e743",
+          "5aef9ad805be",
+          "500ecfc036ae",
+          "3e6cfe97825a",
+          "d0da53cd6cc1",
+          "1aa7d042bae4",
+          "6ff221983c72",
+          "f4460c2acdfa",
+          "58993310fd39",
+          "11783a8fab13",
+          "2981df6df9f2",
+          "52a214f51e5d",
+          "739737453b70",
+          "bc2705f38763",
+          "f4f3f2870d67",
+          "f0ac3f3a78eb",
+          "85f8acce853a",
+          "6fff25ad8489",
+          "3ab6fdf2644f",
+          "33d18eaffa39",
+          "9a1ee917d473",
+          "519daca38ffd",
+          "60049c37d8f1",
+          "6524378ce6da",
+          "1f316cdecc8f",
+          "003f9adefbef",
+          "1e9e37a41255",
+          "f3f6c0ad739a",
+          "38c5d415e590",
+          "ae34d96ab737",
+          "caa076f09092"
+        ]
+      },
+      "causal_sample:<digest>": {
+        "name": "causal_sample",
+        "n": 16,
+        "dataset": null,
+        "instance_ids": [
+          "46402eeda70f",
+          "3cd797bbe086",
+          "e690f4860a24",
+          "9b2ea23303b5",
+          "ee4c88e3d4a7",
+          "57d7bf78e403",
+          "e56c4f19a415",
+          "ce60a2a0e743",
+          "500ecfc036ae",
+          "1aa7d042bae4",
+          "11783a8fab13",
+          "bc2705f38763",
+          "9a1ee917d473",
+          "6524378ce6da",
+          "1e9e37a41255",
+          "caa076f09092"
+        ]
+      }
+    },
+    "circuit": {
+      "label": "self",
+      "kind": "atomic",
+      "expr": null,
+      "operands": {
+        "self": "<TMP>/run"
+      },
+      "home_run_dir": "<TMP>/run",
+      "counts": {
+        "attention_blocks": 1,
+        "mlp_blocks": 1,
+        "attention_heads": 2,
+        "attention_neurons": 6,
+        "mlp_hidden": 5,
+        "mlp_output": 3
+      }
+    },
+    "task": {
+      "label": "sdr",
+      "task": "sdr",
+      "home_run_dir": "<TMP>/run",
+      "dataset": {
+        "data_dir": "<TMP>/datasets",
+        "std_variant": "azaria",
+        "deception_condition": "deceptive",
+        "test_samples": 48
+      }
+    },
+    "intake": {
+      "model": "llama-tiny",
+      "geometry": {
+        "num_heads": 4,
+        "head_dim": 16,
+        "intermediate_size": 128,
+        "hidden_size": 64,
+        "num_layers": 2
+      },
+      "references": {}
+    },
+    "components": {
+      "heads": 2,
+      "mlps": 1,
+      "heads_head_gate_active": 2,
+      "layers": 2
+    },
+    "roles": {
+      "criteria_doc": "docs/component-roles.md",
+      "thresholds": {
+        "z": 2.0,
+        "dla_floor": 0.01,
+        "knockout_floor": 0.01,
+        "path_floor": 0.01,
+        "attention_floor": 0.2
+      },
+      "merged_from": [],
+      "counts": {
+        "binder": 0,
+        "selector": 0,
+        "mover": 0,
+        "suppressor": 0,
+        "unknown": 3
+      },
+      "flavour_counts": {
+        "insufficient": 3
+      }
+    }
+  },
+  "rows": [
+    {
+      "kind": "head",
+      "layer": 0,
+      "index": 0,
+      "kv_group": 0,
+      "head_gate_active": true,
+      "active_neuron_count": 3,
+      "attention_patterns.query_position": "readout",
+      "attention_patterns.pressure_top_segment": "question",
+      "attention_patterns.pressure_top_mass": 0.31161409616470337,
+      "attention_patterns.pressure_paired_top_segment": null,
+      "attention_patterns.pressure_paired_top_mass": null,
+      "attention_patterns.honest_instruction_paired_top_segment": null,
+      "attention_patterns.honest_instruction_paired_top_mass": null,
+      "attention_patterns.honest_twin_descriptive_top_segment": "question",
+      "attention_patterns.honest_twin_descriptive_top_mass": 0.31161409616470337,
+      "path_patching.strongest_incoming": "embed->v.0.0",
+      "path_patching.strongest_incoming_support": 1.598500823136419,
+      "path_patching.strongest_outgoing": "head.0.0->readout",
+      "path_patching.strongest_outgoing_support": -0.6435744888149202,
+      "path_patching.direct_support": -0.6435744888149202,
+      "path_patching.direct_support_se": 0.18949011775844707,
+      "path_patching.strongest_incoming_honest_instruction_paired": null,
+      "path_patching.strongest_incoming_support_honest_instruction_paired": null,
+      "path_patching.strongest_outgoing_honest_instruction_paired": null,
+      "path_patching.strongest_outgoing_support_honest_instruction_paired": null,
+      "path_patching.direct_support_honest_instruction_paired": null,
+      "path_patching.direct_support_honest_instruction_paired_se": null,
+      "roles.role_proposed": "unknown",
+      "roles.role_notes": "unknown/insufficient: not measured: writes (dla); reads question (0.31); writes none; differential none; knockout none; direct support -0.6436 (z=3.4); strongest outgoing head.0.0->readout; honest instruction in none",
+      "roles.reads_group": "frame",
+      "roles.direct_support": -0.6435744888149202,
+      "roles.direct_support_se": 0.18949011775844707,
+      "roles.direct_support_honest_instruction_paired": null
+    },
+    {
+      "kind": "head",
+      "layer": 0,
+      "index": 2,
+      "kv_group": 1,
+      "head_gate_active": true,
+      "active_neuron_count": 3,
+      "attention_patterns.query_position": "readout",
+      "attention_patterns.pressure_top_segment": "question",
+      "attention_patterns.pressure_top_mass": 0.30871716141700745,
+      "attention_patterns.pressure_paired_top_segment": null,
+      "attention_patterns.pressure_paired_top_mass": null,
+      "attention_patterns.honest_instruction_paired_top_segment": null,
+      "attention_patterns.honest_instruction_paired_top_mass": null,
+      "attention_patterns.honest_twin_descriptive_top_segment": "question",
+      "attention_patterns.honest_twin_descriptive_top_mass": 0.30871716141700745,
+      "path_patching.strongest_incoming": "embed->v.0.1",
+      "path_patching.strongest_incoming_support": -0.5038029027637094,
+      "path_patching.strongest_outgoing": "head.0.2->readout",
+      "path_patching.strongest_outgoing_support": 0.32954344246536493,
+      "path_patching.direct_support": 0.32954344246536493,
+      "path_patching.direct_support_se": 0.1342089837362046,
+      "path_patching.strongest_incoming_honest_instruction_paired": null,
+      "path_patching.strongest_incoming_support_honest_instruction_paired": null,
+      "path_patching.strongest_outgoing_honest_instruction_paired": null,
+      "path_patching.strongest_outgoing_support_honest_instruction_paired": null,
+      "path_patching.direct_support_honest_instruction_paired": null,
+      "path_patching.direct_support_honest_instruction_paired_se": null,
+      "roles.role_proposed": "unknown",
+      "roles.role_notes": "unknown/insufficient: not measured: writes (dla); reads question (0.31); writes none; differential none; knockout none; direct support +0.3295 (z=2.5); strongest outgoing head.0.2->readout; honest instruction in none",
+      "roles.reads_group": "frame",
+      "roles.direct_support": 0.32954344246536493,
+      "roles.direct_support_se": 0.1342089837362046,
+      "roles.direct_support_honest_instruction_paired": null
+    },
+    {
+      "kind": "mlp",
+      "layer": 1,
+      "index": 0,
+      "kv_group": null,
+      "head_gate_active": true,
+      "active_neuron_count": 8,
+      "attention_patterns.query_position": null,
+      "attention_patterns.pressure_top_segment": null,
+      "attention_patterns.pressure_top_mass": null,
+      "attention_patterns.pressure_paired_top_segment": null,
+      "attention_patterns.pressure_paired_top_mass": null,
+      "attention_patterns.honest_instruction_paired_top_segment": null,
+      "attention_patterns.honest_instruction_paired_top_mass": null,
+      "attention_patterns.honest_twin_descriptive_top_segment": null,
+      "attention_patterns.honest_twin_descriptive_top_mass": null,
+      "path_patching.strongest_incoming": "head.0.2->mlp_in.1.0",
+      "path_patching.strongest_incoming_support": -0.0744771397439763,
+      "path_patching.strongest_outgoing": "mlp.1.0->readout",
+      "path_patching.strongest_outgoing_support": -0.5056882090866566,
+      "path_patching.direct_support": -0.5056882090866566,
+      "path_patching.direct_support_se": 0.14646455020224314,
+      "path_patching.strongest_incoming_honest_instruction_paired": null,
+      "path_patching.strongest_incoming_support_honest_instruction_paired": null,
+      "path_patching.strongest_outgoing_honest_instruction_paired": null,
+      "path_patching.strongest_outgoing_support_honest_instruction_paired": null,
+      "path_patching.direct_support_honest_instruction_paired": null,
+      "path_patching.direct_support_honest_instruction_paired_se": null,
+      "roles.role_proposed": "unknown",
+      "roles.role_notes": "unknown/insufficient: not measured: writes (dla); reads n/a (MLP block); writes none; differential none; knockout none; direct support -0.5057 (z=3.5); strongest outgoing mlp.1.0->readout; honest instruction in none",
+      "roles.reads_group": "not_applicable",
+      "roles.direct_support": -0.5056882090866566,
+      "roles.direct_support_se": 0.14646455020224314,
+      "roles.direct_support_honest_instruction_paired": null
+    }
+  ]
+}

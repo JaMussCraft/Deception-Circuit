@@ -538,6 +538,7 @@ def test_the_path_floor_sits_above_the_measured_cross_card_noise():
     ("pressure_clause", "pressure"),
     ("question", "frame"),
     ("intro", "frame"),
+    ("response_line", "frame"),
     ("unsegmented", "unestablished"),
     ("readout", "unestablished"),
     ("bos", "unestablished"),

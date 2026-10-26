@@ -76,7 +76,7 @@ import time
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Sequence, Tuple
 
-from component_analysis.head_table import CAUSAL_SAMPLE, \
+from component_analysis.head_table import CAUSAL_SAMPLE, CAUSAL_SAMPLE_NEUTRAL_TWIN, \
     PAIRED_HONEST_INSTRUCTION, row_key
 
 #: The registration protocol (`component_analysis/registry.py`).
@@ -120,14 +120,21 @@ READOUT_KEY = ("readout", 0, 0)
 #: Receiver kinds, in the order the heatmap groups them.
 RECEIVER_KINDS = ("q", "k", "v", "mlp_in", "readout")
 
-#: The two counterfactual pairs of `dataloaders.Batch`, and the `--path-
-#: counterfactual` value that asks for both. `item_swap` is the dataset's own
-#: Corruption (the Designation Site swapped); `honest_instruction` replaces the
-#: Pressure Clause with its Matched Honest Instruction (ticket 05) and exists
-#: only for the instances that survived the honest filter.
+#: The counterfactual pairs of `dataloaders.Batch`, and the `--path-
+#: counterfactual` value that asks for a task's pair of them. `item_swap` is
+#: the dataset's own Corruption (the Designation Site swapped);
+#: `honest_instruction` replaces the Pressure Clause with its Matched Honest
+#: Instruction (ticket 05) and exists only for the instances that survived the
+#: honest filter; `neutral_twin` is the v2 tasks' Neutral-Clause Twin
+#: (mechanism-analysis R1, R16): the same instance with the clause replaced by
+#: a token-matched neutral sentence, D's labels kept, paired by instance id.
+#: `both` is the item swap plus the task's paired honest counterfactual: the
+#: honest instruction on a v1 task, the twin on a v2 task (v2 has no Matched
+#: Honest pool, R1).
 ITEM_SWAP = "item_swap"
 HONEST_INSTRUCTION = "honest_instruction"
-COUNTERFACTUALS = (ITEM_SWAP, HONEST_INSTRUCTION)
+NEUTRAL_TWIN = "neutral_twin"
+COUNTERFACTUALS = (ITEM_SWAP, HONEST_INSTRUCTION, NEUTRAL_TWIN)
 BOTH = "both"
 
 #: What each counterfactual adds to a head-table column's bare name, before a
@@ -136,7 +143,8 @@ BOTH = "both"
 #: has both a paired honest-instruction column and an unpaired honest-twin one,
 #: and end in `_paired` because they are computed over the same instance ids on
 #: both sides (the researcher's 2026-10-13 decision).
-COLUMN_SUFFIX = {ITEM_SWAP: "", HONEST_INSTRUCTION: "_honest_instruction_paired"}
+COLUMN_SUFFIX = {ITEM_SWAP: "", HONEST_INSTRUCTION: "_honest_instruction_paired",
+                 NEUTRAL_TWIN: "_neutral_twin_paired"}
 
 #: The bare names this analysis writes per Component per counterfactual, before
 #: the suffix and before the head table's own `path_patching.` namespace.
@@ -189,7 +197,8 @@ def column_name(name: str, counterfactual: str) -> str:
 #: The instance set each counterfactual's columns cover, by name, for the head
 #: table's coverage meta: the causal sample, or its paired subset.
 INSTANCE_SETS = {ITEM_SWAP: CAUSAL_SAMPLE,
-                 HONEST_INSTRUCTION: PAIRED_HONEST_INSTRUCTION}
+                 HONEST_INSTRUCTION: PAIRED_HONEST_INSTRUCTION,
+                 NEUTRAL_TWIN: CAUSAL_SAMPLE_NEUTRAL_TWIN}
 
 #: The sign convention every JSON of this analysis states in `metric`, as a
 #: marker a reader tests rather than a sentence it parses. Since 2026-10-13 a
@@ -523,6 +532,20 @@ def counterfactual_pair(batch, counterfactual: str):
         rows = list(range(len(batch.ids)))
         return rows, batch.corrupt_input_ids, batch.corrupt_attention_mask
 
+    if counterfactual == NEUTRAL_TWIN:
+        pair = getattr(batch, "neutral_twin", None)
+        if pair is None or not pair.rows:
+            return None
+        rows = list(pair.rows)
+        selector = torch.tensor(rows, dtype=torch.long)
+        if not torch.equal(pair.attention_mask.sum(-1).long() - 1,
+                           batch.readout[selector]):
+            raise ValueError(
+                "a Neutral-Clause Twin does not end at the same position as "
+                "its pressure prompt, so the two Readouts are not the same "
+                "token; the twin split has drifted from the pressure split")
+        return rows, pair.input_ids, pair.attention_mask
+
     pair = batch.honest
     if pair is None or not pair.rows:
         return None
@@ -791,8 +814,14 @@ def add_arguments(group) -> None:
                             f"{HONEST_INSTRUCTION!r} replaces the Pressure "
                             "Clause with its Matched Honest Instruction and "
                             "covers only the instances that survived the "
-                            f"honest filter; {BOTH!r} runs each in turn and "
-                            "writes one file and one column set per pair.")
+                            f"honest filter; {NEUTRAL_TWIN!r} is the v2 "
+                            "tasks' Neutral-Clause Twin (the clause replaced "
+                            "by a token-matched neutral sentence, the "
+                            f"pressure prompt's labels); {BOTH!r} runs the "
+                            "item swap and the task's paired honest "
+                            "counterfactual (the instruction on v1, the twin "
+                            "on v2) in turn and writes one file and one "
+                            "column set per pair.")
     group.add_argument("--path-sweep-threshold", type=float,
                        default=DEFAULT_SWEEP_THRESHOLD_GAP_FRACTION,
                        help="How strong a Component outside the circuit must "
@@ -818,6 +847,15 @@ def add_arguments(group) -> None:
     group.add_argument("--path-top", type=int, default=10,
                        help="How many of the strongest cells, by absolute "
                             "normalized effect, are listed in the JSON.")
+    group.add_argument("--path-category-floor", type=float, default=None,
+                       help="The floor of the receiver category per head "
+                            "(spec 2.3) that the neutral-twin pass writes "
+                            "beside its columns. Default: the roles doc's "
+                            "path floor, 0.01. The position-specific split "
+                            "only exists for cells above "
+                            "--path-position-threshold, so a K or V path "
+                            "between the two reads kv_unresolved; phase 3 "
+                            "sets the threshold to the floor.")
 
 
 def position_threshold(ctx) -> float:
@@ -837,11 +875,23 @@ def sweep_threshold(ctx) -> float:
             else float(given))
 
 
+def is_v2(ctx) -> bool:
+    """A v2 mechanism task, whose paired honest counterfactual is the twin."""
+    from component_analysis.dataloaders import V2_TASKS
+
+    return getattr(getattr(ctx, "task_spec", None), "name", None) in V2_TASKS
+
+
 def selected_counterfactuals(ctx) -> List[str]:
-    """The counterfactuals `--path-counterfactual` asks for, in a fixed order."""
+    """The counterfactuals `--path-counterfactual` asks for, in a fixed order.
+
+    `both` is the item swap and the task's paired honest counterfactual: the
+    Matched Honest Instruction on a v1 task (what it always meant there), the
+    Neutral-Clause Twin on a v2 task.
+    """
     value = getattr(ctx.cli, "path_counterfactual", ITEM_SWAP) or ITEM_SWAP
     if value == BOTH:
-        return list(COUNTERFACTUALS)
+        return [ITEM_SWAP, NEUTRAL_TWIN if is_v2(ctx) else HONEST_INSTRUCTION]
     if value not in COUNTERFACTUALS:
         raise ValueError(
             f"--path-counterfactual {value!r} is not one of "
@@ -937,6 +987,13 @@ def estimate(ctx) -> str:
                      f"Honest-Instruction counterpart, so that pass costs "
                      f"about {budget['minutes'] * paired / max(n_instances, 1):.0f} "
                      f"min")
+    if NEUTRAL_TWIN in chosen:
+        twins = batches.report.get("n_with_neutral_twin") or 0
+        lines.append(f"{twins} of {n_instances} instance(s) have a "
+                     f"Neutral-Clause Twin, so that pass costs about "
+                     f"{budget['minutes'] * twins / max(n_instances, 1):.0f} min"
+                     + ("" if twins else f" (none: "
+                        f"{batches.report.get('neutral_twin_source', 'no twin split')})"))
     return "; ".join(lines)
 
 
@@ -991,6 +1048,8 @@ def run(ctx) -> dict:
         _merge(updates, head_table_columns(grid, summaries), counterfactual)
         _declare(ctx, COLUMN_NAMES, measured_ids(tally), counterfactual)
         segment_pass(ctx, grid, batches, counterfactual, summaries)
+        if counterfactual == NEUTRAL_TWIN:
+            _receiver_categories(ctx, grid, updates, measured_ids(tally))
 
     # Last, and in its own loop over the batches, because it is the most
     # expensive pass and the least likely to fit: a job killed on the wall
@@ -1004,6 +1063,27 @@ def run(ctx) -> dict:
         _declare(ctx, SWEEP_COLUMN_NAMES, measured_ids(sweep_tally),
                  counterfactual)
     return updates
+
+
+def _receiver_categories(ctx, grid: Grid, updates: Dict[tuple, dict],
+                         instance_ids: List[str]) -> None:
+    """The receiver category per circuit head (spec 2.3), read off the two
+    neutral-twin files just written, as columns beside the twin's own and as
+    its own JSON. CPU only; `receiver_category.py` is the one implementation,
+    and `analyze_components.py receiver-category` reruns it on a finished
+    cell."""
+    from component_analysis import receiver_category
+
+    floor = getattr(ctx.cli, "path_category_floor", None)
+    floor = receiver_category.FLOOR if floor is None else float(floor)
+    heads = [key for key in grid.senders if key[0] == "head"]
+    results, payload = receiver_category.categorize_cell(
+        ctx.subdir(SUBDIR), heads, floor=floor)
+    ctx.write_json(SUBDIR, receiver_category.JSON_NAME, payload)
+    for key, values in receiver_category.columns(results).items():
+        updates.setdefault(key, {}).update(values)
+    ctx.declare_coverage(list(receiver_category.COLUMNS), instance_ids=instance_ids,
+                         instance_set=INSTANCE_SETS[NEUTRAL_TWIN])
 
 
 def measured_ids(tally) -> List[str]:
@@ -1121,8 +1201,10 @@ def metric_meta(counterfactual: str) -> dict:
     written before 2026-10-13 has no `convention` key and the opposite sign;
     `convention_of` tells the two apart, and nothing rewrites the old files.
     """
-    against = ("the Corruption (the item swap)" if counterfactual == ITEM_SWAP
-               else "the Matched Honest Instruction")
+    against = {ITEM_SWAP: "the Corruption (the item swap)",
+               HONEST_INSTRUCTION: "the Matched Honest Instruction",
+               NEUTRAL_TWIN: ("the Neutral-Clause Twin (the clause replaced "
+                              "by a token-matched neutral sentence)")}[counterfactual]
     return {
         "quantity": "logit(Target) - logit(Distractor) at the Readout, fp32",
         "effect": "(clean - patched) / (clean - counterfactual), per instance",

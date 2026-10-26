@@ -107,6 +107,17 @@ Head-table columns, namespaced `attention_patterns.` by the CLI:
         _top_mass                           the unpaired twin, labelled in the
                                             column name so a CSV reader cannot
                                             mistake it for a paired contrast
+    pressure_neutral_twin_paired_top_segment /
+        _top_mass                           v2 cells only: the left term of the
+                                            Neutral-Clause Twin pairing (whole
+                                            split, paired by instance id)
+    neutral_twin_paired_top_segment /
+        _top_mass                           v2 cells only: the twins themselves
+    clause_mass_drop_neutral_twin_paired /
+        _se                                 v2 cells only: the B2 signature —
+                                            column-query mass on pressure_clause
+                                            under pressure minus under the twin,
+                                            paired per instance, with its SE
 
 Both paired columns say `paired` in their names and the twin's says
 `descriptive` (the researcher's 2026-10-13 decision; before it the paired honest
@@ -162,6 +173,27 @@ CONDITIONS = (PRESSURE, HONEST_INSTRUCTION, HONEST_TWIN)
 #: which is what spec user story 27 exists to prevent, so the left term is
 #: measured on its own rows and reported beside its right term.
 PRESSURE_PAIRED = "pressure_paired"
+
+#: v2 only (mechanism-analysis spec R1, R16; ticket 02b): the Neutral-Clause
+#: Twin, `<task>_honest`, paired by instance id over the whole test split —
+#: the same instance with its Pressure Clause replaced by a token-matched
+#: neutral sentence, read with the pressure prompt's Segments, which the twin
+#: shares outside the clause by construction. Selectable by name and profiled
+#: by default on a v2 cell (`wanted_conditions_for`); it brings its own left
+#: term, `pressure_neutral_twin_paired`, exactly as `honest_instruction`
+#: brings `pressure_paired`. On a v1 cell, or on a v2 H or F test set, it is
+#: skipped with the loader's reason. Not in `CONDITIONS`, whose order and
+#: contents are v1's flag default.
+NEUTRAL_TWIN = "neutral_twin"
+PRESSURE_NEUTRAL_TWIN_PAIRED = "pressure_neutral_twin_paired"
+ALL_CONDITIONS = CONDITIONS + (NEUTRAL_TWIN,)
+
+#: The B2 signature (spec §2, B2): per head, the mass from the column query
+#: position on `pressure_clause` under the pressure prompt minus under its
+#: twin, per instance, with the paired standard error. Written beside the
+#: twin condition in `patterns.json` and as the two head-table columns below.
+B2_SEGMENT = "pressure_clause"
+B2_COLUMN = "clause_mass_drop_neutral_twin_paired"
 
 #: `--split NAME` to the record fields whose levels the profiles are split by.
 SPLITS: Dict[str, Tuple[str, ...]] = {
@@ -229,15 +261,15 @@ def parse_conditions(value) -> List[str]:
     to reject a typo is a flag that gets typo'd on the cluster.
     """
     if not isinstance(value, str):
-        return [one for one in CONDITIONS if one in value]
+        return [one for one in ALL_CONDITIONS if one in value]
     wanted = [one.strip() for one in value.split(",") if one.strip()]
-    unknown = [one for one in wanted if one not in CONDITIONS]
+    unknown = [one for one in wanted if one not in ALL_CONDITIONS]
     if unknown:
         raise UnknownCondition(
             f"--attention-conditions names {', '.join(unknown)}, which "
             f"{'is' if len(unknown) == 1 else 'are'} not an attention "
-            f"condition. Choose from {', '.join(CONDITIONS)}.")
-    return [one for one in CONDITIONS if one in wanted]
+            f"condition. Choose from {', '.join(ALL_CONDITIONS)}.")
+    return [one for one in ALL_CONDITIONS if one in wanted]
 
 
 def wanted_conditions(cli) -> List[str]:
@@ -256,14 +288,42 @@ def wanted_conditions(cli) -> List[str]:
     return parse_conditions(value)
 
 
+def is_v2(ctx) -> bool:
+    """A v2 mechanism task, which has a Neutral-Clause Twin to pair with."""
+    from component_analysis.dataloaders import V2_TASKS
+
+    return getattr(getattr(ctx, "task_spec", None), "name", None) in V2_TASKS
+
+
+class _DefaultConditions(list):
+    """The flag's default: v1's three, as a list that equals `list(CONDITIONS)`
+    in every reading of it, marked by its type so `wanted_conditions_for` can
+    tell "not given" from "given v1's three" and add the twin on a v2 cell."""
+
+
+def wanted_conditions_for(ctx) -> List[str]:
+    """The conditions this cell profiles: the flag when given, else v1's three
+    plus `neutral_twin` on a v2 cell (the shape `dla.wanted_conditions_for`
+    has)."""
+    value = getattr(ctx.cli, "attention_conditions", None)
+    if value is not None and not isinstance(value, _DefaultConditions):
+        return wanted_conditions(ctx.cli)
+    return list(CONDITIONS) + ([NEUTRAL_TWIN] if is_v2(ctx) else [])
+
+
 def add_arguments(group) -> None:
     group.add_argument("--attention-conditions", type=parse_conditions,
-                       default=list(CONDITIONS), metavar="NAME[,NAME]",
+                       default=_DefaultConditions(CONDITIONS), metavar="NAME[,NAME]",
                        help="Which conditions to profile: "
-                            f"{', '.join(CONDITIONS)}. "
+                            f"{', '.join(ALL_CONDITIONS)}. Default: "
+                            f"{', '.join(CONDITIONS)}, plus {NEUTRAL_TWIN} on "
+                            "a v2 cell. "
                             f"{HONEST_INSTRUCTION} is the paired "
                             "Honest-Instruction Counterfactual and brings its "
-                            f"own left term, {PRESSURE_PAIRED}, with it. "
+                            f"own left term, {PRESSURE_PAIRED}, with it; "
+                            f"{NEUTRAL_TWIN} is the v2 Neutral-Clause Twin, "
+                            "paired over the whole split, and brings "
+                            f"{PRESSURE_NEUTRAL_TWIN_PAIRED}. "
                             f"Dropping {PRESSURE} is allowed and leaves the "
                             "cell with no full-split column, which is a "
                             "smoke-run shape, not a reporting one. A condition "
@@ -700,6 +760,140 @@ def honest_instruction_slices(batches, segmentations, report: dict):
                     [batch.records[row] for row in rows], resolved)
 
 
+def twin_rows(batch, known: dict) -> List[int]:
+    """The rows of `batch` that have a Neutral-Clause Twin *and* a resolved
+    segmentation — `paired_rows` for the v2 pairing, one function for both
+    terms for the same reason."""
+    pair = getattr(batch, "neutral_twin", None)
+    if pair is None:
+        return []
+    return [row for row in pair.rows if batch.ids[row] in known]
+
+
+def pressure_twin_paired_slices(batches, segmentations):
+    """The pressure prompts of the rows that have a twin: the left term."""
+    known = by_record_id(segmentations)
+    for batch in batches:
+        rows = twin_rows(batch, known)
+        if not rows:
+            continue
+        yield Slice(batch.input_ids[rows], batch.attention_mask[rows],
+                    [batch.records[row] for row in rows],
+                    [known[batch.ids[row]] for row in rows])
+
+
+def neutral_twin_slices(batches, segmentations, report: dict):
+    """The twins of the same rows, under the pressure prompt's Segments.
+
+    Sound exactly when the two differ only inside the Pressure Clause, which
+    02a's loader checked at build time and which is re-checked here per
+    instance by diffing the token ids, as `honest_instruction_slices` does;
+    an instance that fails is counted into the report rather than raising.
+    """
+    known = by_record_id(segmentations)
+    for batch in batches:
+        rows = twin_rows(batch, known)
+        if not rows:
+            continue
+        pair = batch.neutral_twin
+        keep = [pair.rows.index(row) for row in rows]
+        input_ids = pair.input_ids[keep]
+        resolved = [known[batch.ids[row]] for row in rows]
+        differs = input_ids != batch.input_ids[rows]
+        for position, one in enumerate(resolved):
+            clause = set(one.segments[B2_SEGMENT].token_indices()) \
+                if B2_SEGMENT in one.segments else set()
+            changed = differs[position].nonzero().flatten().tolist()
+            report["n_pairs"] += 1
+            if not changed:
+                report["n_identical_to_pressure"] += 1
+            elif not set(changed) <= clause:
+                report["n_differing_outside_the_clause"] += 1
+                report["examples_outside_the_clause"] = (
+                    report["examples_outside_the_clause"] + [one.record_id])[:5]
+        yield Slice(input_ids, pair.attention_mask[keep],
+                    [batch.records[row] for row in rows], resolved)
+
+
+def neutral_twin_batches(ctx) -> Tuple[Optional[object], Optional[str]]:
+    """`(the whole split paired with its twin, reason it cannot run)`."""
+    from component_analysis import dataloaders
+
+    try:
+        batches = ctx.neutral_twin_batches()
+    except dataloaders.LoaderUnavailable as unavailable:
+        return None, str(unavailable)
+    report = batches.report
+    if report.get("n_with_neutral_twin"):
+        return batches, None
+    return None, (f"no Neutral-Clause Twin for this cell: "
+                  f"{report.get('neutral_twin_source', 'no twin split')}")
+
+
+class ClauseMasses:
+    """Per-instance mass on one Segment from one query Segment, per head.
+
+    `Profiles` keeps sums and counts, which is all a mean needs; the B2
+    signature is a *paired* difference, so it needs each instance's own
+    number on both sides. Collected from the same forwards, one tensor
+    `[heads]` per instance id, averaged over the query Segment's tokens
+    exactly as `Profiles.add` averages them.
+    """
+
+    def __init__(self, query: str, segment_index: int):
+        self.query = query
+        self.segment_index = segment_index
+        self.values: Dict[str, torch.Tensor] = {}
+        self.absent: List[str] = []
+
+    def add(self, stacked, ids, positions_valid, slots) -> None:
+        columns = [i for i, (name, _k) in enumerate(slots) if name == self.query]
+        if not columns:
+            self.absent.extend(ids)
+            return
+        weight = positions_valid[:, columns].float()
+        denominator = weight.sum(1)
+        per_instance = (stacked[:, :, columns, self.segment_index]
+                        * weight[:, None, :]).sum(2) / denominator[:, None].clamp(min=1)
+        for row, one in enumerate(ids):
+            if denominator[row] == 0:
+                self.absent.append(one)
+            else:
+                self.values[one] = per_instance[row].clone()
+
+
+def paired_clause_drop(pressure: Dict[str, torch.Tensor], twin: Dict[str, torch.Tensor],
+                       head_names: Sequence[str]) -> dict:
+    """The B2 signature per head: mean and standard error of the per-instance
+    pressure-minus-twin mass over the ids both sides have.
+
+    The standard error is the sample standard deviation over the sqrt of n,
+    None below two pairs. Ids on one side only are listed, never filled in.
+    """
+    ids = [one for one in pressure if one in twin]
+    unpaired = sorted((set(pressure) | set(twin)) - set(ids))
+    per_head: Dict[str, dict] = {}
+    if ids:
+        left = torch.stack([pressure[one] for one in ids]).double()
+        right = torch.stack([twin[one] for one in ids]).double()
+        drop = left - right
+        mean = drop.mean(0)
+        se = (drop.std(0, unbiased=True) / math.sqrt(len(ids))
+              if len(ids) >= 2 else None)
+        for position, name in enumerate(head_names):
+            per_head[name] = {
+                "pressure_mean": float(left[:, position].mean()),
+                "twin_mean": float(right[:, position].mean()),
+                "drop": float(mean[position]),
+                "se": None if se is None else float(se[position]),
+            }
+    else:
+        for name in head_names:
+            per_head[name] = {"pressure_mean": None, "twin_mean": None,
+                              "drop": None, "se": None}
+    return {"n": len(ids), "unpaired": unpaired, "per_head": per_head}
+
+
 def paired_batches(ctx) -> Tuple[Optional[object], Optional[str]]:
     """`(the causal sample, reason the paired condition cannot run)`.
 
@@ -767,7 +961,8 @@ def twin_slices(batches, ctx, overrides, resolved_out: List):
 
 def collect_condition(ctx, slices, *, head_keys, names, query_names, split,
                       heads_by_layer, tokens=None,
-                      condition: Optional[str] = None) -> Tuple[Profiles, dict]:
+                      condition: Optional[str] = None,
+                      clause_masses: Optional[ClauseMasses] = None) -> Tuple[Profiles, dict]:
     """Every batch of one condition through the model, into one `Profiles`.
 
     The ids of the instances actually profiled are collected alongside, into
@@ -801,6 +996,10 @@ def collect_condition(ctx, slices, *, head_keys, names, query_names, split,
             n_segments=len(names), rows_out=rows)
         if tokens is not None:
             tokens.add(condition, one, rows, valid, slots)
+        if clause_masses is not None:
+            clause_masses.add(
+                torch.stack([masses[(key[1], key[2])] for key in head_keys], dim=1),
+                [segment.record_id for segment in one.segmentations], valid, slots)
         levels = []
         for record in one.records:
             row = [ALL_LEVEL]
@@ -1071,23 +1270,48 @@ INSTANCE_SETS = {
 }
 
 
-def columns(payload: dict) -> dict:
+#: The twin conditions' prefixes and instance set, added to the v1 ones only
+#: when `neutral_twin` is wanted (a v2 cell, or the flag), so a v1 head table
+#: keeps its column set byte for byte.
+TWIN_COLUMN_PREFIXES = {
+    PRESSURE_NEUTRAL_TWIN_PAIRED: "pressure_neutral_twin_paired",
+    NEUTRAL_TWIN: "neutral_twin_paired",
+}
+TWIN_INSTANCE_SET = ht.PAIRED_NEUTRAL_TWIN
+
+
+def _prefixes(wanted) -> Dict[str, str]:
+    prefixes = dict(COLUMN_PREFIXES)
+    if wanted is not None and NEUTRAL_TWIN in wanted:
+        prefixes.update(TWIN_COLUMN_PREFIXES)
+    return prefixes
+
+
+def _instance_set(condition_name: str) -> str:
+    return INSTANCE_SETS.get(condition_name, TWIN_INSTANCE_SET)
+
+
+def columns(payload: dict, wanted=None) -> dict:
     """`{component key: {column: value}}` — the top Segment per head.
 
     Every condition gets its columns whether or not it ran: a condition with no
     data leaves them empty rather than absent, because a head table whose
     columns differ from cell to cell cannot be concatenated and an absent
-    column reads exactly like a head that attends nowhere.
+    column reads exactly like a head that attends nowhere. The twin's columns
+    (and the B2 signature's two) exist only when `neutral_twin` is in
+    `wanted`, so a v1 table's column set is unchanged.
     """
     query = payload["column_query_position"]
     by_condition = {condition["name"]: condition
                     for condition in payload["conditions"]}
+    prefixes = _prefixes(wanted)
+    b2 = (by_condition.get(NEUTRAL_TWIN) or {}).get("b2") or {}
 
     updates: Dict[tuple, Dict[str, object]] = {}
     for component in payload["components"]:
         key = tuple(component["key"])
         cells: Dict[str, object] = {"query_position": query}
-        for condition_name, prefix in COLUMN_PREFIXES.items():
+        for condition_name, prefix in prefixes.items():
             condition = by_condition.get(condition_name)
             level = _levels_of(condition).get(ALL_LEVEL) if condition else None
             profile = (level or {}).get("masses", {}).get(
@@ -1095,11 +1319,15 @@ def columns(payload: dict) -> dict:
             name, mass = top_segment(profile)
             cells[f"{prefix}_top_segment"] = name
             cells[f"{prefix}_top_mass"] = mass
+        if NEUTRAL_TWIN in prefixes:
+            signature = (b2.get("per_head") or {}).get(component["name"]) or {}
+            cells[B2_COLUMN] = signature.get("drop")
+            cells[f"{B2_COLUMN}_se"] = signature.get("se")
         updates[key] = cells
     return updates
 
 
-def declare_coverage(ctx, payload: dict) -> None:
+def declare_coverage(ctx, payload: dict, wanted=None) -> None:
     """Tell the head table which instances each condition's columns cover.
 
     Read off `patterns.json`'s own `instance_ids`, so the meta and the file
@@ -1109,13 +1337,23 @@ def declare_coverage(ctx, payload: dict) -> None:
     """
     by_condition = {condition["name"]: condition
                     for condition in payload["conditions"]}
-    for condition_name, prefix in COLUMN_PREFIXES.items():
+    prefixes = _prefixes(wanted)
+    for condition_name, prefix in prefixes.items():
         condition = by_condition.get(condition_name) or {}
         ctx.declare_coverage(
             [f"{prefix}_top_segment", f"{prefix}_top_mass"],
             instance_ids=condition.get("instance_ids") or [],
-            instance_set=INSTANCE_SETS[condition_name],
+            instance_set=_instance_set(condition_name),
             dataset=condition.get("dataset"))
+    if NEUTRAL_TWIN in prefixes:
+        twin = by_condition.get(NEUTRAL_TWIN) or {}
+        b2 = twin.get("b2") or {}
+        ids = twin.get("instance_ids") or []
+        unpaired = set(b2.get("unpaired") or [])
+        ctx.declare_coverage(
+            [B2_COLUMN, f"{B2_COLUMN}_se"],
+            instance_ids=[one for one in ids if one not in unpaired],
+            instance_set=TWIN_INSTANCE_SET, dataset=twin.get("dataset"))
 
 
 # ==============================================================================
@@ -1172,7 +1410,7 @@ def estimate(ctx) -> str:
         return ("no attention head in this circuit, so nothing to profile "
                 f"({len(ctx.components)} Component(s), MLP blocks only)")
 
-    wanted = wanted_conditions(ctx.cli)
+    wanted = wanted_conditions_for(ctx)
     batch_size = getattr(ctx.cli, "batch_size", dataloaders.DEFAULT_BATCH_SIZE)
     layers = len(heads_by_layer)
     parts = [f"{len(heads)} head(s) over {layers} layer(s), "
@@ -1221,6 +1459,14 @@ def estimate(ctx) -> str:
         except Exception as failure:                       # noqa: BLE001
             parts.append(f"honest twin (descriptive): none — {directory} "
                          f"could not be loaded ({failure})")
+
+    if NEUTRAL_TWIN in wanted:
+        twin, reason = neutral_twin_batches(ctx)
+        if reason:
+            parts.append(f"neutral twin (paired): none — {reason}")
+        else:
+            parts.append(line("neutral twin (paired), both sides:", len(twin),
+                              twin.report["n_with_neutral_twin"], passes=2))
 
     from component_analysis import attention_token_level
     if attention_token_level.wanted(ctx.cli):
@@ -1277,7 +1523,7 @@ def run(ctx) -> dict:
     shared = {"head_keys": [one.key for one in heads], "names": names,
               "query_names": query, "split": split,
               "heads_by_layer": heads_by_layer}
-    wanted = wanted_conditions(ctx.cli)
+    wanted = wanted_conditions_for(ctx)
     from component_analysis import attention_token_level
     tokens = (attention_token_level.TokenProfiles(shared["head_keys"], names, query)
               if attention_token_level.wanted(ctx.cli) else None)
@@ -1373,13 +1619,99 @@ def run(ctx) -> dict:
              f"{TWIN_SEGMENTATION_FILE}"],
             dataset=directory))
 
+    # --- the paired Neutral-Clause Twin (v2) --------------------------------
+    if NEUTRAL_TWIN in wanted:
+        _run_neutral_twin(ctx, payload, shared, tokens, names, column_query)
+
     if tokens is not None:
         payload["token_level"] = attention_token_level.write(ctx, tokens, payload)
     ctx.write_json(SUBDIR, PATTERNS_FILE, payload)
     write_heatmaps(ctx, payload)
     write_top_heads(ctx, payload)
-    declare_coverage(ctx, payload)
-    return columns(payload)
+    declare_coverage(ctx, payload, wanted)
+    return columns(payload, wanted)
+
+
+def _run_neutral_twin(ctx, payload, shared, tokens, names, column_query) -> None:
+    """Both twin conditions over the whole split, and the B2 signature.
+
+    The left term (the pressure prompts of the rows that have a twin) and the
+    right term (their twins) are read through `twin_rows`, so they cannot
+    drift onto different instances; each side also records every instance's
+    own clause mass at the column query position, from the same forwards, and
+    the paired difference is the B2 signature written beside the right term.
+    """
+    batches, reason = neutral_twin_batches(ctx)
+    if reason:
+        payload["skipped"].append({"condition": NEUTRAL_TWIN, "reason": reason})
+        return
+    n_paired = batches.report["n_with_neutral_twin"]
+    head_names = [component_key_name(key) for key in shared["head_keys"]]
+    segment_index = names.index(B2_SEGMENT) if B2_SEGMENT in names else None
+
+    def clause_masses():
+        return None if segment_index is None else ClauseMasses(column_query, segment_index)
+
+    left_masses = clause_masses()
+    left, left_checks = collect_condition(
+        ctx, pressure_twin_paired_slices(batches, ctx.segmentations), **shared,
+        tokens=tokens, condition=PRESSURE_NEUTRAL_TWIN_PAIRED,
+        clause_masses=left_masses)
+    # Profiled over the rows that have a twin AND a resolved segmentation,
+    # which is every row of a real v2 cell; the count written is the count
+    # profiled, never the loader's.
+    n_profiled = len(left_checks["instance_ids"])
+    unsegmented = n_paired - n_profiled
+    payload["conditions"].append(_condition_json(
+        PRESSURE_NEUTRAL_TWIN_PAIRED, "pressure (paired with the neutral twin)",
+        True, batches, left, left_checks,
+        [f"the Pressure Clause on the {n_profiled} instance(s) that have a "
+         f"Neutral-Clause Twin — the left term of the paired contrast, and the "
+         f"column the {NEUTRAL_TWIN} column is to be read against",
+         f"on a v2 test set every instance has a twin, so this is the same "
+         f"population as {PRESSURE}, read in the twin loader's order"]
+        + ([f"{unsegmented} instance(s) with a twin have no resolved "
+            f"segmentation (the cell was built with --test-samples below the "
+            f"split) and were not profiled"] if unsegmented else []),
+        n_instances=n_profiled))
+
+    report = {"n_pairs": 0, "n_identical_to_pressure": 0,
+              "n_differing_outside_the_clause": 0,
+              "examples_outside_the_clause": []}
+    right_masses = clause_masses()
+    profiles, checks = collect_condition(
+        ctx, neutral_twin_slices(batches, ctx.segmentations, report), **shared,
+        tokens=tokens, condition=NEUTRAL_TWIN, clause_masses=right_masses)
+    notes = [f"paired with the {PRESSURE_NEUTRAL_TWIN_PAIRED} condition, instance "
+             f"by instance; {n_paired} of {batches.report['n_instances']} "
+             f"instances of the split have a Neutral-Clause Twin "
+             f"({batches.report.get('neutral_twin_source')}), {n_profiled} "
+             f"profiled",
+             "the twin reuses its pressure prompt's Segments (token-matched "
+             "outside the clause by construction), which the token diff below "
+             "re-checks per instance",
+             f"b2: per head, the {column_query}-query mass on {B2_SEGMENT} under "
+             f"pressure minus under the twin, paired per instance, with the "
+             f"paired standard error (spec B2: a pressure reader's drops by "
+             f">= 0.05 and >= 2 SE)"]
+    if report["n_differing_outside_the_clause"]:
+        notes.append(
+            f"!! {report['n_differing_outside_the_clause']} pair(s) differ "
+            f"outside the Pressure Clause, so their Segments are not the "
+            f"pressure prompt's: {', '.join(report['examples_outside_the_clause'])}")
+    if segment_index is None:
+        b2 = {"query_position": column_query, "segment": B2_SEGMENT, "n": 0,
+              "unpaired": [], "per_head": {name: {"pressure_mean": None, "twin_mean": None,
+                                                  "drop": None, "se": None}
+                                           for name in head_names},
+              "skipped": f"no {B2_SEGMENT} Segment in this task's segmentation"}
+    else:
+        b2 = {"query_position": column_query, "segment": B2_SEGMENT,
+              **paired_clause_drop(left_masses.values, right_masses.values, head_names),
+              "absent_query_position": sorted(set(left_masses.absent) | set(right_masses.absent))}
+    payload["conditions"].append(_condition_json(
+        NEUTRAL_TWIN, "neutral twin", True, batches, profiles, checks, notes,
+        extra={"alignment": report, "b2": b2}, n_instances=n_profiled))
 
 
 def _condition_json(name, kind, paired, batches, profiles, checks, notes, *,

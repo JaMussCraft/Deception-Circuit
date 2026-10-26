@@ -1,0 +1,212 @@
+{
+  "schema_version": 1,
+  "created": "<volatile>",
+  "task": "sdr",
+  "split": "test",
+  "n_requested": 16,
+  "n_drawn": 16,
+  "seed": 0,
+  "factors": [
+    "designation_polarity",
+    "item_polarity",
+    "template_variant"
+  ],
+  "inactive_factors": {},
+  "allocation": "balanced",
+  "allocation_rule": "the equal share per stratum, capped by each stratum's population, with the surplus handed one at a time to the smallest stratum that still has room",
+  "strata": [
+    {
+      "key": {
+        "designation_polarity": "identity",
+        "item_polarity": "1",
+        "template_variant": "audit"
+      },
+      "available": 5,
+      "target": 2,
+      "achieved": 2,
+      "instance_ids": [
+        "57d7bf78e403",
+        "6524378ce6da"
+      ]
+    },
+    {
+      "key": {
+        "designation_polarity": "identity",
+        "item_polarity": "1",
+        "template_variant": "lab"
+      },
+      "available": 8,
+      "target": 2,
+      "achieved": 2,
+      "instance_ids": [
+        "1e9e37a41255",
+        "500ecfc036ae"
+      ]
+    },
+    {
+      "key": {
+        "designation_polarity": "identity",
+        "item_polarity": "2",
+        "template_variant": "audit"
+      },
+      "available": 6,
+      "target": 2,
+      "achieved": 2,
+      "instance_ids": [
+        "bc2705f38763",
+        "ee4c88e3d4a7"
+      ]
+    },
+    {
+      "key": {
+        "designation_polarity": "identity",
+        "item_polarity": "2",
+        "template_variant": "lab"
+      },
+      "available": 6,
+      "target": 2,
+      "achieved": 2,
+      "instance_ids": [
+        "46402eeda70f",
+        "e56c4f19a415"
+      ]
+    },
+    {
+      "key": {
+        "designation_polarity": "inversion",
+        "item_polarity": "1",
+        "template_variant": "audit"
+      },
+      "available": 6,
+      "target": 2,
+      "achieved": 2,
+      "instance_ids": [
+        "9b2ea23303b5",
+        "caa076f09092"
+      ]
+    },
+    {
+      "key": {
+        "designation_polarity": "inversion",
+        "item_polarity": "1",
+        "template_variant": "lab"
+      },
+      "available": 7,
+      "target": 2,
+      "achieved": 2,
+      "instance_ids": [
+        "1aa7d042bae4",
+        "9a1ee917d473"
+      ]
+    },
+    {
+      "key": {
+        "designation_polarity": "inversion",
+        "item_polarity": "2",
+        "template_variant": "audit"
+      },
+      "available": 7,
+      "target": 2,
+      "achieved": 2,
+      "instance_ids": [
+        "3cd797bbe086",
+        "ce60a2a0e743"
+      ]
+    },
+    {
+      "key": {
+        "designation_polarity": "inversion",
+        "item_polarity": "2",
+        "template_variant": "lab"
+      },
+      "available": 3,
+      "target": 2,
+      "achieved": 2,
+      "instance_ids": [
+        "11783a8fab13",
+        "e690f4860a24"
+      ]
+    }
+  ],
+  "marginals": {
+    "designation_polarity": {
+      "identity": 8,
+      "inversion": 8
+    },
+    "item_polarity": {
+      "1": 8,
+      "2": 8
+    },
+    "template_variant": {
+      "audit": 8,
+      "lab": 8
+    }
+  },
+  "instance_ids": [
+    "46402eeda70f",
+    "3cd797bbe086",
+    "e690f4860a24",
+    "9b2ea23303b5",
+    "ee4c88e3d4a7",
+    "57d7bf78e403",
+    "e56c4f19a415",
+    "ce60a2a0e743",
+    "500ecfc036ae",
+    "1aa7d042bae4",
+    "11783a8fab13",
+    "bc2705f38763",
+    "9a1ee917d473",
+    "6524378ce6da",
+    "1e9e37a41255",
+    "caa076f09092"
+  ],
+  "split_indices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    8,
+    11,
+    17,
+    19,
+    22,
+    26,
+    30,
+    37,
+    40,
+    43,
+    47
+  ],
+  "join_on": "instance_ids. split_indices are positions in the split as the task's loader returns it, BEFORE the dataset class filters it \u2014 DeceptionDatasetLlama drops any record whose target or distractor is not a single token \u2014 so on a split that is not already prefiltered they do not index the dataset the causal analyses iterate. The ids always do.",
+  "meta": {
+    "circuit": {
+      "label": "self",
+      "kind": "atomic",
+      "expr": null,
+      "operands": {
+        "self": "<TMP>/run"
+      },
+      "home_run_dir": "<TMP>/run",
+      "counts": {
+        "attention_blocks": 1,
+        "mlp_blocks": 1,
+        "attention_heads": 2,
+        "attention_neurons": 6,
+        "mlp_hidden": 5,
+        "mlp_output": 3
+      }
+    },
+    "task": {
+      "label": "sdr",
+      "task": "sdr",
+      "home_run_dir": "<TMP>/run",
+      "dataset": {
+        "data_dir": "<TMP>/datasets",
+        "std_variant": "azaria",
+        "deception_condition": "deceptive",
+        "test_samples": 48
+      }
+    }
+  }
+}

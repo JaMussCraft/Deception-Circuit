@@ -87,6 +87,8 @@ ANALYSIS_SPLIT = "test"
 #: analysis because a registered analysis runs inside one invocation, from the
 #: intake's fresh rows, and never sees the columns a previous run wrote.
 SUBCOMMANDS = {"roles": "component_analysis.roles",
+               # The receiver category per head from a twin path-patching pass (02b).
+               "receiver-category": "component_analysis.receiver_category",
                # Several invocations in one job, one model load (mechanism-analysis 02a).
                "batch": "component_analysis.batch"}
 

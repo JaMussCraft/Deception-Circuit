@@ -1,0 +1,548 @@
+{
+  "analysis": "attention_patterns",
+  "schema_version": 1,
+  "task": "sdr",
+  "circuit": "self",
+  "model": "llama-tiny",
+  "split": "designation",
+  "query_positions": [
+    "readout"
+  ],
+  "column_query_position": "readout",
+  "segments": [
+    "intro",
+    "item_1_intro",
+    "item_2_intro",
+    "designating_sentence",
+    "designation_site",
+    "predicate_token",
+    "other_token",
+    "inverse_predicate_token",
+    "designation_suffix",
+    "pressure_clause",
+    "question",
+    "item_1_question_pair",
+    "item_1_question_option",
+    "item_2_question_pair",
+    "item_2_question_option",
+    "stem",
+    "readout",
+    "unsegmented"
+  ],
+  "sum_tolerance": 0.02,
+  "colormap": "YlOrRd",
+  "components": [
+    {
+      "key": [
+        "head",
+        0,
+        0
+      ],
+      "name": "head.0.0",
+      "label": "L0H0",
+      "layer": 0,
+      "index": 0,
+      "kv_group": 0
+    },
+    {
+      "key": [
+        "head",
+        0,
+        2
+      ],
+      "name": "head.0.2",
+      "label": "L0H2",
+      "layer": 0,
+      "index": 2,
+      "kv_group": 1
+    }
+  ],
+  "conditions": [
+    {
+      "name": "pressure",
+      "kind": "pressure",
+      "paired": false,
+      "descriptive": true,
+      "dataset": null,
+      "instance_ids": [
+        "46402eeda70f",
+        "3cd797bbe086",
+        "e690f4860a24",
+        "9b2ea23303b5",
+        "ee4c88e3d4a7",
+        "f67ecf8b6b19",
+        "e4ff27eef936",
+        "da72066ef848",
+        "57d7bf78e403",
+        "8e6d39b3796a",
+        "f508184ee04c",
+        "e56c4f19a415",
+        "151d67190c90",
+        "efb1a0c9fd93",
+        "e2a35e0a2001",
+        "0a4238f3ed97",
+        "294b6063ff83",
+        "ce60a2a0e743",
+        "5aef9ad805be",
+        "500ecfc036ae",
+        "3e6cfe97825a",
+        "d0da53cd6cc1",
+        "1aa7d042bae4",
+        "6ff221983c72",
+        "f4460c2acdfa",
+        "58993310fd39",
+        "11783a8fab13",
+        "2981df6df9f2",
+        "52a214f51e5d",
+        "739737453b70",
+        "bc2705f38763",
+        "f4f3f2870d67",
+        "f0ac3f3a78eb",
+        "85f8acce853a",
+        "6fff25ad8489",
+        "3ab6fdf2644f",
+        "33d18eaffa39",
+        "9a1ee917d473",
+        "519daca38ffd",
+        "60049c37d8f1",
+        "6524378ce6da",
+        "1f316cdecc8f",
+        "003f9adefbef",
+        "1e9e37a41255",
+        "f3f6c0ad739a",
+        "38c5d415e590",
+        "ae34d96ab737",
+        "caa076f09092"
+      ],
+      "n_instances": 48,
+      "n_loaded": 48,
+      "batches": 6,
+      "levels": [
+        {
+          "level": "all",
+          "n": 48,
+          "n_by_query_position": {
+            "readout": 48
+          },
+          "n_absent_by_query_position": {
+            "readout": 0
+          },
+          "masses": {
+            "head.0.0": {
+              "readout": {
+                "intro": 0.0799596756696701,
+                "item_1_intro": 0.012480164878070354,
+                "item_2_intro": 0.012324935756623745,
+                "designating_sentence": 0.09825838357210159,
+                "designation_site": 0.012413326650857925,
+                "predicate_token": 0.012104607187211514,
+                "other_token": 0.012371779419481754,
+                "inverse_predicate_token": 0.012317300774157047,
+                "designation_suffix": 0.13459673523902893,
+                "pressure_clause": 0.15358857810497284,
+                "question": 0.31161409616470337,
+                "item_1_question_pair": 0.012598118744790554,
+                "item_1_question_option": 0.012267936021089554,
+                "item_2_question_pair": 0.01210749987512827,
+                "item_2_question_option": 0.012363101355731487,
+                "stem": 0.07384437322616577,
+                "readout": 0.012495829723775387,
+                "unsegmented": 0.012293566949665546
+              }
+            },
+            "head.0.2": {
+              "readout": {
+                "intro": 0.07941880077123642,
+                "item_1_intro": 0.01237361878156662,
+                "item_2_intro": 0.012460225261747837,
+                "designating_sentence": 0.09977515786886215,
+                "designation_site": 0.012277334928512573,
+                "predicate_token": 0.012356569059193134,
+                "other_token": 0.012180541642010212,
+                "inverse_predicate_token": 0.012633275240659714,
+                "designation_suffix": 0.13568677008152008,
+                "pressure_clause": 0.15358661115169525,
+                "question": 0.30871716141700745,
+                "item_1_question_pair": 0.012462466955184937,
+                "item_1_question_option": 0.012433405965566635,
+                "item_2_question_pair": 0.012671582400798798,
+                "item_2_question_option": 0.012307018041610718,
+                "stem": 0.07398692518472672,
+                "readout": 0.012453410774469376,
+                "unsegmented": 0.012219146825373173
+              }
+            }
+          }
+        },
+        {
+          "level": "identity",
+          "n": 25,
+          "n_by_query_position": {
+            "readout": 25
+          },
+          "n_absent_by_query_position": {
+            "readout": 0
+          },
+          "masses": {
+            "head.0.0": {
+              "readout": {
+                "intro": 0.08192786574363708,
+                "item_1_intro": 0.012419305741786957,
+                "item_2_intro": 0.01223701611161232,
+                "designating_sentence": 0.09929037094116211,
+                "designation_site": 0.012340662069618702,
+                "predicate_token": 0.012051216326653957,
+                "other_token": 0.012326419353485107,
+                "inverse_predicate_token": 0.01209309697151184,
+                "designation_suffix": 0.133986696600914,
+                "pressure_clause": 0.15374791622161865,
+                "question": 0.3102945387363434,
+                "item_1_question_pair": 0.012529385276138783,
+                "item_1_question_option": 0.01218017190694809,
+                "item_2_question_pair": 0.01202734000980854,
+                "item_2_question_option": 0.012349270284175873,
+                "stem": 0.07353255897760391,
+                "readout": 0.012439675629138947,
+                "unsegmented": 0.012226580642163754
+              }
+            },
+            "head.0.2": {
+              "readout": {
+                "intro": 0.08124683052301407,
+                "item_1_intro": 0.012316245585680008,
+                "item_2_intro": 0.012395466677844524,
+                "designating_sentence": 0.10088788717985153,
+                "designation_site": 0.012205703184008598,
+                "predicate_token": 0.012152361683547497,
+                "other_token": 0.012110298499464989,
+                "inverse_predicate_token": 0.012623734772205353,
+                "designation_suffix": 0.13509485125541687,
+                "pressure_clause": 0.1537129282951355,
+                "question": 0.30745062232017517,
+                "item_1_question_pair": 0.012415267527103424,
+                "item_1_question_option": 0.012353315018117428,
+                "item_2_question_pair": 0.012576436623930931,
+                "item_2_question_option": 0.012219412252306938,
+                "stem": 0.07367269694805145,
+                "readout": 0.012401113286614418,
+                "unsegmented": 0.012164801359176636
+              }
+            }
+          }
+        },
+        {
+          "level": "inversion",
+          "n": 23,
+          "n_by_query_position": {
+            "readout": 23
+          },
+          "n_absent_by_query_position": {
+            "readout": 0
+          },
+          "masses": {
+            "head.0.0": {
+              "readout": {
+                "intro": 0.07782034575939178,
+                "item_1_intro": 0.012546316720545292,
+                "item_2_intro": 0.012420495972037315,
+                "designating_sentence": 0.0971367284655571,
+                "designation_site": 0.012492306530475616,
+                "predicate_token": 0.012162643484771252,
+                "other_token": 0.012421081773936749,
+                "inverse_predicate_token": 0.01256099995225668,
+                "designation_suffix": 0.13525988161563873,
+                "pressure_clause": 0.15341532230377197,
+                "question": 0.31304845213890076,
+                "item_1_question_pair": 0.012672829441726208,
+                "item_1_question_option": 0.012363330461084843,
+                "item_2_question_pair": 0.012194634415209293,
+                "item_2_question_option": 0.012378130108118057,
+                "stem": 0.07418327778577805,
+                "readout": 0.012556866742670536,
+                "unsegmented": 0.01236637681722641
+              }
+            },
+            "head.0.2": {
+              "readout": {
+                "intro": 0.07743179053068161,
+                "item_1_intro": 0.012435980141162872,
+                "item_2_intro": 0.01253061555325985,
+                "designating_sentence": 0.09856565296649933,
+                "designation_site": 0.012355191633105278,
+                "predicate_token": 0.01257853303104639,
+                "other_token": 0.012256891466677189,
+                "inverse_predicate_token": 0.012643642723560333,
+                "designation_suffix": 0.13633014261722565,
+                "pressure_clause": 0.15344935655593872,
+                "question": 0.31009379029273987,
+                "item_1_question_pair": 0.012513766996562481,
+                "item_1_question_option": 0.012520461343228817,
+                "item_2_question_pair": 0.012775004841387272,
+                "item_2_question_option": 0.012402242980897427,
+                "stem": 0.0743284672498703,
+                "readout": 0.012510252185165882,
+                "unsegmented": 0.012278221547603607
+              }
+            }
+          }
+        }
+      ],
+      "checks": {
+        "max_abs_sum_minus_one": 2.384185791015625e-07,
+        "max_outside": 0.0,
+        "n_batches": 6,
+        "n_nan": 0,
+        "sums_to_one": true
+      },
+      "notes": []
+    },
+    {
+      "name": "honest_twin",
+      "kind": "honest twin",
+      "paired": false,
+      "descriptive": true,
+      "dataset": "<TMP>/datasets/sdr_honest",
+      "instance_ids": [
+        "46402eeda70f",
+        "3cd797bbe086",
+        "e690f4860a24",
+        "9b2ea23303b5",
+        "ee4c88e3d4a7",
+        "f67ecf8b6b19",
+        "e4ff27eef936",
+        "da72066ef848",
+        "57d7bf78e403",
+        "8e6d39b3796a",
+        "f508184ee04c",
+        "e56c4f19a415",
+        "151d67190c90",
+        "efb1a0c9fd93",
+        "e2a35e0a2001",
+        "0a4238f3ed97",
+        "294b6063ff83",
+        "ce60a2a0e743",
+        "5aef9ad805be",
+        "500ecfc036ae",
+        "3e6cfe97825a",
+        "d0da53cd6cc1",
+        "1aa7d042bae4",
+        "6ff221983c72",
+        "f4460c2acdfa",
+        "58993310fd39",
+        "11783a8fab13",
+        "2981df6df9f2",
+        "52a214f51e5d",
+        "739737453b70",
+        "bc2705f38763",
+        "f4f3f2870d67",
+        "f0ac3f3a78eb",
+        "85f8acce853a",
+        "6fff25ad8489",
+        "3ab6fdf2644f",
+        "33d18eaffa39",
+        "9a1ee917d473",
+        "519daca38ffd",
+        "60049c37d8f1",
+        "6524378ce6da",
+        "1f316cdecc8f",
+        "003f9adefbef",
+        "1e9e37a41255",
+        "f3f6c0ad739a",
+        "38c5d415e590",
+        "ae34d96ab737",
+        "caa076f09092"
+      ],
+      "n_instances": 48,
+      "n_loaded": 48,
+      "batches": 6,
+      "levels": [
+        {
+          "level": "all",
+          "n": 48,
+          "n_by_query_position": {
+            "readout": 48
+          },
+          "n_absent_by_query_position": {
+            "readout": 0
+          },
+          "masses": {
+            "head.0.0": {
+              "readout": {
+                "intro": 0.0799596756696701,
+                "item_1_intro": 0.012480164878070354,
+                "item_2_intro": 0.012324935756623745,
+                "designating_sentence": 0.09825838357210159,
+                "designation_site": 0.012413326650857925,
+                "predicate_token": 0.012104607187211514,
+                "other_token": 0.012371779419481754,
+                "inverse_predicate_token": 0.012317300774157047,
+                "designation_suffix": 0.13459673523902893,
+                "pressure_clause": 0.15358857810497284,
+                "question": 0.31161409616470337,
+                "item_1_question_pair": 0.012598118744790554,
+                "item_1_question_option": 0.012267936021089554,
+                "item_2_question_pair": 0.01210749987512827,
+                "item_2_question_option": 0.012363101355731487,
+                "stem": 0.07384437322616577,
+                "readout": 0.012495829723775387,
+                "unsegmented": 0.012293566949665546
+              }
+            },
+            "head.0.2": {
+              "readout": {
+                "intro": 0.07941880077123642,
+                "item_1_intro": 0.01237361878156662,
+                "item_2_intro": 0.012460225261747837,
+                "designating_sentence": 0.09977515786886215,
+                "designation_site": 0.012277334928512573,
+                "predicate_token": 0.012356569059193134,
+                "other_token": 0.012180541642010212,
+                "inverse_predicate_token": 0.012633275240659714,
+                "designation_suffix": 0.13568677008152008,
+                "pressure_clause": 0.15358661115169525,
+                "question": 0.30871716141700745,
+                "item_1_question_pair": 0.012462466955184937,
+                "item_1_question_option": 0.012433405965566635,
+                "item_2_question_pair": 0.012671582400798798,
+                "item_2_question_option": 0.012307018041610718,
+                "stem": 0.07398692518472672,
+                "readout": 0.012453410774469376,
+                "unsegmented": 0.012219146825373173
+              }
+            }
+          }
+        },
+        {
+          "level": "identity",
+          "n": 25,
+          "n_by_query_position": {
+            "readout": 25
+          },
+          "n_absent_by_query_position": {
+            "readout": 0
+          },
+          "masses": {
+            "head.0.0": {
+              "readout": {
+                "intro": 0.08192786574363708,
+                "item_1_intro": 0.012419305741786957,
+                "item_2_intro": 0.01223701611161232,
+                "designating_sentence": 0.09929037094116211,
+                "designation_site": 0.012340662069618702,
+                "predicate_token": 0.012051216326653957,
+                "other_token": 0.012326419353485107,
+                "inverse_predicate_token": 0.01209309697151184,
+                "designation_suffix": 0.133986696600914,
+                "pressure_clause": 0.15374791622161865,
+                "question": 0.3102945387363434,
+                "item_1_question_pair": 0.012529385276138783,
+                "item_1_question_option": 0.01218017190694809,
+                "item_2_question_pair": 0.01202734000980854,
+                "item_2_question_option": 0.012349270284175873,
+                "stem": 0.07353255897760391,
+                "readout": 0.012439675629138947,
+                "unsegmented": 0.012226580642163754
+              }
+            },
+            "head.0.2": {
+              "readout": {
+                "intro": 0.08124683052301407,
+                "item_1_intro": 0.012316245585680008,
+                "item_2_intro": 0.012395466677844524,
+                "designating_sentence": 0.10088788717985153,
+                "designation_site": 0.012205703184008598,
+                "predicate_token": 0.012152361683547497,
+                "other_token": 0.012110298499464989,
+                "inverse_predicate_token": 0.012623734772205353,
+                "designation_suffix": 0.13509485125541687,
+                "pressure_clause": 0.1537129282951355,
+                "question": 0.30745062232017517,
+                "item_1_question_pair": 0.012415267527103424,
+                "item_1_question_option": 0.012353315018117428,
+                "item_2_question_pair": 0.012576436623930931,
+                "item_2_question_option": 0.012219412252306938,
+                "stem": 0.07367269694805145,
+                "readout": 0.012401113286614418,
+                "unsegmented": 0.012164801359176636
+              }
+            }
+          }
+        },
+        {
+          "level": "inversion",
+          "n": 23,
+          "n_by_query_position": {
+            "readout": 23
+          },
+          "n_absent_by_query_position": {
+            "readout": 0
+          },
+          "masses": {
+            "head.0.0": {
+              "readout": {
+                "intro": 0.07782034575939178,
+                "item_1_intro": 0.012546316720545292,
+                "item_2_intro": 0.012420495972037315,
+                "designating_sentence": 0.0971367284655571,
+                "designation_site": 0.012492306530475616,
+                "predicate_token": 0.012162643484771252,
+                "other_token": 0.012421081773936749,
+                "inverse_predicate_token": 0.01256099995225668,
+                "designation_suffix": 0.13525988161563873,
+                "pressure_clause": 0.15341532230377197,
+                "question": 0.31304845213890076,
+                "item_1_question_pair": 0.012672829441726208,
+                "item_1_question_option": 0.012363330461084843,
+                "item_2_question_pair": 0.012194634415209293,
+                "item_2_question_option": 0.012378130108118057,
+                "stem": 0.07418327778577805,
+                "readout": 0.012556866742670536,
+                "unsegmented": 0.01236637681722641
+              }
+            },
+            "head.0.2": {
+              "readout": {
+                "intro": 0.07743179053068161,
+                "item_1_intro": 0.012435980141162872,
+                "item_2_intro": 0.01253061555325985,
+                "designating_sentence": 0.09856565296649933,
+                "designation_site": 0.012355191633105278,
+                "predicate_token": 0.01257853303104639,
+                "other_token": 0.012256891466677189,
+                "inverse_predicate_token": 0.012643642723560333,
+                "designation_suffix": 0.13633014261722565,
+                "pressure_clause": 0.15344935655593872,
+                "question": 0.31009379029273987,
+                "item_1_question_pair": 0.012513766996562481,
+                "item_1_question_option": 0.012520461343228817,
+                "item_2_question_pair": 0.012775004841387272,
+                "item_2_question_option": 0.012402242980897427,
+                "stem": 0.0743284672498703,
+                "readout": 0.012510252185165882,
+                "unsegmented": 0.012278221547603607
+              }
+            }
+          }
+        }
+      ],
+      "checks": {
+        "max_abs_sum_minus_one": 2.384185791015625e-07,
+        "max_outside": 0.0,
+        "n_batches": 6,
+        "n_nan": 0,
+        "sums_to_one": true
+      },
+      "notes": [
+        "UNPAIRED and descriptive: different instances from the pressure condition, so a difference here is a difference between populations and is not a causal contrast",
+        "segmentation resolved over <TMP>/datasets/sdr_honest and written to honest_twin_segmentation.json"
+      ]
+    }
+  ],
+  "skipped": [
+    {
+      "condition": "honest_instruction",
+      "reason": "no Matched Honest survivors file beside the sdr dataset, so no Honest-Instruction Counterfactual exists for this task"
+    }
+  ],
+  "token_level": null
+}

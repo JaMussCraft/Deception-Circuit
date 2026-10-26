@@ -1,0 +1,6952 @@
+{
+  "schema_version": 1,
+  "created": "<volatile>",
+  "task": "sdr",
+  "scheme": "mechanism",
+  "split": "test",
+  "n_instances": 48,
+  "segment_names": [
+    "intro",
+    "item_1_intro",
+    "item_2_intro",
+    "designating_sentence",
+    "designation_site",
+    "predicate_token",
+    "other_token",
+    "inverse_predicate_token",
+    "designation_suffix",
+    "pressure_clause",
+    "question",
+    "item_1_question_pair",
+    "item_1_question_option",
+    "item_2_question_pair",
+    "item_2_question_option",
+    "stem",
+    "readout",
+    "unsegmented"
+  ],
+  "segment_sources": {
+    "intro": "default",
+    "item_1_intro": "default",
+    "item_2_intro": "default",
+    "designating_sentence": "default",
+    "designation_site": "default",
+    "predicate_token": "default",
+    "other_token": "default",
+    "inverse_predicate_token": "default",
+    "designation_suffix": "default",
+    "pressure_clause": "default",
+    "question": "default",
+    "item_1_question_pair": "default",
+    "item_1_question_option": "default",
+    "item_2_question_pair": "default",
+    "item_2_question_option": "default",
+    "stem": "default",
+    "readout": "default",
+    "unsegmented": "default"
+  },
+  "overrides": {},
+  "spans": "half-open [start, end) ranges of token indices over the CLEAN prompt, tokenized with add_special_tokens=False. The corrupt stream shares them: the item-swap Corruption is a single-token edit, so the two streams align position for position.",
+  "empty_spans": "A Segment with an empty span list is absent from that instance \u2014 the saved FAR run predates the Designation Suffix, and the pilot condition has no Pressure Clause.",
+  "partition": "The default Segments are pairwise disjoint and cover every token, 'unsegmented' holding what the named ones do not claim. 'intro', 'question' and 'designating_sentence' are the frames around the Item Mentions and Designation Positions carved out of them, not spans that contain them. An override may overlap the defaults; any instance where it does is listed under report.instances_with_overlapping_segments.",
+  "report": {
+    "override_match_counts": {},
+    "instances_with_overlapping_segments": []
+  },
+  "meta": {
+    "circuit": {
+      "label": "self",
+      "kind": "atomic",
+      "expr": null,
+      "operands": {
+        "self": "<TMP>/run"
+      },
+      "home_run_dir": "<TMP>/run",
+      "counts": {
+        "attention_blocks": 1,
+        "mlp_blocks": 1,
+        "attention_heads": 2,
+        "attention_neurons": 6,
+        "mlp_hidden": 5,
+        "mlp_output": 3
+      }
+    },
+    "task": {
+      "label": "sdr",
+      "task": "sdr",
+      "home_run_dir": "<TMP>/run",
+      "dataset": {
+        "data_dir": "<TMP>/datasets",
+        "std_variant": "azaria",
+        "deception_condition": "deceptive",
+        "test_samples": 48
+      }
+    }
+  },
+  "instances": [
+    {
+      "record_id": "46402eeda70f",
+      "n_tokens": 84,
+      "readout": 83,
+      "segments": {
+        "intro": [
+          [
+            1,
+            8
+          ],
+          [
+            9,
+            10
+          ]
+        ],
+        "item_1_intro": [
+          [
+            8,
+            9
+          ]
+        ],
+        "item_2_intro": [
+          [
+            10,
+            11
+          ]
+        ],
+        "designating_sentence": [
+          [
+            11,
+            12
+          ],
+          [
+            13,
+            16
+          ],
+          [
+            17,
+            19
+          ],
+          [
+            20,
+            23
+          ]
+        ],
+        "designation_site": [
+          [
+            12,
+            13
+          ]
+        ],
+        "predicate_token": [
+          [
+            16,
+            17
+          ]
+        ],
+        "other_token": [
+          [
+            19,
+            20
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            23,
+            24
+          ]
+        ],
+        "designation_suffix": [
+          [
+            24,
+            35
+          ]
+        ],
+        "pressure_clause": [
+          [
+            35,
+            48
+          ]
+        ],
+        "question": [
+          [
+            48,
+            54
+          ],
+          [
+            55,
+            56
+          ],
+          [
+            57,
+            67
+          ],
+          [
+            68,
+            76
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            54,
+            55
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            67,
+            68
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            56,
+            57
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            76,
+            77
+          ]
+        ],
+        "stem": [
+          [
+            77,
+            83
+          ]
+        ],
+        "readout": [
+          [
+            83,
+            84
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "3cd797bbe086",
+      "n_tokens": 78,
+      "readout": 77,
+      "segments": {
+        "intro": [
+          [
+            1,
+            5
+          ],
+          [
+            6,
+            7
+          ]
+        ],
+        "item_1_intro": [
+          [
+            5,
+            6
+          ]
+        ],
+        "item_2_intro": [
+          [
+            7,
+            8
+          ]
+        ],
+        "designating_sentence": [
+          [
+            8,
+            9
+          ],
+          [
+            10,
+            12
+          ],
+          [
+            13,
+            15
+          ],
+          [
+            16,
+            18
+          ]
+        ],
+        "designation_site": [
+          [
+            9,
+            10
+          ]
+        ],
+        "predicate_token": [
+          [
+            12,
+            13
+          ]
+        ],
+        "other_token": [
+          [
+            15,
+            16
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            18,
+            19
+          ]
+        ],
+        "designation_suffix": [
+          [
+            19,
+            30
+          ]
+        ],
+        "pressure_clause": [
+          [
+            30,
+            42
+          ]
+        ],
+        "question": [
+          [
+            42,
+            48
+          ],
+          [
+            49,
+            50
+          ],
+          [
+            51,
+            61
+          ],
+          [
+            62,
+            70
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            48,
+            49
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            61,
+            62
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            50,
+            51
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            70,
+            71
+          ]
+        ],
+        "stem": [
+          [
+            71,
+            77
+          ]
+        ],
+        "readout": [
+          [
+            77,
+            78
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "e690f4860a24",
+      "n_tokens": 83,
+      "readout": 82,
+      "segments": {
+        "intro": [
+          [
+            1,
+            8
+          ],
+          [
+            9,
+            10
+          ]
+        ],
+        "item_1_intro": [
+          [
+            8,
+            9
+          ]
+        ],
+        "item_2_intro": [
+          [
+            10,
+            11
+          ]
+        ],
+        "designating_sentence": [
+          [
+            11,
+            12
+          ],
+          [
+            13,
+            16
+          ],
+          [
+            17,
+            19
+          ],
+          [
+            20,
+            23
+          ]
+        ],
+        "designation_site": [
+          [
+            12,
+            13
+          ]
+        ],
+        "predicate_token": [
+          [
+            16,
+            17
+          ]
+        ],
+        "other_token": [
+          [
+            19,
+            20
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            23,
+            24
+          ]
+        ],
+        "designation_suffix": [
+          [
+            24,
+            35
+          ]
+        ],
+        "pressure_clause": [
+          [
+            35,
+            47
+          ]
+        ],
+        "question": [
+          [
+            47,
+            53
+          ],
+          [
+            54,
+            55
+          ],
+          [
+            56,
+            66
+          ],
+          [
+            67,
+            75
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            53,
+            54
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            66,
+            67
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            55,
+            56
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            75,
+            76
+          ]
+        ],
+        "stem": [
+          [
+            76,
+            82
+          ]
+        ],
+        "readout": [
+          [
+            82,
+            83
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "9b2ea23303b5",
+      "n_tokens": 78,
+      "readout": 77,
+      "segments": {
+        "intro": [
+          [
+            1,
+            5
+          ],
+          [
+            6,
+            7
+          ]
+        ],
+        "item_1_intro": [
+          [
+            5,
+            6
+          ]
+        ],
+        "item_2_intro": [
+          [
+            7,
+            8
+          ]
+        ],
+        "designating_sentence": [
+          [
+            8,
+            9
+          ],
+          [
+            10,
+            12
+          ],
+          [
+            13,
+            15
+          ],
+          [
+            16,
+            18
+          ]
+        ],
+        "designation_site": [
+          [
+            9,
+            10
+          ]
+        ],
+        "predicate_token": [
+          [
+            12,
+            13
+          ]
+        ],
+        "other_token": [
+          [
+            15,
+            16
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            18,
+            19
+          ]
+        ],
+        "designation_suffix": [
+          [
+            19,
+            30
+          ]
+        ],
+        "pressure_clause": [
+          [
+            30,
+            42
+          ]
+        ],
+        "question": [
+          [
+            42,
+            48
+          ],
+          [
+            49,
+            50
+          ],
+          [
+            51,
+            61
+          ],
+          [
+            62,
+            70
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            48,
+            49
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            61,
+            62
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            50,
+            51
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            70,
+            71
+          ]
+        ],
+        "stem": [
+          [
+            71,
+            77
+          ]
+        ],
+        "readout": [
+          [
+            77,
+            78
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "ee4c88e3d4a7",
+      "n_tokens": 79,
+      "readout": 78,
+      "segments": {
+        "intro": [
+          [
+            1,
+            5
+          ],
+          [
+            6,
+            7
+          ]
+        ],
+        "item_1_intro": [
+          [
+            5,
+            6
+          ]
+        ],
+        "item_2_intro": [
+          [
+            7,
+            8
+          ]
+        ],
+        "designating_sentence": [
+          [
+            8,
+            9
+          ],
+          [
+            10,
+            12
+          ],
+          [
+            13,
+            15
+          ],
+          [
+            16,
+            18
+          ]
+        ],
+        "designation_site": [
+          [
+            9,
+            10
+          ]
+        ],
+        "predicate_token": [
+          [
+            12,
+            13
+          ]
+        ],
+        "other_token": [
+          [
+            15,
+            16
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            18,
+            19
+          ]
+        ],
+        "designation_suffix": [
+          [
+            19,
+            30
+          ]
+        ],
+        "pressure_clause": [
+          [
+            30,
+            43
+          ]
+        ],
+        "question": [
+          [
+            43,
+            49
+          ],
+          [
+            50,
+            51
+          ],
+          [
+            52,
+            62
+          ],
+          [
+            63,
+            71
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            49,
+            50
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            62,
+            63
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            51,
+            52
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            71,
+            72
+          ]
+        ],
+        "stem": [
+          [
+            72,
+            78
+          ]
+        ],
+        "readout": [
+          [
+            78,
+            79
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "f67ecf8b6b19",
+      "n_tokens": 78,
+      "readout": 77,
+      "segments": {
+        "intro": [
+          [
+            1,
+            5
+          ],
+          [
+            6,
+            7
+          ]
+        ],
+        "item_1_intro": [
+          [
+            5,
+            6
+          ]
+        ],
+        "item_2_intro": [
+          [
+            7,
+            8
+          ]
+        ],
+        "designating_sentence": [
+          [
+            8,
+            9
+          ],
+          [
+            10,
+            12
+          ],
+          [
+            13,
+            15
+          ],
+          [
+            16,
+            18
+          ]
+        ],
+        "designation_site": [
+          [
+            9,
+            10
+          ]
+        ],
+        "predicate_token": [
+          [
+            12,
+            13
+          ]
+        ],
+        "other_token": [
+          [
+            15,
+            16
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            18,
+            19
+          ]
+        ],
+        "designation_suffix": [
+          [
+            19,
+            30
+          ]
+        ],
+        "pressure_clause": [
+          [
+            30,
+            42
+          ]
+        ],
+        "question": [
+          [
+            42,
+            48
+          ],
+          [
+            49,
+            50
+          ],
+          [
+            51,
+            61
+          ],
+          [
+            62,
+            70
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            48,
+            49
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            61,
+            62
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            50,
+            51
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            70,
+            71
+          ]
+        ],
+        "stem": [
+          [
+            71,
+            77
+          ]
+        ],
+        "readout": [
+          [
+            77,
+            78
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "e4ff27eef936",
+      "n_tokens": 78,
+      "readout": 77,
+      "segments": {
+        "intro": [
+          [
+            1,
+            5
+          ],
+          [
+            6,
+            7
+          ]
+        ],
+        "item_1_intro": [
+          [
+            5,
+            6
+          ]
+        ],
+        "item_2_intro": [
+          [
+            7,
+            8
+          ]
+        ],
+        "designating_sentence": [
+          [
+            8,
+            9
+          ],
+          [
+            10,
+            12
+          ],
+          [
+            13,
+            15
+          ],
+          [
+            16,
+            18
+          ]
+        ],
+        "designation_site": [
+          [
+            9,
+            10
+          ]
+        ],
+        "predicate_token": [
+          [
+            12,
+            13
+          ]
+        ],
+        "other_token": [
+          [
+            15,
+            16
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            18,
+            19
+          ]
+        ],
+        "designation_suffix": [
+          [
+            19,
+            30
+          ]
+        ],
+        "pressure_clause": [
+          [
+            30,
+            42
+          ]
+        ],
+        "question": [
+          [
+            42,
+            48
+          ],
+          [
+            49,
+            50
+          ],
+          [
+            51,
+            61
+          ],
+          [
+            62,
+            70
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            48,
+            49
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            61,
+            62
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            50,
+            51
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            70,
+            71
+          ]
+        ],
+        "stem": [
+          [
+            71,
+            77
+          ]
+        ],
+        "readout": [
+          [
+            77,
+            78
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "da72066ef848",
+      "n_tokens": 83,
+      "readout": 82,
+      "segments": {
+        "intro": [
+          [
+            1,
+            8
+          ],
+          [
+            9,
+            10
+          ]
+        ],
+        "item_1_intro": [
+          [
+            8,
+            9
+          ]
+        ],
+        "item_2_intro": [
+          [
+            10,
+            11
+          ]
+        ],
+        "designating_sentence": [
+          [
+            11,
+            12
+          ],
+          [
+            13,
+            16
+          ],
+          [
+            17,
+            19
+          ],
+          [
+            20,
+            23
+          ]
+        ],
+        "designation_site": [
+          [
+            12,
+            13
+          ]
+        ],
+        "predicate_token": [
+          [
+            16,
+            17
+          ]
+        ],
+        "other_token": [
+          [
+            19,
+            20
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            23,
+            24
+          ]
+        ],
+        "designation_suffix": [
+          [
+            24,
+            35
+          ]
+        ],
+        "pressure_clause": [
+          [
+            35,
+            47
+          ]
+        ],
+        "question": [
+          [
+            47,
+            53
+          ],
+          [
+            54,
+            55
+          ],
+          [
+            56,
+            66
+          ],
+          [
+            67,
+            75
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            53,
+            54
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            66,
+            67
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            55,
+            56
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            75,
+            76
+          ]
+        ],
+        "stem": [
+          [
+            76,
+            82
+          ]
+        ],
+        "readout": [
+          [
+            82,
+            83
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "57d7bf78e403",
+      "n_tokens": 78,
+      "readout": 77,
+      "segments": {
+        "intro": [
+          [
+            1,
+            5
+          ],
+          [
+            6,
+            7
+          ]
+        ],
+        "item_1_intro": [
+          [
+            5,
+            6
+          ]
+        ],
+        "item_2_intro": [
+          [
+            7,
+            8
+          ]
+        ],
+        "designating_sentence": [
+          [
+            8,
+            9
+          ],
+          [
+            10,
+            12
+          ],
+          [
+            13,
+            15
+          ],
+          [
+            16,
+            18
+          ]
+        ],
+        "designation_site": [
+          [
+            9,
+            10
+          ]
+        ],
+        "predicate_token": [
+          [
+            12,
+            13
+          ]
+        ],
+        "other_token": [
+          [
+            15,
+            16
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            18,
+            19
+          ]
+        ],
+        "designation_suffix": [
+          [
+            19,
+            30
+          ]
+        ],
+        "pressure_clause": [
+          [
+            30,
+            42
+          ]
+        ],
+        "question": [
+          [
+            42,
+            48
+          ],
+          [
+            49,
+            50
+          ],
+          [
+            51,
+            61
+          ],
+          [
+            62,
+            70
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            48,
+            49
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            61,
+            62
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            50,
+            51
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            70,
+            71
+          ]
+        ],
+        "stem": [
+          [
+            71,
+            77
+          ]
+        ],
+        "readout": [
+          [
+            77,
+            78
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "8e6d39b3796a",
+      "n_tokens": 83,
+      "readout": 82,
+      "segments": {
+        "intro": [
+          [
+            1,
+            8
+          ],
+          [
+            9,
+            10
+          ]
+        ],
+        "item_1_intro": [
+          [
+            8,
+            9
+          ]
+        ],
+        "item_2_intro": [
+          [
+            10,
+            11
+          ]
+        ],
+        "designating_sentence": [
+          [
+            11,
+            12
+          ],
+          [
+            13,
+            16
+          ],
+          [
+            17,
+            19
+          ],
+          [
+            20,
+            23
+          ]
+        ],
+        "designation_site": [
+          [
+            12,
+            13
+          ]
+        ],
+        "predicate_token": [
+          [
+            16,
+            17
+          ]
+        ],
+        "other_token": [
+          [
+            19,
+            20
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            23,
+            24
+          ]
+        ],
+        "designation_suffix": [
+          [
+            24,
+            35
+          ]
+        ],
+        "pressure_clause": [
+          [
+            35,
+            47
+          ]
+        ],
+        "question": [
+          [
+            47,
+            53
+          ],
+          [
+            54,
+            55
+          ],
+          [
+            56,
+            66
+          ],
+          [
+            67,
+            75
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            53,
+            54
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            66,
+            67
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            55,
+            56
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            75,
+            76
+          ]
+        ],
+        "stem": [
+          [
+            76,
+            82
+          ]
+        ],
+        "readout": [
+          [
+            82,
+            83
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "f508184ee04c",
+      "n_tokens": 84,
+      "readout": 83,
+      "segments": {
+        "intro": [
+          [
+            1,
+            8
+          ],
+          [
+            9,
+            10
+          ]
+        ],
+        "item_1_intro": [
+          [
+            8,
+            9
+          ]
+        ],
+        "item_2_intro": [
+          [
+            10,
+            11
+          ]
+        ],
+        "designating_sentence": [
+          [
+            11,
+            12
+          ],
+          [
+            13,
+            16
+          ],
+          [
+            17,
+            19
+          ],
+          [
+            20,
+            23
+          ]
+        ],
+        "designation_site": [
+          [
+            12,
+            13
+          ]
+        ],
+        "predicate_token": [
+          [
+            16,
+            17
+          ]
+        ],
+        "other_token": [
+          [
+            19,
+            20
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            23,
+            24
+          ]
+        ],
+        "designation_suffix": [
+          [
+            24,
+            35
+          ]
+        ],
+        "pressure_clause": [
+          [
+            35,
+            48
+          ]
+        ],
+        "question": [
+          [
+            48,
+            54
+          ],
+          [
+            55,
+            56
+          ],
+          [
+            57,
+            67
+          ],
+          [
+            68,
+            76
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            54,
+            55
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            67,
+            68
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            56,
+            57
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            76,
+            77
+          ]
+        ],
+        "stem": [
+          [
+            77,
+            83
+          ]
+        ],
+        "readout": [
+          [
+            83,
+            84
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "e56c4f19a415",
+      "n_tokens": 84,
+      "readout": 83,
+      "segments": {
+        "intro": [
+          [
+            1,
+            8
+          ],
+          [
+            9,
+            10
+          ]
+        ],
+        "item_1_intro": [
+          [
+            8,
+            9
+          ]
+        ],
+        "item_2_intro": [
+          [
+            10,
+            11
+          ]
+        ],
+        "designating_sentence": [
+          [
+            11,
+            12
+          ],
+          [
+            13,
+            16
+          ],
+          [
+            17,
+            19
+          ],
+          [
+            20,
+            23
+          ]
+        ],
+        "designation_site": [
+          [
+            12,
+            13
+          ]
+        ],
+        "predicate_token": [
+          [
+            16,
+            17
+          ]
+        ],
+        "other_token": [
+          [
+            19,
+            20
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            23,
+            24
+          ]
+        ],
+        "designation_suffix": [
+          [
+            24,
+            35
+          ]
+        ],
+        "pressure_clause": [
+          [
+            35,
+            48
+          ]
+        ],
+        "question": [
+          [
+            48,
+            54
+          ],
+          [
+            55,
+            56
+          ],
+          [
+            57,
+            67
+          ],
+          [
+            68,
+            76
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            54,
+            55
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            67,
+            68
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            56,
+            57
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            76,
+            77
+          ]
+        ],
+        "stem": [
+          [
+            77,
+            83
+          ]
+        ],
+        "readout": [
+          [
+            83,
+            84
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "151d67190c90",
+      "n_tokens": 79,
+      "readout": 78,
+      "segments": {
+        "intro": [
+          [
+            1,
+            5
+          ],
+          [
+            6,
+            7
+          ]
+        ],
+        "item_1_intro": [
+          [
+            5,
+            6
+          ]
+        ],
+        "item_2_intro": [
+          [
+            7,
+            8
+          ]
+        ],
+        "designating_sentence": [
+          [
+            8,
+            9
+          ],
+          [
+            10,
+            12
+          ],
+          [
+            13,
+            15
+          ],
+          [
+            16,
+            18
+          ]
+        ],
+        "designation_site": [
+          [
+            9,
+            10
+          ]
+        ],
+        "predicate_token": [
+          [
+            12,
+            13
+          ]
+        ],
+        "other_token": [
+          [
+            15,
+            16
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            18,
+            19
+          ]
+        ],
+        "designation_suffix": [
+          [
+            19,
+            30
+          ]
+        ],
+        "pressure_clause": [
+          [
+            30,
+            43
+          ]
+        ],
+        "question": [
+          [
+            43,
+            49
+          ],
+          [
+            50,
+            51
+          ],
+          [
+            52,
+            62
+          ],
+          [
+            63,
+            71
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            49,
+            50
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            62,
+            63
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            51,
+            52
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            71,
+            72
+          ]
+        ],
+        "stem": [
+          [
+            72,
+            78
+          ]
+        ],
+        "readout": [
+          [
+            78,
+            79
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "efb1a0c9fd93",
+      "n_tokens": 84,
+      "readout": 83,
+      "segments": {
+        "intro": [
+          [
+            1,
+            8
+          ],
+          [
+            9,
+            10
+          ]
+        ],
+        "item_1_intro": [
+          [
+            8,
+            9
+          ]
+        ],
+        "item_2_intro": [
+          [
+            10,
+            11
+          ]
+        ],
+        "designating_sentence": [
+          [
+            11,
+            12
+          ],
+          [
+            13,
+            16
+          ],
+          [
+            17,
+            19
+          ],
+          [
+            20,
+            23
+          ]
+        ],
+        "designation_site": [
+          [
+            12,
+            13
+          ]
+        ],
+        "predicate_token": [
+          [
+            16,
+            17
+          ]
+        ],
+        "other_token": [
+          [
+            19,
+            20
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            23,
+            24
+          ]
+        ],
+        "designation_suffix": [
+          [
+            24,
+            35
+          ]
+        ],
+        "pressure_clause": [
+          [
+            35,
+            48
+          ]
+        ],
+        "question": [
+          [
+            48,
+            54
+          ],
+          [
+            55,
+            56
+          ],
+          [
+            57,
+            67
+          ],
+          [
+            68,
+            76
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            54,
+            55
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            67,
+            68
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            56,
+            57
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            76,
+            77
+          ]
+        ],
+        "stem": [
+          [
+            77,
+            83
+          ]
+        ],
+        "readout": [
+          [
+            83,
+            84
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "e2a35e0a2001",
+      "n_tokens": 79,
+      "readout": 78,
+      "segments": {
+        "intro": [
+          [
+            1,
+            5
+          ],
+          [
+            6,
+            7
+          ]
+        ],
+        "item_1_intro": [
+          [
+            5,
+            6
+          ]
+        ],
+        "item_2_intro": [
+          [
+            7,
+            8
+          ]
+        ],
+        "designating_sentence": [
+          [
+            8,
+            9
+          ],
+          [
+            10,
+            12
+          ],
+          [
+            13,
+            15
+          ],
+          [
+            16,
+            18
+          ]
+        ],
+        "designation_site": [
+          [
+            9,
+            10
+          ]
+        ],
+        "predicate_token": [
+          [
+            12,
+            13
+          ]
+        ],
+        "other_token": [
+          [
+            15,
+            16
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            18,
+            19
+          ]
+        ],
+        "designation_suffix": [
+          [
+            19,
+            30
+          ]
+        ],
+        "pressure_clause": [
+          [
+            30,
+            43
+          ]
+        ],
+        "question": [
+          [
+            43,
+            49
+          ],
+          [
+            50,
+            51
+          ],
+          [
+            52,
+            62
+          ],
+          [
+            63,
+            71
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            49,
+            50
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            62,
+            63
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            51,
+            52
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            71,
+            72
+          ]
+        ],
+        "stem": [
+          [
+            72,
+            78
+          ]
+        ],
+        "readout": [
+          [
+            78,
+            79
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "0a4238f3ed97",
+      "n_tokens": 83,
+      "readout": 82,
+      "segments": {
+        "intro": [
+          [
+            1,
+            8
+          ],
+          [
+            9,
+            10
+          ]
+        ],
+        "item_1_intro": [
+          [
+            8,
+            9
+          ]
+        ],
+        "item_2_intro": [
+          [
+            10,
+            11
+          ]
+        ],
+        "designating_sentence": [
+          [
+            11,
+            12
+          ],
+          [
+            13,
+            16
+          ],
+          [
+            17,
+            19
+          ],
+          [
+            20,
+            23
+          ]
+        ],
+        "designation_site": [
+          [
+            12,
+            13
+          ]
+        ],
+        "predicate_token": [
+          [
+            16,
+            17
+          ]
+        ],
+        "other_token": [
+          [
+            19,
+            20
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            23,
+            24
+          ]
+        ],
+        "designation_suffix": [
+          [
+            24,
+            35
+          ]
+        ],
+        "pressure_clause": [
+          [
+            35,
+            47
+          ]
+        ],
+        "question": [
+          [
+            47,
+            53
+          ],
+          [
+            54,
+            55
+          ],
+          [
+            56,
+            66
+          ],
+          [
+            67,
+            75
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            53,
+            54
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            66,
+            67
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            55,
+            56
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            75,
+            76
+          ]
+        ],
+        "stem": [
+          [
+            76,
+            82
+          ]
+        ],
+        "readout": [
+          [
+            82,
+            83
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "294b6063ff83",
+      "n_tokens": 78,
+      "readout": 77,
+      "segments": {
+        "intro": [
+          [
+            1,
+            5
+          ],
+          [
+            6,
+            7
+          ]
+        ],
+        "item_1_intro": [
+          [
+            5,
+            6
+          ]
+        ],
+        "item_2_intro": [
+          [
+            7,
+            8
+          ]
+        ],
+        "designating_sentence": [
+          [
+            8,
+            9
+          ],
+          [
+            10,
+            12
+          ],
+          [
+            13,
+            15
+          ],
+          [
+            16,
+            18
+          ]
+        ],
+        "designation_site": [
+          [
+            9,
+            10
+          ]
+        ],
+        "predicate_token": [
+          [
+            12,
+            13
+          ]
+        ],
+        "other_token": [
+          [
+            15,
+            16
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            18,
+            19
+          ]
+        ],
+        "designation_suffix": [
+          [
+            19,
+            30
+          ]
+        ],
+        "pressure_clause": [
+          [
+            30,
+            42
+          ]
+        ],
+        "question": [
+          [
+            42,
+            48
+          ],
+          [
+            49,
+            50
+          ],
+          [
+            51,
+            61
+          ],
+          [
+            62,
+            70
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            48,
+            49
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            61,
+            62
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            50,
+            51
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            70,
+            71
+          ]
+        ],
+        "stem": [
+          [
+            71,
+            77
+          ]
+        ],
+        "readout": [
+          [
+            77,
+            78
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "ce60a2a0e743",
+      "n_tokens": 78,
+      "readout": 77,
+      "segments": {
+        "intro": [
+          [
+            1,
+            5
+          ],
+          [
+            6,
+            7
+          ]
+        ],
+        "item_1_intro": [
+          [
+            5,
+            6
+          ]
+        ],
+        "item_2_intro": [
+          [
+            7,
+            8
+          ]
+        ],
+        "designating_sentence": [
+          [
+            8,
+            9
+          ],
+          [
+            10,
+            12
+          ],
+          [
+            13,
+            15
+          ],
+          [
+            16,
+            18
+          ]
+        ],
+        "designation_site": [
+          [
+            9,
+            10
+          ]
+        ],
+        "predicate_token": [
+          [
+            12,
+            13
+          ]
+        ],
+        "other_token": [
+          [
+            15,
+            16
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            18,
+            19
+          ]
+        ],
+        "designation_suffix": [
+          [
+            19,
+            30
+          ]
+        ],
+        "pressure_clause": [
+          [
+            30,
+            42
+          ]
+        ],
+        "question": [
+          [
+            42,
+            48
+          ],
+          [
+            49,
+            50
+          ],
+          [
+            51,
+            61
+          ],
+          [
+            62,
+            70
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            48,
+            49
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            61,
+            62
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            50,
+            51
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            70,
+            71
+          ]
+        ],
+        "stem": [
+          [
+            71,
+            77
+          ]
+        ],
+        "readout": [
+          [
+            77,
+            78
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "5aef9ad805be",
+      "n_tokens": 83,
+      "readout": 82,
+      "segments": {
+        "intro": [
+          [
+            1,
+            8
+          ],
+          [
+            9,
+            10
+          ]
+        ],
+        "item_1_intro": [
+          [
+            8,
+            9
+          ]
+        ],
+        "item_2_intro": [
+          [
+            10,
+            11
+          ]
+        ],
+        "designating_sentence": [
+          [
+            11,
+            12
+          ],
+          [
+            13,
+            16
+          ],
+          [
+            17,
+            19
+          ],
+          [
+            20,
+            23
+          ]
+        ],
+        "designation_site": [
+          [
+            12,
+            13
+          ]
+        ],
+        "predicate_token": [
+          [
+            16,
+            17
+          ]
+        ],
+        "other_token": [
+          [
+            19,
+            20
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            23,
+            24
+          ]
+        ],
+        "designation_suffix": [
+          [
+            24,
+            35
+          ]
+        ],
+        "pressure_clause": [
+          [
+            35,
+            47
+          ]
+        ],
+        "question": [
+          [
+            47,
+            53
+          ],
+          [
+            54,
+            55
+          ],
+          [
+            56,
+            66
+          ],
+          [
+            67,
+            75
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            53,
+            54
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            66,
+            67
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            55,
+            56
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            75,
+            76
+          ]
+        ],
+        "stem": [
+          [
+            76,
+            82
+          ]
+        ],
+        "readout": [
+          [
+            82,
+            83
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "500ecfc036ae",
+      "n_tokens": 83,
+      "readout": 82,
+      "segments": {
+        "intro": [
+          [
+            1,
+            8
+          ],
+          [
+            9,
+            10
+          ]
+        ],
+        "item_1_intro": [
+          [
+            8,
+            9
+          ]
+        ],
+        "item_2_intro": [
+          [
+            10,
+            11
+          ]
+        ],
+        "designating_sentence": [
+          [
+            11,
+            12
+          ],
+          [
+            13,
+            16
+          ],
+          [
+            17,
+            19
+          ],
+          [
+            20,
+            23
+          ]
+        ],
+        "designation_site": [
+          [
+            12,
+            13
+          ]
+        ],
+        "predicate_token": [
+          [
+            16,
+            17
+          ]
+        ],
+        "other_token": [
+          [
+            19,
+            20
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            23,
+            24
+          ]
+        ],
+        "designation_suffix": [
+          [
+            24,
+            35
+          ]
+        ],
+        "pressure_clause": [
+          [
+            35,
+            47
+          ]
+        ],
+        "question": [
+          [
+            47,
+            53
+          ],
+          [
+            54,
+            55
+          ],
+          [
+            56,
+            66
+          ],
+          [
+            67,
+            75
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            53,
+            54
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            66,
+            67
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            55,
+            56
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            75,
+            76
+          ]
+        ],
+        "stem": [
+          [
+            76,
+            82
+          ]
+        ],
+        "readout": [
+          [
+            82,
+            83
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "3e6cfe97825a",
+      "n_tokens": 84,
+      "readout": 83,
+      "segments": {
+        "intro": [
+          [
+            1,
+            8
+          ],
+          [
+            9,
+            10
+          ]
+        ],
+        "item_1_intro": [
+          [
+            8,
+            9
+          ]
+        ],
+        "item_2_intro": [
+          [
+            10,
+            11
+          ]
+        ],
+        "designating_sentence": [
+          [
+            11,
+            12
+          ],
+          [
+            13,
+            16
+          ],
+          [
+            17,
+            19
+          ],
+          [
+            20,
+            23
+          ]
+        ],
+        "designation_site": [
+          [
+            12,
+            13
+          ]
+        ],
+        "predicate_token": [
+          [
+            16,
+            17
+          ]
+        ],
+        "other_token": [
+          [
+            19,
+            20
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            23,
+            24
+          ]
+        ],
+        "designation_suffix": [
+          [
+            24,
+            35
+          ]
+        ],
+        "pressure_clause": [
+          [
+            35,
+            48
+          ]
+        ],
+        "question": [
+          [
+            48,
+            54
+          ],
+          [
+            55,
+            56
+          ],
+          [
+            57,
+            67
+          ],
+          [
+            68,
+            76
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            54,
+            55
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            67,
+            68
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            56,
+            57
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            76,
+            77
+          ]
+        ],
+        "stem": [
+          [
+            77,
+            83
+          ]
+        ],
+        "readout": [
+          [
+            83,
+            84
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "d0da53cd6cc1",
+      "n_tokens": 83,
+      "readout": 82,
+      "segments": {
+        "intro": [
+          [
+            1,
+            8
+          ],
+          [
+            9,
+            10
+          ]
+        ],
+        "item_1_intro": [
+          [
+            8,
+            9
+          ]
+        ],
+        "item_2_intro": [
+          [
+            10,
+            11
+          ]
+        ],
+        "designating_sentence": [
+          [
+            11,
+            12
+          ],
+          [
+            13,
+            16
+          ],
+          [
+            17,
+            19
+          ],
+          [
+            20,
+            23
+          ]
+        ],
+        "designation_site": [
+          [
+            12,
+            13
+          ]
+        ],
+        "predicate_token": [
+          [
+            16,
+            17
+          ]
+        ],
+        "other_token": [
+          [
+            19,
+            20
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            23,
+            24
+          ]
+        ],
+        "designation_suffix": [
+          [
+            24,
+            35
+          ]
+        ],
+        "pressure_clause": [
+          [
+            35,
+            47
+          ]
+        ],
+        "question": [
+          [
+            47,
+            53
+          ],
+          [
+            54,
+            55
+          ],
+          [
+            56,
+            66
+          ],
+          [
+            67,
+            75
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            53,
+            54
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            66,
+            67
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            55,
+            56
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            75,
+            76
+          ]
+        ],
+        "stem": [
+          [
+            76,
+            82
+          ]
+        ],
+        "readout": [
+          [
+            82,
+            83
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "1aa7d042bae4",
+      "n_tokens": 84,
+      "readout": 83,
+      "segments": {
+        "intro": [
+          [
+            1,
+            8
+          ],
+          [
+            9,
+            10
+          ]
+        ],
+        "item_1_intro": [
+          [
+            8,
+            9
+          ]
+        ],
+        "item_2_intro": [
+          [
+            10,
+            11
+          ]
+        ],
+        "designating_sentence": [
+          [
+            11,
+            12
+          ],
+          [
+            13,
+            16
+          ],
+          [
+            17,
+            19
+          ],
+          [
+            20,
+            23
+          ]
+        ],
+        "designation_site": [
+          [
+            12,
+            13
+          ]
+        ],
+        "predicate_token": [
+          [
+            16,
+            17
+          ]
+        ],
+        "other_token": [
+          [
+            19,
+            20
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            23,
+            24
+          ]
+        ],
+        "designation_suffix": [
+          [
+            24,
+            35
+          ]
+        ],
+        "pressure_clause": [
+          [
+            35,
+            48
+          ]
+        ],
+        "question": [
+          [
+            48,
+            54
+          ],
+          [
+            55,
+            56
+          ],
+          [
+            57,
+            67
+          ],
+          [
+            68,
+            76
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            54,
+            55
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            67,
+            68
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            56,
+            57
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            76,
+            77
+          ]
+        ],
+        "stem": [
+          [
+            77,
+            83
+          ]
+        ],
+        "readout": [
+          [
+            83,
+            84
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "6ff221983c72",
+      "n_tokens": 83,
+      "readout": 82,
+      "segments": {
+        "intro": [
+          [
+            1,
+            8
+          ],
+          [
+            9,
+            10
+          ]
+        ],
+        "item_1_intro": [
+          [
+            8,
+            9
+          ]
+        ],
+        "item_2_intro": [
+          [
+            10,
+            11
+          ]
+        ],
+        "designating_sentence": [
+          [
+            11,
+            12
+          ],
+          [
+            13,
+            16
+          ],
+          [
+            17,
+            19
+          ],
+          [
+            20,
+            23
+          ]
+        ],
+        "designation_site": [
+          [
+            12,
+            13
+          ]
+        ],
+        "predicate_token": [
+          [
+            16,
+            17
+          ]
+        ],
+        "other_token": [
+          [
+            19,
+            20
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            23,
+            24
+          ]
+        ],
+        "designation_suffix": [
+          [
+            24,
+            35
+          ]
+        ],
+        "pressure_clause": [
+          [
+            35,
+            47
+          ]
+        ],
+        "question": [
+          [
+            47,
+            53
+          ],
+          [
+            54,
+            55
+          ],
+          [
+            56,
+            66
+          ],
+          [
+            67,
+            75
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            53,
+            54
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            66,
+            67
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            55,
+            56
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            75,
+            76
+          ]
+        ],
+        "stem": [
+          [
+            76,
+            82
+          ]
+        ],
+        "readout": [
+          [
+            82,
+            83
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "f4460c2acdfa",
+      "n_tokens": 79,
+      "readout": 78,
+      "segments": {
+        "intro": [
+          [
+            1,
+            5
+          ],
+          [
+            6,
+            7
+          ]
+        ],
+        "item_1_intro": [
+          [
+            5,
+            6
+          ]
+        ],
+        "item_2_intro": [
+          [
+            7,
+            8
+          ]
+        ],
+        "designating_sentence": [
+          [
+            8,
+            9
+          ],
+          [
+            10,
+            12
+          ],
+          [
+            13,
+            15
+          ],
+          [
+            16,
+            18
+          ]
+        ],
+        "designation_site": [
+          [
+            9,
+            10
+          ]
+        ],
+        "predicate_token": [
+          [
+            12,
+            13
+          ]
+        ],
+        "other_token": [
+          [
+            15,
+            16
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            18,
+            19
+          ]
+        ],
+        "designation_suffix": [
+          [
+            19,
+            30
+          ]
+        ],
+        "pressure_clause": [
+          [
+            30,
+            43
+          ]
+        ],
+        "question": [
+          [
+            43,
+            49
+          ],
+          [
+            50,
+            51
+          ],
+          [
+            52,
+            62
+          ],
+          [
+            63,
+            71
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            49,
+            50
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            62,
+            63
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            51,
+            52
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            71,
+            72
+          ]
+        ],
+        "stem": [
+          [
+            72,
+            78
+          ]
+        ],
+        "readout": [
+          [
+            78,
+            79
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "58993310fd39",
+      "n_tokens": 83,
+      "readout": 82,
+      "segments": {
+        "intro": [
+          [
+            1,
+            8
+          ],
+          [
+            9,
+            10
+          ]
+        ],
+        "item_1_intro": [
+          [
+            8,
+            9
+          ]
+        ],
+        "item_2_intro": [
+          [
+            10,
+            11
+          ]
+        ],
+        "designating_sentence": [
+          [
+            11,
+            12
+          ],
+          [
+            13,
+            16
+          ],
+          [
+            17,
+            19
+          ],
+          [
+            20,
+            23
+          ]
+        ],
+        "designation_site": [
+          [
+            12,
+            13
+          ]
+        ],
+        "predicate_token": [
+          [
+            16,
+            17
+          ]
+        ],
+        "other_token": [
+          [
+            19,
+            20
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            23,
+            24
+          ]
+        ],
+        "designation_suffix": [
+          [
+            24,
+            35
+          ]
+        ],
+        "pressure_clause": [
+          [
+            35,
+            47
+          ]
+        ],
+        "question": [
+          [
+            47,
+            53
+          ],
+          [
+            54,
+            55
+          ],
+          [
+            56,
+            66
+          ],
+          [
+            67,
+            75
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            53,
+            54
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            66,
+            67
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            55,
+            56
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            75,
+            76
+          ]
+        ],
+        "stem": [
+          [
+            76,
+            82
+          ]
+        ],
+        "readout": [
+          [
+            82,
+            83
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "11783a8fab13",
+      "n_tokens": 84,
+      "readout": 83,
+      "segments": {
+        "intro": [
+          [
+            1,
+            8
+          ],
+          [
+            9,
+            10
+          ]
+        ],
+        "item_1_intro": [
+          [
+            8,
+            9
+          ]
+        ],
+        "item_2_intro": [
+          [
+            10,
+            11
+          ]
+        ],
+        "designating_sentence": [
+          [
+            11,
+            12
+          ],
+          [
+            13,
+            16
+          ],
+          [
+            17,
+            19
+          ],
+          [
+            20,
+            23
+          ]
+        ],
+        "designation_site": [
+          [
+            12,
+            13
+          ]
+        ],
+        "predicate_token": [
+          [
+            16,
+            17
+          ]
+        ],
+        "other_token": [
+          [
+            19,
+            20
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            23,
+            24
+          ]
+        ],
+        "designation_suffix": [
+          [
+            24,
+            35
+          ]
+        ],
+        "pressure_clause": [
+          [
+            35,
+            48
+          ]
+        ],
+        "question": [
+          [
+            48,
+            54
+          ],
+          [
+            55,
+            56
+          ],
+          [
+            57,
+            67
+          ],
+          [
+            68,
+            76
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            54,
+            55
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            67,
+            68
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            56,
+            57
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            76,
+            77
+          ]
+        ],
+        "stem": [
+          [
+            77,
+            83
+          ]
+        ],
+        "readout": [
+          [
+            83,
+            84
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "2981df6df9f2",
+      "n_tokens": 83,
+      "readout": 82,
+      "segments": {
+        "intro": [
+          [
+            1,
+            8
+          ],
+          [
+            9,
+            10
+          ]
+        ],
+        "item_1_intro": [
+          [
+            8,
+            9
+          ]
+        ],
+        "item_2_intro": [
+          [
+            10,
+            11
+          ]
+        ],
+        "designating_sentence": [
+          [
+            11,
+            12
+          ],
+          [
+            13,
+            16
+          ],
+          [
+            17,
+            19
+          ],
+          [
+            20,
+            23
+          ]
+        ],
+        "designation_site": [
+          [
+            12,
+            13
+          ]
+        ],
+        "predicate_token": [
+          [
+            16,
+            17
+          ]
+        ],
+        "other_token": [
+          [
+            19,
+            20
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            23,
+            24
+          ]
+        ],
+        "designation_suffix": [
+          [
+            24,
+            35
+          ]
+        ],
+        "pressure_clause": [
+          [
+            35,
+            47
+          ]
+        ],
+        "question": [
+          [
+            47,
+            53
+          ],
+          [
+            54,
+            55
+          ],
+          [
+            56,
+            66
+          ],
+          [
+            67,
+            75
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            53,
+            54
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            66,
+            67
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            55,
+            56
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            75,
+            76
+          ]
+        ],
+        "stem": [
+          [
+            76,
+            82
+          ]
+        ],
+        "readout": [
+          [
+            82,
+            83
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "52a214f51e5d",
+      "n_tokens": 78,
+      "readout": 77,
+      "segments": {
+        "intro": [
+          [
+            1,
+            5
+          ],
+          [
+            6,
+            7
+          ]
+        ],
+        "item_1_intro": [
+          [
+            5,
+            6
+          ]
+        ],
+        "item_2_intro": [
+          [
+            7,
+            8
+          ]
+        ],
+        "designating_sentence": [
+          [
+            8,
+            9
+          ],
+          [
+            10,
+            12
+          ],
+          [
+            13,
+            15
+          ],
+          [
+            16,
+            18
+          ]
+        ],
+        "designation_site": [
+          [
+            9,
+            10
+          ]
+        ],
+        "predicate_token": [
+          [
+            12,
+            13
+          ]
+        ],
+        "other_token": [
+          [
+            15,
+            16
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            18,
+            19
+          ]
+        ],
+        "designation_suffix": [
+          [
+            19,
+            30
+          ]
+        ],
+        "pressure_clause": [
+          [
+            30,
+            42
+          ]
+        ],
+        "question": [
+          [
+            42,
+            48
+          ],
+          [
+            49,
+            50
+          ],
+          [
+            51,
+            61
+          ],
+          [
+            62,
+            70
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            48,
+            49
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            61,
+            62
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            50,
+            51
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            70,
+            71
+          ]
+        ],
+        "stem": [
+          [
+            71,
+            77
+          ]
+        ],
+        "readout": [
+          [
+            77,
+            78
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "739737453b70",
+      "n_tokens": 78,
+      "readout": 77,
+      "segments": {
+        "intro": [
+          [
+            1,
+            5
+          ],
+          [
+            6,
+            7
+          ]
+        ],
+        "item_1_intro": [
+          [
+            5,
+            6
+          ]
+        ],
+        "item_2_intro": [
+          [
+            7,
+            8
+          ]
+        ],
+        "designating_sentence": [
+          [
+            8,
+            9
+          ],
+          [
+            10,
+            12
+          ],
+          [
+            13,
+            15
+          ],
+          [
+            16,
+            18
+          ]
+        ],
+        "designation_site": [
+          [
+            9,
+            10
+          ]
+        ],
+        "predicate_token": [
+          [
+            12,
+            13
+          ]
+        ],
+        "other_token": [
+          [
+            15,
+            16
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            18,
+            19
+          ]
+        ],
+        "designation_suffix": [
+          [
+            19,
+            30
+          ]
+        ],
+        "pressure_clause": [
+          [
+            30,
+            42
+          ]
+        ],
+        "question": [
+          [
+            42,
+            48
+          ],
+          [
+            49,
+            50
+          ],
+          [
+            51,
+            61
+          ],
+          [
+            62,
+            70
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            48,
+            49
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            61,
+            62
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            50,
+            51
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            70,
+            71
+          ]
+        ],
+        "stem": [
+          [
+            71,
+            77
+          ]
+        ],
+        "readout": [
+          [
+            77,
+            78
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "bc2705f38763",
+      "n_tokens": 78,
+      "readout": 77,
+      "segments": {
+        "intro": [
+          [
+            1,
+            5
+          ],
+          [
+            6,
+            7
+          ]
+        ],
+        "item_1_intro": [
+          [
+            5,
+            6
+          ]
+        ],
+        "item_2_intro": [
+          [
+            7,
+            8
+          ]
+        ],
+        "designating_sentence": [
+          [
+            8,
+            9
+          ],
+          [
+            10,
+            12
+          ],
+          [
+            13,
+            15
+          ],
+          [
+            16,
+            18
+          ]
+        ],
+        "designation_site": [
+          [
+            9,
+            10
+          ]
+        ],
+        "predicate_token": [
+          [
+            12,
+            13
+          ]
+        ],
+        "other_token": [
+          [
+            15,
+            16
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            18,
+            19
+          ]
+        ],
+        "designation_suffix": [
+          [
+            19,
+            30
+          ]
+        ],
+        "pressure_clause": [
+          [
+            30,
+            42
+          ]
+        ],
+        "question": [
+          [
+            42,
+            48
+          ],
+          [
+            49,
+            50
+          ],
+          [
+            51,
+            61
+          ],
+          [
+            62,
+            70
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            48,
+            49
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            61,
+            62
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            50,
+            51
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            70,
+            71
+          ]
+        ],
+        "stem": [
+          [
+            71,
+            77
+          ]
+        ],
+        "readout": [
+          [
+            77,
+            78
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "f4f3f2870d67",
+      "n_tokens": 83,
+      "readout": 82,
+      "segments": {
+        "intro": [
+          [
+            1,
+            8
+          ],
+          [
+            9,
+            10
+          ]
+        ],
+        "item_1_intro": [
+          [
+            8,
+            9
+          ]
+        ],
+        "item_2_intro": [
+          [
+            10,
+            11
+          ]
+        ],
+        "designating_sentence": [
+          [
+            11,
+            12
+          ],
+          [
+            13,
+            16
+          ],
+          [
+            17,
+            19
+          ],
+          [
+            20,
+            23
+          ]
+        ],
+        "designation_site": [
+          [
+            12,
+            13
+          ]
+        ],
+        "predicate_token": [
+          [
+            16,
+            17
+          ]
+        ],
+        "other_token": [
+          [
+            19,
+            20
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            23,
+            24
+          ]
+        ],
+        "designation_suffix": [
+          [
+            24,
+            35
+          ]
+        ],
+        "pressure_clause": [
+          [
+            35,
+            47
+          ]
+        ],
+        "question": [
+          [
+            47,
+            53
+          ],
+          [
+            54,
+            55
+          ],
+          [
+            56,
+            66
+          ],
+          [
+            67,
+            75
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            53,
+            54
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            66,
+            67
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            55,
+            56
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            75,
+            76
+          ]
+        ],
+        "stem": [
+          [
+            76,
+            82
+          ]
+        ],
+        "readout": [
+          [
+            82,
+            83
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "f0ac3f3a78eb",
+      "n_tokens": 78,
+      "readout": 77,
+      "segments": {
+        "intro": [
+          [
+            1,
+            5
+          ],
+          [
+            6,
+            7
+          ]
+        ],
+        "item_1_intro": [
+          [
+            5,
+            6
+          ]
+        ],
+        "item_2_intro": [
+          [
+            7,
+            8
+          ]
+        ],
+        "designating_sentence": [
+          [
+            8,
+            9
+          ],
+          [
+            10,
+            12
+          ],
+          [
+            13,
+            15
+          ],
+          [
+            16,
+            18
+          ]
+        ],
+        "designation_site": [
+          [
+            9,
+            10
+          ]
+        ],
+        "predicate_token": [
+          [
+            12,
+            13
+          ]
+        ],
+        "other_token": [
+          [
+            15,
+            16
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            18,
+            19
+          ]
+        ],
+        "designation_suffix": [
+          [
+            19,
+            30
+          ]
+        ],
+        "pressure_clause": [
+          [
+            30,
+            42
+          ]
+        ],
+        "question": [
+          [
+            42,
+            48
+          ],
+          [
+            49,
+            50
+          ],
+          [
+            51,
+            61
+          ],
+          [
+            62,
+            70
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            48,
+            49
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            61,
+            62
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            50,
+            51
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            70,
+            71
+          ]
+        ],
+        "stem": [
+          [
+            71,
+            77
+          ]
+        ],
+        "readout": [
+          [
+            77,
+            78
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "85f8acce853a",
+      "n_tokens": 79,
+      "readout": 78,
+      "segments": {
+        "intro": [
+          [
+            1,
+            5
+          ],
+          [
+            6,
+            7
+          ]
+        ],
+        "item_1_intro": [
+          [
+            5,
+            6
+          ]
+        ],
+        "item_2_intro": [
+          [
+            7,
+            8
+          ]
+        ],
+        "designating_sentence": [
+          [
+            8,
+            9
+          ],
+          [
+            10,
+            12
+          ],
+          [
+            13,
+            15
+          ],
+          [
+            16,
+            18
+          ]
+        ],
+        "designation_site": [
+          [
+            9,
+            10
+          ]
+        ],
+        "predicate_token": [
+          [
+            12,
+            13
+          ]
+        ],
+        "other_token": [
+          [
+            15,
+            16
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            18,
+            19
+          ]
+        ],
+        "designation_suffix": [
+          [
+            19,
+            30
+          ]
+        ],
+        "pressure_clause": [
+          [
+            30,
+            43
+          ]
+        ],
+        "question": [
+          [
+            43,
+            49
+          ],
+          [
+            50,
+            51
+          ],
+          [
+            52,
+            62
+          ],
+          [
+            63,
+            71
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            49,
+            50
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            62,
+            63
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            51,
+            52
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            71,
+            72
+          ]
+        ],
+        "stem": [
+          [
+            72,
+            78
+          ]
+        ],
+        "readout": [
+          [
+            78,
+            79
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "6fff25ad8489",
+      "n_tokens": 78,
+      "readout": 77,
+      "segments": {
+        "intro": [
+          [
+            1,
+            5
+          ],
+          [
+            6,
+            7
+          ]
+        ],
+        "item_1_intro": [
+          [
+            5,
+            6
+          ]
+        ],
+        "item_2_intro": [
+          [
+            7,
+            8
+          ]
+        ],
+        "designating_sentence": [
+          [
+            8,
+            9
+          ],
+          [
+            10,
+            12
+          ],
+          [
+            13,
+            15
+          ],
+          [
+            16,
+            18
+          ]
+        ],
+        "designation_site": [
+          [
+            9,
+            10
+          ]
+        ],
+        "predicate_token": [
+          [
+            12,
+            13
+          ]
+        ],
+        "other_token": [
+          [
+            15,
+            16
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            18,
+            19
+          ]
+        ],
+        "designation_suffix": [
+          [
+            19,
+            30
+          ]
+        ],
+        "pressure_clause": [
+          [
+            30,
+            42
+          ]
+        ],
+        "question": [
+          [
+            42,
+            48
+          ],
+          [
+            49,
+            50
+          ],
+          [
+            51,
+            61
+          ],
+          [
+            62,
+            70
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            48,
+            49
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            61,
+            62
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            50,
+            51
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            70,
+            71
+          ]
+        ],
+        "stem": [
+          [
+            71,
+            77
+          ]
+        ],
+        "readout": [
+          [
+            77,
+            78
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "3ab6fdf2644f",
+      "n_tokens": 84,
+      "readout": 83,
+      "segments": {
+        "intro": [
+          [
+            1,
+            8
+          ],
+          [
+            9,
+            10
+          ]
+        ],
+        "item_1_intro": [
+          [
+            8,
+            9
+          ]
+        ],
+        "item_2_intro": [
+          [
+            10,
+            11
+          ]
+        ],
+        "designating_sentence": [
+          [
+            11,
+            12
+          ],
+          [
+            13,
+            16
+          ],
+          [
+            17,
+            19
+          ],
+          [
+            20,
+            23
+          ]
+        ],
+        "designation_site": [
+          [
+            12,
+            13
+          ]
+        ],
+        "predicate_token": [
+          [
+            16,
+            17
+          ]
+        ],
+        "other_token": [
+          [
+            19,
+            20
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            23,
+            24
+          ]
+        ],
+        "designation_suffix": [
+          [
+            24,
+            35
+          ]
+        ],
+        "pressure_clause": [
+          [
+            35,
+            48
+          ]
+        ],
+        "question": [
+          [
+            48,
+            54
+          ],
+          [
+            55,
+            56
+          ],
+          [
+            57,
+            67
+          ],
+          [
+            68,
+            76
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            54,
+            55
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            67,
+            68
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            56,
+            57
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            76,
+            77
+          ]
+        ],
+        "stem": [
+          [
+            77,
+            83
+          ]
+        ],
+        "readout": [
+          [
+            83,
+            84
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "33d18eaffa39",
+      "n_tokens": 84,
+      "readout": 83,
+      "segments": {
+        "intro": [
+          [
+            1,
+            8
+          ],
+          [
+            9,
+            10
+          ]
+        ],
+        "item_1_intro": [
+          [
+            8,
+            9
+          ]
+        ],
+        "item_2_intro": [
+          [
+            10,
+            11
+          ]
+        ],
+        "designating_sentence": [
+          [
+            11,
+            12
+          ],
+          [
+            13,
+            16
+          ],
+          [
+            17,
+            19
+          ],
+          [
+            20,
+            23
+          ]
+        ],
+        "designation_site": [
+          [
+            12,
+            13
+          ]
+        ],
+        "predicate_token": [
+          [
+            16,
+            17
+          ]
+        ],
+        "other_token": [
+          [
+            19,
+            20
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            23,
+            24
+          ]
+        ],
+        "designation_suffix": [
+          [
+            24,
+            35
+          ]
+        ],
+        "pressure_clause": [
+          [
+            35,
+            48
+          ]
+        ],
+        "question": [
+          [
+            48,
+            54
+          ],
+          [
+            55,
+            56
+          ],
+          [
+            57,
+            67
+          ],
+          [
+            68,
+            76
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            54,
+            55
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            67,
+            68
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            56,
+            57
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            76,
+            77
+          ]
+        ],
+        "stem": [
+          [
+            77,
+            83
+          ]
+        ],
+        "readout": [
+          [
+            83,
+            84
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "9a1ee917d473",
+      "n_tokens": 83,
+      "readout": 82,
+      "segments": {
+        "intro": [
+          [
+            1,
+            8
+          ],
+          [
+            9,
+            10
+          ]
+        ],
+        "item_1_intro": [
+          [
+            8,
+            9
+          ]
+        ],
+        "item_2_intro": [
+          [
+            10,
+            11
+          ]
+        ],
+        "designating_sentence": [
+          [
+            11,
+            12
+          ],
+          [
+            13,
+            16
+          ],
+          [
+            17,
+            19
+          ],
+          [
+            20,
+            23
+          ]
+        ],
+        "designation_site": [
+          [
+            12,
+            13
+          ]
+        ],
+        "predicate_token": [
+          [
+            16,
+            17
+          ]
+        ],
+        "other_token": [
+          [
+            19,
+            20
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            23,
+            24
+          ]
+        ],
+        "designation_suffix": [
+          [
+            24,
+            35
+          ]
+        ],
+        "pressure_clause": [
+          [
+            35,
+            47
+          ]
+        ],
+        "question": [
+          [
+            47,
+            53
+          ],
+          [
+            54,
+            55
+          ],
+          [
+            56,
+            66
+          ],
+          [
+            67,
+            75
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            53,
+            54
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            66,
+            67
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            55,
+            56
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            75,
+            76
+          ]
+        ],
+        "stem": [
+          [
+            76,
+            82
+          ]
+        ],
+        "readout": [
+          [
+            82,
+            83
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "519daca38ffd",
+      "n_tokens": 78,
+      "readout": 77,
+      "segments": {
+        "intro": [
+          [
+            1,
+            5
+          ],
+          [
+            6,
+            7
+          ]
+        ],
+        "item_1_intro": [
+          [
+            5,
+            6
+          ]
+        ],
+        "item_2_intro": [
+          [
+            7,
+            8
+          ]
+        ],
+        "designating_sentence": [
+          [
+            8,
+            9
+          ],
+          [
+            10,
+            12
+          ],
+          [
+            13,
+            15
+          ],
+          [
+            16,
+            18
+          ]
+        ],
+        "designation_site": [
+          [
+            9,
+            10
+          ]
+        ],
+        "predicate_token": [
+          [
+            12,
+            13
+          ]
+        ],
+        "other_token": [
+          [
+            15,
+            16
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            18,
+            19
+          ]
+        ],
+        "designation_suffix": [
+          [
+            19,
+            30
+          ]
+        ],
+        "pressure_clause": [
+          [
+            30,
+            42
+          ]
+        ],
+        "question": [
+          [
+            42,
+            48
+          ],
+          [
+            49,
+            50
+          ],
+          [
+            51,
+            61
+          ],
+          [
+            62,
+            70
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            48,
+            49
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            61,
+            62
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            50,
+            51
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            70,
+            71
+          ]
+        ],
+        "stem": [
+          [
+            71,
+            77
+          ]
+        ],
+        "readout": [
+          [
+            77,
+            78
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "60049c37d8f1",
+      "n_tokens": 79,
+      "readout": 78,
+      "segments": {
+        "intro": [
+          [
+            1,
+            5
+          ],
+          [
+            6,
+            7
+          ]
+        ],
+        "item_1_intro": [
+          [
+            5,
+            6
+          ]
+        ],
+        "item_2_intro": [
+          [
+            7,
+            8
+          ]
+        ],
+        "designating_sentence": [
+          [
+            8,
+            9
+          ],
+          [
+            10,
+            12
+          ],
+          [
+            13,
+            15
+          ],
+          [
+            16,
+            18
+          ]
+        ],
+        "designation_site": [
+          [
+            9,
+            10
+          ]
+        ],
+        "predicate_token": [
+          [
+            12,
+            13
+          ]
+        ],
+        "other_token": [
+          [
+            15,
+            16
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            18,
+            19
+          ]
+        ],
+        "designation_suffix": [
+          [
+            19,
+            30
+          ]
+        ],
+        "pressure_clause": [
+          [
+            30,
+            43
+          ]
+        ],
+        "question": [
+          [
+            43,
+            49
+          ],
+          [
+            50,
+            51
+          ],
+          [
+            52,
+            62
+          ],
+          [
+            63,
+            71
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            49,
+            50
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            62,
+            63
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            51,
+            52
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            71,
+            72
+          ]
+        ],
+        "stem": [
+          [
+            72,
+            78
+          ]
+        ],
+        "readout": [
+          [
+            78,
+            79
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "6524378ce6da",
+      "n_tokens": 78,
+      "readout": 77,
+      "segments": {
+        "intro": [
+          [
+            1,
+            5
+          ],
+          [
+            6,
+            7
+          ]
+        ],
+        "item_1_intro": [
+          [
+            5,
+            6
+          ]
+        ],
+        "item_2_intro": [
+          [
+            7,
+            8
+          ]
+        ],
+        "designating_sentence": [
+          [
+            8,
+            9
+          ],
+          [
+            10,
+            12
+          ],
+          [
+            13,
+            15
+          ],
+          [
+            16,
+            18
+          ]
+        ],
+        "designation_site": [
+          [
+            9,
+            10
+          ]
+        ],
+        "predicate_token": [
+          [
+            12,
+            13
+          ]
+        ],
+        "other_token": [
+          [
+            15,
+            16
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            18,
+            19
+          ]
+        ],
+        "designation_suffix": [
+          [
+            19,
+            30
+          ]
+        ],
+        "pressure_clause": [
+          [
+            30,
+            42
+          ]
+        ],
+        "question": [
+          [
+            42,
+            48
+          ],
+          [
+            49,
+            50
+          ],
+          [
+            51,
+            61
+          ],
+          [
+            62,
+            70
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            48,
+            49
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            61,
+            62
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            50,
+            51
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            70,
+            71
+          ]
+        ],
+        "stem": [
+          [
+            71,
+            77
+          ]
+        ],
+        "readout": [
+          [
+            77,
+            78
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "1f316cdecc8f",
+      "n_tokens": 78,
+      "readout": 77,
+      "segments": {
+        "intro": [
+          [
+            1,
+            5
+          ],
+          [
+            6,
+            7
+          ]
+        ],
+        "item_1_intro": [
+          [
+            5,
+            6
+          ]
+        ],
+        "item_2_intro": [
+          [
+            7,
+            8
+          ]
+        ],
+        "designating_sentence": [
+          [
+            8,
+            9
+          ],
+          [
+            10,
+            12
+          ],
+          [
+            13,
+            15
+          ],
+          [
+            16,
+            18
+          ]
+        ],
+        "designation_site": [
+          [
+            9,
+            10
+          ]
+        ],
+        "predicate_token": [
+          [
+            12,
+            13
+          ]
+        ],
+        "other_token": [
+          [
+            15,
+            16
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            18,
+            19
+          ]
+        ],
+        "designation_suffix": [
+          [
+            19,
+            30
+          ]
+        ],
+        "pressure_clause": [
+          [
+            30,
+            42
+          ]
+        ],
+        "question": [
+          [
+            42,
+            48
+          ],
+          [
+            49,
+            50
+          ],
+          [
+            51,
+            61
+          ],
+          [
+            62,
+            70
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            48,
+            49
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            61,
+            62
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            50,
+            51
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            70,
+            71
+          ]
+        ],
+        "stem": [
+          [
+            71,
+            77
+          ]
+        ],
+        "readout": [
+          [
+            77,
+            78
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "003f9adefbef",
+      "n_tokens": 78,
+      "readout": 77,
+      "segments": {
+        "intro": [
+          [
+            1,
+            5
+          ],
+          [
+            6,
+            7
+          ]
+        ],
+        "item_1_intro": [
+          [
+            5,
+            6
+          ]
+        ],
+        "item_2_intro": [
+          [
+            7,
+            8
+          ]
+        ],
+        "designating_sentence": [
+          [
+            8,
+            9
+          ],
+          [
+            10,
+            12
+          ],
+          [
+            13,
+            15
+          ],
+          [
+            16,
+            18
+          ]
+        ],
+        "designation_site": [
+          [
+            9,
+            10
+          ]
+        ],
+        "predicate_token": [
+          [
+            12,
+            13
+          ]
+        ],
+        "other_token": [
+          [
+            15,
+            16
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            18,
+            19
+          ]
+        ],
+        "designation_suffix": [
+          [
+            19,
+            30
+          ]
+        ],
+        "pressure_clause": [
+          [
+            30,
+            42
+          ]
+        ],
+        "question": [
+          [
+            42,
+            48
+          ],
+          [
+            49,
+            50
+          ],
+          [
+            51,
+            61
+          ],
+          [
+            62,
+            70
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            48,
+            49
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            61,
+            62
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            50,
+            51
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            70,
+            71
+          ]
+        ],
+        "stem": [
+          [
+            71,
+            77
+          ]
+        ],
+        "readout": [
+          [
+            77,
+            78
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "1e9e37a41255",
+      "n_tokens": 84,
+      "readout": 83,
+      "segments": {
+        "intro": [
+          [
+            1,
+            8
+          ],
+          [
+            9,
+            10
+          ]
+        ],
+        "item_1_intro": [
+          [
+            8,
+            9
+          ]
+        ],
+        "item_2_intro": [
+          [
+            10,
+            11
+          ]
+        ],
+        "designating_sentence": [
+          [
+            11,
+            12
+          ],
+          [
+            13,
+            16
+          ],
+          [
+            17,
+            19
+          ],
+          [
+            20,
+            23
+          ]
+        ],
+        "designation_site": [
+          [
+            12,
+            13
+          ]
+        ],
+        "predicate_token": [
+          [
+            16,
+            17
+          ]
+        ],
+        "other_token": [
+          [
+            19,
+            20
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            23,
+            24
+          ]
+        ],
+        "designation_suffix": [
+          [
+            24,
+            35
+          ]
+        ],
+        "pressure_clause": [
+          [
+            35,
+            48
+          ]
+        ],
+        "question": [
+          [
+            48,
+            54
+          ],
+          [
+            55,
+            56
+          ],
+          [
+            57,
+            67
+          ],
+          [
+            68,
+            76
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            54,
+            55
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            67,
+            68
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            56,
+            57
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            76,
+            77
+          ]
+        ],
+        "stem": [
+          [
+            77,
+            83
+          ]
+        ],
+        "readout": [
+          [
+            83,
+            84
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "f3f6c0ad739a",
+      "n_tokens": 83,
+      "readout": 82,
+      "segments": {
+        "intro": [
+          [
+            1,
+            8
+          ],
+          [
+            9,
+            10
+          ]
+        ],
+        "item_1_intro": [
+          [
+            8,
+            9
+          ]
+        ],
+        "item_2_intro": [
+          [
+            10,
+            11
+          ]
+        ],
+        "designating_sentence": [
+          [
+            11,
+            12
+          ],
+          [
+            13,
+            16
+          ],
+          [
+            17,
+            19
+          ],
+          [
+            20,
+            23
+          ]
+        ],
+        "designation_site": [
+          [
+            12,
+            13
+          ]
+        ],
+        "predicate_token": [
+          [
+            16,
+            17
+          ]
+        ],
+        "other_token": [
+          [
+            19,
+            20
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            23,
+            24
+          ]
+        ],
+        "designation_suffix": [
+          [
+            24,
+            35
+          ]
+        ],
+        "pressure_clause": [
+          [
+            35,
+            47
+          ]
+        ],
+        "question": [
+          [
+            47,
+            53
+          ],
+          [
+            54,
+            55
+          ],
+          [
+            56,
+            66
+          ],
+          [
+            67,
+            75
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            53,
+            54
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            66,
+            67
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            55,
+            56
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            75,
+            76
+          ]
+        ],
+        "stem": [
+          [
+            76,
+            82
+          ]
+        ],
+        "readout": [
+          [
+            82,
+            83
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "38c5d415e590",
+      "n_tokens": 78,
+      "readout": 77,
+      "segments": {
+        "intro": [
+          [
+            1,
+            5
+          ],
+          [
+            6,
+            7
+          ]
+        ],
+        "item_1_intro": [
+          [
+            5,
+            6
+          ]
+        ],
+        "item_2_intro": [
+          [
+            7,
+            8
+          ]
+        ],
+        "designating_sentence": [
+          [
+            8,
+            9
+          ],
+          [
+            10,
+            12
+          ],
+          [
+            13,
+            15
+          ],
+          [
+            16,
+            18
+          ]
+        ],
+        "designation_site": [
+          [
+            9,
+            10
+          ]
+        ],
+        "predicate_token": [
+          [
+            12,
+            13
+          ]
+        ],
+        "other_token": [
+          [
+            15,
+            16
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            18,
+            19
+          ]
+        ],
+        "designation_suffix": [
+          [
+            19,
+            30
+          ]
+        ],
+        "pressure_clause": [
+          [
+            30,
+            42
+          ]
+        ],
+        "question": [
+          [
+            42,
+            48
+          ],
+          [
+            49,
+            50
+          ],
+          [
+            51,
+            61
+          ],
+          [
+            62,
+            70
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            48,
+            49
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            61,
+            62
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            50,
+            51
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            70,
+            71
+          ]
+        ],
+        "stem": [
+          [
+            71,
+            77
+          ]
+        ],
+        "readout": [
+          [
+            77,
+            78
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "ae34d96ab737",
+      "n_tokens": 84,
+      "readout": 83,
+      "segments": {
+        "intro": [
+          [
+            1,
+            8
+          ],
+          [
+            9,
+            10
+          ]
+        ],
+        "item_1_intro": [
+          [
+            8,
+            9
+          ]
+        ],
+        "item_2_intro": [
+          [
+            10,
+            11
+          ]
+        ],
+        "designating_sentence": [
+          [
+            11,
+            12
+          ],
+          [
+            13,
+            16
+          ],
+          [
+            17,
+            19
+          ],
+          [
+            20,
+            23
+          ]
+        ],
+        "designation_site": [
+          [
+            12,
+            13
+          ]
+        ],
+        "predicate_token": [
+          [
+            16,
+            17
+          ]
+        ],
+        "other_token": [
+          [
+            19,
+            20
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            23,
+            24
+          ]
+        ],
+        "designation_suffix": [
+          [
+            24,
+            35
+          ]
+        ],
+        "pressure_clause": [
+          [
+            35,
+            48
+          ]
+        ],
+        "question": [
+          [
+            48,
+            54
+          ],
+          [
+            55,
+            56
+          ],
+          [
+            57,
+            67
+          ],
+          [
+            68,
+            76
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            54,
+            55
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            67,
+            68
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            56,
+            57
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            76,
+            77
+          ]
+        ],
+        "stem": [
+          [
+            77,
+            83
+          ]
+        ],
+        "readout": [
+          [
+            83,
+            84
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "record_id": "caa076f09092",
+      "n_tokens": 79,
+      "readout": 78,
+      "segments": {
+        "intro": [
+          [
+            1,
+            5
+          ],
+          [
+            6,
+            7
+          ]
+        ],
+        "item_1_intro": [
+          [
+            5,
+            6
+          ]
+        ],
+        "item_2_intro": [
+          [
+            7,
+            8
+          ]
+        ],
+        "designating_sentence": [
+          [
+            8,
+            9
+          ],
+          [
+            10,
+            12
+          ],
+          [
+            13,
+            15
+          ],
+          [
+            16,
+            18
+          ]
+        ],
+        "designation_site": [
+          [
+            9,
+            10
+          ]
+        ],
+        "predicate_token": [
+          [
+            12,
+            13
+          ]
+        ],
+        "other_token": [
+          [
+            15,
+            16
+          ]
+        ],
+        "inverse_predicate_token": [
+          [
+            18,
+            19
+          ]
+        ],
+        "designation_suffix": [
+          [
+            19,
+            30
+          ]
+        ],
+        "pressure_clause": [
+          [
+            30,
+            43
+          ]
+        ],
+        "question": [
+          [
+            43,
+            49
+          ],
+          [
+            50,
+            51
+          ],
+          [
+            52,
+            62
+          ],
+          [
+            63,
+            71
+          ]
+        ],
+        "item_1_question_pair": [
+          [
+            49,
+            50
+          ]
+        ],
+        "item_1_question_option": [
+          [
+            62,
+            63
+          ]
+        ],
+        "item_2_question_pair": [
+          [
+            51,
+            52
+          ]
+        ],
+        "item_2_question_option": [
+          [
+            71,
+            72
+          ]
+        ],
+        "stem": [
+          [
+            72,
+            78
+          ]
+        ],
+        "readout": [
+          [
+            78,
+            79
+          ]
+        ],
+        "unsegmented": [
+          [
+            0,
+            1
+          ]
+        ]
+      }
+    }
+  ]
+}

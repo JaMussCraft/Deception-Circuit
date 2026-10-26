@@ -21,6 +21,7 @@ touching the original.
 What comes out, per Component:
 
     roles.role_proposed    binder | selector | mover | suppressor | unknown
+                           (and, on a v2 cell only, pressure reader: rule 4b)
     roles.role_notes       one line: the flavour, the lean, and the numbers
     roles.direct_support   path_patching.direct_support, or on a cell
                            written before 2026-10-13 -path_patching.direct_effect
@@ -52,6 +53,16 @@ no merge.
 A table written before the paired columns said `paired` in their names is read
 under the current names (`head_table.modernize_columns`), both the cell's own
 and every merged one, and the translation is recorded in `roles.json`.
+
+**Two variants of a cell (ticket 02b, 2026-10-25).** A v2 cell — the head
+table's `meta.task.task` is `far_v2`, `sdr_v2` or `ser_v2` — has no Matched
+Honest Instruction pool; its paired honest counterfactual is the Neutral-Clause
+Twin (spec R1). On such a cell rule 4's query clause and rule 6's last clause
+read the twin's path columns, rule 4b assigns `pressure reader` from the B2
+signature (`--roles-b2-floor`), the post-clause twin knockout and the receiver
+category, and `response_line` is a `frame` Segment (R7). `roles.json` then
+carries `variant: v2`. A v1 cell is read exactly as before (`Variant`, below);
+`tests/test_v1_snapshot_02b.py` holds its outputs byte for byte.
 """
 
 from __future__ import annotations
@@ -83,8 +94,12 @@ ROLES = ("binder", "selector", "mover", "suppressor", "unknown")
 
 #: Held so that nothing else takes the name. Finding pressure readers needs a
 #: dataset variant this repo does not have yet (spec, Out of Scope), so the
-#: pass notes the signature and assigns `unknown`.
-RESERVED = ("pressure reader",)
+#: pass notes the signature and assigns `unknown` — on a v1 cell. A v2 cell
+#: (mechanism-analysis spec R1, 2026-10-25) has the Neutral-Clause Twin, and
+#: there the role is assignable by rule 4b; see `Variant` below.
+PRESSURE_READER = "pressure reader"
+RESERVED = (PRESSURE_READER,)
+ROLES_V2 = ROLES + (PRESSURE_READER,)
 
 #: The flavours of `unknown`, which the notes name apart. `knockout-only` is
 #: the researcher's 2026-10-13 amendment: a Component whose only significant
@@ -94,6 +109,9 @@ DISAGREE = "disagree"
 INSUFFICIENT = "insufficient"
 KNOCKOUT_ONLY = "knockout-only"
 FLAVOURS = (DISAGREE, KNOCKOUT_ONLY, INSUFFICIENT)
+#: Rule 4b's flavour of `pressure reader` (v2 cells): the where-clause was
+#: never tested because the cell has no path patching under the twin.
+ATTENTION_AND_KNOCKOUT_ONLY = "pressure reader/attention and knockout only"
 
 #: Segment name -> group, from CONTEXT.md's prompt anatomy. A name that is not
 #: here is `unestablished`, which is also what an absent read is: a Segment the
@@ -117,6 +135,7 @@ SEGMENT_GROUPS: Dict[str, str] = {
     "pressure_clause": "pressure",
     "intro": "frame",
     "question": "frame",
+    "response_line": "frame",
     "stem": "frame",
     "readout": "unestablished",
     "unsegmented": "unestablished",
@@ -156,6 +175,25 @@ INCOMING_HONEST = "path_patching.strongest_incoming_honest_instruction_paired"
 INCOMING_HONEST_SUPPORT = \
     "path_patching.strongest_incoming_support_honest_instruction_paired"
 
+#: The v2 cells' columns (ticket 02b; docs/component-roles.md, 2026-10-25):
+#: the Neutral-Clause Twin is the paired counterfactual there, every column
+#: computed over it says `neutral_twin_paired`, and these were all written
+#: after the sign flipped, so none has a legacy spelling.
+TWIN_TOP_SEGMENT = "attention_patterns.pressure_neutral_twin_paired_top_segment"
+B2_DROP = "attention_patterns.clause_mass_drop_neutral_twin_paired"
+B2_DROP_SE = "attention_patterns.clause_mass_drop_neutral_twin_paired_se"
+KNOCKOUT_POST = ("knockout.logit_diff_drop_neutral_twin_paired"
+                 "_after_pressure_clause_excl_readout")
+KNOCKOUT_POST_SE = ("knockout.standard_error_neutral_twin_paired"
+                    "_after_pressure_clause_excl_readout")
+DIRECT_SUPPORT_TWIN = "path_patching.direct_support_neutral_twin_paired"
+DIRECT_SUPPORT_TWIN_SE = "path_patching.direct_support_neutral_twin_paired_se"
+INCOMING_TWIN = "path_patching.strongest_incoming_neutral_twin_paired"
+INCOMING_TWIN_SUPPORT = \
+    "path_patching.strongest_incoming_support_neutral_twin_paired"
+RECEIVER_CATEGORY = "path_patching.receiver_category_neutral_twin"
+RECEIVER_CATEGORY_SUPPORT = "path_patching.receiver_category_neutral_twin_support"
+
 #: The legacy-sign spellings (negative helps deception), under ticket 13's
 #: paired names. Never translated into the columns above: a sign is meaning.
 DIRECT_EFFECT = "path_patching.direct_effect"
@@ -181,6 +219,10 @@ PATH_READS = {
     "outgoing_support": (OUTGOING_SUPPORT, OUTGOING_EFFECT),
     "incoming_honest_instruction_support": (INCOMING_HONEST_SUPPORT,
                                             INCOMING_HONEST_EFFECT),
+    #: The twin's reads (v2 cells) have no legacy generation: `None` says so,
+    #: and every reader of this table treats a `None` legacy as "no column".
+    "direct_support_neutral_twin_paired": (DIRECT_SUPPORT_TWIN, None),
+    "incoming_neutral_twin_support": (INCOMING_TWIN_SUPPORT, None),
 }
 
 #: Which head-table column each counterfactual's path-patching JSON stands
@@ -188,7 +230,9 @@ PATH_READS = {
 #: the generation of the column (`check_markers`).
 MARKED_BY = {path_patching.ITEM_SWAP: PATH_READS["direct_support"],
              path_patching.HONEST_INSTRUCTION:
-                 PATH_READS["direct_support_honest_instruction_paired"]}
+                 PATH_READS["direct_support_honest_instruction_paired"],
+             path_patching.NEUTRAL_TWIN:
+                 PATH_READS["direct_support_neutral_twin_paired"]}
 
 
 class MixedConventions(ValueError):
@@ -233,12 +277,77 @@ class Thresholds:
     knockout_floor: float = 0.01
     path_floor: float = 0.01
     attention_floor: float = 0.20
+    #: Rule 4b (v2 cells): the smallest paired drop of Readout-query mass on
+    #: the Pressure Clause, pressure minus twin, that counts as the B2
+    #: signature. The spec-writer's proposal (spec section 2, B2; R0), not a
+    #: calibration. Written into a v2 cell's JSON only, so a v1 cell's JSON is
+    #: the same bytes as before.
+    b2_floor: float = 0.05
 
-    def as_dict(self) -> dict:
-        return {"z": self.z, "dla_floor": self.dla_floor,
-                "knockout_floor": self.knockout_floor,
-                "path_floor": self.path_floor,
-                "attention_floor": self.attention_floor}
+    def as_dict(self, *, v2: bool = False) -> dict:
+        out = {"z": self.z, "dla_floor": self.dla_floor,
+               "knockout_floor": self.knockout_floor,
+               "path_floor": self.path_floor,
+               "attention_floor": self.attention_floor}
+        if v2:
+            out["b2_floor"] = self.b2_floor
+        return out
+
+
+# ==============================================================================
+# THE TWO VARIANTS OF A CELL
+# ==============================================================================
+
+@dataclass(frozen=True)
+class Variant:
+    """What differs between a v1 cell and a v2 cell in the criteria.
+
+    A v1 cell's paired honest counterfactual is the Honest-Instruction
+    Counterfactual and `pressure reader` is reserved. A v2 cell (`far_v2`,
+    `sdr_v2`, `ser_v2`: `dataloaders.V2_TASKS`) has no Matched Honest pool and
+    pairs with the Neutral-Clause Twin instead (spec R1); rule 4's query clause
+    and rule 6's last clause read the twin's path columns, and rule 4b assigns
+    `pressure reader`. Nothing a v1 cell writes changes.
+    """
+
+    name: str
+    roles: tuple
+    reserved: tuple
+    check_order: tuple
+    #: The path column rule 4 reads for the paired counterfactual's arrival
+    #: at a query, and the `PATH_READS` name of its support.
+    incoming_column: str
+    incoming_read: str
+    #: How the notes name that counterfactual.
+    incoming_label: str
+
+
+CHECK_ORDER = ("suppressor", "binder", "selector", "mover")
+CHECK_ORDER_V2 = ("suppressor", "binder", "selector", PRESSURE_READER, "mover")
+
+V1 = Variant(name="v1", roles=ROLES, reserved=RESERVED, check_order=CHECK_ORDER,
+             incoming_column=INCOMING_HONEST,
+             incoming_read="incoming_honest_instruction_support",
+             incoming_label="honest instruction")
+V2 = Variant(name="v2", roles=ROLES_V2, reserved=(), check_order=CHECK_ORDER_V2,
+             incoming_column=INCOMING_TWIN,
+             incoming_read="incoming_neutral_twin_support",
+             incoming_label="neutral twin")
+
+
+def is_v2_task(name) -> bool:
+    """Is this task name one of the v2 mechanism tasks?"""
+    from component_analysis.dataloaders import V2_TASKS
+
+    return name in V2_TASKS
+
+
+def variant_of(meta) -> Variant:
+    """The variant a head table's meta says its cell is: v2 when
+    `meta.task.task` is a v2 task, v1 otherwise (and when nothing is said)."""
+    task = (meta or {}).get("task") if isinstance(meta, dict) else None
+    name = task.get("task") if isinstance(task, dict) else None
+    return V2 if is_v2_task(name) else V1
 
 
 # ==============================================================================
@@ -309,7 +418,8 @@ def path_value(row, name: str) -> Optional[float]:
     would silently drop the other measurement.
     """
     native, legacy = PATH_READS[name]
-    new, old = _number(row, native), _number(row, legacy)
+    new = _number(row, native)
+    old = None if legacy is None else _number(row, legacy)
     if new is not None and old is not None:
         raise MixedConventions(
             f"{row_key(row)} carries both {legacy} (written before path "
@@ -332,7 +442,8 @@ def generations_of(rows) -> List[str]:
     found = []
     for marker, side in ((path_patching.CONVENTION, 0),
                          (path_patching.LEGACY_CONVENTION, 1)):
-        if any(pair[side] in present for pair in PATH_READS.values()):
+        if any(pair[side] is not None and pair[side] in present
+               for pair in PATH_READS.values()):
             found.append(marker)
     return found
 
@@ -355,7 +466,8 @@ def check_markers(rows, cell_dir: str) -> None:
         if not os.path.isfile(path):
             continue
         has_native = any(_number(one, native) is not None for one in rows)
-        has_legacy = any(_number(one, legacy) is not None for one in rows)
+        has_legacy = legacy is not None and any(
+            _number(one, legacy) is not None for one in rows)
         if not (has_native or has_legacy):
             continue
         with open(path) as handle:
@@ -415,7 +527,33 @@ def is_readout_receiver(path) -> bool:
     return receiver_of(path) == "readout"
 
 
-def views_of(row, thresholds: Thresholds) -> dict:
+def is_kv_receiver_on(path, key, kv_group) -> bool:
+    """Does this path land on the keys or values of *this* head's KV group?
+
+    K and V are per KV group (`k.<layer>.<group>`), so the claim is about the
+    group's heads together, never about one head (spec section 7).
+    """
+    receiver = receiver_of(path)
+    if not receiver or receiver[:2] not in ("k.", "v."):
+        return False
+    parts = receiver.split(".")
+    if len(parts) != 3 or kv_group is None:
+        return False
+    try:
+        return (key[0] == "head" and int(parts[1]) == key[1]
+                and int(parts[2]) == int(kv_group))
+    except (TypeError, ValueError):
+        return False
+
+
+def at_own_query(depends: dict) -> bool:
+    """Rule 4's query clause, under whichever paired counterfactual the row
+    was read with: the honest instruction on a v1 cell, the twin on a v2 cell."""
+    return bool(depends.get("honest_instruction_at_own_query",
+                            depends.get("paired_at_own_query", False)))
+
+
+def views_of(row, thresholds: Thresholds, variant: Variant = V1) -> dict:
     """The three views, as the criteria see them: value, error, verdict."""
     key = row_key(row)
     is_head = key[0] == "head"
@@ -432,9 +570,13 @@ def views_of(row, thresholds: Thresholds) -> dict:
     derived = derived_columns(row)
     support = derived["direct_support"]
     outgoing_support = path_value(row, "outgoing_support")
-    incoming_support = path_value(row, "incoming_honest_instruction_support")
+    incoming_support = path_value(row, variant.incoming_read)
+    incoming = row.get(variant.incoming_column)
+    at_query = (is_query_receiver_on(incoming, key)
+                and incoming_support is not None
+                and abs(incoming_support) >= thresholds.path_floor)
 
-    return {
+    views = {
         "reads": {
             "segment": segment, "mass": mass, "group": group,
             "established": group in ESTABLISHED_GROUPS,
@@ -466,14 +608,46 @@ def views_of(row, thresholds: Thresholds) -> dict:
             "outgoing_clears_floor": (outgoing_support is not None
                                       and abs(outgoing_support) >= thresholds.path_floor),
             "outgoing_is_readout": is_readout_receiver(row.get(OUTGOING)),
-            "incoming_honest_instruction": row.get(INCOMING_HONEST),
-            "incoming_honest_instruction_support": incoming_support,
-            "honest_instruction_at_own_query": (
-                is_query_receiver_on(row.get(INCOMING_HONEST), key)
-                and incoming_support is not None
-                and abs(incoming_support) >= thresholds.path_floor),
         },
     }
+    if variant is V1:
+        views["depends"].update({
+            "incoming_honest_instruction": incoming,
+            "incoming_honest_instruction_support": incoming_support,
+            "honest_instruction_at_own_query": at_query,
+        })
+        return views
+
+    # A v2 cell: the twin's arrival, and rule 4b's three views.
+    b2_drop, b2_se = _number(row, B2_DROP), _number(row, B2_DROP_SE)
+    post, post_se = _number(row, KNOCKOUT_POST), _number(row, KNOCKOUT_POST_SE)
+    category = row.get(RECEIVER_CATEGORY) or None
+    kv_group = row.get("kv_group")
+    views["reads"].update({
+        "twin_segment": row.get(TWIN_TOP_SEGMENT),
+        "b2_drop": b2_drop, "b2_drop_se": b2_se,
+        "b2_sign": direction(b2_drop, b2_se, thresholds.b2_floor, thresholds),
+    })
+    views["depends"].update({
+        "paired_counterfactual": path_patching.NEUTRAL_TWIN,
+        "incoming_paired": incoming,
+        "incoming_paired_support": incoming_support,
+        "paired_at_own_query": at_query,
+        "incoming_paired_on_own_kv": (
+            is_kv_receiver_on(incoming, key, kv_group)
+            and incoming_support is not None
+            and abs(incoming_support) >= thresholds.path_floor),
+        "knockout_post_clause": post, "knockout_post_clause_se": post_se,
+        "knockout_post_clause_sign": direction(post, post_se,
+                                               thresholds.knockout_floor,
+                                               thresholds),
+        "receiver_category": category,
+        "receiver_category_support": _number(row, RECEIVER_CATEGORY_SUPPORT),
+        #: Whether path patching under the twin was run on this cell at all;
+        #: without it rule 4b's where-clause is untested, not failed.
+        "twin_paths_measured": category is not None or incoming is not None,
+    })
+    return views
 
 
 def scored(views: dict) -> bool:
@@ -495,12 +669,13 @@ def support_signs(views: dict) -> List[int]:
             views["depends"]["direct_support_sign"]]
 
 
-def criteria_of(views: dict) -> Dict[str, Dict[str, bool]]:
-    """Every role's clauses, evaluated. The doc's rules 2 to 5, one dict each."""
+def criteria_of(views: dict, variant: Variant = V1) -> Dict[str, Dict[str, bool]]:
+    """Every role's clauses, evaluated. The doc's rules 2 to 5, one dict each,
+    and rule 4b on a v2 cell."""
     reads, writes, depends = views["reads"], views["writes"], views["depends"]
     established = reads["established"] or reads["not_applicable"]
 
-    return {
+    criteria = {
         "suppressor": {
             "writes": writes["sign"] < 0 or writes["suppression"],
             "depends": depends["knockout_sign"] < 0
@@ -518,7 +693,7 @@ def criteria_of(views: dict) -> Dict[str, Dict[str, bool]]:
             "writes": writes["sign"] != 0 and writes["differential_sign"] != 0,
             "depends": (depends["knockout_sign"] > 0
                         or depends["direct_support_sign"] > 0),
-            "query": depends["honest_instruction_at_own_query"],
+            "query": at_own_query(depends),
         },
         "mover": {
             "reads": reads["group"] == "item_mention" or reads["not_applicable"],
@@ -527,10 +702,21 @@ def criteria_of(views: dict) -> Dict[str, Dict[str, bool]]:
                         and depends["outgoing_is_readout"]),
         },
     }
-
-
-#: The order the doc checks the roles in; the first whose clauses all hold wins.
-CHECK_ORDER = ("suppressor", "binder", "selector", "mover")
+    if variant is V2:
+        # Rule 4b. `where` holds without path data (the role is then assigned
+        # with the `attention and knockout only` flavour); with path data the
+        # strongest twin path must land on this head's own KV group from the
+        # clause span.
+        criteria[PRESSURE_READER] = {
+            "reads": reads["b2_sign"] > 0,
+            "depends": depends["knockout_post_clause_sign"] > 0,
+            "where": (not depends["twin_paths_measured"]
+                      or (depends["receiver_category"] == "kv_clause"
+                          and depends["incoming_paired_on_own_kv"])),
+        }
+        # The doc's order: selector before pressure reader before mover.
+        return {role: criteria[role] for role in CHECK_ORDER_V2}
+    return criteria
 
 
 def lean_of(criteria: Dict[str, Dict[str, bool]]) -> Optional[str]:
@@ -541,7 +727,7 @@ def lean_of(criteria: Dict[str, Dict[str, bool]]) -> Optional[str]:
     under half, lean nowhere.
     """
     best, score = None, 0.5
-    for role in CHECK_ORDER:
+    for role in criteria:
         clauses = criteria[role]
         share = sum(1 for one in clauses.values() if one) / len(clauses)
         if share > score:
@@ -563,7 +749,7 @@ def knockout_alone_of_the_support_views(views: dict) -> bool:
             and not writes["suppression"]
             and depends["direct_support_sign"] == 0
             and not depends["outgoing_clears_floor"]
-            and not depends["honest_instruction_at_own_query"])
+            and not at_own_query(depends))
 
 
 def knockout_with_established_read(views: dict) -> bool:
@@ -633,12 +819,13 @@ class Decision:
                 "reads_group": self.reads_group, **self.derived}
 
 
-def propose(row, thresholds: Thresholds = None) -> Decision:
+def propose(row, thresholds: Thresholds = None, *,
+            variant: Variant = V1) -> Decision:
     """The role `docs/component-roles.md` assigns this row, and why."""
     thresholds = thresholds or Thresholds()
     key = row_key(row)
-    views = views_of(row, thresholds)
-    criteria = criteria_of(views)
+    views = views_of(row, thresholds, variant)
+    criteria = criteria_of(views, variant)
     derived = derived_columns(row)
     confirmed = row.get(CONFIRMED)
 
@@ -647,10 +834,12 @@ def propose(row, thresholds: Thresholds = None) -> Decision:
             notes += (f"; knockout effect with an established read (knockout "
                       f"{_knockout_way(views)}, reads {views['reads']['segment']}; DLA and "
                       f"path views silent)")
-        if pressure_reader_signature(views):
+        if variant is V1 and pressure_reader_signature(views):
             notes += ("; pressure-reader signature (reads the Pressure Clause "
                       "under pressure and leaves it under the instruction), "
                       "which is a reserved role and is never assigned")
+        if variant is V2:
+            notes += _b2_notes(views, role)
         return Decision(key=key, role=role, flavour=flavour, notes=notes,
                         reads_group=views["reads"]["group"], views=views,
                         criteria=criteria, confirmed=confirmed, derived=derived)
@@ -664,8 +853,13 @@ def propose(row, thresholds: Thresholds = None) -> Decision:
         return decide("unknown", DISAGREE,
                       f"unknown/disagree: {_evidence(views)}")
 
-    for role in CHECK_ORDER:
+    for role in variant.check_order:
         if all(criteria[role].values()):
+            if role == PRESSURE_READER and not views["depends"]["twin_paths_measured"]:
+                return decide(role, ATTENTION_AND_KNOCKOUT_ONLY,
+                              f"{ATTENTION_AND_KNOCKOUT_ONLY}: the where-clause "
+                              f"(path patching under the twin) was not measured "
+                              f"on this cell; {_evidence(views)}")
             return decide(role, None, f"{role}: {_evidence(views)}")
 
     if knockout_only(views):
@@ -706,6 +900,40 @@ def _knockout_way(views: dict) -> str:
             else "opposes deception")
 
 
+def unmeasured_v2_views(views: dict) -> List[str]:
+    """Rule 4b's views with no value on this row (v2 cells): named in the
+    notes, so a head that is not a pressure reader because a column was never
+    measured is not read as one whose B2 drop or post-clause knockout was
+    measured and silent."""
+    out = []
+    if views["reads"].get("b2_drop") is None:
+        out.append("B2 clause-mass drop (attention_patterns, neutral twin)")
+    if views["depends"].get("knockout_post_clause") is None:
+        out.append("post-clause twin knockout (knockout, S2p)")
+    return out
+
+
+def _b2_notes(views: dict, role: str) -> str:
+    """The v2 phrases beside a decision: the B2 signature where it is met and
+    the role is another, the post-clause arrival, and rule 4b's unmeasured
+    views."""
+    reads, depends = views["reads"], views["depends"]
+    notes = ""
+    if role != PRESSURE_READER and reads["b2_sign"] > 0:
+        notes += "; pressure-reader signature (B2)"
+        if depends["knockout_post_clause"] is not None \
+                and depends["knockout_post_clause_sign"] <= 0:
+            notes += ", knockout silent post-clause"
+    if depends["receiver_category"] == "kv_post_clause":
+        notes += ("; strongest neutral-twin path arrives at K/V from "
+                  "post-clause positions (reads items the pressure already "
+                  "changed), not a pressure reader")
+    unmeasured = unmeasured_v2_views(views)
+    if unmeasured and role != PRESSURE_READER:
+        notes += f"; rule 4b not measured: {', '.join(unmeasured)}"
+    return notes
+
+
 def _missing(criteria, role) -> str:
     return ", ".join(name for name, held in criteria[role].items() if not held)
 
@@ -729,6 +957,7 @@ def _evidence(views: dict) -> str:
         read = ("reads " + str(reads["segment"])
                 + ("" if reads["mass"] is None else f" ({reads['mass']:.2f})")
                 + ("" if reads["established"] else ", unestablished"))
+    tail = f"; {_v2_evidence(views)}" if "paired_counterfactual" in depends else ""
     return "; ".join([
         read,
         f"writes {_number_note(writes['value'], writes['se'])}",
@@ -736,13 +965,31 @@ def _evidence(views: dict) -> str:
         f"knockout {_number_note(depends['knockout'], depends['knockout_se'])}",
         f"direct support {_number_note(depends['direct_support'], depends['direct_support_se'])}",
         f"strongest outgoing {depends['outgoing'] or 'none'}",
-        f"honest instruction in {depends['incoming_honest_instruction'] or 'none'}",
+        _incoming_note(depends),
+    ]) + tail
+
+
+def _incoming_note(depends: dict) -> str:
+    """`honest instruction in <path>` on a v1 row, `neutral twin in <path>`
+    on a v2 row, with the B2 drop and the post-clause knockout beside it."""
+    if "paired_counterfactual" not in depends:
+        return f"honest instruction in {depends['incoming_honest_instruction'] or 'none'}"
+    return f"neutral twin in {depends['incoming_paired'] or 'none'}"
+
+
+def _v2_evidence(views: dict) -> str:
+    reads, depends = views["reads"], views["depends"]
+    return "; ".join([
+        f"B2 clause-mass drop {_number_note(reads['b2_drop'], reads['b2_drop_se'])}",
+        f"post-clause twin knockout {_number_note(depends['knockout_post_clause'], depends['knockout_post_clause_se'])}",
+        f"receiver category {depends['receiver_category'] or 'none'}",
     ])
 
 
-def decide_rows(rows, thresholds: Thresholds = None) -> List[Decision]:
+def decide_rows(rows, thresholds: Thresholds = None, *,
+                variant: Variant = V1) -> List[Decision]:
     thresholds = thresholds or Thresholds()
-    return [propose(row, thresholds) for row in rows]
+    return [propose(row, thresholds, variant=variant) for row in rows]
 
 
 def columns(decisions: List[Decision]) -> dict:
@@ -757,8 +1004,8 @@ def _label(provenance) -> Optional[str]:
     return None if provenance is None else str(provenance)
 
 
-def counts(decisions: List[Decision]) -> dict:
-    out = {role: 0 for role in ROLES}
+def counts(decisions: List[Decision], roles: tuple = ROLES) -> dict:
+    out = {role: 0 for role in roles}
     for one in decisions:
         out[one.role] = out.get(one.role, 0) + 1
     return out
@@ -795,8 +1042,9 @@ def sign_convention(markers) -> str:
 def payload(decisions: List[Decision], *, cell_dir: str, thresholds: Thresholds,
             merged_from: List[str], meta: dict = None,
             missing_views: List[str] = None, renamed: dict = None,
-            conventions: List[str] = ()) -> dict:
-    return {
+            conventions: List[str] = (), variant: Variant = V1) -> dict:
+    v2 = variant is V2
+    out = {
         "analysis": NAME,
         "created": time.strftime("%Y-%m-%dT%H:%M:%S"),
         "criteria_doc": CRITERIA_DOC,
@@ -804,9 +1052,9 @@ def payload(decisions: List[Decision], *, cell_dir: str, thresholds: Thresholds,
         #: `path_patching.CONVENTION` and/or `LEGACY_CONVENTION`: the sign
         #: conventions of the path-patching columns this table was read from.
         "path_conventions": list(conventions),
-        "vocabulary": list(ROLES),
-        "reserved": list(RESERVED),
-        "thresholds": thresholds.as_dict(),
+        "vocabulary": list(variant.roles),
+        "reserved": list(variant.reserved),
+        "thresholds": thresholds.as_dict(v2=v2),
         "cell": cell_dir,
         "merged_from": list(merged_from),
         #: Views whose columns were absent from the table. Non-empty only with
@@ -817,13 +1065,19 @@ def payload(decisions: List[Decision], *, cell_dir: str, thresholds: Thresholds,
         # "circuit" across the analyses must not meet two types.
         "circuit": _label((meta or {}).get("circuit")),
         "task": _label((meta or {}).get("task")),
-        "counts": counts(decisions),
+        "counts": counts(decisions, variant.roles),
         "flavour_counts": flavour_counts(decisions),
         #: Legacy column names translated on the way in, old -> current.
         RENAMED_KEY: dict(renamed or {}),
         "n_components": len(decisions),
         "components": [one.as_dict() for one in decisions],
     }
+    if v2:
+        #: Only a v2 cell says which variant it was read as, and against which
+        #: paired counterfactual; a v1 cell's JSON is the same bytes as before.
+        out["variant"] = variant.name
+        out["paired_counterfactual"] = path_patching.NEUTRAL_TWIN
+    return out
 
 
 # ==============================================================================
@@ -858,6 +1112,11 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--roles-attention-floor", type=float,
                    default=Thresholds.attention_floor,
                    help="Smallest top-Segment mass that establishes a read.")
+    p.add_argument("--roles-b2-floor", type=float, default=Thresholds.b2_floor,
+                   help="v2 cells only (rule 4b): smallest paired drop of "
+                        "Readout-query mass on the Pressure Clause, pressure "
+                        "minus Neutral-Clause Twin, that counts as the B2 "
+                        "signature. Ignored on a v1 cell.")
     p.add_argument("--roles-allow-missing-views", action="store_true",
                    help="Propose even when a whole view's columns are absent "
                         "from the table. Off by default, because a table with "
@@ -873,7 +1132,8 @@ def thresholds_from(cli) -> Thresholds:
     return Thresholds(z=cli.roles_z, dla_floor=cli.roles_dla_floor,
                       knockout_floor=cli.roles_knockout_floor,
                       path_floor=cli.roles_path_floor,
-                      attention_floor=cli.roles_attention_floor)
+                      attention_floor=cli.roles_attention_floor,
+                      b2_floor=cli.roles_b2_floor)
 
 
 def require_columns(rows, *, cell_dir: str, merged_from=(), allow=False) -> list:
@@ -1017,9 +1277,14 @@ def main(argv=None) -> int:
     rows, meta, merged_renamed = merge_cells(rows, cli.roles_merge_from,
                                              meta=meta)
     renamed = {**renamed, **merged_renamed}
+    variant = variant_of(meta)
     print(f"\nROLES — {cli.cell_dir}")
     print(f"  criteria: {CRITERIA_DOC} (pre-registered)")
-    print(f"  thresholds: {thresholds.as_dict()}")
+    print(f"  thresholds: {thresholds.as_dict(v2=variant is V2)}")
+    if variant is V2:
+        print(f"  variant: v2 ({_label(meta.get('task'))}) — the Neutral-Clause "
+              f"Twin is the paired counterfactual; rule 4b (pressure reader) "
+              f"is assignable")
     if renamed:
         print("  legacy column names read under their current names: "
               + ", ".join(f"{old} -> {new}" for old, new in renamed.items()))
@@ -1029,7 +1294,7 @@ def main(argv=None) -> int:
         allow=cli.roles_allow_missing_views)
 
     try:
-        decisions = decide_rows(rows, thresholds)
+        decisions = decide_rows(rows, thresholds, variant=variant)
     except MixedConventions as error:
         raise SystemExit(f"{cli.cell_dir!r}: {error}")
     conventions = generations_of(rows)
@@ -1042,10 +1307,12 @@ def main(argv=None) -> int:
     rows = merge_columns(rows, columns(decisions), namespace=NAME)
     meta = modernize_meta(derived_coverage(meta), renamed)
     meta["roles"] = {"criteria_doc": CRITERIA_DOC,
-                     "thresholds": thresholds.as_dict(),
+                     "thresholds": thresholds.as_dict(v2=variant is V2),
                      "merged_from": list(cli.roles_merge_from),
-                     "counts": counts(decisions),
+                     "counts": counts(decisions, variant.roles),
                      "flavour_counts": flavour_counts(decisions)}
+    if variant is V2:
+        meta["roles"]["variant"] = variant.name
     written = write_head_table(cli.cell_dir, rows, meta=meta)
 
     out = os.path.join(cli.cell_dir, SUBDIR)
@@ -1056,7 +1323,7 @@ def main(argv=None) -> int:
                           thresholds=thresholds,
                           merged_from=cli.roles_merge_from, meta=meta,
                           missing_views=missing_views, renamed=renamed,
-                          conventions=conventions),
+                          conventions=conventions, variant=variant),
                   handle, indent=2, default=str)
 
     print(f"\n  {written['csv']}\n  {written['json']}\n  {json_path}")

@@ -1,0 +1,52 @@
+{
+  "title": "Direct effect on the Readout, by sender (item_swap)",
+  "counterfactual": "item_swap",
+  "receiver": "readout",
+  "senders": [
+    {
+      "sender": "embed",
+      "receiver": "readout",
+      "cell": "embed->readout",
+      "mean": 0.0,
+      "se": 0.0,
+      "n": 16,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.0.0",
+      "receiver": "readout",
+      "cell": "head.0.0->readout",
+      "mean": -0.6435744888149202,
+      "se": 0.18949011775844707,
+      "n": 16,
+      "n_excluded": 0
+    },
+    {
+      "sender": "head.0.2",
+      "receiver": "readout",
+      "cell": "head.0.2->readout",
+      "mean": 0.32954344246536493,
+      "se": 0.1342089837362046,
+      "n": 16,
+      "n_excluded": 0
+    },
+    {
+      "sender": "mlp.1.0",
+      "receiver": "readout",
+      "cell": "mlp.1.0->readout",
+      "mean": -0.5056882090866566,
+      "se": 0.14646455020224314,
+      "n": 16,
+      "n_excluded": 0
+    }
+  ],
+  "metric": {
+    "quantity": "logit(Target) - logit(Distractor) at the Readout, fp32",
+    "effect": "(clean - patched) / (clean - counterfactual), per instance",
+    "counterfactual": "item_swap",
+    "convention": "positive_helps_deception",
+    "convention_version": 2,
+    "sign": "positive means the path carries the clean stream (the prompt under its Pressure Clause) toward the deceptive answer, against the Corruption (the item swap); +1 is the whole clean-minus-counterfactual gap. Knockout's drop has the same sign (positive helps deception).",
+    "min_gap": 0.001
+  }
+}

@@ -1,0 +1,255 @@
+{
+  "analysis": "roles",
+  "created": "<volatile>",
+  "criteria_doc": "docs/component-roles.md",
+  "sign_convention": "positive supports the deceptive answer (ADR-0002); knockout and dla are read natively; roles.direct_support is path_patching.direct_support read natively (a path-patching run since 2026-10-13, positive helps deception)",
+  "path_conventions": [
+    "positive_helps_deception"
+  ],
+  "vocabulary": [
+    "binder",
+    "selector",
+    "mover",
+    "suppressor",
+    "unknown"
+  ],
+  "reserved": [
+    "pressure reader"
+  ],
+  "thresholds": {
+    "z": 2.0,
+    "dla_floor": 0.01,
+    "knockout_floor": 0.01,
+    "path_floor": 0.01,
+    "attention_floor": 0.2
+  },
+  "cell": "<TMP>/analyses/self/sdr",
+  "merged_from": [],
+  "missing_views": [
+    "depends, whether (knockout)",
+    "writes (dla)"
+  ],
+  "circuit": "self",
+  "task": "sdr",
+  "counts": {
+    "binder": 0,
+    "selector": 0,
+    "mover": 0,
+    "suppressor": 0,
+    "unknown": 3
+  },
+  "flavour_counts": {
+    "insufficient": 3
+  },
+  "renamed_columns": {},
+  "n_components": 3,
+  "components": [
+    {
+      "key": [
+        "head",
+        0,
+        0
+      ],
+      "role": "unknown",
+      "flavour": "insufficient",
+      "notes": "unknown/insufficient: not measured: writes (dla); reads question (0.31); writes none; differential none; knockout none; direct support -0.6436 (z=3.4); strongest outgoing head.0.0->readout; honest instruction in none",
+      "reads_group": "frame",
+      "role_confirmed": null,
+      "views": {
+        "reads": {
+          "segment": "question",
+          "mass": 0.31161409616470337,
+          "group": "frame",
+          "established": true,
+          "not_applicable": false,
+          "paired_segment": null,
+          "honest_instruction_segment": null
+        },
+        "writes": {
+          "value": null,
+          "se": null,
+          "sign": 0,
+          "differential": null,
+          "differential_se": null,
+          "differential_sign": 0,
+          "suppression": false
+        },
+        "depends": {
+          "knockout": null,
+          "knockout_se": null,
+          "knockout_sign": 0,
+          "direct_support": -0.6435744888149202,
+          "direct_support_se": 0.18949011775844707,
+          "direct_support_sign": -1,
+          "outgoing": "head.0.0->readout",
+          "outgoing_support": -0.6435744888149202,
+          "outgoing_clears_floor": true,
+          "outgoing_is_readout": true,
+          "incoming_honest_instruction": null,
+          "incoming_honest_instruction_support": null,
+          "honest_instruction_at_own_query": false
+        }
+      },
+      "criteria": {
+        "suppressor": {
+          "writes": false,
+          "depends": true
+        },
+        "binder": {
+          "reads": false,
+          "writes": true,
+          "depends": false
+        },
+        "selector": {
+          "reads": true,
+          "writes": false,
+          "depends": false,
+          "query": false
+        },
+        "mover": {
+          "reads": false,
+          "writes": false,
+          "depends": false
+        }
+      }
+    },
+    {
+      "key": [
+        "head",
+        0,
+        2
+      ],
+      "role": "unknown",
+      "flavour": "insufficient",
+      "notes": "unknown/insufficient: not measured: writes (dla); reads question (0.31); writes none; differential none; knockout none; direct support +0.3295 (z=2.5); strongest outgoing head.0.2->readout; honest instruction in none",
+      "reads_group": "frame",
+      "role_confirmed": null,
+      "views": {
+        "reads": {
+          "segment": "question",
+          "mass": 0.30871716141700745,
+          "group": "frame",
+          "established": true,
+          "not_applicable": false,
+          "paired_segment": null,
+          "honest_instruction_segment": null
+        },
+        "writes": {
+          "value": null,
+          "se": null,
+          "sign": 0,
+          "differential": null,
+          "differential_se": null,
+          "differential_sign": 0,
+          "suppression": false
+        },
+        "depends": {
+          "knockout": null,
+          "knockout_se": null,
+          "knockout_sign": 0,
+          "direct_support": 0.32954344246536493,
+          "direct_support_se": 0.1342089837362046,
+          "direct_support_sign": 1,
+          "outgoing": "head.0.2->readout",
+          "outgoing_support": 0.32954344246536493,
+          "outgoing_clears_floor": true,
+          "outgoing_is_readout": true,
+          "incoming_honest_instruction": null,
+          "incoming_honest_instruction_support": null,
+          "honest_instruction_at_own_query": false
+        }
+      },
+      "criteria": {
+        "suppressor": {
+          "writes": false,
+          "depends": false
+        },
+        "binder": {
+          "reads": false,
+          "writes": true,
+          "depends": false
+        },
+        "selector": {
+          "reads": true,
+          "writes": false,
+          "depends": true,
+          "query": false
+        },
+        "mover": {
+          "reads": false,
+          "writes": false,
+          "depends": true
+        }
+      }
+    },
+    {
+      "key": [
+        "mlp",
+        1,
+        0
+      ],
+      "role": "unknown",
+      "flavour": "insufficient",
+      "notes": "unknown/insufficient: not measured: writes (dla); reads n/a (MLP block); writes none; differential none; knockout none; direct support -0.5057 (z=3.5); strongest outgoing mlp.1.0->readout; honest instruction in none",
+      "reads_group": "not_applicable",
+      "role_confirmed": null,
+      "views": {
+        "reads": {
+          "segment": null,
+          "mass": null,
+          "group": "not_applicable",
+          "established": false,
+          "not_applicable": true,
+          "paired_segment": null,
+          "honest_instruction_segment": null
+        },
+        "writes": {
+          "value": null,
+          "se": null,
+          "sign": 0,
+          "differential": null,
+          "differential_se": null,
+          "differential_sign": 0,
+          "suppression": false
+        },
+        "depends": {
+          "knockout": null,
+          "knockout_se": null,
+          "knockout_sign": 0,
+          "direct_support": -0.5056882090866566,
+          "direct_support_se": 0.14646455020224314,
+          "direct_support_sign": -1,
+          "outgoing": "mlp.1.0->readout",
+          "outgoing_support": -0.5056882090866566,
+          "outgoing_clears_floor": true,
+          "outgoing_is_readout": true,
+          "incoming_honest_instruction": null,
+          "incoming_honest_instruction_support": null,
+          "honest_instruction_at_own_query": false
+        }
+      },
+      "criteria": {
+        "suppressor": {
+          "writes": false,
+          "depends": true
+        },
+        "binder": {
+          "reads": false,
+          "writes": true,
+          "depends": false
+        },
+        "selector": {
+          "reads": true,
+          "writes": false,
+          "depends": false,
+          "query": false
+        },
+        "mover": {
+          "reads": true,
+          "writes": false,
+          "depends": false
+        }
+      }
+    }
+  ]
+}
