@@ -221,6 +221,7 @@ def test_membership_columns_come_from_the_six_head_sets_and_the_operand(res):
     prov = {"heads": ["head.9.19", "head.3.3"], "members": ["head.9.19", "mlp.6.0", "head.3.3"], "mlp_layers": [6, 7]}
     m = res.membership("far", sets, prov)
     assert m[("mlp", 6, 0)]["S_k"] and not m[("mlp", 7, 0)]["S_k"]                  # the deciding set's own MLP
+    assert ("head", 6, 0) not in m                                                  # an MLP member is not a head
     assert m[("head", 17, 24)] == {"U": True, "S_k": False, "C_t": False, "core": True, "excl_t": False,
                                    "DmH_t": False, "DmH_minus_core_t": False, "HmD_t": False, "late_HmD_t": False}
     assert m[("head", 9, 19)]["S_k"] and m[("head", 9, 19)]["excl_t"] and m[("head", 9, 19)]["U"]
@@ -293,22 +294,76 @@ def test_segment_matrix_asserts_exact_zero_before_the_clause_and_keeps_the_infor
 
 
 def test_c_honest_reads_the_late_h_minus_d_heads_in_the_honest_direction(res):
-    d, twin = "dla.pressure", "dla.neutral_twin_paired"
-    rows_d = [_row(30, 3, **{d: -0.02, twin: -0.10}), _row(22, 7, **{d: -0.12, twin: -0.10})]
-    rows_h = [_row(30, 3, **{d: 0.15}), _row(22, 7, **{d: 0.05})]
-    rows_f = [_row(30, 3, **{d: 0.11}), _row(22, 7, **{d: -0.01})]
-    out = res.c_honest({("head", 30, 3), ("head", 22, 7)}, rows_d, rows_h, rows_f)
+    d, dp, twin = "dla.pressure", "dla.pressure_neutral_twin_paired", "dla.neutral_twin_paired"
+    # the D comparison reads the paired pressure column (same instances as the twin), not the unpaired one
+    rows_d = [_row(30, 3, **{d: -0.05, dp: -0.02, twin: -0.10}), _row(22, 7, **{d: -0.12, dp: -0.12, twin: -0.10}),
+              _row(18, 1, **{d: 0.0, dp: 0.03, twin: -0.10})]
+    rows_h = [_row(30, 3, **{d: 0.15}), _row(22, 7, **{d: 0.05}), _row(18, 1, **{d: 0.02})]
+    rows_f = [_row(30, 3, **{d: 0.11}), _row(22, 7, **{d: -0.01}), _row(18, 1, **{d: 0.02})]
+    out = res.c_honest({("head", 30, 3), ("head", 22, 7), ("head", 18, 1)}, rows_d, rows_h, rows_f)
     h30 = out["heads"]["head.30.3"]
     # on D the metric is deceptive-positive, so the honest direction is the negation
     assert h30 == {"dla_H": 0.15, "dla_F": 0.11, "honest_dla_D_pressure": 0.02, "honest_dla_D_twin": 0.10,
                    "suppression": pytest.approx(0.8), "writes_honest_on_H_and_F": True, "suppressed": True,
+                   "flipped": False, "reduced_at_least_half": True, "holds": True,
                    "sign_only": True}                      # no SE column in this fixture: sign-only, and said so
     with_se = [_row(30, 3, **{d: 0.15, "dla.pressure_se": 0.10})]
     weak = res.c_honest({("head", 30, 3)}, rows_d, with_se, with_se)["heads"]["head.30.3"]
     assert weak["writes_honest_on_H_and_F"] is False and "sign_only" not in weak     # 1.5 SE is not >= 2 SE
-    assert out["heads"]["head.22.7"]["suppressed"] is False
+    assert out["heads"]["head.22.7"]["suppressed"] is False and out["heads"]["head.22.7"]["flipped"] is False
     assert out["heads"]["head.22.7"]["writes_honest_on_H_and_F"] is False
-    assert out["n"] == 2 and out["n_writes_honest"] == 1 and out["n_suppressed"] == 1
+    h18 = out["heads"]["head.18.1"]                        # honest on the twin (+0.10), deceptive under pressure
+    assert h18["flipped"] is True and h18["suppressed"] is False and h18["suppression"] == pytest.approx(1.3)
+    assert out["n"] == 3 and out["n_writes_honest"] == 2 and out["n_suppressed"] == 1 and out["n_flipped"] == 1
+    assert out["n_reduced_at_least_half"] == 2
+    # the prediction per head is both clauses at once: writes honest on H and F, and >= 50 % smaller on D
+    assert out["n_holds"] == 2 and h30["holds"] is True and h18["holds"] is True
+    assert out["heads"]["head.22.7"]["holds"] is False
+
+
+def test_twin_dla_column_names_are_the_dla_analysis_own_names(res):
+    from component_analysis import dla
+    for col in (res.DLA_TWIN, res.DLA_PRESSURE_PAIRED):
+        prefix, _, name = col.partition(".")
+        assert prefix == dla.NAME and name in dla.TWIN_COLUMN_SOURCES
+    assert res.DLA_TWIN == "dla.neutral_twin_paired"
+    assert res.DLA_PRESSURE_PAIRED == "dla.pressure_neutral_twin_paired"
+
+
+class _View:
+    def __init__(self, ok, note=""):
+        self.ok, self.note = ok, note
+
+    def __bool__(self):
+        return self.ok
+
+
+def test_cell_check_names_present_missing_and_broken_views(res):
+    def broken(_d):
+        raise ValueError("bad json")
+
+    views = (("head table", lambda d: _View(True)), ("knockout", lambda d: _View(False, "no knockout.json")),
+             ("dla", broken))
+    out = res.cell_check("some/cell", views=views)
+    assert out["views"] == {"head table": "present", "knockout": "missing", "dla": "BROKEN"}
+    assert out["notes"]["knockout"] == "no knockout.json" and "ValueError: bad json" in out["notes"]["dla"]
+    assert out["broken"] == ["dla"]
+
+
+def test_markdown_marks_the_unrequested_extras_exploratory_and_shows_check_cell(res):
+    b = {"n_signature": 2, "n_measured": 4, "n_in_8_17": 2, "share_8_17": 1.0, "p": 0.1, "measured_share_8_17": 0.5,
+         "p_against_measured_share": 0.25, "signature_heads": [], "l13": {}}
+    task = {"membership_counts": {"U": 1}, "n_components": 1,
+            "segments": {"pre_clause_check": {"ok": True, "max_abs_drop": 0.0, "nonzero": []}, "matrix": {}},
+            "families": {}, "clause_mass_by_layer": {}, "c2_reads": {}, "b_reader": b, "b_reader_I": b,
+            "c_honest": {"n": 0, "n_writes_honest": 0, "n_suppressed": 0, "n_flipped": 0, "n_reduced_at_least_half": 0,
+                         "n_holds": 0, "heads": {}},
+            "i_vs_d": {"n": 0, "n_signature_D": 0, "n_signature_I": 0, "n_signature_both": 0, "heads": {}},
+            "roles": {}, "ct_proposal": {"sizes": {}, "mlps": []},
+            "check_cell": {"d": {"views": {"head table": "present", "knockout": "missing"}, "notes": {}, "broken": []}}}
+    text = res.markdown({"root": "r", "tasks": {"far": task}})
+    assert "B-reader on the I cell (exploratory" in text
+    assert "| d | present | missing |" in text and "BROKEN views: none" in text
 
 
 def test_ct_proposal_is_core_excl_dmh_minus_core_sk_heads_and_at_most_ten_mlps(res):
@@ -389,3 +444,34 @@ def test_merge_sources_per_cell_follow_the_phase_1_single_knockout_cells(res):
     assert p2_merge.SOURCES == {"d": ("s1", "s2p"), "h": ("s5",), "f": ("s6",), "i": ("s7",)}
     assert p2_merge.merge_dir("outputs/_analyses/mechanism-analysis-p2", "far", "d") == \
         "outputs/_analyses/mechanism-analysis-p2/_merge/far_d"
+
+
+def test_main_writes_the_groups_dir_it_was_given_into_the_job_lines(jobs, tmp_path):
+    if not os.path.exists(jobs.sweep_path(os.path.join(jobs.REPO, jobs.P1_ROOT), "far")):
+        pytest.skip("the phase-1 sweeps are not fetched in this checkout")
+    groups, out = tmp_path / "groups", tmp_path / "jobs"
+    assert jobs.main(["--groups-dir", str(groups), "--jobs-dir", str(out)]) == 0
+    text = (out / "04-p2-far.batch").read_text()
+    rel = os.path.relpath(str(groups), jobs.REPO)
+    assert f"--knockout-groups {rel}/far_families.json" in text and f"{rel}/far_top20.json" in text
+    assert jobs.GROUPS_DIR not in text
+    assert (groups / "far_families.json").exists() and (groups / "meta.json").exists()
+
+
+def test_committed_job_files_are_what_the_generator_writes_by_default(jobs):
+    for t in ("far", "sdr", "ser"):
+        path = os.path.join(jobs.REPO, jobs.JOBS_DIR, f"04-p2-{t}.batch")
+        with open(path) as f:
+            assert f.read() == jobs.batch_text(t)
+
+
+def test_top_prompt_segment_leaves_the_attention_sink_out(res):
+    profile = {"unsegmented": 0.6, "pressure_clause": 0.25, "response_line": 0.1, "intro": None}
+    assert res.top_segment_excluding(profile) == ("pressure_clause", 0.25)
+    assert res.top_segment_excluding({"unsegmented": 1.0}) == (None, None)
+    rows = [_row(9, 19, **{"attention_patterns.pressure_top_segment": "unsegmented",
+                           "attention_patterns.pressure_top_mass": 0.6})]
+    out = res.rows_with_top_prompt_segment(rows, {("head", 9, 19): profile})
+    assert out[0]["attention_patterns.pressure_top_segment"] == "pressure_clause"
+    assert out[0]["attention_patterns.pressure_top_mass"] == 0.25
+    assert rows[0]["attention_patterns.pressure_top_segment"] == "unsegmented"       # the input row is untouched

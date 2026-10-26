@@ -182,8 +182,9 @@ def head_sets(repo: str = REPO) -> dict:
     return {k: set(v) for k, v in mc._head_sets(repo).items()}
 
 
-def sweep_path(p1_root: str, t: str) -> str:
-    return os.path.join(p1_root, "s2p", "U__leaf", f"{t}_v2", "knockout", "sweep.json")
+def sweep_path(p1_root: str, t: str, cell: str = "s2p") -> str:
+    """The phase-1 completeness sweep of one cell (s1, s2, s2p, s3, s4, s5, s6, s7) on one task."""
+    return os.path.join(p1_root, cell, "U__leaf", f"{t}_v2", "knockout", "sweep.json")
 
 
 def main(argv=None) -> int:
@@ -214,8 +215,9 @@ def main(argv=None) -> int:
         meta["tasks"][t] = {"families": {k: len(v) for k, v in fam.items()}, "empty_families": empty_families(t, sets),
                             "top20": [k for k in top if k != "top20_joint"]}
         path = os.path.join(a.jobs_dir, f"04-p2-{t}.batch")
+        groups_dir = os.path.relpath(a.groups_dir, REPO) if os.path.isabs(a.groups_dir) else a.groups_dir
         with open(path, "w") as f:
-            f.write(batch_text(t, a.out_root, GROUPS_DIR))
+            f.write(batch_text(t, a.out_root, groups_dir))
         print(path, meta["tasks"][t]["families"], "empty:", meta["tasks"][t]["empty_families"])
     for u, (d, h) in RUNS.items():
         for r in (d, h):

@@ -6,7 +6,8 @@ Phase 2 runs no single-Component knockout (R16), so each cell's "depends, whethe
 p2_merge.py builds from the phase-1 sweeps on the same test set over the U' rows (`--roles-merge-from
 <root>/_merge/<t>_<cell>`): d <- s1 + s2p, h <- s5, f <- s6, i <- s7 (twin post-clause only: on I just rule 4b
 can fire). No phase-2 cell has path patching (phase 3 brings it on C_t), so `--roles-allow-missing-views` is passed
-and every role proposed here is read as "without the where-clause"; roles.json records the missing view.
+and every role proposed here lacks the "depends, how" view (what it depends on, CONTEXT.md's Component Role);
+roles.json records the missing view.
 
 usage (from the repository root, after the cells are fetched):
     python outputs/_launch_mechanism_analysis/p2_roles.py [--root DIR] [--dry-run] [--tasks far,sdr,ser]
@@ -25,20 +26,20 @@ for _p in (HERE, REPO):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
-import p2_jobs  # noqa: E402
 
 import p2_merge  # noqa: E402
 
 TASKS = ("far", "sdr", "ser")
 ROOT = "outputs/_analyses/mechanism-analysis-p2"
-MERGE = p2_merge.SOURCES
+#: The head cells that get a roles pass, each with its sweep-built knockout table (p2_merge.SOURCES).
+HEAD_CELLS = p2_merge.SOURCES
 B2_FLOOR = "0.05"
 
 
 def roles_argv(t: str, cell: str, *, cell_dir: str, root: str = ROOT) -> list:
     """The roles command for one cell: merge the sweep-built knockout table (p2_merge.py) for that test set."""
-    if cell not in MERGE:
-        raise KeyError(f"no roles pass on cell {cell!r}; the head cells are {sorted(MERGE)}")
+    if cell not in HEAD_CELLS:
+        raise KeyError(f"no roles pass on cell {cell!r}; the head cells are {sorted(HEAD_CELLS)}")
     return ["roles", cell_dir, "--roles-merge-from", p2_merge.merge_dir(root, t, cell),
             "--roles-b2-floor", B2_FLOOR, "--roles-allow-missing-views"]
 
@@ -56,7 +57,7 @@ def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--root", default=ROOT, help="the fetched phase-2 cells, relative to the repo root")
     p.add_argument("--tasks", default=",".join(TASKS))
-    p.add_argument("--cells", default=",".join(MERGE))
+    p.add_argument("--cells", default=",".join(HEAD_CELLS))
     p.add_argument("--dry-run", action="store_true")
     a = p.parse_args(argv)
     os.chdir(REPO)

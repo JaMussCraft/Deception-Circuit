@@ -108,7 +108,7 @@ def main(argv=None) -> int:
         for cell, srcs in SOURCES.items():
             sweeps, paths = [], []
             for s in srcs:
-                sp = p2_jobs.sweep_path(a.p1_root, t).replace("/s2p/", f"/{s}/")
+                sp = p2_jobs.sweep_path(a.p1_root, t, cell=s)
                 with open(sp) as f:
                     sweep = json.load(f)
                 with open(os.path.join(os.path.dirname(sp), sweep.get("instances_file", "sweep_instances.json"))) as f:

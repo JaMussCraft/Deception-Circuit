@@ -23,10 +23,13 @@ Readings (pure functions, tested in tests/test_mechanism_analysis_p2.py):
     b_reader          the B2-signature heads (clause-mass drop >= floor and >= z SE, paired), the share in layers
                       8-17 against 10/32 by a one-sided binomial upper tail, and L13H5/H20/H21 (B-reader)
     c_honest          the late H-D heads' DLA on H and F (positive = honest there) and, on D, the honest-direction
-                      DLA under pressure against the paired twin; suppressed = >= 50 % smaller (C-honest)
+                      DLA under pressure against the twin, both over the paired instances; suppressed (>= 50 %
+                      smaller, same sign) and flipped (negative under pressure) counted apart (C-honest)
     i_vs_d            the B2 signature and the paired DLA on I against D per head of the deciding set (R-inv input)
-    family_table      the composition-set family knockouts per cell, with R-cls at the family level from the
-                      D/H/F item-swap cells (RQ-A's component part)
+    family_table      the composition-set family knockouts per cell (C3, RQ-A's component part), with the R-cls
+                      bands applied to each family's joint drop (descriptive; the per-head R-cls is phase 1's)
+    c2_reads          what the exclusives and the D-H heads read and write on D (C2)
+    cell_check        scripts/check_cell.py's views per head cell (present / missing / BROKEN)
     segment_matrix    the segment-resolved neutral-twin knockout of the S2p top 20; pre_clause_check asserts the
                       pre-clause Segments exactly zero (R16: a sanity assertion, never a finding)
     ct_proposal       phase 3's C_t = core | excl_t | ((D_t-H_t)-core) | S_k heads | <= 10 MLPs (deciding first,
@@ -60,7 +63,7 @@ for _p in (HERE, REPO):
 import p1_readings as rd  # noqa: E402
 import p2_jobs  # noqa: E402
 import p2_operands  # noqa: E402
-from component_analysis import roles  # noqa: E402
+from component_analysis import dla, roles  # noqa: E402
 
 TASKS = ("far", "sdr", "ser")
 ROOT = "outputs/_analyses/mechanism-analysis-p2"
@@ -76,13 +79,29 @@ L13 = ("head.13.5", "head.13.20", "head.13.21")
 BASE_RATE = 10 / 32
 EPS = 1e-12
 
-# the column names, taken from the roles pass so they cannot drift
+
+def _twin_dla_column(name: str) -> str:
+    """A twin DLA head-table column, `dla.<name>`, checked against the DLA analysis's own column list."""
+    if name not in dla.TWIN_COLUMN_SOURCES:
+        raise KeyError(f"{name!r} is not a twin DLA column; component_analysis/dla.py writes "
+                       f"{sorted(dla.TWIN_COLUMN_SOURCES)}")
+    return f"{dla.NAME}.{name}"
+
+
+# the column names the roles pass reads come from roles.py; the two twin DLA columns the roles pass does not read
+# (the twins' own DLA and the paired pressure DLA over the same instances) come from dla.py's column list
 TOP_SEGMENT, TOP_MASS = roles.TOP_SEGMENT, roles.TOP_MASS
-TWIN_TOP_SEGMENT = roles.TWIN_TOP_SEGMENT
 B2_DROP, B2_DROP_SE = roles.B2_DROP, roles.B2_DROP_SE
 DLA, DLA_SE = roles.DLA, roles.DLA_SE
-DLA_TWIN = "dla.neutral_twin_paired"
-DLA_DIFF_TWIN, DLA_DIFF_TWIN_SE = "dla.differential_neutral_twin_paired", "dla.differential_neutral_twin_paired_se"
+DLA_DIFF_TWIN, DLA_DIFF_TWIN_SE = roles.DLA_DIFFERENTIAL_TWIN, roles.DLA_DIFFERENTIAL_TWIN_SE
+DLA_TWIN = _twin_dla_column("neutral_twin_paired")
+DLA_PRESSURE_PAIRED = _twin_dla_column("pressure_neutral_twin_paired")
+#: the readings beyond the ticket's list, written and labelled exploratory everywhere they appear
+EXPLORATORY = ("families: d_twinko (D under the neutral twin, post-clause) and i (I under the twin)",
+               "b_reader_I: the B2 signature on the I cell",
+               "c_reads_top_prompt_segment: C-reads with the attention sink left out",
+               "b_reader p_against_measured_share: the binomial against U''s own layer-8-17 share",
+               "family-level R-cls: the R-cls bands applied to a family's joint drop")
 
 
 def label_of(key) -> str:
@@ -167,10 +186,11 @@ def membership(t: str, sets: dict, operand_prov: dict) -> dict:
     """{key: {column: bool}} over U' = U | S_k heads | C_t MLP blocks."""
     comp = p2_jobs.composition_sets(t, sets)
     U = set().union(*(sets[k] for k in sets))
-    sk = {parse_label(h) for h in operand_prov["heads"]}
+    # the deciding set is its members (heads and MLP blocks); an older provenance carries the heads only
+    sk = {parse_label(h) for h in operand_prov.get("members") or operand_prov["heads"]}
     ct = {("mlp", int(l), 0) for l in operand_prov["mlp_layers"]}
     out = {}
-    for layer, head in sorted(U | {(l, h) for _k, l, h in sk}):
+    for layer, head in sorted(U | {(l, h) for k, l, h in sk if k == "head"}):
         key = ("head", layer, head)
         pair = (layer, head)
         out[key] = {"U": pair in U, "S_k": key in sk, "C_t": False, "core": pair in comp["core"],
@@ -207,10 +227,15 @@ def c_reads(rows_by_task: dict, excl_by_task: dict, *, segment_col: str = TOP_SE
         counts[t] = {}
         for h in heads[t]:
             counts[t][h["group"]] = counts[t].get(h["group"], 0) + 1
-    groups = [g for g in READ_GROUPS + ("unestablished",) if any(counts[t].get(g) for t in TASKS)]
+    # `unestablished` is the absence of a read group (docs/component-roles.md), not a group: those heads are
+    # counted beside the table and left out of the test
+    groups = [g for g in READ_GROUPS if any(counts[t].get(g) for t in TASKS)]
     table = [[counts[t].get(g, 0) for g in groups] for t in TASKS]
     return {"groups": groups, "tasks": list(TASKS), "table": table, "counts": counts, "p": fisher_exact_rxc(table),
-            "heads": heads, "test": "Freeman-Halton exact, two-sided, head level (not clustered)"}
+            "n_unestablished": {t: counts[t].get("unestablished", 0) for t in TASKS},
+            "n_in_table": {t: sum(counts[t].get(g, 0) for g in groups) for t in TASKS},
+            "heads": heads, "test": "Freeman-Halton exact, two-sided, head level (not clustered), over the four "
+                                    "established read groups; unestablished reads (the attention sink) left out"}
 
 
 def b2_signature(row: dict, *, floor: float, z: float):
@@ -237,31 +262,67 @@ def b_reader(rows, *, floor: float = 0.05, z: float = 2.0) -> dict:
         if s:
             sig.append({"label": label, "layer": int(row["layer"]), "drop": row[B2_DROP], "se": row[B2_DROP_SE]})
     k = sum(1 for h in sig if 8 <= h["layer"] <= 17)
+    # the pre-registered base rate is 10 of 32 layers; U' holds heads in fewer layers, so the share of *measured*
+    # heads that sit in layers 8-17 is reported beside it for the reader
+    measured_in_band = sum(1 for row in rows if row.get("kind") == "head" and b2_signature(row, floor=floor, z=z) is not None
+                           and 8 <= int(row["layer"]) <= 17)
     return {"floor": floor, "z": z, "n_measured": measured, "n_signature": len(sig), "n_in_8_17": k,
             "share_8_17": (k / len(sig)) if sig else None, "base_rate": BASE_RATE,
-            "p": binomial_upper_tail(k, len(sig), BASE_RATE) if sig else None, "signature_heads": sig, "l13": l13,
-            "test": "one-sided binomial upper tail of the layer-8-17 count among signature heads against 10/32"}
+            "measured_share_8_17": (measured_in_band / measured) if measured else None,
+            "p": binomial_upper_tail(k, len(sig), BASE_RATE) if sig else None,
+            "p_against_measured_share": (binomial_upper_tail(k, len(sig), measured_in_band / measured)
+                                         if sig and measured else None),
+            "signature_heads": sig, "l13": l13,
+            "test": "one-sided binomial upper tail of the layer-8-17 count among signature heads against 10/32 "
+                    "(pre-registered); p_against_measured_share uses U''s own layer-band share as the base rate"}
 
 
-def c_honest(late_keys, rows_d, rows_h, rows_f) -> dict:
+def c_honest(late_keys, rows_d, rows_h, rows_f, *, z: float = 2.0) -> dict:
     """C-honest over the late H-D heads. On H and F the DLA is read in the cell's own (honest) direction; on D the
     metric is deceptive-positive, so the honest direction is the negation."""
     D, H, F = _by_key(rows_d), _by_key(rows_h), _by_key(rows_f)
     heads = {}
+
+    def positive(row):
+        """DLA > 0, and >= z SE when the table carries the SE (sign-only otherwise, said in the output)."""
+        v, se = row.get(DLA), row.get(DLA_SE)
+        if v is None:
+            return None, True
+        if se is None:
+            return v > 0, True
+        return bool(v > 0 and v >= z * se), False
+
     for key in sorted(late_keys):
         h, f = H.get(key, {}).get(DLA), F.get(key, {}).get(DLA)
-        dp, dt = D.get(key, {}).get(DLA), D.get(key, {}).get(DLA_TWIN)
+        h_pos, h_sign_only = positive(H.get(key, {}))
+        f_pos, f_sign_only = positive(F.get(key, {}))
+        # both sides of the D comparison come from the paired columns (the same instances): the pressure DLA over
+        # the paired instances and the twins' own DLA
+        dp, dt = D.get(key, {}).get(DLA_PRESSURE_PAIRED), D.get(key, {}).get(DLA_TWIN)
         hp = -dp if dp is not None else None
         htw = -dt if dt is not None else None
         supp = (1.0 - hp / htw) if (hp is not None and htw is not None and htw > 0) else None
+        suppressed = bool(supp is not None and 0.5 <= supp <= 1.0)       # reduced by half or more, same sign
+        flipped = bool(supp is not None and supp > 1.0)                  # writes the deceptive answer under pressure
         heads[label_of(key)] = {"dla_H": h, "dla_F": f, "honest_dla_D_pressure": hp, "honest_dla_D_twin": htw,
                                 "suppression": supp,
-                                "writes_honest_on_H_and_F": bool(h is not None and f is not None and h > 0 and f > 0),
-                                "suppressed": bool(supp is not None and supp >= 0.5)}
+                                "writes_honest_on_H_and_F": bool(h_pos and f_pos),
+                                "suppressed": suppressed, "flipped": flipped,
+                                "reduced_at_least_half": suppressed or flipped,
+                                "holds": bool(h_pos and f_pos) and (suppressed or flipped)}
+        if h_sign_only or f_sign_only:
+            heads[label_of(key)]["sign_only"] = True
     return {"n": len(heads), "n_writes_honest": sum(v["writes_honest_on_H_and_F"] for v in heads.values()),
-            "n_suppressed": sum(v["suppressed"] for v in heads.values()), "heads": heads,
-            "rule": "writes honest = DLA > 0 on both H and F; suppressed = honest-direction DLA under pressure on D "
-                    ">= 50 % smaller than on the paired twin (twin honest-direction DLA > 0)"}
+            "n_suppressed": sum(v["suppressed"] for v in heads.values()),
+            "n_flipped": sum(v["flipped"] for v in heads.values()),
+            "n_reduced_at_least_half": sum(v["reduced_at_least_half"] for v in heads.values()),
+            "n_holds": sum(v["holds"] for v in heads.values()), "heads": heads,
+            "rule": f"writes honest = DLA > 0 and >= {z} SE on both H and F (sign-only where the SE column is absent, "
+                    "flagged sign_only); on D the honest-direction DLA is read over the paired instances "
+                    "(dla.pressure_neutral_twin_paired against dla.neutral_twin_paired, negated); suppressed = "
+                    "reduced by >= 50 % and still honest-signed (0.5 <= suppression <= 1); flipped = negative under "
+                    "pressure (suppression > 1); the spec's '>= 50 % smaller' is suppressed or flipped; holds = "
+                    "writes honest and >= 50 % smaller (both clauses of C-honest on one head)"}
 
 
 def i_vs_d(deciding_heads, rows_d, rows_i, *, floor: float = 0.05, z: float = 2.0) -> dict:
@@ -397,7 +458,7 @@ def clause_mass_by_layer(cdir: str, condition: str = "pressure") -> dict:
     cond = next((c for c in pay["conditions"] if c["name"] == condition), None)
     if not cond:
         return {}
-    level = (cond.get("levels") or {}).get("all") or {}
+    level = {lv["level"]: lv for lv in cond.get("levels") or []}.get("all") or {}
     masses = level.get("masses") or {}
     query = pay["column_query_position"]
     by_layer = {}
@@ -413,6 +474,70 @@ def clause_mass_by_layer(cdir: str, condition: str = "pressure") -> dict:
     return {l: {"mean": sum(v) / len(v), "max": max(v), "n_heads": len(v)} for l, v in sorted(by_layer.items())}
 
 
+SINK = "unsegmented"
+
+
+def top_segment_excluding(profile: dict, exclude=(SINK,)):
+    """(segment, mass) with the largest mass among the Segments not in `exclude`; (None, None) on an empty profile.
+    The attention sink (`unsegmented`, the BOS token) takes the top spot on many heads, so C-reads is also read on
+    the top *prompt* Segment (exploratory, beside the pre-registered top-Segment read)."""
+    best = None
+    for seg, mass in profile.items():
+        if seg in exclude or mass is None:
+            continue
+        if best is None or mass > best[1]:
+            best = (seg, float(mass))
+    return best or (None, None)
+
+
+def profiles(cdir: str, condition: str = "pressure") -> dict:
+    """{key: {segment: mass}} at the column query position for one attention condition of a cell."""
+    path = os.path.join(cdir, "attention", "patterns.json")
+    if not os.path.exists(path):
+        return {}
+    pay = load_json(path)
+    cond = next((c for c in pay["conditions"] if c["name"] == condition), None)
+    if not cond:
+        return {}
+    level = {lv["level"]: lv for lv in cond.get("levels") or []}.get("all") or {}
+    masses = level.get("masses") or {}
+    query = pay["column_query_position"]
+    return {tuple(c["key"]): ((masses.get(c["name"]) or {}).get(query) or {}) for c in pay["components"]}
+
+
+def rows_with_top_prompt_segment(rows, profs: dict) -> list:
+    """The rows with the top-Segment columns replaced by the top prompt Segment (sink excluded)."""
+    out = []
+    for r in rows:
+        seg, mass = top_segment_excluding(profs.get(key_of(r), {}))
+        out.append({**r, TOP_SEGMENT: seg, TOP_MASS: mass})
+    return out
+
+
+def cell_check(cdir: str, views=None) -> dict:
+    """scripts/check_cell.py's views over one cell: present, missing (with the view's note) or BROKEN (a malformed
+    file). `views` defaults to check_cell.VIEWS; the import is lazy so the readings stay importable without it."""
+    if views is None:
+        scripts = os.path.join(REPO, "scripts")
+        if scripts not in sys.path:
+            sys.path.insert(0, scripts)
+        import check_cell  # noqa: E402
+
+        views = check_cell.VIEWS
+    status, notes = {}, {}
+    for label, view_of in views:
+        try:
+            view = view_of(cdir)
+        except Exception as error:  # noqa: BLE001 -- a malformed file is a failure, not an absence (check_cell.py)
+            status[label], notes[label] = "BROKEN", f"{type(error).__name__}: {error}"
+            continue
+        if view:
+            status[label] = "present"
+        else:
+            status[label], notes[label] = "missing", getattr(view, "note", "")
+    return {"views": status, "notes": notes, "broken": [k for k, v in status.items() if v == "BROKEN"]}
+
+
 def roles_summary(rj) -> dict:
     if not rj:
         return {"available": False}
@@ -421,7 +546,29 @@ def roles_summary(rj) -> dict:
             "merged_from": rj.get("merged_from"), "n_components": rj.get("n_components")}
 
 
-def task_results(t: str, root: str, sets: dict, prov: dict, deciding: dict, sweep: dict) -> dict:
+def c2_reads(rows_d, profs: dict, mem: dict, families=("excl_t", "DmH_t")) -> dict:
+    """C2: what the exclusives and the D-H heads read and write on D: top Segment at the Readout (pressure),
+    the top prompt Segment (sink left out), DLA under pressure and on the paired twin."""
+    D = _by_key(rows_d)
+    out = {}
+    for fam in families:
+        rows = []
+        for key, m in mem.items():
+            if key[0] != "head" or not m.get(fam):
+                continue
+            r = D.get(key, {})
+            seg, mass = top_segment_excluding(profs.get(key, {}))
+            rows.append({"label": label_of(key), "layer": key[1], "top_segment": r.get(TOP_SEGMENT),
+                         "top_mass": r.get(TOP_MASS), "top_prompt_segment": seg, "top_prompt_mass": mass,
+                         "group": read_group(r.get(TOP_SEGMENT)), "prompt_group": read_group(seg),
+                         "dla_pressure": r.get(DLA), "dla_pressure_se": r.get(DLA_SE),
+                         "dla_pressure_paired": r.get(DLA_PRESSURE_PAIRED), "dla_twin": r.get(DLA_TWIN),
+                         "b2_drop": r.get(B2_DROP), "core": bool(m.get("core"))})
+        out[fam] = rows
+    return out
+
+
+def task_results(t: str, root: str, sets: dict, prov: dict, deciding: dict, sweep: dict) -> tuple:
     cells = {}
     for cell in list(FAMILY_CELLS) + [f"seg_{s}" for s in p2_jobs.SEGMENTS]:
         try:
@@ -449,7 +596,9 @@ def task_results(t: str, root: str, sets: dict, prov: dict, deciding: dict, swee
         "segments": {"matrix": seg, "pre_clause_check": pre_clause_check(seg, p2_jobs.PRE_CLAUSE),
                      "informative": list(p2_jobs.POST_CLAUSE)},
         "clause_mass_by_layer": {c: clause_mass_by_layer(cells[c]) for c in HEAD_CELLS if cells[c]},
+        "c2_reads": c2_reads(rows.get("d", []), profiles(cells["d"]) if cells.get("d") else {}, mem),
         "roles": {c: roles_summary(load_roles(cells[c])) for c in HEAD_CELLS if cells[c]},
+        "check_cell": {c: cell_check(os.path.abspath(cells[c])) for c in HEAD_CELLS if cells[c]},
         "ct_proposal": ct_proposal(t, sets, deciding, rank),
     }
     return out, rows, mem, cells
@@ -511,23 +660,74 @@ def write_long_tables(curated: str, results: dict) -> None:
 def markdown(results: dict) -> str:
     L = ["# Phase-2 results (ticket 04)", "",
          f"Generated by `outputs/_launch_mechanism_analysis/p2_results.py` from `{results['root']}`. "
-         "Sign conventions: on D and I cells a positive drop or DLA supports the cell's target (the deceptive answer "
-         "on D, the inverted answer on I); on H and F cells positive supports the honest answer (ADR-0002). "
-         "Statistics: Freeman-Halton exact test (two-sided, head level) and the exact one-sided binomial upper tail.", ""]
+         "Sign conventions: every drop and DLA is read in its cell's own target direction (`target_direction` in "
+         "the cell's knockout/groups.json: `deceptive` on D and I, where I's target slot holds the inverted answer; "
+         "`honest` on H and F): a positive value supports the cell's target. The DLA reads the same target and "
+         "distractor fields, so its metric text, which always says 'deceptive', is honest-positive on H and F. "
+         "Statistics: Freeman-Halton exact test (two-sided, head level) and the exact one-sided binomial upper tail. "
+         "Columns marked exploratory were not pre-registered.", ""]
+    if results.get("exploratory"):
+        L += ["Exploratory (beyond the ticket's list; never decides a reading):", ""]
+        L += [f"- {x}" for x in results["exploratory"]] + [""]
+    p1 = results.get("phase1_rcls") or {}
+    if p1.get("rqa"):
+        L += [f"Pre-registered per-head R-cls (RQ-A), graded in phase 1 (`{p1['source']}`, rqa): "
+              + "; ".join(f"{t} core shared {v['core_shared']}/{v['core_n']} ({'holds' if v['core_holds'] else 'fails'}),"
+                          f" exclusives deception-leaning {v['excl_deception_leaning']}/{v['excl_n']} "
+                          f"({'holds' if v['excl_holds'] else 'fails'})" for t, v in p1["rqa"].items()) + ".", ""]
     for t, res in results["tasks"].items():
         L += [f"## {t}", "", "Components in U': " + ", ".join(f"{c} {n}" for c, n in res["membership_counts"].items())
               + f" (total {res['n_components']})", ""]
         chk = res["segments"]["pre_clause_check"]
         L += [f"**Pre-clause sanity assertion (R16):** {'PASS' if chk['ok'] else 'FAIL'}; max |drop| "
               f"{_f(chk['max_abs_drop'], 6)}; non-zero entries {len(chk['nonzero'])}.", ""]
+        cc = res.get("check_cell") or {}
+        if cc:
+            labels = list(next(iter(cc.values()))["views"])
+            broken = [f"{c}: {v}" for c, r in cc.items() for v in r["broken"]]
+            L += ["### scripts/check_cell.py on the head cells", "",
+                  "Missing views are the analyses phase 2 does not run (single knockout, sweeps and path patching come "
+                  "from phases 1 and 3; the family knockout here is the groups pass, `knockout/groups.json`, which "
+                  "check_cell does not list; the dla paired scatter is the honest-instruction scatter, a condition "
+                  "v2 cells do not run).", "",
+                  "| cell | " + " | ".join(labels) + " |", "|---|" + "---|" * len(labels)]
+            L += [f"| {c} | " + " | ".join(r["views"].get(v, "-") for v in labels) + " |" for c, r in cc.items()]
+            L += ["", "BROKEN views: " + ("; ".join(broken) if broken else "none") + ".", ""]
         # families
-        L += ["### Family knockouts", "", "| family | n | " + " | ".join(FAMILY_CELLS) + " | R-cls (d/h/f) |",
+        L += ["### Family knockouts", "",
+              "Columns d, h, f are the spec's family knockouts; d_twinko and i are exploratory. The R-cls column "
+              "applies the R-cls bands to the family's joint drop and is descriptive: the pre-registered per-head "
+              "R-cls classes are phase 1's (reports/03-phase1-results.json, class_counts).", "",
+              "| family | n | " + " | ".join(FAMILY_CELLS) + " | family-level R-cls (descriptive) |",
               "|---|---|" + "---|" * len(FAMILY_CELLS) + "---|"]
         for fam, by in res["families"].items():
             n = next((v["n_components"] for c, v in by.items() if c != "rcls"), "-")
             cells = [f"{_f(by[c]['mean_drop'])} ± {_f(by[c]['standard_error'])}" if c in by else "-" for c in FAMILY_CELLS]
             L.append(f"| {fam} | {n} | " + " | ".join(cells) + f" | {(by.get('rcls') or {}).get('class', '-')} |")
         L.append("")
+        # per-layer clause mass (spec 2.9 descriptive)
+        cm = res["clause_mass_by_layer"].get("d") or {}
+        if cm:
+            layers = sorted(cm)
+            L += ["### Pressure-clause attention mass per layer (D cell, Readout query; descriptive, spec 2.9)", "",
+                  "| layer | " + " | ".join(str(l) for l in layers) + " |", "|---|" + "---|" * len(layers),
+                  "| mean over U' heads | " + " | ".join(_f(cm[l]["mean"]) for l in layers) + " |",
+                  "| max head | " + " | ".join(_f(cm[l]["max"]) for l in layers) + " |",
+                  "| heads | " + " | ".join(str(cm[l]["n_heads"]) for l in layers) + " |", ""]
+        # C2: the exclusives' and the (D-H)-core heads' reads and writes
+        for fam, title in (("excl_t", "the exclusives"), ("DmH_t", "the D-H heads (core column: in the core; the "
+                                                                     "rest are (D-H)-core)")):
+            rows_c2 = res["c2_reads"].get(fam) or []
+            if not rows_c2:
+                continue
+            L += [f"### C2: what {title} read and write (D cell)", "",
+                  "The top prompt Segment (sink left out) is exploratory. DLA is deceptive-positive on D.", "",
+                  "| head | core | top Segment (mass) | top prompt Segment (mass; sink left out) | DLA pressure | "
+                  "DLA pressure (paired) | DLA twin | B2 drop |", "|---|---|---|---|---|---|---|---|"]
+            L += [f"| {r['label']} | {_f(r.get('core'))} | {r['top_segment']} ({_f(r['top_mass'])}) | "
+                  f"{r['top_prompt_segment']} ({_f(r['top_prompt_mass'])}) | {_f(r['dla_pressure'])} | "
+                  f"{_f(r['dla_pressure_paired'])} | {_f(r['dla_twin'])} | {_f(r['b2_drop'])} |" for r in rows_c2]
+            L.append("")
         # segments
         L += ["### Segment-resolved neutral-twin knockout of the S2p top 20 (informative Segments)", ""]
         segs = [s for s in p2_jobs.POST_CLAUSE if any(s in by for by in res["segments"]["matrix"].values())]
@@ -538,22 +738,42 @@ def markdown(results: dict) -> str:
         # B-reader
         b = res["b_reader"]
         if b:
+            named = b["l13"]
             L += ["### B-reader (D cell)", "",
-                  f"Signature heads {b['n_signature']} of {b['n_measured']} measured; in layers 8-17: {b['n_in_8_17']} "
-                  f"(share {_f(b['share_8_17'])} vs base rate {_f(BASE_RATE)}); one-sided binomial p = {_f(b['p'], 4)}.",
+                  "Two pre-registered clauses (spec 2.6): (i) the binomial on the layer-8-17 share; (ii) L13H5, "
+                  "L13H20 and L13H21 show the signature. (ii): "
+                  + "; ".join(f"{k} {'yes' if v['signature'] else 'no'}" for k, v in named.items()) + ".", "",
+                  f"(i) Signature heads {b['n_signature']} of {b['n_measured']} measured; in layers 8-17: {b['n_in_8_17']} "
+                  f"(share {_f(b['share_8_17'])} vs base rate {_f(BASE_RATE)}); one-sided binomial p = {_f(b['p'], 4)}; "
+                  f"against U''s own layer-8-17 share of measured heads ({_f(b['measured_share_8_17'])}) p = "
+                  f"{_f(b['p_against_measured_share'], 4)}.",
                   "", "| head | layer | clause-mass drop | SE |", "|---|---|---|---|"]
             L += [f"| {h['label']} | {h['layer']} | {_f(h['drop'])} | {_f(h['se'])} |" for h in b["signature_heads"]]
             L += ["", "L13 heads: " + "; ".join(f"{k}: drop {_f(v['drop'])} ± {_f(v['se'])}, signature {_f(v['signature'])}"
                                                 for k, v in b["l13"].items()), ""]
+        bi = res.get("b_reader_I")
+        if bi:
+            L += ["### B-reader on the I cell (exploratory; not a B-reader test)", "",
+                  f"Signature heads {bi['n_signature']} of {bi['n_measured']} measured; in layers 8-17: "
+                  f"{bi['n_in_8_17']} (share {_f(bi['share_8_17'])}); binomial p against 10/32 = {_f(bi['p'], 4)}. "
+                  "L13 heads: " + ("; ".join(f"{k} {'yes' if v['signature'] else 'no'}" for k, v in bi["l13"].items())
+                                   or "-") + ".", ""]
         # C-honest
         ch = res["c_honest"]
         L += ["### C-honest (late H-D heads)", "",
-              f"{ch['n']} heads; write honest on H and F: {ch['n_writes_honest']}; suppressed under pressure: "
-              f"{ch['n_suppressed']}.", "",
-              "| head | DLA H | DLA F | honest DLA D (pressure) | honest DLA D (twin) | suppression |",
-              "|---|---|---|---|---|---|"]
+              f"{ch['n']} heads; write honest on H and F (DLA > 0, >= 2 SE): {ch['n_writes_honest']}; on D, honest-"
+              f"direction DLA over the paired instances: suppressed (reduced >= 50 %, still honest-signed) "
+              f"{ch['n_suppressed']}, flipped (negative under pressure) {ch['n_flipped']}; either, the spec's "
+              f"'>= 50 % smaller': {ch['n_reduced_at_least_half']}; both clauses on one head (writes honest and "
+              f">= 50 % smaller): {ch['n_holds']}. A dash in suppression means the twin DLA is not honest-signed.", "",
+              "| head | DLA H | DLA F | honest DLA D (pressure, paired) | honest DLA D (twin) | suppression | state | "
+              "writes honest on H and F | both clauses |",
+              "|---|---|---|---|---|---|---|---|---|"]
         L += [f"| {k} | {_f(v['dla_H'])} | {_f(v['dla_F'])} | {_f(v['honest_dla_D_pressure'])} | "
-              f"{_f(v['honest_dla_D_twin'])} | {_f(v['suppression'])} |" for k, v in ch["heads"].items()]
+              f"{_f(v['honest_dla_D_twin'])} | {_f(v['suppression'])} | "
+              f"{'flipped' if v['flipped'] else 'suppressed' if v['suppressed'] else '-'} | "
+              f"{_f(v['writes_honest_on_H_and_F'])} | {_f(v.get('holds'))} |"
+              for k, v in ch["heads"].items()]
         L.append("")
         # I vs D
         iv = res["i_vs_d"]
@@ -575,14 +795,20 @@ def markdown(results: dict) -> str:
         L.append("")
         ct = res["ct_proposal"]
         L += ["### Proposed C_t for phase 3", "", f"Sizes: {ct['sizes']}", f"MLPs: {', '.join(ct['mlps'])}", ""]
-    cr = results["c_reads"]
-    L += ["## C-reads (exclusive sets' top-Segment groups, own D cell)", "",
-          "| task | " + " | ".join(cr["groups"]) + " |", "|---|" + "---|" * len(cr["groups"])]
-    L += [f"| {t} | " + " | ".join(str(x) for x in row) + " |" for t, row in zip(cr["tasks"], cr["table"])]
-    L += ["", f"Fisher exact p = {_f(cr['p'], 4)} ({cr['test']}).", ""]
-    for t in TASKS:
-        L.append(f"- {t}: " + "; ".join(f"{h['label']} {h['segment']} ({_f(h['mass'])})" for h in cr["heads"][t]))
-    L.append("")
+    for key, title in (("c_reads", "C-reads (exclusive sets' top-Segment groups, own D cell; pre-registered)"),
+                       ("c_reads_top_prompt_segment", "C-reads on the top prompt Segment (attention sink left out; exploratory)")):
+        cr = results.get(key)
+        if not cr:
+            continue
+        L += [f"## {title}", "",
+              "| task | " + " | ".join(cr["groups"]) + " |", "|---|" + "---|" * len(cr["groups"])]
+        L += [f"| {t} | " + " | ".join(str(x) for x in row) + " |" for t, row in zip(cr["tasks"], cr["table"])]
+        L += ["", f"Fisher exact p = {_f(cr['p'], 4)} ({cr['test']}). Heads in the table: "
+              + ", ".join(f"{t} {cr['n_in_table'][t]}" for t in TASKS) + "; unestablished (left out): "
+              + ", ".join(f"{t} {cr['n_unestablished'][t]}" for t in TASKS) + ".", ""]
+        for t in TASKS:
+            L.append(f"- {t}: " + "; ".join(f"{h['label']} {h['segment']} ({_f(h['mass'])})" for h in cr["heads"][t]))
+        L.append("")
     return "\n".join(L)
 
 
@@ -597,8 +823,12 @@ def main(argv=None) -> int:
     a = p.parse_args(argv)
     sets = p2_jobs.head_sets()
     deciding = p2_operands.deciding_sets(load_json(a.readings))
-    results = {"root": os.path.relpath(a.root, REPO), "tasks": {}}
-    rows_by_task = {}
+    results = {"root": os.path.relpath(a.root, REPO), "tasks": {}, "exploratory": list(EXPLORATORY)}
+    p1 = os.path.join(a.reports, "03-phase1-results.json")
+    if os.path.exists(p1):
+        # the pre-registered per-head R-cls grading is phase 1's (sweeps S1, S5, S6); quoted here, not recomputed
+        results["phase1_rcls"] = {"source": os.path.basename(p1), "rqa": load_json(p1).get("rqa")}
+    rows_by_task, prompt_rows_by_task = {}, {}
     os.makedirs(a.curated, exist_ok=True)
     for t in a.tasks.split(","):
         prov = load_json(os.path.join(REPO, p2_jobs.OPERAND.format(t=t), "provenance.json"))
@@ -606,11 +836,14 @@ def main(argv=None) -> int:
         res, rows, mem, cells = task_results(t, a.root, sets, prov, deciding[t], sweep)
         results["tasks"][t] = res
         rows_by_task[t] = rows.get("d", [])
+        prompt_rows_by_task[t] = rows_with_top_prompt_segment(rows.get("d", []), profiles(cells["d"])) if cells.get("d") else []
         write_curated(a.curated, t, rows, mem, cells)
         print(t, "pre-clause", res["segments"]["pre_clause_check"]["ok"], "B-reader p", (res["b_reader"] or {}).get("p"))
     comp = {t: {("head", l, h) for l, h in p2_jobs.composition_sets(t, sets)[f"excl_{t}"]} for t in TASKS}
     results["c_reads"] = c_reads(rows_by_task, comp)
-    results["c_reads_twin_paired_top_segment"] = c_reads(rows_by_task, comp, segment_col=TWIN_TOP_SEGMENT, mass_col=TOP_MASS)
+    results["c_reads_top_prompt_segment"] = c_reads(prompt_rows_by_task, comp)
+    results["c_reads_top_prompt_segment"]["note"] = ("exploratory: the top Segment with the attention sink " \
+                                                      "(unsegmented) left out, from attention/patterns.json")
     write_long_tables(a.curated, results)
     os.makedirs(a.reports, exist_ok=True)
     with open(os.path.join(a.reports, "04-phase2-results.json"), "w") as f:
@@ -618,9 +851,10 @@ def main(argv=None) -> int:
     with open(os.path.join(a.reports, "04-phase2-results.md"), "w") as f:
         f.write(markdown(results))
     readings = {t: {k: v for k, v in res.items() if k in ("b_reader", "b_reader_I", "c_honest", "i_vs_d", "ct_proposal",
-                                                          "membership_counts", "roles")}
+                                                          "membership_counts", "roles", "check_cell")}
                 for t, res in results["tasks"].items()}
     readings["c_reads"] = results["c_reads"]
+    readings["exploratory"] = results["exploratory"]
     with open(os.path.join(a.curated, "p2_readings.json"), "w") as f:
         json.dump(readings, f, indent=1, default=str)
     print("wrote", os.path.join(a.reports, "04-phase2-results.md"))
