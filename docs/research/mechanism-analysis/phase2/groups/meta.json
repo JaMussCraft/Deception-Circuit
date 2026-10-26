@@ -1,0 +1,165 @@
+{
+ "rule": "families = the composition sets at leaf from the six atomic runs' head masks; top20 = the S2p signed top 20 (layer-0 MLP excluded) as singletons plus the joint set; one seg line per v2 Segment",
+ "late_layers": [
+  18,
+  22,
+  30
+ ],
+ "segments": [
+  "intro",
+  "item_1_intro",
+  "item_2_intro",
+  "designating_sentence",
+  "designation_site",
+  "predicate_token",
+  "other_token",
+  "inverse_predicate_token",
+  "designation_suffix",
+  "pressure_clause",
+  "question",
+  "response_line",
+  "item_1_question_pair",
+  "item_1_question_option",
+  "item_2_question_pair",
+  "item_2_question_option",
+  "stem",
+  "readout"
+ ],
+ "pre_clause": [
+  "intro",
+  "item_1_intro",
+  "item_2_intro",
+  "designating_sentence",
+  "designation_site",
+  "predicate_token",
+  "other_token",
+  "inverse_predicate_token",
+  "designation_suffix"
+ ],
+ "post_clause": [
+  "pressure_clause",
+  "question",
+  "response_line",
+  "item_1_question_pair",
+  "item_1_question_option",
+  "item_2_question_pair",
+  "item_2_question_option",
+  "stem",
+  "readout"
+ ],
+ "sources": {
+  "outputs/_analyses/mechanism-analysis-p1/s2p/U__leaf/far_v2/knockout/sweep.json": "cf12de8c278a94b6f0b86c24ece23dcdd61626ad03c9ac8b5d4c431a8b187386",
+  "outputs/_analyses/mechanism-analysis-p1/s2p/U__leaf/sdr_v2/knockout/sweep.json": "9f4d71d3e487fe50d3c51043c8814cffd9f11550e383b9313b5c5e26eb4f7dbe",
+  "outputs/_analyses/mechanism-analysis-p1/s2p/U__leaf/ser_v2/knockout/sweep.json": "5dc1590b3b6064167f18780a534407e719040dd3a06a6a8c73d3406ba7d0ff4d",
+  "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717/active_nodes.json": "fb87b7f88e0d2a66486b736b7451107ee8e8219e183a9c75c00634e0057b0d07",
+  "outputs/llama-8b-instruct_far_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323/active_nodes.json": "bd8a837bd4da362f0712de2296a71bb4dee92c650d11c8717185e69134a727cf",
+  "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323/active_nodes.json": "1f9c4fae07b76a500cc495d4a0d488927cfccc020170cb7fb9cbfe5c59b0c238",
+  "outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323/active_nodes.json": "810fc4177d6d79fe8749612f5d1f445131b191c9f8699b4053a5b9fb88298b86",
+  "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101/active_nodes.json": "96b95bac66d616588fa613eca73e7e50e316a0e59550565c800437d9f3d890a6",
+  "outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323/active_nodes.json": "6d5566c7603c14e55ab148f49e26b3b6581852fbf1be34e2e71e468692152d47",
+  "outputs/_launch_mechanism_analysis/operands/skct_far/active_nodes.json": "c5dbf5ee80fb4d030f4b9a8c0a35b0fa64cfcc3fe7e8fc1c4815379e6ed8fa0d",
+  "outputs/_launch_mechanism_analysis/operands/skct_sdr/active_nodes.json": "90bdac69803969a145218c8915b11e36b9e82503457ef7e0687a49a9e2548d5c",
+  "outputs/_launch_mechanism_analysis/operands/skct_ser/active_nodes.json": "809883d301402fcb3c35f1febe042674f743116c0dfeb73ef6edb2a7a2714b9b"
+ },
+ "tasks": {
+  "far": {
+   "families": {
+    "core": 31,
+    "excl_far": 8,
+    "DmH_far": 26,
+    "DmH_minus_core_far": 15,
+    "HmD_far": 28,
+    "late_HmD_far": 12
+   },
+   "empty_families": [],
+   "top20": [
+    "head.9.29",
+    "mlp.13.0",
+    "head.14.5",
+    "head.9.16",
+    "head.9.19",
+    "head.7.16",
+    "head.11.0",
+    "head.11.15",
+    "mlp.6.0",
+    "head.14.4",
+    "head.7.12",
+    "mlp.14.0",
+    "head.10.22",
+    "head.8.15",
+    "mlp.7.0",
+    "head.7.10",
+    "mlp.11.0",
+    "mlp.8.0",
+    "head.10.19",
+    "head.10.25"
+   ]
+  },
+  "sdr": {
+   "families": {
+    "core": 31,
+    "excl_sdr": 14,
+    "DmH_sdr": 21,
+    "DmH_minus_core_sdr": 15,
+    "HmD_sdr": 19,
+    "late_HmD_sdr": 7
+   },
+   "empty_families": [],
+   "top20": [
+    "mlp.14.0",
+    "head.14.5",
+    "mlp.13.0",
+    "head.14.4",
+    "head.12.4",
+    "head.14.20",
+    "mlp.12.0",
+    "head.14.24",
+    "mlp.6.0",
+    "head.15.11",
+    "head.13.18",
+    "head.15.8",
+    "head.13.23",
+    "head.14.23",
+    "head.17.24",
+    "mlp.7.0",
+    "mlp.8.0",
+    "head.13.21",
+    "head.11.1",
+    "head.13.28"
+   ]
+  },
+  "ser": {
+   "families": {
+    "core": 31,
+    "excl_ser": 10,
+    "DmH_ser": 19,
+    "DmH_minus_core_ser": 19,
+    "HmD_ser": 33,
+    "late_HmD_ser": 8
+   },
+   "empty_families": [],
+   "top20": [
+    "head.11.0",
+    "mlp.13.0",
+    "head.13.23",
+    "head.9.29",
+    "head.14.5",
+    "head.12.4",
+    "head.14.4",
+    "head.11.15",
+    "mlp.14.0",
+    "mlp.6.0",
+    "head.14.20",
+    "mlp.5.0",
+    "mlp.7.0",
+    "head.8.15",
+    "head.13.22",
+    "head.9.3",
+    "head.14.24",
+    "head.9.19",
+    "head.9.31",
+    "head.13.18"
+   ]
+  }
+ }
+}
