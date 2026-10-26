@@ -352,3 +352,15 @@ def test_a_tie_between_two_senders_goes_to_the_grid_s_order_like_strongest_incom
     assert one["tied"] == ["head.9.1->k.1.0", "head.10.0->k.1.0"]
     reordered = rc.categorize_head(("head", 1, 0), cells[::-1], splits)
     assert reordered["path"] == "head.10.0->k.1.0"
+
+
+def test_the_writer_declares_coverage_over_the_measured_instances_like_the_job(cell_dir):
+    """02b review S4 (left for ticket 05): an instance the gap excluded is not in the twin pass's means, so the
+    CLI's coverage leaves it out, as the in-job hook does (`path_patching.measured_ids`)."""
+    path = os.path.join(cell_dir, "path_patching", "agnostic_neutral_twin.json")
+    payload = json.load(open(path))
+    payload["sample"]["excluded_by_gap"] = ["i1"]
+    open(path, "w").write(json.dumps(payload))
+    rc.write(cell_dir)
+    entry = coverage_of(load_head_table_meta(cell_dir), "path_patching.receiver_category_neutral_twin")
+    assert entry["n"] == 2

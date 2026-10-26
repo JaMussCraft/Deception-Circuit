@@ -281,7 +281,12 @@ def write(cell_dir: str, *, floor: float = FLOOR) -> dict:
     subdir = os.path.join(cell_dir, pp.SUBDIR)
     results, out = categorize_cell(subdir, heads, floor=floor)
     rows = merge_columns(rows, columns(results), namespace=NAMESPACE)
-    meta = add_coverage(meta, COLUMNS, out["sample"]["instance_ids"],
+    # Coverage over the measured instances (the pass's, less those the gap excluded), as the in-job hook declares
+    # it through `path_patching.measured_ids` (02b review S4).
+    with open(out["agnostic_file"]) as handle:
+        excluded = set((json.load(handle).get("sample") or {}).get("excluded_by_gap") or [])
+    measured = [one for one in out["sample"]["instance_ids"] if one not in excluded]
+    meta = add_coverage(meta, COLUMNS, measured,
                         instance_set=CAUSAL_SAMPLE_NEUTRAL_TWIN, namespace=NAMESPACE)
     written = write_head_table(cell_dir, rows, meta=meta)
     path = os.path.join(subdir, JSON_NAME)
