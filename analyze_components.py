@@ -43,10 +43,14 @@ leaves one table holding all four analyses' columns. A dry run replaces
 nothing. The researcher's `role_confirmed` and the roles pass's `roles.*`
 columns survive every run by the same rule.
 
-Subcommands come before the flags. There is one:
+Subcommands come before the flags:
 
     # propose a Component Role per Component from a finished head table
     python analyze_components.py roles outputs/_analyses/<suite>/<circuit>/<task>
+    # the receiver category per head from a finished neutral-twin pass (v2)
+    python analyze_components.py receiver-category outputs/_analyses/<suite>/<circuit>/<task>
+    # several intakes from one job file, one cell each
+    python analyze_components.py batch <job file> [shared flags]
 
 It needs no model and no circuit binding — it reads the head table the analyses
 left and applies the pre-registered criteria in `docs/component-roles.md` — so

@@ -6,7 +6,10 @@ under the Neutral-Clause Twin, each circuit head's **strongest incoming path**
 at or above the floor (`FLOOR`, the roles doc's path floor) is read as exactly
 one of
 
-    q               it arrives at the head's own query input: a selector
+    q               it arrives at the head's own query input: the head
+                    itself is steered by the pressure (what rule 4b reads
+                    beside the other columns; the category alone names
+                    no Component Role)
     kv_clause       at the K or V input of the head's KV group, carried from
                     the clause span: the head reads the clause directly
     kv_post_clause  at K or V, carried from positions after the clause
@@ -98,10 +101,11 @@ def incoming_receivers(receivers: Sequence[dict], key: tuple) -> List[dict]:
 
 
 def _rank_key(cell: dict):
-    receiver = cell["receiver"]
-    kind, layer, index = receiver.split(".")
-    return (-abs(cell["mean"]), RECEIVER_ORDER.index(kind), int(layer), int(index),
-            cell["sender"])
+    """Strongest first; an exact tie keeps the incoming list's order, which is
+    the grid's (the head's query receiver, then its KV group's K and V, senders
+    in run order) — the same stable sort `path_patching.strongest` applies for
+    the `strongest_incoming` column, so the two name the same cell."""
+    return -abs(cell["mean"])
 
 
 def _class_of(cell: dict, splits: Dict[str, dict]) -> Tuple[str, Optional[str],
@@ -130,6 +134,15 @@ _CATEGORY_OF_CLASS = {"clause": "kv_clause", "post_clause": "kv_post_clause",
                       "unresolved": "kv_unresolved"}
 
 
+class TwinPassSkipped(Exception):
+    """The cell's neutral-twin pass ran but was skipped (no instance of the
+    causal sample has a twin: an H or F cell, or a D cell the pairing missed),
+    so its heads have no category. Nothing is written: the roles pass reads
+    the absent columns as unmeasured, which is what they are, and a `none` here
+    would say "measured, nothing above the floor" about a pass that measured
+    nothing."""
+
+
 def categorize_head(key: tuple, cells: Sequence[dict], splits: Dict[str, dict],
                     *, floor: float = FLOOR) -> dict:
     """One head's category from its incoming cells (already selected)."""
@@ -151,7 +164,8 @@ def categorize_head(key: tuple, cells: Sequence[dict], splits: Dict[str, dict],
         out["category"] = "q"
         if tied_names:
             out["note"] = (f"tie at |mean| {abs(best['mean'])} with "
-                           f"{', '.join(tied_names[1:])}; receiver order q, k, v decides")
+                           f"{', '.join(tied_names[1:])}; the grid's order decides, "
+                           f"as for strongest_incoming")
         return out
 
     classes = [_class_of(one, splits) for one in tied]
@@ -189,8 +203,6 @@ def categorize(agnostic: dict, segments: Optional[dict], heads: Sequence[tuple],
         incoming = [cell for receiver in incoming_receivers(receivers, key)
                     for cell in by_receiver.get(receiver["key"], [])]
         out[key] = categorize_head(key, incoming, splits, floor=floor)
-        if agnostic.get("skipped"):
-            out[key]["note"] = f"neutral-twin pass skipped: {agnostic['skipped']}"
     return out
 
 
@@ -240,6 +252,11 @@ def categorize_cell(subdir: str, heads: Sequence[tuple], *, floor: float = FLOOR
     segments_file = os.path.join(subdir, pp.output_name(pp.SEGMENTS_STEM, pp.NEUTRAL_TWIN, "json"))
     with open(agnostic_file) as handle:
         agnostic = json.load(handle)
+    if agnostic.get("skipped"):
+        raise TwinPassSkipped(
+            f"{agnostic_file}: the neutral-twin pass was skipped "
+            f"({agnostic['skipped']}), so this cell's heads have no receiver "
+            f"category; the columns stay absent (unmeasured), not `none`")
     segments = None
     if os.path.isfile(segments_file):
         with open(segments_file) as handle:
@@ -285,8 +302,9 @@ def build_parser() -> argparse.ArgumentParser:
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     p.add_argument("cell_dir", help="The cell directory holding head_table.json "
                                     "and path_patching/agnostic_neutral_twin.json.")
-    p.add_argument("--floor", type=float, default=FLOOR,
-                   help="The smallest |mean| an incoming cell must have.")
+    p.add_argument("--path-category-floor", type=float, default=FLOOR,
+                   help="The smallest |mean| an incoming cell must have (the "
+                        "job's flag of the same name).")
     p.add_argument("--dry-run", action="store_true",
                    help="Print the categories and write nothing.")
     return p
@@ -298,11 +316,11 @@ def main(argv=None) -> int:
     heads = [row_key(row) for row in rows if row.get("kind") == "head"]
     try:
         results, out = categorize_cell(os.path.join(cli.cell_dir, pp.SUBDIR), heads,
-                                       floor=cli.floor)
-    except FileNotFoundError as missing:
-        raise SystemExit(str(missing))
+                                       floor=cli.path_category_floor)
+    except (FileNotFoundError, TwinPassSkipped) as why:
+        raise SystemExit(str(why))
     print(f"\nRECEIVER CATEGORY — {cli.cell_dir}")
-    print(f"  floor: {cli.floor}; counts: {out['counts']}")
+    print(f"  floor: {cli.path_category_floor}; counts: {out['counts']}")
     for one in out["heads"]:
         _kind, layer, index = one["key"]
         support = "" if one["support"] is None else f"{one['support']:+.4f}"
@@ -311,7 +329,7 @@ def main(argv=None) -> int:
     if cli.dry_run:
         print("\n  --dry-run: nothing written.")
         return 0
-    written = write(cli.cell_dir, floor=cli.floor)
+    written = write(cli.cell_dir, floor=cli.path_category_floor)
     print(f"\n  {written['head_table']['csv']}\n  {written['head_table']['json']}\n  "
           f"{written['json']}")
     return 0

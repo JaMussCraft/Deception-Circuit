@@ -353,3 +353,16 @@ def test_the_roles_module_still_does_not_import_nnsight_with_the_v2_detection():
                             cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                             capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
+
+
+# ==============================================================================
+# THE REVIEW FIXES (02b)
+# ==============================================================================
+
+def test_the_console_tally_counts_the_pressure_readers_on_a_v2_cell(capsys):
+    roles.print_decisions(roles.decide_rows([a_pressure_reader(), a_v2_selector()], variant=roles.V2),
+                          variant=roles.V2)
+    out = capsys.readouterr().out
+    assert "pressure reader: 1" in out and "selector: 1" in out
+    roles.print_decisions(roles.decide_rows([a_selector()]))
+    assert "pressure reader" not in capsys.readouterr().out

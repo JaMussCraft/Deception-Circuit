@@ -15,6 +15,7 @@ otherwise, as `tests/test_attention_patterns.py` gates them.
 from __future__ import annotations
 
 import argparse
+import types
 import json
 import os
 
@@ -385,3 +386,31 @@ def test_a_v2_cell_without_a_twin_writes_the_skipped_file(model, whole_model_gri
     assert all(value is None for value in updates[("head", 1, 0)].values())
     declared = [one for one in ctx.declared if one[2] == CAUSAL_SAMPLE_NEUTRAL_TWIN]
     assert declared and declared[0][1] == []
+
+
+# ==============================================================================
+# THE TWIN'S OWN POSITION THRESHOLD (R25 A)
+# ==============================================================================
+
+def test_the_twin_position_threshold_is_its_own_flag_and_defaults_to_the_shared_one():
+    """Phase 3 runs the neutral-twin Segment pass at the receiver category's floor (0.01) while the
+    item-swap pass keeps the default 0.05: one flag for the twin, the shared one for the rest."""
+    cli = argparse.Namespace(path_position_threshold=0.05, path_twin_position_threshold=None)
+    ctx = types.SimpleNamespace(cli=cli)
+    assert pp.position_threshold(ctx) == 0.05
+    assert pp.position_threshold(ctx, pp.ITEM_SWAP) == 0.05
+    assert pp.position_threshold(ctx, pp.NEUTRAL_TWIN) == 0.05
+    cli.path_twin_position_threshold = 0.01
+    assert pp.position_threshold(ctx, pp.NEUTRAL_TWIN) == 0.01
+    assert pp.position_threshold(ctx, pp.ITEM_SWAP) == 0.05
+    assert pp.position_threshold(ctx, pp.HONEST_INSTRUCTION) == 0.05
+    # A v1-shaped cli without the attribute reads the shared flag for every counterfactual.
+    old = types.SimpleNamespace(cli=argparse.Namespace(path_position_threshold=0.07))
+    assert pp.position_threshold(old, pp.NEUTRAL_TWIN) == 0.07
+
+
+def test_the_twin_position_threshold_flag_parses_and_is_off_by_default():
+    parser = argparse.ArgumentParser()
+    pp.add_arguments(parser.add_argument_group("path"))
+    assert parser.parse_args([]).path_twin_position_threshold is None
+    assert parser.parse_args(["--path-twin-position-threshold", "0.01"]).path_twin_position_threshold == 0.01

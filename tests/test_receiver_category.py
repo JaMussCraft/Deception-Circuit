@@ -304,3 +304,51 @@ def test_the_subcommand_is_wired(cell_dir, capsys):
     assert "kv_clause" in printed
     rows = load_head_table(cell_dir)
     assert any(r.get("path_patching.receiver_category_neutral_twin") == "q" for r in rows)
+
+
+# ==============================================================================
+# THE REVIEW FIXES (02b)
+# ==============================================================================
+
+def test_a_skipped_twin_pass_is_refused_not_read_as_none(tmp_path):
+    """A v2 H or F cell's twin pass writes a skipped file; its heads have no
+    category, and the roles pass must see the columns absent, never `none`."""
+    write_head_table(str(tmp_path), [{"kind": "head", "layer": 1, "index": 0,
+                                      "kv_group": 0, "head_gate_active": True,
+                                      "active_neuron_count": 0}], meta={"task": {"task": "sdr_v2"}})
+    sub = tmp_path / "path_patching"
+    sub.mkdir()
+    (sub / "agnostic_neutral_twin.json").write_text(json.dumps(
+        {"analysis": "path_patching", "pass": "position_agnostic", "counterfactual": "neutral_twin",
+         "skipped": "no instance of the causal sample has a neutral_twin counterpart", "cells": []}))
+
+    with pytest.raises(rc.TwinPassSkipped, match="skipped"):
+        rc.categorize_cell(str(sub), [("head", 1, 0)])
+    with pytest.raises(rc.TwinPassSkipped):
+        rc.write(str(tmp_path))
+    with pytest.raises(SystemExit, match="skipped"):
+        rc.main([str(tmp_path)])
+    assert not os.path.exists(sub / rc.JSON_NAME)
+    assert rc.COLUMN not in load_head_table(str(tmp_path))[0]
+    assert f"path_patching.{rc.COLUMN}" not in load_head_table(str(tmp_path))[0]
+
+
+def test_the_floor_flag_has_the_analysis_prefix_and_is_the_job_s_name():
+    cli = rc.build_parser().parse_args(["cell", "--path-category-floor", "0.02"])
+    assert cli.path_category_floor == 0.02
+    with pytest.raises(SystemExit):
+        rc.build_parser().parse_args(["cell", "--floor", "0.02"])
+
+
+def test_a_tie_between_two_senders_goes_to_the_grid_s_order_like_strongest_incoming():
+    """`path_patching.strongest_incoming` is a stable sort of the incoming cells in grid order
+    (receiver q, then k, then v; senders in run order), so the category breaks ties the same way:
+    file order, not the sender's name (which would put `head.10.0` before `head.9.1`)."""
+    cells = [cell("head.9.1", "k.1.0", 0.2), cell("head.10.0", "k.1.0", 0.2)]
+    splits = {s["cell"]: s for s in [split("head.9.1->k.1.0", "pressure_clause"),
+                                     split("head.10.0->k.1.0", "pressure_clause")]}
+    one = rc.categorize_head(("head", 1, 0), cells, splits)
+    assert one["path"] == "head.9.1->k.1.0"
+    assert one["tied"] == ["head.9.1->k.1.0", "head.10.0->k.1.0"]
+    reordered = rc.categorize_head(("head", 1, 0), cells[::-1], splits)
+    assert reordered["path"] == "head.10.0->k.1.0"

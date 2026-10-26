@@ -1692,8 +1692,9 @@ def _run_neutral_twin(ctx, payload, shared, tokens, names, column_query) -> None
              "re-checks per instance",
              f"b2: per head, the {column_query}-query mass on {B2_SEGMENT} under "
              f"pressure minus under the twin, paired per instance, with the "
-             f"paired standard error (spec B2: a pressure reader's drops by "
-             f">= 0.05 and >= 2 SE)"]
+             f"paired standard error (spec B2: the roles pass reads a drop of "
+             f"at least --roles-b2-floor and --roles-z standard errors as the "
+             f"signature)"]
     if report["n_differing_outside_the_clause"]:
         notes.append(
             f"!! {report['n_differing_outside_the_clause']} pair(s) differ "

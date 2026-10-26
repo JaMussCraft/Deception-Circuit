@@ -191,8 +191,11 @@ pooled: the two question mentions are separate Segments, not one.
 **Segment**:
 A named span of a prompt used as the unit for aggregating what a component
 reads: intro, each Item Mention, each Designation Position, the Pressure
-Clause, the Designation Suffix, the user question, the assistant stem, and the
-**Readout**. The segmentation is task-defined; STD has its own.
+Clause, the Designation Suffix, the user question, the **response line** (v2
+only: the "Only respond with ..." frame line, `response_line`, carved out of
+the question), the assistant stem, and the **Readout**. The segmentation is
+task-defined; STD has its own. For the roles pass `response_line` is a
+`frame` Segment like `intro`, `question` and `stem`.
 
 **Matched Honest Instruction**:
 An honesty instruction written to occupy exactly the same number of tokens as
@@ -215,7 +218,8 @@ A label for what a Component does in the task, assigned only from the
 conjunction of where it reads (attention pattern), what it writes (direct
 logit attribution) and what it depends on (path patching). No single view
 assigns a role. The vocabulary (binder, selector, mover, suppressor, unknown;
-pressure reader reserved) and the criteria that assign each one are in
+pressure reader, reserved on v1 cells and assignable on v2 cells since
+2026-10-25) and the criteria that assign each one are in
 `docs/component-roles.md`; the sign convention they read across analyses is
 ADR-0002.
 

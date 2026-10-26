@@ -17,6 +17,7 @@ and the v2 datasets, and skip where any is missing.
 from __future__ import annotations
 
 import argparse
+import types
 import json
 import os
 
@@ -253,3 +254,23 @@ def test_dry_run_prices_the_twin_pass_on_a_v2_cell(v2_run, tiny_llama, capsys):
                 if one.strip().startswith(f"{ap.NAME}: "))
     assert "neutral_twin" in line
     assert "neutral twin (paired), both sides: 1000 instance(s)" in line
+
+
+# ==============================================================================
+# THE REVIEW FIXES (02b)
+# ==============================================================================
+
+def test_the_token_level_rerun_hint_names_the_twin_on_a_v2_cell():
+    """The hint reads the cell's conditions the way the run does: the default on a v2 cell includes
+    `neutral_twin`, and an explicit flag is repeated as given."""
+    from component_analysis import attention_token_level as atl
+
+    default = argparse.Namespace(attention_conditions=ap._DefaultConditions(ap.CONDITIONS))
+    v2 = types.SimpleNamespace(cli=default, task_spec=types.SimpleNamespace(name="sdr_v2"))
+    v1 = types.SimpleNamespace(cli=default, task_spec=types.SimpleNamespace(name="sdr"))
+    assert "--attention-conditions pressure,honest_instruction,honest_twin,neutral_twin " in \
+        atl.regenerate(v2, ["readout"], 1000)
+    assert "--attention-conditions pressure,honest_instruction,honest_twin " in atl.regenerate(v1, ["readout"], 1000)
+    given = types.SimpleNamespace(cli=argparse.Namespace(attention_conditions=["pressure", "neutral_twin"]),
+                                  task_spec=types.SimpleNamespace(name="sdr_v2"))
+    assert "--attention-conditions pressure,neutral_twin " in atl.regenerate(given, ["readout"], 1000)

@@ -11,8 +11,14 @@ thresholds auditable:
   for a reason external to any result — and **one flavour of `unknown` has
   been added** — `unknown/knockout-only`, on 2026-10-13, by the researcher's
   decision. Both changes, their reasons and the results they changed are
-  logged under "Changing these criteria" at the end of this file. Nothing else
-  has moved. Read that section before quoting a role.
+  logged under "Changing these criteria" at the end of this file;
+- **one amendment for v2 cells** (`far_v2`, `sdr_v2`, `ser_v2`) was applied on
+  2026-10-25 by orchestrator ruling under the user's standing go
+  (mechanism-analysis spec R1, R7, R25): the Neutral-Clause Twin is the paired
+  counterfactual there, `pressure reader` is assignable there by rule 4b, and
+  `response_line` is a `frame` Segment. **No v1 criterion changed**, which
+  `tests/test_v1_snapshot_02b.py` enforces byte for byte. Logged in the same
+  section. Nothing else has moved. Read that section before quoting a role.
 Owner of the final labels: the researcher, in `role_confirmed`.
 Applied by: `python analyze_components.py roles <cell dir>`.
 Sign convention: ADR-0002.
@@ -118,18 +124,24 @@ the notes.
   floor. The notes carry the lean ("mover lean: writes and direct effect
   support deception, read unestablished").
 
-**pressure reader** — **reserved and never assigned.** A pressure reader would
-attend to the Pressure Clause under pressure and leave it under the Matched
-Honest Instruction. Finding them is out of scope (spec, Out of Scope): it needs
-a dataset variant with an honest-instruction Corruption and a mask trained on
-it, so a circuit discovered against the item-swap Corruption has no reason to
-contain them. The name is held so that nothing else takes it. The mechanical
-pass **notes** a pressure-reader signature when it sees one
+**pressure reader** — **reserved on v1 cells; assignable on v2 cells by rule
+4b (2026-10-25).** A pressure reader attends to the Pressure Clause under
+pressure and leaves it under the matched honest counterfactual. On a v1 cell
+finding them is out of scope (spec, Out of Scope): it needs a dataset variant
+with an honest Corruption and a mask trained on it, so a circuit discovered
+against the item-swap Corruption has no reason to contain them, and the name is
+held so that nothing else takes it. There the mechanical pass **notes** a
+pressure-reader signature when it sees one
 (`attention_patterns.pressure_paired_top_segment` is `pressure_clause` and
 `attention_patterns.honest_instruction_paired_top_segment` is not) and **never
-assigns the reserved name**. The note is appended whatever role the Component
-gets, an assigned one included: a mover may also read the pressure, and that is
-worth seeing.
+assigns the reserved name**. **On v2 cells (mechanism-analysis spec R1) the
+role is assignable, by rule 4b**, because the v2 tasks have the Neutral-Clause
+Twin — the same instance with its clause replaced by a token-matched neutral
+sentence — and the circuits were discovered against it; v1 cells keep it
+reserved because they have no twin. On a v2 cell the note is written from the
+B2 columns instead ("pressure-reader signature (B2)"). Either note is appended
+whatever role the Component gets, an assigned one included: a mover may also
+read the pressure, and that is worth seeing.
 
 ## The columns the criteria read
 
@@ -147,6 +159,57 @@ written, by the roles pass. The roles pass writes only `roles.*` columns.
 | depends (how, direct) | `roles.direct_support` = `path_patching.direct_support`, se from `path_patching.direct_support_se`; on a cell written before 2026-10-13, `-path_patching.direct_effect`, se from `path_patching.direct_effect_se` | **native** since 2026-10-13; **derived** (negated) on a legacy cell, ADR-0002 |
 | depends (how, indirect) | `path_patching.strongest_outgoing`, `..._support` (legacy `..._effect`) | magnitude and receiver name |
 | depends (query side) | `path_patching.strongest_incoming_honest_instruction_paired`, `..._support_honest_instruction_paired` (legacy `..._effect_honest_instruction_paired`) | magnitude and receiver name |
+| reads (paired, v2) | `attention_patterns.pressure_neutral_twin_paired_top_segment` / `_top_mass`, `attention_patterns.neutral_twin_paired_top_segment` / `_top_mass` | names and mass, no direction |
+| reads (B2, v2) | `attention_patterns.clause_mass_drop_neutral_twin_paired`, `..._se` | positive: less mass on the clause under the twin |
+| depends (query side, v2) | `path_patching.strongest_incoming_neutral_twin_paired`, `path_patching.strongest_incoming_support_neutral_twin_paired` | magnitude and receiver name; read in place of the honest-instruction pair on a v2 cell |
+| depends (direct, v2) | `path_patching.direct_support_neutral_twin_paired`, `..._se` | native: positive helps deception, against the twin (no legacy spelling exists) |
+| depends (where, v2) | `path_patching.receiver_category_neutral_twin` in {`q`, `kv_clause`, `kv_post_clause`, `kv_unresolved`, `none`}, with `..._path`, `..._support`, `..._se`, `..._segment` | category; support signed as above |
+| depends (whether, post-clause, v2) | `knockout.logit_diff_drop_neutral_twin_paired_after_pressure_clause_excl_readout`, `knockout.standard_error_neutral_twin_paired_after_pressure_clause_excl_readout` | native: positive supports deception |
+
+**A v2 cell** is one whose `head_table.json` records `meta.task.task` in
+(`far_v2`, `sdr_v2`, `ser_v2`); `roles.json` then says `variant: v2`. The v2
+rows above are read only there; a v1 cell is read from the rows before them
+exactly as before 2026-10-25.
+
+**Receiver category (spec section 2.3, R11(g)).** Per head, from the
+neutral-twin path-patching outputs: the strongest incoming cell by `|mean|` at
+or above the path floor (0.01) among the cells into this head's own `q.`
+receiver and into its KV group's `k.` and `v.` receivers.
+
+- `q`: the receiver is the head's query (the query side of rule 4).
+- `kv_clause`: K or V, and the position-specific split of that cell has its
+  top Segment (by `|mean|`) at `pressure_clause`.
+- `kv_post_clause`: K or V, top Segment after the clause (`question`,
+  `response_line`, the four `item_*_question_*` mentions, `stem`, `readout`).
+- `kv_unresolved`: K or V, but no position-specific split exists for the cell
+  (its `|mean|` is below the position threshold), or the split's top Segment is
+  `unsegmented`. Counted separately and never folded into clause or
+  post-clause. A top Segment **before** the clause is impossible by
+  construction (every pre-clause position is identical in D and its twin) and
+  is reported as `kv_unresolved` with a `!!` note: it is a bug.
+- `none`: no incoming cell at or above the floor.
+
+Ties: the strongest cell is chosen by `|mean|`; on an exact tie the tied cells
+are listed and the choice goes to the first in the grid's order — the head's
+query receiver, then its KV group's K and then V, senders in run order — which
+is the stable tie-break `path_patching.strongest_incoming` already uses, so
+the two columns name the same cell.
+Two tied K and V cells of one KV group agree on the category when their top
+Segments fall in the same class; when they do not, the category is
+`kv_unresolved` and the tie is recorded. K and V receivers are per KV group, so
+this category is a claim about the group's heads together, not about one head
+(the four L17H24-27 heads are one test, spec section 7). A cell whose twin pass
+was skipped has no category (the columns stay absent), and the pass reads that
+as "path patching under the twin not measured", never as `none`.
+
+**Position threshold the category needs.** The position-specific pass runs
+only on cells whose position-agnostic `|mean|` clears the position threshold
+(`--path-position-threshold`, default 0.05), while the category's floor is
+0.01. A phase-3 grid therefore runs the **neutral-twin** pass at
+`--path-twin-position-threshold 0.01` (the item-swap pass keeps 0.05), so every
+K/V path above the category floor has its Segment split; otherwise paths
+between 0.01 and 0.05 read `kv_unresolved`. The cost is in ticket 02b's
+dry-run tables.
 
 `role_confirmed` is read if the table has it and **never written** by anything
 in the package; `head_table.PROTECTED_COLUMNS` enforces that.
@@ -196,6 +259,7 @@ Every numeric criterion asks two questions, and a column must clear both.
 | `--roles-knockout-floor` | 0.01 logits | the same scale on the same metric; it excludes the three Components ticket 07 called indistinguishable from zero |
 | `--roles-path-floor` | 0.01 | one percent of the clean-minus-corrupt gap, which the patching metric normalizes to 1, and **twice ticket 09's measured cross-card noise floor** of about 0.005 on a path-patching cell (A40 against A100). A criterion resting on a cell inside that noise is one that changes with the card the job landed on. Amended from 0.005 on 2026-09-20; see "Changing these criteria" |
 | `--roles-attention-floor` | 0.20 | a Segment must carry a fifth of the head's mass at the query position before the pass calls it what the head reads |
+| `--roles-b2-floor` | 0.05 | v2 cells only (rule 4b): the paired drop of Readout-query mass on the Pressure Clause, pressure minus twin, that counts as the B2 signature. The spec-writer's proposal (mechanism-analysis spec section 2, B2; R0), not a calibration; with the same `z` = 2 as every other criterion. Added 2026-10-25 |
 
 The defaults are flags so a different task or circuit can be read at a
 different scale, and the values actually used are written into `roles.json`
@@ -237,7 +301,7 @@ such as ticket 03's `bos`, which has not been shown to be anything.
 | `designation` | `designating_sentence`, `designation_site`, `predicate_token`, `other_token`, `inverse_predicate_token`, `designation_suffix` |
 | `item_mention` | `item_1_intro`, `item_2_intro`, `item_1_question_pair`, `item_1_question_option`, `item_2_question_pair`, `item_2_question_option` |
 | `pressure` | `pressure_clause` |
-| `frame` | `intro`, `question`, `stem` |
+| `frame` | `intro`, `question`, `response_line`, `stem` |
 | `unestablished` | `readout`, `unsegmented`, and any Segment not named above |
 
 **These are the mechanism tasks' Segments (FAR, SDR, SER).** STD has its own
@@ -257,7 +321,10 @@ Three judgement calls, made here and not revisited:
   the user question are carved out into their own Segments, so the mass left on
   `question` is the mass on the question's *other* words. A head topping out
   there has an established read of the question frame and has not been shown to
-  read an item.
+  read an item. **`response_line`** — the v2 frame line ("Only respond with
+  ...") that ticket 02a carved out of `question` — is a frame by the same
+  reasoning (R7, 2026-10-25); no v1 cell has the Segment, so no v1 read can
+  change.
 - **`unsegmented` is unestablished, not "no read".** On Llama it is mostly the
   `<|begin_of_text|>` attention sink, and ticket 03 showed nine of seventeen
   SDR heads topping out there at the Readout query. A sink head is not idle;
@@ -322,7 +389,56 @@ depends on it.
 - depends (query side):
   `path_patching.strongest_incoming_honest_instruction_paired` names a `q.`
   receiver **on this Component**, with `|effect|` at or above the path floor. This clause is what separates selector from mover, and it is the
-  one the researcher should argue with first.
+  one the researcher should argue with first. **On a v2 cell** (2026-10-25)
+  the clause reads `path_patching.strongest_incoming_neutral_twin_paired` and
+  `path_patching.strongest_incoming_support_neutral_twin_paired` in place of
+  the honest-instruction pair: the number compared, the floor and the receiver
+  test are unchanged; only the counterfactual the path is measured against
+  changes, because a v2 task has no Matched Honest Instruction pool (R1).
+
+**4b. pressure reader (v2 cells only).** On a v1 cell this rule is skipped and
+the name stays reserved. On a v2 cell, all of:
+- reads (paired, the **B2 signature**):
+  `attention_patterns.clause_mass_drop_neutral_twin_paired` — the head's
+  Readout-query attention mass on `pressure_clause` under the pressure prompt
+  minus under its Neutral-Clause Twin, paired per instance over the whole test
+  split — is at or above the B2 floor (`--roles-b2-floor`, 0.05) and at least
+  `z` = 2 of its paired standard error
+  `attention_patterns.clause_mass_drop_neutral_twin_paired_se`.
+  (`pressure_neutral_twin_paired_top_segment` is `pressure_clause` in the
+  textbook case, but the criterion is the paired drop, not the top-Segment
+  pair: a head can read the clause under pressure and still read it under the
+  twin, and that is not a pressure reader.)
+- depends (whether, post-clause): the neutral-twin knockout drop at post-clause
+  positions
+  (`knockout.logit_diff_drop_neutral_twin_paired_after_pressure_clause_excl_readout`,
+  the 1B sweep S2p; standard error
+  `knockout.standard_error_neutral_twin_paired_after_pressure_clause_excl_readout`)
+  is significantly positive and at or above the knockout floor — the
+  Component carries the pressure, in the deceptive direction, somewhere after
+  the clause. The column may be merged in from the phase-1 sweep cell with
+  `--roles-merge-from`.
+- depends (how), **where path patching under the twin exists for the cell**:
+  `path_patching.strongest_incoming_neutral_twin_paired` names a `k.` or `v.`
+  receiver of **this head's KV group** with `|support|` at or above the path
+  floor, and the receiver category (`path_patching.receiver_category_neutral_twin`,
+  "The columns the criteria read") is `kv_clause`: the pressure arrives at the
+  head's keys or values from the clause span. A `q.` arrival is rule 4
+  (selector), which is checked first. **Without path data** (the columns
+  absent) the role is assigned on the two clauses above and the flavour
+  `pressure reader/attention and knockout only` is written, so a reader sees
+  that the where-clause was never tested rather than passed.
+- writes: not a clause. A pressure reader may or may not write the answer; the
+  DLA columns go in the notes.
+
+A head that meets the B2 signature but not the knockout clause gets the note
+"pressure-reader signature (B2), knockout silent post-clause" whatever role it
+receives; a head whose strongest neutral-twin path is K or V from post-clause
+positions (`kv_post_clause`) is not a pressure reader (it reads items the
+pressure already changed: spec section 2.3's mover reading) and is noted as
+such. A head whose B2 columns or post-clause knockout were never measured is
+not a pressure reader and the notes name the views ("rule 4b not measured").
+Checked after suppressor, binder and selector, before mover.
 
 **5. mover.** All of:
 - reads: top Segment in `item_mention` with mass at or above the attention
@@ -331,7 +447,8 @@ depends on it.
 - depends: `roles.direct_support` significantly positive and above the path
   floor, **and** `path_patching.strongest_outgoing` names the Readout — its
   effect reaches the Readout directly;
-- and not a selector by rule 4.
+- and not a selector by rule 4 (nor, on a v2 cell, a pressure reader by rule
+  4b).
 
 **6. unknown/knockout-only.** No role above holds, and all of:
 - depends (whether): `knockout.logit_diff_drop` significant and above the
@@ -345,7 +462,8 @@ depends on it.
 - depends (how): `roles.direct_support` not significant or below the path
   floor, `|path_patching.strongest_outgoing_support|` (`..._effect` on a
   legacy cell) below the path floor, and
-  no honest-instruction path at the Component's own query at or above it.
+  no honest-instruction path at the Component's own query at or above it (on
+  a v2 cell: no neutral-twin path, the same two columns rule 4 reads there).
 
 The DLA and path-patching columns must have been **measured** for this
 Component: a table missing either view (allowed with
@@ -434,6 +552,7 @@ criteria, so the sweep is not a view either.
 Into the head table, namespaced `roles.`, next to the columns it read:
 
     roles.role_proposed     one of binder, selector, mover, suppressor, unknown
+                            (and, on a v2 cell only, pressure reader: rule 4b)
     roles.role_notes        one line: the flavour, the lean and the numbers
     roles.direct_support    ADR-0002's support column: path_patching.direct_support
                             as written, or -path_patching.direct_effect on a
@@ -463,7 +582,10 @@ records the three views' inputs, each criterion's pass or fail, the role, its
 flavour and the notes, so that a disputed label is settled by reading the file
 rather than by rerunning the pass. It also counts the flavours of `unknown`
 (`flavour_counts`) and names any legacy column it read under a current name
-(`renamed_columns`).
+(`renamed_columns`). On a v2 cell it also says `variant: v2` and
+`paired_counterfactual: neutral_twin`, lists `pressure reader` in `vocabulary`
+with an empty `reserved`, and records `b2_floor` among the thresholds; a v1
+cell's JSON has none of these keys.
 
 **The mechanical pass runs first and its output is kept.** An agent may rewrite
 `roles.role_notes` in the head table to say something a one-line template
@@ -575,6 +697,51 @@ to `roles.role_notes` (see beside rule 6); no threshold, clause, role or
 flavour moves, so rule 2 below asks for no rerun. Checked on a copy of
 `sdr-first-run`: the same 0/0/1/0/17, the same six knockout-only heads, and
 the note on L5H11, L14H7 and L14H22 and no other row (ticket 17's comments).
+
+**2026-10-25 — v2 cells: the Neutral-Clause Twin as the paired counterfactual,
+`pressure reader` un-reserved for v2 cells, `response_line` in `frame`.**
+Reason: mechanism-analysis spec rulings R1 and R7, an **orchestrator ruling
+under the user's standing go**, reported to the user before this text was
+applied (R10; the report is ruling R25 in the spec's section 9). Every earlier
+entry here is the researcher's decision; this one is the first that changes an
+assignable role on any cell, and it does so for **v2 cells only**. The v2
+tasks (`far_v2`, `sdr_v2`, `ser_v2`) have no Matched Honest Instruction pool
+and will not get one (R1). Their paired honest counterfactual is the
+Neutral-Clause Twin: the same instance with the Pressure Clause replaced by a
+token-matched neutral sentence, paired by instance id, read with the pressure
+prompt's Target and Distractor. Every column computed over it says
+`neutral_twin_paired` in its name (the researcher's 2026-10-13 rule). Four
+things change, for v2 cells only; a cell is a v2 cell when `head_table.json`
+records `meta.task.task` in (`far_v2`, `sdr_v2`, `ser_v2`). v1 cells read
+exactly as before, which the byte-identity snapshot
+`tests/test_v1_snapshot_02b.py` enforces.
+
+1. **Rule 4 (selector), depends (query side).** On a v2 cell the clause reads
+   `path_patching.strongest_incoming_neutral_twin_paired` and
+   `path_patching.strongest_incoming_support_neutral_twin_paired` in place of
+   the honest-instruction pair. Rule 6's last clause reads the same two columns
+   on a v2 cell. The number compared, the floor (`--roles-path-floor` 0.01) and
+   the receiver test (a `q.` receiver on this Component) are unchanged.
+2. **Rule 4b (pressure reader), v2 cells only.** New assignable role, checked
+   after rule 4 (selector) and before rule 5 (mover); the text is beside rule
+   4 above.
+3. **Segment groups.** `response_line` (the v2 frame line, carved out of
+   `question` by ticket 02a) joins the `frame` group. On a v1 cell no
+   `response_line` Segment exists, so no v1 read can change.
+4. **The pressure-reader note.** On a v2 cell the note is written from the B2
+   columns ("pressure-reader signature (B2)") instead of the
+   honest-instruction top-Segment pair. On a v1 cell the note and the reserved
+   status are unchanged.
+
+Thresholds added: `--roles-b2-floor` 0.05 (spec section 2, B2; the
+spec-writer's proposal per R0, not a calibration), with the same `z` = 2 as
+every other criterion. No existing threshold moves. The columns added are the
+v2 rows of "The columns the criteria read", with the receiver category and the
+position threshold it needs described there.
+
+Per rule 2 below, every v2 cell with a role column is rerun under the amended
+criteria; there is none yet (no v2 roles pass had run, which is what R1
+requires). v1 cells of record are not rerun: no v1 criterion changed.
 
 The rest of this section is the rule for any future change. A threshold or a
 clause may be changed, and then:

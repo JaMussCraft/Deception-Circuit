@@ -436,9 +436,10 @@ def payloads(tokens: TokenProfiles, tokenizer, *, labels) -> Tuple[dict, dict]:
     return index_groups, panels_by_head
 
 
-def regenerate(cli, query_names: Sequence[str], full_bytes: int) -> str:
-    """The exact flags that rewrite this cell's token level with full twins."""
-    conditions = ",".join(ap.wanted_conditions(cli))
+def regenerate(ctx, query_names: Sequence[str], full_bytes: int) -> str:
+    """The exact flags that rewrite this cell's token level with full twins:
+    the conditions the run profiled (the twin included on a v2 cell)."""
+    conditions = ",".join(ap.wanted_conditions_for(ctx))
     return (f"Rerun analyze_components.py into this cell with the circuit "
             f"bindings recorded in head_table.json's meta (and the same --split "
             f"and --segment, if any), adding: --analyses attention_patterns "
@@ -526,7 +527,7 @@ def write(ctx, tokens: TokenProfiles, payload: dict) -> dict:
     full_bytes = sum(len(json.dumps(twin, indent=2)) for twin in twins.values())
     limit = json_limit(ctx.cli)
     full = full_bytes <= limit
-    how = regenerate(ctx.cli, tokens.query_names, full_bytes)
+    how = regenerate(ctx, tokens.query_names, full_bytes)
 
     heads = []
     for component in components:

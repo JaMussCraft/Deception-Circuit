@@ -806,7 +806,17 @@ def add_arguments(group) -> None:
                             "The default is five percent of the "
                             "clean-minus-counterfactual gap; tune it by hand "
                             "per run. The completeness sweep has its own "
-                            "--path-sweep-threshold.")
+                            "--path-sweep-threshold, and the neutral-twin "
+                            "pass may have its own --path-twin-position-threshold.")
+    group.add_argument("--path-twin-position-threshold", type=float, default=None,
+                       help="The position threshold of the neutral-twin pass "
+                            "alone, when it should differ from "
+                            "--path-position-threshold (which every other "
+                            "counterfactual keeps). Phase 3 sets it to the "
+                            "receiver category's floor, 0.01, so that every K "
+                            "or V path the category can name has a Segment "
+                            "split, while the item-swap pass stays at the "
+                            "default. Default: unset, the shared threshold.")
     group.add_argument("--path-counterfactual", default=ITEM_SWAP,
                        choices=sorted(COUNTERFACTUALS) + [BOTH],
                        help="Which counterfactual pair the senders carry. "
@@ -858,8 +868,14 @@ def add_arguments(group) -> None:
                             "sets the threshold to the floor.")
 
 
-def position_threshold(ctx) -> float:
-    """Which cells earn the position-specific pass."""
+def position_threshold(ctx, counterfactual: str = ITEM_SWAP) -> float:
+    """Which cells earn the position-specific pass under `counterfactual`:
+    `--path-twin-position-threshold` for the neutral twin when it is set, else
+    the shared `--path-position-threshold`."""
+    if counterfactual == NEUTRAL_TWIN:
+        own = getattr(ctx.cli, "path_twin_position_threshold", None)
+        if own is not None:
+            return float(own)
     return float(getattr(ctx.cli, "path_position_threshold",
                          DEFAULT_POSITION_THRESHOLD))
 
@@ -969,7 +985,8 @@ def estimate(ctx) -> str:
         f"streams, then {kv} per selected K or V cell ({len(names)} Segment(s) "
         f"plus the union check, about {minutes(kv):.1f} min) and {other} per "
         f"selected Q, MLP or Readout cell (about {minutes(other):.1f} min); how "
-        f"many cells clear --path-position-threshold is not knowable until the "
+        f"many cells clear --path-position-threshold (the neutral twin's own "
+        f"--path-twin-position-threshold when set) is not knowable until the "
         f"position-agnostic pass has run")
 
     if getattr(ctx.cli, "path_completeness_sweep", False):
@@ -1621,7 +1638,8 @@ def by_record_id(segmentations) -> dict:
 
 def segment_pass(ctx, grid: Grid, batches, counterfactual: str,
                  summaries: Dict[Cell, dict]) -> dict:
-    """The second pass over the cells that cleared `--path-position-threshold`.
+    """The second pass over the cells that cleared `--path-position-threshold`
+    (or, under the neutral twin, `--path-twin-position-threshold` when set).
 
     One pass 1 per (cell, batch), shared across every position entry of that
     cell, and one pass 2 per entry. The result says, for each selected cell,
@@ -1629,7 +1647,7 @@ def segment_pass(ctx, grid: Grid, batches, counterfactual: str,
     """
     import torch
 
-    threshold = position_threshold(ctx)
+    threshold = position_threshold(ctx, counterfactual)
     chosen = selected_cells(summaries, threshold)
     segmentations = by_record_id(getattr(ctx, "segmentations", None))
     names = segment_names_of(segmentations)

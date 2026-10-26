@@ -113,7 +113,7 @@ FLAVOURS = (DISAGREE, KNOCKOUT_ONLY, INSUFFICIENT)
 #: never tested because the cell has no path patching under the twin.
 ATTENTION_AND_KNOCKOUT_ONLY = "pressure reader/attention and knockout only"
 
-#: Segment name -> group, from CONTEXT.md's prompt anatomy. A name that is not
+#: Segment name -> group, from CONTEXT.md's Segment entry. A name that is not
 #: here is `unestablished`, which is also what an absent read is: a Segment the
 #: vocabulary does not know about has not been shown to be anything, and a
 #: `--segment` override (ticket 03's `bos`) arrives that way. `designation_site`
@@ -784,8 +784,11 @@ def knockout_only(views: dict) -> bool:
 def pressure_reader_signature(views: dict) -> bool:
     """Reads the Pressure Clause under pressure, and stops under the instruction.
 
-    Noted, never assigned: the reserved role needs a dataset variant with an
-    honest-instruction Corruption, which is out of scope (spec, Out of Scope).
+    On a v1 cell this is noted, never assigned: the reserved role needs a
+    dataset variant with an honest-instruction Corruption, which is out of
+    scope (spec, Out of Scope). A v2 cell assigns the role by rule 4b from the
+    Neutral-Clause Twin's reads instead (B2 and the twin's path columns, the
+    `pressure reader` entry of the row's criteria), not from this.
     """
     reads = views["reads"]
     honest = reads["honest_instruction_segment"]
@@ -1251,15 +1254,15 @@ def derived_coverage(meta: dict) -> dict:
     return meta
 
 
-def print_decisions(decisions: List[Decision]) -> None:
+def print_decisions(decisions: List[Decision], variant: Variant = V1) -> None:
     for one in decisions:
         kind, layer, index = one.key
         label = f"L{layer} MLP" if kind == "mlp" else f"L{layer} H{index}"
         confirmed = f" [confirmed: {one.confirmed}]" if one.confirmed else ""
         print(f"  {label:>10}  {one.role:<11}{confirmed}")
         print(f"              {one.notes}")
-    tally = counts(decisions)
-    print("\n  " + ", ".join(f"{role}: {tally[role]}" for role in ROLES))
+    tally = counts(decisions, variant.roles)
+    print("\n  " + ", ".join(f"{role}: {tally[role]}" for role in variant.roles))
 
 
 def main(argv=None) -> int:
@@ -1298,7 +1301,7 @@ def main(argv=None) -> int:
     except MixedConventions as error:
         raise SystemExit(f"{cli.cell_dir!r}: {error}")
     conventions = generations_of(rows)
-    print_decisions(decisions)
+    print_decisions(decisions, variant)
 
     if cli.dry_run:
         print("\n  --dry-run: nothing written.")
