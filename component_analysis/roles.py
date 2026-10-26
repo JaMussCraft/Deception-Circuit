@@ -156,6 +156,12 @@ DLA = "dla.pressure"
 DLA_SE = "dla.pressure_se"
 DLA_DIFFERENTIAL = "dla.differential_paired"
 DLA_DIFFERENTIAL_SE = "dla.differential_paired_se"
+#: The v2 DLA differential: pressure minus the Neutral-Clause Twin, paired per
+#: instance. A v2 DLA pass writes the two columns above as null (the
+#: honest-instruction condition never runs there), so a v2 cell reads these
+#: instead (R27, 2026-10-25); `Variant.differential_column` says which.
+DLA_DIFFERENTIAL_TWIN = "dla.differential_neutral_twin_paired"
+DLA_DIFFERENTIAL_TWIN_SE = "dla.differential_neutral_twin_paired_se"
 DLA_SUPPRESSION = "dla.suppression"
 KNOCKOUT = "knockout.logit_diff_drop"
 KNOCKOUT_SE = "knockout.standard_error"
@@ -306,8 +312,10 @@ class Variant:
     Counterfactual and `pressure reader` is reserved. A v2 cell (`far_v2`,
     `sdr_v2`, `ser_v2`: `dataloaders.V2_TASKS`) has no Matched Honest pool and
     pairs with the Neutral-Clause Twin instead (spec R1); rule 4's query clause
-    and rule 6's last clause read the twin's path columns, and rule 4b assigns
-    `pressure reader`. Nothing a v1 cell writes changes.
+    and rule 6's last clause read the twin's path columns, rule 4's writes
+    clause and rule 6's differential clause read the twin's DLA differential
+    (R27), and rule 4b assigns `pressure reader`. Nothing a v1 cell writes
+    changes.
     """
 
     name: str
@@ -320,6 +328,10 @@ class Variant:
     incoming_read: str
     #: How the notes name that counterfactual.
     incoming_label: str
+    #: The paired DLA differential the writes view reads (pressure minus the
+    #: paired counterfactual) and its standard error.
+    differential_column: str
+    differential_se_column: str
 
 
 CHECK_ORDER = ("suppressor", "binder", "selector", "mover")
@@ -328,11 +340,15 @@ CHECK_ORDER_V2 = ("suppressor", "binder", "selector", PRESSURE_READER, "mover")
 V1 = Variant(name="v1", roles=ROLES, reserved=RESERVED, check_order=CHECK_ORDER,
              incoming_column=INCOMING_HONEST,
              incoming_read="incoming_honest_instruction_support",
-             incoming_label="honest instruction")
+             incoming_label="honest instruction",
+             differential_column=DLA_DIFFERENTIAL,
+             differential_se_column=DLA_DIFFERENTIAL_SE)
 V2 = Variant(name="v2", roles=ROLES_V2, reserved=(), check_order=CHECK_ORDER_V2,
              incoming_column=INCOMING_TWIN,
              incoming_read="incoming_neutral_twin_support",
-             incoming_label="neutral twin")
+             incoming_label="neutral twin",
+             differential_column=DLA_DIFFERENTIAL_TWIN,
+             differential_se_column=DLA_DIFFERENTIAL_TWIN_SE)
 
 
 def is_v2_task(name) -> bool:
@@ -565,7 +581,8 @@ def views_of(row, thresholds: Thresholds, variant: Variant = V1) -> dict:
         group = "unestablished"
 
     dla = _number(row, DLA)
-    differential = _number(row, DLA_DIFFERENTIAL)
+    differential = _number(row, variant.differential_column)
+    differential_se = _number(row, variant.differential_se_column)
     knockout = _number(row, KNOCKOUT)
     derived = derived_columns(row)
     support = derived["direct_support"]
@@ -589,10 +606,9 @@ def views_of(row, thresholds: Thresholds, variant: Variant = V1) -> dict:
             "sign": direction(dla, _number(row, DLA_SE), thresholds.dla_floor,
                               thresholds),
             "differential": differential,
-            "differential_se": _number(row, DLA_DIFFERENTIAL_SE),
+            "differential_se": differential_se,
             "differential_sign": direction(
-                differential, _number(row, DLA_DIFFERENTIAL_SE),
-                thresholds.dla_floor, thresholds),
+                differential, differential_se, thresholds.dla_floor, thresholds),
             "suppression": _flag(row.get(DLA_SUPPRESSION)),
         },
         "depends": {

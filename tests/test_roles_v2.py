@@ -48,9 +48,18 @@ def category(name, path=None, support=None, se=None, segment=None):
 
 
 def v2(one):
-    """A v1 fixture row as a v2 cell carries it: native path columns, no honest-instruction columns."""
+    """A v1 fixture row as a v2 cell carries it: native path columns, no honest-instruction columns, and the
+    DLA differential under the twin (`dla.differential_neutral_twin_paired`) where a v1 cell has it under the
+    instruction. A v2 DLA pass still writes the v1 differential columns, as null (it never ran), so the fixture
+    keeps them null rather than dropping them: a reader that falls back to the v1 column would see nothing
+    (R27, found on the first real v2 cell)."""
     out = native(one)
-    return {column: value for column, value in out.items() if "honest_instruction" not in column}
+    out = {column: value for column, value in out.items() if "honest_instruction" not in column}
+    out[roles.DLA_DIFFERENTIAL_TWIN] = out.get(roles.DLA_DIFFERENTIAL)
+    out[roles.DLA_DIFFERENTIAL_TWIN_SE] = out.get(roles.DLA_DIFFERENTIAL_SE)
+    out[roles.DLA_DIFFERENTIAL] = None
+    out[roles.DLA_DIFFERENTIAL_SE] = None
+    return out
 
 
 def a_pressure_reader(layer=17, index=25, **kwargs):
@@ -366,3 +375,53 @@ def test_the_console_tally_counts_the_pressure_readers_on_a_v2_cell(capsys):
     assert "pressure reader: 1" in out and "selector: 1" in out
     roles.print_decisions(roles.decide_rows([a_selector()]))
     assert "pressure reader" not in capsys.readouterr().out
+
+
+# ==============================================================================
+# R27: THE WRITES VIEW READS THE TWIN'S DLA DIFFERENTIAL ON A V2 CELL
+# ==============================================================================
+
+def test_the_variants_name_the_differential_pair_they_read():
+    assert roles.V1.differential_column == roles.DLA_DIFFERENTIAL == "dla.differential_paired"
+    assert roles.V1.differential_se_column == roles.DLA_DIFFERENTIAL_SE == "dla.differential_paired_se"
+    assert roles.V2.differential_column == roles.DLA_DIFFERENTIAL_TWIN == "dla.differential_neutral_twin_paired"
+    assert roles.V2.differential_se_column == roles.DLA_DIFFERENTIAL_TWIN_SE == \
+        "dla.differential_neutral_twin_paired_se"
+
+
+def test_the_v2_fixture_carries_the_twin_differential_and_a_null_v1_differential():
+    """What a real v2 DLA cell writes; the earlier fixture kept the v1 column filled, which hid R27."""
+    selector = a_v2_selector()
+    assert selector["dla.differential_paired"] is None
+    assert selector["dla.differential_paired_se"] is None
+    assert selector["dla.differential_neutral_twin_paired"] == a_selector()["dla.differential_paired"]
+    assert selector["dla.differential_neutral_twin_paired_se"] == a_selector()["dla.differential_paired_se"]
+
+
+def test_rule_4_s_writes_clause_reads_the_twin_differential_on_a_v2_cell():
+    selector = a_v2_selector()
+    decision = propose_v2(selector)
+    assert decision.role == "selector"
+    assert decision.criteria["selector"]["writes"] is True
+    assert decision.views["writes"]["differential"] == selector["dla.differential_neutral_twin_paired"]
+    assert decision.views["writes"]["differential_se"] == selector["dla.differential_neutral_twin_paired_se"]
+    # The v1 column alone is not read on a v2 cell: a row with the instruction differential filled and the
+    # twin's null has no pressure-dependent write there.
+    v1_only = selector | {"dla.differential_paired": 0.034, "dla.differential_paired_se": 0.0027,
+                          "dla.differential_neutral_twin_paired": None,
+                          "dla.differential_neutral_twin_paired_se": None}
+    assert propose_v2(v1_only).criteria["selector"]["writes"] is False
+    assert propose_v2(v1_only).views["writes"]["differential"] is None
+    # And the v1 reading of a v1 row is untouched.
+    assert propose_v1(a_selector()).views["writes"]["differential"] == a_selector()["dla.differential_paired"]
+
+
+def test_rule_6_s_differential_clause_reads_the_twin_on_a_v2_cell():
+    from tests.test_roles import knockout_alone
+
+    assert propose_v2(v2(knockout_alone())).flavour == roles.KNOCKOUT_ONLY
+    twin_writes = v2(knockout_alone()) | {"dla.differential_neutral_twin_paired": 0.04,
+                                          "dla.differential_neutral_twin_paired_se": 0.005}
+    assert propose_v2(twin_writes).flavour != roles.KNOCKOUT_ONLY
+    v1_writes = v2(knockout_alone()) | {"dla.differential_paired": 0.04, "dla.differential_paired_se": 0.005}
+    assert propose_v2(v1_writes).flavour == roles.KNOCKOUT_ONLY

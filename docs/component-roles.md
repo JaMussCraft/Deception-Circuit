@@ -161,6 +161,7 @@ written, by the roles pass. The roles pass writes only `roles.*` columns.
 | depends (query side) | `path_patching.strongest_incoming_honest_instruction_paired`, `..._support_honest_instruction_paired` (legacy `..._effect_honest_instruction_paired`) | magnitude and receiver name |
 | reads (paired, v2) | `attention_patterns.pressure_neutral_twin_paired_top_segment` / `_top_mass`, `attention_patterns.neutral_twin_paired_top_segment` / `_top_mass` | names and mass, no direction |
 | reads (B2, v2) | `attention_patterns.clause_mass_drop_neutral_twin_paired`, `..._se` | positive: less mass on the clause under the twin |
+| writes (paired, v2) | `dla.differential_neutral_twin_paired`, `dla.differential_neutral_twin_paired_se` | native; pressure minus twin, read in place of `dla.differential_paired` / `_se` on a v2 cell, whose DLA pass writes those two as null (R27) |
 | depends (query side, v2) | `path_patching.strongest_incoming_neutral_twin_paired`, `path_patching.strongest_incoming_support_neutral_twin_paired` | magnitude and receiver name; read in place of the honest-instruction pair on a v2 cell |
 | depends (direct, v2) | `path_patching.direct_support_neutral_twin_paired`, `..._se` | native: positive helps deception, against the twin (no legacy spelling exists) |
 | depends (where, v2) | `path_patching.receiver_category_neutral_twin` in {`q`, `kv_clause`, `kv_post_clause`, `kv_unresolved`, `none`}, with `..._path`, `..._support`, `..._se`, `..._segment` | category; support signed as above |
@@ -383,7 +384,9 @@ depends on it.
   satisfied, for an MLP block;
 - writes: `dla.pressure` significant and above the DLA floor, **and**
   `dla.differential_paired` significant and above the DLA floor — the
-  contribution is pressure-dependent;
+  contribution is pressure-dependent. **On a v2 cell** (2026-10-25, R27) the
+  differential is `dla.differential_neutral_twin_paired` with its `_se`,
+  pressure minus the twin; the floor and z are the same;
 - depends (whether): `knockout.logit_diff_drop` or `roles.direct_support`
   significantly positive and above its floor;
 - depends (query side):
@@ -458,7 +461,8 @@ Checked after suppressor, binder and selector, before mover.
   attention floor or unmeasured; an MLP block, whose reads view is not
   applicable, has no reads evidence to wait for and qualifies;
 - writes: `dla.pressure` and `dla.differential_paired` not significant or below
-  the DLA floor, and `dla.suppression` false;
+  the DLA floor, and `dla.suppression` false (on a v2 cell the differential is
+  `dla.differential_neutral_twin_paired`, as in rule 4);
 - depends (how): `roles.direct_support` not significant or below the path
   floor, `|path_patching.strongest_outgoing_support|` (`..._effect` on a
   legacy cell) below the path floor, and
@@ -710,7 +714,7 @@ and will not get one (R1). Their paired honest counterfactual is the
 Neutral-Clause Twin: the same instance with the Pressure Clause replaced by a
 token-matched neutral sentence, paired by instance id, read with the pressure
 prompt's Target and Distractor. Every column computed over it says
-`neutral_twin_paired` in its name (the researcher's 2026-10-13 rule). Four
+`neutral_twin_paired` in its name (the researcher's 2026-10-13 rule). Five
 things change, for v2 cells only; a cell is a v2 cell when `head_table.json`
 records `meta.task.task` in (`far_v2`, `sdr_v2`, `ser_v2`). v1 cells read
 exactly as before, which the byte-identity snapshot
@@ -732,6 +736,16 @@ exactly as before, which the byte-identity snapshot
    columns ("pressure-reader signature (B2)") instead of the
    honest-instruction top-Segment pair. On a v1 cell the note and the reserved
    status are unchanged.
+5. **Rule 4 (selector), writes, and rule 6's differential clause** (R27, same
+   day, found on the first real v2 cell). A v2 DLA pass writes
+   `dla.differential_paired` and its `_se` as null, because the
+   honest-instruction condition never runs there, and puts the paired
+   differential (pressure minus twin) in `dla.differential_neutral_twin_paired`
+   / `_se`. On a v2 cell both clauses read those two columns in place of the
+   honest-instruction pair; the DLA floor (`--roles-dla-floor` 0.01) and z are
+   unchanged. Before this, no v2 Component could be a selector and rule 6's
+   differential clause was vacuous; the v2 test fixture had kept the v1 column
+   filled, which hid it, and now carries what a v2 cell writes.
 
 Thresholds added: `--roles-b2-floor` 0.05 (spec section 2, B2; the
 spec-writer's proposal per R0, not a calibration), with the same `z` = 2 as
