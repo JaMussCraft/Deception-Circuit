@@ -1,0 +1,217 @@
+task,label,part,membership,category,path,support,se,segment,s2p_weight,role
+far,mlp.4.0,mlps,mlps,,,,,,0.23997728347778322,unknown
+far,mlp.6.0,S_k,S_k|mlps,,,,,,0.5575885963439942,unknown
+far,head.7.1,core,core,kv_clause,mlp.6.0->k.7.0,-0.02328945605782792,0.003187283809569528,pressure_clause,0.03385152816772461,unknown
+far,head.7.6,core,core,none,,,,,-0.03602384567260742,unknown
+far,head.7.16,S_k,S_k,kv_clause,mlp.6.0->k.7.4,0.036543432860635224,0.0028625164050776453,pressure_clause,0.6043767547607422,pressure reader
+far,head.7.23,DmH_minus_core,DmH_minus_core,none,,,,,-0.14548685073852538,unknown
+far,head.7.27,DmH_minus_core,DmH_minus_core,none,,,,,-0.04685384750366211,unknown
+far,head.7.29,core,core,kv_clause,mlp.4.0->v.7.7,-0.013186429137622326,0.002106399924700434,pressure_clause,0.06052865982055664,unknown
+far,mlp.7.0,S_k,S_k|mlps,,,,,,0.43594530105590823,unknown
+far,head.8.0,core,core,kv_clause,mlp.7.0->k.8.0,0.012220346694812178,0.0011451059174851551,pressure_clause,0.10453493118286133,unknown
+far,head.8.1,core,core,kv_clause,mlp.7.0->k.8.0,0.012220346694812178,0.0011451059174851551,pressure_clause,0.003406257629394531,unknown
+far,head.8.8,core,core,none,,,,,0.22942546844482423,unknown
+far,head.8.9,core,core,none,,,,,-0.05879776000976562,unknown
+far,head.8.11,core,core,none,,,,,0.16468795776367187,unknown
+far,head.8.14,core,core,kv_clause,mlp.7.0->k.8.3,0.028680043039785233,0.0043160058072574045,pressure_clause,-0.11748897552490234,unknown
+far,mlp.8.0,mlps,mlps,,,,,,0.3787177085876465,unknown
+far,head.9.3,S_k,S_k,q,mlp.8.0->q.9.3,0.012931094428276993,0.001600446100515909,,0.30369794845581055,unknown
+far,head.9.13,core,core,kv_unresolved,mlp.8.0->v.9.3,-0.015354196063562996,0.002139266857264888,unsegmented,0.12173852920532227,unknown
+far,head.9.16,S_k,S_k,q,mlp.8.0->q.9.16,0.020466720563708806,0.001711515619719182,,0.6485075187683106,unknown
+far,head.9.19,S_k,excl|DmH_minus_core|S_k,q,mlp.8.0->q.9.19,0.02396670998976333,0.0031208522577757573,,0.6065150451660156,unknown
+far,head.9.20,DmH_minus_core,DmH_minus_core,kv_clause,mlp.8.0->v.9.5,-0.01926749198115431,0.0024109726319001697,pressure_clause,0.11261421203613281,pressure reader
+far,head.9.26,core,core,kv_clause,mlp.8.0->v.9.6,0.038092491191346195,0.0030757801211247307,pressure_clause,0.1559292793273926,unknown
+far,head.9.28,core,core,kv_clause,mlp.6.0->k.9.7,0.052850235427031295,0.003959949922557748,pressure_clause,-0.47364803314208986,unknown
+far,head.9.29,S_k,S_k,kv_clause,mlp.6.0->k.9.7,0.052850235427031295,0.003959949922557748,pressure_clause,1.081861743927002,pressure reader
+far,head.9.30,DmH_minus_core,DmH_minus_core,kv_clause,mlp.6.0->k.9.7,0.052850235427031295,0.003959949922557748,pressure_clause,0.12165508270263672,unknown
+far,head.9.31,S_k,DmH_minus_core|S_k,kv_clause,mlp.6.0->k.9.7,0.052850235427031295,0.003959949922557748,pressure_clause,0.36394758224487306,pressure reader
+far,mlp.9.0,mlps,mlps,,,,,,0.09488042831420898,unknown
+far,head.10.1,core,core,kv_unresolved,head.9.28->v.10.0,0.023877499275258743,0.002016481323814422,unsegmented,0.2016504669189453,unknown
+far,head.10.2,core,core,kv_unresolved,head.9.28->v.10.0,0.023877499275258743,0.002016481323814422,unsegmented,0.050531196594238284,unknown
+far,head.10.3,core,core,kv_unresolved,head.9.28->v.10.0,0.023877499275258743,0.002016481323814422,unsegmented,-0.10041139602661132,unknown
+far,head.10.9,S_k,S_k,kv_clause,mlp.9.0->k.10.2,-0.010563222291239072,0.0017526832700457099,pressure_clause,0.2872636413574219,unknown
+far,head.10.16,S_k,S_k,kv_clause,mlp.9.0->v.10.4,0.015446198956533408,0.0020445526149206186,pressure_clause,0.2159999656677246,pressure reader
+far,head.10.19,S_k,S_k,kv_clause,mlp.9.0->v.10.4,0.015446198956533408,0.0020445526149206186,pressure_clause,0.3764956474304199,pressure reader
+far,head.10.22,S_k,S_k,kv_clause,mlp.8.0->v.10.5,0.03887956662045326,0.0030851001133961327,pressure_clause,0.4591036033630371,pressure reader
+far,head.10.25,S_k,S_k,kv_clause,head.9.19->v.10.6,0.04536395827308297,0.002669160876626812,pressure_clause,0.37601509094238283,pressure reader
+far,head.10.28,core,core,kv_clause,head.9.28->k.10.7,0.016358510358259082,0.002422305156856308,pressure_clause,-0.006142101287841797,unknown
+far,head.10.29,S_k,core|S_k,kv_clause,head.9.28->k.10.7,0.016358510358259082,0.002422305156856308,pressure_clause,0.32208158493041994,unknown
+far,head.10.31,DmH_minus_core,DmH_minus_core,kv_clause,head.9.28->k.10.7,0.016358510358259082,0.002422305156856308,pressure_clause,0.10998128890991211,pressure reader
+far,head.11.0,S_k,S_k,kv_clause,mlp.9.0->v.11.0,0.045481888556387275,0.0032702788220140095,pressure_clause,0.597282485961914,pressure reader
+far,head.11.9,excl,excl|DmH_minus_core,kv_clause,mlp.7.0->k.11.2,-0.01387432514806278,0.0013345913182131511,pressure_clause,0.08930355072021484,pressure reader
+far,head.11.14,DmH_minus_core,DmH_minus_core,kv_clause,mlp.9.0->v.11.3,0.02026074816065375,0.002112989344813612,pressure_clause,0.18399803161621095,unknown
+far,head.11.15,S_k,S_k,kv_clause,mlp.9.0->v.11.3,0.02026074816065375,0.002112989344813612,pressure_clause,0.5577323150634765,pressure reader
+far,head.11.24,excl,excl,q,mlp.7.0->q.11.24,0.010720119159996102,0.001434482227460047,,0.11366914749145508,unknown
+far,head.11.27,S_k,S_k,none,,,,,0.28041940689086914,unknown
+far,mlp.11.0,mlps,mlps,,,,,,0.391910285949707,unknown
+far,head.12.22,excl,excl|DmH_minus_core,kv_post_clause,mlp.11.0->v.12.5,0.014327716503757984,0.0035908042532103515,readout,-0.016037845611572267,unknown
+far,head.13.1,DmH_minus_core,DmH_minus_core,none,,,,,0.05676424026489258,unknown
+far,head.13.5,core,core,none,,,,,-0.08544025421142579,unknown
+far,head.13.10,excl,excl|DmH_minus_core,none,,,,,-0.033646831512451174,unknown
+far,head.13.18,core,core,none,,,,,0.14912937164306642,unknown
+far,head.13.20,core,core,kv_clause,mlp.9.0->k.13.5,0.1513942002877593,0.006275083343772258,pressure_clause,0.20355356216430665,pressure reader
+far,head.13.21,core,core,kv_clause,mlp.9.0->k.13.5,0.1513942002877593,0.006275083343772258,pressure_clause,0.2661915969848633,pressure reader
+far,head.13.22,S_k,S_k,kv_clause,mlp.9.0->k.13.5,0.1513942002877593,0.006275083343772258,pressure_clause,0.3291765785217285,pressure reader
+far,head.13.23,S_k,S_k,kv_clause,mlp.9.0->k.13.5,0.1513942002877593,0.006275083343772258,pressure_clause,0.19215276718139648,pressure reader
+far,mlp.13.0,mlps,mlps,,,,,,0.720067253112793,unknown
+far,head.14.4,core,core,q,mlp.13.0->q.14.4,0.04578942393301986,0.0045126305753206775,,0.54866943359375,unknown
+far,head.14.5,core,core,q,mlp.13.0->q.14.5,0.07349341415421805,0.007004057379880318,,0.6723794364929199,unknown
+far,head.14.6,excl,excl|DmH_minus_core,q,mlp.13.0->q.14.6,0.02944448259705496,0.002787036176646871,,-0.020090885162353515,unknown
+far,head.14.22,excl,excl|DmH_minus_core,q,head.13.18->q.14.22,-0.020646239091292956,0.003574665453353118,,-0.13316139221191406,unknown
+far,head.14.27,excl,excl|DmH_minus_core,q,mlp.13.0->q.14.27,0.025326092827599497,0.0023746553000904913,,0.0005185127258300782,unknown
+far,mlp.14.0,mlps,mlps,,,,,,0.45929046630859377,unknown
+far,head.15.8,S_k,S_k,kv_unresolved,head.14.5->v.15.2,0.04968958576675504,0.0029093427531954193,unsegmented,0.20703908920288086,unknown
+far,mlp.15.0,mlps,mlps,,,,,,0.15446975708007812,unknown
+far,mlp.16.0,mlps,mlps,,,,,,0.13382694244384766,unknown
+far,head.17.24,core,core,q,head.14.4->q.17.24,0.153539697304368,0.007266594476526932,,0.13229080200195312,selector
+far,head.17.25,core,core,q,mlp.15.0->q.17.25,0.031050037886598148,0.0029679285390886443,,0.0005171585083007812,unknown
+far,head.17.26,core,core,q,head.15.8->q.17.26,0.03493668083101511,0.001790584532162202,,0.006795921325683594,unknown
+far,head.17.27,core,core,q,head.15.8->q.17.27,0.042351866289973256,0.001823309579689535,,-0.0010738182067871094,unknown
+far,head.24.17,core,core,none,,,,,-0.002665863037109375,unknown
+far,head.24.20,core,core,none,,,,,0.00041971206665039065,unknown
+far,head.24.26,core,core,q,head.17.24->q.24.26,0.01648763834265992,0.0005888178064088897,,0.001319866180419922,unknown
+far,head.24.27,core,core,q,head.17.24->q.24.27,0.07178909376263619,0.0038276627466299618,,-0.01452789306640625,unknown
+sdr,head.4.13,excl,excl|DmH_minus_core,none,,,,,6.727218627929688e-05,unknown
+sdr,head.4.16,excl,excl|DmH_minus_core,none,,,,,-0.015999279022216796,unknown
+sdr,mlp.4.0,mlps,mlps,,,,,,0.029970359802246094,unknown
+sdr,head.5.4,excl,excl|DmH_minus_core,none,,,,,-0.0036599159240722655,unknown
+sdr,head.5.5,excl,excl|DmH_minus_core,none,,,,,-0.03631208419799805,unknown
+sdr,head.5.8,excl,excl|DmH_minus_core,none,,,,,-0.01360605239868164,unknown
+sdr,head.5.9,excl,excl|DmH_minus_core,none,,,,,-0.008255386352539062,unknown
+sdr,head.5.11,excl,excl|DmH_minus_core,none,,,,,0.0293475341796875,unknown
+sdr,head.5.19,excl,excl|DmH_minus_core,kv_clause,mlp.4.0->v.5.4,-0.01124587023165077,0.0038210105338219963,pressure_clause,-0.0032684898376464846,unknown
+sdr,mlp.6.0,S_k,S_k|mlps,,,,,,0.2939986991882324,unknown
+sdr,head.7.1,core,core,none,,,,,-0.027722034454345703,unknown
+sdr,head.7.4,excl,excl|DmH_minus_core,none,,,,,-0.018420295715332033,unknown
+sdr,head.7.6,core,core,none,,,,,-0.03127079010009766,unknown
+sdr,head.7.29,core,core,kv_clause,mlp.6.0->v.7.7,-0.018936553586390802,0.004646474185239747,pressure_clause,-0.04551116943359375,unknown
+sdr,mlp.7.0,S_k,S_k|mlps,,,,,,0.1922655487060547,unknown
+sdr,head.8.0,core,core,none,,,,,0.018091506958007812,unknown
+sdr,head.8.1,core,core,none,,,,,-0.011760730743408204,unknown
+sdr,head.8.6,DmH_minus_core,DmH_minus_core,kv_clause,mlp.7.0->v.8.1,-0.01413177414524398,0.003529861979623348,pressure_clause,-0.0980921173095703,unknown
+sdr,head.8.8,core,core,none,,,,,-0.013960208892822266,unknown
+sdr,head.8.9,core,core,none,,,,,-0.021588497161865235,unknown
+sdr,head.8.11,core,core,none,,,,,0.002857666015625,unknown
+sdr,head.8.14,core,core,none,,,,,0.04584779739379883,unknown
+sdr,mlp.8.0,S_k,S_k|mlps,,,,,,0.1742357635498047,unknown
+sdr,head.9.12,excl,excl,none,,,,,-0.11452177047729492,unknown
+sdr,head.9.13,core,core,none,,,,,0.006080665588378906,unknown
+sdr,head.9.23,excl,excl|DmH_minus_core,kv_clause,mlp.8.0->v.9.5,-0.012701479382812977,0.0034729622150726997,pressure_clause,-0.03206640243530273,unknown
+sdr,head.9.26,core,core,kv_clause,mlp.6.0->v.9.6,-0.01567831230990123,0.002562261736140144,pressure_clause,-0.018007240295410155,unknown
+sdr,head.9.28,core,core,none,,,,,0.11288358688354493,unknown
+sdr,head.10.1,core,core,none,,,,,0.019852848052978517,unknown
+sdr,head.10.2,core,core,none,,,,,-0.030542049407958984,unknown
+sdr,head.10.3,core,core,none,,,,,0.05476930618286133,unknown
+sdr,head.10.28,core,core,none,,,,,0.0030154991149902344,unknown
+sdr,head.10.29,core,core,q,head.9.28->q.10.29,0.010432529084937414,0.0037225521160704402,,0.04494771957397461,unknown
+sdr,head.10.31,DmH_minus_core,DmH_minus_core,none,,,,,-0.03204904556274414,unknown
+sdr,head.11.1,S_k,S_k,kv_clause,mlp.6.0->v.11.0,0.010826112258655485,0.0024559045532860147,pressure_clause,0.15420066833496093,unknown
+sdr,head.12.4,S_k,S_k,kv_clause,mlp.8.0->k.12.1,0.04796707367873751,0.006534180493680362,pressure_clause,0.47910781860351564,pressure reader
+sdr,mlp.12.0,S_k,S_k|mlps,,,,,,0.3914851474761963,unknown
+sdr,head.13.5,core,core,none,,,,,-0.03464010238647461,unknown
+sdr,head.13.11,excl,excl,none,,,,,-0.022360191345214844,unknown
+sdr,head.13.18,S_k,core|S_k,q,head.12.4->q.13.18,0.01755716260526242,0.0027222879411456027,,0.2611381721496582,unknown
+sdr,head.13.20,core,core,kv_clause,head.12.4->v.13.5,0.07319730263494421,0.013227829533067453,pressure_clause,0.08546030044555664,pressure reader
+sdr,head.13.21,S_k,core|S_k,kv_clause,head.12.4->v.13.5,0.07319730263494421,0.013227829533067453,pressure_clause,0.15902799606323242,pressure reader
+sdr,head.13.23,S_k,S_k,kv_clause,head.12.4->v.13.5,0.07319730263494421,0.013227829533067453,pressure_clause,0.21933164596557617,pressure reader
+sdr,head.13.28,S_k,S_k,none,,,,,0.13863916397094728,unknown
+sdr,mlp.13.0,S_k,S_k|mlps,,,,,,0.7719463348388672,unknown
+sdr,head.14.4,S_k,core|S_k,q,mlp.13.0->q.14.4,0.07553294087178074,0.008931093664669057,,0.689762134552002,binder
+sdr,head.14.5,S_k,core|S_k,q,head.12.4->q.14.5,0.0455204949749168,0.005000859506546768,,0.873377799987793,unknown
+sdr,head.14.20,S_k,S_k,q,head.13.18->q.14.20,0.01864582620211877,0.0022168250546959417,,0.4269289779663086,unknown
+sdr,head.14.23,S_k,S_k,q,mlp.13.0->q.14.23,0.019639139417558907,0.002182640980165809,,0.21644052505493164,unknown
+sdr,head.14.24,S_k,DmH_minus_core|S_k,q,mlp.12.0->q.14.24,0.012825566671963315,0.0017595506842815816,,0.29996414184570314,unknown
+sdr,mlp.14.0,S_k,S_k|mlps,,,,,,0.9497349739074707,unknown
+sdr,head.15.8,S_k,S_k,kv_unresolved,head.14.5->v.15.2,0.08753723532194271,0.006904633315580128,unsegmented,0.2500268363952637,unknown
+sdr,head.15.11,S_k,S_k,kv_unresolved,head.14.5->v.15.2,0.08753723532194271,0.006904633315580128,unsegmented,0.28056838989257815,unknown
+sdr,mlp.15.0,mlps,mlps,,,,,,0.029734725952148437,unknown
+sdr,mlp.16.0,mlps,mlps,,,,,,0.056732921600341796,unknown
+sdr,head.17.24,S_k,core|S_k,q,head.14.4->q.17.24,0.25585959073156117,0.013003512029764849,,0.19370967864990235,selector
+sdr,head.17.25,core,core,q,head.15.8->q.17.25,0.05104906002292409,0.004515912846271684,,0.006860485076904297,unknown
+sdr,head.17.26,core,core,q,head.15.8->q.17.26,0.045842460901476444,0.0018969210426894,,0.017796459197998046,unknown
+sdr,head.17.27,core,core,q,head.15.8->q.17.27,0.06071023320080712,0.004628136840006464,,0.02290843963623047,unknown
+sdr,mlp.19.0,mlps,mlps,,,,,,0.07729961395263672,unknown
+sdr,head.24.17,core,core,q,head.17.24->q.24.17,0.019012018281791825,0.005094038931477624,,0.006318798065185547,unknown
+sdr,head.24.18,excl,excl|DmH_minus_core,none,,,,,-0.00029544830322265626,unknown
+sdr,head.24.20,core,core,none,,,,,0.004514865875244141,unknown
+sdr,head.24.25,excl,excl|DmH_minus_core,none,,,,,0.0028525924682617186,unknown
+sdr,head.24.26,core,core,q,head.17.24->q.24.26,0.025266759842634202,0.001461673166488674,,0.011114215850830078,unknown
+sdr,head.24.27,core,core,q,head.17.24->q.24.27,0.09942077584564686,0.008138774003368258,,0.008234996795654297,selector
+ser,mlp.1.0,mlps,mlps,,,,,,0.043302116394042967,unknown
+ser,mlp.5.0,S_k,S_k|mlps,,,,,,0.35859806060791016,unknown
+ser,mlp.6.0,mlps,mlps,,,,,,0.4386930084228516,unknown
+ser,head.7.1,core,core,kv_clause,mlp.5.0->v.7.0,-0.028403873055940495,0.0049767605409814526,pressure_clause,-0.06929299354553223,unknown
+ser,head.7.2,excl,excl,kv_clause,mlp.5.0->v.7.0,-0.028403873055940495,0.0049767605409814526,pressure_clause,0.04704686164855957,unknown
+ser,head.7.6,core,core,q,mlp.6.0->q.7.6,-0.015274644774617627,0.003784786286831632,,0.015430526733398437,unknown
+ser,head.7.14,S_k,S_k,kv_clause,mlp.5.0->v.7.3,0.09106869006936905,0.010830220143531098,pressure_clause,0.22077342987060547,unknown
+ser,head.7.29,core,core,kv_clause,mlp.6.0->v.7.7,0.018923715527052992,0.005362745496138084,pressure_clause,-0.004350366592407226,unknown
+ser,mlp.7.0,mlps,mlps,,,,,,0.34149187088012695,unknown
+ser,head.8.0,core,core,kv_clause,mlp.7.0->k.8.0,-0.015962319733687308,0.002502763920110283,pressure_clause,-0.0510964298248291,unknown
+ser,head.8.1,core,core,kv_clause,mlp.7.0->k.8.0,-0.015962319733687308,0.002502763920110283,pressure_clause,-0.01970643997192383,unknown
+ser,head.8.8,core,core,kv_clause,mlp.6.0->v.8.2,-0.018442385599191768,0.0029298850663038983,pressure_clause,0.032449588775634766,unknown
+ser,head.8.9,core,core,q,mlp.7.0->q.8.9,-0.02622857621492585,0.004639777542235346,,-0.15139442443847656,unknown
+ser,head.8.11,core,core,kv_clause,mlp.6.0->v.8.2,-0.018442385599191768,0.0029298850663038983,pressure_clause,0.07493537902832031,unknown
+ser,head.8.14,core,core,kv_post_clause,mlp.5.0->v.8.3,-0.02413663618499413,0.004429374272040933,question,-0.14582168579101562,unknown
+ser,head.8.15,S_k,S_k,kv_post_clause,mlp.5.0->v.8.3,-0.02413663618499413,0.004429374272040933,question,0.34122761726379397,unknown
+ser,head.8.22,S_k,S_k,kv_clause,mlp.7.0->v.8.5,0.056694107990551856,0.006479591733746368,pressure_clause,0.14589481353759765,unknown
+ser,head.8.24,S_k,S_k,kv_post_clause,mlp.6.0->v.8.6,0.034965372777660375,0.005409548156011078,question,0.23868736267089843,unknown
+ser,head.9.3,S_k,S_k,kv_clause,mlp.7.0->v.9.0,0.016862755141337404,0.004283690822519125,pressure_clause,0.3275136089324951,unknown
+ser,head.9.13,S_k,core|S_k,kv_clause,mlp.7.0->v.9.3,0.010834994312899653,0.0027048393210273008,pressure_clause,0.14005937576293945,unknown
+ser,head.9.26,core,core,kv_post_clause,head.7.6->v.9.6,-0.023682393668568693,0.0036193090788558062,question,0.019310407638549805,unknown
+ser,head.9.28,core,core,kv_clause,mlp.6.0->k.9.7,0.08987235523178243,0.007298999113946452,pressure_clause,-0.4349332332611084,unknown
+ser,head.9.29,S_k,S_k,kv_clause,mlp.6.0->k.9.7,0.08987235523178243,0.007298999113946452,pressure_clause,0.9047908210754394,unknown
+ser,head.9.30,DmH_minus_core,DmH_minus_core,kv_clause,mlp.6.0->k.9.7,0.08987235523178243,0.007298999113946452,pressure_clause,0.04321842193603516,unknown
+ser,head.9.31,S_k,S_k,kv_clause,mlp.6.0->k.9.7,0.08987235523178243,0.007298999113946452,pressure_clause,0.3014778900146484,unknown
+ser,head.10.1,core,core,kv_unresolved,head.9.28->v.10.0,0.018933878129464576,0.004587527366220723,unsegmented,0.03518923759460449,unknown
+ser,head.10.2,core,core,kv_unresolved,head.9.28->v.10.0,0.018933878129464576,0.004587527366220723,unsegmented,0.1010741138458252,unknown
+ser,head.10.3,core,core,kv_unresolved,head.9.28->v.10.0,0.018933878129464576,0.004587527366220723,unsegmented,-0.16579173088073731,unknown
+ser,head.10.9,S_k,S_k,kv_clause,mlp.6.0->v.10.2,-0.03614612315468548,0.004450575714808473,pressure_clause,0.23081348419189454,unknown
+ser,head.10.28,core,core,kv_clause,head.9.28->k.10.7,0.02231339660618687,0.0036221683067453386,pressure_clause,-0.10665850639343262,unknown
+ser,head.10.29,core,core,kv_clause,head.9.28->k.10.7,0.02231339660618687,0.0036221683067453386,pressure_clause,0.13332001686096193,unknown
+ser,head.11.0,S_k,S_k,kv_clause,mlp.7.0->k.11.0,0.07590402635323698,0.007363490103315185,pressure_clause,1.2059150886535646,unknown
+ser,head.11.14,S_k,S_k,kv_clause,head.9.28->k.11.3,-0.022164926607292728,0.0033367837865452884,pressure_clause,0.2599660968780518,unknown
+ser,head.11.15,S_k,S_k,kv_clause,head.9.28->k.11.3,-0.022164926607292728,0.0033367837865452884,pressure_clause,0.549359359741211,unknown
+ser,head.11.24,S_k,S_k,q,head.9.13->q.11.24,-0.01761352284316672,0.002774485970967584,,0.22170607566833497,unknown
+ser,head.11.27,S_k,S_k,kv_post_clause,head.9.30->v.11.6,-0.010604180453046865,0.001225057130150095,question,0.17812273979187013,unknown
+ser,mlp.11.0,mlps,mlps,,,,,,0.14405214309692382,unknown
+ser,head.12.3,DmH_minus_core,DmH_minus_core,kv_clause,mlp.11.0->k.12.0,0.013800884526826849,0.0017045001369201645,pressure_clause,0.033862333297729495,unknown
+ser,head.12.6,DmH_minus_core,DmH_minus_core,kv_clause,mlp.7.0->k.12.1,0.03929808378219604,0.007196677776129079,pressure_clause,0.17548123359680176,pressure reader
+ser,head.12.7,DmH_minus_core,DmH_minus_core,kv_clause,mlp.7.0->k.12.1,0.03929808378219604,0.007196677776129079,pressure_clause,-0.027693710327148437,unknown
+ser,head.12.13,DmH_minus_core,DmH_minus_core,kv_unresolved,head.10.28->v.12.3,-0.01121901965838333,0.0026892759845745266,unsegmented,-0.08528913497924805,unknown
+ser,head.12.14,excl,excl|DmH_minus_core,kv_unresolved,head.10.28->v.12.3,-0.01121901965838333,0.0026892759845745266,unsegmented,-0.09239585876464844,unknown
+ser,head.12.25,DmH_minus_core,DmH_minus_core,none,,,,,-0.033771085739135745,unknown
+ser,head.12.28,DmH_minus_core,DmH_minus_core,kv_clause,head.9.13->v.12.7,-0.012602078127674759,0.0015721375469699133,pressure_clause,-0.02716061592102051,unknown
+ser,head.13.0,DmH_minus_core,DmH_minus_core,kv_unresolved,mlp.11.0->v.13.0,-0.010240217906612089,0.0016584253684441715,unsegmented,-0.057060136795043945,unknown
+ser,head.13.5,core,core,none,,,,,-0.08539374351501465,unknown
+ser,head.13.6,S_k,S_k,none,,,,,0.23486774444580077,unknown
+ser,head.13.8,excl,excl|DmH_minus_core,none,,,,,0.08578032493591309,unknown
+ser,head.13.18,core,core,q,mlp.11.0->q.13.18,0.01955385571811348,0.0035285664563514075,,0.28957786560058596,unknown
+ser,head.13.20,core,core,kv_clause,mlp.11.0->k.13.5,0.16240528265479953,0.011160102742773204,pressure_clause,-0.1446450901031494,unknown
+ser,head.13.21,S_k,core|S_k,kv_clause,mlp.11.0->k.13.5,0.16240528265479953,0.011160102742773204,pressure_clause,0.27624783515930174,pressure reader
+ser,head.13.22,S_k,S_k,kv_clause,mlp.11.0->k.13.5,0.16240528265479953,0.011160102742773204,pressure_clause,0.33843948364257814,pressure reader
+ser,head.13.23,S_k,S_k,kv_clause,mlp.11.0->k.13.5,0.16240528265479953,0.011160102742773204,pressure_clause,0.9067791938781739,pressure reader
+ser,mlp.13.0,mlps,mlps,,,,,,1.0402635288238526,unknown
+ser,head.14.4,core,core,q,mlp.13.0->q.14.4,0.06696695081191137,0.009095080118991681,,0.7800014209747315,unknown
+ser,head.14.5,core,core,q,head.13.22->q.14.5,0.08389393823221326,0.003900195673583685,,0.9035950660705566,unknown
+ser,head.14.19,DmH_minus_core,DmH_minus_core,none,,,,,0.0030387306213378908,unknown
+ser,head.14.24,S_k,S_k,kv_clause,head.12.6->v.14.6,0.0333781546595128,0.004408853107220772,pressure_clause,0.32289896965026854,pressure reader
+ser,mlp.14.0,mlps,mlps,,,,,,0.5361081314086914,unknown
+ser,head.15.3,excl,excl|DmH_minus_core,none,,,,,0.0023562240600585936,unknown
+ser,head.15.8,excl,excl|DmH_minus_core,kv_unresolved,head.14.5->v.15.2,0.12483802931383252,0.008771735247995049,unsegmented,0.17853520393371583,unknown
+ser,head.15.9,excl,excl|DmH_minus_core,kv_unresolved,head.14.5->v.15.2,0.12483802931383252,0.008771735247995049,unsegmented,-0.0164277458190918,unknown
+ser,head.15.11,excl,excl|DmH_minus_core,kv_unresolved,head.14.5->v.15.2,0.12483802931383252,0.008771735247995049,unsegmented,0.17973365783691406,unknown
+ser,mlp.15.0,mlps,mlps,,,,,,0.13408393859863282,unknown
+ser,head.16.1,excl,excl|DmH_minus_core,none,,,,,0.007089805603027344,unknown
+ser,head.16.22,excl,excl|DmH_minus_core,none,,,,,-0.020931949615478517,unknown
+ser,head.16.28,excl,excl|DmH_minus_core,none,,,,,0.017747583389282225,unknown
+ser,mlp.16.0,mlps,mlps,,,,,,0.04069923400878906,unknown
+ser,head.17.24,core,core,q,head.15.8->q.17.24,0.20695678621530533,0.009071985230593368,,0.11404708862304687,selector
+ser,head.17.25,core,core,q,head.15.8->q.17.25,0.05087461367831565,0.0034883567048895506,,0.008056364059448241,unknown
+ser,head.17.26,core,core,q,head.15.8->q.17.26,0.04649184964044253,0.003517666738104258,,0.017425355911254884,binder
+ser,head.17.27,core,core,q,head.15.8->q.17.27,0.052906515513313934,0.0036003722564724237,,-0.0015289020538330079,unknown
+ser,mlp.19.0,mlps,mlps,,,,,,0.042603492736816406,unknown
+ser,head.24.17,core,core,none,,,,,-0.0008233070373535156,unknown
+ser,head.24.20,core,core,q,head.17.24->q.24.20,0.012476234074565582,0.002753393264581815,,0.0055955791473388675,unknown
+ser,head.24.22,DmH_minus_core,DmH_minus_core,none,,,,,0.002696428298950195,unknown
+ser,head.24.26,core,core,q,head.17.24->q.24.26,0.02406015793327242,0.001242432312002324,,0.0057050991058349605,unknown
+ser,head.24.27,core,core,q,head.17.24->q.24.27,0.07124235555529594,0.004441264145994848,,0.004466371536254883,unknown
