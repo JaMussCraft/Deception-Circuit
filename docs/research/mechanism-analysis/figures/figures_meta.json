@@ -1,0 +1,99 @@
+{
+ "fig1_mediation": {
+  "caption": "R-AB mediation curves on the held-out sample (n = 100, seed 1): joint neutral-twin knockout of S_k at post-clause positions on D. Top: mediated fraction f_D with per-instance bootstrap 95% CIs, the 20-draw layer-matched null (band = min to max, dotted = mean) and test (i)'s 0.75 bar; the diamond is f_I of the deciding set on I (paired R-inv sample, R23; on sdr, read B, the descriptive S_20). Bottom: two-way deceptive accuracy after the knockout, with (i)'s 0.25 bar and the null mean. The CSV also gives the median and quartiles of the 100 per-instance f (spec 2.3, R11(i)).",
+  "csv": "fig1_mediation.csv",
+  "png": "fig1_mediation.png",
+  "rows": 42,
+  "sources": [
+   "reports/03-1c-results.json (rab.<task>.candidates, null_f draws)",
+   "phase1/rinv.csv"
+  ],
+  "status": "pre-registered (R-AB, spec 2.3; f_I from R-inv, spec 2.4)"
+ },
+ "fig2_rinv": {
+  "caption": "R-inv, paired: 0.5 f_D and f_I of the deciding set (far, ser; on sdr, read B, the descriptive S_20) on the same ids (left) and f_I - 0.5 f_D with its 95% CI from a bootstrap clustered by pressure_id (right). On far and ser a CI above 0 reads 'instructed inversion machinery', which licenses only 'not called deception-specific'; both are below the 300-id minimum; FAR polarity-confounded, inversion-polarity subset agrees (R30). sdr's rows are descriptive and carry no verdict. Option B (R23) is primary; the other two id sets are robustness rows.",
+  "csv": "fig2_rinv.csv",
+  "png": "fig2_rinv.png",
+  "rows": 9,
+  "sources": [
+   "phase1/rinv.csv"
+  ],
+  "status": "pre-registered (R-inv, spec 2.4 as amended by R19(3) and R23)"
+ },
+ "fig3_b2_by_layer": {
+  "caption": "B2 pressure-reader signature by layer: the paired drop of each U' head's Readout-query attention mass on the Pressure Clause from D to its Neutral-Clause Twin (1,000 paired rows). Filled = signature (drop >= 0.05 and >= 2 SE); shaded = layers 8-17 of B-reader's binomial test; ringed = member of the deciding S_k.",
+  "csv": "fig3_b2_by_layer.csv",
+  "png": "fig3_b2_by_layer.png",
+  "rows": 396,
+  "sources": [
+   "phase2/far_d_head_table.csv",
+   "phase2/sdr_d_head_table.csv",
+   "phase2/ser_d_head_table.csv"
+  ],
+  "status": "pre-registered (B-reader, spec 2.6; B2 signature of R25 rule 4b)"
+ },
+ "fig4_a_prime": {
+  "caption": "A' adjudication: share of the deciding set's head weight (each head's S2p single effect) by the category of its strongest neutral-twin incoming path above the 0.01 floor (selection sample, path patching on C_t). The call needs > 50% (dashed line). sdr is read B, so its bar describes the single selector's S_20 and carries no sub-reading.",
+  "csv": "fig4_a_prime.csv",
+  "png": "fig4_a_prime.png",
+  "rows": 15,
+  "sources": [
+   "phase3/a_prime.csv"
+  ],
+  "status": "pre-registered on far and ser (A' adjudication, spec 2.3); descriptive on sdr (R-AB reading B)"
+ },
+ "fig5_entry_paths": {
+  "caption": "Where the neutral-twin pressure arrives on C_t (paths >= 0.01, selection sample). Left: K/V paths by the Segment that carries most of their split (the clause span, a named post-clause Segment, or post-clause template tokens). Right: receivers that sit at the query positions by construction (Q, MLP input, Readout).",
+  "csv": "fig5_entry_paths.csv",
+  "png": "fig5_entry_paths.png",
+  "rows": 18,
+  "sources": [
+   "phase3/entry_paths.csv"
+  ],
+  "status": "descriptive (B4, spec 2.6); template-token placement EXPLORATORY"
+ },
+ "fig6_route": {
+  "caption": "The 25 strongest neutral-twin paths per task on C_t (selection sample), placed by layer. Edge width = |normalized effect|; colour = where the path arrives; dashed = the path opposes the pressured answer. kv.L.G is the shared K/V of group G at layer L (four query heads). Paths outside C_t are not measured (routing share (c): far 0.163, sdr 0.297, ser 0.006).",
+  "csv": "fig6_route.csv",
+  "png": "fig6_route.png",
+  "rows": 75,
+  "sources": [
+   "phase3/entry_paths.csv"
+  ],
+  "status": "EXPLORATORY (route description, 05-phase3-reading.md section 3)"
+ },
+ "fig7_c1_matrix": {
+  "caption": "Cross-task knockout matrix (C1): mean normalized drop d of each composition group on the nine item-swap test sets (D, H, F per task) and on D under the neutral twin and under mean ablation (selection sample, n = 100). Positive = supports the test set's own target (deceptive on D, honest on H and F).",
+  "csv": "fig7_c1_matrix.csv",
+  "png": "fig7_c1_matrix.png",
+  "rows": 120,
+  "sources": [
+   "phase1/c1_matrix.csv"
+  ],
+  "status": "descriptive (C1, spec 2.7)"
+ },
+ "fig8_exclusives": {
+  "caption": "The exclusive heads of each D circuit by layer, marked by the read group of their top Segment at the Readout under pressure (sink = the BOS attention sink, no established read).",
+  "csv": "fig8_exclusives.csv",
+  "png": "fig8_exclusives.png",
+  "rows": 32,
+  "sources": [
+   "phase2/far_d_head_table.csv",
+   "phase2/sdr_d_head_table.csv",
+   "phase2/ser_d_head_table.csv"
+  ],
+  "status": "C-reads pre-registered (fails, p 0.58); layer bands descriptive"
+ },
+ "fig9_lens": {
+  "caption": "Raw logit lens at the Readout: mean margin logit(deceptive) - logit(honest) per layer on D and its paired Neutral-Clause Twin (H), 1,000 paired rows; bands are +/- 1.96 per-instance SE. The cells keep no per-instance trajectory, so the band is not clustered by pressure_id. Dashed: R-lens's -0.5 line; dotted verticals: the layer from which each mean margin keeps its final sign (sign_flip_layer of component_analysis/dla.py).",
+  "csv": "fig9_lens.csv",
+  "png": "fig9_lens.png",
+  "rows": 297,
+  "sources": [
+   "outputs/_analyses/mechanism-analysis-p1/lens/U__leaf/far_v2/dla/logit_lens.json",
+   "outputs/_analyses/mechanism-analysis-p1/lens/U__leaf/sdr_v2/dla/logit_lens.json",
+   "outputs/_analyses/mechanism-analysis-p1/lens/U__leaf/ser_v2/dla/logit_lens.json"
+  ],
+  "status": "EXPLORATORY (R12: raw lens, uncalibrated)"
+ }
+}
