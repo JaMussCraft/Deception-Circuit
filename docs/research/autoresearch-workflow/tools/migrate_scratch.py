@@ -334,12 +334,21 @@ def plan_autoresearch(ctx, res):
     ])
 
 
+def in_dot_directory(rel):
+    """True when any directory on ``rel`` starts with a dot, such as ``.pytest_cache/`` (ticket 12)."""
+    return any(part.startswith(".") for part in rel.split(os.sep)[:-1])
+
+
 def plan_copies(ctx, res, root, scan):
-    """R34: every ``*.md`` at any depth, under the per-file and per-directory caps, behind the secret scan."""
+    """R34: every ``*.md`` at any depth, under the per-file and per-directory caps, behind the secret scan.
+
+    Markdown inside a dot-directory (tool caches such as ``.pytest_cache/``) is never copied; it stays archive-only.
+    """
     archive_rel = os.path.relpath(res["archive"], ctx.dc)
     used = 0
     copied = set()
-    for rel in sorted((r for r, f in res["files"].items() if f["type"] == "file" and r.endswith(".md")),
+    for rel in sorted((r for r, f in res["files"].items()
+                       if f["type"] == "file" and r.endswith(".md") and not in_dot_directory(r)),
                       key=md_order):
         f = res["files"][rel]
         if f["bytes"] > FILE_CAP:

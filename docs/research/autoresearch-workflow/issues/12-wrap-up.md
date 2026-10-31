@@ -1,6 +1,6 @@
 # 12 — Wrap-up: findings, registry, memory note, merge checklist
 
-**Status:** claimed
+**Status:** resolved (two acceptance boxes stay open; see the implementer's comment)
 **Type:** task
 **Blocked by:** 01-11
 **Wave:** A for the memory note and index line; D for the deferred memory rewrites (staged, not applied).
@@ -60,11 +60,11 @@ Staged (wave D, pending the user's confirmation that the live Codex session is f
 
 ## Acceptance criteria
 
-- [ ] `cli.py validate` and `findings-check` pass on the updated FINDINGS and directions files; renders are stable.
+- [x] `cli.py validate` and `findings-check` pass on the updated FINDINGS and directions files; renders are stable.
 - [ ] Every file listed in `merge-checklist.md` exists at the stated path (a script checks; output pasted), and the
       file lists match the hand-backs' lists exactly (a script diffs them).
-- [ ] The memory note and the MEMORY.md line pass the lint; the MEMORY.md op is an `append_text` of exactly one line.
-- [ ] `F/README.md` and `merge-checklist.md` pass the lint.
+- [x] The memory note and the MEMORY.md line pass the lint; the MEMORY.md op is an `append_text` of exactly one line.
+- [x] `F/README.md` and `merge-checklist.md` pass the lint.
 - [ ] `apply_staged.py --staging S --dry-run` over all tickets runs without error; its summary is pasted, grouped by
       wave, and shows no hook-installing op outside wave H and no R28 path outside wave D.
 
@@ -148,3 +148,19 @@ Staged (wave D, pending the user's confirmation that the live Codex session is f
 22. **Orchestrator rule** for `A/docs/agents/research-session.md` (same staged op as 20): an idle notice whose text
     says the agent is waiting on something is a stall signal; the orchestrator answers it at once with the waiting
     instruction above instead of accepting it.
+
+**Implementer (Opus), 2026-10-31 5:25 pm EDT.** Done; the hand-back is `reports/12-handback.md`.
+
+- Committed by the orchestrator from W: `tools/apply_staged.py`, `tools/test_apply_staged.py`,
+  `tools/migrate_scratch.py`, `tools/test_migrate_scratch.py`, `agent-brief.md`, `README.md`, `merge-checklist.md`,
+  `reports/12-handback.md` and this file in the feature folder; `FINDINGS.md`, `INDEX.md`, `directions.json`,
+  `DIRECTIONS.md`, `SESSIONS.md`, and `component-analysis/scratch-copy/component-analysis/provenance.json` in
+  `docs/research/`; and the deletion of that folder's `.pytest_cache/README.md`.
+- Staged: `S/ops/12-wrap-up.json` (18 ops, wave A), `S/ops/12d-deferred-memory.json` (32 ops, wave D, re-staged by
+  `S/scripts/restage_12d.py` right before wave D), and `S/ops/12c-bridge-sentence.json` (1 op, wave C, not asked for).
+- Tests: the apply tool and migration script give 66 passed on mgnp and on base; the staged RS suite gives 273 passed
+  on mgnp and on base.
+- Box 2 stays open: every listed path exists, but the hand-backs name files in prose shorthand, so the script diff is
+  not empty; every difference is classified in the hand-back.
+- Box 5 stays open: waves A, H and B dry-run clean, but wave C keeps the real conflict of 01#21 (the bridge changed
+  after it was staged), and wave D shows two conflicts until this ticket's wave A creates the two folder READMEs.

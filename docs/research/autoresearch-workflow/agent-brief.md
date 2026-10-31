@@ -116,6 +116,18 @@ CLAUDE.md); 10 migration B (scripted `.scratch` archive); 11 pilot checklist and
 - Lint your own Markdown deliverables once ticket 01's lint exists:
   `/sw/external/python/anaconda3/bin/python3.9 S/tree/projects/beto/swong2/Alignment/.agents/research_session/cli.py lint <files>`.
 
+## Waiting on runs (added by ticket 12 after incident P3)
+
+- Never end a turn while a run you own is unfinished. You are an in-process teammate, and you are not woken when a
+  background command you started exits. If you end your turn to wait for that notification, you sit idle until the
+  orchestrator messages you.
+- Wait actively instead. Watch the log's final line with the Monitor tool, or run the suite in the foreground in
+  chunks that each finish within the 10-minute timeout.
+- If you cannot wait, put the exact comparison command in your hand-back's Open questions and say that the
+  orchestrator must run it.
+- Never write "pending" as your Status. The SubagentStop hook blocks once on a hand-back whose Status line is missing
+  or says pending, to be filled, TBD or in progress.
+
 ## Hand-back
 
 - At start, set your ticket's `**Status:**` to `claimed`. Tick each checkbox only after verifying it.

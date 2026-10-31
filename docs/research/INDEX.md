@@ -19,8 +19,9 @@ This tree holds the research state of the Deception-Circuit project. A fresh ses
 - `_templates/` holds the starting files for a new direction: `START.md`, `proposal.md`, `WORKLOG.md`, `RESUME.md`, `state.json`, `worklog.json`, `ledger.json`, `handback.md` and `audit.md`.
 - Each direction has a directory `<slug>/` with a `README.md` handoff of two pages at most, `START.md`, a frozen `spec.md`, `WORKLOG.md`, `worklog.json`, `RESUME.md`, `state.json`, `ledger.json`, and the subdirectories `reports/`, `reviews/`, `handbacks/`, `history/` and `issues/`.
 - A paused direction keeps only what it already has plus a `ledger.json`. The other files are created from `_templates/` with `research-session init` when a session resumes it.
-- The directories `component-analysis`, `format-control` and `eval5-grader-fixes` do not exist here yet. Their working files are still in the Alignment checkout under `.scratch/`, and ticket 10 of the autoresearch-workflow direction migrates the closed ones.
-- `held-out.md` and `held_out.json` will hold the held-out instance policy and registry once ticket 04 lands.
+- `component-analysis/`, `format-control/`, `mechanism-analysis/` and `mechanism-datasets/` each hold a `scratch-copy/` folder: byte-identical copies of the Markdown from the direction's old `.scratch/` directory, with a `provenance.json` that names each file's archive path. The working directories themselves move to `outputs/_studies/<slug>/scratch/` in wave B of the autoresearch-workflow setup, after the merge, and `.scratch/<slug>` becomes a symlink to them.
+- `eval5-grader-fixes` has no directory here yet. Its files stay in the Alignment checkout under `.scratch/` until the user confirms that the live Codex session is finished; its copy then arrives with wave D.
+- `held-out.md` is the held-out instance policy, and `held_out.json` is its registry. Research sessions never score held-out ids. A paper-gating run that does records its provenance path in `scored_runs`, which spends the set for that claim.
 
 ## Paths
 
@@ -42,6 +43,7 @@ A finding id is `F-<short>-NNN`, and an id is never reused.
 | comp | component-analysis |
 | fmt | format-control |
 | ev5 | eval5-grader-fixes |
+| arw | autoresearch-workflow |
 
 A new direction picks a short name of two to five lower-case letters and adds it to this table.
 

@@ -309,6 +309,17 @@ class MarkdownTests(Harness):
         self.assertEqual(prov["archive_only"], {"files": 3, "bytes": 7})
         self.assertFalse((self.docs / "alpha-dir" / "scratch-copy" / "alpha" / "f.json").exists())
 
+    def test_dot_directories_are_skipped(self):
+        # Ticket 12: a pytest cache README was copied from component-analysis; tool caches are not research notes.
+        self.make("alpha", {"a.md": "a\n", ".pytest_cache/README.md": "cache\n", "x/.hidden/b.md": "b\n",
+                            ".notes.md": "n\n"})
+        code, out = self.plan("alpha")
+        self.assertEqual(code, 0, out)
+        prov = self.provenance("alpha-dir", "alpha")
+        self.assertEqual(sorted(c["path"] for c in prov["copies"]), [".notes.md", "a.md"])
+        self.assertFalse((self.docs / "alpha-dir" / "scratch-copy" / "alpha" / ".pytest_cache").exists())
+        self.assertEqual(prov["archive_only"], {"files": 2, "bytes": 8})
+
     def test_both_size_caps_with_exclusions_reported(self):
         files = {"big.md": "x" * (migrate_scratch.FILE_CAP + 1)}
         chunk = 190 * 1024

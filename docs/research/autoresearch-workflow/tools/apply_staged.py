@@ -18,12 +18,27 @@ is not APPLY or SKIP.
 
 Safety nets beyond spec section 7: a hook-installing op outside wave H is refused (R26), and an op of wave A or B
 on a path that R28 defers to wave D is refused.
+
+Additions from ticket 12:
+
+- ``expect_sha256: "absent"`` means the destination must not exist yet (spec 7); an existing file is a CONFLICT.
+- A dry run carries planned state forward within the run: a planned ``mkdir`` creates its directory, a planned
+  ``move`` frees its source and fills its destination, a planned ``symlink`` or new-file ``write`` fills its path.
+  A chained mkdir, move and symlink sequence therefore plans without ERROR or CONFLICT. A real run never uses it.
+- ``move`` falls back to copy, sha256 verification of every file and link, and removal of the source when
+  ``os.rename`` fails with EXDEV (different file systems). The journal records ``"method": "copy"``, and rollback
+  uses the same fallback. A move whose source path is now a symlink, either to its destination or to the target a
+  staged symlink op names for that path, counts as already moved.
+- A ``write`` that this same op (ticket and index) installed in an earlier run, recorded in a journal under the
+  backup root, is reported as SKIP when the destination has changed since, for example by a later text op. This
+  holds only while the file differs from the journal's pre-apply hash, so a rolled-back write applies again.
 """
 
 import argparse
 import copy
 import datetime
 import difflib
+import errno
 import hashlib
 import json
 import os
@@ -85,6 +100,61 @@ def line_delta(old, new):
         elif line.startswith("-") and not line.startswith("---"):
             removed += 1
     return added, removed
+
+
+def tree_manifest(path):
+    """``{relative path: ("dir",) | ("link", target) | ("file", sha256)}`` for a file, a symlink or a whole tree."""
+    found = {}
+
+    def add(p, rel):
+        if os.path.islink(p):
+            found[rel] = ("link", os.readlink(p))
+        elif os.path.isdir(p):
+            found[rel] = ("dir",)
+            for name in sorted(os.listdir(p)):
+                add(os.path.join(p, name), os.path.join(rel, name) if rel else name)
+        else:
+            found[rel] = ("file", sha256_file(p))
+
+    add(path, "")
+    return found
+
+
+def remove_path(path):
+    if os.path.islink(path) or (os.path.lexists(path) and not os.path.isdir(path)):
+        os.unlink(path)
+    elif os.path.isdir(path):
+        shutil.rmtree(path)
+
+
+def move_path(src, dest):
+    """Rename ``src`` to ``dest``; across file systems (EXDEV) copy, verify every sha256, then remove the source.
+
+    Returns ``"rename"`` or ``"copy"``. A copy that does not verify is removed and the source is kept.
+    """
+    try:
+        os.rename(src, dest)
+        return "rename"
+    except OSError as exc:
+        if exc.errno != errno.EXDEV:
+            raise
+    before = tree_manifest(src)
+    try:
+        if os.path.islink(src):
+            os.symlink(os.readlink(src), dest)
+        elif os.path.isdir(src):
+            shutil.copytree(src, dest, symlinks=True)
+        else:
+            shutil.copy2(src, dest)
+        after = tree_manifest(dest)
+    except BaseException:
+        remove_path(dest)
+        raise
+    if after != before:
+        remove_path(dest)
+        raise OpProblem(ERROR, "cross-device copy did not verify (sha256); source kept, copy removed")
+    remove_path(src)
+    return "copy"
 
 
 def default_lint_cmd(staging, installed_cli=INSTALLED_CLI, python=BASE_PYTHON):
@@ -244,6 +314,9 @@ class Runner(object):
         self.run_dir = None
         self.journal = None
         self.failures = 0
+        self.planned = {}     # dry run only: normalized path -> planned entry (see _resolve)
+        self.link_ops = {}    # normalized path -> target of every staged symlink op (move re-run check)
+        self._applied = None  # (ticket, index, dest) -> [(run, sha256_before, sha256_after)] from earlier journals
         if args.lint_cmd:
             self.lint_cmd = shlex.split(args.lint_cmd)
         else:
@@ -253,6 +326,83 @@ class Runner(object):
         self.out.write("%s %s%s\n" % (label, status, (": " + detail) if detail else ""))
         if status not in (APPLY, WOULD, SKIP):
             self.failures += 1
+
+    # -- dry-run overlay: planned state carried forward within one run (never used by a real run)
+    #
+    # Entries: ("absent",), ("dir",), ("file",), ("link", target) and ("alias", disk path). An alias is a planned
+    # move's destination; it and everything under it are looked up at the source's disk path.
+
+    def plan(self, path, entry):
+        if self.dry:
+            self.planned[os.path.normpath(path)] = entry
+
+    def _resolve(self, path):
+        """``("disk", p)`` to look ``p`` up on disk, or ``("planned", entry)``."""
+        path = os.path.normpath(path)
+        if not self.planned:
+            return ("disk", path)
+        rel = []
+        p = path
+        while True:
+            entry = self.planned.get(p)
+            if entry is not None:
+                tail = list(reversed(rel))
+                if entry[0] == "alias":
+                    return ("disk", os.path.join(entry[1], *tail) if tail else entry[1])
+                if not tail:
+                    return ("planned", entry)
+                if entry[0] == "link":
+                    return self._resolve(os.path.join(entry[1], *tail))
+                return ("planned", ("absent",))
+            parent = os.path.dirname(p)
+            if parent == p:
+                return ("disk", path)
+            rel.append(os.path.basename(p))
+            p = parent
+
+    def lexists(self, path):
+        where, x = self._resolve(path)
+        return os.path.lexists(x) if where == "disk" else x[0] != "absent"
+
+    def isdir(self, path):
+        where, x = self._resolve(path)
+        if where == "disk":
+            return os.path.isdir(x)
+        return x[0] == "dir" or (x[0] == "link" and self.isdir(x[1]))
+
+    def readlink(self, path):
+        where, x = self._resolve(path)
+        if where == "disk":
+            return os.readlink(x) if os.path.islink(x) else None
+        return x[1] if x[0] == "link" else None
+
+    # -- journals of earlier runs
+
+    def applied_runs(self):
+        if self._applied is None:
+            self._applied = {}
+            root = self.args.backup_root
+            for run in sorted(os.listdir(root)) if os.path.isdir(root) else []:
+                try:
+                    with open(os.path.join(root, run, "journal.json")) as fh:
+                        journal = json.load(fh)
+                except (IOError, OSError, ValueError):
+                    continue
+                for e in journal.get("entries", []) if isinstance(journal, dict) else []:
+                    if isinstance(e, dict) and e.get("op") == "write" and e.get("dest") and e.get("sha256_after"):
+                        key = (str(e.get("ticket")), e.get("index"), e["dest"])
+                        self._applied.setdefault(key, []).append((run, e.get("sha256_before"), e["sha256_after"]))
+        return self._applied
+
+    def applied_earlier(self, op, path, old, new):
+        """The run in which this write op installed exactly ``new`` at ``path``, if the file has moved on since."""
+        if op.get("op") != "write" or old is None:
+            return None
+        current, wanted = sha256_bytes(old), sha256_bytes(new)
+        for run, before, after in self.applied_runs().get((str(op["_ticket"]), op["_index"], path), []):
+            if after == wanted and current != before:
+                return run
+        return None
 
     # -- backup and journal
 
@@ -329,8 +479,15 @@ class Runner(object):
         if old == new:
             self.say(label, SKIP, "already applied")
             return
+        earlier = self.applied_earlier(op, path, old, new)
+        if earlier:
+            self.say(label, SKIP, "applied in run %s; destination changed since by later ops or edits" % earlier)
+            return
         expect = op.get("expect_sha256")
-        if expect is not None:
+        if expect == "absent":
+            if exists:
+                raise OpProblem(CONFLICT, "expect_sha256 is absent but the destination exists")
+        elif expect is not None:
             if not exists:
                 raise OpProblem(CONFLICT, "expect_sha256 given but the destination is missing")
             if sha256_bytes(old) != expect:
@@ -344,6 +501,8 @@ class Runner(object):
         added, removed = line_delta(old or b"", new)
         detail = ("+%d -%d lines" % (added, removed)) + (", new file" if not exists else "") + extra
         if self.dry:
+            if not exists:
+                self.plan(path, ("file",))
             self.say(label, WOULD, detail)
             return
         created_dirs = []
@@ -440,31 +599,43 @@ class Runner(object):
 
     def op_move(self, label, op):
         src, dest = op.get("src"), op.get("dest")
-        if os.path.lexists(dest) and not os.path.lexists(src):
+        if not isinstance(src, str) or not isinstance(dest, str):
+            raise OpProblem(ERROR, "move needs src and dest")
+        link = self.readlink(src)
+        if self.lexists(dest) and (not self.lexists(src) or link == dest or
+                                   (link is not None and link == self.link_ops.get(os.path.normpath(src)))):
+            # The migrations replace the source path with a link: to the destination (R3), or to the target a
+            # staged symlink op names for that path (the autoresearch-workflow exception, R34).
             self.say(label, SKIP, "already moved")
             return
-        if not os.path.lexists(src):
+        if not self.lexists(src):
             raise OpProblem(ERROR, "move source missing")
-        if os.path.lexists(dest):
+        if self.lexists(dest):
             raise OpProblem(CONFLICT, "move destination exists")
-        if not os.path.isdir(os.path.dirname(dest)):
+        if not self.isdir(os.path.dirname(dest)):
             raise OpProblem(ERROR, "move destination parent missing")
         if self.dry:
-            self.say(label, WOULD, "rename")
+            where, x = self._resolve(src)
+            self.plan(dest, ("alias", x) if where == "disk" else x)
+            self.plan(src, ("absent",))
+            self.say(label, WOULD, "rename (copy if across file systems)")
             return
         self.ensure_run_dir()
-        os.rename(src, dest)
-        self.record({"ticket": op["_ticket"], "index": op["_index"], "op": "move", "src": src, "dest": dest})
-        self.say(label, APPLY, "rename")
+        method = move_path(src, dest)
+        self.record({"ticket": op["_ticket"], "index": op["_index"], "op": "move", "src": src, "dest": dest,
+                     "method": method})
+        self.say(label, APPLY, "rename" if method == "rename" else
+                 "copied across file systems, sha256 verified, source removed")
 
     def op_symlink(self, label, op):
         path, target = op.get("path"), op.get("target")
-        if os.path.islink(path) and os.readlink(path) == target:
+        if self.readlink(path) == target:
             self.say(label, SKIP, "already linked")
             return
-        if os.path.lexists(path):
+        if self.lexists(path):
             raise OpProblem(CONFLICT, "link path exists")
         if self.dry:
+            self.plan(path, ("link", target))
             self.say(label, WOULD, "symlink")
             return
         self.ensure_run_dir()
@@ -475,12 +646,16 @@ class Runner(object):
 
     def op_mkdir(self, label, op):
         path = op.get("path")
-        if os.path.isdir(path):
+        if self.isdir(path):
             self.say(label, SKIP, "already exists")
             return
-        if os.path.lexists(path):
+        if self.lexists(path):
             raise OpProblem(CONFLICT, "path exists and is not a directory")
         if self.dry:
+            p = path
+            while p and not self.isdir(p):
+                self.plan(p, ("dir",))
+                p = os.path.dirname(p)
             self.say(label, WOULD, "mkdir")
             return
         self.ensure_run_dir()
@@ -525,6 +700,8 @@ class Runner(object):
 
     def run(self):
         ops = self.load_ops()
+        self.link_ops = dict((os.path.normpath(op["path"]), op.get("target")) for op in ops
+                             if op.get("op") == "symlink" and isinstance(op.get("path"), str))
         selected = [op for op in ops if op.get("wave") == self.args.wave]
         bad_wave = [op for op in ops if op.get("wave") not in WAVES]
         for op in bad_wave:
@@ -581,7 +758,7 @@ def rollback(journal_path, dry, out):
                     failures += say(label, SKIP, "already restored")
                 elif os.path.lexists(dest) and not os.path.lexists(src):
                     if not dry:
-                        os.rename(dest, src)
+                        move_path(dest, src)
                     failures += say(label, status, "rename back")
                 else:
                     failures += say(label, CONFLICT, "both or neither of src and dest exist")
@@ -630,6 +807,8 @@ def rollback(journal_path, dry, out):
                         failures += say(label, status, "restore backup")
                     else:
                         failures += say(label, CONFLICT, "file changed since apply")
+        except OpProblem as exc:
+            failures += say(label, exc.status, exc.reason)
         except (IOError, OSError, KeyError) as exc:
             failures += say(label, ERROR, type(exc).__name__)
     return 1 if failures else 0

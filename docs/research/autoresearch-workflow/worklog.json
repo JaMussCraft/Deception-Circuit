@@ -72,6 +72,13 @@
       "fix": "Orchestrator resumed it once, then wrote the final comparison section itself from the agent's logs. Lesson for the protocol: an agent must not end its turn while a background run it owns is unfinished; it should wait on the run or hand the comparison to the orchestrator explicitly.",
       "id": "P3",
       "what": "The ticket 04 agent went idle twice without finishing: once at 1:20 pm with its drafts only in scratch and nothing in the worktree, and again at 4:06 pm after launching the final test runs, which it never came back to read."
+    },
+    {
+      "at": "2026-10-31T17:26:15-04:00",
+      "effect": "None: the command changed nothing, but agents may not run git at all.",
+      "fix": "The agent brief forbids every git subcommand for agents, and the orchestrator alone runs git.",
+      "id": "P4",
+      "what": "The planning agent ran one read-only git command while drafting the plan."
     }
   ],
   "needs": [

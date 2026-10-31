@@ -5,6 +5,7 @@ home directory, the Alignment checkout or the staging root used by the feature.
 """
 
 import contextlib
+import errno
 import hashlib
 import io
 import json
@@ -14,6 +15,7 @@ import shlex
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
@@ -483,6 +485,249 @@ class ModeTests(Harness):
         self.assertEqual(self.run_tool(wave="D")[0], 0)
         self.assertEqual(note.read_text(), "new\n")
         self.assertEqual(mem.read_text(), "- clean\n")
+
+
+class DryRunChainTests(Harness):
+    """Ticket 12: a dry run carries planned state forward, so chained mkdir, move and symlink ops plan cleanly."""
+
+    def chain(self):
+        src = self.t(".scratch/demo")
+        (src / "reports").mkdir(parents=True)
+        (src / "reports" / "a.md").write_text("a\n")
+        study = self.t("outputs/_studies/demo")
+        self.t("outputs/_studies").mkdir(parents=True)
+        self.ops("10", [
+            {"op": "mkdir", "path": str(study), "wave": "B"},
+            {"op": "move", "src": str(src), "dest": str(study / "scratch"), "wave": "B"},
+            {"op": "symlink", "path": str(src), "target": str(study / "scratch"), "wave": "B"},
+        ])
+        return src, study
+
+    def test_chained_mkdir_move_symlink_dry_runs_clean(self):
+        src, study = self.chain()
+        code, out = self.run_tool("--dry-run", wave="B")
+        self.assertEqual(code, 0, out)
+        self.assertEqual(out.count("WOULD APPLY"), 3, out)
+        self.assertNotIn("ERROR", out)
+        self.assertNotIn("CONFLICT", out)
+        self.assertTrue(src.is_dir() and not src.is_symlink())
+        self.assertFalse(study.exists())
+        self.assertFalse(self.backups.exists())
+
+    def test_real_run_is_unchanged_by_the_overlay(self):
+        src, study = self.chain()
+        self.assertEqual(self.run_tool(wave="B")[0], 0)
+        self.assertEqual(os.readlink(str(src)), str(study / "scratch"))
+        self.assertEqual((src / "reports" / "a.md").read_text(), "a\n")
+        code, out = self.run_tool("--dry-run", wave="B")
+        self.assertEqual((code, out.count("SKIP")), (0, 3), out)
+
+    def test_rerun_skips_a_move_whose_source_became_a_link_elsewhere(self):
+        # Ticket 10's autoresearch-workflow pattern: move the stale copy aside, then link the old path to the
+        # canonical feature directory, not to the moved copy.
+        src = self.t(".scratch/feature")
+        src.mkdir(parents=True)
+        (src / "old.md").write_text("old\n")
+        canonical = self.t("docs/feature")
+        canonical.mkdir(parents=True)
+        stash = self.t("outputs/feature/stale")
+        self.ops("10", [
+            {"op": "mkdir", "path": str(stash.parent), "wave": "B"},
+            {"op": "move", "src": str(src), "dest": str(stash), "wave": "B"},
+            {"op": "symlink", "path": str(src), "target": str(canonical), "wave": "B"},
+        ])
+        self.assertEqual(self.run_tool(wave="B")[0], 0)
+        self.assertEqual(os.readlink(str(src)), str(canonical))
+        code, out = self.run_tool(wave="B")
+        self.assertEqual((code, out.count("SKIP")), (0, 3), out)
+
+    def test_planned_write_fills_its_path_and_moves_chain(self):
+        new = self.t("made/new.md")
+        a = self.t("a")
+        a.mkdir()
+        self.ops("12", [
+            {"op": "write", "dest": str(new), "src": self.stage(new, "x\n"), "wave": "D"},
+            {"op": "symlink", "path": str(new), "target": str(a), "wave": "D"},
+            {"op": "move", "src": str(a), "dest": str(self.t("b")), "wave": "D"},
+            {"op": "move", "src": str(self.t("b")), "dest": str(self.t("c")), "wave": "D"},
+            {"op": "move", "src": str(a), "dest": str(self.t("d")), "wave": "D"},
+        ])
+        code, out = self.run_tool("--dry-run", wave="D")
+        lines = out.splitlines()[1:]
+        self.assertIn("WOULD APPLY", lines[0])
+        self.assertIn("CONFLICT: link path exists", lines[1])
+        self.assertIn("WOULD APPLY", lines[2])
+        self.assertIn("WOULD APPLY", lines[3])
+        self.assertIn("ERROR: move source missing", lines[4])
+        self.assertEqual(code, 1)
+        self.assertFalse(new.exists())
+
+
+class CrossDeviceMoveTests(Harness):
+    """Ticket 12: op_move falls back to copy, sha256 verify and unlink when os.rename fails with EXDEV."""
+
+    EXDEV = OSError(errno.EXDEV, "Invalid cross-device link")
+
+    def tree(self):
+        src = self.t("from/pc")
+        (src / "deep").mkdir(parents=True)
+        (src / "deep" / "f.md").write_text("f\n")
+        (src / "top.md").write_text("top\n")
+        (src / "empty").mkdir()
+        os.symlink("top.md", str(src / "link.md"))
+        self.t("to").mkdir()
+        return src, self.t("to/pc")
+
+    def test_directory_move_across_devices(self):
+        src, dest = self.tree()
+        before = apply_staged.tree_manifest(str(src))
+        self.ops("12", [{"op": "move", "src": str(src), "dest": str(dest), "wave": "D"}])
+        with mock.patch.object(apply_staged.os, "rename", side_effect=self.EXDEV):
+            code, out = self.run_tool(wave="D")
+        self.assertEqual(code, 0, out)
+        self.assertIn("copied across file systems", out)
+        self.assertFalse(os.path.lexists(str(src)))
+        self.assertEqual(apply_staged.tree_manifest(str(dest)), before)
+        self.assertEqual(os.readlink(str(dest / "link.md")), "top.md")
+        [journal] = self.journals()
+        self.assertEqual(json.loads(journal.read_text())["entries"][0]["method"], "copy")
+        with mock.patch.object(apply_staged.os, "rename", side_effect=self.EXDEV):
+            code, out = self.run_tool("--rollback", str(journal), wave=None)
+        self.assertEqual(code, 0, out)
+        self.assertEqual(apply_staged.tree_manifest(str(src)), before)
+        self.assertFalse(os.path.lexists(str(dest)))
+
+    def test_file_move_across_devices(self):
+        src = self.t("one.md")
+        src.write_text("one\n")
+        self.ops("12", [{"op": "move", "src": str(src), "dest": str(self.t("two.md")), "wave": "D"}])
+        with mock.patch.object(apply_staged.os, "rename", side_effect=self.EXDEV):
+            self.assertEqual(self.run_tool(wave="D")[0], 0)
+        self.assertEqual(self.t("two.md").read_text(), "one\n")
+        self.assertFalse(src.exists())
+
+    def test_failed_verification_keeps_the_source(self):
+        src, dest = self.tree()
+        self.ops("12", [{"op": "move", "src": str(src), "dest": str(dest), "wave": "D"}])
+        real = apply_staged.tree_manifest
+        calls = []
+
+        def corrupt(path):
+            calls.append(path)
+            result = real(path)
+            if len(calls) == 2:
+                result["top.md"] = ("file", "0" * 64)
+            return result
+
+        with mock.patch.object(apply_staged.os, "rename", side_effect=self.EXDEV):
+            with mock.patch.object(apply_staged, "tree_manifest", side_effect=corrupt):
+                code, out = self.run_tool(wave="D")
+        self.assertEqual(code, 1)
+        self.assertIn("ERROR: cross-device copy did not verify", out)
+        self.assertEqual((src / "top.md").read_text(), "top\n")
+        self.assertFalse(os.path.lexists(str(dest)))
+
+    def test_other_rename_errors_are_not_copied(self):
+        src, dest = self.tree()
+        self.ops("12", [{"op": "move", "src": str(src), "dest": str(dest), "wave": "D"}])
+        with mock.patch.object(apply_staged.os, "rename", side_effect=OSError(errno.EACCES, "Permission denied")):
+            code, out = self.run_tool(wave="D")
+        self.assertEqual(code, 1)
+        self.assertIn("ERROR", out)
+        self.assertTrue(src.is_dir())
+        self.assertFalse(os.path.lexists(str(dest)))
+
+
+class ExpectAbsentTests(Harness):
+    """Spec 7: ``expect_sha256: "absent"`` means the destination must not exist yet."""
+
+    def test_absent_creates_then_skips(self):
+        dest = self.t("memory/new-note.md")
+        self.ops("12", [{"op": "write", "dest": str(dest), "src": self.stage(dest, "note\n"),
+                         "expect_sha256": "absent", "wave": "A"}])
+        code, out = self.run_tool("--dry-run")
+        self.assertEqual(code, 0, out)
+        self.assertIn("WOULD APPLY: +1 -0 lines, new file", out)
+        self.assertEqual(self.run_tool()[0], 0)
+        self.assertEqual(dest.read_text(), "note\n")
+        code, out = self.run_tool()
+        self.assertEqual(code, 0, out)
+        self.assertIn("SKIP", out)
+
+    def test_absent_conflicts_when_the_file_exists(self):
+        dest = self.t("note.md")
+        dest.write_text("written by someone else\n")
+        self.ops("12", [{"op": "write", "dest": str(dest), "src": self.stage(dest, "note\n"),
+                         "expect_sha256": "absent", "wave": "A"}])
+        code, out = self.run_tool()
+        self.assertEqual(code, 1)
+        self.assertIn("CONFLICT: expect_sha256 is absent but the destination exists", out)
+        self.assertEqual(dest.read_text(), "written by someone else\n")
+
+
+class AppliedEarlierTests(Harness):
+    """Ticket 12: a write this op installed in an earlier run, since changed by later ops, re-runs as SKIP."""
+
+    def test_guarded_write_changed_later_is_skipped(self):
+        dest = self.t("CLAUDE.md")
+        dest.write_text("old\n")
+        self.ops("09", [{"op": "write", "dest": str(dest), "src": self.stage(dest, "new\n"),
+                         "expect_sha256": sha("old\n"), "wave": "A"}])
+        self.assertEqual(self.run_tool()[0], 0)
+        dest.write_text("new\nplus a block from a later op\n")
+        code, out = self.run_tool("--dry-run")
+        self.assertEqual(code, 0, out)
+        self.assertIn("SKIP: applied in run ", out)
+        self.assertIn("changed since by later ops or edits", out)
+        self.assertEqual(self.run_tool()[0], 0)
+        self.assertEqual(dest.read_text(), "new\nplus a block from a later op\n")
+
+    def test_unguarded_write_is_not_reverted(self):
+        dest = self.t("research-session.md")
+        self.ops("08", [{"op": "write", "dest": str(dest), "src": self.stage(dest, "doc\n"), "wave": "A"}])
+        self.assertEqual(self.run_tool()[0], 0)
+        dest.write_text("doc\nwith a later text op\n")
+        code, out = self.run_tool()
+        self.assertEqual(code, 0, out)
+        self.assertIn("SKIP: applied in run ", out)
+        self.assertEqual(dest.read_text(), "doc\nwith a later text op\n")
+
+    def test_rolled_back_write_applies_again(self):
+        dest = self.t("note.md")
+        dest.write_text("old\n")
+        self.ops("01", [{"op": "write", "dest": str(dest), "src": self.stage(dest, "new\n"),
+                         "expect_sha256": sha("old\n"), "wave": "A"}])
+        self.assertEqual(self.run_tool()[0], 0)
+        [journal] = self.journals()
+        self.assertEqual(self.run_tool("--rollback", str(journal), wave=None)[0], 0)
+        self.assertEqual(dest.read_text(), "old\n")
+        code, out = self.run_tool()
+        self.assertEqual(code, 0, out)
+        self.assertIn("APPLY", out)
+        self.assertEqual(dest.read_text(), "new\n")
+
+    def test_changed_staged_source_is_not_skipped(self):
+        dest = self.t("hooks.py")
+        self.ops("06", [{"op": "write", "dest": str(dest), "src": self.stage(dest, "v1\n"), "wave": "A"}])
+        self.assertEqual(self.run_tool()[0], 0)
+        self.stage(dest, "v2\n")
+        code, out = self.run_tool()
+        self.assertEqual(code, 0, out)
+        self.assertNotIn("SKIP", out)
+        self.assertEqual(dest.read_text(), "v2\n")
+
+    def test_another_op_with_the_same_dest_does_not_count(self):
+        dest = self.t("note.md")
+        dest.write_text("old\n")
+        self.ops("01", [{"op": "write", "dest": str(dest), "src": self.stage(dest, "new\n"),
+                         "expect_sha256": sha("old\n"), "wave": "A"}])
+        self.assertEqual(self.run_tool()[0], 0)
+        dest.write_text("changed by codex\n")
+        self.ops("02", [{"op": "write", "dest": str(dest), "src": self.stage(dest, "new\n"),
+                         "expect_sha256": sha("old\n"), "wave": "A"}], slug="other")
+        code, out = self.run_tool("--only", "02")
+        self.assertEqual(code, 1)
+        self.assertIn("CONFLICT", out)
 
 
 class LintCommandTests(unittest.TestCase):
