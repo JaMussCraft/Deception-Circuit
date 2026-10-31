@@ -81,7 +81,7 @@ end of `/u/swong2/.codex/config.toml` that turns off the five shinka and weco ad
 
 Codex outcome: profiles are not available. The installed Codex 0.166.0 reads profile files
 `~/.codex/<name>.config.toml`, not `[profiles.<name>]` tables. Profiles could not restore the nnsight or academic
-adapters that the bridge prunes. jcodemunch stays on in the Codex default; the hand-back lists three options.
+adapters that the bridge prunes. jcodemunch is handled in the second round below.
 
 Tests per env, run with the scratch script `/u/swong2/.claude/jobs/b2cb53cd/tmp/07/verify.py`:
 
@@ -92,3 +92,17 @@ Tests per env, run with the scratch script `/u/swong2/.claude/jobs/b2cb53cd/tmp/
 - The hand-back passes `research-session lint` (clean, which includes the secret scan).
 
 Status is resolved because staging is complete. The Open question 1 decision is made at apply time.
+
+Second round, after the orchestrator's decision to apply wave A as staged:
+
+- The op file now has ten ops: seven in wave A and three in wave C.
+- New wave A op: a "Profiles and Codex" section added to `A/docs/agents/claude-codex.md`, with marker
+  `autoresearch-workflow-profiles` and `lint: true`.
+- New wave C ops: a `replace_text` in `A/.agents/claude_codex_sync.py` and a `replace_text` that adds a test to
+  `A/.agents/tests/test_claude_codex_sync.py`. With them, the bridge writes `enabled = false` for any server named in
+  Claude's user `deniedMcpServers`, so jcodemunch is off in Codex after wave C, and the setting survives every
+  regeneration of the bridge block. The old text occurs once in the live bridge and once in ticket 01's staged bridge.
+- Bridge tests on the combined copy (ticket 01's staged bridge plus this change): 7 passed on base python3.9 and 7
+  passed on mgnp.
+- Dry-runs: wave A would apply 7 ops and wave C would apply 3, with no refusals. A dry-run across all tickets selects
+  5 wave C ops (01#20, 01#21, 07#7, 07#8, 07#9) and refuses none.
