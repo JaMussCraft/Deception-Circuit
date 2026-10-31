@@ -277,3 +277,51 @@ research-session init autoresearch-workflow --missing-only --root /projects/beto
 14. **Template lookup in tests.** The tests read `_templates` from `RESEARCH_SESSION_TEMPLATES`, then DC main's
     `docs/research/_templates`, then this worktree's copy. They fail with the list tried when none exists. After the
     worktree is removed and before the DC merge, the installed tests would fail until main has the templates.
+
+## Follow-up 03b: ledger fixes from ticket 05
+
+The orchestrator asked for two fixes that ticket 05 found while seeding the registry. Both are staged in
+`S/ops/03b-ledger-fixes.json`, which holds 5 write ops in wave A. Each op carries the sha256 of the installed file.
+The op file leaves `cli.py` alone, because ticket 06 is staging its own `cli.py`.
+
+1. **The roll-up skips `_templates`.** `ledger-rollup` now ignores every directory whose name starts with `_` or `.`,
+   so the template ledger no longer appears as a direction named `example-direction`.
+2. **Totals without rows survive later writes.** A ledger may now carry an optional `legacy_totals` block with
+   `reserved_gpu_hours`, `actual_gpu_seconds` and `api_usd_known`. Recomputed totals are the row sums plus this
+   block. Before any RS ledger write, a ledger without the block gets one when a stored total exceeds its row sum,
+   and the surplus goes into it. The sdr-mechanism ledger therefore keeps its 39.5333 reserved GPU-hours and 9,409
+   actual GPU-seconds on its next `ledger`, `worklog-set` cap or `init` write, with no hand edit. The reserved
+   GPU-hour cap check of `ledger add` counts the carried history. Until that first write, `validate` warns that the
+   difference will be kept as `legacy_totals`, instead of saying it will be recomputed. Adding this field is a schema
+   change, and the orchestrator authorized it.
+
+`ledger import` is deferred. Ticket 05 already converted the four legacy ledgers with the RS writer and validator.
+The remaining prose ledgers hold glued per-job lines that no importer could turn into rows reliably. With the carry
+rule, a converted ledger needs only its totals. If another legacy ledger appears, a later ticket can add the command.
+
+Tests written before the fix, both failing first for the reported reasons:
+
+- `test_ledger_rollup_skips_templates_and_hidden_directories` copies the real templates and a hidden direction into
+  the fixture root, and checks that the roll-up lists only the real direction.
+- `test_legacy_totals_field` checks the new warning, a valid ledger with the block, and an unknown key in the block.
+- `test_totals_without_rows_survive_writes_and_rollup` runs a worklog append, a cap change, `ledger add`,
+  `ledger reconcile` and `ledger-rollup` on a rows-free ledger. Totals stay at the legacy values, then grow by the new
+  rows, and a reservation past the cap that only counting history catches is refused.
+- `test_rows_free_ledger_without_worklog_keeps_totals` covers the ledger-only path of a paused direction.
+
+```
+PYTHONDONTWRITEBYTECODE=1 TMPDIR=T/03 /u/swong2/.conda/envs/mgnp/bin/python -m pytest -q -p no:cacheprovider S/tree/.../.agents/tests
+252 passed, 19 subtests passed in 30.18s
+PYTHONDONTWRITEBYTECODE=1 TMPDIR=T/03 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 /sw/external/python/anaconda3/bin/python3.9 -m pytest -q -p no:cacheprovider S/tree/.../.agents/tests
+252 passed in 32.77s
+python3.9 -B F/tools/apply_staged.py --staging S --wave A --only 03b --dry-run
+dry run, wave A: 5 op(s) selected from 5
+[03b#1] write /projects/beto/swong2/Alignment/.agents/research_session/registry.py WOULD APPLY: +55 -11 lines
+[03b#2] write /projects/beto/swong2/Alignment/.agents/research_session/worklog.py WOULD APPLY: +1 -0 lines
+[03b#3] write /projects/beto/swong2/Alignment/.agents/research_session/ledger.py WOULD APPLY: +3 -1 lines
+[03b#4] write /projects/beto/swong2/Alignment/.agents/tests/test_research_session_registry.py WOULD APPLY: +26 -0 lines
+[03b#5] write /projects/beto/swong2/Alignment/.agents/tests/test_research_session_ledger.py WOULD APPLY: +44 -0 lines
+```
+
+The 252 tests include ticket 06's staged hook tests, which were in S at the time. The live roll-up check on the
+worktree's research root runs after the orchestrator applies 03b.

@@ -1,6 +1,6 @@
 # 09 — Migration A: standardize the handoff directories, dedupe project_context, trim CLAUDE.md
 
-**Status:** ready-for-agent
+**Status:** claimed
 **Type:** task
 **Blocked by:** 05 (INDEX exists), 08 (protocol docs to point at)
 **Wave:** A for Alignment files; W files are committed by the orchestrator.
