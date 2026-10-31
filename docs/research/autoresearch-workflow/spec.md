@@ -11,10 +11,9 @@ the staging root `/u/swong2/.claude/jobs/b2cb53cd/tmp/alignment-staging`; **RS**
 
 ## 1. Intent
 
-Research state today lives in prose spread over memory, `.scratch`, two report folders and three handoffs, and every
-safety rule depends on the orchestrator remembering it. This feature makes the state indexable and the rules
-enforced: one index, a small CLI that owns counters and readings, hooks in both tools, lean profiles, written session
-protocols, and provenance guards in the experiment code.
+Research state lives in prose across memory, `.scratch`, reports and handoffs, and every safety rule depends on the
+orchestrator remembering it. This feature adds one index, a CLI that owns counters and readings, hooks in both tools,
+lean profiles, written session protocols, and provenance guards in the experiment code.
 
 ## 2. Goals and non-goals
 
@@ -123,10 +122,9 @@ render time and says the file is generated.
  "converted_from": null}
 ```
 
-`status` in a reservation is one of `PLANNED`, `PENDING`, `RUNNING`, `COMPLETED`, `FAILED`, `CANCELLED`, `TIMEOUT`,
-`OUT_OF_MEMORY`. `converted_from` names the legacy ledger a converted file came from. The global
-`docs/research/ledger.json` is `{"schema": 1, "generated": ..., "directions": {id: totals}, "totals": {...}}` and is
-rendered by `research-session ledger-rollup`.
+Reservation `status`: `PLANNED`, `PENDING`, `RUNNING`, `COMPLETED`, `FAILED`, `CANCELLED`, `TIMEOUT` or
+`OUT_OF_MEMORY`. `converted_from` names a converted legacy ledger. `ledger-rollup` renders the global
+`docs/research/ledger.json` as `{"schema": 1, "generated": ..., "directions": {id: totals}, "totals": {...}}`.
 
 ### 4.5 state.json (per direction, tracked) and the local session file
 
@@ -190,9 +188,9 @@ result whose execution-evidence block is complete. The template file is `_templa
  "incidents": [{"id": "P1", "at": "...", "what": "...", "effect": "...", "fix": "..."}]}
 ```
 
-Everything above the `## Log` heading (header table, Right now, Terms, Needs from you, Findings register, Process
-incidents) is regenerated from `worklog.json` and `state.json` on every `worklog-append`. Everything after `## Log`
-is append-only. A resolved need is rendered struck through with its answer and time; it is never deleted. Times use
+Everything above `## Log` is regenerated from `worklog.json`, `state.json` and `ledger.json` on every RS write, row
+for row as in `_templates/WORKLOG.md` (two weekly usage rows, all models and Fable). The Log is append-only. A
+resolved need is rendered struck through with its answer and time; it is never deleted. Times use
 `%-I:%M %p %Z` in America/Chicago with `am` and `pm` in lower case; day headings are `### <Weekday> <D> <Month> <YYYY>`.
 
 ## 5. Harness
@@ -269,23 +267,20 @@ checkpoint block with `worklog-append --checkpoint N`, sends `HOLD` to every run
 does not poll for the human and starts no new work until the acknowledgement. A worker that receives `HOLD` finishes
 its current atomic step, writes its hand-back, and stops.
 
-A denial uses `permissionDecision: "deny"` with a reason of at most 400 characters that says what to do next. If the
-gate itself raises, it denies Agent and `sbatch` with "gate error" and allows everything else (fail closed for new
-spend, open for the rest).
+A denial uses `permissionDecision: "deny"` with a reason of at most 400 characters naming the next action. If the
+gate raises, it denies Agent and `sbatch` with "gate error" and allows everything else.
 
-Acknowledgement: the UserPromptSubmit hook (H-g) or the human running `! research-session usage-ack` sets
-`acked_through = N`, writes `acked_at` and `acked_by`, and clears the freeze. A question from the user during a
-freeze does not lift it. `usage-ack` without `--session` acks the most recent session whose `cwd` equals the
-current directory and prints which session it acked.
+Acknowledgement: H-g or the human's `! research-session usage-ack` sets `acked_through = N`, `acked_at` and `acked_by`
+and clears the freeze; a user question does not. Without `--session` it acks the most recent session whose `cwd`
+equals the current directory and prints which.
 
 **5.3 State ownership.** RS is the only writer of the session files, `state.json`, `worklog.json`, `WORKLOG.md`,
 `ledger.json`, `DIRECTIONS.md`, `SESSIONS.md` and the global ledger. The orchestrator changes them through RS only;
 the gate enforces this for the session files, `state.json` and `worklog.json` (§5.2 step 1).
 
-**5.4 The Fable-close rule (D8).** Each reading also computes `fable_gap = Fable row − seven_day`. When it exceeds 5 points, H-a, H-e and every
-checkpoint block carry "Fable is N points above all-models: delegate reading, analysis and review to Opus agents."
-The worklog header always shows both rows. The rule is advisory in hooks and mandatory in the protocol (ticket 08).
-Checkpoint increments use `max(all-models, Fable)`, so the gap never delays a checkpoint.
+**5.4 The Fable-close rule (D8).** Each reading computes `fable_gap = Fable row − seven_day`. Above 5 points, H-a,
+H-e and every checkpoint block say "Fable is N points above all-models: delegate reading, analysis and review to Opus
+agents." Advisory in hooks, mandatory in the protocol (ticket 08); checkpoints use `max(all-models, Fable)`.
 
 ### 5.5 Lint rule (lane 4 §0 numbers)
 
@@ -311,12 +306,22 @@ Checkpoint increments use `max(all-models, Fable)`, so the gap never delays a ch
 whose cwd matches), `status`, `usage-check` (refreshes a stale reading, R8), `usage-ack [--session ID]
 [--stale-ok MIN]`, `set-cadence <points>` (human only), `lint <file>...`, `validate <path>...`, `render`
 (DIRECTIONS.md and SESSIONS.md), `ledger-rollup`, `claim <slug>`, `release <slug> --status <status>`,
-`worklog-append <dir> --kind <entry|checkpoint|handback|job|compaction|decision|incident|switch|finding|need|need-resolved>`
-with `--title` and `--body` for log entries, `--checkpoint N` for the checkpoint block, `--plain --setup --strength
---evidence` for `finding` (allocates the next F#), `--text --default` for `need` (allocates the next N#),
-`--id N# --answer` for `need-resolved`, and `--what --effect --fix` for `incident` (allocates the next P# and also logs
-an entry) (R33), `job add|update|list`, `findings-check [--paper DRAFT]`,
-`audit-scan <transcript.jsonl>`. Tickets 02, 03 and 11 implement them; ticket 08 documents them.
+`job add|update|list`, `findings-check [--paper DRAFT]`, `audit-scan <transcript.jsonl>`, and these. Tickets 02, 03
+and 11 implement them; ticket 08 documents them.
+- `worklog-append <dir> --kind <entry|checkpoint|handback|job|compaction|decision|incident|switch|finding|need|need-resolved>`
+  with `--title --body` for log entries, `--checkpoint N` for the checkpoint block, `--plain --setup --strength
+  --evidence` for `finding` (next F#), `--text --default` for `need` (next N#), `--id N# --answer` for
+  `need-resolved`, and `--what --effect --fix` for `incident` (next P#, also logged) (R33).
+- `init <slug> [--from-start START.md] [--gpu-cap H] [--max-gpu-jobs K] [--api-cap USD]` creates `<root>/<slug>/`
+  from `_templates/`: `state.json`, `worklog.json`, `ledger.json`, a rendered `WORKLOG.md`, `RESUME.md`, a `README.md`
+  stub and `START.md` (the given file, else the template). It adds a `proposed` row to `directions.json` when the
+  slug is absent and never overwrites an existing file (R39).
+- `ledger add <dir> --cluster --account --partition --gpus --minutes --job-id [--commit]` (refuses a reservation past
+  `caps`), `ledger reconcile <dir> <job-id> --actual-seconds S --status STATUS` and `ledger api <dir> --usd X
+  [--provider P] [--calls N] [--reserve]` are the only commands that record spend; each recomputes `totals` (R39).
+- `worklog-set <dir> <field> <value>` for `title`, `state`, `right-now`, `directions`, `terms`, `transcripts`,
+  `gpu-cap`, `max-gpu-jobs` and `api-cap`. Caps go to `ledger.json` and the head's budget rows are rendered from it;
+  a freeze or cap pause overrides the State row's set value in the render (R39).
 
 ### 5.7 Profiles (D6)
 
@@ -330,10 +335,9 @@ an entry) (R33), `job add|update|list`, `findings-check [--paper DRAFT]`,
 | shinka-* and weco user skills (via `skillOverrides`) | off | off | off | off | off |
 | jcodemunch MCP | off (`deniedMcpServers`, fallback `permissions.deny`) | off | off | off | off |
 
-Claude launches a profile with `claude --settings ~/.claude/profiles/<name>.json`. Codex profiles use
-`[profiles.<name>]` in `~/.codex/config.toml` only if ticket 07 verifies per-profile skill and MCP keys against
-https://learn.chatgpt.com/docs or `codex --help`. Otherwise Codex gets the lean default through the bridge, which
-drops adapters for plugins disabled at user level, and the Codex writing profile is reported as not available.
+Claude launches a profile with `claude --settings ~/.claude/profiles/<name>.json`. Codex uses `[profiles.<name>]` only
+if ticket 07 verifies per-profile skill and MCP keys in the Codex docs or `--help`; otherwise Codex gets the lean
+default through the bridge and the Codex writing profile is reported as not available.
 
 ## 6. Science guards
 
@@ -342,22 +346,20 @@ never overwrite an existing `run_manifest.json` with different content; they wri
 and say so. Tests mock the git call. Library code may call `git rev-parse` at run time; agents never run git.
 
 **6.2 Number-resolution checker.** `DC/scripts/check_report_numbers.py <report.md> [--strict] [--json]` lists every
-number in prose and tables, except dates, times, section and ruling numbers, ticket numbers, finding ids, component
-ids such as `L17H24`, versions, `file:line` references and numbers inside code. A number resolves when its unit, or
-the heading paragraph of its table, cites an existing file and the number occurs in that file: as a JSON or CSV
-numeric leaf within half a unit of its last displayed digit (a percentage also matches the fraction), or as a literal
-in text files. A unit containing the word "derived" lists its numbers as derived. `--strict` exits 1 on any
-unresolved number.
+number in prose and tables, except dates, times, section, ruling and ticket numbers, finding ids, component ids such
+as `L17H24`, versions, `file:line` references and code. A number resolves when its unit, or its table's heading
+paragraph, cites an existing file containing it: as a JSON or CSV numeric leaf within half a unit of its last
+displayed digit (a percentage also matches the fraction), or as a literal in text files. A unit containing "derived"
+lists its numbers as derived. `--strict` exits 1 on any unresolved number.
 
 **6.3 Grader freeze.** `evaluation/grader_hash.py` computes `grader_sha256` over the sorted `(relative path, sha256)`
 pairs of `evaluation/benchmarks/*.py` and `evaluation/benchmark_eval.py`. A direction records its frozen value in its
 `spec.md` and in `directions.json` (`frozen_grader_sha256`) before its first benchmark run. `findings-check` errors on
 a row whose evidence provenance names a different grader hash.
 
-**6.4 Held-out set policy.** `docs/research/held-out.md` states the rule: research sessions never score held-out
-instance ids; a paper-gating run records its provenance path in the registry's `scored_runs`; a scored set is spent
-for that claim. `docs/research/held_out.json` is `{"schema": 1, "sets": [{"id", "task", "path", "sha256", "n",
-"created", "created_by", "purpose", "scored_runs": []}]}`. The audit checks provenance `dataset_files` against it.
+**6.4 Held-out set policy.** `held-out.md`: sessions never score held-out ids; a paper-gating run's provenance path
+in `scored_runs` spends the set for that claim. The audit checks provenance `dataset_files` against `held_out.json`:
+`{"schema": 1, "sets": [{"id", "task", "path", "sha256", "n", "created", "created_by", "purpose", "scored_runs": []}]}`.
 
 **6.5 Seed-replication gate.** `research-session findings-check` errors when a `replicated` row lacks two provenance
 files with distinct seeds, when a `verified` row lacks a commit-naming provenance file, and, with `--paper <draft.md>`,
@@ -380,21 +382,18 @@ Agents never write in place to `A`, to `~/.claude`, `~/.codex` or `~/.local/bin`
  {"op": "mkdir", "path": "/abs/dir", "wave": "B"}]}
 ```
 
-The apply tool `F/tools/apply_staged.py` (stdlib only, tested on both interpreters) reads every op file in ticket
-order and supports `--dry-run`, `--wave A|H|B|C|D`, `--only NN`, `--allow codex-config`, `--lint-cmd` and
-`--rollback <journal>`. It is idempotent: an op whose target already has the desired content is skipped and
-reported. Before changing a target it copies it to `/u/swong2/.claude/research-session/backups/<timestamp>/<abs path>`
-and records the op in a journal there. `json_merge` deep-merges dicts and only extends lists: it appends a list entry
-unless an identical entry (equal canonical JSON) is present, hook groups also compare by command string, and it never
-replaces or removes an entry (R31). A `write` with `expect_sha256` refuses when the current file differs (a
-concurrent Codex edit) and reports a conflict; whole-file memory writes always carry it. `replace_text` requires
-`old_text` to occur exactly once at apply time, and `append_text` skips text already present, so line edits to a
-shared file such as `MEMORY.md` survive concurrent edits elsewhere in it. An op with `lint: true` lints the
-resulting file first, through `--lint-cmd` (default: base python3.9 on the staged `research_session/cli.py lint`,
-falling back to the installed path). `text_block` inserts or replaces a `# BEGIN <marker>` and `# END <marker>` block;
-for TOML, `before_first_table` places it before the first `[table]` header. Ops on `~/.codex/config.toml` require
-`--allow codex-config`. The tool prints a diff summary (path, lines added and removed) for each op and never prints a
-value under `env`.
+The apply tool `F/tools/apply_staged.py` (stdlib only, both interpreters) reads every op file in ticket order and
+supports `--dry-run`, `--wave A|H|B|C|D`, `--only NN`, `--allow codex-config`, `--lint-cmd` and `--rollback
+<journal>`. It is idempotent: an op whose target already has the desired content is skipped and reported. Before
+changing a target it copies it to `/u/swong2/.claude/research-session/backups/<timestamp>/<abs path>` and journals the
+op there. `json_merge` deep-merges dicts and only extends lists, skipping an entry with equal canonical JSON (hook
+groups also compare by command string); it never replaces or removes one (R31). A `write` with `expect_sha256`
+refuses and reports a conflict when the file differs; whole-file memory writes always carry it. `replace_text` needs
+`old_text` exactly once and `append_text` skips text already present, so line edits to `MEMORY.md` survive concurrent
+edits elsewhere. `lint: true` lints the resulting file first through `--lint-cmd` (default: base python3.9 on the
+staged `research_session/cli.py lint`, else the installed one). `text_block` inserts or replaces a `# BEGIN <marker>`
+and `# END <marker>` block; in TOML, `before_first_table` puts it before the first `[table]`. Ops on
+`~/.codex/config.toml` need `--allow codex-config`. Each op prints a diff summary; no value under `env` is printed.
 
 Waves, applied in this order (R26, R28):
 
@@ -516,3 +515,5 @@ Planner rulings under the user's go of 2026-10-31. R26-R38 are orchestrator ruli
 - **R37. Guard scope.** The self-ack guard exempts `_templates/` and read-only RS subcommands (§5.2 step 1).
 - **R38. Ordering of dependent tickets.** Ticket 11 is blocked by 10 as well, because 05, 10, 11 and 12 all edit
   `directions.json` in that order.
+- **R39. Setup, spend and head fields are RS commands (ticket 08 hand-back).** `init`, `ledger` and `worklog-set`
+  (§5.6) are ticket 03 scope, so no RS-owned file is ever created or edited by hand; `job add` does not write ledgers.

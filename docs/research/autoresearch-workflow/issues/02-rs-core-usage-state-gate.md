@@ -1,6 +1,6 @@
 # 02 — RS core: usage readings, session state, the gate, acknowledgement
 
-**Status:** ready-for-agent
+**Status:** claimed
 **Type:** task
 **Blocked by:** 01 (package skeleton and `cli.py`)
 **Wave:** A

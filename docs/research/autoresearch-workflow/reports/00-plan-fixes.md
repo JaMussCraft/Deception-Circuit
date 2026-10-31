@@ -140,6 +140,38 @@ only the cap pause and the stale-reading denial. Edits:
 My own call beyond the ruling: the self-ack guard and the lint keep applying to unregistered sessions, because they
 run before step 4 and protect files rather than pace work. The orchestrator can narrow that if it meant otherwise.
 
+## Addendum: R39, setup, spend and head-field commands (after ticket 08's hand-back)
+
+Ticket 08's hand-back found no command to create a direction's RS-owned files, to write `ledger.json`, or to set
+the WORKLOG head fields. The orchestrator ruled them into §5.6 and ticket 03 as R39. Edits:
+
+- **spec §5.6.** Rewritten as a list. It adds `init <slug> [--from-start] [--gpu-cap] [--max-gpu-jobs]
+  [--api-cap]`, `ledger add|reconcile|api`, and `worklog-set <dir> <field> <value>` with its field list. Caps live
+  in `ledger.json`, and the head's budget rows always render from it.
+- **spec §4.8.** The head is regenerated on every RS write, row for row as in `_templates/WORKLOG.md`, with two
+  weekly usage rows.
+- **spec R39.** New ruling. `job add` does not write ledgers; `ledger add` does.
+- **spec length.** Prose in §1, §4.4, §5.2 (denial and acknowledgement), §5.4, §5.7, §6.2, §6.4 and §7 was tightened.
+  No ruling text was cut. The spec is 519 lines.
+- **Ticket 03.** It gains `worklog-set`, `research_session/setup.py` (`init`) and `research_session/ledger.py`, two
+  test files, and acceptance criteria for each. The head render must match the template's row labels in order, and
+  a test parses the labels from the template itself. `--import` now maps the old `F/WORKLOG.md` head onto the
+  template rows and refuses only when a register row or a Log byte would be lost.
+- **Ticket 03 size.** Estimated about 220k tokens, inside the 250k budget, so it is not split. If its projection
+  passes 250k after the worklog work, the implementer stops before `init` and `ledger` and names the rest
+  `03b-ledger-and-init`.
+
+Calls of my own within R39:
+
+- `init` adds a `proposed` row to `directions.json` when the slug is absent, because no other command adds a
+  direction. It never claims. It refuses to overwrite and offers `--missing-only`.
+- `ledger add` refuses a reservation past the GPU-hour cap or the concurrent-job cap. `ledger api` always records
+  spend already incurred, and past the cap it prints a warning and exits 3, because refusing would lose a true record.
+- `worklog-set state` sets a base value; a freeze or cap pause in `state.json` overrides it in the render.
+
+Not done here: ticket 08's staged `docs/agents/research-session.md` does not name `init`, `ledger` or
+`worklog-set` yet. It needs a small follow-up, either a `replace_text` op from ticket 08 or a line in ticket 12.
+
 ## Not addressed, for the orchestrator
 
 - The worklog `--import` relies on the hand-written `F/WORKLOG.md` keeping the lane 4 format until ticket 03 lands.
