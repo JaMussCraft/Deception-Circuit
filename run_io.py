@@ -180,10 +180,29 @@ def make_run_dir(args, node_cfg, edge_cfg) -> str:
     cfg = resolved_run_config(args, node_cfg, edge_cfg)
     with open(os.path.join(args.output_dir, "config.json"), "w") as f:
         json.dump(cfg, f, indent=2, default=str)
+    write_run_provenance(args)
 
     if args.node_checkpoint is None:
         args.node_checkpoint = os.path.join(args.output_dir, "active_nodes.json")
     return args.output_dir
+
+
+def write_run_provenance(args):
+    """run_manifest.json beside config.json (spec §4.6). -> its path, or None.
+
+    Provenance must never cost a training run: any failure is printed and the
+    run goes on without the file.
+    """
+    try:
+        import run_manifest
+        return run_manifest.write_run_manifest(
+            args.output_dir,
+            config_path=os.path.join(args.output_dir, "config.json"),
+            dataset_files=run_manifest.dataset_files_for_args(args),
+            model=getattr(args, "model", None), seed=getattr(args, "seed", None))
+    except Exception as error:                  # noqa: BLE001 -- see above
+        print(f"  !! run_manifest.json not written: {type(error).__name__}: {error}")
+        return None
 
 
 class _Tee:

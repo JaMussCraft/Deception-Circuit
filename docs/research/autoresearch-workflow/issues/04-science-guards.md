@@ -1,6 +1,6 @@
 # 04 — Science guards in Deception-Circuit code
 
-**Status:** claimed
+**Status:** resolved (orchestrator closed it 2026-10-31 4:45 pm EDT after writing the full-suite comparison into the hand-back: no regression on either interpreter)
 **Type:** task
 **Blocked by:** nothing (runs in parallel with 01)
 **Wave:** none; everything is in W and committed by the orchestrator.

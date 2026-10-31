@@ -178,6 +178,37 @@ def report_and_write(evaluation, payload, ctx, name) -> str:
     return out
 
 
+def write_cell_manifest(ctx):
+    """run_manifest.json in the cell's output directory (spec §4.6). -> path or None.
+
+    `config_sha256` and `seed` describe the circuit's own training run
+    (`<run_dir>/config.json`), which is what seed replication compares;
+    `dataset_files` are the evaluated task's files. `grader` is filled only
+    when the benchmark evaluation is selected. Provenance never stops a cell:
+    a failure is printed and the cell runs on.
+    """
+    try:
+        import run_manifest
+        cli = ctx.cli
+        grader = None
+        if "benchmarks" in (getattr(cli, "evals", None) or ()):
+            from evaluation.grader_hash import grader_fingerprint
+            grader = grader_fingerprint(getattr(cli, "benchmarks", None))
+        run_dir = getattr(ctx, "run_dir", None)
+        config_path = os.path.join(run_dir, "config.json") if run_dir else None
+        seed = None
+        if config_path and os.path.isfile(config_path):
+            with open(config_path) as f:
+                seed = json.load(f).get("seed")
+        return run_manifest.write_run_manifest(
+            ctx.out_dir, config_path=config_path,
+            dataset_files=run_manifest.dataset_files_for_args(ctx.args),
+            model=getattr(ctx.args, "model", None), seed=seed, grader=grader)
+    except Exception as error:                  # noqa: BLE001 -- see above
+        print(f"  !! run_manifest.json not written: {type(error).__name__}: {error}")
+        return None
+
+
 def run_cell(ctx, *, legacy: bool) -> dict:
     """Run every requested evaluation for one (circuit, task) cell.
 
@@ -187,6 +218,7 @@ def run_cell(ctx, *, legacy: bool) -> dict:
     spec, task_spec = ctx.circuit_spec, ctx.task_spec
 
     os.makedirs(ctx.plots_dir, exist_ok=True)
+    write_cell_manifest(ctx)
     report.banner("CIRCUIT EVALUATION")
     report.kv("run dir", ctx.run_dir)
     report.kv("model / task", f"{ctx.args.model} / {ctx.args.task}")

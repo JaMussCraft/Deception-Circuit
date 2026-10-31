@@ -65,6 +65,13 @@
       "fix": "Feature directory moved into the worktree (matches the approved layout); Alignment-side files are staged and applied by the orchestrator",
       "id": "P2",
       "what": "The worktree isolation hook refuses writes to the Alignment checkout and compound shell commands, so the feature directory could not be created where first planned."
+    },
+    {
+      "at": "2026-10-31T16:47:08-04:00",
+      "effect": "About 2.5 hours of wall-clock delay on ticket 04; no wrong output",
+      "fix": "Orchestrator resumed it once, then wrote the final comparison section itself from the agent's logs. Lesson for the protocol: an agent must not end its turn while a background run it owns is unfinished; it should wait on the run or hand the comparison to the orchestrator explicitly.",
+      "id": "P3",
+      "what": "The ticket 04 agent went idle twice without finishing: once at 1:20 pm with its drafts only in scratch and nothing in the worktree, and again at 4:06 pm after launching the final test runs, which it never came back to read."
     }
   ],
   "needs": [

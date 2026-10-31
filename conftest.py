@@ -4,6 +4,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+os.environ["DC_RUN_MANIFEST_GIT"] = "0"  # run_manifest.py: never shell out to git in tests
 
 # The CPU tests run a 2-layer, 64-hidden model. At the login node's default
 # thread count each of those tiny GEMMs spends ~50 ms in OpenMP synchronisation,
