@@ -117,3 +117,6 @@ Staged (wave D, pending the user's confirmation that the live Codex session is f
     `eval5-grader-fixes` do not exist yet is stale for the first two, which now hold `scratch-copy/`; rewrite it to
     say what each holds and that `eval5-grader-fixes` arrives with wave D. Also note the `held-out.md` bullet once
     ticket 04 lands (it does).
+16. `migrate_scratch.py` copied `component-analysis/scratch-copy/component-analysis/.pytest_cache/README.md`, a
+    pytest cache file. Make the Markdown selection skip dot-directories (test it), delete that copy and its row in
+    the folder's `provenance.json`, and note the change in the hand-back. Do not re-plan the wave B ops for this.

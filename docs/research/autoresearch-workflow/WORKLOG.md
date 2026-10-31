@@ -5,14 +5,14 @@
 |---|---|
 | State | Running |
 | Directions | 1. Hygiene and config: done · 2. Findings index and layout: queued · 3. Hooks and CLI: active (core), hooks queued · 4. Protocol docs and profiles: done · 5. Science guards: active; pilot: queued |
-| Started / last updated | Sat 31 Oct 2026, 9:05 am EDT / Sat 31 Oct 2026, 4:09 pm EDT |
+| Started / last updated | Sat 31 Oct 2026, 9:05 am EDT / Sat 31 Oct 2026, 4:21 pm EDT |
 | Orchestrator auto-compactions | 0, counted by the compaction hook |
 | Weekly usage, all models | no reading yet; no session has registered |
 | Weekly usage, Fable | no reading yet; no session has registered |
 | Review checkpoints | none yet; checkpoints start when the session registers |
 | GPU budget | 0.0 of 0 GPU-h actual (0.0 reserved); no GPU jobs allowed; clusters: none yet |
 | OpenRouter credit | $0.00 of $0.00 cap |
-| Open needs from you | 1, see below |
+| Open needs from you | 0 |
 | Transcripts (for audits) | not recorded yet |
 
 **Right now.** Tickets 01, 02, 03, 07 and 08 are done and installed. Running now: the science guards in the Deception-Circuit code (ticket 04) and the hook definitions for both tools (ticket 06, staged only; nothing installs until the final smoke test). Next: seeding the findings index and directions registry (ticket 05).
@@ -21,7 +21,7 @@
 
 ## Needs from you
 - ~~N0 (Sat 9:30 am): approve the workflow proposal and plugin disable list.~~ Answered Sat 9:55 am: "go", with corrections (checkpoint is a usage freeze; keep superpowers everywhere; move .scratch text into Deception-Circuit docs; science guards during setup).
-- N1 (Sat 4:06 pm): Trust the research-session hooks in Codex: open a fresh Codex session in the Alignment checkout and run /hooks once. Until then Codex skips them. Default if no answer: The Claude hooks work regardless; Codex sessions run without the usage gate and lint until trusted.
+- ~~N1 (Sat 4:06 pm): Trust the research-session hooks in Codex: open a fresh Codex session in the Alignment checkout and run /hooks once. Until then Codex skips them.~~ Answered Sat 4:21 pm: Trusted Sat 4:18 pm EDT. Codex keeps the trust in config.toml, keyed by hooks file, event, group position and content hash, so it is a one-time step unless a hook's command text changes or a group moves.
 
 ## Findings register
 | # | When | Finding, in plain words | Setup needed to read it | Strength | Evidence |
@@ -55,3 +55,4 @@ Strength is one of: preliminary, reviewed by an independent agent, or final.
 **4:05 pm EDT · Hand-back: handoff standardization done; hooks installed in both tools.** The project CLAUDE.md shrank from 190 lines to 97 and now points at the research index instead of describing the layout; the mechanism-analysis direction got a two-page handoff; the unreadable glued state file from the SDR clause-choice work has a full-sentence rewrite that keeps all 123 of its numbers, checked by script. The deduplication of 21 report copies did not happen: every copy is pinned by path in the live Codex session's frozen manifests and audit scripts, and the move tool cannot cross file systems. Ruling: leave them, add pointer READMEs in the wrap-up ticket, and move them only after you confirm the Codex session is finished. Then the hooks were installed in both tools (Claude project settings, the worktree settings, and the Codex hooks file), the smoke test was re-run against the installed settings and passed, and the Claude-Codex bridge was re-synced. One action is yours: a fresh Codex session must trust the new hooks once with /hooks.
 **4:06 pm EDT · Need N1 opened.** Trust the research-session hooks in Codex: open a fresh Codex session in the Alignment checkout and run /hooks once. Until then Codex skips them. Default if no answer: The Claude hooks work regardless; Codex sessions run without the usage gate and lint until trusted.
 **4:09 pm EDT · Hand-back: scripted scratch archive ready, nothing moved yet.** The migration script plans, copies and verifies without moving anything by itself. For the four closed directions (component-analysis, format-control, mechanism-analysis, mechanism-datasets) it copied 211 curated Markdown files, about 2.9 MB, into the Deception-Circuit docs with a provenance file each; the secret scan found nothing. The 20 staged operations rename each old scratch directory into the ignored studies area and leave a symlink behind, so every one of the 33 recorded scratch paths in the code keeps resolving. 50 tests pass in both Python environments. The 13 directories the live Codex session owns were only inventoried (62 GB, 518 Markdown files); their archive waits for your confirmation that the session is finished, and three were touched today so the 12-hour guard would skip them anyway. The moves themselves run after the branch is merged. Ruling: the old autoresearch-workflow scratch copy goes to the backup root by copy, since a rename cannot cross file systems.
+**4:21 pm EDT · Need N1 answered.** Trusted Sat 4:18 pm EDT. Codex keeps the trust in config.toml, keyed by hooks file, event, group position and content hash, so it is a one-time step unless a hook's command text changes or a group moves.
