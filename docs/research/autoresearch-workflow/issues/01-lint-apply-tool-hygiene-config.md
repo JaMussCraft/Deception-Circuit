@@ -1,6 +1,6 @@
 # 01 — Text lint, staging apply tool, hygiene and config
 
-**Status:** claimed
+**Status:** resolved
 **Type:** task
 **Blocked by:** nothing
 **Wave:** A for everything except the Codex `[agents]` block, which is wave C. This ticket stages no hook (R26) and
@@ -67,16 +67,16 @@ In W (committed by the orchestrator):
 
 ## Acceptance criteria
 
-- [ ] Lint tests pass in both envs:
+- [x] Lint tests pass in both envs:
       `/u/swong2/.conda/envs/mgnp/bin/python -m pytest -q -p no:cacheprovider /u/swong2/.claude/jobs/b2cb53cd/tmp/alignment-staging/tree/projects/beto/swong2/Alignment/.agents/tests/test_research_session_lint.py`
       and the same with `OMP_NUM_THREADS=1 /sw/external/python/anaconda3/bin/python3.9 -m pytest ...`.
-- [ ] `cli.py lint` over the clean corpus reports 0 failures, and over the three glued samples reports at least one
+- [x] `cli.py lint` over the clean corpus reports 0 failures, and over the three glued samples reports at least one
       failing unit for each of MEMORY.md lines 27 and 29 and for at least half of the units in RESUME.md lines 9-34.
       Paste the counts. Any allowlist addition is listed with the token that needed it (R10).
-- [ ] The lint module exposes a function that lints a text string (not only a file), because the PreToolUse hook
+- [x] The lint module exposes a function that lints a text string (not only a file), because the PreToolUse hook
       lints `content` and `new_string` before the write (R30). A test covers it.
-- [ ] The secret scan flags synthetic tokens of every pattern in spec §5.5 and nothing in the clean corpus.
-- [ ] Apply-tool tests pass in both envs and cover: write with backup and journal; idempotent re-run; an
+- [x] The secret scan flags synthetic tokens of every pattern in spec §5.5 and nothing in the clean corpus.
+- [x] Apply-tool tests pass in both envs and cover: write with backup and journal; idempotent re-run; an
       `expect_sha256` conflict; `json_merge` deep merge, hook-group de-duplication by command, list extension that
       never duplicates an identical entry and never removes one (R31); `text_block` before the first TOML table
       (parsed with `tomllib` on mgnp); `replace_text` with zero, one and two matches of `old_text` (only one applies);
@@ -84,18 +84,18 @@ In W (committed by the orchestrator):
       restores; the `--wave A|H|B|C|D` and `--only` filters; `lint: true` refusing glued content through `--lint-cmd`
       (default: base python3.9 on the staged `cli.py lint`, fallback to the installed path); and dry-run output that
       never prints a value under `env` (key paths only).
-- [ ] `apply_staged.py --staging S --wave A --only 01 --dry-run` lists exactly the planned targets; output pasted.
-- [ ] Staged memory files pass the lint, and no op in `S/ops/01-hygiene.json` touches a path R28 defers.
-- [ ] Merging the settings fragment into a copy of `~/.claude/settings.json` inside T parses as JSON, adds three keys
+- [x] `apply_staged.py --staging S --wave A --only 01 --dry-run` lists exactly the planned targets; output pasted.
+- [x] Staged memory files pass the lint, and no op in `S/ops/01-hygiene.json` touches a path R28 defers.
+- [x] Merging the settings fragment into a copy of `~/.claude/settings.json` inside T parses as JSON, adds three keys
       and appends entries to one list, keeps every existing `autoMode.environment` entry byte for byte (compare
       hashes, print nothing), and leaves the `env` block's existing key unchanged by hash.
-- [ ] The Codex block applied to a copy of `config.toml` inside T parses with `tomllib` on mgnp, yields an `agents`
+- [x] The Codex block applied to a copy of `config.toml` inside T parses with `tomllib` on mgnp, yields an `agents`
       table with `default_subagent_model`, keeps the top-level keys of lines 1-6 at top level, and leaves the bridge
       block byte-identical.
-- [ ] Hygiene: remote URLs re-checked by reading the two `.git/config` files; secret scan run over
+- [x] Hygiene: remote URLs re-checked by reading the two `.git/config` files; secret scan run over
       `A/.claude/settings*.json`, `~/.codex/config.toml` and both `.git/config` files, with results recorded. The
       user settings `env` block is reported by key name only.
-- [ ] The hand-back lists, for the orchestrator to run after checking `mechanism-datasets` is 0 commits ahead of
+- [x] The hand-back lists, for the orchestrator to run after checking `mechanism-datasets` is 0 commits ahead of
       main: `git -C /projects/beto/swong2/Alignment/Deception-Circuit worktree remove .claude/worktrees/mechanism-datasets`,
       `git -C ... branch -d mechanism-datasets`, and `git -C ... push origin --delete mechanism-datasets`.
 
@@ -104,3 +104,28 @@ In W (committed by the orchestrator):
 Both interpreters for every test file. Paste the dry-run output and the lint counts into the hand-back.
 
 ## Comments
+
+Implementer, 2026-10-31. Details, outputs and open questions are in `F/reports/01-handback.md`.
+
+Files for the orchestrator to commit from W:
+
+- `F/tools/apply_staged.py` and `F/tools/test_apply_staged.py`
+- `F/reports/01-handback.md` and this ticket file
+
+Staged in S, op file `/u/swong2/.claude/jobs/b2cb53cd/tmp/alignment-staging/ops/01-hygiene.json`, 21 ops:
+
+- Wave A, 19 ops: the RS package files `__init__.py`, `cli.py` and `lint.py`; the lint tests and eight fixtures; the
+  memory notes `usage-limit-policy.md` and `subagent-model-policy.md` with `expect_sha256` and `lint: true`; one
+  MEMORY.md `replace_text` on the usage-limit-policy line; the three agent definitions with `expect_sha256`; and the
+  user settings `json_merge`.
+- Wave C, 2 ops: the Codex `[agents]` block and the optional bridge sentence.
+
+Test results:
+
+| Suite | mgnp (Python 3.12) | base (Python 3.9) |
+|---|---|---|
+| Staged `.agents/tests` (29 lint plus 6 bridge tests on the staged bridge) | 35 passed | 35 passed |
+| `F/tools/test_apply_staged.py` | 33 passed | 33 passed |
+
+The orchestrator should read open questions 1 to 3 of the hand-back before applying wave A. They cover the lint scope
+for text ops, hook-group de-duplication by matcher and command, and the allowlist applying to both rules.
