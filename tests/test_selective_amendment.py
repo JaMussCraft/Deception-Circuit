@@ -182,10 +182,12 @@ def test_amended_baseline_fingerprint_shares_arm_space_but_not_wikitext():
     assert r._baseline_fingerprint(identity)!=r._baseline_fingerprint(dict(changed,wikitext_manifest_hash='other'))
 
 
-def test_calibration_profiles_both_spaces_all_arms_and_discards_smoke_states(tmp_path):
+@pytest.mark.parametrize("policy", ["amendment-v2", "amendment-v3"])
+def test_calibration_profiles_both_spaces_all_arms_and_discards_smoke_states(tmp_path,policy):
     model,m,cache,args=_tiny_training_inputs(tmp_path)
-    args.profile_updates=3;args.candidate_space='union'
-    m['amendment']=dict(candidate_space='union',union_heads=m['candidate_heads'])
+    args.profile_updates=3;args.candidate_space='union';args.policy=policy
+    args.max_updates=1536 if policy=='amendment-v3' else 512;args.checkpoint_every=64
+    m['amendment']=dict(policy=policy,candidate_space='union',union_heads=m['candidate_heads'])
     identity=dict(source_files_hash='s')
     from evaluation import selective_wikitext as wt
     block=dict(block_id='train-000000',input_ids=torch.tensor([[1,2,3]]),
@@ -205,22 +207,30 @@ def test_calibration_profiles_both_spaces_all_arms_and_discards_smoke_states(tmp
          patch.object(wt,'iter_blocks',side_effect=lambda manifest,split:iter([block]*32 if split=='train' else [block]*16)):
         r._amended_calibrate(args,m,identity,SimpleNamespace(node_model=model),cache,{},wfp,.1)
     report=json.loads((tmp_path/'calibration.json').read_text())
-    assert len(report['profile'])==6
-    assert {(p['candidate_space'],p['collateral_arm']) for p in report['profile']}=={(s,a) for s in ('union','all') for a in ('H','W','HW')}
+    arms=('W','HW') if policy=='amendment-v3' else ('H','W','HW')
+    assert report['policy']==policy
+    assert len(report['profile'])==2*len(arms)
+    assert {(p['candidate_space'],p['collateral_arm']) for p in report['profile']}=={(s,a) for s in ('union','all') for a in arms}
     assert report['production_optimizer_steps']==0 and report['all_smoke_states_discarded']
     assert all(p['export_equivalent'] and p['export_probe_removed_heads']>=1 for p in report['profile'])
     assert all(torch.equal(v,r._gate_state(model)[k]) for k,v in original.items())
-    assert all(len(p['priced_update_seconds'])==2 and p['estimated_512_update_run_seconds']>0 for p in report['profile'])
+    estimate='estimated_1536_update_run_seconds' if policy=='amendment-v3' else 'estimated_512_update_run_seconds'
+    assert all(len(p['priced_update_seconds'])==2 and p[estimate]>0 for p in report['profile'])
+    if policy=='amendment-v3':
+        for p in report['profile']:
+            expected=.1+1536*sum(p['priced_update_seconds'])/2+24*p['validation_119pairs_16blocks_seconds']+1561*p['checkpoint_seconds']
+            assert p[estimate]==pytest.approx(expected)
 
 
-def test_training_evidence_rejects_changed_measured_artifact(tmp_path):
-    report=dict(policy='amendment-v2',numerical_gate_passed=True,source_files_hash='s',baseline_fingerprint='b',
+@pytest.mark.parametrize("policy", ["amendment-v2", "amendment-v3"])
+def test_training_evidence_rejects_changed_measured_artifact(tmp_path,policy):
+    report=dict(policy=policy,numerical_gate_passed=True,source_files_hash='s',baseline_fingerprint='b',
         wikitext_cache_fingerprint='w',production_optimizer_steps=0,all_smoke_states_discarded=True,
         profile=[dict(candidate_space='union',collateral_arm='W',actual_nonself_candidate_gradient=True,export_equivalent=True)])
     path=tmp_path/'calibration.json';path.write_text(json.dumps(report));digest=r._hash_file(path)
     receipt=dict(source_files_hash='s',baseline_fingerprint='b',wikitext_cache_fingerprint='w',
         numerical_evidence=dict(calibration_path=str(path),calibration_sha256=digest),measured_budget=dict(profile_sha256=digest))
-    m={'amendment':dict(candidate_space='union',collateral_arm='W')}
+    m={'amendment':dict(policy=policy,candidate_space='union',collateral_arm='W')}
     r._verify_amended_evidence(receipt,m)
     path.write_text(json.dumps(dict(report,numerical_gate_passed=False)))
     with pytest.raises(ValueError,match='SHA'):r._verify_amended_evidence(receipt,m)
