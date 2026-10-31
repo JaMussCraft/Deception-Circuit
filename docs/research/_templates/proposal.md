@@ -6,7 +6,7 @@ to one screen. Propose only unclaimed directions, or hand over a paused one by n
 START.md from _templates/START.md.
 -->
 
-Checked against: SESSIONS.md as of <Sun 1 Nov 2026, 2:40 pm CST>; no overlap with <the claimed directions, by name>.
+Checked against: SESSIONS.md as of <Sun 1 Nov 2026, 2:40 pm EST>; no overlap with <the claimed directions, by name>.
 Findings read: FINDINGS.md up to <F-id>.
 
 ## 1. <Plain direction name> (`<slug>`, <new / handed over from a paused session>)

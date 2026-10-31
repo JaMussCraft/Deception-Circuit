@@ -125,10 +125,11 @@ in wave A. Paths are relative to `/projects/beto/swong2/Alignment/.agents/`:
 Test results from the staged location, with the commands of the brief:
 
 ```
-mgnp:  128 passed, 19 subtests passed in 14.77s
-base:  128 passed in 15.57s
+mgnp:  133 passed, 19 subtests passed in 15.73s
+base:  133 passed in 16.40s
 ```
 
-The orchestrator should read two open questions in the hand-back. Open question 1: a fresh `usage.json` without
-`five_hour` reads as 0 under the spec rule, and the live file has no `five_hour` key right now. Open question 9:
-re-running ticket 01's ops alone would install the ticket 02 `cli.py` without a hash check.
+These counts include the five tests added for ruling R40. Under that ruling, a fresh file without `five_hour` is
+refreshed first and then reads as 0 with a note. `RESUME.md` line 16 records a different R40, under which a missing
+`five_hour` is not applicable. The hand-back describes the conflict, and the staged code follows the ruling message.
+Open question 9 is noted by the orchestrator, who will apply with `--only 02`.

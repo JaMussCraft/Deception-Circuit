@@ -31,7 +31,7 @@ a command, because the gate refuses hand edits of `state.json` and `worklog.json
 - Checkpoint block: lane 4 §1 and the `_templates/WORKLOG.md` example.
 - Two legacy ledger styles for later conversion: `A/.scratch/mechanism-analysis/compute-ledger.json` and
   `DC/outputs/_studies/selective-deception/study/compute-ledger.json` (lane 3 P4). Read their key names only.
-- Times: America/Chicago computed with `zoneinfo` (available on Python 3.9). DST ends 1 November 2026 (R22).
+- Times: America/New_York computed with `zoneinfo` (available on Python 3.9). DST ends 1 November 2026 (R22).
 - Existing provenance field names: `W/scripts/sdr_routing_pilot.py:392-403`.
 
 ## Scope
@@ -52,7 +52,7 @@ Staged in S (relative to `S/tree/projects/beto/swong2/Alignment/.agents/`):
   with its default-if-no-answer clause; `need-resolved --id N# --answer` renders that need struck through with the
   answer and time and logs an entry; `incident` allocates the next P#, adds a row and logs an entry; `--checkpoint N`
   writes the checkpoint block of lane 4 §1 and sets that freeze to `recorded`. It updates `last_worklog_entry_at`
-  and lints its whole output before an atomic replace. Times use `%-I:%M %p %Z` in America/Chicago with lower-case
+  and lints its whole output before an atomic replace. Times use `%-I:%M %p %Z` in America/New_York with lower-case
   `am` and `pm`; day headings are `### <Weekday> <D> <Month> <YYYY>` (match `F/WORKLOG.md`).
 - An importer, `worklog-append <dir> --import`, that builds `worklog.json` from an existing hand-written WORKLOG.md in
   the lane 4 format (used once on `F/WORKLOG.md` by the orchestrator, then RS owns it). It regenerates the head in
@@ -99,15 +99,15 @@ Staged in S (relative to `S/tree/projects/beto/swong2/Alignment/.agents/`):
 - [ ] `render` is byte-stable: a second run over unchanged input changes nothing (test asserts equal bytes).
 - [ ] `render` handles a claimed direction whose `state.json` does not exist yet (the `autoresearch-workflow` row will
       be exactly that in ticket 05): the SESSIONS row shows "no state yet" instead of failing.
-- [ ] A test asserts `zoneinfo.ZoneInfo("America/Chicago")` loads (the planner confirmed it does on both
+- [ ] A test asserts `zoneinfo.ZoneInfo("America/New_York")` loads (the planner confirmed it does on both
       interpreters on 2026-10-31).
 - [ ] `claim` refuses a direction already `claimed` or `active` by another session and refuses an unknown slug.
 - [ ] `worklog-append` tests: an entry on a new day adds the `### <Weekday> <D> <Month> <YYYY>` heading; the head
       regeneration leaves everything after `## Log` byte-identical apart from the appended entry; `finding`, `need`
       and `incident` allocate F1, N1 and P1 and then F2, N2 and P2; `need-resolved` strikes through the right need with
       its answer and time and refuses an unknown or already-resolved id; the checkpoint block contains both usage rows
-      and sets freeze `recorded`; a glued `--body` is refused with the lint message; times render as `8:05 am CDT`
-      before 2 a.m. on 1 November 2026 and `8:05 am CST` after (fixed clocks).
+      and sets freeze `recorded`; a glued `--body` is refused with the lint message; times render as `8:05 am EDT`
+      before 2 a.m. on 1 November 2026 and `8:05 am EST` after (fixed clocks).
 - [ ] Head-layout test: a direction created by `init` renders a head whose row labels, in order, equal the row labels
       of `_templates/WORKLOG.md` (parsed from the template at test time, so a template change breaks the test), with
       separate "Weekly usage, all models" and "Weekly usage, Fable" rows filled from a fixture `state.json`.

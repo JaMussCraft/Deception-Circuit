@@ -8,7 +8,7 @@ Counters (compactions, checkpoints, usage) live in state.json and are never copi
 worklog; the worklog may point here, never the other way.
 -->
 
-Last rewritten: <Sun 1 Nov 2026, 2:40 pm CST> by <claude-01a2b3c4>.
+Last rewritten: <Sun 1 Nov 2026, 2:40 pm EST> by <claude-01a2b3c4>.
 
 ## Status
 
@@ -29,7 +29,7 @@ which keeps the waiter command in state.json; this table only says what each job
 
 | Job | Cluster | What it computes | Output directory | Expected finish |
 |---|---|---|---|---|
-| `<job id>` | <Delta> | <plain description> | `<outputs/... path>` | <Sun 4:00 pm CST> |
+| `<job id>` | <Delta> | <plain description> | `<outputs/... path>` | <Sun 4:00 pm EST> |
 
 ## Next action
 

@@ -191,7 +191,7 @@ result whose execution-evidence block is complete. The template file is `_templa
 Everything above `## Log` is regenerated from `worklog.json`, `state.json` and `ledger.json` on every RS write, row
 for row as in `_templates/WORKLOG.md` (two weekly usage rows, all models and Fable). The Log is append-only. A
 resolved need is rendered struck through with its answer and time; it is never deleted. Times use
-`%-I:%M %p %Z` in America/Chicago with `am` and `pm` in lower case; day headings are `### <Weekday> <D> <Month> <YYYY>`.
+`%-I:%M %p %Z` in America/New_York with `am` and `pm` in lower case; day headings are `### <Weekday> <D> <Month> <YYYY>`.
 
 ## 5. Harness
 
@@ -480,7 +480,7 @@ Planner rulings under the user's go of 2026-10-31. R26-R38 are orchestrator ruli
 - **R20. Sizing.** Reading plus writing under about 250k tokens per ticket; briefs finish under 350k until the 600k
   window test passes. Ticket 01 hands back after the lint and the apply tool if its projection passes 250k.
 - **R21. Gitignore in DC.** Ticket 06 adds `.claude/worktrees/` and `.claude/settings.local.json` to `W/.gitignore`.
-- **R22. Times.** America/Chicago with a computed zone; CDT becomes CST on 1 November 2026.
+- **R22. Times.** America/New_York with a computed zone; EDT becomes EST on 1 November 2026.
 - **R23. Claims.** Only the orchestrator edits `directions.json` claims (through `claim`) and commits them on DC main
   before branching. Pushing follows the user's standing policy.
 - **R24. Agent definitions move from Sonnet to Opus.** `idea-critic`, `paper-reader` and `paper-searcher` get
