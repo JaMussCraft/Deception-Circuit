@@ -47,7 +47,7 @@ Staged in S (paths relative to `S/tree/projects/beto/swong2/Alignment/.agents/`)
   exceptions, `argv` or the environment of a child process.
 - `research_session/state.py` (local session file: load, lock with `fcntl.flock`, atomic replace; mirror into a
   registered direction's `state.json`; direction resolution per R5).
-- `research_session/gate.py` (pure decision function implementing spec §5.2 steps 1-6, returning allow or deny
+- `research_session/gate.py` (pure decision function implementing spec §5.2 steps 1-7, returning allow or deny
   with the reason text, plus the fail-closed wrapper).
 - `cli.py` subcommands `register`, `status`, `usage-check`, `usage-ack [--session] [--stale-ok]`, `set-cadence`.
 - Tests: `tests/test_research_session_usage.py`, `test_research_session_state.py`, `test_research_session_gate.py`.
@@ -69,10 +69,18 @@ Staged in S (paths relative to `S/tree/projects/beto/swong2/Alignment/.agents/`)
       stderr, the cache or `usage.json`.
 - [ ] `usage-check` prints the reading, its freshness, whether a refresh happened, and the Fable gap.
 - [ ] Gate tests have one case per row of spec §5.2 (self-ack guard for Bash and for Write/Edit, cap pause on
-      five-hour and on weekly, unknown reading, freeze `crossed`, freeze `recorded` with a normal message, a `HOLD`
-      message, a message to `main`, and a subagent message, and allow), plus: a `stale-ok` window allowing spawns, the
-      kill switch, a cwd outside A, Bash without `sbatch` allowed during a freeze, and an exception inside the
-      decision giving deny for Agent and `sbatch` and allow for others.
+      five-hour and on weekly, unknown reading, unregistered session, freeze `crossed`, freeze `recorded` with a
+      normal message, a `HOLD` message, a message to `main`, and a subagent message, and allow), plus: a `stale-ok`
+      window allowing spawns, the kill switch, a cwd outside A, Bash without `sbatch` allowed during a freeze, and an
+      exception inside the decision giving deny for Agent and `sbatch` and allow for others.
+- [ ] Unregistered-session fixtures (R5, §5.2 step 4), each a recorded PreToolUse input with a session file that has
+      no `register` entry: (a) session points at 40 with cadence 16 and fresh usage under 80%: Agent, `sbatch` and an
+      orchestrator SendMessage are all allowed and no freeze is recorded; (b) the same session at `w = 81`: Agent and
+      `sbatch` are denied by the cap pause; (c) the same session with a stale reading and a failed mocked refresh:
+      Agent is denied as unknown; (d) a session whose cwd matches a direction `worktree` but never ran `register` is
+      still treated as unregistered; (e) `register` at 40 points stores `points_at_register = 40`, the next call is
+      allowed, and checkpoint 1 crosses only at 56 points. The self-ack guard and the Write/Edit lint still apply
+      in unregistered sessions, because they protect files rather than pace work.
 - [ ] State tests cover: two concurrent writers (two processes) without lost updates; mirroring into a direction
       `state.json`; resolution by explicit `register`, by cwd match against a fixture `directions.json`, and the
       unregistered case.

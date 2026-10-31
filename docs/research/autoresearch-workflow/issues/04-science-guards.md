@@ -1,6 +1,6 @@
 # 04 — Science guards in Deception-Circuit code
 
-**Status:** ready-for-agent
+**Status:** claimed
 **Type:** task
 **Blocked by:** nothing (runs in parallel with 01)
 **Wave:** none; everything is in W and committed by the orchestrator.

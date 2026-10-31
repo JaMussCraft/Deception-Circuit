@@ -117,12 +117,29 @@ I also applied these non-blocking review items:
 - **H-j.** It names `background_tasks` and `session_crons`.
 - **Ticket 11.** The pilot times one gate call on Lustre.
 
+## Addendum: unregistered sessions (orchestrator ruling after the fix pass)
+
+The orchestrator ruled that only sessions that ran `register` get the checkpoint freeze. Every other session gets
+only the cap pause and the stale-reading denial. Edits:
+
+- **spec R5.** Rewritten: a cwd match against `directions.json` is attribution only; only a registered session gets
+  the FREEZE; the reason (hooks fire in every A or DC session) is stated.
+- **spec §5.2.** New step 4, "Unregistered session": allow, skipping the two freeze steps. The freeze steps and the
+  final allow are renumbered 5, 6 and 7. The crossing formula now reads `session_points − points_at_register ≥ N ×
+  cadence` in a registered session, so registering late never freezes at once.
+- **spec §4.5.** The session file gains `registered_at` and `points_at_register`.
+- **spec length.** R8 and §5.2 steps 3 and 6 were tightened to stay at 518 lines; the cache and lock paths remain in
+  ticket 02.
+- **Ticket 02.** The gate implements steps 1-7. The per-row gate tests add the unregistered row. A new criterion
+  lists five unregistered fixtures: points past the cadence still allowed; cap pause still denies; stale reading
+  still denies; a cwd match without `register` still unregistered; late `register` counts from
+  `points_at_register`. It also states that the self-ack guard and the Write/Edit lint apply in every session.
+- **Ticket 06.** H-a in an unregistered session prints the `register` command and the reduced gate scope.
+- **Ticket 08.** The research-session doc says a research session must register before its first spawn.
+
+My own call beyond the ruling: the self-ack guard and the lint keep applying to unregistered sessions, because they
+run before step 4 and protect files rather than pace work. The orchestrator can narrow that if it meant otherwise.
+
 ## Not addressed, for the orchestrator
 
-- **Unregistered sessions and wave H.** Once wave H lands, every Claude session rooted under A picks up the gate.
-  An unregistered session then counts checkpoints from its first hook call and freezes after 16 points. The reviewer
-  asked whether to apply wave H only when no other A-rooted session is live, or to give unregistered sessions only the
-  cap and stale gates. R5 still says unregistered sessions get the checkpoint gate. I recommend cap and stale gates
-  only for unregistered sessions, since the freeze is a research-session protocol. That is a user decision, so I left
-  R5 unchanged.
 - The worklog `--import` relies on the hand-written `F/WORKLOG.md` keeping the lane 4 format until ticket 03 lands.

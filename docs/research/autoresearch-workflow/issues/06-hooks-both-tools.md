@@ -59,6 +59,8 @@ installation for wave H so that no hook can exist before the code it calls.
       switch present, exits 0 with no output (use test-only copies of the command string that point at paths in T).
 - [ ] For each hook H-a to H-j, a fixture test feeds a recorded input and asserts the exact stdout JSON and exit code,
       for Claude and, where installed, for Codex. Codex SubagentStop always prints JSON.
+- [ ] H-a in an unregistered session prints the `research-session register <slug>` line and says the session gets
+      only the cap and stale gates; in a registered session it prints the freeze state instead (spec R5).
 - [ ] H-d denies a Write of a glued WORKLOG paragraph and a Write or Edit containing a planted fake token, with the
       failing units in the reason; allows a clean write; and denies Write and Edit on a direction `state.json`,
       `worklog.json` and the session-state root, but not on `_templates/` (R30, R37).

@@ -140,7 +140,7 @@ gate decisions (R5). Every RS write to it is mirrored into the registered direct
    "tool": "claude", "session_id": "...", "cwd": "/abs/worktree", "started_at": "...", "orchestrator_model": "claude-fable-5-1",
    "compactions": 2, "compaction_log": [{"n": 1, "at": "...", "trigger": "auto"}],
    "usage": {"metric": "max(seven_day, Fable)", "cadence": 16, "segments": [{"resets_at": 1793797200, "baseline": 11, "last": 27}],
-     "session_points": 16, "next_checkpoint": 1, "acked_through": 0, "stale_ok_until": null,
+     "session_points": 16, "registered_at": "...", "points_at_register": 0, "next_checkpoint": 1, "acked_through": 0, "stale_ok_until": null,
      "freeze": {"checkpoint": 1, "stage": "crossed", "crossed_at": "...", "recorded_at": null},
      "last_reading": {"five_hour": 9, "seven_day": 11, "fable": 17, "read_at": "...", "fresh": true}},
    "checkpoints": [{"n": 1, "at": "...", "session_points": 16, "all_models": 27, "fable": 33, "acked_at": null, "acked_by": null}],
@@ -239,8 +239,8 @@ The reading is unknown only when that refresh also fails. Reading (Codex): run
 unknown.
 
 Segments: if `resets_at` changed or `w` fell below the open segment's `last`, close the segment and open a new one
-with `baseline = w`. `session_points = Σ(last − baseline)`. Checkpoint N crosses when
-`session_points ≥ N × cadence` (cadence 16 for Claude, 25 for Codex, per-session override by the human only).
+with `baseline = w`. `session_points = Σ(last − baseline)`. In a registered session checkpoint N crosses when
+`session_points − points_at_register ≥ N × cadence` (cadence 16 Claude, 25 Codex, overridable by the human only).
 
 Decisions, evaluated in this order for each PreToolUse call:
 
@@ -253,15 +253,15 @@ Decisions, evaluated in this order for each PreToolUse call:
 2. **Cap pause.** If `h ≥ 80` or `w ≥ 80`: deny Agent and any Bash containing `sbatch`. The pause lifts by itself
    when a fresh reading falls below 80, for example after the window reset.
 3. **Unknown reading.** If the reading is still unknown after the refresh: deny Agent and `sbatch` with a message
-   naming the stale file, its age and the refresh error, and naming the human override
-   `! research-session usage-ack --stale-ok 30` (R8).
-4. **Freeze, stage `crossed`.** When checkpoint N has crossed and N > `acked_through`: deny Agent and `sbatch`.
+   naming the stale file, its age, the refresh error and the human override `! research-session usage-ack --stale-ok 30`.
+4. **Unregistered session.** No `register` entry (a cwd match does not count): allow, skipping steps 5 and 6 (R5).
+   `register` stores the current total as `points_at_register`, so registering late never freezes at once.
+5. **Freeze, stage `crossed`.** When checkpoint N has crossed and N > `acked_through`: deny Agent and `sbatch`.
    SendMessage stays allowed so the orchestrator can tell workers to hold.
-5. **Freeze, stage `recorded`.** After `worklog-append --checkpoint N` writes the block: additionally deny
+6. **Freeze, stage `recorded`.** After `worklog-append --checkpoint N` writes the block: additionally deny
    SendMessage from the orchestrator (no `agent_id` in the hook input) to any recipient other than `main`, unless the
-   message starts with `HOLD` (R6). SendMessage from a subagent is never denied. Codex documents no message tool,
-   so a Codex freeze denies spawns and `sbatch` only (R32).
-6. Everything else is allowed by the gate, so the orchestrator can finish the atomic step in flight, write the block
+   message starts with `HOLD` (R6). SendMessage from a subagent is never denied. Codex: spawns and `sbatch` only (R32).
+7. Everything else is allowed by the gate, so the orchestrator can finish the atomic step in flight, write the block
    and answer the user. Running Slurm jobs and running agents are never cancelled.
 
 What the protocol requires at a freeze (R35): the orchestrator finishes the atomic step in flight, writes the
@@ -442,20 +442,19 @@ Planner rulings under the user's go of 2026-10-31. R26-R38 are orchestrator ruli
   Codex also loads `<repo>/.codex/hooks.json` when the project layer is trusted; ticket 06 verifies whether that
   layer loads for A and for DC (whose `.codex/` holds bridge symlinks) and reports which placement is better (R32).
 - **R5. Session to direction mapping.** Counters live in a private local session file keyed by tool and session id.
-  The direction comes from `register <slug>`, else from matching cwd against `worktree` in DC main's
-  `directions.json`. An unregistered session still gets the cap, stale and checkpoint gates, with local counters only.
+  The direction comes from `register <slug>`, else from a cwd match in DC main's `directions.json` (attribution only).
+  Only a registered session gets the FREEZE; any other gets only the cap and stale gates, because the hooks fire in
+  every A or DC session and a quick question session must not freeze (orchestrator addendum).
 - **R6. FREEZE is two-stage.** Stage `crossed` denies Agent and `sbatch`, so hold messages can still go out; stage
   `recorded` adds the SendMessage denial, with `HOLD` messages and subagent messages always allowed.
 - **R7. Acknowledgement is human-only.** The gate denies model-issued commands and edits that could ack or edit
   counters. `!` commands typed by the user do not pass through PreToolUse (the pilot confirms this).
-- **R8. Stale readings are refreshed by RS (orchestrator, OQ2; supersedes the planner's "never fetch").** When
-  `usage.json` is older than 15 minutes, RS fetches `https://api.anthropic.com/api/oauth/usage` itself with an 8 s
-  bound, reusing the status line's cache `~/.claude/.usage_oauth_cache.json`, its lock `~/.claude/.usage_oauth_cache.lock`
-  (60 s stale sweep) and its 300 s retry floor. The token is read inside the process from
-  `~/.claude/.credentials.json` and never printed, logged or put on a command line. RS merges `five_hour`,
-  `seven_day` and the weekly-scoped rows into `usage.json` atomically, keeps every existing key, and sets the matching
-  freshness stamps. Only if the refresh fails is the reading unknown; then the human `usage-ack --stale-ok <minutes>`
-  (at most 60) is the override. RS never calls `statusline.sh`, because an empty payload would drop `five_hour`.
+- **R8. Stale readings are refreshed by RS (OQ2; supersedes the planner's "never fetch").** When `usage.json` is
+  older than 15 minutes, RS fetches `https://api.anthropic.com/api/oauth/usage` itself (8 s bound) with the status
+  line's cache, lock and 300 s retry floor (paths in ticket 02). The token is read inside the process from
+  `~/.claude/.credentials.json` and never printed, logged or put on a command line. RS merges the rows into
+  `usage.json` atomically, keeps every key and sets the freshness stamps. If the refresh fails the reading is unknown
+  and the human `usage-ack --stale-ok <minutes>` (at most 60) overrides. RS never calls `statusline.sh`.
 - **R9. Usage targets.** Five-hour and weekly caps are 80% (D7). Memory note `usage-limit-policy` moves from 75% to
   80% and records that the weekly reading is `max(seven_day, Fable row)`.
 - **R10. Lint thresholds are fixed as in §5.5.** Ticket 01 may only extend the allowlist and must report each case.

@@ -1,6 +1,6 @@
 # 01 — Text lint, staging apply tool, hygiene and config
 
-**Status:** ready-for-agent
+**Status:** claimed
 **Type:** task
 **Blocked by:** nothing
 **Wave:** A for everything except the Codex `[agents]` block, which is wave C. This ticket stages no hook (R26) and

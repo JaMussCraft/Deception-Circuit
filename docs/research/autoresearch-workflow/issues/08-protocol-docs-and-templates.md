@@ -19,7 +19,8 @@ from a document instead of from memory.
 
 Staged (wave A):
 - `/projects/beto/swong2/Alignment/docs/agents/research-session.md`: start from START.md; register and claim
-  (R23); read FINDINGS and SESSIONS first; at least two directions, each with a fallback; the worklog triggers of
+  (R23), stating that only a registered session gets the checkpoint freeze, so a research session must register
+  before its first spawn (R5); read FINDINGS and SESSIONS first; at least two directions, each with a fallback; the worklog triggers of
   lane 4 §1 and the use of `worklog-append` with every kind (entries, findings, needs with a default, resolved needs,
   incidents; R33); the checkpoint protocol with the two-stage freeze (spec §5.2, R6) and the turn end of R35, in these
   words or stronger: "finish the atomic step in flight, write the checkpoint block, send HOLD to every running worker,
