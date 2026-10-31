@@ -125,11 +125,11 @@ in wave A. Paths are relative to `/projects/beto/swong2/Alignment/.agents/`:
 Test results from the staged location, with the commands of the brief:
 
 ```
-mgnp:  133 passed, 19 subtests passed in 15.73s
-base:  133 passed in 16.40s
+mgnp:  136 passed, 19 subtests passed in 15.22s
+base:  136 passed in 17.19s
 ```
 
-These counts include the five tests added for ruling R40. Under that ruling, a fresh file without `five_hour` is
-refreshed first and then reads as 0 with a note. `RESUME.md` line 16 records a different R40, under which a missing
-`five_hour` is not applicable. The hand-back describes the conflict, and the staged code follows the ruling message.
-Open question 9 is noted by the orchestrator, who will apply with `--only 02`.
+Times use America/New_York with computed offsets, at the orchestrator's request. These counts include the tests for
+the revised ruling R40, the kept merge behaviour and the time zone. A missing `five_hour` in a fresh `usage.json` means the
+five-hour limit is not applicable, with no refresh and no 0, and the reading carries a note. A present key still
+gets the 80% cap. Open question 9 is noted by the orchestrator, who will apply with `--only 02`.
