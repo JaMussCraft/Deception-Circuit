@@ -153,12 +153,22 @@ def evaluate_pred_position(ctx, loader, *, model=None, hook=None,
             if collect_per_example:
                 ref_ids = (ref_argmax.tolist() if ref_argmax is not None
                            else [None] * bsz)
-                per_example.extend(
-                    {"index": n + i, "argmax_id": a, "ref_argmax_id": r,
-                     "target_id": t, "distractor_id": d}
-                    for i, (a, r, t, d) in enumerate(zip(
+                # Full-vocabulary probabilities: pairwise preference is a
+                # different endpoint and must never be presented as this mass.
+                pt = logits[idx, t_pos].float().softmax(-1)[idx, target]
+                pd = logits[idx, d_pos].float().softmax(-1)[idx, distractor]
+                for i, (a, r, t, d) in enumerate(zip(
                         argmax.tolist(), ref_ids, target.tolist(),
-                        distractor.tolist())))
+                        distractor.tolist())):
+                    per_example.append(
+                        {"index": n + i, "argmax_id": a, "ref_argmax_id": r,
+                         "target_id": t, "distractor_id": d,
+                         "target_logit": float(lt[i]),
+                         "distractor_logit": float(ld[i]),
+                         "target_probability": float(pt[i]),
+                         "distractor_probability": float(pd[i]),
+                         "label_probability_mass": float(pt[i] + pd[i]),
+                         "logit_diff": float(lt[i] - ld[i])})
 
             n += bsz
 
