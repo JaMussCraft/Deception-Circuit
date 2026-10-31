@@ -116,10 +116,11 @@ def make_pairs(main):
     return pairs
 
 
-def select_families(mask_root=None,suite_path=None):
-    mask_root=Path(mask_root or PRIMARY/'outputs/llama-8b-instruct_sdr_coarse');suite_path=Path(suite_path or PRIMARY/'outputs/_launch_format_control/suites.json')
+def select_families(mask_root=None,suite_path=None,*,alignment_root=ALIGNMENT):
+    alignment_root=Path(alignment_root).resolve();primary=alignment_root/'Deception-Circuit';design=alignment_root/'.scratch/sdr-cue-circuits'
+    mask_root=Path(mask_root or primary/'outputs/llama-8b-instruct_sdr_coarse');suite_path=Path(suite_path or primary/'outputs/_launch_format_control/suites.json')
     if file_hash(suite_path)!=SUITE_SHA:raise ValueError('original suite mismatch')
-    suite=read_json(suite_path)['format-control-sdr-coarse-nls0.3']['runs'];audit=read_json(DESIGN/'runtime-seam-audit.json')
+    suite=read_json(suite_path)['format-control-sdr-coarse-nls0.3']['runs'];audit=read_json(design/'runtime-seam-audit.json')
     sets={};bindings={'suite':{'path':str(suite_path),'sha256':SUITE_SHA}}
     for symbol,(name,sha) in RUNS.items():
         directory=mask_root/name;path=directory/'active_nodes.coarse.json'
@@ -172,10 +173,13 @@ def make_schedule(main,pairs,families,cal_fixtures,tokenizer):
     return interventions,batches,cal,cal_batches,cal_pool
 
 
-def source_hashes():return {**cue.source_hashes(),**{name:file_hash(ROOT/name) for name in NEW_SOURCES}}
+def source_hashes():return {**cue.source_hashes(),**{name:file_hash(ROOT/name) for name in NEW_SOURCES+['analysis.py','config.py','l0.py']}}
 
 
-def build_protocol(parent_path,cache,spec_path,brief_path,code_commit='UNCOMMITTED'):
+def build_protocol(parent_path,cache,spec_path,brief_path,code_commit='UNCOMMITTED',*,alignment_root=ALIGNMENT):
+    alignment_root=Path(alignment_root).resolve()
+    if not (alignment_root/'Deception-Circuit').is_dir() or not (alignment_root/'.scratch/sdr-cue-circuits').is_dir():raise ValueError('invalid alignment_root')
+    design=alignment_root/'.scratch/sdr-cue-circuits'
     parent_path=Path(parent_path).resolve();cache=Path(cache).resolve();spec_path=Path(spec_path).resolve();brief_path=Path(brief_path).resolve()
     if code_commit!='UNCOMMITTED':_hex(code_commit,40)
     if file_hash(parent_path)!=PARENT_SHA:raise ValueError('immutable cue parent mismatch; input manifests only')
@@ -194,12 +198,12 @@ def build_protocol(parent_path,cache,spec_path,brief_path,code_commit='UNCOMMITT
     for name in ('config.json','generation_config.json'):
         x=read_json(cache/name)['eos_token_id'];eos.update(x if isinstance(x,list) else [x])
     if sorted(eos)!=EOS or 1296 in eos:raise ValueError('cached EOS mismatch')
-    main=tokenize_rows([r for f in fixtures[:8] for r in factor_rows(f)],tokenizer);pairs=make_pairs(main);families,masks=select_families()
+    main=tokenize_rows([r for f in fixtures[:8] for r in factor_rows(f)],tokenizer);pairs=make_pairs(main);families,masks=select_families(alignment_root=alignment_root)
     interventions,batches,cal,cal_batches,cal_pool=make_schedule(main,pairs,families,fixtures[8:],tokenizer)
     if [len(x) for x in (main,pairs,interventions,batches,cal,cal_batches)]!=[384,640,8960,1168,112,14]:raise ValueError('frozen complete counts')
-    audits={name:{'sha256':file_hash(DESIGN/name)} for name in ('runtime-seam-audit.json','example-order-tokenizer-audit.json','truth-span-tokenizer-audit.json')}
+    audits={name:{'sha256':file_hash(design/name)} for name in ('runtime-seam-audit.json','example-order-tokenizer-audit.json','truth-span-tokenizer-audit.json')}
     payload=dict(schema='sdr-cue-circuits-v1',seed=SEED,fixtures=fixtures,main=main,pairs=pairs,interventions=interventions,batches=batches,calibration=cal,calibration_batches=cal_batches,calibration_pool=cal_pool,families=families,masks=masks,audits=audits,parent={'sha256':PARENT_SHA,'scientific_hash':PARENT_SCIENCE},batch_size=8,sequence_length=224,max_new_tokens=64,padding_id=0,eos=EOS,forced_token=1296,numerical={'max_abs_error':1e-5,'full_fp32_vocabulary':True,'identical_greedy':True,'main_baseline_controls':['repeat','empty'],'main_patch_controls':['patched_repeat'],'stress_controls':['repeat','empty','self','patched_repeat'],'full_component_steps':[0,63],'full_component_order':'after P-repeat before forced append','exclude_readout':True},spec={'sha256':file_hash(spec_path),'text':spec_path.read_text()},rubric={'sha256':cue.BRIEF_SHA,'text':brief_path.read_text(),'kinds':KINDS,'quoted_own_assertion':'commitment, conservative format false','finish_override':True},analysis={'categories':CATEGORIES,'indicators':['R','D','ER','ED','X0','X1','record_first','question_first','favored']+CATEGORIES[2:]+['residual','format_ok'],'equal_fixture_weight':True,'all_planned_rows':True,'natural_pairs':{'example_report':128,'truth_report':128,'truth_retrieval':64},'interaction':'J-A-B+intact versus C_J-C_A-C_B+intact','denominator_per_family':640,'no_inference':True},execution={'main_forwards':147648,'calibration_forwards':5460,'write_counts':WRITE_COUNTS,'calibration_write_counts':CAL_WRITE_COUNTS,'benchmark_writes':48,'margin':1.25})
-    provenance={'code_commit':code_commit,'base_commit':BASE_COMMIT,'source_hashes':source_hashes(),'cache':str(cache),'cache_hashes':n.cache_hashes(cache),'software':n.software(),'parent_path':str(parent_path),'spec_path':str(spec_path),'brief_path':str(brief_path)}
+    provenance={'alignment_root':str(alignment_root),'code_commit':code_commit,'base_commit':BASE_COMMIT,'source_hashes':source_hashes(),'cache':str(cache),'cache_hashes':n.cache_hashes(cache),'software':n.software(),'parent_path':str(parent_path),'spec_path':str(spec_path),'brief_path':str(brief_path)}
     payload['record_bounds']=record_bounds(payload,tokenizer,provenance)
     return dict(payload=payload,scientific_hash=digest(payload),provenance=provenance,provenance_hash=digest(provenance))
 
@@ -209,7 +213,7 @@ def verify_protocol(protocol):
     v=protocol['provenance']
     if source_hashes()!=v['source_hashes']:raise ValueError('source drift')
     if n.software()!=v['software'] or n.cache_hashes(v['cache'])!=v['cache_hashes']:raise ValueError('software/cache drift')
-    expected=build_protocol(v['parent_path'],v['cache'],v['spec_path'],v['brief_path'],v['code_commit'])
+    expected=build_protocol(v['parent_path'],v['cache'],v['spec_path'],v['brief_path'],v['code_commit'],alignment_root=v['alignment_root'])
     if expected!=protocol:raise ValueError('literal frozen input mismatch')
 
 
@@ -1158,7 +1162,7 @@ def run(protocol,operations,output,*,calibration,calibration_dir=None,dry_run=Fa
 def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__);sub=parser.add_subparsers(dest='mode',required=True)
     freeze=sub.add_parser('freeze')
-    for key in ('parent','cache','spec','brief','output'):freeze.add_argument('--'+key,type=Path,required=True)
+    for key in ('parent','cache','spec','brief','output','alignment-root'):freeze.add_argument('--'+key,type=Path,required=True)
     freeze.add_argument('--code-commit',default='UNCOMMITTED')
     for mode in ('verify','forecast','calibration','main','reconstruct','export','join','analyze'):
         cmd=sub.add_parser(mode);cmd.add_argument('--protocol',type=Path,required=True)
@@ -1172,7 +1176,7 @@ def main(argv=None):
         if mode=='analyze':cmd.add_argument('--joined',type=Path,required=True)
     args=parser.parse_args(argv)
     if args.mode=='freeze':
-        protocol=build_protocol(args.parent,args.cache,args.spec,args.brief,args.code_commit);verify_protocol(protocol)
+        protocol=build_protocol(args.parent,args.cache,args.spec,args.brief,args.code_commit,alignment_root=args.alignment_root);verify_protocol(protocol)
         out=n.fresh_output(args.output);exclusive_json(out/'protocol.json',protocol);(out/'annotation-brief-source.md').write_bytes(args.brief.read_bytes())
         exclusive_json(out/'freeze-audit.json',{'status':'CPU_FROZEN_NOT_RELEASED','scientific_hash':protocol['scientific_hash'],'provenance_hash':protocol['provenance_hash'],'source_hashes':protocol['provenance']['source_hashes'],'counts':{k:len(protocol['payload'][k]) for k in ('main','pairs','interventions','batches','calibration','calibration_batches')},'record_bounds':protocol['payload']['record_bounds']})
         print(canonical({'status':'CPU_FROZEN_NOT_RELEASED','output':str(out),'scientific_hash':protocol['scientific_hash']}));return
