@@ -1,6 +1,6 @@
 # 02 — RS core: usage readings, session state, the gate, acknowledgement
 
-**Status:** claimed
+**Status:** resolved
 **Type:** task
 **Blocked by:** 01 (package skeleton and `cli.py`)
 **Wave:** A
@@ -57,23 +57,23 @@ Staged in S (paths relative to `S/tree/projects/beto/swong2/Alignment/.agents/`)
 
 ## Acceptance criteria
 
-- [ ] Usage tests cover: a fresh reading; a stale `timestamp` with a fresh `model_scoped_fetched_at` (five-hour
+- [x] Usage tests cover: a fresh reading; a stale `timestamp` with a fresh `model_scoped_fetched_at` (five-hour
       unknown); a missing key in a fresh file (reads 0); a missing Fable row; `resets_at` rollover; a drop below
       `last` without a reset change; points summed across two segments; the Codex reader on exit 0, 1 and 2 using a
       fake `codex-usage` executable; the Codex cache hit within 120 s.
-- [ ] Refresh tests, with a mocked credentials reader and a mocked HTTP endpoint (no real token, no network): a
+- [x] Refresh tests, with a mocked credentials reader and a mocked HTTP endpoint (no real token, no network): a
       stale `usage.json` is refreshed and the reading becomes fresh; every pre-existing key of `usage.json` survives;
       the lock held by another process within 60 s makes RS skip the fetch; a lock older than 60 s is swept; a cache
       younger than 300 s is reused without a fetch; an endpoint error or an 8 s timeout leaves the reading unknown
       and the gate denies spawns with the refresh error in the reason; a planted fake token never appears in stdout,
       stderr, the cache or `usage.json`.
-- [ ] `usage-check` prints the reading, its freshness, whether a refresh happened, and the Fable gap.
-- [ ] Gate tests have one case per row of spec §5.2 (self-ack guard for Bash and for Write/Edit, cap pause on
+- [x] `usage-check` prints the reading, its freshness, whether a refresh happened, and the Fable gap.
+- [x] Gate tests have one case per row of spec §5.2 (self-ack guard for Bash and for Write/Edit, cap pause on
       five-hour and on weekly, unknown reading, unregistered session, freeze `crossed`, freeze `recorded` with a
       normal message, a `HOLD` message, a message to `main`, and a subagent message, and allow), plus: a `stale-ok`
       window allowing spawns, the kill switch, a cwd outside A, Bash without `sbatch` allowed during a freeze, and an
       exception inside the decision giving deny for Agent and `sbatch` and allow for others.
-- [ ] Unregistered-session fixtures (R5, §5.2 step 4), each a recorded PreToolUse input with a session file that has
+- [x] Unregistered-session fixtures (R5, §5.2 step 4), each a recorded PreToolUse input with a session file that has
       no `register` entry: (a) session points at 40 with cadence 16 and fresh usage under 80%: Agent, `sbatch` and an
       orchestrator SendMessage are all allowed and no freeze is recorded; (b) the same session at `w = 81`: Agent and
       `sbatch` are denied by the cap pause; (c) the same session with a stale reading and a failed mocked refresh:
@@ -81,23 +81,23 @@ Staged in S (paths relative to `S/tree/projects/beto/swong2/Alignment/.agents/`)
       still treated as unregistered; (e) `register` at 40 points stores `points_at_register = 40`, the next call is
       allowed, and checkpoint 1 crosses only at 56 points. The self-ack guard and the Write/Edit lint still apply
       in unregistered sessions, because they protect files rather than pace work.
-- [ ] State tests cover: two concurrent writers (two processes) without lost updates; mirroring into a direction
+- [x] State tests cover: two concurrent writers (two processes) without lost updates; mirroring into a direction
       `state.json`; resolution by explicit `register`, by cwd match against a fixture `directions.json`, and the
       unregistered case.
-- [ ] `register <slug>` binds the most recent session whose `cwd` matches, and `register <slug> --session ID` binds
+- [x] `register <slug>` binds the most recent session whose `cwd` matches, and `register <slug> --session ID` binds
       that session; both print the session tag and direction.
-- [ ] Gate tests include Write and Edit calls: denied under the session-state root and on
+- [x] Gate tests include Write and Edit calls: denied under the session-state root and on
       `docs/research/<slug>/state.json` or `worklog.json`, allowed on `docs/research/_templates/state.json` and
       elsewhere, regardless of freeze state. Bash `research-session validate .../state.json` is allowed; the same
       command with a `>` redirection, or any non-read-only subcommand naming that path, is denied (R37).
-- [ ] The gate's Write and Edit path calls the lint's string function on `content` or `new_string` and denies with the
+- [x] The gate's Write and Edit path calls the lint's string function on `content` or `new_string` and denies with the
       failing units in at most 400 characters for scoped paths, and runs the secret scan for every path under A (R30).
       Tests cover a glued WORKLOG paragraph, a planted fake token, a clean write, and an out-of-scope Markdown file.
-- [ ] `usage-ack` acks the most recent session whose `cwd` matches, prints which one, refuses `--stale-ok` above 60,
+- [x] `usage-ack` acks the most recent session whose `cwd` matches, prints which one, refuses `--stale-ok` above 60,
       and records `acked_by: "usage-ack"`.
-- [ ] All tests pass in both envs (commands from the brief); paste the summary lines.
-- [ ] Every reason string the gate can return is at most 400 characters and names the next action.
-- [ ] `apply_staged.py --staging S --wave A --only 02 --dry-run` output pasted.
+- [x] All tests pass in both envs (commands from the brief); paste the summary lines.
+- [x] Every reason string the gate can return is at most 400 characters and names the next action.
+- [x] `apply_staged.py --staging S --wave A --only 02 --dry-run` output pasted.
 
 ## Verification
 
@@ -105,3 +105,30 @@ Both interpreters. Tests use temporary directories and environment overrides for
 path; they never read the real `~/.claude`.
 
 ## Comments
+
+Resolved by the ticket 02 implementer (Opus) on 2026-10-31. The full record is in `reports/02-handback.md`.
+
+Files for the orchestrator to commit from W:
+
+- `docs/research/autoresearch-workflow/reports/02-handback.md`
+- `docs/research/autoresearch-workflow/issues/02-rs-core-usage-state-gate.md`
+
+Staged in S, ops file `/u/swong2/.claude/jobs/b2cb53cd/tmp/alignment-staging/ops/02-rs-core.json`, 14 write ops, all
+in wave A. Paths are relative to `/projects/beto/swong2/Alignment/.agents/`:
+
+- New modules: `research_session/paths.py`, `usage.py`, `oauth_refresh.py`, `state.py` and `gate.py`.
+- Changed module: `research_session/cli.py`, with `expect_sha256` set to the installed ticket 01 file.
+- New tests: `tests/_rs_testlib.py`, `test_research_session_usage.py`, `test_research_session_state.py` and
+  `test_research_session_gate.py`, plus three fixtures in `tests/fixtures/gate/`.
+- The human wrapper `/u/swong2/.local/bin/research-session`, staged with mode 0755.
+
+Test results from the staged location, with the commands of the brief:
+
+```
+mgnp:  128 passed, 19 subtests passed in 14.77s
+base:  128 passed in 15.57s
+```
+
+The orchestrator should read two open questions in the hand-back. Open question 1: a fresh `usage.json` without
+`five_hour` reads as 0 under the spec rule, and the live file has no `five_hour` key right now. Open question 9:
+re-running ticket 01's ops alone would install the ticket 02 `cli.py` without a hash check.
