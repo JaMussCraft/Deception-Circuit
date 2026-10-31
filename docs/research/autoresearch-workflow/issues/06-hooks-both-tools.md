@@ -1,6 +1,6 @@
 # 06 — Hooks for Claude and Codex
 
-**Status:** ready-for-agent
+**Status:** claimed
 **Type:** task
 **Blocked by:** 02, 03
 **Wave:** A for the RS hook code; H for every settings change that installs a hook (R26). You never write

@@ -1,6 +1,6 @@
 # 05 — Index and registry seeding
 
-**Status:** ready-for-agent
+**Status:** resolved
 **Type:** task
 **Blocked by:** 03 (validators and renders)
 **Wave:** none for the index files (in W); A for nothing.
@@ -56,19 +56,33 @@ In W:
 
 ## Acceptance criteria
 
-- [ ] `cli.py validate` passes on `FINDINGS.md`, `directions.json`, every new `ledger.json` and `held_out.json` if
+- [x] `cli.py validate` passes on `FINDINGS.md`, `directions.json`, every new `ledger.json` and `held_out.json` if
       ticket 04 has landed; output pasted.
-- [ ] `cli.py render` and `ledger-rollup` run twice with no byte change on the second run.
-- [ ] Every FINDINGS row's evidence and report paths exist in W or DC (a script in T checks this; output pasted).
+- [x] `cli.py render` and `ledger-rollup` run twice with no byte change on the second run.
+- [x] Every FINDINGS row's evidence and report paths exist in W or DC (a script in T checks this; output pasted).
       Paths that exist only on the local filesystem (ignored outputs) are allowed and listed.
-- [ ] No `verified` or `replicated` row lacks a provenance file naming a commit (`findings-check` output pasted).
-- [ ] Every `directions.json` row has a `status_source` that exists.
-- [ ] `INDEX.md`, `FINDINGS.md`, `SESSIONS.md` and `DIRECTIONS.md` pass the lint, including the secret scan.
-- [ ] The size of `INDEX.md + FINDINGS.md + SESSIONS.md` divided by 4 is under 30,000; the byte counts are pasted.
-- [ ] The hand-back lists any finding the agent saw in the sources but did not seed, with the reason.
+- [x] No `verified` or `replicated` row lacks a provenance file naming a commit (`findings-check` output pasted).
+- [x] Every `directions.json` row has a `status_source` that exists.
+- [x] `INDEX.md`, `FINDINGS.md`, `SESSIONS.md` and `DIRECTIONS.md` pass the lint, including the secret scan.
+- [x] The size of `INDEX.md + FINDINGS.md + SESSIONS.md` divided by 4 is under 30,000; the byte counts are pasted.
+- [x] The hand-back lists any finding the agent saw in the sources but did not seed, with the reason.
 
 ## Verification
 
 Use the staged RS by absolute path with base python3.9. Do not edit the existing handoff READMEs or reports.
 
 ## Comments
+
+**2026-10-31, implementer (Opus, ticket 05): resolved.** The full record is in `reports/05-handback.md`.
+
+Files for the orchestrator to commit from W, all under `docs/research/`:
+
+- `INDEX.md`, `FINDINGS.md` (51 rows), `directions.json` (8 rows), `DIRECTIONS.md`, `SESSIONS.md` and `ledger.json`.
+- `sdr-mechanism/ledger.json`, `selective-deception/ledger.json`, `mechanism-analysis/ledger.json` and the new `mechanism-datasets/ledger.json`.
+- `autoresearch-workflow/reports/05-handback.md` and this ticket.
+
+Nothing is staged in S, and there is no op file. Helper scripts are in `/u/swong2/.claude/jobs/b2cb53cd/tmp/05/`.
+
+Results on base python3.9: `validate` passes on every file, with two expected warnings on the sdr-mechanism ledger, whose totals have no reservation rows. `findings-check` reports 0 errors and 0 warnings. The second `render` and `ledger-rollup` runs leave all three files unchanged by hash. All 51 rows and all 8 status sources resolve, and none is missing. The lint and secret scan pass on the four Markdown files. INDEX, FINDINGS and SESSIONS total 30,817 bytes, about 7,704 tokens. No test suite applies to this ticket. `held_out.json` does not exist yet.
+
+Defect for ticket 03: `ledger-rollup` counts `_templates/ledger.json` as a direction named `example-direction`. The totals are unaffected because that row is all zeros.
