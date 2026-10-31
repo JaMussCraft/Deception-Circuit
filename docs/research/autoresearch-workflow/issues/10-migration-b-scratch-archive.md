@@ -1,6 +1,6 @@
 # 10 — Migration B: archive the closed `.scratch` directories and index their Markdown
 
-**Status:** ready-for-agent
+**Status:** resolved
 **Type:** task
 **Blocked by:** 01 (apply tool, lint), 05 (directions.json)
 **Wave:** B (applied after the DC merge). The directories R28 protects are not migrated now; this ticket only gives
@@ -56,30 +56,61 @@ In W:
 
 ## Acceptance criteria
 
-- [ ] Script tests cover: archive move and symlink on a fixture tree; byte-identity by sha256 of every file; the R28
+- [x] Script tests cover: archive move and symlink on a fixture tree; byte-identity by sha256 of every file; the R28
       refusal and its override flag; the 12-hour skip; refusal when the destination exists; the Markdown selection at
       any depth and both size caps with the exclusions reported; a planted fake token that blocks the copy of that
       file and is reported; the `autoresearch-workflow` case keeping a file with no match in F; `verify` passing after
       a simulated apply and failing after a one-byte change. Both envs.
-- [ ] `migrate_scratch.py plan --include component-analysis,format-control,mechanism-analysis,mechanism-datasets,autoresearch-workflow`
+- [x] `migrate_scratch.py plan --include component-analysis,format-control,mechanism-analysis,mechanism-datasets,autoresearch-workflow`
       ran on the real directories. Its summary (directories, files, bytes, copied files, cap exclusions, skipped
       directories with reasons, secret-scan hits) is pasted. No file contents were printed.
-- [ ] No op in `S/ops/10-migration-b.json` touches a directory listed in R28 (a script checks; output pasted).
-- [ ] The hand-back gives the one-line command for the deferred directories, to run only after the user's
+- [x] No op in `S/ops/10-migration-b.json` touches a directory listed in R28 (a script checks; output pasted).
+- [x] The hand-back gives the one-line command for the deferred directories, to run only after the user's
       confirmation, for example
       `/sw/external/python/anaconda3/bin/python3.9 F/tools/migrate_scratch.py plan --confirmed-live-session-finished --include sdr-assay-diagnosis,...,eval5-grader-fixes`
       with the full list written out.
-- [ ] Every `.scratch/...` string found in the files listed above resolves today; the list, with existence results,
+- [x] Every `.scratch/...` string found in the files listed above resolves today; the list, with existence results,
       is saved to `F/reports/10-scratch-paths-before.json`.
-- [ ] The seven test modules listed above were run in both envs before migration; pass and fail names are saved to
+- [x] The seven test modules listed above were run in both envs before migration; pass and fail names are saved to
       `F/reports/10-tests-before.md`. The hand-back gives the orchestrator the exact commands to rerun them and
       `migrate_scratch.py verify` after wave B.
-- [ ] Every Markdown copy passes the secret scan; copies that fail are not written and are listed.
-- [ ] `directions.json` validates after the edit.
-- [ ] `apply_staged.py --staging S --only 10 --wave B --dry-run` output pasted.
+- [x] Every Markdown copy passes the secret scan; copies that fail are not written and are listed.
+- [x] `directions.json` validates after the edit.
+- [x] `apply_staged.py --staging S --only 10 --wave B --dry-run` output pasted.
 
 ## Verification
 
 Both interpreters for the script tests. The real moves happen only when the orchestrator applies wave B.
 
 ## Comments
+
+2026-10-31, implementer (Opus). Resolved. The full record is in `F/reports/10-handback.md`. No git command was run, and nothing was moved.
+
+Files to commit from W, all under `docs/research/`:
+
+- `autoresearch-workflow/tools/migrate_scratch.py` and `autoresearch-workflow/tools/test_migrate_scratch.py`;
+- `directions.json` (five `archive` entries) and the re-rendered `SESSIONS.md`;
+- `component-analysis/scratch-copy/`, `format-control/scratch-copy/`, `mechanism-analysis/scratch-copy/` and `mechanism-datasets/scratch-copy/`, which hold 211 copies and four `provenance.json` files;
+- `autoresearch-workflow/reports/10-handback.md`, `10-scratch-paths-before.json` and `10-tests-before.md`;
+- this ticket.
+
+Staged in S:
+
+- `ops/10-migration-b.json` holds 20 ops, all wave B.
+- `records/10-migration-b.json` holds the hashes for `verify`.
+- `tree/u/swong2/.claude/research-session/backups/scratch-autoresearch-workflow-20261031/` holds five files.
+
+Test results:
+
+- `test_migrate_scratch.py` with `test_apply_staged.py`: 50 passed on mgnp Python 3.12 and 50 passed on base Python 3.9.
+- The seven `.scratch` test modules before migration, from DC main: mgnp gave 91 passed, 1 failed and 58 errors. Base gave 89 passed, 1 failed, 58 errors and 2 skipped. All of these failures come from a missing `.superpowers` plan file, not from `.scratch`.
+
+The deferred command (wave D) is to be run from DC main after the merge, and only after the user confirms the Codex session is finished:
+
+```
+/sw/external/python/anaconda3/bin/python3.9 -B /projects/beto/swong2/Alignment/Deception-Circuit/docs/research/autoresearch-workflow/tools/migrate_scratch.py plan --confirmed-live-session-finished --staging /u/swong2/.claude/research-session/staging-10d --include sdr-assay-diagnosis,sdr-behavior-identification,sdr-clause-choice,sdr-cue-circuits,sdr-cue-followup,sdr-cue-probe,sdr-native-controls,sdr-routing-pilot,sdr-routing-validation,sdr-shared-composition,sdr-session-wrapup,selective-deception,eval5-grader-fixes
+```
+
+The hand-back gives the apply and verify commands that follow it.
+
+Open item for the orchestrator before wave B: R34 says the directory moves to the backup root, but `/u` and `/projects` are different filesystems. The ops therefore copy the five files to the backup root with `write` ops and rename the directory into an ignored stash, `DC/outputs/_studies/autoresearch-workflow/scratch-stale-20261031`. Please confirm this reading of R34.

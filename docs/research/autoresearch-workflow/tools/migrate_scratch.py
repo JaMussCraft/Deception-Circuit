@@ -84,14 +84,13 @@ def sha256_file(path):
 
 
 def dump_json(path, data):
-    """Indent 2, sorted keys, trailing newline (spec 4), written through a temporary file."""
+    """The RS JSON style (``state.dumps``: indent 2, sorted keys, ASCII, trailing newline), written atomically."""
     parent = os.path.dirname(path)
     if parent and not os.path.isdir(parent):
         os.makedirs(parent)
     tmp = path + ".tmp-%d" % os.getpid()
     with open(tmp, "w", encoding="utf-8") as fh:
-        json.dump(data, fh, indent=2, sort_keys=True, ensure_ascii=False)
-        fh.write("\n")
+        fh.write(json.dumps(data, indent=2, sort_keys=True) + "\n")
     os.replace(tmp, path)
 
 
@@ -501,7 +500,9 @@ def print_summary(results, report_only):
             print("    kind %s, direction %s, %d files in %d directories, %s, newest entry %.1f h old" % (
                 r["kind"], r.get("direction"), len(r["files"]), len(r["dirs"]) + 1, human(r["total_bytes"]),
                 r.get("newest_age_hours", 0.0)))
-            if r["kind"] == "autoresearch":
+            if r["status"] in (SKIPPED, REFUSED):
+                print("    markdown %d; nothing copied or staged" % r["md_files"])
+            elif r["kind"] == "autoresearch":
                 print("    %d file(s) with a sha256 twin in F, %d without" % (
                     len(r.get("matched", [])), len(r.get("unmatched", []))))
                 for u in r.get("unmatched", []):

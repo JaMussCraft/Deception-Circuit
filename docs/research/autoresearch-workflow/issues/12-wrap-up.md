@@ -104,3 +104,16 @@ Staged (wave D, pending the user's confirmation that the live Codex session is f
 11. The user's time zone is Eastern; every human-facing time is 12-hour EDT/EST.
 12. `W/.claude/settings.json` is force-added because the repo's local `info/exclude` ignores `.claude/`; the merge
     checklist must say so, and the user decides whether to keep it tracked.
+13. Ticket 10 is applied in W but its wave B ops wait for the DC merge. The merge checklist copies the exact
+    sequence from `F/reports/10-handback.md` ("Commands for the orchestrator after wave B" and "The deferred
+    command"): `verify --wave B` right before, apply, `verify`, the 33-path resolution check, the seven-module reruns
+    compared by name with the DC main rows of `10-tests-before.md`, and the wave D plan/apply/verify commands with
+    the durable staging root `/u/swong2/.claude/research-session/staging-10d`.
+14. Make `apply_staged.py --dry-run` carry planned state forward within a run (paths a planned `mkdir` creates, a
+    planned `move` frees or fills, a planned `write` creates), so a chained mkdir/move/symlink sequence dry-runs
+    without ERROR or CONFLICT, with a test in `F/tools/test_apply_staged.py`. Ticket 10's dry run exits 1 today for
+    that reason only. The acceptance criterion "dry run over all tickets runs without error" depends on this.
+15. `W/docs/research/INDEX.md`: the Layout bullet saying `component-analysis`, `format-control` and
+    `eval5-grader-fixes` do not exist yet is stale for the first two, which now hold `scratch-copy/`; rewrite it to
+    say what each holds and that `eval5-grader-fixes` arrives with wave D. Also note the `held-out.md` bullet once
+    ticket 04 lands (it does).
