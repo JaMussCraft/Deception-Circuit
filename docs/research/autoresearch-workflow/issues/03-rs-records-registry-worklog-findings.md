@@ -1,6 +1,6 @@
 # 03 — RS records: registry, renders, worklog, jobs, ledger, init, findings-check
 
-**Status:** ready-for-agent
+**Status:** claimed
 **Type:** task
 **Blocked by:** 02 (shared `cli.py` and `state.py`)
 **Wave:** A

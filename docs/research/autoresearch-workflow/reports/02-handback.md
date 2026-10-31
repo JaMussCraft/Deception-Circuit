@@ -86,8 +86,10 @@ applies to it.
 ### Time zone (orchestrator request)
 
 The user's time zone is US Eastern. `paths.TIMEZONE` is now `America/New_York`, and `paths.iso` computes every offset
-from it with `zoneinfo`. No zone label or offset is typed anywhere in the staged code. A grep of the staged package
-and tests finds no other `America/Chicago`, `CDT` or `CST` text.
+from it with `zoneinfo`. No zone label or offset is typed anywhere in the staged code. A grep of the staged package,
+tests and wrapper finds no `America/Chicago`, `CDT` or `CST` text. The staged `paths.py` has sha256 257760f46265...
+and says `America/New_York` at line 33 and in the `iso` docstring at line 142. A re-run after this check gave 136
+passed on mgnp, with 19 subtests, and 136 passed on base python3.9.
 
 The tests for the revised ruling are as follows. A fresh file without `five_hour` is known, has no five-hour value,
 carries the note, and causes no token read and no fetch. A stale refresh whose body lacks the five-hour window gives
