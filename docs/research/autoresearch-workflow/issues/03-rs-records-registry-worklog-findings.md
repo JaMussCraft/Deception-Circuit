@@ -1,6 +1,6 @@
 # 03 — RS records: registry, renders, worklog, jobs, ledger, init, findings-check
 
-**Status:** claimed
+**Status:** resolved
 **Type:** task
 **Blocked by:** 02 (shared `cli.py` and `state.py`)
 **Wave:** A
@@ -94,47 +94,67 @@ Staged in S (relative to `S/tree/projects/beto/swong2/Alignment/.agents/`):
 
 ## Acceptance criteria
 
-- [ ] Validators reject each malformed case they guard (bad status, missing field, unknown key, duplicate F-id,
+- [x] Validators reject each malformed case they guard (bad status, missing field, unknown key, duplicate F-id,
       a `verified` row with no provenance, `claimed_by` in the wrong format) and accept the examples in spec §4.
-- [ ] `render` is byte-stable: a second run over unchanged input changes nothing (test asserts equal bytes).
-- [ ] `render` handles a claimed direction whose `state.json` does not exist yet (the `autoresearch-workflow` row will
+- [x] `render` is byte-stable: a second run over unchanged input changes nothing (test asserts equal bytes).
+- [x] `render` handles a claimed direction whose `state.json` does not exist yet (the `autoresearch-workflow` row will
       be exactly that in ticket 05): the SESSIONS row shows "no state yet" instead of failing.
-- [ ] A test asserts `zoneinfo.ZoneInfo("America/New_York")` loads (the planner confirmed it does on both
+- [x] A test asserts `zoneinfo.ZoneInfo("America/New_York")` loads (the planner confirmed it does on both
       interpreters on 2026-10-31).
-- [ ] `claim` refuses a direction already `claimed` or `active` by another session and refuses an unknown slug.
-- [ ] `worklog-append` tests: an entry on a new day adds the `### <Weekday> <D> <Month> <YYYY>` heading; the head
+- [x] `claim` refuses a direction already `claimed` or `active` by another session and refuses an unknown slug.
+- [x] `worklog-append` tests: an entry on a new day adds the `### <Weekday> <D> <Month> <YYYY>` heading; the head
       regeneration leaves everything after `## Log` byte-identical apart from the appended entry; `finding`, `need`
       and `incident` allocate F1, N1 and P1 and then F2, N2 and P2; `need-resolved` strikes through the right need with
       its answer and time and refuses an unknown or already-resolved id; the checkpoint block contains both usage rows
       and sets freeze `recorded`; a glued `--body` is refused with the lint message; times render as `8:05 am EDT`
       before 2 a.m. on 1 November 2026 and `8:05 am EST` after (fixed clocks).
-- [ ] Head-layout test: a direction created by `init` renders a head whose row labels, in order, equal the row labels
+- [x] Head-layout test: a direction created by `init` renders a head whose row labels, in order, equal the row labels
       of `_templates/WORKLOG.md` (parsed from the template at test time, so a template change breaks the test), with
       separate "Weekly usage, all models" and "Weekly usage, Fable" rows filled from a fixture `state.json`.
-- [ ] `--import` on a copy of `F/WORKLOG.md` in T produces a `worklog.json` that validates, keeps every findings,
+- [x] `--import` on a copy of `F/WORKLOG.md` in T produces a `worklog.json` that validates, keeps every findings,
       needs and incidents row and every Log byte, and renders the template head; the head diff is pasted.
-- [ ] `worklog-set` tests: each text field round-trips and re-renders the head; `directions` and `terms` reject
+- [x] `worklog-set` tests: each text field round-trips and re-renders the head; `directions` and `terms` reject
       malformed JSON and unknown keys; `gpu-cap` and `api-cap` change `ledger.json` `caps` and the GPU and OpenRouter
       rows; a glued `right-now` value is refused before any write; a freeze in `state.json` shows in the State row
       over a set `Running`.
-- [ ] `init` tests: a fresh slug creates all seven files, which validate, with no template example rows left; an
+- [x] `init` tests: a fresh slug creates all seven files, which validate, with no template example rows left; an
       absent slug gains a `proposed` row in a fixture `directions.json`; `--from-start` copies the file byte for
       byte and takes its title; a second `init` refuses and names the existing files; `--missing-only` creates only
       the absent ones; nothing is written outside `<root>/<slug>/` and `directions.json`.
-- [ ] `ledger` tests: `add` computes `reserved_gpu_hours` and recomputes `totals`; `add` refuses past the reserved
+- [x] `ledger` tests: `add` computes `reserved_gpu_hours` and recomputes `totals`; `add` refuses past the reserved
       GPU-hour cap, past `max_concurrent_gpu_jobs`, and with a cap of 0; `reconcile` sets `actual_seconds` and
       `status` and refuses an unknown job id or status; `api` adds known and reserve spend to the day's row and, past
       the cap, records the spend and exits 3; the WORKLOG GPU and OpenRouter rows change after each call; two
       concurrent `add` processes lose no reservation.
-- [ ] `findings-check` tests: `replicated` with one seed fails, with two distinct seeds passes; grader hash mismatch
+- [x] `findings-check` tests: `replicated` with one seed fails, with two distinct seeds passes; grader hash mismatch
       fails; `--paper` fails on a cited `reviewed` row and passes on `replicated` rows only.
-- [ ] `job add` and `update` round-trip through `state.json`, and `list` prints the waiter commands.
-- [ ] All tests pass in both envs; summaries pasted.
-- [ ] `cli.py --help` lists every subcommand named in spec §5.6 that tickets 01-03 own.
-- [ ] `apply_staged.py --staging S --wave A --only 03 --dry-run` output pasted.
+- [x] `job add` and `update` round-trip through `state.json`, and `list` prints the waiter commands.
+- [x] All tests pass in both envs; summaries pasted.
+- [x] `cli.py --help` lists every subcommand named in spec §5.6 that tickets 01-03 own.
+- [x] `apply_staged.py --staging S --wave A --only 03 --dry-run` output pasted.
 
 ## Verification
 
 Both interpreters. No test reads the real `DC/docs/research`; ticket 05 runs the commands on real data.
 
 ## Comments
+
+Ticket 03 resolved on 2026-10-31 by the Opus implementer. The full hand-back is `F/reports/03-handback.md`.
+
+Files to commit from W:
+
+- `F/reports/03-handback.md`
+- `F/issues/03-rs-records-registry-worklog-findings.md`
+
+Staged in S, op file `S/ops/03-rs-records.json`, 15 write ops, all wave A. New modules `records.py`, `registry.py`,
+`worklog.py`, `setup.py`, `ledger.py`, `jobs.py` and `findings.py`; `cli.py` changes with `expect_sha256`
+a38579cbed41... of the installed file; five new test files, one test helper and one worklog fixture.
+
+Test results on the staged suite:
+
+- mgnp: 186 passed, 19 subtests passed.
+- base python3.9: 186 passed.
+
+The R39 commands `init`, `ledger` and `worklog-set` are included, so no `03b` split is needed. After wave A, the
+orchestrator imports the real worklog first and then runs `init autoresearch-workflow --missing-only` with the
+worktree's research root, in that order. Fourteen open questions are listed in the hand-back.
