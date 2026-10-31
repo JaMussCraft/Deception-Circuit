@@ -69,3 +69,38 @@ Staged (wave D, pending the user's confirmation that the live Codex session is f
       wave, and shows no hook-installing op outside wave H and no R28 path outside wave D.
 
 ## Comments
+
+**Orchestrator, 2026-10-31 4:15 pm EDT, additions from the hand-backs so far (all binding):**
+
+1. Wave H is already applied (hooks in `A/.claude/settings.json`, `W/.claude/settings.json`, `~/.codex/hooks.json`;
+   the Codex note block in `A/.claude/CLAUDE.md`), and the smoke test passed afterwards. Tickets 01, 02, 03, 05, 06,
+   07, 08 and 09 have had their wave A ops applied. The merge checklist records these as done and lists the
+   post-apply re-run check only.
+2. Ticket 09 dedupe ruling: the 21 byte-identical `project_context` copies stay in place for now. Stage, wave A, a
+   `README.md` in `A/project_context/reports/` and one in
+   `A/project_context/research_notes/Deception specificity and shared circuits/` that name the canonical
+   `Deception-Circuit/docs/research/...` path for each file and say the copy there is frozen because the live
+   session's manifests pin these paths. Stage the moves themselves as wave D (destination on the same file system, for
+   example `DC/outputs/_studies/project-context-dedupe-20261031/`), together with the matching edit of the
+   selective-deception README sentence about the originals. Before that can run, give `op_move` in
+   `F/tools/apply_staged.py` a cross-device fallback (copy, verify sha256, unlink) with a test in
+   `F/tools/test_apply_staged.py`; the current bare `os.rename` fails with EXDEV from `/projects` to `/u`.
+3. CLAUDE.md overlap: stage a wave A `replace_text` op that removes the one-line "Codex lint rule" bullet from the
+   Deception-Circuit section of `A/.claude/CLAUDE.md`; the `autoresearch-workflow-codex-hooks` block stays.
+4. `AGENTS.md` is a pointer to CLAUDE.md, not a generated copy; nothing to regenerate. The bridge sync was run after
+   wave H.
+5. Memory note `usage-limit-policy.md`: the self-hold is 76% under the 80% caps (it still says 70%/72%); the five-hour
+   limit no longer exists on the account (user, 2026-10-31 about 1:50 pm EDT), so a missing `five_hour` key means not
+   applicable (R40), and the note and the protocol docs' cap wording must say so.
+6. The installed `A/docs/agents/research-session.md` must name the R39 commands `init`, `ledger` and `worklog-set`
+   (replace_text op, wave A).
+7. The `mechanism-datasets` worktree and branch are fully merged; the removal commands are in
+   `F/reports/01-handback.md` and go in the merge checklist as an orchestrator step after ExitWorktree.
+8. Ticket 04 found the root `conftest.py` is not loaded by `pytest W/tests`, so its thread limit never applied; record
+   it as a follow-up `proposed` row, not fixed here.
+9. The session-report plugin install sequence is in `F/reports/07-handback.md`; list it under user actions.
+10. Process incidents for the worklog proposal: plan-01 ran one read-only `git diff --stat`; impl-04 stalled for
+    about 2.5 hours with drafts only in its tmp directory until the orchestrator resumed it.
+11. The user's time zone is Eastern; every human-facing time is 12-hour EDT/EST.
+12. `W/.claude/settings.json` is force-added because the repo's local `info/exclude` ignores `.claude/`; the merge
+    checklist must say so, and the user decides whether to keep it tracked.

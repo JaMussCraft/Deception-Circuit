@@ -5,14 +5,14 @@
 |---|---|
 | State | Running |
 | Directions | 1. Hygiene and config: done · 2. Findings index and layout: queued · 3. Hooks and CLI: active (core), hooks queued · 4. Protocol docs and profiles: done · 5. Science guards: active; pilot: queued |
-| Started / last updated | Sat 31 Oct 2026, 9:05 am EDT / Sat 31 Oct 2026, 4:02 pm EDT |
+| Started / last updated | Sat 31 Oct 2026, 9:05 am EDT / Sat 31 Oct 2026, 4:06 pm EDT |
 | Orchestrator auto-compactions | 0, counted by the compaction hook |
 | Weekly usage, all models | no reading yet; no session has registered |
 | Weekly usage, Fable | no reading yet; no session has registered |
 | Review checkpoints | none yet; checkpoints start when the session registers |
 | GPU budget | 0.0 of 0 GPU-h actual (0.0 reserved); no GPU jobs allowed; clusters: none yet |
 | OpenRouter credit | $0.00 of $0.00 cap |
-| Open needs from you | 0 |
+| Open needs from you | 1, see below |
 | Transcripts (for audits) | not recorded yet |
 
 **Right now.** Tickets 01, 02, 03, 07 and 08 are done and installed. Running now: the science guards in the Deception-Circuit code (ticket 04) and the hook definitions for both tools (ticket 06, staged only; nothing installs until the final smoke test). Next: seeding the findings index and directions registry (ticket 05).
@@ -21,6 +21,7 @@
 
 ## Needs from you
 - ~~N0 (Sat 9:30 am): approve the workflow proposal and plugin disable list.~~ Answered Sat 9:55 am: "go", with corrections (checkpoint is a usage freeze; keep superpowers everywhere; move .scratch text into Deception-Circuit docs; science guards during setup).
+- N1 (Sat 4:06 pm): Trust the research-session hooks in Codex: open a fresh Codex session in the Alignment checkout and run /hooks once. Until then Codex skips them. Default if no answer: The Claude hooks work regardless; Codex sessions run without the usage gate and lint until trusted.
 
 ## Findings register
 | # | When | Finding, in plain words | Setup needed to read it | Strength | Evidence |
@@ -51,3 +52,5 @@ Strength is one of: preliminary, reviewed by an independent agent, or final.
 **2:55 pm EDT · Hand-back: usage gate core done and installed.** The research-session tool now reads your usage file, tracks session points across weekly resets, decides the freeze and cap rules, and records acknowledgements. Two of your notes landed mid-ticket: the five-hour limit no longer exists on your account, so a missing five-hour reading now means "not applicable" rather than zero; and all times are Eastern. 136 tests pass in both Python environments, and a live check reads the real usage file correctly. Ticket 03 (worklog writer, registry, ledger, findings check) started.
 **3:45 pm EDT · Hand-back: Findings index and directions registry seeded.** A fresh session can now orient from three files: the research index, a 51-row findings table (each row with status, commit and evidence path), and a sessions table showing who has claimed what. Together they are about 7,700 tokens, against the 60,000 to 80,000 a fresh agent needed before. Eight directions are registered with their status. Two small ledger defects found on the way went back to the tool's implementer. Next: the two migration tickets (handoff standardization and the scripted archive of closed scratch directories) started.
 **4:02 pm EDT · Hand-back: hook definitions done; smoke test passed.** The research-session tool now answers every hook event both tools fire: it refuses glued or secret-shaped writes before they happen, blocks new agents and GPU submissions once a usage checkpoint is crossed, reports stale usage readings, counts compactions, and reminds a resumed session where it was. 44 recorded hook exchanges and 252 tests pass in both Python environments, and a live smoke test of every hook command against the installed tool passed. Nothing is installed in the two tools' settings yet: that happens in wave H, after the migration ticket rewrites the project CLAUDE.md, so the install order cannot lock a session out. Still running: science guards (ticket 04) and the two migration tickets (09, 10).
+**4:05 pm EDT · Hand-back: handoff standardization done; hooks installed in both tools.** The project CLAUDE.md shrank from 190 lines to 97 and now points at the research index instead of describing the layout; the mechanism-analysis direction got a two-page handoff; the unreadable glued state file from the SDR clause-choice work has a full-sentence rewrite that keeps all 123 of its numbers, checked by script. The deduplication of 21 report copies did not happen: every copy is pinned by path in the live Codex session's frozen manifests and audit scripts, and the move tool cannot cross file systems. Ruling: leave them, add pointer READMEs in the wrap-up ticket, and move them only after you confirm the Codex session is finished. Then the hooks were installed in both tools (Claude project settings, the worktree settings, and the Codex hooks file), the smoke test was re-run against the installed settings and passed, and the Claude-Codex bridge was re-synced. One action is yours: a fresh Codex session must trust the new hooks once with /hooks.
+**4:06 pm EDT · Need N1 opened.** Trust the research-session hooks in Codex: open a fresh Codex session in the Alignment checkout and run /hooks once. Until then Codex skips them. Default if no answer: The Claude hooks work regardless; Codex sessions run without the usage gate and lint until trusted.
