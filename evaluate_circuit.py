@@ -226,6 +226,21 @@ def build_parser():
                         "below --n-random on purpose: generation is orders of "
                         "magnitude more expensive than a single-position "
                         "readout.")
+    g.add_argument("--benchmark-configs", nargs="+", default=None,
+                   choices=["full", "knockout", "circuit_only", "empty"],
+                   help="Run exactly these EVAL 5 states (must include full).")
+    g.add_argument("--benchmark-generation-checkpoint-dir", default=None,
+                   help="Explicit frozen-pilot raw-token resume directory (exclusive writer).")
+    g.add_argument("--benchmark-stop-after-generation-batches", type=int, default=None,
+                   help="Positive maximum NEW batches per segment; durable stop exits 75.")
+    g.add_argument("--benchmark-fixed-cohort", default=None,
+                   help="Validated historical fixed-cohort JSON; no screening or refill.")
+    g.add_argument("--benchmark-frozen-masks", default=None,
+                   help="Validated four-removal manifest; run intact plus those four only.")
+    g.add_argument("--benchmark-judge-cache", default=None,
+                   help="Explicit study cache path; prepare the documented imported copy first.")
+    g.add_argument("--judge-budget-ledger", default=None,
+                   help="Existing reviewed global USD/paid-attempt JSONL ledger (strict opt-in).")
     g.add_argument("--benchmark-screen-cache", default=None,
                    help="Directory holding cached screening passes (default: "
                         "outputs/_screens). The screen runs under all gates "
@@ -323,12 +338,37 @@ def build_parser():
 
 
 def resolve_cli(cli):
+    checkpoint = getattr(cli, 'benchmark_generation_checkpoint_dir', None)
+    limit = getattr(cli, 'benchmark_stop_after_generation_batches', None)
+    if checkpoint or limit is not None:
+        if not checkpoint or limit is None or limit <= 0:
+            raise ValueError('checkpoint directory and positive new-generation-batch limit are required together')
+        if (not getattr(cli, 'benchmark_fixed_cohort', None) or
+                not getattr(cli, 'benchmark_frozen_masks', None) or cli.ablation != 'interchange'):
+            raise ValueError('generation resume is restricted to the frozen fixed-cohort interchange pilot')
     if cli.device is None:
         import torch
         cli.device = "cuda" if torch.cuda.is_available() else "cpu"
     if cli.ref_cache_device is None:
         cli.ref_cache_device = cli.device
     cli.evals = list(dict.fromkeys(cli.evals))
+    if getattr(cli, "benchmark_frozen_masks", None):
+        required = ("benchmark_fixed_cohort", "benchmark_judge_cache", "judge_budget_ledger")
+        if any(not getattr(cli, field, None) for field in required):
+            raise ValueError("frozen pilot requires explicit fixed cohort, imported study cache and reviewed budget ledger")
+        if cli.knockout_granularity != "finest" or cli.ablation != "interchange":
+            raise ValueError("frozen pilot requires finest knockout and native interchange donors")
+        if getattr(cli, "benchmark_configs", None):
+            raise ValueError("frozen pilot already specifies exactly five states")
+        from evaluation.benchmarks.judge_budget import JudgeBudget
+        JudgeBudget(cli.judge_budget_ledger)
+        from evaluation.frozen_head_masks import load_frozen_masks
+        from evaluation.fixed_benchmark_cohort import load_fixed_cohort
+        load_frozen_masks(cli.benchmark_frozen_masks)
+        for dataset in expand(cli.benchmarks):
+            load_fixed_cohort(cli.benchmark_fixed_cohort, dataset)
+        from evaluation.benchmarks.judge import validate_study_cache
+        validate_study_cache(cli.benchmark_fixed_cohort, cli.benchmark_judge_cache)
 
     cli.legacy = suite.is_legacy(cli)
     if cli.legacy and cli.output_dir is None:
@@ -439,7 +479,21 @@ def benchmark_stages(cli, model=None):
     from evaluation import screen_cache
 
     n = cli.benchmark_n_per_dataset
-    n_configs = 4 + cli.benchmark_n_random          # full/knockout/circuit/empty
+    n_configs = (5 if getattr(cli, "benchmark_frozen_masks", None) else
+                 len(cli.benchmark_configs) if getattr(cli, "benchmark_configs", None)
+                 else 4 + cli.benchmark_n_random)
+    if getattr(cli, "benchmark_fixed_cohort", None):
+        from evaluation.fixed_benchmark_cohort import load_fixed_cohort
+        stages = []
+        for dataset in expand(cli.benchmarks):
+            data = load_fixed_cohort(cli.benchmark_fixed_cohort, dataset)
+            n = len(data["items"])
+            tokens = data["new_tokens"]
+            for label, count in (("fresh intact", n), ("native donors", len(data["pool_items"])),
+                                 ("removal states", n * (n_configs - 1))):
+                cost = count * tokens * SEC_PER_GEN_TOKEN_ROW
+                stages.append(("eval 5 %s: %s (%d rows)" % (dataset,label,count), cost, cost, True))
+        return stages
     # The screen judges in chunks and stops when both pools fill; how many
     # candidates that takes is not knowable without generating, so this assumes
     # it runs to its own budget. Stated as the worst case rather than a guess,
@@ -557,6 +611,37 @@ def benchmark_plan(cli) -> None:
     from evaluation.benchmarks import get_benchmark
 
     datasets = expand(cli.benchmarks)
+    if getattr(cli, "benchmark_fixed_cohort", None):
+        from evaluation.fixed_benchmark_cohort import load_fixed_cohort
+        print("  Historical fixed cohort: %s" % cli.benchmark_fixed_cohort)
+        print("  Fresh intact/native donors; no rescreen/refill; historical beliefs fixed.")
+        for dataset in datasets:
+            data = load_fixed_cohort(cli.benchmark_fixed_cohort, dataset)
+            bench = get_benchmark(dataset)
+            if hasattr(bench, "bind"):
+                bench.bind(cli)
+            tokens = bench.new_tokens or cli.benchmark_new_tokens
+            if tokens != data["new_tokens"]:
+                raise ValueError("fixed cohort generation budget differs from historical protocol")
+            print("  %s: %d fixed recipients, %d used donors, %d tokens; judge=%s" %
+                  (dataset, len(data["items"]),len(data["pool_items"]),tokens,bench.judge_spec()))
+            print("    historical selection: %s" % data["selection_provenance"]["source"]["path"])
+        if getattr(cli,"benchmark_frozen_masks",None):
+            from evaluation.frozen_head_masks import load_frozen_masks
+            print("  Exact states: full, %s" % ", ".join(load_frozen_masks(cli.benchmark_frozen_masks)))
+        else:
+            print("  States: %s" % getattr(cli,"benchmark_configs",None))
+        print("  Judge cache: %s (frozen import prefix verified; exact request hits only)" %
+              getattr(cli,"benchmark_judge_cache",None))
+        print("  Global ledger: %s" % getattr(cli,"judge_budget_ledger",None))
+        from evaluation.benchmarks.judge_budget import MODEL_BOUNDS, JudgeBudget
+        if getattr(cli,"judge_budget_ledger",None):
+            print("  Guard: %s" % JudgeBudget(cli.judge_budget_ledger).stats())
+        print("  Pinned USD/M input/output; full input/output token ceilings:")
+        for model, bounds in MODEL_BOUNDS.items():
+            print("    %s: %s" % (model, bounds))
+        print("  Paid startup checks/retries/pending calls share the guard; unknown costs retain reservations.")
+        return
     report.banner(f"DECEPTION BENCHMARKS (EVAL 5) — {len(datasets)} dataset(s)")
     print()
     print(f"  {'dataset':<34} {'condition':<9} {'tokens':>6} {'pool':>8}  judge")
@@ -852,8 +937,11 @@ def check_judges_answer(cli) -> None:
     print("  Checking %d judge(s) answer before loading the model..."
           % len(probes))
     # No cache: a cached "ok" from an earlier run would defeat the point.
+    ledger = getattr(cli, "judge_budget_ledger", None)
+    from evaluation.benchmarks.judge_budget import JudgeBudget
     client = JudgeClient(cache_path=None, concurrency=len(probes),
-                         max_retries=1, verbose=False)
+                         max_retries=1, verbose=False,
+                         budget=JudgeBudget(ledger) if ledger else None)
     results = client.run([p[1] for p in probes])
     # Fatal unless the failure looks like weather. The gate exists to refuse
     # GPU hours that cannot produce a label, so the default has to be "stop":
@@ -915,13 +1003,38 @@ def main():
         check_benchmark_keys(cli)
         if not cli.skip_judge_check:
             check_judges_answer(cli)
+    if getattr(cli, 'benchmark_generation_checkpoint_dir', None):
+        # Greedy frozen replay has no stochastic sampling, but the immutable
+        # runtime identity must also be stable across fresh Python processes.
+        import torch
+        torch.manual_seed(0)
+        torch.use_deterministic_algorithms(True)
+        torch.backends.cuda.matmul.allow_tf32 = False
+        torch.backends.cudnn.allow_tf32 = False
     session = build_session(cli)
     if cli.dry_run:
         return dry_run(session)
     if cli.judge_dry_run:
         from evaluation.benchmark_eval import judge_dry_run
         return judge_dry_run(session)
-    return suite.run(session)
+    checkpoint = getattr(cli, 'benchmark_generation_checkpoint_dir', None)
+    if not checkpoint:
+        return suite.run(session)
+    from evaluation.generation_checkpoint import (GenerationCheckpoint,
+        GenerationSegmentComplete, SEGMENT_EXIT_CODE, atomic_json)
+    with GenerationCheckpoint(checkpoint, cli.benchmark_stop_after_generation_batches) as store:
+        session._generation_checkpoint = store
+        try:
+            return suite.run(session)
+        except GenerationSegmentComplete as error:
+            atomic_json(os.path.join(checkpoint, 'segment-%s.json' % os.getpid()), {
+                'status': 'segment_complete', 'evaluation_complete': False,
+                'headline_available': False, 'reason': str(error),
+                'new_generation_batches': store.new_batches, 'segment': store.provenance})
+            print(str(error))
+            return SEGMENT_EXIT_CODE
+        finally:
+            del session._generation_checkpoint
 
 
 if __name__ == "__main__":

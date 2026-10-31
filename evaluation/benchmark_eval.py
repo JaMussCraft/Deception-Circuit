@@ -68,6 +68,7 @@ provides. `pairing` in `benchmarks.json` records which rule each dataset got.
 from __future__ import annotations
 
 import os
+import json
 import time
 
 import torch
@@ -75,9 +76,12 @@ import torch
 from evaluation import Evaluation
 from evaluation import report
 from evaluation.benchmarks import base, expand, get_benchmark
-from evaluation.benchmarks.judge import JudgeClient
+from evaluation.benchmarks.judge import JudgeClient, validate_study_cache
+from evaluation.benchmarks.judge_budget import JudgeBudget, BudgetExceeded
 from evaluation.coherence import coherence_metrics, completion_mask
 from evaluation.gen_engine import generate_bucketed, resolve_pad_id
+from evaluation.generation_checkpoint import (phase_store, tensor_identity,
+    GenerationSegmentComplete, GenerationCheckpointError)
 from evaluation.masks import knockout_masks, zeros_like
 from evaluation.metrics import summarize_null
 
@@ -328,13 +332,14 @@ def assign_partners(n_items, pool_size, seed, forbidden=None):
 # ==============================================================================
 
 def generate_under(ctx, *, clean_ids, clean_mask, corrupt_ids, hook,
-                   new_tokens, eos, desc):
+                   new_tokens, eos, desc, batch_store=None):
     return generate_bucketed(
         ctx,
         clean_ids=clean_ids, corrupt_ids=corrupt_ids,
         attention_mask=clean_mask, hook=hook, new_tokens=new_tokens,
         eos_ids=eos, batch_size=ctx.cli.benchmark_gen_batch_size,
-        use_cache=not ctx.cli.no_kv_cache, desc=desc).cpu()
+        use_cache=not ctx.cli.no_kv_cache, desc=desc,
+        **({"batch_store": batch_store} if batch_store is not None else {})).cpu()
 
 
 def decode_completions(tokenizer, ids, prompt_width, eos):
@@ -346,6 +351,92 @@ def decode_completions(tokenizer, ids, prompt_width, eos):
 # ==============================================================================
 # SCREENING
 # ==============================================================================
+
+def _save_partial(ctx, dataset, config, payload):
+    """Keep generated text even if a budget stop interrupts the judging batch."""
+    # Opt-in study path only; preserve stock behavior and tests by default.
+    if not (getattr(ctx.cli, "judge_budget_ledger", None) or
+            getattr(ctx.cli, "benchmark_fixed_cohort", None)):
+        return
+    directory = os.path.join(ctx.out_dir, "benchmark_partial")
+    os.makedirs(directory, exist_ok=True)
+    name = dataset.replace(":", "_").replace("/", "_") + "--" + config + ".json"
+    path = os.path.join(directory, name)
+    temporary = path + ".tmp"
+    with open(temporary, "w") as handle:
+        json.dump(payload, handle, ensure_ascii=False, indent=2)
+        handle.flush()
+        os.fsync(handle.fileno())
+    os.replace(temporary, path)
+
+
+def fixed_cohort_screen(ctx, bench, client, dataset):
+    """Historical selection only; regenerate recipients and native donors.
+
+    Never consult the stock screen cache, rejudge eligibility, refill, or drop
+    fresh intact failures. All historical source/hardware provenance remains
+    separate from the execution device stamp.
+    """
+    from evaluation.fixed_benchmark_cohort import load_fixed_cohort
+    from evaluation.screen_cache import device_stamp
+    cli = ctx.cli
+    if cli.ablation != "interchange":
+        raise ValueError("fixed cohort pilot requires native interchange donors")
+    data = load_fixed_cohort(cli.benchmark_fixed_cohort, dataset)
+    screen = Screen(dataset)
+    screen.fixed_cohort = True
+    screen.items = [base.BenchmarkItem(**record) for record in data["items"]]
+    screen.pool_items = [base.BenchmarkItem(**record) for record in data["pool_items"]]
+    screen.partner_index = data["partner_index"]
+    screen.pairing = data["pairing"]
+    screen.partner_reused = len(set(screen.partner_index)) < len(screen.partner_index)
+    screen.selection_provenance = data["selection_provenance"]
+    screen.execution_provenance = {"device": device_stamp(cli),
+                                   "fresh_intact": True, "fresh_native_donors": True}
+    screen.cache_provenance = {"hit": False, "reason": "explicit historical fixed cohort; no screen-cache lookup"}
+    screen.new_tokens = getattr(bench, "new_tokens", None) or cli.benchmark_new_tokens
+    if screen.new_tokens != data["new_tokens"]:
+        raise ValueError("fixed cohort generation budget differs from historical protocol")
+    eos = eos_ids_for(ctx.node_model)
+    pad_id = resolve_pad_id(ctx.tokenizer, eos)
+    screen.prompts = [render_messages(ctx.tokenizer, item.messages) for item in screen.items]
+    if screen.prompts != data["prompts"]:
+        raise ValueError("rendered recipient prompts differ from historical fixed cohort")
+    screen.clean_ids, screen.clean_mask = encode_prompts(ctx.tokenizer, screen.prompts, pad_id)
+    screen.prompt_width = screen.clean_ids.shape[1]
+    corrupt = placeholder_corrupt(screen.clean_ids, screen.clean_mask, screen.new_tokens, pad_id)
+    with ctx.all_gates_open():
+        screen.full_ids = generate_under(ctx, clean_ids=screen.clean_ids,
+            clean_mask=screen.clean_mask, corrupt_ids=corrupt, hook=None,
+            new_tokens=screen.new_tokens, eos=eos, desc=dataset + ": fresh intact",
+            batch_store=phase_store(ctx, dataset, 'recipient-intact', donor=data))
+    full_completions = completion_tokens(screen.full_ids, screen.prompt_width, eos)
+    known = {render_messages(ctx.tokenizer, item.messages):
+             (screen.clean_ids[i][screen.clean_mask[i].bool()].tolist(), full_completions[i])
+             for i, item in enumerate(screen.items)}
+    missing = [item for item in screen.pool_items
+               if render_messages(ctx.tokenizer, item.messages) not in known]
+    if missing:
+        prompts = [render_messages(ctx.tokenizer, item.messages) for item in missing]
+        ids, mask = encode_prompts(ctx.tokenizer, prompts, pad_id)
+        corrupt = placeholder_corrupt(ids, mask, screen.new_tokens, pad_id)
+        with ctx.all_gates_open():
+            out = generate_under(ctx, clean_ids=ids, clean_mask=mask,
+                corrupt_ids=corrupt, hook=None, new_tokens=screen.new_tokens,
+                eos=eos, desc=dataset + ": fresh native donors",
+                batch_store=phase_store(ctx, dataset, 'native-donors', donor={
+                    'cohort': data, 'missing': [item.to_json() for item in missing],
+                    'recipient_tokens': tensor_identity(screen.full_ids)}))
+        completions = completion_tokens(out, ids.shape[1], eos)
+        for i, prompt in enumerate(prompts):
+            known[prompt] = (ids[i][mask[i].bool()].tolist(), completions[i])
+    screen.pool_refs = [known[render_messages(ctx.tokenizer, item.messages)]
+                        for item in screen.pool_items]
+    screen.stats = {"historical_fixed_cohort": True, "screened": 0,
+                    "candidates": len(screen.items), "selected": len(screen.items),
+                    "dropped_no_belief": 0, "early_stopped": False}
+    return screen
+
 
 class Screen(object):
     """One dataset's evaluation set, reference pool and full-model pass.
@@ -991,12 +1082,35 @@ def tally_labels(rows):
     return counts, dict((label, counts[label] / total) for label in base.LABELS)
 
 
+def scoring_coverage(rows, expected):
+    """Judge coverage; source refusal/empty model outputs stay in denominator."""
+    unscored_raw = {"judge-failed", "invalid_judge", "no_judge_response",
+                    "unreadable_judge", "classification_error", "no_belief",
+                    "no_belief_range"}
+    judge_errors = sum(bool(row.get("judge_error")) or row.get("raw") == "judge-failed"
+                       for row in rows)
+    unscored = sum(bool(row.get("judge_error")) or row.get("raw") in unscored_raw
+                   for row in rows)
+    return {"expected": expected, "label_rows": len(rows),
+            "judge_errors": judge_errors, "unscored": unscored,
+            "unparsed": sum(row["label"] == base.UNPARSED for row in rows),
+            "complete": len(rows) == expected and unscored == 0}
+
+
 def headline_of(datasets):
-    """The cell headline: knockout's deception rate per dataset that ran."""
-    return {
-        dataset: entry["configs"]["knockout"]["rates"]["deceptive"]
-        for dataset, entry in datasets.items()
-        if "configs" in entry and "knockout" in entry["configs"]}
+    """Stock knockout or the prospectively fixed new30 primary, complete only."""
+    out = {}
+    frozen_states = {"full", "oldD69", "new-allW23", "new-allW30", "random30"}
+    for dataset, entry in datasets.items():
+        if not entry.get("complete", True):
+            continue
+        configs = entry.get("configs", {})
+        if "knockout" in configs:
+            out[dataset] = configs["knockout"]["rates"]["deceptive"]
+        elif (set(entry.get("requested_configs", [])) == frozen_states and
+              set(configs) == frozen_states):
+            out[dataset] = configs["new-allW30"]["rates"]["deceptive"]
+    return out
 
 
 # ==============================================================================
@@ -1014,8 +1128,17 @@ class BenchmarkEvaluation(Evaluation):
         # reader of benchmarks.json has to be able to tell whether `full`'s
         # tokens were reused from a cache, and on what hardware they were made.
         self._screen_cache = {}
+        ledger = getattr(cli, "judge_budget_ledger", None)
+        if getattr(cli, "benchmark_fixed_cohort", None):
+            validate_study_cache(cli.benchmark_fixed_cohort, judge_cache_path(ctx))
+        technical_proof = None
+        if getattr(cli, "benchmark_frozen_masks", None):
+            from evaluation.frozen_runtime_check import check_frozen_runtime
+            technical_proof = check_frozen_runtime(ctx)
+            print("  Frozen runtime support / same-path full-vocabulary identity: PASS")
         client = JudgeClient(cache_path=judge_cache_path(ctx),
-                             concurrency=cli.judge_concurrency)
+                             concurrency=cli.judge_concurrency,
+                             budget=JudgeBudget(ledger) if ledger else None)
         payload = {
             "resolved": {
                 "model": ctx.args.model,
@@ -1024,21 +1147,39 @@ class BenchmarkEvaluation(Evaluation):
                 "new_tokens": cli.benchmark_new_tokens,
                 "belief_tokens": cli.benchmark_belief_tokens,
                 "ref_pool": cli.benchmark_ref_pool,
-                "n_random": cli.benchmark_n_random,
+                "n_random": (0 if getattr(cli, "benchmark_frozen_masks", None) or
+                              getattr(cli, "benchmark_configs", None) else cli.benchmark_n_random),
                 "gen_batch_size": cli.benchmark_gen_batch_size,
                 "kv_cache": not cli.no_kv_cache,
                 "pairing_seed": cli.wikitext_seed,
             },
-            "belief_source": "the FULL model, reused unchanged by every "
-                             "configuration",
-            "caveats": CAVEATS,
+            "belief_source": ("historical full-model beliefs, frozen unchanged across fresh execution states"
+                              if getattr(cli, "benchmark_fixed_cohort", None) else
+                              "the FULL model, reused unchanged by every configuration"),
+            "caveats": ([CAVEATS[0]] + CAVEATS[2:] + [
+                "Historical fixed cohort; fresh intact outputs remain in the denominator, "
+                "even when they fail historical eligibility. A complete block includes every "
+                "requested state; partial blocks have no efficacy headline."]
+                if getattr(cli, "benchmark_fixed_cohort", None) else CAVEATS),
             "datasets": {},
         }
+        if technical_proof is not None:
+            payload["frozen_runtime_check"] = technical_proof
         failures = {}
-        for dataset in expand(cli.benchmarks):
+        selected_datasets = list(expand(cli.benchmarks))
+        for dataset in selected_datasets:
             started = time.time()
             try:
                 entry = self._run_dataset(ctx, dataset, client)
+            except (GenerationSegmentComplete, GenerationCheckpointError):
+                raise
+            except BudgetExceeded as error:
+                payload["datasets"][dataset] = {
+                    "error": str(error), "complete": False,
+                    "seconds": round(time.time() - started, 1)}
+                failures[dataset] = str(error)
+                payload["budget_stopped"] = True
+                break
             except Exception as error:                      # noqa: BLE001
                 # One dataset must not discard the ones already finished.
                 # `benchmarks.json` is written after the whole loop, so before
@@ -1056,9 +1197,15 @@ class BenchmarkEvaluation(Evaluation):
                 continue
             entry["seconds"] = round(time.time() - started, 1)
             payload["datasets"][dataset] = entry
+            if not entry.get("complete", True):
+                failures[dataset] = entry.get("incomplete_reason", "incomplete state block")
+                payload["budget_stopped"] = entry.get("budget_stopped", False)
+                break
 
+        payload["not_run_datasets"] = [d for d in selected_datasets if d not in payload["datasets"]]
+        payload["complete"] = not failures and not payload["not_run_datasets"]
         payload["failed_datasets"] = failures
-        if failures and len(failures) == len(payload["datasets"]):
+        if failures and all("error" in e for e in payload["datasets"].values()) and not payload.get("budget_stopped"):
             # Nothing survived, so there is no partial result to preserve and
             # a silent empty report would be worse than the traceback.
             raise RuntimeError(
@@ -1084,8 +1231,9 @@ class BenchmarkEvaluation(Evaluation):
         if hasattr(bench, "bind"):
             bench.bind(cli)
 
-        screen = ctx.session.screen_for(dataset, cached_screen, ctx, bench,
-                                        client, dataset)
+        fixed = getattr(cli, "benchmark_fixed_cohort", None)
+        loader = fixed_cohort_screen if fixed else cached_screen
+        screen = ctx.session.screen_for(dataset, loader, ctx, bench, client, dataset)
         # `screen_for` memoises, so in a suite only the first cell to reach a
         # dataset actually built or loaded it. Reporting the same provenance
         # for every cell would read as though each one wrote the cache.
@@ -1128,22 +1276,73 @@ class BenchmarkEvaluation(Evaluation):
                 "tiled_rows": len(tiled),
             },
             "mean_bank_batches": n_batches,
-            "full_row_is_screen": True,
+            "full_row_is_screen": not bool(fixed),
+            "selection_provenance": getattr(screen, "selection_provenance", None),
+            "execution_provenance": getattr(screen, "execution_provenance", None),
             "items": [item.to_json() for item in screen.items],
             "prompts": list(screen.prompts),
             "partner_ids": screen.partner_ids,
             "configs": {},
         }
-        for config, masks in self._configs(ctx):
-            entry["configs"][config] = self._run_config(
-                ctx, bench, client, dataset, screen, corrupt, hook, config,
-                masks, eos)
+        configs = list(self._configs(ctx))
+        entry["requested_configs"] = [name for name, _ in configs]
+        for config, masks in configs:
+            try:
+                entry["configs"][config] = self._run_config(
+                    ctx, bench, client, dataset, screen, corrupt, hook, config,
+                    masks, eos)
+            except BudgetExceeded as error:
+                entry.update(complete=False, budget_stopped=True,
+                             incomplete_reason=str(error), stopped_config=config)
+                entry["coverage"] = {name: scoring_coverage(cell["labels"], len(screen.items))
+                                     for name, cell in entry["configs"].items()}
+                entry["missing_configs"] = [name for name, _ in configs
+                                            if name not in entry["configs"]]
+                _save_partial(ctx, dataset, "block", entry)
+                return entry
+            _save_partial(ctx, dataset, "block", entry)
+        entry["coverage"] = {name: scoring_coverage(cell["labels"], len(screen.items))
+                             for name, cell in entry["configs"].items()}
+        strict_coverage = bool(fixed or getattr(cli, "judge_budget_ledger", None))
+        entry["complete"] = (not strict_coverage or
+                             all(c["complete"] for c in entry["coverage"].values()))
+        if not entry["complete"]:
+            entry["incomplete_reason"] = "judge errors in requested state block"
         entry["null"] = self._null(entry)
         entry["examples"] = self._examples(entry, screen)
+        _save_partial(ctx, dataset, "block", entry)
         return entry
 
     def _configs(self, ctx):
         """(name, masks); `masks is None` means "pin every gate open"."""
+        frozen = getattr(ctx.cli, "benchmark_frozen_masks", None)
+        if frozen:
+            if getattr(ctx.cli, "benchmark_configs", None):
+                raise ValueError("frozen masks already specify exactly five states")
+            if ctx.cli.knockout_granularity != "finest":
+                raise ValueError("frozen whole-head masks require finest knockout")
+            from evaluation.frozen_head_masks import load_frozen_masks
+            masks_by_name = load_frozen_masks(frozen)
+            yield "full", None
+            for name, masks in masks_by_name.items():
+                yield name, knockout_masks(masks, "finest")
+            return
+        requested = getattr(ctx.cli, "benchmark_configs", None)
+        if requested:
+            if len(set(requested)) != len(requested) or "full" not in requested:
+                raise ValueError("explicit benchmark configs require unique states including full")
+            for name in requested:
+                if name == "full":
+                    yield name, None
+                elif name == "knockout":
+                    yield name, ctx.knockout_masks
+                elif name == "circuit_only":
+                    yield name, ctx.circuit_masks
+                elif name == "empty":
+                    yield name, zeros_like(ctx.circuit_masks)
+                else:
+                    raise ValueError("unknown explicit benchmark config: %s" % name)
+            return
         yield "full", None
         yield "knockout", ctx.knockout_masks
         yield "circuit_only", ctx.circuit_masks
@@ -1161,6 +1360,10 @@ class BenchmarkEvaluation(Evaluation):
         if config == "full":
             ids, rows = screen.full_ids, screen.full_rows
             responses = decode_completions(tok, ids, screen.prompt_width, eos)
+            if getattr(screen, "fixed_cohort", False):
+                _save_partial(ctx, dataset, config, {"generations": responses,
+                    "item_ids": [item.item_id for item in screen.items], "judging_complete": False})
+                rows = _judge_all(client, bench, screen.items, responses)
         else:
             context = (ctx.all_gates_open() if masks is None
                        else ctx.circuit(masks))
@@ -1169,8 +1372,14 @@ class BenchmarkEvaluation(Evaluation):
                     ctx, clean_ids=screen.clean_ids,
                     clean_mask=screen.clean_mask, corrupt_ids=corrupt,
                     hook=hook, new_tokens=screen.new_tokens, eos=eos,
-                    desc="%s: %s" % (dataset, config))
+                    desc="%s: %s" % (dataset, config),
+                    batch_store=phase_store(
+                        ctx, dataset, 'mask:' + config, masks=masks, donor={
+                            'partner_index': screen.partner_index,
+                            'partner_ids': screen.partner_ids, 'pool_refs': screen.pool_refs}))
             responses = decode_completions(tok, ids, screen.prompt_width, eos)
+            _save_partial(ctx, dataset, config, {"generations": responses,
+                "item_ids": [item.item_id for item in screen.items], "judging_complete": False})
             rows = _judge_all(client, bench, screen.items, responses)
 
         coherence = coherence_metrics(
@@ -1214,6 +1423,8 @@ class BenchmarkEvaluation(Evaluation):
         curated one. `reason` records which happened, per example.
         """
         if "knockout" not in entry["configs"]:
+            return []
+        if "full" not in entry["configs"]:
             return []
         full = entry["configs"]["full"]
         knock = entry["configs"]["knockout"]
@@ -1261,18 +1472,22 @@ class BenchmarkEvaluation(Evaluation):
                 continue
             self._report_dataset(dataset, entry)
         self._report_headline(payload)
+        if payload.get("not_run_datasets"):
+            print("  NOT RUN: %s" % ", ".join(payload["not_run_datasets"]))
         self._report_examples(payload)
 
         report.banner("HOW TO READ EVAL 5", "-")
         print()
-        for line in CAVEATS:
+        for line in payload.get("caveats", CAVEATS):
             print("  - %s" % line)
 
     def _report_dataset(self, dataset, entry) -> None:
         report.banner("%s — %s" % (dataset, entry["display_name"]), "-")
         judge = entry["judge"]
-        print("\n  belief: elicited from the FULL model and reused unchanged "
-              "by every configuration below.")
+        print("\n  belief: %s" % (
+            "historical full-model beliefs, frozen unchanged across fresh execution states."
+            if not entry.get("full_row_is_screen", True) else
+            "elicited from the FULL model and reused unchanged by every configuration."))
         print("  condition kind: %s     judge: %s"
               % (entry["condition_kind"],
                  "%s/%s" % (judge["provider"], judge["model"]) if judge
@@ -1317,9 +1532,12 @@ class BenchmarkEvaluation(Evaluation):
                      _fmt(coherence["distinct_n"]),
                      _fmt(coherence["distinct_n_corpus"]),
                      coherence["n_tokens"]))
-        print("\n  'full' is 100%% deceptive by construction — these are the "
-              "items it was judged\n  deceptive on. It is the scale for the "
-              "rows below, not a result.")
+        if entry.get("full_row_is_screen", True):
+            print("\n  'full' reuses the deceptive screening rows.")
+        else:
+            print("\n  'full' is freshly generated on the historical fixed cohort.")
+        if not entry.get("complete", True):
+            print("  INCOMPLETE block: %s" % entry.get("incomplete_reason", "missing states"))
         print("  'unparsed' is the column that stops this table lying: a "
               "knockout that destroys\n  output format has no deceptive "
               "content left to find, and would otherwise\n  read as a large "
@@ -1344,21 +1562,13 @@ class BenchmarkEvaluation(Evaluation):
 
     def _report_headline(self, payload) -> None:
         report.banner("CROSS-DATASET HEADLINE", "-")
-        print("\n  %-36s %11s %11s %11s %8s"
-              % ("dataset", "knockout", "circuit only", "empty", "n"))
-        print("  " + "-" * 82)
         for dataset, entry in payload["datasets"].items():
-            if "error" in entry:
-                continue                      # no configs were ever run
-            configs = entry["configs"]
-            print("  %-36s %10.1f%% %10.1f%% %10.1f%% %8d"
-                  % (dataset,
-                     100 * configs["knockout"]["rates"]["deceptive"],
-                     100 * configs["circuit_only"]["rates"]["deceptive"],
-                     100 * configs["empty"]["rates"]["deceptive"],
-                     entry["n_items"]))
-        print("\n  Deception rate, against a `full` row that is 100%% "
-              "everywhere by construction.")
+            if "error" in entry or not entry.get("complete", True):
+                print("  %s: INCOMPLETE; no efficacy headline" % dataset)
+                continue
+            print("  %s (n=%d): %s" % (dataset, entry["n_items"], ", ".join(
+                "%s %.1f%% deceptive" % (name, 100 * cell["rates"]["deceptive"])
+                for name, cell in entry["configs"].items())))
 
     def _report_examples(self, payload) -> None:
         for dataset, entry in payload["datasets"].items():
@@ -1440,6 +1650,9 @@ def judge_cache_path(ctx) -> str:
     the same text, and a re-run after a crash re-judges everything. Both are
     paid once if the cache sits above the cell.
     """
+    explicit = getattr(ctx.cli, "benchmark_judge_cache", None)
+    if explicit:
+        return explicit
     root = getattr(ctx.cli, "output_dir", None)
     if not root and not getattr(ctx.cli, "legacy", True):
         # A suite writes cells three levels down; the cache belongs at the

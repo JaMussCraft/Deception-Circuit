@@ -300,7 +300,7 @@ def _pad_right(ids, target, pad_id):
 
 def generate_bucketed(ctx, *, clean_ids, corrupt_ids, attention_mask,
                       hook=None, new_tokens, eos_ids=(), batch_size=8,
-                      use_cache=True, desc="") -> torch.LongTensor:
+                      use_cache=True, desc="", batch_store=None) -> torch.LongTensor:
     """`generate`, in length-sorted buckets, with the row order restored.
 
     A benchmark's prompts vary in length by an order of magnitude, and a batch
@@ -318,6 +318,15 @@ def generate_bucketed(ctx, *, clean_ids, corrupt_ids, attention_mask,
     # columns are the leading ones, so a right-padded batch would be mangled
     # before `generate` ever saw it.
     require_left_padding(attention_mask)
+    if batch_store is not None:
+        if attention_mask.shape != clean_ids.shape:
+            raise ValueError("attention_mask must match clean_ids")
+        if corrupt_ids.shape[0] != n or corrupt_ids.shape[1] < width + new_tokens:
+            raise ValueError("corrupt_ids has insufficient rows/width")
+        if n == 0 or batch_size <= 0 or new_tokens <= 0:
+            raise ValueError("checkpoint generation requires positive rows/batch/tokens")
+        if use_cache:
+            assert_rope_is_offset_invariant(ctx.node_model.config)
     lengths = attention_mask.sum(dim=1)
 
     if not use_cache and batch_size > 1 and int(lengths.min()) != width:
@@ -332,6 +341,17 @@ def generate_bucketed(ctx, *, clean_ids, corrupt_ids, attention_mask,
     # bucket contents reproducible rather than sort-implementation-defined.
     order = torch.argsort(lengths, descending=True, stable=True)
 
+    if batch_store is not None:
+        plan = []
+        for start in range(0, n, batch_size):
+            rows = order[start:start + batch_size]
+            keep = int(lengths[rows].max())
+            plan.append({'rows': rows.cpu().tolist(), 'keep': keep, 'cut': width - keep})
+        batch_store.bind(clean_ids=clean_ids, corrupt_ids=corrupt_ids,
+            attention_mask=attention_mask, new_tokens=new_tokens, eos_ids=eos_ids,
+            batch_size=batch_size, use_cache=use_cache, plan=plan,
+            vocab_size=ctx.node_model.config.vocab_size,
+            pad_id=resolve_pad_id(ctx.tokenizer, eos_ids))
     pieces = []
     buckets = range(0, n, batch_size)
     for start in tqdm(buckets, desc=desc, leave=False,
@@ -339,6 +359,11 @@ def generate_bucketed(ctx, *, clean_ids, corrupt_ids, attention_mask,
         rows = order[start:start + batch_size]
         keep = int(lengths[rows].max())
         cut = width - keep                      # leading pad columns to drop
+        ordinal = start // batch_size
+        restored = batch_store.load(ordinal, ctx.device) if batch_store is not None else None
+        if restored is not None:
+            pieces.append(restored)
+            continue
         piece = generate(
             ctx,
             clean_ids=clean_ids[rows][:, cut:],
@@ -354,7 +379,10 @@ def generate_bucketed(ctx, *, clean_ids, corrupt_ids, attention_mask,
         # the caller's, which is a difference the docstring's "left padding
         # preserved" promise would quietly break — and one that a fixture whose
         # two pad ids coincide would never notice.
-        pieces.append(piece[:, keep:])
+        block = piece[:, keep:]
+        if batch_store is not None:
+            batch_store.save(ordinal, block)
+        pieces.append(block)
 
     generated = torch.cat(pieces, dim=0)
     inverse = torch.empty_like(order)
