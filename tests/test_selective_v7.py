@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 import pytest
 import torch
 from component_analysis import selective_v7 as v
@@ -53,9 +54,27 @@ def test_tiny_real_hook_write_self_and_full_logits():
 
 
 def test_frozen_prepare_rejects_case_source_and_support_drift(tmp_path):
-    from pathlib import Path
-    source=Path('/projects/beto/swong2/Alignment/.scratch/selective-deception/component-analysis-v7/selection.frozen-001.json')
+    repo=Path(__file__).resolve().parents[1]
+    study=repo.parent/'.scratch/selective-deception'
+    source=study/'component-analysis-v7/selection.frozen-001.json'
     selection=json.loads(source.read_text())
+    original_manifest=Path(selection['manifest_path'])
+    assert v.core.sha256(original_manifest)==selection['manifest_sha256']
+    manifest=json.loads(original_manifest.read_text())
+    # Temporary fixture bindings, preserving every historical source digest.
+    retired_prefix=str(repo/'.claude/worktrees/mechanism-analysis')+'/'
+    manifest['sources']={str(repo/path[len(retired_prefix):]) if path.startswith(retired_prefix) else path: digest
+                         for path,digest in manifest['sources'].items()}
+    manifest_path=tmp_path/'panel.test-fixture.json'
+    manifest_path.write_text(json.dumps(manifest))
+    selection['manifest_path']=str(manifest_path)
+    selection['manifest_sha256']=v.core.sha256(manifest_path)
+    selection_path=tmp_path/'selection.test-fixture.json'
+    selection_path.write_text(json.dumps(selection))
+    # Positive preparation exercises real source hashes, donor joins and tokenizer checks.
+    _,_,cases=v.prepare(manifest_path,selection_path)
+    assert len(cases)==64
+    assert all(c['donor_requested_target_id']!=c['donor_alternate_answer_id'] for c in cases)
     def check(changed,match):
         path=tmp_path/'selection.json';path.write_text(json.dumps(changed))
         with pytest.raises(ValueError,match=match):v.prepare(selection['manifest_path'],path)

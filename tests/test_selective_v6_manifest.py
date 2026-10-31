@@ -6,18 +6,39 @@ from pathlib import Path
 
 import pytest
 
+from component_analysis import selective_v6_manifest as manifest_module
 from component_analysis.selective_v6_manifest import build_manifest, load_manifest, validate_manifest
 
-ROOT = Path('/projects/beto/swong2/Alignment')
+REPO = Path(__file__).resolve().parents[1]
+ROOT = REPO.parent
 PREPARED = ROOT / '.scratch/selective-deception/transfer-v5/v2-prepared-frozen.json'
 PROPOSAL = PREPARED.with_name('v2-inputs-proposal.json')
 MASKS = PREPARED.with_name('frozen-masks.json')
-INVERSION = ROOT / 'Deception-Circuit/.claude/worktrees/mechanism-analysis/data/datasets/sdr_v2_inversion/test/data-00000-of-00001.arrow'
+INVERSION = REPO / 'data/datasets/sdr_v2_inversion/test/data-00000-of-00001.arrow'
 DOC = INVERSION.parents[4] / 'docs/research/mechanism-analysis/inversion-control.md'
 
 
+@pytest.fixture(scope='module', autouse=True)
+def relocated_inversion_config():
+    # Decode a test-local copy; retain original config bytes and derivation hashes.
+    config_path = INVERSION.parents[1] / 'dataset_config.json'
+    read_json = manifest_module._json
+
+    def read_relocated(path):
+        value = read_json(path)
+        if Path(path) == config_path:
+            value = copy.deepcopy(value)
+            value['pool_path'] = str(REPO / 'dataset/deception_pools/v2/inversion_v2.json')
+            value['clause_forms_path'] = str(REPO / 'docs/research/mechanism-analysis/clause-forms.csv')
+        return value
+
+    with pytest.MonkeyPatch.context() as patch:
+        patch.setattr(manifest_module, '_json', read_relocated)
+        yield
+
+
 @pytest.fixture(scope='module')
-def panel():
+def panel(relocated_inversion_config):
     return build_manifest(prepared_path=PREPARED, proposal_path=PROPOSAL, masks_path=MASKS,
                           inversion_path=INVERSION, inversion_doc_path=DOC)
 
