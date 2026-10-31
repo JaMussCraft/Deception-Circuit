@@ -118,7 +118,9 @@ def _restore(path, model, optimizer, fingerprint):
 
 def _read_manifest(path):
     m = json.loads(Path(path).read_text()); sm.validate_pilot_manifest(m)
-    if len(m['candidate_heads']) != 103 or m['candidate_heads_hash'] != CANDIDATE_HASH:
+    if m.get('amendment'):
+        _validate_amendment(m)
+    elif len(m['candidate_heads']) != 103 or m['candidate_heads_hash'] != CANDIDATE_HASH:
         raise ValueError('frozen 103 candidate heads mismatch')
     for split in AUDIT:
         d = m['splits'][split]
@@ -399,6 +401,8 @@ def _execute_generation(manifest, ctx, output, provenance, masks, resume):
 
 def _receipt(path, m, mode):
     record = json.loads(Path(path).read_text())
+    if m.get('amendment'):
+        return _amended_receipt(record,m,mode)
     if (record.get('version') != 1 or record.get('manifest_hash') != m['manifest_hash']
             or record.get('baseline_path') != BASELINE_PATH or not record.get('root_decision')
             or not record.get('source_revision') or not record.get('donor_reference_dir') or record.get('safety_cluster_ids') != _safety_slice(m['splits']['validation']['clusters'])
@@ -444,7 +448,7 @@ def _identity(args, m, receipt):
     _,mask_identity,resolved=sr.resolve_masks()
     if receipt.get('source_files_hash') != sd.content_hash(source):
         raise ValueError('root receipt source content hash mismatch')
-    return dict(manifest_hash=m['manifest_hash'], model={'snapshot': str(snapshot), 'files': files, 'revision':snapshot.name},
+    result = dict(manifest_hash=m['manifest_hash'], model={'snapshot': str(snapshot), 'files': files, 'revision':snapshot.name},
         fixed_masks=mask_identity,fixed_bindings=resolved[1],operand_configs=resolved[2],
         source_revision=receipt['source_revision'], source_files=source, source_files_hash=sd.content_hash(source),
         baseline_path=BASELINE_PATH, dtype='bfloat16', device=args.device,
@@ -454,6 +458,15 @@ def _identity(args, m, receipt):
         receipt={k:v for k,v in receipt.items() if k not in ('final_assessment','final_evaluation_manifest_hash','evaluation_checkpoints')}, settings={k: getattr(args,k) for k in ('rho','seed','epochs','validate_every','joint_pairs','accumulation')},
         optimizer={'name':'AdamW','lr':.03,'weight_decay':0.,'clip_norm':1.,'schedule':'constant','expected_initial_removed':1.},
         policy='report18-v1', deterministic_algorithms=True, cublas_workspace=':4096:8', tf32=False, decode={'max_new_tokens':96,'implementation':'evaluation.gen_engine.generate'})
+    if m.get('amendment'):
+        tokenizer_identity=_wt_manifest(args)['tokenizer_identity']
+        if (str(snapshot)!=tokenizer_identity['snapshot'] or any(files.get(k)!=v for k,v in tokenizer_identity['files'].items())):
+            raise ValueError('WikiText tokenizer/model snapshot identity differs')
+        result.update(policy='amendment-v2', amendment=m['amendment'],
+            original_manifest_hash=m['amendment']['original_manifest_hash'],
+            wikitext_manifest_hash=_wt_manifest(args)['manifest_hash'],
+            settings=_amended_settings(args))
+    return result
 
 
 def _runtime(args, identity):
@@ -471,6 +484,7 @@ def _runtime(args, identity):
 
 
 def _plan(args, m):
+    if m.get('amendment'): return _amended_plan(args,m)
     for key in ('epochs','validate_every','joint_pairs','accumulation'):
         if getattr(args,key) is None or getattr(args,key) <= 0:
             raise ValueError('explicit positive training budget required: ' + key)
@@ -500,6 +514,8 @@ def _plan(args, m):
 
 
 def _baseline_fingerprint(identity):
+    if identity.get('policy') == 'amendment-v2':
+        return sd.content_hash({k:v for k,v in identity.items() if k not in ('receipt','settings','optimizer','manifest_hash','amendment')})
     return sd.content_hash({k:v for k,v in identity.items() if k not in ('receipt','settings','optimizer')})
 
 
@@ -536,7 +552,7 @@ def _checked_cache(args, identity):
     if receipt['baseline_fingerprint'] != fp or _hash_file(args.reference_cache) != receipt['baseline_cache_sha256']:
         raise ValueError('baseline cache fingerprint/hash differs from passed receipt')
     cache = _load_cache(args.reference_cache,fp)
-    if not all(x['capability']['usable'] for x in cache['splits'].values()):
+    if identity.get('policy') != 'amendment-v2' and not all(x['capability']['usable'] for x in cache['splits'].values()):
         raise ValueError('global capable-H control unusable; stop without filtering')
     return cache
 
@@ -711,6 +727,8 @@ def _calibrate(args,m,identity,ctx,cache):
 
 
 def _prepare(args):
+    if getattr(args,'policy','report18-v1') == 'amendment-v2':
+        _prepare_amended(args); return
     from datasets import load_from_disk
     from transformers import AutoTokenizer
     from evaluation.circuits import resolve_circuit_specs
@@ -743,6 +761,8 @@ def _run(args):
         raise ValueError('real model work requires a root-launched CUDA allocation')
     if mode in ('train','calibrate') and 'A100' in torch.cuda.get_device_name(0):
         raise ValueError('8B backward requires A40/H200; A100 training forbidden')
+    if m.get('amendment'):
+        return _run_amended(args,m,receipt,mode)
     if mode in ('train','calibrate','evaluate'):
         settings={k:getattr(args,k) for k in ('seed','epochs','validate_every','joint_pairs','accumulation')}
         if receipt.get('training_settings') != settings or args.rho not in receipt.get('allowed_rhos',[]):
@@ -806,3 +826,559 @@ def run_cli(args):
         try: fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
         except BlockingIOError as exc: raise ValueError('output has an active writer') from exc
         return _run(args)
+
+
+# The explicit amendment keeps the reviewed report18-v1 runner intact.
+def amended_schedule(n_pairs, *, seed=0, updates=512):
+    if n_pairs <= 0 or updates <= 0:
+        raise ValueError('positive schedule dimensions required')
+    order = list(range(n_pairs)); random.Random(seed).shuffle(order)
+    return [[order[(update * 8 + i) % n_pairs] for i in range(8)] for update in range(updates)]
+
+
+@contextmanager
+def _shared_gate_noise(model):
+    """Draw once per eligible gate and rebuild its graph on every forward."""
+    hooks = []; post_noise_cpu = post_noise_cuda = None
+    try:
+        for gate in model.modules():
+            if not isinstance(gate, HardConcreteGate) or gate.eligibility is None or not gate.eligibility.any():
+                continue
+            uniform = torch.rand_like(gate.log_alpha).clamp(1e-8, 1.-1e-8)
+            noise = (uniform.log() - torch.log1p(-uniform)).detach()
+            def fixed(module, inputs, output, noise=noise):
+                soft = (torch.sigmoid((noise + module.log_alpha) / module.beta)
+                        * (module.zeta-module.gamma) + module.gamma).clamp(0, 1)
+                hard = (soft > .5).float()
+                return torch.where(module.eligibility, (hard-soft).detach()+soft, torch.ones_like(soft))
+            hooks.append(gate.register_forward_hook(fixed))
+        post_noise_cpu=torch.get_rng_state()
+        post_noise_cuda=torch.cuda.get_rng_state_all() if torch.cuda.is_available() else []
+        yield
+    finally:
+        for hook in hooks: hook.remove()
+        if post_noise_cpu is not None: torch.set_rng_state(post_noise_cpu)
+        if post_noise_cuda: torch.cuda.set_rng_state_all(post_noise_cuda)
+
+
+def _amended_admissible(row, baseline, arm):
+    if arm not in ('H', 'W', 'HW'): raise ValueError('unknown collateral arm')
+    h = row['h_correct'] >= baseline['h_correct'] and row['capable_correct'] >= baseline['capable_correct']
+    w = (math.isfinite(row['w_nll']) and math.isfinite(row['w_kl'])
+         and row['w_nll']-baseline['w_nll'] <= math.log(1.05) and row['w_kl'] <= .05)
+    return (row['removed'] > 0 and math.isfinite(row['suppression'])
+            and row['suppression'] < baseline['suppression']
+            and (arm == 'W' or h) and (arm == 'H' or w))
+
+
+def select_amended_checkpoint(history, baseline, arm):
+    if baseline.get('split') != 'validation' or any(x.get('split') != 'validation' for x in history):
+        raise ValueError('checkpoint selection accepts validation only')
+    finite = [r for r in history if math.isfinite(r['suppression'])]
+    valid = [r for r in finite if _amended_admissible(r, baseline, arm)]
+    if not finite: return None
+    best = min(valid or finite, key=lambda x: (x['suppression'], x['removed'], x['update'], x.get('rho', 0.)))
+    return dict(best, admissible=bool(valid))
+
+
+def compact_amended_finding(row, baseline, arm):
+    return (1 <= row['removed'] <= 16 and baseline['suppression'] > 0
+            and row['suppression'] <= .9*baseline['suppression'] and _amended_admissible(row, baseline, arm))
+
+
+def _amended_settings(args):
+    return {k:getattr(args,k) for k in ('rho','seed','joint_pairs','collateral_arm','candidate_space',
+            'max_updates','checkpoint_every')}
+
+
+def _validate_amendment(m):
+    a=m['amendment']; heads=m['candidate_heads']
+    expected=[[l,h] for l in range(32) for h in range(32)]
+    if (a.get('policy')!='amendment-v2' or a.get('candidate_space') not in ('union','all')
+            or a.get('collateral_arm') not in ('H','W','HW') or not a.get('original_manifest_hash')
+            or not a.get('wikitext_manifest_hash') or not a.get('protocol_hash')
+            or a.get('max_updates')!=512 or a.get('checkpoint_every')!=64 or a.get('pairs_per_update')!=8):
+        raise ValueError('amendment protocol mismatch')
+    if a['candidate_space']=='union':
+        if len(heads)!=103 or sd.content_hash(heads)!=CANDIDATE_HASH:
+            raise ValueError('frozen union mismatch')
+    elif heads!=expected:
+        raise ValueError('all-head support must be exactly 1024 query heads')
+    if sd.content_hash(a.get('union_heads',[]))!=CANDIDATE_HASH:
+        raise ValueError('original union binding differs')
+    original=copy.deepcopy(m);original.pop('amendment')
+    original['candidate_heads']=a['union_heads'];original['candidate_heads_hash']=CANDIDATE_HASH
+    if sd.manifest_hash(original)!=a['original_manifest_hash']:
+        raise ValueError('amendment altered original SDR manifest')
+
+
+def _wt_manifest(args):
+    from evaluation import selective_wikitext as wt
+    if not args.wikitext_manifest: raise ValueError('WikiText manifest required')
+    m=json.loads(Path(args.wikitext_manifest).read_text()); wt.validate_manifest(m)
+    if [m['splits'][s]['n_blocks'] for s in ('train','validation','test')]!=[32,16,16]:
+        raise ValueError('WikiText requires frozen 32/16/16 blocks')
+    if any(_hash_file(s['source_path'])!=s['source_sha256'] for s in m['splits'].values()):
+        raise ValueError('WikiText source Arrow SHA mismatch')
+    if any(len(b['input_ids'])!=128 for s in m['splits'].values() for b in s['blocks']):
+        raise ValueError('WikiText requires 128-token article windows')
+    return m
+
+
+def _prepare_amended(args):
+    if not args.source_manifest or not args.freeze_record:
+        raise ValueError('amendment preparation requires original --source-manifest and --freeze-record protocol JSON')
+    m=_read_manifest(args.source_manifest)
+    if m.get('amendment'): raise ValueError('source must be immutable original pilot manifest')
+    wt=_wt_manifest(args); protocol=json.loads(args.freeze_record.read_text())
+    original=m['manifest_hash']
+    m['amendment']=dict(policy='amendment-v2',original_manifest_hash=original,union_heads=copy.deepcopy(m['candidate_heads']),
+        candidate_space=args.candidate_space,collateral_arm=args.collateral_arm,
+        wikitext_manifest_hash=wt['manifest_hash'],protocol_hash=sd.content_hash(protocol),
+        max_updates=args.max_updates,checkpoint_every=args.checkpoint_every,pairs_per_update=8)
+    if args.candidate_space=='all': m['candidate_heads']=[[l,h] for l in range(32) for h in range(32)]
+    m['candidate_heads_hash']=sd.content_hash(m['candidate_heads']);m['manifest_hash']=sd.manifest_hash(m)
+    sm.validate_pilot_manifest(m);_validate_amendment(m)
+    args.manifest.parent.mkdir(parents=True,exist_ok=True)
+    with args.manifest.open('x') as f: f.write(sd.canonical_json(m)+'\n')
+
+
+def _amended_plan(args,m):
+    _validate_amendment(m);a=m['amendment'];wt=_wt_manifest(args)
+    if (getattr(args,'policy',None)!='amendment-v2' or args.collateral_arm!=a['collateral_arm']
+            or args.candidate_space!=a['candidate_space'] or args.max_updates!=512
+            or args.checkpoint_every!=64 or args.seed!=0 or args.rho not in (0.,.01)
+            or args.joint_pairs!=1 or wt['manifest_hash']!=a['wikitext_manifest_hash']):
+        raise ValueError('CLI differs from frozen amendment')
+    enabled=args.collateral_arm in ('W','HW')
+    schedule=amended_schedule(119,seed=args.seed)
+    order=list(range(32));random.Random(args.seed).shuffle(order)
+    return dict(policy='amendment-v2',manifest_hash=m['manifest_hash'],source_files_hash=sd.content_hash(_source_files()),
+        settings=_amended_settings(args),effective_candidate_count=len(m['candidate_heads']),
+        updates=512,pair_presentations=4096,full_sdr_cycles=34,additional_pairs=50,
+        row_schedule_hash=sd.content_hash(schedule),w_block_order=order,w_block_cycles=16,
+        train_joint_forwards=4096,train_w_forwards=512 if enabled else 0,
+        validation_checkpoints=8,validation_joint_forwards=8*119,validation_w_forwards=8*16,
+        baseline_joint_forwards=238,baseline_w_forwards=48,test_reference_forwards=0,
+        baseline_generation_completions=0,training_generation_completions=0,
+        reference_cache_fp32_bytes_expression='(238 + 48*127)*vocab_size*4',
+        per_block_cpu_cache=True,max_gpu_reference_blocks=1,checkpoint_every=64,max_checkpoints=9,checkpoint_writes=521,
+        measured_cost_required=True,generation_timing_is_training_estimate=False)
+
+
+def _amended_receipt(record,m,mode):
+    if (record.get('version')!=2 or record.get('policy')!='amendment-v2'
+            or record.get('manifest_hash')!=m['manifest_hash'] or record.get('baseline_path')!=BASELINE_PATH
+            or not record.get('root_decision') or not record.get('source_revision')
+            or not record.get('source_files_hash') or not record.get('model_revision')
+            or record.get('user_authorized_fit') is not True or not isinstance(record.get('prior_behavior'),dict)
+            or not record.get('wikitext_manifest_hash')):
+        raise ValueError('amended root receipt identity/authorization missing')
+    if m['amendment'].get('protocol_hash') and record.get('protocol_hash')!=m['amendment']['protocol_hash']:
+        raise ValueError('amendment scientific protocol hash differs')
+    if mode!='baseline' and any(not record.get(k) for k in ('baseline_fingerprint','baseline_cache_sha256',
+                                                           'wikitext_cache_fingerprint','wikitext_cache_inventory_hash')):
+        raise ValueError('amended baseline technical evidence missing')
+    if mode in ('train','evaluate'):
+        evidence=record.get('numerical_evidence',{})
+        if (evidence.get('root_review')!='passed' or not evidence.get('calibration_sha256')
+                or evidence.get('source_files_hash')!=record['source_files_hash']
+                or evidence.get('baseline_fingerprint')!=record.get('baseline_fingerprint')
+                or evidence.get('wikitext_cache_fingerprint')!=record.get('wikitext_cache_fingerprint')
+                or not record.get('measured_budget',{}).get('passed')
+                or not record.get('measured_budget',{}).get('profile_sha256')):
+            raise ValueError('amended measured numerical/resource evidence missing')
+    return record
+
+
+def _wt_logits(model,block,*,self_donor=False):
+    device=next(model.parameters()).device
+    return model(input_ids=block['input_ids'].to(device),
+        corrupted_input_ids=(block['input_ids'] if self_donor else block['corrupted_input_ids']).to(device),
+        attention_mask=block['attention_mask'].to(device),use_cache=False).logits.float()
+
+
+def _wt_reference_identity(identity):
+    return dict(baseline_fingerprint=_baseline_fingerprint(identity),baseline_path=BASELINE_PATH,
+                wikitext_manifest_hash=identity['wikitext_manifest_hash'])
+
+
+def _wt_inventory(args,wm,fingerprint):
+    from evaluation import selective_wikitext as wt
+    inventory={}
+    for split in ('train','validation'):
+        for block in wt.iter_blocks(wm,split):
+            value=wt.read_reference_block(args.wikitext_cache,fingerprint=fingerprint,block_id=block['block_id'])
+            if value['input_ids_hash']!=sd.content_hash(block['input_ids'].tolist()[0]):
+                raise ValueError('WikiText cache recipient token identity differs')
+            inventory[block['block_id']]=value['payload_digest']
+    return sd.content_hash(inventory)
+
+
+def _amended_baseline(args,m,identity,ctx,load_seconds=0.):
+    from analysis import open_all_gates
+    from evaluation import selective_wikitext as wt
+    started=time.monotonic();fingerprint=_baseline_fingerprint(identity);path=args.output_dir/'reference.pt'
+    if path.exists():
+        if not args.resume: raise FileExistsError('baseline exists; explicit resume required')
+        cache=_load_cache(path,fingerprint)
+    else:
+        cache=dict(fingerprint=fingerprint,baseline_path=BASELINE_PATH,splits={})
+        for name,split in m['splits'].items():
+            logits=_baseline_logits(ctx.node_model,split);labels=_labels(split)
+            capable=logits['H'].argmax(-1)==labels['H']
+            cache['splits'][name]=dict(h_logits=logits['H'].detach().cpu(),capable=capable,
+                capability=_capability_report(split['clusters'],capable),
+                metrics=_metrics(logits['D'],logits['H'],logits['H'],labels,capable,update=0,removed=0))
+        _save_tensor(path,cache)
+    wm=_wt_manifest(args);wfp=wt.cache_fingerprint(wm,_wt_reference_identity(identity))
+    prep=time.monotonic();means={}
+    with _preserve_gates(ctx.node_model),torch.no_grad():
+        open_all_gates(ctx.node_model)
+        for split in ('train','validation'):
+            totals=[]
+            for block in wt.iter_blocks(wm,split):
+                # write_reference_block validates identical existing immutable records.
+                try:
+                    payload=wt.read_reference_block(args.wikitext_cache,fingerprint=wfp,block_id=block['block_id'])
+                    if not args.resume: raise FileExistsError('WikiText reference exists; explicit resume required')
+                except FileNotFoundError:
+                    payload=wt.write_reference_block(args.wikitext_cache,fingerprint=wfp,block_id=block['block_id'],
+                        logits=_wt_logits(ctx.node_model,block,self_donor=True),input_ids=block['input_ids'].to(next(ctx.node_model.parameters()).device))
+                totals.append(payload['base_nll_sum']/block['n_tokens'])
+            means[split]=sum(totals)/len(totals)
+    sr.atomic_json(args.output_dir/'baseline.json',dict(policy='amendment-v2',fingerprint=fingerprint,
+        baseline_cache_sha256=_hash_file(path),wikitext_cache_fingerprint=wfp,
+        wikitext_cache_inventory_hash=_wt_inventory(args,wm,wfp),w_nll=means,
+        capability={s:c['capability'] for s,c in cache['splits'].items()},
+        reference_preparation_seconds=time.monotonic()-prep,total_seconds=time.monotonic()-started,model_load_seconds=load_seconds,
+        sdr_cache_bytes=path.stat().st_size,wikitext_cache_bytes=sum(p.stat().st_size for p in (Path(args.wikitext_cache)/wfp).glob('*.pt')),
+        test_references_prepared=False,behavioral_gates_waived_by_user=True,prior_behavior=identity['receipt']['prior_behavior']))
+
+
+def _w_validation(model,blocks,args,wfp):
+    from evaluation import selective_wikitext as wt
+    total_kl=total_nll=base_nll=0.;count=0;hinges=[]
+    with torch.no_grad():
+        for block in blocks:
+            ref=wt.read_reference_block(args.wikitext_cache,fingerprint=wfp,block_id=block['block_id'])
+            logits=_wt_logits(model,block);loss=wt.block_loss(logits,ref['reference_log_probs'].to(logits.device),block['input_ids'].to(logits.device))
+            total_kl+=float(loss.kl_sum);total_nll+=float(loss.nll_sum);base_nll+=ref['base_nll_sum'];count+=loss.n_tokens
+            hinges.append(max(0.,(float(loss.nll_sum)-ref['base_nll_sum'])/loss.n_tokens))
+    return dict(w_kl=total_kl/count,w_nll=total_nll/count,w_base_nll=base_nll/count,
+                w_nll_nondegradation=sum(hinges)/len(hinges),w_tokens=count)
+
+
+def _amended_validation(model,m,cache,args,identity,wm,wfp,update):
+    from evaluation import selective_wikitext as wt
+    metrics,export=_validation(model,m['splits']['validation'],cache['splits']['validation'],
+                                update,m['candidate_heads'],identity)
+    training=model.training;model.eval()
+    try: metrics.update(_w_validation(model,list(wt.iter_blocks(wm,'validation')),args,wfp))
+    finally: model.train(training)
+    metrics.update(rho=args.rho,collateral_arm=args.collateral_arm)
+    return metrics,export
+
+
+def _amended_update(model,m,cache,args,ids,wblock,wfp,optimizer,*,measure_gradients=False):
+    from evaluation import selective_wikitext as wt
+    ref=cache['splits']['train'];labels=_labels(m['splits']['train']);device=next(model.parameters()).device
+    ncap=int(ref['capable'][ids].sum());params=[p for p in model.parameters() if p.requires_grad]
+    optimizer.zero_grad(set_to_none=True);raw=dict(n_d=8,n_h=8,n_capable=ncap,suppression_sum=0.,kl_sum=0.,truth_sum=0.)
+    contributions={}
+    def component(value,name):
+        grads=torch.autograd.grad(value,params,retain_graph=True,allow_unused=True)
+        vector=torch.cat([(g.detach() if g is not None else torch.zeros_like(p)).flatten() for p,g in zip(params,grads)])
+        contributions[name]=contributions.get(name,torch.zeros_like(vector))+vector
+    def backward(value,name):
+        if not torch.isfinite(value): raise FloatingPointError('nonfinite amended objective')
+        if measure_gradients:
+            component(value,name)
+        value.backward()
+    with _shared_gate_noise(model):
+        for i in ids:
+            d,h=_joint_logits(model,m['splits']['train'],[i])
+            loss=sm.pilot_loss(d,labels['D'][[i],None].to(device),h,ref['h_logits'][[i]].to(device),
+                labels['H'][[i]].to(device),ref['capable'][[i]].to(device),_candidate_logits(model),rho=0.)
+            # Keep the W objective disconnected from both H collateral terms.
+            terms={'T':loss.suppression/8}
+            if args.collateral_arm in ('H','HW'):
+                weight=.5 if args.collateral_arm=='H' else .25
+                terms.update(H_KL=weight*loss.capable_kl*loss.n_capable/max(ncap,1),H_NLL=weight*loss.truth_nondegradation/8)
+            # Backpropagate components separately only during the disposable smoke.
+            if measure_gradients:
+                for name,value in terms.items():
+                    component(value,name)
+            sum(terms.values()).backward()
+            raw['suppression_sum']+=float(loss.suppression.detach());raw['kl_sum']+=float(loss.capable_kl.detach())*loss.n_capable
+            raw['truth_sum']+=float(loss.truth_nondegradation.detach())
+        if args.collateral_arm in ('W','HW'):
+            refw=wt.read_reference_block(args.wikitext_cache,fingerprint=wfp,block_id=wblock['block_id'])
+            logitsw=_wt_logits(model,wblock)
+            lossw=wt.block_loss(logitsw,refw['reference_log_probs'].to(device),wblock['input_ids'].to(device))
+            weight=.5 if args.collateral_arm=='W' else .25
+            terms={'W_KL':weight*lossw.kl_sum/lossw.n_tokens,
+                   'W_NLL':weight*F.relu((lossw.nll_sum-refw['base_nll_sum'])/lossw.n_tokens)}
+            if measure_gradients:
+                for name,value in terms.items():
+                    component(value,name)
+            sum(terms.values()).backward()
+            raw.update(w_kl_sum=float(lossw.kl_sum.detach()),w_nll_sum=float(lossw.nll_sum.detach()),
+                       w_base_nll_sum=refw['base_nll_sum'],w_tokens=lossw.n_tokens,w_block_id=wblock['block_id'])
+        penalty=args.rho*torch.sigmoid(-_candidate_logits(model)).sum();backward(penalty,'penalty')
+    if any(p.grad is not None and not torch.isfinite(p.grad).all() for p in params): raise FloatingPointError('nonfinite gradient')
+    raw['candidate_nonzero_gradient']=any(p.grad is not None and bool(p.grad.any()) for p in params)
+    raw['gradient_isolation']=all(p.grad is None for p in model.parameters() if not p.requires_grad)
+    for module in model.modules():
+        if isinstance(module,HardConcreteGate) and module.eligibility is not None and module.log_alpha.grad is not None:
+            raw['gradient_isolation'] &= not bool(module.log_alpha.grad[~module.eligibility].any())
+    if not raw['gradient_isolation']: raise ValueError('gradient outside candidate support')
+    torch.nn.utils.clip_grad_norm_(params,1.,error_if_nonfinite=True);optimizer.step()
+    hw=.5 if args.collateral_arm=='H' else .25 if args.collateral_arm=='HW' else 0.
+    ww=.5 if args.collateral_arm=='W' else .25 if args.collateral_arm=='HW' else 0.
+    raw.update(expected_removed=float(torch.sigmoid(-_candidate_logits(model)).sum().detach()),
+        H_KL=raw['kl_sum']/max(ncap,1),H_NLL=raw['truth_sum']/8,T=raw['suppression_sum']/8,
+        capable_H_absent=ncap==0,unit_coefficients={'T':1.,'H_KL':hw,'H_NLL':hw,'W_KL':ww,'W_NLL':ww,'removed_count':args.rho},
+        gradient_component_norms={k:float(v.float().norm()) for k,v in contributions.items()})
+    if 'w_tokens' in raw:
+        raw.update(W_KL=raw['w_kl_sum']/raw['w_tokens'],W_NLL=max(0.,(raw['w_nll_sum']-raw['w_base_nll_sum'])/raw['w_tokens']))
+    return raw
+
+
+def _train_amended(args,m,identity,ctx,cache,wm,wfp):
+    from evaluation import selective_wikitext as wt
+    model=ctx.node_model;params=sm.configure_candidate_gates(model,m['candidate_heads'])
+    optimizer=_optimizer(params);fp=sd.content_hash(identity);latest=args.output_dir/'latest.pt'
+    schedule=amended_schedule(len(m['splits']['train']['clusters']),seed=args.seed,updates=args.max_updates)
+    blocks=list(wt.iter_blocks(wm,'train')) if wm else []
+    order=list(range(len(blocks)));random.Random(args.seed).shuffle(order)
+    cursor=dict(update=0,history=[],loss_log=[],row_schedule_hash=sd.content_hash(schedule),w_block_order=order)
+    random.seed(args.seed);np.random.seed(args.seed);torch.manual_seed(args.seed)
+    if torch.cuda.is_available():torch.cuda.manual_seed_all(args.seed)
+    if args.resume:
+        saved=_restore(latest,model,optimizer,fp)
+        if any(saved[k]!=cursor[k] for k in ('row_schedule_hash','w_block_order')):
+            raise ValueError('resume schedule differs')
+        cursor=saved
+    elif latest.exists(): raise FileExistsError('training exists; explicit resume required')
+    model.train()
+    if not args.resume:_checkpoint(latest,model,optimizer,cursor,fp)
+    baseline=dict(cache['splits']['validation']['metrics'])
+    baseline['w_nll']=identity.get('receipt',{}).get('w_nll',{}).get('validation',1.)
+    if wm:
+        base_nll=0.;n_tokens=0
+        for block in wt.iter_blocks(wm,'validation'):
+            ref=wt.read_reference_block(args.wikitext_cache,fingerprint=wfp,block_id=block['block_id'])
+            base_nll+=ref['base_nll_sum'];n_tokens+=ref['n_tokens']
+        baseline.update(w_nll=base_nll/n_tokens,w_kl=0.)
+    for update in range(cursor['update'],args.max_updates):
+        try:
+            raw=_amended_update(model,m,cache,args,schedule[update],
+                blocks[order[update%len(order)]] if blocks else None,wfp,optimizer)
+        except (RuntimeError,FloatingPointError,ValueError):
+            sr.atomic_json(args.output_dir/'failure.json',dict(last_complete_update=cursor['update'],status='incomplete_technical_failure'))
+            raise
+        cursor['update']=update+1;raw['update']=update+1;cursor['loss_log'].append(raw)
+        if (update+1)%args.checkpoint_every==0 or update+1==args.max_updates:
+            metrics,export=_amended_validation(model,m,cache,args,identity,wm,wfp,update+1)
+            checkpoint=args.output_dir/('validation-%06d.pt'%(update+1))
+            metrics.update(checkpoint=str(checkpoint.resolve()),export_hash=export['export_hash'])
+            cursor['history'].append(metrics);_checkpoint(checkpoint,model,optimizer,cursor,fp)
+        _checkpoint(latest,model,optimizer,cursor,fp)
+    selected=select_amended_checkpoint(cursor['history'],baseline,args.collateral_arm)
+    sr.atomic_json(args.output_dir/'frontier.json',dict(policy='amendment-v2',history=cursor['history'],baseline=baseline,
+        selected=selected,status='admissible' if selected and selected['admissible'] else 'failed_frontier',
+        compact_useful_finding=has_compact_amended_finding(cursor['history'],baseline,args.collateral_arm),automatic_retry=False))
+    if selected:
+        _restore(selected['checkpoint'],model,optimizer,fp)
+        export=sm.export_binary_masks(model,m['candidate_heads'],provenance=identity)
+        if export['export_hash']!=selected['export_hash']:raise ValueError('selected export mismatch')
+        sr.atomic_json(args.output_dir/'selected-mask.json',export)
+
+
+def _sync():
+    if torch.cuda.is_available():torch.cuda.synchronize()
+
+
+def _comparison(a,b):
+    delta=(a.detach().float().cpu()-b.detach().float().cpu()).abs()
+    return dict(max_abs_full_vocab=float(delta.max()),mean_abs_full_vocab=float(delta.mean()),
+        finite=bool(torch.isfinite(a).all() and torch.isfinite(b).all()),changed_entries=int((delta>0).sum()),
+        argmax_flips=int((a.detach().cpu().argmax(-1)!=b.detach().cpu().argmax(-1)).sum()))
+
+
+def _amended_calibrate(args,m,identity,ctx,cache,wm,wfp,load_seconds):
+    """Disposable A/B/C and warmed optimizer measurements; restores all state."""
+    from analysis import open_all_gates
+    from evaluation import selective_wikitext as wt
+    model=ctx.node_model;original={k:v.detach().clone() for k,v in _gate_state(model).items()}
+    original_heads=m['candidate_heads'];cpu_rng=torch.get_rng_state()
+    cuda_rng=torch.cuda.get_rng_state_all() if torch.cuda.is_available() else []
+    training=model.training;checks=[];profile=[];hooks=[]
+    blocks=list(wt.iter_blocks(wm,'train'));schedule=amended_schedule(119,seed=args.seed)
+    def forced(module,inputs,out):return out+(torch.ones_like(out)-out).detach()
+    try:
+        # One SDR representative per structural length, plus two corpus documents.
+        representatives={}
+        for i,c in enumerate(m['splits']['train']['clusters']):
+            representatives.setdefault(len(c['prompts']['original']['D']['clean']['input_ids']),i)
+        cases=[('SDR',i) for i in representatives.values()]+[('WT',b) for b in blocks[:2]]
+        for space in ('union','all'):
+            heads=original_heads if space==m['amendment']['candidate_space'] else (
+                [[l,h] for l in range(32) for h in range(32)] if space=='all' else m['amendment'].get('union_heads',[]))
+            if not heads:
+                raise ValueError('all-head profiling needs frozen union head list in amendment')
+            params=sm.configure_candidate_gates(model,heads)
+            for domain,item in cases:
+                def forward(self_donor):
+                    if domain=='WT':return _wt_logits(model,item,self_donor=self_donor)
+                    return torch.cat(_joint_logits(model,m['splits']['train'],[item],self_donor=self_donor))
+                with _preserve_gates(model),torch.no_grad():
+                    open_all_gates(model);a=forward(True);repeat=forward(True);b=forward(False)
+                model.train()
+                for gate in model.modules():
+                    if isinstance(gate,HardConcreteGate) and gate.eligibility is not None and gate.eligibility.any():
+                        hooks.append(gate.register_forward_hook(forced))
+                c=forward(False)
+                for hook in hooks:hook.remove()
+                hooks=[]
+                comparisons=dict(self_nonself=_comparison(a,b),eval_grad=_comparison(b,c),repeat=_comparison(a,repeat))
+                ref_check=None
+                if domain=='WT':
+                    ref=wt.read_reference_block(args.wikitext_cache,fingerprint=wfp,block_id=item['block_id'])
+                    loss=wt.block_loss(c,ref['reference_log_probs'].to(c.device),item['input_ids'].to(c.device))
+                    ref_check=_comparison(F.log_softmax(a[:,:-1].float(),-1).cpu(),ref['reference_log_probs'])
+                    floors=dict(kl=float(loss.kl_sum.detach()/loss.n_tokens),
+                        nll_delta=float((loss.nll_sum.detach()-ref['base_nll_sum'])/loss.n_tokens))
+                else:
+                    labels=_labels(m['splits']['train']);dev=c.device
+                    loss=sm.pilot_loss(c[:1],labels['D'][[item],None].to(dev),c[1:],a[1:],labels['H'][[item]].to(dev),
+                        cache['splits']['train']['capable'][[item]].to(dev),_candidate_logits(model),rho=0.)
+                    floors=dict(kl=float(loss.capable_kl.detach()),nll_delta=float(loss.truth_nondegradation.detach()))
+                if domain=='SDR':
+                    for key,left,right in [('self_nonself',a,b),('eval_grad',b,c),('repeat',a,repeat)]:
+                        token_ids=[int(labels['D'][item]),int(labels['H'][item])]
+                        comparisons[key]['max_abs_label_logits']=float((left.detach()[:,token_ids]-right.detach()[:,token_ids]).abs().max())
+                        comparisons[key]['label_probabilities']=[F.softmax(x.detach().float(),-1)[:,token_ids].cpu().tolist() for x in (left,right)]
+                    ref_check=_comparison(a[1:].cpu(),cache['splits']['train']['h_logits'][[item]])
+                    diagnostic=loss.total
+                else: diagnostic=loss.kl_sum/loss.n_tokens+loss.nll_sum/loss.n_tokens
+                diagnostic.backward()
+                finite_gradients=all(p.grad is None or bool(torch.isfinite(p.grad).all()) for p in model.parameters())
+                isolated=all(p.grad is None for p in model.parameters() if not p.requires_grad)
+                nonzero=any(p.grad is not None and bool(p.grad.any()) for p in params)
+                for gate in model.modules():
+                    if isinstance(gate,HardConcreteGate) and gate.eligibility is not None and gate.log_alpha.grad is not None:
+                        isolated=isolated and not bool(gate.log_alpha.grad[~gate.eligibility].any())
+                checks.append(dict(candidate_space=space,domain=domain,comparisons=comparisons,reference=ref_check,loss_floors=floors,
+                    finite_loss_and_gradients=bool(torch.isfinite(diagnostic)) and finite_gradients,
+                    gradient_isolation=isolated,candidate_nonzero_gradient=nonzero))
+                model.zero_grad(set_to_none=True)
+            # Profile each actual arm under each eligibility; discard warmup/state.
+            for arm in ('H','W','HW'):
+                sm.configure_candidate_gates(model,heads);optimizer=_optimizer([p for p in model.parameters() if p.requires_grad])
+                profile_args=copy.copy(args);profile_args.collateral_arm=arm
+                local_m=dict(m,candidate_heads=heads)
+                model.train();_amended_update(model,local_m,cache,profile_args,schedule[0],blocks[0],wfp,optimizer)
+                durations=[];logs=[]
+                if torch.cuda.is_available():torch.cuda.reset_peak_memory_stats()
+                for j in range(args.profile_updates):
+                    _sync();start=time.monotonic()
+                    logs.append(_amended_update(model,local_m,cache,profile_args,schedule[j+1],blocks[(j+1)%32],wfp,optimizer,
+                                                measure_gradients=j==0))
+                    _sync();durations.append(time.monotonic()-start)
+                # First measured update includes component gradients; exclude its overhead from pricing.
+                priced=durations[1:]
+                _sync();start=time.monotonic()
+                metrics,export=_amended_validation(model,local_m,cache,profile_args,identity,wm,wfp,0)
+                base=cache['splits']['validation']['metrics']
+                no_op=dict(removed=metrics['removed'],all_h_argmax_preserved=metrics['h_argmax_ids']==base['h_argmax_ids'],
+                    all_d_argmax_preserved=metrics['d_argmax_ids']==base['d_argmax_ids'],
+                    max_abs_label_logits=max(float((torch.tensor(metrics[k])-torch.tensor(base[k])).abs().max()) for k in ('d_label_logits','h_label_logits')),
+                    w_kl=metrics['w_kl'],w_nll_delta=metrics['w_nll']-metrics['w_base_nll'])
+                _sync();validation_seconds=time.monotonic()-start
+                io=args.output_dir/('profile-%s-%s.pt'%(space,arm));start=time.monotonic()
+                _checkpoint(io,model,optimizer,{'disposable':True},'profile');io_seconds=time.monotonic()-start
+                io_bytes=io.stat().st_size;io.unlink()
+                # Exercise a nonempty deterministic export, independent of short-smoke convergence.
+                with torch.no_grad(): model.model.layers[heads[0][0]].attn.head_gates.log_alpha[heads[0][1]]=-1.
+                export=sm.export_binary_masks(model,heads,provenance=identity)
+                model.eval();probe=_wt_logits(model,blocks[0]).detach()
+                saved=[]
+                for layer in model.model.layers:
+                    gate=layer.attn.head_gates;fixed=torch.tensor(export['K'][str(len(saved))],device=gate.log_alpha.device,dtype=torch.float32)
+                    saved.append(gate.register_forward_hook(lambda module,inputs,out,fixed=fixed:fixed))
+                try:equivalent=torch.equal(probe,_wt_logits(model,blocks[0]).detach())
+                finally:
+                    for hook in saved:hook.remove()
+                profile.append(dict(candidate_space=space,collateral_arm=arm,warmup_updates=1,disposable_updates=args.profile_updates,
+                    update_seconds=durations,priced_update_seconds=priced,validation_119pairs_16blocks_seconds=validation_seconds,
+                    checkpoint_seconds=io_seconds,checkpoint_bytes=io_bytes,validation_no_op=no_op,
+                    estimated_512_update_run_seconds=(load_seconds+512*sum(priced)/len(priced)+8*validation_seconds+521*io_seconds),
+                    peak_cuda_bytes=torch.cuda.max_memory_allocated() if torch.cuda.is_available() else 0,
+                    export_equivalent=equivalent,export_probe_removed_heads=len(export['removed_heads']),raw_components_and_gradient_contributions=logs[0],
+                    all_updates_finite=True,actual_nonself_candidate_gradient=bool(logs[0]['gradient_component_norms'].get('T',0.)>0) and all(x['candidate_nonzero_gradient'] for x in logs)))
+    finally:
+        for hook in hooks:hook.remove()
+        sm.configure_candidate_gates(model,original_heads)
+        with torch.no_grad():
+            for k,v in _gate_state(model).items():v.copy_(original[k])
+        model.zero_grad(set_to_none=True);model.train(training);torch.set_rng_state(cpu_rng)
+        if cuda_rng:torch.cuda.set_rng_state_all(cuda_rng)
+    finite=all(c['finite_loss_and_gradients'] and c['gradient_isolation'] and all(v['finite'] and not v['argmax_flips']
+        and (c['domain']=='WT' or v['max_abs_label_logits']<=.02) for v in c['comparisons'].values()) for c in checks)
+    no_op_pass=all(p['validation_no_op']['removed']==0 and p['validation_no_op']['all_h_argmax_preserved']
+        and p['validation_no_op']['all_d_argmax_preserved'] and p['validation_no_op']['max_abs_label_logits']<=.02 for p in profile)
+    sr.atomic_json(args.output_dir/'calibration.json',dict(policy='amendment-v2',numerical_checks=checks,
+        numerical_gate_passed=finite and no_op_pass and all(p['actual_nonself_candidate_gradient'] and p['export_equivalent'] for p in profile),
+        fixed_semantic_label_logit_tolerance=.02,wikitext_distributional_floor_requires_root_review=True,model_load_seconds=load_seconds,source_files_hash=identity['source_files_hash'],
+        baseline_fingerprint=_baseline_fingerprint(identity),wikitext_cache_fingerprint=wfp,
+        profile=profile,production_optimizer_steps=0,all_smoke_states_discarded=True,
+        decision='root must inspect measured numerical evidence and cost before issuing train receipt'))
+
+
+def _run_amended(args,m,receipt,mode):
+    from evaluation import selective_wikitext as wt
+    if mode=='evaluate':raise ValueError('native assessment requires root frozen fresh-cluster evaluation protocol')
+    if not 3<=args.profile_updates<=8:raise ValueError('profile requires 3..8 measured updates after warmup')
+    if receipt['wikitext_manifest_hash']!=m['amendment']['wikitext_manifest_hash']:
+        raise ValueError('root WikiText identity differs')
+    if mode=='train': _verify_amended_evidence(receipt,m)
+    if mode=='train' and (receipt.get('training_settings')!=_amended_settings(args)
+                         or args.rho not in receipt.get('allowed_rhos',[])):
+        raise ValueError('training settings differ from root frozen grid')
+    started=time.monotonic();identity=_identity(args,m,receipt);ctx,_=_runtime(args,identity);_sync()
+    load_seconds=time.monotonic()-started
+    torch.use_deterministic_algorithms(True);torch.backends.cuda.matmul.allow_tf32=False;torch.backends.cudnn.allow_tf32=False
+    if mode=='baseline':_amended_baseline(args,m,identity,ctx,load_seconds);return 0
+    cache=_checked_cache(args,identity);wm=_wt_manifest(args)
+    wfp=wt.cache_fingerprint(wm,_wt_reference_identity(identity))
+    if receipt['wikitext_cache_fingerprint']!=wfp or receipt['wikitext_cache_inventory_hash']!=_wt_inventory(args,wm,wfp):
+        raise ValueError('root WikiText reference identity/inventory differs')
+    sm.configure_candidate_gates(ctx.node_model,m['candidate_heads'])
+    if mode=='calibrate':_amended_calibrate(args,m,identity,ctx,cache,wm,wfp,load_seconds)
+    else:_train_amended(args,m,identity,ctx,cache,wm,wfp)
+    return 0
+
+
+def _verify_amended_evidence(receipt,m):
+    evidence=receipt['numerical_evidence']
+    path=Path(evidence['calibration_path'])
+    if _hash_file(path)!=evidence['calibration_sha256'] or receipt['measured_budget']['profile_sha256']!=evidence['calibration_sha256']:
+        raise ValueError('measured calibration/profile artifact SHA mismatch')
+    report=json.loads(path.read_text())
+    if (report.get('policy')!='amendment-v2' or report.get('numerical_gate_passed') is not True
+            or report.get('source_files_hash')!=receipt['source_files_hash']
+            or report.get('baseline_fingerprint')!=receipt['baseline_fingerprint']
+            or report.get('wikitext_cache_fingerprint')!=receipt['wikitext_cache_fingerprint']
+            or report.get('production_optimizer_steps')!=0 or report.get('all_smoke_states_discarded') is not True):
+        raise ValueError('measured calibration/profile content differs from root receipt')
+    matches=[row for row in report.get('profile',[]) if row['candidate_space']==m['amendment']['candidate_space']
+             and row['collateral_arm']==m['amendment']['collateral_arm']]
+    if len(matches)!=1 or not matches[0]['actual_nonself_candidate_gradient'] or not matches[0]['export_equivalent']:
+        raise ValueError('matching measured candidate-space/arm profile missing')
+
+
+def has_compact_amended_finding(history,baseline,arm):
+    """Any useful restricted checkpoint prevents expansion, even if not finalist."""
+    return any(compact_amended_finding(row,baseline,arm) for row in history)

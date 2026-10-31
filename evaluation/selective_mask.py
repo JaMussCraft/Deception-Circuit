@@ -360,3 +360,25 @@ def export_binary_masks(model, candidate_heads: list[Head], *, provenance: dict)
               'provenance': copy.deepcopy(provenance), 'provenance_hash': sd.content_hash(provenance)}
     result['export_hash'] = sd.content_hash(result)
     return result
+
+
+def amended_objective(loss, *, arm, n_d, total_d, total_h, total_capable,
+                      w_kl_sum=None, w_nll_sum=None, w_base_nll_sum=None, w_tokens=None):
+    """One microbatch contribution, with update-level observation denominators.
+
+    WikiText sums describe one entire window, so its hinge is applied after the
+    token mean. Penalty is added once by the runner, outside accumulation.
+    """
+    if arm not in ('H', 'W', 'HW') or min(n_d, total_d, total_h) <= 0 or total_capable < 0:
+        raise ValueError('invalid amended objective units')
+    result = loss.suppression * n_d / total_d
+    if arm in ('H', 'HW'):
+        ch = (loss.capable_kl * loss.n_capable / max(total_capable, 1)
+              + loss.truth_nondegradation * loss.n_h / total_h) / 2
+        result = result + ch * (1. if arm == 'H' else .5)
+    if w_kl_sum is not None:
+        if arm == 'H' or w_tokens is None or w_tokens <= 0:
+            raise ValueError('unexpected WikiText contribution')
+        cw = (w_kl_sum / w_tokens + F.relu(w_nll_sum / w_tokens - w_base_nll_sum / w_tokens)) / 2
+        result = result + cw * (1. if arm == 'W' else .5)
+    return result
