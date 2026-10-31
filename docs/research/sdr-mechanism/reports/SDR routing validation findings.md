@@ -1,0 +1,15 @@
+# SDR validation: prefixes explain retrieval failure; reporting still follows favored context
+
+**Completed answers recover factual retrieval, but this study does not establish a consequence-driven deception assay.** The original first-token validity gate remains failed; the confirmatory pathway tests were not implemented or run. A separate post-hoc diagnostic completed all 1,280 unchanged prompts and clarifies why that gate failed.
+
+On fresh factual retrieval, **512/512 completed answers were correct** across both templates, truth settings, favored identities, bonus conditions and prospective splits. All 114 retrieval responses that initially emitted neither named item eventually answered correctly. The earlier first-token failure was therefore strongly format-sensitive under this scaffold; it did not demonstrate broad factual incompetence. It still fails the original frozen criterion.
+
+Reporting behaves differently. Of 512 fresh reporting responses, **376 were correct, 127 wrong and nine named an organization rather than either candidate**. Favored identity already affected reporting with a fixed bonus: truthful answers in conflicting versus aligned cases were **36/64 versus 60/64** for template A and **24/64 versus 64/64** for B. Making the bonus conditional increased truthful answers from **96/128 to 103/128** for A and **88/128 to 89/128** for B. These results support reporting-context sensitivity; wrong answers alone do not establish strategic deception or intent.
+
+The historically selected native bridge remains separate: **101/128 truthful answers without the pressure clause versus 34/128 with it**, matching its original first-item results. Its large truth/order differences and selection history prevent fresh or OOD validation claims.
+
+The diagnostic used greedy continuations of at most 32 tokens, retaining the full denominator. Every response ended at EOS; none capped, failed or disappeared. Two independent blinded annotators personally labeled all **191 exact unique views** and agreed on identity, response kind and format for every view; original weights restore all 1,280 rows. Across the whole panel, outcomes were **1,023 correct, 248 wrong and nine bad/unresolved**. Among the original 238 non-item first tokens, 201 completed correctly, 28 incorrectly and nine remained bad/unresolved. Calibration was excluded.
+
+The next priority is a prospectively scored native study with matched consequence, adverse-context and factual controls, as in the [decision memo](../../.scratch/sdr-routing-validation/next-research-decision.md). The [earlier pilot](SDR%20routing%20pilot%20findings.md) supplies candidate perturbation routes; this follow-up supplies no new pathway or selective-suppression evidence.
+
+[Technical analysis and complete strata](../../.scratch/sdr-routing-validation/completion-analysis.md); [original baseline audit](../../.scratch/sdr-routing-validation/baseline-analysis.md). New-phase operator accounting: **7,800 reserved GPU-seconds**, including a cancelled H200 reservation; **595 actual A100 GPU-seconds**, **$0 paid APIs**. Lead context compactions: **2**.

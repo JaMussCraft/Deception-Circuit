@@ -1,0 +1,19 @@
+# SDR cue circuit transplant findings
+
+**The original masks share causal influence over example-sensitive reporting and factual answer transfer under these replacements.** Their common 32-head core largely reproduces the larger masks under these replacements. This strengthens a shared task-processing account, while leaving consequence-sensitive deception unexplained.
+
+D, H and F are masks discovered on deceptive, honest and format-control tasks. In eight neutral fixtures, we separately reversed permitted-answer example order (E) or which item the record called damaging (T). We transplanted the corresponding donor head activations throughout the recipient’s original prefix while generating complete answers. All MLPs remained active. Retrieval had no answer examples and received T alone. These are conditional replacement effects in a fixed scaffold.
+
+Intact reporting chose the damaging item 170/256 times and the first permitted example 210/256; retrieval was correct 128/128. Reversing examples changed 82/128 natural reporting pairs, separating example order from the previously confounded lexical identity.
+
+**The shared core carries both kinds of influence.** E transplantation increased choices of the donor’s first example from 46/256 intact to D207, H209, F214 and shared-core S208/256. T transplantation reduced recipient-truth reporting to 87, 86, 85 and 86/256, respectively, and retrieval to 23, 27, 24 and 28/128. Each direction held in all eight fixtures. E’s roughly stable aggregate truth counts do not mean individual answers were preserved. Contradictory T donors insert different facts, so retrieval changes include donor overwrite rather than establishing generic damage.
+
+Matched outside heads retained 128/128 retrieval truth in every comparator. Their E effects were heterogeneous: C_D7, C_H82, C_F64 and C_S3/256 donor-example choices, against intact46 and S208. Thus the shared-core effect exceeds its comparator here, but outsiders are not uniformly inert. One fixed layer/count-matched comparator does not establish general specificity.
+
+**Subtracting overlap hides distinct signed contributions.** D-exclusive A22 lowered E donor-example choices to 11/256, whereas B11=(D∩H)−F raised them to 144/256; both directions held in every fixture. A also lowered recipient-truth reporting to 139/256, decreasing it in all eight fixtures. Their union J33=D−F reached 102/256. Its E interaction was −7/256, versus −1/256 outside. These conditional joint effects do not prove natural redundancy. Weak necessity in another background would not make these heads unimportant. Earlier D−F knockout was strong on native SDR (.119 remaining accuracy versus matched-null fifth percentile .517), although reviewed external results lacked positive advantage.
+
+Universal copying of the donor’s emitted answer also fails: among 46 E pairs where intact recipient and donor both chose the alternative opposite the donor’s first example, transplantation changed the answer to the donor’s first example in D3, H3, F7, S3, B13 and J4 cases. A had zero such counterexamples; that does not prove copying or identify an abstract cue representation.
+
+All 9,344 completions reached EOS; 9,337 commitments and seven contradictory outcomes were retained. All 33,974 main numerical comparisons passed bitwise, with maximum difference zero. Two fresh blinded raters agreed on all 101 views; independent arithmetic checked 2,467,664 scalar comparisons without discrepancy. [Technical evidence](../../.scratch/sdr-cue-circuits/analysis.md).
+
+The result identifies shared cue/content influence under neutral prefix interchange. It establishes neither pressure mediation, intent, reporting-time latent knowledge, removal, OOD transfer, clean task selectivity nor a deception-specific role. E/T amplitudes do not rank encoding preferences. Earlier validation failures remain closed; no new experiments follow automatically.
