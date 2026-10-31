@@ -1,6 +1,7 @@
 """Cue assay scientific contracts; CPU only, never load a real model."""
 import copy
 import itertools
+import hashlib
 import json
 from pathlib import Path
 import pytest
@@ -60,7 +61,11 @@ def test_rank_crossing_render_and_hash_selection(cue,protocol):
             assert [r['id'] for r in p['calibration'] if r['fixture_id']==fixture['id']]==[r['id'] for r in selected]
     assert p['payload']['sequence_length']==224
     assert p['payload']['batch_size']==8
-    assert len(p['provenance']['source_hashes'])==54
+    expected=set(n.SOURCE_NAMES)|set(cue.NEW_SOURCES)
+    for package in ('component_analysis','models','dataset'):
+        expected.update(str(path.relative_to(ROOT)) for path in (ROOT/package).rglob('*.py'))
+    assert set(p['provenance']['source_hashes'])==expected
+    assert p['provenance']['source_hashes']=={path:hashlib.sha256((ROOT/path).read_bytes()).hexdigest() for path in expected}
     assert p['payload']['rubric_source']['sha256']=='930f7f081060262f179dc3a4d030e21b15a8b710e629fbead76c6bf7ceda6185'
     cue.verify_protocol(p)
 
@@ -281,5 +286,9 @@ def test_wrapper_and_cli_modes(tmp_path):
     wrapper=ROOT/'scripts/jobs/run_sdr_cue_probe.sh'
     env={**os.environ,'SDR_CUE_PYTHON':__import__('sys').executable}
     check=subprocess.run(['bash',str(wrapper),'--help'],cwd=ROOT,env=env,capture_output=True,text=True)
+    approved=Path('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/sdr-routing-pilot')
+    if ROOT.resolve()!=approved:
+        assert check.returncode!=0 and 'explicitly approved worktree cwd' in check.stderr
+        return
     assert check.returncode==0 and 'freeze' in check.stdout and 'calibration' in check.stdout
     assert 'main' in check.stdout and 'analyze' in check.stdout

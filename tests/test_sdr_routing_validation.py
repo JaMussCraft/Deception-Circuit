@@ -1,6 +1,7 @@
 """Frozen SDR validation contracts; no pretrained model inference."""
 import copy
 import importlib.util
+import json
 from pathlib import Path
 import pytest
 import torch
@@ -63,11 +64,32 @@ def test_named_truth_favored_correct_answer_distinct_fields(manifest):
         assert v['truth_id']!=v['other_id']
 
 
-def test_sources_use_real_sample_json_and_exclude_prior_stories(manifest):
+def test_sources_use_real_sample_json_and_exclude_prior_stories(manifest,runner):
     h=manifest['historical']
-    assert len(h['component_sample_files'])==25
-    assert len(h['component_source_ids'])==139
-    assert len(h['selective_source_ids'])==64
+    samples={str(path):json.loads(path.read_text())
+        for path in sorted((PRIMARY/'outputs/_analyses').rglob('sample.json'))}
+    samples={path:data for path,data in samples.items() if data.get('task')=='sdr'}
+    assert h['component_sample_files']==[str(path) for path in sorted(map(Path,samples))]
+    component_ids={identity for data in samples.values() for identity in data['instance_ids']}
+    assert h['all_component_source_ids']==sorted(component_ids)
+    test_ids=set(h['source_ids_by_dataset']['sdr/test'])
+    assert h['component_source_ids']==sorted(component_ids & test_ids)
+    selective=json.loads((PRIMARY.parent/'.scratch/selective-deception/sparse-extension-v3/comparison/sdr-inputs.json').read_text())
+    selective_ids={row['source_id'] for row in selective['clusters']}
+    assert h['selective_source_ids']==sorted(selective_ids)
+    exposed=set(h['component_expanded_story_ids'])
+    datasets={(task,split):runner._read_records(PRIMARY,task,split)
+        for task in ('sdr','sdr_honest','sdr_nopressure') for split in ('train','validation','test')}
+    rows=[row for records in datasets.values() for row in records]
+    by_id={row['instance_id']:row for row in rows}
+    story=lambda row:runner.digest({key:row.get(key) for key in ('entity','domain','item_pair','template_variant')})
+    assert exposed=={story(by_id[identity]) for identity in component_ids}
+    exposed.update(story(by_id[identity]) for identity in selective_ids)
+    prior={group['story_id'] for group in json.loads(runner.PILOT_MANIFEST.read_text())['groups']}
+    native_tv={story(row) for (task,split),records in datasets.items() if split!='test' for row in records}
+    assert h['train_validation_story_ids']==sorted(native_tv)
+    assert h['native_excluded_story_ids']==sorted(native_tv|prior|exposed)
+    assert h['fresh_excluded_story_ids']==sorted({story(row) for row in rows}|prior|exposed)
     assert not set(h['native_excluded_story_ids']) & {g['story_id'] for g in manifest['groups'] if g['population']=='native'}
     assert not set(h['fresh_excluded_story_ids']) & {g['story_id'] for g in manifest['groups'] if g['population']=='fresh'}
 

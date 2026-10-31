@@ -378,38 +378,68 @@ def test_EOS_on_token32_is_terminated_not_capped(tiny,monkeypatch):
     assert all(len(row['generated_ids'])==32 and row['stop_reason']=='eos'
         and row['terminal_eos_id']==128008 and row['status']=='completed' for row in got)
 
-CALIBRATION=ROOT/'outputs/_analyses/sdr-completion-diagnostic/calibration-962cdd8-20261021T142417Z'
-
-@pytest.fixture(scope='module')
-def amended_release():
-    r=runner()
-    original=json.loads((CALIBRATION/'manifest.json').read_text())
-    return r,original,r.amend_completion_manifest(CALIBRATION/'manifest.json')
+@pytest.fixture
+def amended_release(tmp_path,monkeypatch):
+    r=runner();calibration=tmp_path/'calibration';calibration.mkdir()
+    # Bind a synthetic release exactly, without rewriting archived evidence or
+    # relying on the historical worktree's absolute source paths.
+    source=tmp_path/'completion.py';source.write_text('# reviewed source\n')
+    original_code={str(source):r.file_hash(source)}
+    original=dict(panel=[dict(ids=[3,4],length=2)],rubric=copy.deepcopy(r.RUBRIC),
+        rubric_hash=r.digest(r.RUBRIC),new_code_sha256=original_code,
+        budget=dict(main_reserved_seconds_max=3000,initial_total_reserved_seconds_max=3600,
+            overall_reserved_seconds_max=14400),
+        parent_files={},config_files={},model_files={},tokenizer_files={})
+    original['manifest_hash']=r.digest(original)
+    monkeypatch.setattr(r,'ORIGINAL_CODE',original_code)
+    monkeypatch.setattr(r,'ORIGINAL_COMPLETION_HASH',original['manifest_hash'])
+    monkeypatch.setattr(r,'NAMESPACE',tmp_path)
+    (calibration/'manifest.json').write_text(json.dumps(original))
+    receipt=dict(status='calibration_complete',manifest_hash=original['manifest_hash'],
+        rubric_hash=original['rubric_hash'],model_load_seconds=20.,audit_seconds=50.,
+        replay_seconds=64.,replay_forwards=160,continuation_seconds=4.,
+        continuation_forwards=10,checkpoint_seconds=18.832,
+        firststep_checks=1280,firststep_gate_pass=True)
+    receipt['forecast']=r.forecast_main(receipt)
+    (calibration/'calibration.json').write_text(json.dumps(receipt))
+    source.write_text('# allocation-only revision\n')
+    return r,original,r.amend_completion_manifest(calibration/'manifest.json'),calibration
 
 def test_operational_amendment_preserves_science_and_old_provenance(amended_release):
-    r,old,new=amended_release
+    r,old,new,calibration=amended_release
     assert new['budget']['main_reserved_seconds_max']==3600
     assert new['budget']['initial_total_reserved_seconds_max']==4200
     assert new['budget']['overall_reserved_seconds_max']==14400
     assert r.scientific_payload_hash(old)==r.scientific_payload_hash(new)
     assert new['operational_amendment']['prior_manifest_hash']==old['manifest_hash']
-    assert new['operational_amendment']['prior_manifest_file_sha256']==r.file_hash(CALIBRATION/'manifest.json')
+    assert new['operational_amendment']['prior_manifest_file_sha256']==r.file_hash(calibration/'manifest.json')
     assert new['operational_amendment']['prior_code_sha256']==old['new_code_sha256']
-    assert old==json.loads((CALIBRATION/'manifest.json').read_text())
+    assert old==json.loads((calibration/'manifest.json').read_text())
 
 def test_amended_main_accepts_measured3208_but_retains_historical_3000_fail(amended_release):
-    r,old,new=amended_release
-    audit=r.validate_calibration_receipt(CALIBRATION/'calibration.json',new,3600)
+    r,old,new,calibration=amended_release
+    audit=r.validate_calibration_receipt(calibration/'calibration.json',new,3600)
     assert audit['fits_allocated_seconds'] is True
     assert audit['historical_forecast']['fits_3000'] is False
     assert 3200<audit['historical_forecast']['forecast_seconds']<3210
-    with pytest.raises(r.DiagnosticStop):r.validate_calibration_receipt(CALIBRATION/'calibration.json',new,3000)
+    with pytest.raises(r.DiagnosticStop):r.validate_calibration_receipt(calibration/'calibration.json',new,3000)
 
 def test_operational_amendment_rejects_changed_scientific_payload(amended_release):
-    r,old,new=amended_release
+    r,old,new,calibration=amended_release
     bad=copy.deepcopy(new);bad['panel'][0]['ids'][0]+=1
-    with pytest.raises(ValueError):r.validate_calibration_receipt(CALIBRATION/'calibration.json',bad,3600)
+    with pytest.raises(ValueError):r.validate_calibration_receipt(calibration/'calibration.json',bad,3600)
     bad=copy.deepcopy(new);bad['rubric_hash']='changed'
-    with pytest.raises(ValueError):r.validate_calibration_receipt(CALIBRATION/'calibration.json',bad,3600)
+    with pytest.raises(ValueError):r.validate_calibration_receipt(calibration/'calibration.json',bad,3600)
     bad=copy.deepcopy(new);bad['operational_amendment']['prior_code_sha256']={}
-    with pytest.raises(ValueError):r.validate_calibration_receipt(CALIBRATION/'calibration.json',bad,3600)
+    with pytest.raises(ValueError):r.validate_calibration_receipt(calibration/'calibration.json',bad,3600)
+
+    # Rehashing cannot authorize a different source release or measured timing.
+    original_path=calibration/'manifest.json'
+    altered=copy.deepcopy(old);altered['new_code_sha256']={}
+    altered['manifest_hash']=r.digest({k:v for k,v in altered.items() if k!='manifest_hash'})
+    original_path.write_text(json.dumps(altered))
+    with pytest.raises(ValueError,match='reviewed original'):r.original_amendment_source(original_path)
+    original_path.write_text(json.dumps(old))
+    receipt_path=calibration/'calibration.json';receipt=json.loads(receipt_path.read_text())
+    receipt['continuation_seconds']+=1;receipt_path.write_text(json.dumps(receipt))
+    with pytest.raises(ValueError,match='forecast changed'):r.validate_calibration_receipt(receipt_path,new,3600)

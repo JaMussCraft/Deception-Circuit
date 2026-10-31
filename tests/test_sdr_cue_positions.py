@@ -423,6 +423,15 @@ def test_actual_wrapper_dryrun_calibration_main_resume(pos,frozen,tmp_path):
     import os,subprocess
     wrapper=ROOT/'scripts/jobs/run_sdr_cue_positions.sh'
     assert wrapper.exists(),'new wrapper not implemented'
+    approved=Path('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/sdr-routing-pilot')
+    if ROOT.resolve()!=approved:
+        # Relocated checkouts exercise the actual guard; archival dryrun mode
+        # remains covered below only in its explicitly approved worktree.
+        result=subprocess.run(['bash',str(wrapper),'--help'],cwd=ROOT,
+            env={**os.environ,'SDR_POS_PYTHON':sys.executable},capture_output=True,text=True)
+        assert result.returncode!=0 and 'explicitly approved worktree cwd' in result.stderr
+        assert list(tmp_path.iterdir())==[]
+        return
     protocol_path=tmp_path/'protocol.json';protocol_path.write_text(json.dumps(frozen))
     op=tmp_path/'operations.json';op.write_text(json.dumps(operations()))
     shim=tmp_path/'python-shim'
