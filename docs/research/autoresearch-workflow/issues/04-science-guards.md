@@ -28,7 +28,8 @@ load.
   `git_fingerprint_error` on failure.
 - Grader code: `W/evaluation/benchmarks/{base,judge,judge_budget,liars_bench,mask_bench,sandbagging,sources,notebook}.py`
   and `W/evaluation/benchmark_eval.py`; `bench.judge_spec()` gives the judge per benchmark
-  (`W/evaluate_circuit.py:626`, `:657`).
+  (`W/evaluate_circuit.py:627`, `:657` and `:916`). Field names `git_dirty`, `config_sha256`, `dataset_files` and
+  `seed` are new in spec §4.6, not reused; keep them as specified.
 - The checker's first real input: `W/docs/research/mechanism-analysis/synthesis.md` (326 lines, cites files for
   every number per lane 1 §0).
 

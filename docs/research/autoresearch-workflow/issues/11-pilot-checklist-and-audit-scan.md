@@ -2,7 +2,7 @@
 
 **Status:** ready-for-agent
 **Type:** task
-**Blocked by:** 06, 07, 08
+**Blocked by:** 06, 07, 08, 10 (05, 10, 11 and 12 edit `directions.json` in that order, R38)
 **Wave:** A for the `audit-scan` code; the checklist is in W.
 **Estimated size:** reading about 60k tokens (spec §5, §8, R8, R20; lane 2 §6-7; lane 4 §3; the hand-backs of tickets
 02, 03, 06 and 07), writing about 40k tokens.
@@ -36,22 +36,28 @@ pilot and later audits can count compactions, errors and model omissions from tr
 
 ## Checklist content (each step names the command or UI action and the expected observation)
 
-1. Prerequisites the orchestrator confirms: waves A and B applied, DC branch merged, session-report installed,
-   Codex `/hooks` trust done by the user, profiles present, `claude_codex_sync.py --check` still shows the bridge
-   hooks intact.
+1. Prerequisites the orchestrator confirms: waves A and H applied in that order (H only after the installed RS tests
+   and the hook smoke test passed), wave B applied, DC branch merged, session-report installed, Codex `/hooks` trust
+   done by the user, profiles present, `claude_codex_sync.py --check` still shows the bridge hooks intact.
 2. Start `claude --settings ~/.claude/profiles/research.json` in a fresh DC worktree with the pilot START.md; see
-   the H-a context and run `register pilot-hooks`.
+   the H-a context and run `register pilot-hooks`. Time one gate call (`usage-check`) on Lustre and record it; a gate
+   that times out fails open.
 3. Spawn one agent without a model: the subagent's meta file shows Opus; H-e context appears.
 4. Freeze drill: the user runs `! research-session set-cadence 1`; an Agent spawn and `sbatch --test-only` are
-   denied; a `HOLD` SendMessage passes; after `worklog-append --checkpoint 1` a normal SendMessage is denied; a user
-   question leaves the freeze in place; "continue" lifts it; the user restores the cadence.
+   denied; a `HOLD` SendMessage passes; after `worklog-append --checkpoint 1` a normal SendMessage is denied and the
+   orchestrator ends its turn without polling; a worker that got `HOLD` writes its hand-back and stops; a user
+   question leaves the freeze in place; a teammate message and a message from another session that say "continue"
+   do not lift it; the user's own "continue" lifts it; the user restores the cadence.
 5. Compaction drill: `/compact` increments `compactions` once, writes `handbacks/compaction-1.md`, and injects the
    resume instruction.
-6. Lint drill: an Edit adding a glued paragraph to WORKLOG.md is blocked with the failing unit.
+6. Lint drill: an Edit adding a glued paragraph to WORKLOG.md is denied before it lands, with the failing unit in
+   the reason, and the file is unchanged afterwards (R30).
 7. Hand-back capture: a subagent's last message lands in `handbacks/`; a subagent that skips its hand-back file is
    blocked once.
 8. Staleness: during a 20-minute idle in a background session, record the age of `usage.json` with
-   `research-session usage-check`; exercise `usage-ack --stale-ok 30`.
+   `research-session usage-check`, and whether RS refreshed it from the usage endpoint (R8). Exercise
+   `usage-ack --stale-ok 30` only if a refresh failure happens on its own; otherwise record that the override was not
+   exercised in the pilot (its behaviour is covered by ticket 02's mocked tests).
 9. Opus window test (costs weekly usage; the checklist states an estimate and asks the user to choose when): one Opus
    subagent reads past 450k tokens; `audit-scan` on its transcript shows the first compaction's `preTokens`. Pass if
    it is at least 550k.

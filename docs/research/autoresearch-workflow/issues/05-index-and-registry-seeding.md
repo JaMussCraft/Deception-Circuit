@@ -30,7 +30,10 @@ orient in under 30k tokens (goal 1).
   2026-10-28); `mechanism-datasets` paused (memory `mechanism-datasets-plan.md`: training awaits the user's go);
   `component-analysis` done (memory `main-merge-261018.md`); `format-control` done (memory
   `format-control-run-state.md`: closed 2026-10-19); `eval5-grader-fixes` open (memory `eval5-grader-fixes-pending.md`);
-  `autoresearch-workflow` active, claimed by the orchestrator's session (ask the orchestrator for its tag).
+  `autoresearch-workflow` active, `claimed_by: "claude-b2cb53cd"` (R29), with `worktree` set to W and `branch`
+  `autoresearch-workflow`. Its `state.json` does not exist yet; the render must show "no state yet" (ticket 03).
+- The live Codex session owns the `sdr-*`, `selective-deception` and `eval5-grader-fixes` work (R28). Seed their rows
+  from what is on disk, but do not edit anything in their directories.
 - Legacy ledgers: `A/.scratch/mechanism-analysis/compute-ledger.json`,
   `DC/outputs/_studies/selective-deception/study/compute-ledger.json`, `A/.scratch/mechanism-datasets/compute-ledger.json`,
   and prose `ledger.md` files in the `sdr-*` directories.

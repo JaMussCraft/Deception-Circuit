@@ -31,7 +31,8 @@ CLAUDE.md); 10 migration B (scripted `.scratch` archive); 11 pilot checklist and
    except exactly what your ticket names. Reading is fine. Ticket 10 reads them only by script (hashes and the secret
    scan), never into your context.
 4. **Where you may write.**
-   - Inside W, directly with Write or Edit (DC code, tests, `docs/research/**`, `.claude/settings.json`, `.gitignore`).
+   - Inside W, directly with Write or Edit (DC code, tests, `docs/research/**`, `.gitignore`), but never
+     `W/.claude/settings.json` (constraint 9).
    - Inside S and T, directly. These are outside every git repository.
    - Your ticket file's `**Status:**` line, checkboxes and `## Comments`, and `F/reports/<NN>-handback.md`.
    - Nowhere else. The isolation hook refuses writes into the main DC checkout and into A.
@@ -41,7 +42,9 @@ CLAUDE.md); 10 migration B (scripted `.scratch` archive); 11 pilot checklist and
    `~/.claude/profiles/`, `~/.codex/config.toml`, `~/.codex/hooks.json`, `~/.local/bin/*`), or in the main checkout's
    ignored areas (`DC/outputs/_studies/`), is staged under `S/tree/<absolute destination without the leading slash>`
    and listed in your op file `S/ops/<NN>-<slug>.json` (spec §7). The orchestrator runs the apply tool. Never write the
-   destination yourself. `~/.codex/config.toml` ops are wave C and wait for the user's go because Codex must restart.
+   destination yourself. Every op names its wave (spec §7): A for code, docs, memory and user settings without hooks;
+   H for any hook installation; B for what needs the DC merge; C for `~/.codex/config.toml`, which waits for the
+   user's go because Codex must restart; D for what waits until the live Codex session is finished.
 6. **Memory edits.** A Codex session is live and edits `A/.agents/memory/` concurrently. `MEMORY.md` is changed only
    with `replace_text` (an `old_text` copied from the file you just re-read, which must occur exactly once) and
    `append_text` ops, never a whole-file write (spec §7, R18). For any other memory file, re-read it immediately
@@ -52,7 +55,22 @@ CLAUDE.md); 10 migration B (scripted `.scratch` archive); 11 pilot checklist and
    `/sw/external/python/anaconda3/bin/python3.9 -c "import json;print(sorted(json.load(open('/u/swong2/.claude/settings.json'))))"`.
    `docs/research/**` is pushed to a public GitHub repository: run the secret scan on anything you put there.
 8. **No GPU jobs, no `sbatch`, no paid API calls.** Ticket 11 only writes what the user will launch.
-9. **Faithful reporting.** Failures are reported as failures, skipped steps as skipped, unverified facts as
+9. **Never install a hook (R26).** Hook settings hot-reload, and a hook whose script is missing exits 2, which
+    blocks every tool call in every session rooted under A, including yours and the orchestrator's. So: every hook
+    command you write is the literal shell guard of spec §5.1 (`sh -c 'test -f <cli.py> && ! test -e <DISABLED> &&
+    exec <python3.9> -B <cli.py> hook <event> --tool <tool> || exit 0'`, with no variables); every hook-installing op
+    is wave H; and you never create or edit `W/.claude/settings.json`, `A/.claude/settings*.json`,
+    `~/.claude/settings.json` hooks or `~/.codex/hooks.json` directly. DC's hook settings are staged at
+    `F/staged/dc-claude-settings.json`. Only the orchestrator applies wave H, after the RS tests pass from the
+    installed path and the hook smoke test passes.
+10. **Live-session protection (R28).** Never stage a wave A or B op that touches `A/.scratch/sdr-*`,
+    `A/.scratch/selective-deception`, `A/.scratch/eval5-grader-fixes`, the memory notes `sdr-mechanism-review.md`
+    and `selective-deception-execution.md`, or `MEMORY.md` lines 27 and 29. Those ops are wave D.
+11. **Credentials (R8, R27).** Never open `~/.claude/.credentials.json` and never use a real token. Tests mock the
+    credentials reader and the HTTP endpoint. You may print key names of `~/.claude/.usage_oauth_cache.json`.
+12. **HOLD.** If the orchestrator sends you a message starting with `HOLD`, finish your current atomic step, write
+    your hand-back with what is done and what is not, and stop. Do not poll and do not start new work.
+13. **Faithful reporting.** Failures are reported as failures, skipped steps as skipped, unverified facts as
    unverified. Never tick a checkbox you did not verify with a command whose output you read.
 
 ## Shell rules (the isolation hook enforces them)

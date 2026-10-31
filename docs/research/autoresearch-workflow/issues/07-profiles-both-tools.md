@@ -31,8 +31,10 @@ table in spec §5.7. Verify the Codex per-profile mechanism before staging anyth
 ## Scope
 
 - Staged `json_merge` into `/u/swong2/.claude/settings.json`: `enabledPlugins` per the default column; `skillOverrides`
-  for the shinka and weco skills; the jcodemunch off switch using the documented key if one exists (check
-  https://code.claude.com/docs/en/settings and the MCP page), otherwise `permissions.deny: ["mcp__jcodemunch"]`.
+  for the shinka and weco skills; the jcodemunch off switch through `deniedMcpServers` (the reviewer found it in the
+  settings index: "block specific MCP servers by URL, command, or name"; confirm its entry shape on
+  https://code.claude.com/docs/en/settings), falling back to `permissions.deny: ["mcp__jcodemunch"]` only if that
+  shape cannot be confirmed. This merge carries no hooks, so it is wave A.
 - Staged files `/u/swong2/.claude/profiles/{research,synthesis,writing,audit}.json`, each containing only
   `enabledPlugins` (and `skillOverrides` if needed).
 - Staged `json_merge` into `/projects/beto/swong2/Alignment/.claude/settings.local.json` setting karpathy to false.

@@ -3,9 +3,9 @@
 <!-- HEADER: rewritten at every trigger; body below is append-only -->
 | | |
 |---|---|
-| State | Running: planning tickets |
+| State | Running: planner applying review fixes; implementation wave A starts next |
 | Directions | 1. Hygiene and config: queued · 2. Findings index and layout: queued · 3. Hooks and CLI: queued · 4. Protocol docs and profiles: queued · 5. Science guards and pilot: queued |
-| Started / last updated | Sat 31 Oct 2026, 8:05 am CDT / Sat 31 Oct 2026, 9:05 am CDT |
+| Started / last updated | Sat 31 Oct 2026, 8:05 am CDT / Sat 31 Oct 2026, 12:55 pm CDT |
 | Orchestrator auto-compactions | 0 |
 | Weekly usage (this session) | account read all-models 11%, Fable 17% at start; cap pause at 80% |
 | Human review checkpoints | 1 of 1 acknowledged (plan approved) |
@@ -13,7 +13,7 @@
 | OpenRouter credit | $0 |
 | Open needs from you | 0 |
 
-**Right now.** An Opus planner is turning the approved proposal into a spec and tickets. A fresh Opus reviewer checks them before any implementation starts.
+**Right now.** The planner is applying the reviewer's nine fixes to the spec and tickets. When they land, two Opus implementers start wave A: the text lint plus apply tool, and the science guards in the Deception-Circuit code. Nothing outside the worktree has been changed yet.
 
 **Terms.** *Worktree*: an isolated copy of the Deception-Circuit repository on its own branch, where all code changes for this setup are made.
 
@@ -39,3 +39,5 @@
 **8:40 am CDT · Hand-backs: all four research lanes finished.** Main gaps: no findings index, checkpoints and counters enforced only by memory, degrading state files, results without commit stamps. Proposal written and reviewed by the advisor.
 **8:55 am CDT · User decision.** Plan approved with corrections (see Needs from you). Setup starts in a pinned Deception-Circuit worktree.
 **9:05 am CDT · Planning started.** Feature directory created inside the worktree. Opus planner spawned to write the spec and tickets.
+**12:30 pm CDT · Hand-back: plan written.** A binding spec with 25 rulings, 12 tickets in 7 waves, a shared agent brief and a facts report. Its eight open questions were ruled on (session tag format, how to refresh a stale usage reading, which directories the live Codex session still owns, and five smaller ones).
+**12:50 pm CDT · Hand-back: independent plan review.** Verdict: approve with nine fixes. The important ones: installing hooks before the tool they call exists could lock a session out of its own tools; the text lint must refuse a bad write before it happens rather than complain after; the migration ticket still touched directories the live Codex session owns. All nine sent back to the planner with rulings. Next: implementation wave A (lint and apply tool; science guards) once the fixes land.

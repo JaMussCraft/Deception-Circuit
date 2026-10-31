@@ -3,8 +3,9 @@
 These answer the eight open questions in `00-plan-handback.md`. They are binding for implementers unless the reviewer
 finds a contradiction with `spec.md`, in which case the orchestrator resolves it and updates both.
 
-OQ1. Session tag for the directions.json claim: `claude-autoresearch-setup-20261031`. The tag format for future
-sessions is `<tool>-<slug>-<YYYYMMDD>` where tool is `claude` or `codex`.
+OQ1. Session tag for the directions.json claim: ~~`claude-autoresearch-setup-20261031`, format
+`<tool>-<slug>-<YYYYMMDD>`~~. Superseded after the plan review (spec R29): the tag is `<tool>-<first 8 characters of
+the session id>`, so this session is `claude-b2cb53cd`. RS resolves sessions by id, so the id form is the machine key.
 
 OQ2. Stale usage readings in background sessions. The status line script (`~/.claude/statusline.sh`) already fetches
 the claude.ai usage endpoint (`https://api.anthropic.com/api/oauth/usage`) with the OAuth token from
@@ -35,3 +36,17 @@ read task and record the `compact_boundary.preTokens` value in the pilot report.
 
 OQ8. autoMode environment block: extend, do not replace. Keep the SHIFT_RT entries and add Alignment and
 Deception-Circuit (remotes, default branch main, accounts beto/bimc/bgrb/bjhz, Bridges-2 allocation cis260361p).
+
+## Refinements after the plan review (2026-10-31)
+
+The planner applied the orchestrator's rulings on the nine review blockers as spec R26-R38. Three of them refine the
+answers above:
+
+- OQ2 is now spec R8 and R27. RS refreshes a stale reading itself with the status line's cache, lock and retry
+  floor, an 8 s bound, and a token read inside the process; tests mock the credentials reader and the endpoint.
+- OQ3 is now spec R28. Besides every `sdr-*` directory, `sdr-session-wrapup` and `selective-deception`, the
+  exclusion covers `eval5-grader-fixes` (its direction is open), the two memory logs `sdr-mechanism-review.md` and
+  `selective-deception-execution.md`, and their `MEMORY.md` lines 27 and 29. Ticket 10 gives the later migration
+  command; ticket 12 stages the memory rewrites as wave D.
+- OQ8 is now spec R31. `json_merge` only extends lists, never duplicates an identical entry, and has no
+  `replace_paths`.
