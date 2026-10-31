@@ -229,7 +229,9 @@ User-level Claude settings carry only `env`, `statusLine.refreshInterval`, `clea
 ### 5.2 Usage gate and the FREEZE checkpoint
 
 Reading (Claude): `w = max(seven_day, Fable model_scoped row)` and `h = five_hour` from `/u/swong2/.claude/usage.json`.
-A missing key reads as 0 only when the file is fresh. Freshness: `timestamp` for `five_hour` and `seven_day`,
+A missing weekly key reads as 0 only when the file is fresh. A missing `five_hour` key means the five-hour limit is
+not applicable (R40: Anthropic removed it from this account on 2026-10-31); the cap row below then uses `w` alone.
+Freshness: `timestamp` for `five_hour` and `seven_day`,
 `model_scoped_fetched_at` for the Fable row. A reading older than 15 minutes is first refreshed by RS itself (R8):
 it fetches the OAuth usage endpoint with the status line's cache and lock, then merges the result into `usage.json`.
 The reading is unknown only when that refresh also fails. Reading (Codex): run
@@ -248,7 +250,7 @@ Decisions, evaluated in this order for each PreToolUse call:
    no `>` redirection. Deny any Write or Edit under `/u/swong2/.claude/research-session/` or on
    `docs/research/<slug>/state.json` or `worklog.json`; `docs/research/_templates/` is exempt. Only humans acknowledge
    (R7, R37).
-2. **Cap pause.** If `h ≥ 80` or `w ≥ 80`: deny Agent and any Bash containing `sbatch`. The pause lifts by itself
+2. **Cap pause.** If `w ≥ 80`, or `h` is present and `h ≥ 80`: deny Agent and any Bash containing `sbatch`. The pause lifts by itself
    when a fresh reading falls below 80, for example after the window reset.
 3. **Unknown reading.** If the reading is still unknown after the refresh: deny Agent and `sbatch` with a message
    naming the stale file, its age, the refresh error and the human override `! research-session usage-ack --stale-ok 30`.
