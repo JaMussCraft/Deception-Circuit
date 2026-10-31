@@ -3,9 +3,9 @@
 <!-- HEADER: rewritten at every trigger; body below is append-only -->
 | | |
 |---|---|
-| State | Running: planner applying review fixes; implementation wave A starts next |
-| Directions | 1. Hygiene and config: queued · 2. Findings index and layout: queued · 3. Hooks and CLI: queued · 4. Protocol docs and profiles: queued · 5. Science guards and pilot: queued |
-| Started / last updated | Sat 31 Oct 2026, 8:05 am CDT / Sat 31 Oct 2026, 12:55 pm CDT |
+| State | Running: four implementers active (science guards, usage gate, profiles, protocol docs) |
+| Directions | 1. Hygiene and config: done (wave A applied) · 2. Findings index and layout: queued · 3. Hooks and CLI: active · 4. Protocol docs and profiles: active · 5. Science guards: active; pilot: queued |
+| Started / last updated | Sat 31 Oct 2026, 8:05 am CDT / Sat 31 Oct 2026, 1:25 pm CDT |
 | Orchestrator auto-compactions | 0 |
 | Weekly usage (this session) | account read all-models 11%, Fable 17% at start; cap pause at 80% |
 | Human review checkpoints | 1 of 1 acknowledged (plan approved) |
@@ -41,3 +41,4 @@
 **9:05 am CDT · Planning started.** Feature directory created inside the worktree. Opus planner spawned to write the spec and tickets.
 **12:30 pm CDT · Hand-back: plan written.** A binding spec with 25 rulings, 12 tickets in 7 waves, a shared agent brief and a facts report. Its eight open questions were ruled on (session tag format, how to refresh a stale usage reading, which directories the live Codex session still owns, and five smaller ones).
 **12:50 pm CDT · Hand-back: independent plan review.** Verdict: approve with nine fixes. The important ones: installing hooks before the tool they call exists could lock a session out of its own tools; the text lint must refuse a bad write before it happens rather than complain after; the migration ticket still touched directories the live Codex session owns. All nine sent back to the planner with rulings. Next: implementation wave A (lint and apply tool; science guards) once the fixes land.
+**1:20 pm CDT · Hand-back: text lint and apply tool done and installed.** The lint that refuses glued-together prose and secret-shaped strings now exists, with 68 passing tests across both Python environments. Its first real run found the two glued lines in the memory index and 9 of 13 glued paragraphs in the bad Codex state file, and zero false alarms on clean documents. The apply tool installed the lint into the Alignment repository, switched the three research agent definitions from Sonnet to Opus, updated the usage policy note to the 80% caps, and added the subagent-model default, a one-minute status-line refresh and one-year transcript retention to your Claude settings (backup journal kept). Three more implementers started: the usage gate and freeze logic, the plugin profiles for both tools, and the protocol documents and templates.

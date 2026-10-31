@@ -1,6 +1,6 @@
 # 08 — Protocol docs and templates
 
-**Status:** ready-for-agent
+**Status:** resolved
 **Type:** task
 **Blocked by:** 01 (lint, to check the docs). It uses the command names fixed in spec §5.6, so it runs in parallel
 with 02 and 03.
@@ -52,18 +52,34 @@ In W:
 
 ## Acceptance criteria
 
-- [ ] Every document and Markdown template passes `cli.py lint`; output pasted.
-- [ ] Every RS command a document names appears in spec §5.6 (a script in T greps the docs and compares; output
+- [x] Every document and Markdown template passes `cli.py lint`; output pasted.
+- [x] Every RS command a document names appears in spec §5.6 (a script in T greps the docs and compares; output
       pasted). When ticket 03 has landed, the same check runs against `cli.py --help`.
 - [ ] `state.json` and `ledger.json` templates pass `cli.py validate` once ticket 03 has landed; until then the
       hand-back says so.
-- [ ] `ticket-implementer.md` keeps its frontmatter byte-identical (`name`, `description`, `model: opus`,
+- [x] `ticket-implementer.md` keeps its frontmatter byte-identical (`name`, `description`, `model: opus`,
       `effort: high`); a diff is pasted.
-- [ ] Each protocol is under about 250 lines and starts with a five-line "what this is and when to use it" summary.
-- [ ] `apply_staged.py --staging S --only 08 --dry-run` output pasted.
+- [x] Each protocol is under about 250 lines and starts with a five-line "what this is and when to use it" summary.
+- [x] `apply_staged.py --staging S --only 08 --dry-run` output pasted.
 
 ## Verification
 
 Lint and the command-name check. No code changes.
 
 ## Comments
+
+Ticket 08 implementer, 2026-10-31. Hand-back: `F/reports/08-handback.md`.
+
+- Committed by the orchestrator from W: the nine templates under `W/docs/research/_templates/` (`START.md`,
+  `proposal.md`, `WORKLOG.md`, `RESUME.md`, `handback.md`, `audit.md`, `state.json`, `ledger.json`, `worklog.json`),
+  this ticket file, and `F/reports/08-handback.md`.
+- Staged, op file `S/ops/08-protocol-docs.json`, four write ops, all wave A with `lint: true`:
+  `A/docs/agents/research-session.md`, `synthesis-session.md` and `session-audit.md` (new files), and
+  `A/.claude/agents/ticket-implementer.md` with `expect_sha256`.
+- Results: lint on 12 Markdown files (deliverables, hand-back, this ticket) clean on base python3.9; secret
+  scan on the 3 JSON templates clean; command-name check against spec section 5.6 with 0 failing files; JSON
+  templates canonical with the spec's top-level keys; frontmatter diff shows additions only after line 13; protocols
+  are 212, 79 and 82 lines; the wave A dry run selects the 4 ops. No tests apply to this ticket.
+- Deferred: `validate` on the templates and the `--help` comparison wait for ticket 03; the third box stays unticked
+  until then. Seven open questions for the orchestrator are in the hand-back, mainly that no spec 5.6 command creates
+  the RS-owned direction files, writes ledger reservations, or sets the worklog head fields.
