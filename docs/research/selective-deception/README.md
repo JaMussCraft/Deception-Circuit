@@ -6,7 +6,7 @@ The user paused this research on 2026-10-31 and requested integration of all eig
 
 The study directory is now in this primary checkout at `outputs/_studies/selective-deception/study/`. The old Alignment `.scratch/selective-deception` location is a compatibility symlink to it, so existing reports and artifact links remain usable. The directory was moved on the same filesystem without changing its inode or rewriting frozen files. Large experiment artifacts remain local and are not committed to Git.
 
-The user-facing reports remain in Alignment `project_context/research_notes/Deception specificity and shared circuits/`, including `v5_transfer.md`, `v6_components.md`, and `v7_positions.md`. The archive contains the underlying plans, training outputs, frozen masks, raw evaluation records, plots, code reviews, scientific reviews and budget ledgers.
+Versioned copies of the ten research notes are included in [reports/](reports/). Their originals remain in Alignment `project_context/research_notes/Deception specificity and shared circuits/`, including `v5_transfer.md`, `v6_components.md`, and `v7_positions.md`. The archive contains the underlying plans, training outputs, frozen masks, raw evaluation records, plots, code reviews, scientific reviews and budget ledgers.
 
 - Sparse necessary-mask experiments cover preservation objectives including WikiText and expanded all-head search. These are complete historical runs, not an active training process.
 - V5 completed the ten frozen-mask eval5 blocks and the necessary-versus-sufficient comparison under the documented grading amendments. The new mask did not establish broad superiority over the old sufficient circuit. Preserve acquisition/classification caveats and the unknown API charge reserve.
@@ -31,3 +31,7 @@ Historical manifests and execution receipts intentionally retain their original 
 At pause: 38.35/40 cumulative reserved GPU-hours; 1.65 hours remain under the existing cap. Actual recorded GPU time is 45,167 seconds. API ledger: 1,113 historical attempts, $4.1784295 known cost plus a retained $0.66 unknown-charge reserve; no additional API costs from V6/V7 or wrapup. Larger runs require a new explicit budget decision. Lead compactions confirmed: 16; ordinary check-ins and this wrapup do not increment that count.
 
 Integration and final verification details are recorded in archive `wrapup-20261031/`. No automatic successor experiment is configured.
+
+## Integration verification
+
+All eight branches merged without conflicts. After cleanup, all 24 session test modules passed:694 tests in the production environment;687 passed and7 expected dependency-version skips in base Python. Two test-only fixture repairs removed stale references to an already-retired mechanism worktree; runtime code, source-hash enforcement and frozen results were unchanged. Twenty-three loose files (103,993,205 bytes) were copied and checksum-verified, and81 frozen V6/V7 runtime bindings were verified directly from their original Git commits. Ten research notes are versioned in this directory. The merges are local; no remote push was performed.
