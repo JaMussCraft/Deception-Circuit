@@ -24,11 +24,12 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument('--model-revision')
     p.add_argument('--dtype',choices=['bfloat16'],default='bfloat16')
     p.add_argument('--rho',type=float)
-    p.add_argument('--policy',choices=['report18-v1','amendment-v2','amendment-v3'],default='report18-v1')
+    p.add_argument('--policy',choices=['report18-v1','amendment-v2','amendment-v3','amendment-v4'],default='report18-v1')
     p.add_argument('--collateral-arm',choices=['H','W','HW'])
     p.add_argument('--candidate-space',choices=['union','all'],default='union')
     p.add_argument('--wikitext-manifest',type=Path)
     p.add_argument('--wikitext-cache',type=Path)
+    p.add_argument('--initial-expected-removed',type=float,default=1.)
     p.add_argument('--max-updates',type=int,default=512)
     p.add_argument('--checkpoint-every',type=int,default=64)
     p.add_argument('--profile-updates',type=int,default=3)
@@ -38,9 +39,11 @@ def main(argv: list[str] | None = None) -> int:
         p.add_argument('--'+name,type=int)
     p.add_argument('--resume',action='store_true')
     args=p.parse_args(argv)
-    required=(['source_manifest','freeze_record','wikitext_manifest'] if args.policy in ('amendment-v2','amendment-v3') else ['stage1_manifest','data_dir','honest_pool','candidate_bindings']) if args.prepare else ['output_dir']
-    if args.policy in ('amendment-v2','amendment-v3') and not args.prepare: required+=['wikitext_manifest']
-    if args.policy in ('amendment-v2','amendment-v3') and not (args.prepare or args.dry_run): required+=['wikitext_cache']
+    if args.policy != 'amendment-v4' and args.initial_expected_removed != 1.:
+        p.error('legacy policies require --initial-expected-removed 1')
+    required=(['source_manifest','freeze_record','wikitext_manifest'] if args.policy in ('amendment-v2','amendment-v3','amendment-v4') else ['stage1_manifest','data_dir','honest_pool','candidate_bindings']) if args.prepare else ['output_dir']
+    if args.policy in ('amendment-v2','amendment-v3','amendment-v4') and not args.prepare: required+=['wikitext_manifest']
+    if args.policy in ('amendment-v2','amendment-v3','amendment-v4') and not (args.prepare or args.dry_run): required+=['wikitext_cache']
     if not (args.prepare or args.dry_run): required+=['freeze_record','data_dir','model_revision']
     if args.train or args.calibrate or args.evaluate: required+=['reference_cache']
     if args.evaluate: required+=['checkpoint','evaluation_manifest']
