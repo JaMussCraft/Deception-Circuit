@@ -59,17 +59,40 @@ Staged (wave A):
 ## Acceptance criteria
 
 - [ ] A script in T prints the sha256 pairs for every candidate duplicate; only equal pairs get a `move` op. Output
-      pasted.
-- [ ] The CLAUDE.md bridge block is byte-identical before and after (the script compares the extracted block).
-- [ ] Every path mentioned in the new CLAUDE.md, the prompts README and issue-tracker.md exists, or will exist after
+      pasted. (Partly done: the pairs are printed and pasted, 21 of 27 equal, but no `move` op is staged; see the
+      blocker in Comments.)
+- [x] The CLAUDE.md bridge block is byte-identical before and after (the script compares the extracted block).
+- [x] Every path mentioned in the new CLAUDE.md, the prompts README and issue-tracker.md exists, or will exist after
       the listed waves (a script checks and labels each).
-- [ ] All new and changed Markdown passes `cli.py lint`.
-- [ ] The readable RESUME rewrite keeps every number of the source; a script lists the numbers in both files and
+- [x] All new and changed Markdown passes `cli.py lint`.
+- [x] The readable RESUME rewrite keeps every number of the source; a script lists the numbers in both files and
       shows no number missing from the rewrite.
-- [ ] `apply_staged.py --staging S --only 09 --dry-run` output pasted.
+- [x] `apply_staged.py --staging S --only 09 --dry-run` output pasted.
 
 ## Verification
 
 Lint, the scripted checks above, and the dry run. Do not touch `A/.scratch` here; that is ticket 10.
 
 ## Comments
+
+**2026-10-31, implementer (Opus).** Status stays `claimed` with one blocker: the dedupe moves. Full detail is in
+`reports/09-handback.md`.
+
+Files to commit from W:
+
+- `docs/research/mechanism-analysis/README.md` (new handoff)
+- `docs/research/sdr-mechanism/history/sdr-clause-choice-RESUME-readable.md` (new, R14)
+- `docs/research/autoresearch-workflow/reports/09-handback.md`
+- `docs/research/autoresearch-workflow/issues/09-migration-a-standardize-dedupe-claude-md.md` (this file)
+
+Staged in S, op file `S/ops/09-migration-a.json`, four `write` ops, all wave A with `lint: true`:
+`A/.claude/CLAUDE.md`, `A/docs/agents/issue-tracker.md`, `A/project_context/prompts/README.md` (new) and
+`A/project_context/prompts/autoresearch.md`. The dry run reports all four as WOULD APPLY.
+
+Tests per environment: this ticket changes no code, so no test suite was run. The lint ran on base Python 3.9 with
+both the installed and the staged `cli.py` and passed. The checker scripts ran on base Python 3.9.
+
+**Blocker.** All 21 byte-identical duplicates in `project_context` belong to the live-session directions of R28, and
+frozen manifests, receipts and audit scripts in `A/.scratch/sdr-*` bind their paths. Separately, the `move` op is a bare
+`os.rename`, which cannot cross from `/projects` to `/u`. No move op and no folder README was staged. The hand-back's
+first open question gives three options for the orchestrator to choose from.
