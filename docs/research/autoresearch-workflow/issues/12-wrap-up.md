@@ -120,3 +120,11 @@ Staged (wave D, pending the user's confirmation that the live Codex session is f
 16. `migrate_scratch.py` copied `component-analysis/scratch-copy/component-analysis/.pytest_cache/README.md`, a
     pytest cache file. Make the Markdown selection skip dot-directories (test it), delete that copy and its row in
     the folder's `provenance.json`, and note the change in the hand-back. Do not re-plan the wave B ops for this.
+17. Ticket 11 is applied (audit-scan installed, 269 RS tests, smoke passed). The merge checklist refers to the staging
+    root by its durable copy `/u/swong2/.claude/research-session/staging-20261031/` (the orchestrator makes that copy
+    after your ops are staged); every apply command in the checklist uses that path, not the job tmp path.
+18. Follow-up `proposed` rows from ticket 11: the Opus compaction-window test (planner compacted at 469,658
+    preTokens, inconclusive; R20 binding until pilot step 9); an `audit-scan` rule for hook denials once the pilot
+    records their record shape; a research-session command that sets a direction's summary (R39 forbids hand edits
+    and `init` leaves a placeholder).
+19. The pilot-hooks row is `proposed` with init's placeholder summary; leave it.
