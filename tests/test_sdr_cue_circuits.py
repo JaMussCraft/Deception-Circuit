@@ -1,6 +1,7 @@
 """CPU contract tests; no model/API/notebook execution."""
 from pathlib import Path
 import importlib.util
+import hashlib
 import json
 from types import SimpleNamespace
 import pytest
@@ -418,7 +419,12 @@ def test_allocation_binding_uses_serialized_timestamp_precision(cc):
 @pytest.mark.parametrize('name',['analysis.py','config.py','l0.py'])
 @pytest.mark.parametrize('mutation',['missing','changed'])
 def test_portable_source_inventory_rejects_extra_module_drift(cc,monkeypatch,name,mutation):
-    hashes=cc.source_hashes();assert len(hashes)==60 and hashes[name]==cc.file_hash(ROOT/name)
+    expected=set(cc.n.SOURCE_NAMES)|set(cc.cue.NEW_SOURCES)|set(cc.NEW_SOURCES)|{'analysis.py','config.py','l0.py'}
+    for package in ('component_analysis','models','dataset'):
+        expected.update(str(path.relative_to(ROOT)) for path in (ROOT/package).rglob('*.py'))
+    hashes=cc.source_hashes()
+    assert set(hashes)==expected
+    assert hashes=={path:hashlib.sha256((ROOT/path).read_bytes()).hexdigest() for path in expected}
     frozen=dict(hashes)
     if mutation=='missing':frozen.pop(name)
     else:frozen[name]='0'*64
@@ -437,7 +443,20 @@ def test_portable_build_roots_and_persisted_rebuild(cc,fixtures,tmp_path,monkeyp
     monkeypatch.setattr(cc.n,'cache_hashes',lambda cache:{'fixed':'f'*64})
     monkeypatch.setattr(cc.n,'software',lambda:{'fixed':'software'})
     monkeypatch.setattr(cc,'record_bounds',lambda p,t,v:{'metadata':len(cc.encoded(v))})
-    parent=ROOT/'.superpowers/sdd/plan-sdr-cue-probe/freeze-final-5f74d0c/protocol.json'
+    archived_parent=ROOT/'.superpowers/sdd/plan-sdr-cue-probe/freeze-final-5f74d0c/protocol.json'
+    parent_data=json.loads(archived_parent.read_text())
+    # A temporary parent binds copied current dependencies; historical source
+    # identities stay immutable and still fail closed when used after drift.
+    closure=tmp_path/'parent-sources';parent_hashes={}
+    for name in cc.cue.source_hashes():
+        target=closure/name;target.parent.mkdir(parents=True,exist_ok=True)
+        shutil.copyfile(ROOT/name,target);parent_hashes[str(target)]=cc.file_hash(target)
+    parent_data['provenance']['source_hashes']=parent_hashes
+    parent_data['provenance_hash']=cc.digest(parent_data['provenance'])
+    parent_data['scientific_hash']=cc.digest(parent_data['payload'])
+    parent=tmp_path/'parent.json';parent.write_text(json.dumps(parent_data))
+    monkeypatch.setattr(cc,'PARENT_SHA',cc.file_hash(parent))
+    monkeypatch.setattr(cc,'PARENT_SCIENCE',parent_data['scientific_hash'])
     spec=tmp_path/'spec';spec.write_text('fixed spec')
     brief=tmp_path/'brief';brief.write_bytes(Path(old['provenance']['brief_path']).read_bytes())
     cache=tmp_path/'cache';cache.mkdir()
@@ -462,6 +481,9 @@ def test_portable_build_roots_and_persisted_rebuild(cc,fixtures,tmp_path,monkeyp
     assert a==b
     monkeypatch.chdir(tmp_path);monkeypatch.setenv('ALIGNMENT_ROOT','/wrong');monkeypatch.setenv('DC_REPO_ROOT','/wrong')
     cc.verify_protocol(protocols[1])
+    changed_source=closure/'component_analysis/attention_patterns.py'
+    changed_source.write_bytes(changed_source.read_bytes()+b'\n# drift\n')
+    with pytest.raises(ValueError,match='immutable old source drift'):cc.verify_protocol(protocols[1])
     with pytest.raises(ValueError,match='alignment.root'):cc.build_protocol(parent,cache,spec,brief,alignment_root=tmp_path/'missing')
 
 def test_portable_freeze_cli_requires_root(cc):
