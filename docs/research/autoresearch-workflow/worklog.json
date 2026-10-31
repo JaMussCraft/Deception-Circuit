@@ -1,0 +1,91 @@
+{
+  "budgets": {
+    "gpu": "0.0 of 0 GPU-h actual (0.0 reserved)",
+    "openrouter": "$0.00 of $0.00 cap"
+  },
+  "directions": [
+    {
+      "name": "Hygiene and config",
+      "state": "done"
+    },
+    {
+      "name": "Findings index and layout",
+      "state": "queued"
+    },
+    {
+      "name": "Hooks and CLI",
+      "state": "active (core), hooks queued"
+    },
+    {
+      "name": "Protocol docs and profiles",
+      "state": "done"
+    },
+    {
+      "name": "Science guards",
+      "state": "active; pilot: queued"
+    }
+  ],
+  "findings": [
+    {
+      "at": "2026-10-31T09:20:00-04:00",
+      "evidence": "reports/lane3-repo-structure.md \u00a71",
+      "id": "F1",
+      "plain": "A fresh synthesis agent needs 60-80k tokens just to learn the current research state, because no index of findings or directions exists.",
+      "setup": "Token estimate from file sizes across .scratch, memory, reports and docs.",
+      "strength": "reviewed"
+    },
+    {
+      "at": "2026-10-31T09:25:00-04:00",
+      "evidence": "reports/lane4-oversight.md \u00a70",
+      "id": "F2",
+      "plain": "The unreadable glued-together state files come from the model re-reading its own compressed prose and compounding it; the same glue leaked into the memory index.",
+      "setup": "Measured share of 20+ character tokens per paragraph in the affected file and in Codex rollout logs.",
+      "strength": "reviewed"
+    },
+    {
+      "at": "2026-10-31T09:25:00-04:00",
+      "evidence": "reports/lane1-public-patterns.md \u00a71b",
+      "id": "F3",
+      "plain": "Only 13 of 2,683 analysis result files record the code commit they came from.",
+      "setup": "Grep over Deception-Circuit/outputs/_analyses JSON files.",
+      "strength": "preliminary"
+    }
+  ],
+  "incidents": [
+    {
+      "at": "2026-10-31T09:40:00-04:00",
+      "effect": "Wrong claim reached the user and a memory note",
+      "fix": "Memory note corrected; model defaults kept only as a safety net",
+      "id": "P1",
+      "what": "A research agent reported that Codex workers had been running on Astra; the user's own check showed 215 of 253 ran Sol. The agent inferred from config files without checking the spawn logs."
+    },
+    {
+      "at": "2026-10-31T10:00:00-04:00",
+      "effect": "10 minutes lost",
+      "fix": "Feature directory moved into the worktree (matches the approved layout); Alignment-side files are staged and applied by the orchestrator",
+      "id": "P2",
+      "what": "The worktree isolation hook refuses writes to the Alignment checkout and compound shell commands, so the feature directory could not be created where first planned."
+    }
+  ],
+  "needs": [
+    {
+      "answer": "\"go\", with corrections (checkpoint is a usage freeze; keep superpowers everywhere; move .scratch text into Deception-Circuit docs; science guards during setup).",
+      "answered_at": "2026-10-31T09:55:00-04:00",
+      "at": "2026-10-31T09:30:00-04:00",
+      "default": null,
+      "id": "N0",
+      "text": "approve the workflow proposal and plugin disable list."
+    }
+  ],
+  "right_now": "Tickets 01, 02, 03, 07 and 08 are done and installed. Running now: the science guards in the Deception-Circuit code (ticket 04) and the hook definitions for both tools (ticket 06, staged only; nothing installs until the final smoke test). Next: seeding the findings index and directions registry (ticket 05).",
+  "schema": 1,
+  "state": "Running",
+  "terms": [
+    {
+      "meaning": "an isolated copy of the Deception-Circuit repository on its own branch, where all code changes for this setup are made.",
+      "term": "Worktree"
+    }
+  ],
+  "title": "setting up the autoresearch workflow",
+  "transcripts": "not recorded yet"
+}
