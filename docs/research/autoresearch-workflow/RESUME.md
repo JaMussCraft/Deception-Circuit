@@ -1,5 +1,6 @@
 # RESUME: autoresearch-workflow setup (machine state; overwrite, keep under 150 lines)
 
+Branch pushed to origin/autoresearch-workflow (tracking) at 5:40 pm EDT; no PR opened; Alignment checkout NOT committed (the user's step, checklist step 3).
 Status: SETUP COMPLETE on the branch, 5:35 pm EDT 2026-10-31; waiting on the user's decisions (merge, wave B, wave C go, wave D confirmation; see F/merge-checklist.md steps 3-9). Approved by user 2026-10-31 ("go"). Orchestrator compactions this session: 1 (3:55 pm EDT, before the hooks were installed, so not counted by the hook).
 Worktree: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/autoresearch-workflow (branch autoresearch-workflow off main 4253bb6); session pinned there.
 Feature dir (canonical): docs/research/autoresearch-workflow/ in the worktree. reports/proposal-full.md is the approved design; reports/lane*.md are the research reports. `.scratch/autoresearch-workflow` in Alignment holds stale copies and becomes a symlink in the migration ticket.
