@@ -1,0 +1,116 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh -c 'test -f /projects/beto/swong2/Alignment/.agents/research_session/cli.py && ! test -e /u/swong2/.claude/research-session/DISABLED && exec /sw/external/python/anaconda3/bin/python3.9 -B /projects/beto/swong2/Alignment/.agents/research_session/cli.py hook session-start --tool claude || exit 0'",
+            "timeout": 10
+          }
+        ],
+        "matcher": "startup|resume"
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh -c 'test -f /projects/beto/swong2/Alignment/.agents/research_session/cli.py && ! test -e /u/swong2/.claude/research-session/DISABLED && exec /sw/external/python/anaconda3/bin/python3.9 -B /projects/beto/swong2/Alignment/.agents/research_session/cli.py hook session-start --tool claude || exit 0'",
+            "timeout": 10
+          }
+        ],
+        "matcher": "compact"
+      }
+    ],
+    "PostCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh -c 'test -f /projects/beto/swong2/Alignment/.agents/research_session/cli.py && ! test -e /u/swong2/.claude/research-session/DISABLED && exec /sw/external/python/anaconda3/bin/python3.9 -B /projects/beto/swong2/Alignment/.agents/research_session/cli.py hook post-compact --tool claude || exit 0'",
+            "timeout": 10
+          }
+        ],
+        "matcher": "manual|auto"
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh -c 'test -f /projects/beto/swong2/Alignment/.agents/research_session/cli.py && ! test -e /u/swong2/.claude/research-session/DISABLED && exec /sw/external/python/anaconda3/bin/python3.9 -B /projects/beto/swong2/Alignment/.agents/research_session/cli.py hook pre-tool-use --tool claude || exit 0'",
+            "timeout": 20
+          }
+        ],
+        "matcher": "Agent|Bash|SendMessage|Write|Edit"
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh -c 'test -f /projects/beto/swong2/Alignment/.agents/research_session/cli.py && ! test -e /u/swong2/.claude/research-session/DISABLED && exec /sw/external/python/anaconda3/bin/python3.9 -B /projects/beto/swong2/Alignment/.agents/research_session/cli.py hook post-tool-use --tool claude || exit 0'",
+            "timeout": 10
+          }
+        ],
+        "matcher": "Agent"
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh -c 'test -f /projects/beto/swong2/Alignment/.agents/research_session/cli.py && ! test -e /u/swong2/.claude/research-session/DISABLED && exec /sw/external/python/anaconda3/bin/python3.9 -B /projects/beto/swong2/Alignment/.agents/research_session/cli.py hook post-tool-use --tool claude || exit 0'",
+            "timeout": 10
+          }
+        ],
+        "matcher": "Write|Edit"
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh -c 'test -f /projects/beto/swong2/Alignment/.agents/research_session/cli.py && ! test -e /u/swong2/.claude/research-session/DISABLED && exec /sw/external/python/anaconda3/bin/python3.9 -B /projects/beto/swong2/Alignment/.agents/research_session/cli.py hook user-prompt-submit --tool claude || exit 0'",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh -c 'test -f /projects/beto/swong2/Alignment/.agents/research_session/cli.py && ! test -e /u/swong2/.claude/research-session/DISABLED && exec /sw/external/python/anaconda3/bin/python3.9 -B /projects/beto/swong2/Alignment/.agents/research_session/cli.py hook subagent-start --tool claude || exit 0'",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh -c 'test -f /projects/beto/swong2/Alignment/.agents/research_session/cli.py && ! test -e /u/swong2/.claude/research-session/DISABLED && exec /sw/external/python/anaconda3/bin/python3.9 -B /projects/beto/swong2/Alignment/.agents/research_session/cli.py hook subagent-stop --tool claude || exit 0'",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh -c 'test -f /projects/beto/swong2/Alignment/.agents/research_session/cli.py && ! test -e /u/swong2/.claude/research-session/DISABLED && exec /sw/external/python/anaconda3/bin/python3.9 -B /projects/beto/swong2/Alignment/.agents/research_session/cli.py hook stop --tool claude || exit 0'",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh -c 'test -f /projects/beto/swong2/Alignment/.agents/research_session/cli.py && ! test -e /u/swong2/.claude/research-session/DISABLED && exec /sw/external/python/anaconda3/bin/python3.9 -B /projects/beto/swong2/Alignment/.agents/research_session/cli.py hook session-start --tool codex || exit 0'",
+            "timeout": 10
+          }
+        ],
+        "matcher": "startup|resume"
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh -c 'test -f /projects/beto/swong2/Alignment/.agents/research_session/cli.py && ! test -e /u/swong2/.claude/research-session/DISABLED && exec /sw/external/python/anaconda3/bin/python3.9 -B /projects/beto/swong2/Alignment/.agents/research_session/cli.py hook session-start --tool codex || exit 0'",
+            "timeout": 10
+          }
+        ],
+        "matcher": "compact"
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh -c 'test -f /projects/beto/swong2/Alignment/.agents/research_session/cli.py && ! test -e /u/swong2/.claude/research-session/DISABLED && exec /sw/external/python/anaconda3/bin/python3.9 -B /projects/beto/swong2/Alignment/.agents/research_session/cli.py hook pre-tool-use --tool codex || exit 0'",
+            "timeout": 20
+          }
+        ],
+        "matcher": "Agent|spawn_agent|Bash|apply_patch"
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh -c 'test -f /projects/beto/swong2/Alignment/.agents/research_session/cli.py && ! test -e /u/swong2/.claude/research-session/DISABLED && exec /sw/external/python/anaconda3/bin/python3.9 -B /projects/beto/swong2/Alignment/.agents/research_session/cli.py hook post-tool-use --tool codex || exit 0'",
+            "timeout": 10
+          }
+        ],
+        "matcher": "Agent|spawn_agent"
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh -c 'test -f /projects/beto/swong2/Alignment/.agents/research_session/cli.py && ! test -e /u/swong2/.claude/research-session/DISABLED && exec /sw/external/python/anaconda3/bin/python3.9 -B /projects/beto/swong2/Alignment/.agents/research_session/cli.py hook post-tool-use --tool codex || exit 0'",
+            "timeout": 10
+          }
+        ],
+        "matcher": "apply_patch"
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh -c 'test -f /projects/beto/swong2/Alignment/.agents/research_session/cli.py && ! test -e /u/swong2/.claude/research-session/DISABLED && exec /sw/external/python/anaconda3/bin/python3.9 -B /projects/beto/swong2/Alignment/.agents/research_session/cli.py hook user-prompt-submit --tool codex || exit 0'",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh -c 'test -f /projects/beto/swong2/Alignment/.agents/research_session/cli.py && ! test -e /u/swong2/.claude/research-session/DISABLED && exec /sw/external/python/anaconda3/bin/python3.9 -B /projects/beto/swong2/Alignment/.agents/research_session/cli.py hook subagent-start --tool codex || exit 0'",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh -c 'test -f /projects/beto/swong2/Alignment/.agents/research_session/cli.py && ! test -e /u/swong2/.claude/research-session/DISABLED && exec /sw/external/python/anaconda3/bin/python3.9 -B /projects/beto/swong2/Alignment/.agents/research_session/cli.py hook subagent-stop --tool codex || exit 0'",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

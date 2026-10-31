@@ -1,6 +1,6 @@
 # 06 — Hooks for Claude and Codex
 
-**Status:** claimed
+**Status:** resolved
 **Type:** task
 **Blocked by:** 02, 03
 **Wave:** A for the RS hook code; H for every settings change that installs a hook (R26). You never write
@@ -53,42 +53,65 @@ installation for wave H so that no hook can exist before the code it calls.
 
 ## Acceptance criteria
 
-- [ ] Every `command` string in the staged settings and in `F/staged/dc-claude-settings.json` matches the shell guard
+- [x] Every `command` string in the staged settings and in `F/staged/dc-claude-settings.json` matches the shell guard
       of spec §5.1 exactly, apart from the event name and `--tool`, and contains no `$`. A test checks this.
-- [ ] Running each staged command with a temporary copy where the CLI path does not exist, and again with the kill
+- [x] Running each staged command with a temporary copy where the CLI path does not exist, and again with the kill
       switch present, exits 0 with no output (use test-only copies of the command string that point at paths in T).
-- [ ] For each hook H-a to H-j, a fixture test feeds a recorded input and asserts the exact stdout JSON and exit code,
+- [x] For each hook H-a to H-j, a fixture test feeds a recorded input and asserts the exact stdout JSON and exit code,
       for Claude and, where installed, for Codex. Codex SubagentStop always prints JSON.
-- [ ] H-a in an unregistered session prints the `research-session register <slug>` line and says the session gets
+- [x] H-a in an unregistered session prints the `research-session register <slug>` line and says the session gets
       only the cap and stale gates; in a registered session it prints the freeze state instead (spec R5).
-- [ ] H-d denies a Write of a glued WORKLOG paragraph and a Write or Edit containing a planted fake token, with the
+- [x] H-d denies a Write of a glued WORKLOG paragraph and a Write or Edit containing a planted fake token, with the
       failing units in the reason; allows a clean write; and denies Write and Edit on a direction `state.json`,
       `worklog.json` and the session-state root, but not on `_templates/` (R30, R37).
-- [ ] H-f returns `additionalContext` only, never `decision: "block"`, and reports a lint problem elsewhere in a file
+- [x] H-f returns `additionalContext` only, never `decision: "block"`, and reports a lint problem elsewhere in a file
       after a clean Edit.
-- [ ] H-g acks on "continue", "Continue." and "  continue with X"; does not ack "can you continue?", a question, any
+- [x] H-g acks on "continue", "Continue." and "  continue with X"; does not ack "can you continue?", a question, any
       prompt starting with `<`, or a prompt containing `<teammate-message`, `<agent-message`,
       `<cross-session-message` or `<task-notification` (fixtures for each wrapper); and injects the freeze notice while
       frozen. The hand-back says whether the payload has a source field (R36).
-- [ ] H-b increments `compactions` exactly once per call; H-c never increments; H-c then H-b and the reverse give the
+- [x] H-b increments `compactions` exactly once per call; H-c never increments; H-c then H-b and the reverse give the
       same count.
-- [ ] H-i saves the message, blocks once when no hand-back file changed since start, never blocks twice, and skips
+- [x] H-i saves the message, blocks once when no hand-back file changed since start, never blocks twice, and skips
       the excluded agent types.
-- [ ] H-j is silent when `stop_hook_active` is true or `background_tasks` or `session_crons` is non-empty.
-- [ ] Every hook no-ops with exit 0 and no output when cwd is outside A.
-- [ ] The Codex hooks page was read. The hand-back records each verified event, matcher and tool name, the
+- [x] H-j is silent when `stop_hook_active` is true or `background_tasks` or `session_crons` is non-empty.
+- [x] Every hook no-ops with exit 0 and no output when cwd is outside A.
+- [x] The Codex hooks page was read. The hand-back records each verified event, matcher and tool name, the
       `apply_patch` input shape, and whether the project-level `.codex/hooks.json` would load for A and for DC, with
       URLs. Unverified Codex matchers are not installed and are listed. No message-tool matcher is installed (R32).
-- [ ] The hand-back gives the orchestrator the smoke command for wave H: feed `F/tools/hook_smoke.json` (a crafted
+- [x] The hand-back gives the orchestrator the smoke command for wave H: feed `F/tools/hook_smoke.json` (a crafted
       PreToolUse Agent call) on stdin to the installed guarded command and expect exit 0 and valid JSON, timed. A
       crash there would deny spawns in every A-rooted session until the kill switch is used.
-- [ ] Applying the two `json_merge` ops to copies in T yields valid JSON that still contains the bridge hook
+- [x] Applying the two `json_merge` ops to copies in T yields valid JSON that still contains the bridge hook
       unchanged; `F/staged/dc-claude-settings.json` parses.
-- [ ] `apply_staged.py --staging S --only 06 --dry-run` shows the code ops as wave A and the settings ops as wave H.
-- [ ] All RS tests pass in both envs; summaries pasted.
+- [x] `apply_staged.py --staging S --only 06 --dry-run` shows the code ops as wave A and the settings ops as wave H.
+- [x] All RS tests pass in both envs; summaries pasted.
 
 ## Verification
 
 Both interpreters. No live session is needed; the pilot (ticket 11) observes the hooks in real sessions.
 
 ## Comments
+
+Ticket 06 implementer, 2026-10-31. Every box above was checked against a command whose output I read; the
+hand-back gives each command and its output. Two boxes carry a stated deviation. For "every hook no-ops with no
+output outside A", Codex SubagentStop and Stop print `{}` instead, because the Codex page calls plain text invalid
+there. For "for Claude and, where installed, for Codex", Codex H-c and H-j are not installed, because the Codex
+PostCompact input has no summary and the Codex Stop output schema has no `additionalContext`.
+
+Committed by the orchestrator from W:
+
+- `.gitignore` (two lines, R21)
+- `docs/research/autoresearch-workflow/staged/dc-claude-settings.json`, `claude-hooks-fragment.json`,
+  `codex-hooks-fragment.json` and `codex-hooks-note.md`
+- `docs/research/autoresearch-workflow/tools/hook_smoke.py`, `hook_smoke.json` and `test_hook_settings.py`
+- `docs/research/autoresearch-workflow/reports/06-handback.md` and this ticket
+
+Staged in S, ops file `/u/swong2/.claude/jobs/b2cb53cd/tmp/alignment-staging/ops/06-hooks.json`: 47 wave A writes
+(`research_session/hooks.py`, `cli.py` with `expect_sha256`, `tests/test_research_session_hooks.py` and 44 fixtures
+in `tests/fixtures/hooks/`), then 4 wave H ops (the two `json_merge` ops, the write of `W/.claude/settings.json`, and
+a `text_block` in `A/.claude/CLAUDE.md`).
+
+Tests: the staged RS suite gave 252 passed with 19 subtests on mgnp, and 252 passed on base python3.9.
+`F/tools/test_hook_settings.py` gave 11 passed on each interpreter, and `F/tools/test_apply_staged.py` gave 33
+passed on base. The smoke script passed against the staged CLI with every isolated call under 0.4 s.
