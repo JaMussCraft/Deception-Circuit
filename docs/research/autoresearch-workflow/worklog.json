@@ -10,11 +10,11 @@
     },
     {
       "name": "Findings index and layout",
-      "state": "queued"
+      "state": "done"
     },
     {
       "name": "Hooks and CLI",
-      "state": "active (core), hooks queued"
+      "state": "done, installed in both tools"
     },
     {
       "name": "Protocol docs and profiles",
@@ -22,7 +22,15 @@
     },
     {
       "name": "Science guards",
-      "state": "active; pilot: queued"
+      "state": "done"
+    },
+    {
+      "name": "Migrations",
+      "state": "scripted; moves wait for the merge (wave B) and your confirmation (wave D)"
+    },
+    {
+      "name": "Pilot",
+      "state": "checklist written, not started"
     }
   ],
   "findings": [
@@ -97,11 +105,19 @@
       "default": "The Claude hooks work regardless; Codex sessions run without the usage gate and lint until trusted.",
       "id": "N1",
       "text": "Trust the research-session hooks in Codex: open a fresh Codex session in the Alignment checkout and run /hooks once. Until then Codex skips them."
+    },
+    {
+      "answer": null,
+      "answered_at": null,
+      "at": "2026-10-31T17:33:41-04:00",
+      "default": "Nothing moves. The branch stays unmerged, the hooks and tool stay installed and working, and the pilot can start in the worktree.",
+      "id": "N2",
+      "text": "Four decisions, in order, from docs/research/autoresearch-workflow/merge-checklist.md: (a) approve merging the autoresearch-workflow branch into Deception-Circuit main, and the commit of the applied Alignment-side files; (b) after the merge, the archive moves of the four closed scratch directories (wave B, reversible, verified by script); (c) your go for the Codex config change (wave C: default worker model Sol, shinka and weco off), which needs a Codex restart; (d) confirmation that the live Codex session is finished, so its directories and the two memory logs can be archived (wave D)."
     }
   ],
-  "right_now": "Tickets 01, 02, 03, 07 and 08 are done and installed. Running now: the science guards in the Deception-Circuit code (ticket 04) and the hook definitions for both tools (ticket 06, staged only; nothing installs until the final smoke test). Next: seeding the findings index and directions registry (ticket 05).",
+  "right_now": "All twelve setup tickets are done and committed on the branch, and every Alignment-side change that did not need your go is applied: the research-session tool, the hooks in both tools (trusted in Codex), the plugin profiles, the protocol guides, the findings index, and the science guards in the code. Waiting on you for four decisions, in the merge checklist: merge the branch, then the archive moves (wave B); the Codex config change (wave C, needs a Codex restart); and the live Codex session's files (wave D, after you confirm that session is finished).",
   "schema": 1,
-  "state": "Running",
+  "state": "Blocked: needs you",
   "terms": [
     {
       "meaning": "an isolated copy of the Deception-Circuit repository on its own branch, where all code changes for this setup are made.",
