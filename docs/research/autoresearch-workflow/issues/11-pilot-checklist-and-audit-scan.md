@@ -1,6 +1,6 @@
 # 11 — Pilot checklist and `audit-scan`
 
-**Status:** ready-for-agent
+**Status:** resolved
 **Type:** task
 **Blocked by:** 06, 07, 08, 10 (05, 10, 11 and 12 edit `directions.json` in that order, R38)
 **Wave:** A for the `audit-scan` code; the checklist is in W.
@@ -70,11 +70,29 @@ An observation table follows the steps with columns: step, expected, observed, p
 
 ## Acceptance criteria
 
-- [ ] `audit-scan` tests pass in both envs on synthetic Claude and Codex transcripts covering each counted item.
-- [ ] A key-only inspection of one real transcript is recorded in the hand-back, and the parser handles those keys.
-- [ ] Every step of the checklist names an exact command or UI action and an expected observation; every hook
+- [x] `audit-scan` tests pass in both envs on synthetic Claude and Codex transcripts covering each counted item.
+- [x] A key-only inspection of one real transcript is recorded in the hand-back, and the parser handles those keys.
+- [x] Every step of the checklist names an exact command or UI action and an expected observation; every hook
       H-a to H-j is exercised by at least one step.
-- [ ] `pilot-checklist.md` and `pilot-hooks/START.md` pass the lint; `directions.json` validates.
-- [ ] `apply_staged.py --staging S --only 11 --dry-run` output pasted.
+- [x] `pilot-checklist.md` and `pilot-hooks/START.md` pass the lint; `directions.json` validates.
+- [x] `apply_staged.py --staging S --only 11 --dry-run` output pasted.
 
 ## Comments
+
+Ticket 11, Opus implementer, 2026-10-31. Hand-back: `F/reports/11-handback.md`.
+
+Files for the orchestrator to commit from W:
+
+- `F/pilot-checklist.md`, `F/reports/11-handback.md` and this ticket.
+- `W/docs/research/pilot-hooks/` with `START.md`, `README.md`, `RESUME.md`, `WORKLOG.md`, `state.json`,
+  `worklog.json` and `ledger.json`, all created by `research-session init --from-start`.
+- `W/docs/research/directions.json` (the `proposed` row `pilot-hooks`), `DIRECTIONS.md` and `SESSIONS.md`
+  (re-rendered).
+
+Staged in S: op file `S/ops/11-audit.json` with three wave A writes. They are `research_session/audit.py` (new),
+`research_session/cli.py` (whole file, `expect_sha256` of the installed file) and
+`tests/test_research_session_audit.py` (new).
+
+Tests of the staged suite: 269 passed with 19 subtests on mgnp, and 269 passed on base python3.9. That is the 252
+installed tests plus 17 new ones. The hand-back also records `audit-scan` runs on real Claude and Codex transcripts,
+with 0 parse errors.
