@@ -7,6 +7,17 @@ exact; see What is NOT done).
 No git command was run, nothing was applied, no Slurm job or paid API call was made, and no session was launched.
 Usage at 5:18 pm EDT: all-models 19%, Fable 23%.
 
+**Addendum at 5:29 pm EDT, after the 4:26 pm (local clock) wave A apply.** The orchestrator's message on Comments 20
+and 21 names "handed-back" as a terminal word, and the staged hook did not accept it. The staged `hooks.py` now
+accepts it, and its block reason lists it. The staged test file has a matching vocabulary case and reason text. The
+staged suite gives 273 passed on both interpreters. Ops 12#1 and 12#2 now expect the installed hashes 03a0f2d636e0
+and 012ac2d37961, which are the files the 4:26 pm run wrote. A dry run of ticket 12 wave A shows 12#1 and 12#2 WOULD
+APPLY and the other 16 SKIP. The orchestrator re-runs `--wave A --only 12`, then the installed tests and the smoke
+test. The pre-change op file is at `/u/swong2/.claude/jobs/b2cb53cd/tmp/12/12-wrap-up.before-handed-back.json`. The
+durable copy `/u/swong2/.claude/research-session/staging-20261031/` predates this change. Three of its files need a
+fresh copy from S: `ops/12-wrap-up.json`, the staged `hooks.py`, and the staged hooks test file.
+Usage at 5:29 pm EDT: all-models 20%, Fable 23%.
+
 ## What changed
 
 ### Committed by the orchestrator from W
@@ -36,10 +47,10 @@ All paths are under `/projects/beto/swong2/Alignment/Deception-Circuit/.claude/w
 S is `/u/swong2/.claude/jobs/b2cb53cd/tmp/alignment-staging`.
 
 1. `/projects/beto/swong2/Alignment/.agents/research_session/hooks.py`, whole-file write, `expect_sha256` e255196b8453
-   (the installed file, re-hashed just before staging). H-i now also blocks once when the newest changed hand-back has
+   (the installed file, re-hashed just before staging; 03a0f2d636e0 since the addendum). H-i now also blocks once when the newest changed hand-back has
    no `Status:` line, a placeholder (pending, to be filled, TBD, in progress) or no terminal word (Comment 21).
 2. `/projects/beto/swong2/Alignment/.agents/tests/test_research_session_hooks.py`, whole-file write, `expect_sha256`
-   3205e28eb977: four new tests, and the existing no-block test now writes a Status line.
+   3205e28eb977 (012ac2d37961 since the addendum): four new tests, and the existing no-block test now writes a Status line.
 3. `.../.agents/tests/fixtures/hooks/claude_subagent_stop_handback_pending.json`, new, `expect_sha256: "absent"`.
 4. `/projects/beto/swong2/Alignment/.agents/memory/autoresearch-workflow.md`, new, `expect_sha256: "absent"`, lint.
 5. `MEMORY.md`, one `append_text` of exactly one line, lint.

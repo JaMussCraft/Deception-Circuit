@@ -95,8 +95,8 @@ CLAUDE.md); 10 migration B (scripted `.scratch` archive); 11 pilot checklist and
 2. `F/spec.md`. Binding: §4 schemas, §5 harness, §6 science guards, §7 staging, §9 rulings. Do not reinterpret a
    ruling; if one seems wrong, hand back.
 3. `F/reports/00-plan-handback.md`: verified facts with file:line evidence, and the list of unverified facts.
-4. The lane report sections your ticket names, in `F/reports/` (lane1 public patterns, lane2 harness, lane3 repo
-   structure, lane4 oversight). `F/reports/proposal-full.md` is the approved design; the spec overrides it.
+4. The lane report sections your ticket names, in `F/reports/` (lane 1 public patterns, lane 2 harness, lane 3 repo
+   structure, lane 4 oversight). `F/reports/proposal-full.md` is the approved design; the spec overrides it.
 5. `A/docs/agents/claude-codex.md` if your ticket touches Codex, plugins or the bridge.
 6. In W: `CONTEXT.md` only if your ticket touches experiment code (ticket 04).
 

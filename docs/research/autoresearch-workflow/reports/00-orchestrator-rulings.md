@@ -50,3 +50,23 @@ answers above:
   command; ticket 12 stages the memory rewrites as wave D.
 - OQ8 is now spec R31. `json_merge` only extends lists, never duplicates an identical entry, and has no
   `replace_paths`.
+
+## Rulings during implementation (2026-10-31, orchestrator)
+
+- **H-i status check (after incident P3, 5:30 pm EDT).** The ticket 04 agent twice ended its turn to wait for a
+  background test run that never woke it, and its hand-back read "resolved, pending the full-suite comparison".
+  Spec 5.1 row H-i is amended: the SubagentStop hook also blocks once when the newest changed hand-back has no
+  `Status:` line, a placeholder status (pending, to be filled, TBD, in progress), or no terminal word (resolved,
+  blocked, handed-back, held, done, failed, abandoned). Ticket 12 implemented it (Comment 21); the agent brief,
+  the ticket-implementer definition and the research-session protocol carry the matching waiting rule (Comments 20
+  and 22).
+- **Ticket 09 dedupe (4:15 pm EDT).** The 21 byte-identical `project_context` copies stay until wave D; pointer
+  READMEs in wave A; the moves need the apply tool's cross-device move, which ticket 12 added.
+- **Ticket 10 (4:20 pm EDT).** Copy-plus-stash for the old `.scratch/autoresearch-workflow` directory accepted; the
+  dry run carries planned state forward (ticket 12).
+- **Ticket 11 (4:35 pm EDT).** R20 stays binding until pilot step 9; all seven `init` files committed; the pilot-hooks
+  summary placeholder stays; the staging root gets a durable copy at
+  `/u/swong2/.claude/research-session/staging-20261031/`.
+- **Ticket 12 (5:30 pm EDT).** Apply `12c#1` in wave C and treat `01#21` CONFLICT as expected; keep the journal-aware
+  skip; apply with `--only`; keep the worktree until wave B verify passes; no symlinks at the old `project_context`
+  paths; FINDINGS rows stay `pre-manifest`; resumed older agents add a `Status:` line to their hand-backs.
