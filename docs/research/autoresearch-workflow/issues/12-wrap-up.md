@@ -1,6 +1,6 @@
 # 12 — Wrap-up: findings, registry, memory note, merge checklist
 
-**Status:** ready-for-agent
+**Status:** claimed
 **Type:** task
 **Blocked by:** 01-11
 **Wave:** A for the memory note and index line; D for the deferred memory rewrites (staged, not applied).
@@ -128,3 +128,23 @@ Staged (wave D, pending the user's confirmation that the live Codex session is f
     records their record shape; a research-session command that sets a direction's summary (R39 forbids hand edits
     and `init` leaves a placeholder).
 19. The pilot-hooks row is `proposed` with init's placeholder summary; leave it.
+20. **Stall-prevention rule for agents** (root cause of incident P3: an in-process teammate subagent is not
+    re-invoked when a Bash command it launched with `run_in_background` exits, so an agent that ends its turn to
+    "wait for the completion notification" idles until the orchestrator messages it). Add the rule, in your own
+    words, to `F/agent-brief.md`, to the installed `A/.claude/agents/ticket-implementer.md` (staged text op,
+    wave A, `expect_sha256`), and to the delegation section of `A/docs/agents/research-session.md` (staged text op):
+    never end a turn while a run you own is unfinished; wait actively with the Monitor tool on the log's final line,
+    or run the suite in the foreground under the 10-minute timeout in chunks; if you cannot wait, put the exact
+    comparison command in the hand-back's Open questions and say the orchestrator must run it; never write
+    "pending" as the Status.
+21. **Hook enforcement.** Extend the SubagentStop handler in the staged RS package (the H-i rule in `hooks.py` that
+    blocks once when the hand-back file is missing) so it also blocks once when the hand-back's `Status:` line is
+    missing, is not a terminal word (use the vocabulary `hooks.py` already has), or contains "pending",
+    "to be filled", "TBD" or "in progress". Same one-block semantics and reason style, a fixture in the fixtures
+    directory, tests in the staged tests tree, full staged suite green on both interpreters. Stage `hooks.py` (and
+    `cli.py` if touched) as whole-file writes with `expect_sha256` of the installed files re-read right before
+    staging, in `S/ops/12-wrap-up.json`, wave A. The merge checklist's post-apply step re-runs the installed tests
+    and `F/tools/hook_smoke.py --live`.
+22. **Orchestrator rule** for `A/docs/agents/research-session.md` (same staged op as 20): an idle notice whose text
+    says the agent is waiting on something is a stall signal; the orchestrator answers it at once with the waiting
+    instruction above instead of accepting it.
