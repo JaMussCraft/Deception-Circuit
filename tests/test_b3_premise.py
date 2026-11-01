@@ -124,6 +124,35 @@ def test_row_id_is_deterministic_and_validated(tok):
         rw.validate_row(bad)
 
 
+def test_control_rows_have_their_own_ids_and_are_skipped(tok):
+    base = make_row(tok, sample=rw.GREEDY)
+    ctl = dict(make_row(tok, sample=rw.GREEDY), control="C1",
+               row_id=rw.make_row_id("test", "V-A", "orb-0001", "free", -1, "C1"))
+    assert ctl["row_id"] == "test:V-A:C1:orb-0001:free:-1"
+    assert base["row_id"] == "test:V-A:orb-0001:free:-1"
+    rw.validate_row(ctl)
+    with pytest.raises(ValueError, match="row_id"):
+        rw.validate_row(dict(ctl, control="C2"))
+    with pytest.raises(ValueError, match="control"):
+        rw.validate_row(dict(ctl, control="C9"))
+    rw.validate_row(dict(base, control=None, tag_pos=40, truncated=False, margins={"P1": 1.0, "P2": 2.0,
+                                                                                  "r1_basis": "seed"}))
+    # Control rows change neither the gap nor the agreement, and the judge never selects them.
+    labels = {}
+    rows = query(tok, labels, "q1", C(7), C(2))
+    controls = []
+    for r in rows:
+        c = dict(r, control="C2", row_id=rw.make_row_id(r["split"], r["variant"], r["query_id"], r["condition"],
+                                                        r["sample"], "C2"))
+        labels[c["row_id"]] = verdict("REFUSE")
+        controls.append(c)
+    assert pm.gap_report(rows + controls, labels)["gap_exact"] == pm.gap_report(rows, labels)["gap_exact"] == "50"
+    res = px.resolve_tokens(px.load_proxy_tokens().with_r1(["Sorry"]), tok)
+    assert pm.proxy_agreement(rows + controls, labels, res, "P1")["n_total"] == 22
+    from scripts import b3_judge
+    assert len(b3_judge.select_rows(rows + controls, "main", None, 0)) == 22
+
+
 @pytest.mark.parametrize("field", ["query_id", "category", "variant", "condition", "sample", "seed", "query",
                                    "response", "opening_ids", "first_token_id", "first_token_text"])
 def test_missing_field_is_rejected(tok, field):

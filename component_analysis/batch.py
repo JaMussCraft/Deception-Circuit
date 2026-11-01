@@ -79,7 +79,8 @@ def main(argv=None) -> int:
                 elif resolved.model != model_name:
                     raise ValueError(f"line {index} names model {resolved.model!r}, but this "
                                      f"batch loaded {model_name!r}")
-                code = cli_module.run(cli, resolved, model=model)
+                # The line's own argv goes into each cell's run_manifest.json.
+                code = cli_module.run(cli, resolved, model=model, argv=line)
             entry["status"] = "ok" if code == 0 else f"exit {code}"
         except SystemExit as exc:
             entry["status"] = f"error: SystemExit {exc}"

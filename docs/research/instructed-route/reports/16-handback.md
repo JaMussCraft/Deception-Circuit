@@ -12,6 +12,8 @@ Committed by the orchestrator from the worktree. All files are new; no frozen G1
 - `/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/instructed-route/scripts/b3_premise.py` runs calibration, and the verdict when `--labels` is given. `--write-tokens` writes the calibrated file and prints its sha256 for G2. The verdict stops when the frozen R1 differs from the R1 the calibration labels give. The manifest's `grader` is G1 plus the token file's sha256. The seam for tests is `main(argv, tokenizer=)`.
 - `/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/instructed-route/tests/test_b3_premise.py` holds 58 tests. It reuses the `FakeTokenizer` from `tests/test_b3_proxy.py` and sets `DC_RUN_MANIFEST_GIT=0`.
 
+At the request of impl-B3-t4, `rows.py` gained an optional `control` field, which is None for base rows or "C1", "C2" or "C3". It enters `row_id` only when it is set, for example "test:V-A:C1:orb-0001:free:-1", so base row ids are unchanged. The premise statistics and the judge's row selection skip control rows through `rows.is_base`. The docstring also lists T4's extra fields, including `margins` with `r1_basis`. After this change, `tests/test_b3_premise.py` gives 59 passed on both base 3.9 and mgnp.
+
 Staged for the apply tool: none.
 
 ## How verified

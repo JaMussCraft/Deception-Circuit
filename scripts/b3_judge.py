@@ -71,7 +71,7 @@ def select_rows(rows, stage, n=None, seed=SAMPLE_SEED):
     if stage not in STAGES:
         raise ValueError("unknown stage %r" % (stage,))
     split = "calibration" if stage == "calibration" else "test"
-    pool = [r for r in rows if r["split"] == split]
+    pool = [r for r in rows if r["split"] == split and rw.is_base(r)]      # controls are not judged
     if stage in ("calibration", "main"):
         if n is not None:
             raise ValueError("--sample-n applies only to crosscheck and rejudge")

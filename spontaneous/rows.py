@@ -7,9 +7,13 @@ lines through `load_rows`, which validates every row with `validate_row`. T4 mus
 **Row fields.** Every row carries:
 
 - `schema` (int): `SCHEMA`, currently 1.
-- `row_id` (str): exactly `make_row_id(split, variant, query_id, condition, sample)`, which is
-  "<split>:<variant>:<query_id>:<condition>:<sample>", for example "test:V-A:orb-0049:free:-1". Judge labels join to
-  rows by this string.
+- `row_id` (str): exactly `make_row_id(split, variant, query_id, condition, sample, control)`, which is
+  "<split>:<variant>:<query_id>:<condition>:<sample>" for a base row, for example "test:V-A:orb-0049:free:-1", and
+  "<split>:<variant>:<control>:<query_id>:<condition>:<sample>" for a control row, for example
+  "test:V-A:C1:orb-0049:free:-1". Judge labels join to rows by this string.
+- `control` (optional; None or absent for the base prompt): "C1" (no consequence), "C2" (semantics swap) or "C3"
+  (innocuous tier behaviour), plan section 3.4. The judge and premise entrypoints use base rows only (`is_base`);
+  control rows are read for their greedy margins.
 - `split` (str): "calibration" (the 20 calibration queries) or "test" (the 100 test queries).
 - `variant` (str): "V-A" or "V-B" (`spontaneous.af_prompts.VARIANTS`).
 - `query_id` (str): the `id` in `data/b3/af_queries.json`, for example "orb-0049".
@@ -43,10 +47,11 @@ required on the greedy row (`sample == -1`) and optional on sampled rows, where 
 `row_margins` raises KeyError instead of approximating when one is not. The premise verdict does not use margins:
 agreement uses the row labels from `opening_ids`. Margins feed transfer (ticket T6) and diagnostics.
 
-**Optional fields.** `margins` (`{"P1": float, "P2": float, "proxy_tokens_sha256": str}`), the margins T4 computed
-with the token file in force at generation time (seed R1 for calibration rows, the frozen G2 file for test rows);
-consumers recompute them with `row_margins`. `finish_reason` ("eos" or "length"), `prompt_len`, `elapsed_s`. Unknown
-fields are allowed and ignored.
+**Optional fields.** `margins` (`{"P1": float, "P2": float, "r1_basis": "seed" or "calibrated"}`, on greedy rows),
+the margins T4 computed in the job on full fp32 vectors with the R1 in force (seed R1 for calibration rows, the frozen
+G2 list for test rows); `row_margins` recomputes them from `stems`. Also `tag_pos`, `prompt_len`, `readout_index`
+(the first generated position, after any assistant prefill), `assistant_prefill`, `finish_reason` ("eos" or
+"length"), `truncated` (bool), `temperature`, `top_p` and `elapsed_s`. Unknown fields are allowed and ignored.
 
 **Judge label records** (written by `scripts/b3_judge.py`, one per line) are the verdict records of
 `spontaneous.judge.judge_rows` plus `row_id`, `stage`, `model` and `cost_usd` (OpenRouter's settled `usage.cost`,
@@ -65,6 +70,7 @@ SPLITS = ("calibration", "test")
 VARIANTS = ("V-A", "V-B")
 CONDITIONS = ("free", "paid")
 GREEDY = -1
+CONTROLS = (None, "C1", "C2", "C3")
 N_SAMPLES = 10
 OPENING_LEN = 8
 N_STEMS = 6
@@ -73,9 +79,16 @@ _STR_FIELDS = ("row_id", "split", "variant", "query_id", "category", "condition"
 _INT_FIELDS = ("schema", "sample", "seed", "n_generated", "vocab_size")
 
 
-def make_row_id(split: str, variant: str, query_id: str, condition: str, sample: int) -> str:
-    """The join key of a row: "<split>:<variant>:<query_id>:<condition>:<sample>"."""
-    return "%s:%s:%s:%s:%d" % (split, variant, query_id, condition, int(sample))
+def make_row_id(split: str, variant: str, query_id: str, condition: str, sample: int, control=None) -> str:
+    """The join key of a row: "<split>:<variant>[:<control>]:<query_id>:<condition>:<sample>"."""
+    if control is None:
+        return "%s:%s:%s:%s:%d" % (split, variant, query_id, condition, int(sample))
+    return "%s:%s:%s:%s:%s:%d" % (split, variant, control, query_id, condition, int(sample))
+
+
+def is_base(row: Mapping[str, Any]) -> bool:
+    """True for a row of the base prompt, False for a control (C1, C2, C3) row."""
+    return row.get("control") is None
 
 
 def _is_int(x) -> bool:
@@ -128,7 +141,10 @@ def validate_row(row: Mapping[str, Any]) -> Mapping[str, Any]:
         _fail(row, "condition %r is not one of %s" % (row["condition"], CONDITIONS))
     if not (row["sample"] == GREEDY or 0 <= row["sample"] < N_SAMPLES):
         _fail(row, "sample %r is not -1 (greedy) or 0 to %d" % (row["sample"], N_SAMPLES - 1))
-    want = make_row_id(row["split"], row["variant"], row["query_id"], row["condition"], row["sample"])
+    if row.get("control") not in CONTROLS:
+        _fail(row, "control %r is not one of %s" % (row.get("control"), CONTROLS))
+    want = make_row_id(row["split"], row["variant"], row["query_id"], row["condition"], row["sample"],
+                       row.get("control"))
     if row["row_id"] != want:
         _fail(row, "row_id should be %r" % want)
     ids = row["opening_ids"]

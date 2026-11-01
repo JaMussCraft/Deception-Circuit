@@ -6,7 +6,10 @@ with `run_manifest.write_run_manifest`; this checks the component-analysis
 cells get the same record (B1 plan, ticket 1): the 40-hex `git_commit` on a
 real run, nothing on a dry run, and the writer's existing convention when a
 cell is re-run with a different command line (`run_manifest.1.json` beside the
-first, never an overwrite).
+first, never an overwrite). From the B2 plan (section 6, T1): a failure never
+stops a run, `DC_RUN_MANIFEST_GIT=0` records `git_fingerprint_error:
+"disabled"`, and each batch line records its own argv, so two batch lines into
+one cell write two manifests.
 
 The model loader is monkeypatched away and the stub analysis is registered, as
 in `tests/test_analyze_components_registry.py`, so this runs in both
@@ -35,15 +38,23 @@ COMMIT = "0123456789abcdef0123456789abcdef01234567"
 
 
 @pytest.fixture
-def registered(monkeypatch):
+def stubbed(monkeypatch):
+    """The stub analysis, no model, and a pinned timestamp; git left as the
+    environment says (`tests/conftest.py` sets DC_RUN_MANIFEST_GIT=0)."""
     monkeypatch.setattr(registry, "ANALYSES", [stub_analysis])
     monkeypatch.setattr(analyze_components, "load_model", lambda cli, resolved: None)
+    monkeypatch.setattr(run_manifest, "now_chicago", lambda: "2026-11-01T00:00:00-05:00")
+    return stub_analysis
+
+
+@pytest.fixture
+def registered(stubbed, monkeypatch):
+    """`stubbed`, with the git fingerprint fixed to one 40-hex commit."""
     monkeypatch.setattr(run_manifest, "git_fingerprint",
                         lambda repo_root=None: {"git_commit": COMMIT,
                                                 "git_dirty": False,
                                                 "dirty_diff_hash": None})
-    monkeypatch.setattr(run_manifest, "now_chicago", lambda: "2026-11-01T00:00:00-05:00")
-    return stub_analysis
+    return stubbed
 
 
 def manifests(out):
@@ -78,6 +89,20 @@ def test_a_run_writes_a_manifest_with_the_40_hex_commit(sdr_run, registered):
                for path in m["dataset_files"])
     assert all(re.fullmatch(r"[0-9a-f]{64}", digest)
                for digest in m["dataset_files"].values())
+
+
+def test_git_disabled_by_the_environment_is_recorded_as_disabled(sdr_run, stubbed,
+                                                                 monkeypatch):
+    monkeypatch.setenv(run_manifest.GIT_ENV_FLAG, "0")
+    run_dir, out, _records = sdr_run
+
+    assert run_cli(str(run_dir), "--num-kv-heads", "2",
+                   "--output-dir", str(out)) == 0
+
+    m = read_manifest(out)
+    assert m["git_fingerprint_error"] == "disabled"
+    assert m["git_commit"] is None
+    assert run_manifest.verify_manifest_hash(m)
 
 
 def test_a_dry_run_writes_no_manifest(sdr_run, registered):
@@ -141,8 +166,32 @@ def test_every_cell_of_a_batch_line_gets_a_manifest(sdr_run, registered, tmp_pat
 
     assert manifests(out) == [os.path.join("a", *CELL, "run_manifest.json"),
                               os.path.join("b", *CELL, "run_manifest.json")]
-    with open(os.path.join(str(out), "b", *CELL, "run_manifest.json")) as handle:
-        assert json.load(handle)["git_commit"] == COMMIT
+    for name in ("a", "b"):
+        with open(os.path.join(str(out), name, *CELL, "run_manifest.json")) as handle:
+            m = json.load(handle)
+        assert m["git_commit"] == COMMIT
+        # Each line's own invocation, not the `batch FILE` command line.
+        assert m["argv"] == ["analyze_components.py", str(run_dir),
+                             "--num-kv-heads", "2", "--output-dir", f"{out}/{name}"]
+
+
+def test_two_batch_lines_into_one_cell_write_two_manifests(sdr_run, registered,
+                                                          tmp_path):
+    """Two lines, one cell, different flags: run_manifest.json then
+    run_manifest.1.json, each holding its own line's argv."""
+    run_dir, out, _records = sdr_run
+    path = tmp_path / "job.batch"
+    path.write_text(f"{run_dir} --num-kv-heads 2 --output-dir {out}\n"
+                    f"{run_dir} --num-kv-heads 2 --analyses stub --output-dir {out}\n")
+
+    assert analyze_components.main(["batch", str(path)]) == 0
+
+    assert manifests(out) == [os.path.join(*CELL, "run_manifest.1.json"),
+                              os.path.join(*CELL, "run_manifest.json")]
+    assert "--analyses" not in read_manifest(out)["argv"]
+    assert read_manifest(out, "run_manifest.1.json")["argv"] == [
+        "analyze_components.py", str(run_dir), "--num-kv-heads", "2",
+        "--analyses", "stub", "--output-dir", str(out)]
 
 
 def test_a_dry_run_batch_writes_no_manifest(sdr_run, registered, tmp_path):

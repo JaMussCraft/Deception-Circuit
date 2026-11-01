@@ -94,7 +94,7 @@ def test_the_model_is_loaded_once_for_every_line_of_a_run(sdr_run, tmp_path, mon
     monkeypatch.setattr(analyze_components, "load_model",
                         lambda cli, resolved: loads.append(cli) or sentinel)
     monkeypatch.setattr(analyze_components, "run",
-                        lambda cli, resolved, model=None: runs.append(model) or 0)
+                        lambda cli, resolved, model=None, argv=None: runs.append(model) or 0)
     path = write_batch(tmp_path, [f"{run_dir} --num-kv-heads 2 --output-dir {out}/a",
                                   f"{run_dir} --num-kv-heads 2 --output-dir {out}/b"])
 

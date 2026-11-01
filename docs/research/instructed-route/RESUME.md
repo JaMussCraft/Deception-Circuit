@@ -16,10 +16,13 @@ The direction instructed-route is claimed and registered by session claude-230e4
 
 ## In-flight jobs
 
-None.
+Three B2 jobs were submitted on Sun 1 Nov 2026 at about 2:45 pm EST from branch commit 4ba00fc; the waiters are armed in this session and must be re-armed from `research-session job list` after a compaction.
 
 | Job | Cluster | What it computes | Output directory | Expected finish |
 |---|---|---|---|---|
+| `23412228` | Delta, A100 interactive | P2, the SDR wish test: 29 group knockouts on the 618 reported-wish ids and their D reference | `outputs/_analyses/instructed-route-b2/p2` | Sun 3:30 pm EST |
+| `23412229` | Delta, H200 interactive | P3, the SER MLP replication: seeds 0, 1, 2 on D, H and F for the three tasks | `outputs/_analyses/instructed-route-b2/p3` | Sun 4:00 pm EST |
+| `23412232` | Delta, A100 | P1 smoke, the falsity-probe capture at 64 rows per cell | `outputs/_analyses/instructed-route-b2/p1-smoke` | Sun 3:30 pm EST |
 
 ## Next action
 
