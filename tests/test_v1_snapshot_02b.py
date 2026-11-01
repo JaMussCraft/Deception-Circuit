@@ -97,7 +97,10 @@ def normalize(text: str, tmp: str) -> str:
 
 
 def snapshot(out: str, tmp: str) -> dict:
-    files = written_files(out)
+    # A cell's run_manifest*.json (B1 ticket 1) is provenance, not v1 output:
+    # host, timestamp, software and code hashes change on every machine.
+    files = [name for name in written_files(out)
+             if not os.path.basename(name).startswith("run_manifest")]
     texts = {}
     for name in files:
         if name.endswith(TEXT):

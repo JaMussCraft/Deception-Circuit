@@ -322,6 +322,31 @@ def write_cell(cell_dir: str, circuit_spec, task_spec, rows, components,
     return write_head_table(cell_dir, rows, meta=meta)
 
 
+def write_cell_provenance(cell_dir: str, cli, resolved, task_spec, *,
+                          argv=None):
+    """`run_manifest.json` in a cell a run wrote (spec 4.6). -> its path, or None.
+
+    Called by `run` beside `write_cell`, never by `dry_run`, so a dry run
+    leaves no manifest. `argv` is the invocation's flags; None records
+    `sys.argv` (in a batch, the batch command line). An existing manifest
+    with different content is kept and `run_manifest.<n>.json` is written
+    beside it (`run_manifest.write_run_manifest`). Provenance never stops a
+    run: a failure is printed and the run goes on.
+    """
+    try:
+        import run_manifest
+        return run_manifest.write_run_manifest(
+            cell_dir, script=os.path.abspath(__file__),
+            argv=(None if argv is None
+                  else [os.path.basename(__file__)] + list(argv)),
+            dataset_files=run_manifest.dataset_files_for_args(task_spec.args),
+            model=resolved.model, seed=getattr(cli, "seed", None))
+    except Exception as error:                  # noqa: BLE001 -- see above
+        print(f"    !! run_manifest.json not written: "
+              f"{type(error).__name__}: {error}")
+        return None
+
+
 # ==============================================================================
 # SEGMENTATION AND SAMPLE
 # ==============================================================================
@@ -586,8 +611,9 @@ def load_model(cli, resolved):
     return model
 
 
-def run(cli, resolved, *, model=None) -> int:
-    """Every selected analysis over every cell, then one head table per cell."""
+def run(cli, resolved, *, model=None, argv=None) -> int:
+    """Every selected analysis over every cell, then one head table and one
+    `run_manifest.json` per cell. `argv` is what the manifest records."""
     selected = selected_analyses(cli)
     if not selected:
         raise SystemExit(
@@ -635,6 +661,10 @@ def run(cli, resolved, *, model=None) -> int:
                                  resolved, meta=meta)
             print(f"    {written['csv']}")
             print(f"    {written['json']}")
+            manifest = write_cell_provenance(cell, cli, resolved, task_spec,
+                                             argv=argv)
+            if manifest:
+                print(f"    {manifest}")
     return 0
 
 
@@ -653,7 +683,7 @@ def main(argv=None) -> int:
     resolved = intake.resolve_intake(cli)
     if cli.dry_run:
         return dry_run(cli, resolved)
-    return run(cli, resolved)
+    return run(cli, resolved, argv=argv)
 
 
 if __name__ == "__main__":
