@@ -16,6 +16,7 @@ All files are committed by the orchestrator from the worktree. Nothing is staged
   - `p2_groups.json` holds `quartet`, `L17H24`, `kvg_{0,1,2,3,4,5,7}` and `null_d00` to `null_d19`. Null i is `sorted(random.Random(20261101 + i).sample(heads 0..31 minus 24..27, 4))`. The script refuses a null that repeats another null or coincides with a key-value (KV) group, so the declared seeds are always the ones used.
   - `p3_groups.json` holds `mlp.11`, `mlp.13`, `mlp.16`, `mlp.30`, `mlp.31` and `mlp.0`. Each has one member, `["mlp", L, 0]`.
   - `b2_inputs_meta.json` records the recipe, the source paths with their sha256, the null seeds, and the seed-2 strata and marginals.
+- On T4's request I confirmed the group names to `impl-B2-t4` by message. Its reader expects `quartet`, `L17H24`, the `kvg_` prefix and the `null_d` prefix, and keys the P3 groups by member label (`mlp.L.0`). Both match the files.
 
 ## How verified
 

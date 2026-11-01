@@ -505,6 +505,99 @@ def _difference_over_rows(logits, target, distractor) -> "torch.Tensor":
 
 
 # ==============================================================================
+# PER-TOKEN DIRECT ATTRIBUTION
+# ==============================================================================
+
+#: Rows of the unembedding averaged at once for the centring row. Llama-3.1-8B's
+#: `lm_head` is 128k rows of 4096 in bfloat16; an fp32 copy of the whole matrix
+#: would be 2 GB, so the mean is accumulated a slice at a time.
+MEAN_ROW_CHUNK = 8192
+
+
+def component_token_logits(model, capture, keys, token_ids, centre=True
+                           ) -> "torch.Tensor":
+    """`[batch, len(keys), n_tokens]`: each key's direct contribution to each
+    listed token's final logit, in fp32, through the real final norm.
+
+    `token_ids` is `[batch, n_tokens]`, one list of ids per row (the two items
+    of an instance differ from row to row), or a 1-D `[n_tokens]` list read on
+    every row. The scale is the one `fixed_scale_readout` uses, the whole Readout
+    residual's, so the Target column minus the Distractor column is
+    `component_logit_difference`.
+
+    Only the gathered unembedding rows are multiplied, never the whole
+    vocabulary, so a sweep over every head of the 8B model stays at
+    `[batch, k, hidden]` rather than `[batch, k, vocab]`.
+
+    `centre=True` subtracts each contribution's projection onto the mean
+    unembedding row, which is that contribution's share of the mean logit over
+    the vocabulary. Summed over every head, every MLP block and the embedding,
+    the centred values equal the model's own Readout logit minus its vocabulary
+    mean, and a vector added to every unembedding row cancels out of them.
+    `centre=False` returns the raw contributions, which sum to the raw logit.
+
+    The final norm's weight and the unembedding are read through
+    `hooks._hf`, as `hooks.readout_logits` reads them, because no hook returns
+    gathered unembedding rows.
+    """
+    import torch
+
+    contributions = component_contributions(model, capture, keys)
+    normed = _fixed_scale_normed(model, contributions,
+                                 capture.residual[:, -1, :])
+    weight = hooks_module()._hf(model).lm_head.weight.detach()
+
+    ids = torch.as_tensor(token_ids, dtype=torch.long, device=weight.device)
+    if ids.dim() == 1:
+        ids = ids.unsqueeze(0).expand(normed.shape[0], -1)
+    if ids.dim() != 2 or ids.shape[0] != normed.shape[0]:
+        raise ValueError(
+            f"token_ids must be [batch, n_tokens] or [n_tokens]; got "
+            f"{tuple(ids.shape)} for a batch of {normed.shape[0]}")
+
+    with torch.no_grad():
+        rows = weight[ids].float().to(normed.device)   # [batch, n_tokens, hidden]
+        logits = torch.einsum("bkh,bnh->bkn", normed, rows)
+        if centre:
+            mean_row = _mean_unembedding_row(weight).to(normed.device)
+            logits = logits - (normed @ mean_row).unsqueeze(-1)
+    return logits
+
+
+def _fixed_scale_normed(model, contributions, residual) -> "torch.Tensor":
+    """`[batch, k, hidden]` fp32: each contribution through the final norm at
+    the *residual's* scale, before the unembedding.
+
+    The same arithmetic, in the same order, as `hooks.readout_logits` with
+    `scale_from`, stopped short of the vocabulary matmul so the caller can
+    multiply by only the unembedding rows it needs.
+    """
+    import torch
+
+    norm = hooks_module()._hf(model).model.norm
+    epsilon = getattr(norm, "variance_epsilon", None)
+    if epsilon is None:
+        epsilon = getattr(norm, "eps", 1e-5)
+    with torch.no_grad():
+        hidden = contributions.detach().float()
+        basis = residual.detach().float().unsqueeze(1)
+        scaled = hidden * torch.rsqrt(basis.pow(2).mean(-1, keepdim=True)
+                                      + epsilon)
+        return scaled * norm.weight.detach().float()
+
+
+def _mean_unembedding_row(weight) -> "torch.Tensor":
+    """`[hidden]` fp32 mean of the unembedding's rows, a slice at a time."""
+    import torch
+
+    total = torch.zeros(weight.shape[1], dtype=torch.float32,
+                        device=weight.device)
+    for start in range(0, weight.shape[0], MEAN_ROW_CHUNK):
+        total += weight[start:start + MEAN_ROW_CHUNK].float().sum(dim=0)
+    return total / weight.shape[0]
+
+
+# ==============================================================================
 # TALLYING OVER INSTANCES
 # ==============================================================================
 
