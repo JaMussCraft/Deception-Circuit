@@ -82,3 +82,11 @@ Expected: focused tests pass in both environments; compare unexpected failures b
 ## Wrapper review ruling
 
 The training hinge margin is explicitly 0.7 for both D and I. Dataset screening thresholds remain their historical 0.7 or 0.5 and must not implicitly select different training objectives. Prelaunch selected-ID checks must inspect actual Arrow row order/counts and available prompt/label provenance, not only configuration metadata. This is a stale-input check, not a request to repeat tokenizer or behavioral filtering.
+
+## Exact matched-cohort ruling before training
+
+The lead accepts all matched survivors in the first primary-margin build: FAR train/validation/test 177/177/891, SDR 187/187/952, SER 168/167/835. D and I use identical ordered IDs within each task and split, with no neutral-baseline competence filter. The source training pools have 200 rows per task; attrition follows the pre-registered inversion margin rather than training outcomes. This implements the existing smaller-cohort review requirement and changes no scientific threshold.
+
+The machine-readable ruling is `a2-cohort-ruling.json`; its build hash, selected-ID digest and complete count map bind permission to this exact cohort. Projection must still hold below 200 without a valid matching ruling. A malformed, foreign or stale ruling must fail closed. A ruling clears only the cohort-size review flag, never receipt validity, six-hour fallback, full timing coverage or the sixty-hour phase cap. The standalone projection and wrapper project stage must accept the same explicit ruling path. Keep under-200 status visible and record the ruling digest in recommendations.
+
+Unequal task counts limit cross-task comparisons; within-task D/I effort remains matched. No training outcomes existed when this decision was recorded. All eighteen masks and independent timing coverage remain planned.

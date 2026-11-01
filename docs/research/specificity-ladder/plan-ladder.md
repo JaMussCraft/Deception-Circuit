@@ -34,7 +34,7 @@
 
 **Interfaces:**
 
-- `freeze_design(condition_rows: dict[str, list[dict]], selection_ids: set[str], *, seed: int = 1, n: int = 100) -> dict` creates ordered assessment ids, mover-selection ids, donor specifications and hashes. Use `sampling.draw_sample` with existing balanced factors, requiring exactly the requested count.
+- `freeze_design(condition_rows: dict[str, list[dict]], selection_ids: set[str], *, mover_selection_ids: list[str], seed: int = 1, n: int = 100) -> dict` creates ordered assessment ids, mover-selection ids, donor specifications and hashes. Use `sampling.draw_sample` with existing balanced factors, requiring exactly the requested count.
 - `choose_mover_candidates(keys: list[tuple], clean_dla, swap_dla, selection_ids: list[str]) -> dict` consumes arrays `[rows, heads]`, oriented correct-minus-other in each H stream; returns ranks, per-head counts and removed keys.
 - `donor_plan(recipient: dict, donor_rows: list[dict], *, operation: str, stream: str, seed: int) -> dict` returns donor id/condition/stream, recipient and donor token-position lists, requested/covered positions, and unsupported reason. For `h_twin`, seed is ignored and H self-replacement is explicitly marked degenerate; for `independent_resample`, same-id donors are rejected. It never returns an unmarked identity donor.
 
@@ -49,7 +49,7 @@
 
 ## Task 2: Joint patch runner, metrics and uncertainty
 
-**Files:** Create `component_analysis/specificity_ladder.py`, `tests/test_specificity_ladder.py`, `tests/test_specificity_ladder_model.py`; extend pure metric helpers in `ladder_design.py`.
+**Files:** Create `component_analysis/specificity_ladder.py`, `component_analysis/ladder_metrics.py`, `tests/test_specificity_ladder.py`, `tests/test_specificity_ladder_model.py`, and `tests/test_ladder_metrics.py`. Keep metric aggregation separate from the sampling and donor-design module.
 
 **Interfaces:**
 
@@ -97,3 +97,7 @@ The lead ruled that START’s “same-item resample from H” means same-instanc
 IOI corruption erases an answer cue rather than switching designation as in FAR/SDR/SER; its gate is a collateral stress test under an explicitly different corruption. MMLU has no defensible native H or item swap here, hence only its stated floor cells. Neither donor compatibility nor the small MMLU floor establishes mechanism equivalence across tasks. The new user-control request frame, absolute-position changes, selection-biased pool and denominator weakness remain reported limitations.
 
 Numerical provenance: START/spec supply native gates and assessment size/seed. Donor/bootstrap seeds/counts, replay tolerance, IOI generation bounds, MMLU count/guard and pilot size are prospective defaults in this plan, not measured outcomes. Only the local MMLU revision/cache availability and selection-file locations above were inspected; no behavioral assay was run.
+
+## Selection identity interface ruling
+
+The union `selection_ids` excludes every prior selection id from assessment. The required keyword `mover_selection_ids` supplies the exact ordered selection list for this task alone. It is never inferred from the union; validate uniqueness, membership in the exclusion union and presence in this task's H rows. DLA arrays follow that supplied order, with no assumed selection count.
