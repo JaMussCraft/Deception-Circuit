@@ -1,47 +1,38 @@
 # Resume: instructed-route
 
-<!--
-Template for docs/research/<slug>/RESUME.md. This is the machine narrative state of the direction: what a fresh
-orchestrator needs in order to continue after a compaction or a new session. It is overwritten, not appended, and
-stays under 150 lines. Keep the six headings below, in this order. Write full sentences with normal spacing.
-Counters (compactions, checkpoints, usage) live in state.json and are never copied here. RESUME never summarizes the
-worklog; the worklog may point here, never the other way.
--->
-
-Last rewritten: <Sun 1 Nov 2026, 2:40 pm EST> by <claude-01a2b3c4>.
+Last rewritten: Sun 1 Nov 2026, 2:40 pm EST by claude-230e4716.
 
 ## Status
 
-<Two to five sentences. Which direction is active, which is the fallback, and where each stands against its
-pre-registered exit rule from spec.md. Name the findings by F number from FINDINGS.md.>
+The direction instructed-route is claimed and registered by session claude-230e4716. All three sub-directions are active and none has run a job yet: B1 (close the loop on FAR and SER with position-resolved path patching), B2 (the falsity signal across tasks, the SDR wish test and the SER MLP replication) and B3 (alignment faking on Llama-3.1-8B-Instruct, then transfer of the route). No finding has been logged. The pre-registered exit rules are copied verbatim from START.md section 10 into spec.md.
 
 ## Branch, worktree and commit
 
-- Branch: `<branch name>`.
-- Worktree: `<absolute worktree path>`.
-- Last commit on the branch: `<short SHA>`, "<commit subject>".
-- Uncommitted work, if any: <files and why they are not committed yet, or "none">.
+- Branch: `instructed-route`.
+- Worktree: `/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/instructed-route`.
+- Last commit on the branch: `57c9add`, "instructed-route: claim the direction for session claude-230e4716".
+- Uncommitted work, if any: RESUME.md and spec.md in the worktree (to be committed on the branch).
+- Where the records live: the tool-owned records (state.json, worklog.json, WORKLOG.md, ledger.json) live in the main checkout at `/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/instructed-route/`, because the research-session tool mirrors the registered session's state into the checkout that contains the session's launch directory (the Alignment root, which resolves to Deception-Circuit main), and the worktree isolation hook refuses other writes there. Pass that main path as the `dir` argument of every research-session command. Everything the session writes itself (RESUME.md, spec.md, plans/, reports/, reviews/, code) lives in the worktree on the branch. The two sets of files meet at the merge.
 
 ## In-flight jobs
 
-<One row per job that has not reached a terminal state. The same jobs are recorded with `research-session job add`,
-which keeps the waiter command in state.json; this table only says what each job is for.>
+None.
 
 | Job | Cluster | What it computes | Output directory | Expected finish |
 |---|---|---|---|---|
-| `<job id>` | <Delta> | <plain description> | `<outputs/... path>` | <Sun 4:00 pm EST> |
 
 ## Next action
 
-<The single next step, stated so that a fresh orchestrator can take it without reading anything else first. Then
-at most three follow-up steps, in order.>
+Three Opus planners, one per sub-direction, write costed plans to `plans/B1-plan.md`, `plans/B2-plan.md` and `plans/B3-plan.md` and hand-backs `reports/01-handback.md` to `reports/03-handback.md`. Then: freeze spec.md from the plans; implement B1's position-resolved path patching on the branch; submit B1 to Bridges-2 (reachable on 1 November, offline about 9 November 2026).
 
 ## Do not
 
-- <Work that is finished and must not be redone, each with the path that records it.>
-- <Protocols that failed their gate, with the path.>
-- <Files and directions owned by other sessions, taken from SESSIONS.md.>
+- Do not redo mechanism-analysis phases 0 to 3 or the selection-sample path patching; see `docs/research/mechanism-analysis/synthesis.md`.
+- Do not resume the closed SDR gates or stopped assays listed in `docs/research/sdr-mechanism/README.md`.
+- Do not write under `docs/research/specificity-ladder/`, which the Codex session codex-01a1987e owns, and do not touch `.scratch/sdr-*`, `.scratch/selective-deception`, `outputs/_studies/selective-deception` or `.scratch/eval5-grader-fixes`.
+- Do not score any set listed in `docs/research/held_out.json`; the held-out sample here means the mechanism-analysis sample of 100 ids with seed 1.
+- Do not put the word for a model's output score (the one ending in "it") in a shell command: the worktree isolation hook matches a three-letter substring of it and refuses the command. Write "answer-token attribution" instead.
 
 ## Open decisions for the user
 
-- <Each decision waiting on the user, with its need number from the worklog and the default if no answer.>
+None yet.
