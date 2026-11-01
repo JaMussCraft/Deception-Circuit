@@ -30,7 +30,7 @@ The FAR and SER deciding sets come directly from the recorded greedy_k20 lists i
 
 ## Subsequent phase commitments
 
-A2 uses three seeds per task for D-neutral and I-neutral masks, heads plus MLP. Pre-register MLPs 5 through 8 and 11 for FAR/SER clause reading, with 11, 13 and 16 on SER alone. Time one mask before reserving the phase; above 6 GPU-hours use the heads-only fallback. D-minus-I seed stability requires Jaccard at least 0.5 and the A1 rule. At least 90 percent D-head containment in I on every seed is a reportable null.
+A2 uses three seeds per task for D-neutral and I-neutral masks, heads plus MLP. The training hinge margin is explicitly 0.7 for both, independent of the historical screening threshold; source screening metadata remains unchanged. Pre-register MLPs 5 through 8 and 11 for FAR/SER clause reading, with 11, 13 and 16 on SER alone. Time one mask before reserving the phase; above 6 GPU-hours use the heads-only fallback. D-minus-I seed stability requires Jaccard at least 0.5 and the A1 rule. At least 90 percent D-head containment in I on every seed is a reportable null.
 
 A3 uses three seeds for difference-of-means directions, random-direction nulls, neuron-range tests restricted to MLPs, and position-aware edge attribution without edge-pruning training. Pass requires the A1 rule and a direction exceeding the 95th percentile of the null. Preserve all START fallbacks and the twin-trained mask comparison.
 

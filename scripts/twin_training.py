@@ -18,6 +18,9 @@ from datetime import datetime, timezone
 from typing import Optional
 
 REPO = Path(__file__).resolve().parents[1]
+# Direct script execution starts with scripts/ on sys.path.
+if str(REPO) not in sys.path:
+    sys.path.insert(0, str(REPO))
 FROZEN_CONFIG = REPO/'scripts/jobs/specificity_ladder_a2.json'
 GATE_FLAGS = ['--no-edge-pruning', '--prune-attention-heads', '--prune-mlp-blocks',
               '--no-prune-attention-neurons', '--no-prune-attention-blocks',
@@ -37,6 +40,104 @@ def digest(value):
 def _require(ok, message):
     if not ok:
         raise ValueError(message)
+
+
+def _private_configs(config, manifest, task):
+    """Check the current materializer contract without importing Arrow or models."""
+    _require(manifest.get('schema_version') == 1, 'unsupported build schema')
+    body = {k: v for k, v in manifest.items() if k != 'build_hash'}
+    build_hash = hashlib.sha256(json.dumps(body, sort_keys=True, ensure_ascii=False,
+        separators=(',', ':')).encode()).hexdigest()
+    _require(manifest.get('build_hash') == build_hash, 'build hash mismatch')
+    hashes = {}
+    for condition in (('D', 'I') if manifest['fleet_ready'] else ('D',)):
+        path = Path(config['data_root'])/condition/task/'dataset_config.json'
+        raw = path.read_bytes()
+        private = json.loads(raw)
+        _require(private.get('model') in (config['model'], 'meta-llama/Llama-3.1-8B-Instruct'),
+                 'private dataset model mismatch')
+        expected = dict(task=task,
+            condition='deceptive' if condition == 'D' else 'user_inversion',
+            recipient_condition='deceptive' if condition == 'D' else 'user_inversion',
+            corruption_kind='neutral_twin_same_item', cohort=manifest['cohort'],
+            fleet_ready=manifest['fleet_ready'], source_commit=manifest['source_commit'],
+            max_seq_length=manifest['max_seq_length'], split_ids=manifest['tasks'][task]['split_ids'])
+        for split, field in [('train', 'train_samples'), ('validation', 'val_samples'), ('test', 'test_samples')]:
+            expected[field] = manifest['tasks'][task]['counts'][split]
+        _check_subset(private, expected, condition+'.dataset_config.')
+        hashes[condition] = hashlib.sha256(raw).hexdigest()
+    return hashes
+
+
+def _canonical(value):
+    # Match build_twin_training._hash, including non-ASCII prompts.
+    return hashlib.sha256(json.dumps(value, sort_keys=True, ensure_ascii=False,
+                                    separators=(',', ':')).encode()).hexdigest()
+
+
+def _stored_rows(config, manifest, task, selected):
+    """Authenticate Arrow prefixes and labels from hashed source rows, on CPU.
+
+    Imports are lazy: importing the wrapper still uses only the standard library.
+    No tokenizer, model, or behavioral admission runs here.
+    """
+    from datasets import load_from_disk
+    info = manifest['tasks'][task]
+    source_cache = {}
+
+    def source_rows(kind):
+        if kind not in source_cache:
+            meta = info['sources'][kind]
+            root = Path(meta['path'])
+            files = {str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest()
+                     for p in sorted(root.rglob('*')) if p.is_file()}
+            _require(files == meta['file_hashes'] and _canonical(files) == meta['content_hash'],
+                     'source file hash mismatch: '+kind)
+            stored = load_from_disk(str(root))
+            records = {split: [dict(row) for row in stored[split]] for split in config['sample_caps']}
+            _require(_canonical(records) == meta['row_hash'], 'source row hash mismatch: '+kind)
+            indexed = {}
+            for split, rows in records.items():
+                indexed[split] = {r['instance_id']: r for r in rows}
+                _require(len(indexed[split]) == len(rows), 'duplicate source ids: '+kind)
+            source_cache[kind] = indexed
+        return source_cache[kind]
+
+    for condition in (('D', 'I') if manifest['fleet_ready'] else ('D',)):
+        donor = 'H' if condition == 'D' else 'I_neutral'
+        root = Path(config['data_root'])/condition/task
+        private = json.loads((root/'dataset_config.json').read_text())
+        _require(private.get('source_provenance') == {k: info['sources'][k] for k in (condition, donor)},
+                 'private source provenance mismatch: '+condition)
+        recipients, references = source_rows(condition), source_rows(donor)
+        stored = load_from_disk(str(root))
+        for split, expected_ids in info['split_ids'].items():
+            rows = [dict(row) for row in stored[split]]
+            _require(len(rows) == info['counts'][split], 'stored split count mismatch: '+condition+'/'+split)
+            ids = [r.get('instance_id') for r in rows]
+            _require(ids == expected_ids, 'stored split id/order mismatch: '+condition+'/'+split)
+            _require(ids[:len(selected[split])] == selected[split], 'stored selected prefix mismatch')
+            proofs = private['token_proofs'][split]
+            _require(set(proofs) == set(expected_ids), 'private prompt-proof ids mismatch')
+            for row in rows:
+                ident = row['instance_id']
+                recipient, reference = recipients[split].get(ident), references[split].get(ident)
+                _require(recipient is not None and reference is not None, 'missing authoritative source id')
+                _require(row.get('source_recipient') == recipient and row.get('source_reference') == reference,
+                         'stored row source provenance mismatch: '+ident)
+                for key in ('target', 'distractor', 'clean_prompt'):
+                    _require(row.get(key) == recipient.get(key), 'stored recipient field mismatch: '+key)
+                _require(row.get('corrupt_prompt') == reference.get('clean_prompt'), 'stored reference prompt mismatch')
+                proof = proofs[ident]
+                _require(row.get('token_proof') == proof, 'stored token proof mismatch')
+                _require(_canonical(row['clean_prompt']) == proof['recipient_prompt_hash'] and
+                         _canonical(row['corrupt_prompt']) == proof['reference_prompt_hash'],
+                         'stored prompt hash mismatch: '+ident)
+                _require(row.get('orientation') == 'clean' and
+                         row.get('corruption_kind') == 'neutral_twin_same_item' and
+                         row.get('recipient_condition') == recipient['condition'] and
+                         row.get('donor_identity') == dict(instance_id=ident, condition=reference['condition'], stream='clean'),
+                         'stored twin metadata mismatch: '+ident)
 
 
 def _selection(config, manifest, task):
@@ -74,6 +175,7 @@ def build_command(config: dict, manifest: dict, *, task: str, condition: str,
         _require(manifest.get('fleet_ready') is True and manifest['cohort'] == 'matched', 'production requires matched fleet_ready')
     if condition == 'I':
         _require(manifest.get('fleet_ready') is True and manifest['cohort'] == 'matched', 'I requires matched A1 inputs')
+    _private_configs(config, manifest, task)
     selected = _selection(config, manifest, task)
     actual_epochs = timing_epochs or config['node_epochs']
     cohort_hash = digest({'build': manifest['build_hash'], 'ids': selected, 'config': config})[:16]
@@ -84,6 +186,7 @@ def build_command(config: dict, manifest: dict, *, task: str, condition: str,
               ('node-lambda-sparsity', config['node_lambda_sparsity']), ('node-epochs', actual_epochs),
               ('lr', config['lr']), ('batch-size', config['batch_size']),
               ('faithfulness-weight', config['faithfulness_weight']),
+              ('deception-margin-loss', config['deception_margin_loss']),
               ('train-samples', len(selected['train'])), ('val-samples', len(selected['validation'])),
               ('test-samples', len(selected['test'])), ('max-seq-length', manifest['max_seq_length']),
               ('seed', seed), ('output-dir', str(output))]
@@ -95,7 +198,7 @@ def expected_config(command):
     expected = {'edge_pruning': False, 'deception_runtime_filter': False,
                 'std_runtime_filter': False, 'skip_node_pruning': False}
     numeric = {'node_lambda_sparsity': float, 'node_epochs': int, 'lr': float, 'batch_size': int,
-               'faithfulness_weight': float, 'train_samples': int, 'val_samples': int,
+               'faithfulness_weight': float, 'deception_margin_loss': float, 'train_samples': int, 'val_samples': int,
                'test_samples': int, 'max_seq_length': int, 'seed': int}
     for i, arg in enumerate(command):
         if arg.startswith('--') and i+1 < len(command) and not command[i+1].startswith('--'):
@@ -111,6 +214,7 @@ def expected_config(command):
 def plan_run(config, manifest, *, task, condition, seed, timing_epochs=None):
     command = build_command(config, manifest, task=task, condition=condition, seed=seed, timing_epochs=timing_epochs)
     selected = _selection(config, manifest, task)
+    _stored_rows(config, manifest, task, selected)
     source_hashes = {name: hashlib.sha256((REPO/name).read_bytes()).hexdigest()
                      for name in ('train.py', 'config.py', 'pruning.py', 'run_io.py',
                                   'dataset/build_twin_training.py', 'scripts/twin_training.py')}
@@ -121,6 +225,7 @@ def plan_run(config, manifest, *, task, condition, seed, timing_epochs=None):
                 source_commit=manifest['source_commit'], build_hash=manifest['build_hash'],
                 build_manifest_sha256=digest(manifest), source_hashes=source_hashes,
                 frozen_config_sha256=digest(config), resolved_config_sha256=digest(expected_config(command)),
+                dataset_config_sha256=_private_configs(config, manifest, task),
                 selected_ids=selected, counts={s: len(v) for s,v in selected.items()},
                 train_under_200_requires_lead_review=len(selected['train']) < 200,
                 max_seq_length=manifest['max_seq_length'], granularity='heads-mlp',
@@ -134,6 +239,41 @@ def _check_subset(actual, expected, prefix=''):
             _check_subset(actual.get(key, {}), value, prefix+key+'.')
         elif actual.get(key) != value:
             raise ValueError('resolved config mismatch: '+prefix+key)
+
+
+def _validate_artifacts(out, command, provenance):
+    """Reject syntactically valid but unfinished or unrelated training outputs."""
+    results = json.loads((out/'results.json').read_text())
+    expected = expected_config(command)
+    _check_subset(results, {key: expected[key] for key in ('model', 'task', 'seed', 'edge_pruning')})
+    for key in ('baseline', 'node_eval'):
+        _require(isinstance(results.get(key), dict) and bool(results[key]), 'empty evaluation: '+key)
+    _require(results.get('edge_eval') is None, 'unexpected edge evaluation')
+    history = json.loads((out/'history.json').read_text())
+    node = history.get('node', {})
+    epochs = expected['node_epochs']
+    _require(node.get('epochs') == list(range(1, epochs+1)), 'incomplete node history')
+    _require(any(isinstance(e, dict) and isinstance(e.get('epoch'), int) and
+                 10 <= e['epoch'] <= epochs for e in node.get('evals', [])), 'missing periodic validation')
+    active = json.loads((out/'active_nodes.json').read_text())
+    heads, mlps = active.get('active_heads'), active.get('active_mlps')
+    _require(isinstance(heads, dict) and isinstance(mlps, list), 'invalid active nodes')
+    _require(all(str(k).isdigit() and 0 <= int(k) < 32 and isinstance(v, list) and
+                 len(v) == len(set(v)) and all(type(h) is int and 0 <= h < 32 for h in v)
+                 for k, v in heads.items()), 'invalid active heads')
+    _require(len(mlps) == len(set(mlps)) and all(type(m) is int and 0 <= m < 32 for m in mlps),
+             'invalid active MLPs')
+    native = json.loads((out/'run_manifest.json').read_text())
+    _require(native.get('schema') == 'run-manifest/1', 'invalid native manifest schema')
+    _require(native.get('manifest_hash') == digest({k:v for k,v in native.items() if k != 'manifest_hash'}),
+             'native manifest hash mismatch')
+    _check_subset(native, dict(model=expected['model'], seed=expected['seed'],
+        config_sha256=hashlib.sha256((out/'config.json').read_bytes()).hexdigest()))
+    config_path = Path(expected['data_dir'])/expected['task']/'dataset_config.json'
+    datasets = {str((REPO/Path(k)).resolve()): v for k,v in native.get('dataset_files', {}).items()}
+    _require(datasets.get(str(config_path.resolve())) ==
+             provenance['dataset_config_sha256'][provenance['condition']], 'native dataset hash mismatch')
+    return native
 
 
 def run_timed(command: list, *, receipt_path: str, provenance: dict,
@@ -150,7 +290,10 @@ def run_timed(command: list, *, receipt_path: str, provenance: dict,
     _require(not log.exists(), 'log already exists')
     out = Path(command[command.index('--output-dir')+1])
     env = dict(os.environ, DC_RUN_MANIFEST_GIT='0')
+    injected_clock = clock is not None and clock is not time.monotonic
     receipt = dict(provenance, status='failed', errors=[], exit_code=None,
+                   test_runner_injected=runner is not None or injected_clock,
+                   test_clock_injected=injected_clock,
                    stdout_stderr_log=str(log), output_dir=str(out),
                    environment={k: env[k] for k in SAFE_ENV if k in env},
                    started_utc=datetime.now(timezone.utc).isoformat(), artifacts={})
@@ -182,7 +325,7 @@ def run_timed(command: list, *, receipt_path: str, provenance: dict,
         _check_subset(json.loads((out/'config.json').read_text()), expected_config(command))
         commit = provenance.get('source_commit', '')
         _require(re.fullmatch('[0-9a-f]{40}', commit) is not None, 'missing full source commit')
-        native = json.loads((out/'run_manifest.json').read_text())
+        native = _validate_artifacts(out, command, provenance)
         native['orchestrator_source_commit'] = commit
         # Rehash the augmented native manifest, retaining native provenance fields.
         native.pop('manifest_hash', None)
