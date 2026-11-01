@@ -107,12 +107,20 @@
       "text": "Trust the research-session hooks in Codex: open a fresh Codex session in the Alignment checkout and run /hooks once. Until then Codex skips them."
     },
     {
-      "answer": null,
-      "answered_at": null,
+      "answer": "Sun 7:00 am: you approved (a) the merge and the Alignment commit, (b) wave B and (c) wave C; all three are done. (d) wave D is still open, see N3.",
+      "answered_at": "2026-11-01T08:10:23-05:00",
       "at": "2026-10-31T17:33:41-04:00",
       "default": "Nothing moves. The branch stays unmerged, the hooks and tool stay installed and working, and the pilot can start in the worktree.",
       "id": "N2",
       "text": "Four decisions, in order, from docs/research/autoresearch-workflow/merge-checklist.md: (a) approve merging the autoresearch-workflow branch into Deception-Circuit main, and the commit of the applied Alignment-side files; (b) after the merge, the archive moves of the four closed scratch directories (wave B, reversible, verified by script); (c) your go for the Codex config change (wave C: default worker model Sol, shinka and weco off), which needs a Codex restart; (d) confirmation that the live Codex session is finished, so its directories and the two memory logs can be archived (wave D)."
+    },
+    {
+      "answer": null,
+      "answered_at": null,
+      "at": "2026-11-01T08:10:24-05:00",
+      "default": "Codex keeps running on the old config until restarted; wave D stays unapplied; main stays local-only.",
+      "id": "N3",
+      "text": "Two things left for you: restart Codex so the wave C config takes effect (trust stays; re-trust via /hooks only if asked), and tell me when the live Codex session is finished so wave D can archive its directories and the two memory logs. Also say whether to push Deception-Circuit main and delete the merged remote branches (mechanism-datasets, autoresearch-workflow); I do not push main on my own."
     }
   ],
   "right_now": "All twelve setup tickets are done and committed on the branch, and every Alignment-side change that did not need your go is applied: the research-session tool, the hooks in both tools (trusted in Codex), the plugin profiles, the protocol guides, the findings index, and the science guards in the code. Waiting on you for four decisions, in the merge checklist: merge the branch, then the archive moves (wave B); the Codex config change (wave C, needs a Codex restart); and the live Codex session's files (wave D, after you confirm that session is finished).",
