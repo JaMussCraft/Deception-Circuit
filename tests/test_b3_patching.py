@@ -47,7 +47,8 @@ def test_layer_matched_nulls_equal_the_source_draws_per_seed(seed):
     sets = _sets()
     for name in ("S_all", "S_far", "S_ser", "S_q", "gupta6"):
         S = sets[name]
-        assert stats.layer_matched_nulls(S, n=20, seed=seed) == src.layer_matched_nulls(S, n=20, seed=seed), name
+        assert (stats.layer_matched_nulls(S, n=20, seed=seed, exclude_members=False)
+                == src.layer_matched_nulls(S, n=20, seed=seed)), name
 
 
 def test_the_null_constants_equal_the_source():
@@ -58,10 +59,11 @@ def test_the_null_constants_equal_the_source():
 
 
 def test_null_draws_are_layer_matched_and_fix_the_mlp_part():
+    """The pre-R10 draw (J3): layer-matched, with the MLP part fixed."""
     S = _sets()["S_all"]
     want = sorted((k, layer) for k, layer, _ in S)
     mlps = sorted(k for k in S if k[0] == "mlp")
-    for draw in stats.layer_matched_nulls(S, n=20, seed=3):
+    for draw in stats.layer_matched_nulls(S, n=20, seed=3, exclude_members=False):
         assert sorted((k, layer) for k, layer, _ in draw) == want
         assert len(set(draw)) == len(draw)
         assert sorted(k for k in draw if k[0] == "mlp") == mlps     # one MLP per layer: fixed
@@ -75,6 +77,117 @@ def test_heads_only_nulls_draw_heads_only_with_the_heads_layer_counts():
     for draw in draws:
         assert all(k[0] == "head" for k in draw)
         assert sorted(layer for _, layer, _ in draw) == sorted(layer for _, layer, _ in heads)
+
+
+# ------------------------------------------------------------------ R10: null draws exclude the set's members
+
+#: Every B3 set whose member-excluded draw is possible (no MLP member), as b3_patch resolves them.
+R10_STRICT_SETS = ("gupta6", "gupta_writers", "L17H24", "S_q", "heads_only")
+R10_MLP_SETS = ("S_all", "S_far", "S_ser")
+
+
+def _hist(keys):
+    from collections import Counter
+    return Counter((k[0], k[1]) for k in keys)
+
+
+def _check_member_free(members, draws, n):
+    assert len(draws) == n
+    for draw in draws:
+        assert not set(draw) & set(members)
+        assert _hist(draw) == _hist(members)
+        assert len(set(draw)) == len(draw) and stats.POSITIVE_CONTROL not in draw
+
+
+@pytest.mark.parametrize("name", R10_STRICT_SETS)
+def test_r10_null_draws_hold_no_member_and_match_the_layer_histogram(name):
+    mod = _script()
+    spec = mod.resolve_sets([name])[name]
+    assert spec["exclude_members"] is True
+    draws = mod.null_draws(spec, 20, label=name)
+    _check_member_free(spec["members"], draws, 20)
+    assert draws == mod.null_draws(dict(spec), 20, label=name)           # seed-deterministic
+    other = dict(spec, null_seed=spec["null_seed"] + 1)
+    assert draws != mod.null_draws(other, 20, label=name)                # and the seed matters
+    # the seed per set is unchanged by R10: NULL_SEED + 1000 x the SET_ORDER index
+    assert spec["null_seed"] == stats.NULL_SEED + 1000 * mod.SET_ORDER.index(name)
+    # with no MLP member, R10a (the default) and strict draw the same, and no draw keeps a member
+    assert draws == mod.null_draws(mod.resolve_sets([name], strict=True)[name], 20, label=name)
+    assert all(stats.kept_members(spec["members"], d) == [] for d in draws)
+
+
+@pytest.mark.parametrize("name", R10_MLP_SETS)
+def test_r10_strict_exclusion_raises_on_a_set_with_an_mlp_member(name):
+    mod = _script()
+    spec = mod.resolve_sets([name], strict=True)[name]
+    assert spec["keep_mlp_members"] is False and spec["null_rule"] == mod.NULL_RULE_STRICT
+    first_mlp = min(k[1] for k in spec["members"] if k[0] == "mlp")
+    with pytest.raises(stats.NullPoolError, match=rf"set {name}: layer {first_mlp} mlp has 0 non-member"):
+        mod.null_draws(spec, 20, label=name)
+
+
+@pytest.mark.parametrize("name", R10_MLP_SETS)
+def test_r10a_default_excludes_head_members_and_keeps_the_mlp_members(name):
+    mod = _script()
+    spec = mod.resolve_sets([name])[name]
+    assert spec["keep_mlp_members"] is True and spec["null_rule"] == mod.NULL_RULE_R10A
+    members = spec["members"]
+    heads = {k for k in members if k[0] == "head"}
+    mlps = sorted(k for k in members if k[0] == "mlp")
+    mlp_names = [f"mlp.{k[1]}.0" for k in members if k[0] == "mlp"]
+    draws = mod.null_draws(spec, 20, label=name)
+    assert len(draws) == 20
+    assert draws == mod.null_draws(dict(spec), 20, label=name)            # seed-deterministic
+    assert draws != mod.null_draws(dict(spec, null_seed=spec["null_seed"] + 1), 20, label=name)
+    for draw in draws:
+        assert not set(draw) & heads
+        assert sorted(k for k in draw if k[0] == "mlp") == mlps
+        assert _hist(draw) == _hist(members)
+        assert len(set(draw)) == len(draw) and stats.POSITIVE_CONTROL not in draw
+        assert stats.kept_members(members, draw) == mlp_names              # what each draw records
+    assert draws == stats.layer_matched_nulls(members, n=20, seed=spec["null_seed"])   # the stats default is R10a
+
+
+def test_r10_too_few_candidates_raises_naming_the_layer_and_never_draws_short():
+    S16 = [("head", 3, h) for h in range(16)]                             # 16 members, 16 non-members: just enough
+    for draw in stats.layer_matched_nulls(S16, n=5, seed=1, label="half"):
+        assert sorted(draw) == [("head", 3, h) for h in range(16, 32)]
+    S17 = [("head", 3, h) for h in range(17)] + [("head", 4, 0)]
+    with pytest.raises(stats.NullPoolError, match=r"set wide: layer 3 head has 15 non-member candidate\(s\) for 17"):
+        stats.layer_matched_nulls(S17, n=20, seed=1, label="wide")
+    with pytest.raises(stats.NullPoolError, match=r"layer 0 mlp has 0 non-member"):
+        stats.layer_matched_nulls([("mlp", 0, 0)], n=1)                    # mlp.0 is out of every pool anyway
+
+
+def test_r10_heads_only_nulls_inherit_the_exclusion():
+    S = _sets()["S_all"]
+    heads = [k for k in S if k[0] == "head"]
+    draws = stats.heads_only_nulls(S, n=20, seed=5)
+    _check_member_free(heads, draws, 20)
+    assert draws == stats.layer_matched_nulls(heads, n=20, seed=5)
+    assert stats.heads_only_nulls(S, n=20, seed=5, exclude_members=False) == stats.layer_matched_nulls(
+        heads, n=20, seed=5, exclude_members=False)
+
+
+J3_RESULTS = ROOT / "outputs" / "_studies" / "b3" / "j3_sycophancy" / "results.json"
+
+
+def test_j3_results_still_reproduce_their_null_draws_from_the_recorded_sets():
+    """J3 ran before R10: its set records have null_kind "layer_matched" and no exclude_members field. null_draws on
+    those records must give the recorded draws exactly, and J3's file is read, never written."""
+    if not J3_RESULTS.is_file():
+        pytest.skip(f"{J3_RESULTS} is not present")
+    before = J3_RESULTS.read_bytes()
+    res = json.loads(before)
+    mod = _script()
+    n = res["n_null"]
+    for name, spec in res["sets"].items():
+        assert spec["null_kind"] == "layer_matched" and "exclude_members" not in spec
+        draws = mod.null_draws(spec, n, label=name)
+        for pos in res["positions"]:
+            for j in range(n):
+                assert [list(k) for k in draws[j]] == res["null_draws"][mod.arm_label(name, pos, j)], (name, j)
+    assert J3_RESULTS.read_bytes() == before
 
 
 def test_f_boot_and_instance_boot_equal_the_source():
@@ -380,14 +493,34 @@ def no_model(monkeypatch):
     ["--task", "af", "--variant", "V-A", "--proxy", "P1"],
     ["--task", "syc"],
     ["--task", "c3", "--variant", "V-A"],
+    ["--task", "syc", "--sets", "gupta6,gupta_writers,L17H24,S_q", "--null-strict"],
 ])
 def test_dry_run_loads_no_model_and_prints_counts(argv, no_model, monkeypatch, capsys, tmp_path):
+    """The default sets of every task (S_all among them) dry-run under R10a; strict works for head-only sets."""
     mod = _script()
     monkeypatch.setattr(mod, "load_tokenizer", lambda model: _WordTok())
     assert mod.main(argv + ["--dry-run", "--out", str(tmp_path / "o")]) == 0
     out = capsys.readouterr().out
     assert "forwards" in out and "walltime" in out
     assert not (tmp_path / "o" / "results.json").exists()
+    assert "members excluded" in out
+    if "--null-strict" not in argv:
+        assert "S_all (35" in out and "MLP members kept: mlp.6.0 mlp.7.0 mlp.5.0" in out
+
+
+@pytest.mark.parametrize("argv", [
+    ["--task", "af", "--variant", "V-B", "--proxy", "P2"],
+    ["--task", "syc"],
+    ["--task", "c3", "--variant", "V-A"],
+])
+def test_null_strict_on_a_set_with_an_mlp_member_fails_loudly_before_the_model(argv, no_model, monkeypatch,
+                                                                              tmp_path):
+    """--null-strict: S_all's MLP layers have no non-member candidate, so the null draw raises, naming the set and
+    the layer, during the dry run and before any model load."""
+    mod = _script()
+    monkeypatch.setattr(mod, "load_tokenizer", lambda model: _WordTok())
+    with pytest.raises(stats.NullPoolError, match=r"set S_all: layer 5 mlp has 0 non-member"):
+        mod.main(argv + ["--null-strict", "--dry-run", "--out", str(tmp_path / "o")])
 
 
 def test_dry_run_forward_count_for_af_p2():
@@ -418,6 +551,7 @@ def test_set_resolution_and_null_seeds_are_stable():
     assert all(k[0] == "head" for k in sets["heads_only"]["members"]) and len(sets["heads_only"]["members"]) == 32
     assert sets["heads_only"]["null_kind"] == "heads_only"
     assert sets["L17H24"]["members"] == [("head", 17, 24)]
+    assert all(s["exclude_members"] is True and s["keep_mlp_members"] is True for s in sets.values())
     again = mod.resolve_sets(["L17H24", "gupta6", "heads_only", "S_all"])
     for name in sets:
         assert sets[name]["null_seed"] == again[name]["null_seed"]
@@ -463,11 +597,13 @@ def tiny_script(monkeypatch, tmp_path):
     monkeypatch.setattr(mod, "load_tokenizer", lambda name: tok)
     monkeypatch.setattr(mod, "load_model", lambda args: model)
 
-    def sets(names):
-        return {n: {"members": TINY_SETS[n], "null_seed": 1 + i, "null_kind": "layer_matched"}
+    def sets(names, strict=False):
+        return {n: {"members": TINY_SETS[n], "null_seed": 1 + i, "null_kind": "layer_matched",
+                    "exclude_members": True, "keep_mlp_members": not strict,
+                    "null_rule": mod.NULL_RULE_STRICT if strict else mod.NULL_RULE_R10A}
                 for i, n in enumerate(names)}
 
-    def draws(spec, n):
+    def draws(spec, n, label=None):
         rng = random.Random(spec["null_seed"])
         return [[("head", layer, rng.randrange(4)) for _k, layer, _i in spec["members"]] for _ in range(n)]
     monkeypatch.setattr(mod, "resolve_sets", sets)
@@ -501,6 +637,12 @@ def test_af_run_end_to_end_writes_margins_results_and_a_manifest(tiny_script, tm
                                            "S_all@readout", "S_all@readout#null00", "S_all@readout#null01"}
     assert len(mar["margins"]["clean"]) == 3
     assert res["nulls"]["S_all@post_tag"]["n"] == 2
+    assert res["sets"]["S_all"]["exclude_members"] is True and res["sets"]["S_all"]["keep_mlp_members"] is True
+    assert res["sets"]["S_all"]["null_kind"] == "layer_matched"
+    assert res["sets"]["S_all"]["null_rule"] == tiny_script.NULL_RULE_R10A
+    assert set(res["null_kept_members"]) == {k for k in mar["margins"]["arms"] if "#null" in k}
+    for label, kept in res["null_kept_members"].items():
+        assert kept == stats.kept_members(TINY_SETS["S_all"], [tuple(x) for x in res["null_draws"][label]])
     assert "label" in res["transfer_verdict"] and "F-mech-003" in res["transfer_verdict"]["caveat"]
     man = json.loads((out / "run_manifest.json").read_text())
     assert re.fullmatch(r"[0-9a-f]{40}", man["git_commit"] or "")

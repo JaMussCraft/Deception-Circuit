@@ -21,7 +21,15 @@ Tasks:
 
 Sets: S_all, S_far, S_ser, S_q, gupta6, gupta_writers, L17H24, heads_only (S_all's 32 heads, with a heads-only
 null). Each set gets --null layer-matched draws (`spontaneous.stats`), seeded NULL_SEED + 1000 x the set's index in
-SET_ORDER, so a set's draws do not depend on the order of --sets.
+SET_ORDER, so a set's draws do not depend on the order of --sets. From J4 on (rulings R10 and R10a) a set's null
+draws exclude the set's head members; its MLP members stay in every draw, because Llama has one MLP per layer and an
+MLP member is the only candidate at its layer. So a null draw for an MLP-containing set shares the set's MLPs, and the
+null comparison tests the set's heads against random heads given the same MLPs; the heads_only arm is reported
+beside. Each set's record carries `exclude_members: true`, `keep_mlp_members` and `null_rule`, and results record
+each draw's `kept_members` under `null_kept_members`. --null-strict excludes MLP members too, which raises (before any
+model load, under --dry-run too) for a set with an MLP member; J4 does not use it. J3 ran before R10: its
+results.json records `null_kind` "layer_matched" with no `exclude_members` field, and `null_draws` on such a record
+gives J3's draws exactly.
 
 Outputs in --out: margins.json (per-item margins of every arm), results.json, run_manifest.json.
 --dry-run loads no model: it builds the twins with the cached tokenizer, checks them, and prints the forward count
@@ -75,8 +83,17 @@ LOAD_S = 476.0
 # Sets, nulls and arms
 # ==============================================================================
 
-def resolve_sets(names):
-    """-> {name: {"members": [...], "null_seed": int, "null_kind": "layer_matched" | "heads_only"}}."""
+NULL_RULE_R10A = "R10a: head members excluded, MLP members kept"
+NULL_RULE_STRICT = "R10 strict: all members excluded"
+
+
+def resolve_sets(names, strict=False):
+    """-> {name: {"members": [...], "null_seed": int, "null_kind": "layer_matched" | "heads_only",
+    "exclude_members": True, "keep_mlp_members": bool, "null_rule": str}}.
+
+    Default R10a; strict=True (--null-strict) excludes MLP members too. `build_arms` draws the nulls before any model
+    load (also under --dry-run), so a set whose strict null is impossible raises `stats.NullPoolError` there, naming
+    the set and the layer."""
     from spontaneous.sets import load_sets
     base = load_sets()
     extra = {"heads_only": [k for k in base["S_all"] if k[0] == "head"], "L17H24": [("head", 17, 24)]}
@@ -87,15 +104,23 @@ def resolve_sets(names):
         members = base[name] if name in base else extra[name]
         out[name] = {"members": [tuple(k) for k in members],
                      "null_seed": stats.NULL_SEED + 1000 * SET_ORDER.index(name),
-                     "null_kind": "heads_only" if name == "heads_only" else "layer_matched"}
+                     "null_kind": "heads_only" if name == "heads_only" else "layer_matched",
+                     "exclude_members": True, "keep_mlp_members": not strict,
+                     "null_rule": NULL_RULE_STRICT if strict else NULL_RULE_R10A}
     return out
 
 
-def null_draws(spec, n):
+def null_draws(spec, n, label=None):
+    """The spec's n null draws. A spec without `exclude_members` (J3's results.json) is drawn as before R10."""
     if n <= 0:
         return []
-    fn = stats.heads_only_nulls if spec["null_kind"] == "heads_only" else stats.layer_matched_nulls
-    return [[tuple(k) for k in d] for d in fn(spec["members"], n=n, seed=spec["null_seed"])]
+    kw = {"exclude_members": bool(spec.get("exclude_members", False)), "label": label}
+    if spec["null_kind"] == "heads_only":
+        draws = stats.heads_only_nulls(spec["members"], n=n, seed=spec["null_seed"], **kw)
+    else:
+        draws = stats.layer_matched_nulls(spec["members"], n=n, seed=spec["null_seed"],
+                                          keep_mlp_members=bool(spec.get("keep_mlp_members", True)), **kw)
+    return [[tuple(k) for k in d] for d in draws]
 
 
 def arm_label(name, pos, null=None):
@@ -106,7 +131,7 @@ def build_arms(sets, positions, n_null):
     """-> ({label: (members, pos)}, {set@pos: [null labels]})."""
     arms, nulls = {}, {}
     for name, spec in sets.items():
-        draws = null_draws(spec, n_null)
+        draws = null_draws(spec, n_null, label=name)
         for pos in positions:
             arms[arm_label(name, pos)] = (spec["members"], pos)
             nulls[arm_label(name, pos)] = []
@@ -421,7 +446,10 @@ def parse_args(argv=None):
     p.add_argument("--proxy", choices=("P1", "P2"), help="the primary proxy of ruling R-B3-a (af)")
     p.add_argument("--sets", help="comma list; default per task: " + "; ".join(f"{k}: {v}"
                                                                              for k, v in DEFAULT_SETS.items()))
-    p.add_argument("--null", type=int, default=stats.N_NULL, help="layer-matched null draws per set")
+    p.add_argument("--null", type=int, default=stats.N_NULL,
+                   help="layer-matched null draws per set; head members excluded, MLP members kept (R10, R10a)")
+    p.add_argument("--null-strict", action="store_true",
+                   help="exclude MLP members too; raises for a set with an MLP member (one MLP per layer); not for J4")
     p.add_argument("--positions", help="comma list of post_tag, readout; default af/c3 post_tag, syc readout")
     p.add_argument("--rows", help="rows file; default the committed data file of the task")
     p.add_argument("--split", default="test", help="af rows split in the data file (default test)")
@@ -482,7 +510,7 @@ def main(argv=None):
     from spontaneous import af_prompts
     tokenizer = load_tokenizer(args.model)
     rows, pairs, dropped = build_pairs(args, tokenizer)
-    sets = resolve_sets(args.set_names)
+    sets = resolve_sets(args.set_names, strict=args.null_strict)
     arms, nulls = build_arms(sets, args.position_arms, args.null)
 
     if args.task == "af":
@@ -508,8 +536,13 @@ def main(argv=None):
           + (f" ({len(dropped)} dropped: no equal-length uncued twin)" if args.task == "syc" else "")
           + (f"; variant {args.variant}" if args.variant else ""))
     print(f"  prompt tokens: mean {mean_len:.0f}, max {max(lengths) if lengths else 0}; stems {len(stems)}")
-    print("  sets: " + ", ".join(f"{n} ({len(s['members'])}, null seed {s['null_seed']}, {s['null_kind']})"
-                                   for n, s in sets.items()))
+    print("  sets: " + ", ".join(
+        f"{n} ({len(s['members'])}, null seed {s['null_seed']}, {s['null_kind']}"
+        + (", members excluded" if s.get("exclude_members") else "")
+        + (", MLP members kept: " + " ".join(stats.kept_members(s["members"], [k for k in s["members"]
+                                                                                 if k[0] == "mlp"]))
+           if s.get("keep_mlp_members") and any(k[0] == "mlp" for k in s["members"]) else "")
+        + ")" for n, s in sets.items()))
     print(f"  positions: {', '.join(args.position_arms)}; {args.null} null draws per set; {len(arms)} arms")
     if args.task == "syc":
         pass1 = 2 * len(pairs)
@@ -551,7 +584,11 @@ def main(argv=None):
         margins = {"ids": ids, **run}
     meta = {"task": args.task, "variant": args.variant, "readout": readout_info, "positions": args.position_arms,
             "sets": {n: {"members": [list(k) for k in s["members"]], "null_seed": s["null_seed"],
-                         "null_kind": s["null_kind"]} for n, s in sets.items()},
+                         "null_kind": s["null_kind"], "exclude_members": bool(s.get("exclude_members", False)),
+                         "keep_mlp_members": bool(s.get("keep_mlp_members", False)),
+                         "null_rule": s.get("null_rule")} for n, s in sets.items()},
+            "null_kept_members": {k: stats.kept_members(sets[k.split("@")[0]]["members"], arms[k][0]) for k in arms
+                                  if "#null" in k},
             "nulls": {k: v for k, v in nulls.items()}, "null_draws": {k: [list(x) for x in arms[k][0]] for k in arms
                                                                       if "#null" in k},
             "n_null": args.null, "n_boot": args.n_boot, "seed": args.seed, "rows_file": args.rows,
