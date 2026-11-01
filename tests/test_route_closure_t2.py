@@ -506,7 +506,7 @@ def test_run_writes_the_schema_with_per_instance_margins_for_every_arm(model, tm
     assert first["masks"]["options"]["segments"] == list(rc.OPTION_SEGMENTS)
     assert first["masks"]["options"]["tokens"] == [OPTION_TOKENS, OPTION_TOKENS]
     assert len(first["masks"]["random_post_d0"]["tokens"][0]) == 4
-    assert payload["t1"]["sweeps"]["status"].startswith("not implemented")
+    assert payload["t1"]["sweeps"]["status"] == "computed"      # ticket 5
     assert ctx.declared and ctx.declared[0][1] == ["tiny_0", "tiny_1"]
 
 

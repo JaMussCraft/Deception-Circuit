@@ -4,7 +4,7 @@ Last rewritten: Sun 1 Nov 2026, 2:40 pm EST by claude-230e4716.
 
 ## Status
 
-The direction instructed-route is claimed and registered by session claude-230e4716. All three sub-directions are active and none has run a job yet: B1 (close the loop on FAR and SER with position-resolved path patching), B2 (the falsity signal across tasks, the SDR wish test and the SER MLP replication) and B3 (alignment faking on Llama-3.1-8B-Instruct, then transfer of the route). No finding has been logged. The pre-registered exit rules are copied verbatim from START.md section 10 into spec.md.
+The direction instructed-route is claimed and registered by session claude-230e4716. B2 is two thirds done: P3 (the SER MLP replication) ran and gave F-rte-001 (only mlp.13 replicates; F-mech-009 superseded), P2 (the SDR wish test) passed its gate at 0.54 with nulls near zero and is under independent review, and P1 (the falsity probe) awaits its H200 capture job. B3 is in its premise phase: J1 (calibration generation) and J3 (sycophancy control) are running or queued, the judge is frozen (G1), and J2 waits on the calibration verdict. B1's code is complete except tickets 5 and 6 (sweeps, C3, path patching, readings), which an implementer is finishing; no B1 job has run and Bridges-2 goes offline about 9 November. The pre-registered exit rules are in spec.md with rulings R1 to R5 and the G1 freeze.
 
 ## Branch, worktree and commit
 
@@ -20,9 +20,7 @@ Three B2 jobs were submitted on Sun 1 Nov 2026 at about 2:45 pm EST from branch 
 
 | Job | Cluster | What it computes | Output directory | Expected finish |
 |---|---|---|---|---|
-| `23412228` | Delta, A100 interactive | P2, the SDR wish test: 29 group knockouts on the 618 reported-wish ids and their D reference | `outputs/_analyses/instructed-route-b2/p2` | Sun 3:30 pm EST |
-| `23412229` | Delta, H200 interactive | P3, the SER MLP replication: seeds 0, 1, 2 on D, H and F for the three tasks | `outputs/_analyses/instructed-route-b2/p3` | Sun 4:00 pm EST |
-| `23412232` | Delta, A100 | P1 smoke, the falsity-probe capture at 64 rows per cell | `outputs/_analyses/instructed-route-b2/p1-smoke` | Sun 3:30 pm EST |
+| `23412454` | Delta, H200 interactive | P1 capture, the falsity-probe residuals and per-token attribution for 9,972 rows in 18 cells (the A100 smoke drifted past the 0.05 margin check) | `outputs/_analyses/instructed-route-b2/p1-cap` | Sun 4:30 pm EST |
 | `23412257` | Delta, A100 | B3 J1, calibration generation: both variants, 20 queries, 10 samples plus greedy per condition, with the proxy quantities | `outputs/_studies/b3/j1_calibration` | Sun 3:45 pm EST |
 | `23412270` | Delta, A100 | B3 J3, the sycophancy positive control: five sets at the readout against 20 nulls on 800 MMLU items | `outputs/_studies/b3/j3_sycophancy` | Sun 4:00 pm EST |
 
