@@ -96,9 +96,23 @@ mlp.31.
 - tasks: {far (FAR gate D, H), ser (SER D, H), sdr (SDR D, H), sdr_I_reported (I-reported against SDR H, sample
   rows dropped)} -> {cells, n_pairs, n_unjoined, n_token_mismatch, n_dropped_sample, n_clusters,
   dla_sum_max_abs_error, groups {group: {suppression {mean, sd, ci}, promotion {mean, sd, ci}}}}.
+- tasks also holds the instructed-inversion contrasts, same shape, when the capture has the cells: far_I (FAR gate I
+  against FAR gate H, the far late heads) and ser_I (SER I against SER H, the ser late heads). "D minus H" reads "I
+  minus H" there. Seed 20261101; each bootstrap is seeded on its own, so adding them leaves the D entries unchanged.
+  `p1_tokens.md` gives them in a second, labelled table beside the D columns.
 - far_minus_ser: {group: {suppression {mean, ci}, promotion {mean, ci}}}, the FAR mean minus the SER mean, the CI
-  from independent cluster bootstraps (FAR seed 20261101, SER seed 20261102).
+  from independent cluster bootstraps (FAR seed 20261101, SER seed 20261102). D only.
 - provenance: as in `score`.
+
+RUN MANIFEST
+------------
+`fit`, `score` and `read` each write `run_manifest.json` into `--out` through `run_manifest.write_run_manifest`
+(plan B2 section 7): argv, the git fingerprint (`DC_RUN_MANIFEST_GIT` aware), `code_sha256` of this script and
+`component_analysis/probe.py`, `dataset_files` with the sha256 of every input the command read (the capture's rows,
+resid or tokens files, `capture_plan.json`, the capture's `run_manifest.json`; `score` adds `p1_fit.pt` and
+`p1_fit.json`), seed (null for `fit`, which draws nothing) and the created time. The helper never overwrites a
+manifest with other content, so the three commands into one `--out` leave `run_manifest.json` (fit),
+`run_manifest.1.json` (score) and `run_manifest.2.json` (read) when run in that order on an empty directory.
 """
 
 from __future__ import annotations
@@ -334,7 +348,10 @@ def _nonfinite(resid) -> int:
     return int((~torch.isfinite(resid)).sum())
 
 
-def run_fit(capture_dir: str, out_dir: str) -> dict:
+FIT_CELLS = ("fit_D", "fit_H", "select_D", "select_H", "select_HI")
+
+
+def run_fit(capture_dir: str, out_dir: str, *, argv: Optional[Sequence[str]] = None) -> dict:
     import torch
 
     cap = Capture(capture_dir)
@@ -402,6 +419,7 @@ def run_fit(capture_dir: str, out_dir: str) -> dict:
                 "mass_mean": torch.from_numpy(mm), "selected": selected},
                os.path.join(out_dir, "p1_fit.pt"))
     _write_json(os.path.join(out_dir, "p1_fit.json"), summary)
+    write_manifest(out_dir, capture_inputs(cap, FIT_CELLS, ("rows", "resid")), argv=argv, seed=None)
     print(f"fit: selected row {selected['row']} (layer {selected['layer']}), C {selected['C']}, "
           f"select AUROC {selected['auroc']:.4f}; {summary['n_not_converged']} fit(s) not converged")
     return summary
@@ -425,6 +443,37 @@ def _sha256(path: str) -> str:
         for block in iter(lambda: handle.read(1 << 20), b""):
             digest.update(block)
     return digest.hexdigest()
+
+
+def capture_inputs(cap: "Capture", cells: Sequence[str], kinds: Sequence[str]) -> List[str]:
+    """Paths of the capture files a command reads: `<kind>.<name>.*` for each present cell, the plan and manifest."""
+    suffix = {"rows": "jsonl", "resid": "pt", "tokens": "pt"}
+    paths = [os.path.join(cap.directory, name) for name in ("capture_plan.json", "run_manifest.json")]
+    for cell in cells:
+        name = cap.find(cell, required=False)
+        if name is None:
+            continue
+        paths.extend(os.path.join(cap.directory, f"{kind}.{name}.{suffix[kind]}") for kind in kinds)
+    return [path for path in paths if os.path.isfile(path)]
+
+
+def write_manifest(out_dir: str, inputs: Sequence[str], *, argv: Optional[Sequence[str]],
+                   seed: Optional[int]) -> Optional[str]:
+    """`run_manifest.json` beside a command's outputs (`run_manifest.write_run_manifest`, plan B2 section 7).
+
+    The helper never overwrites a manifest with other content, so `fit`, `score` and `read` into one `--out` write
+    `run_manifest.json`, `run_manifest.1.json` and `run_manifest.2.json` in run order; each names its command in
+    `argv`. `dataset_files` hashes the files the command read. Provenance never stops a run: a failure is printed.
+    """
+    try:
+        import run_manifest
+
+        return run_manifest.write_run_manifest(
+            out_dir, script=os.path.abspath(__file__), argv=None if argv is None else list(argv), seed=seed,
+            dataset_files=run_manifest.hash_files(inputs), code_files=[os.path.abspath(probe.__file__)])
+    except Exception as error:                  # noqa: BLE001 -- provenance never stops a run
+        print(f"  !! run_manifest.json not written: {type(error).__name__}: {error}")
+        return None
 
 
 def usable_rows(rows: Sequence[dict]) -> Tuple[np.ndarray, dict]:
@@ -615,7 +664,7 @@ def reading_text(fallback: bool, rule_band: str, anti: bool, label: Optional[str
 
 
 def run_score(capture_dir: str, out_dir: str, *, n_resamples: int = N_RESAMPLES,
-              n_permutations: int = N_PERMUTATIONS) -> dict:
+              n_permutations: int = N_PERMUTATIONS, argv: Optional[Sequence[str]] = None) -> dict:
     cap = Capture(capture_dir)
     art, fit_path = load_fit(out_dir)
     if not os.path.exists(os.path.join(out_dir, "p1_fit.json")):
@@ -730,6 +779,10 @@ def run_score(capture_dir: str, out_dir: str, *, n_resamples: int = N_RESAMPLES,
     _write_json(os.path.join(out_dir, "p1_probe.json"), result)
     with open(os.path.join(out_dir, "p1_probe.md"), "w") as handle:
         handle.write(probe_markdown(result))
+    inputs = [fit_path, os.path.join(out_dir, "p1_fit.json")]
+    inputs += capture_inputs(cap, ("fit_D", "fit_H", "select_D", "select_H") + tuple(needed) + tuple(optional),
+                             ("rows", "resid"))
+    write_manifest(out_dir, inputs, argv=argv, seed=SEED)
     print(f"score: FAR gate {gate['auroc']:.4f}, rule (SER D vs H) {rule['auroc']:.4f} {rule['ci']}, "
           f"band {rule_band}, R2 {label}; reading: {verdict['reading']}")
     return result
@@ -858,7 +911,14 @@ def read_task(cap: Capture, cell: str, twin: str, task: str, n_resamples: int, s
     return entry, draws
 
 
-def run_read(capture_dir: str, out_dir: str, *, n_resamples: int = N_RESAMPLES) -> dict:
+#: The instructed-inversion contrasts of `read`: task entry -> (cell, twin, task). Each is the I cell against its own
+#: H twin, joined and bootstrapped exactly as the D rows are (review 04, problem 4).
+INVERSION_TASKS = {"far_I": ("gate_I", "gate_H", "far"), "ser_I": ("ser_I", "ser_H", "ser")}
+READ_CELLS = ("gate_D", "gate_H", "gate_I", "ser_D", "ser_H", "ser_I", "sdr_D", "sdr_H", "sdr_I_reported")
+
+
+def run_read(capture_dir: str, out_dir: str, *, n_resamples: int = N_RESAMPLES,
+             argv: Optional[Sequence[str]] = None) -> dict:
     cap = Capture(capture_dir)
     tasks: Dict[str, dict] = {}
     far, far_draws = read_task(cap, "gate_D", "gate_H", "far", n_resamples, [SEED])
@@ -868,6 +928,10 @@ def run_read(capture_dir: str, out_dir: str, *, n_resamples: int = N_RESAMPLES) 
         tasks["sdr"], _ = read_task(cap, "sdr_D", "sdr_H", "sdr", n_resamples, [SEED])
         if cap.find("sdr_I_reported", required=False):
             tasks["sdr_I_reported"], _ = read_task(cap, "sdr_I_reported", "sdr_H", "sdr", n_resamples, [SEED])
+    # Every `_mean_ci` call seeds its own bootstrap, so these entries leave the D entries above unchanged.
+    for key, (cell, twin, task) in INVERSION_TASKS.items():
+        if cap.find(cell, required=False):
+            tasks[key], _ = read_task(cap, cell, twin, task, n_resamples, [SEED])
 
     far_minus_ser = {}
     for group in far["groups"]:
@@ -884,7 +948,9 @@ def run_read(capture_dir: str, out_dir: str, *, n_resamples: int = N_RESAMPLES) 
         "schema": TOKENS_SCHEMA, "capture": cap.directory, "seed": SEED, "n_resamples": n_resamples,
         "sign": ("D minus H per joined pair. suppression: column 0, the honest item; negative means D lowers it. "
                  "promotion: column 1, the deceptive item; positive means D raises it. Centred logits and "
-                 "centred DLA; whole_model_raw and whole_model_logsoftmax use the other two logit forms."),
+                 "centred DLA; whole_model_raw and whole_model_logsoftmax use the other two logit forms. "
+                 "tasks.far_I and tasks.ser_I are the instructed-inversion cells (FAR gate I, SER I) minus their "
+                 "own H twins, read the same way; I, not D, is the left side there."),
         "groups": token_groups(), "late_honest_heads": {t: [list(h) for h in v] for t, v in LATE_HONEST_HEADS.items()},
         "tasks": tasks, "far_minus_ser": far_minus_ser, "provenance": cap.provenance(),
     }
@@ -892,6 +958,7 @@ def run_read(capture_dir: str, out_dir: str, *, n_resamples: int = N_RESAMPLES) 
     _write_json(os.path.join(out_dir, "p1_tokens.json"), result)
     with open(os.path.join(out_dir, "p1_tokens.md"), "w") as handle:
         handle.write(tokens_markdown(result))
+    write_manifest(out_dir, capture_inputs(cap, READ_CELLS, ("rows", "tokens")), argv=argv, seed=SEED)
     q = far_minus_ser["quartet"]
     print(f"read: FAR {far['n_pairs']} pairs, SER {ser['n_pairs']} pairs; quartet FAR - SER promotion "
           f"{_fmt(q['promotion']['mean'])} {_fmt(q['promotion']['ci'])}")
@@ -919,6 +986,36 @@ def tokens_markdown(result: dict) -> str:
                 cells.append(f"{_fmt(one['mean'])} {_fmt(one['ci'])}")
         lines.append(f"| {group} | " + " | ".join(cells) + " |")
     lines.append("")
+    inversion = [key for key in INVERSION_TASKS if key in result["tasks"]]
+    if inversion:
+        names = {"far_I": "FAR", "ser_I": "SER"}
+        pairs = ", ".join(f"{names[key]} {result['tasks'][key]['n_pairs']} pairs" for key in inversion)
+        header, rule = ["group"], ["---"]
+        for key in inversion:
+            for side in ("D", "I"):
+                for label in ("suppression", "promotion"):
+                    header.append(f"{names[key]} {side} - H {label}")
+                    rule.append("---")
+        lines += [
+            "## Instructed inversion (I minus H) next to D minus H",
+            "",
+            "The I columns are the transparent-inversion cell minus its own H twin, joined on instance_id and "
+            f"bootstrapped over pressure_id clusters exactly as the D columns ({pairs}). The D columns repeat the "
+            "table above.",
+            "",
+            "| " + " | ".join(header) + " |",
+            "| " + " | ".join(rule) + " |",
+        ]
+        for group in far:
+            cells = []
+            for key in inversion:
+                d_groups = result["tasks"][names[key].lower()]["groups"]
+                for source in (d_groups, result["tasks"][key]["groups"]):
+                    for label in ("suppression", "promotion"):
+                        one = source[group][label]
+                        cells.append(f"{_fmt(one['mean'])} {_fmt(one['ci'])}")
+            lines.append(f"| {group} | " + " | ".join(cells) + " |")
+        lines.append("")
     return "\n".join(lines)
 
 
@@ -943,12 +1040,16 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     # A 128-core login node oversubscribes torch's default thread pool: one LBFGS fit on 400 x 4096 took 4.7 s
     # with the default threads and 0.05 s with one (2026-11-01). FALSITY_PROBE_THREADS overrides.
     torch.set_num_threads(int(os.environ.get("FALSITY_PROBE_THREADS", "1")))
+    # The manifest records the invocation: the process argv on the command line, the script path plus the
+    # arguments when a caller (a test) passes them.
+    recorded = list(sys.argv) if argv is None else [os.path.abspath(__file__)] + list(argv)
     if args.command == "fit":
-        run_fit(args.capture, args.out)
+        run_fit(args.capture, args.out, argv=recorded)
     elif args.command == "score":
-        run_score(args.capture, args.out, n_resamples=args.n_resamples, n_permutations=args.n_permutations)
+        run_score(args.capture, args.out, n_resamples=args.n_resamples, n_permutations=args.n_permutations,
+                  argv=recorded)
     else:
-        run_read(args.capture, args.out, n_resamples=args.n_resamples)
+        run_read(args.capture, args.out, n_resamples=args.n_resamples, argv=recorded)
     return 0
 
 

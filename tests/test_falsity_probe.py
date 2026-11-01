@@ -518,6 +518,198 @@ def test_read_writes_the_per_token_contrasts(fp, capture, tmp_path):
     assert os.path.exists(os.path.join(out, "p1_tokens.md"))
 
 
+# ==============================================================================
+# B2-T9: THE INSTRUCTED-INVERSION CONTRAST IN `read` AND THE RUN MANIFESTS
+# ==============================================================================
+
+def _plant_inversion(capture, name, twin, *, honest_shift, deceptive_shift):
+    """Give an I cell a known contrast against its H twin, keyed by instance_id, and reverse its row order.
+
+    mlp.30 is set per row to the row's id number on both files, plus `honest_shift` on the I honest column; the
+    quartet carries `deceptive_shift` on the I deceptive column. Reversing the I files makes a positional join give
+    the wrong mlp.30 value, so only the instance_id join reproduces `honest_shift` exactly.
+    """
+    mlp30 = KEYS.index(["mlp", 30, 0])
+    for cell in (twin, name):
+        path = os.path.join(capture, f"tokens.{cell}.pt")
+        blob = torch.load(path, weights_only=True)
+        number = torch.tensor([float(one[-3:]) for one in blob["ids"]])
+        blob["dla"][:, mlp30, 0] = number
+        if cell == name:
+            blob["dla"][:, mlp30, 0] += honest_shift
+            for k in _quartet_index():
+                blob["dla"][:, k, 1] += deceptive_shift / 4
+        blob["logits_centred"] = blob["dla"].sum(1)
+        torch.save(blob, path)
+    rows_path = os.path.join(capture, f"rows.{name}.jsonl")
+    with open(rows_path) as handle:
+        rows = [line for line in handle if line.strip()]
+    with open(rows_path, "w") as handle:
+        handle.write("".join(rows[::-1]))
+    for kind, tensors in (("resid", ("readout", "resid")),
+                          ("tokens", ("token_ids", "logits_raw", "logits_logsoftmax", "logits_centred", "dla"))):
+        path = os.path.join(capture, f"{kind}.{name}.pt")
+        blob = torch.load(path, weights_only=True)
+        blob["ids"] = list(blob["ids"])[::-1]
+        for key in tensors:
+            blob[key] = blob[key].flip(0)
+        torch.save(blob, path)
+
+
+@pytest.fixture(scope="module")
+def inversion_capture(tmp_path_factory):
+    capture = write_capture(str(tmp_path_factory.mktemp("inversion")))
+    _plant_inversion(capture, "far_gate_I", "far_gate_H", honest_shift=-0.3, deceptive_shift=0.8)
+    _plant_inversion(capture, "ser_test_I", "ser_test_H", honest_shift=-0.7, deceptive_shift=0.4)
+    return capture
+
+
+def test_read_adds_the_i_minus_h_contrast_joined_on_instance_id(fp, inversion_capture, tmp_path):
+    out = str(tmp_path / "read")
+    assert fp.main(["read", "--capture", inversion_capture, "--out", out, "--n-resamples", "100"]) == 0
+    with open(os.path.join(out, "p1_tokens.json")) as handle:
+        tokens = json.load(handle)
+    far_i, ser_i = tokens["tasks"]["far_I"], tokens["tasks"]["ser_I"]
+    assert far_i["cells"] == ["far_gate_I", "far_gate_H"] and ser_i["cells"] == ["ser_test_I", "ser_test_H"]
+    assert far_i["n_pairs"] == 12 and ser_i["n_pairs"] == 10
+    assert far_i["n_unjoined"] == 0 and far_i["n_token_mismatch"] == 0
+    assert far_i["n_clusters"] == 4 and ser_i["n_clusters"] == 5
+    # Only the instance_id join gives these exactly; the I files are in reverse order.
+    for entry, honest, deceptive in ((far_i, -0.3, 0.8), (ser_i, -0.7, 0.4)):
+        groups = entry["groups"]
+        assert groups["mlp.30"]["suppression"]["mean"] == pytest.approx(honest, abs=1e-5)
+        assert groups["mlp.30"]["suppression"]["sd"] == pytest.approx(0.0, abs=1e-5)
+        assert groups["quartet"]["promotion"]["mean"] == pytest.approx(deceptive, abs=1e-5)
+        assert groups["quartet"]["suppression"]["mean"] == pytest.approx(0.0, abs=1e-6)
+        for group in ("whole_model", "whole_model_logsoftmax"):
+            for label in ("suppression", "promotion"):
+                one = groups[group][label]
+                lo, hi = one["ci"]
+                assert lo <= one["mean"] <= hi
+    # The D rows are still D against H; far_minus_ser stays D only.
+    assert tokens["tasks"]["far"]["groups"]["quartet"]["promotion"]["mean"] == pytest.approx(1.0, abs=1e-6)
+    assert set(tokens["far_minus_ser"]) == set(tokens["tasks"]["far"]["groups"])
+    with open(os.path.join(out, "p1_tokens.md")) as handle:
+        text = handle.read()
+    assert "Instructed inversion (I minus H)" in text
+    assert "FAR I - H promotion" in text and "SER I - H suppression" in text and "FAR D - H promotion" in text
+    assert "FAR 12 pairs, SER 10 pairs" in text
+
+
+def test_the_inversion_contrast_leaves_the_d_entries_unchanged(fp, inversion_capture, tmp_path):
+    import shutil
+
+    with_i = str(tmp_path / "with")
+    assert fp.main(["read", "--capture", inversion_capture, "--out", with_i, "--n-resamples", "50"]) == 0
+    stripped = shutil.copytree(inversion_capture, str(tmp_path / "noI"))
+    for name in ("far_gate_I", "ser_test_I"):
+        os.remove(os.path.join(stripped, f"rows.{name}.jsonl"))
+    without = str(tmp_path / "without")
+    assert fp.main(["read", "--capture", stripped, "--out", without, "--n-resamples", "50"]) == 0
+    with open(os.path.join(with_i, "p1_tokens.json")) as handle:
+        a = json.load(handle)
+    with open(os.path.join(without, "p1_tokens.json")) as handle:
+        b = json.load(handle)
+    assert "far_I" not in b["tasks"] and "ser_I" not in b["tasks"]
+    for task in ("far", "ser", "sdr", "sdr_I_reported"):
+        assert a["tasks"][task]["groups"] == b["tasks"][task]["groups"]
+    assert a["far_minus_ser"] == b["far_minus_ser"]
+    with open(os.path.join(without, "p1_tokens.md")) as handle:
+        plain = handle.read()
+    with open(os.path.join(with_i, "p1_tokens.md")) as handle:
+        assert handle.read().startswith(plain)
+    assert "Instructed inversion" not in plain
+
+
+def _manifest(path):
+    import run_manifest
+
+    with open(path) as handle:
+        manifest = json.load(handle)
+    assert manifest["schema"] == "run-manifest/1"
+    assert run_manifest.verify_manifest_hash(manifest)
+    return manifest
+
+
+def test_fit_score_and_read_each_write_a_run_manifest(fp, capture, tmp_path):
+    out = str(tmp_path / "out")
+    assert fp.main(["fit", "--capture", capture, "--out", out]) == 0
+    assert fp.main(["score", "--capture", capture, "--out", out, "--n-resamples", "10",
+                    "--n-permutations", "0"]) == 0
+    assert fp.main(["read", "--capture", capture, "--out", out, "--n-resamples", "10"]) == 0
+    written = sorted(name for name in os.listdir(out) if name.startswith("run_manifest"))
+    assert written == ["run_manifest.1.json", "run_manifest.2.json", "run_manifest.json"]
+    by_command = {}
+    for name in written:
+        manifest = _manifest(os.path.join(out, name))
+        by_command[manifest["argv"][1]] = manifest
+    assert set(by_command) == {"fit", "score", "read"}
+    assert _manifest(os.path.join(out, "run_manifest.json"))["argv"][1] == "fit"
+    assert _manifest(os.path.join(out, "run_manifest.1.json"))["argv"][1] == "score"
+    assert _manifest(os.path.join(out, "run_manifest.2.json"))["argv"][1] == "read"
+
+    probe_py = os.path.join(ROOT, "component_analysis", "probe.py")
+    for command, manifest in by_command.items():
+        assert manifest["script"] == "falsity_probe.py"
+        assert manifest["argv"][0] == SCRIPT and manifest["argv"][2:4] == ["--capture", capture]
+        assert manifest["git_fingerprint_error"] == "disabled"   # tests/conftest.py sets DC_RUN_MANIFEST_GIT=0
+        assert manifest["code_sha256"] == {"scripts/falsity_probe.py": _sha(SCRIPT),
+                                           "component_analysis/probe.py": _sha(probe_py)}
+        assert manifest["created"]
+        files = manifest["dataset_files"]
+        for path, digest in files.items():
+            assert digest == _sha(path)
+        assert os.path.join(capture, "capture_plan.json") in files
+        assert os.path.join(capture, "run_manifest.json") in files
+    assert by_command["fit"]["seed"] is None
+    assert by_command["score"]["seed"] == by_command["read"]["seed"] == 20261101
+
+    fit_files = set(by_command["fit"]["dataset_files"])
+    assert os.path.join(capture, "resid.far_fit_D.pt") in fit_files
+    assert os.path.join(capture, "rows.far_select_HI.jsonl") in fit_files
+    assert not any("ser_test" in path or "far_gate" in path or "tokens." in path for path in fit_files)
+
+    score_files = set(by_command["score"]["dataset_files"])
+    assert {os.path.join(out, "p1_fit.pt"), os.path.join(out, "p1_fit.json"),
+            os.path.join(capture, "resid.ser_test_D.pt"), os.path.join(capture, "resid.far_gate_I.pt"),
+            os.path.join(capture, "resid.sdr_test_I_reported.pt"),
+            os.path.join(capture, "resid.far_fit_H.pt")} <= score_files
+    assert not any("tokens." in path for path in score_files)
+
+    read_files = set(by_command["read"]["dataset_files"])
+    assert {os.path.join(capture, "tokens.far_gate_I.pt"), os.path.join(capture, "tokens.ser_test_I.pt"),
+            os.path.join(capture, "rows.ser_test_H.jsonl")} <= read_files
+    assert not any("resid." in path or "far_fit" in path for path in read_files)
+
+
+def _sha(path):
+    import hashlib
+
+    with open(path, "rb") as handle:
+        return hashlib.sha256(handle.read()).hexdigest()
+
+
+def test_a_rerun_with_identical_content_writes_no_new_manifest_and_a_failure_never_stops_the_run(
+        fp, capture, tmp_path, monkeypatch, capsys):
+    import run_manifest
+
+    out = str(tmp_path / "out")
+    monkeypatch.setattr(run_manifest, "now_chicago", lambda: "2026-11-01T00:00:00-05:00")
+    assert fp.main(["read", "--capture", capture, "--out", out, "--n-resamples", "5"]) == 0
+    assert fp.main(["read", "--capture", capture, "--out", out, "--n-resamples", "5"]) == 0
+    assert sorted(n for n in os.listdir(out) if n.startswith("run_manifest")) == ["run_manifest.json"]
+
+    def broken(*args, **kwargs):
+        raise OSError("disk full")
+
+    monkeypatch.setattr(run_manifest, "write_run_manifest", broken)
+    other = str(tmp_path / "other")
+    assert fp.main(["read", "--capture", capture, "--out", other, "--n-resamples", "5"]) == 0
+    assert os.path.exists(os.path.join(other, "p1_tokens.json"))
+    assert not any(n.startswith("run_manifest") for n in os.listdir(other))
+    assert "run_manifest.json not written: OSError: disk full" in capsys.readouterr().out
+
+
 def test_the_late_honest_heads_follow_the_phase2_readings(fp):
     path = os.path.join(ROOT, "docs", "research", "mechanism-analysis", "phase2", "p2_readings.json")
     if not os.path.exists(path):
