@@ -464,3 +464,13 @@ def filter_pairs(pairs: Sequence[dict], scores: Sequence[dict], *, margin: float
                   'baseline_competence': _rate(len(competent_ids), len(kept)),
                   'all_metrics': paired_metrics(scores),
                   'retained_metrics': paired_metrics(retained_scores)}
+
+
+def main(argv=None, tokenizer=None, model_loader=None):
+    """Deferred staged I/O entry point; pure functions stay importable on CPU."""
+    from dataset.user_inversion_pipeline import main as pipeline_main
+    return pipeline_main(argv, tokenizer=tokenizer, model_loader=model_loader)
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())
