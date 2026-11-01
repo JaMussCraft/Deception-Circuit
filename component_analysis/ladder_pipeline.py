@@ -10,6 +10,7 @@ import json
 import os
 from pathlib import Path
 import re
+import time
 
 from component_analysis import ladder_design as design
 from dataset import user_inversion_pipeline as common
@@ -330,9 +331,48 @@ def validate_tokenization(prepared,tokenizer):
                 require(list(tokenizer.encode(saved['prompt'],add_special_tokens=task=='ioi'))==saved['tokens'],'stale utility tokenization')
 
 
+def start_execution(model):
+    """Reset per-stage GPU peaks only for the model's actual CUDA device."""
+    import torch
+    from component_analysis import hooks
+    started=time.perf_counter()
+    device,dtype=hooks.device_and_dtype(model)
+    cuda_device=torch.device(device) if str(device).startswith('cuda') else None
+    if cuda_device is not None:
+        torch.cuda.synchronize(cuda_device)
+        torch.cuda.reset_peak_memory_stats(cuda_device)
+    return dict(device=device,dtype=dtype,cuda_device=cuda_device,started=started)
+
+
+def finish_execution(state,stage):
+    """Measure actual GPU resources, or explicit null GPU fields on CPU."""
+    import torch
+    cuda_device=state['cuda_device']
+    if cuda_device is not None: torch.cuda.synchronize(cuda_device)
+    return dict(device=str(state['device']),dtype=str(state['dtype']),
+                gpu_name=torch.cuda.get_device_name(cuda_device) if cuda_device is not None else None,
+                peak_allocated_memory_bytes=int(torch.cuda.max_memory_allocated(cuda_device)) if cuda_device is not None else None,
+                peak_reserved_memory_bytes=int(torch.cuda.max_memory_reserved(cuda_device)) if cuda_device is not None else None,
+                memory_scope=stage+' compute after model load; includes resident model',
+                **{stage+'_compute_seconds':time.perf_counter()-state['started']},**selection_runtime_identity())
+
+
+def timed_model_stage(args,model_loader,compute,stage):
+    """Use the same model-load/compute timing boundary on selection and scoring."""
+    started=time.perf_counter()
+    model=model_loader(args)
+    load_seconds=time.perf_counter()-started
+    result=compute(model)
+    result['execution_provenance'].update(model_load_seconds=load_seconds,
+        stage_time_scope='model load plus '+stage+' compute; excludes artifact publication',
+        **{stage+'_stage_seconds':time.perf_counter()-started})
+    return result
+
+
 def select(args,prepared,model):
     import torch
     from component_analysis import specificity_ladder as runner,dla
+    execution_state=start_execution(model)
     groups={}; banks={}
     for task in args.tasks:
         frozen=prepared['designs'][task]; records=prepared['rows'][task]['H']
@@ -347,13 +387,111 @@ def select(args,prepared,model):
                 values.append(dla.component_logit_difference(model,capture,heads,target=b.honest_token,distractor=b.opposite_token).detach().cpu())
             arrays.append(torch.cat(values).numpy())
         screen=design.choose_mover_candidates(members,*arrays,frozen['mover_selection_ids'])
-        groups[task]=dict(screen=screen,full=[list(k) for k in members],minus=screen['remaining_keys'],
+        evidence=dict(head_keys=[list(k) for k in heads],selection_ids=list(frozen['mover_selection_ids']),
+                      clean_dla=arrays[0].tolist(),corrupt_dla=arrays[1].tolist(),
+                      direction='original H correct-minus-other in each designation stream',axes=['ordered_selection_ids','head_keys'])
+        groups[task]=dict(screen=screen,selection_evidence=evidence,full=[list(k) for k in members],minus=screen['remaining_keys'],
                           descriptive=task=='sdr_v2',duplicate_group=screen['duplicate_group'])
         bank_rows=[indexed[rid] for rid in frozen['bank_ids']]
         bank=runner.collect_h_mean_bank(model,[b for stream in design.STREAMS for b in batches(bank_rows,stream)],members)
         banks[task]=dict(values=[dict(key=list(k),value=v.detach().cpu().tolist()) for k,v in bank['values'].items()],provenance=bank['provenance'])
+    execution=finish_execution(execution_state,'selection')
+    execution.update(commit=args.commit,model=args.model,model_revision=args.model_revision,tokenizer_revision=args.tokenizer_revision)
     return dict(kind='selected',design_sha256=design._hash(prepared),groups=groups,banks=banks,
+                execution_provenance=execution,
                 bank_sha256=design._hash(banks),group_sha256=design._hash(groups),injected=args.injected or prepared.get('injected',False))
+
+
+def selection_runtime_identity():
+    """Read only allowlisted runtime labels; never dump the job environment."""
+    job=os.environ.get('SLURM_JOB_ID','')
+    job=job if re.fullmatch(r'[0-9]+(?:_[0-9]+)?',job) else None
+    cluster=None; source=None
+    for name in ('SLURM_CLUSTER_NAME','DC_CLUSTER_NAME','DC_CLUSTER'):
+        value=os.environ.get(name,'')
+        if re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,63}',value):
+            cluster=value; source=name; break
+    return dict(slurm_job_id=job,cluster=cluster,cluster_source=source)
+
+
+def selection_manifest_path(groups_path):
+    return Path(groups_path).with_name('selection_run_manifest.json')
+
+
+def selection_manifest_core(args,prepared,selected):
+    """One schema shared by the final completion marker and its consumers."""
+    return dict(schema_version=1,kind='specificity_ladder_selection',commit=args.commit,model=args.model,
+                  model_revision=args.model_revision,tokenizer_revision=args.tokenizer_revision,
+                  design_sha256=selected['design_sha256'],group_sha256=selected['group_sha256'],bank_sha256=selected['bank_sha256'],
+                  raw_dla_sha256=design._hash({task:group['selection_evidence'] for task,group in selected['groups'].items()}),
+                  source_hashes=prepared['source_hashes'],selection_source_hashes=prepared['selection_hashes'],
+                  code_hashes=code_hashes(),execution=selected['execution_provenance'],injected=selected['injected'],
+                  counts={task:dict(selection_rows=len(group['selection_evidence']['selection_ids']),
+                                    head_columns=len(group['selection_evidence']['head_keys']),
+                                    bank_instances=len(selected['banks'].get(task,{}).get('provenance',{}).get('source_ids',[])))
+                          for task,group in selected['groups'].items()})
+
+
+def write_selection(args,prepared,selected):
+    """Publish raw selection evidence and a sidecar linked to exact file bytes."""
+    target=Path(args.groups); manifest_path=selection_manifest_path(target)
+    require(not target.exists(),'output exists: '+str(target))
+    require(not manifest_path.exists(),'output exists: '+str(manifest_path))
+    manifest=selection_manifest_core(args,prepared,selected)
+    write_artifact(target,selected)
+    manifest.update(selection_artifact=str(target.resolve()),selection_artifact_sha256=design._hash(selected),
+                    selection_file_sha256=common.file_hash(target))
+    with manifest_path.open('x') as handle:
+        json.dump(manifest,handle,sort_keys=True,indent=2,allow_nan=False)
+        handle.write('\n')
+
+
+def read_selection(args,prepared):
+    """Require the last-written completion marker before scoring or summaries."""
+    path=selection_manifest_path(args.groups)
+    require(path.is_file(),'missing selection completion manifest: '+str(path))
+    try:
+        manifest=common.read_json(path)
+    except (ValueError,OSError) as exc:
+        raise ValueError('malformed selection completion manifest: '+str(path)) from exc
+    require(isinstance(manifest,dict) and type(manifest.get('schema_version')) is int
+            and manifest.get('schema_version')==1 and manifest.get('kind')=='specificity_ladder_selection',
+            'invalid selection completion manifest schema')
+    try:
+        selected=read_artifact(args.groups)
+        require(selected['kind']=='selected','invalid selection artifact kind')
+        require(selected['design_sha256']==design._hash(prepared),'stale selection design hash')
+        require(selected['bank_sha256']==design._hash(selected['banks']),'stale selection bank hash')
+        require(selected['group_sha256']==design._hash(selected['groups']),'stale selection group hash')
+        require(set(selected['groups'])==set(args.tasks)==set(selected['banks']),'incomplete selection task scope')
+        require(type(selected['injected']) is bool and (not prepared.get('injected') or selected['injected']),
+                'invalid selection injected provenance')
+        execution=selected['execution_provenance']
+        require(isinstance(execution,dict) and isinstance(execution.get('device'),str) and isinstance(execution.get('dtype'),str),
+                'incomplete selection execution provenance')
+        for field in ('commit','model','model_revision','tokenizer_revision'):
+            require(prepared[field]==getattr(args,field)==execution[field],'stale selection identity: '+field)
+        require(prepared['code_hashes']==code_hashes(),'stale selection code identity')
+        for task,group in selected['groups'].items():
+            evidence=group['selection_evidence']; frozen=prepared['designs'][task]
+            require(group['full']==prepared['recorded_groups'][task[:-3]]['members'],'stale selection recorded group')
+            require(evidence['selection_ids']==frozen['mover_selection_ids'],'stale selection ordered ids')
+            require(evidence['head_keys']==[key for key in group['full'] if key[0]=='head'],'stale selection head-key order')
+            for stream in ('clean_dla','corrupt_dla'):
+                values=evidence[stream]
+                require(isinstance(values,list) and len(values)==len(evidence['selection_ids'])
+                        and all(isinstance(row,list) and len(row)==len(evidence['head_keys']) for row in values),
+                        'incomplete selection raw DLA axes')
+            require(selected['banks'][task]['provenance']['source_ids']==frozen['bank_ids'],'stale selection bank ids')
+        expected=selection_manifest_core(args,prepared,selected)
+        expected.update(selection_artifact=str(Path(args.groups).resolve()),selection_artifact_sha256=design._hash(selected),
+                        selection_file_sha256=common.file_hash(args.groups))
+        require(set(manifest)==set(expected),'incomplete selection completion manifest fields')
+        for field,value in expected.items():
+            require(design._hash(manifest[field])==design._hash(value),'stale selection completion manifest link: '+field)
+    except (KeyError,TypeError,ValueError,OSError) as exc:
+        raise ValueError('invalid selection completion evidence: '+str(exc)) from exc
+    return selected
 
 
 def resolve_bank_reference(reference,selected=None):
@@ -396,9 +534,9 @@ def compact_bank_provenance(rows,selected,artifact_reference):
 
 def score(args,prepared,selected,model):
     import torch
-    from component_analysis import specificity_ladder as runner,hooks
+    from component_analysis import specificity_ladder as runner
     from component_analysis.ladder_tasks import task_batches
-    device,dtype=hooks.device_and_dtype(model)
+    execution_state=start_execution(model)
     results=[]; controls=[]; expected=[]
     for task in args.tasks:
         frozen=prepared['designs'][task]; ids=frozen['assessment_ids'][:args.limit or None]
@@ -446,7 +584,7 @@ def score(args,prepared,selected,model):
     validate_rows(results,expected_keys(prepared,selected,args.limit))
     validate_positive_controls(controls,prepared,args.limit)
     compact_bank_provenance(results,selected,getattr(args,'groups','injected-selected-artifact'))
-    return dict(kind='scored',execution_provenance=dict(device=str(device),dtype=str(dtype)),pilot=bool(args.limit),injected=args.injected or selected.get('injected',False),limit=args.limit,
+    return dict(kind='scored',execution_provenance=finish_execution(execution_state,'scoring'),pilot=bool(args.limit),injected=args.injected or selected.get('injected',False),limit=args.limit,
                 design_sha256=design._hash(prepared),selection_sha256=design._hash(selected),rows=results,expected=[list(k) for k in expected],positive_controls=controls,
                 counts=dict(rows=len(results),expected=len(expected),positive_controls=len(controls)),
                 not_applicable=dict(mmlu=['item_swap','h_twin','independent_resample'],ioi=['h_twin']),
@@ -480,6 +618,7 @@ def main(argv=None,tokenizer=None,model_loader=None):
     if not args.dry_run and args.stage in ('prepare','select','score'):
         output=Path(args.design) if args.stage=='prepare' else (Path(args.groups) if args.stage=='select' else Path(args.work_dir)/'score')
         require(not output.exists(),'output exists: '+str(output))
+        if args.stage=='select': require(not selection_manifest_path(args.groups).exists(),'output exists: '+str(selection_manifest_path(args.groups)))
     require(not args.final or args.stage=='summarize','--final requires summarize')
     require(not args.limit or args.stage in ('score','summarize'),'--limit is scoring pilot only')
     os.environ.update(HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1',HF_DATASETS_OFFLINE='1')
@@ -488,22 +627,20 @@ def main(argv=None,tokenizer=None,model_loader=None):
         prepare(args,tokenizer)
     else:
         prepared=read_artifact(args.design); validate_prepared(args,prepared)
+        if args.stage in ('score','summarize'): selected=read_selection(args,prepared)
         if args.dry_run:
             tokenizer=tokenizer or common.load_tokenizer(args)
             validate_tokenization(prepared,tokenizer)
         if args.stage=='select':
             if not args.dry_run:
                 registries(args,prepared['rows']); utility_registries(args,prepared['utility']); grader_registry()
-                selected=select(args,prepared,(model_loader or load_model)(args)); write_artifact(args.groups,selected)
+                selected=timed_model_stage(args,model_loader or load_model,lambda model:select(args,prepared,model),'selection')
+                write_selection(args,prepared,selected)
         else:
-            selected=read_artifact(args.groups)
-            require(selected['design_sha256']==design._hash(prepared),'stale selected design hash')
-            require(selected['bank_sha256']==design._hash(selected['banks']),'stale bank hash')
-            require(selected['group_sha256']==design._hash(selected['groups']),'stale groups hash')
             if args.stage=='score':
                 if not args.dry_run:
                     registries(args,prepared['rows']); utility_registries(args,prepared['utility']); grader_registry()
-                    scored=score(args,prepared,selected,(model_loader or load_model)(args))
+                    scored=timed_model_stage(args,model_loader or load_model,lambda model:score(args,prepared,selected,model),'scoring')
                     scored['run_manifest']=dict(commit=args.commit,model=args.model,model_revision=args.model_revision,tokenizer_revision=args.tokenizer_revision,
                         code_hashes=code_hashes(),grader_registry=grader_registry(),grader_sha256=GRADER,registry=registries(args,prepared['rows']),
                         design_sha256=design._hash(prepared),selection_sha256=design._hash(selected),group_sha256=selected['group_sha256'],bank_sha256=selected['bank_sha256'],

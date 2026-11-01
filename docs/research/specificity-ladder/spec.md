@@ -38,7 +38,7 @@ A3 uses three seeds for difference-of-means directions, random-direction nulls, 
 
 Total reserved GPU budget is 125 hours: A1 25, A2 60, A3 40. API cap is 10 dollars; concurrent job cap is 99. Train on A40, H200 or H100, never 40 GB A100. Dry-run actual wrappers and reserve observed runtime plus a reasonable buffer. RS owns all ledgers and job records in the primary checkout.
 
-The weekly usage cap is 80 percent. The user applied a temporary 40-point checkpoint cadence until the observed weekly reset. Return to 25 through the human-only command after that reset; do not assume the predicted date is correct.
+The weekly usage cap is 80 percent. The user applied a temporary 75-point checkpoint cadence until the observed weekly reset. Return to 25 through the human-only command after that reset; do not assume the predicted date is correct.
 
 Current benchmark grader code fingerprint: `866fd15dd30b695e46ffe955b09894fb831af92e2b9015eafbd7f0eee151d2f9`. The independently reviewed formal registry command installed this fingerprint in both primary and worktree registries before benchmark scoring. Local ladder adapter, runner and metric source hashes must additionally be frozen in each run manifest because the shared fingerprint does not cover these new files. The existing hash omits external rubric files, so any benchmark plan must additionally capture those files. EVAL 5 still requires explicit user permission. MMLU sample size and scoring protocol must be fixed before its first run.
 
