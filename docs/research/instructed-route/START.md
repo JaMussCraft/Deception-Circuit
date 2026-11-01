@@ -83,7 +83,7 @@ This is the lighter of the two approved sessions and is meant for a Claude orche
    `docs/research/specificity-ladder/`; read it, never write to it.
 
 7. **Budgets.** GPU: 65 reserved GPU-hours in total across Delta and Bridges-2, phase-gated as 20 for B1, 15 for
-   B2 and 30 for B3 (of which at most 10 before the premise test passes); at most 2 concurrent GPU jobs. Bridges-2
+   B2 and 30 for B3 (of which at most 10 before the premise test passes); no limit on concurrent GPU jobs, so parallelise whenever the queue allows (the ledger cap is set to 99 because the tool needs a number). Bridges-2
    goes offline about 2026-11-09, so run B1's path patching there first if it is ready; otherwise Delta.
    OpenRouter: $20, for the alignment-faking judge. Usage: pause at 80% of the five-hour window or 80% of the
    weekly reading (the larger of the all-models and Fable rows). Reserve walltime at the observed runtime plus a

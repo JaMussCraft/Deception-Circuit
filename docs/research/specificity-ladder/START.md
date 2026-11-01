@@ -83,7 +83,7 @@ This is the heavier of the two approved sessions and is meant for a Codex orches
    `docs/research/instructed-route/`; read it, never write to it.
 
 7. **Budgets.** GPU: 125 reserved GPU-hours in total across Delta and Bridges-2, phase-gated as 25 for A1, 60 for
-   A2 after the timing dry-run and 40 for A3; at most 2 concurrent GPU jobs. Bridges-2 goes offline about
+   A2 after the timing dry-run and 40 for A3; no limit on concurrent GPU jobs, so parallelise whenever the queue allows (the ledger cap is set to 99 because the tool needs a number). Bridges-2 goes offline about
    2026-11-09; after that, Delta only. OpenRouter: $10. Usage: pause at 80% of the Codex weekly reading (the
    five-hour window does not apply). Reserve walltime at the observed runtime plus a reasonable buffer; record
    reserved and actual hours in the ledger.

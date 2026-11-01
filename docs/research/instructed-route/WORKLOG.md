@@ -5,12 +5,12 @@
 |---|---|
 | State | Running |
 | Directions | none recorded yet |
-| Started / last updated | Sun 1 Nov 2026, 12:59 pm EST / Sun 1 Nov 2026, 12:59 pm EST |
+| Started / last updated | Sun 1 Nov 2026, 12:59 pm EST / Sun 1 Nov 2026, 1:57 pm EST |
 | Orchestrator auto-compactions | 0, counted by the compaction hook |
 | Weekly usage, all models | no reading yet; no session has registered |
 | Weekly usage, Fable | no reading yet; no session has registered |
 | Review checkpoints | none yet; checkpoints start when the session registers |
-| GPU budget | 0.0 of 65 GPU-h actual (0.0 reserved); at most 2 jobs at once; clusters: none yet |
+| GPU budget | 0.0 of 65 GPU-h actual (0.0 reserved); at most 99 jobs at once; clusters: none yet |
 | OpenRouter credit | $0.00 of $20.00 cap |
 | Open needs from you | 0 |
 | Transcripts (for audits) | not recorded yet |
