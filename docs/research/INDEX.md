@@ -44,6 +44,7 @@ A finding id is `F-<short>-NNN`, and an id is never reused.
 | fmt | format-control |
 | ev5 | eval5-grader-fixes |
 | arw | autoresearch-workflow |
+| lad | specificity-ladder |
 
 A new direction picks a short name of two to five lower-case letters and adds it to this table.
 

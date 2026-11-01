@@ -1,47 +1,41 @@
 # Resume: specificity-ladder
 
-<!--
-Template for docs/research/<slug>/RESUME.md. This is the machine narrative state of the direction: what a fresh
-orchestrator needs in order to continue after a compaction or a new session. It is overwritten, not appended, and
-stays under 150 lines. Keep the six headings below, in this order. Write full sentences with normal spacing.
-Counters (compactions, checkpoints, usage) live in state.json and are never copied here. RESUME never summarizes the
-worklog; the worklog may point here, never the other way.
--->
-
-Last rewritten: <Sun 1 Nov 2026, 2:40 pm EST> by <claude-01a2b3c4>.
-
 ## Status
 
-<Two to five sentences. Which direction is active, which is the fallback, and where each stands against its
-pre-registered exit rule from spec.md. Name the findings by F number from FINDINGS.md.>
+The approved research session has started with ownership claimed and registration active.
+The first work is a read-only map of the transparent user-turn control and crossed ablation ladder.
+Twin-corruption training preparation is the parallel direction; below-head tests depend on the control.
+No experiments have run and no scientific gate has been evaluated in this session.
 
 ## Branch, worktree and commit
 
-- Branch: `<branch name>`.
-- Worktree: `<absolute worktree path>`.
-- Last commit on the branch: `<short SHA>`, "<commit subject>".
-- Uncommitted work, if any: <files and why they are not committed yet, or "none">.
+- Branch: `specificity-ladder`.
+- Worktree: `/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder`.
+- Base commit: `16ce5f7`, which records the direction claim on main.
+- The registered session mirrors its state to the primary checkout because its harness cwd is Alignment.
+- Use research-session with the primary direction directory for authoritative worklogs and ledgers.
+- Research code, plans and reports belong in the worktree. Do not use its template state as live state.
 
 ## In-flight jobs
 
-<One row per job that has not reached a terminal state. The same jobs are recorded with `research-session job add`,
-which keeps the waiter command in state.json; this table only says what each job is for.>
-
-| Job | Cluster | What it computes | Output directory | Expected finish |
-|---|---|---|---|---|
-| `<job id>` | <Delta> | <plain description> | `<outputs/... path>` | <Sun 4:00 pm EST> |
+No Slurm jobs or paid API calls have been started.
 
 ## Next action
 
-<The single next step, stated so that a fresh orchestrator can take it without reading anything else first. Then
-at most three follow-up steps, in order.>
+Read the control reconstruction handback in the worktree at `docs/research/specificity-ladder/reports/01-control-recon-handback.md` when it arrives.
+The initial inspection found that current twin pairing enforces unchanged prefix and suffix, so user-turn controls need matched neutral requests or explicit alignment. Mean ablation must use an honest activation bank, and the answer-mover exclusion needs an operational definition.
+Then write the concrete A1 plan and frozen specification from START, map twin-corruption training, and run CPU baseline checks before implementation.
+Use the existing approved phase budgets and fallback rules. Do not run notebooks.
 
 ## Do not
 
-- <Work that is finished and must not be redone, each with the path that records it.>
-- <Protocols that failed their gate, with the path.>
-- <Files and directions owned by other sessions, taken from SESSIONS.md.>
+- Repeat the closed mechanism-analysis phases or treat hidden operator inversion as a specificity test.
+- Edit instructed-route or the protected paused studies listed in START.
+- Launch EVAL 5, score protected sets, raise spending caps, or merge without the required user authorization.
+- Bypass the human-only cadence hook or edit tool-owned records by hand.
 
 ## Open decisions for the user
 
-- <Each decision waiting on the user, with its need number from the worklog and the default if no answer.>
+- N1 is resolved: the user applied the targeted 40-point cadence command to this Codex session.
+- The user clarified expiry: use the observed weekly usage reset, not a fixed date. The currently predicted reset is November 6 at 11:07 am EST, but recheck live readings.
+- Automatic reversion has not been configured. After the temporary period, the original cadence is 25 points.
