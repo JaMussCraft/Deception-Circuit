@@ -438,11 +438,19 @@ def test_the_readings_script_reads_what_run_writes(model, tmp_path):
 
     rr = load_script()
     payload, _ctx = run_t1(model, tmp_path, "--route-path-patching", "off")
-    readings = rr.read_task(payload, n_resamples=20, seed=1)
     summary = payload["t1"]["summary"]
-    assert readings["t1"]["rule_estimator"] == "forward"
-    assert readings["t1"]["M_q"]["point"] == pytest.approx(summary["M_q"], rel=1e-9)
-    assert readings["t1"]["O"]["point"] == pytest.approx(summary["O"], rel=1e-9)
+    sweeps = payload["t1"]["sweeps"]
+    # Ruling R9: the readings default to the offline estimator, forward beside it. The run's
+    # own summary is on the forward estimator, which the forward setting reproduces.
+    readings = rr.read_task(payload, n_resamples=20, seed=1)
+    assert readings["t1"]["rule_estimator"] == "offline"
+    assert readings["t1"]["M_q"]["point"] == pytest.approx(summary["M_q_offline"], rel=1e-9)
+    assert readings["t1"]["O"]["point"] == pytest.approx(sweeps["offline"]["T"]["O"], rel=1e-9)
+    assert readings["t1"]["beside"]["M_q"]["point"] == pytest.approx(summary["M_q"], rel=1e-9)
+    forward = rr.read_task(payload, n_resamples=20, seed=1, rule_estimator="forward")
+    assert forward["t1"]["rule_estimator"] == "forward"
+    assert forward["t1"]["M_q"]["point"] == pytest.approx(summary["M_q"], rel=1e-9)
+    assert forward["t1"]["O"]["point"] == pytest.approx(summary["O"], rel=1e-9)
     assert readings["t1"]["r_q"]["point"] == pytest.approx(summary["r_q"], rel=1e-6)
     assert readings["t1"]["controls"]["M_C3"]["point"] == pytest.approx(summary["M_C3"],
                                                                          rel=1e-9)

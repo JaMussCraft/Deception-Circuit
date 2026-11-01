@@ -32,8 +32,13 @@ N = 8
 
 
 def payload(*, task="far_v2", m_d=None, m_t=None, arms=None, o=None, o_q=None,
-            controls=None, pids=None, estimator="forward", dq=None):
-    """A minimal route_closure.json. Per-instance values default to exact binary fractions."""
+            controls=None, pids=None, estimator="forward", dq=None, o_fwd=None, o_q_fwd=None,
+            offline_rule_arms=True):
+    """A minimal route_closure.json. Per-instance values default to exact binary fractions.
+
+    `o` and `o_q` are the offline outside sums; the forward ones are `o_fwd` and `o_q_fwd`,
+    equal to the offline ones unless given. `estimator="offline"` writes no forward sweep;
+    `offline_rule_arms=False` drops the offline T and dq_all (a forward-only file)."""
     m_d = list(m_d or [1.0] * N)
     m_t = list(m_t or [0.0] * N)
     n = len(m_d)
@@ -52,10 +57,12 @@ def payload(*, task="far_v2", m_d=None, m_t=None, arms=None, o=None, o_q=None,
                                  "margins": list(margins or [0.0] * n)},
                 "O": sum(outside_sum) / sum(gap)}
 
-    offline = {"T": sweep(o, m_t), "dq_all": sweep(o_q, arms["dq_all"][1])}
+    offline = {"T": sweep(o, m_t), "dq_all": sweep(o_q, arms["dq_all"][1])} \
+        if offline_rule_arms else {}
     for name, values in (controls or {}).items():
         offline[name] = sweep(values)
-    forward = {"T": sweep(o, m_t), "dq_all": sweep(o_q, arms["dq_all"][1])}
+    forward = {"T": sweep(list(o_fwd or o), m_t),
+               "dq_all": sweep(list(o_q_fwd or o_q), arms["dq_all"][1])}
     return {
         "schema": "route_closure/1", "task": task,
         "instances": {"ids": [f"i{k}" for k in range(n)], "pressure_ids": pids,
@@ -103,14 +110,101 @@ def test_m_q_r_q_and_the_t2_shares_as_ratios_of_means():
     # Per-instance medians: M_q,i = O_q,i / O_i, r_a,i = (m_D,i - m_a,i) / G_i.
     assert out["t1"]["M_q"]["median"] == pytest.approx(np.median([1.0, 0.5 / 3.0] * 4))
     assert out["t2"]["r_Q"]["median"] == pytest.approx(np.median([0.5, 1.0 / 3.0] * 4))
-    assert out["t1"]["rule_estimator"] == "forward"
+    assert out["t1"]["rule_estimator"] == "offline"
 
 
 def test_the_offline_estimator_is_used_when_the_forward_sweep_did_not_run():
     data = payload(estimator="offline", o=[2.0] * N, o_q=[1.0] * N)
+    for requested in ("offline", "forward"):
+        out = rr.read_task(data, n_resamples=10, seed=1, rule_estimator=requested)
+        assert out["t1"]["rule_estimator"] == "offline"
+        assert out["t1"]["M_q"]["point"] == pytest.approx(0.5)
+        assert out["t1"]["beside"] is None
+    assert out["t1"]["rule_estimator_fallback"].startswith("forward requested")
+
+
+# ==============================================================================
+# THE RULE ESTIMATOR (ruling R9: offline, forward beside it)
+# ==============================================================================
+
+def two_estimators():
+    """Offline M_q 0.75 (closes), forward M_q 0.375 (bypass)."""
+    return payload(o=[1.0] * N, o_q=[0.75] * N, o_fwd=[2.0] * N, o_q_fwd=[0.75] * N,
+                   controls={"c3_push": [0.25] * N})
+
+
+def test_the_default_rule_estimator_is_offline_with_forward_reported_beside_it():
+    out = rr.read_task(two_estimators(), n_resamples=20, seed=1)
+    t1 = out["t1"]
+    assert rr.DEFAULT_RULE_ESTIMATOR == "offline"
+    assert t1["rule_estimator"] == t1["rule_estimator_requested"] == "offline"
+    assert t1["rule_estimator_fallback"] is None
+    assert t1["O"]["point"] == pytest.approx(1.0)
+    assert t1["M_q"]["point"] == pytest.approx(0.75)
+    assert t1["verdict"] == "closes"
+    beside = t1["beside"]
+    assert beside["estimator"] == "forward"
+    assert beside["O"]["point"] == pytest.approx(2.0)
+    assert beside["O_q"]["point"] == pytest.approx(0.75)
+    assert beside["M_q"]["point"] == pytest.approx(0.375)
+    assert beside["verdict_if_read_on_it"] == "bypass"
+    assert beside["M_q"]["ci95"] is not None
+
+
+def test_the_forward_setting_reads_the_rule_on_forward_and_reports_offline_beside_it():
+    out = rr.read_task(two_estimators(), n_resamples=20, seed=1, rule_estimator="forward")
+    t1 = out["t1"]
+    assert t1["rule_estimator"] == "forward"
+    assert t1["M_q"]["point"] == pytest.approx(0.375)
+    assert t1["verdict"] == "bypass" and t1["label"] == "bypass"
+    assert t1["beside"]["estimator"] == "offline"
+    assert t1["beside"]["M_q"]["point"] == pytest.approx(0.75)
+    assert t1["beside"]["verdict_if_read_on_it"] == "closes"
+    # The controls stay offline whichever estimator the rule is read on.
+    assert t1["controls"]["M_C3"]["point"] == pytest.approx(0.25)
+    assert t1["M_q_offline"] == pytest.approx(0.75)
+
+
+def test_offline_requested_on_a_forward_only_file_falls_back_and_says_so():
+    data = payload(o=[1.0] * N, o_q=[0.5] * N, offline_rule_arms=False)
     out = rr.read_task(data, n_resamples=10, seed=1)
-    assert out["t1"]["rule_estimator"] == "offline"
-    assert out["t1"]["M_q"]["point"] == pytest.approx(0.5)
+    assert out["t1"]["rule_estimator"] == "forward"
+    assert out["t1"]["rule_estimator_requested"] == "offline"
+    assert out["t1"]["rule_estimator_fallback"] == \
+        "offline requested but not in this file; forward used"
+    assert out["t1"]["beside"] is None
+
+
+def test_an_unknown_rule_estimator_is_refused():
+    with pytest.raises(ValueError, match="sideways"):
+        rr.read_task(two_estimators(), n_resamples=5, seed=1, rule_estimator="sideways")
+    with pytest.raises(SystemExit):
+        rr.build_parser().parse_args(["x.json", "--rule-estimator", "sideways"])
+    assert rr.build_parser().parse_args(["x.json"]).rule_estimator == "offline"
+
+
+@pytest.mark.parametrize("setting, rule, other", [(None, "offline", "forward"),
+                                                  ("forward", "forward", "offline")])
+def test_main_names_the_estimator_of_every_t1_number(tmp_path, setting, rule, other):
+    path = tmp_path / "route_closure.json"
+    path.write_text(json.dumps(two_estimators()))
+    out_dir = tmp_path / "out"
+    argv = [str(path), "--out-dir", str(out_dir), "--n-resamples", "50"]
+    if setting:
+        argv += ["--rule-estimator", setting]
+    rr.main(argv)
+    readings = json.load(open(out_dir / "b1_readings.json"))
+    assert readings["rule_estimator"] == rule
+    assert readings["tasks"]["far_v2"]["t1"]["rule_estimator"] == rule
+    assert readings["tasks"]["far_v2"]["t1"]["beside"]["estimator"] == other
+    table = open(out_dir / "b1_readings.md").read()
+    # Rows in order: the T1 rule table, the T1 beside table, the T2 table.
+    rule_rows = [line for line in table.splitlines() if line.startswith("| far_v2 |")]
+    assert len(rule_rows) == 3
+    assert rule_rows[0].split("|")[3].strip() == rule
+    assert rule_rows[1].split("|")[2].strip() == other
+    assert "| task | n | estimator | O | O_q | M_q |" in table
+    assert "### T1 on the other estimator, reported beside the rule" in table
 
 
 def test_an_instance_with_a_vanishing_outside_sum_is_left_out_of_the_median_and_counted():

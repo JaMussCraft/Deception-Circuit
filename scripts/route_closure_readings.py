@@ -10,9 +10,13 @@ ruling R1:
   r_K `k_options`, r_out `out_readout`. Key-side when r_K - r_Q >= 0.15, query-side when
   r_Q - r_K >= 0.15, otherwise indeterminate (the frozen rule, `frozen_rule_verdict`). The
   reading (`verdict`) says "indeterminate, ceiling below 0.15" whenever r_out < 0.15 (plan 2.2).
-- **T1** (plan 1.2 to 1.4, R1). M_q = O_q / O = mean_i O_q,i / mean_i O_i (G cancels), from the
-  rule-of-record estimator: the forward sweep, or the offline one when only it ran. The loop
-  closes when M_q >= 0.50, otherwise bypass. R1's qualifier compares M_q with the controls on one
+- **T1** (plan 1.2 to 1.4, R1, R9). M_q = O_q / O = mean_i O_q,i / mean_i O_i (G cancels), from
+  the rule-of-record estimator, `--rule-estimator` (default `offline`, ruling R9: the offline fp32
+  decomposition is the rule of record, because the bf16 forward sweep's sum over about 980 single
+  swaps carried a same-sign rounding error in the B1 smoke, reports/29-handback.md). The other
+  estimator's O, O_q and M_q are reported beside it (`t1.beside`), with the verdict they would
+  give, for information only. When the file lacks the requested estimator the other one is used
+  and `rule_estimator_fallback` says so. The loop closes when M_q >= 0.50, otherwise bypass. R1's qualifier compares M_q with the controls on one
   estimator, the offline one (plan 1.2: "arms are compared on one estimator"): M_X = mean_i
   O_X,i / mean_i O_T,i for C1, C2, C3 and S_k. "closes, route-specific" when M_q is above every
   C1 and C2 draw and M_q - M_C3 >= 0.15; "closes, generic amplification" when M_q - M_C3 < 0.15;
@@ -50,6 +54,10 @@ JSON_NAME = "b1_readings.json"
 MD_NAME = "b1_readings.md"
 SEED = 20261101
 N_RESAMPLES = 2000
+
+OFFLINE, FORWARD = "offline", "forward"
+RULE_ESTIMATORS = (OFFLINE, FORWARD)
+DEFAULT_RULE_ESTIMATOR = OFFLINE   # ruling R9
 
 CLOSES_AT = 0.50          # frozen T1 rule
 SIDE_MARGIN = 0.15        # frozen T2 rule
@@ -202,7 +210,8 @@ def _arm_numerator(data: dict, name: str) -> np.ndarray:
     return _array(base["m_D"]) - margins
 
 
-def read_task(data: dict, *, n_resamples: int = N_RESAMPLES, seed: int = SEED) -> dict:
+def read_task(data: dict, *, n_resamples: int = N_RESAMPLES, seed: int = SEED,
+              rule_estimator: str = DEFAULT_RULE_ESTIMATOR) -> dict:
     base = data["baseline"]
     gap = _array(base["G"])
     pids = data["instances"]["pressure_ids"]
@@ -228,15 +237,30 @@ def read_task(data: dict, *, n_resamples: int = N_RESAMPLES, seed: int = SEED) -
     else:
         t2.update(verdict=None, note="the T2 rule arms were not run")
     out["t2"] = t2
-    out["t1"] = _read_t1(data, gap, resamples)
+    out["t1"] = _read_t1(data, gap, resamples, rule_estimator)
     return out
 
 
-def _read_t1(data: dict, gap: np.ndarray, resamples) -> dict:
+def _has_rule_arms(table: dict) -> bool:
+    return "T" in table and "dq_all" in table
+
+
+def _read_t1(data: dict, gap: np.ndarray, resamples,
+             rule_estimator: str = DEFAULT_RULE_ESTIMATOR) -> dict:
+    if rule_estimator not in RULE_ESTIMATORS:
+        raise ValueError(f"rule estimator {rule_estimator!r} is not one of "
+                         f"{', '.join(RULE_ESTIMATORS)}")
     sweeps = ((data.get("t1") or {}).get("sweeps") or {})
     forward, offline = sweeps.get("forward") or {}, sweeps.get("offline") or {}
-    rule, name = (forward, "forward") if forward else (offline, "offline")
-    if "T" not in rule or "dq_all" not in rule:
+    tables = {FORWARD: forward, OFFLINE: offline}
+    other = FORWARD if rule_estimator == OFFLINE else OFFLINE
+    name, fallback = rule_estimator, None
+    if not _has_rule_arms(tables[rule_estimator]) and _has_rule_arms(tables[other]):
+        name, fallback = other, (f"{rule_estimator} requested but not in this file; "
+                                 f"{other} used")
+        other = rule_estimator
+    rule = tables[name]
+    if not _has_rule_arms(rule):
         return {"verdict": None, "note": f"no T1 sweep in this file "
                                          f"({sweeps.get('status', 'no t1.sweeps')})"}
 
@@ -244,9 +268,20 @@ def _read_t1(data: dict, gap: np.ndarray, resamples) -> dict:
         return _array(table[arm]["per_instance"]["outside_sum"])
 
     o, o_q = sums(rule, "T"), sums(rule, "dq_all")
-    out = {"rule_estimator": name,
+    out = {"rule_estimator": name, "rule_estimator_requested": rule_estimator,
+           "rule_estimator_fallback": fallback,
            "O": statistic(o, gap, resamples), "O_q": statistic(o_q, gap, resamples),
            "M_q": statistic(o_q, o, resamples)}
+    beside = None
+    if _has_rule_arms(tables[other]):
+        b_o, b_o_q = sums(tables[other], "T"), sums(tables[other], "dq_all")
+        b_m_q = statistic(b_o_q, b_o, resamples)
+        beside = {"estimator": other, "role": "reported beside the rule; not the rule",
+                  "O": statistic(b_o, gap, resamples), "O_q": statistic(b_o_q, gap, resamples),
+                  "M_q": b_m_q,
+                  "verdict_if_read_on_it": t1_verdict(b_m_q["point"])
+                  if b_m_q["point"] is not None else None}
+    out["beside"] = beside
     if "dq_all" in (data.get("arms") or {}):
         out["r_q"] = statistic(_arm_numerator(data, "dq_all"), gap, resamples)
     m_q = out["M_q"]["point"]
@@ -309,22 +344,43 @@ def markdown(readings: dict) -> str:
              f"{readings['bootstrap']['n_resamples']} resamples clustered by pressure_id "
              f"(seed {readings['bootstrap']['seed']}).", "",
              "## T1: loop closure", "",
-             "| task | n | O | O_q | M_q | r_q | M_C3 | max C1/C2 | M_S | verdict | label |",
-             "|---|---|---|---|---|---|---|---|---|---|---|"]
+             f"O, O_q and M_q are read on the rule estimator named in the estimator column "
+             f"(requested: {readings.get('rule_estimator', DEFAULT_RULE_ESTIMATOR)}; ruling R9 "
+             f"makes it offline). The controls (M_C3, C1, C2, M_S) are always offline. r_q is "
+             f"the dq_all arm's own margins and needs no estimator.", "",
+             "| task | n | estimator | O | O_q | M_q | r_q | M_C3 | max C1/C2 | M_S | verdict "
+             "| label |",
+             "|---|---|---|---|---|---|---|---|---|---|---|---|"]
     for task, one in readings["tasks"].items():
         t1 = one["t1"]
         if t1.get("verdict") is None:
-            lines.append(f"| {task} | {one['n_instances']} | {t1.get('note', 'n/a')} "
+            lines.append(f"| {task} | {one['n_instances']} | n/a | {t1.get('note', 'n/a')} "
                          f"| | | | | | | | |")
             continue
         controls = t1["controls"]
         draws = [s["point"] for s in list(controls["M_C1"].values())
                  + list(controls["M_C2"].values()) if s["point"] is not None]
         top_draw = f"{max(draws):.3f}" if draws else "n/a"
+        estimator = t1["rule_estimator"] + (" (fallback)" if t1.get("rule_estimator_fallback")
+                                            else "")
         lines.append(
-            f"| {task} | {one['n_instances']} | {_fmt(t1['O'])} | {_fmt(t1['O_q'])} | "
-            f"{_fmt(t1['M_q'])} | {_fmt(t1.get('r_q'))} | {_fmt(controls['M_C3'])} | "
-            f"{top_draw} | {_fmt(controls['M_S'])} | {t1['verdict']} | {t1['label']} |")
+            f"| {task} | {one['n_instances']} | {estimator} | {_fmt(t1['O'])} | "
+            f"{_fmt(t1['O_q'])} | {_fmt(t1['M_q'])} | {_fmt(t1.get('r_q'))} | "
+            f"{_fmt(controls['M_C3'])} | {top_draw} | {_fmt(controls['M_S'])} | "
+            f"{t1['verdict']} | {t1['label']} |")
+    lines += ["", "### T1 on the other estimator, reported beside the rule", "",
+              "Not the rule of record; the verdict column is what M_q on this estimator would "
+              "give, for comparison only.", "",
+              "| task | estimator | O | O_q | M_q | verdict if read on it |",
+              "|---|---|---|---|---|---|"]
+    for task, one in readings["tasks"].items():
+        beside = one["t1"].get("beside")
+        if not beside:
+            lines.append(f"| {task} | n/a | not in this file | | | |")
+            continue
+        lines.append(f"| {task} | {beside['estimator']} | {_fmt(beside['O'])} | "
+                     f"{_fmt(beside['O_q'])} | {_fmt(beside['M_q'])} | "
+                     f"{beside['verdict_if_read_on_it']} |")
     lines += ["", "## T2: key-side or query-side", "",
               "| task | n | P | r_Q | r_K | r_K - r_Q | r_out | verdict | frozen rule |",
               "|---|---|---|---|---|---|---|---|---|"]
@@ -355,6 +411,10 @@ def build_parser() -> argparse.ArgumentParser:
                         help=f"Where {JSON_NAME} and {MD_NAME} go. Default {DEFAULT_OUT_DIR}.")
     parser.add_argument("--n-resamples", type=int, default=N_RESAMPLES)
     parser.add_argument("--seed", type=int, default=SEED)
+    parser.add_argument("--rule-estimator", choices=RULE_ESTIMATORS,
+                        default=DEFAULT_RULE_ESTIMATOR,
+                        help="The estimator O, O_q, M_q and the T1 verdict are read on; the "
+                             "other is reported beside it. Default offline (ruling R9).")
     return parser
 
 
@@ -369,10 +429,14 @@ def main(argv=None) -> dict:
             raise SystemExit(f"{path}: skipped cell ({data['skipped']}); nothing to read")
         if data["task"] in tasks:
             raise SystemExit(f"{path}: a second file for task {data['task']!r}")
-        tasks[data["task"]] = read_task(data, n_resamples=cli.n_resamples, seed=cli.seed)
+        tasks[data["task"]] = read_task(data, n_resamples=cli.n_resamples, seed=cli.seed,
+                                        rule_estimator=cli.rule_estimator)
         inputs.append({"path": path, "task": data["task"], "sha256": _sha256(path),
                        "schema": data.get("schema")})
     readings = {"schema": SCHEMA, "inputs": inputs,
+                "rule_estimator": cli.rule_estimator,
+                "rule_estimator_ruling": "R9: offline is the rule of record for O, O_q and "
+                                         "M_q; forward is reported beside it",
                 "bootstrap": {"n_resamples": cli.n_resamples, "seed": cli.seed,
                               "cluster": "pressure_id"},
                 "rules": {"t1_closes_at": CLOSES_AT, "t2_side_margin": SIDE_MARGIN,
