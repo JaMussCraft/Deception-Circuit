@@ -23,6 +23,8 @@ Three B2 jobs were submitted on Sun 1 Nov 2026 at about 2:45 pm EST from branch 
 | `23412228` | Delta, A100 interactive | P2, the SDR wish test: 29 group knockouts on the 618 reported-wish ids and their D reference | `outputs/_analyses/instructed-route-b2/p2` | Sun 3:30 pm EST |
 | `23412229` | Delta, H200 interactive | P3, the SER MLP replication: seeds 0, 1, 2 on D, H and F for the three tasks | `outputs/_analyses/instructed-route-b2/p3` | Sun 4:00 pm EST |
 | `23412232` | Delta, A100 | P1 smoke, the falsity-probe capture at 64 rows per cell | `outputs/_analyses/instructed-route-b2/p1-smoke` | Sun 3:30 pm EST |
+| `23412257` | Delta, A100 | B3 J1, calibration generation: both variants, 20 queries, 10 samples plus greedy per condition, with the proxy quantities | `outputs/_studies/b3/j1_calibration` | Sun 3:45 pm EST |
+| `23412270` | Delta, A100 | B3 J3, the sycophancy positive control: five sets at the readout against 20 nulls on 800 MMLU items | `outputs/_studies/b3/j3_sycophancy` | Sun 4:00 pm EST |
 
 ## Next action
 
