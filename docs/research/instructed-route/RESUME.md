@@ -1,37 +1,29 @@
 # Resume: instructed-route
 
-Last rewritten: Sun 1 Nov 2026, 4:35 pm EST by claude-230e4716 (after compaction 1).
+Last rewritten: Sun 1 Nov 2026, 7:20 pm EST by claude-230e4716.
 
 ## Status
 
-The direction instructed-route is claimed and registered by session claude-230e4716. B2: P3 (the SER MLP replication) gave F-rte-001 (only mlp.13 replicates; F-mech-009 superseded) and P2 (the SDR wish test) gave F-rte-002 (quartet knockout removes 0.54 of the wish effect, nulls near zero), both independently reviewed; P1 (the falsity probe) waits on its H200 capture job. B3: the calibration run J1 and its judge pass are done, ruling R6 chose variant V-B (judged gap 10.5 on the 20 calibration queries) and proxy P2 (agreement 0.984 against 0.670 for P1), freeze G2 is recorded, and J2 (test generation, 2,600 rows) is queued; J3 (the sycophancy control) is queued. B1: the code is complete through tickets 5 and 6 (committed d73783e); ticket 7 (batch files, dry runs, Bridges-2 and Delta test-only) is in progress and no B1 job has run. Bridges-2 goes offline about 9 November. The pre-registered rules are in spec.md with rulings R1 to R6 and freezes G1 and G2.
+All three sub-directions have run their pre-registered tests; what remains is review, the B3 fallback transfer and wrap-up. **B2 is complete** with reviewed findings F-rte-001 (only mlp.13 replicates on SER), F-rte-002 (the quartet carries 0.54 of the SDR wish) and F-rte-004 (the FAR falsity probe transfers to SER at AUROC 0.9999 but is instruction-confounded under R2). **B1 has run** on the 100 held-out ids on Bridges-2: both tasks read "bypass" on the offline estimator of record (M_q 0.360 far, 0.462 ser, both under 0.50, intervals clear of it) and "query-side" on T2 (r_Q 0.32 and 0.43 against r_K near 0); the independent review (review-B1) is in progress. **B3**: the sycophancy positive control passed (F-rte-003, reviewed); the alignment-faking premise failed on the 100 test queries (judged gap 7.0, interval 3.9 to 10.2, proxy agreement 0.96), so the pre-registered fallback is the transfer on sycophancy alone; need N2 asks the user whether to run the fallback as written (the default) or spend part of the remaining B3 budget on a second elicitation attempt; analysis-B3 is writing the premise up and setting out J4 on sycophancy; impl-B3-t7 is making null draws exclude set members (R10). Rulings R1 to R10 and freezes G1 and G2 are in spec.md.
 
 ## Branch, worktree and commit
 
-- Branch: `instructed-route`.
+- Branch: `instructed-route`, pushed to origin (the Bridges-2 clone tracks it; sync with `scripts/remote/b2.sh sync-code --branch instructed-route`).
 - Worktree: `/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/instructed-route`.
-- Last commit on the branch: `84a0ac9`, "instructed-route B3: ruling R6 (variant V-B, primary proxy P2) and freeze G2 of the calibrated proxy tokens".
-- Uncommitted work: ticket 7's files from impl-B1-t7 (`jobs/B1-{smoke,far,ser}.batch`, `tests/test_instructed_route_b1_jobs.py`, a change to `scripts/remote/b2.sh`), to be committed by file list once its hand-back (reports/23-handback.md) lands. `outputs/_launch_instructed_route/` is a scratch launch directory and stays untracked.
-- Where the records live: the tool-owned records (state.json, worklog.json, WORKLOG.md, ledger.json) live in the main checkout at `/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/instructed-route/`, because the research-session tool mirrors the registered session's state into the checkout that contains the session's launch directory, and the worktree isolation hook refuses other writes there. Pass that main path as the `dir` argument of every research-session command. Everything the session writes itself (RESUME.md, spec.md, plans/, reports/, reviews/, results/, code) lives in the worktree on the branch. The two sets of files meet at the merge.
+- Last commit on the branch: `46dbc7c`, "instructed-route B1: readings on the 100 held-out ids".
+- Uncommitted work: whatever impl-B3-t7, review-B1 and analysis-B3 are writing (hand-backs 31 and 33, review 05, and spontaneous/sets.py with its tests). `outputs/_launch_instructed_route/`, `outputs/_suites/mechanism-analysis/` and `outputs/_suites/mechanism-v2-coarse.b2local-261025/` are untracked fetch or scratch directories and stay untracked.
+- Where the records live: the tool-owned records (state.json, worklog.json, WORKLOG.md, ledger.json) live in the main checkout at `/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/instructed-route/`; pass that path as the `dir` argument of every research-session command. Everything else lives in the worktree on the branch.
 
 ## In-flight jobs
 
-All on Delta under bimc-delta-gpu; the waiters are armed in this session and must be re-armed from `research-session job list` after a compaction. The ledger holds 5.75 of 65 GPU-hours reserved (r-001 to r-007) and $0.55 of $20 OpenRouter spent.
-
-| Job | Partition | What it computes | Output directory | State at rewrite |
-|---|---|---|---|---|
-| `23412454` | gpuH200x8-interactive | P1 capture: falsity-probe residuals and per-token attribution for 9,972 rows in 18 cells | `outputs/_analyses/instructed-route-b2/p1-cap` | pending (priority) since 3:42 pm |
-| `23412270` | gpuA100x4 | B3 J3, the sycophancy positive control: five sets at the readout against 20 nulls on 800 MMLU items | `outputs/_studies/b3/j3_sycophancy` | pending (priority) since 3:33 pm |
-| `23412904` | gpuA100x4 | B3 J2, test generation: V-B, 100 test queries, base with 10 samples plus greedy per tier, greedy-only C1 and C2; 75 min reserved, 0.57 h estimated | `outputs/_studies/b3/j2_test` | submitted 4:30 pm |
+None. Every submitted job has completed and been reconciled: r-001 to r-010, 10.0 of 65 GPU-hours reserved and about 3.6 used; OpenRouter 2.38 of 20 dollars. Bridges-2 (cis260361p) goes offline about 9 November; its SSH masters (`bridges2`, `b2dtn`) were opened non-interactively this session and die with it. Fetch with `DC_DELTA_REPO_ROOT=<this worktree> scripts/remote/b2.sh fetch`.
 
 ## Next action
 
-1. When J2 completes: reconcile the ledger, then judge the 2,200 base rows with `scripts/b3_judge.py` under the existing reviewed main ledger (`outputs/_studies/b3/judge/ledger_main.jsonl`, $10 cap), run the 200-row Sonnet cross-check under a new reviewed ledger ($3) and the 10% re-judge through a separate cache, record the spend with `ledger api`, then `scripts/b3_premise.py` with `--labels`, `--sonnet-labels`, `--rejudge-labels` and `--tokens spontaneous/grader/proxy_tokens_g2.json` for the premise verdict (gap at least 10 on at least 50 queries, agree at least 0.80). Log the verdict as a decision; ask the user before dropping B3 to sycophancy alone if it fails.
-2. When J3 completes: reconcile, read the sycophancy control result, hand it to a reviewer, log a finding.
-3. When the P1 capture completes: reconcile, run `scripts/falsity_probe.py fit`, `score` and `read` on p1-cap per `plans/B2-plan.md` section 1 and ruling R2, review, log the finding and add the FINDINGS row.
-4. When impl-B1-t7 hands back: commit its files by list, push the branch `instructed-route` (not main) so `scripts/remote/b2.sh sync-code` can fetch it, submit the B1 smoke to Bridges-2 (Delta H200 as the fallback), then far and ser, run `scripts/route_closure_readings.py`, review, log findings.
-5. After the premise verdict: J4 transfer (`scripts/jobs/run_b3_patch.sh --task af --proxy P2`, split arms, H200), C3 control, optional scratchpad.
-6. Before any merge: run the full test suite on both interpreters and compare failures by name with the baseline; wrap up per `docs/agents/research-session.md` (README handoff, FINDINGS rows, release, render, memory note); ask the user before merging to main.
+1. When review-B1 hands back (reviews/05-b1-review.md): commit, log the finding(s), add the FINDINGS rows (next free number F-rte-005), findings-check.
+2. When analysis-B3 hands back (reports/33-handback.md): commit, add the premise FINDINGS row after an independent review, and act on need N2 (default: J4 on sycophancy alone under R5 and R10). Before J4: commit impl-B3-t7's member-excluded null draws (hand-back 31), run the knockout parity check (`scripts/jobs/run_b3_patch.sh` with `--parity-check`, about 0.13 GPU-h, FAR held-out f_D 0.893 within 0.01), then submit J4 (`--task syc`, H200 per hand-back 18, about 1 GPU-h) under beto-delta-gpu if bimc is still stalled.
+3. After J4: readings, review, FINDINGS row.
+4. Wrap-up per `docs/agents/research-session.md`: full test suite on both interpreters compared by name with the baseline, README.md handoff, `research-session release`, render, memory note; delete the stray hand-back copies in the main checkout; ask the user before merging to main.
 
 ## Do not
 
@@ -39,9 +31,11 @@ All on Delta under bimc-delta-gpu; the waiters are armed in this session and mus
 - Do not resume the closed SDR gates or stopped assays listed in `docs/research/sdr-mechanism/README.md`.
 - Do not write under `docs/research/specificity-ladder/`, which the Codex session codex-01a1987e owns, and do not touch `.scratch/sdr-*`, `.scratch/selective-deception`, `outputs/_studies/selective-deception` or `.scratch/eval5-grader-fixes`.
 - Do not score any set listed in `docs/research/held_out.json`; the held-out sample here means the mechanism-analysis sample of 100 ids with seed 1.
-- Do not edit `spontaneous/grader/af_judge_prompt.txt`, `af_judge_config.json`, `spontaneous/judge.py`, `spontaneous/grader/proxy_tokens.json` or `proxy_tokens_g2.json` (freezes G1 and G2); a change is a new ruling and a new hash.
-- Do not put the word for a model's output score (the one ending in "it") in a shell command: the worktree isolation hook matches a three-letter substring of it and refuses the command. Write "answer-token attribution" instead. The hook also refuses research-session commands with long quoted text inside compound commands; run each as a single plain command.
+- Do not edit the frozen grader files (`spontaneous/grader/af_judge_prompt.txt`, `af_judge_config.json`, `spontaneous/judge.py`, `spontaneous/grader/proxy_tokens.json`, `proxy_tokens_g2.json`); a change is a new ruling and a new hash.
+- Do not put the word for a model's output score (the one ending in "it") in a shell command, nor "git fingerprint" or similar in research-session text: the worktree isolation hook matches the three-letter substring and refuses the command. The hook also refuses research-session commands inside compound commands; run each as a single plain command.
+- Do not run `scripts/route_closure_readings.py` without `--out-dir`: its default writes into `docs/research/instructed-route/results/`.
 
 ## Open decisions for the user
 
 - N1 (resolved Sun 1 Nov 2026): the B3 grader hashes stay in spec.md only.
+- N2 (open, Sun 1 Nov 2026): the B3 premise failed; run the pre-registered sycophancy-only fallback (default) or spend part of the remaining B3 budget on a second elicitation attempt first.
