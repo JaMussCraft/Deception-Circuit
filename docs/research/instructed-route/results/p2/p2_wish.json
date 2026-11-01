@@ -1,0 +1,4783 @@
+{
+ "rule": "The wish runs through the route when the quartet's neutral-twin interchange at all positions gives f_wish = (mean m_I - mean m_KO) / (mean m_I - mean m_tw) >= 0.5 on the 618 ids; when any of the 20 layer-matched random quartets or the seven other layer-17 KV groups also reaches 0.5, the verdict is labelled 'not quartet-specific' (spec R3).",
+ "verdict": {
+  "rule": "The wish runs through the route when the quartet's neutral-twin interchange at all positions gives f_wish = (mean m_I - mean m_KO) / (mean m_I - mean m_tw) >= 0.5 on the 618 ids; when any of the 20 layer-matched random quartets or the seven other layer-17 KV groups also reaches 0.5, the verdict is labelled 'not quartet-specific' (spec R3).",
+  "quartet": "quartet",
+  "quartet_f": 0.5395058419032447,
+  "quartet_ci": {
+   "instructed_inversion_id": [
+    0.5237231954325325,
+    0.5549830420344402
+   ],
+   "pressure_id": [
+    0.5192685830970183,
+    0.554048947403887
+   ]
+  },
+  "passes": true,
+  "null_max": {
+   "null_d": 0.03322568155537007,
+   "kvg": 0.005134888419639975
+  },
+  "null_argmax": {
+   "null_d": "null_d12",
+   "kvg": "kvg_7"
+  },
+  "labels": [],
+  "text": "f_wish(quartet) = 0.540 >= 0.5: the wish runs through the route",
+  "status": "complete"
+ },
+ "checks": {
+  "ok": true,
+  "failed": [],
+  "tolerance": 0.05,
+  "items": {
+   "n": {
+    "observed": 618,
+    "expected": 618,
+    "ok": true
+   },
+   "mean_clean": {
+    "observed": 3.144493436350406,
+    "expected": 3.15,
+    "ok": true
+   },
+   "mean_twin": {
+    "observed": -2.9213583893760506,
+    "expected": -2.92,
+    "ok": true
+   },
+   "unpaired": {
+    "observed": 0,
+    "expected": 0,
+    "ok": true
+   },
+   "groups_json": {
+    "observed": true,
+    "expected": true,
+    "ok": true
+   }
+  }
+ },
+ "primary": {
+  "cell": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/instructed-route/outputs/_analyses/instructed-route-b2/p2/wish_all/U__leaf/sdr_v2",
+  "groups_file": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/instructed-route/outputs/_analyses/instructed-route-b2/p2/wish_all/U__leaf/sdr_v2/knockout/groups.json",
+  "plan": {
+   "scheme": "interchange",
+   "counterfactual": "neutral_twin",
+   "positions": "all",
+   "column_suffix": "_neutral_twin_paired"
+  },
+  "n": 618,
+  "n_excluded": 0,
+  "n_unpaired": 0,
+  "n_clusters": {
+   "instructed_inversion_id": 41,
+   "pressure_id": 20
+  },
+  "mean_clean": 3.144493436350406,
+  "mean_twin": -2.9213583893760506,
+  "consistent_with_groups_json": true,
+  "manifest_problem": null,
+  "groups": {
+   "quartet": {
+    "f": 0.5395058419032447,
+    "passes": true,
+    "ci": {
+     "instructed_inversion_id": [
+      0.5237231954325325,
+      0.5549830420344402
+     ],
+     "pressure_id": [
+      0.5192685830970183,
+      0.554048947403887
+     ]
+    },
+    "mean_knocked": -0.12806905974847985,
+    "members": [
+     "head.17.24",
+     "head.17.25",
+     "head.17.26",
+     "head.17.27"
+    ],
+    "n_components": 4
+   },
+   "L17H24": {
+    "f": 0.3630585649042807,
+    "passes": false,
+    "ci": {
+     "instructed_inversion_id": [
+      0.353976794641412,
+      0.3710664632460329
+     ],
+     "pressure_id": [
+      0.35172486284776194,
+      0.37126017877116585
+     ]
+    },
+    "mean_knocked": 0.9422339775801477,
+    "members": [
+     "head.17.24"
+    ],
+    "n_components": 1
+   },
+   "kvg_0": {
+    "f": 0.002503309061212133,
+    "passes": false,
+    "ci": {
+     "instructed_inversion_id": [
+      0.0018942905833549159,
+      0.0030419864546830607
+     ],
+     "pressure_id": [
+      0.0020373858902259386,
+      0.002939218059991109
+     ]
+    },
+    "mean_knocked": 3.1293087345110946,
+    "members": [
+     "head.17.0",
+     "head.17.1",
+     "head.17.2",
+     "head.17.3"
+    ],
+    "n_components": 4
+   },
+   "kvg_1": {
+    "f": 0.0005374319998616436,
+    "passes": false,
+    "ci": {
+     "instructed_inversion_id": [
+      -0.000562714603017141,
+      0.0016586011060275448
+     ],
+     "pressure_id": [
+      -0.0005577413658508243,
+      0.0015176011106148603
+     ]
+    },
+    "mean_knocked": 3.141233453472841,
+    "members": [
+     "head.17.4",
+     "head.17.5",
+     "head.17.6",
+     "head.17.7"
+    ],
+    "n_components": 4
+   },
+   "kvg_2": {
+    "f": -0.0008590988914795172,
+    "passes": false,
+    "ci": {
+     "instructed_inversion_id": [
+      -0.0013512393056463827,
+      -0.0003617958464875471
+     ],
+     "pressure_id": [
+      -0.001427108566088372,
+      -0.0003482676943378111
+     ]
+    },
+    "mean_knocked": 3.1497046029297664,
+    "members": [
+     "head.17.8",
+     "head.17.9",
+     "head.17.10",
+     "head.17.11"
+    ],
+    "n_components": 4
+   },
+   "kvg_3": {
+    "f": 0.004652217887552152,
+    "passes": false,
+    "ci": {
+     "instructed_inversion_id": [
+      0.003774189219347612,
+      0.0054440756305136305
+     ],
+     "pressure_id": [
+      0.0038997495908191905,
+      0.005401104854719025
+     ]
+    },
+    "mean_knocked": 3.1162737719835203,
+    "members": [
+     "head.17.12",
+     "head.17.13",
+     "head.17.14",
+     "head.17.15"
+    ],
+    "n_components": 4
+   },
+   "kvg_4": {
+    "f": 0.0001777508968695413,
+    "passes": false,
+    "ci": {
+     "instructed_inversion_id": [
+      -0.00040638761486233756,
+      0.0007283977158454997
+     ],
+     "pressure_id": [
+      -0.0003267531772914836,
+      0.0006590139782442856
+     ]
+    },
+    "mean_knocked": 3.143415225748105,
+    "members": [
+     "head.17.16",
+     "head.17.17",
+     "head.17.18",
+     "head.17.19"
+    ],
+    "n_components": 4
+   },
+   "kvg_5": {
+    "f": -0.003197361871021875,
+    "passes": false,
+    "ci": {
+     "instructed_inversion_id": [
+      -0.0045153926342090195,
+      -0.001846279137755514
+     ],
+     "pressure_id": [
+      -0.0046662082905720124,
+      -0.0018187670126233125
+     ]
+    },
+    "mean_knocked": 3.163888159693252,
+    "members": [
+     "head.17.20",
+     "head.17.21",
+     "head.17.22",
+     "head.17.23"
+    ],
+    "n_components": 4
+   },
+   "kvg_7": {
+    "f": 0.005134888419639975,
+    "passes": false,
+    "ci": {
+     "instructed_inversion_id": [
+      0.0042085826741832715,
+      0.005995466755554344
+     ],
+     "pressure_id": [
+      0.004344814583415499,
+      0.006004618878758187
+     ]
+    },
+    "mean_knocked": 3.113345964055231,
+    "members": [
+     "head.17.28",
+     "head.17.29",
+     "head.17.30",
+     "head.17.31"
+    ],
+    "n_components": 4
+   },
+   "null_d00": {
+    "f": 0.01118463547035642,
+    "passes": false,
+    "ci": {
+     "instructed_inversion_id": [
+      0.010288077181784532,
+      0.011935091612298793
+     ],
+     "pressure_id": [
+      0.01024357692775305,
+      0.012169546884331016
+     ]
+    },
+    "mean_knocked": 3.0766490948624594,
+    "members": [
+     "head.17.2",
+     "head.17.3",
+     "head.17.12",
+     "head.17.23"
+    ],
+    "n_components": 4
+   },
+   "null_d01": {
+    "f": 0.006495185910708178,
+    "passes": false,
+    "ci": {
+     "instructed_inversion_id": [
+      0.004745689744232004,
+      0.008062248432504264
+     ],
+     "pressure_id": [
+      0.005063313830425171,
+      0.007968840463469304
+     ]
+    },
+    "mean_knocked": 3.105094601035504,
+    "members": [
+     "head.17.2",
+     "head.17.12",
+     "head.17.18",
+     "head.17.20"
+    ],
+    "n_components": 4
+   },
+   "null_d02": {
+    "f": -0.0017651964407408736,
+    "passes": false,
+    "ci": {
+     "instructed_inversion_id": [
+      -0.0030262742509503775,
+      -0.0005675775632623885
+     ],
+     "pressure_id": [
+      -0.0029864626750863966,
+      -0.0008339022138891385
+     ]
+    },
+    "mean_knocked": 3.1552008564032397,
+    "members": [
+     "head.17.2",
+     "head.17.4",
+     "head.17.5",
+     "head.17.6"
+    ],
+    "n_components": 4
+   },
+   "null_d03": {
+    "f": -0.03795881593774221,
+    "passes": false,
+    "ci": {
+     "instructed_inversion_id": [
+      -0.040171983005898554,
+      -0.0356945246519036
+     ],
+     "pressure_id": [
+      -0.04028068473758177,
+      -0.03581482583808829
+     ]
+    },
+    "mean_knocked": 3.374745989308774,
+    "members": [
+     "head.17.6",
+     "head.17.10",
+     "head.17.20",
+     "head.17.23"
+    ],
+    "n_components": 4
+   },
+   "null_d04": {
+    "f": 0.020298765121524075,
+    "passes": false,
+    "ci": {
+     "instructed_inversion_id": [
+      0.018691135500767155,
+      0.02176860732790777
+     ],
+     "pressure_id": [
+      0.018305748192629732,
+      0.022034591496283416
+     ]
+    },
+    "mean_knocked": 3.0213641348780165,
+    "members": [
+     "head.17.4",
+     "head.17.21",
+     "head.17.29",
+     "head.17.30"
+    ],
+    "n_components": 4
+   },
+   "null_d05": {
+    "f": 0.016954352519412436,
+    "passes": false,
+    "ci": {
+     "instructed_inversion_id": [
+      0.015049664581602925,
+      0.018552692632879716
+     ],
+     "pressure_id": [
+      0.014586980127568275,
+      0.018962117035816354
+     ]
+    },
+    "mean_knocked": 3.041650846166518,
+    "members": [
+     "head.17.1",
+     "head.17.2",
+     "head.17.4",
+     "head.17.20"
+    ],
+    "n_components": 4
+   },
+   "null_d06": {
+    "f": 0.006502760463526697,
+    "passes": false,
+    "ci": {
+     "instructed_inversion_id": [
+      0.005381184965888054,
+      0.007406786412266926
+     ],
+     "pressure_id": [
+      0.005476052223187371,
+      0.007595526778428717
+     ]
+    },
+    "mean_knocked": 3.1050486549204606,
+    "members": [
+     "head.17.12",
+     "head.17.14",
+     "head.17.18",
+     "head.17.21"
+    ],
+    "n_components": 4
+   },
+   "null_d07": {
+    "f": 0.002709615518492278,
+    "passes": false,
+    "ci": {
+     "instructed_inversion_id": [
+      0.0019896910257503693,
+      0.003445703537121659
+     ],
+     "pressure_id": [
+      0.0018573834825019772,
+      0.0036974392769550416
+     ]
+    },
+    "mean_knocked": 3.1280573101105427,
+    "members": [
+     "head.17.7",
+     "head.17.9",
+     "head.17.10",
+     "head.17.14"
+    ],
+    "n_components": 4
+   },
+   "null_d08": {
+    "f": 0.009168496287680192,
+    "passes": false,
+    "ci": {
+     "instructed_inversion_id": [
+      0.00820658906448407,
+      0.009987755603298065
+     ],
+     "pressure_id": [
+      0.008359411158388065,
+      0.009902532744996417
+     ]
+    },
+    "mean_knocked": 3.0888786964046147,
+    "members": [
+     "head.17.1",
+     "head.17.5",
+     "head.17.9",
+     "head.17.15"
+    ],
+    "n_components": 4
+   },
+   "null_d09": {
+    "f": 0.01077545138037084,
+    "passes": false,
+    "ci": {
+     "instructed_inversion_id": [
+      0.008477725394017586,
+      0.01272592926241082
+     ],
+     "pressure_id": [
+      0.00860486250736163,
+      0.012857972472725025
+     ]
+    },
+    "mean_knocked": 3.0791311449217567,
+    "members": [
+     "head.17.5",
+     "head.17.9",
+     "head.17.18",
+     "head.17.20"
+    ],
+    "n_components": 4
+   },
+   "null_d10": {
+    "f": 0.011383271211018562,
+    "passes": false,
+    "ci": {
+     "instructed_inversion_id": [
+      0.010071467723893637,
+      0.012467946667081614
+     ],
+     "pressure_id": [
+      0.009925459750674345,
+      0.012811816188294084
+     ]
+    },
+    "mean_knocked": 3.0754441998923094,
+    "members": [
+     "head.17.5",
+     "head.17.8",
+     "head.17.11",
+     "head.17.14"
+    ],
+    "n_components": 4
+   },
+   "null_d11": {
+    "f": -0.02450108296287421,
+    "passes": false,
+    "ci": {
+     "instructed_inversion_id": [
+      -0.0257199181890962,
+      -0.023257305139665185
+     ],
+     "pressure_id": [
+      -0.026303522599813174,
+      -0.022695957835907433
+     ]
+    },
+    "mean_knocked": 3.2931133751730317,
+    "members": [
+     "head.17.6",
+     "head.17.12",
+     "head.17.16",
+     "head.17.29"
+    ],
+    "n_components": 4
+   },
+   "null_d12": {
+    "f": 0.03322568155537007,
+    "passes": false,
+    "ci": {
+     "instructed_inversion_id": [
+      0.030881657365415188,
+      0.035157099797695504
+     ],
+     "pressure_id": [
+      0.030391988126134997,
+      0.035834400914780046
+     ]
+    },
+    "mean_knocked": 2.9429513752267584,
+    "members": [
+     "head.17.0",
+     "head.17.4",
+     "head.17.5",
+     "head.17.30"
+    ],
+    "n_components": 4
+   },
+   "null_d13": {
+    "f": 0.0019390809423079614,
+    "passes": false,
+    "ci": {
+     "instructed_inversion_id": [
+      0.0010910744541090835,
+      0.0028326856715135953
+     ],
+     "pressure_id": [
+      0.0012069871515058702,
+      0.0028103618022808506
+     ]
+    },
+    "mean_knocked": 3.1327312586762757,
+    "members": [
+     "head.17.2",
+     "head.17.7",
+     "head.17.17",
+     "head.17.18"
+    ],
+    "n_components": 4
+   },
+   "null_d14": {
+    "f": -0.002216906299825,
+    "passes": false,
+    "ci": {
+     "instructed_inversion_id": [
+      -0.002884422950720538,
+      -0.001450973044019269
+     ],
+     "pressure_id": [
+      -0.00300173169883493,
+      -0.0014215495213594402
+     ]
+    },
+    "mean_knocked": 3.1579408614766638,
+    "members": [
+     "head.17.0",
+     "head.17.9",
+     "head.17.15",
+     "head.17.22"
+    ],
+    "n_components": 4
+   },
+   "null_d15": {
+    "f": -0.028873463176364904,
+    "passes": false,
+    "ci": {
+     "instructed_inversion_id": [
+      -0.030797746414082373,
+      -0.026909934598637286
+     ],
+     "pressure_id": [
+      -0.03080548014739486,
+      -0.027075693840661063
+     ]
+    },
+    "mean_knocked": 3.3196355856738045,
+    "members": [
+     "head.17.6",
+     "head.17.12",
+     "head.17.20",
+     "head.17.31"
+    ],
+    "n_components": 4
+   },
+   "null_d16": {
+    "f": 0.021215392861228876,
+    "passes": false,
+    "ci": {
+     "instructed_inversion_id": [
+      0.019709294945589463,
+      0.0225210279893239
+     ],
+     "pressure_id": [
+      0.019460925180145985,
+      0.022817930584703737
+     ]
+    },
+    "mean_knocked": 3.0158040068296166,
+    "members": [
+     "head.17.0",
+     "head.17.4",
+     "head.17.7",
+     "head.17.31"
+    ],
+    "n_components": 4
+   },
+   "null_d17": {
+    "f": -0.0368992043306998,
+    "passes": false,
+    "ci": {
+     "instructed_inversion_id": [
+      -0.03888403591950816,
+      -0.03477580788010239
+     ],
+     "pressure_id": [
+      -0.03900265140664575,
+      -0.034895513958876086
+     ]
+    },
+    "mean_knocked": 3.3683185423076347,
+    "members": [
+     "head.17.6",
+     "head.17.10",
+     "head.17.20",
+     "head.17.30"
+    ],
+    "n_components": 4
+   },
+   "null_d18": {
+    "f": -0.000984094531481541,
+    "passes": false,
+    "ci": {
+     "instructed_inversion_id": [
+      -0.0016625603337686987,
+      -0.00024258624730046918
+     ],
+     "pressure_id": [
+      -0.0018101371528220938,
+      -0.00019781326584737504
+     ]
+    },
+    "mean_knocked": 3.1504628079608805,
+    "members": [
+     "head.17.15",
+     "head.17.16",
+     "head.17.22",
+     "head.17.29"
+    ],
+    "n_components": 4
+   },
+   "null_d19": {
+    "f": 0.009240285871204562,
+    "passes": false,
+    "ci": {
+     "instructed_inversion_id": [
+      0.007791912715862227,
+      0.010380094167012372
+     ],
+     "pressure_id": [
+      0.00809738776045716,
+      0.010474562292319882
+     ]
+    },
+    "mean_knocked": 3.088443231428325,
+    "members": [
+     "head.17.12",
+     "head.17.14",
+     "head.17.16",
+     "head.17.18"
+    ],
+    "n_components": 4
+   }
+  }
+ },
+ "bootstrap": {
+  "n_boot": 2000,
+  "seed": 20261101,
+  "cluster_keys": [
+   "instructed_inversion_id",
+   "pressure_id"
+  ]
+ },
+ "locate": {
+  "readout": {
+   "cell": {
+    "cell": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/instructed-route/outputs/_analyses/instructed-route-b2/p2/wish_readout/U__leaf/sdr_v2",
+    "groups_file": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/instructed-route/outputs/_analyses/instructed-route-b2/p2/wish_readout/U__leaf/sdr_v2/knockout/groups.json",
+    "plan": {
+     "scheme": "interchange",
+     "counterfactual": "neutral_twin",
+     "positions": "readout",
+     "column_suffix": "_neutral_twin_paired_at_readout"
+    },
+    "n": 618,
+    "n_excluded": 0,
+    "n_unpaired": 0,
+    "n_clusters": {
+     "instructed_inversion_id": 41,
+     "pressure_id": 20
+    },
+    "mean_clean": 3.144493436350406,
+    "mean_twin": -2.9213583893760506,
+    "consistent_with_groups_json": true,
+    "manifest_problem": null,
+    "groups": {
+     "quartet": {
+      "f": 0.5125263710585128,
+      "passes": true,
+      "ci": {
+       "instructed_inversion_id": [
+        0.49560885404593047,
+        0.5289296936965305
+       ],
+       "pressure_id": [
+        0.49267454573093605,
+        0.526816676374233
+       ]
+      },
+      "mean_knocked": 0.035584412732170626,
+      "members": [
+       "head.17.24",
+       "head.17.25",
+       "head.17.26",
+       "head.17.27"
+      ],
+      "n_components": 4
+     },
+     "L17H24": {
+      "f": 0.34311949004420583,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.3338400578918975,
+        0.35120395107201
+       ],
+       "pressure_id": [
+        0.33222631030279254,
+        0.35080790446896143
+       ]
+      },
+      "mean_knocked": 1.063181451223429,
+      "members": [
+       "head.17.24"
+      ],
+      "n_components": 1
+     },
+     "kvg_0": {
+      "f": 0.0024105924032319275,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.002009056190438002,
+        0.0027973889099071098
+       ],
+       "pressure_id": [
+        0.0020865529011652863,
+        0.0027702350746084607
+       ]
+      },
+      "mean_knocked": 3.129871140020179,
+      "members": [
+       "head.17.0",
+       "head.17.1",
+       "head.17.2",
+       "head.17.3"
+      ],
+      "n_components": 4
+     },
+     "kvg_1": {
+      "f": 5.3597834919949145e-05,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.0009845801060550763,
+        0.0010082729419573961
+       ],
+       "pressure_id": [
+        -0.0010434874539794765,
+        0.000962276755685536
+       ]
+      },
+      "mean_knocked": 3.1441683198256016,
+      "members": [
+       "head.17.4",
+       "head.17.5",
+       "head.17.6",
+       "head.17.7"
+      ],
+      "n_components": 4
+     },
+     "kvg_2": {
+      "f": -0.0009917403167441397,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.0014186534985785686,
+        -0.0006120517916659364
+       ],
+       "pressure_id": [
+        -0.0013940645280066473,
+        -0.0006130801843388517
+       ]
+      },
+      "mean_knocked": 3.1505091861613748,
+      "members": [
+       "head.17.8",
+       "head.17.9",
+       "head.17.10",
+       "head.17.11"
+      ],
+      "n_components": 4
+     },
+     "kvg_3": {
+      "f": 0.0036999210102919193,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.0030658283255684785,
+        0.004356387855805759
+       ],
+       "pressure_id": [
+        0.0031023372995453804,
+        0.004265201478200763
+       ]
+      },
+      "mean_knocked": 3.122050263735083,
+      "members": [
+       "head.17.12",
+       "head.17.13",
+       "head.17.14",
+       "head.17.15"
+      ],
+      "n_components": 4
+     },
+     "kvg_4": {
+      "f": 0.0003397273690039193,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.00032800384758697857,
+        0.0009276984704554324
+       ],
+       "pressure_id": [
+        -0.0003217737586438911,
+        0.001016925982994796
+       ]
+      },
+      "mean_knocked": 3.142432700468884,
+      "members": [
+       "head.17.16",
+       "head.17.17",
+       "head.17.18",
+       "head.17.19"
+      ],
+      "n_components": 4
+     },
+     "kvg_5": {
+      "f": -0.003033039816265546,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.004351157496071787,
+        -0.0018009419569307342
+       ],
+       "pressure_id": [
+        -0.004545690906908992,
+        -0.0018300787133227574
+       ]
+      },
+      "mean_knocked": 3.162891406457401,
+      "members": [
+       "head.17.20",
+       "head.17.21",
+       "head.17.22",
+       "head.17.23"
+      ],
+      "n_components": 4
+     },
+     "kvg_7": {
+      "f": 0.004698043245219863,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.004038866071968467,
+        0.0053463853051817865
+       ],
+       "pressure_id": [
+        0.003954575838810853,
+        0.005415765751366396
+       ]
+      },
+      "mean_knocked": 3.115995802154047,
+      "members": [
+       "head.17.28",
+       "head.17.29",
+       "head.17.30",
+       "head.17.31"
+      ],
+      "n_components": 4
+     },
+     "null_d00": {
+      "f": 0.010499011493890641,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.009469222331706975,
+        0.011409842563306257
+       ],
+       "pressure_id": [
+        0.009515814239981189,
+        0.011618395603970225
+       ]
+      },
+      "mean_knocked": 3.080807988311866,
+      "members": [
+       "head.17.2",
+       "head.17.3",
+       "head.17.12",
+       "head.17.23"
+      ],
+      "n_components": 4
+     },
+     "null_d01": {
+      "f": 0.006591509983176373,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.004968654415618565,
+        0.007884682618216659
+       ],
+       "pressure_id": [
+        0.004990697585615584,
+        0.008182422587857029
+       ]
+      },
+      "mean_knocked": 3.104510313484661,
+      "members": [
+       "head.17.2",
+       "head.17.12",
+       "head.17.18",
+       "head.17.20"
+      ],
+      "n_components": 4
+     },
+     "null_d02": {
+      "f": -0.0005379326621827396,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.0017969596901115598,
+        0.0005626471787183277
+       ],
+       "pressure_id": [
+        -0.0017331910323937398,
+        0.0004548595282451815
+       ]
+      },
+      "mean_knocked": 3.147756456171425,
+      "members": [
+       "head.17.2",
+       "head.17.4",
+       "head.17.5",
+       "head.17.6"
+      ],
+      "n_components": 4
+     },
+     "null_d03": {
+      "f": -0.03629735479646992,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.03827915323122629,
+        -0.03424236608754556
+       ],
+       "pressure_id": [
+        -0.038294630855999115,
+        -0.034477772504090294
+       ]
+      },
+      "mean_knocked": 3.364667812211614,
+      "members": [
+       "head.17.6",
+       "head.17.10",
+       "head.17.20",
+       "head.17.23"
+      ],
+      "n_components": 4
+     },
+     "null_d04": {
+      "f": 0.018379948283139175,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.01674901421589119,
+        0.01988350122759598
+       ],
+       "pressure_id": [
+        0.01644831214339627,
+        0.02004133812696784
+       ]
+      },
+      "mean_knocked": 3.033003393500368,
+      "members": [
+       "head.17.4",
+       "head.17.21",
+       "head.17.29",
+       "head.17.30"
+      ],
+      "n_components": 4
+     },
+     "null_d05": {
+      "f": 0.016242606588106688,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.014608488385817471,
+        0.017580740273140966
+       ],
+       "pressure_id": [
+        0.014272608100680248,
+        0.01794876773560939
+       ]
+      },
+      "mean_knocked": 3.0459681915233823,
+      "members": [
+       "head.17.1",
+       "head.17.2",
+       "head.17.4",
+       "head.17.20"
+      ],
+      "n_components": 4
+     },
+     "null_d06": {
+      "f": 0.0060493354289504865,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.005139817255514526,
+        0.006823952070278434
+       ],
+       "pressure_id": [
+        0.004906225722755286,
+        0.007268007789066081
+       ]
+      },
+      "mean_knocked": 3.1077990639942747,
+      "members": [
+       "head.17.12",
+       "head.17.14",
+       "head.17.18",
+       "head.17.21"
+      ],
+      "n_components": 4
+     },
+     "null_d07": {
+      "f": 0.0017288963872524245,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.0010666435581118134,
+        0.002423725009494528
+       ],
+       "pressure_id": [
+        0.0010866456680596814,
+        0.0025159442274191603
+       ]
+      },
+      "mean_knocked": 3.134006207043299,
+      "members": [
+       "head.17.7",
+       "head.17.9",
+       "head.17.10",
+       "head.17.14"
+      ],
+      "n_components": 4
+     },
+     "null_d08": {
+      "f": 0.00886283481743748,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.007871826254067158,
+        0.00961925807714733
+       ],
+       "pressure_id": [
+        0.007610742844816332,
+        0.009839487938270079
+       ]
+      },
+      "mean_knocked": 3.0907327935919406,
+      "members": [
+       "head.17.1",
+       "head.17.5",
+       "head.17.9",
+       "head.17.15"
+      ],
+      "n_components": 4
+     },
+     "null_d09": {
+      "f": 0.010944440177818891,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.008840987160517302,
+        0.012678568104590154
+       ],
+       "pressure_id": [
+        0.009011506264003533,
+        0.012872101395299493
+       ]
+      },
+      "mean_knocked": 3.078106083916229,
+      "members": [
+       "head.17.5",
+       "head.17.9",
+       "head.17.18",
+       "head.17.20"
+      ],
+      "n_components": 4
+     },
+     "null_d10": {
+      "f": 0.012021683849976712,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.010713917883930621,
+        0.013084872075771924
+       ],
+       "pressure_id": [
+        0.010590208785879265,
+        0.013396285101457142
+       ]
+      },
+      "mean_knocked": 3.0715716834207183,
+      "members": [
+       "head.17.5",
+       "head.17.8",
+       "head.17.11",
+       "head.17.14"
+      ],
+      "n_components": 4
+     },
+     "null_d11": {
+      "f": -0.02434569549181461,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.025661252611366623,
+        -0.022999800599310782
+       ],
+       "pressure_id": [
+        -0.026218638996239108,
+        -0.02247963345702242
+       ]
+      },
+      "mean_knocked": 3.29217081779801,
+      "members": [
+       "head.17.6",
+       "head.17.12",
+       "head.17.16",
+       "head.17.29"
+      ],
+      "n_components": 4
+     },
+     "null_d12": {
+      "f": 0.03126732155207971,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.029134072407578326,
+        0.03310684240291814
+       ],
+       "pressure_id": [
+        0.028590061459201472,
+        0.033676400975573915
+       ]
+      },
+      "mean_knocked": 2.954830496828147,
+      "members": [
+       "head.17.0",
+       "head.17.4",
+       "head.17.5",
+       "head.17.30"
+      ],
+      "n_components": 4
+     },
+     "null_d13": {
+      "f": 0.0015312126173246696,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.0007968364425073473,
+        0.002287288701718464
+       ],
+       "pressure_id": [
+        0.000737605865346179,
+        0.0024968704497062883
+       ]
+      },
+      "mean_knocked": 3.1352053275000316,
+      "members": [
+       "head.17.2",
+       "head.17.7",
+       "head.17.17",
+       "head.17.18"
+      ],
+      "n_components": 4
+     },
+     "null_d14": {
+      "f": -0.003063840216270099,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.0038270131726129133,
+        -0.0021497530976388496
+       ],
+       "pressure_id": [
+        -0.00401652139906228,
+        -0.002110528467976279
+       ]
+      },
+      "mean_knocked": 3.163078237120002,
+      "members": [
+       "head.17.0",
+       "head.17.9",
+       "head.17.15",
+       "head.17.22"
+      ],
+      "n_components": 4
+     },
+     "null_d15": {
+      "f": -0.02755010276035629,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.029000728375116705,
+        -0.025964053430463412
+       ],
+       "pressure_id": [
+        -0.02905728326073542,
+        -0.026050236402583596
+       ]
+      },
+      "mean_knocked": 3.3116082774782645,
+      "members": [
+       "head.17.6",
+       "head.17.12",
+       "head.17.20",
+       "head.17.31"
+      ],
+      "n_components": 4
+     },
+     "null_d16": {
+      "f": 0.019133013611223135,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.01763813334313197,
+        0.020471473187023366
+       ],
+       "pressure_id": [
+        0.017346262802789742,
+        0.020993833035444203
+       ]
+      },
+      "mean_knocked": 3.028435410805119,
+      "members": [
+       "head.17.0",
+       "head.17.4",
+       "head.17.7",
+       "head.17.31"
+      ],
+      "n_components": 4
+     },
+     "null_d17": {
+      "f": -0.03486504130446594,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.03670934449967968,
+        -0.03297691687193278
+       ],
+       "pressure_id": [
+        -0.03683632600303395,
+        -0.033195832434147185
+       ]
+      },
+      "mean_knocked": 3.355979610801129,
+      "members": [
+       "head.17.6",
+       "head.17.10",
+       "head.17.20",
+       "head.17.30"
+      ],
+      "n_components": 4
+     },
+     "null_d18": {
+      "f": -0.0014304003920780322,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.0022906262548664305,
+        -0.0004282251525469468
+       ],
+       "pressure_id": [
+        -0.0023614064712510797,
+        -0.00044593391975873356
+       ]
+      },
+      "mean_knocked": 3.153170033180212,
+      "members": [
+       "head.17.15",
+       "head.17.16",
+       "head.17.22",
+       "head.17.29"
+      ],
+      "n_components": 4
+     },
+     "null_d19": {
+      "f": 0.008214106194171202,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.007031775821990937,
+        0.009193341807189346
+       ],
+       "pressure_id": [
+        0.00713697365567234,
+        0.009388104084506861
+       ]
+      },
+      "mean_knocked": 3.0946678852957814,
+      "members": [
+       "head.17.12",
+       "head.17.14",
+       "head.17.16",
+       "head.17.18"
+      ],
+      "n_components": 4
+     }
+    }
+   },
+   "verdict": {
+    "rule": "The wish runs through the route when the quartet's neutral-twin interchange at all positions gives f_wish = (mean m_I - mean m_KO) / (mean m_I - mean m_tw) >= 0.5 on the 618 ids; when any of the 20 layer-matched random quartets or the seven other layer-17 KV groups also reaches 0.5, the verdict is labelled 'not quartet-specific' (spec R3).",
+    "quartet": "quartet",
+    "quartet_f": 0.5125263710585128,
+    "quartet_ci": {
+     "instructed_inversion_id": [
+      0.49560885404593047,
+      0.5289296936965305
+     ],
+     "pressure_id": [
+      0.49267454573093605,
+      0.526816676374233
+     ]
+    },
+    "passes": true,
+    "null_max": {
+     "null_d": 0.03126732155207971,
+     "kvg": 0.004698043245219863
+    },
+    "null_argmax": {
+     "null_d": "null_d12",
+     "kvg": "kvg_7"
+    },
+    "labels": [],
+    "text": "f_wish(quartet) = 0.513 >= 0.5: the wish runs through the route",
+    "status": "complete"
+   },
+   "note": "locates the effect; decides nothing"
+  },
+  "after": {
+   "cell": {
+    "cell": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/instructed-route/outputs/_analyses/instructed-route-b2/p2/wish_after/U__leaf/sdr_v2",
+    "groups_file": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/instructed-route/outputs/_analyses/instructed-route-b2/p2/wish_after/U__leaf/sdr_v2/knockout/groups.json",
+    "plan": {
+     "scheme": "interchange",
+     "counterfactual": "neutral_twin",
+     "positions": "after=pressure_clause,exclude=readout",
+     "column_suffix": "_neutral_twin_paired_after_pressure_clause_excl_readout"
+    },
+    "n": 618,
+    "n_excluded": 0,
+    "n_unpaired": 0,
+    "n_clusters": {
+     "instructed_inversion_id": 41,
+     "pressure_id": 20
+    },
+    "mean_clean": 3.144493436350406,
+    "mean_twin": -2.9213583893760506,
+    "consistent_with_groups_json": true,
+    "manifest_problem": null,
+    "groups": {
+     "quartet": {
+      "f": 0.029320953021942157,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.02735281667678614,
+        0.031481550245553616
+       ],
+       "pressure_id": [
+        0.0277283720877543,
+        0.03073512146834584
+       ]
+      },
+      "mean_knocked": 2.9666368799302183,
+      "members": [
+       "head.17.24",
+       "head.17.25",
+       "head.17.26",
+       "head.17.27"
+      ],
+      "n_components": 4
+     },
+     "L17H24": {
+      "f": 0.022725904312705894,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.021133235130408923,
+        0.024532174282036582
+       ],
+       "pressure_id": [
+        0.02165339762836508,
+        0.023868013453474782
+       ]
+      },
+      "mean_knocked": 3.006641468183894,
+      "members": [
+       "head.17.24"
+      ],
+      "n_components": 1
+     },
+     "kvg_0": {
+      "f": 0.00020077220518051315,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.00020717057686046566,
+        0.0005853142460043625
+       ],
+       "pressure_id": [
+        -8.921293530340914e-05,
+        0.0005036755900624066
+       ]
+      },
+      "mean_knocked": 3.1432755819030564,
+      "members": [
+       "head.17.0",
+       "head.17.1",
+       "head.17.2",
+       "head.17.3"
+      ],
+      "n_components": 4
+     },
+     "kvg_1": {
+      "f": 0.0004659965433449203,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -1.7654759556193394e-05,
+        0.001021489649400509
+       ],
+       "pressure_id": [
+        5.220335639934112e-05,
+        0.0009737540975058043
+       ]
+      },
+      "mean_knocked": 3.141666770367175,
+      "members": [
+       "head.17.4",
+       "head.17.5",
+       "head.17.6",
+       "head.17.7"
+      ],
+      "n_components": 4
+     },
+     "kvg_2": {
+      "f": -0.00030354383144170024,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.0007914348742362661,
+        0.0001345844690570021
+       ],
+       "pressure_id": [
+        -0.0007523771520020184,
+        0.0001352810107258809
+       ]
+      },
+      "mean_knocked": 3.1463346882545444,
+      "members": [
+       "head.17.8",
+       "head.17.9",
+       "head.17.10",
+       "head.17.11"
+      ],
+      "n_components": 4
+     },
+     "kvg_3": {
+      "f": 0.0009693982606674698,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.0005200820668062372,
+        0.0013931382823723973
+       ],
+       "pressure_id": [
+        0.0005494779561434712,
+        0.0013967806815618079
+       ]
+      },
+      "mean_knocked": 3.13861321014108,
+      "members": [
+       "head.17.12",
+       "head.17.13",
+       "head.17.14",
+       "head.17.15"
+      ],
+      "n_components": 4
+     },
+     "kvg_4": {
+      "f": 0.0004354027174281117,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        2.5643642146786403e-05,
+        0.0008358405800420179
+       ],
+       "pressure_id": [
+        8.23127944325966e-05,
+        0.0007775224750872569
+       ]
+      },
+      "mean_knocked": 3.141852347981968,
+      "members": [
+       "head.17.16",
+       "head.17.17",
+       "head.17.18",
+       "head.17.19"
+      ],
+      "n_components": 4
+     },
+     "kvg_5": {
+      "f": 0.0004545021708909248,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -3.136698108119301e-05,
+        0.0008687407765419228
+       ],
+       "pressure_id": [
+        2.2025053117167884e-05,
+        0.0008283865536509303
+       ]
+      },
+      "mean_knocked": 3.1417364935273104,
+      "members": [
+       "head.17.20",
+       "head.17.21",
+       "head.17.22",
+       "head.17.23"
+      ],
+      "n_components": 4
+     },
+     "kvg_7": {
+      "f": 0.0005051993189284993,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        1.723131262654571e-05,
+        0.0009528534135562444
+       ],
+       "pressure_id": [
+        2.175838423700314e-05,
+        0.0010167320746387104
+       ]
+      },
+      "mean_knocked": 3.1414289721393276,
+      "members": [
+       "head.17.28",
+       "head.17.29",
+       "head.17.30",
+       "head.17.31"
+      ],
+      "n_components": 4
+     },
+     "null_d00": {
+      "f": 0.0005971303848114346,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.00011713177398477655,
+        0.0010552129610819226
+       ],
+       "pressure_id": [
+        9.884482706484122e-05,
+        0.001070901056544394
+       ]
+      },
+      "mean_knocked": 3.1408713319155006,
+      "members": [
+       "head.17.2",
+       "head.17.3",
+       "head.17.12",
+       "head.17.23"
+      ],
+      "n_components": 4
+     },
+     "null_d01": {
+      "f": -0.00014907322369766768,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.0006248137798356459,
+        0.00031850167067170817
+       ],
+       "pressure_id": [
+        -0.0005490405880186636,
+        0.0002830664230917755
+       ]
+      },
+      "mean_knocked": 3.145397692436539,
+      "members": [
+       "head.17.2",
+       "head.17.12",
+       "head.17.18",
+       "head.17.20"
+      ],
+      "n_components": 4
+     },
+     "null_d02": {
+      "f": -0.0008447221490572826,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.0013070272232141558,
+        -0.0003922199309623983
+       ],
+       "pressure_id": [
+        -0.0011566605971567267,
+        -0.00045373689819538465
+       ]
+      },
+      "mean_knocked": 3.1496173957404965,
+      "members": [
+       "head.17.2",
+       "head.17.4",
+       "head.17.5",
+       "head.17.6"
+      ],
+      "n_components": 4
+     },
+     "null_d03": {
+      "f": -0.0013331141728118961,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.0017348506803949435,
+        -0.0009553499328284474
+       ],
+       "pressure_id": [
+        -0.0017186978914793655,
+        -0.0009233421211836422
+       ]
+      },
+      "mean_knocked": 3.1525799093894586,
+      "members": [
+       "head.17.6",
+       "head.17.10",
+       "head.17.20",
+       "head.17.23"
+      ],
+      "n_components": 4
+     },
+     "null_d04": {
+      "f": 0.0023059270115653044,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.0015684853699569348,
+        0.002944746589296159
+       ],
+       "pressure_id": [
+        0.0016638966777189443,
+        0.0029174286543382525
+       ]
+      },
+      "mean_knocked": 3.1305060247773104,
+      "members": [
+       "head.17.4",
+       "head.17.21",
+       "head.17.29",
+       "head.17.30"
+      ],
+      "n_components": 4
+     },
+     "null_d05": {
+      "f": 0.0011590429404808023,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.0005490842384555832,
+        0.001653359247561116
+       ],
+       "pressure_id": [
+        0.0005239588310924398,
+        0.0016381659722565349
+       ]
+      },
+      "mean_knocked": 3.137462853613795,
+      "members": [
+       "head.17.1",
+       "head.17.2",
+       "head.17.4",
+       "head.17.20"
+      ],
+      "n_components": 4
+     },
+     "null_d06": {
+      "f": 0.0012466283184735293,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.0006694554483307534,
+        0.0017345307131545087
+       ],
+       "pressure_id": [
+        0.0007610403572239195,
+        0.001639192180956067
+       ]
+      },
+      "mean_knocked": 3.136931573688791,
+      "members": [
+       "head.17.12",
+       "head.17.14",
+       "head.17.18",
+       "head.17.21"
+      ],
+      "n_components": 4
+     },
+     "null_d07": {
+      "f": 0.0012960666874640508,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.0009171280878426323,
+        0.001654312942732032
+       ],
+       "pressure_id": [
+        0.0009128467816076883,
+        0.0017477195664494162
+       ]
+      },
+      "mean_knocked": 3.1366316878679887,
+      "members": [
+       "head.17.7",
+       "head.17.9",
+       "head.17.10",
+       "head.17.14"
+      ],
+      "n_components": 4
+     },
+     "null_d08": {
+      "f": -8.997878811280826e-05,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.0007509008612643889,
+        0.0005888191840567039
+       ],
+       "pressure_id": [
+        -0.0007985085461172739,
+        0.0006416225826195091
+       ]
+      },
+      "mean_knocked": 3.1450392343465565,
+      "members": [
+       "head.17.1",
+       "head.17.5",
+       "head.17.9",
+       "head.17.15"
+      ],
+      "n_components": 4
+     },
+     "null_d09": {
+      "f": -0.0005246727427225498,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.001202430296512014,
+        0.00020301949081345645
+       ],
+       "pressure_id": [
+        -0.0010778914123254584,
+        2.791354385361246e-05
+       ]
+      },
+      "mean_knocked": 3.1476760234647583,
+      "members": [
+       "head.17.5",
+       "head.17.9",
+       "head.17.18",
+       "head.17.20"
+      ],
+      "n_components": 4
+     },
+     "null_d10": {
+      "f": -0.0006052005119193082,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.0012563642382479136,
+        2.2899018589180036e-05
+       ],
+       "pressure_id": [
+        -0.001290504047352776,
+        3.88883954928755e-05
+       ]
+      },
+      "mean_knocked": 3.148164492980562,
+      "members": [
+       "head.17.5",
+       "head.17.8",
+       "head.17.11",
+       "head.17.14"
+      ],
+      "n_components": 4
+     },
+     "null_d11": {
+      "f": 0.0001535481475935685,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.00018289196793365176,
+        0.0005125956114911765
+       ],
+       "pressure_id": [
+        -0.00019060320234737246,
+        0.0004471628823951707
+       ]
+      },
+      "mean_knocked": 3.1435620360389884,
+      "members": [
+       "head.17.6",
+       "head.17.12",
+       "head.17.16",
+       "head.17.29"
+      ],
+      "n_components": 4
+     },
+     "null_d12": {
+      "f": 0.001591226460241007,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.001153061200458455,
+        0.0019593776922181747
+       ],
+       "pressure_id": [
+        0.0011657606480986592,
+        0.0020069101823336254
+       ]
+      },
+      "mean_knocked": 3.1348412924214086,
+      "members": [
+       "head.17.0",
+       "head.17.4",
+       "head.17.5",
+       "head.17.30"
+      ],
+      "n_components": 4
+     },
+     "null_d13": {
+      "f": 0.0007216792956286112,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.0002073068721976333,
+        0.0011912424563062624
+       ],
+       "pressure_id": [
+        0.0003967449770150125,
+        0.0010211321125126514
+       ]
+      },
+      "mean_knocked": 3.140115836677428,
+      "members": [
+       "head.17.2",
+       "head.17.7",
+       "head.17.17",
+       "head.17.18"
+      ],
+      "n_components": 4
+     },
+     "null_d14": {
+      "f": 0.0009806438283704103,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.0004829188893497896,
+        0.0014703891662252034
+       ],
+       "pressure_id": [
+        0.00047984206559017735,
+        0.0014147307426827457
+       ]
+      },
+      "mean_knocked": 3.1385449961936978,
+      "members": [
+       "head.17.0",
+       "head.17.9",
+       "head.17.15",
+       "head.17.22"
+      ],
+      "n_components": 4
+     },
+     "null_d15": {
+      "f": -0.0006582747883755102,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.0012156050379129846,
+        -0.00013012259682954904
+       ],
+       "pressure_id": [
+        -0.0011865058699998775,
+        -0.00013877894075897175
+       ]
+      },
+      "mean_knocked": 3.148486433677303,
+      "members": [
+       "head.17.6",
+       "head.17.12",
+       "head.17.20",
+       "head.17.31"
+      ],
+      "n_components": 4
+     },
+     "null_d16": {
+      "f": 0.0024813058680478862,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.0019179157189705147,
+        0.0029733156589505485
+       ],
+       "pressure_id": [
+        0.0019739911955962914,
+        0.0029273047781770206
+       ]
+      },
+      "mean_knocked": 3.1294422026205218,
+      "members": [
+       "head.17.0",
+       "head.17.4",
+       "head.17.7",
+       "head.17.31"
+      ],
+      "n_components": 4
+     },
+     "null_d17": {
+      "f": -0.0013422380312885346,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.001864264693036947,
+        -0.000840236259067562
+       ],
+       "pressure_id": [
+        -0.0017624189523315428,
+        -0.0008080527897434023
+       ]
+      },
+      "mean_knocked": 3.152635253363057,
+      "members": [
+       "head.17.6",
+       "head.17.10",
+       "head.17.20",
+       "head.17.30"
+      ],
+      "n_components": 4
+     },
+     "null_d18": {
+      "f": 0.0010729636198766538,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.0004587824311340549,
+        0.00163200978914139
+       ],
+       "pressure_id": [
+        0.0005592628999003255,
+        0.0015865801136187658
+       ]
+      },
+      "mean_knocked": 3.137984998017839,
+      "members": [
+       "head.17.15",
+       "head.17.16",
+       "head.17.22",
+       "head.17.29"
+      ],
+      "n_components": 4
+     },
+     "null_d19": {
+      "f": 0.0007923897076255837,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.0003561807672826582,
+        0.0011834121863262372
+       ],
+       "pressure_id": [
+        0.0004626061425727681,
+        0.001101881853184297
+       ]
+      },
+      "mean_knocked": 3.1396869177957183,
+      "members": [
+       "head.17.12",
+       "head.17.14",
+       "head.17.16",
+       "head.17.18"
+      ],
+      "n_components": 4
+     }
+    }
+   },
+   "verdict": {
+    "rule": "The wish runs through the route when the quartet's neutral-twin interchange at all positions gives f_wish = (mean m_I - mean m_KO) / (mean m_I - mean m_tw) >= 0.5 on the 618 ids; when any of the 20 layer-matched random quartets or the seven other layer-17 KV groups also reaches 0.5, the verdict is labelled 'not quartet-specific' (spec R3).",
+    "quartet": "quartet",
+    "quartet_f": 0.029320953021942157,
+    "quartet_ci": {
+     "instructed_inversion_id": [
+      0.02735281667678614,
+      0.031481550245553616
+     ],
+     "pressure_id": [
+      0.0277283720877543,
+      0.03073512146834584
+     ]
+    },
+    "passes": false,
+    "null_max": {
+     "null_d": 0.0024813058680478862,
+     "kvg": 0.0009693982606674698
+    },
+    "null_argmax": {
+     "null_d": "null_d16",
+     "kvg": "kvg_3"
+    },
+    "labels": [],
+    "text": "f_wish(quartet) = 0.029 < 0.5: the wish takes another path",
+    "status": "complete"
+   },
+   "note": "locates the effect; decides nothing"
+  }
+ },
+ "reference": {
+  "sdrd_all": {
+   "cell": {
+    "cell": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/instructed-route/outputs/_analyses/instructed-route-b2/p2/sdrd_all/U__leaf/sdr_v2",
+    "groups_file": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/instructed-route/outputs/_analyses/instructed-route-b2/p2/sdrd_all/U__leaf/sdr_v2/knockout/groups.json",
+    "plan": {
+     "scheme": "interchange",
+     "counterfactual": "neutral_twin",
+     "positions": "all",
+     "column_suffix": "_neutral_twin_paired"
+    },
+    "n": 618,
+    "n_excluded": 0,
+    "n_unpaired": 0,
+    "n_clusters": {
+     "instructed_inversion_id": 41,
+     "pressure_id": 20
+    },
+    "mean_clean": 4.152970790863037,
+    "mean_twin": -2.9213583893760506,
+    "consistent_with_groups_json": true,
+    "manifest_problem": null,
+    "groups": {
+     "quartet": {
+      "f": 0.5812536484839087,
+      "passes": true,
+      "ci": {
+       "instructed_inversion_id": [
+        0.5659327569367482,
+        0.5946745642627947
+       ],
+       "pressure_id": [
+        0.5586609555303672,
+        0.604078024920548
+       ]
+      },
+      "mean_knocked": 0.04099114427288759,
+      "members": [
+       "head.17.24",
+       "head.17.25",
+       "head.17.26",
+       "head.17.27"
+      ],
+      "n_components": 4
+     },
+     "L17H24": {
+      "f": 0.40477280109230845,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.3949021294350538,
+        0.4127054777826808
+       ],
+       "pressure_id": [
+        0.3921059459006692,
+        0.41833729096222105
+       ]
+      },
+      "mean_knocked": 1.2894747527286072,
+      "members": [
+       "head.17.24"
+      ],
+      "n_components": 1
+     },
+     "kvg_0": {
+      "f": 0.0015379632434873959,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.0010216381359860432,
+        0.00213326865659425
+       ],
+       "pressure_id": [
+        0.0008637374908830889,
+        0.002389263368917649
+       ]
+      },
+      "mean_knocked": 4.142090732611499,
+      "members": [
+       "head.17.0",
+       "head.17.1",
+       "head.17.2",
+       "head.17.3"
+      ],
+      "n_components": 4
+     },
+     "kvg_1": {
+      "f": -0.00039200846910027946,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.0022253080468833046,
+        0.0016530048006157439
+       ],
+       "pressure_id": [
+        -0.0025263218437405416,
+        0.002409679065388304
+       ]
+      },
+      "mean_knocked": 4.155743987814894,
+      "members": [
+       "head.17.4",
+       "head.17.5",
+       "head.17.6",
+       "head.17.7"
+      ],
+      "n_components": 4
+     },
+     "kvg_2": {
+      "f": -0.0019199741264075726,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.00241212675029562,
+        -0.0014251229420040722
+       ],
+       "pressure_id": [
+        -0.0025586830186397048,
+        -0.0012827987341021382
+       ]
+      },
+      "mean_knocked": 4.166553319850786,
+      "members": [
+       "head.17.8",
+       "head.17.9",
+       "head.17.10",
+       "head.17.11"
+      ],
+      "n_components": 4
+     },
+     "kvg_3": {
+      "f": 0.006358780888940098,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.005513472208004651,
+        0.007150711673783112
+       ],
+       "pressure_id": [
+        0.0051578404695107345,
+        0.007679452828480491
+       ]
+      },
+      "mean_knocked": 4.1079866816696615,
+      "members": [
+       "head.17.12",
+       "head.17.13",
+       "head.17.14",
+       "head.17.15"
+      ],
+      "n_components": 4
+     },
+     "kvg_4": {
+      "f": 0.0003788239232829155,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.00019560866184367112,
+        0.0008986067865128621
+       ],
+       "pressure_id": [
+        -0.0005267963137248266,
+        0.0010538090166513343
+       ]
+      },
+      "mean_knocked": 4.150290865728384,
+      "members": [
+       "head.17.16",
+       "head.17.17",
+       "head.17.18",
+       "head.17.19"
+      ],
+      "n_components": 4
+     },
+     "kvg_5": {
+      "f": -0.0019889911075447702,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.0030441678254515365,
+        -0.0009120403683935057
+       ],
+       "pressure_id": [
+        -0.0027220350461543558,
+        -0.0012778944086313285
+       ]
+      },
+      "mean_knocked": 4.167041568694377,
+      "members": [
+       "head.17.20",
+       "head.17.21",
+       "head.17.22",
+       "head.17.23"
+      ],
+      "n_components": 4
+     },
+     "kvg_7": {
+      "f": 0.006873185840813649,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.005804069051389863,
+        0.007741123625699765
+       ],
+       "pressure_id": [
+        0.005486918745348126,
+        0.0077442256348291775
+       ]
+      },
+      "mean_knocked": 4.104347611708163,
+      "members": [
+       "head.17.28",
+       "head.17.29",
+       "head.17.30",
+       "head.17.31"
+      ],
+      "n_components": 4
+     },
+     "null_d00": {
+      "f": 0.01093770895233514,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.009861731460128573,
+        0.011913668393457595
+       ],
+       "pressure_id": [
+        0.009479611017711003,
+        0.012194595712725204
+       ]
+      },
+      "mean_knocked": 4.07559383725657,
+      "members": [
+       "head.17.2",
+       "head.17.3",
+       "head.17.12",
+       "head.17.23"
+      ],
+      "n_components": 4
+     },
+     "null_d01": {
+      "f": 0.010382168880643245,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.008749641507892314,
+        0.011788225939868578
+       ],
+       "pressure_id": [
+        0.007789315202386573,
+        0.012325437365230693
+       ]
+      },
+      "mean_knocked": 4.079523910596532,
+      "members": [
+       "head.17.2",
+       "head.17.12",
+       "head.17.18",
+       "head.17.20"
+      ],
+      "n_components": 4
+     },
+     "null_d02": {
+      "f": -0.003954961067090043,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.005241200248438306,
+        -0.0024891230226160724
+       ],
+       "pressure_id": [
+        -0.005463075160439396,
+        -0.0021511265404483212
+       ]
+      },
+      "mean_knocked": 4.180949487346662,
+      "members": [
+       "head.17.2",
+       "head.17.4",
+       "head.17.5",
+       "head.17.6"
+      ],
+      "n_components": 4
+     },
+     "null_d03": {
+      "f": -0.037657094786672805,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.03954721986717317,
+        -0.035590074284910116
+       ],
+       "pressure_id": [
+        -0.04051226857302174,
+        -0.03512242882243144
+       ]
+      },
+      "mean_knocked": 4.419369475355426,
+      "members": [
+       "head.17.6",
+       "head.17.10",
+       "head.17.20",
+       "head.17.23"
+      ],
+      "n_components": 4
+     },
+     "null_d04": {
+      "f": 0.019617104494740863,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.017738114874263463,
+        0.021367471727393565
+       ],
+       "pressure_id": [
+        0.017540341511910737,
+        0.021714441149630767
+       ]
+      },
+      "mean_knocked": 4.0141929361040924,
+      "members": [
+       "head.17.4",
+       "head.17.21",
+       "head.17.29",
+       "head.17.30"
+      ],
+      "n_components": 4
+     },
+     "null_d05": {
+      "f": 0.020209454931852354,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.018718203986519733,
+        0.021664566153752486
+       ],
+       "pressure_id": [
+        0.018592078274642994,
+        0.021909053781234488
+       ]
+      },
+      "mean_knocked": 4.010002454121907,
+      "members": [
+       "head.17.1",
+       "head.17.2",
+       "head.17.4",
+       "head.17.20"
+      ],
+      "n_components": 4
+     },
+     "null_d06": {
+      "f": 0.00688149418569131,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.00579550299146193,
+        0.00781193282598725
+       ],
+       "pressure_id": [
+        0.005657221891673141,
+        0.008101517653607138
+       ]
+      },
+      "mean_knocked": 4.1042888357415555,
+      "members": [
+       "head.17.12",
+       "head.17.14",
+       "head.17.18",
+       "head.17.21"
+      ],
+      "n_components": 4
+     },
+     "null_d07": {
+      "f": 0.0039767719993422405,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.003052129322957145,
+        0.004919506343193777
+       ],
+       "pressure_id": [
+        0.0028807380400903727,
+        0.005478752476833428
+       ]
+      },
+      "mean_knocked": 4.1248377966649326,
+      "members": [
+       "head.17.7",
+       "head.17.9",
+       "head.17.10",
+       "head.17.14"
+      ],
+      "n_components": 4
+     },
+     "null_d08": {
+      "f": 0.009412783013203441,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.008017059865775545,
+        0.011072919041005966
+       ],
+       "pressure_id": [
+        0.007474863201942124,
+        0.01187073603378035
+       ]
+      },
+      "mean_knocked": 4.086381665325473,
+      "members": [
+       "head.17.1",
+       "head.17.5",
+       "head.17.9",
+       "head.17.15"
+      ],
+      "n_components": 4
+     },
+     "null_d09": {
+      "f": 0.014633162941943674,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.01288448567897112,
+        0.016172488765700217
+       ],
+       "pressure_id": [
+        0.0124119773274435,
+        0.016474008021320177
+       ]
+      },
+      "mean_knocked": 4.049450979263652,
+      "members": [
+       "head.17.5",
+       "head.17.9",
+       "head.17.18",
+       "head.17.20"
+      ],
+      "n_components": 4
+     },
+     "null_d10": {
+      "f": 0.011427858981828057,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.009938159042792294,
+        0.013023378848979354
+       ],
+       "pressure_id": [
+        0.009373643975950557,
+        0.01400824728101967
+       ]
+      },
+      "mean_knocked": 4.0721263546002335,
+      "members": [
+       "head.17.5",
+       "head.17.8",
+       "head.17.11",
+       "head.17.14"
+      ],
+      "n_components": 4
+     },
+     "null_d11": {
+      "f": -0.02723506840582764,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.02867311260517372,
+        -0.025755327366389618
+       ],
+       "pressure_id": [
+        -0.029631707812053938,
+        -0.02519313013667741
+       ]
+      },
+      "mean_knocked": 4.345640630012191,
+      "members": [
+       "head.17.6",
+       "head.17.12",
+       "head.17.16",
+       "head.17.29"
+      ],
+      "n_components": 4
+     },
+     "null_d12": {
+      "f": 0.0339816446948446,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.03168925696151538,
+        0.036263349176984865
+       ],
+       "pressure_id": [
+        0.031220744685278648,
+        0.03677733974015348
+       ]
+      },
+      "mean_knocked": 3.912573450205781,
+      "members": [
+       "head.17.0",
+       "head.17.4",
+       "head.17.5",
+       "head.17.30"
+      ],
+      "n_components": 4
+     },
+     "null_d13": {
+      "f": 0.003637586350085189,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.002577899692177132,
+        0.004525734664896244
+       ],
+       "pressure_id": [
+        0.0024504289305949394,
+        0.005053467000859468
+       ]
+      },
+      "mean_knocked": 4.12723730760099,
+      "members": [
+       "head.17.2",
+       "head.17.7",
+       "head.17.17",
+       "head.17.18"
+      ],
+      "n_components": 4
+     },
+     "null_d14": {
+      "f": -0.002924732410058831,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.0037709069773892564,
+        -0.0020155776315628027
+       ],
+       "pressure_id": [
+        -0.004136728012126989,
+        -0.0015645145801099995
+       ]
+      },
+      "mean_knocked": 4.173661310695907,
+      "members": [
+       "head.17.0",
+       "head.17.9",
+       "head.17.15",
+       "head.17.22"
+      ],
+      "n_components": 4
+     },
+     "null_d15": {
+      "f": -0.027077711346664517,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.028923609069072174,
+        -0.025298710933681034
+       ],
+       "pressure_id": [
+        -0.029993146219027586,
+        -0.024606150825885697
+       ]
+      },
+      "mean_knocked": 4.344527434376837,
+      "members": [
+       "head.17.6",
+       "head.17.12",
+       "head.17.20",
+       "head.17.31"
+      ],
+      "n_components": 4
+     },
+     "null_d16": {
+      "f": 0.024099972664808077,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.0221405480314601,
+        0.026001119670135752
+       ],
+       "pressure_id": [
+        0.021773688899940326,
+        0.026546941463548485
+       ]
+      },
+      "mean_knocked": 3.982479650997421,
+      "members": [
+       "head.17.0",
+       "head.17.4",
+       "head.17.7",
+       "head.17.31"
+      ],
+      "n_components": 4
+     },
+     "null_d17": {
+      "f": -0.03543738350714997,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.037148833560834316,
+        -0.033546716656747584
+       ],
+       "pressure_id": [
+        -0.038030081851182784,
+        -0.0331635067751153
+       ]
+      },
+      "mean_knocked": 4.4036665070789915,
+      "members": [
+       "head.17.6",
+       "head.17.10",
+       "head.17.20",
+       "head.17.30"
+      ],
+      "n_components": 4
+     },
+     "null_d18": {
+      "f": -0.0014050135834185967,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.0020946928985972977,
+        -0.0006497225894959457
+       ],
+       "pressure_id": [
+        -0.0024382179648656825,
+        -0.00042378312996040735
+       ]
+      },
+      "mean_knocked": 4.162910319454848,
+      "members": [
+       "head.17.15",
+       "head.17.16",
+       "head.17.22",
+       "head.17.29"
+      ],
+      "n_components": 4
+     },
+     "null_d19": {
+      "f": 0.01009324274098296,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.008949345096612616,
+        0.011161971750801834
+       ],
+       "pressure_id": [
+        0.008213781710802077,
+        0.011540323935759428
+       ]
+      },
+      "mean_knocked": 4.081567869217265,
+      "members": [
+       "head.17.12",
+       "head.17.14",
+       "head.17.16",
+       "head.17.18"
+      ],
+      "n_components": 4
+     }
+    }
+   },
+   "quartet_f": 0.5812536484839087,
+   "note": "f of the same groups on the reference cell (f_D on SDR D), clustered by the wish rows' ids; descriptive"
+  },
+  "sdrd_readout": {
+   "cell": {
+    "cell": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/instructed-route/outputs/_analyses/instructed-route-b2/p2/sdrd_readout/U__leaf/sdr_v2",
+    "groups_file": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/instructed-route/outputs/_analyses/instructed-route-b2/p2/sdrd_readout/U__leaf/sdr_v2/knockout/groups.json",
+    "plan": {
+     "scheme": "interchange",
+     "counterfactual": "neutral_twin",
+     "positions": "readout",
+     "column_suffix": "_neutral_twin_paired_at_readout"
+    },
+    "n": 618,
+    "n_excluded": 0,
+    "n_unpaired": 0,
+    "n_clusters": {
+     "instructed_inversion_id": 41,
+     "pressure_id": 20
+    },
+    "mean_clean": 4.152970790863037,
+    "mean_twin": -2.9213583893760506,
+    "consistent_with_groups_json": true,
+    "manifest_problem": null,
+    "groups": {
+     "quartet": {
+      "f": 0.5507125500881832,
+      "passes": true,
+      "ci": {
+       "instructed_inversion_id": [
+        0.534703031755923,
+        0.5639874556587052
+       ],
+       "pressure_id": [
+        0.5274873471642276,
+        0.5738758211665028
+       ]
+      },
+      "mean_knocked": 0.257048927850322,
+      "members": [
+       "head.17.24",
+       "head.17.25",
+       "head.17.26",
+       "head.17.27"
+      ],
+      "n_components": 4
+     },
+     "L17H24": {
+      "f": 0.3804847513460437,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.3710486433268122,
+        0.3880627649176719
+       ],
+       "pressure_id": [
+        0.36748932679666857,
+        0.3939678113762675
+       ]
+      },
+      "mean_knocked": 1.461296411779706,
+      "members": [
+       "head.17.24"
+      ],
+      "n_components": 1
+     },
+     "kvg_0": {
+      "f": 0.0019395197215048693,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.001307814765240649,
+        0.0025998418963088087
+       ],
+       "pressure_id": [
+        0.0012115047250393532,
+        0.002820091533495665
+       ]
+      },
+      "mean_knocked": 4.139249989901546,
+      "members": [
+       "head.17.0",
+       "head.17.1",
+       "head.17.2",
+       "head.17.3"
+      ],
+      "n_components": 4
+     },
+     "kvg_1": {
+      "f": -0.0001291285805366983,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.0016439736969640353,
+        0.0015703253564413665
+       ],
+       "pressure_id": [
+        -0.0017505831055180578,
+        0.0018116086101372104
+       ]
+      },
+      "mean_knocked": 4.153884288948331,
+      "members": [
+       "head.17.4",
+       "head.17.5",
+       "head.17.6",
+       "head.17.7"
+      ],
+      "n_components": 4
+     },
+     "kvg_2": {
+      "f": -0.0012005471093963736,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.001649610567214809,
+        -0.0007659852466894699
+       ],
+       "pressure_id": [
+        -0.0017907915515515042,
+        -0.0005946925028349715
+       ]
+      },
+      "mean_knocked": 4.161463856311292,
+      "members": [
+       "head.17.8",
+       "head.17.9",
+       "head.17.10",
+       "head.17.11"
+      ],
+      "n_components": 4
+     },
+     "kvg_3": {
+      "f": 0.005144935803266984,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.0044264732885532145,
+        0.005799450093944369
+       ],
+       "pressure_id": [
+        0.004056605773670348,
+        0.006195480676461776
+       ]
+      },
+      "mean_knocked": 4.116573821379529,
+      "members": [
+       "head.17.12",
+       "head.17.13",
+       "head.17.14",
+       "head.17.15"
+      ],
+      "n_components": 4
+     },
+     "kvg_4": {
+      "f": 0.0007044168952044309,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.00013080137123534303,
+        0.0012291282641635154
+       ],
+       "pressure_id": [
+        -1.300187883118392e-06,
+        0.0013040157510811879
+       ]
+      },
+      "mean_knocked": 4.147987513866239,
+      "members": [
+       "head.17.16",
+       "head.17.17",
+       "head.17.18",
+       "head.17.19"
+      ],
+      "n_components": 4
+     },
+     "kvg_5": {
+      "f": -0.0016609755227738148,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.002621328740302149,
+        -0.00076446262637833
+       ],
+       "pressure_id": [
+        -0.002354370797999446,
+        -0.0009463498973210524
+       ]
+      },
+      "mean_knocked": 4.164721078471459,
+      "members": [
+       "head.17.20",
+       "head.17.21",
+       "head.17.22",
+       "head.17.23"
+      ],
+      "n_components": 4
+     },
+     "kvg_7": {
+      "f": 0.0066730705155857335,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.006021193383227295,
+        0.007265744383987313
+       ],
+       "pressure_id": [
+        0.005625381128399262,
+        0.007377320486741735
+       ]
+      },
+      "mean_knocked": 4.105763293392836,
+      "members": [
+       "head.17.28",
+       "head.17.29",
+       "head.17.30",
+       "head.17.31"
+      ],
+      "n_components": 4
+     },
+     "null_d00": {
+      "f": 0.010781083737770428,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.009772490434532908,
+        0.011613274451748519
+       ],
+       "pressure_id": [
+        0.009409642549958346,
+        0.011930778862936035
+       ]
+      },
+      "mean_knocked": 4.076701855582327,
+      "members": [
+       "head.17.2",
+       "head.17.3",
+       "head.17.12",
+       "head.17.23"
+      ],
+      "n_components": 4
+     },
+     "null_d01": {
+      "f": 0.00988997186762965,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.00845042760502985,
+        0.0111374538855237
+       ],
+       "pressure_id": [
+        0.007710632174088124,
+        0.011610547099856948
+       ]
+      },
+      "mean_knocked": 4.083005874288121,
+      "members": [
+       "head.17.2",
+       "head.17.12",
+       "head.17.18",
+       "head.17.20"
+      ],
+      "n_components": 4
+     },
+     "null_d02": {
+      "f": -0.002175109114086822,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.0034516978996014577,
+        -0.0006093748710646733
+       ],
+       "pressure_id": [
+        -0.0034455255795094635,
+        -0.0006308064749411072
+       ]
+      },
+      "mean_knocked": 4.1683582287390255,
+      "members": [
+       "head.17.2",
+       "head.17.4",
+       "head.17.5",
+       "head.17.6"
+      ],
+      "n_components": 4
+     },
+     "null_d03": {
+      "f": -0.03584373809359865,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.03760148148593275,
+        -0.03394138432199375
+       ],
+       "pressure_id": [
+        -0.038752422589917034,
+        -0.03332594253431032
+       ]
+      },
+      "mean_knocked": 4.406541193187429,
+      "members": [
+       "head.17.6",
+       "head.17.10",
+       "head.17.20",
+       "head.17.23"
+      ],
+      "n_components": 4
+     },
+     "null_d04": {
+      "f": 0.018186302714520725,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.016467340542984574,
+        0.01990765060964589
+       ],
+       "pressure_id": [
+        0.016092545438300538,
+        0.020355604867239478
+       ]
+      },
+      "mean_knocked": 4.024314898889042,
+      "members": [
+       "head.17.4",
+       "head.17.21",
+       "head.17.29",
+       "head.17.30"
+      ],
+      "n_components": 4
+     },
+     "null_d05": {
+      "f": 0.019013086862341527,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.017439632184629416,
+        0.020544021937424408
+       ],
+       "pressure_id": [
+        0.016933420491552185,
+        0.02116483134577402
+       ]
+      },
+      "mean_knocked": 4.018465955666354,
+      "members": [
+       "head.17.1",
+       "head.17.2",
+       "head.17.4",
+       "head.17.20"
+      ],
+      "n_components": 4
+     },
+     "null_d06": {
+      "f": 0.006059286956905898,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.004863561924642626,
+        0.007092727000009404
+       ],
+       "pressure_id": [
+        0.004794401694249683,
+        0.007395604468360717
+       ]
+      },
+      "mean_knocked": 4.110105400332356,
+      "members": [
+       "head.17.12",
+       "head.17.14",
+       "head.17.18",
+       "head.17.21"
+      ],
+      "n_components": 4
+     },
+     "null_d07": {
+      "f": 0.0035629078802125146,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.0027441056504890465,
+        0.0044391631326132506
+       ],
+       "pressure_id": [
+        0.0026384599598420575,
+        0.004807377243454421
+       ]
+      },
+      "mean_knocked": 4.127765607679546,
+      "members": [
+       "head.17.7",
+       "head.17.9",
+       "head.17.10",
+       "head.17.14"
+      ],
+      "n_components": 4
+     },
+     "null_d08": {
+      "f": 0.009674010307228214,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.008224477679973953,
+        0.011341190543744765
+       ],
+       "pressure_id": [
+        0.00766734557739976,
+        0.012019842991709492
+       ]
+      },
+      "mean_knocked": 4.084533657456679,
+      "members": [
+       "head.17.1",
+       "head.17.5",
+       "head.17.9",
+       "head.17.15"
+      ],
+      "n_components": 4
+     },
+     "null_d09": {
+      "f": 0.014723367205942143,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.013216757327992433,
+        0.016039184240311543
+       ],
+       "pressure_id": [
+        0.012534479518665622,
+        0.016870368288979254
+       ]
+      },
+      "mean_knocked": 4.048812844606665,
+      "members": [
+       "head.17.5",
+       "head.17.9",
+       "head.17.18",
+       "head.17.20"
+      ],
+      "n_components": 4
+     },
+     "null_d10": {
+      "f": 0.012498205374711318,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.011091133054914928,
+        0.014104409876552726
+       ],
+       "pressure_id": [
+        0.010492559853014335,
+        0.014860383815302065
+       ]
+      },
+      "mean_knocked": 4.064554371880096,
+      "members": [
+       "head.17.5",
+       "head.17.8",
+       "head.17.11",
+       "head.17.14"
+      ],
+      "n_components": 4
+     },
+     "null_d11": {
+      "f": -0.02561387076379879,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.027087221975988007,
+        -0.02415133201889735
+       ],
+       "pressure_id": [
+        -0.027974860187270554,
+        -0.02360018066783719
+       ]
+      },
+      "mean_knocked": 4.334171744226252,
+      "members": [
+       "head.17.6",
+       "head.17.12",
+       "head.17.16",
+       "head.17.29"
+      ],
+      "n_components": 4
+     },
+     "null_d12": {
+      "f": 0.03252517316539873,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.030247375272538547,
+        0.03475920968171671
+       ],
+       "pressure_id": [
+        0.02955025248293324,
+        0.03567012779570435
+       ]
+      },
+      "mean_knocked": 3.9228770092467276,
+      "members": [
+       "head.17.0",
+       "head.17.4",
+       "head.17.5",
+       "head.17.30"
+      ],
+      "n_components": 4
+     },
+     "null_d13": {
+      "f": 0.003806291908572357,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.002915249204976776,
+        0.004635685266367703
+       ],
+       "pressure_id": [
+        0.0027765701715844284,
+        0.005012451712033966
+       ]
+      },
+      "mean_knocked": 4.126043828945716,
+      "members": [
+       "head.17.2",
+       "head.17.7",
+       "head.17.17",
+       "head.17.18"
+      ],
+      "n_components": 4
+     },
+     "null_d14": {
+      "f": -0.0029069881779103476,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.003850799574749316,
+        -0.001921313551065353
+       ],
+       "pressure_id": [
+        -0.004013443732173901,
+        -0.0015584949147570096
+       ]
+      },
+      "mean_knocked": 4.173535782156638,
+      "members": [
+       "head.17.0",
+       "head.17.9",
+       "head.17.15",
+       "head.17.22"
+      ],
+      "n_components": 4
+     },
+     "null_d15": {
+      "f": -0.025562095648756302,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.02738046540247484,
+        -0.023811550044955606
+       ],
+       "pressure_id": [
+        -0.02818265166754557,
+        -0.023326488841481568
+       ]
+      },
+      "mean_knocked": 4.333805470019096,
+      "members": [
+       "head.17.6",
+       "head.17.12",
+       "head.17.20",
+       "head.17.31"
+      ],
+      "n_components": 4
+     },
+     "null_d16": {
+      "f": 0.021734824558588564,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.0199138750697062,
+        0.02343527915500894
+       ],
+       "pressure_id": [
+        0.01935645486402104,
+        0.02415418059066026
+       ]
+      },
+      "mean_knocked": 3.999211487260837,
+      "members": [
+       "head.17.0",
+       "head.17.4",
+       "head.17.7",
+       "head.17.31"
+      ],
+      "n_components": 4
+     },
+     "null_d17": {
+      "f": -0.033458677270237366,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.03508902452216715,
+        -0.03176525573889981
+       ],
+       "pressure_id": [
+        -0.03635943133680179,
+        -0.031027454920632084
+       ]
+      },
+      "mean_knocked": 4.38966848780808,
+      "members": [
+       "head.17.6",
+       "head.17.10",
+       "head.17.20",
+       "head.17.30"
+      ],
+      "n_components": 4
+     },
+     "null_d18": {
+      "f": -0.0014744546199654846,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.0022739089262451798,
+        -0.0006173878284195307
+       ],
+       "pressure_id": [
+        -0.002516110065805005,
+        -0.00032168405785875726
+       ]
+      },
+      "mean_knocked": 4.163401568205997,
+      "members": [
+       "head.17.15",
+       "head.17.16",
+       "head.17.22",
+       "head.17.29"
+      ],
+      "n_components": 4
+     },
+     "null_d19": {
+      "f": 0.009585223923971768,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.00852920174054465,
+        0.01048298392104896
+       ],
+       "pressure_id": [
+        0.007957560644723784,
+        0.011008572784713021
+       ]
+      },
+      "mean_knocked": 4.085161761558558,
+      "members": [
+       "head.17.12",
+       "head.17.14",
+       "head.17.16",
+       "head.17.18"
+      ],
+      "n_components": 4
+     }
+    }
+   },
+   "quartet_f": 0.5507125500881832,
+   "note": "f of the same groups on the reference cell (f_D on SDR D), clustered by the wish rows' ids; descriptive"
+  },
+  "sdrd_after": {
+   "cell": {
+    "cell": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/instructed-route/outputs/_analyses/instructed-route-b2/p2/sdrd_after/U__leaf/sdr_v2",
+    "groups_file": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/instructed-route/outputs/_analyses/instructed-route-b2/p2/sdrd_after/U__leaf/sdr_v2/knockout/groups.json",
+    "plan": {
+     "scheme": "interchange",
+     "counterfactual": "neutral_twin",
+     "positions": "after=pressure_clause,exclude=readout",
+     "column_suffix": "_neutral_twin_paired_after_pressure_clause_excl_readout"
+    },
+    "n": 618,
+    "n_excluded": 0,
+    "n_unpaired": 0,
+    "n_clusters": {
+     "instructed_inversion_id": 41,
+     "pressure_id": 20
+    },
+    "mean_clean": 4.152970790863037,
+    "mean_twin": -2.9213583893760506,
+    "consistent_with_groups_json": true,
+    "manifest_problem": null,
+    "groups": {
+     "quartet": {
+      "f": 0.038809971000436386,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.035830617402789346,
+        0.041519953756198234
+       ],
+       "pressure_id": [
+        0.03412602626272192,
+        0.04329645356615066
+       ]
+      },
+      "mean_knocked": 3.878416280530417,
+      "members": [
+       "head.17.24",
+       "head.17.25",
+       "head.17.26",
+       "head.17.27"
+      ],
+      "n_components": 4
+     },
+     "L17H24": {
+      "f": 0.03099101791331357,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.027825989802156923,
+        0.03397326895146484
+       ],
+       "pressure_id": [
+        0.027163112501525078,
+        0.035175639021528336
+       ]
+      },
+      "mean_knocked": 3.9337301285135706,
+      "members": [
+       "head.17.24"
+      ],
+      "n_components": 1
+     },
+     "kvg_0": {
+      "f": -0.00040055828997508157,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.0008536159157975948,
+        5.9711904896073855e-05
+       ],
+       "pressure_id": [
+        -0.0010159140761098384,
+        0.00017454810071190264
+       ]
+      },
+      "mean_knocked": 4.1558044720621945,
+      "members": [
+       "head.17.0",
+       "head.17.1",
+       "head.17.2",
+       "head.17.3"
+      ],
+      "n_components": 4
+     },
+     "kvg_1": {
+      "f": -0.0007499518080332212,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.0014527015554374899,
+        3.7028096056396166e-05
+       ],
+       "pressure_id": [
+        -0.0016664352878531597,
+        0.0005299895120891125
+       ]
+      },
+      "mean_knocked": 4.15827619682238,
+      "members": [
+       "head.17.4",
+       "head.17.5",
+       "head.17.6",
+       "head.17.7"
+      ],
+      "n_components": 4
+     },
+     "kvg_2": {
+      "f": -0.00046027091954719266,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.0009669047001618847,
+        0.00010477929558737624
+       ],
+       "pressure_id": [
+        -0.000984684651875889,
+        0.00012994359692431186
+       ]
+      },
+      "mean_knocked": 4.156226898860005,
+      "members": [
+       "head.17.8",
+       "head.17.9",
+       "head.17.10",
+       "head.17.11"
+      ],
+      "n_components": 4
+     },
+     "kvg_3": {
+      "f": 0.0014955518128656321,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.0009935876053505657,
+        0.001985605661599576
+       ],
+       "pressure_id": [
+        0.0008827212535142994,
+        0.0021667223211474487
+       ]
+      },
+      "mean_knocked": 4.142390765032722,
+      "members": [
+       "head.17.12",
+       "head.17.13",
+       "head.17.14",
+       "head.17.15"
+      ],
+      "n_components": 4
+     },
+     "kvg_4": {
+      "f": -0.0002591595876318519,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.0006707488484494894,
+        0.00010992230169741114
+       ],
+       "pressure_id": [
+        -0.0006540587958844773,
+        0.00011278833723690805
+       ]
+      },
+      "mean_knocked": 4.15480417109616,
+      "members": [
+       "head.17.16",
+       "head.17.17",
+       "head.17.18",
+       "head.17.19"
+      ],
+      "n_components": 4
+     },
+     "kvg_5": {
+      "f": -0.000167687738249954,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.000662345258722743,
+        0.0003536198069074065
+       ],
+       "pressure_id": [
+        -0.0006834900560104742,
+        0.0003180419754022335
+       ]
+      },
+      "mean_knocked": 4.154157069122907,
+      "members": [
+       "head.17.20",
+       "head.17.21",
+       "head.17.22",
+       "head.17.23"
+      ],
+      "n_components": 4
+     },
+     "kvg_7": {
+      "f": 0.0002814654693308354,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.00017064158517406976,
+        0.0007570455364743871
+       ],
+       "pressure_id": [
+        -0.00027363650718455256,
+        0.0007830560052394945
+       ]
+      },
+      "mean_knocked": 4.15097961148012,
+      "members": [
+       "head.17.28",
+       "head.17.29",
+       "head.17.30",
+       "head.17.31"
+      ],
+      "n_components": 4
+     },
+     "null_d00": {
+      "f": 0.00020351583951842264,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.0003578895979510779,
+        0.0007842451277161536
+       ],
+       "pressure_id": [
+        -0.0006269931885825211,
+        0.0009622871944143449
+       ]
+      },
+      "mean_knocked": 4.151531052820891,
+      "members": [
+       "head.17.2",
+       "head.17.3",
+       "head.17.12",
+       "head.17.23"
+      ],
+      "n_components": 4
+     },
+     "null_d01": {
+      "f": 0.0002923552297010643,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.00029356036737716233,
+        0.0008942467391233243
+       ],
+       "pressure_id": [
+        -0.00046605962515476005,
+        0.0009459657189088754
+       ]
+      },
+      "mean_knocked": 4.150902573730567,
+      "members": [
+       "head.17.2",
+       "head.17.12",
+       "head.17.18",
+       "head.17.20"
+      ],
+      "n_components": 4
+     },
+     "null_d02": {
+      "f": -0.0014053348970082824,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.0020237234720027553,
+        -0.0006392940016048775
+       ],
+       "pressure_id": [
+        -0.0023935161255954755,
+        -0.0005031920279670182
+       ]
+      },
+      "mean_knocked": 4.162912592532951,
+      "members": [
+       "head.17.2",
+       "head.17.4",
+       "head.17.5",
+       "head.17.6"
+      ],
+      "n_components": 4
+     },
+     "null_d03": {
+      "f": -0.0020324378092437295,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.00262629226805513,
+        -0.0013657878079386659
+       ],
+       "pressure_id": [
+        -0.0027658542312261813,
+        -0.0011766750030548045
+       ]
+      },
+      "mean_knocked": 4.167348924963991,
+      "members": [
+       "head.17.6",
+       "head.17.10",
+       "head.17.20",
+       "head.17.23"
+      ],
+      "n_components": 4
+     },
+     "null_d04": {
+      "f": 0.0019114583346705209,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.0012593430189469935,
+        0.0026074501144730646
+       ],
+       "pressure_id": [
+        0.0011937710187903627,
+        0.002838205014720625
+       ]
+      },
+      "mean_knocked": 4.139448505389266,
+      "members": [
+       "head.17.4",
+       "head.17.21",
+       "head.17.29",
+       "head.17.30"
+      ],
+      "n_components": 4
+     },
+     "null_d05": {
+      "f": 0.0011014509880610478,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.0005649848233514988,
+        0.0016400483063753746
+       ],
+       "pressure_id": [
+        0.00046410457434664746,
+        0.0016480485041887544
+       ]
+      },
+      "mean_knocked": 4.145178763997594,
+      "members": [
+       "head.17.1",
+       "head.17.2",
+       "head.17.4",
+       "head.17.20"
+      ],
+      "n_components": 4
+     },
+     "null_d06": {
+      "f": 0.0007571888894763036,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.0003414477098394323,
+        0.0012173608614599234
+       ],
+       "pressure_id": [
+        0.00019466898269158373,
+        0.0013733003756936822
+       ]
+      },
+      "mean_knocked": 4.147614187407262,
+      "members": [
+       "head.17.12",
+       "head.17.14",
+       "head.17.18",
+       "head.17.21"
+      ],
+      "n_components": 4
+     },
+     "null_d07": {
+      "f": 0.0007498870217901072,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.0003423549717332136,
+        0.0011816561369868152
+       ],
+       "pressure_id": [
+        0.0003681472292221217,
+        0.0010951029686451944
+       ]
+      },
+      "mean_knocked": 4.147665843222905,
+      "members": [
+       "head.17.7",
+       "head.17.9",
+       "head.17.10",
+       "head.17.14"
+      ],
+      "n_components": 4
+     },
+     "null_d08": {
+      "f": -0.0006281192055243228,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.001357939923000849,
+        0.00018689498488070558
+       ],
+       "pressure_id": [
+        -0.0017893964474529028,
+        0.0006128043579775833
+       ]
+      },
+      "mean_knocked": 4.157414312887346,
+      "members": [
+       "head.17.1",
+       "head.17.5",
+       "head.17.9",
+       "head.17.15"
+      ],
+      "n_components": 4
+     },
+     "null_d09": {
+      "f": -0.0009506831479097433,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.0017281197299460046,
+        -0.00013081832097776828
+       ],
+       "pressure_id": [
+        -0.0018925109832020285,
+        -0.0001463737769138436
+       ]
+      },
+      "mean_knocked": 4.159696236397457,
+      "members": [
+       "head.17.5",
+       "head.17.9",
+       "head.17.18",
+       "head.17.20"
+      ],
+      "n_components": 4
+     },
+     "null_d10": {
+      "f": -0.0018270630190046547,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.002452990044045365,
+        -0.0011502103621306384
+       ],
+       "pressure_id": [
+        -0.0029867043900231286,
+        -0.0006841716283896189
+       ]
+      },
+      "mean_knocked": 4.1658960360925175,
+      "members": [
+       "head.17.5",
+       "head.17.8",
+       "head.17.11",
+       "head.17.14"
+      ],
+      "n_components": 4
+     },
+     "null_d11": {
+      "f": -0.0015528935277016194,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.0021776197122268435,
+        -0.0008702218586046956
+       ],
+       "pressure_id": [
+        -0.00239780442726489,
+        -0.0005754727016085908
+       ]
+      },
+      "mean_knocked": 4.163956470859861,
+      "members": [
+       "head.17.6",
+       "head.17.12",
+       "head.17.16",
+       "head.17.29"
+      ],
+      "n_components": 4
+     },
+     "null_d12": {
+      "f": 0.0009402414378539592,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.00017158513935439858,
+        0.0017169422213687247
+       ],
+       "pressure_id": [
+        -8.360403187126163e-05,
+        0.0020054259461181256
+       ]
+      },
+      "mean_knocked": 4.146319213422757,
+      "members": [
+       "head.17.0",
+       "head.17.4",
+       "head.17.5",
+       "head.17.30"
+      ],
+      "n_components": 4
+     },
+     "null_d13": {
+      "f": 8.241290025296705e-05,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.00036384543488544895,
+        0.0005466312188769673
+       ],
+       "pressure_id": [
+        -0.0006409689502377538,
+        0.0007504929730585333
+       ]
+      },
+      "mean_knocked": 4.152387774877949,
+      "members": [
+       "head.17.2",
+       "head.17.7",
+       "head.17.17",
+       "head.17.18"
+      ],
+      "n_components": 4
+     },
+     "null_d14": {
+      "f": -0.00014648125946477747,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.0006890846327606187,
+        0.0003892900833042696
+       ],
+       "pressure_id": [
+        -0.0007332159742387734,
+        0.0004141012424808055
+       ]
+      },
+      "mean_knocked": 4.154007047511227,
+      "members": [
+       "head.17.0",
+       "head.17.9",
+       "head.17.15",
+       "head.17.22"
+      ],
+      "n_components": 4
+     },
+     "null_d15": {
+      "f": -0.001556103609701674,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.0022615508221925577,
+        -0.0008196085630901033
+       ],
+       "pressure_id": [
+        -0.0025696823837874977,
+        -0.0004696614384167247
+       ]
+      },
+      "mean_knocked": 4.163979180036625,
+      "members": [
+       "head.17.6",
+       "head.17.12",
+       "head.17.20",
+       "head.17.31"
+      ],
+      "n_components": 4
+     },
+     "null_d16": {
+      "f": 0.0022603922412327564,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        0.0017588006446133389,
+        0.0028663599772297357
+       ],
+       "pressure_id": [
+        0.0015779406349286243,
+        0.0029707871197528373
+       ]
+      },
+      "mean_knocked": 4.136980032072098,
+      "members": [
+       "head.17.0",
+       "head.17.4",
+       "head.17.7",
+       "head.17.31"
+      ],
+      "n_components": 4
+     },
+     "null_d17": {
+      "f": -0.0017580261875370505,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.002391013045083329,
+        -0.0010255140571522846
+       ],
+       "pressure_id": [
+        -0.002390867050249746,
+        -0.0010317617750197799
+       ]
+      },
+      "mean_knocked": 4.165407646821155,
+      "members": [
+       "head.17.6",
+       "head.17.10",
+       "head.17.20",
+       "head.17.30"
+      ],
+      "n_components": 4
+     },
+     "null_d18": {
+      "f": 0.0001236697396796364,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -0.00025938420208556387,
+        0.0004993270039670304
+       ],
+       "pressure_id": [
+        -0.0003925288115061902,
+        0.0005389559406541028
+       ]
+      },
+      "mean_knocked": 4.152095910414909,
+      "members": [
+       "head.17.15",
+       "head.17.16",
+       "head.17.22",
+       "head.17.29"
+      ],
+      "n_components": 4
+     },
+     "null_d19": {
+      "f": 0.00044216829077422056,
+      "passes": false,
+      "ci": {
+       "instructed_inversion_id": [
+        -2.6867617537158693e-05,
+        0.0008704747651572064
+       ],
+       "pressure_id": [
+        -0.00023875114629820347,
+        0.0010402056110456687
+       ]
+      },
+      "mean_knocked": 4.149842746821037,
+      "members": [
+       "head.17.12",
+       "head.17.14",
+       "head.17.16",
+       "head.17.18"
+      ],
+      "n_components": 4
+     }
+    }
+   },
+   "quartet_f": 0.038809971000436386,
+   "note": "f of the same groups on the reference cell (f_D on SDR D), clustered by the wish rows' ids; descriptive"
+  }
+ },
+ "sensitivity": {
+  "exclude_ids": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/instructed-route/docs/research/instructed-route/groups/sdr_seed1_ids.txt",
+  "cell": {
+   "cell": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/instructed-route/outputs/_analyses/instructed-route-b2/p2/wish_all/U__leaf/sdr_v2",
+   "groups_file": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/instructed-route/outputs/_analyses/instructed-route-b2/p2/wish_all/U__leaf/sdr_v2/knockout/groups.json",
+   "plan": {
+    "scheme": "interchange",
+    "counterfactual": "neutral_twin",
+    "positions": "all",
+    "column_suffix": "_neutral_twin_paired"
+   },
+   "n": 561,
+   "n_excluded": 57,
+   "n_unpaired": 0,
+   "n_clusters": {
+    "instructed_inversion_id": 40,
+    "pressure_id": 20
+   },
+   "mean_clean": 3.1487551908442044,
+   "mean_twin": -2.934289350866634,
+   "consistent_with_groups_json": true,
+   "manifest_problem": null,
+   "groups": {
+    "quartet": {
+     "f": 0.5386394766348833,
+     "passes": true,
+     "ci": {
+      "instructed_inversion_id": [
+       0.521928333587562,
+       0.5534916541400998
+      ],
+      "pressure_id": [
+       0.5189153005303465,
+       0.5535005293868163
+      ]
+     },
+     "mean_knocked": -0.1278127374496052,
+     "members": [
+      "head.17.24",
+      "head.17.25",
+      "head.17.26",
+      "head.17.27"
+     ],
+     "n_components": 4
+    },
+    "L17H24": {
+     "f": 0.36203769996216206,
+     "passes": false,
+     "ci": {
+      "instructed_inversion_id": [
+       0.3519787630028699,
+       0.3706413334413921
+      ],
+      "pressure_id": [
+       0.35076751775444975,
+       0.37156859858528357
+      ]
+     },
+     "mean_knocked": 0.9464637361958278,
+     "members": [
+      "head.17.24"
+     ],
+     "n_components": 1
+    },
+    "kvg_0": {
+     "f": 0.0025505425538682267,
+     "passes": false,
+     "ci": {
+      "instructed_inversion_id": [
+       0.0019513238700637598,
+       0.003088167990273402
+      ],
+      "pressure_id": [
+       0.002128291348707786,
+       0.0029427004874105346
+      ]
+     },
+     "mean_knocked": 3.133240126883495,
+     "members": [
+      "head.17.0",
+      "head.17.1",
+      "head.17.2",
+      "head.17.3"
+     ],
+     "n_components": 4
+    },
+    "kvg_1": {
+     "f": 0.00044621529248265173,
+     "passes": false,
+     "ci": {
+      "instructed_inversion_id": [
+       -0.0007182747363684049,
+       0.0016097729210167505
+      ],
+      "pressure_id": [
+       -0.0005750118840077966,
+       0.00143212870595181
+      ]
+     },
+     "mean_knocked": 3.14604084334484,
+     "members": [
+      "head.17.4",
+      "head.17.5",
+      "head.17.6",
+      "head.17.7"
+     ],
+     "n_components": 4
+    },
+    "kvg_2": {
+     "f": -0.0009546630414685581,
+     "passes": false,
+     "ci": {
+      "instructed_inversion_id": [
+       -0.0014780076293211383,
+       -0.0003994684773346841
+      ],
+      "pressure_id": [
+       -0.0015904463309713928,
+       -0.00036298733276293683
+      ]
+     },
+     "mean_knocked": 3.154562448647783,
+     "members": [
+      "head.17.8",
+      "head.17.9",
+      "head.17.10",
+      "head.17.11"
+     ],
+     "n_components": 4
+    },
+    "kvg_3": {
+     "f": 0.004832148898136152,
+     "passes": false,
+     "ci": {
+      "instructed_inversion_id": [
+       0.003986247542590934,
+       0.005605741214387826
+      ],
+      "pressure_id": [
+       0.004098844016587982,
+       0.00555333147018519
+      ]
+     },
+     "mean_knocked": 3.1193610138646632,
+     "members": [
+      "head.17.12",
+      "head.17.13",
+      "head.17.14",
+      "head.17.15"
+     ],
+     "n_components": 4
+    },
+    "kvg_4": {
+     "f": 0.00036236677548941295,
+     "passes": false,
+     "ci": {
+      "instructed_inversion_id": [
+       -0.000244200580218224,
+       0.000982391326991587
+      ],
+      "pressure_id": [
+       -0.00018377984426453972,
+       0.0008918135386095483
+      ]
+     },
+     "mean_knocked": 3.146550897608466,
+     "members": [
+      "head.17.16",
+      "head.17.17",
+      "head.17.18",
+      "head.17.19"
+     ],
+     "n_components": 4
+    },
+    "kvg_5": {
+     "f": -0.003251786000379641,
+     "passes": false,
+     "ci": {
+      "instructed_inversion_id": [
+       -0.004601375799154745,
+       -0.0019400135056013795
+      ],
+      "pressure_id": [
+       -0.0048221226589939235,
+       -0.0017551514872860853
+      ]
+     },
+     "mean_knocked": 3.1685359499246255,
+     "members": [
+      "head.17.20",
+      "head.17.21",
+      "head.17.22",
+      "head.17.23"
+     ],
+     "n_components": 4
+    },
+    "kvg_7": {
+     "f": 0.004842345754182139,
+     "passes": false,
+     "ci": {
+      "instructed_inversion_id": [
+       0.0038795354162100898,
+       0.005718120094733508
+      ],
+      "pressure_id": [
+       0.003936435835386304,
+       0.005781998930115431
+      ]
+     },
+     "mean_knocked": 3.11929898593515,
+     "members": [
+      "head.17.28",
+      "head.17.29",
+      "head.17.30",
+      "head.17.31"
+     ],
+     "n_components": 4
+    },
+    "null_d00": {
+     "f": 0.011442612387883109,
+     "passes": false,
+     "ci": {
+      "instructed_inversion_id": [
+       0.010512983019341527,
+       0.012252230595574051
+      ],
+      "pressure_id": [
+       0.01050386961262368,
+       0.012434556068027248
+      ]
+     },
+     "mean_knocked": 3.0791492700151792,
+     "members": [
+      "head.17.2",
+      "head.17.3",
+      "head.17.12",
+      "head.17.23"
+     ],
+     "n_components": 4
+    },
+    "null_d01": {
+     "f": 0.006734840094090055,
+     "passes": false,
+     "ci": {
+      "instructed_inversion_id": [
+       0.004885550779178474,
+       0.008448619716925097
+      ],
+      "pressure_id": [
+       0.005191719840809649,
+       0.008312843544466382
+      ]
+     },
+     "mean_knocked": 3.1077868585705546,
+     "members": [
+      "head.17.2",
+      "head.17.12",
+      "head.17.18",
+      "head.17.20"
+     ],
+     "n_components": 4
+    },
+    "null_d02": {
+     "f": -0.001714924620918171,
+     "passes": false,
+     "ci": {
+      "instructed_inversion_id": [
+       -0.0028531342608211357,
+       -0.0005660690968373479
+      ],
+      "pressure_id": [
+       -0.0027956293601137916,
+       -0.0007856776741974268
+      ]
+     },
+     "mean_knocked": 3.159187153698926,
+     "members": [
+      "head.17.2",
+      "head.17.4",
+      "head.17.5",
+      "head.17.6"
+     ],
+     "n_components": 4
+    },
+    "null_d03": {
+     "f": -0.03814391272864811,
+     "passes": false,
+     "ci": {
+      "instructed_inversion_id": [
+       -0.04042364298645455,
+       -0.035786583481197426
+      ],
+      "pressure_id": [
+       -0.04065373540931515,
+       -0.035858416978869816
+      ]
+     },
+     "mean_knocked": 3.380786310967702,
+     "members": [
+      "head.17.6",
+      "head.17.10",
+      "head.17.20",
+      "head.17.23"
+     ],
+     "n_components": 4
+    },
+    "null_d04": {
+     "f": 0.020304780796683814,
+     "passes": false,
+     "ci": {
+      "instructed_inversion_id": [
+       0.018611106418852046,
+       0.021926866484969203
+      ],
+      "pressure_id": [
+       0.018259381599798286,
+       0.02218872225761941
+      ]
+     },
+     "mean_knocked": 3.025240304848302,
+     "members": [
+      "head.17.4",
+      "head.17.21",
+      "head.17.29",
+      "head.17.30"
+     ],
+     "n_components": 4
+    },
+    "null_d05": {
+     "f": 0.01681902378717423,
+     "passes": false,
+     "ci": {
+      "instructed_inversion_id": [
+       0.014884716142111374,
+       0.018537021918619005
+      ],
+      "pressure_id": [
+       0.014472309613391457,
+       0.01891867970375139
+      ]
+     },
+     "mean_knocked": 3.0464443199987294,
+     "members": [
+      "head.17.1",
+      "head.17.2",
+      "head.17.4",
+      "head.17.20"
+     ],
+     "n_components": 4
+    },
+    "null_d06": {
+     "f": 0.0067351692953732676,
+     "passes": false,
+     "ci": {
+      "instructed_inversion_id": [
+       0.005645728578260078,
+       0.007628237068689209
+      ],
+      "pressure_id": [
+       0.005547826348163658,
+       0.007984754445226356
+      ]
+     },
+     "mean_knocked": 3.1077848560244856,
+     "members": [
+      "head.17.12",
+      "head.17.14",
+      "head.17.18",
+      "head.17.21"
+     ],
+     "n_components": 4
+    },
+    "null_d07": {
+     "f": 0.0026615985229260777,
+     "passes": false,
+     "ci": {
+      "instructed_inversion_id": [
+       0.0018687990158986574,
+       0.0034945500170537884
+      ],
+      "pressure_id": [
+       0.001743288192454528,
+       0.003742004799872402
+      ]
+     },
+     "mean_knocked": 3.1325645684770933,
+     "members": [
+      "head.17.7",
+      "head.17.9",
+      "head.17.10",
+      "head.17.14"
+     ],
+     "n_components": 4
+    },
+    "null_d08": {
+     "f": 0.009334329121942915,
+     "passes": false,
+     "ci": {
+      "instructed_inversion_id": [
+       0.008371153787534155,
+       0.010155797359956148
+      ],
+      "pressure_id": [
+       0.008470684964870329,
+       0.010114265543886393
+      ]
+     },
+     "mean_knocked": 3.091974051028437,
+     "members": [
+      "head.17.1",
+      "head.17.5",
+      "head.17.9",
+      "head.17.15"
+     ],
+     "n_components": 4
+    },
+    "null_d09": {
+     "f": 0.011062052350984253,
+     "passes": false,
+     "ci": {
+      "instructed_inversion_id": [
+       0.008790145172853602,
+       0.013016308300770276
+      ],
+      "pressure_id": [
+       0.008821496275489196,
+       0.013233548604537258
+      ]
+     },
+     "mean_knocked": 3.08146423367043,
+     "members": [
+      "head.17.5",
+      "head.17.9",
+      "head.17.18",
+      "head.17.20"
+     ],
+     "n_components": 4
+    },
+    "null_d10": {
+     "f": 0.01156079732530678,
+     "passes": false,
+     "ci": {
+      "instructed_inversion_id": [
+       0.010184752749263936,
+       0.012715266253154844
+      ],
+      "pressure_id": [
+       0.01014045229984375,
+       0.012954439812143758
+      ]
+     },
+     "mean_knocked": 3.0784303457766717,
+     "members": [
+      "head.17.5",
+      "head.17.8",
+      "head.17.11",
+      "head.17.14"
+     ],
+     "n_components": 4
+    },
+    "null_d11": {
+     "f": -0.024734561330467617,
+     "passes": false,
+     "ci": {
+      "instructed_inversion_id": [
+       -0.026069606018590378,
+       -0.023392314149302533
+      ],
+      "pressure_id": [
+       -0.026680927183024106,
+       -0.022822391341624355
+      ]
+     },
+     "mean_knocked": 3.2992166291371174,
+     "members": [
+      "head.17.6",
+      "head.17.12",
+      "head.17.16",
+      "head.17.29"
+     ],
+     "n_components": 4
+    },
+    "null_d12": {
+     "f": 0.03327379893006353,
+     "passes": false,
+     "ci": {
+      "instructed_inversion_id": [
+       0.03085183725321745,
+       0.03542686484450064
+      ],
+      "pressure_id": [
+       0.03059436342409387,
+       0.03582729983030957
+      ]
+     },
+     "mean_knocked": 2.9463491898806975,
+     "members": [
+      "head.17.0",
+      "head.17.4",
+      "head.17.5",
+      "head.17.30"
+     ],
+     "n_components": 4
+    },
+    "null_d13": {
+     "f": 0.0019982204898879763,
+     "passes": false,
+     "ci": {
+      "instructed_inversion_id": [
+       0.0010293216385428485,
+       0.002983800552529172
+      ],
+      "pressure_id": [
+       0.0010932969136130467,
+       0.0030347362338812396
+      ]
+     },
+     "mean_knocked": 3.1365999266000566,
+     "members": [
+      "head.17.2",
+      "head.17.7",
+      "head.17.17",
+      "head.17.18"
+     ],
+     "n_components": 4
+    },
+    "null_d14": {
+     "f": -0.002342277749524843,
+     "passes": false,
+     "ci": {
+      "instructed_inversion_id": [
+       -0.0030273513655350247,
+       -0.0015422765835707312
+      ],
+      "pressure_id": [
+       -0.0031263829301837287,
+       -0.0015475403324940224
+      ]
+     },
+     "mean_knocked": 3.1630033707236223,
+     "members": [
+      "head.17.0",
+      "head.17.9",
+      "head.17.15",
+      "head.17.22"
+     ],
+     "n_components": 4
+    },
+    "null_d15": {
+     "f": -0.029022798167524334,
+     "passes": false,
+     "ci": {
+      "instructed_inversion_id": [
+       -0.031090649476616432,
+       -0.026932739389708946
+      ],
+      "pressure_id": [
+       -0.03115636950455095,
+       -0.027103282392277404
+      ]
+     },
+     "mean_knocked": 3.3253021648223386,
+     "members": [
+      "head.17.6",
+      "head.17.12",
+      "head.17.20",
+      "head.17.31"
+     ],
+     "n_components": 4
+    },
+    "null_d16": {
+     "f": 0.02115423971533454,
+     "passes": false,
+     "ci": {
+      "instructed_inversion_id": [
+       0.019461739018811163,
+       0.022619000477598072
+      ],
+      "pressure_id": [
+       0.019285995959764848,
+       0.02300328406917017
+      ]
+     },
+     "mean_knocked": 3.020073008409796,
+     "members": [
+      "head.17.0",
+      "head.17.4",
+      "head.17.7",
+      "head.17.31"
+     ],
+     "n_components": 4
+    },
+    "null_d17": {
+     "f": -0.03707347423486955,
+     "passes": false,
+     "ci": {
+      "instructed_inversion_id": [
+       -0.03916442186902224,
+       -0.0348310614183376
+      ],
+      "pressure_id": [
+       -0.039406604134095614,
+       -0.03480366427026182
+      ]
+     },
+     "mean_knocked": 3.374274785930885,
+     "members": [
+      "head.17.6",
+      "head.17.10",
+      "head.17.20",
+      "head.17.30"
+     ],
+     "n_components": 4
+    },
+    "null_d18": {
+     "f": -0.001200071140341427,
+     "passes": false,
+     "ci": {
+      "instructed_inversion_id": [
+       -0.001886737274678713,
+       -0.0004705616285703109
+      ],
+      "pressure_id": [
+       -0.002063134763056789,
+       -0.0004537991508373195
+      ]
+     },
+     "mean_knocked": 3.156055277044123,
+     "members": [
+      "head.17.15",
+      "head.17.16",
+      "head.17.22",
+      "head.17.29"
+     ],
+     "n_components": 4
+    },
+    "null_d19": {
+     "f": 0.009593819099136255,
+     "passes": false,
+     "ci": {
+      "instructed_inversion_id": [
+       0.008077157004487329,
+       0.010911341989828804
+      ],
+      "pressure_id": [
+       0.008320071306697213,
+       0.010927455333537495
+      ]
+     },
+     "mean_knocked": 3.0903955619390424,
+     "members": [
+      "head.17.12",
+      "head.17.14",
+      "head.17.16",
+      "head.17.18"
+     ],
+     "n_components": 4
+    }
+   }
+  },
+  "verdict": {
+   "rule": "The wish runs through the route when the quartet's neutral-twin interchange at all positions gives f_wish = (mean m_I - mean m_KO) / (mean m_I - mean m_tw) >= 0.5 on the 618 ids; when any of the 20 layer-matched random quartets or the seven other layer-17 KV groups also reaches 0.5, the verdict is labelled 'not quartet-specific' (spec R3).",
+   "quartet": "quartet",
+   "quartet_f": 0.5386394766348833,
+   "quartet_ci": {
+    "instructed_inversion_id": [
+     0.521928333587562,
+     0.5534916541400998
+    ],
+    "pressure_id": [
+     0.5189153005303465,
+     0.5535005293868163
+    ]
+   },
+   "passes": true,
+   "null_max": {
+    "null_d": 0.03327379893006353,
+    "kvg": 0.004842345754182139
+   },
+   "null_argmax": {
+    "null_d": "null_d12",
+    "kvg": "kvg_7"
+   },
+   "labels": [],
+   "text": "f_wish(quartet) = 0.539 >= 0.5: the wish runs through the route",
+   "status": "complete"
+  },
+  "note": "sensitivity row; the primary verdict stands"
+ }
+}
