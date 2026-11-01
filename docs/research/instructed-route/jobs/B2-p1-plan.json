@@ -1,0 +1,304 @@
+{
+ "schema": "falsity-probe-capture-plan/1",
+ "description": "instructed-route B2 P1 capture, plans/B2-plan.md section 1 (split table); written by scripts/falsity_probe_capture.py --write-plans",
+ "model": "llama-8b-instruct",
+ "seed": 0,
+ "batch_size": 8,
+ "cells": [
+  {
+   "name": "far_fit_D",
+   "role": "fit",
+   "task": "far_v2",
+   "condition": "D",
+   "dataset": "data/datasets/far_v2",
+   "split": "train",
+   "prompt_field": "clean_prompt",
+   "flag_id_files": {
+    "in_seed0_sample": "docs/research/instructed-route/groups/far_seed0_ids.txt",
+    "in_seed1_sample": "docs/research/instructed-route/groups/far_seed1_ids.txt"
+   }
+  },
+  {
+   "name": "far_fit_H",
+   "role": "fit",
+   "task": "far_v2",
+   "condition": "H",
+   "dataset": "data/datasets/far_v2_honest",
+   "split": "train",
+   "prompt_field": "clean_prompt",
+   "flag_id_files": {
+    "in_seed0_sample": "docs/research/instructed-route/groups/far_seed0_ids.txt",
+    "in_seed1_sample": "docs/research/instructed-route/groups/far_seed1_ids.txt"
+   }
+  },
+  {
+   "name": "far_select_D",
+   "role": "select",
+   "task": "far_v2",
+   "condition": "D",
+   "dataset": "data/datasets/far_v2",
+   "split": "validation",
+   "prompt_field": "clean_prompt",
+   "flag_id_files": {
+    "in_seed0_sample": "docs/research/instructed-route/groups/far_seed0_ids.txt",
+    "in_seed1_sample": "docs/research/instructed-route/groups/far_seed1_ids.txt"
+   }
+  },
+  {
+   "name": "far_select_H",
+   "role": "select",
+   "task": "far_v2",
+   "condition": "H",
+   "dataset": "data/datasets/far_v2_honest",
+   "split": "validation",
+   "prompt_field": "clean_prompt",
+   "flag_id_files": {
+    "in_seed0_sample": "docs/research/instructed-route/groups/far_seed0_ids.txt",
+    "in_seed1_sample": "docs/research/instructed-route/groups/far_seed1_ids.txt"
+   }
+  },
+  {
+   "name": "far_select_HI",
+   "role": "select",
+   "task": "far_v2",
+   "condition": "HI",
+   "dataset": "data/datasets/far_v2",
+   "split": "validation",
+   "prompt_field": "honest_instruction_clean_prompt",
+   "keep_if": {
+    "field": "h_honest_instruction_clean",
+    "min": 0.3
+   },
+   "flag_id_files": {
+    "in_seed0_sample": "docs/research/instructed-route/groups/far_seed0_ids.txt",
+    "in_seed1_sample": "docs/research/instructed-route/groups/far_seed1_ids.txt"
+   }
+  },
+  {
+   "name": "far_gate_D",
+   "role": "far_gate",
+   "task": "far_v2",
+   "condition": "D",
+   "dataset": "data/datasets/far_v2",
+   "split": "test",
+   "prompt_field": "clean_prompt",
+   "exclude_id_files": [
+    "docs/research/instructed-route/groups/far_seed0_ids.txt",
+    "docs/research/instructed-route/groups/far_seed1_ids.txt"
+   ],
+   "flag_id_files": {
+    "in_seed0_sample": "docs/research/instructed-route/groups/far_seed0_ids.txt",
+    "in_seed1_sample": "docs/research/instructed-route/groups/far_seed1_ids.txt"
+   }
+  },
+  {
+   "name": "far_gate_H",
+   "role": "far_gate",
+   "task": "far_v2",
+   "condition": "H",
+   "dataset": "data/datasets/far_v2_honest",
+   "split": "test",
+   "prompt_field": "clean_prompt",
+   "exclude_id_files": [
+    "docs/research/instructed-route/groups/far_seed0_ids.txt",
+    "docs/research/instructed-route/groups/far_seed1_ids.txt"
+   ],
+   "flag_id_files": {
+    "in_seed0_sample": "docs/research/instructed-route/groups/far_seed0_ids.txt",
+    "in_seed1_sample": "docs/research/instructed-route/groups/far_seed1_ids.txt"
+   }
+  },
+  {
+   "name": "far_gate_HI",
+   "role": "far_gate",
+   "task": "far_v2",
+   "condition": "HI",
+   "dataset": "data/datasets/far_v2",
+   "split": "test",
+   "prompt_field": "honest_instruction_clean_prompt",
+   "keep_if": {
+    "field": "h_honest_instruction_clean",
+    "min": 0.3
+   },
+   "exclude_id_files": [
+    "docs/research/instructed-route/groups/far_seed0_ids.txt",
+    "docs/research/instructed-route/groups/far_seed1_ids.txt"
+   ],
+   "flag_id_files": {
+    "in_seed0_sample": "docs/research/instructed-route/groups/far_seed0_ids.txt",
+    "in_seed1_sample": "docs/research/instructed-route/groups/far_seed1_ids.txt"
+   }
+  },
+  {
+   "name": "far_gate_F",
+   "role": "far_gate",
+   "task": "far_v2",
+   "condition": "F",
+   "dataset": "data/datasets/far_v2_nopressure",
+   "split": "test",
+   "prompt_field": "clean_prompt",
+   "exclude_id_files": [
+    "docs/research/instructed-route/groups/far_seed0_ids.txt",
+    "docs/research/instructed-route/groups/far_seed1_ids.txt"
+   ],
+   "flag_id_files": {
+    "in_seed0_sample": "docs/research/instructed-route/groups/far_seed0_ids.txt",
+    "in_seed1_sample": "docs/research/instructed-route/groups/far_seed1_ids.txt"
+   }
+  },
+  {
+   "name": "far_gate_I",
+   "role": "far_gate",
+   "task": "far_v2",
+   "condition": "I",
+   "dataset": "data/datasets/far_v2_inversion",
+   "split": "test",
+   "prompt_field": "clean_prompt",
+   "exclude_id_files": [
+    "docs/research/instructed-route/groups/far_seed0_ids.txt",
+    "docs/research/instructed-route/groups/far_seed1_ids.txt"
+   ],
+   "flag_id_files": {
+    "in_seed0_sample": "docs/research/instructed-route/groups/far_seed0_ids.txt",
+    "in_seed1_sample": "docs/research/instructed-route/groups/far_seed1_ids.txt"
+   }
+  },
+  {
+   "name": "ser_test_D",
+   "role": "ser_test",
+   "task": "ser_v2",
+   "condition": "D",
+   "dataset": "data/datasets/ser_v2",
+   "split": "test",
+   "prompt_field": "clean_prompt",
+   "exclude_id_files": [
+    "docs/research/instructed-route/groups/ser_seed0_ids.txt",
+    "docs/research/instructed-route/groups/ser_seed1_ids.txt"
+   ],
+   "flag_id_files": {
+    "in_seed0_sample": "docs/research/instructed-route/groups/ser_seed0_ids.txt",
+    "in_seed1_sample": "docs/research/instructed-route/groups/ser_seed1_ids.txt"
+   }
+  },
+  {
+   "name": "ser_test_H",
+   "role": "ser_test",
+   "task": "ser_v2",
+   "condition": "H",
+   "dataset": "data/datasets/ser_v2_honest",
+   "split": "test",
+   "prompt_field": "clean_prompt",
+   "exclude_id_files": [
+    "docs/research/instructed-route/groups/ser_seed0_ids.txt",
+    "docs/research/instructed-route/groups/ser_seed1_ids.txt"
+   ],
+   "flag_id_files": {
+    "in_seed0_sample": "docs/research/instructed-route/groups/ser_seed0_ids.txt",
+    "in_seed1_sample": "docs/research/instructed-route/groups/ser_seed1_ids.txt"
+   }
+  },
+  {
+   "name": "ser_test_HI",
+   "role": "ser_test",
+   "task": "ser_v2",
+   "condition": "HI",
+   "dataset": "data/datasets/ser_v2",
+   "split": "test",
+   "prompt_field": "honest_instruction_clean_prompt",
+   "keep_if": {
+    "field": "h_honest_instruction_clean",
+    "min": 0.3
+   },
+   "exclude_id_files": [
+    "docs/research/instructed-route/groups/ser_seed0_ids.txt",
+    "docs/research/instructed-route/groups/ser_seed1_ids.txt"
+   ],
+   "flag_id_files": {
+    "in_seed0_sample": "docs/research/instructed-route/groups/ser_seed0_ids.txt",
+    "in_seed1_sample": "docs/research/instructed-route/groups/ser_seed1_ids.txt"
+   }
+  },
+  {
+   "name": "ser_test_F",
+   "role": "ser_test",
+   "task": "ser_v2",
+   "condition": "F",
+   "dataset": "data/datasets/ser_v2_nopressure",
+   "split": "test",
+   "prompt_field": "clean_prompt",
+   "exclude_id_files": [
+    "docs/research/instructed-route/groups/ser_seed0_ids.txt",
+    "docs/research/instructed-route/groups/ser_seed1_ids.txt"
+   ],
+   "flag_id_files": {
+    "in_seed0_sample": "docs/research/instructed-route/groups/ser_seed0_ids.txt",
+    "in_seed1_sample": "docs/research/instructed-route/groups/ser_seed1_ids.txt"
+   }
+  },
+  {
+   "name": "ser_test_I",
+   "role": "ser_test",
+   "task": "ser_v2",
+   "condition": "I",
+   "dataset": "data/datasets/ser_v2_inversion",
+   "split": "test",
+   "prompt_field": "clean_prompt",
+   "exclude_id_files": [
+    "docs/research/instructed-route/groups/ser_seed0_ids.txt",
+    "docs/research/instructed-route/groups/ser_seed1_ids.txt"
+   ],
+   "flag_id_files": {
+    "in_seed0_sample": "docs/research/instructed-route/groups/ser_seed0_ids.txt",
+    "in_seed1_sample": "docs/research/instructed-route/groups/ser_seed1_ids.txt"
+   }
+  },
+  {
+   "name": "sdr_test_D",
+   "role": "sdr",
+   "task": "sdr_v2",
+   "condition": "D",
+   "dataset": "data/datasets/sdr_v2",
+   "split": "test",
+   "prompt_field": "clean_prompt",
+   "exclude_id_files": [
+    "docs/research/instructed-route/groups/sdr_seed0_ids.txt",
+    "docs/research/instructed-route/groups/sdr_seed1_ids.txt"
+   ],
+   "flag_id_files": {
+    "in_seed0_sample": "docs/research/instructed-route/groups/sdr_seed0_ids.txt",
+    "in_seed1_sample": "docs/research/instructed-route/groups/sdr_seed1_ids.txt"
+   }
+  },
+  {
+   "name": "sdr_test_H",
+   "role": "sdr",
+   "task": "sdr_v2",
+   "condition": "H",
+   "dataset": "data/datasets/sdr_v2_honest",
+   "split": "test",
+   "prompt_field": "clean_prompt",
+   "exclude_id_files": [
+    "docs/research/instructed-route/groups/sdr_seed0_ids.txt",
+    "docs/research/instructed-route/groups/sdr_seed1_ids.txt"
+   ],
+   "flag_id_files": {
+    "in_seed0_sample": "docs/research/instructed-route/groups/sdr_seed0_ids.txt",
+    "in_seed1_sample": "docs/research/instructed-route/groups/sdr_seed1_ids.txt"
+   }
+  },
+  {
+   "name": "sdr_test_I_reported",
+   "role": "sdr",
+   "task": "sdr_v2",
+   "condition": "I_reported",
+   "dataset": "data/datasets/sdr_v2_inversion_reported",
+   "split": "test",
+   "prompt_field": "clean_prompt",
+   "id_file": "docs/research/instructed-route/groups/sdr_wish_ids.txt",
+   "flag_id_files": {
+    "in_seed0_sample": "docs/research/instructed-route/groups/sdr_seed0_ids.txt",
+    "in_seed1_sample": "docs/research/instructed-route/groups/sdr_seed1_ids.txt"
+   }
+  }
+ ]
+}
