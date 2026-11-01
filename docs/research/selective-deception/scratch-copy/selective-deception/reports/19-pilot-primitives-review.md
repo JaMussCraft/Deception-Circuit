@@ -1,0 +1,22 @@
+# Ticket 03 independent primitives review
+
+Verdict: **PASS for the bounded CPU primitives ticket**. No Critical or Important correctness finding. This review does not authorize model execution or resolve the remaining scientific/resource gates.
+
+Reviewed the frozen `evaluation/selective_mask.py`, `l0.py`, and `tests/test_selective_mask.py` in `Deception-Circuit/.claude/worktrees/selective-mask-pilot`, plus their actual diagnostics/model/export dependencies. Contract sources: issue 03, reports 06 and 08, report 07's **last authoritative 119/119 correction**, and implementation handoff 13. No source edits, git operations, packages, jobs, GPUs, pretrained weights, APIs or notebooks were used. No full suite or unchanged focused suite was repeated; report 13's dual-environment 92-pass and actual-data hash evidence remains author-supplied verification, separately identified from this independent static review.
+
+## Spec and correctness
+
+- Data construction reserves every raw test/validation semantic key before actual Stage 1 exposure exclusion, structural preflight and representative selection. Corrupt endpoints correctly use D-label truth regardless of instruction policy. Exposure includes all recipient/donor/reference endpoints, with endpoint-to-cluster checks and retokenization during construction. Split-local sorted rotation is outcome independent; singletons are excluded before rotation. Donor membership is a permutation of the final pool, so all assigned donor views are included in the final semantic/text/full-token intersection checks. Final builder evidence in handoff 13 matches the authoritative retained/representative/donor/endpoint hashes and missing coverage cell.
+- Loss math implements the requested fp32 logsumexp suppression, KL(base || masked) only on capable H with its own denominator, all-H nondegradation, and positive expected removed **count**, `sum(sigmoid(-alpha))`. Base references detach. These signs encourage suppression while penalizing removal; no D KL or wrong-baseline all-H KL appears. Separate D/H means prevent condition-count dilution.
+- Noncandidate outputs are exactly one through `where` in train and eval, with zero data-path gradient. Configuration freezes all base/non-head parameters and hard-opens other existing granularities. Candidate logits are fp32 and explicitly initialized. The documented zero-weight-decay optimizer and concatenation of eligible entries are necessary runner responsibilities.
+- Legacy None eligibility introduces no state-dict key. Opted-in eligibility persists and moves as a bool buffer; configure-before-strict-load is explicit. Export follows actual eval threshold including removal at zero, checks head eligibility, preserves exact K/R, and constructs head removal membership with every MLP removal entry zero. It avoids the historical `get_num_active` threshold and broad MLP complementation.
+
+## Standards and tests
+
+No documented-standard breach or material overengineering found. The implementation stays within the three owned files and the small helper/gate seam. Tests go beyond mirroring formulas: corrupt semantic exposure and raw reservation adversaries, outcome-looking metadata, token collisions, relational source/rotation mutation, fixed-draw joint/separate gradient agreement, actual tiny-model nonself intervention/self identity, optimizer-update isolation, strict legacy/opted-in loading, and exact exported-intervention output equivalence all exercise observable behavior.
+
+## Integration obligations already explicit in the contract
+
+These are ticket 04 gates, not missing ticket 03 functionality: validate and bind the frozen 103-head candidate list/source identities; supply source/config/data/donor export provenance; reject globally empty capability; aggregate D/H/KL by their respective row/capability counts and apply regularization once per effective objective; configure before loading opted-in checkpoints; retain fp32 candidate logits and zero weight decay. R1 remains the default evidence pin. Binding the separately approved same-input Stage 1 scoring successor requires root's verified lineage assertion and unchanged pilot hashes. Source/hash serialization checks are integrity checks, not protection against a malicious author recomputing all evidence.
+
+No change requested before ticket 03 integration. Stage 1 compute-path validity, H capability, donor behavior, generation quality, and measured fitting/export cost remain separate prerequisites for production fitting.

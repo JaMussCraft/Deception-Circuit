@@ -1,0 +1,22 @@
+# Final scoped scientific narrative review
+
+**PASS — no outstanding must-fixes.** Final bytes verified 2026-10-26 for only these two new reports:
+
+- `project_context/reports/SDR named-consequence probe findings.md` — SHA256 `5339c000fa558f5c5b73ec241a61585ccbef002f676cddaff6c004668c226370`; 448 whitespace-separated words.
+- `.scratch/sdr-clause-choice/analysis.md` — SHA256 `3bc96e12daf43cb5ff506ac9e1843bc2edce28da0a8bfbec11a4d80e7c5265ef`.
+
+All relative links in both files resolve. The prior prospective oracle and actual scientific audit receipt closure remain unchanged.
+
+The reports correctly state baseline FAIL and that the conditional assay of up to 3,840 patched completions was NOT RUN. They retain all640 main outcomes, including the cap, with32 preflight outcomes excluded. Capability counts3/64,17/128,106/320; report avoidance35/128 versus42/128; both negative template margins; and retrieval avoidance26/128 versus29/128 agree with the already independently verified source/frozen-oracle results. The complete six-cell category table and secondary answered-response descriptions do not replace all-row gates. The 432 explicit refusals remain separate from207 commitments and one cap; no malformed output is invented.
+
+The all128-pair report partition is accurate:80refusal/refusal,40commitment/commitment,8C-refusal/U-commitment. Shared commitments contribute35avoidances per condition; seven U-only avoiding commitments account for the net−7. Two shared-commitment identity switches, plus those eight category changes, give10/128 report changes; the retrieval table gives13/128 changes. The reports do not interpret a zero avoidance score for refusal as absence of clause responsiveness or proof that facts are absent. They distinguish coherent refusal's possible value from the particular expressed-choice prerequisite. The final concise report explicitly says latent knowledge is neither established nor ruled out.
+
+The post-hoc supplement actually used is `refusal-audit.md` (SHA256 `2dd27f0ded86f9b17b5a401409c8b00ea2f67fb1cc62ab3ea7a5304919990324`), with `refusal-row-codes.json` (SHA256 `e7550a10385cd78dc28cb046874fa25b7438bb86b534e1f7833acaca498da539`). Existing116unique refusal-view records restore exactly432unique originally labeled refusal row IDs. Every full response/question/candidate linkage matches the original view and normalized row; all four existing content-code totals and all six condition/task tables match. The164-view inventory is116refusal+47commitment+1cap. Existing source hashes and view/protocol bindings match. No new semantic taxonomy or labels were assigned in this review.
+
+Read eight cited raw representative views: safe report objection (`v-9e4c…`), safe private generic decline (`v-d920…`), report-weight manipulation wording (`v-080c…`), information claim (`v-f345…`), negative-only timeline denial (`v-07b9…`), operative budget selection (`v-5b3e…`), desk/damaging disclosure (`v-672a…`) and the capped decline (`v-f3c4…`). Quotes and their existing label/finish distinctions are faithful. The descriptions remain stated content, not inferred causal computation. The nonblinded manual audit is clearly separated from the two independent original raters and does not masquerade as blinded adjudication.
+
+Requested precision edits were applied only to these two new reports: N explicitly guarantees intact weights while retaining the reporting frame; the changed scaffold is distinguished from original fixture names; the technical runtime receipt hash now includes all64characters; and the main report avoids implying that low expressed capability proves absent latent knowledge. The reports correctly reject a causal prefill-removal inference, pure contingency/pressure attribution, and prevalence/OOD generalization. A possible successor remains a proposal, not an experiment or rescue search already run.
+
+Runtime counts and spending are consistent with the existing audited receipts:84accepted batches/672unique rows,10,486generated tokens,2,333forwards,1,344bitwise controls with zero maximum error, and1,800reserved/546actual A100GPU-seconds with$0API. Raw runtime/hardware verification remains the separate runtime audit's responsibility; rater personal reading and independence remain attestations.
+
+Review scope used existing data, receipts and these new narratives only. No GPU/job/API/Git action, source/label edit or new experiment was performed. No prior report was edited. Final PASS applies to the exact two SHA256s above; further narrative edits require re-verification.

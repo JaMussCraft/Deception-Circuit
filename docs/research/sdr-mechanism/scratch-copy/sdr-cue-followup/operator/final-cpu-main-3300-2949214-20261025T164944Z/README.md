@@ -1,0 +1,9 @@
+# Main proposal and selected actual-wrapper CPU readiness
+
+PASS for the one actual mgnpabsolutewrapper main dryrun:88.705s,exit0,528remainingbatches/4224rows,0accepted, nooutput/runmutation. Finalcommittedsource/protocol/calibration/operations stayed exact. No mainGPUrelease/reservation/submission.
+
+Actualfrozenpositionsrunnerforecast and independent auditor agree: naturalelapsed+seal+publication work1897.595770s×1.5+360.380435sfixedbuffers/audit=3206.774090s (~53m26.8s). Requestproposal3300s55min leaves93.225910s abovethisbufferedexpectation and staysunder3600sinteractivecap. Preserveallrows/cap64/controls; wholepanelcompletionwithinonejobisanexpectation. LivepreflightcountsagainstactualSlurmEnd, and188.889931sforcedbatchguardincludes120sshutdown/safety. Verifieddurableresume handlesoperationalshortfall only afterseparaterootrelease.
+
+Calibratedexacthardware NVIDIAA100-SXM4-40GB/capability8.0/memory42405855232/count1, withfrozenmgnpsoftware, mustmatchatmainadmission. Proposalhardware_class remainsA100 so thefullruntimebindingcanmatchcalibration. Original48hadmissionhorizon is retained; approachingexpiryrequiresrootreassessment andfreshrelease. NoA100x8/H200substitution.
+
+Oneproposal-time schedulercheck foundA100x4userslotempty,beto highestfairshare.140286,and3300stest-onlyforecastimmediate. Recheckownership andunchangedinputs/outputimmediatelybeforeanyfuturemainrelease/submission. Exactreviewableargv uses--wrap execbash ABSOLUTEWRAPPER; itwasnotexecuted. Existingphasecost remains1200reserved/403actualGPUseconds,$0API.

@@ -1,0 +1,25 @@
+# Independent final scientific report review
+
+**PASS. No remaining must-fix findings.** This decision covers the exact final bytes below, including the corrected 46-of-92 diagnostic support definition and conditional-causal wording.
+
+| Reviewed artifact | SHA256 |
+|---|---|
+| `project_context/reports/SDR cue-circuit transplant findings.md` | `d737c0fa8a992b7696372cdf2d6215edea40544813d47906e8d21a70e3e488f5` |
+| `project_context/reports/SDR mechanism investigation status.md` | `a80145838ac135f662c81754e39655284e4bdfe4c2e8815dd5cfdd969fd4f8da` |
+| `.scratch/sdr-cue-circuits/analysis.md` | `140d6ca8f508b054b28bddc3b45e855631cde53f80bfc2f15de92a7b3fcacfb3` |
+
+The actual scientific audit passed **2,467,664 scalar comparisons with zero discrepancies** from raw accepted blind tuples and frozen input factors, using integer counts and exact per-fixture Fraction means. It verifies every restored scientific row, all fixed indicators/anchors, 1,596 full inventory summaries with 729-cell triples and 81-cell transitions, input/direction/alignment zero strata, coherent interactions, matched outside and E/T contrasts, example-averaged matched task contrasts, and natural 128/128/64 pairs. All 9,344 rows remain; calibration is excluded. No production analyzer was imported as an oracle.
+
+An additional **524 Markdown table checks** independently validate the final endpoint table, every 14×8 fixture raw-count row and signed-delta row, five displayed interaction rows, and fixture rank/template ordering against direct raw-label counts. The only subsequent technical-file change was replacing its pending-review status with this review link; its other bytes exactly match those table-checked. The report-table receipt's earlier technical SHA therefore remains historical verification evidence, while this review and the final receipt bind the final technical SHA above.
+
+The concise claims match the counts: baseline report truth170/example210 of256 and retrieval128/128; original D/H/F/S E donor-example207/209/214/208 and T report-truth87/86/85/86, retrieval23/27/24/28. Those signed E/T directions hold in every fixture. A's E donor-example11 and recipient-truth139/256 both decline in all eight fixtures; B and J have the stated signed effects. C_S E donor-example is **3/256**, and other outside comparators are heterogeneous. Native D−F knockout .119 versus null-p5 .517, older sufficiency .494→.967, historical validation failures and cue-probe numbers agree with their linked original reports. Aggregate E truth balance is explicitly distinguished from individual answer preservation.
+
+The 46 emitted-donor diagnostic pairs are a subset of 92 same-answer directed E pairs and additionally require both intact outputs to oppose ED. Every positive counterexample is an actual change **intact recipient=donor≠patch=ED**: D3/H3/F7/S3/B13/J4, A0; all outsiders0. None is an unchanged recipient outcome. This remains a secondary diagnostic and leaves the all-256 primary denominator intact; it does not identify an abstract representation or make A0 evidence for copying.
+
+Original blind exports, both unchanged 101-view label files, complete tuple agreement, exact 9,344-row restoration and all hashes were checked. Root's dispatch receipt corroborates two distinct fresh fork-none Sol agents receiving matching sanitized inputs and separately identical format-only clarification. Personal reading is explicitly attested, distinct from artifact coverage/agreement proof. No semantic relabeling or outcome-based exclusion occurred.
+
+The linked independent-complete-contrasts supplement fills frozen requested presentation tables not emitted by the production JSON; it adds no estimands. Full counts, per-fixture components, natural endpoint distributions and transitions remain available. The prose correctly restricts the finding to shared causal influence under neutral sustained-prefix replacement: no isolated/natural route, removal, pressure mediation, intent, reporting-time latent knowledge, clean selectivity, preferential encoding from E/T amplitudes, natural redundancy proof, completeness, OOD or deception-specific-function claim. Reporting choices are not automatically deceptive assertions; T donors intentionally alter factual content. Existing failed protocols, source/circuit scientific gates and stopped follow-ups remain unchanged; there is no automatic new experiment or v2 evaluation.
+
+Accounting matches the operator ledger:28,800 reserved/1,849 actual H200 GPU-seconds (663 calibration+1,186 main),$0 APIs, lead compactions6. The H100/Bridges-2 route remained unused. Source/results stay unmerged/unpushed.
+
+Evidence: [actual arithmetic review](scientific-audit/actual-review.md), [actual verification](scientific-audit/actual-results-verification.json), [Markdown tables](scientific-audit/report-tables-verification.json), [final exact-byte receipt](scientific-audit/final-narrative-verification.json), [root rater workflow](root-rater-dispatch.json). No models, inference/jobs, APIs, notebooks, source/git edits, remote actions or subagents were used for this review.

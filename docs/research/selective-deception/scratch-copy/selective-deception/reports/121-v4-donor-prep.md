@@ -1,0 +1,29 @@
+# Fixed allW28 alternate-donor diagnostic preparation
+
+October21,2026. Implementation prepared in new scratch files only; no reservation, authorization or submission. Execution remains root-owned and follows completion of the two fixed v4 fits. This diagnostic scores the frozen OLD allW28 mask and does not select masks or modify the optimization contrast. Frozen runtime source remains4247c54d24f277de863abf8a7b9a462470276f45.
+
+Files: `analysis/optimization_v4_donors.py`, `analysis/optimization_v4_donors.sbatch`, `analysis/test_optimization_v4_donors.py`. Existing addback/runtime/manifest/launcher/receipt files were not edited. The stable addback helper is SHA-checked before import:8bd9a2663edeea609c84d14a6c66869607dfe770d7287e07bb6242e533139676.
+
+Exactly four conditions execute in this order: original-intact, original-full28, inverse-intact, inverse-full28. The sole alternate donor map reverses the frozen rotation separately within each original all-view length-signature group, as preregistered in report118. Both maps preserve all119recipients and donor-pool marginals. Original map SHA4e6b8a1359ead8f6720f35baef582bded3e35a0ed6e17c2039673dbde03b031f; inverse SHA252b05f893ff9b568b4472dabbefe2d431c6af715f2b2ea3b04009856c111dd6. Exactly117donors change. The two unchanged recipients8cad0a2fe65917131d84c273719986e2947af772deac3daba7ae0bb867b5b547 andf9146678ce00a0d03ec2d6ecf3b5730170e4d4e000afb1e531243d47c216483a remain explicit controls.
+
+The original parent passes the unchanged frozen `_read_manifest` validator and source-bound SDR/WT cache checks through the existing addback runtime. An independently checked diagnostic split then changes only donor_map and its digest. It is never passed to the legacy original-rotation validator as an unchanged manifest. Independent checks cover exact algorithm/hash, full bijection, no same-cluster/source donor, distinct prompt text/tokens and length/attention alignment for all four views and both recipient policies. Original validation and cluster-list hashes are pinned.
+
+The separate diagnostic binding includes exact parent/source/mask/old selection/receipt/cache identity, both maps, unchanged cluster inputs, fixed condition list, original report114 full28 anchor SHA, diagnostic/wrapper/helper bytes and the immutable v4 baseline fingerprint. The actual runtime model inventory/packages/hardware/fixed artifacts must reconstruct that exact source-bound baseline fingerprint. The saved runtime envelope records the actual Slurm job ID and full parent provenance plus the diagnostic identity hash. Each condition records its binding, donor-map and cluster-input hashes.
+
+Every intact condition must preserve source-bound D/H argmaxes and finite label-logit differences<=.02, with WT abs(KL)<=1e-6 and abs(NLL−baseNLL)<=1e-6. Original full28 must reproduce the complete report114 full28 metrics exactly. Across original/inverse maps, the two unchanged donor rows must reproduce every stored D/H discrete/continuous readout exactly for the same mask. All WT readouts must also reproduce exactly, since that donor/intervention policy is unchanged. Any failure stops the diagnostic; no automatic retry.
+
+Each condition preserves exact per-example D-label probabilities, D/H label logits and argmaxes, stored surrogate, H truthful probabilities/NLL and H-loss/gain cluster identities. Summary JSON reports paired inverse-minus-original shifts in surrogate, D probability, direct D-minus-H logit margin and H truthful NLL. It also subtracts each map's corresponding intact shift, reporting all119 and structurally changed117 subsets separately. Neither subset chooses masks or donors. WT is a fixed control rather than an additional donor-robustness experiment.
+
+The wrapper requests exactly one GPU and6minutes with no requeue; actual execution requires a separate matching root receipt and H200 runtime. Receipt fields must include every key/value in dry-run `binding`, version1, root_decision, authorized_mode=`calibrate-evaluate`, the exact four `conditions`, max_conditions=4, absolute output_dir, max_gpu_seconds in(0,360], required_gpu=`H200` and automatic_retry=false. Output directory creation is exclusive. No root receipt was created by this work.
+
+After the original intact/full28 anchor conditions, measured runtime is checked as`1.25*(load_seconds+4*max(first_two_condition_seconds))+30`; exceeding the receipt cap stops before the inverse conditions. A remaining-time check also precedes each condition. The report118 estimate166.79seconds motivates the proposed6minute cap but is not a guarantee or authorization. Source/cache verification and context load are included in measured load time.
+
+CPU-only actual-wrapper check:
+
+```bash
+bash .scratch/selective-deception/analysis/optimization_v4_donors.sbatch --dry-run
+```
+
+For an authorized future allocation root supplies`--root-receipt ABSOLUTE_PATH --output-dir FRESH_ABSOLUTE_PATH`; no submit command is embedded in the helper. The dry-run is stdlib-only and imports neither torch nor transformers. No train/test/native split is scored, no notebook executed, and no model is run on login. Tests cover exact maps/control identities, alignment and self-donor failures, receipt/resource/source tampering, all-open/no-op and reproduction failures, unchanged-row/WT equality, paired subset arithmetic, exclusive output and fully mocked four-condition execution/measured-budget stop. Final-source verification:29CPU tests passed in mgnp and29 passed in base. The actual wrapper dry-run succeeded after final binding changes, and bash syntax validation passed. All model execution was mocked in functional tests.
+
+Interpretation remains one structured reassignment test of this interchange effect. It cannot establish strategic-deception specificity, explain donor dependence, establish donor competence independence or support generalization. Report118's donor-answer/content confounds remain.

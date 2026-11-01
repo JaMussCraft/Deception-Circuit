@@ -1,0 +1,11 @@
+# Preparation command notes
+
+All shell calls used `login:false`. Initial ordinary sandbox calls failed before execution with `bwrap: Can't mkdir parents for /tmp/usertmp/swong2/codex-daemon-78031: Read-only file system`; the known scoped launcher repair was `require_escalated` with read/preparation justifications. No actual approval rejection occurred. No secrets were printed.
+
+Project-required startup sync ran successfully, exit0: `/sw/external/python/anaconda3/bin/python3.9 /projects/beto/swong2/Alignment/.agents/claude_codex_sync.py --apply --quiet`. Required project guidance/memory, task spec/plan/implementation seams/RESUME and other-thread RESUMEs were read. The using-superpowers source exempts explicitly dispatched subagents from its workflow. No repository/worktree-local CLAUDE.md/AGENTS.md was found at the inspected local paths.
+
+Read-only exploration included `squeue -u swong2`, `sinfo`, `scontrol show partition`, account associations/fairshare and historical operator JSON receipts. An early unfiltered sshare/global squeue call returned excessively broad output; it was not treated as a compact receipt. The durable availability JSON uses account-filtered sshare and records exact commands/results. Global node/partition information in that file is scheduler metadata only; no nvidia-smi/model command was run.
+
+The20 prospective cases in `test-only-20261026T1500Z.json` cover four matching authorized account/QOS pairs across A100x4 normal, A100x4 interactive, A100x8 interactive, H200 normal and H200 interactive. Every case explicitly contains `--test-only`,4CPU/64G/1GPU and --time; A100 uses15minutes, H20010minutes. All20 exited0. This creates no actual Slurm job or GPU reservation. No `srun`, `salloc`, non-test `sbatch`, `scancel`, `scontrol update`, SSH/B2 command, notebook execution, API request or git mutation was performed.
+
+Wrapper/source filenames were listed read-only to establish readiness. Wrapper was provisional45bytes; no dry-run or test suite was claimed. The durable prep report and ledger are the only task writes outside project startup sync; operator did not edit source, original evidence, memory, other-thread artifacts or root-owned study documents.

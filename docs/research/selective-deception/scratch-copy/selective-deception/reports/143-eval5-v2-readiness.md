@@ -1,0 +1,66 @@
+# Frozen-mask EVAL 5 / V2 readiness (2026-10-24)
+
+Read-only source/data reconnaissance; no model/notebook execution, paid API calls, Slurm submissions, or new test outcomes inspected. Only this report written. Repository verified `main`, HEAD `bd67758b387d23741f635ccbe03e377b6ddfc7eb`; existing untracked artifacts preserved. No repository-local CLAUDE.md or .claude/CLAUDE.md exists; Alignment shared instructions/memory read. Startup reconciliation belongs to root's session and was not repeated here.
+
+## Decision
+
+Evaluate frozen new30 before more sparse training. First make a reviewed adapter/protocol and fix graders, then run a bounded common-screen comparison intact/new30/oldD69/new23 (old28 optional). V2 matched transfer is a cheap, complementary check of pressure selectivity, instruction compliance and factual/format collateral; it cannot by itself establish a strategic-deception mechanism. Do not refit/reselect on these outcomes. Separate mechanism-datasets evaluation approvals/budget are not authority for this tranche.
+
+## Interface and intervention compatibility
+
+* Entry point `Deception-Circuit/evaluate_circuit.py:91` accepts a run directory or `--circuit NAME=RUN_DIR`, `--evals benchmarks`, `--ablation interchange`, selected benchmarks, n and screen budget. `evaluation/circuits.py:94`/`:191` loads `config.json` and `active_nodes.json`; `evaluation/masks.py:51` requires the full `masks` object. Frozen v4 lists are **not directly accepted**: `sparse-optimization-v4/comparison/new-allW{23,30}-heads.json:1` contain `{removed_heads:[[layer,head],...]}`. Selection receipt pins both lists/exports/checkpoints; preserve it byte-for-byte.
+* A faithful adapter must encode the removal set as the circuit-to-knock-out, with selected whole heads' attention-neuron leaves active and all MLP leaves zero, then use `knockout_granularity=finest`. Default complement opens coarse gates and complements leaves (`evaluation/masks.py:207`); putting all ungated MLPs in the circuit would ablate every MLP. Validate exact effective support, all nonremoved heads/MLPs untouched, full vocabulary all-open identity, and comparison to native replay before generation. Do not use `--knockout-granularity all`.
+* Stock EVAL 5 donors differ from native v4 replay. EVAL 5 uses the item's honest twin when present (instructed deception), otherwise seeded reference-pool derangement (`evaluation/benchmark_eval.py:48`, `:838`). Its corrupt stream packs/tile-extends donor prompt/completion into recipient length (`:241`). V4 independently generates/captures honest donor activations and replays them under an explicit fixed mapping (`.scratch/selective-deception/analysis/optimization_v4_native.py:184`–`:207`). Calling both interchange does **not** make them identical. Preserve benchmark-native EVAL 5 donor construction across all masks and label this as a new transfer protocol; use reviewed independent replay if asking native-protocol transfer instead.
+* Stock evaluator automatically includes full, knockout, circuit_only, empty and random configs (`benchmark_eval.py:1149`). A lean intact + mask-knockout comparison needs a reviewed configuration filter; setting `--benchmark-n-random 0` alone still generates circuit_only and empty. One suite should bind all masks, with a single `--task-from` to avoid an accidental circuit × task grid (existing launcher guidance `outputs/_launch_format_control/README_eval5.md:98`). Shared model/screen/batch/hardware/seeds/donor mapping are required.
+
+## Graders, cache, paid dependencies
+
+All four recorded caveats remain current at bd67758:
+
+1. Harm-pressure empty generations can become `HONEST/claimed_known_answer`: no nonempty-generation guard in `evaluation/benchmarks/liars_bench.py:652`–`:667`.
+2. MASK binary verdict D is deceptive by `mask_bench.py:378`–`:391`; refusals can therefore contaminate the deceptive screen. Fix entails a **new MASK screen**, not just relabeling knockout outputs.
+3. Honest REJECTED containing “correct” without “incorrect” is invalidated (`liars_bench.py:414`–`:416`).
+4. Judge cache is per invocation/suite (`benchmark_eval.py:1436`); separate suites can relabel identical responses differently. Memory records 10/50 identical harm-pressure rows changed (mostly honest/unparsed) and ~3 deceptive-row noise. One shared suite/cache prevents duplicate judging within this comparison, but not independent cross-suite comparisons.
+
+Judge request fingerprint already hashes the full request (`benchmarks/judge.py:98`), suitable for an explicitly shared cache. No stock CLI judge-cache-path override or generation-only switch was found. `BenchmarkEvaluation.run` constructs JudgeClient and `_run_config` immediately judges generations (`:1017`, `:1175`), so clearing API credentials is not a clean generation-only mode. A reviewed generation export/deferred judging seam would be needed. JudgeClient has injected transport for tests (`judge.py:165`), not a production local judging protocol.
+
+Sandbagging alone has a local deterministic grader (`benchmarks/sandbagging.py:4`, `:144`) and can be $0 API. MASK and selected Liars' Bench tasks require paid OpenRouter judge/belief parsing calls; current benchmark modules import official rubrics, so replacing them with agent/manual labels changes the evaluation and must be reported separately. Existing native blind annotation pipeline is a possible supplementary $0 route after exporting generations, not drop-in official EVAL 5 judging. Do not invoke the stock paid judge under selective-deception's historical $0 protocol without explicit budget/amendment. Exact dollar cost is unestimated: no token-usage/pricing calculation or current credit check performed. GPU authorization is not an API budget.
+
+## V2 provenance and controls
+
+`tasks/deception_v2.py:1` subclasses the existing deception task: task paths `{far,sdr,ser}_v2`, plus `_honest` and `_nopressure`; same next-token readout and loaders. Row construction `dataset/build_deception_v2.py:610`–`:679` preserves instance metadata, makes H by neutral-clause replacement, F by clause removal, flips target/distractor to truth, stores honest-instruction prompts and condition margins, and checks alignment/length/construction purity. H is the **neutral-clause twin**, not the explicit honest-instruction condition (the latter is stored separately). Retain all three plus optional honest-instruction for a capable instruction control.
+
+CPU-only Arrow reads found each of nine datasets has train 200, validation 200, test 1000; within each family all D/H/F instance-ID sets match exactly per split; no within-family ID overlap across splits. Shared generation uses one seen set (`build_deception_v2.py:183`); instance ID includes entity, ordered items, polarity, designation polarity, pressure slot and template (`dataset/deception_common.py:470`). An ID disjointness claim therefore does not establish entity/item/scenario disjointness.
+
+Exact V2 validation/test IDs overlap old SDR train+validation: **0 for all tasks**. But comparison against the actual 119 train + 119 validation sparse clusters in frozen `manifest-W-all-init10.json` finds these entity + unordered item-pair overlaps:
+
+| V2 family | validation / 200 | test / 1000 |
+|---|---:|---:|
+| FAR | 12 | 83 |
+| SDR | 15 | 63 |
+| SER | 8 | 36 |
+
+Counts use actual `splits.*.clusters[*].scenario` (not all source records, which include exclusions). Before any new transfer, prospectively exclude these or freeze overlap strata and report separately. Old SDR train exact-ID overlap in V2 **train** is SDR 7, SER 5, FAR 0; do not call all V2 training data wholly new. Native natural-fact prompts are structurally different, but a full native-fact/entity overlap audit was not completed here; do not claim absolute native semantic independence.
+
+Purity is construction-defined, explicitly not validated by agreement of LLM judges. Provenance e.g. `data/datasets/ser_v2/provenance.json:1123` records both rater failures/near-chance SDR/SER agreement; FAR contradicts the record, SER is literally true, SDR is a true commitment to disclose the harmless item while leaving critical information unshown. Final pool differs: FAR round8 strong subset, SDR/SER round9 unified; SER wording B/original predicates; suffix ON. Thus cross-family differences mix mechanism, instruction wording, predicates/readout and survivor selection. All data are behaviorally filtered for intact pressure-deception plus intact neutral/no-pressure honesty; transfer reports must condition on that selection and reverify intact capability on the actual hardware without silently filtering post-mask.
+
+V2 coarse heads-only training already completed, merged at bd67758. Six D/H sizes FAR58/60, SDR60/58, SER55/69; in-run gates hold. FAR and SER D used H200, H A40, and SER H size gap +25.5% (`.scratch/mechanism-datasets/reports/05-training-summary.md:9`–`:31`). These masks are optional reference controls, not prerequisites for applying frozen sparse masks. Do not inspect concurrent new evaluation outcomes or conflate that separate phase with this comparison.
+
+Minimal V2 transfer: same fixed new23/new30/oldD69 (+ optional old28), intact, all three families; freeze validation IDs or unused test IDs after scenario-exclusion, D/H/F pairing and donor policy; use clean/corrupt within-condition pairs and unchanged whole-head support, first-token D-versus-truth margin, argmax accuracy, full-vocab KL, H/F truth retention, and paired loss/gain counts. Explicit honest-instruction capability is a useful fourth input condition. This can use existing `DeceptionDatasetLlama`/task readout (`tasks/deception.py:41`–`:110`) with a narrow mask adapter; no optimization required. Do not take unmodified broad EVAL 2 as this lean harness: its collateral/random machinery adds work and reads test splits.
+
+## Cost evidence and bounded proposal
+
+Measured anchors, not new profiling:
+
+* Historical one-cell A40 cached-screen EVAL 5 sandbagging+MASK with six random circuits: **3 h 51 min**, 1557 judge lookups (1376 writes +181 hits); `outputs/_launch_format_control/README_eval5.md:236`. Three-cell dry-run estimates 24.3–29.6 GPU-h sm and 9.2–12.5 lb are conservative predictions, **not measured runtime** (`:220`).
+* Evaluator generation constant is measured A40 smoke timing 126 sec for 8 rows ×1024 tokens; coherence 2.91 sec for 8×1220 (`evaluate_circuit.py:66`–`:85`). This overpredicts short/EOS generations and does not measure H200 benchmark throughput.
+* Native v4 H200 full five-condition assessment: **785 GPU-sec** for 320 target completions +32 donor completions +64 identity controls (`sparse-optimization-v4/completion-receipt.json:7`, `analysis/optimization_v4_native.py:57`). This short natural-fact workload is **not** a direct EVAL 5 runtime estimate (benchmark caps 512/1024 tokens, longer prompts and screening).
+* V2 training took ~30 min H200 or ~146 min A40 per circuit (`05-training-summary.md:9`). Training durations do not estimate frozen forward-only evaluation.
+
+For **n=50, three LB datasets**, four conditions intact/new30/D69/new23 imply up to 600 target responses plus belief/screen/donor work; old28 adds 150. **Full 10-dataset sm+lb** implies up to 2000 target responses, or 2500 with old28, plus screen/donors (actual screen may be smaller). Stock circuit_only/empty/random rows can multiply this substantially; use a config-filter cost dry-run before reservation. Three sparse mask cells with default six randoms mean 27 ablated config passes, far above the intended 3 knockouts.
+
+Tentative staged reservation recommendation: tokenizer/adapter and mocked identity checks CPU first; 10–15 min H200 calibration on fixed validation inputs, then choose a hard-capped LB-only generation tranche from measured per-condition/token throughput. A **1–2 H200 GPU-h tentative target** for lean LB is an engineering planning range, not a measured guarantee; do not commit a full 10-dataset tranche under it. Conservative A40 cached-screen arithmetic for full sm alone: three KO passes versus historical nine ablated passes suggests ~1.3 h before common screening/control work; this linear scaling ignores early EOS/config-dependent slowdown and requires calibration. Add old28 only after the fixed batch fits the ceiling.
+
+V2 first-token transfer at n=200 validation ×3 families ×3 conditions ×4 masks/intact (5 states) =9000 clean recipient rows, with paired corrupt forward streams; honesty-instruction adds3000. Batches are ~100-token teacher-forced forwards, so far cheaper than long free generation, but **no directly measured frozen V2 throughput** was found. Reserve a small calibration (10–15min H200) and bound actual rows before proposing a firm full reservation. No paid judge needed for token/margin metrics; open-ended validation would add generation/annotation cost.
+
+Final recommendation: fix graders/cache + faithful frozen-mask adapter; calibrated LB-first EVAL 5; in parallel only CPU preparation of matched V2 transfer/exclusions; proceed to bounded V2 forward evaluation under the selective-deception tranche. Retain frozen masks and every historical result. More training should depend on what fails (OOD deception, H/F preservation, or donor sensitivity), not precede these measurements.

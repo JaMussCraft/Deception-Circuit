@@ -1,0 +1,39 @@
+# V6 bounded component round COMPLETE — 2026-10-26T16:32:56.245681+00:00
+
+Firstpilot+allthree targetedfollowups complete; audits203/208 andscientific210PASS, analyses202/209 andattention211final. Authoritative root-completion-001.json binds reports/data/plots/source. Humanreport project_context/research_notes/Deception specificity and shared circuits/v6_components.md.
+
+New30 readout-only intervention affects shared D/I answerpreference. L17H27 cleanrescue restoresD1.476/I.879logitmargin (H.340/F.304); naturalreleaseD1.333/I.799. IsolatedL13H23→Q17H27 dropsD.0853/I.0776 vsQ17H26.0036/.0088; smallsharedroute, notallmediatedpaths/percentage. OrdinaldonorassignmentcontrastCIsallspan0; heterogeneousvocabconfounded, no equivalence/contentcopy claim. AlltenSDRfollowupstates keep16/16requestednative+FP32answers perDHFIvariant—nochoiceflips/refusals/freegenconclusion. FARpilotD16→6,H/F16retained, unmatchedI caveat. Attention lexicalpatterns similarD/Iat17, onlydescriptive/eagerdrift/novalidsemanticspans.
+
+FourjobsallCOMPLETED:23217920(79s),23218121(301s),23218961(90s),23219286(132s). Noactivejobs/controllers/followups; do not reset anyguard or resubmit. Phase602actualGPU-sec/55minreserved, cumulative38.0166667/40reserved and44981actualGPU-sec. APIledgerunchangedfromV5(1113attempts/$4.1784295known+.66unknownreserve),0newAPI. Remainingreservedbudget1.9833333h; notautomaticauthorizationfornewscientificscope.
+
+Sourceisolatedselective-components-v6 branch57c53ac539d55ae5c6bff67cdb5be31c2289e802 (mainbasec24b5d9), no merge/push. Operativeselection002/205ordinalamendment/packfrozen001; oldselection001/204 andcandidate001preserved. Fullpackcandidate002 differsonlystatusfromfrozen. Smoke4valscenariosrepeatinmain, neverdoublecount. Source/data andallcasejoinsverified; unsavedfullbank/Q/vocabvectorscannotbeindependentlyreconstructed. No furtherworkneededforboundedtranche. Nextquestions all-position/freegen andmatchedlexicaldonorsrequireseparatefrozendesign, noadaptiveedge/masksearchonfinisheddata.
+
+Rootcompactions15confirmed, unchangedordinaryturns; incrementonlyafteractualnewrootcompaction. Olderchronologybelow retained forprovenance.
+
+LATEST: followupmain23219286SUBMITTED10minA40,38.0166667/40reserved. Smoke23218961COMPLETED90sec/0;207PASS160rows/35identityflags×4batches/allpriormetrics exact. Mainfixed64DHFI/640rows/10states,source57c53ac+packeb266afc..., norescopebasedonsmokeeffects. Analysis209preparing(nooutcomesread yet), future208rawaudit/210science aftercompletion. NoAPI. Rootcompactions15unchanged.
+
+LATEST: followupsmoke23218961SUBMITTED15minA40/.25h; total37.85/40reserved. Source57c53ac539d55ae5c6bff67cdb5be31c2289e802; runnerbb822cb8..., frozenpackeb266afc... (candidate002 statuschangedtofrozen; oldcandidate001superseded).206independentreviewPASS,rootactualwrapperdryrunPASS. Needactualfullbank/Q/selfrescueproofs and160rows beforemain640acquisition. Sourcesimmutable; noautoretry. Followupselection002/205ordinalarmsoperative. Smoke4valscenariosreappearmain,nohypothesischange/doublecount.
+
+LATEST DONOR AMENDMENT: reports205 and followup-selection-002.json are operative; old001/204 preserved. Exact-vocabulary matching infeasible(8/32emptybins). Donorarms explicitly ordinal_agree_New30/ordinal_disagree_New30 by constructiontruthslot1/2; heterogeneouswords, descriptiveassignment sensitivity NOTcontentcopy orpurepositioncausality. Same16valDHFI/32unique donors/pool/exclusions/hashseed/order retained. Authorv6_followup_runtime implementing; independent206active, CPUdraftbugsbeingfixed; no candidatepackfrozen/GPUreserved/newoutcomesyet. Remaining2.4h of40.
+
+LATEST 2026-10-26T15:40:44.092067+00:00: firstpilotcomplete/audited203, analysis202 finalanalysis-002 andscience204 complete. L17H27sharedD/I lead; SDRNew30answersunchanged butmarginsdrop; FAR D16→6 H/F16retained. Followup-selection-001 andfollowup-smoke-selection-001 prospectivelyfrozen (L13H23→Q17H27vsQ17H26,cleanrescue17,donoragree/disagree). NEWv6_followup_runtimeworker implementing donorpack/runtime/newfilesonly perfollowup-plan.md/204. No followupGPUreservation/outcomesyet;remaining2.4h,37.6/40reserved. Needindependentreview→root15minA40smoke→measuredmain. NoAPI. Rootcompactions15unchanged.
+
+LATEST: pilot23218121COMPLETED301sec/0. All3248causalrows+720attentionrows acquired.203independent rawauditPASS(infinalwrite); all176FP32readoutintact requestedlabels correct, allnative/fp32samebackendidentityproofs exact. AttentionSDPA/eager maxdiff.4375native/.463084fp32,0argmaxchanges, rawmass.997913–1.002090, restoredsdpa. Nozero-driftclaim acrossbackends. Analysis202+plotsrunning; targetpathAPIrecon pending202candidate+Astrascientificdecision.37.6/40reserved,44759actualGPU-sec,0newAPI. NoGPUcurrentlyactive.
+
+LATEST: smoke23217920COMPLETED79sec/0,201auditPASS112rows/28controls/exactidentity,actualA40. Fixedpilot23218121SUBMITTED one15minA40/.25h shared3phases (discovery2688rows→aggregatevalidation560→attention720). Sourcea5e2a8f, batchmanifestdb15179...; rootactualcombinedCPUdryrun+201dispatchPASS. Total37.6/40reserved, noAPI. Outeronceguard+3receipts; noretries. CPUanalysis202preparing, donotreadpartialasfinal. Nextrootauditall3 andscientificreview, then<=3targetedcontrasts.
+
+LATEST: smoke23217920 nowRUNNINGonA40interactive gpub079 afterpre-outcomehardwareamendment001/Astraapproval; samejob/.25h,37.35/40reserved. FreezeA40forcausalpilot+validation; H200V5notnumericalreplication. Attentionmodule200PASS,butnotyetreserved/launched; sourcecoreunchanged.
+
+LATEST: core199PASS/source0df348497ad875bd7451c60db8f4689fc76a06ba, frozenpanel44aa565...; smoke23217920 SUBMITTED15minH200bjhz,37.35/40cumulative reserved. Noautoretry. Inspectsmoke-001/completion.json and controls+rows beforeheadpilot. Attentionworkernewmodule only,review200active; noattentionGPUreservation. Compactions15unchanged.
+
+# V6 active — 2026-10-26T14:45:46.325662+00:00
+
+User authorized starting low-level component analysis alongside outstanding controls and said Continue. Root high-level plan accepted; scientific review198 approves. Do not reopen/alter completed V5 artifacts. New isolated branch/worktree selective-components-v6 from main c24b5d9. Managed-worktree creation could not resolve nestedrepo commit; manualgitfallback succeeded.
+
+Read spec.md and implementation-plan.md. Active latestSol workers v6_manifest (CPU frozen panel/test module) and v6_runtime (final-position hook runner/tests), disjoint ownership. They coordinate case schema. No new GPU reservation/job/API yet. Remaining2.9 cumulative reservedGPUh (37.1/40 alreadycharged); rootonlylaunches, no paidAPI planned. Suggested≤.25hsmoke+1hpilot+.75hfollowup+.9holdback; reserveonlyaftertechnicalreview/measuredforecast.
+
+SDR32 matchedD/H/F/I,16dev+16validation4/cell; FAR16aggregateonly. Previouslyexposed data, never pristineholdout. FrozenNew30/New23/sevenaddedheads;30singleheadreplacements+7conditionalreleases. Readout-only honestdonorlasttoken→recipientlasttoken, explicitlydifferentfromV5allposition. PrimarywholeNew30 ΔD−ΔI withrawD/I/H/F effects. Attentiondescriptive;≤3targetedcontrastpairsafterdiscovery, no fullgrid or maskoptimization. Closedoldrecoding0/16 mustnotrevive.
+
+Root next: inspectworkerhandoffs andcandidate, independentcode/datareview, finalizehashboundexecutionreceipt/actualCLI dryrun, reserve≤15minH200smoke. Auditbaseline/noop/selfactivationidentityonactualbackend beforeeffects. Thenmeasuredcontrol/headpilot. Don'trunvalidationcandidateeffects beforefreezingselectionreceipt. Reuse separate mechanism-analysis inversionstimuli only, don'trestart itsClaude fleet orduplicate sixcoarsecircuit experiments. Claudeusage73% is that service's shared limit, not an observedSol/Astra usage reading; no Claude calls planned.
+
+Confirmedrootcompactions15, unchangedthisordinaryturn. Updateatnextactualcompactiononly.

@@ -1,0 +1,5 @@
+# Pre-annotation disputed-label consistency rule
+
+Before any actual semantic annotations, root operationalizes the frozen rubric requirement to independently review disputed rows: if first-pass primary categories disagree for exactly identical public (prompt,ground_truth,output) triples, independently review every member of that group. Quality metadata is not part of the semantic identity. This is added to the fixed48balanced sample and all ambiguous/uncertain labels after first-pass byte hashes are frozen. First-pass labels remain unchanged and preserved. Review packets hide categories, dispute status, selectionreason and conditions. Consistent duplicates need no extra selection. This changes no category, scientific endpoint, sample denominator or model output; it prevents annotator inconsistency from creating apparent no-op effects.
+
+The helper addition is synthetic-tested before any real annotation. Report23 records implementation hashes/tests. Root will preserve first/review/finallabels and adjudication audit. The original policyfreeze report24 remains intact.

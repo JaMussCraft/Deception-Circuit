@@ -1,0 +1,9 @@
+# User-authorized next phase — October 19
+
+Run the benign instruction-following control. Independently proceed to sparse circuit optimization regardless of its outcome. Compare matched-H collateral, WikiText collateral, and both; evaluate all preservation dimensions in every arm. Begin with the existing D/H/F union; if the restricted pilot has no useful result, expand the same objective comparison to all attention heads under a separately costed bounded tranche. No MLP removal. Refusal is valid D suppression.
+
+The previous experiment's failed criteria remain factual; this is a new user-authorized protocol, not a retroactive pass. No control outcome gates whether to attempt training. Data correctness, meaningful training signal, numerical validity and resource limits remain necessary. Distinguish SDR label suppression, generated instructed lying, and incentive-driven deception. Resolve training-target choices with Astra advice and existing code/data before implementation.
+
+Budget: current ledger4/20 reservedGPUh, actual2434GPU-seconds, zero paidAPI. User is willing to approve more but no new numeric cap yet. Measure forward/backward throughput before production grid; price restricted and all-head phases explicitly. Max2concurrentGPUjobs, rootalone launches, no automatic retries. Preserve previous16transferdevelopmentpairs and prioroutputs; do not use them to train/select masks.
+
+Plan chunks: (1) fixed benign-control protocol/adapter and code review; (2) CPU data/objective/runtime audit and Astra scientific plan; (3) implement tested WikiText and candidate-space extensions; (4) numerical/cache/throughput smoke, freeze measured batch cost; (5) restricted sparse pilot and blind held-out evaluation; (6) all-head expansion if predeclared useful-result criterion unmet, within approved budget or after concrete increase. Keep user informed at scientific/budget milestones.

@@ -1,0 +1,22 @@
+# Independent final scientific report review
+
+2026-10-21. **PASS. No must-fix findings.** Reviewed `project_context/reports/SDR routing validation findings.md` and `completion-analysis.md` against the immutable baseline audit, completion specification, released joined labels and independent annotation files, plus operator ledger/main completion receipt. Read-only CPU artifact checks were used; no models, notebooks, experiments or jobs were run. This review is the only file edited.
+
+## Verified evidence
+
+- Independently read all 1,280 joined rows, verified unique variant IDs and EOS termination for every row, and checked every first-step checksum equals its original baseline checksum. Both annotation files contain 191 unique opaque views and agree exactly across identity, response kind and format. Their capacity statements attest complete independent blinded reading; agreement is consistency evidence, not external validation of the rubric.
+- Recomputed the semantic join from annotated candidate identity and the original truthful item. Totals match: all-panel 1,023 correct /248 wrong /9 bad-unresolved; fresh 888/127/9; native 135/121/0. Fresh retrieval is 512/512 correct, fresh reporting 376/127/9. All nine bad texts name Ambrix Clinic or Brellow Estates rather than either candidate, supporting the report's description without classifying them as refusal or wrong-candidate answers.
+- Joined original first-token outcomes by variant ID: all 238 non-item rows remain in the denominator and end 201 correct /28 wrong /9 bad-unresolved. The 114 retrieval non-item rows all complete correctly. This supports a format-sensitive first-token diagnosis under the fixed scaffold; it does not establish latent knowledge or broad competence.
+- Recomputed fixed-bonus reporting alignment counts: A conflict 36/64 versus aligned 60/64; B 24/64 versus64/64. Template A reporting changes from96/128 to103/128 correct with conditional bonus; B from88/128 to89/128. Paired transitions match the technical appendix: A95correct→correct,8other→correct,1correct→other,24other→other; B84,5,4,35. Thus the observed correct-answer changes do not support increased incorrect reporting from bonus contingency. The report makes no equivalence or universal null claim from these small differences.
+- Native no-pressure101/128 versus pressure34/128 agrees with joined labels and original first-item outcomes. The report preserves its historical selection and truth/order caveats and does not treat it as fresh/OOD replication.
+- Operator accounting agrees: 7,800 reserved GPU-seconds includes the cancelled H200 reservation; actual A100 elapsed totals595seconds, including baseline191, calibration152 and main252. Zero paid APIs and lead compactions2 match the ledger. The reviewed operational amendment allowed main3,600seconds after the conservative forecast exceeded3,000, without changing the scientific panel.
+
+## Scientific interpretation
+
+The original first-token capability gate remains failed and the confirmatory path grid remains unimplemented/unrun. The completion diagnostic is explicitly separate and post hoc, with unchanged prompts and full denominators; it neither retroactively passes the old gate nor validates a selected-template rescue. Calibration is excluded, full trajectories ended before the fixed cap, and no capped/missing category was silently discarded.
+
+The report distinguishes factual retrieval success from reporting-context sensitivity. Favored-identity effects exist under fixed bonuses, so wrong answers cannot by themselves establish consequence-driven deception, belief manipulation or strategic intent. The technical analysis correctly treats paired bootstrap intervals as exploratory pointwise conditional-fixture uncertainty without multiplicity correction or lexical/pair independence claims. The concise report uses descriptive counts rather than presenting a new confirmatory significance claim.
+
+The earlier pilot's conditional perturbation routes are cited only as candidates. No new pathway, mediation fraction, complete causal graph, autonomous heads-only mechanism, selective suppression, or external generalization is claimed. The recommendation for a prospectively scored native matched-control study is proportionate to these limits. Full outputs remain constrained by the original assistant stems; absence of refusal here is not evidence of general spontaneous-refusal behavior.
+
+The report is ready to present within this bounded descriptive scope.

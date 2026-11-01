@@ -1,0 +1,62 @@
+# Contingent Stage 2: bounded sparse-removal pilot
+
+Status: design advice only, 2026-10-18. No launch authorization, training, model execution or implementation accompanies this report. Read against reports/04-sparse-pilot-map.md and the final scientific correction in issues/01-manifest.md. Stage 1 must first establish usable recipient tasks, the nonself donor policy, intact donor validity and output-quality measurements. Coarse-mask collateral alone does not veto this pilot. The shared authorization is 20 cumulative reserved GPU-hours, not a fresh allowance for Stage 2.
+
+## Small implementation and search space
+
+Use one standalone training entry point, a small manifest/loss/export helper and focused tests. Reuse the existing dual-stream model and head gates; do not modify the old sufficiency objective or create a general search framework.
+
+Keep base model weights frozen. Use only the 1,024 per-query-head gate logits, with attention-block, MLP, layer, neuron, embedding and edge pruning disabled. Candidate set is the verified head union D∪H∪F, frozen before fitting. No outside supporters are added in this first pilot. Heads outside that set must be **exactly hard-open in every stochastic and deterministic forward**. Large positive logits alone are not a hard restriction. A small optional gate eligibility buffer that forces noncandidate gate outputs to one is sufficient; verify zero noncandidate gradients and exact identity outside eligibility. All 1,024 logits may exist in the state dict, but report only eligible logits as effective search parameters. A failed search limits this candidate set and optimizer.
+
+Let K be the keep gate and R=1−K. The native forward is K·recipient+(1−K)·donor. Under the audited binary hard-concrete sampler, expected removed count is sum over candidates of sigmoid(−log_alpha). Penalize this quantity positively. Do not reuse the existing positive kept-density penalty, which encourages removal. Count deterministic removed heads using the actual eval-forward convention, not get_num_active(). Initialize candidate logits explicitly, since the generic init_value is not wired through this model; a conservative starting expected removal count of one is an implementation default, with all deterministic gates initially open. Record the exact initialization.
+
+## Frozen train/validation construction
+
+Start from the stored SDR train and validation records, at most 200 each. Construct token-aligned instructed-H counterparts directly using the matched-instruction phrase pool and stored prompts. Never use matched_honest_survivors.json: it is a test-outcome sidecar. Never use Stage 1 recipients/donors as training or validation data. The existing independent SDR-H dataset is not a paired replacement.
+
+Check semantic cluster overlap, not only instance IDs, across original train/validation/test and all derived recipient/donor prompts. Prefer the existing splits if cluster-disjoint. Otherwise use a frozen structural precedence rule, test > validation > train, dropping lower-priority overlapping clusters before outcomes are computed and recording every exclusion. Do not reassign test clusters into training. If this leaves too few balanced/alignable train or validation pairs, report the blocker rather than silently change the task. Freeze the resulting counts and denominators before fitting. Existing source records remain historically outcome-selected; this is an exploratory conditional pilot.
+
+Create nonself aligned honest donors independently within each split. Share the identical donor assignment across each D/H twin, every learned mask and every comparator. Record source-cluster inequality, exact prompt inequality, compatible length/padding, donor truth/answer relationship and all hashes. Donor baseline validity is measured, not inferred. Donor assignments cannot depend on scored intervention outcomes. Keep this same construction for final evaluation; mismatch/answer-copying remains an explicit limitation. Self-H retention is identity and must never enter a preservation claim or training constraint.
+
+## Losses and the imperfect honest baseline
+
+Concatenate paired D/H rows into a single forward so they share one sampled mask. Compute separate means before applying weights. Use only baseline H readout logits as a reference cache; do not retain full sequence-vocabulary tensors on the GPU. Frozen base parameters still permit clean-path gradients to gate logits.
+
+Target loss: mean −log(1−p_masked(y_D)) on D, computed stably from the deceptive-label logit and logsumexp over the rest of the vocabulary. If the frozen task declares several deceptive alternatives, penalize their summed mass instead. This surrogate permits refusal and does not require honesty. It does not measure free-generation deception and can be optimized by shifting probability to another lie or malformed output. Do not apply base-model KL on D.
+
+For H, original matched instruction does not guarantee an honest intact response. Freeze a train-only baseline-capable indicator from intact full-vocabulary argmax equaling the truthful label at the designated readout. This is an explicitly reported training-loss stratum, not an evaluation filter. Compute:
+
+- KL(P_base,H || P_masked,H) only on the capable training stratum, normalized by its own count.
+- Truth-label nondegradation on **every** H training row: max(0, NLL_masked(y_H) − NLL_base(y_H)).
+
+The second term discourages making truth less likely, including on initially wrong rows, without requiring the model to become honest. The first avoids explicitly preserving an initially wrong distribution. Do not combine all-row KL-to-wrong with an absolute truth-forcing hinge. If no meaningful capable stratum exists, the chosen benign task is invalid for this pilot; fix the control before fitting. Report all-row and capable-stratum counts and losses.
+
+Minimal objective: target loss + beta_KL·capable-H KL + beta_label·all-H truth nondegradation + rho·expected removed count. Set beta_KL=beta_label=1 as explicit engineering defaults, then freeze them before the four-run comparison; no hidden beta sweep. Evaluate all frozen validation/test H rows and separately report the intact-capable subgroup. Ground-truth accuracy, argmax categories, truth-label probability and benign refusal are required reporting measures; KL alone cannot establish utility.
+
+## Four settings, stable selection, no giant grid
+
+Proposed four sparsity coefficients on expected **count**: rho ∈ {0, 0.001, 0.01, 0.1}, one fixed optimization seed. The zero setting is the unconstrained sparsity comparator. These are engineering trial values, not a novel objective or scientifically justified optimum. Changing count to mean requires rescaling coefficients explicitly; do not silently change units.
+
+Use AdamW on eligible gate logits only, learning rate 0.03 and weight_decay=0, with the existing gradient clipping. Freeze an equal update budget and validation cadence from the timed smoke; do not give apparently promising settings unrecorded extra epochs. A small initial maximum such as 100 epochs is a ceiling proposal, not a completion guarantee. Microbatch size is a hardware setting, held consistent within a comparable batch; log any change. Preserve joint D/H sampling when using accumulation.
+
+Evaluate deterministic binary masks at fixed validation checkpoints. For a conservative pilot, admissible checkpoints must show no observed net decline in either all-H truthful argmax accuracy or capable-H accuracy relative to intact validation, while lowering the D suppression surrogate. Report paired uncertainty; zero observed loss does not prove zero population loss. If several qualify, choose greatest validation suppression, then fewer removed heads, then earliest checkpoint. Freeze this rule before training. If none qualify, report the frontier and failed gate; do not relax it after viewing test output. The final numerical gate may be revised once, before fitting, from Stage 1 control validity and practical requirements, with the reason recorded.
+
+Do not tune export thresholds on test or select arbitrary top-k removals afterward. Export the selected checkpoint's exact deterministic K and complementary R, explicit removed head IDs, eligibility set, logits and config/data/donor hashes. Build an evaluator-compatible **removal-head object with zero removed MLPs**. Round-trip tiny-model and real-model smoke outputs against the trained keep-mask forward; exporting K as a knockout circuit would invert the experiment.
+
+## Validation and claim limits
+
+Validate learned masks against intact, fixed shared core, D−F, the existing core-size matched random comparator and the rho=0 mask under the same nonself donor assignments. Report sizes directly; the existing core-sized random mask is not a size-matched null for a small learned mask. If a learned candidate is promising, generate one additional layer/count-matched random mask for that selected size as a bounded evaluation comparator, declared before final assessment. One random remains exploratory.
+
+Use the Stage 1 scoring/generation transformations and blinded categories on a small validation slice fixed before optimization for finalist safety checks. Do not select from repeatedly regenerated test results. Final assessment may reuse Stage 1's frozen test manifest for engineering comparison, but it is no longer pristine confirmatory evidence after its role in design decisions. Keep all rows, raw deceptive/n, coherent refusal/evasion, malformed/empty/repetition/cap hits and benign utility separate. A validation failure or output collapse does not trigger an automatic new training grid.
+
+This minimal pilot constrains matched instructed-H readout fidelity and checks generation/format transfer. It does **not** establish general language-model capability preservation, general instruction following or a deception-specific mechanism. No broad-LM claim is allowed from H-readout KL. Rather than silently add a benchmark, require a later explicit auxiliary control if the result warrants it: a small factual no-pressure or benign instruction-switch set, chosen to distinguish the mechanism suggested by Stage 1, with independently aligned nonself donors. Keep it a separate stratum. Broad LM KL is auxiliary, not a substitute for task utility.
+
+## Compute and decision checkpoints
+
+Reserve only against the remaining portion of the shared 20 GPU-hour ledger. A possible Stage 2 envelope, contingent on measured throughput, is: 0.5 GPU-hours for a training/export smoke; four settings at at most 1.5 GPU-hours each; 1.5 GPU-hours for one second-seed repeat of the selected useful setting; and 1.5 GPU-hours for final validation/generation. Total proposed Stage 2 ceiling 9.5 GPU-hours, including these named slots but **not** an automatic failure-retry allowance. Any retry consumes remaining cumulative reservations and needs a revised concrete ledger entry. Unused reservations do not replenish the hard cap.
+
+The smoke must measure actual paired forward/backward, reference-cache memory, validation and export costs on eligible hardware; do not extrapolate pure-D A40 history as a guarantee. If four equal training runs cannot fit the declared envelope, return the costed reduced batch for a high-level decision before launch. At most two jobs active/pending; root alone submits; no arrays, automatic requeues, APIs or downloads. Other stages' reservations remain charged.
+
+Proceed to the best-setting second seed only if the binary validation frontier and the fixed generation safety slice show a useful candidate. A seed repeat is replication of a frozen setting, not a fifth tuning setting. If Stage 1 finds unusable controls, or the four settings find no candidate, stop with the actual limitation and the next discriminating small experiment. User decisions concern changing the scientific control, expanding the batch or scaling beyond this bounded pilot; ordinary implementation and logging need no repeated permission.
+
+Required code verification before any launch: target/penalty gradient signs; exact candidate restriction; only intended logits updated; shared-mask D/H behavior; all-open and self-donor identity; nonself retention actually intervenes; no test-sidecar leakage; no truncation/readout errors; loss behavior on an initially wrong H reference; stable split/manifest hashes; and keep/removal export equivalence with every MLP intact. Never execute notebooks.

@@ -1,0 +1,17 @@
+# H100 operational amendment review
+
+2026-10-24. Lead compactions: 6. **PASS for the scoped local three-file preparation. GPU release and remote writes remain held.** Reviewed `amendment.md`, `plan-h100.md`, `runtime-seam.md`, `queue-assessment.md`, and the original scientific specification. This is a design review, not source verification, a live queue check, or an execution release.
+
+The whole-panel route preserves the original 9,344 rows, 1,168 physical batches, 640 directed pairs, 14 families, cap64, numerical controls and downstream blinded analysis. Its fresh 112-row/14-batch/5,460-forward/29,232-control H100 calibration, exact runtime match and complete-cap forecast correctly prevent H200 timing transfer or mixed-device scientific evidence. The historical shard proposal is explicitly inactive. No scientific design omission blocks local implementation.
+
+The provenance proposal is sufficient provided its independent audit compares the entire old/new payload tree and enumerates exact changed leaves: only reviewed physical mask paths and `record_bounds` may differ. Complete input-core equality is an additional proof, not a replacement for that exhaustive difference check. The explicit frozen alignment root, `__file__` source root, 60-file exact source inventory, unchanged 54 inherited files plus `analysis.py`/`config.py`/`l0.py`, byte-identical historical parent and independently checked transfer manifest address the identified relocation/import risks. Destination software may differ from Delta, but must be truthfully frozen and match its own fresh H100 calibration/main.
+
+The wrapper plan adequately covers relocated cwd identity, explicit interpreter, numeric Slurm epochs, Eastern fallback query/parse and duration/remaining-time validation. Retain raw scheduler/timezone evidence for independent review; fake-tool CPU tests cannot establish actual Bridges-2 scheduler behavior.
+
+Carry these existing operational gates into the release checklist explicitly:
+
+1. **Before any remote write, not merely GPU submission:** resolve the other-agent Bridges-2 concern and reconcile remaining SU with that investigation's outstanding reservations and pending/running charges; scheduler capacity and allocation balance are separate checks. Preserve its repository, environment, cache, jobs and reservations. A unique destination alone does not establish budget headroom. Local preparation may proceed now.
+2. **At replacement activation:** inventory Delta submissions and every attempt/output both before cancellation and again after terminal cancellation. Close the check/cancel race: any scientific attempt discovered in the final evidence means the old main remains authoritative and no H100 main starts. Retain failed/incomplete attempts; scheduler elapsed/no-start is insufficient. H100 calibration does not justify duplicate main attempts.
+3. **Before H100 release:** independently verify the exact destination snapshot and offline 10-file cache, actual wrapper CPU dry-runs, source/software/complete-core receipts, fresh calibration and actual Slurm bounds. Reserve calibration and main separately against reconciled headroom; historical startup estimates and queue projections do not release 1–2h or 7/10/12h requests. No automatic retry, shard fallback or refund is implied.
+
+These are operational closure conditions already within the selected approach; no extra code scope or user questionnaire is required. Independent source/spec review after implementation remains necessary.

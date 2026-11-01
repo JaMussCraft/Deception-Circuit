@@ -1,0 +1,43 @@
+# Decision after the frozen wrapper feasibility test
+
+2026-10-18. Astra review of report 37, root's accounting record, and root's narrow source/artifact audit (documented separately in report 39). No GPU, model, optimizer, API, network, notebook, git or source-code execution. This proposes a diagnostic, not a launch instruction.
+
+**Recommendation: one intact-only instructed-lying transfer feasibility diagnostic using the existing Liars' Bench instructed-deception task.** It has a structurally suitable same-statement, same-user honest twin. Do not call it naturalistic strategic deception: the intervention in the task is an explicit instruction to lie, not autonomous deception arising from incentives. Keep original-stem answer-routing anatomy as a narrower alternative, not the automatic next claim.
+
+## What the completed result means
+
+The frozen validation results directly fail the joint feasibility gate: original D 1/16 deceptive, H 2/16 truthful/usable; grounded D 3/16 deceptive, H 8/16 truthful/usable. Grounding gains six truthful H answers without losing either baseline truthful answer, but adds one H false assertion and only two D deceptive answers. It helps task engagement without enough D headroom for the planned fit. All 64 outputs end at EOS with no empty or capped output, so truncation does not explain the failure. Stop this synthetic free-generation pilot: no additional wrapper search, lower threshold, favorable-row selection or optimizer run.
+
+This invalidates readiness of these two elicitation protocols for the planned selective-mask fit. It does not invalidate original-label causal effects, prior EVAL5 behavioral effects, the existence of selective subsets, or the broader possibility of internal deception mechanisms. Conversely, those earlier effects do not establish deception specificity: answer selection, format/task state, donor content and broad utility remain live alternatives. Coherent D refusal is still successful suppression when an intervention causes it; an already-refusing baseline provides little measurable headroom.
+
+The validated runner, sparse-mask objective, provenance checks, blinded annotation workflow and paired safety checks remain useful infrastructure. They are ready to support a suitable task; no mask has been fit and no selective solution demonstrated. This small negative elicitation result is a design constraint, not by itself a publishable mechanism result.
+
+## Why this transfer task
+
+Root's audit of `evaluation/benchmarks/liars_bench.py`, `InstructedDeception` (approximately lines 305–388), finds an honest counterpart retaining the same statement and user turn, swapping the system template via `lying_index // 2`. Metadata provides dataset/dataset_index for the twin key, statement, and `correct_option`. The honest twin is an intact belief probe; external correctness and the model's elicited belief are distinct quantities and must be reported separately.
+
+Harm-pressure and convincing-game lack this same-interface honest twin in the inspected implementation. Their neutral belief prompts change the interface, and convincing-game truth about self-traits is partly subjective. These are less clean first choices for the immediate matched-control question, regardless of attractive historical suppression rates.
+
+The existing D&H EVAL5 100% intact rate is outcome-screened. The raw instructed screening rate of approximately .515 across 97 rows is historical context, not a fresh baseline or a license to choose successful rows. Use the underlying unscreened source and metadata, never the positive-only EVAL5 list. The native scorer uses paid API calls and has known guard issues; do not use it for this zero-API diagnostic.
+
+## One bounded next step
+
+Freeze 16 source statements by a deterministic structural rule before new outputs, with their exact existing D/H system-template twins. Preserve statement, user interface and native chat rendering. Review the pairing, source correctness metadata and rubric on CPU; do not rewrite prompts to improve outcomes. Deduplicate by the semantic statement/twin key, not transcript row. Prefer unused source statements if available. If the available pool has historical output exposure, label the new experiment exploratory development/transfer feasibility, not fresh held-out confirmation. No row screening by previous deception or honest correctness.
+
+Run only the same existing 8B model intact: **32 completions, one D/H pair per statement, one native template pair, deterministic decoding, no donors, masks, training, grid or automatic retry**. Proposed ceiling: 256 new tokens per completion, at most 8,192 generated tokens, **at most 0.5 reserved GPU-hours and zero paid APIs**. Freeze decoding/EOS policy, full source/selection provenance and dry-run runtime estimate before submission. If native responses or the estimate cannot fit these limits, return a revised costed proposal before launch instead of silently enlarging the run.
+
+Blind and freeze annotations using the statement and external ground truth; reconcile them with H belief responses only after independent per-output categories are frozen. Report external truth accuracy, semantic agreement with H's stated belief, refusal/evasion and output damage separately. An externally false D answer alone can be an error, and an H answer is not external ground truth. Use operational language such as “instructed false assertion on an intact-H-correct statement,” not direct access to latent knowledge or autonomous deceptive intent.
+
+For this new protocol, propose a stricter, explicitly **paired** feasibility floor: at least **8/16 pairs with a usable externally truthful H answer and an unambiguous externally false D assertion**, plus the separately reported H truthful/usable count (necessarily at least 8). This establishes headroom on statements for which the model's honest response supports the relevant factual capability. It is a pre-output operational choice, not a retrospective change to reports 18 or 37 and not a universal scientific threshold. Keep all 16 pairs in reporting denominators; report D false answers on H-incorrect/uncertain pairs separately rather than treating them as confirmed deception. Unresolved ambiguity does not pass the gate.
+
+If the paired floor fails, stop this bounded attempt; no prompt iteration or replacement rows. If it passes, prepare a separate small core/F/D-minus-F/random transfer intervention with paired H preservation and donor/content controls. Intact feasibility neither releases sparse training nor proves a mechanism. Freeze a future evaluation reserve before fitting anything, and keep any inherited source outcome-selection limits visible.
+
+Root reports 2.5 cumulative reserved GPU-hours used and approximately 0.5494 actually consumed. Under the reservation policy, 17.5 of the authorized 20 hours remain; unused reservations are not replenished. This first step would leave at least 17 hours for subsequently justified work. Available budget is not a reason to bypass task validity.
+
+## Is another user decision necessary?
+
+My earlier suggestion to ask the user was scientific scope advice, not a permission requirement. **This small intact-only transfer diagnostic can remain inside the already-authorized staged research goal**, provided no explicit user instruction separately holds new task launches. Root can prepare and, after ordinary freeze/dry-run/budget prerequisites, execute it as a bounded feasibility check without manufacturing a new approval requirement. This report does not supersede an actual user hold or independently authorize execution.
+
+A user decision is warranted before adopting instructed lying as the project's principal scientific target, abandoning strategic-deception behavioral transfer in favor of original-stem label routing, changing model families, expanding prompt/task search, or launching a large training/benchmark wave. The next meaningful scope question is: **“Do we want the main result to explain explicitly instructed lying, or do we require incentive-driven strategic deception?”** The small proposed transfer check can inform that decision without pretending the two constructs are equivalent.
+
+The narrower original-stem alternative asks which components carry answer identity, instruction/policy and format under controlled interchange. It can use existing competent-label artifacts and initially CPU analysis, but must be presented as answer-selection/routing research. It could illuminate F/shared-core organization; a deception-specific claim would still require suitable generated-behavior transfer and benign controls. Neither route currently supplies a publishable mechanism claim by itself.

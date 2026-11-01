@@ -1,0 +1,23 @@
+# Independent native-results pipeline review
+
+2026-10-19. Verdict: **PASS after one corrected defect**. Bounded CPU review only; no real native outcomes inspected, weights loaded, notebooks executed, GPU/Slurm/API/git operations, or further agents. Reviewer edited only this report. Applied Karpathy review guidance and verification-before-completion; read Alignment shared instructions/memory and Deception-Circuit bridge. Scope: `analysis/native_results.py`, its focused synthetic tests, reports76/67/61, and the native caller's persisted-record/manifest contract.
+
+## Corrected finding
+
+The original D suppression upper bound included uncertain capped or empty responses as potential coherent suppression. Those responses are already ineligible for usable suppression independently of their semantic uncertainty. An independent tiny fixture with16 clear usable intact false assertions,15 clear intervention refusals and1 uncertain capped refusal reproduced point15/16 with bounds[15/16,16/16]. The valid upper bound is15/16. The implementation owner corrected `paired_analysis` to exclude known empty/capped rows from the unknown set and added parameterized cap/empty regressions. Reviewer independently reread the correction and reran both supported environments: **9 passed base in1.71s;9 passed mgnp in1.74s**. Original seven tests also independently passed before the correction (base4.52s; mgnp4.92s).
+
+## Contract checks
+
+- Exact208 closure and240 annotation views are exercised by the focused fixture. An additional independent synthetic six-finalist fixture, including three all-head `failed_frontier` entries, exported exactly352 physical outputs into384 views:256 factual and128 recoding. Three-finalist counts are160 factual/80 recoding. The32 additional donor-context views create no generations.
+- Source/manifest/finalist-file/execution bindings, exact task identities and filenames, record digests, raw donor-bank hashes, decode bounds, in-flight exclusions, balanced donor bijection, prompt-map/query-index/terminal-held accounting agree with the caller contract. Bank hashes stream bytes without deserialization. Missing/corrupt records fail before packet creation.
+- Factual public records omit D/H system instructions and private condition/donor/replay identities. R exposes only its required codebook context in addition to factual fields. Anonymous IDs are shuffled jointly and deterministic; the private map is0600. Packet/map/rubric/source hashes bind the freeze. Labels and freeze are checked before private-map loading/join. Process independence and chronology remain root attestations rather than properties hashes can prove.
+- All16 matched IDs remain in every condition/domain. Factual false-assertion denominators remain16; capped clearly false content counts in raw false rates. Lower/upper semantic uncertainty bounds remain separate. R has compliance and independently judged encoded-target relation, never a factual deception rate.
+- D coherent refusal counts as desirable suppression only on clear usable intact-false IDs. H/R refusal loses capability. Empty/capped/uncertain outputs cannot support capability or suppression. H/R baselines are their own exact intact-capable IDs; gains and losses are separately listed. Zero denominators return JSON null and Markdown NA.
+- Donors receive independent own-statement and recipient factual/encoded views. Reported recipient relations derive from those annotations, not source truth metadata. Coverage, unmapped prefixes and terminal-held reuse remain visible. The results state exploratory paired n16 limits and donor replacement rather than neutral deletion.
+
+One minor presentation limitation remains: finalist `admissible`/`failed_frontier` status is retained in the receipt bound by the packet manifest rather than copied into each concise result condition. All finalists remain included, so this does not change denominators or selection; consult the bound receipt when interpreting an arm's frontier status.
+
+Final reviewed pipeline SHA256: `4c58d8d650f817b6b585328df5bbf1b84427329fe961c0eab9cc8665c352e4a5`.
+Final reviewed focused-test SHA256: `c98a62447733efa7a1385b37af8e3ccb72be2a72ae625942fd067298ae1f50c1`.
+
+Verification commands used `OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1` with `/sw/external/python/anaconda3/bin/python3.9` and `/u/swong2/.conda/envs/mgnp/bin/python`, each invoking `-m pytest -q .scratch/selective-deception/analysis/tests/test_native_results.py`. Independent probes used only those synthetic fixtures in temporary directories, which were cleaned up.

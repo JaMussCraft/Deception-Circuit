@@ -1,0 +1,63 @@
+# Sequential Native SDR Shards Implementation Plan
+
+> **For agentic workers:** Use executing-plans for inline implementation, or root's explicitly chosen delegated workflow. Steps are reviewable checkboxes. This plan is documentation only until root releases source changes after terminal old-main cancellation and zero-attempt proof.
+
+**Goal:** Run the unchanged3072-row native panel once across prospectively frozen sequential allocations of at most1hour and merge it with complete provenance.
+
+**Architecture:** Make a surgical optional shard seam in the existing runner; leave its default monolithic and calibration behavior intact. Reuse `complete_batch`, validation, controls, checkpointing and allocation-bound wrapper. Freeze timing-only ranges outside the scientific payload and add a strict CPU merge; no second inference implementation.
+
+**Tech stack:** Existing Python3.9/base and Python3.12/mgnp, pytest, immutable component hooks, Slurm and JSON artifacts.
+
+**Spec:** `/projects/beto/swong2/Alignment/.scratch/sdr-native-controls/sharding-spec.md`, with scientific requirements inherited from adjacent `spec.md`.
+
+## Global constraints
+
+- Activation requires root/operator terminal cancellation and zero main attempts for job23101635 before source edits. If it starts, stop contingency.
+- Root owns git/releases; operator owns cancellation/submission and numeric ledger. Preserve old15603235 artifacts and reservations. No jobs, GPUs, notebooks or paid APIs during implementation.
+- Scientific canonical payload SHA256 stays52f3860915bd0843dbcb503d856d034659add37458863dd3c3f5ece75b3bf620; all3072 IDs/order and64 calibration IDs stay identical. B8/L224,64-token cap, same exact calibrated A100 identity/software/model, thresholds/rubric unchanged.
+- Shards run sequential ascending global batch ranges, whole original8-slot batches, each row once. New commit requires fresh same64-row calibration and independent review. Both calibrations excluded from science.
+- Keep48x full-panel I/O growth, full-cap/control counts, explicit pre-model H and60sec margin. Any attempted failed shard blocks successors and scientific release; no automatic retry/rescue.
+
+## Review focus
+
+- Old monolith can start during planning: require independent terminal/zero-attempt activation receipt; source stays locked until root gate.
+- Validation consumes allocation time outside model timer: record direct pre-model duration; plan requires T+H+M<=3600 and runtime checks remaining actual allocation.
+- Alternate output/copy-plan/concurrent invocation repeats a range: one frozen absolute plan-scoped registry atomically claims each range; merge audits every claim/output/invocation, including conflicts and failures.
+- A capped response is a valid completed generation but an unresolved semantic label: merge preserves it; runtime failure remains blocking.
+- Missing shard can look like a complete subset: require all frozen ranges and all3072 IDs before downstream export/analysis release.
+
+## Task1: One operational extension and complete CPU integrity gate
+
+**Files:** modify only `scripts/sdr_native_controls.py`, `scripts/jobs/run_sdr_native_controls.sh` if dispatch needs it, and `tests/test_sdr_native_controls.py`, in a root-released isolated source context. Default wrapper startup/deadline behavior should need no change. No old artifact or shared-hook edits. Keep code in the existing module; a separate duplicated generation runner is unnecessary.
+
+**Consumes:** existing `verify_protocol`, `runtime_binding`, `complete_batch`, `_run` checkpoint/control path, `bind_allocation_operations`, `forecast_main`, `atomic_json`, `generation_map` and exact frozen protocol. Implementer is not alone: preserve others' changes. Root alone commits.
+
+**Produces (JSON-serializable interfaces):**
+
+- `build_shard_plan(protocol:dict, calibration:dict, operations:dict) -> dict`: validates complete matching new calibration, takes timing/resource fields only, applies spec q/range algorithm, returns canonical-hash-bound operational plan; never reads generation choices/text.
+- `verify_shard_plan(protocol:dict, calibration:dict, plan:dict) -> None`: recomputes hashes, equality, partition, timing formula, H/M, ordered batch/row IDs and full coverage.
+- `forecast_main(protocol,calibration,operations,*,batch_count:int=384) -> dict`: keep default results identical; shard n changes counts only, retaining factor48, buffers and recipe. Include explicit pre-model policy/release margin in shard plan, separately from unchanged science.
+- `claim_main_shard(protocol:dict, plan:dict, shard_index:int, invocation:dict) -> dict`: verify canonical root-approved registry/plan, durably register invocation/output and atomically create exclusive immutable range claim before any main forward. Existing/orphan claims fail closed, including copied-plan/alternate-output attempts; append all attempts/conflicts, never steal/delete claims. No claim in CPU dry-run/calibration/merge.
+- `run_main_shard(protocol:dict, output:Path, operations:dict, plan:dict, shard_index:int) -> dict`: calls the single shared `_run` path with verified owned range and predecessor binding. Extend `_run` with private optional shard context; never edit or slice protocol.main/payload. Selection of owned rows occurs only after full protocol/plan/calibration verification; batch iteration preserves original global index and slots. Default `run_main` remains full3072.
+- `merge_shards(protocol:dict, calibration:dict, plan:dict, shard_outputs:list[Path], output:Path) -> dict`: strict complete CPU merge, fresh directory, original-order generations and provenance/integrity report; rejects mismatches/partial state before downstream release.
+- CLI additional modes `plan-shards`, `main-shard`, `merge-shards`; new arguments `--shard-plan PATH`, `--shard-index INT`, repeatable `--shard-output PATH`. Reuse `--protocol`, `--calibration`, `--operations`, `--output`, `--dry-run`. Plan requires complete new calibration; main-shard requires plan/index/predecessor receipt through operational JSON; merge requires all outputs. CPU dry-run validates/fixes no live allocation and never loads a model/submits a job. Missing calibration/old source mismatch explicitly blocks.
+
+- [ ] Read both specs and root activation receipt `operator/main-conditional-cancel-23101635.json` (terminal CANCELLED/ElapsedRaw0/StartNone/nooutput/noattempts); require root's separate source implementation release. Verify zero attempts/terminal cancellation before touching source. Record exact base commit. Failure means stop and notify root; documentation remains usable.
+- [ ] Write and run failing timing-plan tests: illustrative old-cal values yield q30 at H120/M60,13 ranges `[0,30),...,[330,360),[360,384)` and3072 unique ordered IDs; higher pre-model time lowers q; no fitting one-batch forecast aborts; mean output length/text/correctness changes cannot affect range selection; T retains48 growth and exact full64/control/checkpoint counts; final short range fits.
+- [ ] Implement `build_shard_plan`, `verify_shard_plan` and optional batch-count forecast seam. Assert byte-for-byte scientific payload equality before/after plan construction, operational reservation/deadline independence and rejection of old-cal/new-source binding mismatch.
+- [ ] Write and run failing exclusive-registry tests: two concurrent claimants yield exactly one claim and at most one main forward; alternate output/copy plan reuses the same absolute registry and cannot reclaim a range; override/relocated registry root is rejected; activated-study monolithic main rejects before any forward, and merge rejects post-cancel monolithic records in the full operator inventory; dry-run/calibration/merge leave registry unchanged; orphan claim blocks restart; every invocation/conflict/output is durably inventoried. Implement `claim_main_shard`, canonical execution-release guard for this activated scientific hash, and shared registry/operator inventory checks. Archived old source is protected by operator no-resubmit/release-inventory enforcement, not edited.
+- [ ] Write and run failing runtime/fake-model tests: original global batch slots retained across range boundaries; no repadding/regrouping; same greedy64/EOS/controls; predecessor required and correct; shard outside plan, repeated attempt inventory, wrong GPU/source/software/B/L/calibration, observed pre-model>H or remaining-allocation failure stops before rows. Cover SIGTERM/deadline/numerical failure preserving all owned IDs/tokens and blocking successor release. Verify default monolithic mode still requires384 batches/full forecast.
+- [ ] Implement the shared `_run` shard context and direct pre-model instrumentation, durable batch-attempt inventory, per-shard receipt/ownership fields and CLI. No second decoding/control implementation. Runtime checks use actual allocation end and unchanged shutdown handling. Completed EOS/capped rows count as generation-complete; attempted failures block rather than retry.
+- [ ] Write and run failing merge tests with synthetic complete3072-row shard artifacts: accept valid original-order reconstruction; reject extra/missing/overlap/duplicate ranges or IDs, duplicate attempts, wrong slot/index, modified data hashes/controls, unknown/unregistered output, duplicate/orphan/failed claim anywhere in the full registry even when omitted from selected inputs, wrong predecessor, calibration/science/source/software/GPU mismatch, failed/partial shard or occupied destination. Every omitted shard yields explicit global missing IDs and no scientific release; no complete-case denominator. Verify merged data passes existing blinded interfaces, preserves capped unresolved labels, and never includes either64-row calibration run.
+- [ ] Implement `merge_shards` and no-model/no-submit CLI dry-runs. Keep per-shard/merged evidence immutable and distinguish merged provenance from a monolithic receipt. Include exact status/control and reserved/actual resource totals, without rewriting operator ledger.
+- [ ] Run pinned-thread focused tests in both supported interpreters: `/sw/external/python/anaconda3/bin/python -m pytest tests/test_sdr_native_controls.py -q` and `/u/swong2/.conda/envs/mgnp/bin/python -m pytest tests/test_sdr_native_controls.py -q`, each with `OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1`. Run relevant unchanged routing/completion suites once if new shared-path changes warrant; report failures by name against prior133passed/2skip base and135passed mgnp receipts. Never execute notebooks or real models on login.
+- [ ] Independent code/spec review checks default-path preservation, row-once failure rules, full-cap timing including H/M, strict merge and immutable science. Root commits only reviewed source files; CPU freeze binds actual new commit and independently confirms science SHA remains exact. Dry-run actual allocation wrapper/CLI for new calibration, plan-shards, first/last main shards and merge with synthetic CPU artifacts; record end-to-end validation overhead.
+
+## Execution after source review (operator/root, not implementation)
+
+- [ ] Root releases exactly one fresh fixed64-row calibration on matching actual A100; operator records reservation before submission. Review complete numerical/provenance/resource receipts; any failure stops. Preserve both calibrations and costs, exclude both from science.
+- [ ] CPU build plan only from new calibrated timings/H. Independent reviewer verifies deterministic ranges, exact global batch/ID partition, full-cap per-range bound and unchanged science. Operator test-only scheduler projection may select an eligible account/partition while actual hardware remains exact; it may not change q, bounds or row assignments from main results.
+- [ ] Root releases sequential main allocations against the frozen plan. Before each, operator records its full reservation and predecessor PASS and complete registry/output inventory; check actual hardware/software/source/allocation binding before rows. Any attempted failed shard stops successors and scientific release. No retries or output-derived reallocation.
+- [ ] Strict CPU merge verifies all frozen shards/3072 original IDs exactly once and produces original-order generations. Independent final integrity audit precedes unchanged blinded export/join/analysis. Report every category/gate and all old/new reservations/actual costs, regardless of behavioral result; no causal grid.
+
+Self-review: activation, timing/partition, shared inference, failure/once-only, merge/provenance and independent science closure each have an owning test/gate above. This is a single feature and review task, followed by operator execution, not independent subsystems.

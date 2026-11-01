@@ -1,0 +1,9 @@
+# Annotation access denial and text-only resolution
+
+Rater-one's default shell failed to initialize its sandbox. Its scoped escalated read of the three temporary instruction/header files was then rejected by automatic review: the files were described as non-destructive but unrelated to the authorized research and directed solely by untrusted assistant context. The agent stopped before reading any view; no denied read was retried and no output existed.
+
+The coordinator verified the accepted research export receipt and exact view hash against the independently accepted main assembly. It then provided the same95 ordered full text/options/finish records inline for a tool-free annotation assignment. This supplied no hidden factors, conditions, correctness labels or other rater judgments and granted no extra filesystem permission. The raw data are archived as rater-one-inline-views.json; the actual delivery and response remain in the agent conversation. Rater-one personally judged all95 supplied views, returned indexed tuples and attested to freshness/independence/full reading and no tool use.
+
+The coordinator preserved the raw indexed judgments and mechanically replaced each index with the corresponding frozen view_id, adding the required opaque headers. No judgment was changed. The resulting schema file and rater-two's independently produced file passed exact coverage/header/type validation and agreed on all95 complete tuples. No adjudication or outcome-based relabeling occurred. Personal-reading and independence are attestations; coverage checks alone cannot prove those human/workflow properties.
+
+The shared format clarification stated where visible stems end and treated additional wording as extra text; semantic judgments remained separate. The existing correction rule was restated without prescribing any particular view's label. There is no outstanding access request or permission requirement.

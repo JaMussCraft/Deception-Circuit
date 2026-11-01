@@ -1,0 +1,17 @@
+# 175 — Strict first paid block auditor
+
+Prepared `transfer-v5/audit-paid-block.py` and `test_audit_paid_block.py`; original strict contract intentionally remains unchanged. Auditor is read-only except exclusive creation of a new requested audit file. No evaluator/launcher/receipt/cache/ledger/benchmark edit, GPU/model/API call or job action.
+
+Checks fixed instructed50×five states/native512/item IDs and prompts, native donor assignments/provenance, runtime support/logit proof, immutable source/manifest/cold-proof/model/tokenizer/runtime identities,42batch canonical checksums/plans/token dimensions/ranges, and contentguard job provenance. Masked donor completions are checked against durable native-donor tokens with original EOS trimming. Global billing snapshot reports known settled cost, pending/unknown retained reserve, cap violations, immutable-prefix cache/appends, SHA/bytes/readtime; no per-split cost attribution is inferred.
+
+Strict complete gate rejects original completeFalse, missing/error coverage, invalid_judge unscored outcomes and any integrity/budget issue; no headline is emitted. Saved official labels remain unchanged. Reused support helper and immutable cold-proof identity are pinned. Public stock tokenizer adds pad=eos relative to cold harness; this exact difference is explicit, while backend/template/init remain exact.
+
+Validation: test-first missingimplementation failed; forged unscored raw behind complete flags and absent/contradictory saved paid verdict fields failed before correction.16synthetic tests pass mgnp; base verification follows same command. Includes partial/foreign IDs/donors/proof/coverage/errors/counts/state,42records plus corruption, budget known/pending/unknown/overcap, cacheprefix/appends, read-onlysnapshot and no-clobber output. Tests do not assume live mutable totals.
+
+The now-terminal job23191053 was audited once read-only: strict exit2/completeFalse/headlineNone. All42checkpoint/source/proof/donor validations PASS; only issues are original incomplete/failed dataset flags and the23invalid_judge coverage outcomes. All250generations/labels have saved judge prompt/text; zero judge_errors; raw vocabulary is86affirmed/141rejected/23invalid_judge. All23have first official AFFIRMED/REJECTED/INVALID verdict INVALID, distributed2/3/9/8/1 acrossfull/new23/new30/D69/random. Thus no missing judge response or transport failure was found. Original strict gate still rejects these classification ambiguities.
+
+Global snapshot at2026-10-25T14:39UTC:190attempts, all known settledUSD0.219921,0pending/unknown; cache immutable5982474byteprefix passes with189valid appends. These are snapshot totals, not guaranteed per-split attribution. Machine result `paid-instructed-strict-audit-001.json` contains exact hashes/asof metadata. Original benchmark remains completeFalse.
+
+Verification boundary: no independent tokenizer decoding of raw checkpoint tokens back to saved generation text, reconstruction of donor prompt token IDs, or independent cache-key/verdict-to-each-label linkage is claimed. Source/proof/manifest closure and native donor completion equality are checked. This is a narrow external audit, not a new model proof.
+
+A separate explicitly versioned post-outcome policy is now authorized by root based on report177; it will not alter these strict files or original artifacts. No original-protocol efficacy headline follows this audit.

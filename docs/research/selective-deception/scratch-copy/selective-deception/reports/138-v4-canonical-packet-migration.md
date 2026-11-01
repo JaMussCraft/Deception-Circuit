@@ -1,0 +1,29 @@
+# Canonical public-view digest mismatch and strict copy preparation
+
+October21,2026. Root hypothesis confirmed using **public records only**. The frozen exporter used extension_compare.digest, whose JSON serialization defaults to ensure_ascii=true. The frozen annotation consumer/collator uses native_results.digest with ensure_ascii=false. All352original manifest digests match the exporter convention; exactly7public views differ under the consumer convention. V0288 has exporter digest7dc68b5da1788c02610ee83465d62b14a85c3369482d16052f6a776321ebbfa6 versus consumer digeste8b4b11edab223f5a46aa05a3534f8d00d00c3ee158ff75a69825c2309e93d84. The exporter introduced the mismatch; its initial ASCII-only integration fixture failed to cover Unicode. The completed785second GPU run, frozen source, original packets and all annotation artifacts remain immutable.
+
+New files only: `analysis/optimization_v4_packet_canonical.py`, `test_optimization_v4_packet_canonical.py` and this report. **No actual migration was run. No real private-map bytes were read or decoded.** The helper's actual-data public-only preflight passed:352views,7changed digests, execution_authorized=false, private_bytes_read=false.
+
+Original public packet-manifest SHA256 is1c53b442cbef11f12ace3fb60967a175e31090db2678694b8bba5c92e8f53b7c. This expected original-manifest SHA is the trust root for opaque private bytes. The helper also pins the immutable original exporter091a4c642729f66271f5ec218f4f5426657e6abc98c23943b1c4b4b9c59f6944, adapterbf574b03fb2bc5aff184059f21c4a2f715fdbea7ce185c41db5aac4607ff8ceb and classification consumer4c58d8d650f817b6b585328df5bbf1b84427329fe961c0eab9cc8665c352e4a5. It verifies the original five input/runtime file bindings and the exact prospective/prepared/selection hashes. Public packets/chunks/rubric must match original SHA bindings, schema, unique V0001–V0352 closure, six<=64row chunks, original legacy digests and frozen rubric.
+
+After separate review139 and root approval, explicit apply creates a **new sibling directory** only. It copies factual-packet.json, all six public chunks and rubric.json byte-for-byte. Original IDs, source statements, responses, rubric, chunk boundaries and public byte hashes stay identical; therefore existing annotations still refer to the same public views.
+
+Private migration never invokes a JSON decoder or converts private bytes to text. It first checks the original private byte SHA against the trusted original manifest. A narrowly anchored bytes-only matcher checks352pretty-JSON record boundaries, exact allowed top-level field names, unique known public anonymous-ID tokens and one corresponding exact legacy public_view_digest token per record. Only those64hex-character digest spans may change. All other field values remain opaque. Unexpected fields, duplicate/nested digest fields, record/ID/digest/format discrepancies and digest collisions are rejected. The source SHA establishes original exporter integrity; this is deliberately not a new semantic interpretation of opaque private values.
+
+All replacements use fixed offsets in a single pass, preventing replacement cascades. It proves equal length, exact byte identity between every digest span, unchanged trailing bytes, and exact recovery of original bytes when replacing the same spans with their prior digests. The new private map is mode0600. The copied manifest preserves original source/exporter/consumer/input fields, replaces public digest values and the private file SHA, and adds converter/original-manifest provenance plus byte-preservation/inverse-recovery proof. A separate canonical-migration.json records original/new manifest/private hashes and unchanged public file hashes. These receipts expose no private content. The original packet tree is rehashed after copying and is never written.
+
+The helper rejects existing or overlapping destinations, symlinks, unexpected source files, duplicate public JSON keys, nonfinite public values, altered input/public/rubric bytes and incorrect original-manifest/source pins. It does not modify labels, sidecars or annotation task receipts. Root's separate annotation-source bridge must link each actual original assignment/chunk/manifest and unchanged label SHA to identical copied public bytes and the canonical manifest. Canonical sidecars must state that root bridges the actual original assignment; they must not imply annotators saw newly named paths.
+
+Public-only preflight (safe before private label freeze):
+
+```bash
+/u/swong2/.conda/envs/mgnp/bin/python .scratch/selective-deception/analysis/optimization_v4_packet_canonical.py
+```
+
+Proposed exact apply command, **not executed; requires review139PASS and root approval**:
+
+```bash
+/u/swong2/.conda/envs/mgnp/bin/python .scratch/selective-deception/analysis/optimization_v4_packet_canonical.py --apply --source /projects/beto/swong2/Alignment/.scratch/selective-deception/sparse-optimization-v4/comparison/native-packets --expected-source-manifest-sha256 1c53b442cbef11f12ace3fb60967a175e31090db2678694b8bba5c92e8f53b7c --output /projects/beto/swong2/Alignment/.scratch/selective-deception/sparse-optimization-v4/comparison/native-packets-canonical
+```
+
+Verification:28synthetic CPU tests pass in mgnp(2.12s) and28pass in base(1.52s). The Unicode fixture fails the **unchanged frozen consumer** before conversion and passes its complete post-freeze analysis after conversion. This synthetic consumer test opens only fabricated private fixtures after a fabricated complete label freeze. Other tests guard against private JSON entering a decoder, prove public-only preflight never reads private bytes, demonstrate inverse recovery and cascade safety, and exercise boundary, field, digest, ID, schema, source, symlink, destination and byte-tampering failures. Hash-looking content outside the named field is preserved. No GPU/API/model/notebook work occurred and no actual private map was opened.

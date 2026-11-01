@@ -115,15 +115,23 @@
       "text": "Four decisions, in order, from docs/research/autoresearch-workflow/merge-checklist.md: (a) approve merging the autoresearch-workflow branch into Deception-Circuit main, and the commit of the applied Alignment-side files; (b) after the merge, the archive moves of the four closed scratch directories (wave B, reversible, verified by script); (c) your go for the Codex config change (wave C: default worker model Sol, shinka and weco off), which needs a Codex restart; (d) confirmation that the live Codex session is finished, so its directories and the two memory logs can be archived (wave D)."
     },
     {
-      "answer": null,
-      "answered_at": null,
+      "answer": "Sun 8:50 AM EST: you confirmed the live Codex session is finished, asked for the push and the branch deletions, and installed session-report. All done; the restart of Codex is still yours (not confirmed).",
+      "answered_at": "2026-11-01T08:50:02-05:00",
       "at": "2026-11-01T08:10:24-05:00",
       "default": "Codex keeps running on the old config until restarted; wave D stays unapplied; main stays local-only.",
       "id": "N3",
       "text": "Two things left for you: restart Codex so the wave C config takes effect (trust stays; re-trust via /hooks only if asked), and tell me when the live Codex session is finished so wave D can archive its directories and the two memory logs. Also say whether to push Deception-Circuit main and delete the merged remote branches (mechanism-datasets, autoresearch-workflow); I do not push main on my own."
+    },
+    {
+      "answer": null,
+      "answered_at": null,
+      "at": "2026-11-01T08:50:03-05:00",
+      "default": "Codex keeps the old config until restarted; the mechanism-datasets worktree stays in place.",
+      "id": "N4",
+      "text": "Two items remain yours: restart Codex so the wave C config takes effect (trust stays), and decide whether the untracked outputs in the mechanism-datasets worktree (outputs/_build_v2 425 MB and two small result dirs) move to main's outputs or are dropped, so that worktree can be removed."
     }
   ],
-  "right_now": "All twelve setup tickets are done and committed on the branch, and every Alignment-side change that did not need your go is applied: the research-session tool, the hooks in both tools (trusted in Codex), the plugin profiles, the protocol guides, the findings index, and the science guards in the code. Waiting on you for four decisions, in the merge checklist: merge the branch, then the archive moves (wave B); the Codex config change (wave C, needs a Codex restart); and the live Codex session's files (wave D, after you confirm that session is finished).",
+  "right_now": "Setup complete and merged; waves A, H, B, C and D are all applied and verified; Deception-Circuit main is pushed and the merged remote branches are deleted. Open for the user: restart Codex, and the mechanism-datasets worktree's untracked outputs. The pilot (direction pilot-hooks, pilot-checklist.md) has not started.",
   "schema": 1,
   "state": "Blocked: needs you",
   "terms": [
