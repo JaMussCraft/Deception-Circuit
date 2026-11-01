@@ -11,6 +11,11 @@ import pytest
 from scripts import twin_training as tw
 
 
+
+def execution_plan(*args, **kwargs):
+    return tw.plan_run(*args, execution_commit='e'*40, **kwargs)
+
+
 def canonical(value):
     import hashlib
     return hashlib.sha256(json.dumps(value, sort_keys=True, ensure_ascii=False,
@@ -101,7 +106,7 @@ def test_frozen_exact_command_and_selected_ids(inputs):
         assert argv[argv.index(flag)+1] == value
     assert set(tw.GATE_FLAGS).issubset(argv)
     assert not any('runtime-filter' in a for a in argv)
-    provenance = tw.plan_run(config, manifest, task='far_v2', condition='D', seed=42, timing_epochs=None)
+    provenance = execution_plan(config, manifest, task='far_v2', condition='D', seed=42, timing_epochs=None)
     assert provenance['selected_ids']['train'] == manifest['tasks']['far_v2']['split_ids']['train'][:200]
     assert provenance['purpose'] == 'scientific-seed'
     assert provenance['recipient_condition'] == 'deceptive'
@@ -122,7 +127,7 @@ def test_timing_only_provisional_and_production_gate(inputs):
         command(inputs)
     argv = command(inputs, timing_epochs=20)
     assert argv[argv.index('--node-epochs')+1] == '20'
-    plan = tw.plan_run(config, manifest, task='far_v2', condition='D', seed=42, timing_epochs=20)
+    plan = execution_plan(config, manifest, task='far_v2', condition='D', seed=42, timing_epochs=20)
     assert (plan['purpose'], plan['planned_epochs'], plan['actual_epochs'], plan['fleet_ready']) == ('timing-only', 500, 20, False)
     with pytest.raises(ValueError):
         command(inputs, condition='I', timing_epochs=20)
@@ -186,7 +191,7 @@ def fake_child(tmp_path, argv, *, missing=None, fail=False, mismatch=False, sema
 def test_run_receipts_and_whole_process_clock(inputs, tmp_path, case):
     config, manifest = inputs
     argv = command(inputs, timing_epochs=20)
-    plan = tw.plan_run(config, manifest, task='far_v2', condition='D', seed=42, timing_epochs=20)
+    plan = execution_plan(config, manifest, task='far_v2', condition='D', seed=42, timing_epochs=20)
     execute = fake_child(tmp_path, argv, missing='history.json' if case == 'missing' else None,
                          fail=case == 'failure', mismatch=case == 'mismatch')
     out = Path(argv[argv.index('--output-dir')+1])
@@ -201,7 +206,7 @@ def test_run_receipts_and_whole_process_clock(inputs, tmp_path, case):
     if case == 'success':
         assert receipt['pruning_seconds'] == 600
         assert Path(receipt['stdout_stderr_log']).read_text().strip().endswith('600.0s')
-        assert json.loads((out/'run_manifest.json').read_text())['orchestrator_source_commit'] == 'a'*40
+        assert json.loads((out/'run_manifest.json').read_text())['orchestrator_source_commit'] == 'e'*40
     else: assert receipt['errors']
 
 
@@ -272,7 +277,7 @@ def test_private_build_consistency(inputs, case):
 
 def test_private_hashes_recorded_for_both_conditions(inputs):
     config, manifest = inputs
-    plan = tw.plan_run(config, manifest, task='far_v2', condition='D', seed=42)
+    plan = execution_plan(config, manifest, task='far_v2', condition='D', seed=42)
     assert set(plan['dataset_config_sha256']) == {'D', 'I'}
     assert all(len(value) == 64 for value in plan['dataset_config_sha256'].values())
 
@@ -282,7 +287,7 @@ def test_private_hashes_recorded_for_both_conditions(inputs):
 def test_reject_semantically_incomplete_artifacts(inputs, tmp_path, case):
     config, manifest = inputs
     argv = command(inputs, timing_epochs=20)
-    plan = tw.plan_run(config, manifest, task='far_v2', condition='D', seed=42, timing_epochs=20)
+    plan = execution_plan(config, manifest, task='far_v2', condition='D', seed=42, timing_epochs=20)
     ticks = iter([10., 1210.])
     receipt = tw.run_timed(argv, receipt_path=str(tmp_path/'receipt.json'), provenance=plan,
         runner=fake_child(tmp_path, argv, semantic=case), clock=lambda: next(ticks))
@@ -316,7 +321,7 @@ def test_actual_materializer_output_launch_contract(tmp_path):
         tokenizer=FakeWordTokenizer(), max_length=30, commit='a'*40)
     config = json.loads(tw.FROZEN_CONFIG.read_text())
     config.update(data_root=str(tmp_path/'materialized'), output_root=str(tmp_path/'runs'))
-    plan = tw.plan_run(config, manifest, task='far_v2', condition='D', seed=42, timing_epochs=20)
+    plan = execution_plan(config, manifest, task='far_v2', condition='D', seed=42, timing_epochs=20)
     assert plan['counts'] == {'train': 1, 'validation': 1, 'test': 1}
     assert plan['train_under_200_requires_lead_review'] is True
     assert plan['selected_ids'] == manifest['tasks']['far_v2']['split_ids']
@@ -345,7 +350,7 @@ def test_training_margin_shared_despite_historical_screening(inputs):
 
 def test_margin_artifact_mismatch_fails(inputs, tmp_path):
     argv = command(inputs, timing_epochs=20)
-    plan = tw.plan_run(*inputs, task='far_v2', condition='D', seed=42, timing_epochs=20)
+    plan = execution_plan(*inputs, task='far_v2', condition='D', seed=42, timing_epochs=20)
     execute = fake_child(tmp_path, argv, semantic='wrong-margin')
     ticks = iter([10., 1210.])
     receipt = tw.run_timed(argv, receipt_path=str(tmp_path/'receipt.json'), provenance=plan,
@@ -394,7 +399,7 @@ def test_rejects_stale_saved_rows_before_launch(inputs, tmp_path, case):
     shutil.rmtree(path)
     replacement.rename(path)
     with pytest.raises(ValueError):
-        tw.plan_run(config, manifest, task='far_v2', condition='D', seed=42)
+        execution_plan(config, manifest, task='far_v2', condition='D', seed=42)
 
 
 @pytest.mark.parametrize('clock_kind', ['custom', 'explicit-monotonic', 'default'])
@@ -408,3 +413,138 @@ def test_clock_only_injection_is_marked_before_allocation_failure(inputs, tmp_pa
     assert 'allocation' in ' '.join(receipt['errors'])
     assert receipt.get('test_runner_injected', False) is (clock_kind == 'custom')
     assert receipt.get('test_clock_injected', False) is (clock_kind == 'custom')
+
+
+@pytest.fixture
+def protected_registries(tmp_path, monkeypatch):
+    paths = [tmp_path/name/'docs/research/held_out.json' for name in ('primary','branch')]
+    for path in paths:
+        path.parent.mkdir(parents=True)
+        path.write_text(json.dumps({'schema':1, 'sets':[]}))
+    monkeypatch.setattr(tw, 'PROTECTED_REGISTRIES', tuple(paths), raising=False)
+    return paths
+
+
+@pytest.mark.parametrize('split', ['train','validation','test'])
+@pytest.mark.parametrize('which', [0,1])
+def test_dry_run_rejects_protected_overlap_in_either_registry(inputs, protected_registries, split, which):
+    path = protected_registries[which]
+    ident = inputs[1]['tasks']['far_v2']['split_ids'][split][0]
+    path.write_text(json.dumps({'schema':1,'sets':[{'task':'far_v2','ids':[ident]}]}))
+    with pytest.raises(ValueError, match='protected registry id overlap'):
+        execution_plan(*inputs, task='far_v2', condition='D', seed=42)
+
+
+def test_runtime_refreshes_registry_before_injected_child(inputs, tmp_path, protected_registries):
+    plan = execution_plan(*inputs, task='far_v2', condition='D', seed=42, timing_epochs=20)
+    protected_registries[0].write_text(json.dumps({'schema':1,'sets':[{'ids':['test0']}]}))
+    calls = []
+    receipt = tw.run_timed(plan['argv'], receipt_path=str(tmp_path/'receipt.json'), provenance=plan,
+                          runner=lambda *a,**kw: calls.append(a))
+    assert receipt['status'] == 'failed' and not calls
+    assert 'protected registry id overlap' in str(receipt['errors'])
+
+
+@pytest.mark.parametrize('case', ['missing','malformed','schema','entry','ids','count','hash','escape'])
+def test_registry_failures_block_plan(inputs, protected_registries, case):
+    path = protected_registries[1]
+    if case=='missing':
+        path.unlink()
+    elif case=='malformed':
+        path.write_text('{')
+    else:
+        registry = {'schema':1,'sets':[]}
+        if case=='schema': registry['schema'] = True
+        elif case=='entry': registry['sets'] = ['unknown']
+        elif case=='ids': registry['sets'] = [{'ids':['x','x']}]
+        else:
+            data = path.parents[2]/'protected.json'
+            data.write_text(json.dumps(['unrelated']))
+            entry = {'path':'protected.json','sha256':tw.hashlib.sha256(data.read_bytes()).hexdigest(),'n':1}
+            if case=='count': entry['n'] = 2
+            elif case=='hash': entry['sha256'] = 'a'*64
+            else: entry['path'] = '../escaped.json'
+            registry['sets'] = [entry]
+        path.write_text(json.dumps(registry))
+    with pytest.raises((ValueError, OSError), match='protected|Expecting'):
+        execution_plan(*inputs, task='far_v2', condition='D', seed=42)
+
+
+def test_registry_hashes_retained_and_task_scope_respected(inputs, tmp_path, protected_registries):
+    protected_registries[0].write_text(json.dumps({'schema':1,'sets':[{'task':'sdr_v2','ids':['test0']}]}))
+    plan = execution_plan(*inputs, task='far_v2', condition='D', seed=42, timing_epochs=20)
+    expected = {str(p):tw.hashlib.sha256(p.read_bytes()).hexdigest() for p in protected_registries}
+    assert plan['registry_sha256'] == expected
+    execute = fake_child(tmp_path, plan['argv'])
+    receipt = tw.run_timed(plan['argv'], receipt_path=str(tmp_path/'receipt.json'), provenance=plan, runner=execute)
+    assert receipt['status'] == 'success'
+    assert receipt['registry_sha256'] == expected
+
+
+def test_real_run_cli_requires_explicit_execution_commit_before_launch(inputs, tmp_path, monkeypatch):
+    cp, mp = tmp_path/'config.json', tmp_path/'build_manifest.json'
+    cp.write_text(json.dumps(inputs[0]))
+    mp.write_text(json.dumps(inputs[1]))
+    calls = []
+    monkeypatch.setattr(tw, 'run_timed', lambda *a,**kw: calls.append(a))
+    with pytest.raises(ValueError, match='execution commit'):
+        tw.main(['--stage','run','--config',str(cp),'--build-manifest',str(mp),
+                 '--task','far_v2','--condition','D','--seed','42','--receipt',str(tmp_path/'receipt.json')])
+    assert not calls
+
+
+@pytest.mark.parametrize('override', [
+    ['--sta','run'], ['--sta=run'], ['--stag','run'], ['--stag=run'],
+    ['--sta','project'], ['--sta=project'], ['--stag','project'], ['--stag=project']])
+def test_actual_launcher_rejects_abbreviated_stage_before_run_or_project(tmp_path, override):
+    """Execute the real launcher, but replace all execution paths with CPU stubs."""
+    marker = tmp_path/'execution-reached.txt'
+    shim = tmp_path/'cpu-python'
+    shim.write_text('#!'+sys.executable+'\n'+ '\n'.join([
+        'import sys', 'from pathlib import Path',
+        'sys.path.insert(0, '+repr(str(tw.REPO))+')',
+        'from scripts import twin_training as tw',
+        'from scripts import twin_training_projection as projection',
+        'marker = Path('+repr(str(marker))+')',
+        "tw.plan_run = lambda *a, **kw: {'argv': ['cpu-stub']}",
+        'def reached(*a, **kw):',
+        "    marker.write_text('execution or project reached')",
+        "    return {'status':'success'}",
+        'tw.run_timed = reached',
+        'projection.main = lambda *a, **kw: (reached() and 0)',
+        'raise SystemExit(tw.main(sys.argv[3:]))',
+    ])+'\n')
+    shim.chmod(0o700)
+    cp, mp = tmp_path/'config.json', tmp_path/'build_manifest.json'
+    cp.write_text('{}')
+    mp.write_text('{}')
+    env = dict(os.environ, DC_PYTHON=str(shim), DC_CLUSTER='delta', PYTHONDONTWRITEBYTECODE='1')
+    result = subprocess.run(['bash','scripts/jobs/specificity_twin_training.sh','--dry-run',
+        '--config',str(cp),'--build-manifest',str(mp),'--task','far_v2','--condition','D',
+        '--seed','42','--receipt',str(tmp_path/'receipt.json'),'--commit','e'*40,*override],
+        cwd=tw.REPO, env=env, capture_output=True, text=True)
+    assert not marker.exists(), result.stdout+result.stderr
+    assert result.returncode == 2, result.stdout+result.stderr
+    assert 'unrecognized arguments' in result.stderr
+
+
+@pytest.mark.parametrize('stage', ['dry-run','run','project'])
+def test_exact_stage_names_keep_their_dispatch(tmp_path, monkeypatch, stage):
+    from scripts import twin_training_projection as projection
+    cp, mp = tmp_path/'config.json', tmp_path/'build_manifest.json'
+    cp.write_text('{}')
+    mp.write_text('{}')
+    calls = []
+    monkeypatch.setattr(tw, 'plan_run', lambda *a,**kw: {'argv':['cpu-stub']})
+    def run(*a,**kw):
+        calls.append('run')
+        return {'status':'success'}
+    def project(*a,**kw):
+        calls.append('project')
+        return 0
+    monkeypatch.setattr(tw, 'run_timed', run)
+    monkeypatch.setattr(projection, 'main', project)
+    assert tw.main(['--stage',stage,'--config',str(cp),'--build-manifest',str(mp),
+        '--task','far_v2','--condition','D','--seed','42','--receipt',str(tmp_path/'receipt.json'),
+        '--commit','e'*40]) == 0
+    assert calls == ([] if stage=='dry-run' else [stage])

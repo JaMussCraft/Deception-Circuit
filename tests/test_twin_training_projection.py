@@ -23,14 +23,14 @@ def fixture():
     manifest['build_hash'] = projection.digest(manifest)
     hardware = dict(gpu_devices=['NVIDIA H200, 143771 MiB'], gpu_count=1, cluster='delta')
     plan = dict(config=config, build_manifest=manifest, hardware=hardware,
-                source_hashes={'train.py': 'b'*64})
+                source_hashes={'train.py': 'b'*64}, execution_commit='e'*40)
     receipts = []
     for task, condition, seed in itertools.product(config['tasks'], config['conditions'], config['seeds']):
         selected = manifest['tasks'][task]['split_ids']
         receipts.append(dict(task=task, condition=condition, seed=seed, model=config['model'],
             status='success', exit_code=0, errors=[], total_seconds=1200, pruning_seconds=600,
             actual_epochs=20, planned_epochs=500, purpose='timing-only', fleet_ready=True, cohort='matched',
-            source_commit=manifest['source_commit'], build_hash=manifest['build_hash'],
+            source_commit=manifest['source_commit'], execution_commit='e'*40, build_hash=manifest['build_hash'],
             build_manifest_sha256=projection.digest(manifest), frozen_config_sha256=projection.digest(config),
             source_hashes=plan['source_hashes'], resolved_config_sha256='c'*64,
             dataset_config_sha256={'D':'d'*64,'I':'e'*64}, selected_ids=selected,
@@ -197,8 +197,10 @@ def test_invalid_buffer_rejected(fraction):
         projection.project_reserved(receipts, plan, pilot_reserved_gpu_hours=1, buffer_fraction=fraction)
 
 
-def test_cli_offline_json_gate(tmp_path):
-    plan, receipts = fixture()
+@pytest.mark.parametrize('entry', [('scripts.twin_training_projection',), ('scripts.twin_training','--stage','project')])
+@pytest.mark.parametrize('ruling_mode', ['none','valid','stale','malformed','missing'])
+def test_cli_offline_json_gate(tmp_path, entry, ruling_mode):
+    plan, receipts = fixture() if ruling_mode=='none' else reviewed_fixture()
     config = plan['config']
     config['data_root'] = str(tmp_path)
     repo = projection.CONFIG.parents[2]
@@ -218,12 +220,26 @@ def test_cli_offline_json_gate(tmp_path):
             path = tmp_path/('receipt'+str(i)+'.json')
             path.write_text(json.dumps(r))
             paths.append(str(path))
+    ruling_args = []
+    if ruling_mode != 'none':
+        ruling_path = tmp_path/'ruling.json'
+        ruling = plan['cohort_ruling']
+        if ruling_mode == 'stale':
+            ruling['build_hash'] = 'a'*64
+        if ruling_mode != 'missing':
+            ruling_path.write_text('{' if ruling_mode == 'malformed' else json.dumps(ruling))
+        ruling_args = ['--cohort-ruling', str(ruling_path)]
     before = set(tmp_path.iterdir())
-    run = subprocess.run([sys.executable,'-m','scripts.twin_training_projection','--receipts',*paths,
+    run = subprocess.run([sys.executable,'-m',*entry,*ruling_args,'--receipts',*paths,
         '--config',str(cp),'--build-manifest',str(mp),'--pilot-reserved-gpu-hours','1'], capture_output=True,text=True)
-    assert run.returncode==0, run.stderr+run.stdout
+    expected = ruling_mode in ('none','valid')
+    assert run.returncode == (0 if expected else 2), run.stderr+run.stdout
     result = json.loads(run.stdout)
-    assert result['fleet_reservation_allowed'] and len(result['cells'])==18
+    assert result['fleet_reservation_allowed'] == expected
+    if expected:
+        assert len(result['cells']) == 18
+    else:
+        assert result['recommendation'] == 'hold' and result['error']
     assert set(tmp_path.iterdir())==before
 
 
@@ -257,3 +273,118 @@ def test_unicode_build_metadata_uses_materializer_hash_and_wrapper_receipt_hash(
     result = projection.project_reserved(receipts, plan, pilot_reserved_gpu_hours=1)
     assert not result['fleet_reservation_allowed']
     assert result['rejected_receipts'][0]['reason']=='receipt mismatch: build_manifest_sha256'
+
+
+def reviewed_fixture():
+    plan, receipts = fixture()
+    manifest = plan['build_manifest']
+    counts = {'far_v2': (177,177,891), 'sdr_v2': (187,187,952), 'ser_v2': (168,167,835)}
+    for task, sizes in counts.items():
+        info = manifest['tasks'][task]
+        info['split_ids'] = {s:info['split_ids'][s][:n] for s,n in zip(projection.SPLITS,sizes)}
+        info['counts'] = {s:len(ids) for s,ids in info['split_ids'].items()}
+    manifest['build_hash'] = projection.build_digest({k:v for k,v in manifest.items() if k!='build_hash'})
+    plan['cohort_ruling'] = dict(schema_version=1, ruling_id='a2-matched-cohort-01',
+        session='codex-01a1987e', decision='accept_exact_matched_cohort',
+        scope='cohort_size_only', selection_rule='all_matched_survivors_no_baseline_competence_filter',
+        conditions=['D','I'], build_hash=manifest['build_hash'],
+        selected_ids_sha256=projection.digest({t:v['split_ids'] for t,v in manifest['tasks'].items()}),
+        counts={t:v['counts'] for t,v in manifest['tasks'].items()}, rationale='Accept all matched survivors.')
+    for r in receipts:
+        selected = manifest['tasks'][r['task']]['split_ids']
+        r.update(selected_ids=selected, counts={s:len(v) for s,v in selected.items()},
+                 build_hash=manifest['build_hash'], build_manifest_sha256=projection.digest(manifest),
+                 total_seconds=500, pruning_seconds=100)
+        for flag,split in (('--train-samples','train'),('--val-samples','validation'),('--test-samples','test')):
+            r['argv'][r['argv'].index(flag)+1] = str(len(selected[split]))
+        r['resolved_config_sha256'] = projection.digest(expected_config(r['argv']))
+    return plan, receipts
+
+
+def test_exact_cohort_ruling_clears_only_review_requirement():
+    plan, receipts = reviewed_fixture()
+    result = projection.project_reserved(receipts, plan, pilot_reserved_gpu_hours=1)
+    assert result['fleet_reservation_allowed']
+    assert result['train_under_200'] is True
+    assert result['train_under_200_requires_lead_review'] is False
+    assert result['cohort_ruling_sha256'] == projection.digest(plan['cohort_ruling'])
+    plan.pop('cohort_ruling')
+    result = projection.project_reserved(receipts, plan, pilot_reserved_gpu_hours=1)
+    assert result['train_under_200_requires_lead_review'] is True
+    assert result['cohort_ruling_sha256'] is None
+    assert not result['fleet_reservation_allowed']
+
+
+@pytest.mark.parametrize('field,value', [
+    ('schema_version',True), ('schema_version',2), ('decision','approve'),
+    ('scope','all_gates'), ('build_hash','a'*64), ('selected_ids_sha256','a'*64),
+    ('counts',{}), ('conditions',['I','D']), ('session',''),
+    ('ruling_id',''), ('selection_rule','baseline_competence'),
+    ('rationale',''), ('extra','plausible'), ('counts',{'far_v2':{'train':True}})])
+def test_malformed_or_foreign_cohort_ruling_fails_closed(field,value):
+    plan, receipts = reviewed_fixture()
+    plan['cohort_ruling'][field] = value
+    with pytest.raises(ValueError, match='cohort ruling'):
+        projection.project_reserved(receipts, plan, pilot_reserved_gpu_hours=1)
+
+
+@pytest.mark.parametrize('change', ['order','count','build','not-matched'])
+def test_cohort_ruling_cannot_follow_changed_plan(change):
+    plan, receipts = reviewed_fixture()
+    manifest = plan['build_manifest']
+    if change=='order':
+        manifest['tasks']['far_v2']['split_ids']['train'].reverse()
+    elif change=='count':
+        info = manifest['tasks']['far_v2']
+        info['split_ids']['train'].pop()
+        info['counts']['train'] -= 1
+    elif change=='build':
+        manifest['max_seq_length'] += 1
+    else:
+        manifest['fleet_ready'] = False
+    manifest['build_hash'] = projection.build_digest({k:v for k,v in manifest.items() if k!='build_hash'})
+    # Even a plausible updated build binding cannot hide changed ordered IDs/counts.
+    if change in ('order','count'):
+        plan['cohort_ruling']['build_hash'] = manifest['build_hash']
+    with pytest.raises(ValueError, match='cohort ruling'):
+        projection.project_reserved(receipts, plan, pilot_reserved_gpu_hours=1)
+
+
+@pytest.mark.parametrize('gate', ['coverage','receipt','budget','six-hour','hardware'])
+def test_cohort_ruling_never_clears_other_gates(gate):
+    plan, receipts = reviewed_fixture()
+    reserve = 1
+    if gate=='coverage':
+        receipts = receipts[:1]
+    elif gate=='receipt':
+        receipts[0]['status'] = 'failed'
+    elif gate=='budget':
+        reserve = 60
+    elif gate=='six-hour':
+        for r in receipts:
+            r.update(total_seconds=900, pruning_seconds=900)
+    else:
+        receipts[0]['gpu_devices'] = ['A40']
+    result = projection.project_reserved(receipts, plan, pilot_reserved_gpu_hours=reserve)
+    assert not result['fleet_reservation_allowed']
+    assert not result['train_under_200_requires_lead_review']
+
+
+@pytest.mark.parametrize('value', [None, 'short', 'a'*39, 'A'*40, 'f'*40])
+def test_execution_revision_missing_or_foreign_blocks_projection(value):
+    plan, receipts = fixture()
+    for r in receipts:
+        r.update(total_seconds=500, pruning_seconds=100)
+    receipts[0]['execution_commit'] = value
+    result = projection.project_reserved(receipts, plan, pilot_reserved_gpu_hours=1)
+    assert not result['fleet_reservation_allowed']
+    assert result['rejected_receipts']
+
+
+def test_mixed_execution_revisions_hold_even_without_plan_revision():
+    plan, receipts = fixture()
+    plan.pop('execution_commit')
+    for r in receipts:
+        r.update(total_seconds=500, pruning_seconds=100)
+    receipts[0]['execution_commit'] = 'f'*40
+    assert not projection.project_reserved(receipts, plan, pilot_reserved_gpu_hours=1)['fleet_reservation_allowed']

@@ -22,6 +22,8 @@ REPO = Path(__file__).resolve().parents[1]
 if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 FROZEN_CONFIG = REPO/'scripts/jobs/specificity_ladder_a2.json'
+PROTECTED_REGISTRIES = (Path('/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/held_out.json'),
+                        REPO/'docs/research/held_out.json')
 GATE_FLAGS = ['--no-edge-pruning', '--prune-attention-heads', '--prune-mlp-blocks',
               '--no-prune-attention-neurons', '--no-prune-attention-blocks',
               '--no-prune-mlp-hidden', '--no-prune-mlp-output',
@@ -40,6 +42,53 @@ def digest(value):
 def _require(ok, message):
     if not ok:
         raise ValueError(message)
+
+
+def _registry_hashes(task, selected):
+    """Refresh the union of primary/worktree protected sets before any scoring.
+
+    Standard-library equivalent of user_inversion_pipeline.check_registry; paths
+    are fixed in production and may only be monkeypatched by CPU tests.
+    """
+    _require(isinstance(task, str) and bool(task) and isinstance(selected, dict) and
+             set(selected) == {'train', 'validation', 'test'}, 'invalid protected registry candidate')
+    for ids in selected.values():
+        _require(isinstance(ids, list) and bool(ids) and
+                 all(isinstance(i, str) and bool(i) for i in ids), 'invalid protected registry candidate ids')
+    candidates = {i for ids in selected.values() for i in ids}
+    hashes = {}
+    for registry_path in dict.fromkeys(PROTECTED_REGISTRIES):
+        registry_path = Path(registry_path)
+        _require(registry_path.is_file(), 'missing required protected registry: '+str(registry_path))
+        raw = registry_path.read_bytes()
+        registry = json.loads(raw)
+        _require(isinstance(registry, dict) and type(registry.get('schema')) is int and
+                 registry['schema'] == 1 and isinstance(registry.get('sets'), list), 'invalid protected registry')
+        hashes[str(registry_path)] = hashlib.sha256(raw).hexdigest()
+        root = registry_path.parent.parent.parent.resolve()
+        for entry in registry['sets']:
+            _require(isinstance(entry, dict), 'unknown protected registry entry')
+            if 'path' in entry:
+                _require(isinstance(entry['path'], str) and bool(entry['path']), 'invalid protected registry path')
+                path = (root/entry['path']).resolve()
+                _require(path.is_relative_to(root), 'escaped protected registry path')
+                _require(path.is_file(), 'protected set file missing')
+                content = path.read_bytes()
+                _require(hashlib.sha256(content).hexdigest() == entry.get('sha256'), 'protected set file hash mismatch')
+                rows = json.loads(content)
+                if isinstance(rows, dict):
+                    rows = rows.get('instance_ids', rows.get('ids', rows.get('rows')))
+                _require(isinstance(rows, list), 'unsupported protected id file')
+                ids = [r.get('instance_id') if isinstance(r, dict) else r for r in rows]
+                _require(type(entry.get('n')) is int and len(ids) == entry['n'], 'protected set count mismatch')
+            else:
+                ids = entry.get('instance_ids', entry.get('ids'))
+            _require(isinstance(ids, list) and all(isinstance(i, str) and bool(i) for i in ids) and
+                     len(set(ids)) == len(ids), 'invalid protected ids; review required')
+            _require(entry.get('task') is None or isinstance(entry['task'], str), 'invalid protected registry task')
+            _require(entry.get('task') not in (None, '', task) or not candidates.intersection(ids),
+                     'protected registry id overlap')
+    return hashes
 
 
 def _private_configs(config, manifest, task):
@@ -211,9 +260,13 @@ def expected_config(command):
     return expected
 
 
-def plan_run(config, manifest, *, task, condition, seed, timing_epochs=None):
+def plan_run(config, manifest, *, task, condition, seed, timing_epochs=None, execution_commit=None):
+    if execution_commit is not None:
+        _require(isinstance(execution_commit, str) and re.fullmatch('[0-9a-f]{40}', execution_commit) is not None,
+                 'full execution commit required')
     command = build_command(config, manifest, task=task, condition=condition, seed=seed, timing_epochs=timing_epochs)
     selected = _selection(config, manifest, task)
+    registry_hashes = _registry_hashes(task, selected)
     _stored_rows(config, manifest, task, selected)
     source_hashes = {name: hashlib.sha256((REPO/name).read_bytes()).hexdigest()
                      for name in ('train.py', 'config.py', 'pruning.py', 'run_io.py',
@@ -222,11 +275,12 @@ def plan_run(config, manifest, *, task, condition, seed, timing_epochs=None):
                 purpose='timing-only' if timing_epochs is not None else 'scientific-seed',
                 actual_epochs=timing_epochs or config['node_epochs'], planned_epochs=config['node_epochs'],
                 fleet_ready=manifest['fleet_ready'], cohort=manifest['cohort'],
-                source_commit=manifest['source_commit'], build_hash=manifest['build_hash'],
+                source_commit=manifest['source_commit'], execution_commit=execution_commit, build_hash=manifest['build_hash'],
                 build_manifest_sha256=digest(manifest), source_hashes=source_hashes,
                 frozen_config_sha256=digest(config), resolved_config_sha256=digest(expected_config(command)),
                 dataset_config_sha256=_private_configs(config, manifest, task),
                 selected_ids=selected, counts={s: len(v) for s,v in selected.items()},
+                registry_sha256=registry_hashes,
                 train_under_200_requires_lead_review=len(selected['train']) < 200,
                 max_seq_length=manifest['max_seq_length'], granularity='heads-mlp',
                 recipient_condition='deceptive' if condition == 'D' else 'user_inversion',
@@ -312,6 +366,10 @@ def run_timed(command: list, *, receipt_path: str, provenance: dict,
             receipt['gpu_count'] = len(devices)
         else:
             receipt['test_runner_injected'] = True
+        execution_commit = provenance.get('execution_commit')
+        _require(isinstance(execution_commit, str) and re.fullmatch('[0-9a-f]{40}', execution_commit) is not None,
+                 'full execution commit required')
+        receipt['registry_sha256'] = _registry_hashes(provenance.get('task'), provenance.get('selected_ids'))
         with log.open('x') as stream:
             result = (runner or subprocess.run)(command, stdout=stream, stderr=subprocess.STDOUT,
                                                  env=env, cwd=str(REPO), check=False)
@@ -326,7 +384,9 @@ def run_timed(command: list, *, receipt_path: str, provenance: dict,
         commit = provenance.get('source_commit', '')
         _require(re.fullmatch('[0-9a-f]{40}', commit) is not None, 'missing full source commit')
         native = _validate_artifacts(out, command, provenance)
-        native['orchestrator_source_commit'] = commit
+        native['orchestrator_source_commit'] = execution_commit
+        native['execution_commit'] = execution_commit
+        native['build_source_commit'] = commit
         # Rehash the augmented native manifest, retaining native provenance fields.
         native.pop('manifest_hash', None)
         native['manifest_hash'] = digest(native)
@@ -349,8 +409,16 @@ def run_timed(command: list, *, receipt_path: str, provenance: dict,
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--stage', choices=('dry-run', 'run'), default='dry-run')
+    argv = list(sys.argv[1:] if argv is None else argv)
+    # Delegate project parsing unchanged so both entrypoints use identical gates.
+    stage_parser = argparse.ArgumentParser(add_help=False, allow_abbrev=False)
+    stage_parser.add_argument('--stage')
+    stage, remaining = stage_parser.parse_known_args(argv)
+    if stage.stage == 'project':
+        from scripts.twin_training_projection import main as project_main
+        return project_main(remaining)
+    parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
+    parser.add_argument('--stage', choices=('dry-run', 'run', 'project'), default='dry-run')
     parser.add_argument('--config', required=True)
     parser.add_argument('--build-manifest', required=True)
     parser.add_argument('--task', required=True)
@@ -358,12 +426,16 @@ def main(argv=None):
     parser.add_argument('--seed', type=int, choices=(42, 1, 123), required=True)
     parser.add_argument('--receipt', required=True)
     parser.add_argument('--timing-epochs', type=int)
+    parser.add_argument('--commit', help='Full execution revision supplied by the orchestrator; required for run')
     args = parser.parse_args(argv)
+    if args.stage == 'run':
+        _require(isinstance(args.commit, str) and re.fullmatch('[0-9a-f]{40}', args.commit) is not None,
+                 'full execution commit required for run')
     config = json.loads(Path(args.config).read_text())
     manifest = json.loads(Path(args.build_manifest).read_text())
     config.setdefault('data_root', str(Path(args.build_manifest).resolve().parent))
     plan = plan_run(config, manifest, task=args.task, condition=args.condition,
-                    seed=args.seed, timing_epochs=args.timing_epochs)
+                    seed=args.seed, timing_epochs=args.timing_epochs, execution_commit=args.commit)
     plan['config_file_sha256'] = hashlib.sha256(Path(args.config).read_bytes()).hexdigest()
     plan['build_manifest_file_sha256'] = hashlib.sha256(Path(args.build_manifest).read_bytes()).hexdigest()
     if args.stage == 'dry-run':

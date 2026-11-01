@@ -54,6 +54,9 @@ def _hashes(value):
 
 def _validate_plan(plan):
     config, manifest = plan['config'], plan['build_manifest']
+    if 'execution_commit' in plan:
+        _require(isinstance(plan['execution_commit'], str) and
+                 re.fullmatch('[0-9a-f]{40}', plan['execution_commit']) is not None, 'full execution commit required')
     for key, expected in dict(tasks=['far_v2','sdr_v2','ser_v2'], conditions=['D','I'], seeds=[42,1,123]).items():
         _require(config.get(key) == expected, 'plan requires complete 18 cells: '+key)
     for key, value in dict(model='llama-8b-instruct', node_epochs=500, node_lambda_sparsity=.3,
@@ -93,10 +96,52 @@ def _validate_plan(plan):
     return config, manifest
 
 
+def _cohort_ruling_digest(plan):
+    """Bind explicit lead review to a cohort, without authenticating signatures."""
+    if 'cohort_ruling' not in plan:
+        return None
+    ruling = plan['cohort_ruling']
+    fields = {'schema_version', 'ruling_id', 'decision', 'session', 'build_hash',
+              'selected_ids_sha256', 'counts', 'conditions', 'selection_rule', 'scope', 'rationale'}
+    _require(isinstance(ruling, dict) and set(ruling) == fields, 'invalid cohort ruling schema')
+    _require(type(ruling['schema_version']) is int and ruling['schema_version'] == 1,
+             'invalid cohort ruling schema version')
+    for key in ('ruling_id', 'session', 'rationale'):
+        _require(isinstance(ruling[key], str) and bool(ruling[key].strip()), 'invalid cohort ruling '+key)
+    for key, value in dict(decision='accept_exact_matched_cohort', scope='cohort_size_only',
+                          conditions=['D','I'],
+                          selection_rule='all_matched_survivors_no_baseline_competence_filter').items():
+        _require(ruling[key] == value, 'invalid cohort ruling '+key)
+    config, manifest = plan['config'], plan['build_manifest']
+    _require(manifest.get('fleet_ready') is True and manifest.get('cohort') == 'matched',
+             'cohort ruling requires matched fleet-ready data')
+    selected = {t:{s:manifest['tasks'][t]['split_ids'][s][:config['sample_caps'][s]]
+                   for s in SPLITS} for t in config['tasks']}
+    counts = {t:{s:len(ids) for s,ids in splits.items()} for t,splits in selected.items()}
+    _require(_hash(ruling['build_hash']) and ruling['build_hash'] == manifest['build_hash'],
+             'cohort ruling build mismatch')
+    _require(_hash(ruling['selected_ids_sha256']) and ruling['selected_ids_sha256'] == digest(selected),
+             'cohort ruling selected IDs mismatch')
+    # JSON equality alone admits bool/float values as integer counts.
+    _require(isinstance(ruling['counts'], dict) and set(ruling['counts']) == set(counts),
+             'cohort ruling counts mismatch')
+    for task in counts:
+        values = ruling['counts'][task]
+        _require(isinstance(values, dict) and set(values) == set(SPLITS) and
+                 all(type(values[s]) is int and values[s] == counts[task][s] for s in SPLITS),
+                 'cohort ruling counts mismatch')
+    return digest(ruling)
+
+
 def _receipt_seconds(receipt, plan, selected):
     config, manifest = plan['config'], plan['build_manifest']
     _require(receipt.get('status') == 'success' and receipt.get('exit_code') == 0 and
              receipt.get('errors') == [] and not receipt.get('test_runner_injected'), 'failed/injected/incomplete receipt')
+    execution_commit = receipt.get('execution_commit')
+    _require(isinstance(execution_commit, str) and re.fullmatch('[0-9a-f]{40}', execution_commit) is not None,
+             'receipt missing full execution commit')
+    _require('execution_commit' not in plan or execution_commit == plan['execution_commit'],
+             'receipt execution commit mismatch')
     for key, expected in dict(model=config['model'], source_commit=manifest['source_commit'],
                               build_hash=manifest['build_hash'], build_manifest_sha256=digest(manifest),
                               frozen_config_sha256=digest(config), source_hashes=plan['source_hashes'],
@@ -165,6 +210,7 @@ def project_reserved(receipts: list, plan: dict, *, pilot_reserved_gpu_hours: fl
     _number(pilot_reserved_gpu_hours, 'pilot reserved GPU-hours', positive=True)
     _number(buffer_fraction, 'buffer fraction')
     config, manifest = _validate_plan(plan)
+    ruling_sha256 = _cohort_ruling_digest(plan)
     usable, rejected = {}, []
     for index, receipt in enumerate(receipts):
         try:
@@ -177,6 +223,9 @@ def project_reserved(receipts: list, plan: dict, *, pilot_reserved_gpu_hours: fl
             usable.setdefault(key, []).append((seconds,index,receipt))
         except (KeyError, TypeError, ValueError) as error:
             rejected.append(dict(index=index, reason=str(error)))
+    execution_commits = {r['execution_commit'] for candidates in usable.values() for _,_,r in candidates}
+    if len(execution_commits) > 1:
+        rejected.append(dict(index=None, reason='mixed receipt execution commits'))
     cells, gaps = [], []
     for task, condition, seed in itertools.product(config['tasks'], config['conditions'], config['seeds']):
         identity = dict(task=task, condition=condition, seed=seed)
@@ -199,14 +248,18 @@ def project_reserved(receipts: list, plan: dict, *, pilot_reserved_gpu_hours: fl
     under = any(len(manifest['tasks'][t]['split_ids']['train'][:config['sample_caps']['train']]) < 200 for t in config['tasks'])
     # Mixed hardware/source receipts block approval even if another receipt covers
     # the cell: a fleet recommendation must describe one comparable receipt set.
-    allowed = complete and matched and within and not rejected and not under and not (
+    review_required = under and ruling_sha256 is None
+    allowed = complete and matched and within and not rejected and not review_required and not (
         trigger and plan.get('granularity','heads-mlp') == 'heads-mlp')
     recommendation = ('measure-heads-only-pilot' if trigger and plan.get('granularity','heads-mlp')=='heads-mlp'
                       else 'fleet-reservation-allowed' if allowed else 'hold')
     return dict(cells=cells, planned_cell_count=18, coverage_gaps=gaps, rejected_receipts=rejected,
                 pilot_reserved_gpu_hours=pilot_reserved_gpu_hours, total_reserved_gpu_hours=total,
                 total_is_partial=not complete, single_mask_over_6h=trigger, within_60h=within,
-                matched_data=matched, train_under_200_requires_lead_review=under,
+                matched_data=matched, train_under_200=under,
+                train_under_200_requires_lead_review=review_required,
+                cohort_ruling_sha256=ruling_sha256,
+                execution_commit=next(iter(execution_commits)) if len(execution_commits)==1 else None,
                 fleet_reservation_allowed=allowed, recommendation=recommendation,
                 conditional_hardware=plan['hardware'], granularity=plan.get('granularity','heads-mlp'),
                 training_margin=config['deception_margin_loss'],
@@ -219,11 +272,13 @@ def project_reserved(receipts: list, plan: dict, *, pilot_reserved_gpu_hours: fl
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     parser.add_argument('--receipts', nargs='+', required=True)
     parser.add_argument('--config', required=True)
     parser.add_argument('--build-manifest', required=True)
     parser.add_argument('--pilot-reserved-gpu-hours', type=float, required=True)
+    parser.add_argument('--commit', help='Expected full execution revision of all measured receipts')
+    parser.add_argument('--cohort-ruling', help='Explicit lead cohort-size ruling JSON; does not clear timing/budget gates')
     parser.add_argument('--granularity', choices=('heads-mlp','heads-only'), default='heads-mlp')
     args = parser.parse_args(argv)
     receipts = [json.loads(Path(p).read_text()) for p in args.receipts]
@@ -239,8 +294,12 @@ def main(argv=None):
     plan = dict(config=config, build_manifest=manifest, hardware=hardware, granularity=args.granularity,
                 source_hashes={s:hashlib.sha256((repo/s).read_bytes()).hexdigest() for s in SOURCES})
     try:
+        if args.commit is not None:
+            plan['execution_commit'] = args.commit
+        if args.cohort_ruling is not None:
+            plan['cohort_ruling'] = json.loads(Path(args.cohort_ruling).read_text())
         result = project_reserved(receipts, plan, pilot_reserved_gpu_hours=args.pilot_reserved_gpu_hours)
-    except (KeyError, TypeError, ValueError) as error:
+    except (OSError, KeyError, TypeError, ValueError) as error:
         result = dict(fleet_reservation_allowed=False, recommendation='hold', error=str(error))
     print(json.dumps(result, indent=2, allow_nan=False))
     return 0 if result['fleet_reservation_allowed'] else 2
