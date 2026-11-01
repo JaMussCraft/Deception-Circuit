@@ -196,3 +196,183 @@ def test_duplicate_unpadded_request_cannot_be_hidden_by_padding():
     pairs, report = builder().derive_pairs(FakeWordTokenizer(), 'far_v2', [d], [h], pool())
     assert not pairs
     assert 'duplicate request text' in str(report['rejected'])
+
+
+# These tests catch reversed H labels, binary-only filtering, threshold drift,
+# dropped baseline failures, and silently truncated/malformed scorer output.
+def scoring_pairs(n=1):
+    d, h = source()
+    pairs, _ = builder().derive_pairs(FakeWordTokenizer(), 'far_v2', [d], [h], pool())
+    return [dict(copy.deepcopy(pairs[0]), instance_id=str(i)) for i in range(n)]
+
+
+def native_score(margin, choice):
+    return dict(margin=margin, logit_a=margin, logit_b=0., choice=choice,
+                argmax_id={'a': 11, 'b': 12, 'other': 99}[choice],
+                argmax={'a': ' honest', 'b': ' opposite', 'other': ' unrelated'}[choice])
+
+
+def scored(pairs, values=None):
+    if values is None:
+        values = [(-.7, 'b'), (-.7, 'b'), (.3, 'a'), (.3, 'a')] * len(pairs)
+    return builder().score_pairs(pairs, lambda prompts, words: [native_score(*v) for v in values])
+
+
+def test_baseline_h_labels_do_not_reverse_canonical_scores():
+    pairs = scoring_pairs()
+    def score_fn(prompts, words):
+        # Deterministic boundary stand-in: native inference is forbidden here.
+        assert prompts == [pairs[0][arm][stream + '_prompt']
+                           for arm in ('inversion', 'baseline') for stream in ('clean', 'corrupt')]
+        assert words == [('beams', 'joints'), ('joints', 'beams')] * 2
+        return [native_score(-1., 'b'), native_score(-2., 'b'),
+                native_score(3., 'a'), native_score(4., 'a')]
+    scores = builder().score_pairs(pairs, score_fn)
+    assert scores[0]['baseline']['clean']['expected_honest'] == 'beams'
+    assert scores[0]['baseline']['corrupt']['expected_opposite'] == 'beams'
+    assert scores[0]['baseline']['clean']['honest_minus_opposite'] == 3.
+    assert scores[0]['inversion']['corrupt']['opposite_minus_honest'] == 2.
+    assert scores[0]['inversion']['clean']['argmax_id'] == 12
+    assert scores[0]['inversion']['clean']['choice'] == 'b'
+
+
+@pytest.mark.parametrize('threshold', [.7, .5])
+@pytest.mark.parametrize('stream', ['clean', 'corrupt'])
+def test_exact_threshold_both_streams(threshold, stream):
+    import math
+    pairs = scoring_pairs()
+    values = [(-threshold, 'b'), (-threshold, 'b'), (.3, 'a'), (.3, 'a')]
+    scores = scored(pairs, values)
+    kept, report = builder().filter_pairs(pairs, scores, margin=threshold)
+    assert kept == pairs and report['retained_count'] == 1
+    values[0 if stream == 'clean' else 1] = (-math.nextafter(threshold, 0.), 'b')
+    assert builder().filter_pairs(pairs, scored(pairs, values), margin=threshold)[0] == []
+
+
+@pytest.mark.parametrize('index', [0, 1])
+def test_other_argmax_rejected_either_stream(index):
+    pairs = scoring_pairs()
+    values = [(-2., 'b'), (-2., 'b'), (.3, 'a'), (.3, 'a')]
+    values[index] = (-2., 'other')
+    kept, report = builder().filter_pairs(pairs, scored(pairs, values), margin=.7)
+    assert kept == [] and report['rejected_count'] == 1
+
+
+@pytest.mark.parametrize('bad', [float('nan'), float('inf'), -float('inf')])
+def test_nonfinite_and_length_mismatch_rejected(bad):
+    pairs = scoring_pairs()
+    with pytest.raises(ValueError):
+        scored(pairs, [(-1., 'b'), (-1., 'b'), (bad, 'other'), (.3, 'a')])
+    with pytest.raises(ValueError):
+        scored(pairs, [(-1., 'b')])
+    scores = scored(pairs)
+    scores[0]['baseline']['clean']['margin'] = bad
+    with pytest.raises(ValueError):
+        builder().filter_pairs(pairs, scores, margin=.7)
+    with pytest.raises(ValueError):
+        builder().paired_metrics(scores)
+
+
+@pytest.mark.parametrize('bad', ['duplicate_pair', 'duplicate_score', 'missing_score',
+                                 'wrong_id', 'missing_margin', 'missing_choice', 'bad_choice',
+                                 'missing_argmax', 'missing_arm', 'wrong_expected', 'bad_logit'])
+def test_malformed_paired_scores_rejected(bad):
+    pairs = scoring_pairs(2)
+    scores = scored(pairs)
+    if bad == 'duplicate_pair': pairs[1]['instance_id'] = pairs[0]['instance_id']
+    if bad == 'duplicate_score': scores[1]['instance_id'] = scores[0]['instance_id']
+    if bad == 'missing_score': scores.pop()
+    if bad == 'wrong_id': scores[1]['instance_id'] = 'missing'
+    if bad == 'missing_margin': del scores[0]['inversion']['clean']['margin']
+    if bad == 'missing_choice': del scores[0]['baseline']['clean']['choice']
+    if bad == 'bad_choice': scores[0]['baseline']['corrupt']['choice'] = 'typo'
+    if bad == 'missing_argmax': del scores[0]['inversion']['clean']['argmax']
+    if bad == 'missing_arm': del scores[0]['baseline']
+    if bad == 'wrong_expected': scores[0]['baseline']['clean']['expected_honest'] = 'stale'
+    if bad == 'bad_logit': scores[0]['baseline']['clean']['logit_a'] = float('nan')
+    with pytest.raises(ValueError):
+        builder().filter_pairs(pairs, scores, margin=.7)
+
+
+def test_baseline_failure_is_reported_not_hidden():
+    pairs = scoring_pairs(2)
+    scores = scored(pairs, [(-1., 'b'), (-1., 'b'), (.3, 'a'), (.3, 'a'),
+                            (-1., 'b'), (-1., 'b'), (-2., 'b'), (.3, 'a')])
+    kept, report = builder().filter_pairs(pairs, scores, margin=.7)
+    assert kept == pairs
+    assert report['input_count'] == 2 and report['retained_count'] == 2
+    assert report['paired_competent_count'] == 1
+    assert report['baseline_failure_ids'] == ['1']
+    assert report['retained_metrics']['clean']['opposite_rate_gap'] == .5
+    assert report['retained_metrics']['joint']['opposite_rate_gap'] == 1.
+
+
+def test_full_vocab_and_binary_disagree():
+    pairs = scoring_pairs(3)
+    scores = scored(pairs, [(-2., 'other'), (-2., 'b'), (1., 'a'), (1., 'a'),
+                            (0., 'other'), (0., 'other'), (0., 'other'), (0., 'other'),
+                            (2., 'a'), (2., 'a'), (-1., 'b'), (-1., 'b')])
+    metrics = builder().paired_metrics(scores)
+    clean = metrics['clean']
+    assert clean['inversion']['count'] == 3
+    assert clean['inversion']['full_vocab']['other']['count'] == 2
+    assert clean['inversion']['binary']['opposite']['count'] == 1
+    assert clean['inversion']['binary']['tie']['count'] == 1
+    assert clean['inversion']['honest_minus_opposite_mean'] == 0.
+    assert clean['inversion']['opposite_minus_honest_mean'] == 0.
+    assert clean['opposite_rate_gap'] == pytest.approx(-1 / 3)
+    assert clean['margin_gap']['values'] == [3., 0., -3.]
+    assert clean['margin_gap']['zero_count'] == 1
+    assert clean['margin_gap']['negative_count'] == 1
+    assert metrics['joint']['inversion']['full_vocab']['opposite']['count'] == 0
+    assert metrics['joint']['inversion']['binary']['opposite']['count'] == 1
+    assert metrics['joint']['margin_gap']['values'] == [3., 0., -3.]
+
+
+@pytest.mark.parametrize('margin', [.6, float('nan'), float('inf'), -.7])
+def test_unsupported_filter_threshold_refused(margin):
+    with pytest.raises(ValueError):
+        builder().filter_pairs([], [], margin=margin)
+
+
+def test_empty_metrics_have_explicit_denominators():
+    metrics = builder().paired_metrics([])
+    assert metrics['count'] == 0
+    assert metrics['clean']['inversion']['full_vocab']['honest'] == {'count': 0, 'denominator': 0, 'rate': None}
+    assert metrics['joint']['opposite_rate_gap'] is None
+    assert metrics['joint']['margin_gap']['mean'] is None
+
+
+def test_score_prompt_hashes_detect_changed_prompts():
+    import hashlib
+    pairs = scoring_pairs()
+    scores = scored(pairs)
+    exact = pairs[0]['baseline']['corrupt_prompt']
+    expected = hashlib.sha256(json.dumps(exact, sort_keys=True, separators=(',', ':'),
+                                          ensure_ascii=False).encode()).hexdigest()
+    assert scores[0]['baseline']['corrupt']['prompt_hash'] == expected
+    pairs[0]['baseline']['corrupt_prompt'] += ' changed'
+    with pytest.raises(ValueError, match='prompt hash'):
+        builder().filter_pairs(pairs, scores, margin=.7)
+
+
+@pytest.mark.parametrize('bad', ['missing_id', 'reordered', 'missing_hash'])
+def test_incomplete_or_reordered_score_identity_refused(bad):
+    pairs = scoring_pairs(2)
+    scores = scored(pairs)
+    if bad == 'missing_id': del scores[0]['instance_id']
+    if bad == 'reordered': scores.reverse()
+    if bad == 'missing_hash': del scores[0]['baseline']['clean']['prompt_hash']
+    with pytest.raises(ValueError):
+        builder().filter_pairs(pairs, scores, margin=.7)
+
+
+@pytest.mark.parametrize('index', [2, 3])
+def test_baseline_competence_exact_boundary(index):
+    import math
+    pairs = scoring_pairs()
+    values = [(-.7, 'b'), (-.7, 'b'), (.3, 'a'), (.3, 'a')]
+    assert builder().filter_pairs(pairs, scored(pairs, values), margin=.7)[1]['paired_competent_count'] == 1
+    values[index] = (math.nextafter(.3, 0.), 'a')
+    kept, report = builder().filter_pairs(pairs, scored(pairs, values), margin=.7)
+    assert kept == pairs and report['paired_competent_count'] == 0

@@ -1,0 +1,15 @@
+{
+  "model": "llama-8b-instruct",
+  "tasks": ["far_v2", "sdr_v2", "ser_v2"],
+  "conditions": ["D", "I"],
+  "seeds": [42, 1, 123],
+  "node_lambda_sparsity": 0.3,
+  "node_epochs": 500,
+  "lr": 0.03,
+  "batch_size": 7,
+  "faithfulness_weight": 1,
+  "init_value": 0.5,
+  "sparsity_warmup_steps": 1000,
+  "sample_caps": {"train": 200, "validation": 200, "test": 1000},
+  "output_root": "outputs/_training_specificity_ladder/a2"
+}
