@@ -1,5 +1,6 @@
 """Private twin training contract; sources are never rewritten."""
 import copy
+import hashlib
 import json
 from pathlib import Path
 
@@ -121,6 +122,57 @@ def test_modes_fail_closed(tmp_path):
     with pytest.raises(ValueError): build(tmp_path, cohort='matched')
 
 
+def canonical_hash(value):
+    return hashlib.sha256(json.dumps(value, sort_keys=True, ensure_ascii=False,
+                                     separators=(',', ':')).encode()).hexdigest()
+
+
+def byte_hash(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def write_score_evidence(mapping, mutate=None, receipt_mutate=None):
+    from dataset.build_user_inversion_v2 import score_pairs
+    tok = FakeWordTokenizer()
+    tok.encode('beams joints')
+    score_files = {}
+    blobs = {}
+    for split in ('train', 'validation', 'test'):
+        rows = {arm: dict(load_from_disk(mapping[kind])[split][0])
+                for arm, kind in [('inversion', 'I'), ('baseline', 'I_neutral')]}
+        pair = dict(instance_id=rows['inversion']['instance_id'], **rows)
+        def native_score(prompts, words):
+            return [dict(choice='b', margin=-.8, logit_a=0., logit_b=.8,
+                         argmax_id=tok.encode(opposite)[0], argmax=tok.decode(tok.encode(opposite)))
+                    for honest, opposite in words]
+        records = score_pairs([pair], native_score)
+        # Baseline deliberately fails competence; it must remain diagnostic.
+        if mutate:
+            mutate(split, records)
+        blob = ''.join(json.dumps(r)+'\n' for r in records).encode()
+        name = 'scores/'+split+'.jsonl'
+        blobs[name] = blob
+        score_files[split] = dict(path=name, sha256=hashlib.sha256(blob).hexdigest())
+    receipt = dict(schema_version=1, kind='user_inversion_scored', source_commit='b'*40,
+                   model='fake', model_revision='fake-model-revision', tokenizer='FakeWordTokenizer',
+                   tokenizer_revision='fake-tokenizer-revision', request_pool_hash='c'*64,
+                   scorer='dataset.deception_common.score_prompts', dtype='float32', score_files=score_files)
+    if receipt_mutate:
+        receipt_mutate(receipt)
+    for root in mapping.values():
+        path = Path(root)
+        for name, blob in blobs.items():
+            target = path/name
+            target.parent.mkdir(exist_ok=True)
+            target.write_bytes(blob)
+        target = path/'scoring_provenance.json'
+        target.write_text(json.dumps(receipt))
+        cfgpath = path/'dataset_config.json'
+        cfg = json.loads(cfgpath.read_text())
+        cfg['scoring_provenance'] = dict(path=target.name, sha256=byte_hash(target))
+        cfgpath.write_text(json.dumps(cfg))
+
+
 def matched_inputs(tmp_path):
     from dataset.build_deception_dataset import save_splits
     d, h = sources()
@@ -140,16 +192,21 @@ def matched_inputs(tmp_path):
             row['clean_prompt'] = h[split][0]['clean_prompt'].replace('user question', 'user '+row['request_text']+'<|eot_id|>')
             row['corrupt_prompt'] = h[split][0]['corrupt_prompt'].replace('user question', 'user '+row['request_text']+'<|eot_id|>')
             row['request_spans'] = {'clean': [6, 8], 'corrupt': [6, 8]}
-            row['source_row_hashes'] = {'D': 'd'*64, 'H': 'e'*64}
+            row['source_row_hashes'] = {key: canonical_hash(original[split][0])
+                                        for key, original in [('D', d), ('H', h)]}
             rows[split] = [row]
         path = tmp_path / ('explicit-'+kind)
         save_splits(rows, str(path))
         (path/'dataset_config.json').write_text(json.dumps(dict(task='far_v2', condition=condition,
-            baseline_kind='matched_frame_neutral_request', model='fake', margin_thresh=.5)))
+            baseline_kind='matched_frame_neutral_request', model='fake',
+            margin_thresh=.5 if kind == 'I' else .3)))
         mapping['far_v2'][kind] = str(path)
+    write_score_evidence(mapping['far_v2'])
+    tokenizer = FakeWordTokenizer()
+    tokenizer.encode('beams joints')
     return dict(root_d=roots['D'], root_h=roots['H'], root_i=None, root_i_neutral=None,
                 output_root=str(tmp_path/'matched'), tasks=['far_v2'], cohort='matched',
-                tokenizer=FakeWordTokenizer(), max_length=30, commit='a'*40, input_paths=mapping)
+                tokenizer=tokenizer, max_length=30, commit='a'*40, input_paths=mapping)
 
 
 def test_matched_explicit_paths_sorted_ids_and_attrition(tmp_path):
@@ -165,7 +222,7 @@ def test_matched_explicit_paths_sorted_ids_and_attrition(tmp_path):
     assert i['train'][0]['corrupt_prompt'].endswith('user Right please<|eot_id|> readout')
     assert i['train'][0]['target'] == 'joints'
     assert i['train'][0]['source_recipient']['request_spans']['clean'] == [6, 8]
-    assert i['train'][0]['source_reference']['source_row_hashes']['H'] == 'e'*64
+    assert i['train'][0]['source_reference']['source_row_hashes']['H'] == canonical_hash(sources()[1]['train'][0])
 
 
 @pytest.mark.parametrize('case', ['commit', 'threshold', 'config_condition', 'baseline', 'dropped_leak',
@@ -292,3 +349,119 @@ def test_rejects_stale_request_spans(tmp_path):
     save_splits(rows,str(path)); (path/'dataset_config.json').write_text(cfg)
     with pytest.raises(ValueError, match='request span'):
         builder().materialize(**args)
+
+
+@pytest.mark.parametrize('case', [
+    'unscored', 'zero_margin', 'neutral_margin', 'model', 'h_model', 'tokenizer',
+    'receipt_digest', 'receipt_escape', 'receipt_missing', 'receipt_difference',
+    'commit', 'revision', 'request_hash', 'scorer', 'dtype', 'score_digest',
+    'score_missing', 'score_escape', 'duplicate', 'cross_split_extra', 'missing_id',
+    'prompt', 'baseline_prompt', 'canonical', 'nan', 'nan_logit', 'bool_argmax',
+    'choice', 'weak_clean', 'weak_corrupt', 'wrong_argmax', 'signed_margin',
+    'd_hash', 'h_hash',
+])
+def test_matched_requires_actual_scored_contract(tmp_path, case):
+    # Removing any corresponding validation would admit this invalid scored input.
+    args = matched_inputs(tmp_path)
+    mapping = args['input_paths']['far_v2']
+    ipath = Path(mapping['I'])
+    if case in ('unscored', 'zero_margin', 'neutral_margin', 'model', 'h_model',
+                'receipt_digest', 'receipt_escape', 'receipt_missing'):
+        kind = 'I_neutral' if case == 'neutral_margin' else 'I'
+        path = Path(mapping[kind])/'dataset_config.json'
+        if case == 'h_model': path = Path(args['root_h'])/'far_v2_honest'/'dataset_config.json'
+        cfg = json.loads(path.read_text())
+        if case == 'unscored': del cfg['scoring_provenance']
+        elif case in ('zero_margin', 'neutral_margin'): cfg['margin_thresh'] = 0
+        elif case in ('model', 'h_model'): cfg['model'] = 'different'
+        elif case == 'receipt_digest': cfg['scoring_provenance']['sha256'] = '0'*64
+        elif case == 'receipt_escape': cfg['scoring_provenance']['path'] = '../scoring_provenance.json'
+        elif case == 'receipt_missing': (ipath/'scoring_provenance.json').unlink()
+        path.write_text(json.dumps(cfg))
+    elif case == 'receipt_difference':
+        path = ipath/'scoring_provenance.json'
+        receipt = json.loads(path.read_text()); receipt['dtype'] = 'bfloat16'
+        path.write_text(json.dumps(receipt))
+        cfgpath = ipath/'dataset_config.json'
+        cfg = json.loads(cfgpath.read_text()); cfg['scoring_provenance']['sha256'] = byte_hash(path)
+        cfgpath.write_text(json.dumps(cfg))
+    elif case in ('d_hash', 'h_hash'):
+        from dataset.build_deception_dataset import save_splits
+        import shutil
+        cfg = (ipath/'dataset_config.json').read_text()
+        rows = {s: list(load_from_disk(str(ipath))[s]) for s in ('train','validation','test')}
+        rows['train'][0]['source_row_hashes']['D' if case == 'd_hash' else 'H'] = 'f'*64
+        shutil.rmtree(ipath)
+        save_splits(rows, str(ipath)); (ipath/'dataset_config.json').write_text(cfg)
+        write_score_evidence(mapping)
+    else:
+        def mutate(split, records):
+            if split != 'train': return
+            score = records[0]['inversion']['clean']
+            if case == 'duplicate': records.append(copy.deepcopy(records[0]))
+            elif case == 'cross_split_extra':
+                extra = copy.deepcopy(records[0]); extra['instance_id'] = 'test-1'; records.append(extra)
+            elif case == 'missing_id': records.clear()
+            elif case == 'prompt': score['prompt_hash'] = '0'*64
+            elif case == 'baseline_prompt': records[0]['baseline']['corrupt']['prompt_hash'] = '0'*64
+            elif case == 'canonical': score['expected_honest'] = 'wrong'
+            elif case == 'nan': score['margin'] = float('nan')
+            elif case == 'nan_logit': score['logit_a'] = float('inf')
+            elif case == 'bool_argmax': score['argmax_id'] = True
+            elif case == 'choice': score['choice'] = 'a'
+            elif case in ('weak_clean', 'weak_corrupt'):
+                weak = records[0]['inversion']['clean' if case == 'weak_clean' else 'corrupt']
+                weak.update(margin=-.4, honest_minus_opposite=-.4, opposite_minus_honest=.4)
+            elif case == 'wrong_argmax': score['argmax_id'] = 999
+            elif case == 'signed_margin': score['opposite_minus_honest'] = 50
+        def receipt_mutate(receipt):
+            if case == 'tokenizer': receipt['tokenizer'] = 'other-tokenizer'
+            elif case == 'commit': receipt['source_commit'] = 'short'
+            elif case == 'revision': receipt['model_revision'] = ''
+            elif case == 'request_hash': receipt['request_pool_hash'] = 'short'
+            elif case == 'scorer': receipt['scorer'] = 'unknown'
+            elif case == 'dtype': del receipt['dtype']
+            elif case == 'score_digest': receipt['score_files']['train']['sha256'] = '0'*64
+            elif case == 'score_escape': receipt['score_files']['train']['path'] = '../scores/train.jsonl'
+        write_score_evidence(mapping, mutate, receipt_mutate)
+        if case == 'score_missing': (ipath/'scores/train.jsonl').unlink()
+    args['validate_only'] = True
+    with pytest.raises(ValueError): builder().materialize(**args)
+    assert not Path(args['output_root']).exists()
+
+
+def test_matched_accepts_point_seven_with_baseline_failure(tmp_path):
+    args = matched_inputs(tmp_path)
+    path = Path(args['input_paths']['far_v2']['I'])/'dataset_config.json'
+    cfg = json.loads(path.read_text()); cfg['margin_thresh'] = .7
+    path.write_text(json.dumps(cfg))
+    assert builder().materialize(**args)['fleet_ready'] is True
+
+
+def test_score_id_cannot_borrow_an_unselected_other_split_source(tmp_path):
+    args = matched_inputs(tmp_path)
+    def mutate(split, records):
+        if split == 'train':
+            extra = copy.deepcopy(records[0])
+            extra['instance_id'] = 'test-0'  # D/H test id dropped by A1 matching.
+            records.append(extra)
+    write_score_evidence(args['input_paths']['far_v2'], mutate)
+    with pytest.raises(ValueError, match='score.*split'):
+        builder().materialize(**args)
+
+
+def test_extra_rejected_scores_and_native_rounded_margins_are_allowed(tmp_path):
+    args = matched_inputs(tmp_path)
+    def mutate(split, records):
+        for arm in ('inversion', 'baseline'):
+            for stream in ('clean', 'corrupt'):
+                # Native low-precision subtraction need not equal promoted logits.
+                records[0][arm][stream]['logit_b'] = .7999
+        extra = copy.deepcopy(records[0])
+        extra['instance_id'] = split+'-rejected'
+        records.append(extra)
+    write_score_evidence(args['input_paths']['far_v2'], mutate)
+    args['validate_only'] = True
+    manifest = builder().materialize(**args)
+    assert manifest['tasks']['far_v2']['counts'] == dict(train=1, validation=1, test=1)
+    assert not Path(args['output_root']).exists()
