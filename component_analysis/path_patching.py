@@ -664,25 +664,67 @@ def _readout_of(model, capture):
     return hooks.readout_logits(model, residual)
 
 
-def receiver_inputs(model, streams: Streams, *, senders, receivers):
+def receiver_inputs(model, streams: Streams, *, senders, receivers,
+                    sender_positions=None):
     """Pass 1: what the receivers read when only `senders` carry corrupt values.
 
     Every other Component of the model is written back with its clean capture,
     so the sender's value reaches the receiver directly and by no other route.
     The receivers come back at every position, which is what makes this the
     position-agnostic pass.
+
+    `sender_positions` restricts where the senders carry their corrupt value:
+    one boolean mask, `[batch, seq]` or `[seq]`, applied to every key in
+    `senders` (a joint sender such as the quartet of the B1 plan is written at
+    one mask). Outside the mask each sender keeps its **clean capture**, not
+    its live value, so a sender downstream of another masked sender stays
+    exactly clean there. `None` writes the corrupt value at every position,
+    bit for bit as before; an all-True mask gives the same tensors and an
+    all-False one the `senders=[]` patch.
     """
     from component_analysis import hooks
 
     patched = {row_key(one) for one in senders}
     replacements = {key: value for key, value in streams.clean_outputs.items()
                     if key not in patched}
-    replacements.update({key: streams.corrupt_outputs[key] for key in patched})
+    if sender_positions is None:
+        replacements.update({key: streams.corrupt_outputs[key]
+                             for key in patched})
+    else:
+        mask = _sender_mask(sender_positions, streams.input_ids.shape)
+        replacements.update({key: _masked_sender(mask,
+                                                 streams.corrupt_outputs[key],
+                                                 streams.clean_outputs[key])
+                             for key in patched})
     return hooks.capture_forward(model, streams.input_ids,
                                  streams.attention_mask,
                                  components=[row_key(one) for one in receivers],
                                  replacements=replacements,
                                  positions=streams.positions)
+
+
+def _sender_mask(sender_positions, shape):
+    """`sender_positions` as a `[batch, seq]` bool tensor, refused by name if
+    it is an index list or does not fit the stream it masks."""
+    import torch
+
+    mask = torch.as_tensor(sender_positions)
+    if mask.dtype != torch.bool:
+        raise TypeError("sender_positions must be a boolean mask over token "
+                        f"positions, not {mask.dtype}")
+    if mask.ndim == 1:
+        mask = mask.unsqueeze(0).expand(shape[0], -1)
+    if tuple(mask.shape) != tuple(shape):
+        raise ValueError(f"sender_positions has shape {tuple(mask.shape)}; "
+                         f"the streams are {tuple(shape)} [batch, seq]")
+    return mask
+
+
+def _masked_sender(mask, corrupt, clean):
+    """The corrupt value where `mask` is True, the clean capture elsewhere."""
+    import torch
+
+    return torch.where(mask.unsqueeze(-1).to(corrupt.device), corrupt, clean)
 
 
 def readout_from_receivers(model, streams: Streams, replacements):
