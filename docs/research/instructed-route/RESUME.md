@@ -23,7 +23,7 @@ None.
 
 ## Next action
 
-Three Opus planners, one per sub-direction, write costed plans to `plans/B1-plan.md`, `plans/B2-plan.md` and `plans/B3-plan.md` and hand-backs `reports/01-handback.md` to `reports/03-handback.md`. Then: freeze spec.md from the plans; implement B1's position-resolved path patching on the branch; submit B1 to Bridges-2 (reachable on 1 November, offline about 9 November 2026).
+The three plans are committed (8c4d691) with rulings R1 to R5 in spec.md. Eleven Opus implementers run concurrently on the branch, each writing a hand-back under `reports/`: B1 tickets 1 to 4 (hand-backs 04 to 07: manifest in analyze_components, sender position masks in path patching, segment-union knockout positions, the route_closure core with the T2 arms); B2 tickets T2 to T5 (08 to 11: the inversion_reported condition, id and group files, the R-cls port and readers, per-token direct attribution); B3 tickets T1 to T3 (12 to 14: queries and prompts, the proxies, the judge and its freeze). When they land: read each hand-back's test counts, commit by file list, then spawn the dependent tickets (B1 5 to 7, B2 T6 to T8, B3 T4 to T6), record freeze G1 (the judge hash) in spec.md, run the dry runs, and submit B1's smoke to Bridges-2 (reachable on 1 November, offline about 9 November 2026).
 
 ## Do not
 
