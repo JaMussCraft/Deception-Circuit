@@ -123,17 +123,17 @@
       "text": "Two things left for you: restart Codex so the wave C config takes effect (trust stays; re-trust via /hooks only if asked), and tell me when the live Codex session is finished so wave D can archive its directories and the two memory logs. Also say whether to push Deception-Circuit main and delete the merged remote branches (mechanism-datasets, autoresearch-workflow); I do not push main on my own."
     },
     {
-      "answer": null,
-      "answered_at": null,
+      "answer": "Sun 9:04 AM EST: Codex restarted (wave C config live); drop the untracked outputs and remove the mechanism-datasets worktree. Done: worktree removed with --force (outputs/_build_v2 425 MB and two small result dirs dropped), local branch mechanism-datasets deleted (0 commits ahead of main), only main remains.",
+      "answered_at": "2026-11-01T09:04:58-05:00",
       "at": "2026-11-01T08:50:03-05:00",
       "default": "Codex keeps the old config until restarted; the mechanism-datasets worktree stays in place.",
       "id": "N4",
       "text": "Two items remain yours: restart Codex so the wave C config takes effect (trust stays), and decide whether the untracked outputs in the mechanism-datasets worktree (outputs/_build_v2 425 MB and two small result dirs) move to main's outputs or are dropped, so that worktree can be removed."
     }
   ],
-  "right_now": "Setup complete and merged; waves A, H, B, C and D are all applied and verified; Deception-Circuit main is pushed and the merged remote branches are deleted. Open for the user: restart Codex, and the mechanism-datasets worktree's untracked outputs. The pilot (direction pilot-hooks, pilot-checklist.md) has not started.",
+  "right_now": "Setup complete and merged; waves A, H, B, C and D applied and verified; Deception-Circuit main pushed; merged remote branches and all worktrees removed; Codex restarted on the wave C config. Nothing waits on the user. The pilot (direction pilot-hooks, pilot-checklist.md) has not started.",
   "schema": 1,
-  "state": "Blocked: needs you",
+  "state": "Closed",
   "terms": [
     {
       "meaning": "an isolated copy of the Deception-Circuit repository on its own branch, where all code changes for this setup are made.",
