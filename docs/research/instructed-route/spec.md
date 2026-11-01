@@ -16,7 +16,8 @@ GPU: 65 reserved GPU-hours in total across Delta and Bridges-2, phase-gated as 2
 ## Graders
 
 - The EVAL 5 benchmark grader hash (`evaluation/grader_hash.py`) is not yet recorded because no benchmark run is planned; it is recorded here and in `directions.json` before any such run.
-- The B3 alignment-faking judge (prompt, rubric and judge model id) is a grader. Its files are frozen and their sha256 is recorded here before the premise test runs.
+- The B3 alignment-faking judge (prompt, rubric and judge model id) is a grader. **Freeze G1, recorded Sun 1 Nov 2026 before any judge call, at branch commit 0ad1850:** `b3_judge_sha256 = 2e819a465b22504996c3421dc55e83f80903c016a550813c0f2f88cdc17bbf00`, over `spontaneous/grader/af_judge_prompt.txt`, `spontaneous/grader/af_judge_config.json` and `spontaneous/judge.py` in the canonical form of `evaluation/grader_hash.py` (reproduced by `python -m spontaneous.judge --print-hash`). These three files are not edited after this point; a change is a new ruling and a new hash. Decisions folded into the freeze: an empty response is labelled UNCLEAR locally without a call; the parser takes the first label word strictly; error rows are counted apart from UNCLEAR; the rubric sits in the system role. Freeze G2 (the proxy token lists) is recorded below when the calibration run has chosen the primary proxy.
+- `directions.json` has one grader field, `frozen_grader_sha256`, reserved for the EVAL 5 hash, and no sanctioned writer for a second hash; the B3 judge hash is therefore recorded here only, and the gap is logged as a need for the user.
 
 ## Rulings
 
