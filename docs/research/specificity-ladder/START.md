@@ -52,8 +52,8 @@ This is the heavier of the two approved sessions and is meant for a Codex orches
      shared core as answer machinery), F-mds-002 and F-mds-003 (coarse v2 circuits and exclusive heads),
      F-fmt-003 (overlaps are the necessary parts), F-sel-006 and F-sel-007 (L17H27 and New30 are not selective).
    - Synthesis and limitations: `docs/research/mechanism-analysis/synthesis.md`, sections 5 (L1 to L25) and 6.
-   - Survey and recommendation: Alignment `.claude/worktrees/survey-deception-circuits/project_context/surveys/
-     deception_circuits/` (`recommendation.md`, `intervention_bar.md`, `novelty_assessment.md`).
+   - Survey and recommendation: Alignment `project_context/surveys/deception_circuits/` on main
+     (`recommendation.md`, `intervention_bar.md`, `novelty_assessment.md`).
    - Critic reviews behind this prompt: Alignment `.scratch/synthesis-20261101/review-B.md` (A2), `review-C.md`
      (A3), `review-D.md` section M8 (the collateral baseline), and `merged-scored.md`.
    - Data: `data/datasets/{far,sdr,ser}_v2` with `_honest`, `_nopressure`, `_inversion` twins; splits 200/200/1000;
