@@ -1,8 +1,431 @@
 {
   "direction": "instructed-route",
-  "jobs": [],
-  "last_worklog_entry_at": "2026-11-01T12:59:22-05:00",
+  "jobs": [
+    {
+      "cluster": "delta",
+      "expected_terminal": [
+        "COMPLETED",
+        "FAILED",
+        "CANCELLED",
+        "TIMEOUT",
+        "OUT_OF_MEMORY",
+        "NODE_FAIL"
+      ],
+      "job_id": "23412228",
+      "last_progress_at": "2026-11-01T15:56:04-05:00",
+      "status": "COMPLETED",
+      "submitted_at": "2026-11-01T15:30:47-05:00",
+      "waiter": "timeout 60m sh -c 'until sacct -j 23412228 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'"
+    },
+    {
+      "cluster": "delta",
+      "expected_terminal": [
+        "COMPLETED",
+        "FAILED",
+        "CANCELLED",
+        "TIMEOUT",
+        "OUT_OF_MEMORY",
+        "NODE_FAIL"
+      ],
+      "job_id": "23412229",
+      "last_progress_at": "2026-11-01T15:41:10-05:00",
+      "status": "COMPLETED",
+      "submitted_at": "2026-11-01T15:30:47-05:00",
+      "waiter": "timeout 60m sh -c 'until sacct -j 23412229 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'"
+    },
+    {
+      "cluster": "delta",
+      "expected_terminal": [
+        "COMPLETED",
+        "FAILED",
+        "CANCELLED",
+        "TIMEOUT",
+        "OUT_OF_MEMORY",
+        "NODE_FAIL"
+      ],
+      "job_id": "23412232",
+      "last_progress_at": "2026-11-01T15:41:34-05:00",
+      "status": "COMPLETED",
+      "submitted_at": "2026-11-01T15:31:13-05:00",
+      "waiter": "timeout 60m sh -c 'until sacct -j 23412232 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'"
+    },
+    {
+      "cluster": "delta",
+      "expected_terminal": [
+        "COMPLETED",
+        "FAILED",
+        "CANCELLED",
+        "TIMEOUT",
+        "OUT_OF_MEMORY",
+        "NODE_FAIL"
+      ],
+      "job_id": "23412257",
+      "last_progress_at": "2026-11-01T16:03:18-05:00",
+      "status": "COMPLETED",
+      "submitted_at": "2026-11-01T15:32:58-05:00",
+      "waiter": "timeout 60m sh -c 'until sacct -j 23412257 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'"
+    },
+    {
+      "cluster": "delta",
+      "expected_terminal": [
+        "COMPLETED",
+        "FAILED",
+        "CANCELLED",
+        "TIMEOUT",
+        "OUT_OF_MEMORY",
+        "NODE_FAIL"
+      ],
+      "job_id": "23412270",
+      "last_progress_at": "2026-11-01T16:40:00-05:00",
+      "status": "COMPLETED",
+      "submitted_at": "2026-11-01T15:33:50-05:00",
+      "waiter": "timeout 60m sh -c 'until sacct -j 23412270 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'"
+    },
+    {
+      "cluster": "delta",
+      "expected_terminal": [
+        "COMPLETED",
+        "FAILED",
+        "CANCELLED",
+        "TIMEOUT",
+        "OUT_OF_MEMORY",
+        "NODE_FAIL"
+      ],
+      "job_id": "23412454",
+      "last_progress_at": "2026-11-01T16:28:26-05:00",
+      "status": "COMPLETED",
+      "submitted_at": "2026-11-01T15:42:27-05:00",
+      "waiter": "timeout 60m sh -c 'until sacct -j 23412454 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'"
+    },
+    {
+      "cluster": "delta",
+      "expected_terminal": [
+        "COMPLETED",
+        "FAILED",
+        "CANCELLED",
+        "TIMEOUT",
+        "OUT_OF_MEMORY",
+        "NODE_FAIL"
+      ],
+      "job_id": "23412904",
+      "last_progress_at": "2026-11-01T17:35:39-05:00",
+      "status": "COMPLETED",
+      "submitted_at": "2026-11-01T16:10:50-05:00",
+      "waiter": "timeout 60m sh -c 'until sacct -j 23412904 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'"
+    },
+    {
+      "cluster": "bridges2",
+      "expected_terminal": [
+        "COMPLETED",
+        "FAILED",
+        "CANCELLED",
+        "TIMEOUT",
+        "OUT_OF_MEMORY",
+        "NODE_FAIL"
+      ],
+      "job_id": "50105613",
+      "last_progress_at": "2026-11-01T17:05:23-05:00",
+      "status": "COMPLETED",
+      "submitted_at": "2026-11-01T16:21:21-05:00",
+      "waiter": "timeout 60m sh -c 'until ssh -o BatchMode=yes bridges2 sacct -j 50105613 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'"
+    },
+    {
+      "cluster": "bridges2",
+      "expected_terminal": [
+        "COMPLETED",
+        "FAILED",
+        "CANCELLED",
+        "TIMEOUT",
+        "OUT_OF_MEMORY",
+        "NODE_FAIL"
+      ],
+      "job_id": "50106660",
+      "last_progress_at": "2026-11-01T17:41:46-05:00",
+      "status": "COMPLETED",
+      "submitted_at": "2026-11-01T17:07:11-05:00",
+      "waiter": "timeout 60m sh -c 'until ssh -o BatchMode=yes bridges2 sacct -j 50106660 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'"
+    },
+    {
+      "cluster": "bridges2",
+      "expected_terminal": [
+        "COMPLETED",
+        "FAILED",
+        "CANCELLED",
+        "TIMEOUT",
+        "OUT_OF_MEMORY",
+        "NODE_FAIL"
+      ],
+      "job_id": "50106721",
+      "last_progress_at": "2026-11-01T17:41:47-05:00",
+      "status": "COMPLETED",
+      "submitted_at": "2026-11-01T17:10:59-05:00",
+      "waiter": "timeout 60m sh -c 'until ssh -o BatchMode=yes bridges2 sacct -j 50106721 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'"
+    },
+    {
+      "cluster": "delta",
+      "expected_terminal": [
+        "COMPLETED",
+        "FAILED",
+        "CANCELLED",
+        "TIMEOUT",
+        "OUT_OF_MEMORY",
+        "NODE_FAIL"
+      ],
+      "job_id": "23415522",
+      "last_progress_at": "2026-11-01T18:05:53-05:00",
+      "status": "COMPLETED",
+      "submitted_at": "2026-11-01T18:01:00-05:00",
+      "waiter": "timeout 60m sh -c 'until sacct -j 23415522 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'"
+    },
+    {
+      "cluster": "delta",
+      "expected_terminal": [
+        "COMPLETED",
+        "FAILED",
+        "CANCELLED",
+        "TIMEOUT",
+        "OUT_OF_MEMORY",
+        "NODE_FAIL"
+      ],
+      "job_id": "23415595",
+      "last_progress_at": "2026-11-01T18:47:28-05:00",
+      "status": "COMPLETED",
+      "submitted_at": "2026-11-01T18:05:55-05:00",
+      "waiter": "timeout 60m sh -c 'until sacct -j 23415595 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'"
+    },
+    {
+      "cluster": "delta",
+      "expected_terminal": [
+        "COMPLETED",
+        "FAILED",
+        "CANCELLED",
+        "TIMEOUT",
+        "OUT_OF_MEMORY",
+        "NODE_FAIL"
+      ],
+      "job_id": "23416459",
+      "last_progress_at": "2026-11-01T19:18:03-05:00",
+      "status": "COMPLETED",
+      "submitted_at": "2026-11-01T18:49:57-05:00",
+      "waiter": "timeout 60m sh -c 'until sacct -j 23416459 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'"
+    }
+  ],
+  "last_worklog_entry_at": "2026-11-01T19:28:12-05:00",
   "schema": 1,
   "session_state": "running",
-  "sessions": {}
+  "sessions": {
+    "claude-230e4716": {
+      "agents": {
+        "aanalysis-B3-fad619d73ac152b0": {
+          "agent_type": "analysis-B3",
+          "started_at": "2026-11-01T17:45:59-05:00",
+          "stop_blocks": 1
+        },
+        "aanalysis-P1-6928650639a0f6b5": {
+          "agent_type": "analysis-P1",
+          "started_at": "2026-11-01T16:29:37-05:00",
+          "stop_blocks": 1
+        },
+        "aimpl-B1-t1-d1b7cbcfe7bb2ab7": {
+          "agent_type": "impl-B1-t1",
+          "started_at": "2026-11-01T15:20:33-05:00",
+          "stop_blocks": 0
+        },
+        "aimpl-B1-t2-ee657919f65aaa66": {
+          "agent_type": "impl-B1-t2",
+          "started_at": "2026-11-01T14:42:18-05:00",
+          "stop_blocks": 0
+        },
+        "aimpl-B1-t3-ee375633fbbb35be": {
+          "agent_type": "impl-B1-t3",
+          "started_at": "2026-11-01T14:42:34-05:00",
+          "stop_blocks": 0
+        },
+        "aimpl-B1-t4-f17c56dc04e294e3": {
+          "agent_type": "impl-B1-t4",
+          "started_at": "2026-11-01T15:26:34-05:00",
+          "stop_blocks": 1
+        },
+        "aimpl-B1-t5-e352cc2df38a2acb": {
+          "agent_type": "impl-B1-t5",
+          "started_at": "2026-11-01T17:10:44-05:00",
+          "stop_blocks": 1
+        },
+        "aimpl-B1-t7-e249d7953c429b73": {
+          "agent_type": "impl-B1-t7",
+          "started_at": "2026-11-01T16:04:49-05:00",
+          "stop_blocks": 0
+        },
+        "aimpl-B2-t2-986981e736848cb7": {
+          "agent_type": "impl-B2-t2",
+          "started_at": "2026-11-01T14:44:34-05:00",
+          "stop_blocks": 0
+        },
+        "aimpl-B2-t3-3e5d40e344013e29": {
+          "agent_type": "impl-B2-t3",
+          "started_at": "2026-11-01T14:50:19-05:00",
+          "stop_blocks": 1
+        },
+        "aimpl-B2-t4-6ba31e2253edff51": {
+          "agent_type": "impl-B2-t4",
+          "started_at": "2026-11-01T14:58:17-05:00",
+          "stop_blocks": 1
+        },
+        "aimpl-B2-t5-b6f292c1628be587": {
+          "agent_type": "impl-B2-t5",
+          "started_at": "2026-11-01T14:45:29-05:00",
+          "stop_blocks": 0
+        },
+        "aimpl-B2-t6-3f99bc033119e5d7": {
+          "agent_type": "impl-B2-t6",
+          "started_at": "2026-11-01T14:56:59-05:00",
+          "stop_blocks": 0
+        },
+        "aimpl-B2-t7-6d25293d9985d9ae": {
+          "agent_type": "impl-B2-t7",
+          "started_at": "2026-11-01T15:18:21-05:00",
+          "stop_blocks": 0
+        },
+        "aimpl-B2-t8-cf298b70e2ba387b": {
+          "agent_type": "impl-B2-t8",
+          "started_at": "2026-11-01T15:15:03-05:00",
+          "stop_blocks": 0
+        },
+        "aimpl-B2-t9-8d6c9d96440e7609": {
+          "agent_type": "impl-B2-t9",
+          "started_at": "2026-11-01T17:04:53-05:00",
+          "stop_blocks": 1
+        },
+        "aimpl-B3-t1-b4134375e5f037e6": {
+          "agent_type": "impl-B3-t1",
+          "started_at": "2026-11-01T14:45:56-05:00",
+          "stop_blocks": 0
+        },
+        "aimpl-B3-t2-7964cf70c3e7dccc": {
+          "agent_type": "impl-B3-t2",
+          "started_at": "2026-11-01T14:57:14-05:00",
+          "stop_blocks": 1
+        },
+        "aimpl-B3-t3-44fd6d7b872f9ad3": {
+          "agent_type": "impl-B3-t3",
+          "started_at": "2026-11-01T14:46:41-05:00",
+          "stop_blocks": 0
+        },
+        "aimpl-B3-t4-9876b37de57ec38e": {
+          "agent_type": "impl-B3-t4",
+          "started_at": "2026-11-01T15:31:33-05:00",
+          "stop_blocks": 1
+        },
+        "aimpl-B3-t5-9dd303f38c03328c": {
+          "agent_type": "impl-B3-t5",
+          "started_at": "2026-11-01T15:19:29-05:00",
+          "stop_blocks": 1
+        },
+        "aimpl-B3-t6-3eaa380a935d0c21": {
+          "agent_type": "impl-B3-t6",
+          "started_at": "2026-11-01T15:03:14-05:00",
+          "stop_blocks": 1
+        },
+        "aimpl-B3-t7-a2487bc4a9336ad9": {
+          "agent_type": "impl-B3-t7",
+          "started_at": "2026-11-01T17:54:32-05:00",
+          "stop_blocks": 1
+        },
+        "aplanner-B1-3e3aa9f1f0c8bc86": {
+          "agent_type": "planner-B1",
+          "started_at": "2026-11-01T14:18:48-05:00",
+          "stop_blocks": 1
+        },
+        "aplanner-B2-8bc12a5288361c35": {
+          "agent_type": "planner-B2",
+          "started_at": "2026-11-01T14:19:19-05:00",
+          "stop_blocks": 1
+        },
+        "aplanner-B3-c7ee947b1e32134c": {
+          "agent_type": "planner-B3",
+          "started_at": "2026-11-01T14:19:54-05:00",
+          "stop_blocks": 1
+        },
+        "areview-B1-27411a1ac17ebeb3": {
+          "agent_type": "review-B1",
+          "started_at": "2026-11-01T17:45:59-05:00",
+          "stop_blocks": 1
+        },
+        "areview-B3-01840884607d2b2c": {
+          "agent_type": "review-B3",
+          "started_at": "2026-11-01T18:05:12-05:00",
+          "stop_blocks": 1
+        },
+        "areview-J3-c091f9f9b584b72c": {
+          "agent_type": "review-J3",
+          "started_at": "2026-11-01T16:40:01-05:00",
+          "stop_blocks": 1
+        },
+        "areview-J4-bfb44f1d3f19f8d0": {
+          "agent_type": "review-J4",
+          "started_at": "2026-11-01T19:18:20-05:00",
+          "stop_blocks": 1
+        },
+        "areview-P1-0bcba249bd64ebde": {
+          "agent_type": "review-P1",
+          "started_at": "2026-11-01T16:42:08-05:00",
+          "stop_blocks": 1
+        },
+        "areview-P2-fab49f58e9bbd687": {
+          "agent_type": "review-P2",
+          "started_at": "2026-11-01T15:57:08-05:00",
+          "stop_blocks": 1
+        },
+        "areview-P3-d7bc7afda23b83f4": {
+          "agent_type": "review-P3",
+          "started_at": "2026-11-01T15:42:53-05:00",
+          "stop_blocks": 1
+        }
+      },
+      "checkpoints": [],
+      "compaction_log": [
+        {
+          "at": "2026-11-01T16:07:40-05:00",
+          "n": 1,
+          "trigger": "auto"
+        },
+        {
+          "at": "2026-11-01T18:50:58-05:00",
+          "n": 2,
+          "trigger": "auto"
+        }
+      ],
+      "compactions": 2,
+      "cwd": "/projects/beto/swong2/Alignment",
+      "orchestrator_model": "claude-fable-5-1",
+      "session_id": "230e4716-3bf9-40c3-b80d-d090ead03819",
+      "started_at": "2026-11-01T14:04:18-05:00",
+      "tool": "claude",
+      "usage": {
+        "acked_through": 0,
+        "cadence": 16,
+        "freeze": null,
+        "last_reading": {
+          "fable": 43,
+          "five_hour": null,
+          "fresh": true,
+          "read_at": "2026-11-01T19:25:13-05:00",
+          "seven_day": 36
+        },
+        "metric": "max(seven_day, Fable)",
+        "next_checkpoint": 1,
+        "points_at_register": 0,
+        "registered_at": "2026-11-01T14:10:41-05:00",
+        "segments": [
+          {
+            "baseline": 31,
+            "last": 43,
+            "resets_at": 1793797199
+          }
+        ],
+        "session_points": 12,
+        "stale_ok_until": null
+      }
+    }
+  }
 }

@@ -1,16 +1,111 @@
 {
   "budgets": {
-    "gpu": "0.0 of 65 GPU-h actual (0.0 reserved)",
-    "openrouter": "$0.00 of $20.00 cap"
+    "gpu": "4.8 of 65 GPU-h actual (11.8 reserved)",
+    "openrouter": "$2.38 of $20.00 cap"
   },
-  "directions": [],
-  "findings": [],
+  "directions": [
+    {
+      "name": "B1 close the loop: outside-grid share and key versus query",
+      "state": "active"
+    },
+    {
+      "name": "B2 falsity signal, SDR wish test and SER MLP replication",
+      "state": "active"
+    },
+    {
+      "name": "B3 spontaneous deception through the instructed route",
+      "state": "active"
+    }
+  ],
+  "findings": [
+    {
+      "at": "2026-11-01T15:50:57-05:00",
+      "evidence": "docs/research/instructed-route/results/p3/p3_rcls.csv; docs/research/instructed-route/reviews/01-p3-review.md; outputs/_analyses/instructed-route-b2/p3/seed{1,2}_{d,h,f}/U__leaf/ser_v2/run_manifest.json (commit a7827d4)",
+      "id": "F1",
+      "plain": "Of the three SER MLPs that leaned toward deception on the selection sample, only mlp.13 keeps that lean on held-out ids in both seeded runs; mlp.11 keeps it in 1 of 2 runs and mlp.16 in 0 of 2, each missing the factor-two bar by 6 to 12 percent, and mlp.13 also leans toward deception on FAR in 1 of 2 runs, so the earlier SER-alone reading does not hold.",
+      "setup": "Item-swap knockout of single MLPs on the SER, FAR and SDR v2 test splits, 100 held-out ids per run with seeds 1 and 2, classes by the R-cls rule, seed 0 reproduced exactly.",
+      "strength": "reviewed"
+    },
+    {
+      "at": "2026-11-01T16:05:48-05:00",
+      "evidence": "docs/research/instructed-route/results/p2/p2_wish.json; docs/research/instructed-route/reviews/02-p2-review.md; outputs/_analyses/instructed-route-b2/p2/wish_all/U__leaf/sdr_v2/run_manifest.json (commit a7827d4)",
+      "id": "F2",
+      "plain": "The reported third-party wish on SDR runs through the layer-17 quartet: restoring the four heads to their neutral-twin state removes 0.54 of the wish effect on all 618 reported-wish ids (interval 0.52 to 0.55), against at most 0.03 for 20 random layer-17 quartets and 0.01 for the other KV groups; the effect sits at the readout (0.51) rather than after the clause (0.03), and the same restoration removes 0.58 of the ordinary pressure effect on the same ids, so the wish and the instruction share the route.",
+      "setup": "Neutral-twin interchange knockout of head groups at all positions, at the readout, and after the clause on the 618 SDR reported-wish rows and their SDR D twins; ratio of means with cluster bootstraps.",
+      "strength": "reviewed"
+    },
+    {
+      "at": "2026-11-01T16:47:19-05:00",
+      "evidence": "outputs/_studies/b3/j3_sycophancy/results.json, margins.json, run_manifest.json; docs/research/instructed-route/reviews/03-j3-review.md. Review caveats for J4: null draws can redraw set members (needs a ruling before J4), the knockout.py parity check has not run (about 0.13 h, run before J4), S_all shares L17H24 and L15H8 with the Gupta set and 71 of the 73 reversals, so a high f(S_all) may be the cue route.",
+      "id": "F3",
+      "plain": "Patching the six Gupta heads with their uncued-twin outputs at the readout reverses 73 of 154 cue-induced flips on MMLU, against a bar of 0.18 and a null max of 0.084 over 20 layer-matched draws; f_syc 0.340. This validates the wrapper and the readout arm, not deception.",
+      "setup": "800 MMLU items seed 0, cue sentence with a token-matched uncued twin, prefill The answer is (, letters read at the next position, 530 kept and 154 flips, 20 layer-matched 6-head nulls, bootstrap 2,000 seed 0; job 23412270, manifest commit 476c187.",
+      "strength": "reviewed"
+    },
+    {
+      "at": "2026-11-01T17:07:51-05:00",
+      "evidence": "outputs/_analyses/instructed-route-b2/p1-probe/p1_probe.json, p1_tokens.json and run_manifest.json; p1-cap/run_manifest.json; p1-margin-check/taskA.json; docs/research/instructed-route/reports/25-handback.md and 28-handback.md; docs/research/instructed-route/reviews/04-p1-review.md.",
+      "id": "F4",
+      "plain": "A linear probe fit on FAR D against H at layer 17 separates SER D from SER H almost perfectly, which the frozen rule reads as misleadingness, but every clause or instruction control also scores high (FAR inversion 1.000, FAR honest instruction 0.963, SER honest instruction 0.747, SER inversion 0.9997) and by score shift the probe reads the instructed answer switch, so under R2 the verdict is instruction-confounded and P1 does not separate misleadingness from literal falsity or deception from instructed inversion.",
+      "setup": "Capture job 23412454 on an H200 (18 cells, 9,972 rows, fp32 readout); fit on FAR train D versus H, selection on FAR validation by D against pooled H and HI (saturated at 1.0 on all 28 eligible layers, tie rule picks layer 17 at C 0.001); score on SER test D versus H with a 17-cluster bootstrap; controls per plan B2 section 1; rulings R7 (margin bar explained by precision) and R8 (F cells 0.681 and 0.624 read as weak confidence leakage).",
+      "strength": "reviewed"
+    },
+    {
+      "at": "2026-11-01T17:59:04-05:00",
+      "evidence": "docs/research/instructed-route/results/b1/b1_readings.json; outputs/_analyses/instructed-route-b1/{far,ser}/Ct__leaf/<task>_v2/route_closure/route_closure.json and run_manifest.json; docs/research/instructed-route/reviews/05-b1-review.md.",
+      "id": "F5",
+      "plain": "On the 100 held-out ids, restoring the quartet outputs with the neutral twin removes 0.360 of the outside-grid share on FAR and 0.462 on SER, both under the 0.50 rule, so the loop does not close through the quartet; the deciding set restored after the clause removes all of it, and the quartet in reverse reproduces about 0.73, so the rest reaches the same late writers by a parallel route B1 does not name.",
+      "setup": "B1 T1 on Bridges-2 H100s, jobs 50106660 and 50106721 from commit 476c187; C_t grid, greedy_k20 deciding sets, KV group 6, interchange with the token-aligned neutral twin, five C1 and five C2 draws, C3 push; offline estimator of record under R9; intervals clustered by pressure id (11 and 14 clusters).",
+      "strength": "reviewed"
+    },
+    {
+      "at": "2026-11-01T17:59:05-05:00",
+      "evidence": "docs/research/instructed-route/results/b1/b1_readings.json; the two route_closure.json files and manifests; docs/research/instructed-route/reviews/05-b1-review.md.",
+      "id": "F6",
+      "plain": "Restoring the quartet queries at the readout from the neutral twin moves 0.321 (FAR) and 0.426 (SER) of the pressure effect, nearly all that the quartet readout output carries, while restoring KV group 6 keys at the four option tokens moves -0.012 and 0.014; the difference 0.33 and 0.41 is beyond the 0.15 rule. Path patching puts the query signal in head.15.8 and head.14.4. This replicates the synthesis B-selector clause 1 on held-out ids and differs from SDR (F-sdr-012, keys).",
+      "setup": "B1 T2 on the same runs as F-rte-005; queries and keys patched before RoPE at aligned positions; reverse arms and post-clause key, value and random-position controls; no attention patterns captured.",
+      "strength": "reviewed"
+    },
+    {
+      "at": "2026-11-01T18:17:57-05:00",
+      "evidence": "outputs/_studies/b3/premise/verdict.json and run_manifest.1.json; outputs/_studies/b3/j2_test/run_manifest.json; outputs/_studies/b3/judge/; docs/research/instructed-route/reports/33-handback.md; docs/research/instructed-route/reviews/06-b3-premise-review.md.",
+      "id": "F7",
+      "plain": "Under the public helpful-only prompt the judged monitored-minus-unmonitored compliance gap on 100 OR-Bench queries is 7.0 points (3.9 to 10.2), consistent in direction (39 queries against 12) but under the pre-registered 10 and mostly refusals turning partial; the proxy agrees with the judge at 0.959. The readout difference survives a neutral-consequence control and reverses when the trained tier is swapped, so it follows the training statement, and cue-following is not excluded. B3 therefore runs on sycophancy alone.",
+      "setup": "J1 calibration (20 queries, both variants) chose V-B and P2 under R4 and R6; J2 generated 2,200 base rows at 512 tokens (10 samples plus greedy per tier) plus greedy C1 and C2 rows; frozen Haiku judge (G1) with a 200-row Sonnet cross-check and a 10 percent re-judge; verdict by scripts/b3_premise.py at commit c7e0449.",
+      "strength": "reviewed"
+    },
+    {
+      "at": "2026-11-01T18:58:25-05:00",
+      "evidence": "outputs/_studies/b3/j4_syc/results.json, docs/research/instructed-route/reviews/07-j4-review.md",
+      "id": "F8",
+      "plain": "The FAR and SER deciding sets with the quartet remove 0.724 of the sycophancy cue effect when patched over the post-cue span, but one of 20 random layer-matched head draws with the same MLPs reaches 0.505, so the route is shared and not specific.",
+      "setup": "review-J4 reproduced every J4 number with its own code: f of S_all at the post-cue arm 0.724 (0.702 to 0.746; 0.669 to 0.770 clustered by subject), null maximum 0.505 from one member-excluded draw (its interval 0.467 to 0.541, next draw 0.442), all 200 draws free of head-member overlap with the MLPs kept per R10a, pass 1 and the shared readout arms bit-identical to J3, the parity check at 0.0. Problems that do not change the verdict: the label rests on one draw 0.005 over the bar; the post-cue span includes the seven differing cue tokens, so random 32-head draws range widely there (SD 0.250 against 0.190 at the readout) and no arm patches only the shared positions after the cue; flip reversal does not discriminate for S_all while non-flip damage does (3 of 376 against 7 to 98); results.json carries no machine-written verdict. Row F-rte-008 is written after the supplement lands so that heads-only, S_far and S_ser enter the claim. The README handoff was committed with the review.",
+      "strength": "reviewed"
+    }
+  ],
   "incidents": [],
-  "needs": [],
-  "right_now": "The direction was just created from the templates; no work has started yet.",
+  "needs": [
+    {
+      "answer": "The user keeps the B3 judge hash in spec.md only; the registry field stays reserved for the EVAL 5 hash.",
+      "answered_at": "2026-11-01T15:39:05-05:00",
+      "at": "2026-11-01T14:56:26-05:00",
+      "default": "Keep the hash in spec.md only, with the registry field reserved for the EVAL 5 hash.",
+      "id": "N1",
+      "text": "The B3 alignment-faking judge is frozen and its hash is recorded in spec.md, but the direction registry has only the EVAL 5 grader field and no sanctioned command writes a second grader hash. Should the judge hash also go into the registry, and if so how?"
+    },
+    {
+      "answer": null,
+      "answered_at": null,
+      "at": "2026-11-01T17:45:59-05:00",
+      "default": "Run the pre-registered fallback: J4 on sycophancy alone under R5 and R10, with the knockout parity check first; no second elicitation attempt.",
+      "id": "N2",
+      "text": "The B3 alignment-faking premise failed on Llama-3.1-8B-Instruct (judged gap 7.0 points, interval 3.9 to 10.2, against the 10-point bar; the proxy agrees with the judge at 0.96). The pre-registered fallback runs the transfer test on sycophancy alone (J4 on the Gupta cue route, about 1 GPU-hour). About 25 of the 30 B3 GPU-hours and 17 of the 20 OpenRouter dollars remain. Do you want the fallback as written, or should part of the remaining B3 budget go to a second elicitation attempt (for example a scratchpad variant per plan B3 section 3.6, or the 1,024-token cap) before the transfer?"
+    }
+  ],
+  "right_now": "Wrap-up complete; released as paused; the merge to main and need N2 await the user.",
   "schema": 1,
-  "state": "Running",
+  "state": "Closed",
   "terms": [],
   "title": "Closing the instructed deception route and testing it on spontaneous deception",
-  "transcripts": "not recorded yet"
+  "transcripts": "/u/swong2/.claude/projects/-projects-beto-swong2-Alignment/230e4716-3bf9-40c3-b80d-d090ead03819.jsonl"
 }
