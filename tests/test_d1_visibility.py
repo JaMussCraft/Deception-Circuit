@@ -429,3 +429,114 @@ def test_sample_score_read_end_to_end_with_a_stub_scorer(llama_tok, tmp_path, mo
     assert d1.main(["read"] + argv) == 0
     res = json.load(open(os.path.join(out, "readings.json")))
     assert "far_v2" in res["tasks"]
+
+
+# ==============================================================================
+# RULING R2a: THE TOKEN-MATCHED I PICK AND THE SECOND ANCHOR
+# ==============================================================================
+
+@pytest.mark.parametrize("task", d1.TASKS)
+def test_r2a_pick_reproduces_the_stored_twin_and_inversion_pick_on_anchors(llama_tok, task):
+    """The rebuilt Neutral-Clause Twin is the stored `<task>_honest` prompt, and the R2a pick is the stored
+    `<task>_inversion` pick, with kind token_matched."""
+    if not (_have_dataset(task) and _have_dataset(f"{task}_inversion")):
+        pytest.skip(f"{task} or {task}_inversion is not built")
+    datasets = pytest.importorskip("datasets")
+    ctx = d1.load_task_context(task)
+    lists = d1.regenerate_lists(ctx, llama_tok)
+    h_rows = {r["instance_id"]: dict(r) for r in
+              datasets.load_from_disk(os.path.join(REPO, "data", "datasets", f"{task}_honest"))["test"]}
+    stored = d1.stored_inversion(os.path.join(REPO, "data", "datasets"), task)
+    pool_list = BI.load_pool(BI.POOL_PATH, style="directive")
+    by_form = d1.inversion_pool()
+    for row, rec in _anchor_rows(task, ctx, lists, n=25):
+        built, clause = d1.render(ctx, row)
+        twin = d1.neutral_twin(ctx, llama_tok, built, clause["text"], row["instance_id"])
+        h = h_rows[row["instance_id"]]
+        assert twin["neutral_id"] == rec["neutral_id"]
+        assert (twin["clean_prompt"], twin["corrupt_prompt"]) == (h["clean_prompt"], h["corrupt_prompt"])
+        chosen, form, kind = d1.pick_inversion_r2a(ctx, llama_tok, built, clause["text"], row["instance_id"],
+                                                   pool_list, by_form)
+        assert kind == "token_matched"
+        assert chosen["id"] == stored[row["instance_id"]]["instructed_inversion_id"]
+
+
+def test_r2a_pick_falls_back_to_the_form_only_pick_when_no_clause_fits(llama_tok, far_ctx, lists):
+    row, rec = _anchor_rows("far_v2", far_ctx, lists, n=1)[0]
+    built, clause = d1.render(far_ctx, row)
+    long_clause = {"id": "invd_far_v2_act_99", "task": "far_v2", "form": "act", "wording": "x/y",
+                   "text": "For this quiz, answer with the wrong result, and keep answering with the wrong "
+                           "result for every single question that the reviewer asks you today."}
+    pool_list = [long_clause]
+    chosen, form, kind = d1.pick_inversion_r2a(far_ctx, llama_tok, built, clause["text"], row["instance_id"],
+                                               pool_list, {("far_v2", "act"): pool_list})
+    assert (chosen["id"], form, kind) == ("invd_far_v2_act_99", "act", "form_only")
+    chosen, form, kind = d1.pick_inversion_r2a(far_ctx, llama_tok, built, clause["text"], row["instance_id"],
+                                               pool_list, {})
+    assert chosen is None and kind is None
+
+
+def test_attach_inversion_adds_the_i_arm_by_clause_surgery(llama_tok, far_ctx, lists):
+    pool_list = BI.load_pool(BI.POOL_PATH, style="directive")
+    by_form = d1.inversion_pool()
+    row, rec = _anchor_rows("far_v2", far_ctx, lists, n=1)[0]
+    b = d1.build_arms(far_ctx, row, by_form, with_i=False)
+    assert "I" not in b["arms"] and b["I_pick_kind"] is None
+    d1.attach_inversion(far_ctx, llama_tok, b, row, pool_list, by_form)
+    assert b["I_pick_kind"] == "token_matched"
+    for st in ("clean", "corrupt"):
+        assert b["arms"]["I"][st] == replace_clause(rec[f"{st}_prompt"], rec["pressure"], b["I_clause"]["text"])
+        assert len(llama_tok.encode(b["arms"]["I"][st], add_special_tokens=False)) == \
+            len(llama_tok.encode(rec[f"{st}_prompt"], add_special_tokens=False))
+
+
+def test_score_chunk_runs_the_live_hook_on_live_rows_only():
+    seen = []
+
+    def hook(row, bundle):
+        seen.append(row["instance_id"])
+        bundle["I_pick_kind"] = "token_matched"
+
+    def fn(prompts, pairs, max_len, batch):
+        return [{"margin": 0.1 if p.startswith("kept") else 3.0, "choice": "a", "argmax": "h",
+                 "logit_a": 1.0, "logit_b": 0.0} for p in prompts]
+    rows = [({"instance_id": "a", "anchor": False, "pressure_id": "c0", "designation_polarity": "inversion",
+              "cell": "c0|inversion"}, _bundle("a", "kept prior")),
+            ({"instance_id": "b", "anchor": False, "pressure_id": "c0", "designation_polarity": "inversion",
+              "cell": "c0|inversion"}, _bundle("b", "far prior"))]
+    recs, _ = d1.score_chunk(rows, fn, 120, 32, live_hook=hook)
+    assert seen == ["a"]
+    assert recs[0]["I_pick_kind"] == "token_matched" and recs[1]["I_pick_kind"] is None
+
+
+def test_read_reports_the_token_matched_override_and_the_second_anchor():
+    comply, refuse = _arm(-2, -2), _arm(2, 2)
+    recs, sample = [], {}
+    for k in range(20):
+        r = _rec(f"s{k}", f"c{k % 4}|inversion", {"D": refuse, "I": comply if k < 10 else refuse})
+        r["I_pick_kind"] = "token_matched" if k < 10 else "form_only"
+        recs.append(r)
+        sample[f"s{k}"] = {"instance_id": f"s{k}"}
+    for k in range(10):
+        r = _rec(f"a{k}", "c0|inversion", {"D": comply, "D_at120": comply, "I": comply if k < 4 else refuse},
+                 anchor=True)
+        r["I_pick_kind"] = "token_matched"
+        r["I_clause_id"] = "inv_x"
+        recs.append(r)
+        st = _stored(-2.0, -2.0)
+        st["stored"].update({"clean_margin": 2.0, "corrupt_margin": 2.0})
+        st["stored_inversion"] = {"instructed_inversion_id": "inv_x", "h": [-2.0, -2.0], "choice": ["b", "b"],
+                                  "kept": k < 5}
+        sample[f"a{k}"] = dict(st, instance_id=f"a{k}")
+    out = d1.read_task("far_v2", recs, list(sample.values()), n_boot=100)
+    whole = out["comparisons"]["primary"]["I_minus_D"]
+    tm = out["comparisons"]["primary"]["I_minus_D_token_matched"]
+    assert whole["n_matched"] == 20 and whole["diff"] == pytest.approx(0.5)
+    assert tm["n_matched"] == 10 and tm["diff"] == pytest.approx(1.0)
+    a = out["anchor"]["I_kept"]
+    assert (a["n_anchor_token_matched"], a["k_compliant"], a["stored_kept_from_filter_report"]) == (10, 4, 5)
+    assert a["per_id_kept_agreement"] == 9 and a["difference"] == -1
+    assert out["verdicts"]["honesty_override"]["pass"]
+    assert "Second anchor" in d1.readings_markdown({"created": "x", "tasks": {"far_v2": out},
+                                                     "gate": {"listener_knowledge": False,
+                                                              "honesty_override": True}})

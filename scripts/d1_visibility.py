@@ -10,10 +10,12 @@ scored under eight arms, each a clean/corrupt prompt pair in the dataset builder
   L1..L3     D with one listener sentence appended inside the system turn directly after the pressure clause,
              a visible and a hidden polarity per phrasing (R2): six arms
   I          the operator-turn transparent inversion clause of `dataset/deception_pools/v2/inversion_v2.json`,
-             form-matched to D's clause (`build_inversion_v2.clause_form`) with the same
-             sha1("inversion:" + instance_id) mod k pick (`build_inversion_v2.select`) over the same-form pool
-             clauses. Orchestrator clarification (ticket brief): no token-count or twin-alignment match, since no
-             twin is patched here; the build report counts how many ids would also have passed the token match.
+             form-matched to D's clause (`build_inversion_v2.clause_form`). Ruling R2a: the pick is
+             `build_inversion_v2`'s own token-matched pick (`candidates` + `select`, against the Neutral-Clause
+             Twin that `deception_v2.select_neutral` gives this id) wherever at least one pool clause fits, and the
+             form-only sha1("inversion:" + instance_id) mod k pick over the same-form clauses otherwise. Every row
+             records its pick kind: token_matched, token_matched_no_twin (no neutral sentence fits, so only the
+             D half of the fit is checked) or form_only.
 
 Stages (run from the worktree root, `python -I scripts/d1_visibility.py <stage> ...`):
 
@@ -153,8 +155,6 @@ def load_task_context(task: str, data_dir: str = DEFAULT_DATA_DIR) -> Dict:
         report = json.load(f)
     for key, ent in prov["sha256"]["pools"].items():
         path = os.path.join(REPO_ROOT, ent["path"]) if not os.path.isabs(ent["path"]) else ent["path"]
-        if key == "neutral_pool":
-            continue  # the neutral twin is not built here
         got = sha256_file(path)
         if got != ent["sha256"]:
             raise SystemExit(f"{task}: {ent['path']} has sha256 {got[:12]}, provenance says "
@@ -167,7 +167,9 @@ def load_task_context(task: str, data_dir: str = DEFAULT_DATA_DIR) -> Dict:
     framing = v2.load_framing(os.path.join(REPO_ROOT, cell["framing_path"]))
     plan = report["plan"]
     prefix = scored_prefix(report, SPLIT, plan["per_task"][task][SPLIT])
+    neutral_pool = v2.load_neutral_pool(os.path.join(REPO_ROOT, prov["sha256"]["pools"]["neutral_pool"]["path"]))
     return {"task": task, "d_dir": d_dir, "cell": cell, "spec": spec, "framing": framing,
+            "neutral_pool": neutral_pool,
             "plan": plan, "seed": prov["seed"], "provenance": prov, "scored_prefix": prefix,
             "plan_count": plan["per_task"][task][SPLIT], "length_window": prov["length_window"],
             "pools": prov["sha256"]["pools"],
@@ -220,6 +222,62 @@ def pick_inversion(task: str, clause: str, instance_id: str,
     return BI.select(cands, instance_id), form
 
 
+PICK_KINDS = ("token_matched", "token_matched_no_twin", "form_only")
+
+
+def neutral_twin(ctx: Dict, tokenizer, built: Dict, clause: str, instance_id: str) -> Optional[Dict]:
+    """The Neutral-Clause Twin prompts of one id exactly as `deception_v2.realize` builds them
+    (`select_neutral` over the build's neutral pool, then clause surgery), or None when no neutral sentence
+    keeps the token count."""
+    try:
+        n = v2.select_neutral(tokenizer, [built["clean_prompt"], built["corrupt_prompt"]], clause,
+                              ctx["neutral_pool"], instance_id)
+    except ValueError:
+        return None
+    return {"neutral_id": n["id"],
+            **{f"{st}_prompt": replace_clause(built[f"{st}_prompt"], clause, n["text"]) for st in STREAMS}}
+
+
+def pick_inversion_r2a(ctx: Dict, tokenizer, built: Dict, clause: str, instance_id: str,
+                       pool_list: Sequence[Dict], pool_by_form) -> Tuple[Optional[Dict], str, Optional[str]]:
+    """(I clause or None, D's clause form, pick kind or None) under R2a."""
+    task = ctx["task"]
+    form = BI.clause_form(clause, task)
+    cands = pool_by_form.get((task, form), [])
+    if not cands:
+        return None, form, None
+    d = {"task": task, "pressure": clause, "instance_id": instance_id,
+         "clean_prompt": built["clean_prompt"], "corrupt_prompt": built["corrupt_prompt"]}
+    twin = neutral_twin(ctx, tokenizer, built, clause, instance_id)
+    if twin is not None:
+        fits = BI.candidates(tokenizer, d, twin, pool_list, BUILDER_MAX_LEN)
+        kind = "token_matched"
+    else:
+        n_clause = len(tokenizer.encode(" " + clause, add_special_tokens=False))
+        fits = [c for c in cands
+                if abs(len(tokenizer.encode(" " + c["text"], add_special_tokens=False)) - n_clause) <= 1
+                and token_fit(tokenizer, built, clause, c["text"], BUILDER_MAX_LEN)]
+        kind = "token_matched_no_twin"
+    if fits:
+        return BI.select(fits, instance_id), form, kind
+    return BI.select(cands, instance_id), form, "form_only"
+
+
+def attach_inversion(ctx: Dict, tokenizer, bundle: Dict, row: Dict, pool_list, pool_by_form) -> Dict:
+    """Add the R2a I arm to a bundle built with `with_i=False`; records I_clause and I_pick_kind."""
+    clause = bundle["clause"]["text"]
+    built = bundle["built"]
+    chosen, form, kind = pick_inversion_r2a(ctx, tokenizer, built, clause, row["instance_id"], pool_list,
+                                            pool_by_form)
+    bundle.update({"I_clause": chosen, "clause_form": form, "I_pick_kind": kind})
+    if chosen is not None:
+        bundle["arms"]["I"] = {
+            "clean": replace_clause(built["clean_prompt"], clause, chosen["text"]),
+            "corrupt": replace_clause(built["corrupt_prompt"], clause, chosen["text"]),
+            "pairs": bundle["arms"]["D"]["pairs"]}
+    return bundle
+
+
 def render(ctx: Dict, row: Dict) -> Tuple[Dict, Dict]:
     """The builder's D prompts of one instance (`build_deception_v2.render_pressure`)."""
     built, clause = B.render_pressure(ctx, row)
@@ -238,9 +296,10 @@ def listener_prompts(ctx: Dict, row: Dict, clause_text: str, sentence: str) -> D
                                 row["designation_polarity"], clause_text + " " + sentence)
 
 
-def build_arms(ctx: Dict, row: Dict, pool_by_form) -> Dict:
+def build_arms(ctx: Dict, row: Dict, pool_by_form, with_i: bool = True) -> Dict:
     """Every arm of one sampled id: {"P": {"prompt", "pair"}, "<arm>": {"clean", "corrupt", "pairs"}},
-    plus "I_clause" (the chosen pool entry or None) and "clause_form"."""
+    plus "I_clause" (the chosen pool entry or None) and "clause_form". With with_i the I arm is the
+    form-only pick; the pipeline builds with with_i=False and adds the R2a pick by `attach_inversion`."""
     built, clause = render(ctx, row)
     pairs = {st: tuple(ct.stream_words(built, st)) for st in STREAMS}
     arms = {"P": {"prompt": built["neutral_prompt"], "pair": (row["item_1"], row["item_2"])},
@@ -251,12 +310,16 @@ def build_arms(ctx: Dict, row: Dict, pool_by_form) -> Dict:
             assert lb["target"] == built["target"] and lb["distractor"] == built["distractor"]
             arms[f"L{k}_{pol}"] = {"clean": lb["clean_prompt"], "corrupt": lb["corrupt_prompt"],
                                    "pairs": pairs}
-    chosen, form = pick_inversion(ctx["task"], clause["text"], row["instance_id"], pool_by_form)
-    if chosen is not None:
-        arms["I"] = {"clean": replace_clause(built["clean_prompt"], clause["text"], chosen["text"]),
-                     "corrupt": replace_clause(built["corrupt_prompt"], clause["text"], chosen["text"]),
-                     "pairs": pairs}
-    return {"arms": arms, "built": built, "clause": clause, "I_clause": chosen, "clause_form": form}
+    out = {"arms": arms, "built": built, "clause": clause, "I_clause": None,
+           "clause_form": BI.clause_form(clause["text"], ctx["task"]), "I_pick_kind": None}
+    if with_i:
+        chosen, form = pick_inversion(ctx["task"], clause["text"], row["instance_id"], pool_by_form)
+        out.update({"I_clause": chosen, "clause_form": form, "I_pick_kind": "form_only" if chosen else None})
+        if chosen is not None:
+            arms["I"] = {"clean": replace_clause(built["clean_prompt"], clause["text"], chosen["text"]),
+                         "corrupt": replace_clause(built["corrupt_prompt"], clause["text"], chosen["text"]),
+                         "pairs": pairs}
+    return out
 
 
 def arm_lengths(tokenizer, arms: Dict) -> Dict[str, int]:
@@ -488,7 +551,8 @@ def _summ(values: Sequence[int]) -> Dict:
 
 def prepare_rows(ctx: Dict, rows: Sequence[Dict], tokenizer, pool_by_form, limit: int,
                  check_alignment: bool = True, visit: Optional[Callable[[Dict, Dict], None]] = None,
-                 keep: bool = True) -> Tuple[List[Tuple[Dict, Dict]], Dict]:
+                 keep: bool = True, pool_list: Optional[Sequence[Dict]] = None
+                 ) -> Tuple[List[Tuple[Dict, Dict]], Dict]:
     """[(row, arms bundle)] of the rows whose longest arm is within `limit`, and the drop counts.
     `visit(row, bundle)` sees every kept row; with keep=False the bundles are not retained (the build
     report streams, so the login node never holds every prompt at once)."""
@@ -496,7 +560,9 @@ def prepare_rows(ctx: Dict, rows: Sequence[Dict], tokenizer, pool_by_form, limit
     lengths = defaultdict(list)
     n_kept = 0
     for row in rows:
-        bundle = build_arms(ctx, row, pool_by_form)
+        bundle = build_arms(ctx, row, pool_by_form, with_i=False)
+        if pool_list is not None:      # the R2a I arm now (build); the score stage attaches it per live row
+            attach_inversion(ctx, tokenizer, bundle, row, pool_list, pool_by_form)
         lens = arm_lengths(tokenizer, bundle["arms"])
         bundle["lengths"] = lens
         if max(lens.values()) > limit:
@@ -522,12 +588,13 @@ def run_build(args, tokenizer) -> int:
         rows, srep = load_sample(args.out_root, task)
         t0 = time.time()
         i_cov, i_drop = Counter(), Counter()
-        fit_any, fit_chosen, anchor_pick = 0, 0, Counter()
+        kinds, kinds_sampled, kinds_by_clause, anchor_pick = Counter(), Counter(), defaultdict(Counter), Counter()
         n_anchor = 0
         example = []
+        pool_list = BI.load_pool(BI.POOL_PATH, style="directive")
 
         def visit(row, b):
-            nonlocal fit_any, fit_chosen, n_anchor
+            nonlocal n_anchor
             n_anchor += bool(row["anchor"])
             if args.show_example and not example:
                 example.append(b)
@@ -535,29 +602,17 @@ def run_build(args, tokenizer) -> int:
                 i_drop[row["pressure_id"]] += 1
                 return
             i_cov[row["pressure_id"]] += 1
-            cands = pool_by_form[(task, b["clause_form"])]
-            n_clause = len(tokenizer.encode(" " + b["clause"]["text"], add_special_tokens=False))
-            fits = [c for c in cands
-                    if abs(len(tokenizer.encode(" " + c["text"], add_special_tokens=False)) - n_clause) <= 1
-                    and token_fit(tokenizer, b["built"], b["clause"]["text"], c["text"], BUILDER_MAX_LEN)]
-            fit_any += bool(fits)
-            fit_chosen += any(c["id"] == b["I_clause"]["id"] for c in fits)
+            kinds[b["I_pick_kind"]] += 1
+            if not row["anchor"]:
+                kinds_sampled[b["I_pick_kind"]] += 1
+            kinds_by_clause[row["pressure_id"]][b["I_pick_kind"]] += 1
             if row["anchor"] and "stored_inversion" in row:
-                stored_id = row["stored_inversion"]["instructed_inversion_id"]
-                same = stored_id == b["I_clause"]["id"]
-                anchor_pick["agree"] += same
                 anchor_pick["n"] += 1
-                if fits:
-                    # the stored build's pick: select over the token fits (the twin half is not checked
-                    # here; for the stored rows the twin fits wherever D does, see build_inversion_v2)
-                    anchor_pick["token_pick_reproduces_stored"] += BI.select(fits, row["instance_id"])["id"] == \
-                        stored_id
-                    sets_equal = [c["id"] for c in fits] == [c["id"] for c in cands]
-                    anchor_pick["form_set_equals_token_set"] += sets_equal
-                    anchor_pick["agree_where_sets_equal"] += sets_equal and same
+                anchor_pick["agree"] += row["stored_inversion"]["instructed_inversion_id"] == b["I_clause"]["id"]
+                anchor_pick[b["I_pick_kind"]] += 1
 
         _, prep = prepare_rows(ctx, rows, tokenizer, pool_by_form, args.max_seq_length, visit=visit,
-                               keep=False)
+                               keep=False, pool_list=pool_list)
         n_kept = prep["n_kept"]
         n_sampled = n_kept - n_anchor
         n_i = sum(i_cov.values())
@@ -583,10 +638,11 @@ def run_build(args, tokenizer) -> int:
             "token_lengths": {k: _summ(v) for k, v in lengths.items()},
             "I_coverage": {"n_with_I": n_i, "n_without_I": sum(i_drop.values()),
                            "dropped_by_clause": dict(i_drop), "with_I_by_clause": dict(i_cov),
-                           "would_pass_token_match_any": fit_any,
-                           "chosen_clause_passes_token_match": fit_chosen,
-                           "token_match_note": "build_inversion_v2's standalone-count and token-count/D-"
-                                               "alignment checks, without the twin half",
+                           "pick_kind_counts": {k: kinds[k] for k in PICK_KINDS},
+                           "pick_kind_counts_sampled": {k: kinds_sampled[k] for k in PICK_KINDS},
+                           "pick_kind_by_clause": {c: dict(v) for c, v in sorted(kinds_by_clause.items())},
+                           "pick_rule": "R2a: build_inversion_v2 candidates + select against the id's "
+                                        "Neutral-Clause Twin where a clause fits, else the form-only pick",
                            "anchors_vs_stored_inversion_pick": dict(anchor_pick)},
             "forwards_expected": fwd,
             "forwards_note": "P for every row; the pair arms only for prior-kept rows (expected at the "
@@ -599,8 +655,8 @@ def run_build(args, tokenizer) -> int:
         print(f"  prompts {report['prompt_counts']}")
         for k, s in report["token_lengths"].items():
             print(f"  {k:10s} tokens min {s['min']} median {s['median']} p99 {s['p99']} max {s['max']}")
-        print(f"  I coverage {n_i}/{n_kept}; dropped by clause {dict(i_drop)}; token match any "
-              f"{fit_any}, chosen {fit_chosen}; anchor picks {dict(anchor_pick)}")
+        print(f"  I coverage {n_i}/{n_kept}; dropped by clause {dict(i_drop)}; pick kinds "
+              f"{dict(kinds)} (sampled {dict(kinds_sampled)}); anchor picks {dict(anchor_pick)}")
         print(f"  forwards expected {fwd}")
         if example:
             b = example[0]
@@ -630,13 +686,14 @@ def make_score_fn(model, tokenizer, device) -> Callable:
 
 
 def score_chunk(rows_bundles: Sequence[Tuple[Dict, Dict]], score_fn, max_len: int, batch_size: int,
-                align: Optional[Callable[[Dict], None]] = None) -> Tuple[List[Dict], int]:
+                align: Optional[Callable[[Dict], None]] = None,
+                live_hook: Optional[Callable[[Dict, Dict], None]] = None) -> Tuple[List[Dict], int]:
     """Score one chunk: P on every row, then every pair arm on prior-kept rows and anchors, then the
-    anchor controls. `align(bundle)` asserts a live row's arms aligned before they are scored. Returns
-    (one record per row, forwards)."""
+    anchor controls. `live_hook(row, bundle)` runs on each live row first (the score stage attaches the
+    R2a I arm there); `align(bundle)` then asserts its arms aligned. Returns (one record per row,
+    forwards)."""
     recs = [{"instance_id": r["instance_id"], "anchor": r["anchor"], "pressure_id": r["pressure_id"],
-             "designation_polarity": r["designation_polarity"], "cell": r["cell"],
-             "I_clause_id": b["I_clause"]["id"] if b["I_clause"] else None, "arms": {}}
+             "designation_polarity": r["designation_polarity"], "cell": r["cell"], "arms": {}}
             for r, b in rows_bundles]
     fwd = 0
     p = score_fn([b["arms"]["P"]["prompt"] for _, b in rows_bundles],
@@ -647,9 +704,15 @@ def score_chunk(rows_bundles: Sequence[Tuple[Dict, Dict]], score_fn, max_len: in
         rec["prior_kept"] = abs(sc["margin"]) < ct.PRIOR_EPS
         rec["arms"]["P"] = sc
     live = [k for k, rec in enumerate(recs) if rec["prior_kept"] or rec["anchor"]]
-    if align is not None:
-        for k in live:
-            align(rows_bundles[k][1])
+    for k in live:
+        row, bundle = rows_bundles[k]
+        if live_hook is not None:
+            live_hook(row, bundle)
+        if align is not None:
+            align(bundle)
+    for rec, (_, b) in zip(recs, rows_bundles):
+        rec["I_clause_id"] = b["I_clause"]["id"] if b.get("I_clause") else None
+        rec["I_pick_kind"] = b.get("I_pick_kind")
     prompts, pairs, where = [], [], []
     for k in live:
         arms = rows_bundles[k][1]["arms"]
@@ -717,8 +780,13 @@ def run_score(args, tokenizer, model_loader=None, score_fn=None) -> int:
     checked = [(task, load_task_context(task, args.data_dir), load_sample(args.out_root, task)[1])
                for task in args.tasks]
 
+    pool_list = BI.load_pool(BI.POOL_PATH, style="directive")
+
     def align(bundle):
         assert_arms_aligned(tokenizer, bundle["built"], bundle["arms"], args.max_seq_length)
+        if "I" in bundle["arms"]:
+            n = len(tokenizer.encode(bundle["arms"]["I"]["clean"], add_special_tokens=False))
+            assert n <= args.max_seq_length, f"I arm is {n} tokens > {args.max_seq_length}"
 
     device = None
     if score_fn is None:
@@ -754,8 +822,10 @@ def run_score(args, tokenizer, model_loader=None, score_fn=None) -> int:
             if os.path.exists(path):
                 continue
             t0 = time.time()
-            recs, fwd = score_chunk(kept[k:k + args.chunk_size], score_fn, args.max_seq_length,
-                                    args.batch_size, align=align)
+            recs, fwd = score_chunk(
+                kept[k:k + args.chunk_size], score_fn, args.max_seq_length, args.batch_size, align=align,
+                live_hook=lambda row, b, ctx=ctx: attach_inversion(ctx, tokenizer, b, row, pool_list,
+                                                                   pool_by_form))
             dt = time.time() - t0
             write_json(os.path.join(chunk_dir, f"meta_{stem}.json"),
                        {"chunk": stem, "n": len(recs), "forwards": fwd, "seconds": dt,
@@ -783,6 +853,8 @@ def run_score(args, tokenizer, model_loader=None, score_fn=None) -> int:
             "n_ids": len(all_recs), "length_dropped": prep["n_dropped"],
             "length_dropped_by_clause": prep["dropped_by_clause"],
             "n_prior_kept": sum(r["prior_kept"] for r in all_recs),
+            "I_pick_kinds": dict(Counter(str(r.get("I_pick_kind")) for r in all_recs
+                                         if r["prior_kept"] or r["anchor"])),
             "forwards": sum(m["forwards"] for m in metas), "seconds": sum(m["seconds"] for m in metas),
             "seconds_wall_this_job": round(time.time() - t_task, 1),
             "sample": {"path": _rel(os.path.join(out, "sample.jsonl")), "sha256": srep["sample_sha256"]},
@@ -981,6 +1053,32 @@ def inversion_anchor(recs: Sequence[Dict], sample_by_id: Dict[str, Dict]) -> Dic
             "kept_agreement": agree_kept}
 
 
+#: The stored `<task>_inversion` kept counts of 1,000 (R1; spec R2a's second anchor).
+STORED_I_KEPT = {"far_v2": 210, "sdr_v2": 788, "ser_v2": 249}
+
+
+def is_token_matched(rec: Dict) -> bool:
+    return str(rec.get("I_pick_kind") or "").startswith("token_matched")
+
+
+def inversion_kept_anchor(task: str, recs: Sequence[Dict], sample_by_id: Dict[str, Dict]) -> Dict:
+    """R2a second anchor: R1 compliance of the token-matched I arm on the anchors against the stored
+    `<task>_inversion` kept count, with the per-id kept agreement on the anchors whose pick equals the
+    stored pick."""
+    rows = [r for r in recs if r["anchor"] and "I" in r["arms"] and is_token_matched(r)]
+    k = sum(comply_primary(r["arms"]["I"]) for r in rows)
+    stored = [sample_by_id[r["instance_id"]].get("stored_inversion") for r in recs if r["anchor"]]
+    stored_kept = sum(bool(s and s["kept"]) for s in stored)
+    same = [r for r in rows if sample_by_id[r["instance_id"]].get("stored_inversion") and
+            r["I_clause_id"] == sample_by_id[r["instance_id"]]["stored_inversion"]["instructed_inversion_id"]]
+    agree = sum(comply_primary(r["arms"]["I"]) == bool(sample_by_id[r["instance_id"]]["stored_inversion"]["kept"])
+                for r in same)
+    return {"n_anchor_token_matched": len(rows), "k_compliant": k,
+            "stored_kept_from_filter_report": stored_kept, "stored_kept_expected": STORED_I_KEPT.get(task),
+            "difference": k - stored_kept, "n_same_pick": len(same), "per_id_kept_agreement": agree,
+            "kinds_on_anchors": dict(Counter(str(r.get("I_pick_kind")) for r in recs if r["anchor"]))}
+
+
 def compliance_table(recs: Sequence[Dict], arms: Sequence[str]) -> Dict:
     out = {}
     for arm in arms:
@@ -1004,7 +1102,8 @@ def read_task(task: str, recs: Sequence[Dict], sample: Sequence[Dict], *, n_boot
            "dropped_D_ids_rescored": sum(not comply_primary(r["arms"]["D"]) for r in pool if "D" in r["arms"]),
            "anchor": {"D": anchor, "D_at120": anchor_120, "P": prior_check(recs, by_id, "P"),
                       "P_at120": prior_check(recs, by_id, "P_at120"),
-                      "I_same_pick": inversion_anchor(recs, by_id)},
+                      "I_same_pick": inversion_anchor(recs, by_id),
+                      "I_kept": inversion_kept_anchor(task, recs, by_id)},
            "compliance": compliance_table(pool, arms),
            "compliance_anchor_descriptive": compliance_table([r for r in recs if r["anchor"]], arms)}
     cells = defaultdict(lambda: {"n_scored": 0, "n_prior_kept": 0})
@@ -1014,12 +1113,15 @@ def read_task(task: str, recs: Sequence[Dict], sample: Sequence[Dict], *, n_boot
         cells[r["cell"]]["n_scored"] += 1
         cells[r["cell"]]["n_prior_kept"] += bool(r["prior_kept"])
     out["cells"] = dict(sorted(cells.items()))
+    out["I_pick_kinds_verdict_pool"] = dict(Counter(str(r.get("I_pick_kind")) for r in pool))
     out["cells_below_floor"] = sorted(c for c, v in cells.items() if v["n_prior_kept"] < FLOOR_PER_CELL)
     comps = {}
     for d in DEFINITIONS:
         comps[d] = {f"L{k}": compare(pool, f"L{k}_visible", f"L{k}_hidden", d, n_boot=n_boot, seed=seed)
                     for k in PHRASINGS}
         comps[d]["I_minus_D"] = compare(pool, "I", "D", d, n_boot=n_boot, seed=seed)
+        comps[d]["I_minus_D_token_matched"] = compare([r for r in pool if is_token_matched(r)], "I", "D", d,
+                                                      n_boot=n_boot, seed=seed)
         comps[d]["L1_hidden_minus_D"] = compare(pool, "L1_hidden", "D", d, n_boot=n_boot, seed=seed)
     out["comparisons"] = comps
     read = anchor["pass"]
@@ -1072,7 +1174,8 @@ def readings_markdown(result: Dict) -> str:
           "| task | definition | comparison | matched n | clusters | a k/n (rate) | b k/n (rate) | a - b (pts) | "
           "95% interval (pts) |", "|---|---|---|---|---|---|---|---|---|"]
     names = {"L1": "L1 visible - hidden (visibility)", "L2": "L2 visible - hidden (belief)",
-             "L3": "L3 visible - hidden (consequence)", "I_minus_D": "I - D (honesty override)",
+             "L3": "L3 visible - hidden (consequence)", "I_minus_D": "I - D (honesty override, decides)",
+             "I_minus_D_token_matched": "I - D, token-matched I rows only (R2a, descriptive)",
              "L1_hidden_minus_D": "L1 hidden - D (descriptive)"}
     for task, t in result["tasks"].items():
         for d, comps in t["comparisons"].items():
@@ -1105,6 +1208,15 @@ def readings_markdown(result: Dict) -> str:
                          f"{_fmt(s['exact_share'], True)} | {_fmt(s['within_2ulp_share'], True)} | "
                          f"{_fmt(s['two_ulp_tail_share'], True)} | {s['sign_flips']}/{s['n']} | "
                          f"{s['own_field_gap']:.3f} |")
+    L += ["", "Second anchor (R2a): R1 compliance of the token-matched I arm on the anchors against the stored "
+              "`<task>_inversion` kept count.", "",
+          "| task | anchors with token-matched I | compliant | stored kept | difference | same pick | "
+          "per-id kept agreement |", "|---|---|---|---|---|---|---|"]
+    for task, t in result["tasks"].items():
+        a = t["anchor"]["I_kept"]
+        L.append(f"| {task} | {a['n_anchor_token_matched']} | {a['k_compliant']} | "
+                 f"{a['stored_kept_from_filter_report']} (expected {a['stored_kept_expected']}) | "
+                 f"{a['difference']:+d} | {a['n_same_pick']} | {a['per_id_kept_agreement']}/{a['n_same_pick']} |")
     L += ["", "| task | prior arm | n | signed mean | mean abs | exact | prior-kept on rescore |",
           "|---|---|---|---|---|---|---|"]
     for task, t in result["tasks"].items():
