@@ -71,7 +71,9 @@ user's confirmation before launch. Follow
      per gate), paired two-condition loaders and a four-pass objective; clause-twin corruption exists only on
      Codex's branch. Reuse Codex's reviewed plan-a3 Task 5 constrained-mask driver rather than building a second
      one, after the user has coordinated with Codex (section 9). Positive control: the same partition on IOI
-     against GT from `tasks/`. Run FAR with 3 seeds first; SER and SDR are deferred. Premise test in phase 0
+     against GP from `tasks/` (GT does not support Llama). A visible-D training dataset paired with its own neutral
+     twin is required code, because D1 produces scored prompts, not a dataset. Run FAR with 3 seeds first; SER and
+     SDR are deferred. Premise test in phase 0
      (about 1 GPU-h): node-level attribution patching of the D effect and the visible-D effect (and the
      operator-turn I effect) with split-half reliability; U1 is built only if at least one component's difference
      clears the split-half noise. Fallback: if D1 is null, the partition is predicted empty by construction and U1
@@ -156,7 +158,9 @@ user's confirmation before launch. Follow
    phase 1 (D2 up to 16, D3 up to 12, U1 up to 21 with at most 6 before its positive control passes) and 5 in
    reserve; no limit on concurrent GPU jobs, so parallelise whenever the queue allows (the ledger cap is set to 99
    because the tool needs a number). Check the Bridges-2 SU balance before reserving there; it was near 500 SUs on
-   1 Nov and has not been verified since. Use Bridges-2 (allocation cis260361p, `--gpus-per-node=h100-80:1`,
+   1 Nov and has not been verified since. Budget rule: the phase upper bounds add to about 63 GPU-h, so the cap of
+   55 binds; if both D3 and the full U1 run qualify, run D3, hold D2 at 8 GPU-h, then run U1 on FAR only, and if
+   the full U1 run would cross 55, defer it with its spec and pilot already done. Use Bridges-2 (allocation cis260361p, `--gpus-per-node=h100-80:1`,
    `--export=ALL,DC_CLUSTER=...`, model load about 460 s) first so Delta's fair share is spared; it goes offline
    about 2026-11-09, after which Delta only (beto and bimc fair share is poor; bgrb or bjhz start sooner). Run
    8B mask training on H100 or H200 only. OpenRouter: $20 for the D2 judge and classifier labels. Usage: pause at
@@ -195,12 +199,14 @@ user's confirmation before launch. Follow
       random directions. **Fail:** otherwise, with the refusal direction's share reported.
     - **D4 rules.** (a) and (b) report their numbers; (c) replicates F-rte-006's rule (query share minus key share
       against 0.15) on SDR. (d) **P1, query side:** Q-composition scores of each layer 7 to 16 head's OV into the
-      quartet's W_Q must rank senders consistently with the F-rte-006 path-patching ranking, Spearman at least 0.5
-      over the top 20, with head.15.8 and head.14.4 above the 95th percentile of random layer-matched heads. **P2,
+      quartet's W_Q are computed for every layer 7 to 16 head; head.15.8 and head.14.4 must each rank in the top 5
+      percent of those scores, and the layer 14 and layer 15 sums must exceed every other layer from 7 to 16 (the B1
+      readings store query-side path effects only as layer totals plus those two heads, so no full ranking exists
+      for a rank correlation). **P2,
       copy:** at least 2 of the 4 quartet heads reach an OV copy score of at least 0.5 against the item unembeddings
       with the final-norm-scaled W_U. A P1 fail means the routing is activation-dependent, which supports the
       distributed parallel route; neither outcome bears on specificity.
-    - **U1 done** when 3 seeds of the FAR partition and the IOI-against-GT positive control exist. **Pass:** on the
+    - **U1 done** when 3 seeds of the FAR partition and the IOI-against-GP positive control exist. **Pass:** on the
       held-out sample, every seed's D-only set removes at least 50 percent of the D effect and under 25 percent of
       the visible-D effect, moves H, F and IOI accuracy by under 5 points each, has Jaccard at least 0.5 across
       seeds, and beats 20 layer-matched random sets of equal size; the positive control recovers task-specific
