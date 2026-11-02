@@ -52,6 +52,7 @@ def test_a_registered_analysis_writes_its_json_in_its_own_subdirectory(
 
     assert written_files(out) == sorted(
         [os.path.join(*CELL, name) for name in INTAKE_FILES]
+        + [os.path.join(*CELL, "run_manifest.json")]  # B1 ticket 1: a run's provenance
         + [os.path.join(*CELL, registered.SUBDIR, registered.CHECK_FILE)])
     check = read_json(out, *CELL, registered.SUBDIR, registered.CHECK_FILE)
     assert check["task"] == "sdr"

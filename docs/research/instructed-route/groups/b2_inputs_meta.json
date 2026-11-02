@@ -1,0 +1,377 @@
+{
+ "written_by": "scripts/instructed_route_b2_inputs.py (B2 ticket T3)",
+ "procedure": "component_analysis.sampling.draw_sample(test split, n=100, seed=s, default factors, exclude_ids=...), as analyze_components --seed s --exclude-ids FILE: seed 0 no exclusion, seed 1 excludes seed 0, seed 2 excludes seeds 0 and 1",
+ "wish": {
+  "dataset": "sdr_v2_inversion_reported",
+  "n": 618
+ },
+ "p2": {
+  "layer": 17,
+  "quartet": [
+   24,
+   25,
+   26,
+   27
+  ],
+  "quartet_kv_group": 6,
+  "null_seeds": [
+   20261101,
+   20261102,
+   20261103,
+   20261104,
+   20261105,
+   20261106,
+   20261107,
+   20261108,
+   20261109,
+   20261110,
+   20261111,
+   20261112,
+   20261113,
+   20261114,
+   20261115,
+   20261116,
+   20261117,
+   20261118,
+   20261119,
+   20261120
+  ],
+  "null_rule": "random.Random(seed).sample(heads 0..31 minus 24..27, 4), sorted"
+ },
+ "p3": {
+  "mlp_layers": [
+   11,
+   13,
+   16,
+   30,
+   31,
+   0
+  ]
+ },
+ "tasks": {
+  "far": {
+   "split": "test",
+   "population": 1000,
+   "seed0_source": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_analyses/mechanism-analysis-p1/s1/U__leaf/far_v2/sample.json",
+   "seed0_sha256": "1bd1e83c75015572e1eef23579ea17e49df920f379fbdd964ad9c11fd4e18892",
+   "seed1_source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/instructed-route/docs/research/mechanism-analysis/phase1/groups/far_heldout_D_sample.json",
+   "seed1_sha256": "8d3550801ae1842067ca01b4a96d9e4ea9d5e9d0c234455509f2285bb82fdb66",
+   "seed0_redraw_matches": true,
+   "seed1_redraw_matches": true,
+   "seed2": {
+    "seed": 2,
+    "n": 100,
+    "excluded": "seed0 + seed1 ids",
+    "factors": [
+     "designation_polarity",
+     "item_polarity",
+     "template_variant"
+    ],
+    "strata": [
+     {
+      "key": {
+       "designation_polarity": "identity",
+       "item_polarity": "1",
+       "template_variant": "audit"
+      },
+      "available": 99,
+      "achieved": 13
+     },
+     {
+      "key": {
+       "designation_polarity": "identity",
+       "item_polarity": "1",
+       "template_variant": "lab"
+      },
+      "available": 99,
+      "achieved": 13
+     },
+     {
+      "key": {
+       "designation_polarity": "identity",
+       "item_polarity": "2",
+       "template_variant": "audit"
+      },
+      "available": 99,
+      "achieved": 13
+     },
+     {
+      "key": {
+       "designation_polarity": "identity",
+       "item_polarity": "2",
+       "template_variant": "lab"
+      },
+      "available": 99,
+      "achieved": 13
+     },
+     {
+      "key": {
+       "designation_polarity": "inversion",
+       "item_polarity": "1",
+       "template_variant": "audit"
+      },
+      "available": 101,
+      "achieved": 12
+     },
+     {
+      "key": {
+       "designation_polarity": "inversion",
+       "item_polarity": "1",
+       "template_variant": "lab"
+      },
+      "available": 101,
+      "achieved": 12
+     },
+     {
+      "key": {
+       "designation_polarity": "inversion",
+       "item_polarity": "2",
+       "template_variant": "audit"
+      },
+      "available": 101,
+      "achieved": 12
+     },
+     {
+      "key": {
+       "designation_polarity": "inversion",
+       "item_polarity": "2",
+       "template_variant": "lab"
+      },
+      "available": 101,
+      "achieved": 12
+     }
+    ],
+    "marginals": {
+     "designation_polarity": {
+      "identity": 52,
+      "inversion": 48
+     },
+     "item_polarity": {
+      "1": 50,
+      "2": 50
+     },
+     "template_variant": {
+      "audit": 50,
+      "lab": 50
+     }
+    }
+   }
+  },
+  "sdr": {
+   "split": "test",
+   "population": 1000,
+   "seed0_source": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_analyses/mechanism-analysis-p1/s1/U__leaf/sdr_v2/sample.json",
+   "seed0_sha256": "512060a83f6a7df8a16a504e46d046bbad4f71a0d72d1e7402505f3aba139e1c",
+   "seed1_source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/instructed-route/docs/research/mechanism-analysis/phase1/groups/sdr_heldout_D_sample.json",
+   "seed1_sha256": "01d423917c6aff467dc1ceae84ec27e7da151ca724173a40bbdd82f52e91bea9",
+   "seed0_redraw_matches": true,
+   "seed1_redraw_matches": true,
+   "seed2": {
+    "seed": 2,
+    "n": 100,
+    "excluded": "seed0 + seed1 ids",
+    "factors": [
+     "designation_polarity",
+     "item_polarity",
+     "template_variant"
+    ],
+    "strata": [
+     {
+      "key": {
+       "designation_polarity": "identity",
+       "item_polarity": "1",
+       "template_variant": "audit"
+      },
+      "available": 99,
+      "achieved": 13
+     },
+     {
+      "key": {
+       "designation_polarity": "identity",
+       "item_polarity": "1",
+       "template_variant": "lab"
+      },
+      "available": 99,
+      "achieved": 13
+     },
+     {
+      "key": {
+       "designation_polarity": "identity",
+       "item_polarity": "2",
+       "template_variant": "audit"
+      },
+      "available": 99,
+      "achieved": 13
+     },
+     {
+      "key": {
+       "designation_polarity": "identity",
+       "item_polarity": "2",
+       "template_variant": "lab"
+      },
+      "available": 99,
+      "achieved": 13
+     },
+     {
+      "key": {
+       "designation_polarity": "inversion",
+       "item_polarity": "1",
+       "template_variant": "audit"
+      },
+      "available": 101,
+      "achieved": 12
+     },
+     {
+      "key": {
+       "designation_polarity": "inversion",
+       "item_polarity": "1",
+       "template_variant": "lab"
+      },
+      "available": 101,
+      "achieved": 12
+     },
+     {
+      "key": {
+       "designation_polarity": "inversion",
+       "item_polarity": "2",
+       "template_variant": "audit"
+      },
+      "available": 101,
+      "achieved": 12
+     },
+     {
+      "key": {
+       "designation_polarity": "inversion",
+       "item_polarity": "2",
+       "template_variant": "lab"
+      },
+      "available": 101,
+      "achieved": 12
+     }
+    ],
+    "marginals": {
+     "designation_polarity": {
+      "identity": 52,
+      "inversion": 48
+     },
+     "item_polarity": {
+      "1": 50,
+      "2": 50
+     },
+     "template_variant": {
+      "audit": 50,
+      "lab": 50
+     }
+    }
+   }
+  },
+  "ser": {
+   "split": "test",
+   "population": 1000,
+   "seed0_source": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_analyses/mechanism-analysis-p1/s1/U__leaf/ser_v2/sample.json",
+   "seed0_sha256": "459c2d05d484d621185a783f977e71543014b6dba1a8aa277f8a7a0cffad79c0",
+   "seed1_source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/instructed-route/docs/research/mechanism-analysis/phase1/groups/ser_heldout_D_sample.json",
+   "seed1_sha256": "6e70de157f53bba73abd91687afe7a4b93378ebe1acf80a5150dfe31bd2213ff",
+   "seed0_redraw_matches": true,
+   "seed1_redraw_matches": true,
+   "seed2": {
+    "seed": 2,
+    "n": 100,
+    "excluded": "seed0 + seed1 ids",
+    "factors": [
+     "designation_polarity",
+     "item_polarity",
+     "template_variant"
+    ],
+    "strata": [
+     {
+      "key": {
+       "designation_polarity": "identity",
+       "item_polarity": "1",
+       "template_variant": "audit"
+      },
+      "available": 99,
+      "achieved": 13
+     },
+     {
+      "key": {
+       "designation_polarity": "identity",
+       "item_polarity": "1",
+       "template_variant": "lab"
+      },
+      "available": 99,
+      "achieved": 13
+     },
+     {
+      "key": {
+       "designation_polarity": "identity",
+       "item_polarity": "2",
+       "template_variant": "audit"
+      },
+      "available": 99,
+      "achieved": 13
+     },
+     {
+      "key": {
+       "designation_polarity": "identity",
+       "item_polarity": "2",
+       "template_variant": "lab"
+      },
+      "available": 99,
+      "achieved": 13
+     },
+     {
+      "key": {
+       "designation_polarity": "inversion",
+       "item_polarity": "1",
+       "template_variant": "audit"
+      },
+      "available": 101,
+      "achieved": 12
+     },
+     {
+      "key": {
+       "designation_polarity": "inversion",
+       "item_polarity": "1",
+       "template_variant": "lab"
+      },
+      "available": 101,
+      "achieved": 12
+     },
+     {
+      "key": {
+       "designation_polarity": "inversion",
+       "item_polarity": "2",
+       "template_variant": "audit"
+      },
+      "available": 101,
+      "achieved": 12
+     },
+     {
+      "key": {
+       "designation_polarity": "inversion",
+       "item_polarity": "2",
+       "template_variant": "lab"
+      },
+      "available": 101,
+      "achieved": 12
+     }
+    ],
+    "marginals": {
+     "designation_polarity": {
+      "identity": 52,
+      "inversion": 48
+     },
+     "item_polarity": {
+      "1": 50,
+      "2": 50
+     },
+     "template_variant": {
+      "audit": 50,
+      "lab": 50
+     }
+    }
+   }
+  }
+ }
+}

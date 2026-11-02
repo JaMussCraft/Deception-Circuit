@@ -60,6 +60,8 @@ ANALYSES: List[str] = [
     "component_analysis.knockout",                    # ticket 07
 
     "component_analysis.path_patching",   # ticket 08
+
+    "component_analysis.route_closure",   # instructed-route B1 ticket 4
 ]
 
 #: The five names a module must expose to be an analysis.

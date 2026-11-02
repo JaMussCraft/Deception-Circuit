@@ -35,8 +35,9 @@ HF_WIKITEXT_DIRS=("hub/datasets--Salesforce--wikitext" "datasets/Salesforce___wi
 # Suite output roots that `fetch` brings back whole (ticket 06 writes its suites under the second).
 FETCH_SUITE_ROOTS=("outputs/_suites" "outputs/_launch_mechanism_v2/evals")
 # Analysis cells under outputs/_analyses that `fetch` brings back (git-ignored, so a fetch is their only way
-# to Delta). Only these: the v1 cells of record in the same directory are never touched.
-FETCH_ANALYSIS_GLOBS=("mechanism-analysis-*")
+# to Delta). Only these: the v1 cells of record in the same directory are never touched. instructed-route-b1*
+# holds the B1 loop-closure cells (docs/research/instructed-route/jobs/B1-*.batch).
+FETCH_ANALYSIS_GLOBS=("mechanism-analysis-*" "instructed-route-b1*")
 
 usage() {
     cat >&2 <<'EOF'

@@ -1,0 +1,159 @@
+{
+ "description": "Golden R-cls inputs and outputs for ticket T4 of instructed-route B2: the seed-0 sweep entries (mean_drop, standard_error, clean_run.mean_logit_difference) of S1 (D), S5 (H) and S6 (F), selection sample n = 100, item-swap at all positions, U binding, H100 job 49825318, and the class, d, sig, m_HF and U_HF of docs/research/mechanism-analysis/phase1/rcls.csv for the same rows.",
+ "extracted_by": "CPU on the Delta login node, impl-B2-t4, 2026-11-01",
+ "expected_source": "docs/research/mechanism-analysis/phase1/rcls.csv",
+ "entries": [
+  {
+   "task": "ser",
+   "label": "mlp.11.0",
+   "inputs": {
+    "D": {
+     "drop": 0.561760663986206,
+     "se": 0.06711974231027479,
+     "clean": 2.3547460556030275,
+     "n": 100,
+     "source": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_analyses/mechanism-analysis-p1/s1/U__leaf/ser_v2/knockout/sweep.json"
+    },
+    "H": {
+     "drop": 0.21752227783203126,
+     "se": 0.09702232382393917,
+     "clean": 3.7086935234069824,
+     "n": 100,
+     "source": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_analyses/mechanism-analysis-p1/s5/U__leaf/ser_v2/knockout/sweep.json"
+    },
+    "F": {
+     "drop": 0.13277920722961425,
+     "se": 0.072779858991795,
+     "clean": 3.5584253787994387,
+     "n": 100,
+     "source": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_analyses/mechanism-analysis-p1/s6/U__leaf/ser_v2/knockout/sweep.json"
+    }
+   },
+   "expected": {
+    "class": "deception-leaning",
+    "d_D": 0.23856528505463176,
+    "d_H": 0.05865199603557561,
+    "d_F": 0.03731403446611322,
+    "sig_D": 1,
+    "sig_H": 1,
+    "sig_F": 0,
+    "m_HF": 0.05865199603557561,
+    "U_HF": 0.10992712931221997
+   }
+  },
+  {
+   "task": "ser",
+   "label": "mlp.13.0",
+   "inputs": {
+    "D": {
+     "drop": 0.47888916015625,
+     "se": 0.09458366534061892,
+     "clean": 2.3547460556030275,
+     "n": 100,
+     "source": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_analyses/mechanism-analysis-p1/s1/U__leaf/ser_v2/knockout/sweep.json"
+    },
+    "H": {
+     "drop": 0.024403743743896485,
+     "se": 0.12795570570953654,
+     "clean": 3.7086935234069824,
+     "n": 100,
+     "source": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_analyses/mechanism-analysis-p1/s5/U__leaf/ser_v2/knockout/sweep.json"
+    },
+    "F": {
+     "drop": 0.01719099998474121,
+     "se": 0.0925782265109139,
+     "clean": 3.5584253787994387,
+     "n": 100,
+     "source": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_analyses/mechanism-analysis-p1/s6/U__leaf/ser_v2/knockout/sweep.json"
+    }
+   },
+   "expected": {
+    "class": "deception-leaning",
+    "d_D": 0.20337189185082258,
+    "d_H": 0.006580145700871514,
+    "d_F": 0.0048310694070367735,
+    "sig_D": 1,
+    "sig_H": 0,
+    "sig_F": 0,
+    "m_HF": 0.006580145700871514,
+    "U_HF": 0.07420319991331586
+   }
+  },
+  {
+   "task": "ser",
+   "label": "mlp.16.0",
+   "inputs": {
+    "D": {
+     "drop": 0.41249237060546873,
+     "se": 0.05155216614132045,
+     "clean": 2.3547460556030275,
+     "n": 100,
+     "source": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_analyses/mechanism-analysis-p1/s1/U__leaf/ser_v2/knockout/sweep.json"
+    },
+    "H": {
+     "drop": 0.13447269439697265,
+     "se": 0.07555663516335273,
+     "clean": 3.7086935234069824,
+     "n": 100,
+     "source": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_analyses/mechanism-analysis-p1/s5/U__leaf/ser_v2/knockout/sweep.json"
+    },
+    "F": {
+     "drop": 0.1544948101043701,
+     "se": 0.06620306848747332,
+     "clean": 3.5584253787994387,
+     "n": 100,
+     "source": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_analyses/mechanism-analysis-p1/s6/U__leaf/ser_v2/knockout/sweep.json"
+    }
+   },
+   "expected": {
+    "class": "deception-leaning",
+    "d_D": 0.17517488547181512,
+    "d_H": 0.03625877780093288,
+    "d_F": 0.04341662214552169,
+    "sig_D": 1,
+    "sig_H": 0,
+    "sig_F": 1,
+    "m_HF": 0.04341662214552169,
+    "U_HF": 0.07988163136238664
+   }
+  },
+  {
+   "task": "far",
+   "label": "mlp.13.0",
+   "inputs": {
+    "D": {
+     "drop": 0.1696484375,
+     "se": 0.0558347470010197,
+     "clean": 2.5491507911682127,
+     "n": 100,
+     "source": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_analyses/mechanism-analysis-p1/s1/U__leaf/far_v2/knockout/sweep.json"
+    },
+    "H": {
+     "drop": 0.10764527320861816,
+     "se": 0.10626531435373816,
+     "clean": 7.181252937316895,
+     "n": 100,
+     "source": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_analyses/mechanism-analysis-p1/s5/U__leaf/far_v2/knockout/sweep.json"
+    },
+    "F": {
+     "drop": -0.05242850303649902,
+     "se": 0.10372315606585385,
+     "clean": 5.8179177570343015,
+     "n": 100,
+     "source": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_analyses/mechanism-analysis-p1/s6/U__leaf/far_v2/knockout/sweep.json"
+    }
+   },
+   "expected": {
+    "class": "none",
+    "d_D": 0.06655096202537877,
+    "d_H": 0.014989762113690047,
+    "d_F": -0.009011557953549448,
+    "sig_D": 1,
+    "sig_H": 0,
+    "sig_F": 0,
+    "m_HF": 0.014989762113690047,
+    "U_HF": 0.04399305972085464
+   }
+  }
+ ]
+}

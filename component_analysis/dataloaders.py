@@ -78,8 +78,9 @@ V2_TASKS = ("far_v2", "sdr_v2", "ser_v2")
 MECHANISM_TASKS = ("far", "sdr", "ser") + V2_TASKS
 
 #: The record `condition`s whose prompts carry a Pressure Clause that the
-#: Neutral-Clause Twin replaces: D, and the instructed-inversion control I.
-TWINNED_CONDITIONS = ("deceptive", "inversion")
+#: Neutral-Clause Twin replaces: D, the instructed-inversion control I, and I's
+#: reported-wish pool (`inversion_reported`, instructed-route B2 ticket T2).
+TWINNED_CONDITIONS = ("deceptive", "inversion", "inversion_reported")
 #: What the twin split must say it is.
 NEUTRAL_TWIN_KIND = "neutral_clause"
 
@@ -274,8 +275,9 @@ def _honest_by_id(dataset_dir: str, tokenizer, *, split: str, task: Optional[str
 def neutral_twin_dir(dataset_dir: str, config: dict) -> str:
     """`<data_dir>/<task>_honest`, from the dataset's own task name.
 
-    Not `dataset_dir + "_honest"`: the I condition lives at
-    `<task>_inversion`, and its twin is the same `<task>_honest` D's is.
+    Not `dataset_dir + "_honest"`: the I conditions live at
+    `<task>_inversion` and `<task>_inversion_reported`, and their twin is the
+    same `<task>_honest` D's is.
     """
     return os.path.join(os.path.dirname(os.path.abspath(dataset_dir)),
                         f"{config['task']}_honest")

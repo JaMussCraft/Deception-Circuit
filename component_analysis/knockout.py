@@ -142,8 +142,19 @@ def resolve_counterfactual(value) -> str:
 _SEGMENT_NAME = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
 
 
+#: Joins the Segment names of a union, in the flag and in the column suffix.
+#: Not a Segment-name character, so a union's suffix can never equal a single
+#: Segment's.
+UNION_SEPARATOR = "+"
+
+
 def parse_positions(value) -> dict:
-    """`--knockout-positions`, parsed: `{"form", "segment"?, "exclude_readout"?, "text"}`.
+    """`--knockout-positions`, parsed: `{"form", "segment"?, "segments"?,
+    "exclude_readout"?, "text"}`.
+
+    Forms: `all`, `readout`, a Segment name, `after=<Segment>[,exclude=readout]`,
+    and the union `segments=<Segment>+<Segment>+...` (`"segments"` keeps the
+    names in the order given; one name is allowed, a repeated name is not).
 
     Wired as the flag's `type=`, so a malformed value is refused at parse time.
     Whether the named Segment exists is a property of the cell's segmentation
@@ -161,13 +172,28 @@ def parse_positions(value) -> dict:
         if _SEGMENT_NAME.fullmatch(segment) and rest in ([], ["exclude=readout"]):
             return {"form": "after", "segment": segment,
                     "exclude_readout": bool(rest), "text": text}
+    if text.startswith("segments="):
+        names = text[len("segments="):].split(UNION_SEPARATOR)
+        if all(_SEGMENT_NAME.fullmatch(name) for name in names):
+            if len(set(names)) != len(names):
+                raise UnsupportedScheme(
+                    f"--knockout-positions {text!r} names a Segment twice")
+            return {"form": "segments", "segments": names, "text": text}
     raise UnsupportedScheme(
         f"--knockout-positions {text!r} is not one of: all, readout, a Segment "
-        f"name, or after=<Segment>[,exclude=readout]")
+        f"name, after=<Segment>[,exclude=readout], or "
+        f"segments=<Segment>+<Segment>[+...]")
 
 
 def positions_slug(parsed: dict) -> str:
-    """The positions part of a column suffix; empty for every position."""
+    """The positions part of a column suffix; empty for every position.
+
+    A union `segments=a+b+c` writes `at_` and its names sorted and joined by
+    `+` (`at_a+b+c`): the same Segments in any order are the same mask and so
+    the same columns, `+` cannot occur in a Segment name so no union collides
+    with a single Segment's `at_<name>`, and a union of one Segment writes that
+    Segment's own columns, which it equals.
+    """
     form = parsed["form"]
     if form == "all":
         return ""
@@ -175,6 +201,8 @@ def positions_slug(parsed: dict) -> str:
         return "at_readout"
     if form == "segment":
         return f"at_{parsed['segment']}"
+    if form == "segments":
+        return "at_" + UNION_SEPARATOR.join(sorted(parsed["segments"]))
     return f"after_{parsed['segment']}" + ("_excl_readout"
                                            if parsed["exclude_readout"] else "")
 
@@ -241,6 +269,8 @@ def ablation_sentence(plan: KnockoutPlan) -> str:
                 "value it carried on the item-swap corrupt stream")
     where = {"all": "at every position", "readout": "at the Readout only",
              "segment": f"at the {plan.parsed_positions.get('segment')} Segment's tokens",
+             "segments": ("at the tokens of any of the Segments "
+                          + ", ".join(plan.parsed_positions.get("segments") or ())),
              "after": (f"at every token after the "
                        f"{plan.parsed_positions.get('segment')} Segment"
                        + (", the Readout excluded"
@@ -266,7 +296,9 @@ def position_mask(parsed: dict, ids, segmentations, readout, seq_len: int):
     clean prompt; the item-swap and twin streams are token-aligned with it).
     A Segment absent on a row is refused by name: a post-clause knockout on a
     prompt with no clause (the nopressure condition) is not a smaller
-    knockout, it is a different question.
+    knockout, it is a different question. A union (`segments=a+b`) is the
+    logical OR of its Segments' masks, and every one of its Segments must be
+    defined by the row's scheme and present on the row, for the same reason.
     """
     import torch
 
@@ -279,21 +311,23 @@ def position_mask(parsed: dict, ids, segmentations, readout, seq_len: int):
         if form == "readout":
             mask[row, readout[row]] = True
             continue
-        name = parsed["segment"]
+        names = parsed["segments"] if form == "segments" else [parsed["segment"]]
         segmentation = segmentations.get(one) if segmentations else None
         if segmentation is None:
             raise ValueError(f"instance {one} has no segmentation, so "
                              f"--knockout-positions {parsed['text']} cannot be placed")
-        if name not in segmentation.segments:
-            raise ValueError(f"instance {one} has no Segment {name!r}; its "
-                             f"Segments are {', '.join(segmentation.segments)}")
-        tokens = segmentation.segments[name].token_indices()
-        if not tokens:
-            raise ValueError(f"Segment {name!r} is absent on instance {one}, so "
-                             f"--knockout-positions {parsed['text']} has no tokens "
-                             f"there")
-        if form == "segment":
-            mask[row, tokens] = True
+        for name in names:
+            if name not in segmentation.segments:
+                raise ValueError(f"instance {one} has no Segment {name!r}; its "
+                                 f"Segments are {', '.join(segmentation.segments)}")
+            tokens = segmentation.segments[name].token_indices()
+            if not tokens:
+                raise ValueError(f"Segment {name!r} is absent on instance {one}, so "
+                                 f"--knockout-positions {parsed['text']} has no "
+                                 f"tokens there")
+            if form != "after":
+                mask[row, tokens] = True
+        if form != "after":
             continue
         last = readout[row] if not parsed["exclude_readout"] else readout[row] - 1
         start = max(tokens) + 1
@@ -1623,9 +1657,14 @@ def add_arguments(group) -> None:
                             "and I cells only).")
     group.add_argument("--knockout-positions", type=parse_positions,
                        default=parse_positions(POSITIONS),
-                       metavar="all|readout|SEGMENT|after=SEGMENT[,exclude=readout]",
+                       metavar="all|readout|SEGMENT|after=SEGMENT[,exclude=readout]"
+                               "|segments=SEGMENT+SEGMENT[+...]",
                        help="Where the knockout writes. 'after=pressure_clause,"
                             "exclude=readout' is the spec's post-clause range. "
+                            "'segments=a+b+c' writes at the union of those "
+                            "Segments' tokens (each must be present on every "
+                            "row); its columns take the suffix 'at_' plus the "
+                            "names sorted and joined by '+'. "
                             "Applies to every pass of the run.")
     group.add_argument("--knockout-singles", choices=["on", "off"], default="on",
                        help="Run the per-Component pass over the circuit's "

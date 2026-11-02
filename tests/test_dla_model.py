@@ -486,3 +486,123 @@ def test_a_differential_over_different_instances_is_refused(model, prompts,
 
     with pytest.raises(ValueError, match="same instances"):
         dla.paired_difference(left, right)
+
+
+# ==============================================================================
+# PER-TOKEN DIRECT ATTRIBUTION (B2 ticket T5)
+# ==============================================================================
+
+def answer_columns(answers):
+    """`[batch, 2]`: each row's Target id then its Distractor id."""
+    target, distractor = answers
+    return torch.stack([target, distractor], dim=1)
+
+
+def centred_model_logits(model, capture, token_ids):
+    """The model's own fp32 Readout logits, centred on the vocabulary mean,
+    gathered at each row's ids. The whole-vocabulary readout is the independent
+    reference the gathered-column path must reproduce."""
+    full = hooks.readout_logits(model, capture.residual[:, -1, :])
+    centred = full - full.mean(dim=-1, keepdim=True)
+    return torch.gather(centred, 1, token_ids)
+
+
+def test_per_token_columns_differ_by_exactly_the_logit_difference(
+        model, capture, answers):
+    """Target column minus Distractor column is the existing DLA number.
+
+    Centring subtracts the same amount from both columns, so the difference
+    must hold with and without it.
+    """
+    target, distractor = answers
+    expected = dla.component_logit_difference(
+        model, capture, ALL_KEYS, target=target, distractor=distractor)
+
+    for centre in (True, False):
+        tokens = dla.component_token_logits(model, capture, ALL_KEYS,
+                                            answer_columns(answers),
+                                            centre=centre)
+        assert tokens.shape == (BATCH, len(ALL_KEYS), 2)
+        assert torch.allclose(tokens[..., 0] - tokens[..., 1], expected,
+                              atol=1e-5)
+
+
+def test_per_token_attribution_over_every_sender_sums_to_the_centred_logit(
+        model, capture, answers):
+    """The completeness invariant, per token rather than per difference."""
+    token_ids = answer_columns(answers)
+
+    tokens = dla.component_token_logits(model, capture, ALL_KEYS, token_ids)
+
+    assert torch.allclose(tokens.sum(dim=1),
+                          centred_model_logits(model, capture, token_ids),
+                          atol=1e-4)
+
+
+def test_uncentred_attribution_is_the_full_vocab_readout_gathered(
+        model, capture, answers):
+    """`centre=False` is the raw fixed-scale readout at the listed ids."""
+    keys = [("head", 1, 2), ("mlp", 0, 0), hooks.EMBED_KEY]
+    token_ids = answer_columns(answers)
+
+    raw = dla.component_token_logits(model, capture, keys, token_ids,
+                                     centre=False)
+
+    full = dla.fixed_scale_readout(
+        model, dla.component_contributions(model, capture, keys),
+        capture.residual[:, -1, :])
+    expected = torch.gather(full, 2, token_ids.unsqueeze(1).expand(
+        -1, len(keys), -1))
+    assert torch.allclose(raw, expected, atol=1e-5)
+    centred = dla.component_token_logits(model, capture, keys, token_ids)
+    assert not torch.allclose(raw, centred, atol=1e-3)
+
+
+def test_one_list_of_ids_is_read_for_every_row(model, capture):
+    """A 1-D id list is the same ids on every row."""
+    keys = [("head", 0, 1), ("mlp", 1, 0)]
+    shared = torch.tensor([3, 50, 99])
+
+    once = dla.component_token_logits(model, capture, keys, shared)
+    per_row = dla.component_token_logits(model, capture, keys,
+                                         shared.expand(BATCH, -1))
+
+    assert once.shape == (BATCH, len(keys), 3)
+    assert torch.equal(once, per_row)
+
+
+def test_centring_cancels_a_shift_added_to_every_unembedding_row(
+        model, capture, answers):
+    """A constant vector added to every row of `lm_head` moves every logit by
+    the same amount, so the centred attribution must not move and the raw one
+    must. The model fixture is shared, so the shift is undone in `finally`."""
+    hf = model._model
+    weight = hf.lm_head.weight
+    assert weight.data_ptr() != hf.model.embed_tokens.weight.data_ptr(), \
+        "tied embeddings: shifting lm_head would also shift the embedding"
+    token_ids = answer_columns(answers)
+    before = dla.component_token_logits(model, capture, ALL_KEYS, token_ids)
+    raw_before = dla.component_token_logits(model, capture, ALL_KEYS, token_ids,
+                                            centre=False)
+    torch.manual_seed(2)
+    shift = torch.randn(weight.shape[1]) * 3.0
+    original = weight.detach().clone()
+
+    try:
+        with torch.no_grad():
+            weight.add_(shift)
+        after = dla.component_token_logits(model, capture, ALL_KEYS, token_ids)
+        raw_after = dla.component_token_logits(model, capture, ALL_KEYS,
+                                               token_ids, centre=False)
+    finally:
+        with torch.no_grad():
+            weight.copy_(original)
+
+    assert torch.allclose(after, before, atol=1e-4)
+    assert not torch.allclose(raw_after, raw_before, atol=1e-2)
+
+
+def test_per_token_attribution_refuses_a_receiver(model, capture):
+    with pytest.raises(ValueError, match="residual stream"):
+        dla.component_token_logits(model, capture, [("q", 0, 0)],
+                                   torch.tensor([1, 2]))

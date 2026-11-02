@@ -1,0 +1,120 @@
+{
+ "rule": "An MLP replicates when R-cls calls it deception-leaning on SER in both seeded runs and each run's SER D, H and F cells have a run_manifest.json with a 40-hex git_commit (B2 plan section 3). FAR and SDR rows are descriptive (R3).",
+ "replication_runs": [
+  "seed1",
+  "seed2"
+ ],
+ "baseline_run": "seed0",
+ "verdicts": [
+  {
+   "label": "mlp.11.0",
+   "status": "fails",
+   "classes": {
+    "seed1": "none",
+    "seed2": "deception-leaning"
+   },
+   "missing": [],
+   "text": "mlp.11.0 does not meet the rule on SER: seed1 class none"
+  },
+  {
+   "label": "mlp.13.0",
+   "status": "replicates",
+   "classes": {
+    "seed1": "deception-leaning",
+    "seed2": "deception-leaning"
+   },
+   "missing": [],
+   "text": "mlp.13.0 is deception-leaning on SER in seed1 and seed2, each with provenance"
+  },
+  {
+   "label": "mlp.16.0",
+   "status": "fails",
+   "classes": {
+    "seed1": "none",
+    "seed2": "none"
+   },
+   "missing": [],
+   "text": "mlp.16.0 does not meet the rule on SER: seed1 class none; seed2 class none"
+  }
+ ],
+ "summary": "replicates: mlp.13.0; fails: mlp.11.0, mlp.16.0",
+ "problems": {
+  "seed0/ser": [],
+  "seed1/far": [],
+  "seed1/sdr": [],
+  "seed1/ser": [],
+  "seed2/far": [],
+  "seed2/sdr": [],
+  "seed2/ser": []
+ },
+ "baseline": {
+  "ok": true,
+  "tolerance": 0.01,
+  "reference": "docs/research/mechanism-analysis/phase1/rcls.csv",
+  "labels": {
+   "mlp.11.0": {
+    "ok": true,
+    "class": "deception-leaning",
+    "reference_class": "deception-leaning",
+    "d_diff": {
+     "D": 0.0,
+     "H": 0.0,
+     "F": 0.0
+    },
+    "d": {
+     "D": 0.23856528505463176,
+     "H": 0.05865199603557561,
+     "F": 0.03731403446611322
+    },
+    "reference_d": {
+     "D": 0.23856528505463176,
+     "H": 0.05865199603557561,
+     "F": 0.03731403446611322
+    }
+   },
+   "mlp.13.0": {
+    "ok": true,
+    "class": "deception-leaning",
+    "reference_class": "deception-leaning",
+    "d_diff": {
+     "D": 0.0,
+     "H": 0.0,
+     "F": 0.0
+    },
+    "d": {
+     "D": 0.20337189185082258,
+     "H": 0.006580145700871514,
+     "F": 0.0048310694070367735
+    },
+    "reference_d": {
+     "D": 0.20337189185082258,
+     "H": 0.006580145700871514,
+     "F": 0.0048310694070367735
+    }
+   },
+   "mlp.16.0": {
+    "ok": true,
+    "class": "deception-leaning",
+    "reference_class": "deception-leaning",
+    "d_diff": {
+     "D": 0.0,
+     "H": 0.0,
+     "F": 0.0
+    },
+    "d": {
+     "D": 0.17517488547181512,
+     "H": 0.03625877780093288,
+     "F": 0.04341662214552169
+    },
+    "reference_d": {
+     "D": 0.17517488547181512,
+     "H": 0.03625877780093288,
+     "F": 0.04341662214552169
+    }
+   }
+  },
+  "problems": []
+ },
+ "layout": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/instructed-route/docs/research/instructed-route/jobs/B2-p3-layout.json",
+ "rows_file": "docs/research/instructed-route/results/p3/p3_rcls.csv"
+}

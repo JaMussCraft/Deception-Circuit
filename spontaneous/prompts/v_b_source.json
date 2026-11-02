@@ -1,0 +1,16 @@
+{
+ "variant": "V-B",
+ "description": "Public helpful-only no-chain-of-thought system prompt of Greenblatt et al. (2024), alignment faking. Byte-verbatim copy in v_b_system.txt. The public file stubs its reasoning examples with the literal line '[STUBBED EXAMPLES FOR REASONING TRACE]', which is kept as published.",
+ "repo": "redwoodresearch/alignment_faking_public",
+ "commit": "8d98bb786893ac44d02f41eb222eabf302c0aab9",
+ "path": "model_organism_honly_prompts/prompt_atn_honly_no_cot.txt",
+ "url": "https://raw.githubusercontent.com/redwoodresearch/alignment_faking_public/8d98bb786893ac44d02f41eb222eabf302c0aab9/model_organism_honly_prompts/prompt_atn_honly_no_cot.txt",
+ "sha256": "4111398c44638e2ea6f0b9dcbac83c4b946eb491843df59dd28d502eb9830e69",
+ "fetched": "2026-11-01",
+ "user_turn_source": {
+  "path": "minimal_helpful_only_setting.ipynb",
+  "url": "https://raw.githubusercontent.com/redwoodresearch/alignment_faking_public/8d98bb786893ac44d02f41eb222eabf302c0aab9/minimal_helpful_only_setting.ipynb",
+  "sha256": "db261548c33fd798167d05f3bb33628f012fda8ad297fe1454bd42b4dddf2c9f",
+  "note": "The notebook's prompt_template wraps the query as <INPUT>, <is_free_tier_user>, <user_input>. B3 keeps that wrapper and drops the appended '<request_fully_accepted/>' or '<rejected/>' instruction, which forces the opening tokens. The notebook's no-CoT run loads prompt_atn_honly_no_cot_with_examples.txt; B3 uses the file without examples, matching V-A's no-examples design and the plan's prompt-length estimate."
+ }
+}
