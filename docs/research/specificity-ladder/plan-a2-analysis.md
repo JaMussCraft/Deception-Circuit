@@ -17,7 +17,7 @@
 - A1 selected artifact and its `selection_run_manifest.json` sidecar must be valid under current `read_selection` checks. Reuse it as immutable A1 provenance, never overwrite it with A2 memberships or banks.
 - No EVAL5, protected-set scoring, notebook execution, API, model/GPU execution or git in this documentation task. Before any future scoring job, recheck live protected registry, frozen graders, code/source hashes, phase ledger and usage gates. Protected-set/EVAL5 requests require the START approval route.
 - No new efficacy cutoff for masks. Native faithfulness, competence, KL, exact match and margins are reported without turning post-training outcomes into a new acceptance threshold.
-- A2 budget remains60 GPU-hours including pilots/failures; A1 is25, A3 is40, total125. No silent cap transfer. Full timing coverage now exists according to lead coordination, with independent audit pending; the reported approximately19 GPU-hours including pilots is a projected fleet cost, not a new audited spend assertion by this plan.
+- A2 budget remains60 GPU-hours including pilots/failures; A1 is25, A3 is40, total125. No silent cap transfer. Independent audit 62 accepted all six task-condition timings. The fleet and pilot reservation plan totals about 19.22 GPU-hours; actual training runtime and efficacy remain separate measurements.
 
 ## Review focus
 
