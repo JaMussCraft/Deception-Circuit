@@ -1,33 +1,32 @@
 # Resume: deception-divergence
 
-Last rewritten: Mon 2 Nov 2026, 11:40 am EST by claude-5b9b1c28.
+Last rewritten: Mon 2 Nov 2026, 1:45 pm EST by claude-5b9b1c28.
 
 ## Status
 
-Phase 0 is being built. The session claimed the direction (commit 9563f2e on main), registered, and froze the pre-registration in `spec.md` (R1 compliance equals the dataset's margin-0.7-both-streams gate; R2 eight arms with three listener phrasings scored in one job and read in order; R3 stratified regenerated sampling with the 1,000 selected test ids as the reproduction anchor; R4 clause-clustered paired bootstrap; R5 the U1 premise waits for D1 because no attribution-patching code exists). Three Opus workers are building D1 (scoring pipeline, hand-back 01), D4 (riders a to d, hand-back 02; rider d runs on CPU inside the ticket) and the F-rte-008 row correction (hand-back 03). No GPU job has been submitted and no finding exists yet. D2, D3 and U1 wait for the Fable weekly reset (Tue 4 Nov 2026, about 7 am EST) and for D1's verdict.
+Phase 0 is running. The pre-registration is frozen in `spec.md` (R1 to R5). D4 is three quarters read: rider (d), the static weight read of the quartet, fails both P1 and P2 (worklog finding F1, preliminary); rider (a) shows the quartet's readout attention moves under the clause on FAR and SER (F2); rider (b) shows the sycophancy transfer is mostly downstream of the cue window with the early MLPs acting on the cue tokens (F3); rider (c), SDR route closure, runs on Bridges-2. The FINDINGS.md corrections to F-rte-005, 006, 008 and F-mech-009 are committed (hand-back 03). D1's scoring pipeline is still being built by the Opus worker `d1-worker` (hand-back 01 pending); no D1 job has run, so no gate verdict exists. D2, D3 and U1 wait for the weekly reset (Tue 4 Nov 2026, about 7 am EST) and for D1.
 
 ## Branch, worktree and commit
 
 - Branch: `deception-divergence`.
 - Worktree: `/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/deception-divergence`.
-- Last commit on the branch: `8be396f`, "deception-divergence: pre-registration spec".
-- Uncommitted work, if any: worker files in progress under `scripts/`, `tests/`, `docs/research/deception-divergence/{jobs,reports}/`; committed by the orchestrator by explicit file list when each hand-back is read.
+- Last commit on the branch: `c6752c0`, "deception-divergence D4: static QK/OV read ... hand-back 02" (pushed to origin; Bridges-2 clone synced to it).
+- Uncommitted work, if any: `scripts/remote/b2.sh` and its test (fetch glob for deception-divergence outputs), the addendum to `reports/02-handback.md`, and the D1 worker's files `scripts/d1_visibility.py`, `scripts/jobs/run_d1_visibility.sh`, `tests/test_d1_visibility.py`; committed by explicit file list when the hand-backs are read.
 - Tool-owned records (state, worklog, ledger, handbacks) live in the main checkout at `/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/deception-divergence/`; pass that path as the `dir` argument of every research-session command. Everything else is on the branch.
 
 ## In-flight jobs
 
-None submitted. Bridges-2 allocation cis260361p had 397 of 452 GPU service units on Mon 2 Nov 2026 (a second allocation, cis260372p, has 100 unused units and is not used unless the user says so). Delta's H200 queue held nine pending Codex jobs at the same time.
+Delta's batch A100 queue projected a start of 9 Nov, so phase 0 jobs run on Delta's interactive partitions (one-hour cap, one job per user per partition) or on Bridges-2. Reservations r-001 to r-004: D4a (job 23443932) and D4b (23443933) completed on Delta in 134 s and 1,048 s; the Delta D4c (23443934) was cancelled after its start slipped to 4 Nov and resubmitted on Bridges-2.
 
 | Job | Cluster | What it computes | Output directory | Expected finish |
 |---|---|---|---|---|
-| none | | | | |
+| `50132625` | Bridges-2 | D4c SDR route closure (T1 and T2 on the 100 held-out ids) | `outputs/_analyses/deception-divergence/d4c/sdr` (fetched back with `b2.sh fetch`) | Mon 3:15 pm EST |
 
 ## Next action
 
-1. Read hand-back 01 (D1 pipeline). Check the anchor match count is 1,000 of 1,000 per task, record R2a if the I-arm token-match relaxation needs a ruling, run the wrapper dry run, then `ledger add`, `sbatch`, `job add`, and message `d1-worker` to monitor and run the `read` stage.
-2. Read hand-back 02 (D4). Log rider d's P1 and P2 numbers as a finding if its evidence block is complete; submit riders a, b and c in parallel within the 4.5 GPU-hour D4 allowance.
-3. Read hand-back 03 and commit the FINDINGS.md row by explicit file list.
-4. On D1's verdict: log a `decision` entry; it is a milestone checkpoint, so open a need, send HOLD and end the turn.
+1. Read hand-back 01 (D1 pipeline) when `d1-worker` reports. Check the anchor match is 1,000 of 1,000 per task; add ruling R2a if the I-arm token-match relaxation needs one; dry-run the wrapper; sync the branch to Bridges-2 (push, then `b2.sh sync-code --branch deception-divergence` with `DC_DELTA_REPO_ROOT` set to this worktree); submit on Bridges-2 or a Delta interactive partition (the script is resumable in chunks under the one-hour cap); `ledger add`, `job add`; message `d1-worker` to monitor and run `read`.
+2. When `d4-worker` reports D4c: log the job and the SDR T2 finding, commit the hand-back 02 addendum, `b2.sh` and its test by explicit file list.
+3. On D1's verdict: `decision` entry; milestone checkpoint (need with default, HOLD, end turn).
 
 ## Do not
 
