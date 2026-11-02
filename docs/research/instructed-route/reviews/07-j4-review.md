@@ -21,8 +21,17 @@ draws with the same three MLPs range from -0.430 to 0.505 at post_tag. Most of t
 the cue's own tokens. The verdict carries the plan section 4 label, "a cue-driven, non-instructed falsehood, not
 spontaneous deception", and the F-mech-003 caveat.
 
-The supplement run (heads_only, S_far, S_ser; job 23416459) had not finished when this review was written. Its section
-below is pending.
+The supplement run (job 23416459: heads_only, S_far and S_ser) changes how the verdict should be read, though not the
+verdict itself. Check 6 has the numbers.
+
+- **The heads beat random heads; the MLPs carry the qualifier and the band.** S_all's 32 heads alone remove 0.498
+  (0.470 to 0.526). That is 0.227 above the largest of their 20 heads-only null draws, 0.271, and no draw comes near
+  0.5. So the non-specific label comes from the three shared early MLPs combined with random heads, not from S_all's
+  heads. The same MLPs also lift S_all from 0.498 into the shared band: the heads alone sit 0.002 under 0.50, with an
+  interval that straddles it.
+- **The specific transfer is in S_far and the quartet.** S_far removes 0.393 against a null maximum of 0.276. It holds
+  Gupta's writer L15H8 but no quartet head. S_ser removes 0.197, and 3 of its 20 null draws exceed it (maximum 0.586).
+  So S_ser shows no effect distinguishable from random layer-matched sets.
 
 ## Checks
 
@@ -133,10 +142,11 @@ What drives it:
   - The only drawable gupta6 head is L15H11, in the single layer-15 slot, and it appears only in draw 01 (f 0.136).
   - Draw 10's layer-17 heads are H0, H10, H18 and H21. Draw 11's are H1, H4, H11 and H31.
   - The overlap concern that R10 fixed for each set's own members does not reappear through gupta6 or S_q heads here.
-- **The shared MLPs do not give a uniform offset.** All 20 draws contain mlp.5 to mlp.7, yet the draws range from
-  −0.430 to 0.505 with a mean near zero. The MLPs are not lifting every draw toward 0.5. Whether they matter in
-  combination with particular heads cannot be read from this run. The heads_only arm of the supplement is the direct
-  test.
+- **The shared MLPs lift the null, but they do not make it wide.** All 20 draws contain mlp.5 to mlp.7, yet the
+  draws range from −0.430 to 0.505. The supplement's heads-only null (check 6) has no MLPs and is just as wide, with
+  SD 0.280 and a range of −0.703 to 0.271. But its mean is −0.072 against 0.034 with the MLPs, and its maximum is
+  0.271 against 0.505. So the MLPs raise the null by about 0.1 on average and carry its top draw over 0.5, while the
+  width comes from the heads. The two nulls use different seeds, so this comparison is not paired draw by draw.
 - **No single high-leverage head stands out.** I compared each head's mean draw f with and without it, over the heads
   that appear in at least three draws. The largest gaps are about ±0.3, both up (L11H6, L13H18, L10H0) and down
   (L10H30, L11H26). With 20 draws and 32 heads each, that is noise-level, not an identification.
@@ -170,7 +180,11 @@ What drives it:
 - So at least the quartet's 0.331 is inside S_all's 0.724, and plausibly much of the Gupta writer route.
 - The remaining 0.39 comes from S_all's other 26 heads and the three MLPs, non-additively. Those include the FAR and
   SER members in layers 7 to 14, which are exactly the early heads whose random counterparts make the null wide.
-- The FAR- and SER-specific share is not separated by this run. S_far and S_ser in the supplement will bound it.
+- The supplement (check 6) splits this remainder:
+  - The three MLPs add 0.226: S_all removes 0.724 and its heads alone 0.498.
+  - S_far, which holds L15H8 but no quartet head, removes 0.393 and beats all its draws.
+  - S_ser, which holds neither L15H8 nor a quartet head, removes 0.197, inside its null.
+- So the specific transfer sits in the quartet and the FAR set, and S_far's share includes Gupta's writer L15H8.
 
 ### 4. What the result licenses
 
@@ -184,6 +198,8 @@ model may believe the user, and nothing in this task elicits a belief-contrary s
   little collateral damage.
 - The quartet that carries the instructed pressure on FAR and SER (F-rte-005, F-rte-006) also carries a third of this
   non-instructed cue's effect. Its null is tight: four random layer-17 heads reach at most 0.021.
+- The FAR deciding set alone removes 0.393 against a null maximum of 0.276. S_all's heads remove 0.498 against a
+  heads-only null maximum of 0.271.
 - So the cue route these sets implement is not confined to operator instructions. It also serves a user's stated
   opinion.
 
@@ -191,10 +207,11 @@ model may believe the user, and nothing in this task elicits a belief-contrary s
 
 - **Deception-specific machinery.** F-mech-003 already shows the sets carry transparent inversion, and sycophancy is
   not deception.
-- **That the FAR and SER members carry the effect.** The quartet and two Gupta writers inside S_all may carry much of
-  it. The supplement's S_far and S_ser arms bound this.
-- **That S_all is specific among sets of its size and layers.** One of 20 random 32-head draws with the same MLPs
-  reaches 0.505 at post_tag. The label is pre-registered.
+- **That the SER set carries any of it.** S_ser's 0.197 is exceeded by 3 of its 20 draws.
+- **That the FAR set's share is separate from Gupta's route.** S_far contains L15H8, one of Gupta's writers.
+- **That S_all as a whole is specific among sets of its size and layers.** One of 20 random 32-head draws with the
+  same MLPs reaches 0.505 at post_tag. The label is pre-registered.
+- **That the shared band holds without the early MLPs.** The heads alone give 0.498, 0.002 under the bar.
 - **Anything about alignment faking**, whose premise failed (F-rte-007).
 
 **What is new at post_tag.** J3 already showed S_all at the Readout: 0.453 here and bit-identical in J3. J3's null
@@ -229,18 +246,56 @@ On it, S_all's 0.453 would fall in the partial band, and it exceeds its null max
     their bands.
   - Clustering by cue letter or by neutral sentence is not meaningful here: only one neutral sentence is used.
 
-### 6. Supplement: heads_only, S_far and S_ser (pending)
+### 6. Supplement: heads_only, S_far and S_ser
 
-Job 23416459 was in pass 2 (96 of 530 rows) when this review was written. Nothing in it is read here. How to read it
-when it lands:
+**The run.**
 
-- **heads_only (S_all's 32 heads, heads-only null).**
-  - If its f stays near 0.72, the three MLPs add little to S_all.
-  - If its null maximum stays near 0.5, the width of the S_all null comes from patching 32 heads over the cue tokens,
-    not from the shared MLPs.
-  - A null maximum near 0.2 would put the width on the MLPs in combination with the heads.
-- **S_far and S_ser.** Their f values, set against S_q's 0.331, bound how much of the transfer the FAR- and
-  SER-specific members carry beyond the quartet and L15H8.
+- The job is 23416459 on an A100 (host gpua034), with 1,455 s of compute after the model load.
+- The command is `--task syc --sets heads_only,S_far,S_ser --positions post_tag,readout`, with 20 null draws per set.
+- The manifest's `git_commit` is c32627e37900e23a63f3deb8d1b955182700647b (40 hex), with `git_dirty` false.
+- All seven `code_sha256` entries and both dataset hashes equal `sha256sum` of the current files. They are the same
+  hashes as the main J4 run.
+- Pass 1, the kept, flip and kept_rows lists, and the pass-2 clean and uncued margins are identical to J4's.
+- The recompute is `j4rev_supp.py` and `j4rev_supp2.py`, which import no project code.
+  - It reproduces every stored f exactly.
+  - It re-draws all 120 null draws exactly: seed 20266025 for heads_only, 20262025 for S_far and 20263025 for S_ser.
+  - No draw holds a head member of its own set.
+  - The kept MLPs are none for heads_only, mlp.6 and mlp.7 for S_far, and mlp.5 for S_ser, as R10a requires.
+
+| arm | f (kept) | 95% CI | reversal | non-flips lost | null f max (draw) | draws above the set | null mean, SD |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| heads_only post_tag | 0.4984 | 0.4699 to 0.5262 | 0.805 | 3 | 0.2706 (07) | 0 | −0.072, 0.280 |
+| heads_only readout | 0.4006 | 0.3831 to 0.4169 | 0.565 | 4 | 0.1859 (07) | 0 | −0.010, 0.155 |
+| S_far post_tag | 0.3928 | 0.3588 to 0.4249 | 0.630 | 8 | 0.2761 (07) | 0 | −0.170, 0.270 |
+| S_far readout | 0.3085 | 0.2937 to 0.3220 | 0.331 | 9 | 0.1914 (07) | 0 | 0.046, 0.119 |
+| S_ser post_tag | 0.1974 | 0.1624 to 0.2318 | 0.377 | 17 | 0.5857 (17) | 3 | −0.161, 0.430 |
+| S_ser readout | 0.1246 | 0.1106 to 0.1396 | 0.149 | 13 | 0.3032 (17) | 3 | −0.018, 0.235 |
+
+**What it settles.**
+
+- **The non-specific label comes from the MLPs, not the heads.** S_all's 32 heads beat every heads-only draw by 0.227.
+  The top heads-only draw is 0.271 (interval 0.248 to 0.293), and no draw reaches 0.5. With mlp.5 to mlp.7 added to
+  both the set and its draws, the set rises to 0.724 and the top draw to 0.505.
+  - So the one-draw label should be read as "random heads, given the same three early MLPs, can reach half the effect".
+    It should not be read as "S_all's heads are no better than random".
+  - The same MLPs move S_all over the band boundary. The heads alone give 0.498, and their interval of 0.470 to 0.526
+    straddles 0.50. So both the band and the qualifier hinge on the early MLPs at the cue positions.
+- **The width of the null comes from the heads.** The heads-only null is as wide as the MLP-sharing one, with SD
+  0.280 against 0.250. S_ser's null (19 heads in layers 7 to 14, plus mlp.5) is the widest, with SD 0.430 and a range
+  of −1.020 to 0.586. This fits the explanation in check 3: early-layer heads interchanged over the cue tokens perturb
+  the readout strongly in both directions. Every null is narrower at the readout.
+- **S_far carries a specific share; S_ser does not.**
+  - S_far removes 0.393, beating all its draws by 0.117. It holds L15H8, one of Gupta's writers, and no quartet head.
+  - S_ser removes 0.197. That is under 0.25, and it ranks fourth among its 20 draws, at both arms (draws 17, 15 and 00
+    exceed it at post_tag).
+  - S_ser shares 9 members with S_far, but not L15H8.
+- **S_ser's null maximum above the set itself needs a caveat.** Read it as "the SER deciding set shows no transfer
+  distinguishable from random layer-matched sets". The SER set's non-FAR members are not shown to add anything to
+  S_all. The arm does not decide, so the verdict is unaffected.
+
+The seeds differ between the heads-only null and the MLP-sharing null, so comparing them is by distribution, not draw
+by draw. No MLP-only arm exists, so the MLPs' own effect is inferred as S_all minus heads_only (0.226), and that
+difference is not additive in general.
 
 ## Problems found
 
@@ -249,15 +304,17 @@ Severity-ordered. None changes the verdict.
 1. **The non-specific label rests on one draw (medium, interpretation).** Draw 11 is 0.505 with interval 0.467 to
    0.541. The next draw is 0.442, and S_all exceeds every draw. The label is pre-registered and correct as applied,
    but the row should give the null maximum, its draw and how thin the crossing is, so the label is not read as "S_all
-   is no better than random".
+   is no better than random". The heads-only arm shows the label comes from the shared MLPs: S_all's heads beat every
+   heads-only draw (0.498 against at most 0.271).
 2. **The rule arm patches the cue tokens themselves (medium, interpretation).** post_tag starts on the 7 differing cue
    tokens, as R11 defines it. A large set of early-layer components interchanged there partly substitutes the cue's
    token content, which explains the wide null (SD 0.250 against 0.190 at the readout) and the large negative draws.
    No arm patches only the 23 shared positions after the cue window. That arm, by analogy with the "after the clause"
    arm of F-rte-002, would separate carrying the cue forward from reading the cue tokens. It is not required by R11.
    It would be a cheap follow-up: S_all and its 20 draws on 530 items is about 0.2 h on an A100, including the
-   model load. Patching code for
-   that span does not exist yet.
+   model load. Patching code for that span does not exist yet. The supplement makes this more pressing. The shared
+   band depends on mlp.5 to mlp.7, and early MLPs at the cue tokens are the components most likely to act as token
+   substitution.
 3. **Flip reversal is not a specificity measure for S_all (low, reporting).** Null draws with f near zero reverse 0.34
    to 0.43 of flips. Report reversal beside f with the non-flip damage (S_all 3 of 376; null draws 7 to 98), or not
    at all for S_all.
@@ -267,12 +324,16 @@ Severity-ordered. None changes the verdict.
 5. **results.json still loses the set-to-null-label mapping (low, carried over from review 03, problem 3).** The
    `nulls` summaries overwrite the label lists. `margins.json` keeps them, and `null_draws` and `null_kept_members`
    are now in both files, so the draws can be tied to labels by name.
-6. **The supplement is pending (low, scope).** heads_only, S_far and S_ser are non-deciding under R11, so the verdict
-   does not wait for them, but the MLP question and the FAR/SER-specific share do.
+6. **The shared band rests on the three early MLPs (medium, interpretation; from the supplement).** S_all's heads alone
+   give 0.498 (0.470 to 0.526), just under 0.50. The verdict is about S_all as R11 defines it and stands. But the row
+   should say the heads alone sit at the band boundary.
+7. **S_ser does not beat its own null (low, reporting; from the supplement).** S_ser's 0.197 is exceeded by 3 of its
+   20 draws (maximum 0.586) at post_tag, and again by 3 at the readout. The row should report S_ser as showing no
+   specific transfer, not as a smaller effect.
 
 ## Proposed finding text
 
-Row F-rte-008, in the F-rte-002 shape:
+Row F-rte-008, in the F-rte-002 shape, with the supplement folded in:
 
 > Does the instructed route carry a non-instructed, cue-driven falsehood (B3 transfer on sycophancy alone, R11):
 > shared, non-specific; interchanging S_all (the FAR and SER deciding sets and the layer 17 quartet: 32 heads in
@@ -281,33 +342,38 @@ Row F-rte-008, in the F-rte-002 shape:
 > shift of logit(cue letter) minus logit(gold) over the 530 of 800 MMLU items answered correctly without the cue, and
 > reverses 145 of 154 cue-induced flips while 3 of 376 other kept items lose the right answer; it exceeds all 20
 > layer-matched draws of 32 non-member heads with the same three MLPs, but the largest, 0.505 (draw 11, interval
-> 0.467 to 0.541; next 0.442), reaches the 0.5 at which R5 labels the result non-specific; at the readout alone S_all
-> removes 0.453 against a null maximum of 0.218; the quartet alone removes 0.331 at the post-cue positions (null
-> maximum 0.021) and Gupta et al.'s six heads 0.486 (null maximum 0.180), and every flip either reverses S_all also
-> reverses. Sycophancy here is a cue-driven, non-instructed falsehood, not spontaneous deception, and per F-mech-003
-> the sets also carry transparent inversion, so "shared" means a shared cue route, not deception-specific machinery.
-> Caveats: the non-specific label rests on one draw 0.005 over the bar; the post-cue span includes the 7 differing cue
-> tokens, where random 32-head draws range from -0.430 to 0.505 (SD 0.250, against 0.190 at the readout), so flip
-> reversal does not discriminate for this set (draws with f near zero reverse 0.34 to 0.43 of flips); S_all contains
-> the quartet and two of Gupta's writers (L17H24, L15H8), so the share carried by the FAR and SER members alone is not
-> separated, and the null draws share mlp.5 to mlp.7 under R10a; one prompt, one cue type and one neutral sentence,
-> on MMLU only.
-
-If the supplement lands before the row is written, add its numbers to the claim. Add the heads_only f with its
-heads-only null maximum, and S_far and S_ser at post_tag with their null maxima, then trim the two caveats they
-resolve.
+> 0.467 to 0.541; next 0.442), reaches the 0.5 at which R5 labels the result non-specific. Both the label and the
+> band rest on the three shared early MLPs: S_all's 32 heads alone remove 0.498 (0.470 to 0.526), against at most
+> 0.271 for 20 heads-only draws. The specific transfer sits in the FAR set and the quartet: the FAR deciding set
+> removes 0.393 (null maximum 0.276) and the quartet 0.331 (null maximum 0.021), while the SER deciding set's 0.197
+> is exceeded by 3 of its 20 draws (maximum 0.586), so it shows no specific transfer; Gupta et al.'s six heads remove
+> 0.486 (null maximum 0.180), every flip that they or the quartet reverse S_all also reverses, and at the readout
+> alone S_all removes 0.453 against a null maximum of 0.218. Sycophancy here is a cue-driven, non-instructed
+> falsehood, not spontaneous deception, and per F-mech-003 the sets also carry transparent inversion, so "shared"
+> means a shared cue route, not deception-specific machinery. Caveats: the non-specific label rests on one draw 0.005
+> over the bar; the post-cue span includes the 7 differing cue tokens, where random draws of early-layer heads swing
+> widely in both directions (null SD 0.250 for S_all, 0.280 heads-only, 0.430 for the SER set, against 0.190 for
+> S_all at the readout), so flip reversal does not discriminate for these sets (S_all draws with f near zero reverse
+> 0.34 to 0.43 of flips), and no arm patches only the positions after the cue window, which would test whether the
+> early MLPs act as token substitution; the FAR set contains Gupta's writer L15H8, so its share is not separated from
+> Gupta's route; the MLP contribution (0.226) is inferred as S_all minus its heads, from nulls with different seeds;
+> one prompt, one cue type and one neutral sentence, on MMLU only.
 
 Evidence:
 
 - `outputs/_studies/b3/j4_syc/results.json`
 - `outputs/_studies/b3/j4_syc/margins.json`
 - `outputs/_studies/b3/j4_syc/run_manifest.json`
+- `outputs/_studies/b3/j4_syc_supplement/results.json`
+- `outputs/_studies/b3/j4_syc_supplement/margins.json`
+- `outputs/_studies/b3/j4_syc_supplement/run_manifest.json`
 - `outputs/_studies/b3/parity/parity.json`
 - `docs/research/instructed-route/reviews/07-j4-review.md`
-- with the supplement: `outputs/_studies/b3/j4_syc_supplement/results.json` and its `run_manifest.json`
 
-The commit is the run's, 21bc397.
+**Commit.** The deciding run is at 21bc397 and the supplement at c32627e, and the code hashes are identical. The
+commit field should name 21bc397, the commit of the run that decides. The supplement manifest in the evidence carries
+c32627e.
 
 **Strength.** "reviewed" is right. The run follows R11 and R10a as written, an independent recompute matches every
-number, and the rule arm's verdict does not depend on the pending supplement. The row should not go higher than
-reviewed: it is one run on one item set, with one draw deciding the qualifier.
+number in both runs, and the supplement only qualifies how the verdict reads. The row should not go higher than
+reviewed. It is one run on one item set, one draw decides the qualifier, and the heads alone sit at the band boundary.

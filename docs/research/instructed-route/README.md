@@ -37,10 +37,13 @@ held-out data; nothing was selected on the test sample.
   (3.9 to 10.2) against the pre-registered 10, consistent in direction but a third of Mehta's 24.4, so B3 ran on
   sycophancy alone. Patching the union of the FAR and SER deciding sets and the quartet from the uncued twin over
   the post-cue span removes 0.724 (0.702 to 0.746) of the sycophancy cue effect, in the shared band, but the
-  largest of 20 member-excluded null draws reaches 0.505, so the label is "shared, non-specific": a 32-head set
-  with the same MLPs at random layer-matched heads does nearly as well. The quartet-query set S_q removes 0.331
-  with a null maximum of 0.021. Sycophancy here is a cue-driven, non-instructed falsehood, not spontaneous
-  deception, and every set also carries transparent inversion (F-mech-003).
+  largest of 20 member-excluded null draws reaches 0.505, so the label is "shared, non-specific". Both the band
+  and the label rest on the three shared early MLPs: the 32 heads alone remove 0.498 against at most 0.271 for
+  heads-only draws, so random heads given mlp.5 to mlp.7 reach half the effect while the heads themselves sit at
+  the band boundary. The specific part is the FAR set (0.393, null maximum 0.276) and the quartet (0.331, null
+  maximum 0.021); the SER set shows no transfer distinguishable from random draws. Sycophancy here is a
+  cue-driven, non-instructed falsehood, not spontaneous deception, and every set also carries transparent
+  inversion (F-mech-003).
 
 Taken together with the specificity survey, the picture is the one the user expected: deception on this model reuses
 ordinary cue-routing machinery. The quartet is a reusable selector that pressure, wish and sycophancy cues all reach
@@ -51,9 +54,9 @@ at the query; what decides deception against honest inversion is not in these se
 - The named parallel route from the deciding set to mlp.30, mlp.31 and L31H0 is the open B1 question; a
   sender-resolved path patch from the deciding set to the three writers on the same 100 ids would reuse the B1
   batch files and the offline estimator of R9.
-- The sycophancy null maximum of 0.505 says the shared band is reachable by random heads given the MLPs; a
-  heads-only arm with its own null is in `outputs/_studies/b3/j4_syc_supplement` (job 23416459) and is reported,
-  not deciding.
+- No J4 arm patches only the positions after the seven cue tokens, so whether mlp.5 to mlp.7 act by token
+  substitution over the cue window is inferred, not measured; a third position arm (after the cue window only)
+  is not built in `spontaneous/patching.py`, and would settle it on the same items in under an hour of GPU.
 - Need N2 is open: a second alignment-faking elicitation (a different scaffold or a stronger model) is premise work
   under the 10-hour sub-cap and a new ruling; the fallback result stands either way.
 - Discovery on the sycophancy contrast (plan B3 section 3.5) was not needed because f_syc(S_all) was not divergent.
