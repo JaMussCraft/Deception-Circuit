@@ -1,0 +1,27 @@
+BASELINE {"cache_disk": 1515830, "host_ram": 156526760, "output_disk": 18200878, "scratch_disk": 3797656}
+REJECT cachecapacity1 full target cache capacity underflow
+REJECT tier1_host_ram full target storage capacity underflow
+REJECT tier1_cache_disk full target storage capacity underflow
+REJECT tier1_output_disk full target storage capacity underflow
+REJECT tier1_scratch_disk full target storage capacity underflow
+ACCEPT exact_tier_plus_host_peak
+REJECT one_byte_short_host_plus_peak full target storage capacity underflow
+ACCEPT exact_shared_disk_pool
+REJECT shared_disk_one_byte_short full target storage capacity underflow
+ACCEPT original_anchor_reserved0.1_actual0.01
+REJECT envelope_entry_ids missing/duplicate original envelope reservation IDs
+REJECT envelope_max_gpu_hours envelope source/upper inventory/ceiling differs from original admission
+REJECT envelope_admission_sha256 original admission content/reference mismatch
+REJECT no_refund_completed direction M2 exceeds 9 GPU hours
+REJECT no_refund_failed direction M2 exceeds 9 GPU hours
+REJECT no_refund_running direction M2 exceeds 9 GPU hours
+REJECT no_refund_reserved direction M2 exceeds 9 GPU hours
+REJECT omitted_linked_completed original admission reservations omitted from envelope
+ADMITTED_BAD_SAME_ADMISSION_ID completed {"envelope_consumed": 0.1, "all_reserved": 0.59}
+REJECT omitted_linked_failed original admission reservations omitted from envelope
+ADMITTED_BAD_SAME_ADMISSION_ID failed {"envelope_consumed": 0.1, "all_reserved": 0.59}
+REJECT omitted_linked_running original admission reservations omitted from envelope
+REJECT wrong_hash_same_admission_id_running current validation reservation omitted from envelope
+REJECT omitted_linked_reserved original admission reservations omitted from envelope
+REJECT wrong_hash_same_admission_id_reserved current validation reservation omitted from envelope
+REJECT all_dummy_experiments_removed_98 packing mandatory dedicated dummy batch coverage missing
