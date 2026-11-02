@@ -5,10 +5,10 @@
 |---|---|
 | State | Closed |
 | Directions | 1. B1 close the loop: outside-grid share and key versus query: active · 2. B2 falsity signal, SDR wish test and SER MLP replication: active · 3. B3 spontaneous deception through the instructed route: active |
-| Started / last updated | Sun 1 Nov 2026, 12:59 pm EST / Mon 2 Nov 2026, 8:31 am EST |
+| Started / last updated | Sun 1 Nov 2026, 12:59 pm EST / Mon 2 Nov 2026, 8:52 am EST |
 | Orchestrator auto-compactions | 2, counted by the compaction hook |
-| Weekly usage, all models | account reads 36%; +14 points this session |
-| Weekly usage, Fable | account reads 45%; 9 points above all models, so reading, analysis and review go to Opus agents |
+| Weekly usage, all models | account reads 37%; +15 points this session |
+| Weekly usage, Fable | account reads 46%; 9 points above all models, so reading, analysis and review go to Opus agents |
 | Review checkpoints | none yet; first at +16 session points; cadence 16 points; cap pause at 80% |
 | GPU budget | 4.8 of 65 GPU-h actual (11.8 reserved); at most 99 jobs at once; clusters: Delta, Bridges-2 |
 | OpenRouter credit | $2.38 of $20.00 cap |
@@ -110,3 +110,4 @@ Strength is one of: preliminary, reviewed by an independent agent, or final.
 ### Monday 2 November 2026
 **8:22 am EST · Need N2 answered.** No second alignment-faking elicitation for now; merge the branch, clean up unused branches and push main. A new synthesis session follows and may propose the elicitation again if it judges it worth running. The direction moves from paused to done.
 **8:31 am EST · Merged into main, worktree and branch removed, outputs moved to the primary checkout.** On the user's instruction the branch was merged into main at 087a7ed (clean merge), the direction was released as done, and the branch was deleted locally and on origin. Before the worktree was removed its git-ignored results were moved into the primary checkout at the same relative paths: outputs/_analyses/instructed-route-b1 (28 MB), outputs/_analyses/instructed-route-b2 (3.0 GB), outputs/_studies/b3 (74 MB), outputs/_launch_instructed_route, data/b3/_downloads and the eleven Slurm logs. The fetched mechanism-analysis copies in the worktree matched the primary copies except 30 derived head tables, parked in outputs/_analyses/instructed-route-fetch-diffs with a README; the primary copies are canonical. Both test suites are running on the merged main before the push; the remote branch claude/determined-pascal-60fkur (one unmerged commit, a literature note from 31 Oct) was left for the user.
+**8:52 am EST · Test suites on the merged main pass the baseline check; main pushed.** On main at f63c7e9 the base Python 3.9 suite gives 3,480 passed, 10 failed, 69 errors and 91 skipped in 829 s, and the mgnp suite 3,741 passed, 10 failed and 69 errors in 1,662 s. The 79 failing names are the same on both interpreters and all lie inside the 120-name baseline of F-arw-005 (fewer than in the worktree because the primary checkout holds the fixtures the worktree lacked). Main was pushed to origin.
