@@ -1,0 +1,23 @@
+....................F........                                            [100%]
+=================================== FAILURES ===================================
+________ test_index_matches_full_validator_axis_rejection[axis_sha256] _________
+
+proof_case = ({'axis_class': 'validated_nonzero_image_axis', 'axis_ids': [0, 0], 'axis_scope': [{'axis_index': 0, 'family': 'learne...ken': 0, 'honest_token': 0, ...}]}}, <component_analysis.a3_direction_workload._PackingProof object at 0x7f8615c7f820>)
+field = 'axis_sha256'
+
+    @pytest.mark.parametrize('field',['site','seed','family','axis_index','operation','axis_sha256'])
+    def test_index_matches_full_validator_axis_rejection(proof_case,field):
+        m,evidence,proof=proof_case;changed=copy.deepcopy(m);a=changed['axis_scope'][0]
+>       old=a[field];a[field]=['head',999,999] if field=='site' else (old+1 if type(old) is int else old+'-changed')
+E       KeyError: 'axis_sha256'
+
+docs/research/specificity-ladder/reports/111-numerical-evidence/test_independent_numerical.py:40: KeyError
+=============================== warnings summary ===============================
+../../../../../../../../u/swong2/.local/lib/python3.9/site-packages/pandas/core/arrays/masked.py:61
+  /u/swong2/.local/lib/python3.9/site-packages/pandas/core/arrays/masked.py:61: UserWarning: Pandas requires version '1.3.6' or newer of 'bottleneck' (version '1.3.5' currently installed).
+    from pandas.core import (
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED docs/research/specificity-ladder/reports/111-numerical-evidence/test_independent_numerical.py::test_index_matches_full_validator_axis_rejection[axis_sha256]
+1 failed, 28 passed, 1 warning in 6.90s
