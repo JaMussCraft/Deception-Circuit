@@ -719,3 +719,21 @@ def test_invalid_per_condition_token_count_rejected(bad):
     ins[0].token_counts[0,0]=bad
     with pytest.raises(ValueError,match='token count'):
         m._validate_chunks(ds,ins)
+
+
+def test_validation_timing_context_keeps_split_and_rejects_cross_purpose_resume():
+    model,support=tiny();ds,ins=chunks('D'),chunks('I')
+    for c in ds+ins:c.split='validation'
+    opt=torch.optim.Adam(support.parameters(),lr=.01)
+    with pytest.raises(ValueError,match='train split'):
+        m.streamed_update(model,support,opt,ds,ins,m.native_chunk_forward,g_d_fit=torch.tensor(2.),identity={})
+    m.streamed_update(model,support,opt,ds,ins,m.native_chunk_forward,g_d_fit=torch.tensor(2.),identity={},purpose='validation_timing')
+    state=m.make_checkpoint(model,support,opt,ds,ins,identity={},update=1,purpose='validation_timing')
+    assert state['purpose']=='validation_timing' and all(c.split=='validation' for c in ds+ins)
+    m.restore_checkpoint(state,model,support,opt,ds,ins,identity={},purpose='validation_timing')
+    with pytest.raises(ValueError,match='purpose|split'):
+        m.restore_checkpoint(state,model,support,opt,ds,ins,identity={},purpose='scientific_training')
+    for c in ds+ins:c.split='train'
+    with pytest.raises(ValueError,match='purpose|split'):
+        m.streamed_update(model,support,opt,ds,ins,m.native_chunk_forward,g_d_fit=torch.tensor(2.),identity={},purpose='validation_timing')
+    with pytest.raises(ValueError):m._validate_chunks(ds,ins,purpose='unknown')

@@ -316,15 +316,18 @@ def _chunks_identity(ds, ins):
     )
 
 
-def _validate_chunks(ds, ins):
+def _validate_chunks(ds, ins, *, purpose="scientific_training"):
+    if purpose not in ("scientific_training", "validation_timing"):
+        raise ValueError("unknown mask execution purpose")
+    expected_split = "train" if purpose == "scientific_training" else "validation"
     if not ds or not ins:
         raise ValueError("complete D and I cohorts required")
 
     def validate(chunks):
         ids = []
         for c in chunks:
-            if c.split != "train":
-                raise ValueError("optimizer core accepts train split only")
+            if c.split != expected_split:
+                raise ValueError("mask purpose requires " + expected_split + " split only")
             _paired(c.baseline_margin, "baseline")
             if (
                 c.baseline_margin.shape[0] != len(c.ids)
@@ -511,6 +514,7 @@ def streamed_update(
     identity,
     constrained=True,
     epsilon=GAP_EPSILON,
+    purpose="scientific_training",
 ):
     """One exact streamed full-cohort update. No parameters change until the step.
 
@@ -519,7 +523,7 @@ def streamed_update(
     """
     if getattr(model, "_a3_update_in_progress", False):
         raise RuntimeError("nested update is not an optimizer boundary")
-    n = _validate_chunks(d_chunks, i_chunks)
+    n = _validate_chunks(d_chunks, i_chunks, purpose=purpose)
     gap = _gap(g_d_fit, epsilon)
     _check_modes(model, support, optimizer)
     specification = {
@@ -528,6 +532,7 @@ def streamed_update(
         "gap": gap.item(),
         "epsilon": epsilon,
         "constrained": bool(constrained),
+        "purpose": purpose,
         "computation": _computation_identity(model),
     }
     previous = getattr(model, "_a3_mask_update_spec", None)
@@ -727,17 +732,18 @@ def _base_identity(model):
     )
 
 
-def make_checkpoint(model, support, optimizer, d_chunks, i_chunks, *, identity, update):
+def make_checkpoint(model, support, optimizer, d_chunks, i_chunks, *, identity, update, purpose="scientific_training"):
     """Snapshot at completed-update boundary; Task5b writes this atomically."""
     if getattr(model, "_a3_update_in_progress", False) or not getattr(
         model, "_a3_mask_boundary", True
     ):
         raise RuntimeError("checkpoint requires completed optimizer boundary")
-    _validate_chunks(d_chunks, i_chunks)
+    _validate_chunks(d_chunks, i_chunks, purpose=purpose)
     _check_support(model, support)
     previous = getattr(model, "_a3_mask_update_spec", None)
     if previous is not None and (
-        previous["chunks"] != _chunks_identity(d_chunks, i_chunks)
+        previous.get("purpose") != purpose
+        or previous["chunks"] != _chunks_identity(d_chunks, i_chunks)
         or previous["computation"] != _computation_identity(model)
         or previous["identity"] != _fingerprint(identity)
     ):
@@ -748,6 +754,7 @@ def make_checkpoint(model, support, optimizer, d_chunks, i_chunks, *, identity, 
         {
             "schema": "a3-mask-checkpoint-v1",
             "boundary": "after_optimizer_step",
+            "purpose": purpose,
             "update": update,
             "identity": identity,
             "chunks": _chunks_identity(d_chunks, i_chunks),
@@ -766,16 +773,17 @@ def make_checkpoint(model, support, optimizer, d_chunks, i_chunks, *, identity, 
 
 
 def restore_checkpoint(
-    state, model, support, optimizer, d_chunks, i_chunks, *, identity
+    state, model, support, optimizer, d_chunks, i_chunks, *, identity, purpose="scientific_training"
 ):
     """Reject altered sources, support, chunk boundaries/order, or intact targets."""
     if getattr(model, "_a3_update_in_progress", False):
         raise RuntimeError("restore requires completed optimizer boundary")
-    _validate_chunks(d_chunks, i_chunks)
+    _validate_chunks(d_chunks, i_chunks, purpose=purpose)
     _check_support(model, support)
     if (
         state["schema"] != "a3-mask-checkpoint-v1"
         or state["boundary"] != "after_optimizer_step"
+        or state.get("purpose") != purpose
         or state["identity"] != identity
         or state["support"] != support.candidates
         or state["chunks"] != _chunks_identity(d_chunks, i_chunks)
