@@ -1,0 +1,23 @@
+Scoped re-review of updated source, independent observed output.
+mgnp runner suite: 56 passed in 15.75s; exit 0; both actual tiny NNsight tests executed.
+base runner suite: 54 passed, 2 skipped in 12.97s; exit 0.
+Known base skips: tests/test_a3_direction_runner.py:504 and :1027, NNsight 0.5.12.
+Independent mgnp re-attacks, exit 0:
+packing-sensitive patch measurement: blocked: equivalence margin disagreement; extra forwards=39
+baseline measured packing valid=True
+stale packing source: blocked: equivalence source/profile mismatch; extra forwards=0
+stale packing axis: blocked: equivalence tested maps/axes/coverage do not match execution; extra forwards=0
+stale packing input: blocked: equivalence tested inputs do not cover requested batch; extra forwards=0
+stale packing receipt: blocked: equivalence receipt content hash mismatch; extra forwards=0
+fabricated positive controls: blocked: positive backing measurement content hash mismatch; extra forwards=0
+positive helper forwards=6; expected=6
+stale positive error: blocked: positive backing measurement content hash mismatch; extra forwards=0
+stale positive valid: blocked: positive backing measurement content hash mismatch; extra forwards=0
+stale positive sender: blocked: positive backing measurement content hash mismatch; extra forwards=0
+stale positive donor: blocked: positive backing measurement content hash mismatch; extra forwards=0
+stale positive geometry: blocked: positive backing measurement content hash mismatch; extra forwards=0
+stale positive tolerance: blocked: positive backing measurement content hash mismatch; extra forwards=0
+positive wrong runtime: blocked: model backend/profile mismatch; extra forwards=0
+all independent re-attacks blocked
+Usage checkpoint used_percent24, remaining_percent76, should_pause false.
+Final documented script path rerun in mgnp and base: exit 0 both; identical attack output above.

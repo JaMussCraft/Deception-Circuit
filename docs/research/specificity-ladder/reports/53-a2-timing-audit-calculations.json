@@ -1,0 +1,308 @@
+{
+  "status": "all-audit-assertions-passed",
+  "receipt": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-timing-6bd8bf5-h200/far-D-seed42.json",
+  "execution_commit": "6bd8bf5334f2e83613a129d2fcfeacf83e762191",
+  "build_source_commit": "77b6487b08b4410a4e5a9995c6ff5e46834a5ce3",
+  "native_manifest": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/far_v2_D_seed42_heads-mlp_741e575c346e3f25_timing20/run_manifest.json",
+  "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+  "model_identity": "meta-llama/Llama-3.1-8B-Instruct",
+  "weight_shards_present": 4,
+  "source_hash_count": 6,
+  "artifact_count": 5,
+  "native_dataset_file_count": 11,
+  "counts": {
+    "train": 177,
+    "validation": 177,
+    "test": 891
+  },
+  "epochs_observed": 20,
+  "epochs_expected": 20,
+  "validation_epochs": [
+    0,
+    10,
+    20
+  ],
+  "eval_summaries": {
+    "baseline": {
+      "rows": 891,
+      "accuracy": 1.0,
+      "logit_diff": 2.539141414141414
+    },
+    "node_eval": {
+      "rows": 891,
+      "accuracy": 1.0,
+      "logit_diff": 2.493476430976431
+    }
+  },
+  "baseline_log_accuracy": 1.0,
+  "baseline_result_accuracy": 1.0,
+  "independent_baseline_replay": false,
+  "slurm_accounting": {
+    "23414452": {
+      "JobIDRaw": "23414452",
+      "State": "FAILED",
+      "ExitCode": "1:0",
+      "ElapsedRaw": "157",
+      "TimelimitRaw": "20",
+      "AllocTRES": "billing=1024,cpu=4,gres/gpu=1,mem=64G,node=1",
+      "MaxRSS": "",
+      "Start": "2026-11-01T16:02:51",
+      "End": "2026-11-01T16:05:28"
+    },
+    "23414452.batch": {
+      "JobIDRaw": "23414452.batch",
+      "State": "FAILED",
+      "ExitCode": "1:0",
+      "ElapsedRaw": "157",
+      "TimelimitRaw": "",
+      "AllocTRES": "cpu=4,gres/gpu=1,mem=64G,node=1",
+      "MaxRSS": "14746424K",
+      "Start": "2026-11-01T16:02:51",
+      "End": "2026-11-01T16:05:28"
+    },
+    "23414452.extern": {
+      "JobIDRaw": "23414452.extern",
+      "State": "COMPLETED",
+      "ExitCode": "0:0",
+      "ElapsedRaw": "157",
+      "TimelimitRaw": "",
+      "AllocTRES": "billing=1024,cpu=4,gres/gpu=1,mem=64G,node=1",
+      "MaxRSS": "",
+      "Start": "2026-11-01T16:02:51",
+      "End": "2026-11-01T16:05:28"
+    },
+    "23414611": {
+      "JobIDRaw": "23414611",
+      "State": "COMPLETED",
+      "ExitCode": "0:0",
+      "ElapsedRaw": "235",
+      "TimelimitRaw": "12",
+      "AllocTRES": "billing=6000,cpu=4,gres/gpu:h200=1,gres/gpu=1,mem=64G,node=1",
+      "MaxRSS": "",
+      "Start": "2026-11-01T16:17:16",
+      "End": "2026-11-01T16:21:11"
+    },
+    "23414611.batch": {
+      "JobIDRaw": "23414611.batch",
+      "State": "COMPLETED",
+      "ExitCode": "0:0",
+      "ElapsedRaw": "235",
+      "TimelimitRaw": "",
+      "AllocTRES": "cpu=4,gres/gpu:h200=1,gres/gpu=1,mem=64G,node=1",
+      "MaxRSS": "15103172K",
+      "Start": "2026-11-01T16:17:16",
+      "End": "2026-11-01T16:21:11"
+    },
+    "23414611.extern": {
+      "JobIDRaw": "23414611.extern",
+      "State": "COMPLETED",
+      "ExitCode": "0:0",
+      "ElapsedRaw": "235",
+      "TimelimitRaw": "",
+      "AllocTRES": "billing=6000,cpu=4,gres/gpu:h200=1,gres/gpu=1,mem=64G,node=1",
+      "MaxRSS": "",
+      "Start": "2026-11-01T16:17:16",
+      "End": "2026-11-01T16:21:11"
+    }
+  },
+  "total_seconds": 216.46261171100195,
+  "pruning_seconds": 119.7,
+  "fixed_seconds": 96.76261171100195,
+  "scaled_pruning_seconds": 2992.5,
+  "full_500_epoch_seconds": 3089.262611711002,
+  "full_500_epoch_minutes": 51.48771019518337,
+  "buffer_fraction": 0.2,
+  "buffered_seconds": 3707.1151340532024,
+  "rounded_reservation_minutes": 62,
+  "pilot_reserved_minutes": 32,
+  "pilot_reserved_gpu_hours": 0.5333333333333333,
+  "successful_allocation_seconds": 235,
+  "failed_allocation_seconds": 157,
+  "both_allocations_seconds": 392,
+  "allocation_minus_process_seconds": 18.537388288998045,
+  "allocation_anchored_full_seconds": 3107.8,
+  "allocation_anchored_buffered_minutes": 63,
+  "primary_ledger_reconciled": true,
+  "wall_clock_receipt_seconds": 216.462635,
+  "peak_allocated_gib": 51.61,
+  "peak_allocated_decimal_gb": 55.41581553664,
+  "peak_reserved_gib": 53.49,
+  "receipt_peak_field_gib": 51.61,
+  "projection": {
+    "cells": [
+      {
+        "task": "far_v2",
+        "condition": "D",
+        "seed": 42,
+        "estimated_seconds": 3089.262611711002,
+        "reserved_minutes": 62,
+        "reserved_gpu_hours": 1.0333333333333334,
+        "coverage_source_receipt": {
+          "index": 0,
+          "task": "far_v2",
+          "condition": "D",
+          "seed": 42
+        },
+        "seed_only_timing_reuse": false
+      },
+      {
+        "task": "far_v2",
+        "condition": "D",
+        "seed": 1,
+        "estimated_seconds": 3089.262611711002,
+        "reserved_minutes": 62,
+        "reserved_gpu_hours": 1.0333333333333334,
+        "coverage_source_receipt": {
+          "index": 0,
+          "task": "far_v2",
+          "condition": "D",
+          "seed": 42
+        },
+        "seed_only_timing_reuse": true
+      },
+      {
+        "task": "far_v2",
+        "condition": "D",
+        "seed": 123,
+        "estimated_seconds": 3089.262611711002,
+        "reserved_minutes": 62,
+        "reserved_gpu_hours": 1.0333333333333334,
+        "coverage_source_receipt": {
+          "index": 0,
+          "task": "far_v2",
+          "condition": "D",
+          "seed": 42
+        },
+        "seed_only_timing_reuse": true
+      }
+    ],
+    "planned_cell_count": 18,
+    "coverage_gaps": [
+      {
+        "task": "far_v2",
+        "condition": "I",
+        "seed": 42
+      },
+      {
+        "task": "far_v2",
+        "condition": "I",
+        "seed": 1
+      },
+      {
+        "task": "far_v2",
+        "condition": "I",
+        "seed": 123
+      },
+      {
+        "task": "sdr_v2",
+        "condition": "D",
+        "seed": 42
+      },
+      {
+        "task": "sdr_v2",
+        "condition": "D",
+        "seed": 1
+      },
+      {
+        "task": "sdr_v2",
+        "condition": "D",
+        "seed": 123
+      },
+      {
+        "task": "sdr_v2",
+        "condition": "I",
+        "seed": 42
+      },
+      {
+        "task": "sdr_v2",
+        "condition": "I",
+        "seed": 1
+      },
+      {
+        "task": "sdr_v2",
+        "condition": "I",
+        "seed": 123
+      },
+      {
+        "task": "ser_v2",
+        "condition": "D",
+        "seed": 42
+      },
+      {
+        "task": "ser_v2",
+        "condition": "D",
+        "seed": 1
+      },
+      {
+        "task": "ser_v2",
+        "condition": "D",
+        "seed": 123
+      },
+      {
+        "task": "ser_v2",
+        "condition": "I",
+        "seed": 42
+      },
+      {
+        "task": "ser_v2",
+        "condition": "I",
+        "seed": 1
+      },
+      {
+        "task": "ser_v2",
+        "condition": "I",
+        "seed": 123
+      }
+    ],
+    "rejected_receipts": [],
+    "pilot_reserved_gpu_hours": 0.5333333333333333,
+    "total_reserved_gpu_hours": 3.6333333333333333,
+    "total_is_partial": true,
+    "single_mask_over_6h": false,
+    "within_60h": false,
+    "matched_data": true,
+    "train_under_200": true,
+    "train_under_200_requires_lead_review": false,
+    "cohort_ruling_sha256": "343bff33ea69a9e40ba9fade582f7e038f508e4bfe333c3328b93eeb14784605",
+    "execution_commit": "6bd8bf5334f2e83613a129d2fcfeacf83e762191",
+    "fleet_reservation_allowed": false,
+    "recommendation": "hold",
+    "conditional_hardware": {
+      "gpu_devices": [
+        "NVIDIA H200, 143771 MiB"
+      ],
+      "gpu_count": 1,
+      "cluster": "delta"
+    },
+    "granularity": "heads-mlp",
+    "training_margin": 0.7,
+    "source_screening_thresholds": {
+      "far_v2": {
+        "D": 0.7,
+        "H": 0.3,
+        "I": 0.7,
+        "I_neutral": 0.3
+      },
+      "sdr_v2": {
+        "D": 0.7,
+        "H": 0.3,
+        "I": 0.7,
+        "I_neutral": 0.3
+      },
+      "ser_v2": {
+        "D": 0.7,
+        "H": 0.3,
+        "I": 0.7,
+        "I_neutral": 0.3
+      }
+    },
+    "limitations": [
+      "Fixed cost is total minus printed pruning time; pruning scaling conservatively repeats periodic validation.",
+      "No extrapolation across task, condition, build, shape, hardware or granularity; only seed-only reuse.",
+      "Pilot reservation must include all allocations, including failed pilots; no ledger is mutated.",
+      "No lead conservative bounds supported; short pilots have a different cosine horizon."
+    ]
+  },
+  "failed_receipt_preserved": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-timing-224823f-a40/far-D-seed42.json",
+  "weight_byte_hashing_performed": false
+}
