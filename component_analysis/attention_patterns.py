@@ -188,6 +188,20 @@ NEUTRAL_TWIN = "neutral_twin"
 PRESSURE_NEUTRAL_TWIN_PAIRED = "pressure_neutral_twin_paired"
 ALL_CONDITIONS = CONDITIONS + (NEUTRAL_TWIN,)
 
+#: `--attention-instances`: which rows the two whole-split conditions
+#: (`pressure` and `neutral_twin` with its left term) read. `split`, the
+#: default, is the whole test split, as every cell before it. `causal_sample`
+#: reads the cell's causal sample instead (`--n-causal`, `--include-ids`), so
+#: an attention profile can sit on exactly the held-out ids a causal analysis
+#: ran on (direction deception-divergence, rider D4(a): the quartet's patterns
+#: on the B1 held-out ids). On a v2 task the causal loader already pairs every
+#: row with its Neutral-Clause Twin, so the twin slices read it unchanged. The
+#: honest-instruction condition always reads the causal sample and the honest
+#: twin is a different dataset, so neither is affected.
+INSTANCES_SPLIT = "split"
+INSTANCES_SAMPLE = "causal_sample"
+INSTANCE_CHOICES = (INSTANCES_SPLIT, INSTANCES_SAMPLE)
+
 #: The B2 signature (spec §2, B2): per head, the mass from the column query
 #: position on `pressure_clause` under the pressure prompt minus under its
 #: twin, per instance, with the paired standard error. Written beside the
@@ -295,6 +309,19 @@ def is_v2(ctx) -> bool:
     return getattr(getattr(ctx, "task_spec", None), "name", None) in V2_TASKS
 
 
+def instances_of(ctx) -> str:
+    """`split` (the default) or `causal_sample`, from `--attention-instances`."""
+    value = getattr(getattr(ctx, "cli", None), "attention_instances", None)
+    return value if value in INSTANCE_CHOICES else INSTANCES_SPLIT
+
+
+def pressure_batches(ctx):
+    """The `pressure` condition's loader: the whole split, or the causal sample."""
+    if instances_of(ctx) == INSTANCES_SAMPLE:
+        return ctx.causal_batches()
+    return ctx.descriptive_batches()
+
+
 class _DefaultConditions(list):
     """The flag's default: v1's three, as a list that equals `list(CONDITIONS)`
     in every reading of it, marked by its type so `wanted_conditions_for` can
@@ -329,6 +356,13 @@ def add_arguments(group) -> None:
                             "smoke-run shape, not a reporting one. A condition "
                             "whose data this cell does not have is reported "
                             "under 'skipped' and left out.")
+    group.add_argument("--attention-instances", default=INSTANCES_SPLIT,
+                       choices=INSTANCE_CHOICES,
+                       help="Which rows the pressure and neutral_twin "
+                            "conditions read: 'split' (default), the whole "
+                            "test split; 'causal_sample', the cell's causal "
+                            "sample (--n-causal, --include-ids), so the "
+                            "profile sits on the ids a causal analysis used.")
     group.add_argument("--query-positions", default=None,
                        metavar="SEGMENT[,SEGMENT]",
                        help="Which Segments to read attention from, by name "
@@ -820,7 +854,8 @@ def neutral_twin_batches(ctx) -> Tuple[Optional[object], Optional[str]]:
     from component_analysis import dataloaders
 
     try:
-        batches = ctx.neutral_twin_batches()
+        batches = (ctx.causal_batches() if instances_of(ctx) == INSTANCES_SAMPLE
+                   else ctx.neutral_twin_batches())
     except dataloaders.LoaderUnavailable as unavailable:
         return None, str(unavailable)
     report = batches.report
@@ -1287,7 +1322,12 @@ def _prefixes(wanted) -> Dict[str, str]:
     return prefixes
 
 
-def _instance_set(condition_name: str) -> str:
+def _instance_set(condition_name: str, instances: str = INSTANCES_SPLIT) -> str:
+    if instances == INSTANCES_SAMPLE:
+        if condition_name == PRESSURE:
+            return ht.CAUSAL_SAMPLE
+        if condition_name in TWIN_COLUMN_PREFIXES:
+            return ht.CAUSAL_SAMPLE_NEUTRAL_TWIN
     return INSTANCE_SETS.get(condition_name, TWIN_INSTANCE_SET)
 
 
@@ -1338,12 +1378,13 @@ def declare_coverage(ctx, payload: dict, wanted=None) -> None:
     by_condition = {condition["name"]: condition
                     for condition in payload["conditions"]}
     prefixes = _prefixes(wanted)
+    instances = payload.get("instances", INSTANCES_SPLIT)
     for condition_name, prefix in prefixes.items():
         condition = by_condition.get(condition_name) or {}
         ctx.declare_coverage(
             [f"{prefix}_top_segment", f"{prefix}_top_mass"],
             instance_ids=condition.get("instance_ids") or [],
-            instance_set=_instance_set(condition_name),
+            instance_set=_instance_set(condition_name, instances),
             dataset=condition.get("dataset"))
     if NEUTRAL_TWIN in prefixes:
         twin = by_condition.get(NEUTRAL_TWIN) or {}
@@ -1353,7 +1394,8 @@ def declare_coverage(ctx, payload: dict, wanted=None) -> None:
         ctx.declare_coverage(
             [B2_COLUMN, f"{B2_COLUMN}_se"],
             instance_ids=[one for one in ids if one not in unpaired],
-            instance_set=TWIN_INSTANCE_SET, dataset=twin.get("dataset"))
+            instance_set=_instance_set(NEUTRAL_TWIN, instances),
+            dataset=twin.get("dataset"))
 
 
 # ==============================================================================
@@ -1432,8 +1474,11 @@ def estimate(ctx) -> str:
         return (f"{label} {n_instances} instance(s) in {over}, "
                 f"{forwards} eager forward(s) ~{_duration(seconds)}")
 
+    if instances_of(ctx) == INSTANCES_SAMPLE:
+        parts.append("pressure and neutral twin read the causal sample "
+                     "(--attention-instances causal_sample)")
     if PRESSURE in wanted:
-        pressure = ctx.descriptive_batches()
+        pressure = pressure_batches(ctx)
         parts.append(line("pressure:", len(pressure), pressure.n_instances))
 
     causal, reason = (None, "not in --attention-conditions") \
@@ -1506,6 +1551,9 @@ def run(ctx) -> dict:
         # What --attention-token-level wrote, or None when it was not asked for.
         "token_level": None,
     }
+    if instances_of(ctx) == INSTANCES_SAMPLE:
+        # Only off the default, so a default cell's patterns.json keeps its keys.
+        payload["instances"] = INSTANCES_SAMPLE
 
     if ctx.model is None:
         payload["skipped"].append(
@@ -1535,7 +1583,7 @@ def run(ctx) -> dict:
              "reason": f"{PRESSURE} is not in --attention-conditions"})
     else:
         missing: List[str] = []
-        batches = ctx.descriptive_batches()
+        batches = pressure_batches(ctx)
         profiles, checks = collect_condition(
             ctx, pressure_slices(batches, ctx.segmentations, missing), **shared,
             tokens=tokens, condition=PRESSURE)

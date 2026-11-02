@@ -9,7 +9,12 @@ A patched run is the clean run with a component set's outputs replaced by the va
 - `post_tag`: every position from the first differing token (the tag, or the cue's first token) to the Readout,
   inclusive, teacher-forced stem tokens included. Positions before the tag are identical in both twins, so this
   equals patching every position (plan 3.2);
-- `readout`: the Readout only (Gupta's method; the sycophancy pass bar).
+- `readout`: the Readout only (Gupta's method; the sycophancy pass bar);
+- `after_cue`: every position strictly after the cue window (the span from the first to the last differing token,
+  the cue tokens themselves excluded) through the Readout, inclusive (direction deception-divergence, rider D4(b),
+  the F-rte-008 caveat). The window ends at `SycPair.cue_end` on the sycophancy twins and, by default, one past the
+  last differing token (`last_difference`). Positions after the window are token-identical in both twins, so this arm
+  writes only what the components computed there from the cue, never the cue tokens' own values.
 
 The recipe is `component_analysis/knockout.py`'s, unchanged: one clean `capture_forward` with no components, one twin
 `capture_forward` capturing every key any arm writes, and one `capture_forward` per arm with
@@ -41,7 +46,7 @@ import numpy as np
 
 from spontaneous import stats
 
-POSITION_ARMS = ("post_tag", "readout")
+POSITION_ARMS = ("post_tag", "readout", "after_cue")
 
 #: Plan section 2: the six named heads must reverse at least this share of flips.
 SYC_BAR = 0.18
@@ -181,6 +186,16 @@ def first_difference(a: Sequence[int], b: Sequence[int]) -> int:
     raise ValueError("twins are identical; there is no tag to patch from")
 
 
+def last_difference(a: Sequence[int], b: Sequence[int]) -> int:
+    """One past the index of the last token where two equal-length twins differ (the end of the cue window)."""
+    if len(a) != len(b):
+        raise ValueError(f"twins differ in length ({len(a)} vs {len(b)})")
+    for i in range(len(a) - 1, -1, -1):
+        if a[i] != b[i]:
+            return i + 1
+    raise ValueError("twins are identical; there is no cue window")
+
+
 def right_pad(seqs: Sequence[Sequence[int]], pad_id: int = 0):
     """-> (ids [b, max], attention mask [b, max], Readout [b] = last real position), right-padded."""
     import torch
@@ -193,17 +208,28 @@ def right_pad(seqs: Sequence[Sequence[int]], pad_id: int = 0):
     return ids, mask, mask.sum(-1) - 1
 
 
-def arm_mask(arm: str, starts: Sequence[int], readout, seq_len: int):
-    """`[b, seq]` bool: `post_tag` covers start..Readout inclusive; `readout` the Readout only."""
+def arm_mask(arm: str, starts: Sequence[int], readout, seq_len: int, ends: Optional[Sequence[int]] = None):
+    """`[b, seq]` bool: `post_tag` covers start..Readout inclusive; `readout` the Readout only; `after_cue` covers
+    ends[row]..Readout inclusive, where `ends` is one past the last cue token (required for that arm only)."""
     import torch
     if arm not in POSITION_ARMS:
         raise ValueError(f"unknown positions arm {arm!r}; expected one of {POSITION_ARMS}")
+    if arm == "after_cue" and ends is None:
+        raise ValueError("the after_cue arm needs the cue window ends")
     readout = [int(r) for r in torch.as_tensor(readout).tolist()]
     mask = torch.zeros((len(readout), seq_len), dtype=torch.bool)
     for row, end in enumerate(readout):
-        start = end if arm == "readout" else int(starts[row])
-        if start > end:
-            raise ValueError(f"row {row}: the tag ({start}) is after the Readout ({end})")
+        if arm == "after_cue":
+            start = int(ends[row])
+            if start <= int(starts[row]):
+                raise ValueError(f"row {row}: the cue window ends ({start}) at or before it starts "
+                                 f"({int(starts[row])})")
+            if start > end:
+                raise ValueError(f"row {row}: no position after the cue window ({start}) up to the Readout ({end})")
+        else:
+            start = end if arm == "readout" else int(starts[row])
+            if start > end:
+                raise ValueError(f"row {row}: the tag ({start}) is after the Readout ({end})")
         mask[row, start:end + 1] = True
     return mask
 
@@ -262,10 +288,11 @@ def interchange_tensors(model, clean_ids, clean_mask, twin_ids, twin_mask, reado
 
 def twin_interchange(model, clean_seqs, twin_seqs, arms: Mapping[str, Tuple[Sequence, str]], *,
                      starts: Optional[Sequence[int]] = None, reduce: Optional[Callable] = None,
-                     pad_id: int = 0) -> InterchangeOutput:
-    """Twin pairs as token lists; `arms` maps a label to `(keys, "post_tag" | "readout")`.
+                     pad_id: int = 0, ends: Optional[Sequence[int]] = None) -> InterchangeOutput:
+    """Twin pairs as token lists; `arms` maps a label to `(keys, "post_tag" | "readout" | "after_cue")`.
 
-    `starts` defaults to each pair's first differing token, which is where the post-tag mask begins.
+    `starts` defaults to each pair's first differing token, which is where the post-tag mask begins. `ends` (read
+    only by an `after_cue` arm) defaults to one past each pair's last differing token.
     """
     if len(clean_seqs) != len(twin_seqs):
         raise ValueError("one twin per clean sequence")
@@ -275,7 +302,10 @@ def twin_interchange(model, clean_seqs, twin_seqs, arms: Mapping[str, Tuple[Sequ
     tids, tmask, treadout = right_pad(twin_seqs, pad_id)
     if not bool((readout == treadout).all()):
         raise ValueError("a twin does not end at its clean prompt's Readout")
-    masks = {arm: arm_mask(arm, starts, readout, ids.shape[1]) for arm in {a for _k, a in arms.values()}}
+    wanted = {a for _k, a in arms.values()}
+    if "after_cue" in wanted and ends is None:
+        ends = [last_difference(a, b) for a, b in zip(clean_seqs, twin_seqs)]
+    masks = {arm: arm_mask(arm, starts, readout, ids.shape[1], ends=ends) for arm in wanted}
     return interchange_tensors(model, ids, mask, tids, tmask, readout,
                                {label: (list(k), masks[arm]) for label, (k, arm) in arms.items()}, reduce=reduce)
 
@@ -413,7 +443,7 @@ def run_syc(model, pairs, letter_ids: Mapping[str, int], arms: Mapping[str, Tupl
     for start in range(0, len(pairs), batch_size):
         chunk = pairs[start:start + batch_size]
         res = twin_interchange(model, [p.cued_ids for p in chunk], [p.uncued_ids for p in chunk], {},
-                               starts=[p.cue_start for p in chunk], reduce=reduce)
+                               starts=[p.cue_start for p in chunk], ends=[p.cue_end for p in chunk], reduce=reduce)
         first["clean"].append(res.clean.numpy())
         first["twin"].append(res.twin.numpy())
         if progress:
@@ -428,7 +458,7 @@ def run_syc(model, pairs, letter_ids: Mapping[str, int], arms: Mapping[str, Tupl
         rows = kept[start:start + batch_size]
         chunk = [pairs[i] for i in rows]
         res = twin_interchange(model, [p.cued_ids for p in chunk], [p.uncued_ids for p in chunk], arms,
-                               starts=[p.cue_start for p in chunk], reduce=reduce)
+                               starts=[p.cue_start for p in chunk], ends=[p.cue_end for p in chunk], reduce=reduce)
         second["clean"].append(res.clean.numpy())
         second["twin"].append(res.twin.numpy())
         for label in arms:
