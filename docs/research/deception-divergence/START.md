@@ -1,8 +1,9 @@
 # Where deception and transparent inversion come apart: listener knowledge, the second turn and a learned partition
 
 Starting prompt for direction `deception-divergence`. Written Mon 2 Nov 2026 by synthesis session claude-ecd31ee4.
-Approved by the user on Mon 2 Nov 2026 (D1 to D4 approved as proposed; the user's two directions U1 and U2 merged
-after an Opus critic pass and a literature check, see Alignment `.scratch/synthesis-20261102/`). Follow
+D1 to D4 were approved by the user on Mon 2 Nov 2026; the user's two directions U1 and U2 were merged in after an
+Opus critic pass and a literature check (Alignment `.scratch/synthesis-20261102/`) and the merged form awaits the
+user's confirmation before launch. Follow
 `docs/agents/research-session.md` in the Alignment repository. This session runs on Claude.
 
 1. **Goal.** Find a readout on which deceiving an unaware user and a transparent inversion actually differ in
@@ -22,7 +23,9 @@ after an Opus critic pass and a literature check, see Alignment `.scratch/synthe
    - **D1. Listener-knowledge and role-matched controls (gate, phase 0, 3 to 4 GPU-h).** Keep the operator clause
      identical and toggle one sentence, "The user can see these instructions" against "The user cannot see these
      instructions"; also score the operator-turn transparent I (the existing `invd_` clauses) on the same
-     unselected prior-kept candidate ids of each task, stratified by clause id and designation polarity. Rescore
+     unselected prior-kept candidate ids of each task, stratified by clause id and designation polarity; a
+     stratified sample per clause and polarity (a few hundred ids per cell) is enough, the full prior-kept pools
+     are not required. Rescore
      the dropped D ids, since their per-id records were deleted on 2026-11-01 (the instance lists are seeded, seed
      42, and `dataset/build_deception_v2.py` is the builder). Report, per task: does the first-token choice
      condition on the listener's knowledge, and does operator-D compliance sit below role-matched transparent
@@ -151,7 +154,9 @@ after an Opus critic pass and a literature check, see Alignment `.scratch/synthe
 
 7. **Budgets.** GPU: 55 reserved GPU-hours in total, phase-gated as 10 for phase 0 (D1, D4, the U1 premise), 40 for
    phase 1 (D2 up to 16, D3 up to 12, U1 up to 21 with at most 6 before its positive control passes) and 5 in
-   reserve; at most 8 concurrent GPU jobs. Use Bridges-2 (allocation cis260361p, `--gpus-per-node=h100-80:1`,
+   reserve; no limit on concurrent GPU jobs, so parallelise whenever the queue allows (the ledger cap is set to 99
+   because the tool needs a number). Check the Bridges-2 SU balance before reserving there; it was near 500 SUs on
+   1 Nov and has not been verified since. Use Bridges-2 (allocation cis260361p, `--gpus-per-node=h100-80:1`,
    `--export=ALL,DC_CLUSTER=...`, model load about 460 s) first so Delta's fair share is spared; it goes offline
    about 2026-11-09, after which Delta only (beto and bimc fair share is poor; bgrb or bjhz start sooner). Run
    8B mask training on H100 or H200 only. OpenRouter: $20 for the D2 judge and classifier labels. Usage: pause at
