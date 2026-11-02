@@ -7,6 +7,7 @@ from __future__ import annotations
 import copy
 import csv
 import json
+import re
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -157,15 +158,89 @@ def freeze_semantic_maps(design, tokenizer):
     return result
 
 
+def validate_assessment_membership(design, parent):
+    """Ordered original assessment cohorts and utility bytes remain ancestral."""
+    require(set(design['tasks'])==set(parent['tasks']), 'changed assessment task scope')
+    require(design['utility']==parent['utility'], 'changed original assessment utilities')
+    for task,settings in design['tasks'].items():
+        ids=parent['designs'][task]['assessment_ids']
+        require(settings['assessment_ids']==ids, 'changed original assessment membership/order')
+        expected={(c,r['instance_id']):r for c,values in parent['rows'][task].items()
+                  for r in values if r['instance_id'] in set(ids)}
+        actual={(r['condition'],r['instance_id']):r for r in design['access_rows'][task]
+                if r['instance_id'] in set(ids)}
+        require(set(actual)==set(expected), 'changed assessment row coverage')
+        for key,row in expected.items():
+            # Semantic source enrichment is allowed; all original stream data,
+            # labels and exact prompt/token bytes remain immutable.
+            for field,value in row.items():
+                if field=='streams':
+                    require(set(actual[key]['streams'])==set(value),'changed assessment streams')
+                    require(all(actual[key]['streams'][stream].get(k)==v for stream,record in value.items()
+                                for k,v in record.items()), 'changed assessment prompt/token/label bytes')
+                elif field not in ('pressure','pressure_text','pressure_clause','request_text','question','designation_text'):
+                    require(actual[key].get(field)==value,'changed assessment row identity')
+
+
+def assessment_exclusions(parent):
+    """Original assessment prompts plus actual donor/source identities and bytes."""
+    fixed=[]
+    for task,conditions in parent['rows'].items():
+        settings=parent['designs'][task]
+        donors=copy.deepcopy(settings.get('donors',[]))
+        donor_ids=set().union(*(a3_design._utility_identity(row)[0] for row in donors)) if donors else set()
+        ids=set(settings['assessment_ids'])|donor_ids
+        fixed.extend(copy.deepcopy(row) for values in conditions.values() for row in values
+                     if row['instance_id'] in ids)
+        fixed.extend(donors)
+    for values in parent['utility'].values():
+        if isinstance(values,list): fixed.extend(copy.deepcopy(row) for row in values if isinstance(row,dict))
+    return fixed
+
+
+def direction_protocol(design, *, commit, injected_code_hashes=None):
+    """Freeze the reviewed operational contract, separately from the A1 identity."""
+    from component_analysis import a3_direction_artifacts as artifacts
+    require(isinstance(commit,str) and re.fullmatch('[0-9a-f]{40}',commit) is not None,
+            'A3 execution requires full source commit')
+    if injected_code_hashes is not None:
+        require(design.get('injected') is True and isinstance(injected_code_hashes,dict),
+                'injected source closure forbidden for production')
+        closure=copy.deepcopy(injected_code_hashes)
+    else: closure=artifacts.code_hashes()
+    protocol=dict(schema_version=1,kind='a3_direction_protocol',commit=commit,code_hashes=closure,
+        design_sha256=ladder.design._hash(design),injected=bool(design.get('injected')),
+        task_order=list(design['tasks']),candidate_sites={t:v['direction_sites'] for t,v in design['tasks'].items()},
+        stream_order=list(ladder.design.STREAMS),seeds=[42,1,123],assessment_orientations=199,calibration_orientations=32,
+        bootstrap=dict(assessment=2000,assessment_seed=9001,power=2000,power_seed=19001),
+        confirmatory_tasks=['far_v2','ser_v2'],descriptive_tasks=['sdr_v2'],
+        utility_membership={k:copy.deepcopy(design[k]) for k in ('ioi_validation','mmlu_validation','ioi_validation_maps','mmlu_validation_maps')},
+        original_utility_sha256=ladder.design._hash(design['utility']),
+        operations=dict(primary=dict(mechanism='opposite_designation_subspace_interchange',ioi='item_swap',mmlu=['subspace_zero','centered_H']),
+            primary_families=['learned','assessment_null','calibration_null'],
+            secondary=dict(families=['learned','nuisance'],tasks=['mechanism','ioi'],operations=['subspace_zero','centered_H']),
+            steering=dict(families=['learned','nuisance','assessment_null:0'],signs=[-1,1],tasks=['mechanism','ioi','mmlu']),
+            controls=['no_op','positive_control','perturbation_diagnostics']),
+        numeric_profile=dict(dtype='bfloat16',backend='existing native inference hooks',readout='last unpadded assistant readout',
+                             gradients=False,matched_shape_controls=True),
+        limits=dict(direction_M1_gpu_hours=0.5,all_M1_gpu_hours=2,direction_M2_gpu_hours=9,A3_gpu_hours=40),
+        validation_mmlu=dict(candidate_seed=2,candidate_count=128,n=32,source_split='test',analysis_split='validation',
+                             selection='first unique disjoint candidates; no redraw/network/outcome filtering'),
+        finalization=dict(requires_complete_runtime=True,injected_forbidden=True,pilot_forbidden=True))
+    if injected_code_hashes is not None: protocol['injected_source_closure']=closure
+    return protocol
+
+
 def prepare(*, a1_design, a1_selected, matched_root, historical_csv, root_ruling,
-            tokenizer, registry_paths=(), output=None, a1_repo_root=ladder.REPO):
+            tokenizer, registry_paths=(), output=None, a1_repo_root=ladder.REPO,
+            commit=None, injected_code_hashes=None):
     """Validate CPU provenance and freeze; no call to A1 freeze_design/draw_sample.
 
     The output is immutable. ``output=None`` validates without writing. Fixtures
     may call freeze_a3 directly; production preparation requires actual files.
     """
     from dataset.build_twin_training import _hash as matched_hash
-    from component_analysis.ladder_tasks import _ioi_candidates
+    from component_analysis.ladder_tasks import _ioi_candidates, mmlu_rows, ioi_item_swap_maps, mmlu_calibration_maps
     p,s,evidence=load_a1_parents(a1_design,a1_selected)
     _validate_parent_files(p,a1_repo_root=a1_repo_root)
     fresh_identity=common.tokenizer_identity(tokenizer,p['tokenizer_revision'],injected=p.get('injected',False))
@@ -189,6 +264,15 @@ def prepare(*, a1_design, a1_selected, matched_root, historical_csv, root_ruling
                   a1_repo_root=str(Path(a1_repo_root).resolve()),
                   reused_a2_validator_sha256=common.file_hash(ladder.REPO/'scripts/twin_training.py'),
                   matched_build_path=str(path.resolve()),matched_build_file_sha256=common.file_hash(path))
+    fixed_assessment=assessment_exclusions(p)
+    candidates,candidate_manifest=mmlu_rows(tokenizer,n=128,seed=2)
+    require(len(candidates)==128, 'canonical MMLU candidate count mismatch')
+    result['mmlu_validation']=a3_design.eligible_mmlu(candidates,fixed_assessment,n=32)
+    result['mmlu_validation_candidates_manifest']=copy.deepcopy(candidate_manifest)
+    result['mmlu_validation_candidates_manifest']['grader_registry']=ladder.grader_registry()
+    result['mmlu_validation_candidates_manifest']['grader_sha256']=p['grader_sha256']
+    result['ioi_validation_maps']=ioi_item_swap_maps(validation)
+    result['mmlu_validation_maps']=mmlu_calibration_maps(result['mmlu_validation'])
     result['semantic_twin_maps']=freeze_semantic_maps(result,tokenizer)
     for rows in result['access_rows'].values():
         for row in rows:
@@ -198,5 +282,33 @@ def prepare(*, a1_design, a1_selected, matched_root, historical_csv, root_ruling
                 source=dict(row,**record,stream=stream,designation_source=pair)
                 record['semantic']=a3_design.semantic_record(source,tokenizer)
     result['registry_hashes']=a3_design.validate_access(result,list(registry_paths))
-    if output is not None: ladder.write_artifact(output,result)
+    validate_assessment_membership(result,p)
+    protocol=direction_protocol(result,commit=commit,injected_code_hashes=injected_code_hashes)
+    result['direction_protocol']=protocol
+    result['direction_protocol_sha256']=ladder.design._hash(protocol)
+    if output is not None:
+        target=Path(output)
+        require(target.name=='design.json','canonical A3 output must be NEW_ROOT/design.json')
+        def writer(root):
+            ladder.write_artifact(root/'design.json',result)
+            ladder.write_artifact(root/'direction_protocol.json',protocol)
+        common.publish(target.parent,writer)
     return result
+
+
+def main(argv=None, *, tokenizer=None, model_loader=None):
+    """Lazy stage boundary; partial implementations must not silently succeed."""
+    import argparse
+    parser=argparse.ArgumentParser(add_help=False)
+    parser.add_argument('--experiment',required=True,choices=('directions',))
+    parser.parse_known_args(argv)
+    try:
+        from component_analysis.a3_direction_pipeline import main as dispatch
+    except ModuleNotFoundError as error:
+        if error.name!='component_analysis.a3_direction_pipeline': raise
+        raise ValueError('A3 direction stages are not implemented; complete runtime required') from error
+    return dispatch(argv,tokenizer=tokenizer,model_loader=model_loader)
+
+
+if __name__=='__main__':
+    main()

@@ -155,3 +155,52 @@ def test_cluster_bootstrap_policy_is_frozen_without_row_truncation():
     assert policy['draw_count']=='number of eligible wording clusters C'
     assert policy['weights']=='cluster multiplicity per member ID, normalized to sum 1'
     assert policy['row_truncation'] is False and policy['instance_fallback'] is False
+
+
+def mmlu_candidate(i, **extra):
+    return dict(instance_id='candidate:'+str(i),source_id='source:'+str(i),split='test',
+                streams={'clean':{'prompt':'question '+str(i)}},**extra)
+
+
+def test_validation_mmlu_first_disjoint_seed2_candidates():
+    candidates=[mmlu_candidate(i) for i in range(128)]
+    fixed=[copy.deepcopy(candidates[0]),dict(instance_id='alias',source_id='source:2',streams={})]
+    candidates[3]['donor_id']='source:2'
+    actual=d.eligible_mmlu(candidates,fixed)
+    assert [r['instance_id'] for r in actual]==['candidate:1']+['candidate:'+str(i) for i in range(4,35)]
+    assert 'analysis_split' not in candidates[1]
+
+
+def test_validation_mmlu_source_split_retained():
+    result=d.eligible_mmlu([mmlu_candidate(i) for i in range(32)],[])
+    assert all(r['split']=='test' and r['analysis_split']=='validation' for r in result)
+
+
+def test_validation_utility_prompt_alias_collision():
+    candidates=[mmlu_candidate(i) for i in range(34)]
+    candidates[0]['streams']['clean']['prompt']='assessment prompt'
+    candidates[1]['donor']={'instance_id':'donor','streams':{'clean':{'prompt':'assessment prompt'}}}
+    fixed=[dict(instance_id='assessment',streams={'clean':{'prompt':'assessment prompt'}})]
+    assert d.eligible_mmlu(candidates,fixed)[0]['instance_id']=='candidate:2'
+
+
+def test_validation_mmlu_insufficient_blocks_without_redraw():
+    with pytest.raises(ValueError,match='insufficient'):
+        d.eligible_mmlu([mmlu_candidate(i) for i in range(31)],[])
+
+
+def test_new_utility_is_in_live_protected_checks(tmp_path):
+    design=freeze(); design['mmlu_validation']=[mmlu_candidate(0,donor_id='donor-private')]
+    registry=tmp_path/'protected.json'
+    for protected in ('source:0','donor-private','candidate:0'):
+        registry.write_text(json.dumps({'schema':1,'sets':[{'task':'mmlu','instance_ids':[protected]}]}))
+        with pytest.raises(ValueError,match='overlap'):
+            d.validate_access(design,[str(registry)])
+
+
+def test_utility_map_donor_is_in_protected_access_union(tmp_path):
+    design=freeze()
+    design['utility']['ioi_resample_donors']=[dict(instance_id='resample',source_id='private-source',streams={})]
+    registry=tmp_path/'protected.json'
+    registry.write_text(json.dumps({'schema':1,'sets':[{'task':'ioi','instance_ids':['private-source']}]}))
+    with pytest.raises(ValueError,match='overlap'): d.validate_access(design,[str(registry)])

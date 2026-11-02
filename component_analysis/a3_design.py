@@ -153,6 +153,21 @@ def eligible_ioi(candidates, fixed_rows, *, n=100):
     return result
 
 
+def eligible_mmlu(candidates, fixed_rows, *, n=32):
+    """First disjoint cached candidates; source split remains the MMLU test split.
+
+    No sampling or fetch occurs here. Callers supply the one canonical seed-2
+    candidate draw and the complete original assessment exclusion set.
+    """
+    require(type(n) is int and n > 0, 'positive MMLU validation size required')
+    result=eligible_ioi(candidates,fixed_rows,n=n)
+    require(len(result)==n, 'insufficient disjoint eligible MMLU validation candidates')
+    for row in result:
+        require(row.get('split')=='test', 'MMLU source split must remain test')
+        row['analysis_split']='validation'
+    return result
+
+
 def confound_diagnostics(rows):
     """Metadata-only nearest-centroid classifier: train fit, validation report.
 
@@ -271,8 +286,15 @@ def validate_access(design: dict, registry_paths: list[str]) -> dict:
     contexts={}
     rows=copy.deepcopy(design.get('access_rows',{}))
     for task in ('ioi','mmlu'):
-        rows[task]=copy.deepcopy(design.get('utility',{}).get(task,[]))
+        rows[task]=[]
+        # Utility donor pools/maps are source access too, including optional
+        # resampling donors not repeated in the primary recipient membership.
+        for name,values in design.get('utility',{}).items():
+            if name==task or name.startswith(task+'_'):
+                if isinstance(values,list):
+                    rows[task] += copy.deepcopy([r for r in values if isinstance(r,dict)])
     rows['ioi'] += copy.deepcopy(design.get('ioi_validation',[]))
+    rows['mmlu'] += copy.deepcopy(design.get('mmlu_validation',[]))
     for task,values in rows.items():
         expanded=[dict(instance_id=i) for i in design.get('donor_ids',{}).get(task,[])]
         for row in values:
