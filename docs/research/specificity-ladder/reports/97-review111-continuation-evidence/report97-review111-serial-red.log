@@ -1,0 +1,66 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__ test_prefit_pilot_emits_actual_complete_scope_and_non_authorizing_cost[1] ___
+
+tmp_path = PosixPath('/tmp/review111-serial-red/test_prefit_pilot_emits_actual0')
+fake = [(tensor([[2, 3, 6, 0],
+        [2, 3, 5, 0]]), None), (tensor([[1, 2, 4, 0],
+        [1, 2, 3, 0]]), None), (tensor([...None), (tensor([[2, 3, 5, 0],
+        [2, 3, 7, 0]]), None), (tensor([[1, 2, 3, 0],
+        [1, 2, 5, 0]]), None), ...]
+tile = 1
+
+    @pytest.mark.parametrize('tile',[1,2])
+    def test_prefit_pilot_emits_actual_complete_scope_and_non_authorizing_cost(tmp_path,fake,tile):
+        from types import SimpleNamespace
+        from tests.test_a3_direction_workload import fixture,ledger
+        from tests.test_a3_direction_artifacts import scientific_metadata
+        from component_analysis import ladder_tasks
+        r=runtime();d,_,_=fixture();source=scientific_metadata()['identity']
+        d.update(a1_identity=source['a1_identity'],parent_evidence=source['parent_evidence'])
+        for task,spec in d['tasks'].items():spec['direction_sites']=[['head',0,0]]
+        groups=list(d['access_rows'].items())+[(task,d[task+'_validation']) for task in ('ioi','mmlu')]+[(task,d['utility'][task]) for task in ('ioi','mmlu')]
+        for task,rows in groups:
+            for j,row in enumerate(rows):
+                row.update(task=task,source_id=row['instance_id'],source_hash='e'*64,question_hash=row['instance_id'],
+                    analysis_split='validation' if row['instance_id'] in {x['instance_id'] for x in d.get(task+'_validation',[])} else row['split'],
+                    expected_token=1,honest_token=2,opposite_token=1)
+                if task=='mmlu':row.update(choice_tokens=[0,1,2,3],gold_letter='B')
+                for stream,saved in row['streams'].items():
+                    saved.update(tokens=[1,2,3+(j%3)] if stream=='clean' else [2,3,5+(j%3)],readout=2,layout=None,
+                        expected_token=1,honest_token=2,opposite_token=1)
+        d['mmlu_validation_maps']=ladder_tasks.mmlu_calibration_maps(d['mmlu_validation'])
+        d['utility']['mmlu_maps']=ladder_tasks.mmlu_calibration_maps(d['utility']['mmlu'])
+        pr=dict(commit=source['commit'],code_hashes=source['code_hashes'],injected=True,numeric_profile={})
+        settings=dict(microbatch_size=2,axis_tile_size=tile,head_width=2,hidden_size=4,num_layers=1,vocabulary_size=4,dtype_bytes=4,
+            hardware={'gpu':'injected-cpu','count':1},warmup_batches=1,serialization_batches=0,finish_reserve_seconds=1,
+            probe_max_bytes=1048576,dtype='torch.float32',backend='fake',jobs=1)
+        r.freeze_operational_contract(d,pr,settings)
+        inv=r.workload.build_inventory(d,pr,stage='prefit')
+        import time
+        start=time.perf_counter();model=object();startup=time.perf_counter()-start
+        result=r.run_pilot(model,d,pr,inv,root=tmp_path,args=SimpleNamespace(pilot_part='prefit',selected=None),guard=lambda:None,startup_seconds=startup)
+        target=r.read_object(tmp_path/'pilot-target-inventory'/'prefit')
+        assert result['complete'] and result['status']=='completed' and result['source_split']=='validation'
+        assert (result['packing_references'] if tile>1 else result['serial_numeric_references']) and all(m['batch_seconds'] for m in result['measurements'])
+        if tile==1:r._authenticate_serial_references(d,pr,inv,result)
+        if tile==1:
+            original_path=Path(next(iter(result['serial_numeric_references'].values()))['path'])
+            original=r.read_object(original_path)
+            for damage in ('replay','timer','positive','rows','selected_backing'):
+                changed=copy.deepcopy(original);raw=changed['receipt']
+                if damage=='replay':raw['rows'][0]['replay_errors']['empty']=1.
+                if damage=='timer':raw['operation_samples'][0]['seconds']=0.
+                if damage=='positive':changed['positive_controls']=[]
+                if damage=='rows':raw['rows'].pop()
+                if damage=='selected_backing':changed.update(injected=False,timing_only=False,numeric_backing_references={})
+                raw['receipt_sha256']=r.workload.digest({k:v for k,v in raw.items() if k!='receipt_sha256'})
+                damaged=tmp_path/'serial-damage'/damage;r.publish_object(damaged,changed)
+>               with pytest.raises(ValueError):r._SerialNumericProof(damaged)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+E               Failed: DID NOT RAISE ValueError
+
+tests/test_a3_direction_runtime.py:458: Failed
+=========================== short test summary info ============================
+FAILED tests/test_a3_direction_runtime.py::test_prefit_pilot_emits_actual_complete_scope_and_non_authorizing_cost[1]
+1 failed in 7.91s
