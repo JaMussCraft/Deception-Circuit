@@ -119,7 +119,7 @@ def independent_primary(rows,task,group,*,n_boot=2000,seed=1):
     strong=bool(point and all(effect[c]['fraction_interval'] is not None for c in effect)
         and effect['D']['fraction_interval'][0]>=.5 and effect['I']['fraction_interval'][1]<.25
         and all(v['shift_interval'] is not None and v['shift_interval'][0]>-.05 and v['shift_interval'][1]<.05 for v in collateral.values()))
-    return dict(coverage=coverage,D=effect['D'],I=effect['I'],collateral=collateral,MMLU=mmlu,epsilon=epsilon,n_ids=len(ids),n_assessment_ids=len(required_ids),n_clusters=len(clusters),
+    return dict(coverage=coverage,D=effect['D'],I=effect['I'],collateral=collateral,MMLU=mmlu,raw=dict(D=accuracy([row for row in diagnostic if row['condition']=='D'])),epsilon=epsilon,n_ids=len(ids),n_assessment_ids=len(required_ids),n_clusters=len(clusters),
                 interpretable=interpretable,point_pass=point,strong=strong,status='unsupported' if coverage['unsupported'] else 'strong' if strong else 'uncertain' if point else 'fails' if interpretable else 'uninterpretable')
 
 
@@ -206,6 +206,7 @@ def audit_score(args,prepared,selected,folder,*,limit,job):
         for batch in task_batches(prepared['utility'][task][:limit or None],batch_size=8):
             for one in runner._rows(batch):recipients[(task,one.ids[0],one.condition,one.stream)]=one
         for m in prepared['utility'][task+'_maps']:maps[(task,m['recipient_id'],m['recipient_condition'],m['recipient_stream'],m['operation'],m.get('seed'))]=m
+    checked_bank_references={}
     for row in scored['rows']:
         assert row['assay_valid'] and row['self_replay_margin_error']==0
         batch=recipients[tuple(row[k] for k in ('task','instance_id','condition','stream'))]
@@ -230,7 +231,12 @@ def audit_score(args,prepared,selected,folder,*,limit,job):
             assert row['donor_provenance'] is None and row['supported']
             assert row['degenerate']==bool(row['operation'] in ('self_replay','empty') or not row['group_members'])
             assert row['gate_valid']==bool(row['operation'] not in ('self_replay','empty') and row['group_members'])
-        if 'mean_bank_provenance' in row:p.resolve_bank_reference(row['mean_bank_provenance'],selected)
+        if 'mean_bank_provenance' in row:
+            reference=row['mean_bank_provenance']
+            assert Path(reference['artifact_reference']).resolve()==Path(args.groups).resolve()
+            if owner not in checked_bank_references:
+                p.resolve_bank_reference(reference,selected);checked_bank_references[owner]=reference
+            else:assert reference==checked_bank_references[owner]
         for value in row.values():
             if isinstance(value,float):assert math.isfinite(value)
     senders=[['embed',0,0]]
@@ -301,7 +307,12 @@ def main():
         p.validate_finalization(scored,final=True)
         terminal=(PARENT/'full/accounting.txt').read_text().splitlines()
         main_record=next(line.split('|') for line in terminal if line.split('|')[0]=='23417811')
-        assert main_record[1:3]==['delta','COMPLETED'] and main_record[4]=='0:0'
+        if main_record[1]=='delta':
+            accounting=dict(job_id=main_record[0],cluster=main_record[1],state=main_record[2],elapsed_seconds=int(main_record[3]),exit_code=main_record[4],allocated_tres=main_record[5])
+        else:
+            accounting=dict(job_id=main_record[0],cluster=manifest['execution']['cluster'],state=main_record[1],elapsed_seconds=int(main_record[2]),exit_code=main_record[3],allocated_tres=main_record[4])
+        assert accounting['state']=='COMPLETED' and accounting['exit_code']=='0:0' and accounting['elapsed_seconds']>0
+        assert accounting['cluster']=='delta' and 'gres/gpu=1' in accounting['allocated_tres']
         summary=p.read_artifact(PARENT/'full/summary.json');assert summary['score_sha256']==p.design._hash(scored)
         canonical=summary['summary'];assert canonical['bootstrap']==dict(seed=1,n_boot=2000,confidence=.95,unit='source pressure id; paired id for utility',donor_seed_outer='independent_resample only')
         expected_cells={(task,name,op) for task,g in selected['groups'].items() for name in ([task+'_full']+([] if g['duplicate_group'] else [task+'_minus'])) for op in p.OPERATIONS}
@@ -331,7 +342,7 @@ def main():
         # All SDR operations retain their qualification, not merely item-swap.
         for cell in canonical['cells']:
             if cell['task']=='sdr_v2':assert cell['descriptive'] and cell['status']=='descriptive_only' and cell['strong'] is False
-        output.update(full_run_examined=True,canonical_summary_examined=True,canonical_summary_final=summary['final'],full_counts=scored['counts'],execution=manifest['execution'],accounting_main_record=main_record,
+        output.update(full_run_examined=True,canonical_summary_examined=True,canonical_summary_final=summary['final'],full_counts=scored['counts'],execution=manifest['execution'],accounting_main_record=accounting,
                       independent_primary=primary,full_noop_max_error=max(r['self_replay_margin_error'] for r in scored['rows']),full_positive_max_error=max(c['max_abs_logit_error'] for c in scored['positive_controls']),
                       full_row_statuses={k:sum(bool(r.get(k)) for r in scored['rows']) for k in ('assay_valid','supported','degenerate','gate_valid')},by_task_rows=dict(Counter(r['task'] for r in scored['rows'])))
     print(json.dumps(output,sort_keys=True,indent=2,allow_nan=False))
