@@ -1,0 +1,438 @@
+{
+ "task": "sdr_v2",
+ "created": "2026-11-02T15:12:52",
+ "split": "test",
+ "seed_lists": 42,
+ "sample_seed": 42,
+ "plan_count": 54168,
+ "scored_prefix": 40000,
+ "scored_prefix_note": "the build scored only this prefix of the plan's test list (sum of the base test chunks in filter_report compute); candidates are drawn from it",
+ "per_cell_target": 200,
+ "floor": 100,
+ "prior_rate_used": 0.31,
+ "funnel_prior_rate": 0.31320944412012713,
+ "n_cells": 50,
+ "n_sampled": 32300,
+ "n_anchor": 1000,
+ "n_rows": 33300,
+ "out_of_window_dropped": {},
+ "anchor_byte_identity": {
+  "clean_prompt": "1000/1000",
+  "corrupt_prompt": "1000/1000",
+  "neutral_prompt": "1000/1000"
+ },
+ "anchor_with_stored_inversion": 1000,
+ "clause_forms_csv": {
+  "in_table": 20,
+  "agree": 20,
+  "disagree": [],
+  "n_clauses": 25,
+  "note": "forms come from the text rule for every clause; the csv covers only the clauses of the stored D test rows and is cross-checked where it has an entry"
+ },
+ "cells_short_of_target": [],
+ "cells_below_floor": [],
+ "per_cell": {
+  "r9_rule_unified_sdr_v2_00|inversion": {
+   "available_unselected": 770,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_00|identity": {
+   "available_unselected": 763,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_01|inversion": {
+   "available_unselected": 778,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_01|identity": {
+   "available_unselected": 777,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_02|inversion": {
+   "available_unselected": 767,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_02|identity": {
+   "available_unselected": 798,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_03|inversion": {
+   "available_unselected": 781,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_03|identity": {
+   "available_unselected": 792,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_04|inversion": {
+   "available_unselected": 765,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_04|identity": {
+   "available_unselected": 776,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_05|inversion": {
+   "available_unselected": 791,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_05|identity": {
+   "available_unselected": 789,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_06|inversion": {
+   "available_unselected": 771,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_06|identity": {
+   "available_unselected": 800,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_07|inversion": {
+   "available_unselected": 777,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_07|identity": {
+   "available_unselected": 796,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_08|inversion": {
+   "available_unselected": 789,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_08|identity": {
+   "available_unselected": 788,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_09|inversion": {
+   "available_unselected": 792,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_09|identity": {
+   "available_unselected": 800,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_10|inversion": {
+   "available_unselected": 772,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_10|identity": {
+   "available_unselected": 773,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_11|inversion": {
+   "available_unselected": 774,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_11|identity": {
+   "available_unselected": 772,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_12|inversion": {
+   "available_unselected": 770,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_12|identity": {
+   "available_unselected": 729,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_13|inversion": {
+   "available_unselected": 759,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_13|identity": {
+   "available_unselected": 747,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_14|inversion": {
+   "available_unselected": 769,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_14|identity": {
+   "available_unselected": 779,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_15|inversion": {
+   "available_unselected": 759,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_15|identity": {
+   "available_unselected": 774,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_16|inversion": {
+   "available_unselected": 774,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_16|identity": {
+   "available_unselected": 751,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_17|inversion": {
+   "available_unselected": 785,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_17|identity": {
+   "available_unselected": 777,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_18|inversion": {
+   "available_unselected": 771,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_18|identity": {
+   "available_unselected": 757,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_19|inversion": {
+   "available_unselected": 780,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_sdr_v2_19|identity": {
+   "available_unselected": 774,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "shared_00|inversion": {
+   "available_unselected": 793,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "shared_00|identity": {
+   "available_unselected": 808,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "shared_01|inversion": {
+   "available_unselected": 796,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "shared_01|identity": {
+   "available_unselected": 798,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "shared_02|inversion": {
+   "available_unselected": 802,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "shared_02|identity": {
+   "available_unselected": 801,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "shared_03|inversion": {
+   "available_unselected": 801,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "shared_03|identity": {
+   "available_unselected": 796,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "shared_04|inversion": {
+   "available_unselected": 797,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "shared_04|identity": {
+   "available_unselected": 802,
+   "drawn": 646,
+   "requested": 646,
+   "expected_prior_kept": 200.3,
+   "short_of_target": false,
+   "below_floor": false
+  }
+ },
+ "sample_sha256": "900dcc770dde4f7706960004764dbf07f8d8080ff73decb0f5432c201ba623b6",
+ "sample_path": "outputs/_analyses/deception-divergence/d1/sdr_v2/sample.jsonl"
+}

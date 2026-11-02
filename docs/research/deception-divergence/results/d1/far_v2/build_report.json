@@ -1,0 +1,307 @@
+{
+ "task": "far_v2",
+ "created": "2026-11-02T13:19:04",
+ "sample_sha256": "f4c36f9d9d91860de6609b19a5711d4f6d25f264b16bc1bec09b445fb55816a2",
+ "max_seq_length": 120,
+ "n_rows": 24850,
+ "n_kept": 24850,
+ "n_anchor": 1000,
+ "n_sampled": 23850,
+ "length_dropped": 0,
+ "length_dropped_by_clause": {},
+ "longest_arm_tokens": 113,
+ "arms": [
+  "P",
+  "D",
+  "L1_visible",
+  "L1_hidden",
+  "L2_visible",
+  "L2_hidden",
+  "L3_visible",
+  "L3_hidden",
+  "I",
+  "D_at120 (anchors)",
+  "P_at120 (anchors)"
+ ],
+ "prompt_counts": {
+  "P": 24850,
+  "D": 49700,
+  "L1_visible": 49700,
+  "L1_hidden": 49700,
+  "L2_visible": 49700,
+  "L2_hidden": 49700,
+  "L3_visible": 49700,
+  "L3_hidden": 49700,
+  "I": 36344,
+  "D_at120": 2000,
+  "P_at120": 1000
+ },
+ "token_lengths": {
+  "P": {
+   "n": 24850,
+   "min": 86,
+   "median": 90,
+   "p99": 93,
+   "max": 93,
+   "histogram": {
+    "86": 286,
+    "87": 1419,
+    "88": 3460,
+    "89": 5450,
+    "90": 5880,
+    "91": 4795,
+    "92": 2448,
+    "93": 1112
+   }
+  },
+  "D": {
+   "n": 24850,
+   "min": 94,
+   "median": 98,
+   "p99": 101,
+   "max": 101,
+   "histogram": {
+    "94": 286,
+    "95": 1419,
+    "96": 3460,
+    "97": 5450,
+    "98": 5880,
+    "99": 4795,
+    "100": 2448,
+    "101": 1112
+   }
+  },
+  "L1_visible": {
+   "n": 24850,
+   "min": 101,
+   "median": 105,
+   "p99": 108,
+   "max": 108,
+   "histogram": {
+    "101": 286,
+    "102": 1419,
+    "103": 3460,
+    "104": 5450,
+    "105": 5880,
+    "106": 4795,
+    "107": 2448,
+    "108": 1112
+   }
+  },
+  "L1_hidden": {
+   "n": 24850,
+   "min": 101,
+   "median": 105,
+   "p99": 108,
+   "max": 108,
+   "histogram": {
+    "101": 286,
+    "102": 1419,
+    "103": 3460,
+    "104": 5450,
+    "105": 5880,
+    "106": 4795,
+    "107": 2448,
+    "108": 1112
+   }
+  },
+  "L2_visible": {
+   "n": 24850,
+   "min": 102,
+   "median": 106,
+   "p99": 109,
+   "max": 109,
+   "histogram": {
+    "102": 286,
+    "103": 1419,
+    "104": 3460,
+    "105": 5450,
+    "106": 5880,
+    "107": 4795,
+    "108": 2448,
+    "109": 1112
+   }
+  },
+  "L2_hidden": {
+   "n": 24850,
+   "min": 104,
+   "median": 108,
+   "p99": 111,
+   "max": 111,
+   "histogram": {
+    "104": 286,
+    "105": 1419,
+    "106": 3460,
+    "107": 5450,
+    "108": 5880,
+    "109": 4795,
+    "110": 2448,
+    "111": 1112
+   }
+  },
+  "L3_visible": {
+   "n": 24850,
+   "min": 105,
+   "median": 109,
+   "p99": 112,
+   "max": 112,
+   "histogram": {
+    "105": 286,
+    "106": 1419,
+    "107": 3460,
+    "108": 5450,
+    "109": 5880,
+    "110": 4795,
+    "111": 2448,
+    "112": 1112
+   }
+  },
+  "L3_hidden": {
+   "n": 24850,
+   "min": 106,
+   "median": 110,
+   "p99": 113,
+   "max": 113,
+   "histogram": {
+    "106": 286,
+    "107": 1419,
+    "108": 3460,
+    "109": 5450,
+    "110": 5880,
+    "111": 4795,
+    "112": 2448,
+    "113": 1112
+   }
+  },
+  "I": {
+   "n": 18172,
+   "min": 94,
+   "median": 97,
+   "p99": 101,
+   "max": 101,
+   "histogram": {
+    "94": 343,
+    "95": 1513,
+    "96": 3264,
+    "97": 4362,
+    "98": 3795,
+    "99": 2926,
+    "100": 1000,
+    "101": 969
+   }
+  }
+ },
+ "I_coverage": {
+  "n_with_I": 18172,
+  "n_without_I": 6678,
+  "dropped_by_clause": {
+   "r8_rule_strong_far_v2_16": 954,
+   "r8_rule_strong_far_v2_17": 954,
+   "shared_03": 954,
+   "shared_02": 954,
+   "shared_00": 954,
+   "r8_rule_strong_far_v2_04": 954,
+   "r8_rule_strong_far_v2_02": 954
+  },
+  "with_I_by_clause": {
+   "r8_rule_strong_far_v2_15": 1021,
+   "r8_rule_strong_far_v2_12": 1026,
+   "r8_rule_strong_far_v2_06": 998,
+   "r8_rule_strong_far_v2_10": 1042,
+   "r8_rule_strong_far_v2_03": 1104,
+   "r8_rule_strong_far_v2_05": 1064,
+   "r8_rule_strong_far_v2_11": 1045,
+   "r8_rule_strong_far_v2_09": 963,
+   "r8_rule_strong_far_v2_01": 1050,
+   "r8_rule_strong_far_v2_19": 954,
+   "r8_rule_strong_far_v2_00": 1070,
+   "r8_rule_strong_far_v2_14": 954,
+   "r8_rule_strong_far_v2_13": 954,
+   "r8_rule_strong_far_v2_08": 1104,
+   "r8_rule_strong_far_v2_07": 961,
+   "shared_01": 954,
+   "r8_rule_strong_far_v2_18": 954,
+   "shared_04": 954
+  },
+  "pick_kind_counts": {
+   "token_matched": 16264,
+   "token_matched_no_twin": 0,
+   "form_only": 1908
+  },
+  "pick_kind_counts_sampled": {
+   "token_matched": 15264,
+   "token_matched_no_twin": 0,
+   "form_only": 1908
+  },
+  "pick_kind_by_clause": {
+   "r8_rule_strong_far_v2_00": {
+    "token_matched": 1070
+   },
+   "r8_rule_strong_far_v2_01": {
+    "token_matched": 1050
+   },
+   "r8_rule_strong_far_v2_03": {
+    "token_matched": 1104
+   },
+   "r8_rule_strong_far_v2_05": {
+    "token_matched": 1064
+   },
+   "r8_rule_strong_far_v2_06": {
+    "token_matched": 998
+   },
+   "r8_rule_strong_far_v2_07": {
+    "token_matched": 961
+   },
+   "r8_rule_strong_far_v2_08": {
+    "token_matched": 1104
+   },
+   "r8_rule_strong_far_v2_09": {
+    "token_matched": 963
+   },
+   "r8_rule_strong_far_v2_10": {
+    "token_matched": 1042
+   },
+   "r8_rule_strong_far_v2_11": {
+    "token_matched": 1045
+   },
+   "r8_rule_strong_far_v2_12": {
+    "token_matched": 1026
+   },
+   "r8_rule_strong_far_v2_13": {
+    "token_matched": 954
+   },
+   "r8_rule_strong_far_v2_14": {
+    "token_matched": 954
+   },
+   "r8_rule_strong_far_v2_15": {
+    "token_matched": 1021
+   },
+   "r8_rule_strong_far_v2_18": {
+    "token_matched": 954
+   },
+   "r8_rule_strong_far_v2_19": {
+    "token_matched": 954
+   },
+   "shared_01": {
+    "form_only": 954
+   },
+   "shared_04": {
+    "form_only": 954
+   }
+  },
+  "pick_rule": "R2a: build_inversion_v2 candidates + select against the id's Neutral-Clause Twin where a clause fits, else the form-only pick",
+  "anchors_vs_stored_inversion_pick": {
+   "n": 1000,
+   "agree": 1000,
+   "token_matched": 1000
+  }
+ },
+ "forwards_expected": {
+  "P_all": 24850,
+  "pair_arms_expected": 170351,
+  "anchor_controls": 3000,
+  "total_expected": 198201
+ },
+ "forwards_note": "P for every row; the pair arms only for prior-kept rows (expected at the sample's prior rate) and the anchors; anchors add D and P at max_length 120",
+ "seconds_cpu": 623.0
+}

@@ -1,0 +1,336 @@
+{
+ "task": "sdr_v2",
+ "created": "2026-11-02T13:38:56",
+ "sample_sha256": "900dcc770dde4f7706960004764dbf07f8d8080ff73decb0f5432c201ba623b6",
+ "max_seq_length": 120,
+ "n_rows": 33300,
+ "n_kept": 33300,
+ "n_anchor": 1000,
+ "n_sampled": 32300,
+ "length_dropped": 0,
+ "length_dropped_by_clause": {},
+ "longest_arm_tokens": 118,
+ "arms": [
+  "P",
+  "D",
+  "L1_visible",
+  "L1_hidden",
+  "L2_visible",
+  "L2_hidden",
+  "L3_visible",
+  "L3_hidden",
+  "I",
+  "D_at120 (anchors)",
+  "P_at120 (anchors)"
+ ],
+ "prompt_counts": {
+  "P": 33300,
+  "D": 66600,
+  "L1_visible": 66600,
+  "L1_hidden": 66600,
+  "L2_visible": 66600,
+  "L2_hidden": 66600,
+  "L3_visible": 66600,
+  "L3_hidden": 66600,
+  "I": 66600,
+  "D_at120": 2000,
+  "P_at120": 1000
+ },
+ "token_lengths": {
+  "P": {
+   "n": 33300,
+   "min": 90,
+   "median": 94,
+   "p99": 98,
+   "max": 98,
+   "histogram": {
+    "90": 356,
+    "91": 1778,
+    "92": 3521,
+    "93": 5750,
+    "94": 7287,
+    "95": 6405,
+    "96": 5247,
+    "97": 2237,
+    "98": 719
+   }
+  },
+  "D": {
+   "n": 33300,
+   "min": 98,
+   "median": 102,
+   "p99": 106,
+   "max": 106,
+   "histogram": {
+    "98": 356,
+    "99": 1778,
+    "100": 3521,
+    "101": 5750,
+    "102": 7287,
+    "103": 6405,
+    "104": 5247,
+    "105": 2237,
+    "106": 719
+   }
+  },
+  "L1_visible": {
+   "n": 33300,
+   "min": 105,
+   "median": 109,
+   "p99": 113,
+   "max": 113,
+   "histogram": {
+    "105": 356,
+    "106": 1778,
+    "107": 3521,
+    "108": 5750,
+    "109": 7287,
+    "110": 6405,
+    "111": 5247,
+    "112": 2237,
+    "113": 719
+   }
+  },
+  "L1_hidden": {
+   "n": 33300,
+   "min": 105,
+   "median": 109,
+   "p99": 113,
+   "max": 113,
+   "histogram": {
+    "105": 356,
+    "106": 1778,
+    "107": 3521,
+    "108": 5750,
+    "109": 7287,
+    "110": 6405,
+    "111": 5247,
+    "112": 2237,
+    "113": 719
+   }
+  },
+  "L2_visible": {
+   "n": 33300,
+   "min": 106,
+   "median": 110,
+   "p99": 114,
+   "max": 114,
+   "histogram": {
+    "106": 356,
+    "107": 1778,
+    "108": 3521,
+    "109": 5750,
+    "110": 7287,
+    "111": 6405,
+    "112": 5247,
+    "113": 2237,
+    "114": 719
+   }
+  },
+  "L2_hidden": {
+   "n": 33300,
+   "min": 108,
+   "median": 112,
+   "p99": 116,
+   "max": 116,
+   "histogram": {
+    "108": 356,
+    "109": 1778,
+    "110": 3521,
+    "111": 5750,
+    "112": 7287,
+    "113": 6405,
+    "114": 5247,
+    "115": 2237,
+    "116": 719
+   }
+  },
+  "L3_visible": {
+   "n": 33300,
+   "min": 109,
+   "median": 113,
+   "p99": 117,
+   "max": 117,
+   "histogram": {
+    "109": 356,
+    "110": 1778,
+    "111": 3521,
+    "112": 5750,
+    "113": 7287,
+    "114": 6405,
+    "115": 5247,
+    "116": 2237,
+    "117": 719
+   }
+  },
+  "L3_hidden": {
+   "n": 33300,
+   "min": 110,
+   "median": 114,
+   "p99": 118,
+   "max": 118,
+   "histogram": {
+    "110": 356,
+    "111": 1778,
+    "112": 3521,
+    "113": 5750,
+    "114": 7287,
+    "115": 6405,
+    "116": 5247,
+    "117": 2237,
+    "118": 719
+   }
+  },
+  "I": {
+   "n": 33300,
+   "min": 98,
+   "median": 102,
+   "p99": 106,
+   "max": 106,
+   "histogram": {
+    "98": 356,
+    "99": 1778,
+    "100": 3521,
+    "101": 5750,
+    "102": 7287,
+    "103": 6405,
+    "104": 5247,
+    "105": 2237,
+    "106": 719
+   }
+  }
+ },
+ "I_coverage": {
+  "n_with_I": 33300,
+  "n_without_I": 0,
+  "dropped_by_clause": {},
+  "with_I_by_clause": {
+   "r9_rule_unified_sdr_v2_18": 1369,
+   "r9_rule_unified_sdr_v2_12": 1392,
+   "r9_rule_unified_sdr_v2_06": 1320,
+   "shared_04": 1292,
+   "r9_rule_unified_sdr_v2_10": 1336,
+   "r9_rule_unified_sdr_v2_09": 1300,
+   "r9_rule_unified_sdr_v2_13": 1392,
+   "shared_01": 1292,
+   "r9_rule_unified_sdr_v2_04": 1348,
+   "r9_rule_unified_sdr_v2_07": 1325,
+   "r9_rule_unified_sdr_v2_03": 1325,
+   "shared_00": 1292,
+   "r9_rule_unified_sdr_v2_11": 1335,
+   "r9_rule_unified_sdr_v2_16": 1358,
+   "r9_rule_unified_sdr_v2_15": 1353,
+   "r9_rule_unified_sdr_v2_14": 1337,
+   "r9_rule_unified_sdr_v2_08": 1311,
+   "shared_03": 1292,
+   "r9_rule_unified_sdr_v2_05": 1317,
+   "r9_rule_unified_sdr_v2_02": 1338,
+   "r9_rule_unified_sdr_v2_19": 1345,
+   "r9_rule_unified_sdr_v2_17": 1336,
+   "shared_02": 1292,
+   "r9_rule_unified_sdr_v2_01": 1341,
+   "r9_rule_unified_sdr_v2_00": 1362
+  },
+  "pick_kind_counts": {
+   "token_matched": 33300,
+   "token_matched_no_twin": 0,
+   "form_only": 0
+  },
+  "pick_kind_counts_sampled": {
+   "token_matched": 32300,
+   "token_matched_no_twin": 0,
+   "form_only": 0
+  },
+  "pick_kind_by_clause": {
+   "r9_rule_unified_sdr_v2_00": {
+    "token_matched": 1362
+   },
+   "r9_rule_unified_sdr_v2_01": {
+    "token_matched": 1341
+   },
+   "r9_rule_unified_sdr_v2_02": {
+    "token_matched": 1338
+   },
+   "r9_rule_unified_sdr_v2_03": {
+    "token_matched": 1325
+   },
+   "r9_rule_unified_sdr_v2_04": {
+    "token_matched": 1348
+   },
+   "r9_rule_unified_sdr_v2_05": {
+    "token_matched": 1317
+   },
+   "r9_rule_unified_sdr_v2_06": {
+    "token_matched": 1320
+   },
+   "r9_rule_unified_sdr_v2_07": {
+    "token_matched": 1325
+   },
+   "r9_rule_unified_sdr_v2_08": {
+    "token_matched": 1311
+   },
+   "r9_rule_unified_sdr_v2_09": {
+    "token_matched": 1300
+   },
+   "r9_rule_unified_sdr_v2_10": {
+    "token_matched": 1336
+   },
+   "r9_rule_unified_sdr_v2_11": {
+    "token_matched": 1335
+   },
+   "r9_rule_unified_sdr_v2_12": {
+    "token_matched": 1392
+   },
+   "r9_rule_unified_sdr_v2_13": {
+    "token_matched": 1392
+   },
+   "r9_rule_unified_sdr_v2_14": {
+    "token_matched": 1337
+   },
+   "r9_rule_unified_sdr_v2_15": {
+    "token_matched": 1353
+   },
+   "r9_rule_unified_sdr_v2_16": {
+    "token_matched": 1358
+   },
+   "r9_rule_unified_sdr_v2_17": {
+    "token_matched": 1336
+   },
+   "r9_rule_unified_sdr_v2_18": {
+    "token_matched": 1369
+   },
+   "r9_rule_unified_sdr_v2_19": {
+    "token_matched": 1345
+   },
+   "shared_00": {
+    "token_matched": 1292
+   },
+   "shared_01": {
+    "token_matched": 1292
+   },
+   "shared_02": {
+    "token_matched": 1292
+   },
+   "shared_03": {
+    "token_matched": 1292
+   },
+   "shared_04": {
+    "token_matched": 1292
+   }
+  },
+  "pick_rule": "R2a: build_inversion_v2 candidates + select against the id's Neutral-Clause Twin where a clause fits, else the form-only pick",
+  "anchors_vs_stored_inversion_pick": {
+   "n": 1000,
+   "agree": 1000,
+   "token_matched": 1000
+  }
+ },
+ "forwards_expected": {
+  "P_all": 33300,
+  "pair_arms_expected": 176208,
+  "anchor_controls": 3000,
+  "total_expected": 212508
+ },
+ "forwards_note": "P for every row; the pair arms only for prior-kept rows (expected at the sample's prior rate) and the anchors; anchors add D and P at max_length 120",
+ "seconds_cpu": 1191.7
+}

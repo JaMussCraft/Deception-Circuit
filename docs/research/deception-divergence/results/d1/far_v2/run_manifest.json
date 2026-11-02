@@ -1,0 +1,73 @@
+{
+ "task": "far_v2",
+ "stage": "score",
+ "commit": "4bdf6bb3a313453ce7e0a66d0a8d812451c94a60",
+ "created": "2026-11-02T15:36:20",
+ "model": "meta-llama/Llama-3.1-8B-Instruct",
+ "dtype": "bfloat16",
+ "loader": "dataset.pilot_v2.load_model",
+ "scoring": "dataset.deception_common.score_prompts (build_deception_v2._score fields + item logits)",
+ "max_seq_length": 120,
+ "batch_size": 32,
+ "anchor_control": {
+  "arms": [
+   "D_at120",
+   "P_at120"
+  ],
+  "max_seq_length": 120,
+  "batch_size": 32
+ },
+ "chunk_size": 2000,
+ "max_ids": 0,
+ "n_ids": 24850,
+ "length_dropped": 0,
+ "length_dropped_by_clause": {},
+ "n_prior_kept": 10906,
+ "I_pick_kinds": {
+  "token_matched": 7328,
+  "None": 3021,
+  "form_only": 605
+ },
+ "forwards": 197072,
+ "seconds": 1040.693814754486,
+ "seconds_wall_this_job": 1045.2,
+ "sample": {
+  "path": "outputs/_analyses/deception-divergence/d1/far_v2/sample.jsonl",
+  "sha256": "f4c36f9d9d91860de6609b19a5711d4f6d25f264b16bc1bec09b445fb55816a2"
+ },
+ "scores_sha256": "827d53ea873a02352045312173810eb2154d22d104fa44394e69637b319d8934",
+ "code_sha256": {
+  "scripts/d1_visibility.py": "5bb67c6ed2a09e5d790dd348c12a8917ce8a9cf11122e9083ee6330b866e5233",
+  "dataset/build_deception_v2.py": "60597332ae2953bbbf2517ca39629bb0b6e64509176c4dbd5910614879e4a4a2",
+  "dataset/build_inversion_v2.py": "6aacfde804edc9603e56c627a88f5b5cfb450133b1315814a518e48d6a89e207",
+  "dataset/deception_v2.py": "bd4b9fe72d26e4b09c331415e7c747c9c20f8cfefee0275c0ed3e2ab87acf85e",
+  "dataset/deception_common.py": "cd3995b54d1a15135dc4e96642e86e5e0a23d84ee4c401959953951f3c8487e8",
+  "dataset/contingency.py": "630f74db0605fcb3e6d44e98a279277be518c8441716bb94a6cb5e708cfa0204",
+  "dataset/clause_surgery.py": "31972e3f5b854f1ced8698824f886ac5bc3bcaf790470a760fff0ded84697065",
+  "dataset/matched_honest.py": "cb30aa003b22a0cb940bb2fb16e0f67be77f0f5e433d7a4d9b52f1fd059f13f0",
+  "dataset/pilot_v2.py": "966637dfb8e34eb49a8fedb0254f46ada4c35b3eae10cb8f1d8c4fb8b46fe605"
+ },
+ "pool_sha256": {
+  "inversion_v2": "9cf3994ab57fa444e6002865b7b637a12389d8795f734a461f99323b91eb730c",
+  "clause_forms_csv": "0b239b03b51fa090e772a3c9533aecb65ce3fb3cb1fae846eb0aad662b884cd6",
+  "framing": "a7e54e7b893fa68843cc20d0dee79b5de09a7145c9080dc3dfc6b8b5b09dc1d3",
+  "neutral_pool": "d20e6b0aef030f62ccb965f511ff5fbb384574c38a3230fb13483a2320355ac4",
+  "shared_clauses": "9a97e3bf5f5d688c7891722d39b5729cb25f0726542cf3b6a88941690df668a0",
+  "item_pairs": "cde26ecfc6a26d452741b12bd90a9b694ff905e982321530f8dd31d69d8ac9e2",
+  "entities": "e480428006e22e44428bab22e0cfa00683e0fb3d70b6a64326e94f2ed443f9df"
+ },
+ "cluster": "bridges2",
+ "job_id": "50145353",
+ "partition": "GPU-shared",
+ "host": "w009.ib.bridges2.psc.edu",
+ "gpu": "NVIDIA H100 80GB HBM3",
+ "versions": {
+  "python": "3.12.13",
+  "torch": "2.11.0+cu128",
+  "transformers": "5.13.0",
+  "numpy": "2.5.1"
+ },
+ "chunk_jobs": [
+  "50145353"
+ ]
+}

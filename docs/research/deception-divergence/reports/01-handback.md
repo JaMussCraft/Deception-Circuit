@@ -3,7 +3,8 @@
 Agent: Opus worker (claude-opus-5-5), direction deception-divergence. Ticket: the orchestrator's D1 message of Mon 2
 Nov 2026 (START.md section 2 item D1, section 10 "D1 done", spec.md rulings R1 to R4), then the orchestrator's R2a
 follow-up of the same day (spec.md ruling R2a). Status: resolved. The pipeline is built, tested on both interpreters
-and dry-run through its wrapper, with the R2a I pick. No GPU job was submitted.
+and dry-run through its wrapper, with the R2a I pick. The orchestrator ran it as Bridges-2 job 50145353, and
+"Results" holds the readings: both anchors pass, and neither verdict passes on any task.
 
 ## What changed
 
@@ -213,74 +214,281 @@ Observed: `19 failed, 3733 passed, 23 skipped, 2 warnings, 101 errors in 1958.14
 - **Comparison with main.** The main checkout's baseline list of names was not available to me, so I did not compare
   against it. The base py3.9 full suite was not run.
 
+## Results
+
+Bridges-2 job 50145353 completed in 1:08:27 on one H100. It ran from commit 4bdf6bb. Both reproduction anchors
+pass. Neither verdict passes on any task under the primary R1 rule, and neither passes under the secondary
+definition either. The D1 gate of R4 (any task passes) is therefore not passed for listener knowledge or for the
+honesty override.
+
+### Execution evidence block
+
+| field | value |
+| --- | --- |
+| job | Bridges-2 50145353, partition GPU-shared, one NVIDIA H100 80GB HBM3, node w009 |
+| state | COMPLETED, exit code 0:0 |
+| elapsed | 1:08:27, from 3:09 pm to 4:17 pm EST, Mon 2 Nov 2026 (1.14 GPU-h) |
+| commit | `4bdf6bb3a313453ce7e0a66d0a8d812451c94a60` (in every `run_manifest.json`) |
+| code hash | `scripts/d1_visibility.py` sha256 `5bb67c6ed2a09e5d790dd348c12a8917ce8a9cf11122e9083ee6330b866e5233` |
+| manifests | `outputs/_analyses/deception-divergence/d1/<task>/run_manifest.json` |
+| readings | `outputs/_analyses/deception-divergence/d1/readings.json` and `readings.md` |
+| job log | `logs/bridges2/d1_visibility_50145353.out` |
+
+The samples were redrawn inside the job and match the dry-run hashes: FAR `f4c36f9d9d91`, SDR `900dcc770dde` and
+SER `cfe13594eeb4`. The job's sample stage found all 1,000 anchors per task byte-identical on the clean, corrupt and
+neutral prompts. The fetch kept `sample_report.json.pre-b2fetch` beside each task's report. Each backup differs from
+the fetched report only in its `created` time, and all three are still in place.
+
+Row counts, observed against the build report:
+
+| task | scores.jsonl rows | build report rows | prior-kept sampled | rows with pair arms | rows with I | forwards | build expected | scoring seconds |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| far_v2 | 24,850 | 24,850 | 9,954 | 10,954 | 7,933 | 197,072 | 198,201 | 1,041 |
+| sdr_v2 | 33,300 | 33,300 | 9,563 | 10,563 | 10,563 | 205,308 | 212,508 | 1,187 |
+| ser_v2 | 32,250 | 32,250 | 9,846 | 10,846 | 10,846 | 208,786 | 211,250 | 1,164 |
+
+Pair-arm rows are the prior-kept sampled ids plus the 1,000 anchors. The forwards reconcile exactly: one P forward
+per row, 14 per pair-arm row (seven arms, two streams), 2 per row with an I clause and 3,000 anchor controls. For FAR
+that is 24,850 + 10,954 × 14 + 7,933 × 2 + 3,000 = 197,072. The build expectation used the 10,000 prior-kept target
+per task. The rescore kept fewer, so there are fewer forwards and no missing rows. The scores files have sha256
+`827d53ea` (FAR), `2960568c` (SDR) and `eaffbeab` (SER), with the full hashes in the manifests.
+
+I fetched the outputs with
+`DC_DELTA_REPO_ROOT=<this worktree> scripts/remote/b2.sh fetch outputs/_analyses/deception-divergence/d1`, and I
+copied the log from `b2dtn`. The read stage was rerun on Delta under mgnp, from the worktree root:
+
+```
+OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 /u/swong2/.conda/envs/mgnp/bin/python -I scripts/d1_visibility.py read
+```
+
+It exited 0. Its `readings.md` is identical to the one the job wrote, apart from the `Created` line.
+
+### Anchor 1: D reproduces the stored margins
+
+R3 fails the anchor at a sign-flip rate above 1 percent. No task has a flip. Margins are signed instructed minus
+honest. The D_at120 control gave the same numbers as D, because this run's max length is the builder's 120.
+
+| task | stream | n | signed mean | mean abs | exact (%) | within 2 ulp (%) | sign flips | own-field gap |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| far_v2 | clean | 1,000 | -0.0066 | 0.0832 | 45.5 | 99.3 | 0 | 1.334 |
+| far_v2 | corrupt | 1,000 | -0.0064 | 0.0839 | 45.7 | 99.4 | 0 | 1.331 |
+| sdr_v2 | clean | 1,000 | -0.0013 | 0.0802 | 45.0 | 99.4 | 0 | 1.702 |
+| sdr_v2 | corrupt | 1,000 | -0.0094 | 0.0786 | 45.4 | 99.7 | 0 | 1.704 |
+| ser_v2 | clean | 1,000 | -0.0159 | 0.0901 | 40.9 | 98.1 | 0 | 1.616 |
+| ser_v2 | corrupt | 1,000 | -0.0195 | 0.0932 | 42.6 | 98.1 | 0 | 1.608 |
+
+The prior arm P keeps 952 (FAR), 941 (SDR) and 943 (SER) of the 1,000 anchors inside the prior window on the
+rescore, although all 1,000 were inside it when stored. This is the documented bf16 drift, not a reproduction
+failure. Prior margins lie on a 0.125 grid, which is one bf16 ulp at these logit sizes. Every stored anchor prior has
+an absolute value of 0.375 or less. Every anchor that leaves the window moved from 0.375 to exactly 0.5, and the gate
+is a strict `< 0.5`. The P mean absolute change is 0.054, 0.055 and 0.052. The verdict pools use the rescored prior,
+so they are consistent with this job.
+
+### Anchor 2: token-matched I compliance against the stored kept counts
+
+| task | anchors with token-matched I | R1 compliant | stored kept | difference | same pick | per-id kept agreement |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| far_v2 | 1,000 | 210 | 210 | 0 | 1,000 | 1,000 of 1,000 |
+| sdr_v2 | 1,000 | 788 | 788 | 0 | 1,000 | 1,000 of 1,000 |
+| ser_v2 | 1,000 | 249 | 249 | 0 | 1,000 | 1,000 of 1,000 |
+
+The I margins on these anchors equal the stored `<task>_inversion` margins exactly, with a mean absolute difference
+of 0.0. Both were scored on Bridges-2 H100s.
+
+### Verdicts
+
+The listener rule is |visible minus hidden| of at least 10 points, with the clustered 95 percent interval excluding
+zero. Phrasing 1 (visibility) decides. Phrasing 2 (belief) and then phrasing 3 (consequence) are read only when the
+phrasing before is null. The override rule reads the I minus D point estimate against 10 points and reports the
+interval beside it. Intervals are percentile bootstraps of 2,000 resamples, clustered by D's pressure clause.
+Differences are in percentage points, ordered by phrasing.
+
+| task | definition | L1 visible - hidden | L2 visible - hidden | L3 visible - hidden | listener knowledge | I - D | honesty override |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| far_v2 | primary | +2.5 [+1.1, +4.1] | -0.2 [-0.8, +0.4] | -0.1 [-1.2, +0.9] | null | -5.9 [-15.0, +2.8] | null |
+| far_v2 | secondary | +2.5 [+1.0, +4.2] | -3.1 [-5.0, -1.3] | +0.8 [-0.4, +1.8] | null | +0.0 [-17.3, +17.4] | null |
+| sdr_v2 | primary | -5.2 [-9.1, -1.7] | -6.7 [-13.4, -0.8] | -6.4 [-13.7, -0.2] | null | +8.2 [-2.3, +20.2] | null |
+| sdr_v2 | secondary | -9.7 [-16.9, -3.4] | -9.9 [-18.1, -2.4] | -9.6 [-18.2, -1.9] | null | +8.4 [-2.0, +19.8] | null |
+| ser_v2 | primary | -2.4 [-3.9, -0.8] | -1.4 [-4.2, +1.6] | -5.5 [-8.9, -2.2] | null | +1.9 [-8.1, +10.8] | null |
+| ser_v2 | secondary | -4.1 [-5.2, -2.8] | -4.2 [-7.1, -1.3] | -6.6 [-9.7, -3.5] | null | +3.1 [-9.2, +15.4] | null |
+
+The read stage computes verdicts under the primary rule only. The secondary verdicts above apply the same two rules
+to the secondary rows of `readings.json`.
+
+- **The listener verdict is null on size, not on uncertainty.** All three phrasing-1 intervals under the primary
+  rule exclude zero, but no point estimate reaches 10 points. The sign differs by task: FAR is positive, SDR and SER
+  are negative.
+- **SDR is the most consistent listener effect.** Telling the model the user can see, knows or will find out lowers
+  compliance under all three phrasings and both definitions. Under the secondary definition the drop is 9.6 to 9.9
+  points, just short of the bar.
+- **No override interval excludes zero.** SDR's +8.2 points is the nearest to the bar. The intervals are wide, with
+  18 to 25 pressure-clause clusters per task.
+- **The appended sentence moves compliance by itself in SER.** L1 hidden minus D, which is descriptive, is +9.6
+  [+5.7, +13.7] points under the primary rule and +13.4 [+10.0, +16.6] under the secondary. For FAR it is -2.8 [-4.8,
+  -1.1], and for SDR it is +0.5 [-4.5, +5.6] primary and +7.6 [+0.6, +15.4] secondary.
+
+Full comparison rows, with counts and the token-matched override row, are in `readings.md` under "Paired
+comparisons". The token-matched-only override is -7.4 [-17.4, +1.7] for FAR, the same as the whole pool for SDR,
+and +1.9 [-8.8, +11.2] for SER, all under the primary rule.
+
+### Matched pools
+
+| task | listener matched n | listener clusters | override matched n | override clusters | token-matched I | form-only I | no I |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| far_v2 | 9,954 | 25 | 6,933 | 18 | 6,328 | 605 | 3,021 |
+| sdr_v2 | 9,563 | 25 | 9,563 | 25 | 9,563 | 0 | 0 |
+| ser_v2 | 9,846 | 25 | 9,846 | 25 | 9,731 | 115 | 0 |
+
+The listener pools of all three phrasings, and L1 hidden minus D, share one matched set per task: every prior-kept
+sampled id was scored under every listener arm. The 1,000 anchors are excluded from every verdict.
+
+"Cells below floor" has two meanings in the outputs. The sample stage reports 0 for every task, meaning every cell
+had enough candidates to draw its quota. The read stage reports the cells whose realized prior-kept count is under
+the floor of 100. That is 0 for FAR and SDR and 4 for SER: clause 06 identity (81) and inversion (90), and clause 07
+identity (55) and inversion (60). Those two clauses keep about 9 to 14 percent of their draws against the 0.32 funnel
+rate. Clause 07 is also SER's form-only I clause.
+
+Matched n per cell follows (pressure clause by designation polarity, primary rule; the secondary rule has the same
+counts). "no I" marks FAR's seven clauses that are not act-named, and "form-only" marks the R2a fallback.
+
+Matched n per cell, `far_v2`:
+
+| pressure clause | identity: listener n | identity: I - D n | inversion: listener n | inversion: I - D n |
+| --- | ---: | ---: | ---: | ---: |
+| r8_rule_strong_00 | 227 | 227 | 235 | 235 |
+| r8_rule_strong_01 | 222 | 222 | 227 | 227 |
+| r8_rule_strong_02 | 259 | no I | 252 | no I |
+| r8_rule_strong_03 | 188 | 188 | 195 | 195 |
+| r8_rule_strong_04 | 280 | no I | 267 | no I |
+| r8_rule_strong_05 | 100 | 100 | 118 | 118 |
+| r8_rule_strong_06 | 111 | 111 | 121 | 121 |
+| r8_rule_strong_07 | 241 | 241 | 215 | 215 |
+| r8_rule_strong_08 | 141 | 141 | 158 | 158 |
+| r8_rule_strong_09 | 216 | 216 | 204 | 204 |
+| r8_rule_strong_10 | 129 | 129 | 111 | 111 |
+| r8_rule_strong_11 | 246 | 246 | 230 | 230 |
+| r8_rule_strong_12 | 267 | 267 | 267 | 267 |
+| r8_rule_strong_13 | 290 | 290 | 288 | 288 |
+| r8_rule_strong_14 | 240 | 240 | 221 | 221 |
+| r8_rule_strong_15 | 122 | 122 | 127 | 127 |
+| r8_rule_strong_16 | 257 | no I | 259 | no I |
+| r8_rule_strong_17 | 242 | no I | 236 | no I |
+| r8_rule_strong_18 | 214 | 214 | 215 | 215 |
+| r8_rule_strong_19 | 223 | 223 | 219 | 219 |
+| shared_00 | 160 | no I | 184 | no I |
+| shared_01 | 147 | 147 (form-only) | 143 | 143 (form-only) |
+| shared_02 | 169 | no I | 164 | no I |
+| shared_03 | 155 | no I | 137 | no I |
+| shared_04 | 166 | 166 (form-only) | 149 | 149 (form-only) |
+| total | 9954 (both polarities) | 6933 (both polarities) | | |
+
+Matched n per cell, `sdr_v2`:
+
+| pressure clause | identity: listener n | identity: I - D n | inversion: listener n | inversion: I - D n |
+| --- | ---: | ---: | ---: | ---: |
+| r9_rule_unified_00 | 201 | 201 | 185 | 185 |
+| r9_rule_unified_01 | 240 | 240 | 235 | 235 |
+| r9_rule_unified_02 | 207 | 207 | 208 | 208 |
+| r9_rule_unified_03 | 161 | 161 | 149 | 149 |
+| r9_rule_unified_04 | 215 | 215 | 202 | 202 |
+| r9_rule_unified_05 | 118 | 118 | 119 | 119 |
+| r9_rule_unified_06 | 237 | 237 | 253 | 253 |
+| r9_rule_unified_07 | 233 | 233 | 214 | 214 |
+| r9_rule_unified_08 | 186 | 186 | 167 | 167 |
+| r9_rule_unified_09 | 251 | 251 | 242 | 242 |
+| r9_rule_unified_10 | 223 | 223 | 211 | 211 |
+| r9_rule_unified_11 | 125 | 125 | 132 | 132 |
+| r9_rule_unified_12 | 176 | 176 | 184 | 184 |
+| r9_rule_unified_13 | 270 | 270 | 273 | 273 |
+| r9_rule_unified_14 | 206 | 206 | 193 | 193 |
+| r9_rule_unified_15 | 168 | 168 | 185 | 185 |
+| r9_rule_unified_16 | 173 | 173 | 221 | 221 |
+| r9_rule_unified_17 | 111 | 111 | 112 | 112 |
+| r9_rule_unified_18 | 187 | 187 | 206 | 206 |
+| r9_rule_unified_19 | 174 | 174 | 188 | 188 |
+| shared_00 | 168 | 168 | 173 | 173 |
+| shared_01 | 189 | 189 | 178 | 178 |
+| shared_02 | 189 | 189 | 177 | 177 |
+| shared_03 | 195 | 195 | 195 | 195 |
+| shared_04 | 186 | 186 | 172 | 172 |
+| total | 9563 (both polarities) | 9563 (both polarities) | | |
+
+Matched n per cell, `ser_v2`:
+
+| pressure clause | identity: listener n | identity: I - D n | inversion: listener n | inversion: I - D n |
+| --- | ---: | ---: | ---: | ---: |
+| r9_rule_unified_00 | 190 | 190 | 175 | 175 |
+| r9_rule_unified_01 | 257 | 257 | 273 | 273 |
+| r9_rule_unified_02 | 131 | 131 | 142 | 142 |
+| r9_rule_unified_03 | 115 | 115 | 119 | 119 |
+| r9_rule_unified_04 | 131 | 131 | 135 | 135 |
+| r9_rule_unified_05 | 154 | 154 | 146 | 146 |
+| r9_rule_unified_06 | 81 | 81 | 90 | 90 |
+| r9_rule_unified_07 | 55 | 55 (form-only) | 60 | 60 (form-only) |
+| r9_rule_unified_08 | 228 | 228 | 233 | 233 |
+| r9_rule_unified_09 | 293 | 293 | 289 | 289 |
+| r9_rule_unified_10 | 250 | 250 | 256 | 256 |
+| r9_rule_unified_11 | 109 | 109 | 119 | 119 |
+| r9_rule_unified_12 | 191 | 191 | 198 | 198 |
+| r9_rule_unified_13 | 263 | 263 | 283 | 283 |
+| r9_rule_unified_14 | 280 | 280 | 279 | 279 |
+| r9_rule_unified_15 | 232 | 232 | 243 | 243 |
+| r9_rule_unified_16 | 180 | 180 | 182 | 182 |
+| r9_rule_unified_17 | 301 | 301 | 293 | 293 |
+| r9_rule_unified_18 | 285 | 285 | 272 | 272 |
+| r9_rule_unified_19 | 214 | 214 | 220 | 220 |
+| shared_00 | 183 | 183 | 184 | 184 |
+| shared_01 | 205 | 205 | 176 | 176 |
+| shared_02 | 226 | 226 | 192 | 192 |
+| shared_03 | 188 | 188 | 214 | 214 |
+| shared_04 | 175 | 175 | 156 | 156 |
+| total | 9846 (both polarities) | 9846 (both polarities) | | |
+
+### What the numbers do not show
+
+The D1 verdicts above are the pre-registered reading. One descriptive cut, outside R1 to R4, is listed under Open
+questions.
+
 ## Execution evidence
 
-Not applicable: no runs. No GPU job was submitted and nothing was scored. The CPU dry runs above are the only
-executions, with the commands and outputs given in "How verified".
+The full evidence block for the GPU run is in "Results" above. The CPU dry runs and tests are in "How verified".
 
-Runtime estimate, from the expected forwards in the build reports. The pair arms run only on prior-kept ids and
-anchors, at the R3 rates.
+The runtime estimate held. Measured against it:
 
-| quantity | value |
-| --- | --- |
-| expected forwards, three tasks | 621,959 |
-| H100 rate (Bridges-2 `<task>_inversion` scoring, max length 120, batch 32) | 0.0042 s per forward |
-| A100 rate (Delta v2 build, `filter_report` compute) | 0.011 s per forward |
-| CPU work in the job: sample, prompt building, and the twin and I pick on live rows | about 20 min |
-| H100 total (44 min scoring, 8 min model load, about 20 min CPU) | about 1.2 GPU-h |
-| A100 total (114 min scoring, model load, about 20 min CPU) | about 2.4 GPU-h |
+| quantity | estimated | observed |
+| --- | ---: | ---: |
+| forwards, three tasks | 621,959 | 611,166 |
+| wall time on one H100 | about 1.2 GPU-h | 1:08:27 (1.14 GPU-h) |
+| scoring time per task, CPU pick work included | not measured | 1,041 s, 1,187 s and 1,164 s |
 
-Bridges-2 is preferred by START section 7. Push the branch, run `scripts/remote/b2.sh sync-code --branch
-deception-divergence`, then submit:
+The submitting command was the orchestrator's:
 
 ```
 scripts/remote/b2.sh submit --time 02:00:00 --script scripts/jobs/run_d1_visibility.sh --job-name d1-visibility
 ```
 
-That is this sbatch on the Bridges-2 login node:
-
-```
-cd /ocean/projects/cis260361p/swong2/Deception-Circuit && mkdir -p logs && sbatch --export=ALL,DC_CLUSTER=bridges2,DC_B2_ALLOC=cis260361p -A cis260361p -p GPU-shared --gpus-per-node=h100-80:1 --cpus-per-task=1 --mem=64G -t 02:00:00 --job-name=d1-visibility scripts/jobs/run_d1_visibility.sh
-```
-
-Fetch the results with:
-
-```
-scripts/remote/b2.sh fetch outputs/_analyses/deception-divergence/d1
-```
-
-The Delta fallback runs from the worktree root after `mkdir -p logs`:
-
-```
-sbatch --time=03:30:00 --partition=gpuA100x4 --account=bgrb-delta-gpu scripts/jobs/run_d1_visibility.sh
-```
-
 ## What is NOT done
 
-- The GPU score and read stages have not run, so there are no compliance numbers, verdicts or anchor margins yet.
-  The orchestrator submits the job.
-- The H100 rate is the steady-state rate of a 2,000-forward job. The CPU time inside the job is extrapolated from
-  the login-node build times. The build computes the twin and I pick for every row; the job computes them for the
-  prior-kept rows and anchors only. Neither time has been measured inside this job.
-- The base-interpreter build dry run was not repeated on the R2a code. The R2a pick is covered on py3.9 by the
-  tests above.
-- The anchor check compares against the stored margins, which carry the 2026-10-21 build's bf16 drift (instructed-
-  route R7). With max length 120 the D arm is on the builder's path, so the D_at120 control differs only in batch
-  composition.
-- I did not commit, push or sync to Bridges-2; workers never run git.
+- The analysis covers only R1 to R4 and the R2a additions. No other cut of the scores has been read, apart from the
+  one descriptive check under Open questions.
+- `outputs/_analyses/deception-divergence/d1/` (scores, manifests and readings) and the job log are git-ignored. I
+  did not decide whether to track the readings; that is the orchestrator's call.
+- The three `sample_report.json.pre-b2fetch` backups were left in place.
+- The base-interpreter build dry run was not repeated on the R2a code. The R2a pick is covered on py3.9 by the tests.
+- The compaction hook asked for a "Resumed after compaction #2" worklog entry. Workers never touch `WORKLOG.md`, so I
+  did not write it, and the orchestrator may want to record it.
+- I did not commit, push or sync; workers never run git.
 
 ## Open questions
 
-R2a settles the earlier defaults. These are the scored-prefix population, the token-matched I pick with a form-only
-fallback, FAR's 18 act-form clauses with no borrowing, unselected candidates as the verdict pool, the two-sided
-listener rule and the point-estimate override rule. The remaining questions:
-
-- **The second anchor has no pass bar.** R2a names the stored kept counts 210, 788 and 249 as a second anchor but no
-  tolerance. Default: report the count, the difference and the per-id kept agreement, and gate nothing on it; the
-  sign-flip rule of the first anchor still decides whether anything is read.
-- **Form-only rows are whole clauses.** Under the fallback, FAR shared_01 and shared_04 and SER clause 07 get a
-  form-only I whose length differs from D's. Default: keep them in the whole-pool override, which R2a says decides,
-  and show the token-matched-only row beside it.
-- **CPU time on the GPU node.** The twin and I pick add about 15 minutes of CPU work while the GPU waits. Default:
-  accept it. The alternative is to precompute the picks on Delta and sync them to Bridges-2, which adds a manifest
-  entry for little saving.
+- **A descriptive cut that does not change any verdict.** On the verdict-pool ids that comply under D (R1 primary),
+  FAR's phrasing-1 visible minus hidden is +14.7 [+8.6, +22.8] points (1,326 ids, 18 clusters). The same cut is
+  below 5 points in all 17 other estimates: FAR phrasings 2 and 3 and every SDR and SER phrasing, under both
+  definitions. It conditions on an outcome of the same model and is not in R1 to R4, so it is not a
+  result. It is reproducible from `scores.jsonl` with the pipeline's own `compare`. Default: no follow-up unless the
+  orchestrator pre-registers a conditional reading.
+- **The second anchor has no pass bar.** It reproduced exactly (difference 0 and 1,000 of 1,000 agreement on every
+  task), so the question no longer changes anything. Default: keep reporting the count and the agreement.
+- **Form-only rows stay in the whole-pool override.** FAR shared_01 and shared_04 and SER clause 07 use the
+  form-only I. The token-matched-only row is reported beside the whole pool and does not change any override
+  verdict. Default: as R2a rules, the whole pool decides.
