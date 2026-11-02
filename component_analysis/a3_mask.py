@@ -331,17 +331,31 @@ def _validate_chunks(ds, ins):
                 or c.token_counts.shape != c.baseline_margin.shape
             ):
                 raise ValueError("row/token count mismatch")
+            if (not torch.isfinite(c.token_counts).all()
+                or not (c.token_counts > 0).all()
+                or not torch.equal(c.token_counts, c.token_counts.round())):
+                raise ValueError("positive integer token counts required")
+            if isinstance(c.payload, dict) and "input_ids" in c.payload:
+                p = c.payload
+                ids_tensor = p["input_ids"]
+                mask = p["attention_mask"]
+                if (ids_tensor.ndim != 3 or ids_tensor.shape[1] != 2
+                    or ids_tensor.shape != p["neutral_input_ids"].shape
+                    or ids_tensor.shape != mask.shape
+                    or not ((mask == 0) | (mask == 1)).all()
+                    or not torch.equal(mask.sum(-1).cpu(), c.token_counts.cpu())):
+                    raise ValueError("native own-condition token counts/shapes disagree")
             ids.extend(c.ids)
         if len(ids) != len(set(ids)):
             raise ValueError("duplicate cohort id")
         return ids, torch.cat([c.token_counts.cpu() for c in chunks])
 
-    dids, dtokens = validate(ds)
-    iids, itokens = validate(ins)
+    dids, _ = validate(ds)
+    iids, _ = validate(ins)
     if dids != iids:
         raise ValueError("D/I ids/order must match")
-    if not torch.equal(dtokens, itokens):
-        raise ValueError("matched D/I token counts required")
+    # D and I have different role layouts. Only each condition and its own
+    # neutral twin share token geometry; native_chunk_forward checks that proof.
     for c in ins:
         if (
             c.baseline_logits is None

@@ -681,3 +681,41 @@ def test_completed_checkpoint_rejects_changed_authenticated_boundary(mutation):
         model.model.norm.variance_epsilon = 1.0
     with pytest.raises(ValueError, match="boundary identity"):
         m.make_checkpoint(model, support, opt, ds, ins, identity={}, update=1)
+
+
+def test_unequal_condition_layout_streamed_retained_adam_and_resume():
+    """D system pressure and I user request have distinct native token lengths."""
+    model,support=tiny()
+    with torch.no_grad():
+        for gate in support.gates.values(): gate.log_alpha.zero_()
+    reference=copy.deepcopy(model); rs=m.support_for(reference)
+    opt=torch.optim.Adam(support.parameters(),lr=.01)
+    ropt=torch.optim.Adam(rs.parameters(),lr=.01)
+    ds,ins=chunks('D'),chunks('I')
+    for c in ins:
+        for key in ('input_ids','neutral_input_ids','attention_mask'):
+            c.payload[key]=torch.cat([c.payload[key],c.payload[key][...,:2]],-1)
+        c.token_counts=torch.full_like(c.token_counts,6)
+    initial=m.rng_state()
+    expected,_=retained(reference,rs,ropt,ds,ins,torch.tensor(2.),True)
+    m.restore_rng(initial)
+    actual=m.streamed_update(model,support,opt,ds,ins,m.native_chunk_forward,
+        g_d_fit=torch.tensor(2.),identity={'case':'unequal'})
+    for name,value in expected.items(): torch.testing.assert_close(actual['gradients'][name],value,atol=2e-6,rtol=2e-5)
+    for a,b in zip(support.parameters(),rs.parameters()): torch.testing.assert_close(a,b,atol=2e-6,rtol=2e-5)
+    state=m.make_checkpoint(model,support,opt,ds,ins,identity={'case':'unequal'},update=1)
+    changed=copy.deepcopy(ins); changed[0].token_counts[0,0]-=1
+    with pytest.raises(ValueError,match='identity|token counts'):
+        m.restore_checkpoint(state,model,support,opt,ds,changed,identity={'case':'unequal'})
+    with pytest.raises(ValueError,match='token counts'):
+        m.native_chunk_forward(model,changed[0])
+    m.restore_checkpoint(state,model,support,opt,ds,ins,identity={'case':'unequal'})
+
+
+@pytest.mark.parametrize('bad',[0,-1,float('nan'),1.5])
+def test_invalid_per_condition_token_count_rejected(bad):
+    ds,ins=chunks('D'),chunks('I')
+    ins[0].token_counts=ins[0].token_counts.float()
+    ins[0].token_counts[0,0]=bad
+    with pytest.raises(ValueError,match='token count'):
+        m._validate_chunks(ds,ins)
