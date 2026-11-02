@@ -161,3 +161,38 @@ def test_actual_ioi_task_resample_is_distinct_and_checks_sources(model,monkeypat
         score_cell(model,tasks.task_batches(rows),donor_batches=tasks.task_batches(donors),
                    groups=kwargs['groups'],operation='independent_resample',
                    donor_maps=[dict(m,operation='independent_resample') for m in plan])
+
+
+def test_positive_control_128_129_recovers_donor_and_noops_on_common_shape(model,monkeypatch):
+    """Real native hooks audit calibration geometry, residual, logits and noops."""
+    from component_analysis import specificity_ladder as runner
+    from tests.test_specificity_ladder_calibration import singleton, plan
+    recipient,donor=singleton(128),singleton(129,'corrupt')
+    recipient.input_ids=recipient.input_ids.long()
+    donor.input_ids=donor.input_ids.long()
+    # Observe real captures: no replacement of the model or tracing machinery.
+    original_capture=runner._capture
+    captures=[]
+    def observe(model,batch,keys,replacements=None):
+        assert batch.input_ids.shape==(1,129)
+        capture,logits=original_capture(model,batch,keys,replacements)
+        captures.append((batch,capture,logits))
+        return capture,logits
+    monkeypatch.setattr(runner,'_capture',observe)
+    result=runner.positive_control(model,[recipient],donor_batches=[donor],donor_maps=[plan()])
+    assert len(result)==1 and result[0]['valid']
+    assert list(hooks.EMBED_KEY) in result[0]['sender_keys']
+    assert list(hooks.READOUT_KEY) not in result[0]['sender_keys']
+    _,dc,dl=captures[1]
+    _,patched,pl=captures[2]
+    assert torch.allclose(pl,dl,atol=1e-5,rtol=1e-5)
+    assert torch.allclose(patched.logits,dc.logits,atol=1e-5,rtol=1e-5)
+    assert torch.allclose(patched.residual[:,-1],dc.residual[:,-1],atol=1e-5,rtol=1e-5)
+    keys=hooks.all_component_keys(model)
+    for batch,capture,logits in captures[:2]:
+        for replacements in ({},{k:hooks.Replacement(capture.outputs[k],batch.attention_mask.bool()) for k in keys}):
+            noop,nl=original_capture(model,batch,keys,replacements)
+            runner._noop_error(logits,nl,batch)
+            assert torch.allclose(nl,logits,atol=1e-5,rtol=1e-5)
+            assert torch.allclose(noop.residual[:,-1],capture.residual[:,-1],atol=1e-5,rtol=1e-5)
+    assert recipient.input_ids.shape==(1,128) and donor.input_ids.shape==(1,129)

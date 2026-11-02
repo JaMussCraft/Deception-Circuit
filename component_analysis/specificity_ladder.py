@@ -8,7 +8,7 @@ Only hooks owns model-wrapper access. All ranking uses its fp32 readout.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Optional
 import torch
 
@@ -309,11 +309,34 @@ def score_cell(model, recipient_batches, *, groups: list[tuple[str,list[tuple]]]
     return result
 
 
+def _pad_calibration_batch(batch, width):
+    """Right-pad one positive-control row; never trim parent padding or tokens."""
+    validate_batch(batch)
+    if len(batch.ids)!=1:
+        raise ValueError('positive calibration requires singleton geometry')
+    if (not isinstance(batch.readout,torch.Tensor)
+            or batch.readout.dtype not in (torch.int32,torch.int64)
+            or batch.input_ids.dtype not in (torch.int32,torch.int64)):
+        raise ValueError('positive calibration requires integer token/readout tensors')
+    current=batch.input_ids.shape[1]
+    if type(width) is not int or width<current:
+        raise ValueError('positive calibration width must be integer and cannot truncate')
+    if width==current: return batch
+    padded=replace(batch,
+                   input_ids=torch.nn.functional.pad(batch.input_ids,(0,width-current),value=0),
+                   attention_mask=torch.nn.functional.pad(batch.attention_mask,(0,width-current),value=0))
+    validate_batch(padded)
+    return padded
+
+
 def positive_control(model, recipient_batches, *, donor_batches, donor_maps):
     """Batch-one all-sender readout calibration, separate from ladder cells.
 
     Donor maps must explicitly name readout-to-readout mapping. Native item
     swaps and utility cyclic donors are both permitted; no answer filtering.
+    Both singleton inputs retain all original padding and use the same padded
+    width before capture: BF16 projection kernels can depend on sequence shape.
+    This numerical calibration does not change score_cell's scientific path.
     """
     keys=hooks.all_component_keys(model)
     donors={}
@@ -330,6 +353,9 @@ def positive_control(model, recipient_batches, *, donor_batches, donor_maps):
             donor=donors[(m['donor_condition'],m['donor_id'],m['donor_stream'])]
             if m['recipient_positions']!=batch.readout.tolist() or m['donor_positions']!=donor.readout.tolist():
                 raise ValueError('positive control requires explicit readout-to-readout map')
+            width=max(batch.input_ids.shape[1],donor.input_ids.shape[1])
+            batch=_pad_calibration_batch(batch,width)
+            donor=_pad_calibration_batch(donor,width)
             intact,base=_capture(model,batch,keys); dc,dl=_capture(model,donor,keys)
             replacements={k:mapped_replacement(intact.outputs[k],dc.outputs[k],[m],batch.attention_mask,donor.attention_mask) for k in keys}
             _,patched=_capture(model,batch,keys,replacements)
