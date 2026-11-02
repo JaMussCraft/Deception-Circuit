@@ -1,11 +1,12 @@
 # Resume: instructed-route
 
-Last rewritten: Sun 1 Nov 2026, 7:25 pm EST by claude-230e4716, at wrap-up.
+Last rewritten: Sun 1 Nov 2026, 7:25 pm EST by claude-230e4716, at wrap-up; amended Mon 2 Nov 2026 after the merge.
 
 ## Status
 
-**All three sub-directions are complete and reviewed; the direction is released as paused pending two user decisions
-(the merge to main and need N2).** The handoff is `README.md`. Findings F-rte-001 to F-rte-008 are in
+**All three sub-directions are complete and reviewed; the direction is released as done.** On Mon 2 Nov 2026 the
+user declined a second alignment-faking elicitation for now (need N2 resolved; a later synthesis session may propose
+it again) and had the branch merged into main, the worktree removed and main pushed. The handoff is `README.md`. Findings F-rte-001 to F-rte-008 are in
 `docs/research/FINDINGS.md`, each at status reviewed with an independent Opus review under `reviews/01` to `07`.
 Verdicts: B1 bypass on both tasks (M_q 0.360 FAR, 0.462 SER, offline estimator of record under R9) and query-side
 on both (T2); B2 falsity probe instruction-confounded (R2), SDR wish through the quartet (0.540), only mlp.13
@@ -15,19 +16,23 @@ non-specific (null maximum 0.505), with the band and the label resting on the th
 
 ## Branch, worktree and commit
 
-- Branch: `instructed-route`, pushed to origin at wrap-up, 51 commits ahead of `main`. `main` has one commit the
-  branch lacks (16ce5f7, the Codex claim of specificity-ladder in `directions.json`), so the merge is a true merge
-  and `directions.json` may need a hand resolution. The Bridges-2 clone tracks the branch.
-- Worktree: `/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/instructed-route`.
+- Branch: `instructed-route` was merged into `main` at 087a7ed on Mon 2 Nov 2026 (a clean merge; the branch never
+  touched `directions.json`) and then deleted locally and on origin. The Bridges-2 clone still has the branch name;
+  it goes offline about 9 November.
+- Worktree: removed on Mon 2 Nov 2026. Its git-ignored outputs were moved into the primary checkout at the same
+  relative paths: `outputs/_analyses/instructed-route-b1/`, `outputs/_analyses/instructed-route-b2/`,
+  `outputs/_studies/b3/`, `outputs/_launch_instructed_route/`, `data/b3/_downloads/` and the Slurm logs in `logs/`.
+  Fetched mechanism-analysis head tables that differed from the primary copies are parked in
+  `outputs/_analyses/instructed-route-fetch-diffs/`; the primary copies are canonical.
 - Last commit on the branch before this file: `5cd684b`, "instructed-route B3: J4 supplement folded into review 07;
   FINDINGS gains F-rte-008; README updated".
-- Uncommitted work: none in the worktree. `outputs/_launch_instructed_route/`, `outputs/_suites/mechanism-analysis/`
+- Uncommitted work: none. `outputs/_launch_instructed_route/`, `outputs/_suites/mechanism-analysis/`
   and `outputs/_suites/mechanism-v2-coarse.b2local-261025/` are untracked fetch or scratch directories and stay
   untracked.
 - Where the records live: the tool-owned records (state.json, worklog.json, WORKLOG.md, ledger.json, handbacks/)
   live in the main checkout at `/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/instructed-route/`;
-  pass that path as the `dir` argument of every research-session command. Everything else lives in the worktree on
-  the branch. The main-checkout copies of hand-backs that workers wrote there by mistake were deleted at wrap-up
+  pass that path as the `dir` argument of every research-session command. Everything else is on `main` at the same
+  paths. The main-checkout copies of hand-backs that workers wrote there by mistake were deleted at wrap-up
   after a byte comparison with the worktree copies.
 
 ## In-flight jobs
@@ -39,15 +44,12 @@ beto-delta-gpu because bimc-delta-gpu's fair share was exhausted.
 
 ## Next action
 
-1. If the user approves the merge: merge `instructed-route` into `main` (a true merge; resolve `directions.json` by
-   keeping both claims), run both test suites on main, and commit the main-checkout research-session records
-   (`docs/research/instructed-route/{state,worklog,ledger}.json`, `WORKLOG.md`, `RESUME.md`,
-   `docs/research/directions.json`, `SESSIONS.md`, `DIRECTIONS.md`, the global `ledger.json`) by explicit file list.
-2. If the user chooses a second alignment-faking elicitation for need N2: record it as ruling R13 in `spec.md` (it is
-   premise work under the 10-hour sub-cap of R12), re-claim the direction, and reuse `scripts/b3_premise.py` with a
-   new variant; the J4 result stands either way.
-3. Otherwise nothing runs. Open follow-ups are listed in `README.md` ("What to do next") and are new proposals, not
-   unfinished jobs.
+1. Nothing runs. Open follow-ups are listed in `README.md` ("What to do next") and are new proposals, not unfinished
+   jobs; a synthesis session decides whether any of them, or a second alignment-faking elicitation, becomes a new
+   direction.
+2. If a second elicitation is ever run: record it as a new ruling in `spec.md` (premise work under the 10-hour
+   sub-cap of R12), claim the direction again, and reuse `scripts/b3_premise.py` with a new variant; the J4 result
+   stands either way.
 
 ## Do not
 
@@ -72,6 +74,6 @@ beto-delta-gpu because bimc-delta-gpu's fair share was exhausted.
 ## Open decisions for the user
 
 - N1 (resolved Sun 1 Nov 2026): the B3 grader hashes stay in spec.md only.
-- N2 (open, Sun 1 Nov 2026): the B3 premise failed; the pre-registered sycophancy-only fallback has run (F-rte-008).
-  A second elicitation attempt remains possible as a new ruling under the 10-hour sub-cap.
-- Merge (open): merge `instructed-route` into `main`, or keep it on the branch.
+- N2 (resolved Mon 2 Nov 2026): no second elicitation for now; the sycophancy-only fallback (F-rte-008) is the B3
+  result. A later synthesis session may propose the elicitation again.
+- Merge (resolved Mon 2 Nov 2026): merged into `main`, branch deleted.

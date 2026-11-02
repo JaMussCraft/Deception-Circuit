@@ -210,7 +210,7 @@
       "waiter": "timeout 60m sh -c 'until sacct -j 23416459 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'"
     }
   ],
-  "last_worklog_entry_at": "2026-11-01T19:28:12-05:00",
+  "last_worklog_entry_at": "2026-11-02T08:31:24-05:00",
   "schema": 1,
   "session_state": "running",
   "sessions": {
@@ -406,10 +406,10 @@
         "cadence": 16,
         "freeze": null,
         "last_reading": {
-          "fable": 43,
+          "fable": 45,
           "five_hour": null,
           "fresh": true,
-          "read_at": "2026-11-01T19:25:13-05:00",
+          "read_at": "2026-11-02T08:30:45-05:00",
           "seven_day": 36
         },
         "metric": "max(seven_day, Fable)",
@@ -419,11 +419,11 @@
         "segments": [
           {
             "baseline": 31,
-            "last": 43,
+            "last": 45,
             "resets_at": 1793797199
           }
         ],
-        "session_points": 12,
+        "session_points": 14,
         "stale_ok_until": null
       }
     }
