@@ -236,3 +236,171 @@ The output files are named `b1_readings.json` and `b1_readings.md`, because the 
   Default: keep.
 - P2 power: see the ceiling numbers above. Default: report P2 as failed under the frozen rule, with the ceiling as its
   caveat. Do not re-specify the read after seeing the result.
+
+## Addendum: GPU riders
+
+The orchestrator submitted the three riders on Delta interactive partitions from commit c6752c0 on Mon 2 Nov 2026. I
+monitored them, read them and record them here. Every elapsed time is sacct's `Elapsed` for the job allocation.
+
+Follow-up edit in the same pass, for the orchestrator to commit:
+`/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/deception-divergence/scripts/remote/b2.sh`, where
+`FETCH_ANALYSIS_GLOBS` gains `deception-divergence*` and keeps the two existing globs. The test is in
+`/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/deception-divergence/tests/test_d4_jobs.py`
+(`test_b2_fetch_brings_back_the_deception_divergence_root_and_keeps_the_old_globs`). Every suite that touches `b2.sh`
+passes: mgnp "142 passed", base "142 passed". The sync dry run follows:
+
+```
+bash scripts/remote/b2.sh sync-code --dry --branch deception-divergence
+```
+
+Observed: exit 0. Both SSH masters were open (`ssh -O check` answered "Master running" for bridges2 and b2dtn). It
+printed one command and ran nothing. Over `ssh -o BatchMode=yes bridges2`, that command would:
+1. In `/ocean/projects/cis260361p/swong2/Deception-Circuit`, run `git fetch origin
+   +deception-divergence:refs/remotes/origin/deception-divergence`.
+2. Check out a local `deception-divergence` branch, creating it with `--track origin/deception-divergence` if absent.
+3. Fast-forward it to origin, or `reset --keep` after a force-push, printing the old head.
+4. Print `git status --short` and `remote_head`.
+A real `fetch` writes into `$DC_REPO_ROOT`, which the Delta profile defaults to the mechanism-analysis worktree. A
+fetch for this direction therefore needs `DC_DELTA_REPO_ROOT=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/deception-divergence`.
+
+### D4(a): the quartet's attention under D against the twin
+
+- Job id and cluster: 23443932 on Delta (gpuA100x4-interactive, host gpua001).
+- Slurm state: COMPLETED, exit 0:0, elapsed 134 s. The timings file records a 24.6 s model load, 65.5 s for far and
+  40.2 s for ser.
+- Row counts: far and ser each profile 100 of 100 held-out ids on both sides. `pressure_neutral_twin_paired` and
+  `neutral_twin` carry identical `instance_ids`. Every pair aligns: 100 pairs, 0 differing outside the clause, 0
+  identical to the pressure prompt. Rows sum to one, with 0 NaN. The split is 52 identity and 48 inversion on both
+  tasks, as the dry run's sample showed. `patterns.json` records `"instances": "causal_sample"`.
+- Baseline reproduces: the cell holds 62 heads on far and 68 on ser, as the dry run printed. The four quartet heads
+  read KV group 6.
+- Provenance file: `outputs/_analyses/deception-divergence/d4a/{far,ser}/Ct__leaf/<task>_v2/run_manifest.json`,
+  commit `c6752c05478c2e0b6f8b6b18df3ca3f478de9afb`. `git_dirty` is true from other workers' untracked files. The sha256
+  of `component_analysis/attention_patterns.py` in the worktree equals `git show c6752c0:` of it (c1780949).
+
+Reading (descriptive, deciding nothing). **Yes: the pressure changes which positions the quartet attends to from the
+Readout, on both tasks.** The measure is half the L1 distance between the mean per-Segment mass under D and under the
+twin. It is a total-variation distance between the two mean attention profiles over 19 Segments. Paired standard
+errors exist only for the clause mass, which is the B2 column.
+
+| task | head | shift D against twin | rank of the shift among C_t heads | median of the other C_t heads (90th pct) |
+|---|---|---|---|---|
+| far | L17H24 | 0.329 | 8 of 62 | 0.100 (0.312) |
+| far | L17H25 | 0.243 | 13 of 62 | |
+| far | L17H26 | 0.476 | 2 of 62 | |
+| far | L17H27 | 0.198 | 17 of 62 | |
+| ser | L17H24 | 0.166 | 7 of 68 | 0.041 (0.158) |
+| ser | L17H25 | 0.155 | 10 of 68 | |
+| ser | L17H26 | 0.316 | 2 of 68 | |
+| ser | L17H27 | 0.058 | 26 of 68 | |
+
+Where the mass moves, as the quartet mean over the 100 ids, D against twin:
+
+| task | Segment | D | twin |
+|---|---|---|---|
+| far | designating_sentence | 0.064 | 0.184 |
+| far | designation_suffix | 0.015 | 0.077 |
+| far | item_2_question_pair | 0.167 | 0.092 |
+| far | item_2_question_option | 0.118 | 0.051 |
+| ser | designation_suffix | 0.024 | 0.129 |
+| ser | pressure_clause | 0.067 | 0.020 |
+| ser | unsegmented | 0.168 | 0.128 |
+| ser | item_1_question_pair | 0.060 | 0.039 |
+
+On far, under pressure the quartet reads less of the designation and more of the item options. L17H26 drops from
+0.453 to 0.151 on the designating sentence, and L17H24 rises from 0.205 to 0.377 on item 2's question pair. On ser,
+under pressure it reads less of the designation suffix and more of the pressure clause. The B2 clause-mass drops are
+L17H26 0.094 (SE 0.011) and L17H25 0.071 (SE 0.007) on ser, and under 0.013 for every quartet head on far. The same
+direction holds in the identity and the inversion halves. So the query-side entry of F-rte-006 comes with a change in
+where the quartet looks, not only in what it writes. Whether that attention shift carries the effect is not tested
+here; B1's key restoration at the options was about zero.
+
+### D4(b): the after-cue arm of J4
+
+- Job id and cluster: 23443933 on Delta (gpuA100x8-interactive, host gpuc05).
+- Slurm state: COMPLETED, exit 0:0, elapsed 1,048 s. Pass 2 took 977 s.
+- Row counts: 800 items with 0 dropped, 530 kept and 154 flips, identical to J4 (800, 530, 154). There were 84 arms,
+  with 20 null draws per set and position.
+- Baseline reproduces: S_all at `post_tag` f = 0.7241 (0.7017 to 0.7463) against J4's 0.724, with null maximum 0.5051
+  against J4's 0.505. heads_only at `post_tag` f = 0.4984 (0.4699 to 0.5262) against the supplement's 0.4984, with
+  null maximum 0.2706 against 0.2706. Each null set reproduces its recorded maximum exactly.
+- Provenance file: `outputs/_analyses/deception-divergence/d4b/run_manifest.json`, commit
+  `c6752c05478c2e0b6f8b6b18df3ca3f478de9afb`, slurm_job_id 23443933, model revision 0e9e39f2. `git_dirty` is true from
+  other workers' files. The sha256 of `spontaneous/patching.py` (05a26445) and `scripts/b3_patch.py` (447416db)
+  equals the committed files.
+
+| set at positions | f (kept, 95% CI) | flip reversal | null f max (20 draws) | draws at or above f |
+|---|---|---|---|---|
+| S_all at after_cue | 0.662 (0.644 to 0.679) | 0.825 | 0.383 | 0 |
+| S_all at post_tag | 0.724 (0.702 to 0.746) | 0.942 | 0.505 | 0 |
+| heads_only at after_cue | 0.582 (0.563 to 0.601) | 0.779 | 0.346 | 0 |
+| heads_only at post_tag | 0.498 (0.470 to 0.526) | 0.805 | 0.271 | 0 |
+
+Reading (rule: report the numbers). Every row's cue window is 7 tokens, followed by 23 after-cue positions.
+- **Mostly downstream of the cue window.** Patching S_all only after the window keeps 0.662 of the cue effect, 91
+  percent of its 0.724 over the whole post-tag span. So the transfer runs mainly through state computed after the
+  cue, not through substituting the cue tokens.
+- **The cue window costs the heads alone.** heads_only does better after the cue (0.582) than over the whole span
+  (0.498).
+- **What the MLPs add.** S_all minus heads_only falls from 0.226 at `post_tag` to 0.080 at `after_cue`. So most of
+  mlp.5 to mlp.7's extra contribution sits on the cue window itself, which answers the F-rte-008 caveat.
+- **No longer non-specific.** At `after_cue`, S_all's null maximum is 0.383, under the R5 non-specific line of 0.5.
+  The "shared, non-specific" label of F-rte-008 came from the `post_tag` arm, where the null reached 0.505. On the
+  after-cue span, S_all reads as shared and specific against its R10a nulls. This is a reading, not a re-decision of
+  F-rte-008, whose frozen arm is `post_tag`.
+
+### D4(c): SDR key against query on the B1 code path
+
+The orchestrator cancelled the Delta submission, job 23443934 (gpuH200x8-interactive). It never started, because
+squeue had projected its start at Wed 4 Nov 11:52 CST. The orchestrator resubmitted it on Bridges-2.
+
+- Job id and cluster: 50132625 on Bridges-2 (GPU-shared, H100-80, host w001.ib.bridges2.psc.edu).
+- Slurm state: COMPLETED, exit 0:0, elapsed 1,868 s. The timings file records a 394 s model load and 1,711 s for the
+  line, which fits the 0.6 GPU-hour estimate above.
+- Fetch:
+  `DC_DELTA_REPO_ROOT=<this worktree> bash scripts/remote/b2.sh fetch outputs/_analyses/deception-divergence/d4c`
+  exited 0. The local dry-run files were replaced by the job's and kept as `.pre-b2fetch` backups.
+  `route_closure.json` arrived at 5,113,046 bytes, the same as on Bridges-2. The job log was copied to
+  `logs/bridges2/analyze_components_50132625.out`.
+- Row counts: 100 instances in `baseline.m_D` and in `instances.pressure_ids`, over 19 pressure-id clusters. The
+  sample ids equal the 100 ids of `phase1/groups/sdr_heldout_D_sample.json`. The grid is 66 Components (ct.json sdr),
+  with 47 arms.
+- Baseline reproduces:
+  - Gate G1 is bit-identical (max absolute difference 0.0), and G2's max difference is 0.0.
+  - G3 passed: the largest per-sender difference is 0.00031 (T:head.13.7) against 0.01, and the summed difference is
+    0.0138 against 0.02.
+  - The readings tool reproduces B1's far T2 row exactly (r_Q 0.321, r_K -0.012) when given B1's far file. That check
+    is under How verified; this job ran sdr only.
+- Provenance file: `outputs/_analyses/deception-divergence/d4c/sdr/Ct__leaf/sdr_v2/run_manifest.json`, commit
+  `c6752c05478c2e0b6f8b6b18df3ca3f478de9afb`, dirty flag false, slurm_job_id 50132625, model revision 0e9e39f2.
+
+Readings, which ran on the Delta login node with exit 0:
+
+```
+/u/swong2/.conda/envs/mgnp/bin/python scripts/route_closure_readings.py outputs/_analyses/deception-divergence/d4c/sdr/Ct__leaf/sdr_v2/route_closure/route_closure.json --out-dir docs/research/deception-divergence/results/d4c
+```
+
+They wrote `/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/deception-divergence/docs/research/deception-divergence/results/d4c/b1_readings.json`
+and `.md`, for the orchestrator to commit.
+
+| task | P | r_Q | r_K | r_K - r_Q | r_out | T2 frozen rule |
+|---|---|---|---|---|---|---|
+| sdr_v2 | 6.547 | 0.524 (0.488 to 0.556) | -0.002 (-0.012 to 0.008) | -0.526 (-0.556 to -0.490) | 0.558 (0.524 to 0.589) | query-side |
+| far_v2 (B1) | 9.886 | 0.321 | -0.012 | -0.333 | 0.327 | query-side |
+| ser_v2 (B1) | 5.960 | 0.426 | 0.014 | -0.412 | 0.433 | query-side |
+
+**Verdict on the D4(c) rule: query-side on SDR.** r_Q minus r_K is 0.526, against the 0.15 margin, with the interval
+far from it. On one code path and one estimator, SDR therefore looks like FAR and SER. The SDR-against-FAR/SER
+contrast of F-sdr-012 against F-rte-006 does not survive. F-sdr-012's key-side account came from a different setup:
+the earlier sdr-routing pilot, its candidate perturbations and a truth margin on confirmation stories. So the contrast
+belonged to the method or the dataset, not to the tasks.
+
+T1, reported beside the rule and not part of D4(c)'s rule:
+
+| task | O | O_q | M_q | M_C3 | max C1/C2 | M_S | label |
+|---|---|---|---|---|---|---|---|
+| sdr_v2 | 0.857 (0.823 to 0.891) | 0.468 | 0.546 (0.511 to 0.577) | -0.032 | 0.022 | 0.821 | closes, route-specific |
+
+On sdr_v2 the loop closes through the quartet: M_q is 0.546 on the R9 offline estimator, and 0.550 on the forward
+estimator. That differs from the bypass on FAR (0.360) and SER (0.462). The lower interval end of 0.511 sits close to
+the 0.50 bar.

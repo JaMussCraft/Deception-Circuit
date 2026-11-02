@@ -163,3 +163,28 @@ def test_d4a_header_states_the_question_and_the_run_command():
     assert "does the query-side signal of F-rte-006 change which positions the quartet attends to" in text
     assert ("python analyze_components.py batch docs/research/deception-divergence/jobs/D4a.batch "
             "--timings outputs/_analyses/deception-divergence/d4a/timings/d4a.json") in text
+
+
+# ---------------------------------------------------------------------------- Bridges-2 fetch of this direction
+
+
+def test_b2_fetch_brings_back_the_deception_divergence_root_and_keeps_the_old_globs(tmp_path):
+    import os
+    import shutil
+    import subprocess
+
+    import re
+    b2 = ROOT / "scripts" / "remote" / "b2.sh"
+    match = re.search(r"^FETCH_ANALYSIS_GLOBS=\((.*)\)\s*$", b2.read_text(), flags=re.M)
+    globs = re.findall(r'"([^"]+)"', match.group(1))
+    assert globs == ["mechanism-analysis-*", "instructed-route-b1*", "deception-divergence*"]
+    bash = shutil.which("bash")
+    if bash is None:
+        pytest.skip("no bash")
+    env = dict(os.environ, DC_DELTA_REPO_ROOT=str(tmp_path))
+    done = subprocess.run([bash, str(b2), "fetch", "--dry"], cwd=str(ROOT), env=env,
+                          capture_output=True, text=True, timeout=60)
+    assert done.returncode == 0, done.stderr
+    (line,) = [one for one in done.stdout.splitlines() if "outputs/_analyses/" in one]
+    assert "--include=/deception-divergence*/***" in line
+    assert "--include=/instructed-route-b1*/***" in line and "--include=/mechanism-analysis-*/***" in line
