@@ -1,40 +1,42 @@
 # Resume: deception-divergence
 
-Last rewritten: Mon 2 Nov 2026, 4:35 pm EST by claude-5b9b1c28.
+Last rewritten: Mon 2 Nov 2026, 8:05 pm EST by claude-5b9b1c28.
 
 ## Status
 
-Phase 0 is complete and the session is frozen on need N1 (a milestone checkpoint: D1's verdict). D1 is null on every task under the frozen rule: the visibility sentence moves first-token compliance by +2.5 (FAR), -5.2 (SDR) and -2.4 (SER) points under phrasing 1, with the belief and consequence phrasings also under 10, and operator-D compliance does not sit below role-matched transparent compliance (worklog F5; both reproduction anchors pass; independent review `reviews/02-d1-review.md` running). By the rule, D3 and U1 are closed and phase 1 holds only D2. D4 is done and independently reviewed (`reviews/01-d4-review.md`): the static read fails P1 and P2 (F1); the quartet's readout attention moves under the clause (F2); the sycophancy transfer sits mostly after the cue window (F3); SDR is query-side and the loop closes on the B1 code path, so the F-sdr-012 contrast does not reproduce (F4). The FINDINGS.md corrections are committed (hand-back 03). Two descriptive D1 readings outside the rules are recorded in the decision entry (FAR D-compliant subset +14.7; SDR negative under every phrasing).
+Phase 1 is running under the user's N1 answer (continue under the 80 percent cap, run the option B follow-up, find a defensible route to U1) and ruling R6. Phase 0 is closed: D1 null on size on every task (F5, reviewed, `reviews/02-d1-review.md`); D4 done and reviewed (F1 to F4, `reviews/01-d4-review.md`). The R6 follow-up found the phrasing-1 flip pool empty on every task (F6): the system-turn sentence shifts margins but never flips a compliant answer, so U1 cannot return through phrasing 1; the user-turn phrasing 4 job is the last listener route and runs now. The D2 premise (two-turn lie maintenance; rulings R7 to R13, judge freeze G-D2 at hash 1e41b6b9...) is built, tested and submitted; its judge stage is the orchestrator's and spends OpenRouter credit. U1 is re-admitted only by a qualifying phrasing-4 flip pool or a D2 premise pass (R6 iii and iv); U1 trainer code still waits for the user's word on Codex coordination.
 
 ## Branch, worktree and commit
 
 - Branch: `deception-divergence`.
 - Worktree: `/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/deception-divergence`.
-- Last commit on the branch: `adc8723`, "deception-divergence D1: results ... hand-back 01 Results section" (pushed).
+- Last commit on the branch: `a0936e5`, "rulings R7 to R13 and freeze G-D2 for the D2 premise" (pushed; Bridges-2 clone synced to it).
 - Uncommitted work, if any: none from the orchestrator; worker edits are committed by explicit file list when each hand-back is read.
 - Tool-owned records (state, worklog, ledger, handbacks) live in the main checkout at `/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/deception-divergence/`; pass that path as the `dir` argument of every research-session command. Everything else is on the branch.
 
 ## In-flight jobs
 
-None. Reservations r-001 to r-005 are reconciled: 5.33 GPU-hours reserved, 1.99 actual (D4a 134 s, D4b 1,048 s on Delta interactive A100s; D4c 1,868 s and D1 4,107 s on Bridges-2 H100s; the Delta D4c copy was cancelled at 0 s). Delta's batch GPU queues projected week-long waits, so phase 0 ran on Delta interactive partitions (one-hour cap) and Bridges-2 (cis260361p, 397 of 452 units before this session). The Bridges-2 clone is at the pushed branch head and `scripts/remote/b2.sh fetch` now brings back `outputs/_analyses/deception-divergence*`.
+Reservations r-001 to r-007: 7.08 GPU-hours reserved, 1.99 actual before the two jobs below. Bridges-2 (cis260361p) is the working cluster; Delta's batch queues projected week-long waits and its interactive partitions carry a one-hour cap. The user allows any Delta or Bridges-2 allocation (shared memory note `cluster-allocations`).
 
 | Job | Cluster | What it computes | Output directory | Expected finish |
 |---|---|---|---|---|
-| none | | | | |
+| `50152632` | Bridges-2 | D1 follow-up: phrasing-4 listener arms on the D1 sample (R6 i, iii) | `outputs/_analyses/deception-divergence/d1/` (`scores_l4.jsonl`, `followup_readings.*`) | Mon about 9:15 pm EST |
+| `50153789` | Bridges-2 | D2 premise: elicitation features, acts-on-it proxies and generations, refusal direction (R7 to R13) | `outputs/_analyses/deception-divergence/d2/` | Mon about 10 pm EST |
 
 ## Next action
 
-1. Wait for the user's answer to need N1 (phase 1 scope after the D1 null; default A: D2 alone after the Tuesday 4 Nov reset). Do not start new work before the acknowledgement. When `d1-reviewer` reports, commit `reviews/02-d1-review.md` by explicit file list and log it; if it supports the null, F5 becomes reviewed.
-2. After "continue" and the reset: write the D2 plan (two-turn row builder, teacher-forced first answer, Pacchiardi-style undictated follow-ups, the acts-on-it turn, the refusal-direction control with a harmful/harmless prompt set to be sourced), record its rulings in `spec.md`, freeze the judge or classifier hash before any judged row, and run the 1 GPU-hour premise first.
-3. If the user chooses C, run the wrap-up of the protocol (README, FINDINGS rows for F1 to F5, release paused, render, ledger-rollup, memory note).
+1. When `d1b-worker` reports the phrasing-4 results: log the job and a finding; read the R6 (i) verdict and the (iii) flip pool per task. If a task qualifies, open a need asking the user to confirm Codex coordination before any U1 trainer code; otherwise record that U1 waits on D2.
+2. When `d2-worker` reports: log the job; record the proxy token file hash in `spec.md` (G-D2 second part) before any test row is read; run the `judge` stage (OpenRouter, within the $20 cap, `ledger api`), then have the worker run `read` and write the verdict under R13; log a `decision` entry (milestone). If the premise passes, write the patching ruling and plan the 8 to 15 GPU-hour patching run; if it fails, report the rates and the direction is ready for wrap-up.
+3. Independent Opus reviews of the follow-up and of D2 before their findings are marked reviewed.
+4. Checkpoint 1 fires at 24 session points (cadence set by the user); cap pause at 80 percent weekly.
 
 ## Do not
 
 - Do not redo any first-token "necessary in D, not in user-turn I" test (Codex A1 to A3, `docs/research/specificity-ladder/START.md`), the instructed-route tests B1 to B3 (`docs/research/instructed-route/README.md`), the mechanism-analysis phases or the closed SDR gates.
 - Do not write under `docs/research/specificity-ladder/`, the `specificity-ladder` worktree or branch, `.scratch/sdr-*`, `outputs/_analyses/sdr-*`, `.scratch/selective-deception`, `outputs/_studies/selective-deception`, `.scratch/eval5-grader-fixes`, or `docs/research/instructed-route/` (except the F-rte-008 row in FINDINGS.md).
 - Do not score any set listed in `docs/research/held_out.json`.
-- Do not write U1 trainer code before the user has coordinated with Codex.
+- Do not write U1 trainer code before the user has said the Codex coordination is done (reaffirmed in R6 v).
 
 ## Open decisions for the user
 
-- N1: phase 1 scope after the D1 null (A: D2 alone after the reset; B: also a small pre-registered follow-up on the two descriptive signals; C: stop and release paused), and whether the second Bridges-2 allocation cis260372p may be used. Default A, cis260361p only.
+- None open. N1 was answered on Mon 2 Nov 2026 (continue, option B, any allocation). The next decision is the U1 go-ahead, which this session asks for only if a flip pool qualifies or the D2 premise passes.
