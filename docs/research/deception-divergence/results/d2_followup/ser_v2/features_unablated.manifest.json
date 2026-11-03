@@ -1,0 +1,79 @@
+{
+  "argv": [
+    "scripts/d2_followup.py",
+    "features"
+  ],
+  "clauses": {
+    "path": "data/d2/d2_followup_clauses.json",
+    "sha256": "9b8244d9aab323a9575242516566ab88262ea4c46d6fd060d346ee7f25be332a"
+  },
+  "code_sha256": {
+    "scripts/d2_followup.py": "0b277047f5a50f49b3f071c87e66e50c970ed83ee6dfbff3a01fb8616e67f373",
+    "scripts/d2_premise.py": "2c159274957cd76e6ee41a97640fe04737b989ec385b5238ec9ee8d40813f338",
+    "scripts/d2_rows.py": "c06a4fd802361aaa13d7eab88c7295fe93fe9f6914c762fb6dcfbfc81409179b",
+    "spontaneous/d2_judge.py": "701a88a5dbc8aacaa619dce3ea16edb5d2d23dbbd4920302ccc363ec89250391"
+  },
+  "commit": "54cd1ebe98a1fe084452d56f0610fabfba1f5b05",
+  "created": "2026-11-03T00:43:45",
+  "d2_feature_sha256": {
+    "far_v2/features_ablated.jsonl": "37cc9fe1f473118a16a769c7321244f10462728175b42d59e35e4e0ec3926d3e",
+    "far_v2/features_unablated.jsonl": "6affb59a95845b87d1d86ff75f9716abb94713b529611abe7d5e4e0bd49d35fd",
+    "sdr_v2/features_ablated.jsonl": "75f8bf0ecb51e11809e66fc0096ce42cb9a904a237032b51b02034069a4a0cc5",
+    "sdr_v2/features_unablated.jsonl": "4a0b9cb6d61f83f28f154d0f718d2b9f7673eedea61ba96d4223673e05648ffa",
+    "ser_v2/features_ablated.jsonl": "4ef894d0706fb51d494eb1ddb683279f5a44de5b586bc508cf14c1a2d9b5fb78",
+    "ser_v2/features_unablated.jsonl": "f6368efc02d7d8c33f32c4f775285bed51d114c63ce86d6d724a2c33c0cb9c5d"
+  },
+  "d2_root": "outputs/_analyses/deception-divergence/d2",
+  "dtype": "bfloat16",
+  "gpu": "NVIDIA H100 80GB HBM3",
+  "host": "w004.ib.bridges2.psc.edu",
+  "inputs": {
+    "path": "data/d2/d2_inputs.json",
+    "sha256": "a91cb15b846a815b631986957fecdf9b03ef705a1dc6f6bd826e3d5637932451"
+  },
+  "model": "meta-llama/Llama-3.1-8B-Instruct",
+  "no_ids": [
+    912,
+    2201,
+    2360,
+    2822,
+    9173
+  ],
+  "path_of_record": "full",
+  "picks": {
+    "test:mirror": 249,
+    "train:mirror": 200,
+    "validation:mirror": 200
+  },
+  "refusal_direction_sha256": "3e03edcd4b0458be2ce4a8a73468fcbf7ad33047b9c52bb018c1ff81f0bf7cf0",
+  "rows": 1147,
+  "samples": {
+    "max_fit_ids": 0,
+    "max_test_ids": 250,
+    "pre_registered": true
+  },
+  "seconds": 240.6,
+  "sha256": "a2da2bba430accf7d987b69feb8d22ae1aae0f8ff8499132eb804079f85b892c",
+  "slurm_job_id": "50161975",
+  "stack_check": [],
+  "stage": "features_unablated",
+  "tasks": [
+    "far_v2",
+    "sdr_v2",
+    "ser_v2"
+  ],
+  "test_ids_sha256": "0a38027438883cdaa5efdfe51be3ca167aa8d1ff610b92b9d7dfbf38c973df12",
+  "versions": {
+    "numpy": "2.5.1",
+    "python": "3.12.13",
+    "torch": "2.11.0+cu128",
+    "transformers": "5.13.0"
+  },
+  "yes_ids": [
+    7566,
+    9642,
+    9891,
+    10035,
+    14331
+  ]
+}

@@ -1,8 +1,16 @@
-# Hand-back 10: the D2 follow-up, amended plan and build
+# Hand-back 10: the D2 follow-up, amended plan, build and result
 
 Written Mon 2 Nov 2026, about 11:55 pm EST, by the Opus worker `d2-worker` of direction `deception-divergence`,
-under ruling R15. The lead asked for hand-back 09, but `reports/09-handback.md` already holds the plan reviewer's
-hand-back, so this one is 10. No git, no Slurm job and no paid call.
+under ruling R15, and extended on Tue 3 Nov 2026 after the orchestrator's Bridges-2 job 50161975. This is hand-back
+10 because `reports/09-handback.md` holds the plan reviewer's hand-back. I ran no git, no Slurm job and no paid
+call; the orchestrator committed, synced, submitted and fetched.
+
+**Result in one paragraph.** Every task is (b), and the direction label is (b). The D-against-HI classifier
+separates the lie instruction from its honest mirror on every task (validation AUROC 0.976 to 1.000), and the joint
+reading places DT with D and HT with HI on every task, so it reads the instruction's content. But on the
+form-matched act-form clauses, where I names the wrong answer as D does, D and I do not differ: the gap is 0.010 on
+FAR (210 ids) and 0.114 on SDR (35 ids), and both intervals reach zero. Under R15 the D2 route therefore closes U1
+(R6 iv), and F8's SDR pass is read as clause-driven on every task. F8 and the D2 verdict stand as recorded.
 
 ## What changed
 
@@ -30,6 +38,14 @@ hand-back, so this one is 10. No git, no Slurm job and no paid call.
   `--dry-run`. Its header gives the Bridges-2 command.
 - **Tests.** New `tests/test_d2_followup.py` has 43 tests.
 - **Dry-run report.** New `results/d2_followup/build_report.json`.
+- **After job 50161975.** The record copies are in `results/d2_followup/`: `readings.json`, `readings.md`,
+  `drift_anchor.json`, `gpu_timings_1793684926.json`, and the nine feature manifests in `far_v2/`, `sdr_v2/` and
+  `ser_v2/`. Each is byte-identical to the fetched file. The feature `.jsonl` files stay in
+  `outputs/_analyses/deception-divergence/d2_followup/` only. The job logs are copied to `logs/bridges2/`:
+  `d2_followup_50161975.out` (sha256 `2fba3e62cf35c8796cb70addb7c1e8ff096a7dd63663b0a05f01ea54f394271b`) and the
+  failed first submission `d2_followup_50161907.out` (sha256
+  `561e02293d886b936553a3df3c960c9dd574acb7caeb08e37dcd06319bd4c6ea`), each equal to the Bridges-2 copy.
+- **Results.** A new Results section, before What is NOT done.
 
 | file | sha256 |
 |---|---|
@@ -71,6 +87,28 @@ OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4 MKL_NUM_THREADS=4 /sw/external/python/a
   1.3 s. With HI equal to H, `C_HI` is D2's `C_H`, and the act-form gaps reproduce D2's: FAR 0.005 and SDR 0.000.
   These files are scratch and are not a result.
 - **Lint.** `research-session lint` passes on the plan and this hand-back.
+- **The job's manifests.** A scratch check (`/u/swong2/.claude/jobs/5b9b1c28/tmp/verify_fu.py`) read all nine.
+  - Every feature file's sha256 equals its manifest's, and every row count equals the file's.
+  - Every manifest carries `pre_registered: true`, an empty stack check, torch 2.11.0+cu128 and transformers 5.13.0
+    on an "NVIDIA H100 80GB HBM3", the pinned direction sha256, the full-sequence path and commit `54cd1eb`.
+  - Picks are all own mirrors, with zero fallback firings and zero failed picks.
+  - The code and pool hashes equal the local files.
+  - Rows are 5,481 in all: 600 anchor, 3,572 other unablated and 1,309 ablated.
+- **The D2 hashes the read checked.** The six D2 feature hashes in `readings.json`, those in the follow-up
+  manifests and those of the files on Delta are identical. FAR's unablated file is the `6affb59a...` of hand-back 07.
+- **Local re-read.** I ran `read` on a scratch copy of the fetched features:
+
+```
+OMP_NUM_THREADS=4 /u/swong2/.conda/envs/mgnp/bin/python scripts/d2_followup.py read --out-root /u/swong2/.claude/jobs/5b9b1c28/tmp/fu_reread
+```
+
+`drift_anchor.json` is byte-identical, and `readings.md` is identical apart from its timestamp. `readings.json` is
+not byte-identical. 146 floating-point values differ by at most 3.6e-15. They are the classifier coefficients and the
+IH-interaction statistics, which are computed from those coefficients. Every rate, gap, rate interval, label and
+non-numeric field is identical. This is linear-algebra rounding between the Bridges-2 node and the Delta login node.
+
+- **One figure computed after the read.** The test AUROC of D against HI under `C_HI` is not in the readings, so I
+  computed it with the read's own fit (`/u/swong2/.claude/jobs/5b9b1c28/tmp/test_auroc_fu.py`). It is descriptive.
 
 ## Execution evidence
 
@@ -155,18 +193,187 @@ The job needs D2's `outputs/_analyses/deception-divergence/d2/` in the Bridges-2
 feature files with their manifests and `refusal_direction.pt`. Job 50155519 wrote them there, and the wrapper
 refuses to start if the direction is missing.
 
+**Job 50161975.** `sacct` on Bridges-2 reports COMPLETED, exit 0:0, node w004, from 00:21:03 to 00:49:10 on Tue 3
+Nov 2026 (Bridges-2 time), elapsed 00:28:07. The log is `logs/bridges2/d2_followup_50161975.out`, at commit
+`54cd1ebe98a1fe084452d56f0610fabfba1f5b05`.
+
+| step | seconds | rows | seconds per row |
+|---|---|---|---|
+| plan (picks and fit tests, CPU) | 13.9 | | |
+| model load | 295.2 | | |
+| drift anchor, three tasks | 153.8 | 600 | 0.256 |
+| unablated HI, DT, HT and IH | 744.3 | 3,572 | 0.208 |
+| ablated HI | 301.0 | 1,309 | 0.230 |
+
+- **Drift anchor.** All 600 recomputed train D rows are bit-identical to job 50155519's, with a maximum absolute
+  difference of 0.0 on every task.
+- **First submission.** Job 50161907 failed after 4 s, before any Python ran. Its working directory pointed at the
+  other allocation's path, `/ocean/projects/cis260372p/...`, and the wrapper's cwd guard refused it.
+
+## Results
+
+All figures are from `results/d2_followup/readings.json` unless marked as computed after the read. Rates are the
+share of rows `C_HI` scores at or above 0.5 (R15 writes them `p_X`).
+
+### Labels
+
+| task | role | gate AUROC, validation (act-form validation) | test AUROC D against HI, all ids (act-form) | label |
+|---|---|---|---|---|
+| far_v2 | primary | 1.000 (1.000 on 200) | 1.000 (1.000) | (b) |
+| sdr_v2 | secondary | 0.999 (0.997 on 46) | 0.999 (1.000) | (b) |
+| ser_v2 | excluded from the act-form reading | 0.976 (0.991 on 15) | 0.980 (one act-form id) | (b) |
+
+The direction label is (b): D and I share what `C_HI` reads. U1 is not re-admitted. The test AUROCs were computed
+after the read and are descriptive.
+
+**What (b) everywhere means under R15.** The D-against-HI classifier passes its gate on every task, so it
+separates the instruction to lie from the token-matched honest instruction, not just the presence of an instruction.
+But on the form-matched act-form clauses, where I names the wrong answer as D does, D and I do not differ. On FAR,
+I is scored D-like on 208 of 210 ids. On SDR, D and I differ on 4 of 35 ids, with an interval reaching zero. The D2
+route therefore closes U1 (R6 iv). F8's SDR pass, which review 04 traced to predicate-form clauses, is read as
+clause-driven on every task: where D and I separate, the I clause's wording differs, not a listener-deception state.
+
+### Rates under `C_HI`
+
+| task | ids | D | I | H | HI | DT | HT | IH |
+|---|---|---|---|---|---|---|---|---|
+| far_v2 | all test, 210 | 1.000 | 0.990 | 0.000 | 0.000 | 1.000 | 0.000 | 0.000 |
+| far_v2 | act-form, 210 | 1.000 | 0.990 | 0.000 | 0.000 | 1.000 | 0.000 | 0.000 |
+| sdr_v2 | all test, 250 | 0.976 | 0.636 | 0.000 | 0.020 | 0.980 | 0.176 | (act-form only) |
+| sdr_v2 | act-form, 35 | 1.000 | 0.886 | 0.000 | 0.000 | 1.000 | 0.257 | 0.000 |
+| ser_v2 | all test, 249 | 0.944 | 0.414 | 0.032 | 0.120 | 0.912 | 0.277 | (not run) |
+
+FAR's test ids are all act-form, so its two rows are the same ids.
+
+### The act-form reading
+
+| | far_v2 (primary) | sdr_v2 (secondary) |
+|---|---|---|
+| ids, D clause clusters, I clauses | 210, 12, 13 | 35, 7, 17 |
+| signed gap, D minus I | 0.010 | 0.114 |
+| interval clustered by D clause | 0.000 to 0.028 | 0.000 to 0.250 |
+| interval clustered by I clause | 0.000 to 0.025 | 0.000 to 0.269 |
+| leave-one-cluster-out range | 0.005 to 0.012 | 0.037 to 0.143 |
+| spread, D minus HI | 1.000 | 1.000 |
+| I's position `p_I` | 0.990 | 0.886 |
+| ablated refit: rates D, I, HI | 1.000, 0.990, 0.000 | 1.000, 0.943, 0.000 |
+| ablated gap | 0.010 | 0.057 |
+| ablated `C_HI` AUROC D against HI, act-form (all ids) | 1.000 (1.000) | 1.000 (0.999) |
+| refusal control explains | no | yes (a change of exactly half) |
+| IH interaction on the logit | 3.853, interval 1.823 to 6.205 | 0.716, interval -1.449 to 3.473 |
+| logit shift D minus I, HI minus IH | 2.347, -1.506 | 1.065, 0.349 |
+| frame share | -0.64 | 0.33 |
+| conditions failed | gap under 15 points; interval reaches zero | gap under 15 points; interval reaches zero; refusal explains; IH interval reaches zero |
+
+The conditions that pass on FAR are the gate, the spread, every leave-one-cluster-out gap above zero, the refusal
+validity bar, the refusal control not explaining, and the IH interaction. The two that fail are the ones that carry
+the hypothesis.
+
+### The joint DT and HT reading (all test ids)
+
+| task | spread, D minus HI | `p_I` | `p_H` | `p_DT` | `p_HT` | `p_DT - p_HT` | interval | cell |
+|---|---|---|---|---|---|---|---|---|
+| far_v2 | 1.000 | 0.990 | 0.000 | 1.000 | 0.000 | 1.000 | 1.000 to 1.000 | instruction content |
+| sdr_v2 | 0.956 | 0.644 | -0.021 | 1.004 | 0.163 | 0.841 | 0.725 to 0.940 | instruction content |
+| ser_v2 | 0.823 | 0.356 | -0.107 | 0.961 | 0.190 | 0.771 | 0.647 to 0.887 | instruction content |
+
+On every task the deceptive instruction with a true answer reads as D, and the honest instruction with a true answer
+reads near HI. `C_HI` follows what the system instruction says, not the truth of the stated answer or whether the
+model obeyed. The statistic is near +1, the content reader's value, and its interval excludes 0 on every task.
+
+### Descriptive readings
+
+The D-I gap under `C_HI` by D form:
+
+| task | all ids | interval | act | predicate | interval | other | interval |
+|---|---|---|---|---|---|---|---|
+| far_v2 | 0.010 (210) | 0.000 to 0.028 | 0.010 (210) | none | | none | |
+| sdr_v2 | 0.340 (250) | 0.242 to 0.442 | 0.114 (35) | 0.386 (166) | 0.262 to 0.532 | 0.347 (49) | 0.240 to 0.571 |
+| ser_v2 | 0.530 (249) | 0.374 to 0.693 | 0.000 (1) | 0.426 (148) | 0.236 to 0.618 | 0.690 (100) | 0.477 to 0.955 |
+
+The act-form gap by I frame family:
+
+| task | drill | quiz | game |
+|---|---|---|---|
+| far_v2 | 0.000 (52 ids) | 0.013 (78) | 0.013 (80) |
+| sdr_v2 | 0.000 (14) | 0.231 (13) | 0.125 (8) |
+
+Rates under D2's frozen `C_H` (D against H, refitted exactly as D2 did; its D, I and H rates reproduce D2's):
+
+| task | D | I | H | HI | DT | HT | IH |
+|---|---|---|---|---|---|---|---|
+| far_v2 | 1.000 | 0.995 | 0.000 | 0.005 | 1.000 | 0.000 | 0.010 |
+| sdr_v2 | 1.000 | 0.840 | 0.000 | 0.240 | 1.000 | 0.692 | 0.286 |
+| ser_v2 | 1.000 | 0.855 | 0.000 | 0.956 | 1.000 | 0.936 | (not run) |
+
+The B1 to B4 sensitivity refit drops every row of a borderline D clause, which is 6 clauses on SDR and 5 on SER:
+
+| task | fit, gate, test ids | gate AUROC | gap, all ids | interval | predicate gap | interval |
+|---|---|---|---|---|---|---|
+| sdr_v2 | 113, 125, 146 | 0.998 | 0.308 | 0.181 to 0.441 | 0.369 (111) | 0.217 to 0.525 |
+| ser_v2 | 151, 136, 149 | 0.972 | 0.376 | 0.198 to 0.559 | 0.378 (148) | 0.195 to 0.560 |
+
+SDR's act-form gap is unchanged at 0.114, because no act-form clause is borderline after SDR 02's relabelling. The
+borderline mirrors do not drive the predicate-form gaps.
+
+### Drift anchor and cost
+
+The drift anchor is bit-identical on all 600 rows (maximum difference 0.0 against the 0.25 bar).
+
+| item | GPU-hours |
+|---|---|
+| reserved, 00:45:00 on one H100 | 0.75 |
+| estimate at D2's measured rates | 0.46 |
+| estimate by the model constant | 0.68 |
+| actual, job 50161975, 28:07 | 0.47 |
+| failed first submission 50161907, 4 s | 0.00 |
+
+No paid call was made, and no OpenRouter spend.
+
+### Caveats
+
+- **Few clusters.** SDR's act-form reading rests on 35 ids in 7 D clause clusters, and FAR's on 12 clusters
+  ranging from 1 to 44 ids. Percentile intervals over so few clusters are optimistic. Neither label is close to the
+  line, though: FAR's gap is 2 ids of 210, and SDR's is 4 of 35.
+- **The rates saturate.** `C_HI` scores D at 1.000 and HI at 0.000 on FAR's act-form ids, so the rule's rates
+  cannot show gradation. On the logit, I sits 2.35 below D on FAR but stays above the threshold on 208 of 210 ids.
+  The pre-registered rule is on rates, and the logit figures are description.
+- **The IH interaction on FAR holds, with a surprising sign.** The frame words move the honest mirror toward D:
+  IH scores 1.51 logits more D-like than HI, a negative frame share. So the frames do not carry I's D-likeness, and
+  the interaction holds because I sits below D while IH sits above HI. It cannot rescue the label, because the gap
+  fails. On SDR the interaction's interval reaches zero.
+- **SDR's refusal "explains" by an exact tie.** The ablated gap is 0.057, exactly half of 0.114, and R12 counts half
+  or more. The label is (b) on the gap alone, so the tie changes nothing.
+- **Under `C_HI` the non-act gaps grow.** All-ids gaps are 0.340 on SDR and 0.530 on SER, against 0.160 and 0.145
+  under D2's `C_H`. The predicate and other I clauses never name a wrong answer, and a classifier that reads
+  instruction content places them nearer HI. This fits the clause-driven reading. It is descriptive, and the R15
+  rule reads only the act-form ids.
+- **D2's own classifier read different things on different tasks.** Under the frozen `C_H`, HI reads as D on SER
+  (0.956), not on FAR (0.005), and partly on SDR (0.240). SER's D2 classifier read instruction presence. FAR's
+  did not.
+- **The truth shift is small.** HT sits at 0.163 and 0.190 on SDR and SER rather than at 0, and DT at about 1. A
+  common shift from the true answer would move both together, and the statistic cancels it. The cell is the same on
+  all three tasks.
+- **The re-read differs in the last digits.** 146 values differ by at most 3.6e-15 (How verified). No rate, gap,
+  interval of a rate or label differs.
+- **The acts-on-it sequence** was computed for every row and is not read, as planned.
+
 ## What is NOT done
 
-- **No job.** Nothing was submitted, synced, fetched or committed, and no GPU feature exists yet.
-- **The anchor on the real stack is untested.** It is tested only on the tiny model. The pinned-stack refusal can
-  only fire on the cluster; on Delta's login node there is no GPU.
-- **Readings are untested on real follow-up features.** The read has run only on synthetic records and on the
-  scratch stand-in files.
-- **The Bridges-2 dry run** has not been run.
+- **No git.** I committed, pushed, synced and submitted nothing; the orchestrator did.
+- **No finding or worklog entry.** Recording the result, the closure of the D2 route to U1 under R6 iv, and how F8
+  is now read is the orchestrator's.
+- **No independent review** of this result has been run.
+- **No refusal share and no generations.** These were excluded by the plan, and the acts-on-it sequences stay
+  unread.
+- **Feature files are not copied into `results/`,** as instructed; they stay in
+  `outputs/_analyses/deception-divergence/d2_followup/`, which is git-ignored.
+- **The test AUROC of D against HI** is not in `readings.json`. It was computed afterwards by a scratch script and
+  is recorded only in this hand-back.
 
 ## Open questions
 
-None open. The two operational readings below were confirmed by the orchestrator and recorded as a dated R15
+The two operational readings below were confirmed by the orchestrator before the job and recorded as a dated R15
 implementation note in `spec.md`:
 
 1. **Validity bar ids (confirmed).** The ablated AUROC that gates (c) is computed on the same act-form test ids as
@@ -175,5 +382,11 @@ implementation note in `spec.md`:
    `C_HI` logit lies above zero. This equals R15's I minus IH read beside D minus HI. The frame share is reported,
    not thresholded.
 
-The hand-back number is 10, as the orchestrator asked, because 09 holds the plan reviewer's hand-back. The read and
-the Results section of this hand-back follow the job.
+The hand-back number is 10, as the orchestrator asked, because 09 holds the plan reviewer's hand-back.
+
+After the job, two questions are left for the orchestrator. Neither changes a label:
+
+1. **Should the test AUROC be in the readings?** It was asked for, but the read does not compute it. Adding it to
+   `read` would change `scripts/d2_followup.py` after the result. As it stands it is a scratch figure here.
+2. **Does the FAR IH sign need a note in the finding?** The frame words move the honest mirror toward D, not I away
+   from it. This is a descriptive surprise and is not part of R15's rule.
