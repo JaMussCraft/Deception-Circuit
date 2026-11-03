@@ -160,6 +160,7 @@ def test_gpu_stages_end_to_end_on_the_tiny_model(tok, tiny, tmp_path):
     assert all(len(r["features"]) == P.N_PROBES for r in un)
     man = json.load(open(os.path.join(d, "features_unablated.manifest.json")))
     assert man["cache_check"]["rows"] == P.CACHE_CHECK_ROWS and man["cache_check"]["max_abs_diff"] < 1e-3
+    assert man["cache_check"]["path_of_record"] == "cached" and man["prefix_cache"] is True
     assert man["samples"]["pre_registered"] is False
     gens = P.read_jsonl(os.path.join(d, "generations.jsonl"))
     assert len(gens) == 6 + 6 + 2
@@ -446,3 +447,18 @@ def test_wrapper_names_every_gpu_stage_once():
     text = open(WRAPPER).read()
     assert "run features direction generate" in text and "run build --dry-run" in text
     assert "--gpus-per-node=h100-80:1" in text and "-t 01:00:00" in text
+
+
+@pytest.mark.skipif(not (HAVE_FAR and HAVE_INPUTS), reason="far_v2 datasets or data/d2/d2_inputs.json absent")
+def test_no_prefix_cache_records_the_drift_and_does_not_stop(tok, tiny, tmp_path, monkeypatch):
+    # a guard that would stop any cached run: the full path of record must run through it and record the drift
+    monkeypatch.setattr(P, "CACHE_TOL", -1.0)
+    out = str(tmp_path / "d2")
+    argv = ["--tasks", "far_v2", "--out-root", out, "--max-fit-ids", "1", "--max-test-ids", "1", "--cal-ids", "1"]
+    with pytest.raises(SystemExit):
+        P.main(["features"] + argv, tokenizer=tok, model_loader=lambda args: (tiny, "cpu"))
+    assert P.main(["features", "--no-prefix-cache"] + argv, tokenizer=tok,
+                  model_loader=lambda args: (tiny, "cpu")) == 0
+    man = json.load(open(os.path.join(out, "far_v2", "features_unablated.manifest.json")))
+    assert man["prefix_cache"] is False and man["cache_check"]["path_of_record"] == "full"
+    assert man["cache_check"]["rows"] == 7 and man["cache_check"]["max_abs_diff"] < 1e-3

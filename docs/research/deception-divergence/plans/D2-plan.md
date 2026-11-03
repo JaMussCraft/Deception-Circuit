@@ -161,6 +161,11 @@ Prefix caching: each row's prefix (through the forced answer's `<|eot_id|>`) run
 repeated across the 49 second turns (`DynamicCache.batch_repeat_interleave`, present in transformers 4.57.3 and
 5.13.0). The full-sequence path is the reference: the tests assert equality on the tiny model, and the GPU job
 compares both paths on the first 8 rows of each task and stops if any feature differs by more than 0.25 logits.
+**Update after job 50153789:** the guard stopped the first run (far_v2, 0.251 against 0.25, about two bf16
+spacings at logit magnitude 16 to 32; no feature file was written). The bar is unchanged and the full-sequence
+path (`--no-prefix-cache`) becomes the path of record; under it the same comparison is recorded, not enforced.
+Full-path estimate from the dry run: 54.9M feature tokens in 7,854 forwards, 3,696 s (1.03 GPU-hours) with the
+460 s load, which the failed job showed to be about 30 s on Bridges-2.
 
 ## 7. Sample sizes, forwards and GPU-hours
 

@@ -128,6 +128,13 @@ Nothing here is verified on the 8B model; that waits for the job.
 - Arditi pooled four harmful sources; only AdvBench is used. The refusal direction's validity is checked, not
   assumed.
 
+- Job 50153789 (Bridges-2) failed after 158 s on the cache guard: far_v2 cached against full features differ by
+  0.251 against the 0.25 bar; no feature file was written for any task. The guard now applies to the cached path
+  only, and `--no-prefix-cache` (forwarded by the wrapper to every stage) makes the full path the path of record,
+  with the comparison recorded in each features manifest. Changed: `scripts/d2_premise.py`,
+  `tests/test_d2_premise.py` (33 tests pass on mgnp), the plan's section 6 note. The resubmission is the
+  orchestrator's.
+
 ## Open questions
 
 - FAR and SER have no unused I ids after the premise (all 210 and 249 are in it), so a passing FAR or SER would

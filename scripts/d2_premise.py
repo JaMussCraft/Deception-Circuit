@@ -468,21 +468,31 @@ def build_task_report(task: str, plan: Dict, tokenizer, probes: Sequence[Dict]) 
     }
 
 
-def estimate(reports: Sequence[Dict], n_ref_candidates: int) -> Dict:
+def estimate(reports: Sequence[Dict], n_ref_candidates: int, use_cache: bool = True) -> Dict:
+    """Seconds on one H100. Cached path: one prefix forward plus one forward of the 49 second turns per row.
+    Full path (--no-prefix-cache): one forward per row of 49 full sequences, each right-padded to the row's
+    longest (prefix plus the longest second turn)."""
     feats_tokens = 0.0
     forwards = 0
     gens = 0
     for rep in reports:
         rows = rep["rows_unablated_pass"] + rep["rows_ablated_pass"]
-        feats_tokens += rows * (rep["tokens"]["mean_prefix"] + rep["tokens"]["second_turn_tokens_per_row"])
-        forwards += 2 * rows
+        if use_cache:
+            feats_tokens += rows * (rep["tokens"]["mean_prefix"] + rep["tokens"]["second_turn_tokens_per_row"])
+            forwards += 2 * rows
+        else:
+            width = rep["tokens"]["mean_prefix"] + max(rep["tokens"]["probe_turn"]["max"],
+                                                       rep["tokens"]["acts_on_it_turn"]["max"])
+            feats_tokens += rows * rep["second_turns_per_row"] * width
+            forwards += rows
         gens += sum(rep["generations"].values())
     feats_s = feats_tokens / EST_TOKENS_PER_S + forwards * EST_FORWARD_OVERHEAD_S
     ref_forwards = 2 * (N_REF_TRAIN // 32) + n_ref_candidates * 3
     ref_s = ref_forwards * 0.12
     gen_s = math.ceil(gens / GEN_BATCH) * GEN_MAX_NEW * EST_GEN_STEP_S
     total = EST_LOAD_S + feats_s + ref_s + gen_s
-    return {"features_tokens": int(feats_tokens), "features_forwards": forwards, "features_s": round(feats_s),
+    return {"prefix_cache": use_cache, "features_tokens": int(feats_tokens), "features_forwards": forwards,
+            "features_s": round(feats_s),
             "refusal_forwards": ref_forwards, "refusal_s": round(ref_s), "generations": gens,
             "generation_s": round(gen_s), "load_s": EST_LOAD_S, "total_s": round(total),
             "gpu_hours": round(total / 3600.0, 2),
@@ -539,7 +549,8 @@ def run_build(args, tokenizer) -> int:
                "yes_ids": yes, "no_ids": no, "refusal_ids": ref,
                "refusal_prompt_tails": dict(tails), "refusal_candidates": n_cand,
                "refusal_layers": list(range(n_refusal_layers(n_layers))),
-               "estimate": estimate(reports, n_cand),
+               "estimate": estimate(reports, n_cand, use_cache=not args.no_prefix_cache),
+               "estimate_other_path": estimate(reports, n_cand, use_cache=args.no_prefix_cache),
                "totals": {"unablated_rows": sum(r["rows_unablated_pass"] for r in reports),
                           "ablated_rows": sum(r["rows_ablated_pass"] for r in reports),
                           "second_turn_sequences": sum(sum(r["second_turn_sequences"].values()) for r in reports),
@@ -911,7 +922,11 @@ def run_gpu(args, tokenizer, stages: Sequence[str], model_loader=None) -> int:
             recs, check = feature_pass(model, tokenizer, task, plans[task], pass_name, probes, yes, no, device,
                                        ablation=ablation, use_cache=use_cache, pad_id=pad,
                                        check_rows=CACHE_CHECK_ROWS if pass_name == "unablated" else 0)
-            if check["rows"] and check["max_abs_diff"] > CACHE_TOL:
+            # The guard protects the cached path only. Under --no-prefix-cache the full-sequence path is the path
+            # of record and the reference itself; the same 8-row comparison (now against the cached path) is
+            # recorded in the manifest as a descriptive bf16 drift figure and stops nothing.
+            check["path_of_record"] = "cached" if use_cache else "full"
+            if use_cache and check["rows"] and check["max_abs_diff"] > CACHE_TOL:
                 raise SystemExit(f"{task}: cached and full features differ by {check['max_abs_diff']:.3f} > "
                                  f"{CACHE_TOL}; rerun with --no-prefix-cache")
             secs = time.time() - t0
