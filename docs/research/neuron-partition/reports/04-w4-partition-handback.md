@@ -501,3 +501,21 @@ construction, so its verdict is "n/a" at every k.
   layer-matched. A layer-matched floor would be higher, because the classes are concentrated in L10 to L16, but it
   would still be far below these values. START's "IOI floor" is replaced by this random-set floor, as the brief
   said.
+
+## Addendum: position all (ruling R11)
+
+Added Tue 3 Nov 2026, after ruling R11 made the all-position attribution the primary ranking.
+
+- **Code.** `scripts/neuron_partition_sets.py` accepts `--position all` in both `partition` and `stability`. It
+  reads `atp_all_mean` for s_D and s_I, and minus `rev_atp_all_mean` for s_H. The outputs carry an `_all` tag:
+  `far_all_sets_k<k>.json`, `far_all_sets_k<k>_with_nulls.json`, `partition_summary_all.json` and
+  `stability_summary_all.{json,md}`. Readout and clause are unchanged.
+- **Contrast.** The scorer writes no `contrast_all_*` keys, so `--score contrast --position all` stops and names
+  the missing key. The contrast comparison stays at the readout.
+- **Tests.** `tests/test_neuron_partition_sets.py` gains three tests on synthetic scores in which the readout and
+  clause keys hold a decoy. They check that position all reads only the all-position keys, that the partition and
+  stability CLIs write the `_all` files with nulls, and that the contrast-all refusal works. The suite now has 18
+  tests, and both interpreters report `18 passed`: 9.12 s on mgnp and 7.44 s on base, with no skips. The new
+  sha256 values are `6280ebf3…8274` for the script and `cd545e9b…d5` for the tests.
+- **Not done yet.** The all-position partition and stability have not run, because the score directories with the
+  `atp_all_*` keys do not exist yet. They will be appended when W1's rerun lands.
