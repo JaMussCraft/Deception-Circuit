@@ -1,47 +1,52 @@
 # Resume: neuron-partition
 
-<!--
-Template for docs/research/<slug>/RESUME.md. This is the machine narrative state of the direction: what a fresh
-orchestrator needs in order to continue after a compaction or a new session. It is overwritten, not appended, and
-stays under 150 lines. Keep the six headings below, in this order. Write full sentences with normal spacing.
-Counters (compactions, checkpoints, usage) live in state.json and are never copied here. RESUME never summarizes the
-worklog; the worklog may point here, never the other way.
--->
-
-Last rewritten: <Sun 1 Nov 2026, 2:40 pm EST> by <claude-01a2b3c4>.
+Last rewritten: Tue 3 Nov 2026, 12:10 pm EST by claude-5201d56c.
 
 ## Status
 
-<Two to five sentences. Which direction is active, which is the fallback, and where each stands against its
-pre-registered exit rule from spec.md. Name the findings by F number from FINDINGS.md.>
+N1 (the causal neuron map and the three-way partition) is active; N2 (honest bypass or suppression) and N3
+(split-half stability) wait on N1's classes. Nothing has run on a GPU yet. The exit criteria are frozen in
+`spec.md` (copied from item 10 of START.md). No finding has been recorded. The first report is due Wed 4 Nov 2026,
+12:00 pm EST, with whatever N1 has produced.
 
 ## Branch, worktree and commit
 
-- Branch: `<branch name>`.
-- Worktree: `<absolute worktree path>`.
-- Last commit on the branch: `<short SHA>`, "<commit subject>".
-- Uncommitted work, if any: <files and why they are not committed yet, or "none">.
+- Branch: `neuron-partition`.
+- Worktree: `/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/neuron-partition`.
+- Last commit on the branch: see `git log -1`; the branch starts from main at `7a020a9` (claim rendered).
+- Tool-owned records (state, worklog, ledger, hook-saved hand-backs) live in the main checkout at
+  `/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/neuron-partition/`; everything else is on the branch.
+- Uncommitted work, if any: none.
 
 ## In-flight jobs
 
-<One row per job that has not reached a terminal state. The same jobs are recorded with `research-session job add`,
-which keeps the waiter command in state.json; this table only says what each job is for.>
-
-| Job | Cluster | What it computes | Output directory | Expected finish |
-|---|---|---|---|---|
-| `<job id>` | <Delta> | <plain description> | `<outputs/... path>` | <Sun 4:00 pm EST> |
+None.
 
 ## Next action
 
-<The single next step, stated so that a fresh orchestrator can take it without reading anything else first. Then
-at most three follow-up steps, in order.>
+1. Four Opus agents are briefed in parallel: a reader (FINDINGS do-not-redo brief and the ladder's readout
+   definition), W1 (down-projection-input capture site and the attribution-patching scorer), W2 (neutral-twin
+   interchange for the `mlp_hidden` kind in `component_analysis/knockout.py`, plus mean and zero set ablation),
+   W3 (fresh test sample seed 2, user-turn pool copies with sha256, matched-null generator, Bridges-2 code sync).
+2. Pilot the scorer on a Delta interactive partition; then the full ranking plus the first ablation cells in one
+   Bridges-2 H100 job charged to cis260372p if `--test-only` shows it starts earlier.
+3. Partition, ablate, nulls; write the N1 hand-back and the first report by Wed noon EST.
 
 ## Do not
 
-- <Work that is finished and must not be redone, each with the path that records it.>
-- <Protocols that failed their gate, with the path.>
-- <Files and directions owned by other sessions, taken from SESSIONS.md.>
+- Do not redo the head-level D/H partition (F-comp-001), the head-level cross-task tests (F-mech-005, F-mech-008),
+  the layer-17 residual probe (F-rte-004), or any residual-stream direction.
+- Do not use the item-swap corrupt prompt as the neuron ablation reference (near no-op by construction).
+- Do not use SAE or transcoder features, top-activating lists without ablation, raw Jaccard without ceiling and floor,
+  or thresholds tuned on the evaluation ids.
+- Do not read or import code from `.claude/worktrees/specificity-ladder/`, write there, or touch its Slurm jobs
+  (23472894, 23474289 and later). Read its user-turn pools only, by path, and record sha256.
+- Do not record a verdict in the Codex A3 cell (down-projection-input neurons at MLP layers 5 to 8 and 11, readout
+  position only, D-minus-I gap over H standard deviation, top 1 percent per layer, A1's 100 assessment ids).
+- Do not use A1's 100 assessment ids or the mechanism-analysis held-out samples for ranking or ablation.
+- Paused directions (sdr-mechanism, selective-deception, mechanism-datasets, deception-divergence) stay paused.
 
 ## Open decisions for the user
 
-- <Each decision waiting on the user, with its need number from the worklog and the default if no answer.>
+- Cadence: START says 24 points; only the user can set it with the research-session cadence command; the default
+  16 is in force until then.
