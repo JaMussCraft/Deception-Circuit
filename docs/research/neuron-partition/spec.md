@@ -100,3 +100,7 @@ as a ruling before that run.
 - **R9 (Tue 3 Nov 2026): operational.** Ablation cells pass `--max-length 128` (lossless: any truncation raises);
   rows.jsonl stays in outputs and is never committed; the IOI rows follow the reader brief's recipe and are not shown
   to be the ladder's own 100 rows.
+- **R10 (Tue 3 Nov 2026, before the first ablation cell): "in both split halves".** The N1 pass clause "in both
+  split halves" is read on the seed-2 test sample: its ids are split into two halves with seed 2 (stratified the way
+  W3's rank halves are), and a class must meet every bar on each half as well as on the whole sample. Ranking
+  stability across the rank halves is N3's report and does not enter the N1 pass.
