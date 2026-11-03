@@ -59,6 +59,13 @@ def build_parser():
                         "outputs/_analyses/neuron-partition/data/pools).")
     p.add_argument("--inversion-dir", default=None, help="User-turn I pool; overrides --pool-dir.")
     p.add_argument("--neutral-dir", default=None, help="User-neutral twin pool; overrides --pool-dir.")
+    p.add_argument("--ids", default=None, metavar="JSON",
+                   help="Restrict the ranking rows to the instance ids listed in this JSON file (for example W3's "
+                        "far_rank_ids.json); I/N rows are matched by the same ids.")
+    p.add_argument("--ids-key", default=None, metavar="DOTTED.KEY",
+                   help="Where the id list sits in --ids, as a dotted key (for example halves.A).")
+    p.add_argument("--tag", default=None, help="Inserted into each output directory name before the commit "
+                                               "(for example half1).")
     p.add_argument("--output-root", default=DEFAULT_OUTPUT_ROOT)
     p.add_argument("--commit", default=None, help="Short commit for the directory name; default read from .git.")
     p.add_argument("--note", action="append", default=[], help="Free-text note for run_manifest.json (repeatable).")
@@ -130,8 +137,36 @@ def pool_dirs(args, pair):
             "twin": args.neutral_dir or os.path.join(args.pool_dir, f"{args.task}_user_neutral")}
 
 
+def load_id_list(path, key):
+    """The id list at dotted `key` of the JSON file `path` (the whole file when it is itself a list)."""
+    import json
+    with open(path) as handle:
+        value = json.load(handle)
+    for part in (key.split(".") if key else ()):
+        if not isinstance(value, dict) or part not in value:
+            raise SystemExit(f"--ids {path}: no key {key!r} (stopped at {part!r})")
+        value = value[part]
+    if not isinstance(value, list) or not all(isinstance(v, str) for v in value):
+        raise SystemExit(f"--ids {path} --ids-key {key!r}: not a list of id strings")
+    if len(set(value)) != len(value):
+        raise SystemExit(f"--ids {path} --ids-key {key!r}: duplicate ids")
+    return value
+
+
+def filter_rows(rows, wanted):
+    """(rows whose id is in `wanted`, in their own order; a report of how many matched)."""
+    wanted_set = set(wanted)
+    kept = [r for r in rows if r.id in wanted_set]
+    have = {r.id for r in rows}
+    return kept, {"n_wanted": len(wanted_set), "n_matched": len(kept),
+                  "n_wanted_not_in_pool": len(wanted_set - have)}
+
+
 def output_dir(args, pair, splits, commit):
-    name = f"{args.task}_{pair}_{'+'.join(splits)}_{(commit or 'nocommit')[:7]}"
+    name = f"{args.task}_{pair}_{'+'.join(splits)}"
+    if args.tag:
+        name += f"_{args.tag}"
+    name += f"_{(commit or 'nocommit')[:7]}"
     if args.limit is not None:
         name += f"_limit{args.limit}"
     if args.reverse:
@@ -152,6 +187,11 @@ def load_rows(args, pair, splits, tokenizer):
             got, report = na.in_pairs(dirs["clean"], dirs["twin"], tokenizer, split=split)
         rows.extend(got)
         reports.append(report.as_dict())
+    if args.ids:
+        rows, id_report = filter_rows(rows, load_id_list(args.ids, args.ids_key))
+        if not rows:
+            raise SystemExit(f"[{pair}] --ids {args.ids} --ids-key {args.ids_key}: no ranking row matched")
+        reports.append({"id_filter": {"path": os.path.abspath(args.ids), "key": args.ids_key, **id_report}})
     if args.limit is not None:
         rows = rows[:args.limit]
     return rows, reports, dirs
@@ -210,6 +250,11 @@ def main(argv=None) -> int:
         print(f"[{pair}] {len(rows)} paired row(s) from {', '.join(splits)}; clause on {n_clause}; "
               f"clean {dirs['clean']}; twin {dirs['twin']}")
         for report in reports:
+            if "id_filter" in report:
+                f = report["id_filter"]
+                print(f"  id filter {f['path']} [{f['key']}]: {f['n_matched']} row(s) matched of {f['n_wanted']} "
+                      f"id(s); {f['n_wanted_not_in_pool']} listed id(s) not in this pool")
+                continue
             print(f"  {report['split']}: {report['n_rows']} of {report['n_split']} paired; "
                   f"{len(report['without_twin'])} without twin; {len(report['dropped_by_tokenization'])} dropped by "
                   f"tokenization; {len(report['clause_fallback'])} clause fallback")
@@ -254,6 +299,9 @@ def main(argv=None) -> int:
         dataset_files = {}
         for entry in pools.values():
             dataset_files.update(entry["files"])
+        if args.ids:
+            import run_manifest as rm
+            dataset_files.update(rm.hash_files([os.path.abspath(args.ids)]))
         notes = list(args.note)
         if pair == "in":
             in_place = (os.path.normpath(os.path.dirname(os.path.abspath(dirs["clean"])))

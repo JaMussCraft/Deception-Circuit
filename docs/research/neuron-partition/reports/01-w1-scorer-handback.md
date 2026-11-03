@@ -318,3 +318,51 @@ it failed, the run would have stopped before reading any row.
 
 **Not done in this addendum.** No partition into D-only, H-only and shared classes, no thresholds, and no SER run.
 The corrupt-stream question in Open questions still stands.
+
+## Addendum: split-half ranking for N3
+
+Status: the code and tests are done. The job is not submitted: it waits for the orchestrator's commit of the
+`--ids` change, so that the manifests name a committed tree.
+
+**What changed.** Committed by the orchestrator from the worktree:
+
+- `scripts/neuron_attribution.py` gains three options.
+  - `--ids <json>` and `--ids-key <dotted.key>` restrict the ranking rows to a listed id set. I/N rows are matched by
+    the same ids.
+  - `--tag <name>` is inserted into the directory name before the commit.
+  - The ids file's sha256 goes into `dataset_files`, and an `id_filter` report (path, key, wanted, matched, listed
+    but absent) goes into `rows.json`. A filter that matches no row stops the run.
+- `tests/test_neuron_attribution.py` gains four tests.
+  - The dotted-key loader and its refusals.
+  - Filter order and counts.
+  - The real halves: `halves.A` and `halves.B` give 200 D/H rows each and select exactly W3's `I_A` (174) and `I_B`
+    (180) I/N ids. The two halves do not overlap.
+  - The CLI end to end with `--ids` and `--tag`.
+- `docs/research/neuron-partition/jobs/split_half_attribution_far.sbatch` is new. It makes six runs in four python
+  calls: per half, `dh` and `in` forward, then `dh --reverse`. It reserves 30 minutes and takes the commit as its
+  only argument. `component_analysis/neuron_attribution.py` is unchanged.
+
+**How verified.**
+
+```
+/u/swong2/.conda/envs/mgnp/bin/python -m pytest -p no:cacheprovider -q -rs tests/test_neuron_attribution.py
+OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 /sw/external/python/anaconda3/bin/python3.9 -m pytest -p no:cacheprovider -q -rs tests/test_neuron_attribution.py --basetemp=/tmp/w1-5201d56c-bt_base5
+```
+
+Observed: `28 passed in 42.53s` (mgnp) and `28 passed, 2 warnings in 41.84s` (base), with no skips.
+
+- The first base run failed one test with `OSError: [Errno 122] Disk quota exceeded`. The file-count quota of
+  `/u/swong2` stood at 761k files against a 760k hard limit, which this session did not cause alone.
+- I deleted my own pytest temp trees under `/u/swong2/.claude/jobs/5201d56c/tmp/w1/`, about 390 files. I then reran
+  with a uniquely named temp directory under `/tmp`, and removed it afterwards.
+
+The dry run of both halves, with `--commit 0000000`:
+
+| Half | D/H rows matched | I/N rows matched | listed ids absent from I/N |
+|---|---|---|---|
+| A (`--tag half1`) | 200 of 200 | 174 | 26 |
+| B (`--tag half2`) | 200 of 200 | 180 | 20 |
+
+**Execution evidence.** Not yet available: the job is waiting for the orchestrator's commit sha.
+
+**What is NOT done.** The split-half job is not submitted, so there are no split-half scores and no Jaccard.

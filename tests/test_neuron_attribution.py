@@ -437,3 +437,73 @@ def test_cli_pool_dir_reads_the_pools_from_there(tok, tmp_path, monkeypatch, cap
     assert cli.main(["--pair", "in", "--split", "validation", "--dry-run", "--pool-dir", str(pools),
                      "--output-root", str(tmp_path / "out")]) == 0
     assert str(pools / "far_v2_user_inversion") in capsys.readouterr().out
+
+
+# ==============================================================================
+# THE --ids FILTER (split halves for N3)
+# ==============================================================================
+
+RANK_IDS = os.path.join(REPO, "outputs", "_analyses", "neuron-partition", "data", "far_rank_ids.json")
+HAVE_RANK_IDS = os.path.exists(RANK_IDS)
+
+
+def test_load_id_list_reads_a_dotted_key_and_refuses_bad_ones(tmp_path):
+    path = tmp_path / "ids.json"
+    path.write_text(json.dumps({"halves": {"A": ["a", "b"], "n": 3, "dup": ["a", "a"]}, "flat": ["x"]}))
+    assert cli.load_id_list(str(path), "halves.A") == ["a", "b"]
+    assert cli.load_id_list(str(path), "flat") == ["x"]
+    for bad in ("halves.C", "halves.n", "halves.dup", "halves.A.x"):
+        with pytest.raises(SystemExit):
+            cli.load_id_list(str(path), bad)
+
+
+def test_filter_rows_keeps_listed_ids_in_row_order():
+    rows = _random_rows(4, 8, seed=11)
+    kept, report = cli.filter_rows(rows, ["r3", "r1", "zz"])
+    assert [r.id for r in kept] == ["r1", "r3"]
+    assert report == {"n_wanted": 3, "n_matched": 2, "n_wanted_not_in_pool": 1}
+
+
+@pytest.mark.skipif(not (HAVE_FAR and HAVE_POOL and HAVE_RANK_IDS), reason="datasets or W3's id file not present")
+def test_the_halves_split_both_pairs_by_the_same_ids(tok):
+    """halves.A and halves.B are D ids over train+validation; the same lists, matched by id on the I/N pool, give
+    exactly W3's I_A and I_B."""
+    with open(RANK_IDS) as handle:
+        halves = json.load(handle)["halves"]
+    parser = cli.build_parser()
+    for half, i_key in (("A", "I_A"), ("B", "I_B")):
+        args = parser.parse_args(["--pair", "dh", "in", "--ids", RANK_IDS, "--ids-key", f"halves.{half}"])
+        dh, dh_reports, _ = cli.load_rows(args, "dh", ["train", "validation"], tok)
+        inv, in_reports, _ = cli.load_rows(args, "in", ["train", "validation"], tok)
+        assert len(dh) == len(halves[half]) == 200
+        assert {r.id for r in dh} == set(halves[half])
+        assert {r.id for r in inv} == set(halves[i_key])
+        assert dh_reports[-1]["id_filter"]["n_wanted_not_in_pool"] == 0
+        assert in_reports[-1]["id_filter"]["n_matched"] == len(halves[i_key])
+    assert not set(halves["A"]) & set(halves["B"])
+
+
+@pytest.mark.skipif(not (HAVE_FAR and HAVE_POOL), reason="datasets not present")
+def test_cli_ids_and_tag_end_to_end_on_the_tiny_model(tok, tiny, tmp_path, monkeypatch):
+    import models
+    monkeypatch.setattr(models.ModelAdapter, "load_full_model", lambda self, device: tiny)
+    d_rows, _ = na.dh_pairs(os.path.join(DATA, "far_v2"), tok, split="validation")
+    i_rows, _ = na.in_pairs(POOL_I, POOL_N, tok, split="validation")
+    i_ids = {x.id for x in i_rows}
+    shared = [r.id for r in d_rows if r.id in i_ids][:2]
+    extra = d_rows[-1].id
+    ids = tmp_path / "ids.json"
+    ids.write_text(json.dumps({"halves": {"A": shared + [extra]}}))
+    code = cli.main(["--pair", "dh", "in", "--split", "validation", "--batch-size", "2", "--device", "cpu",
+                     "--ids", str(ids), "--ids-key", "halves.A", "--tag", "half1",
+                     "--output-root", str(tmp_path / "out"), "--commit", "abcdef0123"])
+    assert code == 0
+    for pair in ("dh", "in"):
+        cell = tmp_path / "out" / f"far_v2_{pair}_validation_half1_abcdef0"
+        rows_json = json.loads((cell / "rows.json").read_text())
+        expected = 3 if pair == "dh" else 2 + (extra in i_ids)
+        assert rows_json["n_rows"] == expected
+        assert {i.split("/", 1)[1] for i in rows_json["ids"]} <= set(shared + [extra])
+        assert rows_json["loader_reports"][-1]["id_filter"]["key"] == "halves.A"
+        manifest = json.loads((cell / "run_manifest.json").read_text())
+        assert any(k.endswith("ids.json") for k in manifest["dataset_files"])
