@@ -1,6 +1,6 @@
 # D2 premise readings
 
-Generated 2026-11-02T21:19:53 by scripts/d2_premise.py read.
+Generated 2026-11-02T21:46:36 by scripts/d2_premise.py read.
 
 Refusal direction: chosen {'bypass': -9.814223289489746, 'degenerate': False, 'induce': 7.715332984924316, 'kl': 0.054618071764707565, 'layer': 11, 'norm': 4.234919548034668, 'position': -5}, valid True, harmful refusal share 1.0 unablated and 0.0 ablated.
 

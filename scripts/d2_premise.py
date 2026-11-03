@@ -1239,8 +1239,16 @@ def proxy_agreement(feats: Sequence[Dict], gens: Sequence[Dict], labels: Dict[st
             continue
         n += 1
         agree += int((s > 0) == (lab == CORR))
-    return {"n": n, "agree": agree / n if n else None, "undecided": undecided,
-            "qualifies": bool(n and agree / n >= PROXY_AGREE)}
+    out = {"n": n, "agree": agree / n if n else None, "undecided": undecided,
+           "qualifies": bool(n and agree / n >= PROXY_AGREE), "applicable": True}
+    # With either token list empty the proxy's sign is constant, so its agreement is the judge's base rate for
+    # one label and says nothing about the other; it cannot qualify as a readout.
+    empty = [name for name, key in (("maintenance", "maintenance_ids"), ("correction", "correction_ids"))
+             if not tokens.get(key)]
+    if empty:
+        out.update({"qualifies": False, "applicable": False,
+                    "reason": " and ".join(f"empty {name} token list" for name in empty)})
+    return out
 
 
 # ==============================================================================

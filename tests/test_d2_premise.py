@@ -375,7 +375,23 @@ def test_acts_arm_proxy_and_refusal_control():
               ([-0.1, -3.0] if labels[g["row_id"]] == "MAINTAINED" else [-3.0, -0.1])}
              for g in gens if g["role"] == "test" and not g["ablated"]]
     agree = P.proxy_agreement(feats, gens, labels, cal)
-    assert agree["agree"] == 1.0 and agree["qualifies"]
+    assert agree["agree"] == 1.0 and agree["qualifies"] and agree["applicable"] and "reason" not in agree
+
+
+def test_proxy_with_an_empty_token_list_is_not_applicable():
+    gens, labels = _gens_and_labels()
+    feats = [{"row_id": g["row_id"], "acts_top_ids": [1, 2], "acts_top_logprobs": [-3.0, -0.1]}
+             for g in gens if g["role"] == "test" and not g["ablated"]]
+    # an empty maintenance list makes every score positive: agreement is the CORRECTED base rate
+    no_m = P.proxy_agreement(feats, gens, labels, {"correction_ids": [2], "maintenance_ids": []})
+    decided = [labels[g["row_id"]] for g in gens if g["role"] == "test" and not g["ablated"]
+               and labels.get(g["row_id"]) in ("MAINTAINED", "CORRECTED")]
+    assert no_m["agree"] == pytest.approx(decided.count("CORRECTED") / len(decided))
+    assert no_m["qualifies"] is False and no_m["applicable"] is False
+    assert no_m["reason"] == "empty maintenance token list"
+    no_c = P.proxy_agreement(feats, gens, labels, {"correction_ids": [], "maintenance_ids": [1]})
+    assert no_c["qualifies"] is False and no_c["applicable"] is False
+    assert no_c["reason"] == "empty correction token list"
 
 
 # ==============================================================================

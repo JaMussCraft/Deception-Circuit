@@ -30,7 +30,8 @@ Committed by the orchestrator from the worktree
 
 After job 50155519 (worktree files, not yet committed):
 
-- `scripts/d2_premise.py` (sha256 `ad21b9d48b5883c7610a8d6bd078d2fc1ccd2fb961b2d0492e96462be7bcfe40`): two changes
+- `scripts/d2_premise.py` (sha256 `ad21b9d48b5883c7610a8d6bd078d2fc1ccd2fb961b2d0492e96462be7bcfe40` after these
+  two changes, `2c159274957cd76e6ee41a97640fe04737b989ec385b5238ec9ee8d40813f338` after the review 04 fix below): two changes
   to the read side only, beyond the lead's literal ask, each for a reason found while preparing the judge. No
   function used by `features`, `direction` or `generate` changed (a line diff against the job's copy at
   `fe47e7c6...` touches only lines after 1,249: `load_labels`, the acts-on-it block of `read_task`, `readings_md`
@@ -42,7 +43,8 @@ After job 50155519 (worktree files, not yet committed):
   with stage `crosscheck` or `rejudge` are now kept out of the primary labels, and `readings.json` gains a
   `judge_checks` block (agreement overall and per task, agreement without UNCLEAR, a confusion count, and the
   re-judge flip rate). The lead may accept or revert either change; neither touches the G-D2 files.
-- `tests/test_d2_premise.py` (sha256 `e53a533f67a19647f3dc21686e2047f086bcf44e6fcd53707afdb7259291d7eb`): 27 tests;
+- `tests/test_d2_premise.py` (sha256 `e53a533f...` with 27 tests, then
+  `f4c4443f01d973c2994faf94964648cc2e75686b7f89ba6f23d8e6c4fef4548e` with 28 after the review 04 fix);
   the end-to-end test also runs a calibration-only read, and two new tests check that check labels never overwrite
   primary labels and that `judge` stage output (mocked transport, reviewed test ledgers) round-trips into `read`.
 - `docs/research/deception-divergence/results/d2/job50155519/`: the job's `readings.json`, `readings.md`,
@@ -59,6 +61,10 @@ After the judge (worktree files, not yet committed; the orchestrator ran every p
   (created 21:19:53, `final` true), kept apart from the job's partial read in `results/d2/job50155519/`.
 - `docs/research/deception-divergence/results/d2/proxy_tokens.json` (sha256 `304ad7fa...`) was written by the
   orchestrator's calibration read; it is listed here because it belongs in the commit.
+- Review 04 fix: `proxy_agreement` now reports `qualifies` false, `applicable` false and a `reason` ("empty
+  maintenance token list" or "empty correction token list") when either token list is empty; `agree` is reported
+  as before. A new test checks both cases. `calibrate_proxy` and the token file are unchanged. The orchestrator's
+  final read command was re-run, and its output replaced `results/d2/readings_final.json` and `readings_final.md`.
 - Not copied: the three judge caches, which hold full prompts. They stay in the ignored output directory:
 
 | cache | bytes | sha256 |
@@ -236,10 +242,11 @@ direction cap, but the spend is $2.71.
 | judge/ledger_main_ablated.jsonl | `9eef51a9b53e9c7fa5ccc899c7f09516ec55a36a19923c4647e63aa09ff98d7a` |
 | judge/ledger_crosscheck.jsonl | `76ec60ac75ca3a771138066a2eaa42d2772c418d835df579108c4bc1fd17cd21` |
 | judge/ledger_rejudge.jsonl | `92db59d497429bd259628d1561a1da414b7355c6e37b362853daf78d6340e1fd` |
-| readings_final.json | `509d2838d3424555e103ef6e1188fb0eb0674cdc9b5ba210ab0cb814b18a8156` |
-| readings_final.md | `03bfefeb0540fa3af7bfcd9b5b0978c0620a756b9c0701769e484380186c4992` |
+| readings_final.json (re-run after the review 04 fix) | `2072104864653f00f80e51f2001b121d07ca78d63d7db27135c8581d02947721` |
+| readings_final.md (re-run after the review 04 fix) | `ab524e3eb3a5bd5615ae789d65ee5e3134f75e4bfd52b27979d9f982a54d9e88` |
 
-The final read names code `scripts/d2_premise.py` `ad21b9d4...` (the read-side changes above), `scripts/d2_rows.py`
+The orchestrator's final read named code `scripts/d2_premise.py` `ad21b9d4...` (the read-side changes above); the
+re-run after the review 04 fix names `2c159274...` and differs from it only in the proxy flags. Both name `scripts/d2_rows.py`
 `c06a4fd8...` and `spontaneous/d2_judge.py` `701a88a5...`, and the frozen token file
 `results/d2/proxy_tokens.json` with sha256 `304ad7fa5e9963067e57f06833a03b64e2938eb6deb68dd33aadda31992302a0`.
 The orchestrator recorded that hash in spec.md after the calibration stage and before the main stage, and the final
@@ -328,7 +335,8 @@ needs. The FAR ablated pass raises the UNCLEAR flag, with D at 0.29 against the 
 
 First-token proxy, frozen in `results/d2/proxy_tokens.json`. The correction lists are FAR "I", "The", "However",
 "Wait" and "Actually"; SDR "I" and "Actually"; SER "I". The maintenance list is empty on every task. Agreement with
-the judge on unablated decided test rows is 0.988 (579 rows), 0.987 (686) and 0.997 (695), with no undecided row.
+the judge on unablated decided test rows is 0.988 (579 rows), 0.987 (686) and 0.997 (695), with no undecided row. The
+proxy is marked not applicable on every task (`qualifies` false, reason "empty maintenance token list").
 
 ### Judge checks (R11)
 
@@ -390,7 +398,10 @@ agreements plus those 7 disagreements. No row flips between MAINTAINED and CORRE
 - **(d) Other points from `readings_final.json`:**
   - **The proxy is vacuous.** Its maintenance list is empty, so it labels every row CORRECTED when any correction
     token is present. Its agreement (0.987 to 0.997) equals the judge's CORRECTED share; on FAR, 572 of 579 rows
-    is exactly 0.988. It "qualifies" by the 0.85 bar but cannot detect maintenance.
+    is exactly 0.988. It passes the 0.85 bar numerically but cannot detect maintenance. After review 04,
+    `readings_final.json` marks it `qualifies` false and `applicable` false with the reason "empty maintenance
+    token list". On re-running the final read, every other field of `readings.json` is identical apart from the
+    script's code hash, and `readings.md` differs only in its timestamp, so no other number moved.
   - **The plan's proxy trigger fired.** "I" opens at least 112, 125 and 188 of the 200 calibration rows (FAR, SDR, SER),
     above the one-fifth trigger of plan section 3b. So a stem-resolved proxy needs a ruling before any first-token
     proxy can serve as a patching readout.
