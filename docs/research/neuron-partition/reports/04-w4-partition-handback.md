@@ -519,3 +519,142 @@ Added Tue 3 Nov 2026, after ruling R11 made the all-position attribution the pri
   sha256 values are `6280ebf3…8274` for the script and `cd545e9b…d5` for the tests.
 - **Not done yet.** The all-position partition and stability have not run, because the score directories with the
   `atp_all_*` keys do not exist yet. They will be appended when W1's rerun lands.
+
+## Addendum: all-position partition (R11)
+
+Added Tue 3 Nov 2026, about 3:00 pm EST, by implementation worker W5 (Claude, Opus) after the login-node reboot. It
+records the R11 primary partition, its stability, and the readout partition rerun at c3d7763.
+
+**Runs.** These are four local CPU runs on the login node, each with exit code 0. No Slurm job was used. `ATT` stands
+for `/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/neuron-partition/outputs/_analyses/neuron-partition/attribution`
+and `SETS` for the sibling `sets` directory. Both were passed as absolute paths.
+
+```
+/u/swong2/.conda/envs/mgnp/bin/python scripts/neuron_partition_sets.py partition --position all --dh "ATT/far_v2_dh_train+validation_c3d7763_rev" --in "ATT/far_v2_in_train+validation_c3d7763" --dh-reverse "ATT/far_v2_dh_train+validation_c3d7763_rev" --label "FAR full ranking, train+validation, AtP all positions (R11 primary)" --out-dir SETS/far_atp_all_c3d7763
+/u/swong2/.conda/envs/mgnp/bin/python scripts/neuron_partition_sets.py stability --position all --dh "ATT/far_v2_dh_train+validation_half1_c3d7763_rev" "ATT/far_v2_dh_train+validation_half2_c3d7763_rev" --in "ATT/far_v2_in_train+validation_half1_c3d7763" "ATT/far_v2_in_train+validation_half2_c3d7763" --dh-reverse "ATT/far_v2_dh_train+validation_half1_c3d7763_rev" "ATT/far_v2_dh_train+validation_half2_c3d7763_rev" --label "FAR split halves A and B, AtP all positions (R11 primary)" --out-dir SETS/far_atp_all_c3d7763
+```
+
+The readout pair is the same two commands without `--position all`, with the label "AtP readout (R11 comparison)"
+and `--out-dir SETS/far_atp_readout_c3d7763`.
+
+- **Inputs.** The inputs are the c3d7763 runs of Delta job 23478550 (hand-back 01, "Addendum: all-position run").
+  The `_rev` directory serves as both `--dh` and `--dh-reverse`. That loses no check: its forward keys, including
+  `atp_all_mean`, equal the plain dh run's with a maximum absolute difference of 0.0, in the full run and in both
+  halves. No I half was run with `--reverse`, so `--in` takes the plain I halves.
+- **Outputs.** The all-position files carry the `_all` tag. The directory `SETS/far_atp_all_c3d7763/` holds
+  `far_all_sets_k{500,1000,2000}.json`, `far_all_sets_k{500,1000,2000}_with_nulls.json`,
+  `partition_summary_all.json`, `stability_summary_all.json`, `stability_summary_all.md` and `nulls/`. The readout
+  directory `SETS/far_atp_readout_c3d7763/` keeps the untagged names `far_sets_k<k>*.json`,
+  `partition_summary.json` and `stability_summary.{json,md}`. The four console logs sit beside the directories as
+  `far_atp_all_c3d7763.log`, `far_atp_all_c3d7763_stability.log`, `far_atp_readout_c3d7763.log` and
+  `far_atp_readout_c3d7763_stability.log`.
+- **Group counts.** Every with-nulls file holds 84 groups, which are 4 classes and 80 nulls. No class is empty at any
+  k. W2's `knockout.load_groups` accepts all three all-position files. Every null has its class's size and 32-layer
+  histogram, and none contains a tested neuron.
+- **Readout reproduces.** The six set and with-nulls files of `far_atp_readout_c3d7763/` compare byte-identical
+  (`cmp`) to `far_atp_66741d7/`. The 12 null files under `nulls/` are byte-identical too. Only the summaries and the
+  12 `nulls/*.provenance.json` sidecars differ, because they record paths, inputs and times. The readout stability
+  table at c3d7763 equals the 66741d7 table row for row.
+
+| file | sha256 |
+| --- | --- |
+| `far_atp_all_c3d7763/far_all_sets_k500_with_nulls.json` | `64fa9565fc2b3ad1caef5955e2f961a8cb96734d668980bb18ed2113cfbc411a` |
+| `far_atp_all_c3d7763/far_all_sets_k1000_with_nulls.json` | `9ba4180c464a6857893a70928c2ba36d05f8959fae9b0309c4c71dc6fd54bba7` |
+| `far_atp_all_c3d7763/far_all_sets_k2000_with_nulls.json` | `df0d67969d596799b9afaa9d6d27d68f5ee3cf43d63f320bbe5ca34b8a2faee7` |
+| `far_atp_all_c3d7763/partition_summary_all.json` | `e607705f06336707fc053bb18c8ff512e98941221e3e3b15a289a72d8ac81f19` |
+| `far_atp_all_c3d7763/stability_summary_all.json` | `839249fb833c17c0f6af99340092615bc12456a460916de799a107dd4d939b90` |
+| `far_atp_all_c3d7763/stability_summary_all.md` | `df09cdd3063b5691bd4bc256b97ac052cf8ad26a69b0169b0596ea2663da0db0` |
+| `far_atp_readout_c3d7763/far_sets_k1000_with_nulls.json` | `3b516bb33ec81f2579b08feaac57fae4d648beafe0d7960fbe9a4ea7d3c9250f` |
+| `far_atp_readout_c3d7763/partition_summary.json` | `d76326057fefb2f237be436a488c298392dd149b307276d0f7ccb4ebff88e283` |
+| `far_atp_readout_c3d7763/stability_summary.json` | `62eee068ad630fb154befc9c5f43b17f741ad9147b0a9df688a16149b678bd62` |
+
+**Bridges-2 copy.** Both directories were rsynced through b2dtn into the clone's
+`outputs/_analyses/neuron-partition/sets/`. The sha256 lists of all 66 files are identical on both sides. Jobs A
+(50183187) and B (50183194) read them. Their submitted lines use `far_all_sets_k<k>_with_nulls.json` in place of the
+`far_sets_k<k>_with_nulls.json` that `jobs/ablation_bridges2.md` assumed for the all-position directory.
+
+**Class sizes and overlaps, all positions.** The Venn columns count neurons. The share of T_D in T_H is
+|T_D ∩ T_H| / k.
+
+| k | D_only | DI_shared | H_only | all_shared | T_D&T_I | T_D&T_H | T_I&T_H | share of T_D in T_H |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 500 | 338 | 79 | 390 | 62 | 141 (J 0.164) | 83 (J 0.091) | 89 (J 0.098) | 0.17 |
+| 1,000 | 714 | 144 | 802 | 94 | 238 (J 0.135) | 142 (J 0.076) | 150 (J 0.081) | 0.14 |
+| 2,000 | 1,442 | 289 | 1,623 | 160 | 449 (J 0.126) | 269 (J 0.072) | 268 (J 0.072) | 0.13 |
+
+No ranking was truncated. The positive counts are 234,271 for s_D, 235,115 for s_I and 234,803 for s_H.
+
+| k | threshold T_D | threshold T_I | threshold T_H |
+| --- | --- | --- | --- |
+| 500 | 0.03515 | 0.04874 | 0.03175 |
+| 1,000 | 0.02552 | 0.03481 | 0.0222 |
+| 2,000 | 0.01844 | 0.02534 | 0.01575 |
+
+**Per-layer concentration, all positions.** Each cell gives the set's share by layer band at k = 500, 1,000 and
+2,000. The full 32-bin histograms are in `partition_summary_all.json` under `by_k.<k>.per_layer`.
+
+| set | L0 to L9 | L10 to L16 | L17 to L29 | L30 to L31 | densest layer at k = 500, 1,000, 2,000 |
+| --- | --- | --- | --- | --- | --- |
+| D_only | 0.62, 0.65, 0.64 | 0.37, 0.35, 0.35 | 0.01, 0.01, 0.00 | 0.00, 0.00, 0.00 | L8 (44), L7 (88), L7 (186) |
+| DI_shared | 0.10, 0.14, 0.18 | 0.87, 0.84, 0.79 | 0.03, 0.02, 0.03 | 0.00, 0.00, 0.00 | L13 (19), L13 (34), L13 (51) |
+| H_only | 0.09, 0.12, 0.14 | 0.75, 0.77, 0.78 | 0.15, 0.09, 0.06 | 0.01, 0.02, 0.01 | L13 (75), L13 (164), L13 (314) |
+| all_shared | 0.00, 0.00, 0.03 | 0.47, 0.53, 0.51 | 0.37, 0.32, 0.29 | 0.16, 0.15, 0.18 | L13 (11), L13 (17), L13 (27) |
+| T_D | 0.45, 0.49, 0.51 | 0.47, 0.45, 0.44 | 0.06, 0.04, 0.03 | 0.02, 0.01, 0.02 | L12 (57), L12 (101), L7 (201) |
+| T_I | 0.21, 0.25, 0.29 | 0.68, 0.66, 0.64 | 0.08, 0.07, 0.05 | 0.02, 0.02, 0.02 | L13 (74), L12 (147), L12 (307) |
+| T_H | 0.09, 0.12, 0.14 | 0.70, 0.73, 0.75 | 0.18, 0.12, 0.09 | 0.03, 0.03, 0.03 | L13 (92), L13 (193), L13 (375) |
+
+**Comparison with the readout classes.** Each cell is the Jaccard between the all-position set and the readout set
+of the same name at the same k, with the shared count in parentheses. The readout sets are those of
+`far_atp_readout_c3d7763/`, which equal `far_atp_66741d7/`.
+
+| k | D_only | DI_shared | H_only | all_shared | T_D | T_I | T_H |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 500 | 0.056 (27) | 0.268 (53) | 0.297 (165) | 0.466 (55) | 0.193 (162) | 0.370 (270) | 0.387 (279) |
+| 1,000 | 0.040 (43) | 0.221 (83) | 0.261 (311) | 0.377 (83) | 0.153 (265) | 0.311 (474) | 0.337 (504) |
+| 2,000 | 0.041 (91) | 0.185 (143) | 0.227 (572) | 0.378 (133) | 0.135 (475) | 0.267 (844) | 0.297 (917) |
+
+**Stability, all positions.** The table is copied from `stability_summary_all.md`. The ceiling is the Jaccard of T_D
+between the two halves of the D-versus-H run.
+
+| k | set | size A | size B | Jaccard | ceiling | floor (analytic) | floor (empirical) | verdict |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 500 | T_D | 500 | 500 | 0.7794 | 0.7794 | 0.0005 | 0.0007 | stable |
+| 500 | T_I | 500 | 500 | 0.8692 | 0.7794 | 0.0005 | 0.0007 | stable |
+| 500 | T_H | 500 | 500 | 0.8282 | 0.7794 | 0.0005 | 0.0007 | stable |
+| 500 | D_only | 334 | 340 | 0.7506 | 0.7794 | 0.0004 | 0.0004 | stable |
+| 500 | DI_shared | 76 | 80 | 0.7333 | 0.7794 | 0.0001 | 0.0003 | stable |
+| 500 | H_only | 388 | 390 | 0.7926 | 0.7794 | 0.0004 | 0.0005 | stable |
+| 500 | all_shared | 67 | 62 | 0.7917 | 0.7794 | 0.0001 | 0.0000 | stable |
+| 1000 | T_D | 1000 | 1000 | 0.8083 | 0.8083 | 0.0011 | 0.0010 | stable |
+| 1000 | T_I | 1000 | 1000 | 0.8639 | 0.8083 | 0.0011 | 0.0010 | stable |
+| 1000 | T_H | 1000 | 1000 | 0.8132 | 0.8083 | 0.0011 | 0.0010 | stable |
+| 1000 | D_only | 713 | 708 | 0.7718 | 0.8083 | 0.0008 | 0.0006 | stable |
+| 1000 | DI_shared | 145 | 144 | 0.8291 | 0.8083 | 0.0002 | 0.0002 | stable |
+| 1000 | H_only | 804 | 797 | 0.7671 | 0.8083 | 0.0009 | 0.0009 | stable |
+| 1000 | all_shared | 93 | 92 | 0.8317 | 0.8083 | 0.0001 | 0.0003 | stable |
+| 2000 | T_D | 2000 | 2000 | 0.7770 | 0.7770 | 0.0022 | 0.0021 | stable |
+| 2000 | T_I | 2000 | 2000 | 0.8536 | 0.7770 | 0.0022 | 0.0021 | stable |
+| 2000 | T_H | 2000 | 2000 | 0.8223 | 0.7770 | 0.0022 | 0.0021 | stable |
+| 2000 | D_only | 1430 | 1439 | 0.7398 | 0.7770 | 0.0016 | 0.0014 | stable |
+| 2000 | DI_shared | 303 | 280 | 0.7455 | 0.7770 | 0.0003 | 0.0003 | stable |
+| 2000 | H_only | 1621 | 1616 | 0.7934 | 0.7770 | 0.0018 | 0.0020 | stable |
+| 2000 | all_shared | 150 | 165 | 0.7308 | 0.7770 | 0.0002 | 0.0002 | stable |
+
+**Reading.** These results are descriptive. Nothing here is an ablation result.
+
+- **Every class is stable at every k.** The bar is half the ceiling, 0.39 to 0.40. Every class Jaccard lies between
+  0.73 and 0.83, and the floors are 0.0001 to 0.002.
+- **D_only is now about as stable as the other classes.** Its Jaccard is 0.74 to 0.77, against 0.65 to 0.66 at the
+  readout. The ceilings are similar, 0.78 to 0.81 against 0.79 to 0.82.
+- **D_only is most of T_D under all positions.** It holds 68, 71 and 72 percent of T_D at k = 500, 1,000 and 2,000,
+  against 35 to 45 percent at the readout. DI_shared shrinks to 79, 144 and 289 neurons, against 172, 314 and 629.
+- **The all-position D_only is a different set.** Its Jaccard with the readout D_only is 0.04 to 0.06. It sits 62
+  to 65 percent in L0 to L9, with its peak at L7 and L8. The readout D_only sat 86 to 88 percent in L10 to L16.
+  all_shared changes least, with a Jaccard of 0.38 to 0.47.
+- **T_I and T_H stay in the middle layers.** Only T_D gains the early block. That fits the lower correlation of
+  s_D and s_I over all neurons: 0.355 under all positions against 0.775 at the readout. s_D and s_H correlate at
+  0.007.
+- **A hypothesis, not a finding.** The D and H prompts differ in the pressure clause, while the I and user-neutral
+  prompts differ in the user turn. The early D_only neurons may therefore read the clause's tokens without deciding
+  anything. Jobs A and B test the classes under the twin interchange, the mean and the zero references, each
+  against 20 matched nulls.

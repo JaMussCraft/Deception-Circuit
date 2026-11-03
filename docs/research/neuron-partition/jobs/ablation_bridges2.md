@@ -113,3 +113,40 @@ The pilot's IOI rows came from the old hash-seed-dependent draw. The fixed draw 
 `61ebeea317ac4932c0b859cc62b88ed0c45a7d6602d4866a9cf2373ee2cc5e59` under every hash seed. No model has run on those
 rows yet. The R4 check against 0.51 therefore comes from the first full job, at
 `sets.<any>.references.mean.conditions.IOI.accuracy_argmax_intact` in `summary.json`.
+
+## Submitted: jobs A and B
+
+Added Tue 3 Nov 2026 by W5. Jobs A and B were submitted at about 2:57 pm EST from Delta over the bridges2 master,
+after `sbatch --test-only` with the same arguments. The lines differ from the templates above in two ways.
+
+- **Walltime.** Each job reserves `-t 04:00:00` instead of 03:30:00, because the H100 rate is unmeasured and a
+  walltime kill overnight would cost a rerun.
+- **File names.** The all-position directory names its files `far_all_sets_k<k>_with_nulls.json`, not
+  `far_sets_k<k>_with_nulls.json`. The readout directory keeps the untagged name.
+
+The substitutions are ALLSHA = READSHA = c3d7763 and COMMIT = fe2db9e. Job C was not resubmitted.
+
+| Job | Bridges-2 id | Ledger | Projected start (test-only) | Sets files |
+|---|---|---|---|---|
+| A | 50183187 | r-007 | 3:06 pm EST on w007 | all-position k 500, then k 1,000 |
+| B | 50183194 | r-008 | 3:07 pm EST on w007 | all-position k 2,000, then readout k 1,000 |
+| C | 50182995 | r-006 | started 2:50 pm EST on w010 | contrast k 1,000 (submitted earlier) |
+
+Job A, as submitted:
+
+```
+ssh -o BatchMode=yes bridges2 'cd /ocean/projects/cis260361p/swong2/Deception-Circuit && sbatch --export=ALL,DC_CLUSTER=bridges2,DC_B2_ALLOC=cis260361p,PYTHONHASHSEED=0,NP_I_DIR=outputs/_analyses/neuron-partition/data/pools/far_v2_user_inversion,NP_N_DIR=outputs/_analyses/neuron-partition/data/pools/far_v2_user_neutral -A cis260372p -p GPU-shared --gpus-per-node=h100-80:1 --cpus-per-task=1 --mem=64G -t 04:00:00 --job-name=np-ablate-A docs/research/neuron-partition/jobs/ablation_cells.sbatch outputs/_analyses/neuron-partition/sets/far_atp_all_c3d7763/far_all_sets_k500_with_nulls.json,outputs/_analyses/neuron-partition/sets/far_atp_all_c3d7763/far_all_sets_k1000_with_nulls.json outputs/_analyses/neuron-partition/data/far_test_sample_seed2.json outputs/_analyses/neuron-partition/ablation/jobA-fe2db9e --max-length 128'
+```
+
+Job B, as submitted:
+
+```
+ssh -o BatchMode=yes bridges2 'cd /ocean/projects/cis260361p/swong2/Deception-Circuit && sbatch --export=ALL,DC_CLUSTER=bridges2,DC_B2_ALLOC=cis260361p,PYTHONHASHSEED=0,NP_I_DIR=outputs/_analyses/neuron-partition/data/pools/far_v2_user_inversion,NP_N_DIR=outputs/_analyses/neuron-partition/data/pools/far_v2_user_neutral -A cis260372p -p GPU-shared --gpus-per-node=h100-80:1 --cpus-per-task=1 --mem=64G -t 04:00:00 --job-name=np-ablate-B docs/research/neuron-partition/jobs/ablation_cells.sbatch outputs/_analyses/neuron-partition/sets/far_atp_all_c3d7763/far_all_sets_k2000_with_nulls.json,outputs/_analyses/neuron-partition/sets/far_atp_readout_c3d7763/far_sets_k1000_with_nulls.json outputs/_analyses/neuron-partition/data/far_test_sample_seed2.json outputs/_analyses/neuron-partition/ablation/jobB-fe2db9e --max-length 128'
+```
+
+- **Before submitting.** The clone was at `fe2db9e0d4736469aa180c6d89a18b5736710c20`, and its `ablation_cells.sbatch`
+  splits the sets argument on commas. The two sets directories were rsynced through b2dtn, and the sha256 of all 66
+  files matched on both sides. The clone's `far_test_sample_seed2.json` has sha256 `cdbfca85…a845`, and both pool
+  directories exist.
+- **Last state seen.** At 2:57 pm EST, A and B were PENDING (Priority) and C was RUNNING. From about 3:00 pm EST,
+  the Bridges-2 login host stopped answering ssh, while b2dtn still answered. No start was confirmed after that.

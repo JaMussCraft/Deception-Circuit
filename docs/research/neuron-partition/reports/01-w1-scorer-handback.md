@@ -411,3 +411,112 @@ class analysis, not to this scorer.
 | D/H `rev_atp_readout_mean` | 0.986 | 2,568 and 2,930 | 0.783 | 72 and 85 | 0.670 |
 
 **What is NOT done.** No class partition and no N3 ceiling or floor comparison. No SER split halves.
+
+## Addendum: all-position run
+
+Added Tue 3 Nov 2026, about 3:00 pm EST, by implementation worker W5 (Claude, Opus). W1 wrote the all-position keys
+(ruling R11, committed at c3d7763) and the job script, and the job ran before the login node was rebooted. W5
+verified the outputs. The script is `docs/research/neuron-partition/jobs/all_position_attribution_far.sbatch`. It
+makes ten output directories in six python calls: the full ranking forward and with `--reverse` for both pairs, and
+per half the two pairs forward and D/H with `--reverse`.
+
+**Execution evidence.**
+
+- **Job id and cluster.** Delta 23478550, account beto-delta-gpu, `gpuA40x4-interactive` on node gpub040 (NVIDIA
+  A40 46 GB). It was submitted at 1:45 pm EST, started at 1:46 pm and ended at 1:54 pm.
+- **Exit code or Slurm state.** COMPLETED 0:0, elapsed 482 s against 30 min reserved. It is ledger r-005 in the
+  main-checkout directory `/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/neuron-partition`,
+  recorded with `--commit c3d7763` and reconciled at 482 s. The log is
+  `logs/neuron_partition_all_position_far_23478550.out`.
+- **Row counts.** Every run matched its expected count, with the clause on every row and 0 fallbacks. Every tensor
+  is [32, 14336] float32 and finite.
+
+  | Run | rows (expected) | mean m, clean stream | mean m, twin stream |
+  |---|---|---|---|
+  | full, D against H, forward and reverse | 400 (400) | D 2.412 | H −7.198 |
+  | full, I against N, forward and reverse | 354 (354) | I 5.763 | N −8.844 |
+  | half 1, D against H, forward and reverse | 200 (200) | D 2.497 | H −7.010 |
+  | half 1, I against N | 174 (174) | I 5.703 | N −8.709 |
+  | half 2, D against H, forward and reverse | 200 (200) | D 2.325 | H −7.387 |
+  | half 2, I against N | 180 (180) | I 5.819 | N −8.975 |
+
+  The mean m values equal those of jobs 23476096 and 23476621 to the printed digits.
+- **Speed.** Forward scoring took 0.082 to 0.087 seconds per row, and `--reverse` took 0.116 to 0.125. The model
+  loaded in 11.1 to 22.7 s.
+- **Provenance files.** Each output directory holds its own `run_manifest.json`, with `slurm_job_id` 23478550.
+  - All ten record `git_commit` `8363d3fc11958588c99042945ce17b219545ff76` and `git_dirty` true, with
+    `dirty_diff_hash` `73f3a431…8223`. HEAD was 8363d3f because an unrelated hand-back was uncommitted when the job
+    ran.
+  - The directory names carry c3d7763, the commit of the all-position code,
+    `c3d7763d258f708a9406c629459bb9f01ee5a278`.
+  - `code_sha256` pins the scorer at `e99e30cc…a8ea` and the CLI at `c7604bfe…28f8` in all ten. Both equal the files
+    on disk at HEAD d981ae3, so the code that ran is the committed code.
+- **Output directories.** All ten are under `/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/neuron-partition/outputs/_analyses/neuron-partition/attribution/`:
+  - `far_v2_dh_train+validation_c3d7763/` and `far_v2_dh_train+validation_c3d7763_rev/`
+  - `far_v2_in_train+validation_c3d7763/` and `far_v2_in_train+validation_c3d7763_rev/`
+  - `far_v2_dh_train+validation_half1_c3d7763/` and `far_v2_dh_train+validation_half1_c3d7763_rev/`
+  - `far_v2_in_train+validation_half1_c3d7763/`
+  - `far_v2_dh_train+validation_half2_c3d7763/` and `far_v2_dh_train+validation_half2_c3d7763_rev/`
+  - `far_v2_in_train+validation_half2_c3d7763/`
+
+**Verification.** The script is `outputs/_analyses/neuron-partition/w5_tmp/verify_inputs.py`, a temporary file, and
+its output is `verify_inputs.json` beside it.
+
+- **Keys.** Every `scores.pt` holds `atp_all_mean` and `atp_all_absmean`. The four `_rev` directories also hold
+  `rev_atp_all_mean` and `rev_atp_all_absmean`.
+- **Earlier runs reproduce.** Every key of the earlier runs is present again and equal, with a maximum absolute
+  difference of 0.0. That covers the readout, clause and contrast keys and, in the `_rev` directories, the reverse
+  keys. The full runs were compared with the 7386fd3 directories and the halves with the 66741d7 ones. No full
+  ranking carries 66741d7.
+- **Forward and reverse runs agree.** The forward keys of each `_rev` directory, `atp_all_mean` included, equal the
+  plain run's with a maximum absolute difference of 0.0.
+- **Halves reproduce the full ranking.** The row-weighted mean of the two halves equals the full `atp_all_mean`
+  within 4.5e-4 for D/H and 2.4e-4 for I/N, and the full `rev_atp_all_mean` within 4.2e-4. The maxima are 0.47 to
+  1.05.
+
+**How concentrated the all-position scores are.** The counts are neurons out of 458,752. The readout counts of the
+earlier addendum are repeated for comparison.
+
+| Pair and key | above 0.01 | above 0.1 | largest | readout above 0.01 | readout above 0.1 |
+|---|---|---|---|---|---|
+| D/H `atp_all_mean` | 13,987 | 105 | 0.474 | 1,477 | 46 |
+| I/N `atp_all_mean` | 24,998 | 206 | 0.936 | 6,338 | 114 |
+| D/H `rev_atp_all_mean` | 9,323 | 115 | 1.054 | 2,732 | 83 |
+| I/N `rev_atp_all_mean` | 9,840 | 147 | 1.242 | 4,670 | 112 |
+| D/H and I/N both, `atp_all_mean` | 5,261 | 60 | not computed | 1,180 | 40 |
+
+**All positions against the readout.** The Jaccard compares the top 1,000 neurons by each key. "Signed" ranks by the
+R6 sign, that is the score itself for `atp` and its negative for `rev_atp`. "Absolute" ranks by magnitude.
+
+| Run | key pair | Pearson | Jaccard top 1,000, signed | Jaccard top 1,000, absolute |
+|---|---|---|---|---|
+| full D/H | `atp_all_mean` and `atp_readout_mean` | 0.546 | 0.153 | 0.183 |
+| full D/H `_rev` | `rev_atp_all_mean` and `rev_atp_readout_mean` | 0.822 | 0.337 | 0.369 |
+| full I/N | `atp_all_mean` and `atp_readout_mean` | 0.733 | 0.311 | 0.342 |
+| full I/N `_rev` | `rev_atp_all_mean` and `rev_atp_readout_mean` | 0.896 | 0.497 | 0.511 |
+| half 1 D/H | `atp_all_mean` and `atp_readout_mean` | 0.546 | 0.154 | 0.183 |
+| half 1 D/H `_rev` | `rev_atp_all_mean` and `rev_atp_readout_mean` | 0.815 | 0.324 | 0.357 |
+| half 1 I/N | `atp_all_mean` and `atp_readout_mean` | 0.731 | 0.301 | 0.345 |
+| half 2 D/H | `atp_all_mean` and `atp_readout_mean` | 0.545 | 0.157 | 0.171 |
+| half 2 D/H `_rev` | `rev_atp_all_mean` and `rev_atp_readout_mean` | 0.829 | 0.348 | 0.383 |
+| half 2 I/N | `atp_all_mean` and `atp_readout_mean` | 0.736 | 0.307 | 0.341 |
+
+The forward rows of each `_rev` directory equal its plain run's, so they are not repeated.
+
+**Split-half agreement, all positions.**
+
+| Score | Pearson, half 1 against half 2 |
+|---|---|
+| D/H `atp_all_mean` | 0.981 |
+| I/N `atp_all_mean` | 0.992 |
+| D/H `rev_atp_all_mean` | 0.987 |
+
+**Reading.** These readings are descriptive.
+
+- **The all-position D/H score is the one that moves most.** It correlates with its readout score at only 0.55, and
+  the top 1,000 sets share 15 percent. The I/N and reverse scores stay closer, at 0.73 to 0.90.
+- **D/H and I/N agree less over all positions.** Their `atp_all_mean` maps correlate at 0.355, against 0.775 at the
+  readout. s_D and s_H correlate at 0.007.
+- **The all-position scores are spread more widely.** About nine times as many D/H neurons pass 0.01 as at the
+  readout, and about twice as many pass 0.1.
+- **The classes.** Hand-back 04, "Addendum: all-position partition (R11)", reports the partition these scores give.
