@@ -16,7 +16,10 @@ Implements ruling R6 of `docs/research/neuron-partition/spec.md`. CPU only (nump
   in (a_I - a_N), and s_H = minus `contrast_<pos>_mean` of dh (a_H - a_D, "more active under H"). Contrast has no
   readout orientation, so no reverse run enters, and T_D and T_H are disjoint by construction: all_shared is
   always empty and H_only is T_H - T_I. That is a property of the rule, not a finding.
-* `--position clause` reads the `*_clause_*` keys instead of `*_readout_*`.
+* `--position clause` reads the `*_clause_*` keys instead of `*_readout_*`; `--position all` reads the all-position
+  keys `atp_all_mean` and `rev_atp_all_mean` (ruling R11: the primary ranking, because the twin ablation writes every
+  position). The scorer writes no `contrast_all_*` keys, so `--score contrast --position all` stops with the missing
+  key named.
 
 **Partition** (R6), for each k of the ladder 500, 1,000, 2,000: T_X = the top-k neurons by s_X among those with
 s_X > 0 (all positive ones when fewer than k are positive, recorded), ties broken by the flat index (layer * 14336 +
@@ -59,6 +62,7 @@ INTERMEDIATE = 14336
 N_NEURONS = NUM_LAYERS * INTERMEDIATE        # 458,752
 NEURON_KIND = "mlp_hidden"
 LADDER = (500, 1000, 2000)
+POSITIONS = ("readout", "clause", "all")
 CLASSES = ("D_only", "DI_shared", "H_only", "all_shared")
 TOP_SETS = ("T_D", "T_I", "T_H")
 N_NULLS = 20
@@ -136,7 +140,7 @@ def _key(run: dict, key: str) -> np.ndarray:
 def signed_scores(dh: dict, inv: dict, rev: Optional[dict], *, score: str, position: str,
                   allow_missing_reverse: bool) -> dict:
     """{s_D, s_I, s_H (or None), keys, notes} per R6; see the module docstring for the signs."""
-    if score not in ("atp", "contrast") or position not in ("readout", "clause"):
+    if score not in ("atp", "contrast") or position not in POSITIONS:
         raise ValueError(f"score {score!r} / position {position!r}")
     notes = []
     s_d = _key(dh, f"{score}_{position}_mean")
@@ -311,7 +315,7 @@ def write_json(path: str, obj, *, force: bool) -> str:
 
 
 def variant_tag(score: str, position: str) -> str:
-    return ("" if score == "atp" else "_contrast") + ("" if position == "readout" else "_clause")
+    return ("" if score == "atp" else "_contrast") + ("" if position == "readout" else f"_{position}")
 
 
 def task_prefix(dh: dict) -> str:
@@ -535,7 +539,8 @@ def build_parser():
 
     def common(q):
         q.add_argument("--score", choices=("atp", "contrast"), default="atp")
-        q.add_argument("--position", choices=("readout", "clause"), default="readout")
+        q.add_argument("--position", choices=POSITIONS, default="readout",
+                       help="readout (default), clause, or all (R11: every position)")
         q.add_argument("-k", "--k", type=int, nargs="+", default=list(LADDER), help="the ladder (default 500 1000 "
                                                                                      "2000)")
         q.add_argument("--allow-missing-reverse", action="store_true",

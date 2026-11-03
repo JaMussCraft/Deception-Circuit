@@ -171,6 +171,62 @@ def test_clause_position_reads_clause_keys(tmp_path):
         flat(*D_)}
 
 
+def _all_position_dirs(tmp_path, tag=""):
+    """dh/in runs whose all-position keys hold the designed scores and whose readout/clause keys point elsewhere."""
+    decoy = grid({(7, 7): 9.0})
+    dh = write_run(str(tmp_path / f"dh{tag}"), {
+        "atp_all_mean": grid(S_D), "rev_atp_all_mean": grid(REV), "atp_all_absmean": grid(S_D).abs(),
+        "rev_atp_all_absmean": grid(REV).abs(), "atp_readout_mean": decoy, "rev_atp_readout_mean": -decoy,
+        "atp_clause_mean": decoy, "rev_atp_clause_mean": -decoy}, reverse=True)
+    inv = write_run(str(tmp_path / f"in{tag}"), {"atp_all_mean": grid(S_I), "atp_all_absmean": grid(S_I).abs(),
+                                                 "atp_readout_mean": decoy}, pair="in")
+    return dh, inv
+
+
+def test_all_position_reads_all_keys(tmp_path):
+    dh, inv = _all_position_dirs(tmp_path)
+    run_dh = nps.load_run(dh)
+    signed = nps.signed_scores(run_dh, nps.load_run(inv), run_dh, score="atp", position="all",
+                               allow_missing_reverse=False)
+    assert signed["keys"]["s_D"] == "+atp_all_mean of --dh"
+    assert signed["keys"]["s_H"] == "-rev_atp_all_mean of --dh-reverse"
+    part = nps.partition(signed["s_D"], signed["s_I"], signed["s_H"], 3)
+    a, b, c, d = (flat(*x) for x in (A, B, C, D_))
+    assert part["sets"]["D_only"] == {a} and part["sets"]["DI_shared"] == {b}
+    assert part["sets"]["H_only"] == {d} and part["sets"]["all_shared"] == {c}
+    assert flat(7, 7) not in part["sets"]["T_D"]                 # the readout/clause decoy is not read
+    # the readout position of the same runs still reads the readout keys
+    ro = nps.signed_scores(run_dh, nps.load_run(inv), run_dh, score="atp", position="readout",
+                           allow_missing_reverse=False)
+    assert nps.partition(ro["s_D"], ro["s_I"], ro["s_H"], 3)["sets"]["T_D"] == {flat(7, 7)}
+
+
+def test_all_position_cli_partition_and_stability(tmp_path):
+    dh, inv = _all_position_dirs(tmp_path)
+    out = str(tmp_path / "out")
+    assert nps.main(["partition", "--dh", dh, "--in", inv, "--dh-reverse", dh, "--position", "all", "--out-dir", out,
+                     "-k", "3"]) == 0
+    sets = json.load(open(os.path.join(out, "far_all_sets_k3.json")))
+    assert sets["D_only"] == [["mlp_hidden", 0, 1]] and sets["H_only"] == [["mlp_hidden", 20, 11]]
+    groups = json.load(open(os.path.join(out, "far_all_sets_k3_with_nulls.json")))
+    assert "null_all_shared_3_19" in groups
+    summary = json.load(open(os.path.join(out, "partition_summary_all.json")))
+    assert summary["position"] == "all" and summary["by_k"]["3"]["sizes"]["all_shared"] == 1
+    dh2, inv2 = _all_position_dirs(tmp_path, tag="2")
+    assert nps.main(["stability", "--dh", dh, dh2, "--in", inv, inv2, "--dh-reverse", dh, dh2, "--position", "all",
+                     "--out-dir", out, "-k", "3", "--floor-draws", "3"]) == 0
+    stab = json.load(open(os.path.join(out, "stability_summary_all.json")))
+    assert stab["by_k"]["3"]["ceiling"] == 1.0 and stab["by_k"]["3"]["sets"]["all_shared"]["jaccard"] == 1.0
+    assert os.path.exists(os.path.join(out, "stability_summary_all.md"))
+
+
+def test_contrast_all_position_names_the_missing_key(tmp_path):
+    dh, inv = _all_position_dirs(tmp_path)
+    with pytest.raises(SystemExit, match="contrast_all_mean"):
+        nps.main(["partition", "--score", "contrast", "--position", "all", "--dh", dh, "--in", inv,
+                  "--out-dir", str(tmp_path / "out"), "--no-nulls"])
+
+
 # ------------------------------------------------------------------------------ the CLI with W3's nulls
 
 def _run_designed_partition(tmp_path, extra=()):
