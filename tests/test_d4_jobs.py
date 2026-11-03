@@ -177,7 +177,8 @@ def test_b2_fetch_brings_back_the_deception_divergence_root_and_keeps_the_old_gl
     b2 = ROOT / "scripts" / "remote" / "b2.sh"
     match = re.search(r"^FETCH_ANALYSIS_GLOBS=\((.*)\)\s*$", b2.read_text(), flags=re.M)
     globs = re.findall(r'"([^"]+)"', match.group(1))
-    assert globs == ["mechanism-analysis-*", "instructed-route-b1*", "deception-divergence*"]
+    # The old globs stay first and in order; later directions append theirs (neuron-partition*).
+    assert globs[:3] == ["mechanism-analysis-*", "instructed-route-b1*", "deception-divergence*"]
     bash = shutil.which("bash")
     if bash is None:
         pytest.skip("no bash")

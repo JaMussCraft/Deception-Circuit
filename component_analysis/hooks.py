@@ -126,7 +126,17 @@ def load_analysis_model(model_name: str, *, device: str = "cuda",
 #     ("k", layer, g)                   receiver  `k_proj` output, KV group g's slice
 #     ("v", layer, g)                   receiver  `v_proj` output, KV group g's slice
 #     ("mlp_in", layer, 0)              receiver  the MLP block's input
+#     ("mlp_hidden", layer, n)          neuron    `down_proj` input, column n
 #     ("readout", 0, 0)    READOUT_KEY  receiver  the final norm's input
+#
+# `mlp_hidden` is one MLP hidden neuron: column n of the `down_proj` input,
+# after the SwiGLU gate (`act(gate_proj(x)) * up_proj(x)`), so 14,336 per
+# layer on Llama-3.1-8B. It is the `mlp_hidden` unit of the leaf gates in
+# `models/llama_node.py`. A capture saves the layer's whole
+# `[batch, seq, intermediate_size]` tensor once and hands each key back a
+# `[batch, seq, 1]` view of it; a replacement writes only the named columns,
+# all of a layer's in one vectorized write. The site is touched only on a pass
+# that names an `mlp_hidden` key, so every other pass runs exactly as before.
 #
 # Under grouped-query attention K and V are **per KV group**, not per head:
 # Llama-3.1-8B has 8 KV groups of 4 query heads, so patching "head 7's K" would
@@ -157,6 +167,8 @@ HEAD_KINDS = ("head", "q")
 GROUP_KINDS = ("k", "v")
 #: Kinds that are one whole tensor, indexed 0.
 WHOLE_KINDS = ("mlp", "mlp_in", "embed", "readout")
+#: Kinds sliced one column per index: MLP hidden neurons (the `down_proj` input).
+NEURON_KINDS = ("mlp_hidden",)
 
 
 @dataclass
@@ -181,7 +193,8 @@ class Capture:
     #: metrics go through `readout_logits` instead (ADR-0001: fp32).
     logits: "torch.Tensor"
     #: `{key: [batch, seq, dim]}`. `dim` is `head_dim` for a head or a Q slice,
-    #: `head_dim` for a K or V group, and the hidden size for everything else.
+    #: `head_dim` for a K or V group, 1 for an `mlp_hidden` neuron (a view of
+    #: `layers`), and the hidden size for everything else.
     #: Full length, so one capture can be replayed at any subset of positions.
     outputs: Dict[tuple, "torch.Tensor"]
     #: `[batch, num_layers + 1, hidden]` at the Readout: the embedding output,
@@ -190,6 +203,12 @@ class Capture:
     residual: Optional["torch.Tensor"]
     #: `[batch]`, the Readout position each row was read at.
     readout: "torch.Tensor"
+    #: `{("mlp_hidden", layer): [batch, seq, intermediate_size]}`: the whole
+    #: `down_proj` input of every layer an `mlp_hidden` key was captured at,
+    #: which `outputs` slices one column per key. A reduction over a layer
+    #: (the mean bank) reads this once instead of one view per neuron. Empty
+    #: when no `mlp_hidden` key was asked for.
+    layers: Dict[tuple, "torch.Tensor"] = None
 
 
 # ==============================================================================
@@ -236,7 +255,8 @@ def geometry(model) -> dict:
     return {"num_layers": config.num_hidden_layers, "num_heads": num_heads,
             "head_dim": head_dim, "num_kv_heads": num_kv_heads,
             "heads_per_group": num_heads // num_kv_heads,
-            "hidden_size": config.hidden_size}
+            "hidden_size": config.hidden_size,
+            "intermediate_size": config.intermediate_size}
 
 
 def kv_group_of(model, head: int) -> int:
@@ -341,11 +361,13 @@ def _plan(keys, shape) -> dict:
     looks exactly like a Component with no effect.
     """
     sites: Dict[str, dict] = {kind: {} for kind in
-                              ("q", "k", "v", "head", "mlp_in", "mlp")}
+                              ("q", "k", "v", "head", "mlp_in", "mlp_hidden",
+                               "mlp")}
     flags = {"embed": False, "readout": False}
     limits = {"q": shape["num_heads"], "head": shape["num_heads"],
               "k": shape["num_kv_heads"], "v": shape["num_kv_heads"],
-              "mlp": 1, "mlp_in": 1}
+              "mlp": 1, "mlp_in": 1,
+              "mlp_hidden": shape.get("intermediate_size", 0)}
 
     for key in keys:
         kind, layer, index = key
@@ -371,6 +393,58 @@ def _plan(keys, shape) -> dict:
     return {"sites": sites, **flags}
 
 
+def _neuron_writes(sites: dict, replacements: dict) -> dict:
+    """`{layer: (columns, values, where)}`: one vectorized write per layer.
+
+    `columns` is a `[k]` long tensor of the layer's replaced neurons, `values`
+    the `[batch, seq, k]` tensor their replacements stack to (each replacement
+    is `[batch, seq, 1]`, or `[batch, seq]`), and `where` None or a
+    `[batch or 1, seq, 1]` bool mask. Built before the trace, so a set of two
+    thousand neurons is one indexed write inside it rather than two thousand.
+    Every replacement of one layer must share its positions: one mask per
+    layer is what makes the write a single `torch.where`.
+    """
+    import torch
+
+    out = {}
+    for layer, indices in sites.items():
+        chosen = [replacements[("mlp_hidden", layer, index)] for index in indices]
+        values = []
+        for one in chosen:
+            value = one.value
+            if value.ndim == 2:
+                value = value.unsqueeze(-1)
+            if value.shape[-1] != 1:
+                raise ValueError(
+                    f"an mlp_hidden replacement is one neuron's column, "
+                    f"[batch, seq, 1]; got {tuple(one.value.shape)} at layer {layer}")
+            values.append(value)
+        first = chosen[0].positions
+        for one in chosen[1:]:
+            same = (one.positions is first) or (
+                one.positions is not None and first is not None
+                and torch.equal(torch.as_tensor(one.positions),
+                                torch.as_tensor(first)))
+            if not same:
+                raise ValueError(
+                    f"the mlp_hidden replacements of layer {layer} name different "
+                    f"positions; one layer's neurons are written with one mask")
+        stacked = torch.cat(values, dim=-1) if len(values) > 1 else values[0]
+        where = None
+        if first is not None:
+            mask = torch.as_tensor(first)
+            if mask.dtype != torch.bool:
+                raise TypeError("Replacement.positions must be a boolean mask over "
+                                "token positions, not indices")
+            if mask.ndim == 1:
+                mask = mask.unsqueeze(0)
+            where = mask.unsqueeze(-1).to(stacked.device)
+        columns = torch.as_tensor(list(indices), dtype=torch.long,
+                                  device=stacked.device)
+        out[layer] = (columns, stacked, where)
+    return out
+
+
 def _traced_forward(model, input_ids, attention_mask, *, capture=(),
                     replacements=None, positions=None, residual=False):
     """One forward: replace what was asked for, capture what was asked for.
@@ -381,8 +455,10 @@ def _traced_forward(model, input_ids, attention_mask, *, capture=(),
     on this forward" means.
 
     Every envoy access below is written in **execution order** — embedding,
-    then per layer q, k, v, the attention output, the MLP input, the MLP output
-    and the layer's own output, then the final norm's input and the logits.
+    then per layer q, k, v, the attention output, the MLP input, the
+    `down_proj` input (only when an `mlp_hidden` key names the layer), the MLP
+    output and the layer's own output, then the final norm's input and the
+    logits.
     nnsight 0.7.0 resolves these lazily against the forward as it runs, so an
     access out of order ends the trace with `MissedProviderError` naming the
     module that came too late.
@@ -401,6 +477,8 @@ def _traced_forward(model, input_ids, attention_mask, *, capture=(),
     rows = torch.arange(input_ids.shape[0], device=readout.device)
     saved: Dict[tuple, object] = {}
     saved_residual = []
+    neuron_writes = _neuron_writes(written["sites"]["mlp_hidden"], replacements)
+    neuron_layers = set(wanted["sites"]["mlp_hidden"]) | set(neuron_writes)
 
     def site(kind, layer, value, width):
         """Apply this site's writes to `value` and save it if it was asked for.
@@ -454,6 +532,24 @@ def _traced_forward(model, input_ids, attention_mask, *, capture=(),
                 if changed:
                     block.mlp.input = value
 
+                # The down_proj input runs after the MLP input and before the
+                # MLP output. Touched only on a pass that names an mlp_hidden
+                # key at this layer, so no other pass gains an envoy access.
+                if layer in neuron_layers:
+                    down = block.mlp.down_proj
+                    value = down.input
+                    if layer in neuron_writes:
+                        columns, values, where = neuron_writes[layer]
+                        value = value.clone()
+                        if where is None:
+                            value[:, :, columns] = values
+                        else:
+                            value[:, :, columns] = torch.where(
+                                where, values, value[:, :, columns])
+                        down.input = value
+                    if layer in wanted["sites"]["mlp_hidden"]:
+                        saved[("mlp_hidden", layer)] = value.save()
+
                 value, changed = site("mlp", layer, block.mlp.output, None)
                 if changed:
                     block.mlp.output = value
@@ -471,12 +567,18 @@ def _traced_forward(model, input_ids, attention_mask, *, capture=(),
             logits = model.output.logits[rows, readout, :].save()
 
     outputs = {}
+    layers = {}
     for key in capture:
         kind, layer, index = key
         if key in (EMBED_KEY, READOUT_KEY):
             outputs[key] = saved[key].detach()
         elif kind in WHOLE_KINDS:
             outputs[key] = saved[(kind, layer)].detach()
+        elif kind in NEURON_KINDS:
+            whole = layers.get((kind, layer))
+            if whole is None:
+                whole = layers[(kind, layer)] = saved[(kind, layer)].detach()
+            outputs[key] = whole[:, :, index:index + 1]
         else:
             span = slice(index * head_dim, (index + 1) * head_dim)
             outputs[key] = saved[(kind, layer)][:, :, span].detach()
@@ -484,7 +586,7 @@ def _traced_forward(model, input_ids, attention_mask, *, capture=(),
     stacked = torch.stack([one.detach() for one in saved_residual], dim=1) \
         if residual else None
     return Capture(logits=logits.detach(), outputs=outputs, residual=stacked,
-                   readout=readout)
+                   readout=readout, layers=layers)
 
 
 def capture_forward(model, input_ids, attention_mask, *, components,

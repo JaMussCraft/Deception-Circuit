@@ -375,6 +375,13 @@ class Effects:
     #: row with no twin. Under a neutral-twin plan it is the counterfactual
     #: run itself. Empty when no batch carried a twin (v1, H, F).
     neutral_twin_logit_difference: List[Optional[float]] = field(default_factory=list)
+    #: Full-vocabulary argmax token at the Readout, per instance in `ids`
+    #: order, on the clean run, under each knockout and on the counterfactual
+    #: run. Filled only under `knock_out_groups(..., record_argmax=True)` (the
+    #: neuron-partition collateral gates read argmax accuracy); empty otherwise.
+    clean_argmax: List[int] = field(default_factory=list)
+    knocked_argmax: Dict[tuple, List[int]] = field(default_factory=dict)
+    counterfactual_argmax: List[int] = field(default_factory=list)
 
     def drops(self, key) -> List[float]:
         """Clean minus knocked-out, per instance. Positive helps deception."""
@@ -623,10 +630,17 @@ def _by_id(segmentations) -> Optional[dict]:
 
 
 def _fill(key, *, scheme, mean_bank, n, seq, shape, dtype, device):
-    """The `[n, seq, dim]` value a mean or zero knockout writes at `key`."""
+    """The `[n, seq, dim]` value a mean or zero knockout writes at `key`.
+
+    `dim` is 1 for an `mlp_hidden` neuron (one column of the `down_proj`
+    input), whose bank entry is that neuron's `(1,)` mean.
+    """
     import torch
 
-    dim = shape["head_dim"] if key[0] == "head" else shape["hidden_size"]
+    if key[0] == "mlp_hidden":
+        dim = 1
+    else:
+        dim = shape["head_dim"] if key[0] == "head" else shape["hidden_size"]
     if scheme == "zero":
         return torch.zeros((n, seq, dim), dtype=dtype, device=device)
     if key not in mean_bank:
@@ -640,8 +654,42 @@ def _fill(key, *, scheme, mean_bank, n, seq, shape, dtype, device):
         .expand(n, seq, dim).contiguous()
 
 
+def _neuron_fill(keys, *, scheme, mean_bank, shape, dtype, device) -> dict:
+    """`{layer: [1, 1, intermediate_size]}` mean or zero values for mlp_hidden keys.
+
+    Zero everywhere for `zero`. For `mean`, the bank's `(1,)` mean of each named
+    neuron at its column (cast to `dtype` as `_fill` casts) and zero at the
+    columns no key names, which are never written.
+    """
+    import torch
+
+    out = {}
+    width = shape["intermediate_size"]
+    for layer in sorted({key[1] for key in keys}):
+        out[layer] = torch.zeros((1, 1, width), dtype=dtype, device=device)
+    if scheme != "mean":
+        return out
+    by_layer: Dict[int, list] = {}
+    for key in keys:
+        if key not in mean_bank:
+            raise KeyError(f"the mean bank has no entry for {key}; collect it over "
+                           f"every Component the run knocks out")
+        mean = mean_bank[key]
+        if tuple(mean.shape) != (1,):
+            raise ValueError(f"the mean bank's {key} has shape {tuple(mean.shape)}, "
+                             f"expected (1,)")
+        by_layer.setdefault(key[1], []).append((key[2], mean))
+    for layer, entries in by_layer.items():
+        columns = torch.tensor([index for index, _mean in entries], dtype=torch.long,
+                               device=device)
+        means = torch.cat([mean.reshape(1).to(device=device) for _index, mean in entries])
+        out[layer][0, 0, columns] = means.to(dtype)
+    return out
+
+
 def knock_out_groups(model, batches, groups, *, scheme=SCHEME, plan=None,
-                     segmentations=None, mean_bank=None) -> Effects:
+                     segmentations=None, mean_bank=None,
+                     record_argmax: bool = False) -> Effects:
     """Knock out each *group* of Components together, and keep every number.
 
     `groups` is `[(label, [component key, ...]), ...]`. A single-Component
@@ -673,6 +721,11 @@ def knock_out_groups(model, batches, groups, *, scheme=SCHEME, plan=None,
     (`{id: Segmentation}` or the cell's list) and a mean plan a `mean_bank`
     (`collect_mean_bank`). With the default plan the forwards are exactly the
     ones this function always ran.
+
+    `record_argmax` also keeps the full-vocabulary argmax at the Readout of
+    every run (`Effects.clean_argmax`, `knocked_argmax`,
+    `counterfactual_argmax`), read off the same fp32 logits as the margin. It
+    adds no forward and changes no margin.
     """
     import torch
 
@@ -693,19 +746,24 @@ def knock_out_groups(model, batches, groups, *, scheme=SCHEME, plan=None,
     labels = [label for label, _members in groups]
     # Every Component any group ablates, captured once on the corrupt stream:
     # two families that share a member cost one capture, not two.
-    keys = []
+    # A set beside the list keeps the dedup linear: neuron groups name
+    # thousands of keys, and `key not in keys` on a list would be quadratic.
+    # The order (first appearance) is the order the list always had.
+    keys, seen = [], set()
     for _label, members in groups:
         for key in members:
-            if key not in keys:
+            if key not in seen:
+                seen.add(key)
                 keys.append(key)
     # Where the weights actually are, which is not always what `--device` asked
     # for: the CLI seam test runs the tiny model on a CPU under `--device cuda`.
     device, _dtype = hooks.device_and_dtype(model)
 
-    def logit_difference(capture, target, distractor):
-        return hooks.target_minus_distractor(
-            hooks.readout_logits(model, capture.residual[:, -1, :]),
-            target, distractor).tolist()
+    def logit_difference(capture, target, distractor, argmax_into=None):
+        logits = hooks.readout_logits(model, capture.residual[:, -1, :])
+        if argmax_into is not None:
+            argmax_into.extend(logits.argmax(-1).tolist())
+        return hooks.target_minus_distractor(logits, target, distractor).tolist()
 
     ids: List[str] = []
     clean_logit_difference: List[float] = []
@@ -713,8 +771,20 @@ def knock_out_groups(model, batches, groups, *, scheme=SCHEME, plan=None,
     twin_margins: List[Optional[float]] = []
     unpaired: List[str] = []
     knocked: Dict[tuple, List[float]] = {label: [] for label in labels}
+    clean_argmax: List[int] = []
+    counterfactual_argmax: List[int] = []
+    knocked_argmax: Dict[tuple, List[int]] = (
+        {label: [] for label in labels} if record_argmax else {})
     shape = hooks.geometry(model) if scheme != "interchange" else None
     model_dtype = hooks.device_and_dtype(model)[1]
+    # Mean and zero for mlp_hidden: one `[1, 1, intermediate_size]` fill per
+    # layer, built once per call, and each neuron's value a view of it, so a
+    # set of thousands of neurons costs no per-neuron tensor per batch. The
+    # values are `_fill`'s (the bank's mean, cast to the model's dtype, or 0).
+    neuron_fill = (_neuron_fill([key for key in keys if key[0] == "mlp_hidden"],
+                                scheme=scheme, mean_bank=mean_bank, shape=shape,
+                                dtype=model_dtype, device=device)
+                   if scheme != "interchange" else {})
 
     for batch in batches:
         batch_ids = list(batch.ids)
@@ -757,14 +827,23 @@ def knock_out_groups(model, batches, groups, *, scheme=SCHEME, plan=None,
                                                 components=keys, positions=readout)
                 values = corrupt.outputs
                 counterfactual_logit_difference.extend(
-                    logit_difference(corrupt, target, distractor))
+                    logit_difference(corrupt, target, distractor,
+                                     counterfactual_argmax if record_argmax
+                                     else None))
             else:
-                values = {key: _fill(key, scheme=scheme, mean_bank=mean_bank,
-                                     n=clean_ids.shape[0], seq=clean_ids.shape[1],
-                                     shape=shape, dtype=model_dtype, device=device)
+                n, seq = clean_ids.shape[0], clean_ids.shape[1]
+                spread = {layer: fill.expand(n, seq, -1)
+                          for layer, fill in neuron_fill.items()}
+                values = {key: (spread[key[1]][:, :, key[2]:key[2] + 1]
+                                if key[0] == "mlp_hidden" else
+                                _fill(key, scheme=scheme, mean_bank=mean_bank,
+                                      n=n, seq=seq, shape=shape, dtype=model_dtype,
+                                      device=device))
                           for key in keys}
             ids.extend(batch_ids)
-            clean_logit_difference.extend(logit_difference(clean, target, distractor))
+            clean_logit_difference.extend(logit_difference(
+                clean, target, distractor,
+                clean_argmax if record_argmax else None))
             if twin:
                 twin_margins.extend(counterfactual_logit_difference[-len(batch_ids):])
             elif getattr(batch, "neutral_twin", None) is not None:
@@ -790,8 +869,9 @@ def knock_out_groups(model, batches, groups, *, scheme=SCHEME, plan=None,
                     replacements={key: (values[key] if where is None else
                                         hooks.Replacement(values[key], positions=where))
                                   for key in members})
-                knocked[label].extend(logit_difference(patched, target,
-                                                       distractor))
+                knocked[label].extend(logit_difference(
+                    patched, target, distractor,
+                    knocked_argmax[label] if record_argmax else None))
     return Effects(ids=ids, keys=labels,
                    clean_logit_difference=clean_logit_difference,
                    knocked_logit_difference=knocked, scheme=scheme,
@@ -800,7 +880,9 @@ def knock_out_groups(model, batches, groups, *, scheme=SCHEME, plan=None,
                    plan=plan.describe(), unpaired=unpaired,
                    neutral_twin_logit_difference=(
                        twin_margins if any(one is not None for one in twin_margins)
-                       else []))
+                       else []),
+                   clean_argmax=clean_argmax, knocked_argmax=knocked_argmax,
+                   counterfactual_argmax=counterfactual_argmax)
 
 
 def collect_mean_bank(model, batches, keys) -> tuple:
@@ -817,8 +899,15 @@ def collect_mean_bank(model, batches, keys) -> tuple:
     from component_analysis import hooks
 
     keys = [row_key(one) for one in keys]
+    # `mlp_hidden` neurons are reduced once per layer, over the layer's whole
+    # down_proj input (`Capture.layers`), and indexed at the end: a bank over
+    # tens of thousands of neurons would otherwise be that many small sums per
+    # batch. Every other kind keeps its per-key sum, unchanged.
+    per_key = [key for key in keys if key[0] != "mlp_hidden"]
+    neuron_layers = sorted({key[1] for key in keys if key[0] == "mlp_hidden"})
     device, _dtype = hooks.device_and_dtype(model)
     sums: Dict[tuple, "torch.Tensor"] = {}
+    layer_sums: Dict[int, "torch.Tensor"] = {}
     tokens = 0.0
     instances = 0
     for batch in batches:
@@ -832,12 +921,22 @@ def collect_mean_bank(model, batches, keys) -> tuple:
                                                 stream_mask, components=keys)
             weight = stream_mask.float().unsqueeze(-1)
             tokens += float(stream_mask.sum())
-            for key in keys:
+            for key in per_key:
                 contribution = (capture.outputs[key].float() * weight).sum(dim=(0, 1))
                 sums[key] = contribution if key not in sums else sums[key] + contribution
+            for layer in neuron_layers:
+                whole = capture.layers[("mlp_hidden", layer)]
+                contribution = (whole.float() * weight).sum(dim=(0, 1))
+                layer_sums[layer] = (contribution if layer not in layer_sums
+                                     else layer_sums[layer] + contribution)
     if not tokens:
         raise ValueError("the mean bank saw no token; the split is empty")
-    bank = {key: total / tokens for key, total in sums.items()}
+    bank = {}
+    for key in keys:
+        if key[0] == "mlp_hidden":
+            bank[key] = layer_sums[key[1]][key[2]:key[2] + 1] / tokens
+        else:
+            bank[key] = sums[key] / tokens
     return bank, {"source": "pooled", "n_instances": instances,
                   "n_tokens": tokens, "n_keys": len(keys),
                   "semantics": ("per site, every unpadded position of the cell's "
@@ -1265,12 +1364,22 @@ DEFAULT_GREEDY_POOL_SIZE = 50
 DEFAULT_GREEDY_K_MAX = 20
 
 
-def load_groups(path: str) -> List[tuple]:
+#: The `mlp_hidden` index bound `load_groups` checks before any model is
+#: loaded: Llama-3.1-8B's `intermediate_size`. `check_groups` checks the
+#: loaded model's own size.
+MLP_HIDDEN_SIZE = 14336
+
+#: The kinds a groups file may name: heads, MLP blocks and MLP hidden neurons.
+GROUPABLE_KINDS = ("head", "mlp", "mlp_hidden")
+
+
+def load_groups(path: str, *, mlp_hidden_size: int = MLP_HIDDEN_SIZE) -> List[tuple]:
     """`[(name, [key, ...]), ...]` from `{name: [[kind, layer, index], ...]}`.
 
     Keys are written in `head_table.row_key` order, (kind, layer, index), and
     each group is knocked out jointly. Refused by name: an empty group, a
-    malformed key, a kind that is not a Component, a key named twice.
+    malformed key, a kind that is not a Component or an MLP hidden neuron,
+    an `mlp_hidden` index outside `[0, mlp_hidden_size)`, a key named twice.
     """
     with open(path) as handle:
         raw = json.load(handle)
@@ -1281,30 +1390,39 @@ def load_groups(path: str) -> List[tuple]:
     for name, members in raw.items():
         if not isinstance(members, list) or not members:
             raise ValueError(f"{path}: group {name!r} names no Component")
-        keys = []
+        keys, seen = [], set()
         for member in members:
             if not isinstance(member, list) or len(member) != 3:
                 raise ValueError(f"{path}: group {name!r} has {member!r}; each "
                                  f"member is [kind, layer, index]")
             key = row_key(tuple(member))
-            if key[0] not in ("head", "mlp"):
+            if key[0] not in GROUPABLE_KINDS:
                 raise ValueError(f"{path}: group {name!r} has {member!r}; a "
-                                 f"Component is a head or mlp")
-            if key in keys:
+                                 f"Component is a head or mlp, and a neuron "
+                                 f"is mlp_hidden")
+            if key[0] == "mlp_hidden" and not 0 <= key[2] < mlp_hidden_size:
+                raise ValueError(f"{path}: group {name!r} has {member!r}; an "
+                                 f"mlp_hidden index is in 0..{mlp_hidden_size - 1}")
+            if key in seen:
                 raise ValueError(f"{path}: group {name!r} names {member!r} twice")
+            seen.add(key)
             keys.append(key)
         out.append((str(name), keys))
     return out
 
 
 def check_groups(groups, geometry: dict) -> None:
-    """Every member must be a Component of this model (layers, heads, MLP 0)."""
+    """Every member must be a Component of this model (layers, heads, MLP 0)
+    or one of its MLP hidden neurons (`intermediate_size`, else Llama-8B's)."""
     for name, keys in groups:
         for kind, layer, index in keys:
             if not 0 <= layer < geometry["num_layers"]:
                 raise ValueError(f"group {name!r}: layer {layer} is outside the "
                                  f"model's {geometry['num_layers']} layers")
-            limit = geometry["num_heads"] if kind == "head" else 1
+            if kind == "mlp_hidden":
+                limit = geometry.get("intermediate_size", MLP_HIDDEN_SIZE)
+            else:
+                limit = geometry["num_heads"] if kind == "head" else 1
             if not 0 <= index < limit:
                 raise ValueError(f"group {name!r}: {kind} index {index} is "
                                  f"outside 0..{limit - 1}")

@@ -38,7 +38,8 @@ FETCH_SUITE_ROOTS=("outputs/_suites" "outputs/_launch_mechanism_v2/evals")
 # to Delta). Only these: the v1 cells of record in the same directory are never touched. instructed-route-b1*
 # holds the B1 loop-closure cells (docs/research/instructed-route/jobs/B1-*.batch). deception-divergence* holds
 # that direction's D1 pools and D4 riders (docs/research/deception-divergence/jobs/).
-FETCH_ANALYSIS_GLOBS=("mechanism-analysis-*" "instructed-route-b1*" "deception-divergence*")
+# neuron-partition* holds that direction's id samples, neuron maps and ablations (docs/research/neuron-partition/).
+FETCH_ANALYSIS_GLOBS=("mechanism-analysis-*" "instructed-route-b1*" "deception-divergence*" "neuron-partition*")
 
 usage() {
     cat >&2 <<'EOF'

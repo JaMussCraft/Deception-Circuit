@@ -90,3 +90,13 @@ as a ruling before that run.
   of the ladder on the seed-2 test sample with its own size-and-layer-matched null, and the pass bars of item 10
   are read at each k; the finding reports every k and never picks k on the test sample. The activation-contrast
   ranking is the comparison, built with the same rule from the contrast mean.
+- **R7 (Tue 3 Nov 2026, before the first ablation cell): collateral under the twin reference.** F and IOI have no
+  neutral twin, so the collateral bars of item 10 (H, F and IOI accuracy under 5 points) are read under the mean
+  reference for every tested set; under the twin reference the H collateral is the reverse patch and is descriptive.
+  The finding says so.
+- **R8 (Tue 3 Nov 2026): the rate effect under mean and zero.** The ablated D rate is compared with the ablated H
+  rate (the effect inside the ablated model); the comparison against intact H is written beside it and is
+  descriptive.
+- **R9 (Tue 3 Nov 2026): operational.** Ablation cells pass `--max-length 128` (lossless: any truncation raises);
+  rows.jsonl stays in outputs and is never committed; the IOI rows follow the reader brief's recipe and are not shown
+  to be the ladder's own 100 rows.
