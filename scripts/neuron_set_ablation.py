@@ -156,7 +156,13 @@ def build_parser() -> argparse.ArgumentParser:
                    help="F split(s) the mean bank is collected over (comma list). "
                         "Default train,validation keeps every test id out of it")
     p.add_argument("--ioi", action=argparse.BooleanOptionalAction, default=True)
-    p.add_argument("--ioi-n", type=int, default=100)
+    p.add_argument("--ioi-n", "--ioi-rows", dest="ioi_n", type=int, default=100,
+                   help="IOI rows: the first N eligible rows of the seeded draw, so the "
+                        "first 100 of any N are the default 100. Refused when the pool "
+                        "holds fewer eligible rows (raise --ioi-pool)")
+    p.add_argument("--ioi-only", action="store_true",
+                   help="run the IOI cells only (no D, H, F, I or N cell); the mean "
+                        "reference still collects its F bank")
     p.add_argument("--ioi-seed", type=int, default=1)
     p.add_argument("--ioi-pool", type=int, default=1000)
     p.add_argument("--model", default="llama-8b-instruct")
@@ -178,6 +184,20 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--output-dir", required=True)
     p.add_argument("--dry-run", action="store_true")
     return p
+
+
+def apply_ioi_only(args):
+    """`--ioi-only`: no condition cell, so `cells` yields the IOI cell of each
+    non-twin reference only. Refused with `--no-ioi` or without a mean or zero
+    reference (the twin reference has no IOI cell)."""
+    if not args.ioi_only:
+        return args
+    if not args.ioi:
+        raise SystemExit("--ioi-only and --no-ioi leave nothing to run")
+    if not any(one != "twin" for one in args.references):
+        raise SystemExit("--ioi-only needs the mean or zero reference: IOI has no twin")
+    args.conditions = []
+    return args
 
 
 def resolve_dirs(args) -> Dict[str, Optional[str]]:
@@ -451,6 +471,9 @@ def ioi_rows(tokenizer, *, n: int, seed: int, pool: int) -> List[dict]:
                     "sentence": sentence})
         if len(out) == n:
             break
+    if len(out) < n:
+        raise SystemExit(f"IOI: only {len(out)} eligible distinct rows in a pool of {pool} "
+                         f"(seed {seed}); {n} were asked for. Raise --ioi-pool")
     return out
 
 
@@ -462,7 +485,8 @@ def ioi_sentences_sha256(rows: Sequence[dict]) -> str:
 
 
 def ioi_report(rows: Sequence[dict], args) -> dict:
-    return {"n_instances": len(rows), "seed": args.ioi_seed, "pool": args.ioi_pool,
+    return {"n_instances": len(rows), "ioi_rows": len(rows),
+            "seed": args.ioi_seed, "pool": args.ioi_pool,
             "names_order": "sorted before the seeded draw",
             "sentences_sha256": ioi_sentences_sha256(rows),
             "first_sentence": rows[0]["sentence"] if rows else None,
@@ -1068,7 +1092,7 @@ def dry_run(args, groups, dirs, ids_by_condition) -> dict:
 
 
 def main(argv=None) -> int:
-    args = build_parser().parse_args(argv)
+    args = apply_ioi_only(build_parser().parse_args(argv))
     dirs = resolve_dirs(args)
     groups = load_sets(args.sets)
     ids = load_ids(args.ids) or {one: None for one in CONDITIONS}

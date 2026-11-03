@@ -734,3 +734,57 @@ def test_the_ioi_check_reports_intact_accuracy_against_the_ladders_0_51():
     assert check["intact_argmax_accuracy"] == pytest.approx(0.5)
     assert check["ladder_reference"] == 0.51
     assert check["difference_points"] == pytest.approx(-1.0)
+
+
+def test_ioi_rows_is_an_alias_of_ioi_n_with_the_default_100():
+    parse = nsa.build_parser().parse_args
+    assert parse(["--sets", "x", "--output-dir", "y"]).ioi_n == 100
+    assert parse(["--sets", "x", "--output-dir", "y", "--ioi-rows", "300"]).ioi_n == 300
+    assert parse(["--sets", "x", "--output-dir", "y", "--ioi-n", "300"]).ioi_n == 300
+
+
+def test_more_ioi_rows_extend_the_draw_and_keep_its_first_rows():
+    first = nsa.ioi_rows(_WordTokenizer(), n=100, seed=1, pool=1000)
+    more = nsa.ioi_rows(_WordTokenizer(), n=300, seed=1, pool=1000)
+    assert len(more) == 300 and len({one["sentence"] for one in more}) == 300
+    assert [one["sentence"] for one in more[:100]] == [one["sentence"] for one in first]
+    assert nsa.ioi_sentences_sha256(more[:100]) == nsa.ioi_sentences_sha256(first)
+    assert nsa.ioi_report(more, nsa.build_parser().parse_args(
+        ["--sets", "x", "--output-dir", "y"]))["ioi_rows"] == 300
+
+
+def test_asking_for_more_ioi_rows_than_the_pool_holds_is_refused():
+    with pytest.raises(SystemExit, match="Raise --ioi-pool"):
+        nsa.ioi_rows(_WordTokenizer(), n=30, seed=1, pool=20)
+
+
+#: The 100 IOI rows of every N1 cell (jobs A, B and C; reports/02 hand-back).
+IOI_100_SHA256 = "61ebeea317ac4932c0b859cc62b88ed0c45a7d6602d4866a9cf2373ee2cc5e59"
+
+
+def test_the_llama_draw_reproduces_the_n1_hash_and_extends_to_300_rows():
+    try:
+        from component_analysis.instances import load_analysis_tokenizer
+        tokenizer = load_analysis_tokenizer("llama-8b-instruct")
+    except Exception as error:                               # noqa: BLE001
+        pytest.skip(f"the Llama tokenizer does not load here: {type(error).__name__}")
+    first = nsa.ioi_rows(tokenizer, n=100, seed=1, pool=1000)
+    assert nsa.ioi_sentences_sha256(first) == IOI_100_SHA256
+    more = nsa.ioi_rows(tokenizer, n=300, seed=1, pool=1000)
+    assert len({one["sentence"] for one in more}) == 300
+    assert [one["sentence"] for one in more[:100]] == [one["sentence"] for one in first]
+
+
+def test_ioi_only_runs_the_ioi_cell_of_each_non_twin_reference_only():
+    parse = nsa.build_parser().parse_args
+    args = nsa.apply_ioi_only(parse(["--sets", "x", "--output-dir", "y", "--ioi-only",
+                                     "--references", "mean"]))
+    assert args.conditions == []
+    assert nsa.cells(args, has_ioi=True) == [("mean", nsa.IOI, "clean", "fill")]
+    unchanged = nsa.apply_ioi_only(parse(["--sets", "x", "--output-dir", "y"]))
+    assert unchanged.conditions == list(nsa.CONDITIONS)
+    with pytest.raises(SystemExit):
+        nsa.apply_ioi_only(parse(["--sets", "x", "--output-dir", "y", "--ioi-only", "--no-ioi"]))
+    with pytest.raises(SystemExit):
+        nsa.apply_ioi_only(parse(["--sets", "x", "--output-dir", "y", "--ioi-only",
+                                  "--references", "twin"]))
