@@ -1,16 +1,17 @@
 # Resume: neuron-partition
 
-Last rewritten: Tue 3 Nov 2026, 12:50 pm EST by claude-5201d56c.
+Last rewritten: Tue 3 Nov 2026, 1:35 pm EST by claude-5201d56c.
 
 ## Status
 
-N1 is active: the attribution-patching scorer is committed and reviewed-in-progress, and the full FAR ranking
-(job 23476096, 400 D/H and 354 I/N rows, forward and reverse) is done under
-`outputs/_analyses/neuron-partition/attribution/far_v2_{dh,in}_train+validation_7386fd3{,_rev}/`. Rulings R2 to R6
-in `spec.md` fix the effect measure (ladder margin effect primary), the mean-bank splits, the IOI adapter, the
-assessment-id file and the partition rule. N2 and N3 wait on N1's classes. No finding has been recorded. First
-look, descriptive: the D/H and I/N maps correlate at 0.78 and most strong D neurons are strong I neurons. The first report is due Wed 4 Nov 2026,
-12:00 pm EST, with whatever N1 has produced.
+N1 is active. Done: the attribution scorer (reviewed, PASS WITH FIXES), the full and split-half FAR rankings at the
+readout position, the partition under R6 (sets under `outputs/_analyses/neuron-partition/sets/far_atp_66741d7/`),
+the N3 stability report (preliminary finding F1: every class stable), the neuron set-ablation machinery (reviewed,
+PASS WITH FIXES; two majors being fixed), the seed-2 test sample (300 per condition), the verdict script, and the
+first report draft with placeholders (`reports/05-first-report.md`). In progress: W1 reruns the ranking with the
+all-position attribution key (ruling R11), W4 then rebuilds the sets, W2 fixes the IOI hash-seed and ids-loader
+majors and prepares three Bridges-2 job lines. Rulings R1 to R12 are in `spec.md`. The first report is due Wed 4
+Nov 2026, 12:00 pm EST.
 
 ## Branch, worktree and commit
 
@@ -23,19 +24,17 @@ look, descriptive: the D/H and I/N maps correlate at 0.78 and most strong D neur
 
 ## In-flight jobs
 
-None. Reservations r-001 (pilot, 89 s) and r-002 (full ranking, 252 s) are reconciled; 1.25 of 20 GPU-hours reserved.
+Reservations r-001 to r-003 (ranking pilot, full ranking, split halves; 89, 252 and 259 s) are reconciled and r-004 (W2's ablation pilot, job 23477197, Delta interactive) was running at 1:30 pm EST; about 2 of 20 GPU-hours reserved. Projected Bridges-2 start on cis260372p was about one hour at 1:11 pm EST.
 
 ## Next action
 
-1. Collect the hand-backs of W2 (neuron ablation under twin, mean and zero; `scripts/neuron_set_ablation.py`),
-   W3 (seed-2 test sample at `outputs/_analyses/neuron-partition/data/`, nulls, Bridges-2 sync), W4 (partition
-   sets per R6 at `outputs/_analyses/neuron-partition/partition/`) and the scorer review (`reviews/01`); commit by
-   file list.
-2. Submit the ablation cells (every class at k 500, 1,000, 2,000 with 20 matched nulls, three references, conditions
-   D/H/F/I/N and IOI) as one job: Bridges-2 H100 charged to cis260372p if `--test-only` starts sooner, else a Delta
-   interactive partition in 55-minute chunks.
-3. W1's split-half ranking job for N3; then the N1 verdict against item 10, the N2 cell on the H-only set, and the
-   first report by Wed noon EST.
+1. When W1 names the all-position score directories: W4 runs partition and stability into
+   `sets/far_atp_all_<sha>/` and `sets/far_atp_readout_<sha>/`; W3 syncs code and `sets/` to the Bridges-2 clone.
+2. Commit W2's fixes; submit jobs A (all-position k 500 and 1,000), B (k 2,000 plus readout k 1,000) and C
+   (contrast k 1,000) on Bridges-2 GPU-shared H100, `-A cis260372p`, per `jobs/ablation_bridges2.md`; ledger add
+   and job add on the main checkout dir after each sbatch; waiters at most 60 minutes.
+3. Fetch the cells, run `scripts/neuron_partition_verdict.py`, log the N1 and N2 decisions, fill the placeholders of
+   `reports/05-first-report.md`, run `scripts/check_report_numbers.py`, hand back by Wed noon EST.
 
 ## Do not
 
