@@ -195,6 +195,36 @@ def test_atp_over_the_clause_equals_the_summed_finite_differences(tiny64):
     assert scores["atp_clause_mean"][layer, index].item() == pytest.approx(total, rel=1e-4, abs=1e-8)
 
 
+@pytest.mark.parametrize("layer, index", [(0, 17), (1, 40)])
+def test_atp_over_every_position_equals_the_summed_finite_differences(tiny64, layer, index):
+    """R11's all-position key against the per-position FD products summed over the whole prompt. The span leaves six
+    positions after the clause, where the activations differ through attention, so the clause sum alone differs."""
+    row = _random_rows(1, 14, seed=5, span=(4, 8))[0]
+    batch = na.collate([row])
+    scores, _, _ = _row_scores(tiny64, row)
+    a_c = _activations(tiny64, batch.input_ids, batch.attention_mask)[layer][0]
+    a_t = _activations(tiny64, batch.twin_input_ids, batch.attention_mask)[layer][0]
+    terms = [(a_c[pos, index] - a_t[pos, index]).item()
+             * _fd_gradient(tiny64, batch, layer=layer, index=index, position=pos) for pos in range(14)]
+    total = sum(terms)
+    assert abs(total) > 1e-6
+    assert abs(sum(terms[8:])) > 1e-6   # the post-clause positions contribute
+    assert all(t == 0.0 for t in terms[:4])   # before the clause the activations are equal
+    assert scores["atp_all_mean"][layer, index].item() == pytest.approx(total, rel=1e-4, abs=1e-8)
+    assert scores["atp_all_absmean"][layer, index].item() == pytest.approx(abs(total), rel=1e-4, abs=1e-8)
+
+
+def test_atp_over_every_position_of_a_one_token_prompt_equals_the_readout_key(tiny64):
+    row = _random_rows(1, 1, seed=11, span=(0, 1))[0]
+    row.twin_input_ids = torch.tensor([(int(row.input_ids[0]) + 1) % 1000 + 10])   # surely a different token
+    assert row.readout == 0
+    scores, _, _ = _row_scores(tiny64, row, reverse=True)
+    assert scores["atp_readout_absmean"].abs().max() > 1e-6
+    for kind in ("mean", "absmean"):
+        torch.testing.assert_close(scores[f"atp_all_{kind}"], scores[f"atp_readout_{kind}"])
+        torch.testing.assert_close(scores[f"rev_atp_all_{kind}"], scores[f"rev_atp_readout_{kind}"])
+
+
 def test_a_one_neuron_patch_moves_m_by_about_the_atp_estimate(tiny64):
     """The full activation patch (clean value replaced by the twin value) against AtP: equal to first order, so
     the two agree closely on this small, smooth model (not a tolerance claim for the 8B model)."""
@@ -220,6 +250,14 @@ def test_reverse_atp_uses_the_twin_gradient(tiny64):
     backward, _, _ = _row_scores(tiny64, swapped)
     torch.testing.assert_close(forward["rev_atp_readout_mean"], backward["atp_readout_mean"])
     torch.testing.assert_close(forward["rev_atp_clause_mean"], backward["atp_clause_mean"])
+    torch.testing.assert_close(forward["rev_atp_all_mean"], backward["atp_all_mean"])
+    torch.testing.assert_close(forward["rev_atp_all_absmean"], backward["atp_all_absmean"])
+
+
+#: The absmean keys are here so an absmean computed as |mean| fails (review 01, minor 3): with three rows of mixed sign
+#: the mean of |s| and |mean s| differ.
+INDEPENDENT_KEYS = ("atp_readout_mean", "atp_readout_absmean", "atp_clause_mean", "atp_clause_absmean",
+                    "atp_all_mean", "atp_all_absmean", "contrast_readout_mean")
 
 
 def test_rows_in_one_batch_are_scored_independently(tiny64):
@@ -228,9 +266,9 @@ def test_rows_in_one_batch_are_scored_independently(tiny64):
     acc_sum = {k: torch.zeros_like(v) for k, v in together.items()}
     for r in rows:
         alone, _, _ = _row_scores(tiny64, r)
-        for k in ("atp_readout_mean", "atp_clause_mean", "contrast_readout_mean"):
+        for k in INDEPENDENT_KEYS:
             acc_sum[k] += alone[k] / 3
-    for k in ("atp_readout_mean", "atp_clause_mean", "contrast_readout_mean"):
+    for k in INDEPENDENT_KEYS:
         torch.testing.assert_close(together[k], acc_sum[k], rtol=1e-5, atol=1e-6)
     assert record["n_rows"] == 3 and len(record["m_clean"]) == 3 and len(record["m_twin"]) == 3
 
@@ -270,6 +308,7 @@ def test_activation_contrast_matches_numpy(tiny):
 # ==============================================================================
 
 EXPECTED_KEYS = {"atp_readout_mean", "atp_readout_absmean", "atp_clause_mean", "atp_clause_absmean",
+                 "atp_all_mean", "atp_all_absmean",
                  "contrast_readout_mean", "contrast_readout_std", "contrast_clause_mean", "contrast_clause_std"}
 
 
@@ -304,7 +343,8 @@ def test_outputs_have_the_expected_keys_and_shapes(tiny, tmp_path):
 def test_reverse_adds_its_keys(tiny):
     scores, _ = na.score_rows(tiny, _random_rows(2, 10, seed=10), batch_size=2, reverse=True)
     assert set(scores) == EXPECTED_KEYS | {"rev_atp_readout_mean", "rev_atp_readout_absmean",
-                                           "rev_atp_clause_mean", "rev_atp_clause_absmean"}
+                                           "rev_atp_clause_mean", "rev_atp_clause_absmean",
+                                           "rev_atp_all_mean", "rev_atp_all_absmean"}
 
 
 def test_baseline_summary():

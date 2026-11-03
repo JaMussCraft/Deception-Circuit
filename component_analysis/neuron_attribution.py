@@ -28,11 +28,18 @@ per-neuron tensor is ever kept):
 * AtP over the clause: the same product summed over the pressure (D) or request (I) clause positions. Rows whose
   clean and twin clause spans differ in length fall back to the Readout only: they are left out of the clause sums
   and listed in `rows.json`. `atp_clause_mean`, `atp_clause_absmean`.
+* AtP over every position (ruling R11, the primary ranking): the same product summed per row over every real prompt
+  position, clean position p against twin position p (the pairs have equal length and attention mask, so the twin
+  interchange of `scripts/neuron_set_ablation.py` aligns them the same way). It estimates m(clean) minus m(clean with
+  this neuron patched to its twin value at every position), the first-order estimate of that ablation. Positions
+  before the clause add 0 (the activations are equal there) and padding adds 0 (masked, and after the Readout).
+  `atp_all_mean`, `atp_all_absmean`; over a one-token prompt it equals the Readout key.
 * Activation contrast: the mean over rows of a_clean - a_twin at the Readout (`contrast_readout_mean`) and that mean
   divided by the population standard deviation of a_twin over rows plus 1e-6 (`contrast_readout_std`); the same for
   activations summed over the clause positions (`contrast_clause_mean`, `contrast_clause_std`).
 * With `reverse=True`, the twin run is differentiated too and `rev_atp_*` hold (a_twin - a_clean) * dm_twin/da: H as
-  clean, D as twin. It costs one more backward per batch.
+  clean, D as twin, at the Readout, over the clause and over every position (`rev_atp_all_*`). It costs one more
+  backward per batch.
 
 Nothing here imports nnsight. The model is the unmodified HF `LlamaForCausalLM` (`ModelAdapter.load_full_model`,
 bf16 weights, frozen parameters). Gradients reach the captured activations because the embedding output is made to
@@ -102,9 +109,10 @@ PAIRS = ("dh", "in")
 STD_EPS = 1e-6
 
 #: Running sums, each [layers, width] float64. `n_readout` and `n_clause` count the rows each family covers.
-READOUT_SUMS = ("atp_ro_sum", "atp_ro_abs", "diff_ro_sum", "twin_ro_sum", "twin_ro_sq")
+READOUT_SUMS = ("atp_ro_sum", "atp_ro_abs", "diff_ro_sum", "twin_ro_sum", "twin_ro_sq", "atp_all_sum", "atp_all_abs")
 CLAUSE_SUMS = ("atp_cl_sum", "atp_cl_abs", "diff_cl_sum", "twin_cl_sum", "twin_cl_sq")
-REVERSE_SUMS = ("rev_atp_ro_sum", "rev_atp_ro_abs", "rev_atp_cl_sum", "rev_atp_cl_abs")
+REVERSE_SUMS = ("rev_atp_ro_sum", "rev_atp_ro_abs", "rev_atp_cl_sum", "rev_atp_cl_abs", "rev_atp_all_sum",
+                "rev_atp_all_abs")
 
 
 # ==============================================================================
@@ -453,9 +461,13 @@ class Accumulator:
             out["contrast_readout_mean"] = s["diff_ro_sum"] / n
             out["contrast_readout_std"] = out["contrast_readout_mean"] / (_std(s["twin_ro_sum"], s["twin_ro_sq"], n)
                                                                           + STD_EPS)
+            out["atp_all_mean"] = s["atp_all_sum"] / n
+            out["atp_all_absmean"] = s["atp_all_abs"] / n
             if self.reverse:
                 out["rev_atp_readout_mean"] = s["rev_atp_ro_sum"] / n
                 out["rev_atp_readout_absmean"] = s["rev_atp_ro_abs"] / n
+                out["rev_atp_all_mean"] = s["rev_atp_all_sum"] / n
+                out["rev_atp_all_absmean"] = s["rev_atp_all_abs"] / n
         if self.n_clause:
             n = float(self.n_clause)
             out["atp_clause_mean"] = s["atp_cl_sum"] / n
@@ -508,6 +520,7 @@ def score_batch(model, batch: PairBatch, acc: Accumulator) -> Tuple[torch.Tensor
     clause = batch.clause_mask.to(device)
     has = batch.has_clause.to(device)
     work = _work_dtype(clean_acts[0])
+    valid = mask.unsqueeze(-1).to(work)   # every real prompt position; padding is on the right, after the Readout
     for layer in range(len(clean_acts)):
         a_c = clean_acts[layer].to(work)
         a_t = twin_acts[layer].to(work)
@@ -521,6 +534,9 @@ def score_batch(model, batch: PairBatch, acc: Accumulator) -> Tuple[torch.Tensor
         acc.add(layer, "diff_ro_sum", diff_ro)
         acc.add(layer, "twin_ro_sum", twin_ro)
         acc.add(layer, "twin_ro_sq", twin_ro * twin_ro)
+        atp_all = (diff * g * valid).sum(1)
+        acc.add(layer, "atp_all_sum", atp_all)
+        acc.add(layer, "atp_all_abs", atp_all.abs())
         if bool(has.any()):
             weight = clause.unsqueeze(-1)
             atp_cl = (diff * g * weight).sum(1)[has]
@@ -535,6 +551,9 @@ def score_batch(model, batch: PairBatch, acc: Accumulator) -> Tuple[torch.Tensor
             rev_ro = -diff_ro * g_t[rows, readout]
             acc.add(layer, "rev_atp_ro_sum", rev_ro)
             acc.add(layer, "rev_atp_ro_abs", rev_ro.abs())
+            rev_all = (-diff * g_t * valid).sum(1)
+            acc.add(layer, "rev_atp_all_sum", rev_all)
+            acc.add(layer, "rev_atp_all_abs", rev_all.abs())
             if bool(has.any()):
                 rev_cl = (-diff * g_t * clause.unsqueeze(-1)).sum(1)[has]
                 acc.add(layer, "rev_atp_cl_sum", rev_cl)
