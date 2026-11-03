@@ -363,6 +363,51 @@ The dry run of both halves, with `--commit 0000000`:
 | A (`--tag half1`) | 200 of 200 | 174 | 26 |
 | B (`--tag half2`) | 200 of 200 | 180 | 20 |
 
-**Execution evidence.** Not yet available: the job is waiting for the orchestrator's commit sha.
+**Execution evidence.** The orchestrator committed the `--ids` change at 66741d7, and the job ran after that.
 
-**What is NOT done.** The split-half job is not submitted, so there are no split-half scores and no Jaccard.
+- **Job id and cluster.** Delta 23476621, account beto-delta-gpu, `gpuA40x4-interactive` on node gpub019 (NVIDIA A40
+  46 GB). It was submitted at 11:46 am CST with `split_half_attribution_far.sbatch 66741d7`.
+- **Exit code or Slurm state.** COMPLETED 0:0, elapsed 259 s against 30 min reserved. Ledger r-003 and the job record
+  are in the main-checkout directory. The job is marked COMPLETED and the ledger is reconciled with
+  `--actual-seconds 259`. The log `logs/neuron_partition_split_half_far_23476621.out` has no errors.
+- **Row counts and mean m.** Every row has its clause span and there are 0 fallbacks. All tensors are
+  [32, 14336] float32 and finite.
+
+  | Run | rows (expected) | mean m, clean stream | mean m, twin stream | Pearson with stored, clean and twin | sign agreement |
+  |---|---|---|---|---|---|
+  | half 1, D against H | 200 (200) | D 2.497 | H −7.010 | 0.9993, 0.9997 | 1.000 |
+  | half 1, I against N | 174 (174) | I 5.703 | N −8.709 | 0.9981, 0.9985 | 1.000 |
+  | half 2, D against H | 200 (200) | D 2.325 | H −7.387 | 0.9993, 0.9998 | 1.000 |
+  | half 2, I against N | 180 (180) | I 5.819 | N −8.975 | 0.9989, 0.9991 | 1.000 |
+
+  The two `--reverse` runs score the same D/H rows and give the same m.
+- **Speed.** Forward scoring took about 0.085 seconds per row and `--reverse` about 0.112.
+- **Halves reproduce the full ranking.** The row-weighted mean of the two halves equals the full-ranking scores
+  within 3.2e-4 on `atp_readout_mean` and 3.9e-4 on `atp_clause_mean`, against maxima of 0.39 to 0.86. Batch
+  composition changes the padded length and with it the bf16 kernels.
+- **Provenance.** Each output directory holds its own `run_manifest.json`. All six manifests verify their hash,
+  record `slurm_job_id` 23476621 and `git_dirty` false, and hash `far_rank_ids.json` into `dataset_files`.
+  - The orchestrator committed during the run, so the recorded HEADs differ by run.
+    - `e5962fe97f758297497a1223ed703e88ce7a8e43`: the first two runs, half 1 D/H and I/N.
+    - `5e4fd2ce1533c6e4439a0f323431315f4f420783`: half 1 reverse and half 2 forward.
+    - `767d4be0ad733ed3d4a6486ac136f1dd82459ef9`: half 2 reverse, which is the current HEAD.
+  - `code_sha256` is identical in all six: scorer ac21a987…647a and CLI c7604bfe…28f8, the files on disk at
+    767d4be. The directory names carry 66741d7 as requested.
+- **Output directories.** All six are under `/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/neuron-partition/outputs/_analyses/neuron-partition/attribution/`:
+  - `far_v2_dh_train+validation_half1_66741d7/`
+  - `far_v2_in_train+validation_half1_66741d7/`
+  - `far_v2_dh_train+validation_half1_66741d7_rev/`
+  - `far_v2_dh_train+validation_half2_66741d7/`
+  - `far_v2_in_train+validation_half2_66741d7/`
+  - `far_v2_dh_train+validation_half2_66741d7_rev/`
+
+**Split-half agreement.** These readings are descriptive. N3's Jaccard against a ceiling and a floor belongs to the
+class analysis, not to this scorer.
+
+| Score | Pearson, half 1 against half 2 | above 0.01, half 1 and half 2 | Jaccard above 0.01 | above 0.1, half 1 and half 2 | Jaccard above 0.1 |
+|---|---|---|---|---|---|
+| D/H `atp_readout_mean` | 0.977 | 1,516 and 1,428 | 0.790 | 42 and 44 | 0.792 |
+| I/N `atp_readout_mean` | 0.989 | 6,525 and 6,182 | 0.857 | 116 and 112 | 0.781 |
+| D/H `rev_atp_readout_mean` | 0.986 | 2,568 and 2,930 | 0.783 | 72 and 85 | 0.670 |
+
+**What is NOT done.** No class partition and no N3 ceiling or floor comparison. No SER split halves.
