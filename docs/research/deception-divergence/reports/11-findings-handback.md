@@ -10,6 +10,15 @@ Status: resolved for F1 to F8. F-dd-009 waits for the lead's text.
   eight new rows after F-rte-008, ids F-dd-001 to F-dd-008 for worklog findings F1 to F8 in order. Every row is
   dated 2026-11-02, has status `reviewed` and puts its review in the report column. No other row changed.
 - This hand-back. No code, outputs, worklog or tool-owned records were touched. No git was run.
+- Second task, the lead's README brief of Tue 3 Nov 2026: `docs/research/deception-divergence/README.md` was
+  rewritten as the direction handoff. It covers the question, the verdict, F-dd-001 to F-dd-009, what the controls
+  say, open leads, what was not done, the budget and pointers. It keeps the placeholder "[F9 residual signal: wording
+  from review 06]" for the lead to fill. The F-dd-009 bullet is drafted from hand-back 10 and marked as waiting for
+  review 06. The budget uses the ledger: 10.58 GPU-hours reserved, where the brief said 11.33, and 3.38 actual.
+  The lead later confirmed 10.58. After review 06, row F-dd-009 was added from the lead's text, dated 2026-11-03,
+  commit 1aa5084, and findings-check still reports 0 errors and 0 warnings. The README's F-dd-009 bullet, Verdict
+  wording, open lead on the FAR score-space residual and pointers to review 06 and the job log were finalised. The budget note now splits the actual time into 2.91 GPU-hours before the R15
+  follow-up and 0.47 for job 50161975.
 
 Commit column choices:
 
