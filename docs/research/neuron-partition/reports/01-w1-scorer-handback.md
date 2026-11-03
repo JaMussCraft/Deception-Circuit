@@ -239,3 +239,82 @@ Observed:
   The pilot sbatch hard-codes `--split validation --limit 64`, and a later argument cannot remove `--limit`. The
   full run therefore needs a copy of the sbatch whose python line is
   `--task far_v2 --pair dh in --split train,validation --batch-size 4 [--reverse]`.
+
+## Addendum: full ranking
+
+The full FAR ranking ran on train and validation, for D against H and for I against N, each with and without
+`--reverse`. The job script is
+`/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/neuron-partition/docs/research/neuron-partition/jobs/full_attribution_far.sbatch`,
+and it is new and uncommitted. It reads the pools from W3's copy through `--pool-dir`. The arrow check passed: had
+it failed, the run would have stopped before reading any row.
+
+**Execution evidence.**
+
+- **Job id and cluster.** Delta 23476096, account beto-delta-gpu, `gpuA40x4-interactive` on node gpub045 (NVIDIA A40
+  46 GB). It was submitted at 11:30 am CST and started at once.
+- **Exit code or Slurm state.** COMPLETED 0:0, elapsed 252 s against 30 min reserved.
+  - Ledger r-002 and the job record are in the main-checkout directory
+    `/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/neuron-partition`, recorded with
+    `--commit 7386fd3`.
+  - The job is marked COMPLETED and the ledger is reconciled with `--actual-seconds 252`.
+- **Row counts.** D/H has 400 rows against an expected 400, with the clause on 400 and 0 fallbacks. I/N has 354
+  against an expected 354, with the clause on 354 and 0 fallbacks. All 8 tensors, or 12 in the reverse runs, are
+  [32, 14336] float32 and finite.
+- **Speed.** Forward-only scoring took 0.082 seconds per row for D/H and 0.085 for I/N. With `--reverse` it took
+  0.112 and 0.120, about 1.4 times as long. The model loaded in 23.1 s and 11.5 s.
+- **Mean m per stream.** m is logit(opposite) minus logit(honest) in D's orientation (R2).
+
+  | Pair and stream | mean m | rows with m > 0.7 | Pearson with stored margin | mean abs diff | sign agreement |
+  |---|---|---|---|---|---|
+  | D/H, D (m_clean) | 2.412 | 390 of 400 | 0.9993 | 0.044 | 1.000 |
+  | D/H, H (m_twin) | −7.198 | 0 of 400; all 400 below −0.7 | 0.9998 | 0.042 | 1.000 |
+  | I/N, I (m_clean) | 5.763 | 354 of 354 | 0.9985 | 0.112 | 1.000 |
+  | I/N, N (m_twin) | −8.844 | 0 of 354; all 354 below −0.7 | 0.9988 | 0.092 | 1.000 |
+
+  The intact clean-stream gaps, mean m_clean minus mean m_twin, are 9.61 for D against H and 14.61 for I against N.
+  The audit reported 9.915 for D's clean stream and 14.979 for I averaged over both streams. Ten D rows fall below
+  0.7 in this fp32 readout, though all are above 0. The pool screen used the stored margins, which differ from
+  mine by 0.044 on average.
+- **Reverse runs reproduce the forward runs.** The forward keys of each `--reverse` run equal those of the plain run
+  exactly, with a maximum absolute difference of 0.0.
+- **Provenance files.** Each output directory holds its own `run_manifest.json`. All four have `manifest_hash`
+  verified and `slurm_job_id` 23476096. `dataset_files` has 24 entries for D/H and 34 for I/N, and the I/N `notes`
+  say the pools were read from a copy of the A1 control cell, sha256-checked.
+  - The manifests record `git_commit` `6c6d5be1b631f4f248a29bbc77c0192cb198b4ea`, which was HEAD when the job ran.
+    The directory names carry `7386fd3` because the brief asked for `--commit 7386fd3`. `git_dirty` is true.
+  - `code_sha256` pins the scorer at ac21a987…647a and the CLI at 126574ec…57c2. Those are the files on disk now,
+    unchanged since the R2 follow-up, which the orchestrator reports committed at 7386fd3.
+- **Output directories.** All four are under `/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/neuron-partition/outputs/_analyses/neuron-partition/attribution/`:
+  - `far_v2_dh_train+validation_7386fd3/`
+  - `far_v2_dh_train+validation_7386fd3_rev/`
+  - `far_v2_in_train+validation_7386fd3/`
+  - `far_v2_in_train+validation_7386fd3_rev/`
+
+  The brief named them with `_trainval_`. The committed CLI names them `train+validation`, and I did not change code
+  to rename them. The log is `logs/neuron_partition_full_far_23476096.out`, which shows no errors.
+
+**How concentrated the scores are.** The counts are neurons out of 458,752, by the absolute value of
+`atp_readout_mean`, the mean over rows of the Readout attribution. These readings are descriptive, not a partition.
+
+| Pair | above 0.01 | above 0.1 | above 0.5 | largest |
+|---|---|---|---|---|
+| D/H | 1,477 | 46 | 0 | 0.392 |
+| I/N | 6,338 | 114 | 6 | 0.863 |
+| Both pairs | 1,180 | 40 | not computed | not computed |
+| D/H, clause positions (`atp_clause_mean`) | 8,520 | 38 | 0 | 0.475 |
+| I/N, clause positions | 11,702 | 21 | 0 | 0.347 |
+
+- **Concentration.** The Readout AtP is concentrated. Under 0.4 percent of neurons pass 0.01 for D/H, and 46 pass
+  0.1.
+- **Overlap.** Most large D/H neurons are also large for I/N: 40 of the 46 above 0.1, and 1,180 of the 1,477 above
+  0.01. The correlation of the two `atp_readout_mean` maps over all neurons is 0.775. This is an early sign that the
+  D-only class at the Readout will be small. It is a reading, not a verdict.
+- **Layer distribution.** Above 0.01, the D/H neurons sit in layers 11 to 16, with a peak of 340 in layer 13, and in
+  layers 29 to 31, with 97 in layer 31. I/N has the same shape but more neurons, with 1,356 in layer 13.
+- **Reverse direction.** With H as clean, `rev_atp_readout_mean` passes 0.01 for 2,732 neurons and 0.1 for 83 on
+  D/H. On I/N the counts are 4,670 and 112.
+- **Clause scores.** The clause scores are spread more widely above 0.01, at 8,520 and 11,702 neurons, but few pass
+  0.1.
+
+**Not done in this addendum.** No partition into D-only, H-only and shared classes, no thresholds, and no SER run.
+The corrupt-stream question in Open questions still stands.
