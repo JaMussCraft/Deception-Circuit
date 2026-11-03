@@ -104,3 +104,10 @@ as a ruling before that run.
   split halves" is read on the seed-2 test sample: its ids are split into two halves with seed 2 (stratified the way
   W3's rank halves are), and a class must meet every bar on each half as well as on the whole sample. Ranking
   stability across the rank halves is N3's report and does not enter the N1 pass.
+- **R11 (Tue 3 Nov 2026, before the first ablation cell, from review 01 major 1): ranking position.** The twin
+  interchange writes every position, so the primary ranking score is the attribution summed over every position of
+  the prompt (the "all-position" key), which estimates that ablation; the readout-position score of R6 becomes the
+  comparison ranking beside the activation contrast. Everything else in R6 is unchanged. Review 01 major 2 (the
+  deception and honest scores share the activation difference and agree in sign on only 63 of the top 100) is
+  recorded as a known property; a direct one-neuron interchange check on the top neurons by each score is
+  descriptive if run.
