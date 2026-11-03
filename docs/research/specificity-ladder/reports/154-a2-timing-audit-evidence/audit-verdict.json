@@ -1,0 +1,94 @@
+{
+  "status": "PASS_SCOPED_MEASURED_BANK_AND_PREFIX4_TIMING",
+  "source_commit": "40fe57289405fd53a3fce02e5d4e47a0ebf78b64",
+  "job_id": "23473669",
+  "source_file_count": 511,
+  "source_unchanged_now": true,
+  "rows": 2484,
+  "expected": 2484,
+  "unique_expected_keys": 2484,
+  "positive_controls": 144,
+  "all_controls_valid": true,
+  "group_aliases": [
+    "far_v2_seed123_DminusI",
+    "far_v2_seed1_DminusI",
+    "far_v2_seed42_DminusI",
+    "sdr_v2_seed123_DminusI",
+    "sdr_v2_seed1_DminusI",
+    "sdr_v2_seed42_DminusI",
+    "ser_v2_seed123_DminusI",
+    "ser_v2_seed1_DminusI",
+    "ser_v2_seed42_DminusI"
+  ],
+  "original_H_banks": {
+    "far_v2": {
+      "instances": 400,
+      "keys": 123,
+      "source_id_order_sha256": "3e5ed9cab261181ee0314ac14f6029033e88f4419b0c0076c807f2386ef94dc1"
+    },
+    "sdr_v2": {
+      "instances": 400,
+      "keys": 122,
+      "source_id_order_sha256": "ff3a7971fe55790eb99f34a9b0a6cd5cfe76fd3e403fda285d1daab4cd3f4d9e"
+    },
+    "ser_v2": {
+      "instances": 400,
+      "keys": 145,
+      "source_id_order_sha256": "a74a16bf7fdde1466773a9dd314b65a780feed9a767b72f40214fba4091d94be"
+    }
+  },
+  "gpu_uuid": "GPU-adb553ae-0dad-02ab-a1db-c64a86ae9511",
+  "same_bank_score_UUID": true,
+  "execution": {
+    "cluster": "delta",
+    "cluster_source": "SLURM_CLUSTER_NAME",
+    "device": "cuda:0",
+    "dtype": "torch.bfloat16",
+    "gpu_name": "NVIDIA H200",
+    "memory_scope": "scoring compute after model load; includes resident model",
+    "model_load_seconds": 9.052671638783067,
+    "peak_allocated_memory_bytes": 19600040960,
+    "peak_reserved_memory_bytes": 20778582016,
+    "scoring_compute_seconds": 714.5478384736925,
+    "scoring_stage_seconds": 729.072010688018,
+    "slurm_job_id": "23473669",
+    "stage_time_scope": "model load plus scoring compute; excludes artifact publication"
+  },
+  "budget_reservation": {
+    "account": "beto-delta-gpu",
+    "actual_seconds": 1135,
+    "cluster": "delta",
+    "gpus": 1,
+    "id": "r-039",
+    "job_id": "23473669",
+    "manifest_hash": null,
+    "output_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/all18-40fe57289405-v2",
+    "partition": "gpuH200x8-interactive",
+    "requested_minutes": 25.0,
+    "reserved_gpu_hours": 0.4167,
+    "source_commit": "40fe57289405fd53a3fce02e5d4e47a0ebf78b64",
+    "status": "COMPLETED"
+  },
+  "current_phase_reserved": {
+    "A1": 4.5,
+    "A2": 27.3668,
+    "A3": 1.5
+  },
+  "budget_old_charges_retained": true,
+  "complete_file_sha256": "61a248e0a09486ad7c7f2a4168d65d3d5bee96c2d76fecaddb71a1d0d272a2c2",
+  "score_manifest_sha256": "5c532bc5aa9f59f8ca6aa7f0ef07e45cd7507016db2fcf6fd2ddceb400f90616",
+  "payload_file_sha256": {
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/all18-40fe57289405-v2-timing-limit4/score/score.json": "16787e52ec0630519f0f8285293c85073ea997206f4920d570f776243335bfc3",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/all18-40fe57289405-v2/bank/banks.json": "9c874e387a45d26fa966d69eda64ee9398a836f1c1681aa1c049ff5532702660"
+  },
+  "full_resource_proposal_sha256": "3d14df0b00d9fdd19e03c405212e60f567e97211116f1b3a8e28db4dc6d05df2",
+  "assessment_effects_inspected": false,
+  "model_or_execution_authority_granted": false,
+  "limitations": [
+    "prefix4 timing is not an upper bound or hardware drift test",
+    "same-H200 bank/score established; no Bridges2 hardware transfer claim",
+    "full expected-key builder/complete full-artifact validation and real fresh protection/lease remain owning CLI duties"
+  ],
+  "original_H_source_ID_sets_equal_A1_design": true,
+  "A1_design_file_sha256": "fe8d38875358dca69029751a9cf17a2cb0ddec3c215ede8a0d43bc3594554a0d"
+}

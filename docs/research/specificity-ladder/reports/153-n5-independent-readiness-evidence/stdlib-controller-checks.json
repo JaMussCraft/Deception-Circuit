@@ -1,0 +1,26 @@
+{
+  "method": "Exact current controller AST; tiny stdlib-only transport/clock/receipt fixtures, no application/model/job execution",
+  "normal_interactive_declared_list_pass": true,
+  "deadline_extension_refused": true,
+  "earlier_end_shrinks_deadline": true,
+  "complete_exact_nonfinal_receipt_pass": true,
+  "negative_count": 15,
+  "negatives": [
+    "Partition=gpuA100x4",
+    "TimeLimit=01:00:00",
+    "Requeue=1",
+    "Restarts=1",
+    "ReqTRES=cpu=4,mem=32G,gres/gpu=1",
+    "ReqTRES=cpu=4,mem=64G,gres/gpu=10",
+    "Account=other",
+    "Command=/tmp/other.sh",
+    "receipt.complete",
+    "receipt.injected",
+    "receipt.reservation_id",
+    "receipt.target_inventory_sha256",
+    "receipt.purpose",
+    "receipt.arms",
+    "receipt.missing_required_bank"
+  ],
+  "first_attempt_note": "The initial AST harness omitted globalB; corrected harness namespace only, no controller change."
+}

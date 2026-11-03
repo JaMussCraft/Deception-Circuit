@@ -1,0 +1,11 @@
+{
+  "source": "component_analysis/a3_direction_runtime.py",
+  "lines": "334-343",
+  "normalize_ledger_returned_keys": [
+    "snapshot_sha256",
+    "current_snapshot_sha256"
+  ],
+  "both_same_fresh_digest": true,
+  "static_only": true,
+  "correction": "No ledger key defect. Added explicit equality and actual parent+batch/extern sacct terminal checks before artifact reads."
+}
