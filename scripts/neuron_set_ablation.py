@@ -273,7 +273,12 @@ def corrupt_stream(batch):
         neutral_twin=twin)
 
 
-def attach_twin(batch, twin_batch, span_field: str = "request_spans"):
+TWIN_CONDITIONS = ("user_inversion", "user_neutral")
+SHARED_ID_FIELDS = ("pressure_id", "request_id", "neutral_id")
+
+
+def attach_twin(batch, twin_batch, span_field: str = "request_spans",
+                conditions: Optional[Sequence[str]] = TWIN_CONDITIONS):
     """`batch` with `twin_batch`'s prompts as its Neutral-Clause Twin.
 
     The I to user-neutral pairing, which the loader does not build
@@ -281,7 +286,10 @@ def attach_twin(batch, twin_batch, span_field: str = "request_spans"):
     H path makes: the same ids in the same order, the same attention masks and
     Readouts on both streams, the twin's Target equal to this row's Distractor
     (the twin is the honest condition), and tokens that differ only inside the
-    request span the records name.
+    request span the records name. With `conditions`, every row's record must
+    name the first and every twin's the second (so swapped --i-dir and --n-dir
+    are refused), and the pressure, request and neutral ids must agree where
+    both records carry them.
     """
     import torch
 
@@ -290,6 +298,19 @@ def attach_twin(batch, twin_batch, span_field: str = "request_spans"):
     if list(batch.ids) != list(twin_batch.ids):
         raise ValueError("twin batch ids differ from the batch's: "
                          f"{list(batch.ids)[:3]} vs {list(twin_batch.ids)[:3]}")
+    if conditions is not None:
+        for side, records, expected in (("row", batch.records, conditions[0]),
+                                        ("twin", twin_batch.records, conditions[1])):
+            for row, record in enumerate(records):
+                if record.get("condition") != expected:
+                    raise ValueError(f"instance {batch.ids[row]}: the {side} record's condition "
+                                     f"is {record.get('condition')!r}, not {expected!r}; "
+                                     f"are --i-dir and --n-dir swapped?")
+    for row, (mine, theirs) in enumerate(zip(batch.records, twin_batch.records)):
+        for field in SHARED_ID_FIELDS:
+            if field in mine and field in theirs and mine[field] != theirs[field]:
+                raise ValueError(f"instance {batch.ids[row]}: {field} {mine[field]!r} vs the "
+                                 f"twin's {theirs[field]!r}")
     for name in ("attention_mask", "corrupt_attention_mask"):
         if not torch.equal(getattr(batch, name), getattr(twin_batch, name)):
             raise ValueError(f"the twin's {name} is not the row's: the streams are "
@@ -390,14 +411,27 @@ def ioi_rows(tokenizer, *, n: int, seed: int, pool: int) -> List[dict]:
     prefix plus the answer name's one token). The first `n` eligible rows,
     the final name stripped; the Readout is the last prefix token. Ids are
     `ioi:seed=<seed>:row=<k>`.
+
+    The names are sorted before the seeded draw. `load_names` returns
+    `list(set(...))`, whose order follows PYTHONHASHSEED, so without the sort
+    the same seed drew different rows in different processes (review 02,
+    finding 1). The sort is local to this call; other IOI callers keep
+    `load_names` as it is.
     """
     import contextlib
     import io
+    from unittest import mock
 
-    from dataset.ioi_llama import generate_ioi_data_llama
+    from dataset import ioi_llama
 
-    with contextlib.redirect_stdout(io.StringIO()):
-        samples = generate_ioi_data_llama(pool, tokenizer, seed=seed)
+    original = ioi_llama.load_names
+
+    def sorted_names(names_path=None):
+        return sorted(original(names_path))
+
+    with contextlib.redirect_stdout(io.StringIO()), \
+            mock.patch.object(ioi_llama, "load_names", sorted_names):
+        samples = ioi_llama.generate_ioi_data_llama(pool, tokenizer, seed=seed)
     out, seen = [], set()
     for sample in samples:
         sentence = sample["sentence"]
@@ -418,6 +452,22 @@ def ioi_rows(tokenizer, *, n: int, seed: int, pool: int) -> List[dict]:
         if len(out) == n:
             break
     return out
+
+
+def ioi_sentences_sha256(rows: Sequence[dict]) -> str:
+    """sha256 of the IOI sentences in row order, one per line (UTF-8)."""
+    import hashlib
+
+    return hashlib.sha256("\n".join(one["sentence"] for one in rows).encode("utf-8")).hexdigest()
+
+
+def ioi_report(rows: Sequence[dict], args) -> dict:
+    return {"n_instances": len(rows), "seed": args.ioi_seed, "pool": args.ioi_pool,
+            "names_order": "sorted before the seeded draw",
+            "sentences_sha256": ioi_sentences_sha256(rows),
+            "first_sentence": rows[0]["sentence"] if rows else None,
+            "pythonhashseed": os.environ.get("PYTHONHASHSEED"),
+            "recipe": ioi_rows.__doc__.strip().split("\n\n")[0]}
 
 
 def ioi_batches(tokenizer, rows: Sequence[dict], *, batch_size: int):
@@ -534,16 +584,25 @@ def build_condition_batches(args, dirs, tokenizer, ids_by_condition) -> dict:
         report[condition]["dataset_dir"] = os.path.abspath(dirs[condition])
         out[condition] = list(batches)
     if "I" in out:
-        out["I"] = [attach_twin(one, twin) for one, twin in zip(out["I"], out["N"])]
-        if len(out["I"]) != len(out["N"]):
-            raise ValueError("I and user-neutral load different numbers of batches")
-        report["I"]["neutral_twin_source"] = os.path.abspath(dirs["N"])
-        report["I"]["n_with_neutral_twin"] = sum(len(one.ids) for one in out["I"])
-        report["I"]["without_neutral_twin"] = []
+        pair_user_turn(out, report, dirs)
     if "N" in out and "N" not in args.conditions:
         del out["N"]
     check_labels(out)
     return out, report
+
+
+def pair_user_turn(out: dict, report: dict, dirs: dict) -> None:
+    """Attach user-neutral to I as its twin, in place. The batch and row counts
+    are compared before pairing, so extra I batches cannot be dropped by zip."""
+    sizes_i = [len(one.ids) for one in out["I"]]
+    sizes_n = [len(one.ids) for one in out["N"]]
+    if sizes_i != sizes_n:
+        raise ValueError("I and user-neutral load different numbers of batches or rows: "
+                         f"{sizes_i} vs {sizes_n}")
+    out["I"] = [attach_twin(one, twin) for one, twin in zip(out["I"], out["N"])]
+    report["I"]["neutral_twin_source"] = os.path.abspath(dirs["N"])
+    report["I"]["n_with_neutral_twin"] = sum(sizes_i)
+    report["I"]["without_neutral_twin"] = []
 
 
 def check_labels(batches_by_condition: dict) -> None:
@@ -979,6 +1038,7 @@ def dry_run(args, groups, dirs, ids_by_condition) -> dict:
             n_batches[IOI] = -(-len(ioi) // args.batch_size)
             rows[IOI] = len(ioi)
             max_length[IOI] = max(len(one["prefix"]) for one in ioi) if ioi else 32
+            report[IOI] = ioi_report(ioi, args)
     else:
         from dataset import deception_common as dc
         for condition in set(args.conditions) | ({"F"} if "mean" in args.references else set()):
@@ -1057,8 +1117,8 @@ def run(args, groups, dirs, ids) -> int:
     if args.ioi:
         ioi = ioi_rows(tokenizer, n=args.ioi_n, seed=args.ioi_seed, pool=args.ioi_pool)
         batches[IOI] = ioi_batches(tokenizer, ioi, batch_size=args.batch_size)
-        report[IOI] = {"n_instances": len(ioi), "seed": args.ioi_seed, "pool": args.ioi_pool,
-                       "recipe": ioi_rows.__doc__.strip().split("\n\n")[0]}
+        report[IOI] = ioi_report(ioi, args)
+        print(f"  IOI: {len(ioi)} rows, sentences sha256 {report[IOI]['sentences_sha256']}")
     union, seen = [], set()
     for _name, keys in groups:
         for key in keys:
@@ -1084,6 +1144,10 @@ def run(args, groups, dirs, ids) -> int:
                 bank_batches.extend(list(loaded))
             t0 = time.time()
             bank, bank_info = ko.collect_mean_bank(model, bank_batches, union)
+            bank_info["semantics"] = (
+                f"per neuron, every unpadded position of F's {args.mean_bank_split} split(s) "
+                "(never test), clean and corrupt prompts pooled with equal token weight, fp32 "
+                "accumulation; written in the model's dtype (evaluation/ablation.py)")
             bank_info.update({"dataset_dir": os.path.abspath(dirs["F"]),
                               "splits": args.mean_bank_split, "seconds": time.time() - t0,
                               "forwards": 2 * len(bank_batches)})
@@ -1213,7 +1277,7 @@ def run(args, groups, dirs, ids) -> int:
     summary = {
         "analysis": "neuron_set_ablation",
         "task": f"{args.task}_v2",
-        "args": vars(args),
+        "args": {key: value for key, value in vars(args).items() if key != "hf_token"},
         "model": args.model, "model_description": hooks.describe(model),
         "model_load_seconds": load_seconds,
         "definitions": {
@@ -1268,7 +1332,8 @@ def run(args, groups, dirs, ids) -> int:
                            seed=args.ioi_seed,
                            code_files=[os.path.join(ROOT, "component_analysis", name)
                                        for name in ("hooks.py", "knockout.py",
-                                                    "dataloaders.py")])
+                                                    "dataloaders.py")]
+                           + [os.path.join(ROOT, "dataset", "ioi_llama.py")])
     except Exception as error:                               # noqa: BLE001
         print(f"  !! run_manifest.json not written: {type(error).__name__}: {error}")
     print(f"  wrote {args.output_dir}/summary.json, rows.jsonl, run_manifest.json in "

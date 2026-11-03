@@ -399,3 +399,60 @@ These are not yet committed. The pilot ran before them.
   - mgnp: `36 passed`. Base: `20 passed, 16 skipped`. `ruff check --select F,E9`: all checks passed.
   - A dry run of the job script, given the sample file directly and the default pool dir, built 300 ids for each of
     D, H, F, I and N.
+
+## Addendum: review 02 fixes and the Bridges-2 job lines
+
+Written Tue 3 Nov 2026, 1:50 pm EST, after compaction #2. The pilot had already run before the lead's request to fix
+review 02 first reached this worker. It ran at f965bd5, which predates these fixes. Only its IOI rows are affected:
+they came from the hash-seed-dependent draw.
+
+### Review 02 fixes
+
+- **Major 1, IOI rows.** `ioi_rows` sorts the names before the seeded draw. It does this by patching
+  `dataset.ioi_llama.load_names` only for the length of the call, so other IOI callers are unchanged.
+  `summary.json` records `conditions.IOI.sentences_sha256`, the first sentence, the names order and
+  `PYTHONHASHSEED`. The wrapper exports `PYTHONHASHSEED=0`. With the real tokenizer, hash seeds 0 and 7 give the same
+  100 rows, sha256 `61ebeea317ac4932c0b859cc62b88ed0c45a7d6602d4866a9cf2373ee2cc5e59`. `dataset/ioi_llama.py` is
+  added to the run manifest's code files.
+- **Major 2, the ids file.** `load_ids` already unwrapped W3's per-condition `ids` map after the pilot. A new test
+  builds a file with every top-level key of `far_test_sample_seed2.json`, and another reads the real file when
+  present (300 ids for each of D, H, F, I and N). The wrapper's example now points at the real file.
+- **Minor 3, pairing.** The I and user-neutral batch and row counts are compared before any zip, in the new
+  `pair_user_turn`. `attach_twin` refuses a row whose record is not `user_inversion` or a twin that is not
+  `user_neutral`, so swapped `--i-dir` and `--n-dir` fail. It also refuses unequal `pressure_id`, `request_id` or
+  `neutral_id` where both records carry them.
+- **Minor 4, mean-bank text.** The script overwrites the bank's `semantics` with F's splits and "never test".
+- **Minor 5, wrapper defaults.** The Delta example has `--max-length 128`. The pool default already pointed at W3's
+  copy on both clusters.
+- **Minor 6, HF token.** `summary.json`'s `args` drops `hf_token`.
+- **Minor 7, resume.** Not done. No code resumes from `cells_partial.jsonl`, and the Bridges-2 plan works around it.
+- **Wrapper, more than one sets file.** `ablation_cells.sbatch` takes a comma-separated list of sets files. Each file
+  runs in its own process into `<output_dir>/<file name>/`. The job exits non-zero if any file failed. One file
+  behaves as before. Python now runs with `-u`, so the log is not block-buffered.
+
+### Verification
+
+- `tests/test_neuron_set_ablation.py`: mgnp `44 passed`. Base `28 passed, 16 skipped`. Eight tests are new.
+- Full `tests/` suites on both interpreters were running when this was written; their counts follow in the message to the lead.
+- `ruff check --select F,E9` on the script and the test file: all checks passed.
+- `bash -n` on the wrapper passed. The isolation hook refuses `bash` on a script, so the wrapper's loop was not run
+  locally. Its two Python calls were run directly instead.
+- Dry runs with the fixed code, W3's sample file passed directly and `--max-length 128`:
+  `far_sets_k500_with_nulls.json` gave 84 sets and 97,210 forwards. `far_contrast_sets_k1000_with_nulls.json` gave
+  63 sets and 72,622 forwards. Both paired 300 of 300 rows on D and on I.
+
+### Bridges-2 job lines
+
+The three command lines, their `--test-only` variants, the estimate and the walltime risk are in
+`docs/research/neuron-partition/jobs/ablation_bridges2.md`. The `--test-only` runs at 1:26 pm EST projected a
+1:57 pm start for any reservation up to 03:30 and 3:10 pm for 03:45 or 04:00. At the pilot-scaled H100 rate of
+0.0526 s per forward, jobs A and B need about 3.2 h each and C about 1.2 h. A and B fit 03:30 only if the H100 rate
+is under 0.058 s per forward.
+
+### Files to commit
+
+- `scripts/neuron_set_ablation.py`
+- `tests/test_neuron_set_ablation.py`
+- `docs/research/neuron-partition/jobs/ablation_cells.sbatch`
+- `docs/research/neuron-partition/jobs/ablation_bridges2.md`
+- `docs/research/neuron-partition/reports/02-w2-ablation-handback.md`

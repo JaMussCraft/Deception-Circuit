@@ -4,7 +4,12 @@
 # scripts/neuron_set_ablation.py, which loads the model once and loops over sets and references, and writes
 # summary.json, rows.jsonl and run_manifest.json into the output dir.
 #
-# Arguments: <sets.json> <ids.json> <output_dir> [extra args passed to neuron_set_ablation.py]
+# Arguments: <sets.json>[,<sets.json>...] <ids.json> <output_dir> [extra args passed to neuron_set_ablation.py]
+#
+# One sets file writes straight into <output_dir>. A comma-separated list runs the files one after another, one
+# process each (one model load each, ~460 s on Bridges-2), file <name>.json into <output_dir>/<name>/; a failure or a
+# walltime kill in a later file leaves the earlier files' summary.json complete. The job exits non-zero if any
+# file failed. See docs/research/neuron-partition/jobs/ablation_bridges2.md for the full-cell command lines.
 #
 # Submit from the repository root (the Bridges-2 clone or the Delta worktree), with --time on the command line
 # (this header sets none on purpose; size it from the CLI's --dry-run estimate plus a buffer) and `logs/` present.
@@ -16,13 +21,14 @@
 #       --gpus-per-node=h100-80:1 --cpus-per-task=1 --mem=64G -t 02:30:00 --job-name=np-ablate \
 #       docs/research/neuron-partition/jobs/ablation_cells.sbatch \
 #       outputs/_analyses/neuron-partition/sets/far_sets.json \
-#       outputs/_analyses/neuron-partition/ids/far_test_seed2.json \
+#       outputs/_analyses/neuron-partition/data/far_test_sample_seed2.json \
 #       outputs/_analyses/neuron-partition/ablation/far-cell1 --max-length 128
 #
 # Delta (A40, H100 or H200 only; 8B activations and the twin capture do not fit a 40 GB A100):
 #
 #   sbatch --account=bimc-delta-gpu --partition=gpuH200x8 --gpus-per-node=1 -t <from the pilot timing> \
-#       docs/research/neuron-partition/jobs/ablation_cells.sbatch <sets.json> <ids.json> <output_dir>
+#       docs/research/neuron-partition/jobs/ablation_cells.sbatch <sets.json> <ids.json> <output_dir> \
+#       --max-length 128
 #
 # Pilot first, to measure seconds per forward (summary.json `timing`) before sizing the full cell's walltime:
 # `--limit 16` is 2 batches per condition (IOI's 100 rows and the 400-row mean bank are not limited): 7,354
@@ -69,7 +75,8 @@ SETS="$1"
 IDS="$2"
 OUT="$3"
 shift 3
-for path in "$SETS" "$IDS"; do
+IFS=, read -r -a SETS_FILES <<< "$SETS"
+for path in "${SETS_FILES[@]}" "$IDS"; do
     if [[ ! -f "$path" ]]; then
         echo "no such file: $path" >&2
         exit 2
@@ -97,6 +104,8 @@ export HF_HOME="$DC_HF_HOME"
 # The model is already in HF_HOME; this job never downloads.
 export HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 TRANSFORMERS_OFFLINE=1
 export OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+# The IOI rows no longer depend on the hash seed (the script sorts the names), but pin it anyway.
+export PYTHONHASHSEED=0
 export RESEARCH_DIRECTION=neuron-partition
 
 TASK="${NP_TASK:-far}"
@@ -116,5 +125,20 @@ echo "np-ablate: cluster ${DC_CLUSTER_NAME:-delta}, host $(hostname), job ${SLUR
 echo "  sets $SETS  ids $IDS  out $OUT"
 echo "  I $I_DIR"
 echo "  N $N_DIR"
-exec python scripts/neuron_set_ablation.py --task "$TASK" --sets "$SETS" --ids "$IDS" \
-    --i-dir "$I_DIR" --n-dir "$N_DIR" --output-dir "$OUT" "$@"
+if [ "${#SETS_FILES[@]}" -eq 1 ]; then
+    exec python -u scripts/neuron_set_ablation.py --task "$TASK" --sets "$SETS" --ids "$IDS" \
+        --i-dir "$I_DIR" --n-dir "$N_DIR" --output-dir "$OUT" "$@"
+fi
+failed=0
+for sets_file in "${SETS_FILES[@]}"; do
+    name="$(basename "$sets_file" .json)"
+    echo "np-ablate: $(date '+%F %T') start $sets_file -> $OUT/$name"
+    if python -u scripts/neuron_set_ablation.py --task "$TASK" --sets "$sets_file" --ids "$IDS" \
+            --i-dir "$I_DIR" --n-dir "$N_DIR" --output-dir "$OUT/$name" "$@"; then
+        echo "np-ablate: $(date '+%F %T') done $sets_file"
+    else
+        echo "np-ablate: $(date '+%F %T') FAILED $sets_file (exit $?)" >&2
+        failed=1
+    fi
+done
+exit "$failed"

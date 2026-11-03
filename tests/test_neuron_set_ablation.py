@@ -459,17 +459,23 @@ def test_the_reverse_twin_makes_the_twin_the_recipient_with_its_own_labels():
     assert torch.equal(reverse.target_token, batch.distractor_token)
 
 
-def _pool_batch(request_tokens, *, target, distractor, span=(5, 8)):
+def _pool_batch(request_tokens, *, target, distractor, span=(5, 8), condition=None,
+                rows=2, request_id="far_quiz_v1"):
     from component_analysis import dataloaders
 
-    ids = torch.arange(10, 10 + SEQ).repeat(2, 1)
+    if condition is None:
+        condition = "user_inversion" if target == 7 else "user_neutral"
+    ids = torch.arange(10, 10 + SEQ).repeat(rows, 1)
     ids[:, span[0]:span[1]] = torch.tensor(request_tokens)
     mask = torch.ones_like(ids)
-    records = [{"request_spans": {"clean": list(span), "corrupt": list(span)}}] * 2
+    records = [{"request_spans": {"clean": list(span), "corrupt": list(span)},
+                "condition": condition, "request_id": request_id, "neutral_id": "n0",
+                "pressure_id": "p0"} for _ in range(rows)]
     return dataloaders.Batch(
-        ids=["a", "b"], records=records, input_ids=ids, attention_mask=mask,
+        ids=["a", "b", "c"][:rows], records=records, input_ids=ids, attention_mask=mask,
         corrupt_input_ids=ids.clone(), corrupt_attention_mask=mask.clone(),
-        target_token=torch.tensor([target] * 2), distractor_token=torch.tensor([distractor] * 2),
+        target_token=torch.tensor([target] * rows),
+        distractor_token=torch.tensor([distractor] * rows),
         readout=mask.sum(-1) - 1, honest=None)
 
 
@@ -495,6 +501,32 @@ def test_attach_twin_refuses_a_twin_whose_words_are_not_swapped():
     neutral = _pool_batch([4, 5, 6], target=7, distractor=8)
     with pytest.raises(ValueError, match="swapped"):
         nsa.attach_twin(inversion, neutral)
+
+
+def test_attach_twin_refuses_swapped_i_and_n_dirs():
+    inversion = _pool_batch([1, 2, 3], target=7, distractor=8, condition="user_neutral")
+    neutral = _pool_batch([4, 5, 6], target=8, distractor=7, condition="user_inversion")
+    with pytest.raises(ValueError, match="swapped"):
+        nsa.attach_twin(inversion, neutral)
+
+
+def test_attach_twin_refuses_a_twin_with_another_request_id():
+    inversion = _pool_batch([1, 2, 3], target=7, distractor=8)
+    neutral = _pool_batch([4, 5, 6], target=8, distractor=7, request_id="other")
+    with pytest.raises(ValueError, match="request_id"):
+        nsa.attach_twin(inversion, neutral)
+
+
+def test_i_and_n_with_different_row_counts_are_refused_before_pairing():
+    inversion = [_pool_batch([1, 2, 3], target=7, distractor=8),
+                 _pool_batch([1, 2, 3], target=7, distractor=8)]
+    neutral = [_pool_batch([4, 5, 6], target=8, distractor=7)]
+    with pytest.raises(ValueError, match="different numbers"):
+        nsa.pair_user_turn({"I": inversion, "N": neutral}, {"I": {}}, {"N": "n"})
+    shorter = [_pool_batch([4, 5, 6], target=8, distractor=7, rows=1),
+               _pool_batch([4, 5, 6], target=8, distractor=7)]
+    with pytest.raises(ValueError, match="different numbers"):
+        nsa.pair_user_turn({"I": inversion, "N": shorter}, {"I": {}}, {"N": "n"})
 
 
 def test_the_ladder_ratio_averages_streams_within_an_id_then_ids():
@@ -588,6 +620,84 @@ def test_ids_files_accept_the_seed2_sample_files_nested_condition_map(tmp_path):
     path.write_text(json.dumps({"task": "far", "seed": 2, "ids": {"D": ["x"], "I": ["z"]}}))
     loaded = nsa.load_ids(str(path))
     assert loaded["D"] == ["x"] and loaded["I"] == ["z"] and loaded["F"] is None
+
+
+def test_ids_files_accept_w3s_sample_file_with_all_its_top_level_keys(tmp_path):
+    # The shape of outputs/_analyses/neuron-partition/data/far_test_sample_seed2.json.
+    ids = {one: [f"{one}{k}" for k in range(3)] for one in ("D", "H", "F", "I", "N")}
+    sample = {"task": "far", "seed": 2, "split": "test", "ids": ids,
+              "pairing": {"H": "D", "F": "D", "N": "I", "I_vs_D": "overlap"},
+              "act_naming_filter": "clause_form", "excluded": {"union": []},
+              "pool_files": {"far_v2_user_inversion": {}}, "counts": {"D": 3},
+              "samples": {"D": {}, "I": {}}, "dataset_files": {"x": "sha"}}
+    path = tmp_path / "far_test_sample_seed2.json"
+    path.write_text(json.dumps(sample))
+    loaded = nsa.load_ids(str(path))
+    assert loaded == ids
+
+
+def test_the_w3_sample_file_on_disk_loads_per_condition():
+    import os
+
+    path = os.path.join(nsa.ROOT, "outputs", "_analyses", "neuron-partition", "data",
+                        "far_test_sample_seed2.json")
+    if not os.path.exists(path):
+        pytest.skip("W3's sample file is not in this checkout")
+    loaded = nsa.load_ids(path)
+    assert sorted(loaded) == sorted(nsa.CONDITIONS)
+    assert all(len(loaded[one]) == 300 for one in nsa.CONDITIONS)
+
+
+class _WordTokenizer:
+    """One token per whitespace word, by crc32: independent of PYTHONHASHSEED."""
+
+    def encode(self, text, add_special_tokens=False):
+        import zlib
+
+        words = [zlib.crc32(one.encode()) for one in text.split()]
+        return ([1] if add_special_tokens else []) + words
+
+
+def test_ioi_rows_do_not_depend_on_the_hash_seed():
+    import os
+    import subprocess
+    import sys
+
+    code = ("import sys; sys.path.insert(0, 'tests'); "
+            "from tests.test_neuron_set_ablation import _WordTokenizer; "
+            "from scripts import neuron_set_ablation as nsa; "
+            "print(nsa.ioi_sentences_sha256(nsa.ioi_rows(_WordTokenizer(), n=20, seed=1, "
+            "pool=60)))")
+    hashes = []
+    for seed in ("0", "1", "12345"):
+        env = dict(os.environ, PYTHONHASHSEED=seed, OMP_NUM_THREADS="1", MKL_NUM_THREADS="1",
+                   OPENBLAS_NUM_THREADS="1")
+        done = subprocess.run([sys.executable, "-c", code], cwd=nsa.ROOT, env=env,
+                              capture_output=True, text=True, timeout=300)
+        assert done.returncode == 0, done.stderr[-2000:]
+        hashes.append(done.stdout.strip().splitlines()[-1])
+    assert len(set(hashes)) == 1, hashes
+
+
+def test_ioi_rows_draw_from_the_sorted_names():
+    from dataset import ioi_llama
+
+    rows = nsa.ioi_rows(_WordTokenizer(), n=5, seed=1, pool=20)
+    import random
+    random.seed(1)
+    names = sorted(ioi_llama.load_names())
+    first = random.sample(names, 2)
+    assert rows[0]["sentence"].count(first[0]) >= 1 and rows[0]["sentence"].count(first[1]) >= 1
+    assert len(nsa.ioi_sentences_sha256(rows)) == 64
+
+
+def test_the_ioi_report_carries_the_sentence_hash():
+    rows = [{"sentence": "a b"}, {"sentence": "c d"}]
+    args = nsa.build_parser().parse_args(["--sets", "x", "--output-dir", "y"])
+    report = nsa.ioi_report(rows, args)
+    import hashlib
+    assert report["sentences_sha256"] == hashlib.sha256(b"a b\nc d").hexdigest()
+    assert report["names_order"] == "sorted before the seeded draw"
 
 
 def test_pool_dir_supplies_the_user_turn_pools_and_explicit_dirs_win(tmp_path):
