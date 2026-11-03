@@ -1247,11 +1247,56 @@ def proxy_agreement(feats: Sequence[Dict], gens: Sequence[Dict], labels: Dict[st
 # READ STAGE
 # ==============================================================================
 
+CHECK_STAGES = ("crosscheck", "rejudge")
+
+
 def load_labels(paths: Optional[Sequence[str]]) -> Dict[str, str]:
+    """Primary labels (calibration, main, main_ablated). Cross-check and re-judge records are skipped here, so
+    passing their files to `read` can never overwrite a primary label; `load_check_labels` reads them."""
     out: Dict[str, str] = {}
     for p in paths or ():
         for r in read_jsonl(p):
+            if r.get("stage") in CHECK_STAGES:
+                continue
             out[r["row_id"]] = r["scored"]
+    return out
+
+
+def load_check_labels(paths: Optional[Sequence[str]]) -> Dict[str, Dict[str, Dict]]:
+    out: Dict[str, Dict[str, Dict]] = {s: {} for s in CHECK_STAGES}
+    for p in paths or ():
+        for r in read_jsonl(p):
+            if r.get("stage") in CHECK_STAGES:
+                out[r["stage"]][r["row_id"]] = r
+    return out
+
+
+def judge_checks(primary: Dict[str, str], checks: Dict[str, Dict[str, Dict]]) -> Dict:
+    """R11: agreement of the Sonnet cross-check with the primary judge, and the re-judge flip rate, overall and
+    per task. `agree` is exact label agreement; `agree_decided` drops rows where either label is UNCLEAR."""
+    out = {}
+    for stage in CHECK_STAGES:
+        recs = checks.get(stage) or {}
+        if not recs:
+            out[stage] = {"status": "no labels"}
+            continue
+        groups: Dict[str, List] = {"all": []}
+        for rid, r in recs.items():
+            if rid in primary:
+                pair = (primary[rid], r["scored"])
+                groups["all"].append(pair)
+                groups.setdefault(r.get("task", "?"), []).append(pair)
+        res = {"n_labels": len(recs), "n_missing_primary": len(recs) - len(groups["all"])}
+        for g, pairs in sorted(groups.items()):
+            dec = [(a, b) for a, b in pairs if UNCL not in (a, b)]
+            res[g] = {"n": len(pairs),
+                      "agree": sum(a == b for a, b in pairs) / len(pairs) if pairs else None,
+                      "n_decided": len(dec),
+                      "agree_decided": sum(a == b for a, b in dec) / len(dec) if dec else None,
+                      "confusion": dict(Counter(f"{a}->{b}" for a, b in pairs))}
+        if stage == "rejudge" and res["all"]["agree"] is not None:
+            res["flip_rate"] = 1.0 - res["all"]["agree"]
+        out[stage] = res
     return out
 
 
@@ -1310,7 +1355,11 @@ def read_task(task: str, args, labels: Dict[str, str], direction_info: Dict, tok
                                          cal["maintenance_ids"]):
             raise SystemExit(f"{task}: the frozen proxy token file differs from the calibration")
         agree = proxy_agreement(unabl, gens, labels, cal)
-        acts = {"status": "read", "unablated": a0, "ablated": a1, "proxy": {"tokens": cal, "agreement": agree},
+        # Test rows without a label (for example a read after the calibration stage only, run to freeze the
+        # proxy tokens) leave the arm partial, so the verdict cannot be reported as final.
+        missing = sum(a["counts"][c].get("missing", 0) for a in (a0, a1) for c in R.CONDITIONS)
+        status = "read" if not missing else f"partial: {missing} test rows have no judge label"
+        acts = {"status": status, "unablated": a0, "ablated": a1, "proxy": {"tokens": cal, "agreement": agree},
                 "verdict": {"separates": acts_sep, "refusal_explains": acts_expl,
                             "r2": r2_reading(a0["maintenance_rate"])}}
     res["acts_on_it"] = acts
@@ -1319,9 +1368,9 @@ def read_task(task: str, args, labels: Dict[str, str], direction_info: Dict, tok
     arm_pass = []
     if clf_sep and clf_expl is False:
         arm_pass.append("classifier")
-    if acts_sep and acts_expl is False:
-        arm_pass.append("acts_on_it")
     pending = acts["status"] != "read"
+    if acts_sep and acts_expl is False and not pending:
+        arm_pass.append("acts_on_it")
     res["verdict"] = {
         "refusal_control_valid": valid_ref,
         "arms_passing": arm_pass if valid_ref else [],
@@ -1365,12 +1414,24 @@ def readings_md(out: Dict) -> str:
                      f"H {f(u['maintenance_rate']['H'])}; gap {f(u['gap'])}; ablated gap {f(a['ablated']['gap'])}; "
                      f"separates {a['verdict']['separates']}; refusal explains {a['verdict']['refusal_explains']}; "
                      f"proxy agreement {f(a['proxy']['agreement']['agree'])}; {a['verdict']['r2']['reading']}.")
+    checks = out.get("judge_checks") or {}
+    if checks:
+        lines += ["", "Judge checks (R11):", ""]
+        for stage in CHECK_STAGES:
+            c = checks.get(stage) or {"status": "no labels"}
+            if "all" not in c:
+                lines.append(f"- {stage}: {c.get('status', 'no labels')}.")
+                continue
+            extra = f"; flip rate {f(c['flip_rate'])}" if "flip_rate" in c else ""
+            lines.append(f"- {stage}: {c['all']['n']} rows compared, agreement {f(c['all']['agree'])}, "
+                         f"agreement without UNCLEAR {f(c['all']['agree_decided'])}{extra}.")
     lines += ["", f"Verdict: premise passes on {out['passing_tasks'] or 'no task'}; final {out['final']}.", ""]
     return "\n".join(lines)
 
 
 def run_read(args) -> int:
     labels = load_labels(args.labels)
+    checks = judge_checks(labels, load_check_labels(args.labels))
     dpath = os.path.join(args.out_root, "refusal_direction.json")
     direction_info = json.load(open(dpath)) if os.path.exists(dpath) else {"valid": False,
                                                                           "reason": "direction stage not run"}
@@ -1381,6 +1442,7 @@ def run_read(args) -> int:
            "refusal": {k: direction_info.get(k) for k in ("chosen", "valid", "reason", "n_passing_filter",
                                                           "harmful_refusal_share_base",
                                                           "harmful_refusal_share_ablated")},
+           "judge_checks": checks,
            "passing_tasks": passing, "premise_passes": bool(passing),
            "final": all(r["verdict"]["final"] for r in tasks.values()),
            "rule": {"points": RULE_POINTS, "explain_share": EXPLAIN_SHARE, "gate_auroc": GATE_AUROC,
@@ -1389,7 +1451,7 @@ def run_read(args) -> int:
            "code_sha256": code_hashes()}
     if args.write_tokens:
         tok = {t: {k: r["acts_on_it"]["proxy"]["tokens"][k] for k in ("correction_ids", "maintenance_ids")}
-               for t, r in tasks.items() if r["acts_on_it"]["status"] == "read"}
+               for t, r in tasks.items() if "proxy" in r["acts_on_it"]}
         write_json(args.write_tokens, tok)
         out["tokens_written"] = {"path": os.path.abspath(args.write_tokens), "sha256": sha256_file(args.write_tokens)}
         print(f"proxy tokens sha256 {out['tokens_written']['sha256']}  {args.write_tokens}")

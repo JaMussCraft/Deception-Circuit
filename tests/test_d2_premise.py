@@ -177,6 +177,23 @@ def test_gpu_stages_end_to_end_on_the_tiny_model(tok, tiny, tmp_path):
     rd = json.load(open(os.path.join(out, "readings.json")))
     assert rd["tasks"]["far_v2"]["acts_on_it"]["status"] == "read"
     assert "verdict" in rd["tasks"]["far_v2"]
+    assert rd["tasks"]["far_v2"]["verdict"]["final"] is True
+    # a read with the calibration labels only (the step that freezes the proxy tokens) writes the token file
+    # but leaves the verdict not final, because the test rows carry no judge label yet
+    cal_labels = tmp_path / "cal_labels.jsonl"
+    with open(cal_labels, "w") as f:
+        for g in gens:
+            if g["role"] == "cal":
+                f.write(json.dumps({"row_id": g["row_id"], "scored": "MAINTAINED"}) + "\n")
+    tokens = str(tmp_path / "proxy_tokens.json")
+    assert P.main(["read", "--tasks", "far_v2", "--out-root", out, "--labels", str(cal_labels),
+                   "--write-tokens", tokens]) == 0
+    rd = json.load(open(os.path.join(out, "readings.json")))
+    acts = rd["tasks"]["far_v2"]["acts_on_it"]
+    assert acts["status"].startswith("partial: 12 test rows")
+    assert rd["tasks"]["far_v2"]["verdict"]["final"] is False and rd["final"] is False
+    assert "acts_on_it" not in rd["tasks"]["far_v2"]["verdict"]["arms_passing"]
+    assert set(json.load(open(tokens))["far_v2"]) == {"correction_ids", "maintenance_ids"}
 
 
 @pytest.mark.skipif(not HAVE_INPUTS, reason="data/d2/d2_inputs.json absent")
@@ -462,3 +479,63 @@ def test_no_prefix_cache_records_the_drift_and_does_not_stop(tok, tiny, tmp_path
     man = json.load(open(os.path.join(out, "far_v2", "features_unablated.manifest.json")))
     assert man["prefix_cache"] is False and man["cache_check"]["path_of_record"] == "full"
     assert man["cache_check"]["rows"] == 7 and man["cache_check"]["max_abs_diff"] < 1e-3
+
+
+def test_check_labels_never_overwrite_primary_and_report_agreement(tmp_path):
+    prim = tmp_path / "main.jsonl"
+    chk = tmp_path / "checks.jsonl"
+    with open(prim, "w") as f:
+        for i, lab in enumerate(["MAINTAINED", "CORRECTED", "UNCLEAR", "MAINTAINED"]):
+            f.write(json.dumps({"row_id": f"r{i}", "scored": lab, "stage": "main", "task": "far_v2"}) + "\n")
+    with open(chk, "w") as f:
+        for i, lab in enumerate(["MAINTAINED", "MAINTAINED", "CORRECTED"]):
+            f.write(json.dumps({"row_id": f"r{i}", "scored": lab, "stage": "crosscheck", "task": "far_v2"}) + "\n")
+        for i, lab in enumerate(["MAINTAINED", "CORRECTED", "UNCLEAR", "CORRECTED"]):
+            f.write(json.dumps({"row_id": f"r{i}", "scored": lab, "stage": "rejudge", "task": "sdr_v2"}) + "\n")
+    paths = [str(prim), str(chk)]
+    primary = P.load_labels(paths)
+    assert primary == {"r0": "MAINTAINED", "r1": "CORRECTED", "r2": "UNCLEAR", "r3": "MAINTAINED"}
+    rep = P.judge_checks(primary, P.load_check_labels(paths))
+    cc = rep["crosscheck"]
+    assert cc["all"]["n"] == 3 and abs(cc["all"]["agree"] - 1 / 3) < 1e-12
+    assert cc["all"]["n_decided"] == 2 and cc["all"]["agree_decided"] == 0.5
+    assert cc["far_v2"]["n"] == 3 and "flip_rate" not in cc
+    rj = rep["rejudge"]
+    assert rj["all"]["n"] == 4 and rj["all"]["agree"] == 0.75 and abs(rj["flip_rate"] - 0.25) < 1e-12
+    assert P.judge_checks(primary, P.load_check_labels([str(prim)]))["crosscheck"] == {"status": "no labels"}
+
+
+def test_judge_stage_labels_round_trip_into_read(tmp_path):
+    from evaluation.benchmarks.judge import JudgeCompletion
+    gens = []
+    for k in range(4):
+        for c in "DIH":
+            g = dict(ROW, row_id=f"far_v2:test:{k}:{c}", role="test", condition=c, ablated=False,
+                     instance_id=str(k), pressure_id="p0", response=f"reply {k} {c}")
+            g.pop("system")
+            gens.append(g)
+    out = tmp_path / "d2"
+    P.write_jsonl(str(out / "far_v2" / "generations.jsonl"), gens)
+    words = {"D": "MAINTAINED", "I": "CORRECTED", "H": "UNCLEAR"}
+
+    async def transport(request):
+        cond = request.messages[-1]["content"].split("<reply>\nreply ")[1].split()[1][0]
+        return JudgeCompletion(words[cond], usage={"cost": 0.0001}, response_id="g")
+
+    def ledger(name):
+        p = tmp_path / name
+        p.write_text(json.dumps(dict(schema=1, reviewed=True, max_usd=20, max_paid_attempts=5000)) + "\n")
+        return str(p)
+
+    main_out = str(tmp_path / "labels_main.jsonl")
+    cc_out = str(tmp_path / "labels_cc.jsonl")
+    base = ["judge", "--tasks", "far_v2", "--out-root", str(out)]
+    assert P.main(base + ["--judge-stage", "main", "--ledger", ledger("a.jsonl"), "--cache",
+                          str(tmp_path / "c1.jsonl"), "--labels-out", main_out], transport=transport) == 0
+    assert P.main(base + ["--judge-stage", "crosscheck", "--sample-n", "6", "--ledger", ledger("b.jsonl"),
+                          "--cache", str(tmp_path / "c2.jsonl"), "--labels-out", cc_out], transport=transport) == 0
+    primary = P.load_labels([main_out, cc_out])
+    assert primary == {g["row_id"]: words[g["condition"]] for g in gens}
+    rep = P.judge_checks(primary, P.load_check_labels([main_out, cc_out]))
+    assert rep["crosscheck"]["all"]["n"] == 6 and rep["crosscheck"]["all"]["agree"] == 1.0
+    assert rep["crosscheck"]["far_v2"]["n"] == 6 and rep["rejudge"] == {"status": "no labels"}

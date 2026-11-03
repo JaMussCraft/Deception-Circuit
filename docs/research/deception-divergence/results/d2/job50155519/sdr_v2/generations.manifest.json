@@ -1,0 +1,46 @@
+{
+  "argv": [
+    "scripts/d2_premise.py",
+    "features",
+    "direction",
+    "generate",
+    "--no-prefix-cache"
+  ],
+  "code_sha256": {
+    "scripts/d2_premise.py": "fe47e7c6f1b57f06fe2db7ea44164f36b3082ec8b406b39c9b6b26541e8457f6",
+    "scripts/d2_rows.py": "c06a4fd802361aaa13d7eab88c7295fe93fe9f6914c762fb6dcfbfc81409179b",
+    "spontaneous/d2_judge.py": "701a88a5dbc8aacaa619dce3ea16edb5d2d23dbbd4920302ccc363ec89250391"
+  },
+  "commit": "fb2cb9e7fd6e4e7e2f594b3d03f1a079e4b40e54",
+  "created": "2026-11-02T21:41:14",
+  "dtype": "bfloat16",
+  "host": "w001.ib.bridges2.psc.edu",
+  "inputs": {
+    "path": "data/d2/d2_inputs.json",
+    "sha256": "a91cb15b846a815b631986957fecdf9b03ef705a1dc6f6bd826e3d5637932451"
+  },
+  "max_new_tokens": 128,
+  "model": "meta-llama/Llama-3.1-8B-Instruct",
+  "rows": 1700,
+  "samples": {
+    "cal_ids": 100,
+    "max_fit_ids": 0,
+    "max_test_ids": 250,
+    "pre_registered": true
+  },
+  "seconds": 88.0,
+  "sha256": "8c3a467c55233b0fa0a5db8dbfd8c1b34d34e7731f6dcbddf74727c09f885a6d",
+  "slurm_job_id": "50155519",
+  "stage": "generate",
+  "tasks": [
+    "far_v2",
+    "sdr_v2",
+    "ser_v2"
+  ],
+  "versions": {
+    "numpy": "2.5.1",
+    "python": "3.12.13",
+    "torch": "2.11.0+cu128",
+    "transformers": "5.13.0"
+  }
+}
