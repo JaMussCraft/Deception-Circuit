@@ -352,3 +352,65 @@ Write it out in full in real commands.
    unique. Default: keep.
 4. **Nulls for T_D, T_I and T_H.** The brief said "each class", so the T sets get no nulls. If they are ablated
    too, the same nulls command with `--set T_D` covers them. Default: classes only.
+
+## Addendum: real partition
+
+Added Tue 3 Nov 2026, after the lead's request to write the real partition under `sets/` for commit 66741d7.
+
+- **Runs.** These are local CPU runs with exit code 0 and the same inputs as Execution evidence: `--dh`
+  `far_v2_dh_train+validation_7386fd3`, `--in` `far_v2_in_train+validation_7386fd3`, and `--dh-reverse`
+  `far_v2_dh_train+validation_7386fd3_rev`. The contrast run has no reverse.
+- **Outputs.** They are under
+  `/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/neuron-partition/outputs/_analyses/neuron-partition/sets/`:
+  `far_atp_66741d7/` and `far_contrast_66741d7/`, with the logs `far_atp_66741d7.log` and
+  `far_contrast_66741d7.log` beside them. Each directory holds the k = 500, 1,000 and 2,000 sets, the 20-null
+  companion files and `nulls/`.
+- **Identical sets.** All 12 set and with-nulls files compare byte-identical (`cmp`) to the earlier
+  `partition/far_*_7386fd3/` run. Only the summaries differ, because they record paths and times.
+
+| file | sha256 |
+| --- | --- |
+| `far_atp_66741d7/partition_summary.json` | `96633d679c1ee89e2457a6aaf516399194cd459249048de22d10855dbbebdc3f` |
+| `far_contrast_66741d7/partition_summary_contrast.json` | `dbe30c53b14ddd4c5577d41b5167ba33b363fe53b2389d8c0df8c7416af212ad` |
+
+**Class sizes and overlaps.** The Venn columns count neurons. The share of T_D in T_H is |T_D ∩ T_H| / k.
+
+| ranking | k | D_only | DI_shared | H_only | all_shared | T_D&T_I | T_D&T_H | share of T_D in T_H |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| AtP | 500 | 174 | 172 | 331 | 111 | 283 (J 0.395) | 154 (J 0.182) | 0.31 |
+| AtP | 1,000 | 409 | 314 | 702 | 209 | 523 (J 0.354) | 277 (J 0.161) | 0.28 |
+| AtP | 2,000 | 895 | 629 | 1,474 | 325 | 954 (J 0.313) | 476 (J 0.135) | 0.24 |
+| contrast | 500 | 189 | 311 | 492 | 0 | 311 (J 0.451) | 0 | 0 |
+| contrast | 1,000 | 386 | 614 | 985 | 0 | 614 (J 0.443) | 0 | 0 |
+| contrast | 2,000 | 815 | 1,185 | 1,974 | 0 | 1,185 (J 0.421) | 0 | 0 |
+
+**Score thresholds** (the k-th positive score; about 230k to 237k neurons are positive in every map):
+
+| ranking | k | T_D | T_I | T_H |
+| --- | --- | --- | --- | --- |
+| AtP | 500 | 0.01348 | 0.02913 | 0.01917 |
+| AtP | 1,000 | 0.008468 | 0.01926 | 0.01281 |
+| AtP | 2,000 | 0.005553 | 0.01324 | 0.008189 |
+| contrast | 500 | 0.1979 | 0.1943 | 0.1965 |
+| contrast | 1,000 | 0.1316 | 0.1357 | 0.1283 |
+| contrast | 2,000 | 0.08968 | 0.09795 | 0.08905 |
+
+**Per-layer concentration.** Each cell gives the class's share by layer band at k = 500, 1,000 and 2,000. The full
+32-bin histograms are in the summaries under `by_k.<k>.per_layer`.
+
+| ranking | class | L0 to L9 | L10 to L16 | L17 to L29 | L30 to L31 | densest layer |
+| --- | --- | --- | --- | --- | --- | --- |
+| AtP | D_only | 0.01, 0.01, 0.02 | 0.88, 0.86, 0.87 | 0.06, 0.07, 0.05 | 0.06, 0.06, 0.05 | L13 |
+| AtP | DI_shared | 0.00, 0.00, 0.00 | 0.89, 0.89, 0.92 | 0.10, 0.09, 0.07 | 0.01, 0.02, 0.00 | L13 |
+| AtP | H_only | 0.00, 0.00, 0.00 | 0.77, 0.81, 0.83 | 0.20, 0.17, 0.14 | 0.03, 0.02, 0.02 | L13 (tied with L15 at k = 500) |
+| AtP | all_shared | 0.00, 0.00, 0.00 | 0.39, 0.42, 0.43 | 0.41, 0.35, 0.31 | 0.20, 0.23, 0.25 | L31 |
+| contrast | D_only | 0.00, 0.00, 0.00 | 0.12, 0.16, 0.30 | 0.17, 0.22, 0.24 | 0.71, 0.62, 0.45 | L31 |
+| contrast | DI_shared | 0.00, 0.00, 0.00 | 0.19, 0.25, 0.34 | 0.12, 0.16, 0.20 | 0.68, 0.58, 0.46 | L31 |
+| contrast | H_only | 0.00, 0.00, 0.00 | 0.20, 0.25, 0.33 | 0.15, 0.21, 0.24 | 0.65, 0.54, 0.42 | L31 |
+
+**Is the AtP H-only class degenerate (prediction 1)?** No. T_D and T_H share 24 to 31 percent of their members,
+far below the 80 percent trigger, so no third ranking variant was built. The whole-map correlation of s_D and s_H
+is 0.013. H_only is the largest AtP class at 331, 702 and 1,474 neurons. It is not a mirror of T_D, because only 111
+to 325 neurons are in all three top sets. My first-order prediction was wrong. The readout gradients in the D and H
+runs differ enough that the forward and reverse attributions pick different neurons. All of this is descriptive
+until the classes are ablated against their nulls.
