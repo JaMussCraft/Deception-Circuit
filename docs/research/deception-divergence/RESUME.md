@@ -1,6 +1,6 @@
 # Resume: deception-divergence
 
-Last rewritten: Mon 2 Nov 2026, 11:40 pm EST by claude-5b9b1c28 (after compaction 4). Note: Delta file times are Central; these timestamps are Eastern.
+Last rewritten: Tue 3 Nov 2026, 12:20 am EST by claude-5b9b1c28 (after compaction 4). Note: Delta file times are Central; these timestamps are Eastern.
 
 ## Status
 
@@ -10,22 +10,22 @@ Phase 1 is running under the user's N1 answer (continue under the 80 percent cap
 
 - Branch: `deception-divergence`.
 - Worktree: `/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/deception-divergence`.
-- Last commit on the branch: `4b63e0b`, "ruling R15 freezes the D2 follow-up; plan review 05" (pushed; Bridges-2 clone at `fb2cb9e`, to be synced before the follow-up job).
-- Uncommitted work, if any: this RESUME; the worker's follow-up code, tests, plan amendments and hand-back 09, committed by file list when the hand-back is read.
+- Last commit on the branch: `54cd1eb`, "D2 follow-up (R15): pool, code, tests, plan, dry run, hand-back 10" (pushed; Bridges-2 clone synced to it).
+- Uncommitted work, if any: this RESUME only.
 - Tool-owned records (state, worklog, ledger, handbacks) live in the main checkout at `/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/deception-divergence/`; pass that path as the `dir` argument of every research-session command. Everything else is on the branch.
 
 ## In-flight jobs
 
-No GPU job is in flight. Reservations r-001 to r-008: 8.33 GPU-hours reserved, 2.91 actual. OpenRouter: $2.71 spent on the D2 judge (4,064 paid calls; `ledger.json` shows 8,409 calls because the tool merged the 4,345-call reserve with the actual). Bridges-2 (cis260361p) is the working cluster; Delta's batch queues projected week-long waits and its interactive partitions carry a one-hour cap. The user allows any Delta or Bridges-2 allocation (shared memory note `cluster-allocations`).
+One GPU job is in flight (below). Reservations r-001 to r-009: 9.08 GPU-hours reserved, 2.91 actual before this job. OpenRouter: $2.71 spent on the D2 judge (4,064 paid calls; `ledger.json` shows 8,409 calls because the tool merged the 4,345-call reserve with the actual). Bridges-2 (cis260361p) is the working cluster; Delta's batch queues projected week-long waits and its interactive partitions carry a one-hour cap. The user allows any Delta or Bridges-2 allocation (shared memory note `cluster-allocations`).
 
-| Process | Where | What it does | Output | Expected finish |
+| Job | Cluster | What it computes | Output directory | Expected finish |
 |---|---|---|---|---|
-| `d2-worker` (Opus) | worktree | amends the follow-up plan to R15, builds `scripts/d2_followup.py` test-first with a Bridges-2 wrapper, runs both test suites and the CPU dry run, writes hand-back 09 | `plans/D2-followup-plan.md`, `scripts/d2_followup.py`, `tests/test_d2_followup.py`, `scripts/jobs/`, `results/d2_followup/build_report.json`, `reports/09-handback.md` | Tue about 1:00 am EST |
+| `50161846` (r-009) | Bridges-2, GPU-shared, one H100, cis260361p, 00:45:00 | D2 follow-up under R15: stack, direction-hash and drift-anchor checks, HI, DT, HT and IH features (5,481 rows), the R15 read (C_HI refit, act-form branches, direction label, joint reading) | `outputs/_analyses/deception-divergence/d2_followup/` on the clone; log `logs/bridges2/d2_followup_50161846.out`; fetch with `scripts/remote/b2.sh fetch outputs/_analyses/deception-divergence/d2_followup` | about 30 minutes after it starts (submitted 12:15 am EST, pending on priority) |
 
 ## Next action
 
-1. When `d2-worker` reports hand-back 09: read it, commit by file list, push, sync the Bridges-2 clone (`DC_DELTA_REPO_ROOT=<worktree> scripts/remote/b2.sh sync-code --branch deception-divergence`), dry-run the wrapper there (`DC_CLUSTER=bridges2 DC_B2_ALLOC=cis260361p`, mgnp env activated), check the session points against checkpoint 1 (24), `ledger add` 0.75 GPU-hours with `--job-id`, submit with `-t 00:45:00`, `job add`, start the waiter, log the `job` entry.
-2. When the job completes: fetch `outputs/_analyses/deception-divergence/d2_followup/`, reconcile the ledger, have the worker run the read and write the per-task branches, the direction label and the joint reading into hand-back 09 (Results); copy readings and manifests into `results/d2_followup/`; independent Opus review; log the finding and a `decision` entry. If the direction label is (a) or (b), U1 is closed through D2 and the direction is ready for wrap-up (handoff README, findings rows, memory). If (c) on FAR, write nothing for U1 until the user answers N2 and confirms Codex coordination.
+1. When job 50161846 completes (the background waiter reports it): fetch `outputs/_analyses/deception-divergence/d2_followup/`, `ledger reconcile --actual-seconds --status`, `job update`, log the `job` entry. The job runs the read itself; if it stopped at the drift anchor or a check, read the log before anything else.
+2. Have `d2-worker` verify the read against the fetched features, write the per-task branches, the direction label and the joint reading into hand-back 10 (Results), copy readings and manifests into `results/d2_followup/`; independent Opus review (`reviews/06-...`); log the finding and a `decision` entry. If the direction label is (a) or (b), U1 is closed through D2 and the direction is ready for wrap-up (handoff README, findings rows, memory). If (c) on FAR, write nothing for U1 until the user answers N2 and confirms Codex coordination.
 3. If the user answers N2 before the job: follow the answer (A run, B stop the job and open the U1 ruling question, C cancel and wrap up).
 4. Do not write the patching ruling or U1 trainer code before the user's answers.
 4. Checkpoint 1 fires at 24 session points (cadence set by the user); cap pause at 80 percent weekly.
