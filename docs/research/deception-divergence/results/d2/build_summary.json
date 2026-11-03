@@ -1,0 +1,81 @@
+{
+  "estimate": {
+    "constants": {
+      "forward_overhead_s": 0.03,
+      "gen_step_s_batch64": 0.035,
+      "load_s": 460.0,
+      "tokens_per_s": 21000.0
+    },
+    "features_forwards": 15708,
+    "features_s": 987,
+    "features_tokens": 10835666,
+    "generation_s": 340,
+    "generations": 4854,
+    "gpu_hours": 0.51,
+    "load_s": 460.0,
+    "refusal_forwards": 398,
+    "refusal_s": 48,
+    "total_s": 1835
+  },
+  "inputs_sha256": "a91cb15b846a815b631986957fecdf9b03ef705a1dc6f6bd826e3d5637932451",
+  "no_ids": [
+    912,
+    2201,
+    2360,
+    2822,
+    9173
+  ],
+  "refusal_candidates": 130,
+  "refusal_ids": [
+    40
+  ],
+  "refusal_layers": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25
+  ],
+  "refusal_prompt_tails": {
+    "<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n": 320
+  },
+  "tasks": [
+    "far_v2",
+    "sdr_v2",
+    "ser_v2"
+  ],
+  "totals": {
+    "ablated_rows": 3327,
+    "generations": 4854,
+    "second_turn_sequences": 384846,
+    "unablated_rows": 4527
+  },
+  "yes_ids": [
+    7566,
+    9642,
+    9891,
+    10035,
+    14331
+  ]
+}

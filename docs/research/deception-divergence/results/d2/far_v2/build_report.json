@@ -1,0 +1,134 @@
+{
+  "alignment_test_ids": {
+    "D_H_aligned": 210,
+    "D_I_aligned": 210
+  },
+  "corrupt_stream_checked_rows": 20,
+  "generations": {
+    "calibration": 200,
+    "test_ablated": 630,
+    "test_unablated": 630
+  },
+  "i_clause_forms": {
+    "act": 210
+  },
+  "ids": {
+    "calibration": 100,
+    "fit": 200,
+    "gate": 200,
+    "test_used": 210,
+    "test_with_I_available": 210
+  },
+  "render_llama3_checked_rows": 1430,
+  "render_messages_checked_rows": 50,
+  "rows": {
+    "fit:D": 200,
+    "fit:H": 200,
+    "gate:D": 200,
+    "gate:H": 200,
+    "test:D": 210,
+    "test:H": 210,
+    "test:I": 210
+  },
+  "rows_ablated_pass": 1030,
+  "rows_unablated_pass": 1430,
+  "second_turn_sequences": {
+    "ablated": 50470,
+    "unablated": 70070
+  },
+  "second_turns_per_row": 49,
+  "seconds_cpu": 9.7,
+  "segment_tokens": {
+    "answer_close": {
+      "max": 2,
+      "mean": 2.0,
+      "min": 2,
+      "n": 1430
+    },
+    "answer_item": {
+      "max": 1,
+      "mean": 1.0,
+      "min": 1,
+      "n": 1430
+    },
+    "clause": {
+      "max": 14,
+      "mean": 12.0,
+      "min": 10,
+      "n": 1430
+    },
+    "followup": {
+      "max": 14,
+      "mean": 14.0,
+      "min": 14,
+      "n": 1430
+    },
+    "followup_turn": {
+      "max": 19,
+      "mean": 19.0,
+      "min": 19,
+      "n": 1430
+    },
+    "prior_answer": {
+      "max": 9,
+      "mean": 9.0,
+      "min": 9,
+      "n": 1430
+    },
+    "question": {
+      "max": 28,
+      "mean": 28.0,
+      "min": 28,
+      "n": 1430
+    },
+    "readout_header": {
+      "max": 4,
+      "mean": 4.0,
+      "min": 4,
+      "n": 1430
+    },
+    "stem": {
+      "max": 6,
+      "mean": 6.0,
+      "min": 6,
+      "n": 1430
+    },
+    "system": {
+      "max": 52,
+      "mean": 48.79,
+      "min": 45,
+      "n": 1430
+    }
+  },
+  "spans_checked_rows": 1430,
+  "task": "far_v2",
+  "test_ids_sha256": "6314d1d8f5277f3968777e4b76c12f926899f1414a5ea1b01d0a265de6c944f9",
+  "tokens": {
+    "acts_on_it_turn": {
+      "max": 23,
+      "mean": 23.0,
+      "min": 23,
+      "n": 1430
+    },
+    "full_acts_row": {
+      "max": 127,
+      "mean": 123.79,
+      "min": 120,
+      "n": 1430
+    },
+    "mean_prefix": 100.8,
+    "prefix": {
+      "max": 104,
+      "mean": 100.79,
+      "min": 97,
+      "n": 1430
+    },
+    "probe_turn": {
+      "max": 39,
+      "mean": 26.04,
+      "min": 16,
+      "n": 48
+    },
+    "second_turn_tokens_per_row": 1273.0
+  }
+}

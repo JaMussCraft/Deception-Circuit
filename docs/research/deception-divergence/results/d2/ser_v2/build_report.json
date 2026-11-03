@@ -1,0 +1,136 @@
+{
+  "alignment_test_ids": {
+    "D_H_aligned": 249,
+    "D_I_aligned": 249
+  },
+  "corrupt_stream_checked_rows": 20,
+  "generations": {
+    "calibration": 200,
+    "test_ablated": 747,
+    "test_unablated": 747
+  },
+  "i_clause_forms": {
+    "act": 1,
+    "other": 100,
+    "predicate": 148
+  },
+  "ids": {
+    "calibration": 100,
+    "fit": 200,
+    "gate": 200,
+    "test_used": 249,
+    "test_with_I_available": 249
+  },
+  "render_llama3_checked_rows": 1547,
+  "render_messages_checked_rows": 50,
+  "rows": {
+    "fit:D": 200,
+    "fit:H": 200,
+    "gate:D": 200,
+    "gate:H": 200,
+    "test:D": 249,
+    "test:H": 249,
+    "test:I": 249
+  },
+  "rows_ablated_pass": 1147,
+  "rows_unablated_pass": 1547,
+  "second_turn_sequences": {
+    "ablated": 56203,
+    "unablated": 75803
+  },
+  "second_turns_per_row": 49,
+  "seconds_cpu": 10.3,
+  "segment_tokens": {
+    "answer_close": {
+      "max": 2,
+      "mean": 2.0,
+      "min": 2,
+      "n": 1547
+    },
+    "answer_item": {
+      "max": 1,
+      "mean": 1.0,
+      "min": 1,
+      "n": 1547
+    },
+    "clause": {
+      "max": 14,
+      "mean": 12.95,
+      "min": 9,
+      "n": 1547
+    },
+    "followup": {
+      "max": 20,
+      "mean": 20.0,
+      "min": 20,
+      "n": 1547
+    },
+    "followup_turn": {
+      "max": 25,
+      "mean": 25.0,
+      "min": 25,
+      "n": 1547
+    },
+    "prior_answer": {
+      "max": 9,
+      "mean": 9.0,
+      "min": 9,
+      "n": 1547
+    },
+    "question": {
+      "max": 31,
+      "mean": 31.0,
+      "min": 31,
+      "n": 1547
+    },
+    "readout_header": {
+      "max": 4,
+      "mean": 4.0,
+      "min": 4,
+      "n": 1547
+    },
+    "stem": {
+      "max": 6,
+      "mean": 6.0,
+      "min": 6,
+      "n": 1547
+    },
+    "system": {
+      "max": 52,
+      "mean": 49.59,
+      "min": 44,
+      "n": 1547
+    }
+  },
+  "spans_checked_rows": 1547,
+  "task": "ser_v2",
+  "test_ids_sha256": "0a38027438883cdaa5efdfe51be3ca167aa8d1ff610b92b9d7dfbf38c973df12",
+  "tokens": {
+    "acts_on_it_turn": {
+      "max": 29,
+      "mean": 29.0,
+      "min": 29,
+      "n": 1547
+    },
+    "full_acts_row": {
+      "max": 136,
+      "mean": 133.59,
+      "min": 128,
+      "n": 1547
+    },
+    "mean_prefix": 104.6,
+    "prefix": {
+      "max": 107,
+      "mean": 104.59,
+      "min": 99,
+      "n": 1547
+    },
+    "probe_turn": {
+      "max": 39,
+      "mean": 26.04,
+      "min": 16,
+      "n": 48
+    },
+    "second_turn_tokens_per_row": 1279.0
+  }
+}
