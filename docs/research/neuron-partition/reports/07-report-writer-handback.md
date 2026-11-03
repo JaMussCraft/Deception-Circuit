@@ -12,6 +12,10 @@ session hook asks for this file; the lead's brief named only the report.
   has one comparison table of D-only rows and the deciding N2 rows under the mean reference.
 - **Evidence.** The table adds the ablation pilot, the all-position ranking run, jobs A, B and C, and the queued IOI
   resolution job, which appeared in the ledger while the report was written.
+- **Review 03 round.** The pending-review line now states review 03's CONFIRMED WITH NOTES and ruling R13. A new
+  paragraph gives the IOI resolution reading, and the zero table's caption notes zero's own IOI shift of -17.0 at
+  size 500. "What is NOT done" lists the 1,000-row IOI measurement as pending under R13
+  (`../reviews/03-verdict-review.md`).
 - **Length.** The report is under 300 lines. To fit, the conditions and baseline tables became prose, the test table
   became one paragraph, and the zero table keeps only its D-only rows.
 

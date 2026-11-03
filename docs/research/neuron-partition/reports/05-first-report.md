@@ -1,12 +1,10 @@
 # Report 05: First report on neuron-partition, for the advisor meeting of Wed 4 Nov 2026
 
-Agent: report writer (Claude, Opus), read-only on code. Ticket: the lead's first-report brief of Tue 3 Nov 2026 (item
-8 of `../START.md`). Status: complete draft with every ablation result in; all findings are preliminary. Bare file
-names are in `docs/research/neuron-partition/reports/`, and `../` is `docs/research/neuron-partition/`.
+Agent: report writer (Claude, Opus). Ticket: item 8 of `../START.md`. Status: complete; findings are preliminary. Bare
+file names are in `docs/research/neuron-partition/reports/`, and `../` is `docs/research/neuron-partition/`.
 
-**Review pending.** An independent reviewer is recomputing the headline numbers tonight; this line will be replaced.
-
-**Summary.**
+**Review 03: CONFIRMED WITH NOTES.** Every D-only number, recomputed from the rows, matches the verdict with no
+discrepancy (`../reviews/03-verdict-review.md`). Ruling R13 keeps N1 failed and the size-500 class a descriptive lead.
 
 1. **Question.** Do any MLP neurons of Llama-3.1-8B-Instruct matter only for instructed deception (FAR task), and not
    for a transparent inversion control or for the honest answer (`../START.md`)?
@@ -165,8 +163,8 @@ points under the mean reference in every table (R7, `outputs/_analyses/neuron-pa
 | all_shared | 1000 | 94 | 0.202 [0.19, 0.21] | 0.665 [0.63, 0.70] | 0.298 [0.29, 0.30] | 0.315 [0.29, 0.34] | 0.007 | 0.0 | -0.3 | -10.0 | fail | fail | fail |
 | all_shared | 2000 | 160 | 0.232 [0.22, 0.24] | 0.775 [0.74, 0.80] | 0.335 [0.33, 0.34] | 0.457 [0.43, 0.48] | 0.017 | -4.2 | -4.5 | -19.0 | fail | fail | fail |
 
-**Zero ablation, D-only rows.** Zero is reported beside the deciding references; its other nine rows are in
-`outputs/_analyses/neuron-partition/verdict/far_atp_all_c3d7763/verdict.md`.
+**Zero ablation, D-only rows** (`outputs/_analyses/neuron-partition/verdict/far_atp_all_c3d7763/verdict.md`). The
+collateral columns are the mean reference's (R7); zero's own IOI shift at 500 is -17.0 (`../reviews/03-verdict-review.md`).
 
 | class | k | size | D removed (margin) | D removed (rate) | I removed (margin) | I removed (rate) | null p95 of D removed | H shift | F shift | IOI shift | bars (whole) | half 1 | half 2 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -179,10 +177,14 @@ and both halves, so the frozen text records the null for this ranking. At size 5
 size, D, I, H, F and null bars on the whole sample and both halves under all three references. Under twin and mean it
 removes 0.813 and 0.724 of the D margin, with rate effects 1.000 and 0.997, and 0.145 and 0.161 of the I margin,
 against null 95th percentiles of 0.012 and 0.020. It fails only IOI: accuracy falls 6.0 points against the bar of 5,
-that is 6 of 100 rows, and every subset fails because both halves share the 100 IOI rows. The 20 matched nulls move
-IOI by -3 to +6 points, with a 95th percentile of the absolute shift of 3.15
+that is 6 of 100 rows, and every subset fails because both halves share the 100 IOI rows
 (`outputs/_analyses/neuron-partition/verdict/far_atp_all_c3d7763/verdict.json` and
 `outputs/_analyses/neuron-partition/verdict/far_atp_all_c3d7763/verdict.md`).
+
+**How well 100 rows resolve the IOI bar.** The 6-point drop is 6 rows lost and 0 gained out of 100, an exact McNemar
+p of 0.031. Its 95% interval runs from about 2 to 13 points lost, so the sample cannot place the true shift on either
+side of the 5-point bar. The 20 matched nulls span -3 to +6 at size 500, with a 95th percentile of the absolute shift
+of 3.15, and reach -9 at size 1,000 (`../reviews/03-verdict-review.md`, section "IOI resolution").
 
 **Larger sets fail two bars, and the references agree.** At 1,000 and 2,000 the class also removes 0.340 and 0.495 of
 the I margin under twin and 0.414 and 0.573 under mean, above the bar of a quarter, and moves IOI by -11.0 and -13.0
@@ -221,9 +223,8 @@ remove more of the I margin than of the D margin under every reference
   bar of under 5. Half 1 reads bypass and half 2 undetermined
   (`outputs/_analyses/neuron-partition/verdict/far_atp_all_c3d7763/verdict.json` and
   `outputs/_analyses/neuron-partition/verdict/far_atp_all_c3d7763/verdict.md`).
-- **Zero and twin are beside the decision.** Zero reads bypass at 2,000 on the whole sample and both halves, with H
-  at -44.3 points and D's rate at -4.5. The twin reverse patch reads "suppression or shared" at 1,000 and 2,000, and
-  is descriptive under R7 (`outputs/_analyses/neuron-partition/verdict/far_atp_all_c3d7763/verdict.md`).
+- **Beside the decision.** Zero reads bypass at 2,000 (H -44.3, D rate -4.5), and the twin reverse patch reads
+  "suppression or shared" at 1,000 and 2,000 (`outputs/_analyses/neuron-partition/verdict/far_atp_all_c3d7763/verdict.md`).
 - **Ablating the H-only class raises the deception margin.** D removed is negative at every size: -0.149 to -0.647
   under twin and -0.209 to -0.698 under mean. The readout and contrast H-only classes read undetermined at 1,000
   (`outputs/_analyses/neuron-partition/verdict/far_atp_all_c3d7763/verdict.md` and the two comparison verdicts).
@@ -271,9 +272,9 @@ on 100 rows in each, against the brief's 0.51 (R4); the pilot read 0.48 before t
 
 ## What is NOT done
 
-- **A larger IOI measurement.** The IOI bar, the only bar the near-miss class fails, was read on 100 rows, and no
-  larger IOI set has run. An exploratory, not pre-registered run on 1,000 IOI rows is queued; it asks what 100 rows
-  can resolve and cannot change the N1 decision (`02-w2-ablation-handback.md`, addendum "IOI resolution").
+- **A larger IOI measurement.** The IOI bar was read on 100 rows. Under ruling R13 an exploratory, not pre-registered
+  measurement on 1,000 IOI rows is running tonight on Bridges-2. It is pending, will be an addendum, and cannot
+  change the N1 decision (`../spec.md`, R13).
 - **The one-neuron interchange check** of the scorer review's second major is descriptive and was not run.
 - **SER.** No SER ranking or ablation has run. START makes SER a bonus.
 - **Dropped or unused.** The N3 rotation test is dropped, as START's fallback allows, and no verdict is recorded in
@@ -281,11 +282,9 @@ on 100 rows in each, against the brief's 0.51 (R4); the pilot read 0.48 before t
 
 ## Open questions
 
-- **The near miss.** Does the advisor read the smallest-size result as a lead worth a larger IOI measurement and a
-  pre-registered follow-up, given that the bars were frozen? The class fails only IOI, by 6.0 points against 5 on 100
-  rows, and one matched null of 20 also moved IOI by 6
-  (`outputs/_analyses/neuron-partition/verdict/far_atp_all_c3d7763/verdict.json`). An exploratory larger IOI run is
-  queued. Default: record the fail as the frozen bar reads it, and pre-register any follow-up as a new item.
+- **The near miss.** Does the advisor read the size-500 result as a lead worth a larger IOI measurement and a
+  pre-registered follow-up, given that the bars were frozen? Default: as ruling R13 records, N1 stays failed and the
+  class is a descriptive lead; any follow-up gets its own pre-registered bars (`../spec.md`).
 - **Rate or margin (R2).** The bars read the margin effect, and the rate at margin 0.7 sits beside it (`../spec.md`).
   The rate is close to saturated: at the smallest size D-and-I shared removes 0.856 of the D rate but 0.257 of the D
   margin under twin (`outputs/_analyses/neuron-partition/verdict/far_atp_all_c3d7763/verdict.json`). Default: margin.
