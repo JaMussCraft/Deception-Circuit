@@ -1,8 +1,9 @@
 # Hand-back 04: W4, the R6 partition sets and the N3 stability script
 
 Agent: implementation worker W4 (Claude, Opus). Ticket: the team lead's W4 brief of Tue 3 Nov 2026 (partition and
-stability, ruling R6 of `spec.md`). Status: resolved. The script and its tests are done, and the pilot partition ran
-end to end. The real inputs, a dh run with `--reverse` and the half runs, do not exist yet.
+stability, ruling R6 of `spec.md`), then the lead's follow-up to partition the full FAR scores. Status: resolved for
+`partition`. The script and its tests are done, and the real FAR partition (AtP and contrast) has run with its nulls.
+`stability` is built and tested but waits on the half runs.
 
 ## What changed
 
@@ -16,7 +17,25 @@ Both code files are new. No existing file was edited. The orchestrator commits t
 - `/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/neuron-partition/docs/research/neuron-partition/reports/04-w4-partition-handback.md`
   is this file.
 
-Nothing is staged for the apply tool. The pilot outputs are temporary files under
+Nothing is staged for the apply tool. Outputs, git-ignored, under
+`/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/neuron-partition/outputs/_analyses/neuron-partition/partition/`:
+
+- **`far_atp_7386fd3/`** is the R6 ranking. It holds `far_sets_k{500,1000,2000}.json`, the matching
+  `_with_nulls.json` files with 84 groups each (4 classes and 80 nulls), `partition_summary.json`, and 12 W3 null
+  files with their sidecars under `nulls/`.
+- **`far_contrast_7386fd3/`** is the comparison ranking. It holds `far_contrast_sets_k*.json`, the matching
+  `_with_nulls.json` files with 63 groups each (3 classes and 60 nulls), `partition_summary_contrast.json`, and
+  `nulls/`. The console log `far_contrast_7386fd3.log` sits beside the directory.
+
+| file | sha256 |
+| --- | --- |
+| `far_atp_7386fd3/partition_summary.json` | `5d557fe18186cbe3e8443f74ddc8d74ea3b13d9eb9f026976767e7abe661f9bc` |
+| `far_atp_7386fd3/far_sets_k500_with_nulls.json` | `cec0f0b2837f24963664de345a782a306a6603d73937ab41c3f0aa7a547af1b4` |
+| `far_atp_7386fd3/far_sets_k1000_with_nulls.json` | `3b516bb33ec81f2579b08feaac57fae4d648beafe0d7960fbe9a4ea7d3c9250f` |
+| `far_atp_7386fd3/far_sets_k2000_with_nulls.json` | `eff481ad22e6bfec3b44c730423134ab4095ad0ba21a4d72ba845ea09307d1ee` |
+| `far_contrast_7386fd3/partition_summary_contrast.json` | `e8a5607ce8ddda8c77a40b05f8afc555dd71c4a02da6ed250e7ed12924655d4c` |
+
+The summaries hash every other output. The pilot outputs are temporary files under
 `/u/swong2/.claude/jobs/5201d56c/tmp/w4/pilot_partition/`, and no finding rests on them.
 
 **Which key holds each score.** These are the decisions that change the sets.
@@ -136,10 +155,97 @@ done. No smoke output exists, and none is claimed.
 
 ## Execution evidence
 
-Not applicable: no runs.
+No Slurm job and no GPU were used. These are local CPU runs of the script on the login node.
 
-No job and no GPU were used. The one local CPU run of the pilot partition, labelled "pilot, 64 rows, not for
-findings", was:
+- **Job id and cluster.** None. The local commands, run from the worktree, are below. `A` stands for
+  `/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/neuron-partition/outputs/_analyses/neuron-partition/attribution`
+  and `P` for the sibling `partition` directory. Both were passed as absolute paths.
+
+  ```
+  /u/swong2/.conda/envs/mgnp/bin/python scripts/neuron_partition_sets.py partition --dh "A/far_v2_dh_train+validation_7386fd3" --in "A/far_v2_in_train+validation_7386fd3" --dh-reverse "A/far_v2_dh_train+validation_7386fd3_rev" --label "FAR full ranking, train+validation, AtP readout" --out-dir "P/far_atp_7386fd3"
+  /u/swong2/.conda/envs/mgnp/bin/python scripts/neuron_partition_sets.py partition --score contrast --dh "A/far_v2_dh_train+validation_7386fd3" --in "A/far_v2_in_train+validation_7386fd3" --label "FAR full ranking, train+validation, activation contrast readout (comparison)" --out-dir "P/far_contrast_7386fd3"
+  ```
+
+- **Exit code.** It was not captured separately, because each command was piped through `tee`. Both runs printed
+  their final "wrote ... partition_summary" line, and the summary is the script's last write after every set and
+  null file. The `tee` for the AtP log failed because its directory did not exist yet, so the AtP console output
+  is kept only below.
+- **Row counts.**
+  - The inputs hold 400 rows for dh, 354 for in, and 400 for dh `_rev` (`reverse: true`).
+  - Every T_X holds exactly k neurons at every k, and no ranking was truncated. The positive counts are 234,942
+    for s_D, 236,004 for s_I and 236,673 for s_H.
+  - Each AtP with-nulls file holds 84 groups and each contrast file 63. W2's `load_groups` accepts all six.
+  - Every null has its class's size and 32-layer histogram, and none contains a tested neuron.
+- **Baseline reproduces.** The forward keys of the `_rev` directory equal the plain dh run exactly. Both
+  `atp_readout_mean` and `contrast_readout_mean` show max |diff| = 0, and the summary records the same check.
+- **Provenance file.** The three input manifests (`run_manifest.json` in each directory) name commit
+  6c6d5be1b631f4f248a29bbc77c0192cb198b4ea, Slurm job 23476096 and a dirty tree. `partition_summary.json` records
+  them with the sha256 of each `scores.pt`.
+
+AtP console output, verbatim apart from the output paths:
+
+```
+note: consistency: max |atp_readout_mean(--dh) - atp_readout_mean(--dh-reverse)| = 0
+k=500: D_only 174, DI_shared 172, H_only 331, all_shared 111, T_D 500, T_I 500, T_H 500
+  thresholds: T_D 0.01348 (pos 234942), T_I 0.02913 (pos 236004), T_H 0.01917 (pos 236673)
+  D_only densest layers: L13 45, L12 39, L14 21, L15 18, L11 15
+  DI_shared densest layers: L13 50, L14 34, L15 30, L12 18, L16 18
+  H_only densest layers: L13 65, L15 65, L14 56, L16 41, L17 22
+  all_shared densest layers: L31 19, L15 17, L13 12, L19 12, L20 9
+k=1000: D_only 409, DI_shared 314, H_only 702, all_shared 209, T_D 1000, T_I 1000, T_H 1000
+  thresholds: T_D 0.008468 (pos 234942), T_I 0.01926 (pos 236004), T_H 0.01281 (pos 236673)
+  D_only densest layers: L13 108, L12 60, L14 60, L11 49, L15 38
+  DI_shared densest layers: L13 78, L14 74, L15 55, L12 39, L16 23
+  H_only densest layers: L13 162, L14 152, L15 123, L16 75, L12 40
+  all_shared densest layers: L31 40, L13 24, L15 24, L14 22, L19 15
+k=2000: D_only 895, DI_shared 629, H_only 1474, all_shared 325, T_D 2000, T_I 2000, T_H 2000
+  thresholds: T_D 0.005553 (pos 234942), T_I 0.01324 (pos 236004), T_H 0.008189 (pos 236673)
+  D_only densest layers: L13 210, L12 173, L14 135, L11 119, L10 60
+  DI_shared densest layers: L13 168, L14 143, L15 91, L12 88, L16 47
+  H_only densest layers: L13 340, L14 312, L15 258, L16 143, L12 128
+  all_shared densest layers: L31 68, L14 41, L13 39, L15 31, L19 20
+```
+
+**Class sizes, AtP ranking (R6).** These are descriptive. Nothing is ablated yet, so no class is shown to matter.
+
+| k | D_only | DI_shared | H_only | all_shared | J(T_D, T_I) | J(T_D, T_H) | J(T_I, T_H) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 500 | 174 | 172 | 331 | 111 | 0.395 | 0.182 | 0.144 |
+| 1,000 | 409 | 314 | 702 | 209 | 0.354 | 0.161 | 0.130 |
+| 2,000 | 895 | 629 | 1,474 | 325 | 0.313 | 0.135 | 0.103 |
+
+**Per-layer concentration, AtP.** The table gives each class's share of its neurons by layer band, at k = 500,
+1,000 and 2,000.
+
+| class | L0 to L9 | L10 to L16 | L17 to L29 | L30 to L31 |
+| --- | --- | --- | --- | --- |
+| D_only | 0.01, 0.01, 0.02 | 0.88, 0.86, 0.87 | 0.06, 0.07, 0.05 | 0.06, 0.06, 0.05 |
+| DI_shared | 0.00, 0.00, 0.00 | 0.89, 0.89, 0.92 | 0.10, 0.09, 0.07 | 0.01, 0.02, 0.00 |
+| H_only | 0.00, 0.00, 0.00 | 0.77, 0.81, 0.83 | 0.20, 0.17, 0.14 | 0.03, 0.02, 0.02 |
+| all_shared | 0.00, 0.00, 0.00 | 0.39, 0.42, 0.43 | 0.41, 0.35, 0.31 | 0.20, 0.23, 0.25 |
+
+- **D-only is small.** It is 35 percent of T_D at k = 500, 41 percent at 1,000 and 45 percent at 2,000. It peaks at
+  L13 and reaches down into L10 to L12 more than the other classes do. That fits the lead's note that the dh and in
+  maps correlate at r = 0.775.
+- **H_only is the largest class** and sits in L13 to L16.
+- **all_shared is the only class spread across depth**, with its largest single layer at L31.
+- **T_D and T_H are far from coinciding.** Their Jaccard is 0.13 to 0.18, although that is still far above the
+  random-set floor (about 0.0005 at k = 500). Over all 458,752 neurons, s_D and s_H correlate at only r = 0.013.
+  Open question 1 is updated accordingly.
+
+**Contrast comparison.** Here s_H = a_H − a_D, so T_D and T_H are disjoint by construction and all_shared is empty
+by the rule.
+
+| k | D_only | DI_shared | H_only | J(T_D, T_I) | share in L30 to L31, D_only / DI / H_only |
+| --- | --- | --- | --- | --- | --- |
+| 500 | 189 | 311 | 492 | 0.451 | 0.71 / 0.68 / 0.65 |
+| 1,000 | 386 | 614 | 985 | 0.443 | 0.62 / 0.58 / 0.54 |
+| 2,000 | 815 | 1,185 | 1,974 | 0.421 | 0.45 / 0.46 / 0.42 |
+
+The contrast ranking is dominated by L31 and L30, where activations are large, while AtP puts the classes in L10 to
+L16. The two rankings therefore pick largely different neurons. I did not compute their cross-ranking overlap.
+
+**The earlier pilot.** The local CPU run of the pilot partition, labelled "pilot, 64 rows, not for findings", was:
 
 ```
 /u/swong2/.conda/envs/mgnp/bin/python scripts/neuron_partition_sets.py partition --dh /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/neuron-partition/outputs/_analyses/neuron-partition/attribution/far_v2_dh_validation_f4ce555_limit64 --in /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/neuron-partition/outputs/_analyses/neuron-partition/attribution/far_v2_in_validation_f4ce555_limit64 --dh-reverse /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/neuron-partition/outputs/_analyses/neuron-partition/attribution/far_v2_dh_validation_f4ce555_limit64 --allow-missing-reverse --label "pilot, 64 rows, not for findings" --out-dir /u/swong2/.claude/jobs/5201d56c/tmp/w4/pilot_partition
@@ -182,10 +288,9 @@ The readings below are descriptive only: 64 validation rows, no s_H, and no abla
 
 ## What is NOT done
 
-- **Real partition.** The real partition has not been run. No dh run with `--reverse` exists. The full runs
-  `far_v2_dh_train+validation_7386fd3` and `far_v2_in_train+validation_7386fd3` have `reverse: false` (their
-  manifests say `git_commit` 6c6d5be). They can give D_only = T_D − T_I only, which is not R6. The `in` run needs
-  no reverse and can be reused as `--in`.
+- **Real partition.** It is done for FAR, AtP and contrast at the readout (see Execution evidence). It was not run
+  at the clause position (`--position clause`), because the lead did not ask for it. SER was not run.
+- **Cross-ranking overlap.** The overlap between the AtP and contrast classes is not computed.
 - **Stability.** Stability has not been run on halves, because no half runs exist. W1's scorer now has `--ids`,
   `--ids-key` and `--tag`, so the half runs below are possible.
 - **SER.** SER is not covered by a run. The script is task-agnostic: the prefix comes from `rows.json` `task`.
@@ -195,7 +300,9 @@ The readings below are descriptive only: 64 validation rows, no s_H, and no abla
   alert. I deleted nothing. Write the real outputs
   under `/projects`, as in the commands below.
 
-**Commands for the orchestrator.** `<C>` is the 7-character commit the scorer puts in the directory name, and
+**Commands for the orchestrator.** Steps 1 and 2 are done for commit 7386fd3: the lead ran step 1, and I ran
+step 2 into `partition/far_atp_7386fd3` and `partition/far_contrast_7386fd3`, not into `sets/`. Steps 3 and 4
+remain. `<C>` is the 7-character commit the scorer puts in the directory name, and
 `ATT` is `/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/neuron-partition/outputs/_analyses/neuron-partition/attribution`.
 Write it out in full in real commands.
 
@@ -234,13 +341,10 @@ Write it out in full in real commands.
 
 ## Open questions
 
-1. **AtP makes T_D and T_H nearly the same set to first order.** s_D = Δa · g_D and s_H = Δa · g_H, with the same
-   Δa = a_D − a_H and the gradient taken in D or in H. Where g_D ≈ g_H, T_D and T_H coincide. all_shared will then
-   be large, and D_only = T_D − (T_I ∪ T_H) keeps only neurons whose gradient differs between D and H. That is
-   R6's literal rule, and I implemented it unchanged. This is a prediction, not a measurement, because no reverse
-   data exist. Default: run R6 as written and read the T_D ∩ T_H Jaccard in `partition_summary.json`
-   (`overlaps["T_D&T_H"]`) before planning ablations. If it is near 1, the orchestrator should rule on whether
-   D_only is still the intended class.
+1. **My first-order prediction that T_D and T_H would nearly coincide was wrong.** I predicted it because both
+   scores share Δa = a_D − a_H and differ only in the gradient. On the real data, J(T_D, T_H) is 0.13 to 0.18 and
+   the whole-map correlation of s_D and s_H is 0.013. The readout gradients therefore differ strongly between the D
+   and H runs, so D_only is not just a gradient-mismatch residue. R6 behaves as intended, and no ruling is needed.
 2. **Contrast s_H.** I used s_H = a_H − a_D with no flip, because the AtP flip exists only to undo D's metric
    orientation. Applying the flip literally to contrast would make s_H = s_D and D_only empty. Default: keep
    a_H − a_D and report the contrast variant as a comparison only.
