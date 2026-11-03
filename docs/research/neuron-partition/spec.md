@@ -115,3 +115,10 @@ as a ruling before that run.
   the union of A1's assessment ids, the ladder's selection ids and the two mechanism-analysis held-out samples
   (356 ids), one list more than R5 names. The sample stands as drawn: the extra exclusion only removes ids the
   ladder tuned on, and 644 D and 566 I rows remain eligible.
+- **R13 (Tue 3 Nov 2026, 6:30 pm EST, after the cells): the N1 decision stands as failed; the size-500 result is
+  a descriptive lead.** The all-position deception-only class at size 500 met every N1 bar except IOI (minus 6.0
+  points against 5, on 100 IOI rows where matched random sets moved IOI by minus 3 to plus 6). The bars are not
+  changed. One exploratory, not pre-registered measurement is run: the same class and its 20 nulls on the largest
+  IOI row set the recipe supports (up to 1,000 rows), IOI condition and mean reference only, to report what 100
+  rows could resolve. Its result is descriptive and does not alter N1; a follow-up would need its own
+  pre-registered bars.
