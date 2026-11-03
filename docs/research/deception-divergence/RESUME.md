@@ -1,33 +1,33 @@
 # Resume: deception-divergence
 
-Last rewritten: Mon 2 Nov 2026, 8:05 pm EST by claude-5b9b1c28.
+Last rewritten: Mon 2 Nov 2026, 10:40 pm EST by claude-5b9b1c28 (after compaction 4). Note: Delta file times are Central; these timestamps are Eastern.
 
 ## Status
 
-Phase 1 is running under the user's N1 answer (continue under the 80 percent cap, run the option B follow-up, find a defensible route to U1) and ruling R6. Phase 0 is closed: D1 null on size on every task (F5, reviewed, `reviews/02-d1-review.md`); D4 done and reviewed (F1 to F4, `reviews/01-d4-review.md`). The R6 follow-up found the phrasing-1 flip pool empty on every task (F6): the system-turn sentence shifts margins but never flips a compliant answer, so U1 cannot return through phrasing 1; the user-turn phrasing 4 job is the last listener route and runs now. The D2 premise (two-turn lie maintenance; rulings R7 to R13, judge freeze G-D2 at hash 1e41b6b9...) is built, tested and submitted; its judge stage is the orchestrator's and spends OpenRouter credit. U1 is re-admitted only by a qualifying phrasing-4 flip pool or a D2 premise pass (R6 iii and iv); U1 trainer code still waits for the user's word on Codex coordination.
+Phase 1 is running under the user's N1 answer (continue under the 80 percent cap, run the option B follow-up, find a defensible route to U1) and ruling R6. Phase 0 is closed: D1 null on size on every task (F5, reviewed, `reviews/02-d1-review.md`); D4 done and reviewed (F1 to F4, `reviews/01-d4-review.md`). Both listener routes to U1 are closed: the phrasing-1 and phrasing-4 flip pools are empty on every task (F6, F7, both reviewed, `reviews/03-d1-followup-review.md`). The D2 premise GPU job is done (Bridges-2 `50155519`, full-sequence path of record under R14; `reports/07-handback.md`): the classifier arm separates D from I on SDR only (gap 0.160, interval 0.086 to 0.227, 0.136 under refusal ablation, so the refusal control does not explain it), FAR shows no gap (0.005) and SER misses the 15-point bar (0.145). The paid judge stage is complete ($2.71, 4,064 calls, five reviewed ledgers) and the final read is written (`outputs/_analyses/deception-divergence/d2/readings.md`, final true): the acts-on-it arm is uninformative because the model corrects its forced wrong answer in 96 to 99 percent of rows in every condition, judge checks agree (cross-check 0.965, re-judge 1.000), and the frozen rule passes the premise on SDR from the classifier arm alone, by one point over the 15-point bar. Under R6 iv that admits U1, pending the independent review; the R2 reading on every task is that I patterns like D, and the frozen-classifier ablation (H read as D at 0.98 to 1.0 once the refusal direction is removed) says the D-against-H axis is largely the refusal direction, which the review must weigh. U1 trainer code still waits for the user's word on Codex coordination.
 
 ## Branch, worktree and commit
 
 - Branch: `deception-divergence`.
 - Worktree: `/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/deception-divergence`.
-- Last commit on the branch: `a0936e5`, "rulings R7 to R13 and freeze G-D2 for the D2 premise" (pushed; Bridges-2 clone synced to it).
-- Uncommitted work, if any: none from the orchestrator; worker edits are committed by explicit file list when each hand-back is read.
+- Last commit on the branch: `d49473b`, "D2: premise job 50155519 results, read-side fixes, hand-back 07" (pushed; Bridges-2 clone at `fb2cb9e`).
+- Uncommitted work, if any: this RESUME, the G-D2 proxy-token line in `spec.md`, `results/d2/proxy_tokens.json`; judge ledgers, caches and labels under `outputs/_analyses/deception-divergence/d2/judge/` (committed with the verdict).
 - Tool-owned records (state, worklog, ledger, handbacks) live in the main checkout at `/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/deception-divergence/`; pass that path as the `dir` argument of every research-session command. Everything else is on the branch.
 
 ## In-flight jobs
 
-Reservations r-001 to r-007: 7.08 GPU-hours reserved, 1.99 actual before the two jobs below. Bridges-2 (cis260361p) is the working cluster; Delta's batch queues projected week-long waits and its interactive partitions carry a one-hour cap. The user allows any Delta or Bridges-2 allocation (shared memory note `cluster-allocations`).
+No GPU job is in flight. Reservations r-001 to r-008: 8.33 GPU-hours reserved, 2.91 actual. OpenRouter: $2.71 spent on the D2 judge (4,064 paid calls; `ledger.json` shows 8,409 calls because the tool merged the 4,345-call reserve with the actual). Bridges-2 (cis260361p) is the working cluster; Delta's batch queues projected week-long waits and its interactive partitions carry a one-hour cap. The user allows any Delta or Bridges-2 allocation (shared memory note `cluster-allocations`).
 
-| Job | Cluster | What it computes | Output directory | Expected finish |
+| Process | Where | What it does | Output | Expected finish |
 |---|---|---|---|---|
-| `50152632` | Bridges-2 | D1 follow-up: phrasing-4 listener arms on the D1 sample (R6 i, iii) | `outputs/_analyses/deception-divergence/d1/` (`scores_l4.jsonl`, `followup_readings.*`) | Mon about 9:15 pm EST |
-| `50153789` | Bridges-2 | D2 premise: elicitation features, acts-on-it proxies and generations, refusal direction (R7 to R13) | `outputs/_analyses/deception-divergence/d2/` | Mon about 10 pm EST |
+| `d2-worker` (Opus) | worktree | writes the R13 verdict, tables and caveats into `reports/07-handback.md`; copies judge ledgers, labels, manifests and the final readings into `results/d2/` | `reports/07-handback.md`, `results/d2/judge/`, `results/d2/readings_final.*` | Mon about 11:15 pm EST |
+| `d2-reviewer` (Opus) | worktree | independent review of the D2 verdict: R13 as frozen, clause-presence confound, freeze order | `reviews/04-d2-review.md` | Mon about 11:30 pm EST |
 
 ## Next action
 
-1. When `d1b-worker` reports the phrasing-4 results: log the job and a finding; read the R6 (i) verdict and the (iii) flip pool per task. If a task qualifies, open a need asking the user to confirm Codex coordination before any U1 trainer code; otherwise record that U1 waits on D2.
-2. When `d2-worker` reports: log the job; record the proxy token file hash in `spec.md` (G-D2 second part) before any test row is read; run the `judge` stage (OpenRouter, within the $20 cap, `ledger api`), then have the worker run `read` and write the verdict under R13; log a `decision` entry (milestone). If the premise passes, write the patching ruling and plan the 8 to 15 GPU-hour patching run; if it fails, report the rates and the direction is ready for wrap-up.
-3. Independent Opus reviews of the follow-up and of D2 before their findings are marked reviewed.
+1. When `d2-worker` reports: commit by file list (spec, RESUME, `results/d2/proxy_tokens.json`, `results/d2/judge/*`, `results/d2/readings_final.*`, `reports/07-handback.md`), push, and give the reviewer the hand-back for its second pass.
+2. When `d2-reviewer` reports: log the `finding` (premise passes on SDR by one point, one task, one arm, R2 reading "I patterns like D" everywhere) with the review's qualifiers, then a `decision` entry (milestone). Recommended first step before any patching: an honest-instructed H arm (same forced wrong answer, an honest system instruction present, about a fifth of the D2 job) to test whether the SDR gap survives when both sides carry a clause; that is a new ruling and waits for the user's read. Then open the `need` asking the user to confirm Codex coordination before any U1 trainer code (R6 iv now admits U1).
+3. Do not write the patching ruling or U1 trainer code before the review and the user's answers.
 4. Checkpoint 1 fires at 24 session points (cadence set by the user); cap pause at 80 percent weekly.
 
 ## Do not

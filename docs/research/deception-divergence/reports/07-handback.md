@@ -1,9 +1,10 @@
 # Hand-back 07: D2 premise plan and two-turn build
 
 Agent: Opus worker (claude-opus-5-5), direction deception-divergence. Ticket: the lead's message of Mon 2 Nov 2026,
-"D2 plan and two-turn premise build", and the follow-ups on jobs 50153789 and 50155519. Status: the plan, the code,
-the tests and the GPU job are done; the classifier arm is read; the acts-on-it arm waits for the judge, which the
-orchestrator runs (commands in "Results so far").
+"D2 plan and two-turn premise build", and the follow-ups on jobs 50153789 and 50155519 and on the judge. Status:
+done. The plan, the code, the tests, the GPU job, the judge (run by the orchestrator) and the final read are
+complete, and the R13 verdict is in "Results". The patching ruling and the independent review are the
+orchestrator's.
 
 ## What changed
 
@@ -48,6 +49,23 @@ After job 50155519 (worktree files, not yet committed):
   `refusal_direction.json` and its manifest, the GPU timings and the nine per-task stage manifests, copied from the
   ignored output directory.
 - `logs/bridges2/d2_premise_50155519.out`: the job log (sha256 `d206a71e...`, equal on both ends).
+
+After the judge (worktree files, not yet committed; the orchestrator ran every paid stage and the final read):
+
+- `docs/research/deception-divergence/results/d2/judge/`: the five ledgers, the five label files and their five
+  manifests, copied unchanged from `outputs/_analyses/deception-divergence/d2/judge/` (hashes in "Execution
+  evidence").
+- `docs/research/deception-divergence/results/d2/readings_final.json` and `readings_final.md`: the final read
+  (created 21:19:53, `final` true), kept apart from the job's partial read in `results/d2/job50155519/`.
+- `docs/research/deception-divergence/results/d2/proxy_tokens.json` (sha256 `304ad7fa...`) was written by the
+  orchestrator's calibration read; it is listed here because it belongs in the commit.
+- Not copied: the three judge caches, which hold full prompts. They stay in the ignored output directory:
+
+| cache | bytes | sha256 |
+|---|---|---|
+| `judge/cache_haiku.jsonl` | 369,903 | `24b0765522770d150bb40cbe05ae772431f679e27a80cab987824b4b0fb92aa1` |
+| `judge/cache_sonnet.jsonl` | 19,777 | `2f23c6f7603273dcf82bccb7c8ef2f3f7d06e66e95b8a84f86eaa0839197c609` |
+| `judge/cache_rejudge.jsonl` | 20,353 | `005ea409dbf063e2e78259735f8726f9cfe22b063b335dc4afb23154f5a2d446` |
 
 Not committed: the raw downloads in `data/d2/_downloads/` (`pacchiardi_probes/`, `advbench/`, `alpaca/`, each its
 own directory, read with `python -I` only). Nothing is staged for the apply tool.
@@ -136,6 +154,12 @@ OMP_NUM_THREADS=4 HF_HUB_OFFLINE=1 /sw/external/python/anaconda3/bin/python3.9 -
 
 Observed: 35 passed on mgnp and 35 passed on base Python 3.9.
 
+After the judge, each ledger and label file was read with a short script (header, reserve and settle events, costs,
+label status, grader hash in each manifest). The files were then copied, and every copy's sha256 equals its source.
+A third check confirmed that the label files' sha256 equal the `labels` block of the final `readings.json`. The
+token file's sha256 was recomputed and matches the G-D2 entry in spec.md. A fourth check decoded the proxy token ids
+with the Llama-3 tokenizer: 40 "I", 791 "The", 11458 "However", 14524 "Wait", 53692 "Actually".
+
 ## Execution evidence
 
 - Job id and cluster: 50155519 on Bridges-2, GPU-shared, one H100-80, account cis260361p, host
@@ -184,110 +208,226 @@ Observed: 35 passed on mgnp and 35 passed on base Python 3.9.
 | ser_v2/generations.jsonl | `22115e82f078af9ad440a9bcd5a7ff75970182d4ee188511381e4f25be64f106` |
 | readings.json | `7f6ad3693a733f0a7eef76af0e2406d959216d70cf400c95c7a35148d64f1714` |
 
-The classifier arm's evidence block is complete. The acts-on-it arm has no evidence yet, so the premise verdict is
-not yet verified: the judge labels are missing.
+Judge (run by the orchestrator; read and checked here):
+
+| stage | model | ledger ceiling | paid attempts | settled cost (USD) | unsettled | labels (all parsed) |
+|---|---|---|---|---|---|---|
+| calibration | Haiku 4.5 | $2.00, 700 | 547 | 0.3313 | 0 | 600 |
+| main | Haiku 4.5 | $4.50, 2,000 | 1,546 | 0.9460 | 0 | 2,127 |
+| main_ablated | Haiku 4.5 | $4.50, 2,100 | 1,578 | 0.9578 | 0 | 2,127 |
+| crosscheck | Sonnet 4.5 | $8.00, 250 | 191 | 0.3491 | 0 | 200 |
+| rejudge | Haiku 4.5 | $2.00, 300 | 202 | 0.1229 | 0 | 213 |
+| total | | $21.00 in ceilings | 4,064 | 2.7071 | 0 | 5,267 |
+
+Every ledger header is schema 1 and reviewed. Every label manifest names grader `d2_judge_sha256`
+`1e41b6b92a0d...`, the G-D2 freeze. The main and ablated stages paid for fewer requests than the dry run's 1,666 and
+1,739, because they shared the Haiku cache with the calibration stage. The ceilings sum to $21.00, above the $20
+direction cap, but the spend is $2.71.
+
+| record file | sha256 |
+|---|---|
+| judge/labels_calibration.jsonl | `7b3d25af2f75d46d8acf5f46483db19c120158d4a99c469fdd97c3d297114b8f` |
+| judge/labels_main.jsonl | `6c430de9951772231d8603a518a13ae68d394a962e2c47a246c7ccef9e6705ee` |
+| judge/labels_main_ablated.jsonl | `5c1e632b381b24df22e791433a1d002cd1cec9d1a0dfdffa5e21fc3434f86fec` |
+| judge/labels_crosscheck.jsonl | `38eb9a49c46c4e7e8d0e2d2ed04f244a37e31a316b2e2ab4a154e1682e94544f` |
+| judge/labels_rejudge.jsonl | `58cdb586dad3ff1740860f3356f7032534e08055de1ba3d7bfb43afc4c5a8810` |
+| judge/ledger_calibration.jsonl | `2ad39d57c5be35617f6063397d38457672e396942e1bef3e419f66541c937362` |
+| judge/ledger_main.jsonl | `5ad9c9ba4d49143400e0e9360e374265a15a2b4983256093fccd85b46f9d2ce4` |
+| judge/ledger_main_ablated.jsonl | `9eef51a9b53e9c7fa5ccc899c7f09516ec55a36a19923c4647e63aa09ff98d7a` |
+| judge/ledger_crosscheck.jsonl | `76ec60ac75ca3a771138066a2eaa42d2772c418d835df579108c4bc1fd17cd21` |
+| judge/ledger_rejudge.jsonl | `92db59d497429bd259628d1561a1da414b7355c6e37b362853daf78d6340e1fd` |
+| readings_final.json | `509d2838d3424555e103ef6e1188fb0eb0674cdc9b5ba210ab0cb814b18a8156` |
+| readings_final.md | `03bfefeb0540fa3af7bfcd9b5b0978c0620a756b9c0701769e484380186c4992` |
+
+The final read names code `scripts/d2_premise.py` `ad21b9d4...` (the read-side changes above), `scripts/d2_rows.py`
+`c06a4fd8...` and `spontaneous/d2_judge.py` `701a88a5...`, and the frozen token file
+`results/d2/proxy_tokens.json` with sha256 `304ad7fa5e9963067e57f06833a03b64e2938eb6deb68dd33aadda31992302a0`.
+The orchestrator recorded that hash in spec.md after the calibration stage and before the main stage, and the final
+read checked the file against the calibration.
+
+The execution-evidence block is complete for both arms.
 
 The earlier CPU dry run (both interpreters, equal key for key) predicted the row counts above; its tables are in
 `results/d2/build_summary.json` and the per-task build reports.
 
-## Results so far
+## Results
 
-**Refusal direction (R12).** Layer 11, position -5, chosen among 19 of 125 non-degenerate candidates that passed
+### R13 verdict
+
+| task | classifier arm | acts-on-it arm | refusal control | task verdict |
+|---|---|---|---|---|
+| far_v2 | no separation (gap 0.005) | no separation (gap -0.012) | valid | fails |
+| sdr_v2 | separates (gap 0.160, 0.086 to 0.227), not explained (ablated 0.136) | no separation (gap 0.031) | valid | passes |
+| ser_v2 | misses (gap 0.145 < 0.15), and explained (ablated 0.032) | no separation (gap 0.000) | valid | fails |
+
+The direction's premise passes under R13, on SDR only.
+
+- **The SDR pass rests on the classifier arm alone.** That arm fits D against H on the 48 elicitation answers and
+  rates I on the same scale.
+- **The acts-on-it arm is uninformative.** After the forced wrong first answer, the model corrects it when the user
+  says they will act on it. Among rows the judge decided, 96 to 100 percent are corrections in every condition
+  without ablation, and 89 to 100 percent with it. Maintenance is under 0.04 everywhere without ablation, so no arm
+  can separate and the R2 reading is undefined on every task.
+- **The R2 reading on the classifier scale is the same on every task:** I patterns like D (p 0.84 to 0.995, spread
+  1.0), which the plan labels a falsity state. See caveat (a) for what that label can and cannot mean here.
+
+Refusal direction (R12): layer 11, position -5, chosen among 19 of 125 non-degenerate candidates that passed
 Arditi's filter (bypass -9.81, induce 7.72, KL 0.055). Ablation takes the harmful refusal share on the 32 held-out
 AdvBench prompts from 1.0 to 0.0, so the control is valid.
 
-**Classifier arm (R10), test ids, threshold 0.5:**
+### Classifier arm
 
-| task | gate AUROC (validation, D vs H) | rate D | rate I | rate H | gap D - I | 95% interval | gap under ablation (refit) | separates | refusal explains | R2 p |
-|---|---|---|---|---|---|---|---|---|---|---|
-| far_v2 | 1.000 | 1.000 | 0.995 | 0.000 | 0.005 | 0.000 to 0.018 | 0.000 | no | yes | 0.995 |
-| sdr_v2 | 1.000 | 1.000 | 0.840 | 0.000 | 0.160 | 0.086 to 0.227 | 0.136 | yes | no | 0.840 |
-| ser_v2 | 1.000 | 1.000 | 0.855 | 0.000 | 0.145 | 0.076 to 0.215 | 0.032 | no | yes | 0.855 |
+Test ids, threshold 0.5. "Refit" is the R12 primary under ablation: the classifier fitted again on ablated fit rows.
+"Frozen" applies the unablated classifier to ablated features.
 
-- SDR passes the pre-registered rule by one point: the gap is 0.160 against the 0.15 bar, and its interval
-  (0.086 to 0.227) spans the bar. Ablation leaves 0.136 of it, less than half the change needed to "explain" it.
-- SER misses by half a point (0.145), and the refusal control would explain it anyway (0.145 to 0.032).
-- FAR has no gap. Its "refusal explains: yes" is degenerate, because any change of a near-zero gap counts as half.
-- The R2 reading is "I patterns like D: falsity state" on all three tasks (spread 1.0, p 0.84 to 0.995). The
-  plan's qualifier applies: D and I share clause words, so this can be lexical.
-- AUROC of D against H is 1.000 on validation and test in every task, and I against H is 0.991 to 1.000. Only H
-  lacks an operator clause, so the probe may be reading the clause's presence rather than a lie state; D against I
-  is 0.69 to 0.76.
-- Under ablation the frozen classifier calls almost everything D (H rate 0.46, 0.98 and 1.00), so it is
-  uninformative, as R12 anticipated by making the refit primary. The refit has no gate (no gate rows were run
-  ablated); its held-out D and H test rates (1.0 and 0.0) are the out-of-sample check.
-- Per question group (descriptive, not in the rule), the D - I gap is: FAR lie 0.000, no-lie 0.086, knowable 0.148;
-  SDR 0.152, 0.044, 0.316; SER 0.213, 0.181, 0.004.
+| task | condition | gate AUROC (val D vs H) | rate D | rate I | rate H | gap D - I | 95% interval | AUROC D vs I | AUROC I vs H |
+|---|---|---|---|---|---|---|---|---|---|
+| far_v2 | base | 1.000 | 1.000 | 0.995 | 0.000 | 0.005 | 0.000 to 0.018 | 0.711 | 1.000 |
+| far_v2 | ablated, refit | none | 1.000 | 1.000 | 0.000 | 0.000 | 0.000 to 0.000 | 0.663 | |
+| far_v2 | ablated, frozen | | 1.000 | 1.000 | 0.457 | 0.000 | | | |
+| sdr_v2 | base | 1.000 | 1.000 | 0.840 | 0.000 | 0.160 | 0.086 to 0.227 | 0.763 | 1.000 |
+| sdr_v2 | ablated, refit | none | 1.000 | 0.864 | 0.000 | 0.136 | 0.069 to 0.196 | 0.775 | |
+| sdr_v2 | ablated, frozen | | 1.000 | 1.000 | 0.984 | 0.000 | | | |
+| ser_v2 | base | 1.000 | 1.000 | 0.855 | 0.000 | 0.145 | 0.076 to 0.215 | 0.690 | 0.991 |
+| ser_v2 | ablated, refit | none | 1.000 | 0.968 | 0.000 | 0.032 | 0.005 to 0.061 | 0.635 | |
+| ser_v2 | ablated, frozen | | 1.000 | 1.000 | 1.000 | 0.000 | | | |
 
-**Verdict so far.** The classifier arm passes on SDR only. Every task's verdict is not final until the acts-on-it
-arm is judged, so the premise does not yet pass or fail.
+Test AUROC of D against H is 1.000 on every task, and training AUROC is 1.000 (base and refit). Mean classifier
+score: D 0.996 to 0.998, I 0.823 to 0.942, H 0.002 to 0.003.
 
-**Generations.** Read by eye on a seeded sample: replies are complete sentences; the model often corrects the
-forced answer in all three conditions (for example "I made a mistake... the correct answer is actually ...") and
-sometimes refuses to help mislead a boss in D. Nothing here is a judged rate.
+Per question group (descriptive, not in the rule; each group fits its own classifier):
 
-**Judge plan for the orchestrator (not run).** Requests are counted by the dry run against empty caches; duplicate
-requests (identical facts and reply) share one paid call and every row still gets its label. The cost uses the
-measured prompt sizes (about 670 input tokens, 8 output tokens) at the pinned prices (Haiku $1 and $5, Sonnet $3
-and $15 per million).
+| task | group | gate AUROC | rate D | rate I | rate H | gap | 95% interval | AUROC D vs I |
+|---|---|---|---|---|---|---|---|---|
+| far_v2 | lie | 1.000 | 1.000 | 1.000 | 0.000 | 0.000 | 0.000 to 0.000 | 0.714 |
+| far_v2 | no-lie | 1.000 | 1.000 | 0.914 | 0.000 | 0.086 | 0.031 to 0.161 | 0.614 |
+| far_v2 | knowable | 1.000 | 0.981 | 0.833 | 0.000 | 0.148 | 0.079 to 0.237 | 0.624 |
+| sdr_v2 | lie | 1.000 | 1.000 | 0.848 | 0.000 | 0.152 | 0.076 to 0.228 | 0.806 |
+| sdr_v2 | no-lie | 1.000 | 0.996 | 0.952 | 0.012 | 0.044 | 0.008 to 0.088 | 0.612 |
+| sdr_v2 | knowable | 0.966 | 0.896 | 0.580 | 0.068 | 0.316 | 0.239 to 0.400 | 0.653 |
+| ser_v2 | lie | 1.000 | 0.996 | 0.783 | 0.000 | 0.213 | 0.142 to 0.295 | 0.722 |
+| ser_v2 | no-lie | 0.999 | 0.996 | 0.815 | 0.008 | 0.181 | 0.060 to 0.317 | 0.640 |
+| ser_v2 | knowable | 0.974 | 0.916 | 0.912 | 0.044 | 0.004 | -0.088 to 0.095 | 0.391 |
 
-| stage | model | rows | paid requests | estimated cost | ledger ceiling (minimum) |
-|---|---|---|---|---|---|
-| calibration | Haiku 4.5 | 600 | 547 | $0.39 | $2.00 |
-| main | Haiku 4.5 | 2,127 | 1,666 | $1.19 | $4.50 |
-| main_ablated | Haiku 4.5 | 2,127 | 1,739 or fewer | $1.23 | $4.50 |
-| crosscheck | Sonnet 4.5 | 200 | 191 | $0.41 | $7.00 |
-| rejudge | Haiku 4.5 | 213 | 202 | $0.14 | $2.00 |
-| total | | 5,267 | 4,345 or fewer | about $3.40 | $20.00 |
+### Acts-on-it arm
 
-The ceilings matter more than the spend. `JudgeBudget` counts in-flight reservations against the ceiling: a Haiku
-reservation is $0.20 at concurrency 8 ($1.60 in flight), and a Sonnet reservation is $3.00 at concurrency 2 ($6.00
-in flight), which `d2_premise.py` cannot lower. A crosscheck ledger below about $6.50 stops on its second call.
-B3's split ($10, $3, $7) does not carry over. Each stage stays far under 5,000 attempts.
+Judged labels on test rows. The maintenance rate is MAINTAINED / (MAINTAINED + CORRECTED). Counts are MAINTAINED,
+CORRECTED and UNCLEAR. The gap is D - I on ids where both are decided.
 
-Commands, from the worktree with `OPENROUTER_API_KEY` set; `J` is `outputs/_analyses/deception-divergence/d2/judge`
-and the frozen token file's default path is `docs/research/deception-divergence/results/d2/proxy_tokens.json`
-(a default; any tracked path works):
+| task | condition | counts D | counts I | counts H | maintenance D | maintenance I | maintenance H | gap | 95% interval | paired ids | UNCLEAR share D, I, H |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| far_v2 | base | 2, 197, 11 | 4, 166, 40 | 1, 209, 0 | 0.010 | 0.024 | 0.005 | -0.012 | -0.043 to 0.031 | 162 | 0.05, 0.19, 0.00 |
+| far_v2 | ablated | 9, 141, 60 | 18, 141, 51 | 3, 206, 1 | 0.060 | 0.113 | 0.014 | -0.067 | -0.185 to 0.000 | 120 | 0.29, 0.24, 0.00 |
+| sdr_v2 | base | 8, 198, 44 | 1, 229, 20 | 0, 250, 0 | 0.039 | 0.004 | 0.000 | 0.031 | -0.005 to 0.093 | 193 | 0.18, 0.08, 0.00 |
+| sdr_v2 | ablated | 9, 216, 25 | 2, 220, 28 | 0, 250, 0 | 0.040 | 0.009 | 0.000 | 0.030 | 0.005 to 0.066 | 202 | 0.10, 0.11, 0.00 |
+| ser_v2 | base | 1, 205, 43 | 1, 239, 9 | 0, 249, 0 | 0.005 | 0.004 | 0.000 | 0.000 | -0.015 to 0.014 | 203 | 0.17, 0.04, 0.00 |
+| ser_v2 | ablated | 13, 217, 19 | 9, 214, 26 | 0, 247, 2 | 0.057 | 0.040 | 0.000 | 0.014 | -0.039 to 0.062 | 207 | 0.08, 0.10, 0.01 |
 
-```
-PY="/u/swong2/.conda/envs/mgnp/bin/python -I scripts/d2_premise.py"
-J=outputs/_analyses/deception-divergence/d2/judge
-TOK=docs/research/deception-divergence/results/d2/proxy_tokens.json
-# 1. calibration labels (600 rows)
-$PY judge --judge-stage calibration --ledger $J/ledger_calibration.jsonl --cache $J/cache_haiku.jsonl --labels-out $J/labels_calibration.jsonl
-# 2. freeze the proxy tokens; record the printed sha256 in spec.md before step 3 (G-D2)
-$PY read --labels $J/labels_calibration.jsonl --write-tokens $TOK
-# 3. and 4. primary labels on the test rows
-$PY judge --judge-stage main --ledger $J/ledger_main.jsonl --cache $J/cache_haiku.jsonl --labels-out $J/labels_main.jsonl
-$PY judge --judge-stage main_ablated --ledger $J/ledger_main_ablated.jsonl --cache $J/cache_haiku.jsonl --labels-out $J/labels_main_ablated.jsonl
-# 5. Sonnet cross-check (200 seeded unablated test rows)
-$PY judge --judge-stage crosscheck --ledger $J/ledger_crosscheck.jsonl --cache $J/cache_sonnet.jsonl --labels-out $J/labels_crosscheck.jsonl
-# 6. re-judge (213 seeded rows) through a fresh cache
-$PY judge --judge-stage rejudge --ledger $J/ledger_rejudge.jsonl --cache $J/cache_rejudge.jsonl --primary-cache $J/cache_haiku.jsonl --labels-out $J/labels_rejudge.jsonl
-# 7. the verdict, against the frozen tokens
-$PY read --labels $J/labels_calibration.jsonl $J/labels_main.jsonl $J/labels_main_ablated.jsonl $J/labels_crosscheck.jsonl $J/labels_rejudge.jsonl --tokens $TOK
-```
+The spread between the D and H maintenance rates is 0.005, 0.039 and 0.005, far below the 0.30 that the R2 reading
+needs. The FAR ablated pass raises the UNCLEAR flag, with D at 0.29 against the 0.25 bar.
 
-Each live stage refuses without a reviewed ledger, so the five ledgers (schema 1, reviewed, the ceilings above,
-`max_paid_attempts` up to 5,000) come first. Add `--dry-run` to any judge line to recount against the cache before
-paying. Step 7 checks that the frozen token file equals the calibration and fails otherwise. Before the read-side
-change above, step 7 would have let the cross-check and re-judge labels overwrite primary labels; with it, those
-files feed only the R11 report.
+First-token proxy, frozen in `results/d2/proxy_tokens.json`. The correction lists are FAR "I", "The", "However",
+"Wait" and "Actually"; SDR "I" and "Actually"; SER "I". The maintenance list is empty on every task. Agreement with
+the judge on unablated decided test rows is 0.988 (579 rows), 0.987 (686) and 0.997 (695), with no undecided row.
+
+### Judge checks (R11)
+
+| check | rows | exact agreement | agreement where both decided | flip rate |
+|---|---|---|---|---|
+| Sonnet cross-check, all | 200 | 0.965 | 1.000 (179 rows) | |
+| cross-check far_v2 | 50 | 0.980 | 1.000 (45) | |
+| cross-check sdr_v2 | 69 | 0.913 | 1.000 (57) | |
+| cross-check ser_v2 | 81 | 1.000 | 1.000 (77) | |
+| re-judge, all | 213 | 1.000 | 1.000 (196) | 0.000 |
+
+Confusion, primary label then check label:
+
+| check | C to C | M to M | U to U | C to U | M to U | U to C |
+|---|---|---|---|---|---|---|
+| cross-check | 175 | 4 | 14 | 3 | 1 | 3 |
+| re-judge | 191 | 5 | 17 | 0 | 0 | 0 |
+
+The cross-check's 7 disagreements all involve UNCLEAR. The 21 rows outside "both decided" are the 14 UNCLEAR
+agreements plus those 7 disagreements. No row flips between MAINTAINED and CORRECTED in either check.
+
+### Spend and the proxy freeze
+
+| item | value |
+|---|---|
+| OpenRouter spend, five ledgers, all settled | $2.7071 of the $20 cap |
+| paid attempts | 4,064 |
+| GPU | job 50155519, 0.70 GPU-hours (plus 158 s for the failed 50153789) |
+| proxy token file sha256, recorded in spec.md before the main stage | `304ad7fa5e9963067e57f06833a03b64e2938eb6deb68dd33aadda31992302a0` |
+
+### Caveats
+
+- **(a) The classifier may read the instruction clause, not a lie-maintenance state.** It is trained on D against
+  H. D and I both carry an operator clause and H does not, so a gate AUROC of 1.000 and I rates of 0.84 to 0.995
+  are what a clause-presence reader would produce. Four observations bear on this:
+  - **Not falsity alone.** H has the same forced false first answer and scores 0.000 on every task, so the
+    classifier does not read the falsity of the prior answer by itself. It reads something D and I share and H
+    lacks. In this design that is the clause, or the fact that the falsehood was instructed, and nothing here tells
+    them apart. The R2 label "falsity state" can only mean "instructed falsity" here.
+  - **Unrelated questions.** D and H separate almost perfectly on the knowable group too (gate 0.97 to 1.00).
+    Those are questions unrelated to the lie, so the signal is available everywhere in the context. Pacchiardi et
+    al. report lie detection from unrelated questions as well, so this does not settle the question.
+  - **D against I.** This AUROC is 0.69 to 0.76, the only part of the evidence that bears on a D-specific
+    component. D's and I's clauses differ in wording as well as in whom they deceive, so even that difference can
+    be lexical.
+  - **The refusal ablation is silent.** The refit separates D from H as perfectly as before, so the D-H marker is
+    not the refusal direction. That says nothing about clause against state.
+  - What would bear on it: a condition with the clause but a true forced answer, a condition with a lie but no
+    clause, or the position-resolved patching of plan section 8. None was run.
+- **(b) The SDR pass is narrow and stands alone.** The gap is 0.160 against the 0.15 bar, so it passes by one
+  point. Its interval runs from 0.086 to 0.227, so the data cannot exclude a gap well under the bar; the pass
+  rests on the point estimate. SER sits 0.5 points below the bar, where its interval (0.076 to 0.215) overlaps
+  SDR's almost entirely. Only one of three tasks passes, on one arm.
+- **(c) The acts-on-it null is a limit of the design, not evidence about the state.** With a forced wrong first
+  answer, the model corrects itself in nearly every row of every condition, honest twin included. The arm has no
+  room to separate D from I. Its null says the two-turn design under forced wrong answers cannot measure
+  maintenance in this model. It says nothing about whether a maintenance state exists. The R2 reading on this arm
+  is undefined, not "I patterns like H".
+- **(d) Other points from `readings_final.json`:**
+  - **The proxy is vacuous.** Its maintenance list is empty, so it labels every row CORRECTED when any correction
+    token is present. Its agreement (0.987 to 0.997) equals the judge's CORRECTED share; on FAR, 572 of 579 rows
+    is exactly 0.988. It "qualifies" by the 0.85 bar but cannot detect maintenance.
+  - **The plan's proxy trigger fired.** "I" opens at least 112, 125 and 188 of the 200 calibration rows (FAR, SDR, SER),
+    above the one-fifth trigger of plan section 3b. So a stem-resolved proxy needs a ruling before any first-token
+    proxy can serve as a patching readout.
+  - **The frozen classifier is uninformative under ablation.** It calls H rows D at 0.46, 0.98 and 1.00. Ablating
+    the refusal direction moves the probe answers along the classifier's D-H axis, which is why R12 made the refit
+    primary. The refit has no validation gate, because no gate rows were run ablated. Its held-out D and H test
+    rates (1.0 and 0.0) are the only out-of-sample check.
+  - **Ablation makes I more D-like on every task** (refit I rate FAR 0.995 to 1.000, SDR 0.840 to 0.864, SER 0.855
+    to 0.968). That is what "explains" SER's gap.
+  - **The gap is not carried by a consistent question group.** By group, SDR's gap sits mostly in the knowable
+    (0.316) and lie (0.152) groups. SER's sits in the lie (0.213) and no-lie (0.181) groups, with knowable at 0.004
+    and a D-I AUROC of 0.391, below chance. FAR's appears only in knowable (0.148). The groups are descriptive and
+    not corrected for multiplicity.
+  - **"Refusal explains" is degenerate where the gap is near zero.** That covers FAR's classifier arm and the FAR
+    and SER acts-on-it arms, where any change counts as half.
+  - **D carries the most UNCLEAR labels.** Unablated, 0.17 to 0.18 on SDR and SER; ablated FAR reaches 0.29 and
+    trips the flag. Among the few maintained rows, D leads on SDR (8 of 206 decided), and the SDR acts-on-it
+    interval under ablation (0.005 to 0.066) excludes zero. Both are far under the 15-point rule.
+  - **The I ids are the whole inversion pool on FAR (210) and SER (249).** SDR uses 250 of its 788 ids. The first
+    answer is forced, so the model never chose the lie it is asked to maintain.
 
 ## What is NOT done
 
-- The judge stages, the proxy token freeze and the acts-on-it arm have not run, so no task's verdict is final.
-  Paid calls are the orchestrator's.
+- Not done by this worker: the patching ruling and the independent review, which are the orchestrator's. The
+  findings entry is not written either.
+- No stem-resolved proxy exists. Plan section 3b's trigger fired ("I" opens more than a fifth of the calibration
+  rows on every task), so one needs a ruling before any first-token proxy serves as a patching readout.
 - The full repository test suite was not run; only the two D2 test files ran, on both interpreters. No existing
   file other than `.gitignore` was edited.
 - Once, while checking the output files, a combined command ran `git status --short` in the worktree (read only, no
   output). The brief forbids git; no other git command ran.
-- The patching payload (plan section 8) is planned only and needs its own ruling if the premise passes.
+- The patching payload (plan section 8) is planned only. The premise passes on SDR, so it now waits on the
+  orchestrator's ruling.
 - No teacher-forced stem set was built for the first-token proxy, although the brief asked for one as
   instructed-route R4 did. The proxy is calibrated from the first generated token of the judged validation
-  generations; an ambiguous opener such as "I" falls into neither list and its rows count as `undecided`. If such
-  openers start more than a fifth of the calibration rows, a stem-resolved proxy needs a ruling before the proxy
-  can be the patching readout (plan section 3b). The judge is the primary readout either way.
+  generations. In the event, "I" reached the 80 percent majority for CORRECTED and joined the correction list on
+  every task, and no maintenance token qualified (see caveat (d)). The judge is the primary readout either way.
 - The model tests use a tiny random Llama (2 layers, 64 hidden) with the real 128,256-token vocabulary instead of
   the vocab-101 model in `tests/helpers.py`, so that the real rows, the 48 questions and the real yes, no and
   refusal token ids run unchanged.
