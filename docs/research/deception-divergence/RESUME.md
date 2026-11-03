@@ -36,6 +36,7 @@ No GPU job is in flight. Reservations r-001 to r-008: 8.33 GPU-hours reserved, 2
 - Do not write under `docs/research/specificity-ladder/`, the `specificity-ladder` worktree or branch, `.scratch/sdr-*`, `outputs/_analyses/sdr-*`, `.scratch/selective-deception`, `outputs/_studies/selective-deception`, `.scratch/eval5-grader-fixes`, or `docs/research/instructed-route/` (except the F-rte-008 row in FINDINGS.md).
 - Do not score any set listed in `docs/research/held_out.json`.
 - Do not write U1 trainer code before the user has said the Codex coordination is done (reaffirmed in R6 v).
+- Do not create judge ledgers whose ceilings sum to more than the remaining OpenRouter cap (the D2 ledgers summed to $21 against a $20 cap while spend was $2.71; review 04, hand-back check).
 
 ## Open decisions for the user
 
