@@ -456,3 +456,366 @@ is under 0.058 s per forward.
 - `docs/research/neuron-partition/jobs/ablation_cells.sbatch`
 - `docs/research/neuron-partition/jobs/ablation_bridges2.md`
 - `docs/research/neuron-partition/reports/02-w2-ablation-handback.md`
+
+## Addendum: full cells
+
+Written by W6 (Claude, Opus) on Tue 3 Nov 2026 and after. Each job ran on Bridges-2, allocation cis260372p, partition GPU-shared, one H100-80 GB, from the clone `/ocean/projects/cis260361p/swong2/Deception-Circuit`. Outputs were fetched with rsync through `b2dtn` to the same paths under `WT/outputs/_analyses/neuron-partition/`, and the Slurm logs to `WT/logs/bridges2/`. Times are EST.
+
+### Job A: all-position sets at k 500 and 1,000
+
+- **Job and cluster.** Job 50183187 on Bridges-2, partition GPU-shared, node w007, one H100-80 GB.
+- **State.** `sacct`: COMPLETED, exit 0:0, elapsed 02:39:44 (9,584 s) against 04:00:00 reserved. It started at 2:58 pm and ended at 5:38 pm.
+- **Slurm log.** `WT/logs/bridges2/np_ablate_50183187.out`.
+
+#### Cell `ablation/jobA-fe2db9e/far_all_sets_k500_with_nulls/`
+
+- **Sets file.** `outputs/_analyses/neuron-partition/sets/far_atp_all_c3d7763/far_all_sets_k500_with_nulls.json`, sha256 `64fa9565fc2b3ad1caef5955e2f961a8cb96734d668980bb18ed2113cfbc411a`, the same on Bridges-2 and Delta. It holds 84 sets: D_only, DI_shared, H_only, all_shared, each with 20 matched nulls.
+- **Cells.** 30 of 30 expected. `rows.jsonl` has 369,600 lines against 369,600 expected. Rows per condition: D 300, H 300, F 300, I 300, N 300, IOI 100. `unpaired` is empty.
+- **Self-replay and crosscheck.** Self-replay error D 0.0, I 0.0. The twin crosscheck's largest absolute difference is 0.0 over mean:D, mean:I, zero:D, zero:I (n = 600 each).
+- **Timing.** Model load 584.8 s. Script wall time 4481.6 s. Non-IOI cells ran at 0.0392 s per forward (range 0.039 to 0.0396), 96,654 forwards in the cells.
+- **Intact effects per stream,** from the twin-reference D and I cells (m in D's orientation, rate at margin 0.7).
+
+  | Stream | Ids | Intact G | p(opposite), intact | p(opposite), twin | Intact rate effect |
+  |---|---|---|---|---|---|
+  | D, clean | 300 | 9.847 | 0.993 | 0.000 | 0.993 |
+  | D, corrupt | 300 | 9.820 | 0.977 | 0.000 | 0.977 |
+  | I, clean | 300 | 14.730 | 0.997 | 0.000 | 0.997 |
+  | I, corrupt | 300 | 14.687 | 0.993 | 0.000 | 0.993 |
+
+  Averaged over streams, G is 9.834 for D (ladder audit 10.087) and 14.708 for I (ladder audit 14.979). The summary's intact rate is 0.985 for D and 0.995 for I.
+- **IOI (ruling R4).** Intact full-vocabulary argmax accuracy 0.51 on 100 rows against the brief's 0.51 (+0.0 points). The two-way accuracy is 1.0. Sentences sha256 `61ebeea317ac4932c0b859cc62b88ed0c45a7d6602d4866a9cf2373ee2cc5e59`.
+- **Provenance.** `WT/outputs/_analyses/neuron-partition/ablation/jobA-fe2db9e/far_all_sets_k500_with_nulls/run_manifest.json` names `git_commit` fe2db9e0d4736469aa180c6d89a18b5736710c20, `git_dirty` false, and `slurm_job_id` 50183187.
+- **Fetch check.** `summary.json` sha256 `d0847e207e6929eb771db88ebde761637595a9400fb963c5e5c6e8264b0f159e` on Delta, the same as on Bridges-2.
+
+#### Cell `ablation/jobA-fe2db9e/far_all_sets_k1000_with_nulls/`
+
+- **Sets file.** `outputs/_analyses/neuron-partition/sets/far_atp_all_c3d7763/far_all_sets_k1000_with_nulls.json`, sha256 `9ba4180c464a6857893a70928c2ba36d05f8959fae9b0309c4c71dc6fd54bba7`, the same on Bridges-2 and Delta. It holds 84 sets: D_only, DI_shared, H_only, all_shared, each with 20 matched nulls.
+- **Cells.** 30 of 30 expected. `rows.jsonl` has 369,600 lines against 369,600 expected. Rows per condition: D 300, H 300, F 300, I 300, N 300, IOI 100. `unpaired` is empty.
+- **Self-replay and crosscheck.** Self-replay error D 0.0, I 0.0. The twin crosscheck's largest absolute difference is 0.0 over mean:D, mean:I, zero:D, zero:I (n = 600 each).
+- **Timing.** Model load 904.3 s. Script wall time 4878.2 s. Non-IOI cells ran at 0.0401 s per forward (range 0.0398 to 0.0423), 96,654 forwards in the cells.
+- **Intact effects per stream,** from the twin-reference D and I cells (m in D's orientation, rate at margin 0.7).
+
+  | Stream | Ids | Intact G | p(opposite), intact | p(opposite), twin | Intact rate effect |
+  |---|---|---|---|---|---|
+  | D, clean | 300 | 9.847 | 0.993 | 0.000 | 0.993 |
+  | D, corrupt | 300 | 9.820 | 0.977 | 0.000 | 0.977 |
+  | I, clean | 300 | 14.730 | 0.997 | 0.000 | 0.997 |
+  | I, corrupt | 300 | 14.687 | 0.993 | 0.000 | 0.993 |
+
+  Averaged over streams, G is 9.834 for D (ladder audit 10.087) and 14.708 for I (ladder audit 14.979). The summary's intact rate is 0.985 for D and 0.995 for I.
+- **IOI (ruling R4).** Intact full-vocabulary argmax accuracy 0.51 on 100 rows against the brief's 0.51 (+0.0 points). The two-way accuracy is 1.0. Sentences sha256 `61ebeea317ac4932c0b859cc62b88ed0c45a7d6602d4866a9cf2373ee2cc5e59`.
+- **Provenance.** `WT/outputs/_analyses/neuron-partition/ablation/jobA-fe2db9e/far_all_sets_k1000_with_nulls/run_manifest.json` names `git_commit` fe2db9e0d4736469aa180c6d89a18b5736710c20, `git_dirty` false, and `slurm_job_id` 50183187.
+- **Fetch check.** `summary.json` sha256 `9de27a83713324ee609958d987fbafc346d49fcd52d56ec8303169d02e041cf9` on Delta, the same as on Bridges-2.
+
+### Job B: all-position k 2,000, then the readout-position comparison at k 1,000
+
+- **Job and cluster.** Job 50183194 on Bridges-2, partition GPU-shared, node w008, one H100-80 GB.
+- **State.** `sacct`: COMPLETED, exit 0:0, elapsed 02:42:04 (9,724 s) against 04:00:00 reserved. It started at 3:06 pm and ended at 5:48 pm.
+- **Slurm log.** `WT/logs/bridges2/np_ablate_50183194.out`.
+
+#### Cell `ablation/jobB-fe2db9e/far_all_sets_k2000_with_nulls/`
+
+- **Sets file.** `outputs/_analyses/neuron-partition/sets/far_atp_all_c3d7763/far_all_sets_k2000_with_nulls.json`, sha256 `df0d67969d596799b9afaa9d6d27d68f5ee3cf43d63f320bbe5ca34b8a2faee7`, the same on Bridges-2 and Delta. It holds 84 sets: D_only, DI_shared, H_only, all_shared, each with 20 matched nulls.
+- **Cells.** 30 of 30 expected. `rows.jsonl` has 369,600 lines against 369,600 expected. Rows per condition: D 300, H 300, F 300, I 300, N 300, IOI 100. `unpaired` is empty.
+- **Self-replay and crosscheck.** Self-replay error D 0.0, I 0.0. The twin crosscheck's largest absolute difference is 0.0 over mean:D, mean:I, zero:D, zero:I (n = 600 each).
+- **Timing.** Model load 474.8 s. Script wall time 4714.8 s. Non-IOI cells ran at 0.0423 s per forward (range 0.0419 to 0.0464), 96,654 forwards in the cells.
+- **Intact effects per stream,** from the twin-reference D and I cells (m in D's orientation, rate at margin 0.7).
+
+  | Stream | Ids | Intact G | p(opposite), intact | p(opposite), twin | Intact rate effect |
+  |---|---|---|---|---|---|
+  | D, clean | 300 | 9.847 | 0.993 | 0.000 | 0.993 |
+  | D, corrupt | 300 | 9.820 | 0.977 | 0.000 | 0.977 |
+  | I, clean | 300 | 14.730 | 0.997 | 0.000 | 0.997 |
+  | I, corrupt | 300 | 14.687 | 0.993 | 0.000 | 0.993 |
+
+  Averaged over streams, G is 9.834 for D (ladder audit 10.087) and 14.708 for I (ladder audit 14.979). The summary's intact rate is 0.985 for D and 0.995 for I.
+- **IOI (ruling R4).** Intact full-vocabulary argmax accuracy 0.51 on 100 rows against the brief's 0.51 (+0.0 points). The two-way accuracy is 1.0. Sentences sha256 `61ebeea317ac4932c0b859cc62b88ed0c45a7d6602d4866a9cf2373ee2cc5e59`.
+- **Provenance.** `WT/outputs/_analyses/neuron-partition/ablation/jobB-fe2db9e/far_all_sets_k2000_with_nulls/run_manifest.json` names `git_commit` fe2db9e0d4736469aa180c6d89a18b5736710c20, `git_dirty` false, and `slurm_job_id` 50183194.
+- **Fetch check.** `summary.json` sha256 `ebf663adbe34a44afd9a83a0710e8a07f622860fd820d976ed6f69fc08cdf8a9` on Delta, the same as on Bridges-2.
+
+#### Cell `ablation/jobB-fe2db9e/far_sets_k1000_with_nulls/`
+
+- **Sets file.** `outputs/_analyses/neuron-partition/sets/far_atp_readout_c3d7763/far_sets_k1000_with_nulls.json`, sha256 `3b516bb33ec81f2579b08feaac57fae4d648beafe0d7960fbe9a4ea7d3c9250f`, the same on Bridges-2 and Delta. It holds 84 sets: D_only, DI_shared, H_only, all_shared, each with 20 matched nulls.
+- **Cells.** 30 of 30 expected. `rows.jsonl` has 369,600 lines against 369,600 expected. Rows per condition: D 300, H 300, F 300, I 300, N 300, IOI 100. `unpaired` is empty.
+- **Self-replay and crosscheck.** Self-replay error D 0.0, I 0.0. The twin crosscheck's largest absolute difference is 0.0 over mean:D, mean:I, zero:D, zero:I (n = 600 each).
+- **Timing.** Model load 703.6 s. Script wall time 4640.5 s. Non-IOI cells ran at 0.0398 s per forward (range 0.0395 to 0.0409), 96,654 forwards in the cells.
+- **Intact effects per stream,** from the twin-reference D and I cells (m in D's orientation, rate at margin 0.7).
+
+  | Stream | Ids | Intact G | p(opposite), intact | p(opposite), twin | Intact rate effect |
+  |---|---|---|---|---|---|
+  | D, clean | 300 | 9.847 | 0.993 | 0.000 | 0.993 |
+  | D, corrupt | 300 | 9.820 | 0.977 | 0.000 | 0.977 |
+  | I, clean | 300 | 14.730 | 0.997 | 0.000 | 0.997 |
+  | I, corrupt | 300 | 14.687 | 0.993 | 0.000 | 0.993 |
+
+  Averaged over streams, G is 9.834 for D (ladder audit 10.087) and 14.708 for I (ladder audit 14.979). The summary's intact rate is 0.985 for D and 0.995 for I.
+- **IOI (ruling R4).** Intact full-vocabulary argmax accuracy 0.51 on 100 rows against the brief's 0.51 (+0.0 points). The two-way accuracy is 1.0. Sentences sha256 `61ebeea317ac4932c0b859cc62b88ed0c45a7d6602d4866a9cf2373ee2cc5e59`.
+- **Provenance.** `WT/outputs/_analyses/neuron-partition/ablation/jobB-fe2db9e/far_sets_k1000_with_nulls/run_manifest.json` names `git_commit` fe2db9e0d4736469aa180c6d89a18b5736710c20, `git_dirty` false, and `slurm_job_id` 50183194.
+- **Fetch check.** `summary.json` sha256 `f102e10c7a4459135f9a03af280d7d8e2b450d5fdc72fb0eae072f1abfea3bed` on Delta, the same as on Bridges-2.
+
+### Job C: contrast-key sets at k 1,000
+
+- **Job and cluster.** Job 50182995 on Bridges-2, partition GPU-shared, node w010, one H100-80 GB.
+- **State.** `sacct`: COMPLETED, exit 0:0, elapsed 01:07:15 (4,035 s) against 02:00:00 reserved. It started at 2:50 pm and ended at 3:57 pm.
+- **Slurm log.** `WT/logs/bridges2/np_ablate_50182995.out`.
+
+#### Cell `ablation/jobC-fe2db9e/`
+
+- **Sets file.** `outputs/_analyses/neuron-partition/sets/far_contrast_66741d7/far_contrast_sets_k1000_with_nulls.json`, sha256 `6adacdee3d198364fa87a86772efc1672447c0d76a7181a47705f39e5e1e0cad`, the same on Bridges-2 and Delta. It holds 63 sets: D_only, DI_shared, H_only, each with 20 matched nulls.
+- **Cells.** 30 of 30 expected. `rows.jsonl` has 277,200 lines against 277,200 expected. Rows per condition: D 300, H 300, F 300, I 300, N 300, IOI 100. `unpaired` is empty.
+- **Self-replay and crosscheck.** Self-replay error D 0.0, I 0.0. The twin crosscheck's largest absolute difference is 0.0 over mean:D, mean:I, zero:D, zero:I (n = 600 each).
+- **Timing.** Model load 738.4 s. Script wall time 3873.3 s. Non-IOI cells ran at 0.041 s per forward (range 0.0407 to 0.0412), 72,066 forwards in the cells.
+- **Intact effects per stream,** from the twin-reference D and I cells (m in D's orientation, rate at margin 0.7).
+
+  | Stream | Ids | Intact G | p(opposite), intact | p(opposite), twin | Intact rate effect |
+  |---|---|---|---|---|---|
+  | D, clean | 300 | 9.847 | 0.993 | 0.000 | 0.993 |
+  | D, corrupt | 300 | 9.820 | 0.977 | 0.000 | 0.977 |
+  | I, clean | 300 | 14.730 | 0.997 | 0.000 | 0.997 |
+  | I, corrupt | 300 | 14.687 | 0.993 | 0.000 | 0.993 |
+
+  Averaged over streams, G is 9.834 for D (ladder audit 10.087) and 14.708 for I (ladder audit 14.979). The summary's intact rate is 0.985 for D and 0.995 for I.
+- **IOI (ruling R4).** Intact full-vocabulary argmax accuracy 0.51 on 100 rows against the brief's 0.51 (+0.0 points). The two-way accuracy is 1.0. Sentences sha256 `61ebeea317ac4932c0b859cc62b88ed0c45a7d6602d4866a9cf2373ee2cc5e59`.
+- **Provenance.** `WT/outputs/_analyses/neuron-partition/ablation/jobC-fe2db9e/run_manifest.json` names `git_commit` fe2db9e0d4736469aa180c6d89a18b5736710c20, `git_dirty` false, and `slurm_job_id` 50182995.
+- **Fetch check.** `summary.json` sha256 `d3c8db4683fc85ef287d32fd8b0e355366b71e04dc19c8aeec13c30d9134f1f7` on Delta, the same as on Bridges-2.
+
+### Verdict: All-position ranking, primary (jobs A and B, k 500, 1,000 and 2,000)
+
+```
+/u/swong2/.conda/envs/mgnp/bin/python scripts/neuron_partition_verdict.py --cell outputs/_analyses/neuron-partition/ablation/jobA-fe2db9e/far_all_sets_k500_with_nulls --cell outputs/_analyses/neuron-partition/ablation/jobA-fe2db9e/far_all_sets_k1000_with_nulls --cell outputs/_analyses/neuron-partition/ablation/jobB-fe2db9e/far_all_sets_k2000_with_nulls --output-dir outputs/_analyses/neuron-partition/verdict/far_atp_all_c3d7763
+```
+
+This run replaced the provisional run on job A alone, which wrote the same directory at 5:45 pm EST.
+
+`WT/outputs/_analyses/neuron-partition/verdict/far_atp_all_c3d7763/verdict.md`, verbatim below the title, with its headings moved down two levels. The only edit is that half1 and half2 are written half 1 and half 2, which the linter requires.
+
+
+Cells: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/neuron-partition/outputs/_analyses/neuron-partition/ablation/jobA-fe2db9e/far_all_sets_k500_with_nulls, /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/neuron-partition/outputs/_analyses/neuron-partition/ablation/jobA-fe2db9e/far_all_sets_k1000_with_nulls, /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/neuron-partition/outputs/_analyses/neuron-partition/ablation/jobB-fe2db9e/far_all_sets_k2000_with_nulls.
+Halves: split_halves (scripts/neuron_partition_data.py), stratified by pressure_id.
+D and I removed are the ladder margin ratio (R2, primary) and the rate at margin 0.7 (R8); brackets are bootstrap 95% intervals over ids (whole sample). Collateral shifts are under the mean reference (R7). Pass flags: every N1 bar on the subset.
+
+#### Reference: twin
+
+| class | k | size | D removed (margin) | D removed (rate) | I removed (margin) | I removed (rate) | null p95 of D removed | H shift | F shift | IOI shift | bars (whole) | half 1 | half 2 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| D_only | 500 | 338 | 0.813 [0.80, 0.82] | 1.000 [1.00, 1.00] | 0.145 [0.14, 0.15] | 0.186 [0.16, 0.21] | 0.012 | 0.0 | 0.0 | -6.0 | fail | fail | fail |
+| D_only | 1000 | 714 | 0.850 [0.84, 0.86] | 1.000 [1.00, 1.00] | 0.340 [0.33, 0.35] | 0.481 [0.45, 0.51] | 0.025 | -0.2 | 0.0 | -11.0 | fail | fail | fail |
+| D_only | 2000 | 1442 | 0.847 [0.84, 0.85] | 1.000 [1.00, 1.00] | 0.495 [0.49, 0.50] | 0.968 [0.95, 0.98] | 0.028 | -0.8 | -0.2 | -13.0 | fail | fail | fail |
+| DI_shared | 500 | 79 | 0.257 [0.25, 0.27] | 0.856 [0.83, 0.88] | 0.380 [0.38, 0.39] | 0.806 [0.78, 0.84] | 0.007 | 0.0 | 0.0 | 3.0 | fail | fail | fail |
+| DI_shared | 1000 | 144 | 0.291 [0.28, 0.30] | 0.909 [0.89, 0.93] | 0.403 [0.40, 0.41] | 0.950 [0.93, 0.97] | 0.012 | 0.0 | 0.0 | 0.0 | fail | fail | fail |
+| DI_shared | 2000 | 289 | 0.336 [0.33, 0.34] | 0.944 [0.93, 0.96] | 0.431 [0.43, 0.44] | 1.000 [1.00, 1.00] | 0.016 | 0.0 | 0.0 | 2.0 | fail | fail | fail |
+| H_only | 500 | 390 | -0.149 [-0.17, -0.12] | 0.222 [0.19, 0.26] | -0.272 [-0.29, -0.26] | 0.022 [0.01, 0.04] | 0.024 | -1.3 | -1.3 | -8.0 | fail | fail | fail |
+| H_only | 1000 | 802 | -0.495 [-0.53, -0.45] | 0.130 [0.10, 0.16] | -0.368 [-0.38, -0.35] | 0.018 [0.01, 0.03] | 0.040 | -11.2 | -10.2 | -5.0 | fail | fail | fail |
+| H_only | 2000 | 1623 | -0.647 [-0.71, -0.58] | 0.166 [0.13, 0.20] | -0.421 [-0.44, -0.40] | 0.010 [0.00, 0.02] | 0.061 | -23.5 | -19.8 | -1.0 | fail | fail | fail |
+| all_shared | 500 | 62 | 0.370 [0.36, 0.38] | 0.964 [0.95, 0.98] | 0.451 [0.44, 0.46] | 0.889 [0.86, 0.92] | 0.005 | 0.0 | -0.3 | -11.0 | fail | fail | fail |
+| all_shared | 1000 | 94 | 0.405 [0.40, 0.41] | 0.988 [0.98, 1.00] | 0.488 [0.48, 0.49] | 0.960 [0.94, 0.97] | 0.004 | 0.0 | -0.3 | -10.0 | fail | fail | fail |
+| all_shared | 2000 | 160 | 0.480 [0.47, 0.49] | 1.000 [1.00, 1.00] | 0.546 [0.54, 0.55] | 0.998 [0.99, 1.00] | 0.019 | -4.2 | -4.5 | -19.0 | fail | fail | fail |
+
+#### Reference: mean
+
+| class | k | size | D removed (margin) | D removed (rate) | I removed (margin) | I removed (rate) | null p95 of D removed | H shift | F shift | IOI shift | bars (whole) | half 1 | half 2 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| D_only | 500 | 338 | 0.724 [0.71, 0.74] | 0.997 [0.99, 1.00] | 0.161 [0.15, 0.17] | 0.129 [0.11, 0.16] | 0.020 | 0.0 | 0.0 | -6.0 | fail | fail | fail |
+| D_only | 1000 | 714 | 0.768 [0.75, 0.78] | 1.000 [1.00, 1.00] | 0.414 [0.41, 0.42] | 0.858 [0.83, 0.88] | 0.045 | -0.2 | 0.0 | -11.0 | fail | fail | fail |
+| D_only | 2000 | 1442 | 0.783 [0.77, 0.80] | 1.000 [1.00, 1.00] | 0.573 [0.57, 0.58] | 1.000 [1.00, 1.00] | 0.025 | -0.8 | -0.2 | -13.0 | fail | fail | fail |
+| DI_shared | 500 | 79 | 0.233 [0.22, 0.24] | 0.829 [0.80, 0.86] | 0.373 [0.37, 0.38] | 0.729 [0.69, 0.76] | 0.007 | 0.0 | 0.0 | 3.0 | fail | fail | fail |
+| DI_shared | 1000 | 144 | 0.252 [0.24, 0.26] | 0.849 [0.82, 0.87] | 0.391 [0.39, 0.40] | 0.894 [0.87, 0.92] | 0.030 | 0.0 | 0.0 | 0.0 | fail | fail | fail |
+| DI_shared | 2000 | 289 | 0.279 [0.27, 0.29] | 0.919 [0.90, 0.94] | 0.417 [0.41, 0.42] | 0.975 [0.96, 0.99] | 0.028 | 0.0 | 0.0 | 2.0 | fail | fail | fail |
+| H_only | 500 | 390 | -0.209 [-0.22, -0.19] | 0.102 [0.08, 0.13] | -0.121 [-0.14, -0.11] | 0.126 [0.10, 0.15] | 0.047 | -1.3 | -1.3 | -8.0 | fail | fail | fail |
+| H_only | 1000 | 802 | -0.515 [-0.54, -0.49] | 0.100 [0.08, 0.13] | -0.159 [-0.18, -0.14] | 0.137 [0.11, 0.16] | 0.034 | -11.2 | -10.2 | -5.0 | fail | fail | fail |
+| H_only | 2000 | 1623 | -0.698 [-0.73, -0.67] | 0.146 [0.12, 0.17] | -0.042 [-0.07, -0.02] | 0.280 [0.24, 0.31] | 0.074 | -23.5 | -19.8 | -1.0 | fail | fail | fail |
+| all_shared | 500 | 62 | 0.177 [0.17, 0.18] | 0.497 [0.46, 0.53] | 0.261 [0.26, 0.27] | 0.223 [0.19, 0.25] | 0.005 | 0.0 | -0.3 | -11.0 | fail | fail | fail |
+| all_shared | 1000 | 94 | 0.202 [0.19, 0.21] | 0.665 [0.63, 0.70] | 0.298 [0.29, 0.30] | 0.315 [0.29, 0.34] | 0.007 | 0.0 | -0.3 | -10.0 | fail | fail | fail |
+| all_shared | 2000 | 160 | 0.232 [0.22, 0.24] | 0.775 [0.74, 0.80] | 0.335 [0.33, 0.34] | 0.457 [0.43, 0.48] | 0.017 | -4.2 | -4.5 | -19.0 | fail | fail | fail |
+
+#### Reference: zero
+
+| class | k | size | D removed (margin) | D removed (rate) | I removed (margin) | I removed (rate) | null p95 of D removed | H shift | F shift | IOI shift | bars (whole) | half 1 | half 2 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| D_only | 500 | 338 | 0.550 [0.54, 0.56] | 0.980 [0.97, 0.99] | 0.220 [0.21, 0.23] | 0.204 [0.18, 0.23] | 0.025 | 0.0 | 0.0 | -6.0 | fail | fail | fail |
+| D_only | 1000 | 714 | 0.583 [0.57, 0.59] | 0.959 [0.94, 0.97] | 0.287 [0.28, 0.29] | 0.233 [0.20, 0.27] | 0.073 | -0.2 | 0.0 | -11.0 | fail | fail | fail |
+| D_only | 2000 | 1442 | 0.552 [0.54, 0.56] | 0.958 [0.94, 0.97] | 0.403 [0.40, 0.41] | 0.911 [0.89, 0.93] | 0.037 | -0.8 | -0.2 | -13.0 | fail | fail | fail |
+| DI_shared | 500 | 79 | 0.227 [0.22, 0.24] | 0.812 [0.78, 0.84] | 0.369 [0.36, 0.37] | 0.680 [0.64, 0.71] | 0.010 | 0.0 | 0.0 | 3.0 | fail | fail | fail |
+| DI_shared | 1000 | 144 | 0.245 [0.24, 0.25] | 0.839 [0.81, 0.87] | 0.387 [0.38, 0.39] | 0.866 [0.84, 0.89] | 0.030 | 0.0 | 0.0 | 0.0 | fail | fail | fail |
+| DI_shared | 2000 | 289 | 0.273 [0.26, 0.28] | 0.919 [0.90, 0.94] | 0.418 [0.41, 0.42] | 0.972 [0.96, 0.98] | 0.034 | 0.0 | 0.0 | 2.0 | fail | fail | fail |
+| H_only | 500 | 390 | -0.127 [-0.14, -0.11] | 0.103 [0.08, 0.13] | -0.003 [-0.01, 0.01] | 0.146 [0.12, 0.17] | 0.063 | -1.3 | -1.3 | -8.0 | fail | fail | fail |
+| H_only | 1000 | 802 | -0.326 [-0.35, -0.31] | 0.225 [0.19, 0.26] | -0.023 [-0.04, -0.01] | 0.265 [0.23, 0.30] | 0.032 | -11.2 | -10.2 | -5.0 | fail | fail | fail |
+| H_only | 2000 | 1623 | -0.428 [-0.45, -0.40] | 0.261 [0.23, 0.30] | 0.081 [0.07, 0.10] | 0.457 [0.42, 0.49] | 0.079 | -23.5 | -19.8 | -1.0 | fail | fail | fail |
+| all_shared | 500 | 62 | 0.176 [0.17, 0.18] | 0.491 [0.45, 0.53] | 0.260 [0.25, 0.26] | 0.235 [0.21, 0.26] | 0.005 | 0.0 | -0.3 | -11.0 | fail | fail | fail |
+| all_shared | 1000 | 94 | 0.199 [0.19, 0.21] | 0.665 [0.63, 0.70] | 0.295 [0.29, 0.30] | 0.315 [0.28, 0.34] | 0.006 | 0.0 | -0.3 | -10.0 | fail | fail | fail |
+| all_shared | 2000 | 160 | 0.232 [0.22, 0.24] | 0.785 [0.75, 0.82] | 0.330 [0.32, 0.33] | 0.454 [0.43, 0.48] | 0.017 | -4.2 | -4.5 | -19.0 | fail | fail | fail |
+
+#### N1 (D_only)
+
+Deciding references: twin, mean. A pass needs every bar under each on the whole sample and both halves.
+
+| k | twin whole | twin half 1 | twin half 2 | mean whole | mean half 1 | mean half 2 | verdict |
+|---|---|---|---|---|---|---|---|
+| 500 | fail | fail | fail | fail | fail | fail | fail |
+| 1000 | fail | fail | fail | fail | fail | fail | fail |
+| 2000 | fail | fail | fail | fail | fail | fail | fail |
+
+N1 pass at any k: False.
+
+#### N2 (H_only)
+
+| reference | k | subset | H shift | D rate change | null p95 of abs H shift | verdict |
+|---|---|---|---|---|---|---|
+| twin | 500 | whole | -7.3 | -21.8 | 0.0 | undetermined at this size |
+| twin | 500 | half 1 | -7.4 | -21.5 | 0.0 | undetermined at this size |
+| twin | 500 | half 2 | -7.3 | -22.2 | 0.0 | undetermined at this size |
+| twin | 1000 | whole | -31.2 | -12.8 | 0.0 | suppression or shared |
+| twin | 1000 | half 1 | -30.4 | -11.5 | 0.0 | suppression or shared |
+| twin | 1000 | half 2 | -31.9 | -14.2 | 0.0 | suppression or shared |
+| twin | 2000 | whole | -48.8 | -16.3 | 0.0 | suppression or shared |
+| twin | 2000 | half 1 | -49.4 | -16.3 | 0.0 | suppression or shared |
+| twin | 2000 | half 2 | -48.3 | -16.3 | 0.0 | suppression or shared |
+| mean | 500 | whole | -1.3 | -9.8 | 0.0 | undetermined at this size |
+| mean | 500 | half 1 | -1.3 | -9.9 | 0.0 | undetermined at this size |
+| mean | 500 | half 2 | -1.4 | -9.7 | 0.0 | undetermined at this size |
+| mean | 1000 | whole | -11.2 | -5.8 | 0.0 | undetermined at this size |
+| mean | 1000 | half 1 | -9.9 | -5.8 | 0.0 | undetermined at this size |
+| mean | 1000 | half 2 | -12.5 | -5.9 | 0.0 | undetermined at this size |
+| mean | 2000 | whole | -23.5 | -5.2 | 0.0 | undetermined at this size |
+| mean | 2000 | half 1 | -24.7 | -4.5 | 0.0 | bypass |
+| mean | 2000 | half 2 | -22.2 | -5.9 | 0.0 | undetermined at this size |
+| zero | 500 | whole | -17.8 | -8.7 | 0.0 | undetermined at this size |
+| zero | 500 | half 1 | -19.2 | -8.7 | 0.0 | undetermined at this size |
+| zero | 500 | half 2 | -16.3 | -8.7 | 0.0 | undetermined at this size |
+| zero | 1000 | whole | -31.5 | -7.0 | 0.0 | undetermined at this size |
+| zero | 1000 | half 1 | -32.1 | -6.7 | 0.0 | undetermined at this size |
+| zero | 1000 | half 2 | -30.9 | -7.3 | 0.0 | undetermined at this size |
+| zero | 2000 | whole | -44.3 | -4.5 | 0.0 | bypass |
+| zero | 2000 | half 1 | -46.8 | -4.5 | 0.0 | bypass |
+| zero | 2000 | half 2 | -41.7 | -4.5 | 0.0 | bypass |
+
+N2 is decided under the mean reference; zero is beside it and twin is the descriptive reverse patch.
+
+### Verdict: Readout-position ranking, comparison (job B, k 1,000)
+
+```
+/u/swong2/.conda/envs/mgnp/bin/python scripts/neuron_partition_verdict.py --cell outputs/_analyses/neuron-partition/ablation/jobB-fe2db9e/far_sets_k1000_with_nulls --output-dir outputs/_analyses/neuron-partition/verdict/far_atp_readout_c3d7763
+```
+
+`WT/outputs/_analyses/neuron-partition/verdict/far_atp_readout_c3d7763/verdict.md`, verbatim below the title, with its headings moved down two levels. The only edit is that half1 and half2 are written half 1 and half 2, which the linter requires.
+
+
+Cells: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/neuron-partition/outputs/_analyses/neuron-partition/ablation/jobB-fe2db9e/far_sets_k1000_with_nulls.
+Halves: split_halves (scripts/neuron_partition_data.py), stratified by pressure_id.
+D and I removed are the ladder margin ratio (R2, primary) and the rate at margin 0.7 (R8); brackets are bootstrap 95% intervals over ids (whole sample). Collateral shifts are under the mean reference (R7). Pass flags: every N1 bar on the subset.
+
+#### Reference: twin
+
+| class | k | size | D removed (margin) | D removed (rate) | I removed (margin) | I removed (rate) | null p95 of D removed | H shift | F shift | IOI shift | bars (whole) | half 1 | half 2 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| D_only | 1000 | 409 | 0.291 [0.28, 0.30] | 0.978 [0.96, 0.99] | 0.192 [0.19, 0.20] | 0.121 [0.10, 0.15] | 0.028 | 0.0 | 0.0 | -11.0 | fail | fail | fail |
+| DI_shared | 1000 | 314 | 0.271 [0.26, 0.28] | 0.964 [0.95, 0.98] | 0.411 [0.41, 0.42] | 0.985 [0.97, 0.99] | 0.008 | 0.0 | 0.0 | 3.0 | fail | fail | fail |
+| H_only | 1000 | 702 | -0.870 [-0.90, -0.84] | 0.014 [-0.00, 0.03] | -0.413 [-0.44, -0.39] | 0.050 [0.03, 0.07] | 0.025 | 0.0 | -0.3 | 2.0 | fail | fail | fail |
+| all_shared | 1000 | 209 | 0.474 [0.47, 0.48] | 1.000 [1.00, 1.00] | 0.564 [0.56, 0.57] | 0.998 [0.99, 1.00] | 0.007 | -2.3 | -4.2 | -19.0 | fail | fail | fail |
+
+#### Reference: mean
+
+| class | k | size | D removed (margin) | D removed (rate) | I removed (margin) | I removed (rate) | null p95 of D removed | H shift | F shift | IOI shift | bars (whole) | half 1 | half 2 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| D_only | 1000 | 409 | 0.236 [0.23, 0.24] | 0.775 [0.74, 0.80] | 0.112 [0.11, 0.12] | 0.080 [0.06, 0.10] | 0.021 | 0.0 | 0.0 | -11.0 | fail | fail | fail |
+| DI_shared | 1000 | 314 | 0.235 [0.23, 0.24] | 0.905 [0.88, 0.93] | 0.387 [0.38, 0.39] | 0.908 [0.88, 0.93] | 0.017 | 0.0 | 0.0 | 3.0 | fail | fail | fail |
+| H_only | 1000 | 702 | -0.792 [-0.82, -0.76] | -0.002 [-0.02, 0.01] | -0.416 [-0.43, -0.40] | 0.032 [0.02, 0.05] | 0.027 | 0.0 | -0.3 | 2.0 | fail | fail | fail |
+| all_shared | 1000 | 209 | 0.203 [0.20, 0.21] | 0.616 [0.58, 0.65] | 0.324 [0.32, 0.33] | 0.372 [0.34, 0.40] | 0.008 | -2.3 | -4.2 | -19.0 | fail | fail | fail |
+
+#### Reference: zero
+
+| class | k | size | D removed (margin) | D removed (rate) | I removed (margin) | I removed (rate) | null p95 of D removed | H shift | F shift | IOI shift | bars (whole) | half 1 | half 2 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| D_only | 1000 | 409 | 0.216 [0.21, 0.22] | 0.706 [0.67, 0.74] | 0.213 [0.21, 0.22] | 0.183 [0.15, 0.21] | 0.024 | 0.0 | 0.0 | -11.0 | fail | fail | fail |
+| DI_shared | 1000 | 314 | 0.230 [0.22, 0.24] | 0.870 [0.84, 0.89] | 0.384 [0.38, 0.39] | 0.839 [0.81, 0.87] | 0.017 | 0.0 | 0.0 | 3.0 | fail | fail | fail |
+| H_only | 1000 | 702 | -0.784 [-0.82, -0.75] | 0.002 [-0.01, 0.02] | -0.406 [-0.42, -0.39] | 0.032 [0.02, 0.05] | 0.034 | 0.0 | -0.3 | 2.0 | fail | fail | fail |
+| all_shared | 1000 | 209 | 0.202 [0.19, 0.21] | 0.613 [0.58, 0.64] | 0.323 [0.32, 0.33] | 0.365 [0.33, 0.40] | 0.007 | -2.3 | -4.2 | -19.0 | fail | fail | fail |
+
+#### N1 (D_only)
+
+Deciding references: twin, mean. A pass needs every bar under each on the whole sample and both halves.
+
+| k | twin whole | twin half 1 | twin half 2 | mean whole | mean half 1 | mean half 2 | verdict |
+|---|---|---|---|---|---|---|---|
+| 1000 | fail | fail | fail | fail | fail | fail | fail |
+
+N1 pass at any k: False.
+
+#### N2 (H_only)
+
+| reference | k | subset | H shift | D rate change | null p95 of abs H shift | verdict |
+|---|---|---|---|---|---|---|
+| twin | 1000 | whole | -11.0 | -1.3 | 0.0 | undetermined at this size |
+| twin | 1000 | half 1 | -10.6 | -0.3 | 0.0 | undetermined at this size |
+| twin | 1000 | half 2 | -11.5 | -2.4 | 0.0 | undetermined at this size |
+| mean | 1000 | whole | 0.0 | 0.2 | 0.0 | undetermined at this size |
+| mean | 1000 | half 1 | 0.0 | 1.0 | 0.0 | undetermined at this size |
+| mean | 1000 | half 2 | 0.0 | -0.7 | 0.0 | undetermined at this size |
+| zero | 1000 | whole | -0.8 | -0.2 | 0.0 | undetermined at this size |
+| zero | 1000 | half 1 | -1.3 | 0.6 | 0.0 | undetermined at this size |
+| zero | 1000 | half 2 | -0.3 | -1.0 | 0.1 | undetermined at this size |
+
+N2 is decided under the mean reference; zero is beside it and twin is the descriptive reverse patch.
+
+### Verdict: Contrast comparison, job C
+
+```
+/u/swong2/.conda/envs/mgnp/bin/python scripts/neuron_partition_verdict.py --cell outputs/_analyses/neuron-partition/ablation/jobC-fe2db9e --output-dir outputs/_analyses/neuron-partition/verdict/far_contrast_66741d7
+```
+
+`WT/outputs/_analyses/neuron-partition/verdict/far_contrast_66741d7/verdict.md`, verbatim below the title, with its headings moved down two levels. The only edit is that half1 and half2 are written half 1 and half 2, which the linter requires.
+
+
+Cells: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/neuron-partition/outputs/_analyses/neuron-partition/ablation/jobC-fe2db9e.
+Halves: split_halves (scripts/neuron_partition_data.py), stratified by pressure_id.
+D and I removed are the ladder margin ratio (R2, primary) and the rate at margin 0.7 (R8); brackets are bootstrap 95% intervals over ids (whole sample). Collateral shifts are under the mean reference (R7). Pass flags: every N1 bar on the subset.
+
+#### Reference: twin
+
+| class | k | size | D removed (margin) | D removed (rate) | I removed (margin) | I removed (rate) | null p95 of D removed | H shift | F shift | IOI shift | bars (whole) | half 1 | half 2 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| D_only | 1000 | 386 | 0.039 [0.03, 0.05] | 0.227 [0.19, 0.26] | -0.005 [-0.01, 0.00] | 0.042 [0.03, 0.06] | 0.007 | 0.0 | -0.2 | -23.0 | fail | fail | fail |
+| DI_shared | 1000 | 614 | 0.174 [0.17, 0.18] | 0.569 [0.53, 0.61] | 0.258 [0.25, 0.26] | 0.285 [0.26, 0.31] | 0.015 | 0.0 | 0.0 | -22.0 | fail | fail | fail |
+| H_only | 1000 | 985 | 0.208 [0.20, 0.22] | 0.624 [0.59, 0.66] | 0.282 [0.27, 0.29] | 0.268 [0.24, 0.30] | 0.017 | -4.2 | -1.8 | -36.0 | fail | fail | fail |
+
+#### Reference: mean
+
+| class | k | size | D removed (margin) | D removed (rate) | I removed (margin) | I removed (rate) | null p95 of D removed | H shift | F shift | IOI shift | bars (whole) | half 1 | half 2 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| D_only | 1000 | 386 | 0.032 [0.03, 0.04] | 0.212 [0.18, 0.24] | -0.018 [-0.02, -0.01] | 0.017 [0.01, 0.03] | 0.009 | 0.0 | -0.2 | -23.0 | fail | fail | fail |
+| DI_shared | 1000 | 614 | 0.080 [0.07, 0.08] | 0.259 [0.22, 0.29] | 0.196 [0.19, 0.20] | 0.184 [0.16, 0.21] | 0.012 | 0.0 | 0.0 | -22.0 | fail | fail | fail |
+| H_only | 1000 | 985 | 0.187 [0.18, 0.19] | 0.533 [0.51, 0.56] | 0.271 [0.26, 0.28] | 0.280 [0.25, 0.31] | 0.011 | -4.2 | -1.8 | -36.0 | fail | fail | fail |
+
+#### Reference: zero
+
+| class | k | size | D removed (margin) | D removed (rate) | I removed (margin) | I removed (rate) | null p95 of D removed | H shift | F shift | IOI shift | bars (whole) | half 1 | half 2 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| D_only | 1000 | 386 | 0.031 [0.03, 0.04] | 0.210 [0.18, 0.24] | -0.027 [-0.03, -0.02] | 0.012 [0.00, 0.02] | 0.010 | 0.0 | -0.2 | -23.0 | fail | fail | fail |
+| DI_shared | 1000 | 614 | 0.066 [0.06, 0.07] | 0.222 [0.19, 0.25] | 0.180 [0.18, 0.19] | 0.141 [0.11, 0.16] | 0.012 | 0.0 | 0.0 | -22.0 | fail | fail | fail |
+| H_only | 1000 | 985 | 0.181 [0.17, 0.19] | 0.511 [0.49, 0.53] | 0.261 [0.25, 0.27] | 0.281 [0.25, 0.31] | 0.014 | -4.2 | -1.8 | -36.0 | fail | fail | fail |
+
+#### N1 (D_only)
+
+Deciding references: twin, mean. A pass needs every bar under each on the whole sample and both halves.
+
+| k | twin whole | twin half 1 | twin half 2 | mean whole | mean half 1 | mean half 2 | verdict |
+|---|---|---|---|---|---|---|---|
+| 1000 | fail | fail | fail | fail | fail | fail | fail |
+
+N1 pass at any k: False.
+
+#### N2 (H_only)
+
+| reference | k | subset | H shift | D rate change | null p95 of abs H shift | verdict |
+|---|---|---|---|---|---|---|
+| twin | 1000 | whole | -1.0 | -61.5 | 0.0 | undetermined at this size |
+| twin | 1000 | half 1 | -0.6 | -62.5 | 0.0 | undetermined at this size |
+| twin | 1000 | half 2 | -1.4 | -60.4 | 0.0 | undetermined at this size |
+| mean | 1000 | whole | -4.2 | -52.5 | 0.0 | undetermined at this size |
+| mean | 1000 | half 1 | -2.6 | -52.9 | 0.0 | undetermined at this size |
+| mean | 1000 | half 2 | -5.9 | -52.1 | 0.0 | undetermined at this size |
+| zero | 1000 | whole | -5.5 | -50.3 | 0.0 | undetermined at this size |
+| zero | 1000 | half 1 | -4.2 | -51.0 | 0.0 | undetermined at this size |
+| zero | 1000 | half 2 | -6.9 | -49.7 | 0.0 | undetermined at this size |
+
+N2 is decided under the mean reference; zero is beside it and twin is the descriptive reverse patch.
