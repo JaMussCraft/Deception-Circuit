@@ -1,12 +1,15 @@
 # Resume: neuron-partition
 
-Last rewritten: Tue 3 Nov 2026, 12:10 pm EST by claude-5201d56c.
+Last rewritten: Tue 3 Nov 2026, 12:50 pm EST by claude-5201d56c.
 
 ## Status
 
-N1 (the causal neuron map and the three-way partition) is active; N2 (honest bypass or suppression) and N3
-(split-half stability) wait on N1's classes. Nothing has run on a GPU yet. The exit criteria are frozen in
-`spec.md` (copied from item 10 of START.md). No finding has been recorded. The first report is due Wed 4 Nov 2026,
+N1 is active: the attribution-patching scorer is committed and reviewed-in-progress, and the full FAR ranking
+(job 23476096, 400 D/H and 354 I/N rows, forward and reverse) is done under
+`outputs/_analyses/neuron-partition/attribution/far_v2_{dh,in}_train+validation_7386fd3{,_rev}/`. Rulings R2 to R6
+in `spec.md` fix the effect measure (ladder margin effect primary), the mean-bank splits, the IOI adapter, the
+assessment-id file and the partition rule. N2 and N3 wait on N1's classes. No finding has been recorded. First
+look, descriptive: the D/H and I/N maps correlate at 0.78 and most strong D neurons are strong I neurons. The first report is due Wed 4 Nov 2026,
 12:00 pm EST, with whatever N1 has produced.
 
 ## Branch, worktree and commit
@@ -20,17 +23,19 @@ N1 (the causal neuron map and the three-way partition) is active; N2 (honest byp
 
 ## In-flight jobs
 
-None.
+None. Reservations r-001 (pilot, 89 s) and r-002 (full ranking, 252 s) are reconciled; 1.25 of 20 GPU-hours reserved.
 
 ## Next action
 
-1. Four Opus agents are briefed in parallel: a reader (FINDINGS do-not-redo brief and the ladder's readout
-   definition), W1 (down-projection-input capture site and the attribution-patching scorer), W2 (neutral-twin
-   interchange for the `mlp_hidden` kind in `component_analysis/knockout.py`, plus mean and zero set ablation),
-   W3 (fresh test sample seed 2, user-turn pool copies with sha256, matched-null generator, Bridges-2 code sync).
-2. Pilot the scorer on a Delta interactive partition; then the full ranking plus the first ablation cells in one
-   Bridges-2 H100 job charged to cis260372p if `--test-only` shows it starts earlier.
-3. Partition, ablate, nulls; write the N1 hand-back and the first report by Wed noon EST.
+1. Collect the hand-backs of W2 (neuron ablation under twin, mean and zero; `scripts/neuron_set_ablation.py`),
+   W3 (seed-2 test sample at `outputs/_analyses/neuron-partition/data/`, nulls, Bridges-2 sync), W4 (partition
+   sets per R6 at `outputs/_analyses/neuron-partition/partition/`) and the scorer review (`reviews/01`); commit by
+   file list.
+2. Submit the ablation cells (every class at k 500, 1,000, 2,000 with 20 matched nulls, three references, conditions
+   D/H/F/I/N and IOI) as one job: Bridges-2 H100 charged to cis260372p if `--test-only` starts sooner, else a Delta
+   interactive partition in 55-minute chunks.
+3. W1's split-half ranking job for N3; then the N1 verdict against item 10, the N2 cell on the H-only set, and the
+   first report by Wed noon EST.
 
 ## Do not
 
