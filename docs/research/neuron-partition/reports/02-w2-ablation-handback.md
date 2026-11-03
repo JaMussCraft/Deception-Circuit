@@ -819,3 +819,52 @@ N1 pass at any k: False.
 | zero | 1000 | half 2 | -6.9 | -49.7 | 0.0 | undetermined at this size |
 
 N2 is decided under the mean reference; zero is beside it and twin is the descriptive reverse patch.
+
+## Addendum: IOI resolution measurement (exploratory, not pre-registered)
+
+Written by W7 (Claude, Opus) on Tue 3 Nov 2026, 6:11 pm EST, as an interim record. This measurement asks how well
+100 IOI rows can resolve a 5-point collateral bar. It is not a retest, and it does not change the N1 decision. N1
+failed under the frozen bars on 100 rows, and that stands. The job has not been submitted yet: it waits for the
+orchestrator's commit of the code below. The numbers will be added under the same headings when the run returns.
+
+### What changed
+
+- **Capacity.** The recipe's space is 820 single-token names, times 819, times 30 templates, 20 places and 20
+  objects, about 8.06e9 sentences. With the sorted-names seed-1 draw, all 1,000 samples of the default pool are
+  distinct and eligible. Pools of 1,200 to 3,000 give as many rows as samples, and the first 100 always hash to
+  `61ebeea3…`. So the run uses 1,000 rows at the default pool of 1,000.
+- **`scripts/neuron_set_ablation.py`.** `--ioi-rows` is an alias of the existing `--ioi-n` with the default 100, so
+  every existing path is unchanged. `--ioi-only` runs only the IOI cell of each mean or zero reference. It is refused
+  with `--no-ioi` or with the twin reference alone. A request for more rows than the pool holds is refused.
+  The IOI report in `summary.json` records `ioi_rows` beside `sentences_sha256`.
+- **`tests/test_neuron_set_ablation.py`.** Five new tests. One loads the Llama tokenizer and checks that 100 rows
+  reproduce `61ebeea3…` and that 300 rows are distinct with the first 100 unchanged. It skips if the tokenizer does
+  not load.
+- **Sets file.** `outputs/_analyses/neuron-partition/ablation/ioi_resolution_sets.json` (gitignored) holds D_only at
+  size 500 and its 20 nulls, 338 neurons each, copied unchanged from `far_all_sets_k500_with_nulls.json` (sha256
+  `64fa9565…`). Its own sha256 is `4729312b68545f63189a78458b88098bccec3dcbde7759e18c1d865772a75f38`.
+
+### How verified
+
+| Interpreter | Passed | Skipped | Baseline |
+|---|---|---|---|
+| mgnp | 49 | 0 | 44 passed |
+| base Python 3.9 | 33 | 16 | 28 passed, 16 skipped |
+
+- **Dry run.** The wrapper ran on the Delta login node with `--ioi-rows 1000 --ioi-only --references mean
+  --max-length 128`. It planned 2,850 forwards, about 8.1 minutes with the model load. IOI pads to 21 tokens at 1,000
+  rows, the same as job A at 100 rows, so the first 100 rows see the same batch shapes.
+- **Analysis script.** Run on job A's k 500 output, it reproduces D_only at -6.0 points and the nulls from -3 to +6.
+
+### Execution evidence
+
+No job yet. The planned job is one H100 on Bridges-2, GPU-shared, account cis260372p, `--time=00:45:00`, output
+`outputs/_analyses/neuron-partition/ablation/ioi_resolution-<sha>/`.
+
+### What is NOT done
+
+- The commit, the clone sync, the Bridges-2 job, the ledger entries, the fetch and the numbers.
+
+### Open questions
+
+- None yet. The question this run answers is what 1,000 rows can resolve against a 5-point bar.
