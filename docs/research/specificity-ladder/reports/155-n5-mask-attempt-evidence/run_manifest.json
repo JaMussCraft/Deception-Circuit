@@ -1,0 +1,77 @@
+{
+  "status": "INCOMPLETE_FIXED_FINISH_STOP_NO_RETRY_NO_M5_ADMISSION",
+  "source_commit": "861f84a3938a5e22fa329af0c469b2dd812fe68a",
+  "job_id": "23474289",
+  "reservation_id": "r-040",
+  "state": "FAILED",
+  "exit_code": "1:0",
+  "elapsed_seconds": 2342,
+  "requested_minutes": 45,
+  "reserved_gpu_hours_retained": 0.75,
+  "original_r031_charge_retained": 0.75,
+  "mask_M1_reserved_total": 1.5,
+  "actual_GPU_hours": 0.6505555555555556,
+  "cpus": 4,
+  "memory_GiB": 64,
+  "gpus": 1,
+  "node": "gpue07",
+  "account": "beto-delta-gpu",
+  "partition": "gpuH200x8-interactive",
+  "cause": "Outer fixed_finish_reserve at39minsoft boundary; childSIGTERM, TimeoutError,noautomaticretry",
+  "final_receipt_marker": false,
+  "post_terminal_receipt_checked": true,
+  "complete_timing_H_banks": [
+    "far_v2",
+    "sdr_v2"
+  ],
+  "partial_object_markers": [
+    {
+      "name": "timing-H-banks",
+      "complete": false
+    },
+    {
+      "name": "timing-checkpoint-constrained",
+      "complete": true
+    },
+    {
+      "name": "timing-checkpoint-unconstrained",
+      "complete": true
+    },
+    {
+      "name": "timing-selection-serialization-constrained",
+      "complete": true
+    },
+    {
+      "name": "timing-selection-serialization-unconstrained",
+      "complete": true
+    },
+    {
+      "name": "timing-validation-constrained",
+      "complete": true
+    },
+    {
+      "name": "timing-validation-unconstrained",
+      "complete": true
+    }
+  ],
+  "canonical_RS_row": {
+    "account": "beto-delta-gpu",
+    "actual_seconds": 2342,
+    "cluster": "delta",
+    "gpus": 1,
+    "id": "r-040",
+    "job_id": "23474289",
+    "manifest_hash": null,
+    "output_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-mask-n5-pilots-861f84a3938a/mask-pilot-1",
+    "partition": "gpuH200x8,gpuH200x8-interactive",
+    "requested_minutes": 45.0,
+    "reserved_gpu_hours": 0.75,
+    "source_commit": "861f84a3938a5e22fa329af0c469b2dd812fe68a",
+    "status": "FAILED"
+  },
+  "no_prior_numeric_or_OOM_error_observed": true,
+  "scientific_effects_inspected": false,
+  "no_source_authority_or_scheduler_mutations_by_worker": true,
+  "requested_charge_not_refunded": true,
+  "next_gate": "No complete authenticated completed-M1 receipt; mask M5 cost admission blocked. Any new attempt needs applicable authorization, not an automatic retry."
+}

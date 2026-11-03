@@ -1,0 +1,64 @@
+{
+  "status": "FROZEN_UNEXECUTED_CPU_ONLY_GPU_NOT_READY",
+  "proposal_directory": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-prefit-readiness-cpu-proposal",
+  "proposal_manifest_sha256": "6db9019bb59fb1d86589c066bb5b89a4f1be712bc1fd378620eaa13deffcb8da",
+  "actual_new_CPU_or_GPU_execution": false,
+  "static_checks": {
+    "status": "STATIC_ONLY_NO_PREPARATION_OR_MODEL_EXECUTION",
+    "python_compile": true,
+    "exact_original_no_model_commands": true,
+    "commands": 4,
+    "genuine_source_commit": "861f84a3938a5e22fa329af0c469b2dd812fe68a",
+    "source13_unchanged": true,
+    "paired_stage_tiles_supported": true,
+    "pinned_files_current": true,
+    "output_fresh": true,
+    "child_cap_seconds": 1320,
+    "kill_grace_seconds": 15,
+    "Slurm_minutes": 25,
+    "initial_remaining_seconds": 1410,
+    "startup_slack_seconds": 90,
+    "outer_allowance_seconds": 165,
+    "CPUs": 4,
+    "memory_GiB": 32,
+    "GPUs": 0,
+    "finite_ancestor_headroom_GiB": 16,
+    "metadata_certificates_refreshed_without_science_relabeling": true,
+    "actual_CPU_no_model_checks_pending": true,
+    "independent_used_path_review_pending": true,
+    "both_part_M1_feasibility_pending": true,
+    "bash_n_exit_code": 0,
+    "initial_static_check_helper_failure": "Path helper accepted a string without Path conversion; corrected and rerun. No preparation/model was executed.",
+    "on_node_command_allowlist_enforced": true
+  },
+  "accepted_prefit_evidence": "accepted-prefit-process.json",
+  "CPU_resource_basis": "duration-basis.json",
+  "budget_ready": false,
+  "open_gaps": "readiness-gaps.json",
+  "no_model_commands": "commands.json",
+  "source13_unchanged": true,
+  "commands": [
+    {
+      "command": "compile() four proposal Python files",
+      "exit_code": 0
+    },
+    {
+      "command": "bash -n launch.sbatch",
+      "exit_code": 0
+    },
+    {
+      "command": "research-session lint README.md",
+      "exit_code": 0
+    },
+    {
+      "command": "check_report_numbers.py README.md --strict --json",
+      "exit_code": 0,
+      "counts": {
+        "numbers": 29,
+        "resolved": 22,
+        "derived": 7,
+        "unresolved": 0
+      }
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "status": "PENDING_FINAL_PACKET_AND_CPU_PREFLIGHT",
+  "reviewed_draft_sha256": {
+    "gpu-probe.py": "6ef1bc255392c270d19d7aba31ab5ff6351ba7cd6132a910f07601c0c4aa51ec",
+    "config.json": "1ed37e7f324e1b99a2c723e39e22ad9029156c02e67024302dcd6f58bec3cb67",
+    "controller.py": "5f6d860846c42577506ca6335a434efd6f11f6b681918ceb5af777351f776b71",
+    "cpu-preflight.sh": "a8d58ef9538c111fb7b29edb0199495ddef9ddd8f470882ecccc49f2bc351ac1",
+    "environment.sh": "4c9bd31f886437d81bc121f72b4051604bc5c24ac2a0b35f62c7f50f2a7d53b0",
+    "manifest.json": "66f4ef5e883eff7ec86ef39f0562780eda11f699c5cd2fb40289af2aa2c4bb94",
+    "common.py": "22346fa8fa92ac37a71e2350f0f4ddb438e0a5c9eb0bb3ac718be40a5069a4c1",
+    "gpu-score.sh": "f2e38c403ea62186710154d4b317f1c0081ef29b96019e9d41bbdb49c3a80c4d",
+    "preflight.py": "d0bc0bfc7496d9147ff3696ecfca957498e7417a18c559a43334c6518715eeff"
+  },
+  "owner_narrative_read": false,
+  "production_source_changed": false,
+  "source": "40fe57289405fd53a3fce02e5d4e47a0ebf78b64",
+  "confirmed_scope": "scoring-only genuine G2 bank/all9groups/full59652/no pilotlimit/no finalization",
+  "compatibility_source": "a2_pipeline.py numeric_environment521-540; validate_banks737-750; score825-839 same dtype/CUDAprefix/GPUname, no physicalUUID constraint",
+  "specific_open_finding": "Refresh live actual allocation/end and assert before Popen after source/budget/probe work; initial deadline alone can become stale under lease contraction",
+  "no_execution_authority": true
+}

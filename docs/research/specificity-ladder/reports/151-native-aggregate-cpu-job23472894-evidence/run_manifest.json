@@ -1,0 +1,1503 @@
+{
+  "status": "BLOCKED_INCOMPLETE_after_bounded_process_stop",
+  "terminal_accounting": {
+    "23472894": {
+      "JobIDRaw": "23472894",
+      "JobName": "lad-a3-aggregate-cal32",
+      "State": "FAILED",
+      "ExitCode": "143:0",
+      "ElapsedRaw": "5409",
+      "TimelimitRaw": "125",
+      "AllocTRES": "billing=16384,cpu=4,mem=32G,node=1",
+      "MaxRSS": "",
+      "Start": "2026-11-03T14:06:05",
+      "End": "2026-11-03T15:36:14"
+    },
+    "23472894.batch": {
+      "JobIDRaw": "23472894.batch",
+      "JobName": "batch",
+      "State": "FAILED",
+      "ExitCode": "143:0",
+      "ElapsedRaw": "5409",
+      "TimelimitRaw": "",
+      "AllocTRES": "cpu=4,mem=32G,node=1",
+      "MaxRSS": "6772K",
+      "Start": "2026-11-03T14:06:05",
+      "End": "2026-11-03T15:36:14"
+    },
+    "23472894.extern": {
+      "JobIDRaw": "23472894.extern",
+      "JobName": "extern",
+      "State": "COMPLETED",
+      "ExitCode": "0:0",
+      "ElapsedRaw": "5410",
+      "TimelimitRaw": "",
+      "AllocTRES": "billing=16384,cpu=4,mem=32G,node=1",
+      "MaxRSS": "",
+      "Start": "2026-11-03T14:06:05",
+      "End": "2026-11-03T15:36:15"
+    },
+    "23472894.0": {
+      "JobIDRaw": "23472894.0",
+      "JobName": "python3.9",
+      "State": "FAILED",
+      "ExitCode": "143:0",
+      "ElapsedRaw": "5402",
+      "TimelimitRaw": "",
+      "AllocTRES": "cpu=4,mem=32G,node=1",
+      "MaxRSS": "9006068K",
+      "Start": "2026-11-03T14:06:12",
+      "End": "2026-11-03T15:36:14"
+    }
+  },
+  "actual_allocation": {
+    "kind": "actual_slurm_cpu_fixture_provenance",
+    "job_id": "23472894",
+    "step_id": "0",
+    "host": "cn004.delta.ncsa.illinois.edu",
+    "pid": 2673414,
+    "observed_utc": "2026-11-03T14:06:12.787717+00:00",
+    "slurm_environment": {
+      "SLURM_JOB_ID": "23472894",
+      "SLURM_JOBID": "23472894",
+      "SLURM_STEP_ID": "0",
+      "SLURM_STEPID": "0",
+      "SLURM_CLUSTER_NAME": "delta",
+      "SLURM_JOB_ACCOUNT": "beto-delta-cpu",
+      "SLURM_JOB_PARTITION": "cpu",
+      "SLURM_JOB_NODELIST": "cn004",
+      "SLURM_NODELIST": "cn004",
+      "SLURM_CPUS_PER_TASK": "4",
+      "SLURM_JOB_CPUS_PER_NODE": "4",
+      "SLURM_CPUS_ON_NODE": "4",
+      "SLURM_JOB_NUM_NODES": "1",
+      "SLURM_NNODES": "1",
+      "SLURM_NTASKS": "1",
+      "SLURM_MEM_PER_NODE": "32768"
+    },
+    "allocation_fields": {
+      "JobId": "23472894",
+      "JobName": "lad-a3-aggregate-cal32",
+      "UserId": "swong2(78031)",
+      "GroupId": "grp_202(202)",
+      "MCS_label": "N/A",
+      "Priority": "1367",
+      "Nice": "0",
+      "Account": "beto-delta-cpu",
+      "QOS": "beto-delta-cpu",
+      "JobState": "RUNNING",
+      "Reason": "None",
+      "Dependency": "(null)",
+      "Requeue": "0",
+      "Restarts": "0",
+      "BatchFlag": "1",
+      "Reboot": "0",
+      "ExitCode": "0:0",
+      "RunTime": "00:00:07",
+      "TimeLimit": "02:05:00",
+      "TimeMin": "N/A",
+      "SubmitTime": "2026-11-03T14:06:02",
+      "EligibleTime": "2026-11-03T14:06:02",
+      "AccrueTime": "2026-11-03T14:06:02",
+      "StartTime": "2026-11-03T14:06:05",
+      "EndTime": "2026-11-03T16:11:05",
+      "Deadline": "N/A",
+      "SuspendTime": "None",
+      "SecsPreSuspend": "0",
+      "LastSchedEval": "2026-11-03T14:06:05",
+      "Scheduler": "Main",
+      "Partition": "cpu",
+      "AllocNode:Sid": "dt-login04:1498769",
+      "ReqNodeList": "(null)",
+      "ExcNodeList": "(null)",
+      "NodeList": "cn004",
+      "BatchHost": "cn004",
+      "NumNodes": "1",
+      "NumCPUs": "4",
+      "NumTasks": "1",
+      "CPUs/Task": "4",
+      "ReqB:S:C:T": "0:0:*:*",
+      "ReqTRES": "cpu=4,mem=32G,node=1,billing=16384",
+      "AllocTRES": "cpu=4,mem=32G,node=1,billing=16384",
+      "Socks/Node": "*",
+      "NtasksPerN:B:S:C": "0:0:*:*",
+      "CoreSpec": "*",
+      "MinCPUsNode": "4",
+      "MinMemoryNode": "32G",
+      "MinTmpDiskNode": "0",
+      "Features": "projects",
+      "DelayBoot": "00:00:00",
+      "OverSubscribe": "OK",
+      "Contiguous": "0",
+      "Licenses": "(null)",
+      "LicensesAlloc": "(null)",
+      "Network": "(null)",
+      "Command": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/native-continuation-plan/selected-aggregate-calibration-proposal/launch.sbatch",
+      "SubmitLine": "sbatch",
+      "--export": "ALL",
+      "--dependency": "",
+      "--account": "beto-delta-cpu",
+      "--partition": "cpu",
+      "--time": "02:05:00",
+      "WorkDir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+      "StdErr": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/logs/lad-a3-aggregate-cal32-23472894.err",
+      "StdIn": "/dev/null",
+      "StdOut": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/logs/lad-a3-aggregate-cal32-23472894.out",
+      "TresPerTask": "cpu=4"
+    },
+    "allocation_tres": {
+      "cpu": "4",
+      "mem": "32G",
+      "node": "1",
+      "billing": "16384"
+    },
+    "allocation_memory_bytes": 34359738368,
+    "time_limit_seconds": 7500,
+    "end_time_unix": 1793722265.0,
+    "actual_GPU_count": 0,
+    "raw_scontrol": "JobId=23472894 JobName=lad-a3-aggregate-cal32 UserId=swong2(78031) GroupId=grp_202(202) MCS_label=N/A Priority=1367 Nice=0 Account=beto-delta-cpu QOS=beto-delta-cpu JobState=RUNNING Reason=None Dependency=(null) Requeue=0 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=0:0 RunTime=00:00:07 TimeLimit=02:05:00 TimeMin=N/A SubmitTime=2026-11-03T14:06:02 EligibleTime=2026-11-03T14:06:02 AccrueTime=2026-11-03T14:06:02 StartTime=2026-11-03T14:06:05 EndTime=2026-11-03T16:11:05 Deadline=N/A SuspendTime=None SecsPreSuspend=0 LastSchedEval=2026-11-03T14:06:05 Scheduler=Main Partition=cpu AllocNode:Sid=dt-login04:1498769 ReqNodeList=(null) ExcNodeList=(null) NodeList=cn004 BatchHost=cn004 NumNodes=1 NumCPUs=4 NumTasks=1 CPUs/Task=4 ReqB:S:C:T=0:0:*:* ReqTRES=cpu=4,mem=32G,node=1,billing=16384 AllocTRES=cpu=4,mem=32G,node=1,billing=16384 Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=* MinCPUsNode=4 MinMemoryNode=32G MinTmpDiskNode=0 Features=projects DelayBoot=00:00:00 OverSubscribe=OK Contiguous=0 Licenses=(null) LicensesAlloc=(null) Network=(null) Command=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/native-continuation-plan/selected-aggregate-calibration-proposal/launch.sbatch SubmitLine=sbatch --parsable --export=ALL --dependency= --account=beto-delta-cpu --partition=cpu --time=02:05:00 /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/native-continuation-plan/selected-aggregate-calibration-proposal/launch.sbatch WorkDir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder StdErr=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/logs/lad-a3-aggregate-cal32-23472894.err StdIn=/dev/null StdOut=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/logs/lad-a3-aggregate-cal32-23472894.out TresPerTask=cpu=4\n",
+    "raw_scontrol_sha256": "7beea8ac1524a8ee92d5bd1db59954e43639e1ab27ebdcbeabe9230411a361d8",
+    "cpu_model": "AMD EPYC 7763 64-Core Processor",
+    "affinity_CPUs": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "process_cgroup": "0::/system.slice/slurmstepd.scope/job_23472894/step_0/user/task_0\n",
+    "scientific_execution": false,
+    "production_admission": false
+  },
+  "phases": {
+    "selected-pilot-aggregate": {
+      "started": true,
+      "result": {
+        "phase": "selected-pilot-aggregate",
+        "command": [
+          "/u/swong2/.conda/envs/mgnp/bin/python",
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/native-continuation-plan/selected-aggregate-calibration-proposal/coordinator.py",
+          "--root",
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8",
+          "--out",
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/diagnostics/selected-aggregate-calibration-job23472894/selected-pilot-aggregate",
+          "--phase",
+          "selected-pilot-aggregate"
+        ],
+        "pid": 2673419,
+        "exit_code": -15,
+        "elapsed_seconds": 5400.771070283023,
+        "user_seconds": 730.494721,
+        "system_seconds": 1298.958671,
+        "peak_child_rss_bytes": 8393662464,
+        "timeout_seconds": 5400,
+        "kill_grace_seconds": 15,
+        "term_sent_at": 5400.270361631061,
+        "actual_job_id": "23472894",
+        "actual_step_id": "0",
+        "actual_host": "cn004.delta.ncsa.illinois.edu",
+        "scientific_execution": false,
+        "production_admission": false
+      },
+      "coordinator": null,
+      "failure": null
+    }
+  },
+  "case_authentication": [
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 370.9108024419984,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "4318f65b0a320e883897ca95ad472e2d1a0a11f53abea6ce1a848853d9fb57f1",
+      "authentication_seconds": 104.75523437594529,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 420.453205572092,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "d5738bfcdec6990c3b6e77b2c7e625d46562ea134457f5de2896af9600db7ceb",
+      "authentication_seconds": 49.54094156506471,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 470.61738263699226,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "83a2ffde546a0776df0d08fb27abf14381516a83a642c337521e6a44aa57c063",
+      "authentication_seconds": 50.16379582893569,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 521.5387557890499,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "f7e34290fa268cca16634b7b597fdec2fd5d7ee2f61c20ebd3a7573569c3c54d",
+      "authentication_seconds": 50.91977145301644,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 570.8224971049931,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "b78f0ec2e42db6bafa0f8cd18e01b8d2240506c81627e32ec6813f5bf019cb3f",
+      "authentication_seconds": 49.28231437597424,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 621.5506490221014,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "a8404c4ddd3367b64515b6503940852ce05181cb56ba1327a20bf4be27dcb939",
+      "authentication_seconds": 50.72783223702572,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 670.0677148670657,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "c5151f79afd7c35ef8357d76e2f50ff0cc6b644147e365ce5ff009ba30ec3848",
+      "authentication_seconds": 48.51565324200783,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 720.606151288026,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "75460fe31425c8a7f68fe7ad51960991d8e4467fadc2d93ef9b294903775f73f",
+      "authentication_seconds": 50.5380811940413,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 770.1996010490693,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "5110a5cf1c9baaab8db4009b2dbf12502f273588d42508c89850bc6382e73ae8",
+      "authentication_seconds": 49.59188476204872,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 819.3895261920989,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "5e5b03c6ce4cfcba43be2731cd568d2465834ecf357db2d6602c9709824f0191",
+      "authentication_seconds": 49.1884902769234,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 867.7696561800549,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "5ad5152f8af02319b8f31448b56f67a6f336bf6df33dfae79830fcd3c2656268",
+      "authentication_seconds": 48.378682147944346,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 916.7704538720427,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "4255ef15798e7fddbb1afc95cd76b77a84ce54a63985c3cdfaffb8c4c48f6bf4",
+      "authentication_seconds": 49.00037690100726,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 965.3707669250434,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "e1fd1e506c3fe4b24f230bfbe0bbc6644636d5d2ce1f99e12a497f0cfa8bee89",
+      "authentication_seconds": 48.5999456839636,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 1013.2338136530016,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "530420cccb4484fa3a6c659d069ff9c08ec1bc5ef856ef3fe7606c62332959ba",
+      "authentication_seconds": 47.86160729301628,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 1062.9639046560042,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "3f9decf7e245988919a3dd624adeafeb92ca89ca7dcd0c53fb654fa24c92b9c7",
+      "authentication_seconds": 49.72859664692078,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 1113.6493776560528,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "f39ad19af5b04475d3f704df15aecb567522b76f4cbf7d502682b88b128c005a",
+      "authentication_seconds": 50.684041950968094,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 1164.0922118580202,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "418639e7b31374027439df15b2df7cf79d1e1fd3337682e10b936a600252b24e",
+      "authentication_seconds": 50.44247004808858,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 1213.0455423441017,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "0c5da163a54585be1e62a85f637cbb2ca74e9ac578df62e72f1045e565d73455",
+      "authentication_seconds": 48.95181417709682,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 1259.9829207430594,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "3372a17fcdb3096c445cab2fd8b07a30cfdf2013166a444fb950e2781d632834",
+      "authentication_seconds": 46.93594973499421,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 1304.9494716370245,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "a44490143375d97f51ac57bd52977d8d499299725f23ae744d2e9db6fa65f4fc",
+      "authentication_seconds": 44.96516743500251,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 1352.0767064940883,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "33e11c5f05f7b29d24d4b255a4e58902c8ade9d68f7fde305fbc3232739ffb4a",
+      "authentication_seconds": 47.12686536205001,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 1398.891949760029,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "407e853ddabe0645bb1a215a307e7fdabd651628830016cc33345eaca57e88fd",
+      "authentication_seconds": 46.81382758705877,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 1447.4790461430093,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "b6b581edc7e6c83381108be0ad7a0ec39b3c7f8c5360257e68a6dade14daf665",
+      "authentication_seconds": 48.585661398014054,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 1494.7036147760227,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "ec7668ae1190c9a557637ea881b180d14082174730b44d940775bce7244d409e",
+      "authentication_seconds": 47.22420869697817,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 1544.2828972970601,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "7b65475a2bb901db9b3d6befc7e2258c1c0180f1afd0558cdca64ef705eb0cf5",
+      "authentication_seconds": 49.57793519995175,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 1595.5374154030578,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "e9f52497184faad85279b1e04931e85817f57b0061a48a02383bffc608d8ed9b",
+      "authentication_seconds": 51.25306332297623,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 1642.741348536103,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "f65423f369a580d246e1f144e1ad1a6a30d24a1d9b26b4c771ab2157a682a62b",
+      "authentication_seconds": 47.202630066894926,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 1690.480118851061,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "4ad29dd4936dee4f7061dd641832b1c10eed6d3907106ba1a5bb33566b0d2f15",
+      "authentication_seconds": 47.73844540398568,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 1738.9212893310469,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "74642412b7c85babaa9058aa005ab9c1dfbc86c1cc09d12620f4e79ab3a72521",
+      "authentication_seconds": 48.43948414304759,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 1785.7968291860307,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "3b2ca0f2a52b9b19f4bc02e8875fa61b824928a8f4689ef6eff0b2bd5a77699e",
+      "authentication_seconds": 46.87387488898821,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 1830.247357603046,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "5342934dba478edfc823605b24e50dc4aaebea1c3feead486bccee1a06a39b30",
+      "authentication_seconds": 44.45021168095991,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 1875.109769984032,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "ab3ca8650a50677f6d04d4abbbe668ed545ec4bd293740eb296e7827c4303605",
+      "authentication_seconds": 44.86088305001613,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 1926.7664596160175,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "a9128e2551536f2f42cfc20dd9be1431f0343920f7ddb27380f58683c6e07f13",
+      "authentication_seconds": 51.65496084501501,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 1972.7644813290099,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "55c24741940d5aa1905f732a4749febacd853f01104d6606bd5df1c0c6981b47",
+      "authentication_seconds": 45.99668181699235,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 2019.5934928070055,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "658e20db8201412649955d1b94bd4a64186f2fc854f643a3071bf3468407fa37",
+      "authentication_seconds": 46.828623619978316,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 2072.27804318408,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "7bcfe7b84e0ca9cfc25bc6fd7039b59ba40d5653354bf8da867e489a4926bf9a",
+      "authentication_seconds": 52.682922711013816,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 2124.010297576082,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "35b680a34a767a2b2992f571e5ae484a09325888cefa940b9c37dd407cec0af0",
+      "authentication_seconds": 51.73090727208182,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 2172.1257014910225,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "ea651d8a75c5f1d4d8fc0f0476660e8f3df7d7c160494fec02138864d9dc14d5",
+      "authentication_seconds": 48.113382249022834,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 2220.0523630130338,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "96c74558b78020dc596eeb3fa44a09a91e14aece57fc3ec340d37632853e7f41",
+      "authentication_seconds": 47.9263103120029,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 2268.3097048540367,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "b6662a52bf53147f7c36f81dfb3bdd0abf77704317d3a9bc9b3ae6516d4db48b",
+      "authentication_seconds": 48.25578254205175,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 2317.938033477054,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "73a35b4e1fe31e204238c5cb7271104ed1356e2ed1d9df2218c74b3dcf5499c0",
+      "authentication_seconds": 49.62679760705214,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 2363.8507570370566,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "1197fb77187ade3f65a3abb80de77bf43c12cfc6397c70f36fab77f6368168cc",
+      "authentication_seconds": 45.91233544098213,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 2410.2559419230092,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "54c44d8ee858c2a35f91719c8a895258a2ceb5fe6298acd801e0669d002c9da0",
+      "authentication_seconds": 46.403806686983444,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 2460.919707427034,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "0f4352a4c30bdf58030cde11dc5cc5ecce6292bae9b575c8f2bc018edad27af5",
+      "authentication_seconds": 50.662078303983435,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 2506.919532370055,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "3da1e9bda49f0380a837c2da9197cf37b355df218c64e3dbd13674f7fb9abc83",
+      "authentication_seconds": 45.99950079503469,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 2554.9338192610303,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "864be1d071a545d8b60077b8c7b602795f085aab232164a0c727b1e5cd5ea2eb",
+      "authentication_seconds": 48.01270584005397,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 2603.6196021620417,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "fa2da4f56ba65e6d366b8dd98ee640d0068c9e372224f4ef93746a266b1d76dc",
+      "authentication_seconds": 48.6842894150177,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 2651.215102076996,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "5672734719c93d17c08bbe01315d2fd9a35885af2259051106d3088c17910644",
+      "authentication_seconds": 47.594119081040844,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 2697.901820211089,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "f772eb5c8b2ec07209d00e173d8dece4aa598410aeea19257b78b607d636115e",
+      "authentication_seconds": 46.68637698201928,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 2745.8380575421033,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "55ca1d24b5ae58656f7bcfcdb80a99bce784aff9eea801713e29725c71b2f93c",
+      "authentication_seconds": 47.934820560971275,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 2794.4457945970353,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "c04577a6af89a571eee759187a1a37a3e1ab02ee08d5bdae3e2c46c3970b56e5",
+      "authentication_seconds": 48.60615372098982,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 2843.5620010111015,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "debc963ec3a1c857268c19c0af3af92a495c15f1be195a63cd3a112a45212c10",
+      "authentication_seconds": 49.11587046307977,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 2891.466165675083,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "4fe85b7963acbbb10ef4373c1aafe19bd4bc7ea659dda6f90a0ecd85535f9980",
+      "authentication_seconds": 47.903172811027616,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 2938.141742304084,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "844e097a17a2631c82ac995973dfdec46b0b3b7f0670ef1f8933931bbbd61c12",
+      "authentication_seconds": 46.674191737081856,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 3093.279961919994,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "a83bc256e79eb904efef036f770ce045318bc7e57ac0c2e86473676d4c9f71a1",
+      "authentication_seconds": 155.13653388002422,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 3221.3967847080203,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "c840e02711ec12881b4c050a119dd0f813d19f826e4fdde58a78d4bd134c6681",
+      "authentication_seconds": 128.1142789189471,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 3270.381567743025,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "c9e3df1e8d0c1b23b5efe2a2fe2a15abe19818fcf6bfe1d84c279e865382df38",
+      "authentication_seconds": 48.983350644935854,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 3318.609158679028,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "bca7dda98d2faebf47ffc5d79450cc0641176c070bcbe50ab5d104d09541c7ea",
+      "authentication_seconds": 48.22616426600143,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 3366.431979859015,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "26d031097b7fc6eac8a1b71f8078c778783baa527c7d3fe81708caffb1800b36",
+      "authentication_seconds": 47.82246024196502,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 3417.381156399031,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "2d423ca93ae64db5cece9ac542e00261648c6e1038260d2bef1597db71873442",
+      "authentication_seconds": 50.94766932900529,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 3466.3423592810286,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "7162a3af2f2595014f72914cd34a7137bfdedfa919fef1d1161ee8bb91df282c",
+      "authentication_seconds": 48.95976682496257,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 3523.954152588034,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "9861b5c5e4ccb1eb2cd974433e7455df7883f1a77262b71660977d8e53206983",
+      "authentication_seconds": 57.611376204993576,
+      "new_model_forwards": 0
+    },
+    {
+      "event": "case_auth_end",
+      "elapsed_seconds": 3583.0441150360275,
+      "peak_rss_bytes": 6895173632,
+      "case_id": "152789d51416e2fa97cc19e35d9caa3bce552c92f2c9e0d1c44980b7e845aeb4",
+      "authentication_seconds": 59.088206519023515,
+      "new_model_forwards": 0
+    }
+  ],
+  "counts": {
+    "required_original_cases": 63,
+    "successfully_reauthenticated_cases": 63,
+    "authentication_model_forwards": 0,
+    "published_object_completion_markers": 29,
+    "full_pilot_receipt_marker": false,
+    "verification_aggregate_marker": false,
+    "calibration_started": false,
+    "first_calibration_shards_requested": 32,
+    "full_calibration_shards": 630,
+    "full_assessment_shards": 3978,
+    "full_remaining_rows": 165834
+  },
+  "published_objects": [
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/0c5da163a54585be1e62a85f637cbb2ca74e9ac578df62e72f1045e565d73455",
+      "completion_marker": true,
+      "files": [
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/0c5da163a54585be1e62a85f637cbb2ca74e9ac578df62e72f1045e565d73455/COMPLETE.json",
+          "bytes": 204
+        },
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/0c5da163a54585be1e62a85f637cbb2ca74e9ac578df62e72f1045e565d73455/payload.json",
+          "bytes": 2930085
+        }
+      ],
+      "numerical_validation_not_inferred_from_marker": true,
+      "marker_sha256": "86cd86f23df955751da76fb11f5cebf8ba4816257af61e588561101799e329c2"
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/3372a17fcdb3096c445cab2fd8b07a30cfdf2013166a444fb950e2781d632834",
+      "completion_marker": true,
+      "files": [
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/3372a17fcdb3096c445cab2fd8b07a30cfdf2013166a444fb950e2781d632834/COMPLETE.json",
+          "bytes": 204
+        },
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/3372a17fcdb3096c445cab2fd8b07a30cfdf2013166a444fb950e2781d632834/payload.json",
+          "bytes": 2480829
+        }
+      ],
+      "numerical_validation_not_inferred_from_marker": true,
+      "marker_sha256": "4f53ffe4b55cade9f2e4e0e6c9676a96bae9a219072318807dc3ea8cb0f51a9a"
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/33e11c5f05f7b29d24d4b255a4e58902c8ade9d68f7fde305fbc3232739ffb4a",
+      "completion_marker": true,
+      "files": [
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/33e11c5f05f7b29d24d4b255a4e58902c8ade9d68f7fde305fbc3232739ffb4a/COMPLETE.json",
+          "bytes": 204
+        },
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/33e11c5f05f7b29d24d4b255a4e58902c8ade9d68f7fde305fbc3232739ffb4a/payload.json",
+          "bytes": 1485745
+        }
+      ],
+      "numerical_validation_not_inferred_from_marker": true,
+      "marker_sha256": "218d5a64173616ef3eb3b827a77575eb2f76819ed49b93f46fce96c044b2ea3b"
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/3f9decf7e245988919a3dd624adeafeb92ca89ca7dcd0c53fb654fa24c92b9c7",
+      "completion_marker": true,
+      "files": [
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/3f9decf7e245988919a3dd624adeafeb92ca89ca7dcd0c53fb654fa24c92b9c7/COMPLETE.json",
+          "bytes": 204
+        },
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/3f9decf7e245988919a3dd624adeafeb92ca89ca7dcd0c53fb654fa24c92b9c7/payload.json",
+          "bytes": 8686091
+        }
+      ],
+      "numerical_validation_not_inferred_from_marker": true,
+      "marker_sha256": "f1f4bd58a5930e05c528c63fb4907b61a4d7e7ac1d39361716c35963fc006bd0"
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/407e853ddabe0645bb1a215a307e7fdabd651628830016cc33345eaca57e88fd",
+      "completion_marker": true,
+      "files": [
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/407e853ddabe0645bb1a215a307e7fdabd651628830016cc33345eaca57e88fd/COMPLETE.json",
+          "bytes": 204
+        },
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/407e853ddabe0645bb1a215a307e7fdabd651628830016cc33345eaca57e88fd/payload.json",
+          "bytes": 8677561
+        }
+      ],
+      "numerical_validation_not_inferred_from_marker": true,
+      "marker_sha256": "5879858d748e51fb7c3b66fe7b81efa55851e489578addb515407794e5a3ed99"
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/418639e7b31374027439df15b2df7cf79d1e1fd3337682e10b936a600252b24e",
+      "completion_marker": true,
+      "files": [
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/418639e7b31374027439df15b2df7cf79d1e1fd3337682e10b936a600252b24e/COMPLETE.json",
+          "bytes": 204
+        },
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/418639e7b31374027439df15b2df7cf79d1e1fd3337682e10b936a600252b24e/payload.json",
+          "bytes": 1880673
+        }
+      ],
+      "numerical_validation_not_inferred_from_marker": true,
+      "marker_sha256": "c41d573f4fb1a02b76a6080b63e0055bce91f294f9981981d5a02b0e9ecff557"
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/4255ef15798e7fddbb1afc95cd76b77a84ce54a63985c3cdfaffb8c4c48f6bf4",
+      "completion_marker": true,
+      "files": [
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/4255ef15798e7fddbb1afc95cd76b77a84ce54a63985c3cdfaffb8c4c48f6bf4/COMPLETE.json",
+          "bytes": 204
+        },
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/4255ef15798e7fddbb1afc95cd76b77a84ce54a63985c3cdfaffb8c4c48f6bf4/payload.json",
+          "bytes": 2478033
+        }
+      ],
+      "numerical_validation_not_inferred_from_marker": true,
+      "marker_sha256": "a668745c79d45f8409db2b15575b617d6cd19ec7d46a4011dec2a2f84c3cf74c"
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/4318f65b0a320e883897ca95ad472e2d1a0a11f53abea6ce1a848853d9fb57f1",
+      "completion_marker": true,
+      "files": [
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/4318f65b0a320e883897ca95ad472e2d1a0a11f53abea6ce1a848853d9fb57f1/COMPLETE.json",
+          "bytes": 204
+        },
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/4318f65b0a320e883897ca95ad472e2d1a0a11f53abea6ce1a848853d9fb57f1/payload.json",
+          "bytes": 8677561
+        }
+      ],
+      "numerical_validation_not_inferred_from_marker": true,
+      "marker_sha256": "ddb9268db8042e05b92f13bb11899d81cd89b65bbc74eccd3a935d14536716fc"
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/4ad29dd4936dee4f7061dd641832b1c10eed6d3907106ba1a5bb33566b0d2f15",
+      "completion_marker": true,
+      "files": [
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/4ad29dd4936dee4f7061dd641832b1c10eed6d3907106ba1a5bb33566b0d2f15/COMPLETE.json",
+          "bytes": 204
+        },
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/4ad29dd4936dee4f7061dd641832b1c10eed6d3907106ba1a5bb33566b0d2f15/payload.json",
+          "bytes": 1485165
+        }
+      ],
+      "numerical_validation_not_inferred_from_marker": true,
+      "marker_sha256": "c7250953c60e27f5f026f24cf8dffc77a66a4039933345ca350d0353ac30dba2"
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/5110a5cf1c9baaab8db4009b2dbf12502f273588d42508c89850bc6382e73ae8",
+      "completion_marker": true,
+      "files": [
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/5110a5cf1c9baaab8db4009b2dbf12502f273588d42508c89850bc6382e73ae8/COMPLETE.json",
+          "bytes": 204
+        },
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/5110a5cf1c9baaab8db4009b2dbf12502f273588d42508c89850bc6382e73ae8/payload.json",
+          "bytes": 8318209
+        }
+      ],
+      "numerical_validation_not_inferred_from_marker": true,
+      "marker_sha256": "ee8005da5edb59f3f702179ee540963e78fcdead672a5d4a0345e839f3ba52a5"
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/530420cccb4484fa3a6c659d069ff9c08ec1bc5ef856ef3fe7606c62332959ba",
+      "completion_marker": true,
+      "files": [
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/530420cccb4484fa3a6c659d069ff9c08ec1bc5ef856ef3fe7606c62332959ba/COMPLETE.json",
+          "bytes": 204
+        },
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/530420cccb4484fa3a6c659d069ff9c08ec1bc5ef856ef3fe7606c62332959ba/payload.json",
+          "bytes": 1484723
+        }
+      ],
+      "numerical_validation_not_inferred_from_marker": true,
+      "marker_sha256": "ec543091ad2f0e574fcbd26fa55c92ca49551c61b40630555badc23d340acc41"
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/5ad5152f8af02319b8f31448b56f67a6f336bf6df33dfae79830fcd3c2656268",
+      "completion_marker": true,
+      "files": [
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/5ad5152f8af02319b8f31448b56f67a6f336bf6df33dfae79830fcd3c2656268/COMPLETE.json",
+          "bytes": 204
+        },
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/5ad5152f8af02319b8f31448b56f67a6f336bf6df33dfae79830fcd3c2656268/payload.json",
+          "bytes": 2923395
+        }
+      ],
+      "numerical_validation_not_inferred_from_marker": true,
+      "marker_sha256": "fb4004f898b576d92ff3aa3d28d56d8d671d6a2ef11de7f0329d0998a60b692f"
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/5e5b03c6ce4cfcba43be2731cd568d2465834ecf357db2d6602c9709824f0191",
+      "completion_marker": true,
+      "files": [
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/5e5b03c6ce4cfcba43be2731cd568d2465834ecf357db2d6602c9709824f0191/COMPLETE.json",
+          "bytes": 204
+        },
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/5e5b03c6ce4cfcba43be2731cd568d2465834ecf357db2d6602c9709824f0191/payload.json",
+          "bytes": 1878991
+        }
+      ],
+      "numerical_validation_not_inferred_from_marker": true,
+      "marker_sha256": "9524896e8957189c3112133bdc30169d21d4b387b092af2420a232bea50a8445"
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/74642412b7c85babaa9058aa005ab9c1dfbc86c1cc09d12620f4e79ab3a72521",
+      "completion_marker": true,
+      "files": [
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/74642412b7c85babaa9058aa005ab9c1dfbc86c1cc09d12620f4e79ab3a72521/COMPLETE.json",
+          "bytes": 204
+        },
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/74642412b7c85babaa9058aa005ab9c1dfbc86c1cc09d12620f4e79ab3a72521/payload.json",
+          "bytes": 8669243
+        }
+      ],
+      "numerical_validation_not_inferred_from_marker": true,
+      "marker_sha256": "c077501e1e3247a091baf3b780a48ed0353e33973de01b3d7985bf809e8d22eb"
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/75460fe31425c8a7f68fe7ad51960991d8e4467fadc2d93ef9b294903775f73f",
+      "completion_marker": true,
+      "files": [
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/75460fe31425c8a7f68fe7ad51960991d8e4467fadc2d93ef9b294903775f73f/COMPLETE.json",
+          "bytes": 204
+        },
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/75460fe31425c8a7f68fe7ad51960991d8e4467fadc2d93ef9b294903775f73f/payload.json",
+          "bytes": 8669243
+        }
+      ],
+      "numerical_validation_not_inferred_from_marker": true,
+      "marker_sha256": "2a0ae6dd0e383cee2c4508a820942eda012e8b4f596dcbc599c8bd958e30f0d5"
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/7b65475a2bb901db9b3d6befc7e2258c1c0180f1afd0558cdca64ef705eb0cf5",
+      "completion_marker": true,
+      "files": [
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/7b65475a2bb901db9b3d6befc7e2258c1c0180f1afd0558cdca64ef705eb0cf5/COMPLETE.json",
+          "bytes": 204
+        },
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/7b65475a2bb901db9b3d6befc7e2258c1c0180f1afd0558cdca64ef705eb0cf5/payload.json",
+          "bytes": 2926891
+        }
+      ],
+      "numerical_validation_not_inferred_from_marker": true,
+      "marker_sha256": "afc4cf84eba0064a03fcd55aa374a8b5b627a817cfa40bfd55553a0c36c8a232"
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/83a2ffde546a0776df0d08fb27abf14381516a83a642c337521e6a44aa57c063",
+      "completion_marker": true,
+      "files": [
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/83a2ffde546a0776df0d08fb27abf14381516a83a642c337521e6a44aa57c063/COMPLETE.json",
+          "bytes": 204
+        },
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/83a2ffde546a0776df0d08fb27abf14381516a83a642c337521e6a44aa57c063/payload.json",
+          "bytes": 1879926
+        }
+      ],
+      "numerical_validation_not_inferred_from_marker": true,
+      "marker_sha256": "5264d4c566c725525ddc33845371867f00fc540d2c3252372a7734e51e1a05f4"
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/a44490143375d97f51ac57bd52977d8d499299725f23ae744d2e9db6fa65f4fc",
+      "completion_marker": true,
+      "files": [
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/a44490143375d97f51ac57bd52977d8d499299725f23ae744d2e9db6fa65f4fc/COMPLETE.json",
+          "bytes": 204
+        },
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/a44490143375d97f51ac57bd52977d8d499299725f23ae744d2e9db6fa65f4fc/payload.json",
+          "bytes": 1300341
+        }
+      ],
+      "numerical_validation_not_inferred_from_marker": true,
+      "marker_sha256": "15681c46bfdb14c9a64223e7e1714025a9afdc9798c234e846e7b91fb2ffb428"
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/a8404c4ddd3367b64515b6503940852ce05181cb56ba1327a20bf4be27dcb939",
+      "completion_marker": true,
+      "files": [
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/a8404c4ddd3367b64515b6503940852ce05181cb56ba1327a20bf4be27dcb939/COMPLETE.json",
+          "bytes": 204
+        },
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/a8404c4ddd3367b64515b6503940852ce05181cb56ba1327a20bf4be27dcb939/payload.json",
+          "bytes": 1300230
+        }
+      ],
+      "numerical_validation_not_inferred_from_marker": true,
+      "marker_sha256": "3f2b2cd79f3a2468d2abc16ffee35ce3a1694716a4845f99b4d8d66764e3d3b1"
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/b6b581edc7e6c83381108be0ad7a0ec39b3c7f8c5360257e68a6dade14daf665",
+      "completion_marker": true,
+      "files": [
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/b6b581edc7e6c83381108be0ad7a0ec39b3c7f8c5360257e68a6dade14daf665/COMPLETE.json",
+          "bytes": 204
+        },
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/b6b581edc7e6c83381108be0ad7a0ec39b3c7f8c5360257e68a6dade14daf665/payload.json",
+          "bytes": 8326673
+        }
+      ],
+      "numerical_validation_not_inferred_from_marker": true,
+      "marker_sha256": "a6789fdd2553b879d81048c59084869b588f00504ce99f45368b0431905282f7"
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/b78f0ec2e42db6bafa0f8cd18e01b8d2240506c81627e32ec6813f5bf019cb3f",
+      "completion_marker": true,
+      "files": [
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/b78f0ec2e42db6bafa0f8cd18e01b8d2240506c81627e32ec6813f5bf019cb3f/COMPLETE.json",
+          "bytes": 204
+        },
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/b78f0ec2e42db6bafa0f8cd18e01b8d2240506c81627e32ec6813f5bf019cb3f/payload.json",
+          "bytes": 2479595
+        }
+      ],
+      "numerical_validation_not_inferred_from_marker": true,
+      "marker_sha256": "ae0998e45eb7c62ac1b09107e0758842ca313f9568263139ecaeb5d0a74e3797"
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/c5151f79afd7c35ef8357d76e2f50ff0cc6b644147e365ce5ff009ba30ec3848",
+      "completion_marker": true,
+      "files": [
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/c5151f79afd7c35ef8357d76e2f50ff0cc6b644147e365ce5ff009ba30ec3848/COMPLETE.json",
+          "bytes": 204
+        },
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/c5151f79afd7c35ef8357d76e2f50ff0cc6b644147e365ce5ff009ba30ec3848/payload.json",
+          "bytes": 1485165
+        }
+      ],
+      "numerical_validation_not_inferred_from_marker": true,
+      "marker_sha256": "c7250953c60e27f5f026f24cf8dffc77a66a4039933345ca350d0353ac30dba2"
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/d5738bfcdec6990c3b6e77b2c7e625d46562ea134457f5de2896af9600db7ceb",
+      "completion_marker": true,
+      "files": [
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/d5738bfcdec6990c3b6e77b2c7e625d46562ea134457f5de2896af9600db7ceb/COMPLETE.json",
+          "bytes": 204
+        },
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/d5738bfcdec6990c3b6e77b2c7e625d46562ea134457f5de2896af9600db7ceb/payload.json",
+          "bytes": 8326673
+        }
+      ],
+      "numerical_validation_not_inferred_from_marker": true,
+      "marker_sha256": "38ef207268601bd0f32f670de1538a658c99f5876e4fa56fa33eb3f25ec75894"
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/e1fd1e506c3fe4b24f230bfbe0bbc6644636d5d2ce1f99e12a497f0cfa8bee89",
+      "completion_marker": true,
+      "files": [
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/e1fd1e506c3fe4b24f230bfbe0bbc6644636d5d2ce1f99e12a497f0cfa8bee89/COMPLETE.json",
+          "bytes": 204
+        },
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/e1fd1e506c3fe4b24f230bfbe0bbc6644636d5d2ce1f99e12a497f0cfa8bee89/payload.json",
+          "bytes": 1300107
+        }
+      ],
+      "numerical_validation_not_inferred_from_marker": true,
+      "marker_sha256": "bf8c3a852ba5ad66fd9331bdc3eff3918c5632fb4b6f1dc51cf0ad98acfcb1f7"
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/e9f52497184faad85279b1e04931e85817f57b0061a48a02383bffc608d8ed9b",
+      "completion_marker": true,
+      "files": [
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/e9f52497184faad85279b1e04931e85817f57b0061a48a02383bffc608d8ed9b/COMPLETE.json",
+          "bytes": 204
+        },
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/e9f52497184faad85279b1e04931e85817f57b0061a48a02383bffc608d8ed9b/payload.json",
+          "bytes": 2479595
+        }
+      ],
+      "numerical_validation_not_inferred_from_marker": true,
+      "marker_sha256": "d05b14f554198a564048a2bcfe9a402142189a52f67808924918f15d35ed7c82"
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/ec7668ae1190c9a557637ea881b180d14082174730b44d940775bce7244d409e",
+      "completion_marker": true,
+      "files": [
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/ec7668ae1190c9a557637ea881b180d14082174730b44d940775bce7244d409e/COMPLETE.json",
+          "bytes": 204
+        },
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/ec7668ae1190c9a557637ea881b180d14082174730b44d940775bce7244d409e/payload.json",
+          "bytes": 1879926
+        }
+      ],
+      "numerical_validation_not_inferred_from_marker": true,
+      "marker_sha256": "5264d4c566c725525ddc33845371867f00fc540d2c3252372a7734e51e1a05f4"
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/f39ad19af5b04475d3f704df15aecb567522b76f4cbf7d502682b88b128c005a",
+      "completion_marker": true,
+      "files": [
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/f39ad19af5b04475d3f704df15aecb567522b76f4cbf7d502682b88b128c005a/COMPLETE.json",
+          "bytes": 204
+        },
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/f39ad19af5b04475d3f704df15aecb567522b76f4cbf7d502682b88b128c005a/payload.json",
+          "bytes": 8335155
+        }
+      ],
+      "numerical_validation_not_inferred_from_marker": true,
+      "marker_sha256": "66c36f516909c90cf7d3a3b08ab7e316c43d05b58508c461fb033b6e4c784ba4"
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/f65423f369a580d246e1f144e1ad1a6a30d24a1d9b26b4c771ab2157a682a62b",
+      "completion_marker": true,
+      "files": [
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/f65423f369a580d246e1f144e1ad1a6a30d24a1d9b26b4c771ab2157a682a62b/COMPLETE.json",
+          "bytes": 204
+        },
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/f65423f369a580d246e1f144e1ad1a6a30d24a1d9b26b4c771ab2157a682a62b/payload.json",
+          "bytes": 1300230
+        }
+      ],
+      "numerical_validation_not_inferred_from_marker": true,
+      "marker_sha256": "3f2b2cd79f3a2468d2abc16ffee35ce3a1694716a4845f99b4d8d66764e3d3b1"
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/f7e34290fa268cca16634b7b597fdec2fd5d7ee2f61c20ebd3a7573569c3c54d",
+      "completion_marker": true,
+      "files": [
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/f7e34290fa268cca16634b7b597fdec2fd5d7ee2f61c20ebd3a7573569c3c54d/COMPLETE.json",
+          "bytes": 204
+        },
+        {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-evidence/selected/f7e34290fa268cca16634b7b597fdec2fd5d7ee2f61c20ebd3a7573569c3c54d/payload.json",
+          "bytes": 2926891
+        }
+      ],
+      "numerical_validation_not_inferred_from_marker": true,
+      "marker_sha256": "afc4cf84eba0064a03fcd55aa374a8b5b627a817cfa40bfd55553a0c36c8a232"
+    }
+  ],
+  "case_marker_hashes_match_original": true,
+  "current_source13_matches_frozen": true,
+  "compute_node_post_phase_check_observed": false,
+  "source_hashes": {
+    "component_analysis/a3_direction_pipeline.py": "96678db186078ab37cad108e2d1e71ffdccf1fb3dd157c35cdc57a91b2ebd4a0",
+    "component_analysis/a3_direction_runner.py": "89a62335665595533204006c3eca28d14ca9c42eb600879c235e9c6370739429",
+    "component_analysis/a3_direction_runtime.py": "b66c2d8cd26c36f321b5079758209214746b0e4eec16a6c801742086d729c0cc",
+    "component_analysis/a3_direction_workload.py": "3e43aaf2b4cacb99df87593ae377c8fdf3eb7b223b258ed8873853841404d8f9",
+    "component_analysis/a3_directions.py": "ed882d4e12a396e03e73671e588beba5b1a8c90ab9d31e7ee73d4194430b4a86",
+    "component_analysis/a3_pipeline.py": "310eb53427ad4ac32522dfd0d6cd3b33e4ec887af1776579845f8953bdbe83f5",
+    "scripts/jobs/specificity_a3.sh": "936dfb7f8b9c2d267d52f1e199ed431275e6527cbfc3a105a22e3812289a9b96",
+    "tests/test_a3_direction_runner.py": "3ea945d5b23b4eef7d56139758c7075ea1b56ac612f1923590b7978628ca0120",
+    "tests/test_a3_direction_runtime.py": "5a41e89b0b2bd5fd59553f5f5a63260638e3547a63c31a615d84da08f796fb6a",
+    "tests/test_a3_direction_workload.py": "91eb6f874e180c5ffb362daba231631b7bea21c224446580efccfe20a9007300",
+    "tests/test_a3_directions.py": "cd8471b1524ad7b8f1b7c87f9eb5fec5724b3ab2980027ef7aadfea3fc3bb1c1",
+    "tests/test_a3_pipeline.py": "bbb3efdba075cc14c2997cc11ae44bab268bdea56459c0574d6bfc21b62f4a18",
+    "tests/a3_direction_native_scenario.py": "9b5061ab9618222b23230917f446abcaa73747f3d216f69c77b9218feec6297b"
+  },
+  "cgroup_event_deltas": {
+    "selected-pilot-aggregate": {
+      "/sys/fs/cgroup/system.slice/slurmstepd.scope/job_23472894/step_0/user/task_0": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "/sys/fs/cgroup/system.slice/slurmstepd.scope/job_23472894/step_0/user": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "/sys/fs/cgroup/system.slice/slurmstepd.scope/job_23472894/step_0": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "/sys/fs/cgroup/system.slice/slurmstepd.scope/job_23472894": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "/sys/fs/cgroup/system.slice/slurmstepd.scope": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "/sys/fs/cgroup/system.slice": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "/sys/fs/cgroup": {
+        "status": "unavailable; not treated as zero"
+      }
+    }
+  },
+  "new_reconciliation_forward_count": null,
+  "unknown_new_work_not_replaced_by_zero": true,
+  "no_source_driver_edits_or_retry": true,
+  "scientific_execution": false,
+  "production_admission": false,
+  "all_owned_job_processes_terminal": true,
+  "commands": [
+    {
+      "command": "TZ=UTC sacct -j 23472894 --format=JobIDRaw,JobName,State,ExitCode,ElapsedRaw,TimelimitRaw,AllocTRES,MaxRSS,Start,End -P",
+      "exit_code": 0,
+      "output": "terminal-accounting.txt"
+    },
+    {
+      "command": "research-session lint /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/151-native-aggregate-cpu-job23472894-handback.md",
+      "exit_code": 0
+    },
+    {
+      "command": "check_report_numbers.py /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/151-native-aggregate-cpu-job23472894-handback.md --strict --json",
+      "exit_code": 0,
+      "counts": {
+        "numbers": 21,
+        "resolved": 21,
+        "derived": 0,
+        "unresolved": 0
+      }
+    }
+  ],
+  "derived_authentication_interval_sum_seconds": 3316.8153397742426,
+  "derived_authentication_sum_definition": "Sum of the63 actually recorded read-only authentication intervals; not an additional executed timing sample.",
+  "prefit_dependency_answer": "prefit-m1-dependency-answer.json",
+  "artifact_file_hashes": {
+    "slurm-23472894.out": {
+      "sha256": "9af57ec014b853c8ca58612bf4b6c6008324e4235bfc8a5312fb0ffd765c1547",
+      "bytes": 1178
+    },
+    "number-check.json": {
+      "sha256": "299baa01b50b7fcfae6b35a53542dff838795861d307316289ceda0b340b1db5",
+      "bytes": 4137
+    },
+    "submission.json": {
+      "sha256": "d6aa4ef6e5c1c22e7d264881d704b4b3bbe70c82ef4354416d8506c76490ebfc",
+      "bytes": 1165
+    },
+    "prefit-m1-dependency-answer.json": {
+      "sha256": "c229b74ae81984d8ccd2b7b9d215d615cf4bbde6275368d1e24725a9319f927c",
+      "bytes": 4216
+    },
+    "lint.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "accepted-prefit-process.json": {
+      "sha256": "59995ecdb18e3aa6d2324ec33b61712039b86efdec770c85dd0bfa8b43bb1819",
+      "bytes": 380
+    },
+    "slurm-23472894.err": {
+      "sha256": "d43ed52ce7aadbeb99c8095ab0ac1a96f13c493c2698b3a2fa5f130fa890fd47",
+      "bytes": 54
+    },
+    "driver-hashes.json": {
+      "sha256": "babaf17dbf75e3cd8e9cbb8aa59b7ea714ab95ce3db69ed67825126ee1dbce3b",
+      "bytes": 8945
+    },
+    "attempt1-number-check.json": {
+      "sha256": "7089f6508286578ca9a8716eac5d6f3cb50b3fe95560fc9cd81872eacc0359dc",
+      "bytes": 3205
+    },
+    "terminal-accounting.txt": {
+      "sha256": "cfbe26107bda44f566e998bac187b28a3cb4a63188fc43f4087b66167bad7cdd",
+      "bytes": 549
+    },
+    "expectation.json": {
+      "sha256": "26bd64dff873ba0b84004cb1d0cf48a01c54c1663113cc5ca7e2df7f4c5d31b0",
+      "bytes": 23209
+    },
+    "protocol-checks.json": {
+      "sha256": "d5087fa32115580b453ff702eca2c3954ddb2b1b04afcc9449cc3680abbf0fcb",
+      "bytes": 1188
+    },
+    "job-raw/driver-identity.json": {
+      "sha256": "f4450f075acdda302cc516b4d0bdedace6a1d515671bddeabe8777bec7c8a4ce",
+      "bytes": 320
+    },
+    "job-raw/allocation-before.json": {
+      "sha256": "76a3d525fa207b31faee8855365c09ec616cbfba4ebc6713ab1447af077f0041",
+      "bytes": 5761
+    },
+    "job-raw/selected-pilot-aggregate/result.json": {
+      "sha256": "67cdc25d04e1a49599d357674064f5cb40d44c8f2379a3ea1a492b548af2824c",
+      "bytes": 1248
+    },
+    "job-raw/selected-pilot-aggregate/steps.log": {
+      "sha256": "3f8aa493118b01b153fec2058d2ff849cd39e8a2524cf5bbfd3f918b6cd5e4f3",
+      "bytes": 26808
+    },
+    "job-raw/selected-pilot-aggregate/memory-before.json": {
+      "sha256": "02ce608f2f580ea368fd25b26d8b1f61a07f73ac219b715c80b4e08b43692d03",
+      "bytes": 2352
+    },
+    "job-raw/selected-pilot-aggregate/memory-after.json": {
+      "sha256": "066baa4388a0ebe1df98ba54603c5127c885fee576cf8d3843fbbe1cd5e071a2",
+      "bytes": 2357
+    },
+    "job-raw/selected-pilot-aggregate/completed-parent.json": {
+      "sha256": "25dade8c34195c66193cf1659489186964b51d89f1b2cbf08c4ca7afb6b0302d",
+      "bytes": 291
+    },
+    "job-raw/selected-pilot-aggregate/allocation-before.json": {
+      "sha256": "f7fb614a694170550584f599a683e12583d09ae5e2c7605f9803631de339ece1",
+      "bytes": 5761
+    },
+    "job-raw/selected-pilot-aggregate/allocation-after.json": {
+      "sha256": "5cc2bb32ad9e9f765b9adac35b8c71b3e33be4f07fb1f6225a2d6189eb1df183",
+      "bytes": 5761
+    },
+    "job-raw/selected-pilot-aggregate/child-samples.jsonl": {
+      "sha256": "5616c07f1ef40fe1c4feb29b9a26d0882e939713ae434d2794975359d0a1ef1f",
+      "bytes": 150534
+    },
+    "job-raw/selected-pilot-aggregate/allocation.json": {
+      "sha256": "590bc674f2db52dc6383b49f16dac0b08efb1e0d300b5e4c5828efd8ec3eb74a",
+      "bytes": 5761
+    },
+    "published-object-markers/0c5da163a54585be1e62a85f637cbb2ca74e9ac578df62e72f1045e565d73455.json": {
+      "sha256": "86cd86f23df955751da76fb11f5cebf8ba4816257af61e588561101799e329c2",
+      "bytes": 204
+    },
+    "published-object-markers/530420cccb4484fa3a6c659d069ff9c08ec1bc5ef856ef3fe7606c62332959ba.json": {
+      "sha256": "ec543091ad2f0e574fcbd26fa55c92ca49551c61b40630555badc23d340acc41",
+      "bytes": 204
+    },
+    "published-object-markers/4ad29dd4936dee4f7061dd641832b1c10eed6d3907106ba1a5bb33566b0d2f15.json": {
+      "sha256": "c7250953c60e27f5f026f24cf8dffc77a66a4039933345ca350d0353ac30dba2",
+      "bytes": 204
+    },
+    "published-object-markers/4255ef15798e7fddbb1afc95cd76b77a84ce54a63985c3cdfaffb8c4c48f6bf4.json": {
+      "sha256": "a668745c79d45f8409db2b15575b617d6cd19ec7d46a4011dec2a2f84c3cf74c",
+      "bytes": 204
+    },
+    "published-object-markers/ec7668ae1190c9a557637ea881b180d14082174730b44d940775bce7244d409e.json": {
+      "sha256": "5264d4c566c725525ddc33845371867f00fc540d2c3252372a7734e51e1a05f4",
+      "bytes": 204
+    },
+    "published-object-markers/5e5b03c6ce4cfcba43be2731cd568d2465834ecf357db2d6602c9709824f0191.json": {
+      "sha256": "9524896e8957189c3112133bdc30169d21d4b387b092af2420a232bea50a8445",
+      "bytes": 204
+    },
+    "published-object-markers/5110a5cf1c9baaab8db4009b2dbf12502f273588d42508c89850bc6382e73ae8.json": {
+      "sha256": "ee8005da5edb59f3f702179ee540963e78fcdead672a5d4a0345e839f3ba52a5",
+      "bytes": 204
+    },
+    "published-object-markers/b6b581edc7e6c83381108be0ad7a0ec39b3c7f8c5360257e68a6dade14daf665.json": {
+      "sha256": "a6789fdd2553b879d81048c59084869b588f00504ce99f45368b0431905282f7",
+      "bytes": 204
+    },
+    "published-object-markers/3372a17fcdb3096c445cab2fd8b07a30cfdf2013166a444fb950e2781d632834.json": {
+      "sha256": "4f53ffe4b55cade9f2e4e0e6c9676a96bae9a219072318807dc3ea8cb0f51a9a",
+      "bytes": 204
+    },
+    "published-object-markers/b78f0ec2e42db6bafa0f8cd18e01b8d2240506c81627e32ec6813f5bf019cb3f.json": {
+      "sha256": "ae0998e45eb7c62ac1b09107e0758842ca313f9568263139ecaeb5d0a74e3797",
+      "bytes": 204
+    },
+    "published-object-markers/407e853ddabe0645bb1a215a307e7fdabd651628830016cc33345eaca57e88fd.json": {
+      "sha256": "5879858d748e51fb7c3b66fe7b81efa55851e489578addb515407794e5a3ed99",
+      "bytes": 204
+    },
+    "published-object-markers/74642412b7c85babaa9058aa005ab9c1dfbc86c1cc09d12620f4e79ab3a72521.json": {
+      "sha256": "c077501e1e3247a091baf3b780a48ed0353e33973de01b3d7985bf809e8d22eb",
+      "bytes": 204
+    },
+    "published-object-markers/d5738bfcdec6990c3b6e77b2c7e625d46562ea134457f5de2896af9600db7ceb.json": {
+      "sha256": "38ef207268601bd0f32f670de1538a658c99f5876e4fa56fa33eb3f25ec75894",
+      "bytes": 204
+    },
+    "published-object-markers/a44490143375d97f51ac57bd52977d8d499299725f23ae744d2e9db6fa65f4fc.json": {
+      "sha256": "15681c46bfdb14c9a64223e7e1714025a9afdc9798c234e846e7b91fb2ffb428",
+      "bytes": 204
+    },
+    "published-object-markers/7b65475a2bb901db9b3d6befc7e2258c1c0180f1afd0558cdca64ef705eb0cf5.json": {
+      "sha256": "afc4cf84eba0064a03fcd55aa374a8b5b627a817cfa40bfd55553a0c36c8a232",
+      "bytes": 204
+    },
+    "published-object-markers/3f9decf7e245988919a3dd624adeafeb92ca89ca7dcd0c53fb654fa24c92b9c7.json": {
+      "sha256": "f1f4bd58a5930e05c528c63fb4907b61a4d7e7ac1d39361716c35963fc006bd0",
+      "bytes": 204
+    },
+    "published-object-markers/e9f52497184faad85279b1e04931e85817f57b0061a48a02383bffc608d8ed9b.json": {
+      "sha256": "d05b14f554198a564048a2bcfe9a402142189a52f67808924918f15d35ed7c82",
+      "bytes": 204
+    },
+    "published-object-markers/f65423f369a580d246e1f144e1ad1a6a30d24a1d9b26b4c771ab2157a682a62b.json": {
+      "sha256": "3f2b2cd79f3a2468d2abc16ffee35ce3a1694716a4845f99b4d8d66764e3d3b1",
+      "bytes": 204
+    },
+    "published-object-markers/f7e34290fa268cca16634b7b597fdec2fd5d7ee2f61c20ebd3a7573569c3c54d.json": {
+      "sha256": "afc4cf84eba0064a03fcd55aa374a8b5b627a817cfa40bfd55553a0c36c8a232",
+      "bytes": 204
+    },
+    "published-object-markers/5ad5152f8af02319b8f31448b56f67a6f336bf6df33dfae79830fcd3c2656268.json": {
+      "sha256": "fb4004f898b576d92ff3aa3d28d56d8d671d6a2ef11de7f0329d0998a60b692f",
+      "bytes": 204
+    },
+    "published-object-markers/33e11c5f05f7b29d24d4b255a4e58902c8ade9d68f7fde305fbc3232739ffb4a.json": {
+      "sha256": "218d5a64173616ef3eb3b827a77575eb2f76819ed49b93f46fce96c044b2ea3b",
+      "bytes": 204
+    },
+    "published-object-markers/c5151f79afd7c35ef8357d76e2f50ff0cc6b644147e365ce5ff009ba30ec3848.json": {
+      "sha256": "c7250953c60e27f5f026f24cf8dffc77a66a4039933345ca350d0353ac30dba2",
+      "bytes": 204
+    },
+    "published-object-markers/75460fe31425c8a7f68fe7ad51960991d8e4467fadc2d93ef9b294903775f73f.json": {
+      "sha256": "2a0ae6dd0e383cee2c4508a820942eda012e8b4f596dcbc599c8bd958e30f0d5",
+      "bytes": 204
+    },
+    "published-object-markers/418639e7b31374027439df15b2df7cf79d1e1fd3337682e10b936a600252b24e.json": {
+      "sha256": "c41d573f4fb1a02b76a6080b63e0055bce91f294f9981981d5a02b0e9ecff557",
+      "bytes": 204
+    },
+    "published-object-markers/a8404c4ddd3367b64515b6503940852ce05181cb56ba1327a20bf4be27dcb939.json": {
+      "sha256": "3f2b2cd79f3a2468d2abc16ffee35ce3a1694716a4845f99b4d8d66764e3d3b1",
+      "bytes": 204
+    },
+    "published-object-markers/83a2ffde546a0776df0d08fb27abf14381516a83a642c337521e6a44aa57c063.json": {
+      "sha256": "5264d4c566c725525ddc33845371867f00fc540d2c3252372a7734e51e1a05f4",
+      "bytes": 204
+    },
+    "published-object-markers/e1fd1e506c3fe4b24f230bfbe0bbc6644636d5d2ce1f99e12a497f0cfa8bee89.json": {
+      "sha256": "bf8c3a852ba5ad66fd9331bdc3eff3918c5632fb4b6f1dc51cf0ad98acfcb1f7",
+      "bytes": 204
+    },
+    "published-object-markers/4318f65b0a320e883897ca95ad472e2d1a0a11f53abea6ce1a848853d9fb57f1.json": {
+      "sha256": "ddb9268db8042e05b92f13bb11899d81cd89b65bbc74eccd3a935d14536716fc",
+      "bytes": 204
+    },
+    "published-object-markers/f39ad19af5b04475d3f704df15aecb567522b76f4cbf7d502682b88b128c005a.json": {
+      "sha256": "66c36f516909c90cf7d3a3b08ab7e316c43d05b58508c461fb033b6e4c784ba4",
+      "bytes": 204
+    }
+  }
+}
