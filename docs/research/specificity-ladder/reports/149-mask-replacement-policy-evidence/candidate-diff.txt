@@ -1,0 +1,358 @@
+--- 40fe/tests/test_a3_direction_runtime.py
++++ candidate/tests/test_a3_direction_runtime.py
+@@ -1796,3 +1796,73 @@
+     aggregate=r.read_object(tmp_path/'pilot-verification-aggregate'/'prefit')
+     assert aggregate['case_order']==ids and aggregate['original_case_forward_calls']>0 and aggregate['case_forwards_reexecuted'] is False
+     assert r.object_reference(first)==before
++
++
++@pytest.mark.parametrize('fault',[None,'directions','edges','M2','M3','M4','M5','contingency_low','total','other_M1'])
++def test_n5_exact_additive_boundary_preserves_other_caps(fault):
++    from tests.test_a3_direction_workload import _n5_fixture,_n5_actual
++    w,policy,old,a=_n5_fixture();new,a=_n5_actual(w,policy,a)
++    entries=[old,new]+[dict(id=phase+sub,phase=phase,subphase=sub,reserved_gpu_hours=h,state='completed',actual_gpu_hours=0)
++        for phase,sub,h in [('M1','directions',.5),('M1','edges',.75),('M2','directions',9),('M3','neurons',4),('M4','edges',9),('M5','masks',10)]]
++    contingency=5.25
++    if fault in ('directions','edges'):
++        next(x for x in entries if x['phase']=='M1' and x['subphase']==fault)['reserved_gpu_hours']+=.01
++    elif fault in ('M2','M3','M4','M5'):next(x for x in entries if x['phase']==fault)['reserved_gpu_hours']+=.01
++    elif fault=='contingency_low':contingency=5.24
++    elif fault=='total':contingency=5.26
++    elif fault=='other_M1':entries.append(dict(phase='M1',subphase='other',reserved_gpu_hours=.01))
++    if fault is None:assert runtime().validate_global_budgets(entries,contingency_remaining=contingency)['all']==34.75
++    else:
++        with pytest.raises(ValueError):runtime().validate_global_budgets(entries,contingency_remaining=contingency)
++
++
++def test_n5_prospective_actual_successor_live_order(tmp_path):
++    from tests.test_a3_direction_workload import _n5_fixture,_n5_actual
++    import time
++    r=runtime();w,policy,old,admission=_n5_fixture();identity=admission['identity']
++    from pathlib import Path
++    original_admission_path=Path(policy['original_reservation']['output_dir']).parent/'root-mask-m1'/'admission'
++    original=r.read_object(original_admission_path)
++    r.publish_object(tmp_path/'old-admission',original)
++    live=dict(reservations=[copy.deepcopy(old['actual_entry'])]);live_path=tmp_path/'live.json';live_path.write_text(json.dumps(live))
++    snapshot=tmp_path/'original.json';snapshot.write_bytes(live_path.read_bytes());directory=tmp_path/'successors';directory.mkdir()
++    old_map=dict(reservation_id='r-031',experiment='A3',phase='M1',subphase='masks',inventory_sha256=policy['original_upper_inventory_sha256'],
++        original_reserved_gpu_hours=.75,actual_entry=copy.deepcopy(old['actual_entry']),reservation_lineage=old['reservation_lineage'])
++    mapping=dict(kind='a3_root_ledger_mapping_v1',ledger_path=str(live_path),ledger_snapshot_path=str(snapshot),ledger_sha256=r.common.file_hash(snapshot),
++        expected_entry_ids=['r-031'],entries=[old_map],original_admission_paths=[str(tmp_path/'old-admission')],
++        original_admission_references={str(tmp_path/'old-admission'):r.object_reference(tmp_path/'old-admission')},
++        storage_capacities={'host_ram':dict(pool='ram',available_bytes=10**9)},contingency_gpu_hours=5.25,max_age_seconds=900,
++        generation=0,successor_directory=str(directory),refresh_wait_seconds=0)
++    r.publish_object(tmp_path/'mapping',mapping)
++    before=r.normalize_ledger(tmp_path/'mapping',identity=identity,injected=True)
++    assert w._ledger(before,identity)['mask_retry_gpu_hours']==0
++    assert w.validate_mask_replacement_admission(admission,before['entries'])['execution_authorized'] is False
++    assert before['expected_entry_ids']==['r-031']  # No invented new actual entry to construct admission.
++    new,admission=_n5_actual(w,policy,admission);new['actual_entry'].update(status='RUNNING',actual_seconds=None)
++    live['reservations'].append(new['actual_entry']);live_path.write_text(json.dumps(live))
++    r.publish_object(tmp_path/'new-admission',admission)
++    second=tmp_path/'second.json';second.write_bytes(live_path.read_bytes())
++    successor=copy.deepcopy(mapping);successor.update(generation=1,predecessor_reference=r.object_reference(tmp_path/'mapping'),
++        ledger_snapshot_path=str(second),ledger_sha256=r.common.file_hash(second),expected_entry_ids=['r-031','r-new'])
++    successor['entries'].append(dict(reservation_id='r-new',experiment='A3',phase='M1',subphase='masks',inventory_sha256='c'*64,
++        original_reserved_gpu_hours=.75,actual_entry=new['actual_entry'],reservation_lineage=new['reservation_lineage']))
++    successor['original_admission_paths'].append(str(tmp_path/'new-admission'))
++    successor['original_admission_references'][str(tmp_path/'new-admission')]=r.object_reference(tmp_path/'new-admission')
++    r.publish_object(directory/'mapping-000001',successor)
++    ledger=r.normalize_ledger(tmp_path/'mapping',identity=identity,injected=True)
++    assert w._ledger(ledger,identity)['mask_retry_gpu_hours']==.75
++    inv=dict(identity=identity,inventory_sha256='c'*64,phase='M1',expected_keys=[],finish_reserve_seconds=1)
++    r.publish_object(tmp_path/'upper',inv)
++    r.publish_object(tmp_path/'allocation',dict(kind='a3_injected_slurm_allocation_v1',injected=True,job_id='999999',cluster='delta',
++        account='new-account',partition='gpuH200x8',gpus=1,state='RUNNING',start_time_unix=time.time()-1,
++        end_time_unix=time.time()+2700,time_limit_seconds=2700))
++    reservation=dict(kind='a3_root_execution_reservation_v1',identity=identity,inventory_sha256='c'*64,reservation_id='r-new',
++        actual_entry={k:new['actual_entry'].get(k) for k in r.RESERVATION_FIELDS},admission_path=str(tmp_path/'new-admission'),
++        admission_reference=r.object_reference(tmp_path/'new-admission'),admission_sha256=admission['admission_sha256'],
++        upper_inventory_path=str(tmp_path/'upper'),minimum_shard_seconds=1,injected_allocation_path=str(tmp_path/'allocation'))
++    r.publish_object(tmp_path/'reservation',reservation)
++    call=lambda:r.validate_reservation(tmp_path/'reservation',ledger=ledger,inventory=inv,work_dir='/tmp/n5-replacement',injected=True,
++        subphase='masks',subphase_limits={'M1':1.5,'M5':10},inventory_validator=lambda _:None)
++    assert call()['execution_authorized'] is True  # Explicit software allocation fixture only.
++    with pytest.raises(ValueError):r.validate_reservation(tmp_path/'reservation',ledger=ledger,inventory=inv,work_dir='/tmp/n5-replacement',
++        injected=False,subphase='masks',subphase_limits={'M1':1.5,'M5':10},inventory_validator=lambda _:None)
+--- 40fe/tests/test_a3_direction_workload.py
++++ candidate/tests/test_a3_direction_workload.py
+@@ -711,3 +711,84 @@
+     if any(r['operation']=='guard_refresh' for r in inv['requirements']):
+         guard=next(r for r in inv['requirements'] if r['operation']=='guard_refresh')
+         assert guard['batches']==10*len(inv['shards'])+3*len(inv['captures'])+2*len(inv['jobs'])
++
++
++def _n5_fixture():
++    from component_analysis import a3_direction_workload as w
++    policy={'kind': 'a3_mask_replacement_policy_v1', 'approved_policy_sha256': 'e560adace32533895149742494de837dc6320cd6dcc129f3800e040db14e89f8', 'original_reservation': {'account': 'bimc-delta-gpu', 'actual_seconds': 0, 'cluster': 'delta', 'gpus': 1, 'id': 'r-031', 'job_id': '23444798', 'manifest_hash': None, 'output_dir': '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-independent-pilots-74efb4d04819/mask-pilot-1', 'partition': 'gpuH200x8', 'requested_minutes': 45.0, 'reserved_gpu_hours': 0.75, 'source_commit': '74efb4d0481968a1d0138eb1a79b97f302fd3c3b', 'status': 'CANCELLED'}, 'original_admission_id': 'a3-mask-m1-23444798', 'original_admission_sha256': 'd5083712dc93eb6a0b8971fefff7d37ad65a7dcc2a3bbb909f30f39b578313a3', 'original_upper_inventory_sha256': 'ee8553504a386259e7ff575dc248f80521d139b0f520a55c5b8f14eb9a9c05d1', 'additional_reservations_max': 1, 'replacement_gpu_hours_max': 0.75}
++    old=dict(id='r-031',phase='M1',subphase='masks',state='failed',reserved_gpu_hours=.75,actual_gpu_hours=0,
++        actual_entry=copy.deepcopy(policy['original_reservation']),reservation_lineage=dict(admission_id=policy['original_admission_id'],
++            admission_sha256=policy['original_admission_sha256'],upper_inventory_sha256=policy['original_upper_inventory_sha256'],reserved_gpu_hours=.75,max_gpu_hours=.75))
++    admission=dict(kind='a3_root_pilot_admission_v1',id='n5-replacement',identity={'commit':'b'*40},max_gpu_hours=.75,
++        upper_inventory_sha256='c'*64,reservation_ids=[],mask_replacement_policy=copy.deepcopy(policy))
++    admission['admission_sha256']=w.digest(admission)
++    return w,policy,old,admission
++
++
++def _n5_actual(w,policy,admission,hours=.75):
++    admission=copy.deepcopy(admission);admission['reservation_ids']=['r-new']
++    admission['admission_sha256']=w.digest({k:v for k,v in admission.items() if k!='admission_sha256'})
++    new=dict(id='r-new',phase='M1',subphase='masks',state='reserved',reserved_gpu_hours=hours,actual_gpu_hours=None,
++        actual_entry=dict(id='r-new',job_id='999999',cluster='delta',account='new-account',partition='gpuH200x8',gpus=1,
++            requested_minutes=hours*60,reserved_gpu_hours=hours,source_commit='b'*40,output_dir='/tmp/n5-replacement',manifest_hash=None),
++        reservation_lineage=dict(admission_id=admission['id'],admission_sha256=admission['admission_sha256'],upper_inventory_sha256='c'*64,
++            max_gpu_hours=.75,reserved_gpu_hours=hours,mask_replacement_policy_sha256=w.digest(policy)))
++    return new,admission
++
++
++def test_n5_real_construction_order_prospective_then_actual():
++    w,policy,old,admission=_n5_fixture()
++    assert w.mask_replacement_policy()==policy
++    assert w.validate_mask_replacement_admission(admission,[old])['execution_authorized'] is False
++    ledger=dict(kind='a3_root_ledger_snapshot_v1',root_supplied=True,snapshot_sha256='a'*64,current_snapshot_sha256='a'*64,
++        age_seconds=0,max_age_seconds=900,expected_identity=admission['identity'],entries=[old],expected_entry_ids=['r-031'],
++        contingency_gpu_hours=5.25,original_admissions=[])
++    assert w._ledger(ledger,admission['identity'])['mask_retry_gpu_hours']==0
++    new,completed_admission=_n5_actual(w,policy,admission)
++    ledger.update(entries=[old,new],expected_entry_ids=['r-031','r-new'],original_admissions=[completed_admission])
++    assert w._ledger(ledger,admission['identity'])['mask_retry_gpu_hours']==.75
++    from component_analysis import a3_direction_runtime as r
++    assert r.validate_global_budgets([old,new],contingency_remaining=5.25)['M1']==1.5
++
++
++@pytest.mark.parametrize('fault',['second_small','old_source','old_output','old_hours','old_phase','old_job','old_admission','not_cancelled',
++    'new_policy','new_source','new_output','new_hours','new_lineage','new_admission_policy','new_admission_source','new_admission_anchors','new_admission_hash'])
++def test_n5_replacement_rejects_wrong_scope_or_lineage(fault):
++    w,policy,old,admission=_n5_fixture();new,admission=_n5_actual(w,policy,admission,.25)
++    entries=[old,new]
++    if fault=='second_small':
++        other=copy.deepcopy(new);other['id']='r-third';other['actual_entry']['id']='r-third';entries.append(other)
++    elif fault=='old_source':old['actual_entry']['source_commit']='c'*40
++    elif fault=='old_output':old['actual_entry']['output_dir']='/changed'
++    elif fault=='old_hours':old['reserved_gpu_hours']=0
++    elif fault=='old_phase':old['phase']='contingency'
++    elif fault=='old_job':old['actual_entry']['job_id']='777'
++    elif fault=='old_admission':old['reservation_lineage']['admission_sha256']='0'*64
++    elif fault=='not_cancelled':old['actual_entry']['status']='PENDING'
++    elif fault=='new_policy':new['reservation_lineage']['mask_replacement_policy_sha256']='0'*64
++    elif fault=='new_source':new['actual_entry']['source_commit']=old['actual_entry']['source_commit']
++    elif fault=='new_output':new['actual_entry']['output_dir']=old['actual_entry']['output_dir']
++    elif fault=='new_hours':new['reserved_gpu_hours']=.8
++    elif fault=='new_lineage':new['reservation_lineage']['admission_id']='unrelated'
++    elif fault=='new_admission_policy':admission['mask_replacement_policy']['approved_policy_sha256']='0'*64
++    elif fault=='new_admission_source':admission['identity']['commit']='d'*40
++    elif fault=='new_admission_anchors':admission['reservation_ids']=['r-new','r-third']
++    elif fault=='new_admission_hash':admission['admission_sha256']='0'*64
++    with pytest.raises(ValueError):w.mask_retry_gpu_hours(entries,admissions=[admission])
++
++
++@pytest.mark.parametrize('state',['reserved','running','completed','failed'])
++def test_n5_new_reservation_always_consumes_one_attempt(state):
++    w,policy,old,admission=_n5_fixture();new,admission=_n5_actual(w,policy,admission,.25);new['state']=state;new['actual_gpu_hours']=0
++    assert w.mask_retry_gpu_hours([old,new],admissions=[admission])==.25
++    third=copy.deepcopy(new);third['id']='r-third'
++    with pytest.raises(ValueError):w.mask_retry_gpu_hours([old,new,third],admissions=[admission])
++
++
++
++def test_n5_direction_cost_accepts_approved_aggregate_above_original_m1():
++    w,policy,old,a=_n5_fixture();new,a=_n5_actual(w,policy,a)
++    inv=inventory('prefit');l=ledger(inv)
++    l.update(entries=[old,new,dict(id='edge',phase='M1',subphase='edges',state='completed',reserved_gpu_hours=.75)],
++        expected_entry_ids=['r-031','r-new','edge'],contingency_gpu_hours=5.25,original_admissions=[a])
++    assert w.project_cost(receipts(inv),inv,l)['execution_authorized'] is False
+--- 40fe/tests/test_a3_mask_pipeline.py
++++ candidate/tests/test_a3_mask_pipeline.py
+@@ -782,3 +782,22 @@
+     after=w.project_cost([receipt],inventory,ledger)
+     assert all(b['seconds']>a['seconds'] for a,b in zip(before['job_proposals'],after['job_proposals']))
+     assert after['requested_seconds']-before['requested_seconds']==pytest.approx(9*state.stats()['initialization_seconds'])
++
++
++
++def test_n5_completed_replacement_cost_intake_preserves_original_charge():
++    from tests.test_a3_direction_workload import _n5_fixture,_n5_actual
++    w,policy,old,a=_n5_fixture();new,a=_n5_actual(w,policy,a)
++    inventory,receipt,ledger=cost_fixture();a['identity']=copy.deepcopy(inventory['identity'])
++    a['upper_inventory_sha256']=receipt['pilot_inventory_sha256']
++    a['admission_sha256']=w.digest({k:v for k,v in a.items() if k!='admission_sha256'})
++    new.update(state='completed',actual_gpu_hours=.01,inventory_sha256=receipt['pilot_inventory_sha256'])
++    new['actual_entry']['source_commit']=inventory['identity']['commit']
++    new['reservation_lineage'].update(admission_sha256=a['admission_sha256'],upper_inventory_sha256=a['upper_inventory_sha256'])
++    receipt.update(reservation_id='r-new',allocation_job_id='999999',output_dir='/tmp/n5-replacement')
++    ledger.update(entries=[old,new],expected_entry_ids=['r-031','r-new'],contingency_gpu_hours=5.25,original_admissions=[a])
++    from component_analysis import a3_mask_workload as mw
++    assert mw.project_cost([receipt],inventory,ledger)['execution_authorized'] is False
++    assert old['reserved_gpu_hours']==.75
++    bad=copy.deepcopy(ledger);bad['entries'][1]['state']='failed'
++    with pytest.raises(ValueError):mw.project_cost([receipt],inventory,bad)
+--- 40fe/component_analysis/a3_direction_workload.py
++++ candidate/component_analysis/a3_direction_workload.py
+@@ -780,6 +780,95 @@
+     return body
+ 
+ 
++def mask_replacement_policy():
++    """The fixed user-approved N5 exception; not a caller-configurable budget."""
++    return {'kind': 'a3_mask_replacement_policy_v1', 'approved_policy_sha256': 'e560adace32533895149742494de837dc6320cd6dcc129f3800e040db14e89f8', 'original_reservation': {'account': 'bimc-delta-gpu', 'actual_seconds': 0, 'cluster': 'delta', 'gpus': 1, 'id': 'r-031', 'job_id': '23444798', 'manifest_hash': None, 'output_dir': '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-independent-pilots-74efb4d04819/mask-pilot-1', 'partition': 'gpuH200x8', 'requested_minutes': 45.0, 'reserved_gpu_hours': 0.75, 'source_commit': '74efb4d0481968a1d0138eb1a79b97f302fd3c3b', 'status': 'CANCELLED'}, 'original_admission_id': 'a3-mask-m1-23444798', 'original_admission_sha256': 'd5083712dc93eb6a0b8971fefff7d37ad65a7dcc2a3bbb909f30f39b578313a3', 'original_upper_inventory_sha256': 'ee8553504a386259e7ff575dc248f80521d139b0f520a55c5b8f14eb9a9c05d1', 'additional_reservations_max': 1, 'replacement_gpu_hours_max': 0.75}
++
++
++def _mask_replacement_entry(entries):
++    policy=mask_replacement_policy();anchor=policy['original_reservation']
++    originals=[e for e in entries if e.get('id')==anchor['id']]
++    masks=[e for e in entries if e.get('phase')=='M1' and e.get('subphase')=='masks']
++    if not originals:
++        _require(sum(e['reserved_gpu_hours'] for e in masks)<=.75,'mask retry requires authentic original anchor')
++        return None
++    _require(len(originals)==1,'duplicate original mask anchor')
++    old=originals[0];actual=old.get('actual_entry',{});line=old.get('reservation_lineage',{})
++    _require(old.get('phase')=='M1' and old.get('subphase')=='masks' and old.get('reserved_gpu_hours')==.75
++        and old.get('state')=='failed' and old.get('actual_gpu_hours')==0
++        and all(actual.get(k)==v for k,v in anchor.items()),'original mask cancellation/source/charge anchor changed')
++    _require(line.get('admission_id')==policy['original_admission_id']
++        and line.get('admission_sha256')==policy['original_admission_sha256']
++        and line.get('upper_inventory_sha256')==policy['original_upper_inventory_sha256']
++        and line.get('reserved_gpu_hours')==line.get('max_gpu_hours')==.75,'original mask admission lineage changed')
++    replacements=[e for e in masks if e.get('id')!=anchor['id']]
++    _require(len(replacements)<=1,'only one additional mask reservation is approved, including failed attempts')
++    if not replacements:return None
++    entry=replacements[0];actual=entry.get('actual_entry',{});line=entry.get('reservation_lineage',{})
++    hours=_finite(entry.get('reserved_gpu_hours'),'mask replacement hours',positive=True)
++    _require(hours<=.75 and entry.get('state') in ('reserved','running','completed','failed'),'mask replacement exceeds approved attempt')
++    _require(isinstance(entry.get('id'),str) and entry['id'] and actual.get('id')==entry['id']
++        and actual.get('gpus')==1 and type(actual.get('gpus')) is int
++        and actual.get('reserved_gpu_hours')==hours and type(actual.get('requested_minutes')) in (int,float)
++        and 0<actual['requested_minutes']<=45 and round(actual['requested_minutes']/60,4)==hours,
++        'mask replacement actual reserved resource identity differs')
++    from pathlib import Path
++    _require(re.fullmatch(r'[0-9a-f]{40}',str(actual.get('source_commit'))) is not None
++        and actual['source_commit']!=anchor['source_commit']
++        and re.fullmatch(r'[0-9]+',str(actual.get('job_id'))) is not None and str(actual['job_id'])!=anchor['job_id']
++        and isinstance(actual.get('output_dir'),str) and Path(actual['output_dir']).is_absolute()
++        and Path(actual['output_dir']).resolve()!=Path(anchor['output_dir']).resolve(),'mask replacement source/job/output retargeted')
++    _require(line.get('mask_replacement_policy_sha256')==digest(policy)
++        and isinstance(line.get('admission_id'),str) and line['admission_id']!=policy['original_admission_id']
++        and re.fullmatch(r'[0-9a-f]{64}',str(line.get('admission_sha256'))) is not None
++        and re.fullmatch(r'[0-9a-f]{64}',str(line.get('upper_inventory_sha256'))) is not None
++        and line.get('reserved_gpu_hours')==hours and type(line.get('max_gpu_hours')) in (int,float)
++        and hours<=line['max_gpu_hours']<=.75,'mask replacement approved policy/admission lineage differs')
++    return entry
++
++
++def validate_mask_replacement_admission(admission,entries):
++    """Check a prospective N5 admission without inventing a mapped reservation.
++
++    Empty anchors are permitted only at this nonauthorizing policy boundary;
++    production validate_reservation still requires the actual linked RS entry.
++    """
++    policy=mask_replacement_policy();entry=_mask_replacement_entry(entries)
++    _require(any(e.get('id')==policy['original_reservation']['id'] for e in entries),'mask replacement needs original cancellation anchor')
++    _require(admission.get('kind')=='a3_root_pilot_admission_v1'
++        and admission.get('mask_replacement_policy')==policy
++        and isinstance(admission.get('id'),str) and admission['id'] and admission['id']!=policy['original_admission_id']
++        and re.fullmatch(r'[0-9a-f]{40}',str(admission.get('identity',{}).get('commit'))) is not None
++        and admission['identity']['commit']!=policy['original_reservation']['source_commit'],
++        'replacement admission is outside approved source/policy')
++    maximum=_finite(admission.get('max_gpu_hours'),'replacement admission ceiling',positive=True)
++    anchors=admission.get('reservation_ids')
++    _require(maximum<=.75 and isinstance(anchors,list) and len(anchors)<=1
++        and all(isinstance(x,str) and x and x!=policy['original_reservation']['id'] for x in anchors),
++        'replacement admission permits more than one bounded new reservation')
++    _require(admission.get('admission_sha256')==digest({k:v for k,v in admission.items() if k!='admission_sha256'}),
++        'replacement admission content digest differs')
++    if entry is not None:
++        line=entry['reservation_lineage']
++        _require(anchors==[entry['id']] and admission['id']==line['admission_id']
++            and admission['admission_sha256']==line['admission_sha256']
++            and admission.get('upper_inventory_sha256')==line['upper_inventory_sha256']
++            and maximum==line['max_gpu_hours'] and admission['identity']['commit']==entry['actual_entry']['source_commit'],
++            'replacement admission does not bind its actual single reservation')
++    return dict(execution_authorized=False,reservation_bound=entry is not None)
++
++
++def mask_retry_gpu_hours(entries,*,admissions=None):
++    """Only the actual single N5 mask attempt expands aggregate M1 headroom."""
++    entry=_mask_replacement_entry(entries)
++    if entry is None:return 0
++    if admissions is not None:
++        matches=[a for a in admissions if a.get('id')==entry['reservation_lineage']['admission_id']]
++        _require(len(matches)==1,'replacement original admission missing or duplicated')
++        validate_mask_replacement_admission(matches[0],entries)
++    return entry['reserved_gpu_hours']
++
++
+ def _ledger(ledger, identity):
+     _require(ledger.get('kind')=='a3_root_ledger_snapshot_v1' and ledger.get('root_supplied') is True,'fresh root ledger required')
+     _require(re.fullmatch('[0-9a-f]{64}',str(ledger.get('snapshot_sha256'))) is not None
+@@ -803,8 +892,9 @@
+         else: sums['actual_unknown_entries']+=1
+         sums['all']+=h; sums[e['phase']]+=h
+         if e.get('subphase')=='directions': sums['direction_'+e['phase']]+=h
++    sums['mask_retry_gpu_hours']=mask_retry_gpu_hours(entries,admissions=ledger.get('original_admissions',[]))
+     contingency=_finite(ledger.get('contingency_gpu_hours'),'contingency reserve')
+-    _require(contingency+sums['contingency']>=6,'full A3 contingency must remain counted')
++    _require(contingency+sums['contingency']>=5.25,'approved A3 contingency must remain counted')
+     sums['contingency_remaining']=contingency
+     return sums
+ 
+@@ -1263,7 +1353,7 @@
+     dm2=sums['direction_M2']+(additional if phase=='M2' else 0)
+     all_a3=sums['all']+sums['contingency_remaining']+additional
+     _require(dm1<=.5,'direction M1 exceeds 0.5 GPU hours')
+-    _require(m1<=2,'all M1 exceeds 2 GPU hours')
++    _require(m1<=2+sums['mask_retry_gpu_hours'],'all M1 exceeds approved mask replacement headroom')
+     _require(dm2<=9,'direction M2 exceeds 9 GPU hours')
+     _require(all_a3<=40,'all A3 exceeds 40 GPU hours including contingency')
+     if 'deadline_remaining_seconds' in ledger:
+--- 40fe/component_analysis/a3_mask_workload.py
++++ candidate/component_analysis/a3_mask_workload.py
+@@ -294,7 +294,7 @@
+     entries=ledger['entries'];m5=sum(e['reserved_gpu_hours'] for e in entries if e.get('phase')=='M5' and e.get('subphase')=='masks')
+     m1=sum(e['reserved_gpu_hours'] for e in entries if e.get('phase')=='M1' and e.get('subphase')=='masks')
+     hours=math.fsum(j['reserved_gpu_hours'] for j in job_proposals)
+-    require(m5+hours<=10 and m1<=.75 and sums['M1']<=2 and sums['all']+hours+sums['contingency_remaining']<=40,
++    require(m5+hours<=10 and m1<=.75+sums['mask_retry_gpu_hours'] and sums['M1']<=2+sums['mask_retry_gpu_hours'] and sums['all']+hours+sums['contingency_remaining']<=40,
+         'original reserved-hour milestone/global cap exceeded')
+     return dict(kind='a3_mask_cost_proposal_v2',identity=identity,inventory_sha256=inventory['inventory_sha256'],
+         requested_seconds=seconds,requested_gpu_hours=hours,execution_authorized=False,counts=counts,operation_seconds=prices,
+--- 40fe/component_analysis/a3_direction_runtime.py
++++ candidate/component_analysis/a3_direction_runtime.py
+@@ -512,7 +512,7 @@
+     limits={'M1':.5,'M2':9} if subphase_limits is None and subphase=='directions' else subphase_limits
+     require(isinstance(limits,dict) and limits and all(k in ('M1','M2','M3','M4','M5','contingency') and type(v) in (int,float)
+         and math.isfinite(v) and 0<v<=40 for k,v in limits.items()),'frozen subphase ceilings required')
+-    require(sums['M1']<=2 and sums['all']+sums['contingency_remaining']<=40
++    require(sums['M1']<=2+sums['mask_retry_gpu_hours'] and sums['all']+sums['contingency_remaining']<=40
+         and all(sum(e['reserved_gpu_hours'] for e in ledger['entries'] if e['subphase']==subphase and e['phase']==phase)<=ceiling
+             for phase,ceiling in limits.items()),'A3 original reservation caps exceeded')
+     if require_allocation:
+@@ -2394,9 +2394,10 @@
+         phase=entry['phase'];require(phase in ('M1','M2','M3','M4','M5','contingency'),'unknown A3 milestone')
+         totals[phase]+=hours;totals['all']+=hours;shares[(phase,entry.get('subphase'))]+=hours
+     require(type(contingency_remaining) in (int,float) and math.isfinite(contingency_remaining) and contingency_remaining>=0,'invalid remaining contingency')
+-    for phase,ceiling in dict(M1=2,M2=9,M3=4,M4=9,M5=10).items():require(totals[phase]<=ceiling+1e-9,'A3 '+phase+' original reservation ceiling exceeded')
+-    for sub,ceiling in dict(directions=.5,edges=.75,masks=.75).items():require(shares[('M1',sub)]<=ceiling+1e-9,'A3 M1 '+sub+' ceiling exceeded')
+-    require(totals['contingency']+contingency_remaining>=6-1e-9 and totals['all']+contingency_remaining<=40+1e-9,'A3 total including original contingency exceeded')
++    retry=workload.mask_retry_gpu_hours(entries)
++    for phase,ceiling in dict(M1=2+retry,M2=9,M3=4,M4=9,M5=10).items():require(totals[phase]<=ceiling+1e-9,'A3 '+phase+' original reservation ceiling exceeded')
++    for sub,ceiling in dict(directions=.5,edges=.75,masks=.75+retry).items():require(shares[('M1',sub)]<=ceiling+1e-9,'A3 M1 '+sub+' ceiling exceeded')
++    require(totals['contingency']+contingency_remaining>=5.25-1e-9 and totals['all']+contingency_remaining<=40+1e-9,'A3 total including original contingency exceeded')
+     return dict(totals)
+ 
+ 
+--- 40fe/component_analysis/a3_mask_pipeline.py
++++ candidate/component_analysis/a3_mask_pipeline.py
+@@ -1543,11 +1543,11 @@
+     if context is None:
+         ledger=authority.normalize_ledger(args.ledger_snapshot,identity=inventory['identity'],injected=injected)
+         context=authority.make_authority_context(args.reservation,ledger=ledger,inventory=inventory,work_dir=args.work_dir,
+-            injected=injected,subphase='masks',inventory_validator=workload.validate_inventory,subphase_limits={'M1':.75,'M5':10},
++            injected=injected,subphase='masks',inventory_validator=workload.validate_inventory,subphase_limits={'M1':1.5,'M5':10},
+             requested_scope=scope,inventory_path=args.inventory)
+         args._mask_authority_context=context;args._mask_initial_ledger=ledger
+     result=authority.validate_reservation(args.reservation,ledger=args._mask_initial_ledger,inventory=inventory,work_dir=args.work_dir,
+-        injected=injected,subphase='masks',inventory_validator=workload.validate_inventory,subphase_limits={'M1':.75,'M5':10},
++        injected=injected,subphase='masks',inventory_validator=workload.validate_inventory,subphase_limits={'M1':1.5,'M5':10},
+         authority_context=context,requested_scope=scope,inventory_path=args.inventory)
+     if getattr(args,'admission',None):
+         require(result['reservation']['admission_path']==str(Path(args.admission).resolve()),'CLI admission differs from original root reservation')

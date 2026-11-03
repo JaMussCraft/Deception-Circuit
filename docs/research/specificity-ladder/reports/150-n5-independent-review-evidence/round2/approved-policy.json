@@ -1,0 +1,51 @@
+{
+  "kind": "user_approved_specificity_ladder_N5_mask_replacement",
+  "recorded_utc": "2026-11-03T13:58:41.432562+00:00",
+  "session": "codex-01a1987e",
+  "need_id": "N5",
+  "user_answer": "Approve the bounded replacement",
+  "approved_question": "Cancel the unstarted old mask job, retain its 0.75 GPU-hour charge, and reallocate 0.75 GPU-hours from contingency for exactly one replacement 45-minute H200 timing attempt. Cumulative mask M1 cap 1.5, overall M1 2.75, contingency 5.25, A3 total 40. Budget amendment and new source-bound admission must pass review before launch; no automatic retry or reduced controls.",
+  "rendered_approval_line": "**8:50 am EST \u00b7 Need N5 answered.** The user approved cancelling the unstarted old mask job while retaining its charge and transferring three-quarters of a GPU-hour from contingency for exactly one replacement forty-five-minute H200 timing attempt. Total below-head budget stays forty GPU-hours. The synchronized budget amendment and new source-bound admission must pass review before launch; no automatic retry or reduced controls.",
+  "approval_log_reference": {
+    "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/mask-replacement-approved-policy/approval-log.snapshot.md",
+    "sha256": "348596585c9215efd9500fbc8276f41039bedb8c1512771bd177829b9a157fb4"
+  },
+  "canonical_ledger_path": "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/specificity-ladder/ledger.json",
+  "ledger_snapshot_reference": {
+    "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/mask-replacement-approved-policy/ledger-after-cancellation.snapshot.json",
+    "sha256": "b9a10d456beb05e51148c11aac7498c4355ce61853812426e5c9df77bacd02db"
+  },
+  "original_reservation": {
+    "account": "bimc-delta-gpu",
+    "actual_seconds": 0,
+    "cluster": "delta",
+    "gpus": 1,
+    "id": "r-031",
+    "job_id": "23444798",
+    "manifest_hash": null,
+    "output_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-independent-pilots-74efb4d04819/mask-pilot-1",
+    "partition": "gpuH200x8",
+    "requested_minutes": 45.0,
+    "reserved_gpu_hours": 0.75,
+    "source_commit": "74efb4d0481968a1d0138eb1a79b97f302fd3c3b",
+    "status": "CANCELLED"
+  },
+  "cancellation_accounting_reference": {
+    "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/mask-replacement-approved-policy/cancellation-accounting.txt",
+    "sha256": "e701f5e6910094999f1a98bc392a27e08b8d20f8de1eb49fb364a7e95488c5c2"
+  },
+  "approved_limits": {
+    "original_charge_retained": 0.75,
+    "additional_reservations_max": 1,
+    "replacement_minutes_max": 45,
+    "replacement_gpu_hours_max": 0.75,
+    "mask_M1_cumulative_max": 1.5,
+    "overall_M1_max": 2.75,
+    "contingency_after_full_transfer": 5.25,
+    "A3_total_max": 40
+  },
+  "new_source_and_admission_review_required": true,
+  "new_reservation_anchor": "must be bound by root after candidate review; none created yet",
+  "automatic_retry_authorized": false,
+  "scientific_controls_reduction_authorized": false
+}

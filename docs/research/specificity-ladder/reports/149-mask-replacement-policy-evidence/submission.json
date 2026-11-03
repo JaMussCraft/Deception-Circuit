@@ -1,0 +1,27 @@
+{
+  "job_id": "23473000",
+  "cluster": "delta",
+  "submitted_utc": "2026-11-03T14:16:25.703743+00:00",
+  "command": [
+    "sbatch",
+    "--parsable",
+    "--export=ALL",
+    "--account=bjhz-delta-cpu",
+    "--partition=cpu-interactive",
+    "--constraint=projects",
+    "--ntasks=1",
+    "--cpus-per-task=4",
+    "--mem=16G",
+    "--time=00:10:00",
+    "--job-name=lad-a3-policy-tests",
+    "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/mask-replacement-policy-source",
+    "--output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/149-mask-replacement-policy-evidence/slurm-%j.log",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/149-mask-replacement-policy-evidence/cpu-test.sh"
+  ],
+  "proposal_sha256": "d774ae63561f531efb455a512256fc1d358b66171fe4d7789b6de59b69cc1f4a",
+  "cpus": 4,
+  "memory_GiB": 16,
+  "gpus": 0,
+  "time_minutes": 10,
+  "scope": "Focused approved N5 policy amendment tests in both interpreters; no production admission"
+}

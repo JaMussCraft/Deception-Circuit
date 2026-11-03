@@ -1,0 +1,121 @@
+........................................................................ [ 25%]
+........................................................................ [ 51%]
+..............F......................................................... [ 76%]
+.................................................................F       [100%]
+=================================== FAILURES ===================================
+___ test_actual_a1_parent_schema_derives_masks_without_serialized_attention ____
+
+    def test_actual_a1_parent_schema_derives_masks_without_serialized_attention():
+        from component_analysis import ladder_pipeline as ladder,ladder_design
+        import os
+        p=driver();path=Path(os.environ.get('A3_A1_SCHEMA_TEST_DESIGN',str(Path(__file__).resolve().parents[1]/'outputs/_analyses/specificity-ladder/ladder-5f450dc/design.json')))
+>       parent=ladder.read_artifact(path);conditions=parent['rows']['far_v2']
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_a3_mask_pipeline.py:506: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+component_analysis/ladder_pipeline.py:37: in read_artifact
+    raw=common.read_json(path)
+        ^^^^^^^^^^^^^^^^^^^^^^
+dataset/user_inversion_pipeline.py:36: in read_json
+    return json.loads(Path(path).read_text())
+                      ^^^^^^^^^^^^^^^^^^^^^^
+/u/swong2/.conda/envs/mgnp/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/mask-replacement-policy-source/outputs/_analyses/specificity-ladder/ladder-5f450dc/design.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/mask-replacement-policy-source/outputs/_analyses/specificity-ladder/ladder-5f450dc/design.json'
+
+/u/swong2/.conda/envs/mgnp/lib/python3.12/pathlib.py:1013: FileNotFoundError
+_______________ test_n5_prospective_actual_successor_live_order ________________
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/149-mask-replacement-policy-evidence/pytest-23473000-mgnp/test_n5_prospective_actual_suc0')
+
+    def test_n5_prospective_actual_successor_live_order(tmp_path):
+        from tests.test_a3_direction_workload import _n5_fixture,_n5_actual
+        import time
+        r=runtime();w,policy,old,admission=_n5_fixture();identity=admission['identity']
+        from pathlib import Path
+        original_admission_path=Path(policy['original_reservation']['output_dir']).parent/'root-mask-m1'/'admission'
+        original=r.read_object(original_admission_path)
+        r.publish_object(tmp_path/'old-admission',original)
+        live=dict(reservations=[copy.deepcopy(old['actual_entry'])]);live_path=tmp_path/'live.json';live_path.write_text(json.dumps(live))
+        snapshot=tmp_path/'original.json';snapshot.write_bytes(live_path.read_bytes());directory=tmp_path/'successors';directory.mkdir()
+        old_map=dict(reservation_id='r-031',experiment='A3',phase='M1',subphase='masks',inventory_sha256=policy['original_upper_inventory_sha256'],
+            original_reserved_gpu_hours=.75,actual_entry=copy.deepcopy(old['actual_entry']),reservation_lineage=old['reservation_lineage'])
+        mapping=dict(kind='a3_root_ledger_mapping_v1',ledger_path=str(live_path),ledger_snapshot_path=str(snapshot),ledger_sha256=r.common.file_hash(snapshot),
+            expected_entry_ids=['r-031'],entries=[old_map],original_admission_paths=[str(tmp_path/'old-admission')],
+            original_admission_references={str(tmp_path/'old-admission'):r.object_reference(tmp_path/'old-admission')},
+            storage_capacities={'host_ram':dict(pool='ram',available_bytes=10**9)},contingency_gpu_hours=5.25,max_age_seconds=900,
+            generation=0,successor_directory=str(directory),refresh_wait_seconds=0)
+        r.publish_object(tmp_path/'mapping',mapping)
+        before=r.normalize_ledger(tmp_path/'mapping',identity=identity,injected=True)
+        assert w._ledger(before,identity)['mask_retry_gpu_hours']==0
+        assert w.validate_mask_replacement_admission(admission,before['entries'])['execution_authorized'] is False
+        assert before['expected_entry_ids']==['r-031']  # No invented new actual entry to construct admission.
+        new,admission=_n5_actual(w,policy,admission);new['actual_entry'].update(status='RUNNING',actual_seconds=None)
+        live['reservations'].append(new['actual_entry']);live_path.write_text(json.dumps(live))
+        r.publish_object(tmp_path/'new-admission',admission)
+        second=tmp_path/'second.json';second.write_bytes(live_path.read_bytes())
+        successor=copy.deepcopy(mapping);successor.update(generation=1,predecessor_reference=r.object_reference(tmp_path/'mapping'),
+            ledger_snapshot_path=str(second),ledger_sha256=r.common.file_hash(second),expected_entry_ids=['r-031','r-new'])
+        successor['entries'].append(dict(reservation_id='r-new',experiment='A3',phase='M1',subphase='masks',inventory_sha256='c'*64,
+            original_reserved_gpu_hours=.75,actual_entry=new['actual_entry'],reservation_lineage=new['reservation_lineage']))
+        successor['original_admission_paths'].append(str(tmp_path/'new-admission'))
+        successor['original_admission_references'][str(tmp_path/'new-admission')]=r.object_reference(tmp_path/'new-admission')
+        r.publish_object(directory/'mapping-000001',successor)
+        ledger=r.normalize_ledger(tmp_path/'mapping',identity=identity,injected=True)
+        assert w._ledger(ledger,identity)['mask_retry_gpu_hours']==.75
+        inv=dict(identity=identity,inventory_sha256='c'*64,phase='M1',expected_keys=[],finish_reserve_seconds=1)
+        r.publish_object(tmp_path/'upper',inv)
+        r.publish_object(tmp_path/'allocation',dict(kind='a3_injected_slurm_allocation_v1',injected=True,job_id='999999',cluster='delta',
+            account='new-account',partition='gpuH200x8',gpus=1,state='RUNNING',start_time_unix=time.time()-1,
+            end_time_unix=time.time()+2700,time_limit_seconds=2700))
+        reservation=dict(kind='a3_root_execution_reservation_v1',identity=identity,inventory_sha256='c'*64,reservation_id='r-new',
+            actual_entry={k:new['actual_entry'].get(k) for k in r.RESERVATION_FIELDS},admission_path=str(tmp_path/'new-admission'),
+            admission_reference=r.object_reference(tmp_path/'new-admission'),admission_sha256=admission['admission_sha256'],
+            upper_inventory_path=str(tmp_path/'upper'),minimum_shard_seconds=1,injected_allocation_path=str(tmp_path/'allocation'))
+        r.publish_object(tmp_path/'reservation',reservation)
+        call=lambda:r.validate_reservation(tmp_path/'reservation',ledger=ledger,inventory=inv,work_dir='/tmp/n5-replacement',injected=True,
+            subphase='masks',subphase_limits={'M1':1.5,'M5':10},inventory_validator=lambda _:None)
+>       assert call()['execution_authorized'] is True  # Explicit software allocation fixture only.
+               ^^^^^^
+
+tests/test_a3_direction_runtime.py:1866: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_a3_direction_runtime.py:1864: in <lambda>
+    call=lambda:r.validate_reservation(tmp_path/'reservation',ledger=ledger,inventory=inv,work_dir='/tmp/n5-replacement',injected=True,
+component_analysis/a3_direction_runtime.py:472: in validate_reservation
+    if allocation is not None:validate_allocation(allocation,reservation['actual_entry'],inventory,work_dir,injected=injected,allocation_contract=contract)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+component_analysis/a3_direction_runtime.py:2757: in validate_allocation
+    require(0<limit<=actual['requested_minutes']*60 and 0<end-start<=limit+1 and start<=time.time()+5,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False
+message = 'live allocation duration exceeds/conflicts with original requested limit'
+
+    def require(condition, message):
+        if not condition:
+>           raise ValueError(message)
+E           ValueError: live allocation duration exceeds/conflicts with original requested limit
+
+dataset/user_inversion_pipeline.py:32: ValueError
+=========================== short test summary info ============================
+FAILED tests/test_a3_mask_pipeline.py::test_actual_a1_parent_schema_derives_masks_without_serialized_attention
+FAILED tests/test_a3_direction_runtime.py::test_n5_prospective_actual_successor_live_order
+2 failed, 280 passed in 458.16s (0:07:38)
