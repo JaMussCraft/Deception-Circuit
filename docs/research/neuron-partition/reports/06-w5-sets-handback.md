@@ -46,6 +46,9 @@ The outputs are git-ignored, under `outputs/_analyses/neuron-partition/sets/` in
 Both are recorded in the ledger and the job list of the main-checkout direction directory. Worker w6-babysit has the
 ids.
 
+- **Walltime.** w6-babysit measured 0.041 s per forward on the H100 in job C, 50182995. That puts each of A and B at
+  about 2.7 h of the 4 h reserved, with break-even at about 0.065 s per forward.
+
 ## What is NOT done
 
 - **Job starts.** Neither start is confirmed. The Bridges-2 login host has not answered ssh since about 3:00 pm EST,
