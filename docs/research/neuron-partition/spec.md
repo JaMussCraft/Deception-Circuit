@@ -79,3 +79,14 @@ as a ruling before that run.
   the reader brief, section 4, with its intact accuracy checked against the brief's 0.51 on 100 rows before use.
 - **R5 (Tue 3 Nov 2026): assessment ids.** A1's 100 assessment ids per task are read from the ladder's design file
   named in the reader brief, section 3, not from the a1-full directory that START names.
+- **R6 (Tue 3 Nov 2026, before any ablation cell): partition rule.** Three signed scores per neuron, each the
+  attribution-patching mean over the ranking rows at the readout position: s_D from the D-versus-H run with D as
+  the clean stream (positive means the neuron supports the deceptive answer), s_I from the I-versus-user-neutral run
+  with I clean (positive supports the inverted answer), and s_H from the reverse run with H as the clean stream and
+  D as the twin, with its sign flipped so that positive means the neuron supports the honest answer. For a size k
+  taken from the ladder 500, 1,000 and 2,000, T_D, T_I and T_H are the top-k neurons by each signed score (positive
+  only). Classes: D-only = T_D minus (T_I union T_H); D-and-I shared = (T_D intersection T_I) minus T_H; H-only =
+  T_H minus (T_D union T_I); all-shared = T_D intersection T_I intersection T_H. Every class is ablated at every k
+  of the ladder on the seed-2 test sample with its own size-and-layer-matched null, and the pass bars of item 10
+  are read at each k; the finding reports every k and never picks k on the test sample. The activation-contrast
+  ranking is the comparison, built with the same rule from the contrast mean.
