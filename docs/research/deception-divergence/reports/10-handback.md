@@ -166,10 +166,14 @@ refuses to start if the direction is missing.
 
 ## Open questions
 
-1. **Validity bar ids.** The ablated AUROC that gates (c) is computed on the same act-form test ids as the gap,
-   following R15's "on the same ids". The all-ids AUROC is reported beside it. Please confirm.
-2. **IH interaction.** "Holds" is coded as the clustered interval of
-   `(z_D - z_I) - (z_HI - z_IH)` lying above zero. This equals R15's I minus IH read beside D minus HI. The frame
-   share is reported, not thresholded. Please confirm.
-3. **Hand-back number.** This is 10 because 09 was taken. Any reference to "hand-back 09" for the build should
-   point here.
+None open. The two operational readings below were confirmed by the orchestrator and recorded as a dated R15
+implementation note in `spec.md`:
+
+1. **Validity bar ids (confirmed).** The ablated AUROC that gates (c) is computed on the same act-form test ids as
+   the gap. The all-ids AUROC is reported beside it.
+2. **IH interaction (confirmed).** "Holds" means the clustered interval of `(z_D - z_I) - (z_HI - z_IH)` on the
+   `C_HI` logit lies above zero. This equals R15's I minus IH read beside D minus HI. The frame share is reported,
+   not thresholded.
+
+The hand-back number is 10, as the orchestrator asked, because 09 holds the plan reviewer's hand-back. The read and
+the Results section of this hand-back follow the job.
