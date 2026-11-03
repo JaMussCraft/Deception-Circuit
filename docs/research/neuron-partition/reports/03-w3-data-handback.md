@@ -246,6 +246,12 @@ Observed: "IDENTICAL", 37 files.
 
   The GPU SU balances were unchanged: cis260361p 390 of 452, cis260372p 89 of 100 and cis260382p 100 of 100.
 
+- **Re-sync to fe2db9e.** `sync-code` moved the Bridges-2 clone to
+  `fe2db9e0d4736469aa180c6d89a18b5736710c20`, and `git log` over ssh confirms it. Refreshing `data/` and `sets/`
+  transferred 0 files. All 101 files under them have the same sha256 on both sides. They include
+  `sets/far_contrast_66741d7/far_contrast_sets_k1000_with_nulls.json` (`6adacdee…0cad`),
+  `data/far_test_sample_seed2.json` (`cdbfca85…a845`) and the 34 pool files. W2 and the lead were told.
+
 ## Execution evidence
 
 Not applicable: no runs.
