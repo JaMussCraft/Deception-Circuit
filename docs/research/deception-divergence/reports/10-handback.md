@@ -1,7 +1,8 @@
 # Hand-back 10: the D2 follow-up, amended plan, build and result
 
 Written Mon 2 Nov 2026, about 11:55 pm EST, by the Opus worker `d2-worker` of direction `deception-divergence`,
-under ruling R15, and extended on Tue 3 Nov 2026 after the orchestrator's Bridges-2 job 50161975. This is hand-back
+under ruling R15, extended on Tue 3 Nov 2026 after the orchestrator's Bridges-2 job 50161975, and corrected in
+wording after independent review 06 (`reviews/06-d2-followup-review.md`), which found no numerical or code error. This is hand-back
 10 because `reports/09-handback.md` holds the plan reviewer's hand-back. I ran no git, no Slurm job and no paid
 call; the orchestrator committed, synced, submitted and fetched.
 
@@ -10,7 +11,9 @@ separates the lie instruction from its honest mirror on every task (validation A
 reading places DT with D and HT with HI on every task, so it reads the instruction's content. But on the
 form-matched act-form clauses, where I names the wrong answer as D does, D and I do not differ: the gap is 0.010 on
 FAR (210 ids) and 0.114 on SDR (35 ids), and both intervals reach zero. Under R15 the D2 route therefore closes U1
-(R6 iv), and F8's SDR pass is read as clause-driven on every task. F8 and the D2 verdict stand as recorded.
+(R6 iv). F8's SDR pass is attributed to clause wording. Where wording is form-matched (act-form FAR and SDR), D and
+I do not differ at the rate readout. On SER the attribution rests on descriptive by-form gaps. F8 and the D2 verdict
+stand as recorded.
 
 ## What changed
 
@@ -212,8 +215,10 @@ Nov 2026 (Bridges-2 time), elapsed 00:28:07. The log is `logs/bridges2/d2_follow
 
 ## Results
 
-All figures are from `results/d2_followup/readings.json` unless marked as computed after the read. Rates are the
-share of rows `C_HI` scores at or above 0.5 (R15 writes them `p_X`).
+All figures are from `results/d2_followup/readings.json` unless marked as computed after the read. A rate is the
+share of rows `C_HI` scores at or above 0.5. R15 writes rates as `p_X`, but the read and the joint table below use
+`p_X` for positions on the HI-to-D axis, `p_X = (rate_X - rate_HI) / (rate_D - rate_HI)`. In this hand-back "rate"
+always means a share, and every `p_X` is a position.
 
 ### Labels
 
@@ -230,8 +235,9 @@ after the read and are descriptive.
 separates the instruction to lie from the token-matched honest instruction, not just the presence of an instruction.
 But on the form-matched act-form clauses, where I names the wrong answer as D does, D and I do not differ. On FAR,
 I is scored D-like on 208 of 210 ids. On SDR, D and I differ on 4 of 35 ids, with an interval reaching zero. The D2
-route therefore closes U1 (R6 iv). F8's SDR pass, which review 04 traced to predicate-form clauses, is read as
-clause-driven on every task: where D and I separate, the I clause's wording differs, not a listener-deception state.
+route therefore closes U1 (R6 iv). F8's SDR pass, which review 04 traced to predicate-form clauses, is
+attributed to clause wording. Where wording is form-matched (act-form FAR and SDR), D and I do not differ at the rate
+readout. On SER the attribution rests on descriptive by-form gaps, because SER has no matched act-form reading.
 
 ### Rates under `C_HI`
 
@@ -271,7 +277,10 @@ the hypothesis.
 
 ### The joint DT and HT reading (all test ids)
 
-| task | spread, D minus HI | `p_I` | `p_H` | `p_DT` | `p_HT` | `p_DT - p_HT` | interval | cell |
+The `p_X` columns are positions on the HI-to-D axis, not rates: 0 is HI's rate and 1 is D's. A position can fall
+below 0 or rise above 1, as SDR's `p_H` of -0.021 and `p_DT` of 1.004 do.
+
+| task | spread, D minus HI (rates) | position `p_I` | position `p_H` | position `p_DT` | position `p_HT` | `p_DT - p_HT` | interval | cell |
 |---|---|---|---|---|---|---|---|---|
 | far_v2 | 1.000 | 0.990 | 0.000 | 1.000 | 0.000 | 1.000 | 1.000 to 1.000 | instruction content |
 | sdr_v2 | 0.956 | 0.644 | -0.021 | 1.004 | 0.163 | 0.841 | 0.725 to 0.940 | instruction content |
@@ -279,7 +288,10 @@ the hypothesis.
 
 On every task the deceptive instruction with a true answer reads as D, and the honest instruction with a true answer
 reads near HI. `C_HI` follows what the system instruction says, not the truth of the stated answer or whether the
-model obeyed. The statistic is near +1, the content reader's value, and its interval excludes 0 on every task.
+model obeyed. This holds on FAR. On SDR and SER, score space shows a compliance-like component beside instruction
+content: on the mean logit a true answer moves HT about 40 percent of the way toward D and barely moves D (review 06,
+Question 3, reviewer-computed and descriptive). The rate readout hides it, because most HT rows stay below the
+threshold. The statistic is near +1, the content reader's value, and its interval excludes 0 on every task.
 
 ### Descriptive readings
 
@@ -341,19 +353,24 @@ No paid call was made, and no OpenRouter spend.
 - **The IH interaction on FAR holds, with a surprising sign.** The frame words move the honest mirror toward D:
   IH scores 1.51 logits more D-like than HI, a negative frame share. So the frames do not carry I's D-likeness, and
   the interaction holds because I sits below D while IH sits above HI. It cannot rescue the label, because the gap
-  fails. On SDR the interaction's interval reaches zero.
+  fails. On SDR the interaction's interval reaches zero. Review 06 adds that the interaction is enlarged by IH
+  sitting above HI. The residual D minus I of 2.35 log-odds (interval 0.92 to 4.34) tracks I-clause identity and
+  wording overlap. It falls to 1.19 (interval -0.20 to 3.08) on the 153 ids whose D clause uses I's lie word,
+  "wrong". These figures are reviewer-computed and descriptive.
 - **SDR's refusal "explains" by an exact tie.** The ablated gap is 0.057, exactly half of 0.114, and R12 counts half
   or more. The label is (b) on the gap alone, so the tie changes nothing.
 - **Under `C_HI` the non-act gaps grow.** All-ids gaps are 0.340 on SDR and 0.530 on SER, against 0.160 and 0.145
   under D2's `C_H`. The predicate and other I clauses never name a wrong answer, and a classifier that reads
-  instruction content places them nearer HI. This fits the clause-driven reading. It is descriptive, and the R15
+  instruction content places them nearer HI. This fits the attribution to clause wording. It is descriptive, and the R15
   rule reads only the act-form ids.
 - **D2's own classifier read different things on different tasks.** Under the frozen `C_H`, HI reads as D on SER
   (0.956), not on FAR (0.005), and partly on SDR (0.240). SER's D2 classifier read instruction presence. FAR's
   did not.
-- **The truth shift is small.** HT sits at 0.163 and 0.190 on SDR and SER rather than at 0, and DT at about 1. A
-  common shift from the true answer would move both together, and the statistic cancels it. The cell is the same on
-  all three tasks.
+- **The truth shift is small on rates only.** HT's position is 0.163 on SDR and 0.190 on SER rather than 0, and
+  DT's is about 1. On the logit the shift is not small: a true answer moves HT 5.7 (SDR) and 3.1 (SER) log-odds
+  toward D, and moves D to DT by less than one (review 06, Question 3, reviewer-computed and descriptive). That is not
+  a common shift, so the statistic does not cancel it. It is the compliance-like component noted under the joint
+  reading. The cell is the same on all three tasks.
 - **The re-read differs in the last digits.** 146 values differ by at most 3.6e-15 (How verified). No rate, gap,
   interval of a rate or label differs.
 - **The acts-on-it sequence** was computed for every row and is not read, as planned.
@@ -363,7 +380,8 @@ No paid call was made, and no OpenRouter spend.
 - **No git.** I committed, pushed, synced and submitted nothing; the orchestrator did.
 - **No finding or worklog entry.** Recording the result, the closure of the D2 route to U1 under R6 iv, and how F8
   is now read is the orchestrator's.
-- **No independent review** of this result has been run.
+- **Independent review 06** has been run. Its wording corrections are applied here, and its new figures are
+  marked as reviewer-computed.
 - **No refusal share and no generations.** These were excluded by the plan, and the acts-on-it sequences stay
   unread.
 - **Feature files are not copied into `results/`,** as instructed; they stay in
@@ -384,9 +402,9 @@ implementation note in `spec.md`:
 
 The hand-back number is 10, as the orchestrator asked, because 09 holds the plan reviewer's hand-back.
 
-After the job, two questions are left for the orchestrator. Neither changes a label:
+After the job, I asked the orchestrator two questions. Neither changes a label, and both are now closed:
 
-1. **Should the test AUROC be in the readings?** It was asked for, but the read does not compute it. Adding it to
-   `read` would change `scripts/d2_followup.py` after the result. As it stands it is a scratch figure here.
-2. **Does the FAR IH sign need a note in the finding?** The frame words move the honest mirror toward D, not I away
-   from it. This is a descriptive surprise and is not part of R15's rule.
+1. **Should the test AUROC be in the readings? (closed)** No. The orchestrator ruled that it stays a hand-back
+   figure, because the code is frozen at `54cd1eb` for this result. Review 06 agrees.
+2. **Does the FAR IH sign need a note in the finding? (closed)** Yes. The note is the addition to the IH caveat
+   under Caveats, with review 06's account of the residual D minus I.
