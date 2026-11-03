@@ -1,15 +1,145 @@
 {
   "budgets": {
-    "gpu": "0.0 of 55 GPU-h actual (0.0 reserved)",
-    "openrouter": "$0.00 of $20.00 cap"
+    "gpu": "3.4 of 55 GPU-h actual (10.6 reserved)",
+    "openrouter": "$2.71 of $20.00 cap, plus $5.00 reserved"
   },
-  "directions": [],
-  "findings": [],
-  "incidents": [],
-  "needs": [],
-  "right_now": "The direction was just created from the templates; no work has started yet.",
+  "directions": [
+    {
+      "name": "1. D1 listener-knowledge and role-matched controls (gate; fallback: two further visibility phrasings, then a null result)",
+      "state": "done: null on size on every task (F5, reviewed)"
+    },
+    {
+      "name": "2. D1 follow-up B under ruling R6: phrasing 4 in the user turn, content-clause readings, flip pools for U1",
+      "state": "done: phrasing 4 null, flip pools empty (F6, F7, reviewed in review 03)"
+    },
+    {
+      "name": "3. D4 closure riders and the static QK/OV read of the layer 17 quartet (fallback: report what ran)",
+      "state": "done and independently reviewed (F1 to F4)"
+    },
+    {
+      "name": "4. D2 lie maintenance at the second turn (phase 1; fallback: behavioral maintenance and reveal rates)",
+      "state": "done: premise passes on SDR under the frozen rule from the classifier arm alone, gap confined to predicate-form clauses, acts-on-it arm uninformative (F8, reviewed in review 04); follow-up pre-registration pending need N2"
+    },
+    {
+      "name": "5. D3 honesty override direction (phase 1; runs only if D1 shows one)",
+      "state": "closed by the D1 null"
+    },
+    {
+      "name": "6. U1 learned three-way partition on FAR (phase 1; re-admitted only by a D2 premise pass, R6 iv)",
+      "state": "not admitted on the D2 result alone (review 04); waits on need N2, the D2 follow-up and the user's Codex coordination"
+    }
+  ],
+  "findings": [
+    {
+      "at": "2026-11-02T12:40:47-05:00",
+      "evidence": "outputs/_analyses/deception-divergence/d4d/static_quartet.json; outputs/_analyses/deception-divergence/d4d/run_manifest.json; docs/research/deception-divergence/reports/02-handback.md",
+      "id": "F1",
+      "plain": "The static weight read of the layer 17 quartet fails both pre-registered rules. P1: head.15.8 ranks 7 of 320 but head.14.4 ranks 24 (cutoff 16), and the layer sums order 14, 13, 12, 15, so layer 15 is fourth, which reads as activation-dependent routing into the quartet and supports the distributed parallel route. P2: the quartet's OV copy scores against the item unembeddings are 0.000, 0.000, 0.012 and 0.000 against a 0.5 bar, but no head of the 1,024 in the model reaches 0.5 (best 0.390), so the copy read has almost no power on this untied-embedding model and is weak evidence against copying.",
+      "setup": "Weights read lazily from the safetensors shards on CPU; Q-composition in the Elhage normalised Frobenius form into the stacked quartet W_Q over all layer 7 to 16 heads; copy score as the share of 82 item tokens whose own logit lands in the vocabulary top 5 after the head's OV and the final-norm-scaled unembedding; 20 random layer 17 baselines for each.",
+      "strength": "preliminary"
+    },
+    {
+      "at": "2026-11-02T13:28:30-05:00",
+      "evidence": "outputs/_analyses/deception-divergence/d4a/{far,ser}/Ct__leaf/*/attention/patterns.json; outputs/_analyses/deception-divergence/d4a/*/Ct__leaf/*/run_manifest.json; docs/research/deception-divergence/reports/02-handback.md (addendum)",
+      "id": "F2",
+      "plain": "Rider (a): under the pressure clause the layer 17 quartet's readout attention moves on both tasks relative to the neutral twin on 100 of 100 held-out ids each. L17H26 shows the second-largest total-variation shift of the 62 FAR and 68 SER circuit heads (0.476 on FAR and 0.316 on SER against medians of 0.100 and 0.041). On FAR the quartet's mass on the designating sentence falls from 0.184 under the twin to 0.064 under D and moves onto item 2's question pair and option; on SER the designation suffix falls from 0.129 to 0.024 while the pressure clause rises from 0.020 to 0.067. So the query-side signal of F-rte-006 does change which positions the quartet attends to.",
+      "setup": "Attention patterns of the quartet heads under D and under the token-aligned neutral twin on the mechanism-analysis held-out sample (100 ids, seed 1) per task, read as per-segment mean attention mass at the readout; shift is the total-variation distance between the two mean patterns.",
+      "strength": "preliminary"
+    },
+    {
+      "at": "2026-11-02T13:28:30-05:00",
+      "evidence": "outputs/_analyses/deception-divergence/d4b/results.json; outputs/_analyses/deception-divergence/d4b/margins.json; outputs/_analyses/deception-divergence/d4b/run_manifest.json; docs/research/deception-divergence/reports/02-handback.md (addendum)",
+      "id": "F3",
+      "plain": "Rider (b): the sycophancy transfer of F-rte-008 is mostly downstream of the cue window. Patching the shared set only at positions after the cue tokens removes 0.662 of the cue-induced gap (interval 0.644 to 0.679) against 0.724 over the full post-cue span (which reproduced exactly as the in-run anchor, with its null maximum 0.505), so 91 percent of the effect survives excluding the cue tokens. The heads alone remove 0.582 after the cue (0.563 to 0.601) against 0.498 over the full span, so the increment the three early MLPs add falls from 0.226 to 0.080: mlp.5 to mlp.7 act mostly on the cue tokens themselves. On the after-cue span no null draw of 20 reaches 0.5 (maxima 0.383 and 0.346), so the non-specific label of F-rte-008 does not transfer to that span; F-rte-008's frozen arm remains the full post-cue span and is unchanged.",
+      "setup": "Twin interchange of S_all (32 heads in layers 7 to 17 plus mlp.5 to mlp.7) and its heads alone with the uncued twin on the 530 kept of 800 sycophancy items (154 flips), at two position arms: after the cue window and the full post-cue span, each with 20 member-excluded layer-matched null draws.",
+      "strength": "preliminary"
+    },
+    {
+      "at": "2026-11-02T14:14:16-05:00",
+      "evidence": "docs/research/deception-divergence/results/d4c/b1_readings.json; outputs/_analyses/deception-divergence/d4c/sdr/Ct__leaf/sdr_v2/route_closure/route_closure.json; outputs/_analyses/deception-divergence/d4c/sdr/Ct__leaf/sdr_v2/run_manifest.json; docs/research/deception-divergence/reports/02-handback.md (addendum)",
+      "id": "F4",
+      "plain": "Rider (c): on the B1 route-closure code path, SDR is query-side like FAR and SER. Restoring the layer 17 quartet's final-token queries from the neutral twin moves 0.524 of the SDR pressure effect (interval 0.488 to 0.556) while restoring the option-token keys moves -0.002, a difference of 0.526 against the 0.15 margin, so the earlier key-side SDR reading (F-sdr-012) does not survive the single-code-path replication. Beside the rule, the loop closes on SDR: restoring the quartet outputs removes 0.546 of the outside-grid share (0.511 to 0.577), labelled closes, route-specific, where FAR (0.360) and SER (0.462) were bypasses.",
+      "setup": "Same code, inputs and estimator as B1 (offline estimator of record, R9; T2 rule query share minus key share against 0.15) on the 100 SDR held-out ids of the mechanism-analysis sample, run on a Bridges-2 H100; gates G1 to G3 passed.",
+      "strength": "preliminary"
+    },
+    {
+      "at": "2026-11-02T16:28:02-05:00",
+      "evidence": "docs/research/deception-divergence/results/d1/readings.json; docs/research/deception-divergence/results/d1/<task>/run_manifest.json; outputs/_analyses/deception-divergence/d1/<task>/scores.jsonl; docs/research/deception-divergence/reports/01-handback.md (Results)",
+      "id": "F5",
+      "plain": "D1 is null on every task. Telling the model that the user can see the operator's instruction changes first-token compliance with it by +2.5 points on FAR (interval +1.1 to +4.1), -5.2 on SDR (-9.1 to -1.7) and -2.4 on SER (-3.9 to -0.8), each interval excluding zero but none reaching the pre-registered 10 points; the belief and consequence phrasings also stay under 10 on every task. Operator-D compliance does not sit below role-matched transparent compliance: inversion minus D is -5.9 on FAR (-15.0 to +2.8), +8.2 on SDR (-2.3 to +20.2) and +1.9 on SER (-8.1 to +10.8). So at the first answer token this model does not condition the instructed answer on the listener's knowledge and shows no honesty override, which answers the D1 question with a null and, by the frozen rule, closes D3 and U1.",
+      "setup": "Eight first-token arms on both streams for about 10,000 unselected prior-kept candidate ids per task (R3 sampling, 25 clauses by two polarities), compliance per R1 (instructed item is the argmax with margin at least 0.7 in both streams), paired differences with a 2,000-resample bootstrap clustered by clause (R4), reading order phrasing 1 then 2 then 3 (R2).",
+      "strength": "preliminary"
+    },
+    {
+      "at": "2026-11-02T19:02:19-05:00",
+      "evidence": "outputs/_analyses/deception-divergence/d1/followup_readings.json; docs/research/deception-divergence/reports/06-handback.md",
+      "id": "F6",
+      "plain": "The system-turn listener sentence never flips an answer. Among the ids that comply with the operator clause under D, the visibility and belief phrasings bring 0 ids to the honest gate in either direction on every task (0 of 9,954 FAR, 9,563 SDR and 9,846 SER unselected ids, and 0 of 1,000 anchors), and the consequence phrasing does so for only 8 of 4,789 SDR ids; the transparent inversion clause reaches that gate for 214, 76 and 190 ids, so the gate itself is reachable. The D1 effect is therefore a margin shift inside the compliant answer, not a change of answer, and U1's listener-visible contrast has no flip pool under the system-turn phrasings (R6 iii not met). On the 20 content clauses no listener difference reaches 10 points and inversion minus D is negative on all three tasks.",
+      "setup": "The D1 scores read again under ruling R6: flip pool is D compliant under R1, visible arm honest at the no-pressure gate (correct item argmax, margin at least 0.3 in both streams), hidden arm compliant; content pool excludes the five shared stakes clauses per task.",
+      "strength": "preliminary"
+    },
+    {
+      "at": "2026-11-02T20:28:20-05:00",
+      "evidence": "docs/research/deception-divergence/results/d1/followup_readings.json; docs/research/deception-divergence/results/d1/<task>/run_manifest_l4.json; docs/research/deception-divergence/reports/06-handback.md (Results)",
+      "id": "F7",
+      "plain": "The user-turn acknowledgement (phrasing 4) is also null on every task. Telling the model in the user's own turn that the user can rather than cannot see the operator's instruction changes first-token compliance by +2.4 points on FAR (interval +1.3 to +3.6), +1.1 on SDR (-0.9 to +3.4) and +1.2 on SER (+0.1 to +2.4) on the full pools, and by +2.9, +2.3 and +1.4 on the 20 content clauses, all under the 10-point rule. Its flip pools are empty: among D-compliant ids the visible user sentence brings 0, 1 and 0 ids to the honest gate (FAR, SDR of 4,789, SER). Adding the sentence at all moves compliance more than its content does (hidden minus D: +6.2 FAR, -9.0 SDR, -2.1 SER). With both the system-turn and the user-turn listener routes null and no flip pool anywhere, U1's listener-visible contrast does not exist at the first token, and U1 depends on the D2 premise (R6 iv).",
+      "setup": "The D1 sample rescored under two user-turn arms (R6 i) on both streams, read with the D1 listener rule on the full and the content pools and the R6 (iii) flip-pool rule; a D rescore on the 1,000 anchors matched the D1 job exactly as the cross-job control.",
+      "strength": "preliminary"
+    },
+    {
+      "at": "2026-11-02T22:43:37-05:00",
+      "evidence": "docs/research/deception-divergence/results/d2/readings_final.json; results/d2/readings_final.md; results/d2/judge/ (five ledgers, five label files with manifests); results/d2/proxy_tokens.json; results/d2/job50155519/; outputs/_analyses/deception-divergence/d2/ (features, generations, caches); reports/07-handback.md (Results, Caveats); reviews/04-d2-review.md (clause-form breakdown, margin counts, refusals in UNCLEAR)",
+      "id": "F8",
+      "plain": "Under the frozen rule R13 the D2 premise passes on SDR alone, by one point, from the classifier arm alone: the second-turn classifier trained D against H reads D as D-like in 100 percent of test rows, H in 0 percent and I in 84.0 percent on SDR (gap 0.160, clause-clustered interval 0.086 to 0.227; refit under refusal ablation 0.136, so the control does not explain it), 99.5 percent on FAR (gap 0.005) and 85.5 percent on SER (gap 0.145, misses the bar, and ablation drops it to 0.032). The gap is confined to predicate-form inversion clauses (0.241 on 166 SDR ids) and is zero on act-form clauses, which name the wrong answer as D's clause does, on SDR (35 ids) and FAR (all 210), and zero on SDR other-form (49): the classifier reads the instruction clause and the D-I gap tracks clause wording, not whether the listener is deceived. The R2 reading on every task is that I patterns like D, which here can only mean instructed falsity, since H states the same false answer and reads 0.000. The acts-on-it arm is uninformative: with a forced wrong answer the model corrects it in 96 to 100 percent of decided rows in every condition (maintenance under 0.04 unablated; up to 0.113 ablated), the first-token proxy has no maintenance token and its 0.987 to 0.997 agreement is the CORRECTED base rate, and the judge checks (cross-check 0.965, 1.000 on decided rows; re-judge 1.000) see only 5 MAINTAINED rows each. Descriptive: D alone refuses in the second turn (29 of 44 SDR UNCLEAR rows and 39 of 43 SER rows open with I can't help with that; none on H or FAR), and these refusals vanish under ablation. The pass is fragile: 40 I rows under the threshold against 37.5 needed, 13 within one logit, about 40 percent of cluster resamples under 15 points, 12 to 20 clause clusters per task.",
+      "setup": "D2 premise (plans/D2-plan.md, rulings R7 to R14): first answer teacher-forced to D's wrong item in D, transparent I and H (honest context, no clause), then 48 Pacchiardi elicitation questions and three acts-on-it turns; standardised first-token log-probability features, L2 logistic regression D against H (C 1, threshold 0.5), rates per condition on the pre-registered test ids (210 FAR, 250 SDR, 249 SER), clause-clustered percentile bootstrap (2,000, seed 20261102); Arditi refusal direction at layer 11 (valid, 19 of 125 candidates) ablated by projection, refit primary; Haiku 4.5 judge frozen at G-D2 with a 200-row Sonnet 4.5 cross-check and 213-row re-judge, 4,064 paid calls, 2.71 USD. Job 50155519 on Bridges-2 (full-sequence path of record, R14).",
+      "strength": "reviewed"
+    },
+    {
+      "at": "2026-11-03T01:09:49-05:00",
+      "evidence": "docs/research/deception-divergence/results/d2_followup/readings.json; results/d2_followup/readings.md; results/d2_followup/drift_anchor.json; results/d2_followup/<task>/features_*.manifest.json; results/d2_followup/job50161975.log; outputs/_analyses/deception-divergence/d2_followup/ (features); reports/10-handback.md (Results, Caveats); reviews/06-d2-followup-review.md (Question 2 logit table, Verdict and qualifiers)",
+      "id": "F9",
+      "plain": "Under ruling R15 the D2 follow-up labels every task (b): with an honest-instructed control (HI, the token-matched honest mirror of D's clause) the refit classifier C_HI separates the lie instruction from its honest mirror (gate AUROC 1.000 FAR, 0.999 SDR, 0.976 SER; p_D 1.000, p_HI 0.000), but on form-matched act-form clauses D and transparent I do not differ at the rate readout: FAR (primary, 210 ids, 12 clusters) gap 0.010 with interval 0.000 to 0.028 by D clause and 0.000 to 0.025 by I clause; SDR (secondary, 35 ids, 7 clusters) gap 0.114 with interval 0.000 to 0.250; SER excluded (one act-form id). The direction label is (b), so the D2 route closes U1 under R6 iv as a consequence of the ruling, not as a demonstration that no listener-knowledge representation exists. The joint DT and HT reading lands on instruction content on every task (p_DT minus p_HT 1.000 FAR, 0.841 SDR, 0.771 SER; positions on the HI-to-D axis, not rates): the classifier reads being told to lie, not having lied. F8's SDR pass is attributed to clause wording: where wording is form-matched (act-form FAR and SDR) D and I do not differ at the rate readout, and on SER the attribution rests on descriptive by-form gaps (all-ids gaps under C_HI 0.010 FAR, 0.340 SDR, 0.530 SER, sitting in the predicate and other forms). Qualifiers: the rate readout is saturated on FAR (D and I 6 to 8 log-odds above threshold), so the null is a null of the pre-registered rate readout; FAR shows a descriptive, reviewer-computed score-space difference D minus I of 2.35 log-odds (0.92 to 4.34, about 15 percent of the D-HI span) with the IH interaction 3.85 (1.82 to 6.21), which is carried by I-clause identity, tracks wording overlap, falls to 1.19 (-0.20 to 3.08) where D's lie word matches I's, and is absent on SDR, so it reads as wording; SDR's null is underpowered (upper bound 0.25) while FAR's is tight (0.028); SDR's refusal control explains on an exact tie (ablated gap 0.057, half of 0.114) without affecting the label; drift anchor bit-identical on 600 D train rows; F8 and the D2 verdict stand.",
+      "setup": "R15 follow-up to the D2 premise (plans/D2-followup-plan.md as amended by review 05): conditions HI, DT, HT and IH built on the D2 train, validation and test ids with the frozen honest pool (data/d2/d2_followup_clauses.json, sha256 9b8244d9...), D, I and H features of job 50155519 reused; C_HI an L2 logistic refit of D against HI (C 1, threshold 0.5) with a 0.75 validation gate; clause-clustered percentile bootstrap (2,000, seed 20261102) by D clause with a secondary I-clause interval; refusal ablation refit with a validity AUROC on the act-form ids; IH interaction as the clustered interval of (z_D minus z_I) minus (z_HI minus z_IH). Job 50161975 on Bridges-2 (one H100, 28:07, 0.47 GPU-hours, no judge), pinned stack, direction sha256 verified, zero fallback firings, 5,481 rows.",
+      "strength": "reviewed"
+    }
+  ],
+  "incidents": [
+    {
+      "at": "2026-11-02T11:33:07-05:00",
+      "effect": "One extra worker turn and an idle notice; no work was lost, and the hand-back was committed from the worktree.",
+      "fix": "Open; the hook should follow the session's worktree pin. Until then workers write hand-backs in the worktree only and the orchestrator reads them there.",
+      "id": "P1",
+      "what": "The worker stop hook looks for a hand-back under the main checkout's direction directory, while workers write hand-backs on the branch in the worktree, so the hook refused the findings worker's first stop although its hand-back existed and passed lint."
+    },
+    {
+      "at": "2026-11-02T22:43:38-05:00",
+      "effect": "Immaterial to the results: the code ties the proxy tokens to calibration rows only, the job read reports the acts-on-it arm pending on every task, and no proxy label on a test row existed before the hash; the judge hash itself was in spec.md at a0936e5 (7:38 pm EST) before any judged row (confirmed by git show at fb2cb9e, count 1). The classifier arm has no freeze and none was claimed for it.",
+      "fix": "The clarification stays as a dated note, not an edit of the frozen text; future freezes should name the object they guard (the proxy tokens) and the event they precede (the first proxy label on a test row) instead of a stage name.",
+      "id": "P2",
+      "what": "Freeze G-D2 says the proxy token file's sha256 is recorded before any test row is read. The classifier arm's test rows were read by the job's own read stage (9:43 pm EST) and by the login-node calibration read (10:11 pm EST) before the hash was recorded at 10:11 pm EST, and the 10:40 pm EST spec clarification (before any proxy-labelled test row) reinterprets the frozen wording after the fact. Review 04 calls this a process deviation."
+    }
+  ],
+  "needs": [
+    {
+      "answer": "The user chose to keep going: phase 1 starts now while usage stays under the 80 percent cap, the option B follow-up runs, and the user wants a way to still run U1 despite the D1 null on size. Any Delta or Bridges-2 allocation the user can access may be used, including cis260372p. The user also asked for the review cadence to be raised to 24 points overnight (a human command).",
+      "answered_at": "2026-11-02T18:33:29-05:00",
+      "at": "2026-11-02T16:28:32-05:00",
+      "default": "A: D2 alone after the reset; the descriptive signals go to the README as leads for synthesis, not runs; cis260361p stays the Bridges-2 allocation.",
+      "id": "N1",
+      "text": "D1 is null on all three phrasings and all tasks, so by the frozen rule D3 and U1 are closed and phase 1 holds only D2 (lie maintenance at the second turn, 1 GPU-hour premise then 8 to 15). Three choices: (A) run phase 1 as D2 alone after the Tuesday reset and close the direction when D2 finishes; (B) also admit a small pre-registered follow-up on the two descriptive signals outside the rules (the FAR D-compliant subset at +14.7 and the SDR negative sign), as a new ruling before any run; (C) stop phase 1 now and release the direction paused for the next synthesis to re-plan. Note also that a second Bridges-2 allocation (cis260372p, 100 GPU units, deception project) exists; say if it may be used."
+    },
+    {
+      "answer": null,
+      "answered_at": null,
+      "at": "2026-11-02T22:43:39-05:00",
+      "default": "If there is no answer: pre-register the follow-up as a ruling in spec.md and have an Opus worker build and test it at zero GPU cost; then submit it as one small job (under 0.5 GPU-hours, under 1 USD) under your standing instruction to keep making progress under the 80 percent cap; write no U1 trainer code and no patching ruling until you answer.",
+      "id": "N2",
+      "text": "The D2 premise passes on SDR under the frozen rule (F8), but the independent review shows the D-I gap is carried entirely by predicate-form inversion clauses and is zero where I names the wrong answer as D does, so the classifier reads the instruction clause; the acts-on-it arm cannot measure maintenance because the model corrects its forced wrong answer in 96 to 100 percent of rows in every condition. Review 04 advises against admitting U1 on this alone and names two preconditions: an honest-instructed H arm and a form-matched D-I reading. Three options. (A) Run the pre-registered D2 follow-up (act-form-only reading, honest-instructed H arm, forced-true D; under 0.5 GPU-hours on Bridges-2 plus under 1 USD of judge) and decide U1 on its result. (B) Admit U1 now under R6 iv on the letter of the rule, against the review's advice; this needs your confirmation that the Codex coordination is done before any U1 trainer code, and a new ruling saying what U1 trains on under a D2 key. (C) Wrap the direction: F1 to F8 stand, no U1, write the handoff. Spend so far: 2.91 of 55 GPU-hours actual, 2.71 of 20 USD."
+    }
+  ],
+  "right_now": "Two Bridges-2 jobs are in flight: the phrasing-4 listener arms (the last listener route back to U1) and the D2 premise (two-turn lie maintenance). The system-turn sentence never flips an answer (F6), so U1 depends on phrasing 4 or on D2.",
   "schema": 1,
-  "state": "Running",
+  "state": "Closed",
   "terms": [],
   "title": "Where deception and transparent inversion come apart: listener knowledge, the second turn and a learned partition",
   "transcripts": "not recorded yet"
