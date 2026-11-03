@@ -62,3 +62,20 @@ as a ruling before that run.
 ## Rulings
 
 - **R1 (Tue 3 Nov 2026).** The frozen text is item 10 of START.md as above; no change yet.
+- **R2 (Tue 3 Nov 2026, before the first GPU job): effect measure.** Item 10 says "the effect measures are the
+  ladder's" and paraphrases them as a rate difference at margin 0.7. The reader brief (reports/00-reader-brief.md,
+  section 2) shows the ladder's measure is the margin effect: per row and stream, m = logit(opposite) minus
+  logit(honest) in float32 at the readout token, in D's orientation; the intact effect is G = mean(m_intact minus
+  m_intact of the twin), averaged over both streams within an id; the fraction removed is mean(m_intact minus
+  m_patched) divided by G. Margin 0.7 is only the pool screen, so under the rate reading the intact effect is 1.0 by
+  construction. Ruling: the pass bars of item 10 (50 percent of the D effect, 25 percent of the I effect, the null's
+  95th percentile) are read on the ladder's margin effect, the primary measure. The rate difference at margin 0.7
+  (p(deceptive under D) minus p(deceptive under H), and the same for I against user-neutral) is stored from the
+  same logits and reported beside it as the secondary measure. The collateral bars (H, F and IOI accuracy under 5
+  points) stay rate measures. Every result table shows both.
+- **R3 (Tue 3 Nov 2026): mean bank.** The no-pressure mean bank for mean ablation is collected on the F train and
+  validation splits (as the ladder built its bank), never on the test split that holds the excluded ids.
+- **R4 (Tue 3 Nov 2026): IOI.** The IOI adapter exists only in the Codex worktree and is rebuilt from the recipe in
+  the reader brief, section 4, with its intact accuracy checked against the brief's 0.51 on 100 rows before use.
+- **R5 (Tue 3 Nov 2026): assessment ids.** A1's 100 assessment ids per task are read from the ladder's design file
+  named in the reader brief, section 3, not from the a1-full directory that START names.
