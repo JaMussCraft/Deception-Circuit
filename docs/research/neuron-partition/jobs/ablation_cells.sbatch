@@ -38,9 +38,9 @@
 #
 # The user-turn I and user-neutral pools are untracked HF dataset dicts inside the Codex worktree on Delta. On
 # Bridges-2 they must be copied first (read-only, sha256 recorded by run_manifest.json on the host that runs).
-# Their location: NP_I_DIR and NP_N_DIR when set; else, on Bridges-2,
-# outputs/_inputs/neuron-partition/<task>_v2_user_{inversion,neutral} under the repository root; on Delta, the
-# specificity-ladder A1 control cell (read only, never written). NP_TASK picks the task (default far).
+# Their location: NP_I_DIR and NP_N_DIR when set; else <NP_POOL_DIR>/<task>_v2_user_{inversion,neutral}, where
+# NP_POOL_DIR defaults to W3's copies in outputs/_analyses/neuron-partition/data/pools under the repository root
+# (on both clusters). NP_TASK picks the task (default far).
 #
 # Login-node check first (no GPU, no model; builds every batch with the tokenizer and prints the estimate):
 #   bash docs/research/neuron-partition/jobs/ablation_cells.sbatch <sets.json> <ids.json> <scratch_dir> --dry-run
@@ -100,11 +100,8 @@ export OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
 export RESEARCH_DIRECTION=neuron-partition
 
 TASK="${NP_TASK:-far}"
-if [ "${DC_CLUSTER_NAME:-delta}" = "bridges2" ]; then
-    pools="outputs/_inputs/neuron-partition"
-else
-    pools="/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a1-control-77b6487-m07"
-fi
+# W3's read-only copies, shipped with the clone (pools_manifest.json records their sha256).
+pools="${NP_POOL_DIR:-outputs/_analyses/neuron-partition/data/pools}"
 I_DIR="${NP_I_DIR:-${pools}/${TASK}_v2_user_inversion}"
 N_DIR="${NP_N_DIR:-${pools}/${TASK}_v2_user_neutral}"
 for path in "$I_DIR" "$N_DIR"; do

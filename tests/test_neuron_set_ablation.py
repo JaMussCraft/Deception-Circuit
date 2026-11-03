@@ -581,3 +581,46 @@ def test_ids_files_accept_a_list_a_wrapped_list_or_a_per_condition_map(tmp_path)
     path.write_text(json.dumps({"D": ["x"], "I": ["z"]}))
     loaded = nsa.load_ids(str(path))
     assert loaded["D"] == ["x"] and loaded["I"] == ["z"] and loaded["H"] is None
+
+
+def test_ids_files_accept_the_seed2_sample_files_nested_condition_map(tmp_path):
+    path = tmp_path / "sample.json"
+    path.write_text(json.dumps({"task": "far", "seed": 2, "ids": {"D": ["x"], "I": ["z"]}}))
+    loaded = nsa.load_ids(str(path))
+    assert loaded["D"] == ["x"] and loaded["I"] == ["z"] and loaded["F"] is None
+
+
+def test_pool_dir_supplies_the_user_turn_pools_and_explicit_dirs_win(tmp_path):
+    pools = tmp_path / "pools"
+    for name in ("far_v2_user_inversion", "far_v2_user_neutral", "other"):
+        (pools / name).mkdir(parents=True)
+    args = nsa.build_parser().parse_args(
+        ["--sets", "x", "--output-dir", "y", "--pool-dir", str(pools), "--conditions", "I,N",
+         "--references", "twin,zero"])
+    dirs = nsa.resolve_dirs(args)
+    assert dirs["I"] == str(pools / "far_v2_user_inversion")
+    assert dirs["N"] == str(pools / "far_v2_user_neutral")
+    args.n_dir = str(pools / "other")
+    assert nsa.resolve_dirs(args)["N"] == str(pools / "other")
+
+
+def test_the_limit_is_taken_per_pairing_group(monkeypatch):
+    split = {"D": ["a", "b", "c"], "H": ["a", "b", "c"], "F": ["a", "b", "c"],
+             "I": ["x", "y", "b"], "N": ["x", "y", "b"]}
+    monkeypatch.setattr(nsa, "condition_ids",
+                        lambda directory, split_name, wanted, limit: list(split[directory]))
+    args = nsa.build_parser().parse_args(["--sets", "x", "--output-dir", "y", "--limit", "2"])
+    dirs = {one: one for one in nsa.CONDITIONS}
+    out = nsa.limited_ids(args, dirs, {one: None for one in nsa.CONDITIONS})
+    assert out["D"] == out["H"] == out["F"] == ["a", "b"]
+    assert out["I"] == out["N"] == ["x", "y"]
+
+
+def test_the_ioi_check_reports_intact_accuracy_against_the_ladders_0_51():
+    cell = _cell(1, {"r0": 1.0, "r1": -1.0}, {"r0": 1.0, "r1": -1.0},
+                 argmax={"r0": 5, "r1": 9}, target={"r0": 5, "r1": 5})
+    args = nsa.build_parser().parse_args(["--sets", "x", "--output-dir", "y"])
+    check = nsa.ioi_check({"mean": {nsa.IOI: {"clean": cell}}}, args)
+    assert check["intact_argmax_accuracy"] == pytest.approx(0.5)
+    assert check["ladder_reference"] == 0.51
+    assert check["difference_points"] == pytest.approx(-1.0)

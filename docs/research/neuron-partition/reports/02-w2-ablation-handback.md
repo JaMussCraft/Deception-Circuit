@@ -126,7 +126,7 @@ Observed: `173 passed, 22 skipped in 55.71s`, which is the baseline 157 passed a
 /u/swong2/.conda/envs/mgnp/bin/python -m pytest -p no:cacheprovider -q --basetemp=/u/swong2/.claude/jobs/5201d56c/tmp/w2/bt_mgnp3 <the 14 files above> tests/test_neuron_set_ablation.py
 ```
 
-Observed: FINAL_MGNP.
+Observed: `272 passed in 630.36s`. That is the baseline 240 plus the new file's 32. There were no failures, so there are no names to compare against the known baseline.
 
 Golden numbers. Head 1.2 and MLP 0 of the tiny model were knocked out jointly under item-swap, twin, zero and
 mean. The script `/u/swong2/.claude/jobs/5201d56c/tmp/w2/golden.py` was run before the change and after each
@@ -210,7 +210,21 @@ hidden neurons, batch 3 x 12, CPU.
 ```
 
 Observed: 0.53 s for 10 forwards. The `_traced_forward` self time was 0.061 s in total, about 6 ms per forward;
-the rest is nnsight's interleaving. OVERHEAD_LINE
+the rest is nnsight's interleaving.
+
+The uncontended benchmark at the same toy width ran 32 sets of 2,000 neurons, 1,000 per layer, on one batch of
+3 x 12 tokens on CPU. It is not an H100 number.
+
+```
+/u/swong2/.conda/envs/mgnp/bin/python /u/swong2/.claude/jobs/5201d56c/tmp/w2/overhead.py
+```
+
+Observed: a plain forward took 16.9 ms. Twin took 23.7 ms per forward, 6.8 ms above it. Mean took 31.2 ms, 14.3 ms
+above. Zero took 24.0 ms, 7.1 ms above. An earlier run of the same script under a concurrent pytest showed
+185 to 372 ms above, so it was contention, not the code.
+
+After the last edit, which added `cells_partial.jsonl`, the CPU smoke was rerun. It gave `exit 0`,
+`self_replay {'D': 0.0, 'I': 0.0}` and `rows 624`. `cells_partial.jsonl` had 31 lines: 1 header and 30 cells.
 
 ## Execution evidence
 
@@ -257,3 +271,131 @@ result runs.
    sha256 values to compare against.
 6. **`--max-length 128`.** Default: pass it. It is lossless (any truncation raises) and saves about 30 minutes per
    84-set cell.
+
+## Addendum: GPU pilot
+
+The lead asked for this pilot on Tue 3 Nov 2026. It was run on k = 500 sets with `--limit 16`, and no other
+inputs or ids.
+
+### Inputs
+
+- **Sets.** `WT/outputs/_analyses/neuron-partition/ablation/pilot_sets.json` is a byte copy of W4's
+  `/u/swong2/.claude/jobs/5201d56c/tmp/w4/pilot_partition/far_sets_k500_with_nulls.json`, sha256
+  `8763b33bb3ecd4886fedb1ef5f7e557111a8e13163612f9359e2ffe821362aaf`.
+  - It holds two classes, so nothing was trimmed: D_only (219 neurons) and DI_shared (281 neurons).
+  - Each class has 20 size-and-layer-matched nulls, for 42 sets in all.
+- **Ids.** `WT/outputs/_analyses/neuron-partition/ablation/pilot_ids.json` is the `ids` field of
+  `outputs/_analyses/neuron-partition/data/far_test_sample_seed2.json`, copied verbatim. The committed `load_ids`
+  did not unwrap that nesting, and the copy kept the pilot on committed code.
+  - With `--limit 16`, the committed rule took the first 16 ids common to all five conditions, in D's order. The D
+    and I samples share 164 ids.
+- **Pools.** `WT/outputs/_analyses/neuron-partition/data/pools/far_v2_user_{inversion,neutral}`, passed through
+  `NP_I_DIR` and `NP_N_DIR`.
+- **Other options.** `--max-length 128`, all three references, conditions D, H, F, I and N, both streams, and IOI
+  with 100 rows.
+
+### Submission
+
+```
+sbatch --parsable --account=beto-delta-gpu --partition=gpuH200x8-interactive,gpuA40x4-interactive --gpus-per-node=1 --time=00:30:00 --job-name=np-ablate-pilot --export=ALL,NP_I_DIR=outputs/_analyses/neuron-partition/data/pools/far_v2_user_inversion,NP_N_DIR=outputs/_analyses/neuron-partition/data/pools/far_v2_user_neutral docs/research/neuron-partition/jobs/ablation_cells.sbatch outputs/_analyses/neuron-partition/ablation/pilot_sets.json outputs/_analyses/neuron-partition/ablation/pilot_ids.json outputs/_analyses/neuron-partition/ablation/pilot-e5962fe --max-length 128 --limit 16
+```
+
+Observed: `23477197`. It was recorded with `ledger add` (r-004, 0.5 GPU-h; 2.25 of 20 GPU-h reserved) and with
+`job add`, both against `/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/neuron-partition`. After
+it ended it was marked with `job update --status COMPLETED` and `ledger reconcile --actual-seconds 679 --status
+COMPLETED`.
+
+### Execution evidence
+
+- **Job and cluster.** Job 23477197 on Delta, partition gpuA40x4-interactive, node gpub046, one NVIDIA A40. The
+  scheduler chose the A40 over the H200 partition.
+- **State.** `sacct`: COMPLETED, exit 0:0, elapsed 00:11:19 (679 s). Model load took 39 s and the script's wall time
+  was 653 s.
+- **Cells.**
+  - 30 of 30 expected: twin 8 (D and I twin, H and N reverse, two streams each), mean 11 and zero 11 (5
+    conditions x 2 streams + IOI).
+  - `cells_partial.jsonl` holds 1 header and 30 cell lines.
+  - `rows.jsonl` has 17,808 lines, the expected 42 sets x (twin 4 x 16 + mean and zero (5 x 16 + 100) each).
+  - Rows per condition: D, H, F, I and N 16 each, IOI 100. `unpaired` is empty.
+- **Self-replay and crosscheck.** The self-replay error is 0.0 on D and on I, over the union of 10,036 neurons. The
+  twin crosscheck (H read as D's twin against H's own run, in D orientation) has a max abs difference of 0.0 for
+  mean:D, mean:I, zero:D and zero:I, n = 32 each.
+- **Mean bank.** 400 F instances (train and validation), 68,574 tokens, 100 forwards in 21 s.
+- **Intact effects, both measures,** on 16 ids with both streams. The ladder audit's values are on its own 100 ids.
+
+| Effect | Margin effect G | Ladder audit G | Intact rate |
+|---|---|---|---|
+| D against H | 10.508 logits | 10.087 | p(D) 0.9375 − p(H) 0.0 = 0.9375 |
+| I against user-neutral | 14.564 logits | 14.979 | p(I) 1.0 − p(N) 0.0 = 1.0 |
+
+  Intact argmax accuracy is 1.0 on D, H, F, I and N.
+- **IOI.** Intact full-vocabulary argmax accuracy is 0.48 on 100 rows, against the brief's 0.51 (−3 points). The
+  two-way accuracy is 0.99. The rows follow the recipe and are not shown to be the ladder's own (R9).
+- **Measured seconds per forward.** 0.201 s on the A40 at batch 8 x 128 tokens, the mean over the 28 non-IOI cells
+  (range 0.196 to 0.205). This is 1.06 times the repository's plain A40 knockout constant
+  (`knockout.SECONDS_PER_FORWARD` = 0.19), so the neuron writes add about 6 percent. The IOI cells ran at 0.066 s
+  per forward (21 tokens).
+- **Provenance.** `WT/outputs/_analyses/neuron-partition/ablation/pilot-e5962fe/run_manifest.json`.
+  - It names `git_commit` f965bd5e8681265ec930176d10f518abf8bcdb33, which was HEAD of the worktree when the job
+    started. That is not e5962fe; the orchestrator's later commit was HEAD.
+  - It records `git_dirty` true and `dirty_diff_hash` 8a543653…, from other workers' uncommitted tracked changes.
+  - Its `code_sha256` for `scripts/neuron_set_ablation.py`, `component_analysis/hooks.py`,
+    `component_analysis/knockout.py` and `component_analysis/dataloaders.py` matched the files on disk after the
+    job. I made no edit to them between the commit and the end of the job.
+  - It lists 71 dataset files and records direction `neuron-partition` and job 23477197.
+
+Pilot results on 16 ids, descriptive only. The sample is too small for any bar, and the pass is not read here.
+
+| Set | Reference | D margin removed | I margin removed | D rate removed | I rate removed |
+|---|---|---|---|---|---|
+| D_only (219) | twin | 0.327 | 0.194 | 0.867 | 0.156 |
+| D_only | mean | 0.264 | 0.140 | 0.667 | 0.156 |
+| D_only | zero | 0.233 | 0.208 | 0.500 | 0.188 |
+| DI_shared (281) | twin | 0.440 | 0.501 | 1.000 | 1.000 |
+| DI_shared | mean | 0.280 | 0.374 | 0.867 | 0.781 |
+| null_D_only_500_0 | twin / mean | 0.010 / −0.001 | 0.017 / 0.014 | 0.067 / 0.0 | 0.031 / 0.0 |
+
+- **Mean-reference collateral.** For D_only, H and F moved 0 points and IOI moved −9. For DI_shared, H and F moved
+  0 and IOI moved −12.
+- **Twin-reference reverse patch on H.** DI_shared moved H by −50 points (descriptive).
+
+### Sizing the full cell
+
+The full cell is 4 classes x 3 k x (1 + 20 nulls) = 252 sets x 3 references x 5 conditions on 300 ids per condition.
+It has both streams, the twin reverse patch, IOI and self-replay. The forward count comes from the script's own
+estimator.
+
+| Plan | Forwards | A40 hours (measured) | H100 hours (extrapolated) | H200 hours (extrapolated) |
+|---|---|---|---|---|
+| Full: 252 sets, all 3 references | 288,820 | 16.1 | 4.2 | 3.1 |
+| Cut A: 12 class sets with all references, plus 240 nulls under twin and mean only, no reverse | 153,026 | 8.6 | 2.2 | 1.7 |
+| Cut B: as A, but the nulls score the clean stream only | 85,842 | 4.8 | 1.3 | 0.9 |
+
+- **How the hours are computed.** A40 uses the measured 0.201 s. H100 is 0.0497 x 1.058 and H200 is 0.0368 x 1.058,
+  both extrapolated from the H200 sweep of job 22899543. Model load adds about 0.13 h per job.
+- **Recommendation.** The full plan is under the 6 H100-hour line at about 4.3 h with load, so no cut is needed on
+  H100 or H200.
+  - Split it into 3 jobs, one per k (about 1.4 H100-h each), to use the 3-concurrent cap. Reserve walltime at about
+    2 h each until a measured H100 rate exists.
+  - Do not run the full cell on A40s (16 h).
+  - If the H100 rate turns out more than 1.4 times the extrapolation, use cut A. It is twin and mean for the nulls,
+    which is what the pass rule reads (R2, R7). Zero then runs on the 12 class sets only, as a spot check.
+
+### Changes after the pilot
+
+These are not yet committed. The pilot ran before them.
+
+- **`--pool-dir` (ruling 5).** The I and user-neutral dirs default to `<pool-dir>/<task>_v2_user_{inversion,
+  neutral}`, and `--i-dir` and `--n-dir` override it. The job script now defaults `NP_POOL_DIR` to
+  `outputs/_analyses/neuron-partition/data/pools` on both clusters.
+- **`load_ids`.** It accepts W3's sample file directly, whose `ids` field is a per-condition map.
+- **`--limit`.** It is taken per pairing group (D, H, F and I, N), so the D and I samples need not overlap.
+- **IOI check.** `summary.json` gains `ioi_check`: intact argmax accuracy, the ladder's 0.51 and the difference in
+  points (ruling R4).
+- **Ruling 1, both streams.** Already met. Every condition scores the clean and the corrupt streams, and the twin
+  reference also scores H with D's values patched in (the reverse patch).
+- **Tests.**
+  - `tests/test_neuron_set_ablation.py` gained 4 tests.
+  - mgnp: `36 passed`. Base: `20 passed, 16 skipped`. `ruff check --select F,E9`: all checks passed.
+  - A dry run of the job script, given the sample file directly and the default pool dir, built 300 ids for each of
+    D, H, F, I and N.

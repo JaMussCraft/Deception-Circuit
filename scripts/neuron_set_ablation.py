@@ -136,6 +136,10 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--i-dir", help="user-turn inversion pool (HF dataset dict); "
                                    "required when I is a condition")
     p.add_argument("--n-dir", help="user-neutral pool, I's twin; required with I or N")
+    p.add_argument("--pool-dir", help="directory holding <task>_v2_user_inversion and "
+                                      "<task>_v2_user_neutral (W3's copies under "
+                                      "outputs/_analyses/neuron-partition/data/pools); "
+                                      "--i-dir and --n-dir override it")
     p.add_argument("--ids", help="JSON list of instance ids (or {\"instance_ids\": [...]}"
                                  ", or {condition: [...]}) restricting every condition")
     p.add_argument("--split", default="test")
@@ -178,8 +182,11 @@ def build_parser() -> argparse.ArgumentParser:
 
 def resolve_dirs(args) -> Dict[str, Optional[str]]:
     base = os.path.join(ROOT, "data", "datasets", f"{args.task}_v2")
+    pool = getattr(args, "pool_dir", None)
+    i_dir = args.i_dir or (os.path.join(pool, f"{args.task}_v2_user_inversion") if pool else None)
+    n_dir = args.n_dir or (os.path.join(pool, f"{args.task}_v2_user_neutral") if pool else None)
     dirs = {"D": args.d_dir or base, "H": args.h_dir or base + "_honest",
-            "F": args.f_dir or base + "_nopressure", "I": args.i_dir, "N": args.n_dir}
+            "F": args.f_dir or base + "_nopressure", "I": i_dir, "N": n_dir}
     needed = set(args.conditions)
     if "I" in needed:
         needed.add("N")
@@ -206,7 +213,8 @@ def load_ids(path: Optional[str]) -> Optional[Dict[str, Optional[List[str]]]]:
         raw = json.load(handle)
     if isinstance(raw, dict):
         for field in ("instance_ids", "ids"):
-            if field in raw and isinstance(raw[field], list):
+            # A list of ids, or W3's sample file, whose `ids` is {condition: [...]}.
+            if field in raw and isinstance(raw[field], (list, dict)):
                 raw = raw[field]
                 break
     if isinstance(raw, list):
@@ -460,17 +468,27 @@ def condition_ids(dataset_dir: str, split: str, wanted: Optional[List[str]],
     return chosen[:limit] if limit else chosen
 
 
+#: Conditions that must run on the same ids: D with its twin H and with F, and
+#: I with its twin user-neutral.
+PAIRING_GROUPS = (("D", "H", "F"), ("I", "N"))
+
+
 def limited_ids(args, dirs, ids_by_condition) -> dict:
-    """`--limit`: the first `limit` ids every loaded condition has, in the order
-    of the first loaded condition (D, else I), so a pilot pairs D with H and F
-    and I with user-neutral on the same instances."""
-    loaded = [one for one in CONDITIONS if dirs.get(one)]
-    available = {one: condition_ids(dirs[one], args.split, ids_by_condition[one], None)
-                 for one in loaded}
-    common = set.intersection(*(set(v) for v in available.values())) if available else set()
-    order = available[loaded[0]] if loaded else []
-    chosen = [one for one in order if one in common][:args.limit]
-    return {one: (chosen if dirs.get(one) else None) for one in CONDITIONS}
+    """`--limit`: per pairing group (D, H, F and I, user-neutral), the first
+    `limit` ids every loaded condition of the group has, in the order of the
+    group's first loaded condition. The D and I samples need not overlap."""
+    out = {one: None for one in CONDITIONS}
+    for group in PAIRING_GROUPS:
+        loaded = [one for one in group if dirs.get(one)]
+        if not loaded:
+            continue
+        available = {one: condition_ids(dirs[one], args.split, ids_by_condition[one], None)
+                     for one in loaded}
+        common = set.intersection(*(set(v) for v in available.values()))
+        chosen = [one for one in available[loaded[0]] if one in common][:args.limit]
+        for one in loaded:
+            out[one] = chosen
+    return out
 
 
 def build_condition_batches(args, dirs, tokenizer, ids_by_condition) -> dict:
@@ -904,6 +922,25 @@ def twin_crosscheck(opposite_cells: Dict[str, Cell], twin_cond_cells: Dict[str, 
 # RUN
 # ==============================================================================
 
+#: The ladder's audited intact IOI accuracy on its 100 rows (reader brief section 2).
+IOI_REFERENCE_ACCURACY = 0.51
+
+
+def ioi_check(results, args) -> Optional[dict]:
+    """Intact IOI argmax accuracy against the ladder's 0.51 (ruling R4)."""
+    for reference in ("mean", "zero"):
+        cell = results.get(reference, {}).get(IOI, {}).get("clean")
+        if cell is None or not cell.ids:
+            continue
+        correct = [float(cell.intact_argmax[one] == cell.target[one]) for one in cell.ids]
+        accuracy = sum(correct) / len(correct)
+        return {"n_rows": len(correct), "intact_argmax_accuracy": accuracy,
+                "ladder_reference": IOI_REFERENCE_ACCURACY,
+                "difference_points": 100.0 * (accuracy - IOI_REFERENCE_ACCURACY),
+                "seed": args.ioi_seed, "pool": args.ioi_pool}
+    return None
+
+
 def _plan(reference):
     if reference == "twin":
         return ko.KnockoutPlan(scheme="interchange", counterfactual="neutral_twin")
@@ -1209,6 +1246,7 @@ def run(args, groups, dirs, ids) -> int:
                 "zero": "zeros at every position"},
         },
         "conditions": report,
+        "ioi_check": ioi_check(results, args),
         "mean_bank": bank_info,
         "self_replay_error": replay,
         "twin_crosscheck": crosschecks,
