@@ -2,7 +2,7 @@
 
 Agent: Opus worker (claude-opus-5-5), direction deception-divergence. Ticket: the lead's brief of Mon 2 Nov 2026, the
 option B follow-up to D1, pre-registered as ruling R6 in `docs/research/deception-divergence/spec.md`. Status:
-resolved for the CPU parts. The phrasing-4 GPU job is built, dry-run and ready for the orchestrator to submit.
+resolved. The phrasing-4 job ran on Bridges-2 as 50152632, and its results are under "Results".
 
 ## What changed
 
@@ -110,7 +110,8 @@ same holds for phrasing 1.
 
 ## Results
 
-All numbers come from the read stage on the D1 scores of Bridges-2 job 50145353. Points are percentage points.
+All numbers come from the read stage on the D1 scores of Bridges-2 job 50145353, with the phrasing-4 scores of
+Bridges-2 job 50152632. Points are percentage points.
 Intervals are the R4 clause-clustered 95 percent bootstrap with 2,000 resamples and seed 20261102. The pool is the
 unselected prior-kept ids.
 
@@ -190,97 +191,131 @@ the SER movement comes from adding a sentence, not from its polarity.
 The secondary rows and the shared-pool rows are in `followup_readings.md`. On the shared pool, SDR's L1 is -23.3 and
 its I minus D is +60.5, as review 02 found.
 
-### Phrasing 4 (R6 i)
+### Phrasing 4 (R6 i and iii), Bridges-2 job 50152632
 
-Phrasing 4 is not scored yet. The read stage reports two verdicts once it is scored:
+**Phrasing 4 is null on every task, under both the full-pool rule and the content-pool rule.** The phrasing-4 flip
+pool is empty on every task, so U1 is admitted on no task. No flip pool qualified and phrasing 4 is null, so R6 (iv)
+now applies: U1 is admitted only if the D2 premise passes, under a new ruling.
 
-- **Full pool.** The D1 listener rule on the unselected pool: at least 10 points, primary compliance, interval
-  excluding zero. A pass admits U1.
-- **Content pool.** The same rule on the content pool.
+Listener verdicts, visible minus hidden, primary compliance:
 
-It also adds the phrasing-4 flip pools and the D_repro control.
+| task | pool | visible k of n | hidden k of n | visible - hidden | interval | verdict |
+| --- | --- | ---: | ---: | ---: | --- | --- |
+| far_v2 | full, 25 clauses | 2,175 of 9,954 | 1,940 of 9,954 | +2.4 | +1.3 to +3.6 | null |
+| sdr_v2 | full, 25 clauses | 4,036 of 9,563 | 3,928 of 9,563 | +1.1 | -0.9 to +3.4 | null |
+| ser_v2 | full, 25 clauses | 1,629 of 9,846 | 1,509 of 9,846 | +1.2 | +0.1 to +2.4 | null |
+| far_v2 | content, 20 clauses | 2,164 of 8,380 | 1,925 of 8,380 | +2.9 | +1.6 to +4.3 | null |
+| sdr_v2 | content, 20 clauses | 3,987 of 7,741 | 3,807 of 7,741 | +2.3 | +0.0 to +4.8 | null |
+| ser_v2 | content, 20 clauses | 1,615 of 7,947 | 1,500 of 7,947 | +1.4 | -0.0 to +3.1 | null |
 
-**GPU estimate for phrasing 4.**
+Every difference is under 3 points, and every point estimate is positive: the visible arm complies slightly more.
+Under the secondary definition the full-pool differences are +1.5, +0.3 and -0.5.
 
-| quantity | value |
-| --- | ---: |
-| live ids, three tasks | 32,363 |
-| forwards: L4 arms, four per id | 129,452 |
-| forwards: D_repro, two per anchor | 6,000 |
-| forwards total | 135,452 |
-| D1 per-forward time on an H100, upper bound | 0.0053 to 0.0058 s |
-| scoring time | about 12 to 13 minutes |
-| model load plus L4 prompt preparation | about 10 minutes |
-| read stage on CPU | about 2 minutes |
-| estimate | about 25 minutes, 0.4 GPU-hours |
-| requested wall time | 00:45:00 |
+**The appended sentence matters more than its polarity.** Hidden minus D compares the hidden arm with no sentence at
+all:
 
-The per-forward bound comes from D1's chunk metas: summed seconds over summed forwards, with D1's CPU-side I pick
-included. The estimate is above R6 (v)'s "about 0.3 GPU-hours" because it counts model load and the anchor control.
+| task | full pool | interval | content pool | interval |
+| --- | ---: | --- | ---: | --- |
+| far_v2 | +6.2 | +2.7 to +9.8 | +7.3 | +3.4 to +11.5 |
+| sdr_v2 | -9.0 | -12.9 to -5.2 | -11.9 | -15.8 to -8.5 |
+| ser_v2 | -2.1 | -4.6 to +0.3 | -2.6 | -5.4 to +0.4 |
+
+So adding either user-turn sentence raises FAR compliance and lowers SDR compliance, and the can/cannot switch moves
+it by at most 3 points.
+
+Flip pools, phrasing 4, primary definition, unselected pool:
+
+| task | matched ids | D compliant | forward pool | clauses | reverse pool | admit U1 |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| far_v2 | 9,954 | 1,326 | 0 of 9,954 | 0 | 0 of 9,954 | no |
+| sdr_v2 | 9,563 | 4,789 | 0 of 9,563 | 0 | 0 of 9,563 | no |
+| ser_v2 | 9,846 | 1,715 | 0 of 9,846 | 0 | 0 of 9,846 | no |
+
+The 1,000 anchors of each task also give 0 forward and 0 reverse ids. Among D-compliant ids, the phrasing-4 arms reach
+the honest gate as follows:
+
+| task | D compliant | honest under L4 visible | honest under L4 hidden |
+| --- | ---: | ---: | ---: |
+| far_v2 | 1,326 | 0 | 0 |
+| sdr_v2 | 4,789 | 1 | 10 |
+| ser_v2 | 1,715 | 0 | 1 |
+
+Secondary definitions for phrasing 4, for information only:
+
+| task | definition | forward n of matched | clauses | reverse n | reverse clauses |
+| --- | --- | ---: | ---: | ---: | ---: |
+| far_v2 | clean-stream argmax only | 18 of 9,954 | 13 | 14 | 9 |
+| far_v2 | compliance lost | 5 of 9,954 | 3 | 39 | 8 |
+| sdr_v2 | clean-stream argmax only | 103 of 9,563 | 21 | 221 | 22 |
+| sdr_v2 | compliance lost | 110 of 9,563 | 22 | 263 | 19 |
+| ser_v2 | clean-stream argmax only | 153 of 9,846 | 20 | 139 | 18 |
+| ser_v2 | compliance lost | 71 of 9,846 | 16 | 118 | 16 |
+
+The primary pool without the D gate is 0 on every task for phrasing 4.
+
+**GPU cost against the estimate.** The job used 10 minutes 56 seconds, 0.18 GPU-hours, against an estimate of about
+0.4. Scoring ran at 0.0042 to 0.0044 s per forward, and model load and prompt preparation were faster than the
+estimate.
 
 ## Execution evidence
 
-- **Job id and cluster.** No GPU job was run. The CPU read ran locally on the Delta login node:
-  `OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4 /u/swong2/.conda/envs/mgnp/bin/python -I scripts/d1_followup.py read`,
-  from the worktree root. The inputs are the D1 scores of Bridges-2 job 50145353.
-- **Exit code.** 0, on the final run, which wrote `followup_readings.json` at 2026-11-02T17:51:22.
-- **Row counts.**
+- **Job id and cluster.** Bridges-2 job 50152632, partition GPU-shared, one NVIDIA H100 80GB HBM3 on node w009. It ran
+  from 8:13:06 PM to 8:24:02 PM EST on Mon 2 Nov 2026, after about an hour in the queue on priority.
+- **Slurm state.** COMPLETED, exit code 0:0, elapsed 00:10:56. The log has no traceback, error, OOM or kill line.
+- **Row counts.** Each `scores_l4.jsonl` matches the dry-run build report. No row was dropped for length.
 
-  | task | scores.jsonl rows | verdict pool | content pool | shared pool | anchors |
+  | task | scores_l4.jsonl rows | build report live ids | forwards | build report forwards | scoring seconds |
   | --- | ---: | ---: | ---: | ---: | ---: |
-  | far_v2 | 24,850 | 9,954 | 8,380 | 1,574 | 1,000 |
-  | sdr_v2 | 33,300 | 9,563 | 7,741 | 1,822 | 1,000 |
-  | ser_v2 | 32,250 | 9,846 | 7,947 | 1,899 | 1,000 |
+  | far_v2 | 10,954 | 10,954 | 45,816 | 45,816 | 195 |
+  | sdr_v2 | 10,563 | 10,563 | 44,252 | 44,252 | 191 |
+  | ser_v2 | 10,846 | 10,846 | 45,384 | 45,384 | 196 |
 
-  Each verdict pool equals readings.json's `n_prior_kept_sampled` and review 02's count.
-- **Baseline reproduces.** The content and shared pools sum to D1's pooled phrasing-1 counts on every task:
+- **Cross-job control.** D rescored in this job on the anchors reproduces the D1 job's D margins bit for bit:
 
-  | task | visible, content + shared | readings.json | hidden, content + shared | readings.json |
-  | --- | --- | ---: | --- | ---: |
-  | far_v2 | 1,285 + 11 = 1,296 | 1,296 | 1,034 + 11 = 1,045 | 1,045 |
-  | sdr_v2 | 4,273 + 63 = 4,336 | 4,336 | 4,346 + 488 = 4,834 | 4,834 |
-  | ser_v2 | 2,419 + 5 = 2,424 | 2,424 | 2,649 + 10 = 2,659 | 2,659 |
+  | task | anchors | exact margins, clean | exact margins, corrupt | sign flips | R1 agreement | R1 compliant, D1 and this job |
+  | --- | ---: | ---: | ---: | ---: | ---: | --- |
+  | far_v2 | 1,000 | 1,000 | 1,000 | 0 of 2,000 | 1,000 | 969 and 969 |
+  | sdr_v2 | 1,000 | 1,000 | 1,000 | 0 of 2,000 | 1,000 | 994 and 994 |
+  | ser_v2 | 1,000 | 1,000 | 1,000 | 0 of 2,000 | 1,000 | 948 and 948 |
 
-  Every content-pool point estimate in review 02's decomposition table reproduces exactly. Those are FAR +3.0 and
-  -7.4, SDR -0.9 and -4.1, and SER -2.9 and -3.4, plus SDR shared -23.3 and +60.5.
-- **Provenance.** `outputs/_analyses/deception-divergence/d1/<task>/run_manifest.json` names commit
-  `4bdf6bb3a313453ce7e0a66d0a8d812451c94a60` and job 50145353. The read stage checks each `scores.jsonl` against the
-  `scores_sha256` there. The code that produced the read is uncommitted worktree code, so its commit is pending the
-  orchestrator's commit.
+  So the phrasing-4 flip pool, which pairs D from job 50145353 with L4 from job 50152632, carries no cross-job drift.
+- **Baseline reproduces.** The phrasing 1 to 3 rows of the read are unchanged from the CPU read before the job. On
+  every task, the content and shared pools still sum to D1's pooled phrasing-1 counts in readings.json, for example
+  FAR 1,285 + 11 = 1,296 visible and 1,034 + 11 = 1,045 hidden.
+- **Read reproduction.** The job's own read stage wrote `followup_readings.md`. I reran the read locally on the fetched
+  scores, and the two files are identical below the creation-time line.
+
+  ```
+  OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4 /u/swong2/.conda/envs/mgnp/bin/python -I scripts/d1_followup.py read
+  ```
+
+  Observed: exit 0. A diff of the job's copy against the local copy, below the header, was empty.
+- **Provenance.** Each `outputs/_analyses/deception-divergence/d1/<task>/run_manifest_l4.json` names commit
+  `a0936e57e07905fbf9f657a05851f8dbc487c357` and job 50152632. Its `scores_sha256` equals the hash of the fetched
+  `scores_l4.jsonl`. Its D1 inputs are job 50145353's scores, whose hash equals D1's `run_manifest.json`. All ten
+  code-file hashes in the manifest, `scripts/d1_followup.py` included, equal the files in this worktree.
+- **Log.** The log is `logs/bridges2/d1_followup_50152632.out`. `b2.sh fetch` copies directories only, so I copied the
+  log over the open SSH master.
 
 ## What is NOT done
 
-- **Phrasing 4 is not scored.** The GPU job is the orchestrator's to submit, and parts (a) and (c) for phrasing 4
-  wait on it.
-- **Inputs on Bridges-2.** I did not check that the Bridges-2 clone still holds D1's `sample.jsonl`,
-  `sample_report.json`, `scores.jsonl` and `run_manifest.json`. The job refuses to start if their hashes differ.
 - **Full suite.** I did not run the full test suite. I ran only the two D1 files, on both interpreters.
-- **Base interpreter dry run.** The wrapper dry run and the read ran on mgnp only. The base interpreter ran the tests,
-  including the end-to-end stub run of build, score and read.
-- **Output tracking.** `outputs/_analyses/` is git-ignored, so `followup_readings.*` and `build_report_l4.json` are
-  not in the commit list. Whether to track the readings is the orchestrator's call.
-- **Git.** I did not commit, push, sync or submit anything.
+- **Base interpreter dry run.** The wrapper dry run and the reads ran on mgnp only. The base interpreter ran the
+  tests, including the end-to-end stub run of build, score and read.
+- **Output tracking.** `outputs/_analyses/` is git-ignored, so `followup_readings.*`, `build_report_l4.json`,
+  `scores_l4.jsonl` and `run_manifest_l4.json` are not in the commit list. Whether to track the readings is the
+  orchestrator's call.
+- **Fetch backups.** The fetch kept my pre-job reads as `followup_readings.json.pre-b2fetch` and
+  `followup_readings.md.pre-b2fetch`. I left them in place.
+- **Git.** I did not commit, push or sync anything.
 
 ## Open questions
 
-- **Is phrasing 4 still worth its 0.4 GPU-hours?** The phrasing-1 flip pool is empty on every task, and no one-sentence
-  listener arm moves a D-compliant id to the honest gate. So the phrasing-4 flip route under R6 (iii) is very
-  unlikely to reach 400 ids. Phrasing 4 can still admit U1 through the full-pool listener rule of R6 (i), which the
-  job decides. Default: submit as pre-registered, since R6 budgets it and the listener verdict is the deciding read.
-- **Does the R6 (i) listener rule count a negative difference?** I applied the D1 rule as R2a defines it: two-sided,
-  with the sign reported. A pass with hidden more compliant than visible would therefore admit U1 as written. Default:
-  two-sided, as frozen, with the sign reported beside the verdict.
-- **What does "over at least 10 clauses" count?** I counted the distinct clauses with at least one forward id, and the
-  per-clause counts are reported. Default: that count. A stricter reading, such as a per-clause minimum, would need a
-  ruling.
-- **Should the reverse pool require D compliance?** The reverse pool requires D compliance, mirroring the forward
-  pool. The brief says only "visible compliant, hidden honest". The no-D-gate variant is reported beside it. Default:
-  keep the D gate.
-- **Which inputs does the Bridges-2 job read?** It reads D1's inputs in the Bridges-2 clone. If they are missing,
-  the orchestrator can push the Delta copies, which hash to the D1 manifests. Default: the clone's copies are intact.
-
-The Bridges-2 command, run from the Bridges-2 clone root after syncing the branch and `mkdir -p logs`:
-
-```
-sbatch --export=ALL,DC_CLUSTER=bridges2,DC_B2_ALLOC=cis260361p -A cis260361p -p GPU-shared --gpus-per-node=h100-80:1 --cpus-per-task=1 --mem=64G -t 00:45:00 --job-name=d1-followup scripts/jobs/run_d1_followup.sh
-```
+- **What comes after R6 (iv)?** No flip pool qualified and phrasing 4 is null, so U1 waits on the D2 premise and a new
+  ruling. Default: nothing further from this ticket; the route is the orchestrator's and the user's call.
+- **Which commit ran?** The brief said the clone was at 06332ca, but the job manifest names a0936e5. All ten code
+  hashes match this worktree, so the code that ran is the code under review. Default: record a0936e5 as the job's
+  commit.
+- **Do the rule readings matter now?** The two-sided rule, the clause count and the D gate on the reverse pool were
+  default readings. Every listener difference is under 3 points and every primary flip pool is 0, so none of them
+  changes a verdict. Default: keep them as written.
