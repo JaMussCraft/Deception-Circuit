@@ -414,3 +414,90 @@ is 0.013. H_only is the largest AtP class at 331, 702 and 1,474 neurons. It is n
 to 325 neurons are in all three top sets. My first-order prediction was wrong. The readout gradients in the D and H
 runs differ enough that the forward and reverse attributions pick different neurons. All of this is descriptive
 until the classes are ablated against their nulls.
+
+## Addendum: stability
+
+Added Tue 3 Nov 2026, after the lead's request to run N3 on the split-half runs.
+
+- **Runs.** These are local CPU runs of `scripts/neuron_partition_sets.py stability`, both with exit code 0. The
+  logs are `sets/far_atp_66741d7_stability.log` and `sets/far_contrast_66741d7_stability.log`.
+- **Inputs.** They are under `outputs/_analyses/neuron-partition/attribution/`:
+  `far_v2_dh_train+validation_half{1,2}_66741d7` (`--dh`), `far_v2_in_train+validation_half{1,2}_66741d7`
+  (`--in`) and `far_v2_dh_train+validation_half{1,2}_66741d7_rev` (`--dh-reverse`, AtP only).
+- **Row counts.** The `rows.json` files record W3's `far_rank_ids.json` filter. half1 is `halves.A`, with 200 of 200
+  D rows and 174 I rows. half2 is `halves.B`, with 200 of 200 D rows and 180 I rows. The I counts equal W3's I_A and
+  I_B.
+
+| file | sha256 |
+| --- | --- |
+| `sets/far_atp_66741d7/stability_summary.json` | `37dacd7cd584f14163f6bf20616a398da631472157e6c592764cf0101b46be67` |
+| `sets/far_atp_66741d7/stability_summary.md` | `5d1ba77402d471d7eb55e2985cf80db01ef2a51f98f2d964d1b31542584c4e5e` |
+| `sets/far_contrast_66741d7/stability_summary_contrast.json` | `a3e1cc876dadf03d490a282f59d56650d7a4b14b473d3fce891e0d4a00f1c6c3` |
+| `sets/far_contrast_66741d7/stability_summary_contrast.md` | `6719ee77ed22e69d07e845ef1ef235f38a48172f14d4f66870369e4a977ed4d8` |
+
+**AtP ranking (R6).** The table is copied from `stability_summary.md`. The ceiling is the Jaccard of T_D between
+the two halves of the D-versus-H run.
+
+| k | set | size A | size B | Jaccard | ceiling | floor (analytic) | floor (empirical) | verdict |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 500 | T_D | 500 | 500 | 0.8182 | 0.8182 | 0.0005 | 0.0007 | stable |
+| 500 | T_I | 500 | 500 | 0.8587 | 0.8182 | 0.0005 | 0.0007 | stable |
+| 500 | T_H | 500 | 500 | 0.8018 | 0.8182 | 0.0005 | 0.0007 | stable |
+| 500 | D_only | 169 | 173 | 0.6602 | 0.8182 | 0.0002 | 0.0000 | stable |
+| 500 | DI_shared | 169 | 169 | 0.7789 | 0.8182 | 0.0002 | 0.0009 | stable |
+| 500 | H_only | 326 | 330 | 0.7493 | 0.8182 | 0.0004 | 0.0004 | stable |
+| 500 | all_shared | 114 | 117 | 0.7500 | 0.8182 | 0.0001 | 0.0004 | stable |
+| 1000 | T_D | 1000 | 1000 | 0.8018 | 0.8018 | 0.0011 | 0.0010 | stable |
+| 1000 | T_I | 1000 | 1000 | 0.8467 | 0.8018 | 0.0011 | 0.0010 | stable |
+| 1000 | T_H | 1000 | 1000 | 0.8215 | 0.8018 | 0.0011 | 0.0010 | stable |
+| 1000 | D_only | 400 | 424 | 0.6480 | 0.8018 | 0.0004 | 0.0006 | stable |
+| 1000 | DI_shared | 323 | 304 | 0.7514 | 0.8018 | 0.0003 | 0.0004 | stable |
+| 1000 | H_only | 699 | 704 | 0.7873 | 0.8018 | 0.0008 | 0.0006 | stable |
+| 1000 | all_shared | 204 | 204 | 0.7817 | 0.8018 | 0.0002 | 0.0001 | stable |
+| 2000 | T_D | 2000 | 2000 | 0.7889 | 0.7889 | 0.0022 | 0.0021 | stable |
+| 2000 | T_I | 2000 | 2000 | 0.8622 | 0.7889 | 0.0022 | 0.0021 | stable |
+| 2000 | T_H | 2000 | 2000 | 0.8051 | 0.7889 | 0.0022 | 0.0021 | stable |
+| 2000 | D_only | 898 | 894 | 0.6608 | 0.7889 | 0.0010 | 0.0008 | stable |
+| 2000 | DI_shared | 633 | 623 | 0.7690 | 0.7889 | 0.0007 | 0.0007 | stable |
+| 2000 | H_only | 1484 | 1472 | 0.7743 | 0.7889 | 0.0016 | 0.0017 | stable |
+| 2000 | all_shared | 333 | 320 | 0.7989 | 0.7889 | 0.0004 | 0.0002 | stable |
+
+**Contrast comparison.** The table is copied from `stability_summary_contrast.md`. all_shared is empty by
+construction, so its verdict is "n/a" at every k.
+
+| k | set | size A | size B | Jaccard | ceiling | floor (analytic) | floor (empirical) | verdict |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 500 | T_D | 500 | 500 | 0.8519 | 0.8519 | 0.0005 | 0.0007 | stable |
+| 500 | T_I | 500 | 500 | 0.8149 | 0.8519 | 0.0005 | 0.0007 | stable |
+| 500 | T_H | 500 | 500 | 0.8315 | 0.8519 | 0.0005 | 0.0007 | stable |
+| 500 | D_only | 183 | 194 | 0.6463 | 0.8519 | 0.0002 | 0.0000 | stable |
+| 500 | DI_shared | 317 | 306 | 0.7954 | 0.8519 | 0.0003 | 0.0003 | stable |
+| 500 | H_only | 491 | 492 | 0.8305 | 0.8519 | 0.0005 | 0.0002 | stable |
+| 1000 | T_D | 1000 | 1000 | 0.8332 | 0.8332 | 0.0011 | 0.0010 | stable |
+| 1000 | T_I | 1000 | 1000 | 0.8165 | 0.8332 | 0.0011 | 0.0010 | stable |
+| 1000 | T_H | 1000 | 1000 | 0.8484 | 0.8332 | 0.0011 | 0.0010 | stable |
+| 1000 | D_only | 369 | 392 | 0.6123 | 0.8332 | 0.0004 | 0.0007 | stable |
+| 1000 | DI_shared | 631 | 608 | 0.7879 | 0.8332 | 0.0007 | 0.0006 | stable |
+| 1000 | H_only | 981 | 981 | 0.8492 | 0.8332 | 0.0011 | 0.0010 | stable |
+| 2000 | T_D | 2000 | 2000 | 0.8536 | 0.8536 | 0.0022 | 0.0021 | stable |
+| 2000 | T_I | 2000 | 2000 | 0.8442 | 0.8536 | 0.0022 | 0.0021 | stable |
+| 2000 | T_H | 2000 | 2000 | 0.8544 | 0.8536 | 0.0022 | 0.0021 | stable |
+| 2000 | D_only | 800 | 834 | 0.6759 | 0.8536 | 0.0009 | 0.0010 | stable |
+| 2000 | DI_shared | 1200 | 1166 | 0.8158 | 0.8536 | 0.0013 | 0.0011 | stable |
+| 2000 | H_only | 1969 | 1972 | 0.8537 | 0.8536 | 0.0022 | 0.0021 | stable |
+
+**Reading.** These are descriptive N3 results. Nothing here is an ablation result.
+
+- **Every non-empty class is "stable" at every k, under both rankings.** The bar is half the ceiling, about 0.39
+  to 0.43. The floors are about 0.0001 to 0.002, so every Jaccard is hundreds of times above chance.
+- **The ceiling is 0.79 to 0.82 under AtP and 0.83 to 0.85 under contrast.** T_I and T_H sit at or slightly above
+  it, so the D-versus-H split-half is not the most stable map.
+- **D_only is the least stable class.** Its Jaccard is 0.65 to 0.66 under AtP and 0.61 to 0.68 under contrast.
+  That is about 0.8 of the ceiling, well above the bar but clearly below DI_shared, H_only and all_shared, which
+  run 0.75 to 0.80 under AtP.
+- **The bar is lenient.** A class at half the ceiling shares only about a third of its neurons across halves. So
+  "stable" here means "not noise". It does not mean the D_only membership is pinned down neuron by neuron.
+- **What the floors measure.** Both floors use uniform random sets over all 458,752 neurons and are not
+  layer-matched. A layer-matched floor would be higher, because the classes are concentrated in L10 to L16, but it
+  would still be far below these values. START's "IOI floor" is replaced by this random-set floor, as the brief
+  said.
