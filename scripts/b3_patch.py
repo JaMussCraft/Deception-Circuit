@@ -450,7 +450,8 @@ def parse_args(argv=None):
                    help="layer-matched null draws per set; head members excluded, MLP members kept (R10, R10a)")
     p.add_argument("--null-strict", action="store_true",
                    help="exclude MLP members too; raises for a set with an MLP member (one MLP per layer); not for J4")
-    p.add_argument("--positions", help="comma list of post_tag, readout; default af/c3 post_tag, syc readout")
+    p.add_argument("--positions", help="comma list of post_tag, readout, after_cue (strictly after the cue window "
+                                       "through the Readout); default af/c3 post_tag, syc readout")
     p.add_argument("--rows", help="rows file; default the committed data file of the task")
     p.add_argument("--split", default="test", help="af rows split in the data file (default test)")
     p.add_argument("--tokens", default=str(TOKENS), help="the frozen proxy token file (af)")
@@ -544,6 +545,11 @@ def main(argv=None):
            if s.get("keep_mlp_members") and any(k[0] == "mlp" for k in s["members"]) else "")
         + ")" for n, s in sets.items()))
     print(f"  positions: {', '.join(args.position_arms)}; {args.null} null draws per set; {len(arms)} arms")
+    if args.task == "syc" and "after_cue" in args.position_arms and pairs:
+        widths = [p.cue_end - p.cue_start for p in pairs]
+        after = [len(p.cued_ids) - p.cue_end for p in pairs]
+        print(f"  cue window: {min(widths)} to {max(widths)} tokens (mean {sum(widths) / len(widths):.1f}); "
+              f"after_cue positions per row: {min(after)} to {max(after)} (mean {sum(after) / len(after):.1f})")
     if args.task == "syc":
         pass1 = 2 * len(pairs)
         pass2 = count_forwards(n_rows=len(pairs), n_stems=1, n_sets=len(sets), n_null=args.null,

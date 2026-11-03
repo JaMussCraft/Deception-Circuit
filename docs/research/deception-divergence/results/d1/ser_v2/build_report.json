@@ -1,0 +1,336 @@
+{
+ "task": "ser_v2",
+ "created": "2026-11-02T13:58:09",
+ "sample_sha256": "cfe13594eeb469f3a25355ea223fc8d4e2ca45d24f285882c8df060bf030ccd9",
+ "max_seq_length": 120,
+ "n_rows": 32250,
+ "n_kept": 32250,
+ "n_anchor": 1000,
+ "n_sampled": 31250,
+ "length_dropped": 0,
+ "length_dropped_by_clause": {},
+ "longest_arm_tokens": 116,
+ "arms": [
+  "P",
+  "D",
+  "L1_visible",
+  "L1_hidden",
+  "L2_visible",
+  "L2_hidden",
+  "L3_visible",
+  "L3_hidden",
+  "I",
+  "D_at120 (anchors)",
+  "P_at120 (anchors)"
+ ],
+ "prompt_counts": {
+  "P": 32250,
+  "D": 64500,
+  "L1_visible": 64500,
+  "L1_hidden": 64500,
+  "L2_visible": 64500,
+  "L2_hidden": 64500,
+  "L3_visible": 64500,
+  "L3_hidden": 64500,
+  "I": 64500,
+  "D_at120": 2000,
+  "P_at120": 1000
+ },
+ "token_lengths": {
+  "P": {
+   "n": 32250,
+   "min": 88,
+   "median": 93,
+   "p99": 96,
+   "max": 96,
+   "histogram": {
+    "88": 322,
+    "89": 802,
+    "90": 866,
+    "91": 2470,
+    "92": 5242,
+    "93": 7966,
+    "94": 8112,
+    "95": 5042,
+    "96": 1428
+   }
+  },
+  "D": {
+   "n": 32250,
+   "min": 96,
+   "median": 101,
+   "p99": 104,
+   "max": 104,
+   "histogram": {
+    "96": 322,
+    "97": 802,
+    "98": 866,
+    "99": 2470,
+    "100": 5242,
+    "101": 7966,
+    "102": 8112,
+    "103": 5042,
+    "104": 1428
+   }
+  },
+  "L1_visible": {
+   "n": 32250,
+   "min": 103,
+   "median": 108,
+   "p99": 111,
+   "max": 111,
+   "histogram": {
+    "103": 322,
+    "104": 802,
+    "105": 866,
+    "106": 2470,
+    "107": 5242,
+    "108": 7966,
+    "109": 8112,
+    "110": 5042,
+    "111": 1428
+   }
+  },
+  "L1_hidden": {
+   "n": 32250,
+   "min": 103,
+   "median": 108,
+   "p99": 111,
+   "max": 111,
+   "histogram": {
+    "103": 322,
+    "104": 802,
+    "105": 866,
+    "106": 2470,
+    "107": 5242,
+    "108": 7966,
+    "109": 8112,
+    "110": 5042,
+    "111": 1428
+   }
+  },
+  "L2_visible": {
+   "n": 32250,
+   "min": 104,
+   "median": 109,
+   "p99": 112,
+   "max": 112,
+   "histogram": {
+    "104": 322,
+    "105": 802,
+    "106": 866,
+    "107": 2470,
+    "108": 5242,
+    "109": 7966,
+    "110": 8112,
+    "111": 5042,
+    "112": 1428
+   }
+  },
+  "L2_hidden": {
+   "n": 32250,
+   "min": 106,
+   "median": 111,
+   "p99": 114,
+   "max": 114,
+   "histogram": {
+    "106": 322,
+    "107": 802,
+    "108": 866,
+    "109": 2470,
+    "110": 5242,
+    "111": 7966,
+    "112": 8112,
+    "113": 5042,
+    "114": 1428
+   }
+  },
+  "L3_visible": {
+   "n": 32250,
+   "min": 107,
+   "median": 112,
+   "p99": 115,
+   "max": 115,
+   "histogram": {
+    "107": 322,
+    "108": 802,
+    "109": 866,
+    "110": 2470,
+    "111": 5242,
+    "112": 7966,
+    "113": 8112,
+    "114": 5042,
+    "115": 1428
+   }
+  },
+  "L3_hidden": {
+   "n": 32250,
+   "min": 108,
+   "median": 113,
+   "p99": 116,
+   "max": 116,
+   "histogram": {
+    "108": 322,
+    "109": 802,
+    "110": 866,
+    "111": 2470,
+    "112": 5242,
+    "113": 7966,
+    "114": 8112,
+    "115": 5042,
+    "116": 1428
+   }
+  },
+  "I": {
+   "n": 32250,
+   "min": 96,
+   "median": 101,
+   "p99": 104,
+   "max": 104,
+   "histogram": {
+    "96": 383,
+    "97": 939,
+    "98": 966,
+    "99": 2629,
+    "100": 5419,
+    "101": 8068,
+    "102": 7955,
+    "103": 4820,
+    "104": 1071
+   }
+  }
+ },
+ "I_coverage": {
+  "n_with_I": 32250,
+  "n_without_I": 0,
+  "dropped_by_clause": {},
+  "with_I_by_clause": {
+   "r9_rule_unified_ser_v2_15": 1400,
+   "r9_rule_unified_ser_v2_14": 1276,
+   "r9_rule_unified_ser_v2_00": 1400,
+   "shared_00": 1250,
+   "shared_04": 1250,
+   "r9_rule_unified_ser_v2_05": 1251,
+   "r9_rule_unified_ser_v2_12": 1332,
+   "r9_rule_unified_ser_v2_07": 1250,
+   "r9_rule_unified_ser_v2_10": 1351,
+   "r9_rule_unified_ser_v2_13": 1299,
+   "r9_rule_unified_ser_v2_01": 1286,
+   "shared_01": 1250,
+   "r9_rule_unified_ser_v2_09": 1250,
+   "shared_03": 1250,
+   "r9_rule_unified_ser_v2_08": 1250,
+   "r9_rule_unified_ser_v2_18": 1326,
+   "r9_rule_unified_ser_v2_02": 1299,
+   "r9_rule_unified_ser_v2_03": 1296,
+   "r9_rule_unified_ser_v2_11": 1314,
+   "r9_rule_unified_ser_v2_17": 1304,
+   "r9_rule_unified_ser_v2_06": 1252,
+   "r9_rule_unified_ser_v2_04": 1273,
+   "r9_rule_unified_ser_v2_16": 1296,
+   "r9_rule_unified_ser_v2_19": 1295,
+   "shared_02": 1250
+  },
+  "pick_kind_counts": {
+   "token_matched": 31000,
+   "token_matched_no_twin": 0,
+   "form_only": 1250
+  },
+  "pick_kind_counts_sampled": {
+   "token_matched": 30000,
+   "token_matched_no_twin": 0,
+   "form_only": 1250
+  },
+  "pick_kind_by_clause": {
+   "r9_rule_unified_ser_v2_00": {
+    "token_matched": 1400
+   },
+   "r9_rule_unified_ser_v2_01": {
+    "token_matched": 1286
+   },
+   "r9_rule_unified_ser_v2_02": {
+    "token_matched": 1299
+   },
+   "r9_rule_unified_ser_v2_03": {
+    "token_matched": 1296
+   },
+   "r9_rule_unified_ser_v2_04": {
+    "token_matched": 1273
+   },
+   "r9_rule_unified_ser_v2_05": {
+    "token_matched": 1251
+   },
+   "r9_rule_unified_ser_v2_06": {
+    "token_matched": 1252
+   },
+   "r9_rule_unified_ser_v2_07": {
+    "form_only": 1250
+   },
+   "r9_rule_unified_ser_v2_08": {
+    "token_matched": 1250
+   },
+   "r9_rule_unified_ser_v2_09": {
+    "token_matched": 1250
+   },
+   "r9_rule_unified_ser_v2_10": {
+    "token_matched": 1351
+   },
+   "r9_rule_unified_ser_v2_11": {
+    "token_matched": 1314
+   },
+   "r9_rule_unified_ser_v2_12": {
+    "token_matched": 1332
+   },
+   "r9_rule_unified_ser_v2_13": {
+    "token_matched": 1299
+   },
+   "r9_rule_unified_ser_v2_14": {
+    "token_matched": 1276
+   },
+   "r9_rule_unified_ser_v2_15": {
+    "token_matched": 1400
+   },
+   "r9_rule_unified_ser_v2_16": {
+    "token_matched": 1296
+   },
+   "r9_rule_unified_ser_v2_17": {
+    "token_matched": 1304
+   },
+   "r9_rule_unified_ser_v2_18": {
+    "token_matched": 1326
+   },
+   "r9_rule_unified_ser_v2_19": {
+    "token_matched": 1295
+   },
+   "shared_00": {
+    "token_matched": 1250
+   },
+   "shared_01": {
+    "token_matched": 1250
+   },
+   "shared_02": {
+    "token_matched": 1250
+   },
+   "shared_03": {
+    "token_matched": 1250
+   },
+   "shared_04": {
+    "token_matched": 1250
+   }
+  },
+  "pick_rule": "R2a: build_inversion_v2 candidates + select against the id's Neutral-Clause Twin where a clause fits, else the form-only pick",
+  "anchors_vs_stored_inversion_pick": {
+   "n": 1000,
+   "agree": 1000,
+   "token_matched": 1000
+  }
+ },
+ "forwards_expected": {
+  "P_all": 32250,
+  "pair_arms_expected": 176000,
+  "anchor_controls": 3000,
+  "total_expected": 211250
+ },
+ "forwards_note": "P for every row; the pair arms only for prior-kept rows (expected at the sample's prior rate) and the anchors; anchors add D and P at max_length 120",
+ "seconds_cpu": 1151.9
+}

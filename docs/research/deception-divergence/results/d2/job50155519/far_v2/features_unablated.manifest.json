@@ -1,0 +1,67 @@
+{
+  "argv": [
+    "scripts/d2_premise.py",
+    "features",
+    "direction",
+    "generate",
+    "--no-prefix-cache"
+  ],
+  "cache_check": {
+    "max_abs_diff": 0.25061607360839844,
+    "path_of_record": "full",
+    "rows": 8,
+    "top1_mismatch": 0
+  },
+  "code_sha256": {
+    "scripts/d2_premise.py": "fe47e7c6f1b57f06fe2db7ea44164f36b3082ec8b406b39c9b6b26541e8457f6",
+    "scripts/d2_rows.py": "c06a4fd802361aaa13d7eab88c7295fe93fe9f6914c762fb6dcfbfc81409179b",
+    "spontaneous/d2_judge.py": "701a88a5dbc8aacaa619dce3ea16edb5d2d23dbbd4920302ccc363ec89250391"
+  },
+  "commit": "fb2cb9e7fd6e4e7e2f594b3d03f1a079e4b40e54",
+  "created": "2026-11-02T21:13:18",
+  "dtype": "bfloat16",
+  "host": "w001.ib.bridges2.psc.edu",
+  "inputs": {
+    "path": "data/d2/d2_inputs.json",
+    "sha256": "a91cb15b846a815b631986957fecdf9b03ef705a1dc6f6bd826e3d5637932451"
+  },
+  "model": "meta-llama/Llama-3.1-8B-Instruct",
+  "no_ids": [
+    912,
+    2201,
+    2360,
+    2822,
+    9173
+  ],
+  "prefix_cache": false,
+  "rows": 1430,
+  "samples": {
+    "cal_ids": 100,
+    "max_fit_ids": 0,
+    "max_test_ids": 250,
+    "pre_registered": true
+  },
+  "seconds": 306.4,
+  "sha256": "6affb59a95845b87d1d86ff75f9716abb94713b529611abe7d5e4e0bd49d35fd",
+  "slurm_job_id": "50155519",
+  "stage": "features_unablated",
+  "tasks": [
+    "far_v2",
+    "sdr_v2",
+    "ser_v2"
+  ],
+  "test_ids_sha256": "6314d1d8f5277f3968777e4b76c12f926899f1414a5ea1b01d0a265de6c944f9",
+  "versions": {
+    "numpy": "2.5.1",
+    "python": "3.12.13",
+    "torch": "2.11.0+cu128",
+    "transformers": "5.13.0"
+  },
+  "yes_ids": [
+    7566,
+    9642,
+    9891,
+    10035,
+    14331
+  ]
+}

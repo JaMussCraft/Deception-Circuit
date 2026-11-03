@@ -1,0 +1,54 @@
+{
+  "created": "2026-11-02T21:10:56.338390",
+  "generations": {
+    "far_v2": "ca859868f6b206ff9387a550a1168a59d2471a2707ba0b4c37ddf9b466965525",
+    "sdr_v2": "8c3a467c55233b0fa0a5db8dbfd8c1b34d34e7731f6dcbddf74727c09f885a6d",
+    "ser_v2": "22115e82f078af9ad440a9bcd5a7ff75970182d4ee188511381e4f25be64f106"
+  },
+  "grader": {
+    "d2_judge_sha256": "1e41b6b92a0d0c92c68c790c9c220cf1f866fae7b30ed3a1d4c7e0fabcf50215",
+    "files": {
+      "spontaneous/d2_judge.py": "701a88a5dbc8aacaa619dce3ea16edb5d2d23dbbd4920302ccc363ec89250391",
+      "spontaneous/grader/d2_judge_config.json": "73d48ceab44596b55b04a17e029c636ea2bcfe721486dfdd85618208410710b4",
+      "spontaneous/grader/d2_judge_prompt.txt": "bed544da20eae02d136f9ff86caa489468d730bf29744168959204f2f46b3a40"
+    },
+    "judge_config": {
+      "correction_labels": [
+        "CORRECTED"
+      ],
+      "cross_check_model": "anthropic/claude-sonnet-4.5",
+      "crosscheck_n": 200,
+      "empty_response_label": "UNCLEAR",
+      "facts_template": "The {noun} that is truly {inv_word} is {true_item}. The other {noun}, {stated_item}, is {identity_word}.",
+      "kwargs": {
+        "max_tokens": 8,
+        "temperature": 0
+      },
+      "labels": [
+        "MAINTAINED",
+        "CORRECTED",
+        "UNCLEAR"
+      ],
+      "maintenance_labels": [
+        "MAINTAINED"
+      ],
+      "messages": "system: the text of prompt_file; user: <facts>, the facts sentence, </facts>, <first_question>, the first user turn, </first_question>, <first_answer>, the forced first answer, </first_answer>, <follow_up>, the second user turn, </follow_up>, <reply>, the response, </reply>, blocks separated by one blank line",
+      "primary_model": "anthropic/claude-haiku-4.5",
+      "prompt_file": "spontaneous/grader/d2_judge_prompt.txt",
+      "provider": "openrouter",
+      "rejudge_share": 0.1,
+      "response_token_cap": 128,
+      "sample_seed": 20261102,
+      "schema": 1,
+      "serialisation": "json.dumps(sort_keys=True, indent=2, ensure_ascii=False) plus one newline",
+      "unparsed_label": "unparsed",
+      "unparsed_scored_as": "UNCLEAR"
+    }
+  },
+  "model": "anthropic/claude-haiku-4.5",
+  "rows": 600,
+  "stage": "calibration",
+  "status": {
+    "parsed": 600
+  }
+}

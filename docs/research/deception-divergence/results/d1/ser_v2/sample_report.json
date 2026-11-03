@@ -1,0 +1,438 @@
+{
+ "task": "ser_v2",
+ "created": "2026-11-02T15:12:59",
+ "split": "test",
+ "seed_lists": 42,
+ "sample_seed": 42,
+ "plan_count": 81588,
+ "scored_prefix": 81588,
+ "scored_prefix_note": "the build scored only this prefix of the plan's test list (sum of the base test chunks in filter_report compute); candidates are drawn from it",
+ "per_cell_target": 200,
+ "floor": 100,
+ "prior_rate_used": 0.32,
+ "funnel_prior_rate": 0.32298816360834853,
+ "n_cells": 50,
+ "n_sampled": 31250,
+ "n_anchor": 1000,
+ "n_rows": 32250,
+ "out_of_window_dropped": {},
+ "anchor_byte_identity": {
+  "clean_prompt": "1000/1000",
+  "corrupt_prompt": "1000/1000",
+  "neutral_prompt": "1000/1000"
+ },
+ "anchor_with_stored_inversion": 1000,
+ "clause_forms_csv": {
+  "in_table": 17,
+  "agree": 17,
+  "disagree": [],
+  "n_clauses": 25,
+  "note": "forms come from the text rule for every clause; the csv covers only the clauses of the stored D test rows and is cross-checked where it has an entry"
+ },
+ "cells_short_of_target": [],
+ "cells_below_floor": [],
+ "per_cell": {
+  "r9_rule_unified_ser_v2_00|inversion": {
+   "available_unselected": 1545,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_00|identity": {
+   "available_unselected": 1568,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_01|inversion": {
+   "available_unselected": 1618,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_01|identity": {
+   "available_unselected": 1614,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_02|inversion": {
+   "available_unselected": 1608,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_02|identity": {
+   "available_unselected": 1609,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_03|inversion": {
+   "available_unselected": 1595,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_03|identity": {
+   "available_unselected": 1622,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_04|inversion": {
+   "available_unselected": 1612,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_04|identity": {
+   "available_unselected": 1626,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_05|inversion": {
+   "available_unselected": 1631,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_05|identity": {
+   "available_unselected": 1632,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_06|inversion": {
+   "available_unselected": 1632,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_06|identity": {
+   "available_unselected": 1630,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_07|inversion": {
+   "available_unselected": 1634,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_07|identity": {
+   "available_unselected": 1630,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_08|inversion": {
+   "available_unselected": 1628,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_08|identity": {
+   "available_unselected": 1631,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_09|inversion": {
+   "available_unselected": 1632,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_09|identity": {
+   "available_unselected": 1633,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_10|inversion": {
+   "available_unselected": 1601,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_10|identity": {
+   "available_unselected": 1552,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_11|inversion": {
+   "available_unselected": 1570,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_11|identity": {
+   "available_unselected": 1625,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_12|inversion": {
+   "available_unselected": 1579,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_12|identity": {
+   "available_unselected": 1607,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_13|inversion": {
+   "available_unselected": 1626,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_13|identity": {
+   "available_unselected": 1590,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_14|inversion": {
+   "available_unselected": 1625,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_14|identity": {
+   "available_unselected": 1603,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_15|inversion": {
+   "available_unselected": 1546,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_15|identity": {
+   "available_unselected": 1568,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_16|inversion": {
+   "available_unselected": 1597,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_16|identity": {
+   "available_unselected": 1614,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_17|inversion": {
+   "available_unselected": 1619,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_17|identity": {
+   "available_unselected": 1597,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_18|inversion": {
+   "available_unselected": 1612,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_18|identity": {
+   "available_unselected": 1576,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_19|inversion": {
+   "available_unselected": 1616,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "r9_rule_unified_ser_v2_19|identity": {
+   "available_unselected": 1606,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "shared_00|inversion": {
+   "available_unselected": 1628,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "shared_00|identity": {
+   "available_unselected": 1640,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "shared_01|inversion": {
+   "available_unselected": 1631,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "shared_01|identity": {
+   "available_unselected": 1631,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "shared_02|inversion": {
+   "available_unselected": 1635,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "shared_02|identity": {
+   "available_unselected": 1631,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "shared_03|inversion": {
+   "available_unselected": 1635,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "shared_03|identity": {
+   "available_unselected": 1633,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "shared_04|inversion": {
+   "available_unselected": 1631,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  },
+  "shared_04|identity": {
+   "available_unselected": 1634,
+   "drawn": 625,
+   "requested": 625,
+   "expected_prior_kept": 200.0,
+   "short_of_target": false,
+   "below_floor": false
+  }
+ },
+ "sample_sha256": "cfe13594eeb469f3a25355ea223fc8d4e2ca45d24f285882c8df060bf030ccd9",
+ "sample_path": "outputs/_analyses/deception-divergence/d1/ser_v2/sample.jsonl"
+}

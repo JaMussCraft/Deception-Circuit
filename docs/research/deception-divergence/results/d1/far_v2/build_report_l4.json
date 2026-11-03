@@ -1,0 +1,107 @@
+{
+ "task": "far_v2",
+ "created": "2026-11-02T17:52:41",
+ "sample_sha256": "f4c36f9d9d91860de6609b19a5711d4f6d25f264b16bc1bec09b445fb55816a2",
+ "d1_scores_sha256": "827d53ea873a02352045312173810eb2154d22d104fa44394e69637b319d8934",
+ "d1_commit": "4bdf6bb3a313453ce7e0a66d0a8d812451c94a60",
+ "d1_job_id": "50145353",
+ "max_seq_length": 120,
+ "n_live": 10954,
+ "n_kept": 10954,
+ "n_anchor": 1000,
+ "n_sampled": 9954,
+ "length_dropped": 0,
+ "length_dropped_by_clause": {},
+ "sentences": {
+  "L4_visible": "I can see the instructions you were given.",
+  "L4_hidden": "I cannot see the instructions you were given."
+ },
+ "token_lengths": {
+  "D": {
+   "n": 10954,
+   "min": 94,
+   "median": 98,
+   "p99": 101,
+   "max": 101,
+   "histogram": {
+    "94": 148,
+    "95": 682,
+    "96": 1642,
+    "97": 2433,
+    "98": 2542,
+    "99": 2048,
+    "100": 982,
+    "101": 477
+   }
+  },
+  "L4_visible": {
+   "n": 10954,
+   "min": 103,
+   "median": 107,
+   "p99": 110,
+   "max": 110,
+   "histogram": {
+    "103": 148,
+    "104": 682,
+    "105": 1642,
+    "106": 2433,
+    "107": 2542,
+    "108": 2048,
+    "109": 982,
+    "110": 477
+   }
+  },
+  "L4_hidden": {
+   "n": 10954,
+   "min": 103,
+   "median": 107,
+   "p99": 110,
+   "max": 110,
+   "histogram": {
+    "103": 148,
+    "104": 682,
+    "105": 1642,
+    "106": 2433,
+    "107": 2542,
+    "108": 2048,
+    "109": 982,
+    "110": 477
+   }
+  }
+ },
+ "L4_visible_minus_hidden_tokens_per_id": {
+  "0": 10954
+ },
+ "twin_check": {
+  "rule": "visible and hidden have the same token length and differ at exactly one position, per id and stream",
+  "phrasing_1": {
+   "n": 21908,
+   "same_length": 21908,
+   "one_position": 21908,
+   "length_difference_histogram": {
+    "0": 21908
+   },
+   "differing_positions_histogram": {
+    "1": 21908
+   }
+  },
+  "phrasing_4": {
+   "n": 21908,
+   "same_length": 21908,
+   "one_position": 21908,
+   "length_difference_histogram": {
+    "0": 21908
+   },
+   "differing_positions_histogram": {
+    "1": 21908
+   }
+  }
+ },
+ "forwards_expected": {
+  "L4_pairs": 43816,
+  "D_repro_anchors": 2000,
+  "total": 45816
+ },
+ "example_clean_prompts": null,
+ "seconds_cpu": 40.1
+}

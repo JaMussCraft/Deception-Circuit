@@ -1,0 +1,32 @@
+{
+  "correction_labels": [
+    "CORRECTED"
+  ],
+  "cross_check_model": "anthropic/claude-sonnet-4.5",
+  "crosscheck_n": 200,
+  "empty_response_label": "UNCLEAR",
+  "facts_template": "The {noun} that is truly {inv_word} is {true_item}. The other {noun}, {stated_item}, is {identity_word}.",
+  "kwargs": {
+    "max_tokens": 8,
+    "temperature": 0
+  },
+  "labels": [
+    "MAINTAINED",
+    "CORRECTED",
+    "UNCLEAR"
+  ],
+  "maintenance_labels": [
+    "MAINTAINED"
+  ],
+  "messages": "system: the text of prompt_file; user: <facts>, the facts sentence, </facts>, <first_question>, the first user turn, </first_question>, <first_answer>, the forced first answer, </first_answer>, <follow_up>, the second user turn, </follow_up>, <reply>, the response, </reply>, blocks separated by one blank line",
+  "primary_model": "anthropic/claude-haiku-4.5",
+  "prompt_file": "spontaneous/grader/d2_judge_prompt.txt",
+  "provider": "openrouter",
+  "rejudge_share": 0.1,
+  "response_token_cap": 128,
+  "sample_seed": 20261102,
+  "schema": 1,
+  "serialisation": "json.dumps(sort_keys=True, indent=2, ensure_ascii=False) plus one newline",
+  "unparsed_label": "unparsed",
+  "unparsed_scored_as": "UNCLEAR"
+}
