@@ -1,7 +1,7 @@
 # Hand-back 07: report writer, first report filled
 
 Agent: report writer (Claude, Opus), session claude-5201d56c. Ticket: the lead's brief of Tue 3 Nov 2026 to fill the
-placeholders of `05-first-report.md`. Status: resolved, pending the independent review of the headline numbers. The
+placeholders of `05-first-report.md`. Status: resolved; review 03 confirmed the headline numbers. The
 session hook asks for this file; the lead's brief named only the report.
 
 ## What changed
@@ -12,7 +12,7 @@ session hook asks for this file; the lead's brief named only the report.
   has one comparison table of D-only rows and the deciding N2 rows under the mean reference.
 - **Evidence.** The table adds the ablation pilot, the all-position ranking run, jobs A, B and C, and the queued IOI
   resolution job, which appeared in the ledger while the report was written.
-- **Review 03 round.** The pending-review line now states review 03's CONFIRMED WITH NOTES and ruling R13. A new
+- **Review 03 round.** The review line now states review 03's CONFIRMED WITH NOTES and ruling R13. A new
   paragraph gives the IOI resolution reading, and the zero table's caption notes zero's own IOI shift of -17.0 at
   size 500. "What is NOT done" lists the 1,000-row IOI measurement as pending under R13
   (`../reviews/03-verdict-review.md`).
@@ -36,7 +36,6 @@ session hook asks for this file; the lead's brief named only the report.
 
 ## What is NOT done
 
-- **Review.** The "Review pending" line in the report waits for the independent review.
 - **The IOI resolution job.** It shows as queued with no result, and its numbers are not in the report.
 
 ## Open questions
