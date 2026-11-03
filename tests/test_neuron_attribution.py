@@ -391,3 +391,49 @@ def test_cli_dry_run_loads_no_model(tok, tmp_path, monkeypatch, capsys):
     assert cli.main(["--pair", "dh", "in", "--dry-run", "--output-root", str(tmp_path)]) == 0
     out = capsys.readouterr().out
     assert "dry run: no model loaded" in out and "[dh]" in out and "[in]" in out
+
+
+# ==============================================================================
+# POOL CHECKS AND THE R2 ORIENTATION
+# ==============================================================================
+
+@pytest.mark.skipif(not HAVE_POOL, reason="specificity-ladder user-turn pools not present")
+def test_the_pool_arrows_match_the_reader_brief():
+    for directory in (POOL_I, POOL_N):
+        checked = na.verify_pool_arrows(directory, ("train", "validation", "test"))
+        assert all(entry["ok"] is True for entry in checked.values())
+
+
+def test_a_pool_copy_with_a_wrong_arrow_is_refused(tmp_path):
+    split = tmp_path / "far_v2_user_inversion" / "train"
+    split.mkdir(parents=True)
+    (split / "data-00000-of-00001.arrow").write_bytes(b"not the pool")
+    with pytest.raises(ValueError, match="sha256"):
+        na.verify_pool_arrows(str(tmp_path / "far_v2_user_inversion"), ("train",))
+    unknown = tmp_path / "other_pool" / "train"
+    unknown.mkdir(parents=True)
+    (unknown / "data-00000-of-00001.arrow").write_bytes(b"x")
+    assert na.verify_pool_arrows(str(tmp_path / "other_pool"), ("train",))["train"]["ok"] is None
+
+
+@pytest.mark.skipif(not (HAVE_FAR and HAVE_POOL), reason="datasets not present")
+@pytest.mark.parametrize("split", ["train", "validation"])
+def test_i_and_n_are_scored_with_d_labels(tok, split):
+    """Ruling R2: m = logit(opposite) - logit(honest) in D's orientation on every stream. D's Target is the
+    deceptive (opposite) answer, and the I/N rows are scored with the I row's labels, which must equal D's."""
+    d_rows, _ = na.dh_pairs(os.path.join(DATA, "far_v2"), tok, split=split)
+    d_labels = {r.id: (r.target, r.distractor) for r in d_rows}
+    i_rows, _ = na.in_pairs(POOL_I, POOL_N, tok, split=split)
+    assert len(i_rows) == 177
+    assert all(d_labels[r.id] == (r.target, r.distractor) for r in i_rows)
+
+
+@pytest.mark.skipif(not (HAVE_FAR and HAVE_POOL), reason="datasets not present")
+def test_cli_pool_dir_reads_the_pools_from_there(tok, tmp_path, monkeypatch, capsys):
+    import shutil
+    pools = tmp_path / "pools"
+    for directory in (POOL_I, POOL_N):
+        shutil.copytree(directory, str(pools / os.path.basename(directory)))
+    assert cli.main(["--pair", "in", "--split", "validation", "--dry-run", "--pool-dir", str(pools),
+                     "--output-root", str(tmp_path / "out")]) == 0
+    assert str(pools / "far_v2_user_inversion") in capsys.readouterr().out

@@ -53,9 +53,12 @@ def build_parser():
     p.add_argument("--model", default=DEFAULT_MODEL)
     p.add_argument("--device", default=None)
     p.add_argument("--data-dir", default=os.path.join(REPO, "data", "datasets"))
-    p.add_argument("--inversion-dir", default=None, help="User-turn I pool; default the A1 control cell's "
-                                                         "<task>_user_inversion.")
-    p.add_argument("--neutral-dir", default=None, help="User-neutral twin pool; default <task>_user_neutral there.")
+    p.add_argument("--pool-dir", default=na.CODEX_POOL_ROOT,
+                   help="Directory holding <task>_user_inversion and <task>_user_neutral; default the A1 control "
+                        "cell in the Codex worktree, read in place (W3's copy: "
+                        "outputs/_analyses/neuron-partition/data/pools).")
+    p.add_argument("--inversion-dir", default=None, help="User-turn I pool; overrides --pool-dir.")
+    p.add_argument("--neutral-dir", default=None, help="User-neutral twin pool; overrides --pool-dir.")
     p.add_argument("--output-root", default=DEFAULT_OUTPUT_ROOT)
     p.add_argument("--commit", default=None, help="Short commit for the directory name; default read from .git.")
     p.add_argument("--note", action="append", default=[], help="Free-text note for run_manifest.json (repeatable).")
@@ -123,8 +126,8 @@ def pool_dirs(args, pair):
     if pair == "dh":
         clean = os.path.join(args.data_dir, args.task)
         return {"clean": clean, "twin": os.path.join(args.data_dir, f"{args.task}_honest")}
-    return {"clean": args.inversion_dir or os.path.join(na.CODEX_POOL_ROOT, f"{args.task}_user_inversion"),
-            "twin": args.neutral_dir or os.path.join(na.CODEX_POOL_ROOT, f"{args.task}_user_neutral")}
+    return {"clean": args.inversion_dir or os.path.join(args.pool_dir, f"{args.task}_user_inversion"),
+            "twin": args.neutral_dir or os.path.join(args.pool_dir, f"{args.task}_user_neutral")}
 
 
 def output_dir(args, pair, splits, commit):
@@ -138,6 +141,9 @@ def output_dir(args, pair, splits, commit):
 
 def load_rows(args, pair, splits, tokenizer):
     dirs = pool_dirs(args, pair)
+    if pair == "in":   # before any row is read: a drifted or partial copy stops here
+        for directory in dirs.values():
+            na.verify_pool_arrows(directory, splits)
     rows, reports = [], []
     for split in splits:
         if pair == "dh":
@@ -151,8 +157,8 @@ def load_rows(args, pair, splits, tokenizer):
     return rows, reports, dirs
 
 
-def pool_record(dirs, pair):
-    """{role: {path, files: {path: sha256}, note}} for rows.json."""
+def pool_record(dirs, pair, splits=RANKING_SPLITS):
+    """{role: {path, files: {path: sha256}, note, arrow_check}} for rows.json."""
     import run_manifest as rm
     out = {}
     for role, directory in dirs.items():
@@ -160,6 +166,7 @@ def pool_record(dirs, pair):
                  "files": rm.hash_files(rm.data_files_under(directory))}
         if pair == "in":
             entry["note"] = na.UNMERGED_NOTE
+            entry["arrow_check"] = na.verify_pool_arrows(directory, splits)
         out[role] = entry
     return out
 
@@ -239,7 +246,7 @@ def main(argv=None) -> int:
 
         scores, record = na.score_rows(model, rows, batch_size=args.batch_size, reverse=args.reverse,
                                        progress=progress)
-        pools = pool_record(dirs, pair)
+        pools = pool_record(dirs, pair, splits)
         paths = na.write_outputs(out, scores, record, reports=reports, pools=pools,
                                  extra={"task": args.task, "pair": pair, "splits": splits, "model": hf_id,
                                         "model_load_seconds": load_seconds,
@@ -249,8 +256,12 @@ def main(argv=None) -> int:
             dataset_files.update(entry["files"])
         notes = list(args.note)
         if pair == "in":
-            notes.append(f"{na.UNMERGED_NOTE}: I = {dirs['clean']}, N = {dirs['twin']} (specificity-ladder A1 "
-                         f"control cell, read in place)")
+            in_place = (os.path.normpath(os.path.dirname(os.path.abspath(dirs["clean"])))
+                        == os.path.normpath(na.CODEX_POOL_ROOT))
+            where = ("specificity-ladder A1 control cell, read in place" if in_place
+                     else "a copy of the specificity-ladder A1 control cell")
+            notes.append(f"{na.UNMERGED_NOTE}: I = {dirs['clean']}, N = {dirs['twin']} ({where}); arrow sha256 "
+                         f"checked against the reader brief")
         manifest = na.write_manifest(
             out, notes=notes, script=os.path.join(REPO, "scripts", "neuron_attribution.py"), argv=argv_list,
             dataset_files=dataset_files, model=hf_id, seed=None,

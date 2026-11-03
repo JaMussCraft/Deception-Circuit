@@ -44,6 +44,23 @@ All four files are new. No existing file was edited. The orchestrator commits th
     `.../far_v2_in_validation_f4ce555_limit64/` each hold `scores.pt`, `rows.json` and `run_manifest.json`.
   - The job log is `logs/neuron_partition_pilot_23475874.out`. Both paths are under the worktree.
 
+**Follow-up after ruling R2 and the reader brief.** These changes came after the pilot. The pilot manifests'
+`code_sha256` values therefore pin the pilot-time versions of the scorer and the CLI, not the versions the
+orchestrator commits.
+
+- **Orientation is unchanged and confirmed.** m is logit(opposite) minus logit(honest) in D's orientation on every
+  run, because D's Target is the deceptive answer and the twin is scored with the clean row's labels. The I/N rows
+  use the I row's labels. A new test asserts that they equal D's Target and Distractor on all 177 + 177 ranking
+  rows.
+- **`--pool-dir` added.** It names the directory that holds `<task>_user_inversion` and `<task>_user_neutral`.
+  The default is the Codex A1 control cell, read in place. For W3's copy, pass
+  `--pool-dir outputs/_analyses/neuron-partition/data/pools`.
+- **Pool checks.** Every arrow file of an I or N pool is checked against the reader brief's sha256 table before any
+  row is read; a mismatch stops the run. `in_pairs` now also asserts that I and N hold each id at the same row
+  position.
+- **Notes and provenance.** The manifest note says whether the pools were read in place or from a copy. `rows.json`
+  records the arrow check per split.
+
 **Output format.** `scores.pt` is a dict of float32 tensors of shape [32, 14336]:
 
 - `atp_readout_mean`, `atp_readout_absmean`, `atp_clause_mean`, `atp_clause_absmean`.
@@ -95,6 +112,30 @@ One debugging note. The first finite-difference test used a forward difference w
 layer 0. Graph and leaf gradients agreed exactly, and the gap came from Llama's RMSNorm, which casts to float32
 inside even a float64 model. A central difference converges to the graph gradient: at a step of 1e-3, the values
 0.1033197 against 0.1033192 and −0.3222778 against −0.3222773.
+
+After the R2 follow-up, the test file has 24 tests:
+
+```
+/u/swong2/.conda/envs/mgnp/bin/python -m pytest -p no:cacheprovider -q -rs tests/test_neuron_attribution.py
+OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 /sw/external/python/anaconda3/bin/python3.9 -m pytest -p no:cacheprovider -q -rs tests/test_neuron_attribution.py
+```
+
+Observed: `24 passed in 25.08s` (mgnp) and `24 passed, 2 warnings in 26.53s` (base), with no skips. The new tests
+cover four checks:
+
+- **Brief match.** The Codex pools' train, validation and test arrows match the brief.
+- **Tampered copy.** A tampered copy is refused.
+- **R2 labels.** I/N labels equal D's on both ranking splits.
+- **Pool directory.** `--pool-dir` reads a copied pool.
+
+Dry run against W3's copy:
+
+```
+/u/swong2/.conda/envs/mgnp/bin/python scripts/neuron_attribution.py --task far_v2 --pair dh in --split train,validation --pool-dir /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/neuron-partition/outputs/_analyses/neuron-partition/data/pools --dry-run
+```
+
+Observed: the arrow check passed and nothing was raised. The run has `[dh] 400` and `[in] 354` paired rows, with
+clauses on all of them, 0 without a twin, 0 dropped and 0 fallbacks.
 
 Login-node dry run of the full ranking plan:
 
@@ -177,6 +218,13 @@ Observed:
   later N1 work: W2 owns the ablation and W3 the test sample.
 
 ## Open questions
+
+- **Corrupt stream.** The scorer reads only the clean designation stream. Under R2, the ladder's G averages the
+  clean and corrupt streams within an id, and the corrupt stream reverses the words. Should the ranking also score
+  the corrupt stream, with D's opposite word as the corrupt row's Distractor? That would double the cost, which is
+  still minutes. Default: rank on the clean stream only, because ranking is a selection step and the ablation
+  readout, which W2 owns, carries both streams. The pilot's clean-stream gap is 10.45 on 64 validation rows,
+  against the audit's 9.915 for the clean stream on test ids.
 
 - **Standardized contrast floor.** `contrast_readout_std` is dominated by neurons that are nearly constant under
   the twin. Its top magnitudes reach 94 on D/H and 260 on I/N because the 1e-6 floor barely acts. Should the ranking

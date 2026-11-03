@@ -57,6 +57,47 @@ CODEX_POOL_ROOT = ("/projects/beto/swong2/Alignment/Deception-Circuit/.claude/wo
                    "_analyses/specificity-ladder/a1-control-77b6487-m07")
 UNMERGED_NOTE = "unmerged Codex pool"
 
+#: sha256 of each pool split's `data-00000-of-00001.arrow`, from the reader brief (reports/00-reader-brief.md,
+#: section 3). A pool read from anywhere (the Codex worktree or W3's copy) is checked against these.
+POOL_ARROW_SHA256 = {
+    "far_v2_user_inversion": {
+        "train": "6e1284c415eced018dbb648c2b2aec8a41bac1ed2de278df5639fc474e7581cf",
+        "validation": "2c7659c2a51f4cc449b0dcbb3863acbf99750269aca773766abc5a9340f38f75",
+        "test": "256586de17f532ee438bb8a22f6028e8175b41c179a61913955b7f9ab02fe11c"},
+    "far_v2_user_neutral": {
+        "train": "353f899645cb36e63506154930752147b93e2861fedaa3037870e1f1584bd01d",
+        "validation": "7addc5f978309d0025f59cc2980abbdcb51cd3405d07c949aaf90bc611ee3389",
+        "test": "afd925d7d5e7cc817262fd674b5915b0f852e8210a3aa457773e082cb469377e"},
+    "ser_v2_user_inversion": {
+        "train": "cc246ec7d483847eae19ec11ec8470494d919eabd6cc2d62c23426933ec36fc5",
+        "validation": "184a90d65670f4e069f4b20b644171afc1fed3e55b56d488b1260e07da313db9",
+        "test": "495c4275e8ffc88244318ea60c56af2b8e44d90c7047e6c5faaba614e620ea33"},
+    "ser_v2_user_neutral": {
+        "train": "6e41400ba7f385340120763378a5160c93ca6653d438d51af888693596666d2f",
+        "validation": "948ccf52a5578848d376629c45f380692f9015c2679281fb47d85d6433304b93",
+        "test": "79371a00f69abd087c1111693ff885f96f44abe3104fdfd99b05e3f8869e7f5b"},
+}
+
+
+def verify_pool_arrows(directory: str, splits: Sequence[str]) -> Dict[str, dict]:
+    """{split: {path, sha256, expected, ok}} for one pool directory; raises when a known file does not match.
+
+    The pool name is the directory's base name; a name with no recorded hashes is reported with expected None.
+    """
+    import run_manifest as rm
+
+    expected = POOL_ARROW_SHA256.get(os.path.basename(os.path.normpath(directory)), {})
+    out = {}
+    for split in splits:
+        path = os.path.join(directory, split, "data-00000-of-00001.arrow")
+        got = rm.file_sha256(path) if os.path.isfile(path) else None
+        want = expected.get(split)
+        out[split] = {"path": os.path.abspath(path), "sha256": got, "expected": want,
+                      "ok": None if want is None else got == want}
+        if want is not None and got != want:
+            raise ValueError(f"{path}: sha256 {got} is not the reader brief's {want}")
+    return out
+
 PAIRS = ("dh", "in")
 STD_EPS = 1e-6
 
@@ -181,7 +222,8 @@ def in_pairs(inversion_dir: str, neutral_dir: str, tokenizer, *, split: str,
     if max_length is None:
         max_length = int(config.get("max_seq_length", dc.MAX_SEQ_LENGTH))
     inv = _load_split(inversion_dir, split)
-    neu = {sampling.record_id(r, i): r for i, r in enumerate(_load_split(neutral_dir, split))}
+    neutral = _load_split(neutral_dir, split)
+    neu = {sampling.record_id(r, i): r for i, r in enumerate(neutral)}
     scores = _scores_by_id(inversion_dir, split)
     report = PairReport(pair="in", split=split,
                         source={"clean": os.path.abspath(inversion_dir), "twin": os.path.abspath(neutral_dir)})
@@ -190,6 +232,9 @@ def in_pairs(inversion_dir: str, neutral_dir: str, tokenizer, *, split: str,
     for index, record in enumerate(inv):
         one = sampling.record_id(record, index)
         twin = neu.get(one)
+        if twin is not None and (index >= len(neutral) or sampling.record_id(neutral[index], index) != one):
+            raise ValueError(f"instance {one}: the user-neutral pool does not hold it at the same position "
+                             f"({index}); the pools must share ids and row order")
         if twin is None:
             report.without_twin.append(one)
             continue
