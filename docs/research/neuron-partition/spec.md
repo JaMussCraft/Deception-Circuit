@@ -111,3 +111,7 @@ as a ruling before that run.
   deception and honest scores share the activation difference and agree in sign on only 63 of the top 100) is
   recorded as a known property; a direct one-neuron interchange check on the top neurons by each score is
   descriptive if run.
+- **R12 (Tue 3 Nov 2026): the test sample also excludes the ladder's 100 selection ids.** W3's sample excluded
+  the union of A1's assessment ids, the ladder's selection ids and the two mechanism-analysis held-out samples
+  (356 ids), one list more than R5 names. The sample stands as drawn: the extra exclusion only removes ids the
+  ladder tuned on, and 644 D and 566 I rows remain eligible.

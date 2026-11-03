@@ -182,7 +182,27 @@ Observed: "20 passed" on mgnp and "20 passed, 1 warning" on base.
 Observed before the test_d4_jobs edit: one failure, `test_b2_fetch_brings_back_the_deception_divergence_root_and_keeps_the_old_globs`,
 at line 180. Observed after: "54 passed" on mgnp and "54 passed, 3 warnings" on base.
 
-Full suite on both interpreters: FULL_SUITE_PLACEHOLDER
+```
+/u/swong2/.conda/envs/mgnp/bin/python -m pytest tests -p no:cacheprovider -q -rf --basetemp=<job tmp>/pt-mgnp
+env OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 /sw/external/python/anaconda3/bin/python3.9 -m pytest tests -p no:cacheprovider -q --tb=line -rf --basetemp=<job tmp>/pt-base2
+```
+
+Observed on mgnp: "20 failed, 3872 passed, 25 skipped, 2 warnings, 101 errors in 2081.55s". Observed on base: "19
+failed, 3648 passed, 136 skipped, 4 warnings, 101 errors in 1123.22s". None of the failures or errors is in a file I
+touched or reads `b2.sh`.
+
+- **Base run killed once.** The first base run stopped at 63% with no summary and no traceback. The shared user
+  cgroup has a 40 GB cap and recorded `oom_kill 2`. Other sessions share that cgroup, so the kill cannot be attributed
+  to one process. The rerun above completed.
+- **The 101 errors** are all FileNotFoundError at setup. They name git-ignored artifacts that a fresh worktree lacks:
+  `.superpowers/sdd/plan-sdr-*`, `outputs/_analyses/sdr-routing-*` and `.claude/worktrees/.scratch/selective-deception/`.
+- **The 19 failures on both interpreters** fall into two groups. Some are location failures: the MASK checkout in
+  `test_benchmarks`, and the missing artifacts in `test_sdr_*` and `test_selective_v6/v7`. The others are the known
+  `test_deception_common` and `test_deception_tasks` failures: specs, word reuse, pool size, length gap and
+  hyperparameters.
+- **The 20th failure, on mgnp only,**
+  `test_component_analysis_v2_dataloaders.py::test_a_twin_with_another_pressure_id_is_refused`, did not recur. A rerun
+  of that file gave "12 passed in 34.01s". W1 and W2 edit this worktree concurrently, which may explain it.
 
 ```
 ssh -o BatchMode=yes bridges2 'cd /ocean/projects/cis260361p/swong2/Deception-Circuit && git log --oneline -1 && git status --short | head'
@@ -197,6 +217,34 @@ find . -type f | sort | xargs sha256sum   # on Delta, and the same over ssh brid
 ```
 
 Observed: "IDENTICAL", 37 files.
+
+### Follow-up after commit e5962fe
+
+- **Brief check (R5).** Excluding only the A1 assessment ids and the two held-out samples gives 256 ids. That leaves
+  744 D test ids, 654 of them in the I pool, matching the reader brief. My sample also excludes the 100 selection ids,
+  which leaves 644 D and 566 I. All six pool arrow sha256 values in `pools_manifest.json` appear in the brief.
+- **test_d4_jobs.py.** The prefix check stands, as committed at e5962fe.
+- **Re-sync.** `sync-code --branch neuron-partition` fast-forwarded the Bridges-2 clone from 618efdd to
+  `e5962fe97f758297497a1223ed703e88ce7a8e43`. The local worktree head was f965bd5, which was not yet pushed.
+- **Directories.** I rsynced four directories through b2dtn:
+  - `data/`, with 0 files changed.
+  - `partition/far_atp_7386fd3/`, 31 files.
+  - `partition/far_contrast_7386fd3/`, 25 files.
+  - `sets/`, 64 files.
+
+  I compared sha256sum of all 157 files on both sides, and the diff was empty ("IDENTICAL").
+- **Projected starts.** I ran `sbatch --test-only` for `jobs/ablation_cells.sbatch` with placeholder arguments. It
+  ran at 1:11 pm EST on Bridges-2 and at 1:11 pm EST (12:11 CST) on Delta. Nothing was submitted.
+
+| cluster and account | partition, time | projected start (EST) |
+| --- | --- | --- |
+| Bridges-2 cis260361p | GPU-shared h100-80:1, 4 h | Tue 3 Nov 2:57 pm |
+| Bridges-2 cis260372p | GPU-shared h100-80:1, 4 h | Tue 3 Nov 2:18 pm |
+| Delta beto-delta-gpu | gpuH200x8-interactive or gpuA40x4-interactive, 55 min | Tue 3 Nov 2:13 pm (gpuH200x8-interactive) |
+| Delta beto-delta-gpu | gpuA40x4, 4 h | Fri 6 Nov 9:18 pm |
+| Delta bimc-delta-gpu | gpuA40x4, 4 h | Sun 8 Nov 11:09 pm |
+
+  The GPU SU balances were unchanged: cis260361p 390 of 452, cis260372p 89 of 100 and cis260382p 100 of 100.
 
 ## Execution evidence
 
