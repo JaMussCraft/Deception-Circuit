@@ -1,0 +1,1689 @@
+{
+  "blocked": [],
+  "code_sha256": {
+    "scripts/d2_followup.py": "0b277047f5a50f49b3f071c87e66e50c970ed83ee6dfbff3a01fb8616e67f373",
+    "scripts/d2_premise.py": "2c159274957cd76e6ee41a97640fe04737b989ec385b5238ec9ee8d40813f338",
+    "scripts/d2_rows.py": "c06a4fd802361aaa13d7eab88c7295fe93fe9f6914c762fb6dcfbfc81409179b",
+    "spontaneous/d2_judge.py": "701a88a5dbc8aacaa619dce3ea16edb5d2d23dbbd4920302ccc363ec89250391"
+  },
+  "counts": {
+    "ablated": 1309,
+    "arms": {
+      "DT": 709,
+      "HI": 1909,
+      "HI_ablated": 1309,
+      "HT": 709,
+      "IH": 245,
+      "anchor": 600
+    },
+    "unablated": 4172
+  },
+  "counts_match": true,
+  "created": "2026-11-02T22:46:35",
+  "estimate": {
+    "measured": {
+      "gpu_hours": 0.46,
+      "load_s": 460.0,
+      "rates_s_per_row": {
+        "ablated": 0.231,
+        "unablated": 0.214
+      },
+      "seconds": 1655
+    },
+    "model_constant": {
+      "forward_overhead_s": 0.03,
+      "gpu_hours": 0.68,
+      "seconds": 2447,
+      "tokens_per_s": 21000.0
+    },
+    "reservation": "00:45:00",
+    "rows": {
+      "ablated": 1309,
+      "unablated": 4172
+    }
+  },
+  "inputs_sha256": "a91cb15b846a815b631986957fecdf9b03ef705a1dc6f6bd826e3d5637932451",
+  "mirror_pick": {
+    "fallback_firings": {
+      "far_v2": 0,
+      "sdr_v2": 0,
+      "ser_v2": 0
+    },
+    "rule": "own mirror; salted sha1 draw (salt honest_instructed:) among other fitting mirrors of the same task and D form as the fallback; a recorded deviation from the inversion builder's draw"
+  },
+  "pool": {
+    "borderline": [
+      "r9_rule_unified_sdr_v2_04",
+      "r9_rule_unified_sdr_v2_05",
+      "r9_rule_unified_sdr_v2_13",
+      "r9_rule_unified_sdr_v2_15",
+      "r9_rule_unified_sdr_v2_18",
+      "r9_rule_unified_sdr_v2_19",
+      "r9_rule_unified_ser_v2_01",
+      "r9_rule_unified_ser_v2_02",
+      "r9_rule_unified_ser_v2_13",
+      "r9_rule_unified_ser_v2_17",
+      "r9_rule_unified_ser_v2_19"
+    ],
+    "hi": 50,
+    "ih": 30,
+    "path": "data/d2/d2_followup_clauses.json",
+    "sha256": "9b8244d9aab323a9575242516566ab88262ea4c46d6fd060d346ee7f25be332a"
+  },
+  "pool_violations": [],
+  "pre_registered": true,
+  "pre_registered_counts": {
+    "ablated": 1309,
+    "arms": {
+      "DT": 709,
+      "HI": 1909,
+      "HI_ablated": 1309,
+      "HT": 709,
+      "IH": 245,
+      "anchor": 600
+    },
+    "unablated": 4172
+  },
+  "refusal_direction": {
+    "expected_sha256": "3e03edcd4b0458be2ce4a8a73468fcbf7ad33047b9c52bb018c1ff81f0bf7cf0",
+    "local_sha256": "3e03edcd4b0458be2ce4a8a73468fcbf7ad33047b9c52bb018c1ff81f0bf7cf0",
+    "path": "outputs/_analyses/deception-divergence/d2/refusal_direction.pt"
+  },
+  "submission_blocked": false,
+  "tasks": {
+    "far_v2": {
+      "checks": {
+        "DT_minus_D_tokens": {
+          "0": 210
+        },
+        "HI_D_aligned": 610,
+        "HT_DT_aligned": 210,
+        "HT_minus_D_tokens": {
+          "0": 210
+        },
+        "IH_I_aligned": 210,
+        "form_mismatch": 0,
+        "true_item_multi_token": 0
+      },
+      "ids": {
+        "fit": 200,
+        "gate": 200,
+        "test": 210,
+        "test_act_form": 210
+      },
+      "ih_pairs": {
+        "invd_far_v2_act_02": {
+          "clause_tokens": [
+            10,
+            10
+          ],
+          "frame": "game",
+          "full_prompt_diff": {
+            "0": 14
+          },
+          "rows": 14
+        },
+        "invd_far_v2_act_03": {
+          "clause_tokens": [
+            10,
+            10
+          ],
+          "frame": "drill",
+          "full_prompt_diff": {
+            "0": 5
+          },
+          "rows": 5
+        },
+        "invd_far_v2_act_05": {
+          "clause_tokens": [
+            11,
+            11
+          ],
+          "frame": "drill",
+          "full_prompt_diff": {
+            "0": 21
+          },
+          "rows": 21
+        },
+        "invd_far_v2_act_06": {
+          "clause_tokens": [
+            11,
+            11
+          ],
+          "frame": "game",
+          "full_prompt_diff": {
+            "0": 8
+          },
+          "rows": 8
+        },
+        "invd_far_v2_act_07": {
+          "clause_tokens": [
+            11,
+            11
+          ],
+          "frame": "quiz",
+          "full_prompt_diff": {
+            "0": 24
+          },
+          "rows": 24
+        },
+        "invd_far_v2_act_08": {
+          "clause_tokens": [
+            12,
+            12
+          ],
+          "frame": "quiz",
+          "full_prompt_diff": {
+            "0": 16
+          },
+          "rows": 16
+        },
+        "invd_far_v2_act_09": {
+          "clause_tokens": [
+            12,
+            12
+          ],
+          "frame": "drill",
+          "full_prompt_diff": {
+            "0": 7
+          },
+          "rows": 7
+        },
+        "invd_far_v2_act_10": {
+          "clause_tokens": [
+            12,
+            12
+          ],
+          "frame": "game",
+          "full_prompt_diff": {
+            "0": 25
+          },
+          "rows": 25
+        },
+        "invd_far_v2_act_11": {
+          "clause_tokens": [
+            12,
+            12
+          ],
+          "frame": "quiz",
+          "full_prompt_diff": {
+            "0": 20
+          },
+          "rows": 20
+        },
+        "invd_far_v2_act_12": {
+          "clause_tokens": [
+            14,
+            14
+          ],
+          "frame": "quiz",
+          "full_prompt_diff": {
+            "0": 2
+          },
+          "rows": 2
+        },
+        "invd_far_v2_act_13": {
+          "clause_tokens": [
+            14,
+            14
+          ],
+          "frame": "drill",
+          "full_prompt_diff": {
+            "0": 19
+          },
+          "rows": 19
+        },
+        "invd_far_v2_act_14": {
+          "clause_tokens": [
+            14,
+            14
+          ],
+          "frame": "game",
+          "full_prompt_diff": {
+            "0": 33
+          },
+          "rows": 33
+        },
+        "invd_far_v2_act_15": {
+          "clause_tokens": [
+            14,
+            14
+          ],
+          "frame": "quiz",
+          "full_prompt_diff": {
+            "0": 16
+          },
+          "rows": 16
+        }
+      },
+      "pairs": {
+        "r8_rule_strong_far_v2_00": {
+          "borderline": [],
+          "clause_tokens": [
+            10,
+            10
+          ],
+          "d_form": "act",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 68
+          },
+          "hi_form": "act",
+          "rows": {
+            "test": 18,
+            "train": 27,
+            "validation": 23
+          },
+          "words_changed": 1
+        },
+        "r8_rule_strong_far_v2_01": {
+          "borderline": [],
+          "clause_tokens": [
+            11,
+            11
+          ],
+          "d_form": "act",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 55
+          },
+          "hi_form": "act",
+          "rows": {
+            "test": 18,
+            "train": 19,
+            "validation": 18
+          },
+          "words_changed": 1
+        },
+        "r8_rule_strong_far_v2_03": {
+          "borderline": [],
+          "clause_tokens": [
+            14,
+            14
+          ],
+          "d_form": "act",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 104
+          },
+          "hi_form": "act",
+          "rows": {
+            "test": 44,
+            "train": 30,
+            "validation": 30
+          },
+          "words_changed": 1
+        },
+        "r8_rule_strong_far_v2_05": {
+          "borderline": [],
+          "clause_tokens": [
+            11,
+            11
+          ],
+          "d_form": "act",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 50
+          },
+          "hi_form": "act",
+          "rows": {
+            "test": 8,
+            "train": 20,
+            "validation": 22
+          },
+          "words_changed": 1
+        },
+        "r8_rule_strong_far_v2_06": {
+          "borderline": [],
+          "clause_tokens": [
+            12,
+            12
+          ],
+          "d_form": "act",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 38
+          },
+          "hi_form": "act",
+          "rows": {
+            "test": 16,
+            "train": 12,
+            "validation": 10
+          },
+          "words_changed": 1
+        },
+        "r8_rule_strong_far_v2_07": {
+          "borderline": [],
+          "clause_tokens": [
+            12,
+            12
+          ],
+          "d_form": "act",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 5
+          },
+          "hi_form": "act",
+          "rows": {
+            "test": 3,
+            "train": 2
+          },
+          "words_changed": 1
+        },
+        "r8_rule_strong_far_v2_08": {
+          "borderline": [],
+          "clause_tokens": [
+            12,
+            12
+          ],
+          "d_form": "act",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 80
+          },
+          "hi_form": "act",
+          "rows": {
+            "test": 20,
+            "train": 30,
+            "validation": 30
+          },
+          "words_changed": 1
+        },
+        "r8_rule_strong_far_v2_09": {
+          "borderline": [],
+          "clause_tokens": [
+            10,
+            10
+          ],
+          "d_form": "act",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 2
+          },
+          "hi_form": "act",
+          "rows": {
+            "test": 1,
+            "validation": 1
+          },
+          "words_changed": 1
+        },
+        "r8_rule_strong_far_v2_10": {
+          "borderline": [],
+          "clause_tokens": [
+            11,
+            11
+          ],
+          "d_form": "act",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 46
+          },
+          "hi_form": "act",
+          "rows": {
+            "test": 13,
+            "train": 17,
+            "validation": 16
+          },
+          "words_changed": 1
+        },
+        "r8_rule_strong_far_v2_11": {
+          "borderline": [],
+          "clause_tokens": [
+            11,
+            11
+          ],
+          "d_form": "act",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 50
+          },
+          "hi_form": "act",
+          "rows": {
+            "test": 14,
+            "train": 16,
+            "validation": 20
+          },
+          "words_changed": 1
+        },
+        "r8_rule_strong_far_v2_12": {
+          "borderline": [],
+          "clause_tokens": [
+            12,
+            12
+          ],
+          "d_form": "act",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 57
+          },
+          "hi_form": "act",
+          "rows": {
+            "test": 29,
+            "train": 10,
+            "validation": 18
+          },
+          "words_changed": 1
+        },
+        "r8_rule_strong_far_v2_13": {
+          "borderline": [],
+          "clause_tokens": [
+            12,
+            12
+          ],
+          "d_form": "act",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 1
+          },
+          "hi_form": "act",
+          "rows": {
+            "train": 1
+          },
+          "words_changed": 1
+        },
+        "r8_rule_strong_far_v2_15": {
+          "borderline": [],
+          "clause_tokens": [
+            14,
+            14
+          ],
+          "d_form": "act",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 54
+          },
+          "hi_form": "act",
+          "rows": {
+            "test": 26,
+            "train": 16,
+            "validation": 12
+          },
+          "words_changed": 1
+        }
+      },
+      "per_split": {
+        "test": {
+          "clause_hi_minus_d": {
+            "0": 210
+          },
+          "d_forms": {
+            "act": 210
+          },
+          "fallback": 0,
+          "form_mismatch": 0,
+          "full_prompt_hi_minus_d": {
+            "0": 210
+          },
+          "hi_aligned_with_d": 210,
+          "ids": 210,
+          "mirror": 210
+        },
+        "train": {
+          "clause_hi_minus_d": {
+            "0": 200
+          },
+          "d_forms": {
+            "act": 200
+          },
+          "fallback": 0,
+          "form_mismatch": 0,
+          "full_prompt_hi_minus_d": {
+            "0": 200
+          },
+          "hi_aligned_with_d": 200,
+          "ids": 200,
+          "mirror": 200
+        },
+        "validation": {
+          "clause_hi_minus_d": {
+            "0": 200
+          },
+          "d_forms": {
+            "act": 200
+          },
+          "fallback": 0,
+          "form_mismatch": 0,
+          "full_prompt_hi_minus_d": {
+            "0": 200
+          },
+          "hi_aligned_with_d": 200,
+          "ids": 200,
+          "mirror": 200
+        }
+      },
+      "picks": {
+        "ih:mirror": 210,
+        "test:mirror": 210,
+        "train:mirror": 200,
+        "validation:mirror": 200
+      },
+      "problems": [],
+      "rows": {
+        "anchor:D": 200,
+        "fit:HI": 200,
+        "gate:HI": 200,
+        "test:DT": 210,
+        "test:HI": 210,
+        "test:HT": 210,
+        "test:IH": 210
+      },
+      "rows_ablated_pass": 410,
+      "rows_unablated_pass": 1440,
+      "seconds_cpu": 12.4,
+      "task": "far_v2",
+      "test_ids_sha256": "6314d1d8f5277f3968777e4b76c12f926899f1414a5ea1b01d0a265de6c944f9",
+      "tokens": {
+        "acts_turn_max": 23,
+        "full_path_tokens_per_row": 6853.5,
+        "mean_prefix": 100.9,
+        "probe_turn_max": 39
+      }
+    },
+    "sdr_v2": {
+      "checks": {
+        "DT_minus_D_tokens": {
+          "0": 250
+        },
+        "HI_D_aligned": 650,
+        "HT_DT_aligned": 250,
+        "HT_minus_D_tokens": {
+          "0": 250
+        },
+        "IH_I_aligned": 35,
+        "form_mismatch": 0,
+        "true_item_multi_token": 0
+      },
+      "ids": {
+        "fit": 200,
+        "gate": 200,
+        "test": 250,
+        "test_act_form": 35
+      },
+      "ih_pairs": {
+        "invd_sdr_v2_act_00": {
+          "clause_tokens": [
+            10,
+            10
+          ],
+          "frame": "quiz",
+          "full_prompt_diff": {
+            "0": 1
+          },
+          "rows": 1
+        },
+        "invd_sdr_v2_act_01": {
+          "clause_tokens": [
+            10,
+            10
+          ],
+          "frame": "drill",
+          "full_prompt_diff": {
+            "0": 2
+          },
+          "rows": 2
+        },
+        "invd_sdr_v2_act_02": {
+          "clause_tokens": [
+            10,
+            10
+          ],
+          "frame": "drill",
+          "full_prompt_diff": {
+            "0": 1
+          },
+          "rows": 1
+        },
+        "invd_sdr_v2_act_03": {
+          "clause_tokens": [
+            10,
+            10
+          ],
+          "frame": "drill",
+          "full_prompt_diff": {
+            "0": 3
+          },
+          "rows": 3
+        },
+        "invd_sdr_v2_act_04": {
+          "clause_tokens": [
+            11,
+            11
+          ],
+          "frame": "quiz",
+          "full_prompt_diff": {
+            "0": 4
+          },
+          "rows": 4
+        },
+        "invd_sdr_v2_act_05": {
+          "clause_tokens": [
+            11,
+            11
+          ],
+          "frame": "drill",
+          "full_prompt_diff": {
+            "0": 1
+          },
+          "rows": 1
+        },
+        "invd_sdr_v2_act_06": {
+          "clause_tokens": [
+            11,
+            11
+          ],
+          "frame": "game",
+          "full_prompt_diff": {
+            "0": 2
+          },
+          "rows": 2
+        },
+        "invd_sdr_v2_act_07": {
+          "clause_tokens": [
+            11,
+            11
+          ],
+          "frame": "drill",
+          "full_prompt_diff": {
+            "0": 2
+          },
+          "rows": 2
+        },
+        "invd_sdr_v2_act_11": {
+          "clause_tokens": [
+            13,
+            13
+          ],
+          "frame": "quiz",
+          "full_prompt_diff": {
+            "0": 1
+          },
+          "rows": 1
+        },
+        "invd_sdr_v2_act_12": {
+          "clause_tokens": [
+            14,
+            14
+          ],
+          "frame": "quiz",
+          "full_prompt_diff": {
+            "0": 2
+          },
+          "rows": 2
+        },
+        "invd_sdr_v2_act_13": {
+          "clause_tokens": [
+            14,
+            14
+          ],
+          "frame": "drill",
+          "full_prompt_diff": {
+            "0": 1
+          },
+          "rows": 1
+        },
+        "invd_sdr_v2_act_14": {
+          "clause_tokens": [
+            14,
+            14
+          ],
+          "frame": "game",
+          "full_prompt_diff": {
+            "0": 5
+          },
+          "rows": 5
+        },
+        "invd_sdr_v2_act_15": {
+          "clause_tokens": [
+            14,
+            14
+          ],
+          "frame": "quiz",
+          "full_prompt_diff": {
+            "0": 2
+          },
+          "rows": 2
+        },
+        "invd_sdr_v2_act_16": {
+          "clause_tokens": [
+            15,
+            15
+          ],
+          "frame": "quiz",
+          "full_prompt_diff": {
+            "0": 1
+          },
+          "rows": 1
+        },
+        "invd_sdr_v2_act_17": {
+          "clause_tokens": [
+            15,
+            15
+          ],
+          "frame": "drill",
+          "full_prompt_diff": {
+            "0": 4
+          },
+          "rows": 4
+        },
+        "invd_sdr_v2_act_18": {
+          "clause_tokens": [
+            15,
+            15
+          ],
+          "frame": "quiz",
+          "full_prompt_diff": {
+            "0": 2
+          },
+          "rows": 2
+        },
+        "invd_sdr_v2_act_19": {
+          "clause_tokens": [
+            15,
+            15
+          ],
+          "frame": "game",
+          "full_prompt_diff": {
+            "0": 1
+          },
+          "rows": 1
+        }
+      },
+      "pairs": {
+        "r9_rule_unified_sdr_v2_00": {
+          "borderline": [],
+          "clause_tokens": [
+            15,
+            15
+          ],
+          "d_form": "predicate",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 51
+          },
+          "hi_form": "predicate",
+          "rows": {
+            "test": 23,
+            "train": 13,
+            "validation": 15
+          },
+          "words_changed": 2
+        },
+        "r9_rule_unified_sdr_v2_01": {
+          "borderline": [],
+          "clause_tokens": [
+            11,
+            11
+          ],
+          "d_form": "act",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 21
+          },
+          "hi_form": "act",
+          "rows": {
+            "test": 4,
+            "train": 7,
+            "validation": 10
+          },
+          "words_changed": 1
+        },
+        "r9_rule_unified_sdr_v2_02": {
+          "borderline": [],
+          "clause_tokens": [
+            14,
+            14
+          ],
+          "d_form": "act",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 26
+          },
+          "hi_form": "act",
+          "rows": {
+            "test": 10,
+            "train": 4,
+            "validation": 12
+          },
+          "words_changed": 2
+        },
+        "r9_rule_unified_sdr_v2_03": {
+          "borderline": [],
+          "clause_tokens": [
+            15,
+            15
+          ],
+          "d_form": "act",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 21
+          },
+          "hi_form": "act",
+          "rows": {
+            "test": 8,
+            "train": 6,
+            "validation": 7
+          },
+          "words_changed": 2
+        },
+        "r9_rule_unified_sdr_v2_04": {
+          "borderline": [
+            "B1"
+          ],
+          "clause_tokens": [
+            13,
+            13
+          ],
+          "d_form": "other",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 39
+          },
+          "hi_form": "other",
+          "rows": {
+            "test": 17,
+            "train": 10,
+            "validation": 12
+          },
+          "words_changed": 3
+        },
+        "r9_rule_unified_sdr_v2_05": {
+          "borderline": [
+            "B1"
+          ],
+          "clause_tokens": [
+            14,
+            14
+          ],
+          "d_form": "other",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 25
+          },
+          "hi_form": "other",
+          "rows": {
+            "test": 7,
+            "train": 9,
+            "validation": 9
+          },
+          "words_changed": 3
+        },
+        "r9_rule_unified_sdr_v2_06": {
+          "borderline": [],
+          "clause_tokens": [
+            10,
+            10
+          ],
+          "d_form": "act",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 14
+          },
+          "hi_form": "act",
+          "rows": {
+            "test": 7,
+            "train": 1,
+            "validation": 6
+          },
+          "words_changed": 1
+        },
+        "r9_rule_unified_sdr_v2_07": {
+          "borderline": [],
+          "clause_tokens": [
+            11,
+            11
+          ],
+          "d_form": "act",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 13
+          },
+          "hi_form": "act",
+          "rows": {
+            "test": 4,
+            "train": 4,
+            "validation": 5
+          },
+          "words_changed": 1
+        },
+        "r9_rule_unified_sdr_v2_08": {
+          "borderline": [],
+          "clause_tokens": [
+            13,
+            13
+          ],
+          "d_form": "act",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 9
+          },
+          "hi_form": "act",
+          "rows": {
+            "test": 1,
+            "train": 3,
+            "validation": 5
+          },
+          "words_changed": 1
+        },
+        "r9_rule_unified_sdr_v2_09": {
+          "borderline": [],
+          "clause_tokens": [
+            11,
+            11
+          ],
+          "d_form": "act",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 2
+          },
+          "hi_form": "act",
+          "rows": {
+            "test": 1,
+            "validation": 1
+          },
+          "words_changed": 1
+        },
+        "r9_rule_unified_sdr_v2_10": {
+          "borderline": [],
+          "clause_tokens": [
+            14,
+            14
+          ],
+          "d_form": "predicate",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 32
+          },
+          "hi_form": "predicate",
+          "rows": {
+            "test": 11,
+            "train": 9,
+            "validation": 12
+          },
+          "words_changed": 1
+        },
+        "r9_rule_unified_sdr_v2_11": {
+          "borderline": [],
+          "clause_tokens": [
+            12,
+            12
+          ],
+          "d_form": "predicate",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 22
+          },
+          "hi_form": "predicate",
+          "rows": {
+            "test": 8,
+            "train": 8,
+            "validation": 6
+          },
+          "words_changed": 3
+        },
+        "r9_rule_unified_sdr_v2_12": {
+          "borderline": [],
+          "clause_tokens": [
+            10,
+            10
+          ],
+          "d_form": "predicate",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 59
+          },
+          "hi_form": "predicate",
+          "rows": {
+            "test": 21,
+            "train": 19,
+            "validation": 19
+          },
+          "words_changed": 1
+        },
+        "r9_rule_unified_sdr_v2_13": {
+          "borderline": [
+            "B2"
+          ],
+          "clause_tokens": [
+            12,
+            12
+          ],
+          "d_form": "other",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 65
+          },
+          "hi_form": "other",
+          "rows": {
+            "test": 25,
+            "train": 20,
+            "validation": 20
+          },
+          "words_changed": 4
+        },
+        "r9_rule_unified_sdr_v2_14": {
+          "borderline": [],
+          "clause_tokens": [
+            13,
+            13
+          ],
+          "d_form": "predicate",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 32
+          },
+          "hi_form": "predicate",
+          "rows": {
+            "test": 15,
+            "train": 11,
+            "validation": 6
+          },
+          "words_changed": 1
+        },
+        "r9_rule_unified_sdr_v2_15": {
+          "borderline": [
+            "B3"
+          ],
+          "clause_tokens": [
+            13,
+            13
+          ],
+          "d_form": "predicate",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 34
+          },
+          "hi_form": "predicate",
+          "rows": {
+            "test": 11,
+            "train": 17,
+            "validation": 6
+          },
+          "words_changed": 4
+        },
+        "r9_rule_unified_sdr_v2_16": {
+          "borderline": [],
+          "clause_tokens": [
+            11,
+            11
+          ],
+          "d_form": "predicate",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 53
+          },
+          "hi_form": "predicate",
+          "rows": {
+            "test": 20,
+            "train": 18,
+            "validation": 15
+          },
+          "words_changed": 1
+        },
+        "r9_rule_unified_sdr_v2_17": {
+          "borderline": [],
+          "clause_tokens": [
+            12,
+            12
+          ],
+          "d_form": "predicate",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 29
+          },
+          "hi_form": "predicate",
+          "rows": {
+            "test": 13,
+            "train": 10,
+            "validation": 6
+          },
+          "words_changed": 1
+        },
+        "r9_rule_unified_sdr_v2_18": {
+          "borderline": [
+            "B3"
+          ],
+          "clause_tokens": [
+            11,
+            11
+          ],
+          "d_form": "predicate",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 63
+          },
+          "hi_form": "predicate",
+          "rows": {
+            "test": 30,
+            "train": 20,
+            "validation": 13
+          },
+          "words_changed": 3
+        },
+        "r9_rule_unified_sdr_v2_19": {
+          "borderline": [
+            "B3"
+          ],
+          "clause_tokens": [
+            13,
+            13
+          ],
+          "d_form": "predicate",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 40
+          },
+          "hi_form": "predicate",
+          "rows": {
+            "test": 14,
+            "train": 11,
+            "validation": 15
+          },
+          "words_changed": 2
+        }
+      },
+      "per_split": {
+        "test": {
+          "clause_hi_minus_d": {
+            "0": 250
+          },
+          "d_forms": {
+            "act": 35,
+            "other": 49,
+            "predicate": 166
+          },
+          "fallback": 0,
+          "form_mismatch": 0,
+          "full_prompt_hi_minus_d": {
+            "0": 250
+          },
+          "hi_aligned_with_d": 250,
+          "ids": 250,
+          "mirror": 250
+        },
+        "train": {
+          "clause_hi_minus_d": {
+            "0": 200
+          },
+          "d_forms": {
+            "act": 25,
+            "other": 39,
+            "predicate": 136
+          },
+          "fallback": 0,
+          "form_mismatch": 0,
+          "full_prompt_hi_minus_d": {
+            "0": 200
+          },
+          "hi_aligned_with_d": 200,
+          "ids": 200,
+          "mirror": 200
+        },
+        "validation": {
+          "clause_hi_minus_d": {
+            "0": 200
+          },
+          "d_forms": {
+            "act": 46,
+            "other": 41,
+            "predicate": 113
+          },
+          "fallback": 0,
+          "form_mismatch": 0,
+          "full_prompt_hi_minus_d": {
+            "0": 200
+          },
+          "hi_aligned_with_d": 200,
+          "ids": 200,
+          "mirror": 200
+        }
+      },
+      "picks": {
+        "ih:mirror": 35,
+        "test:mirror": 250,
+        "train:mirror": 200,
+        "validation:mirror": 200
+      },
+      "problems": [],
+      "rows": {
+        "anchor:D": 200,
+        "fit:HI": 200,
+        "gate:HI": 200,
+        "test:DT": 250,
+        "test:HI": 250,
+        "test:HT": 250,
+        "test:IH": 35
+      },
+      "rows_ablated_pass": 450,
+      "rows_unablated_pass": 1385,
+      "seconds_cpu": 14.1,
+      "task": "sdr_v2",
+      "test_ids_sha256": "4d32ed193562db6b4619c3139ba5c5bb0af275173d94e38c8eb7a6a8e56843c9",
+      "tokens": {
+        "acts_turn_max": 26,
+        "full_path_tokens_per_row": 7056.3,
+        "mean_prefix": 105.0,
+        "probe_turn_max": 39
+      }
+    },
+    "ser_v2": {
+      "checks": {
+        "DT_minus_D_tokens": {
+          "0": 249
+        },
+        "HI_D_aligned": 649,
+        "HT_DT_aligned": 249,
+        "HT_minus_D_tokens": {
+          "0": 249
+        },
+        "IH_I_aligned": 0,
+        "form_mismatch": 0,
+        "true_item_multi_token": 0
+      },
+      "ids": {
+        "fit": 200,
+        "gate": 200,
+        "test": 249,
+        "test_act_form": 1
+      },
+      "ih_pairs": {},
+      "pairs": {
+        "r9_rule_unified_ser_v2_00": {
+          "borderline": [],
+          "clause_tokens": [
+            13,
+            13
+          ],
+          "d_form": "predicate",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 92
+          },
+          "hi_form": "predicate",
+          "rows": {
+            "test": 32,
+            "train": 30,
+            "validation": 30
+          },
+          "words_changed": 1
+        },
+        "r9_rule_unified_ser_v2_01": {
+          "borderline": [
+            "B2"
+          ],
+          "clause_tokens": [
+            12,
+            12
+          ],
+          "d_form": "other",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 27
+          },
+          "hi_form": "other",
+          "rows": {
+            "test": 13,
+            "train": 5,
+            "validation": 9
+          },
+          "words_changed": 3
+        },
+        "r9_rule_unified_ser_v2_02": {
+          "borderline": [
+            "B1"
+          ],
+          "clause_tokens": [
+            14,
+            14
+          ],
+          "d_form": "other",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 50
+          },
+          "hi_form": "other",
+          "rows": {
+            "test": 24,
+            "train": 14,
+            "validation": 12
+          },
+          "words_changed": 2
+        },
+        "r9_rule_unified_ser_v2_03": {
+          "borderline": [],
+          "clause_tokens": [
+            13,
+            13
+          ],
+          "d_form": "act",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 26
+          },
+          "hi_form": "act",
+          "rows": {
+            "test": 1,
+            "train": 13,
+            "validation": 12
+          },
+          "words_changed": 1
+        },
+        "r9_rule_unified_ser_v2_04": {
+          "borderline": [],
+          "clause_tokens": [
+            9,
+            9
+          ],
+          "d_form": "act",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 7
+          },
+          "hi_form": "act",
+          "rows": {
+            "train": 5,
+            "validation": 2
+          },
+          "words_changed": 1
+        },
+        "r9_rule_unified_ser_v2_06": {
+          "borderline": [],
+          "clause_tokens": [
+            12,
+            12
+          ],
+          "d_form": "act",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 2
+          },
+          "hi_form": "act",
+          "rows": {
+            "train": 1,
+            "validation": 1
+          },
+          "words_changed": 1
+        },
+        "r9_rule_unified_ser_v2_10": {
+          "borderline": [],
+          "clause_tokens": [
+            13,
+            13
+          ],
+          "d_form": "predicate",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 51
+          },
+          "hi_form": "predicate",
+          "rows": {
+            "test": 19,
+            "train": 21,
+            "validation": 11
+          },
+          "words_changed": 2
+        },
+        "r9_rule_unified_ser_v2_11": {
+          "borderline": [],
+          "clause_tokens": [
+            13,
+            13
+          ],
+          "d_form": "predicate",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 22
+          },
+          "hi_form": "predicate",
+          "rows": {
+            "test": 8,
+            "train": 8,
+            "validation": 6
+          },
+          "words_changed": 2
+        },
+        "r9_rule_unified_ser_v2_12": {
+          "borderline": [],
+          "clause_tokens": [
+            13,
+            13
+          ],
+          "d_form": "predicate",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 50
+          },
+          "hi_form": "predicate",
+          "rows": {
+            "test": 15,
+            "train": 16,
+            "validation": 19
+          },
+          "words_changed": 2
+        },
+        "r9_rule_unified_ser_v2_13": {
+          "borderline": [
+            "B2",
+            "B4"
+          ],
+          "clause_tokens": [
+            12,
+            12
+          ],
+          "d_form": "other",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 46
+          },
+          "hi_form": "other",
+          "rows": {
+            "test": 20,
+            "train": 11,
+            "validation": 15
+          },
+          "words_changed": 1
+        },
+        "r9_rule_unified_ser_v2_14": {
+          "borderline": [],
+          "clause_tokens": [
+            12,
+            12
+          ],
+          "d_form": "predicate",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 12
+          },
+          "hi_form": "predicate",
+          "rows": {
+            "test": 6,
+            "train": 2,
+            "validation": 4
+          },
+          "words_changed": 1
+        },
+        "r9_rule_unified_ser_v2_15": {
+          "borderline": [],
+          "clause_tokens": [
+            14,
+            14
+          ],
+          "d_form": "predicate",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 106
+          },
+          "hi_form": "predicate",
+          "rows": {
+            "test": 46,
+            "train": 30,
+            "validation": 30
+          },
+          "words_changed": 1
+        },
+        "r9_rule_unified_ser_v2_16": {
+          "borderline": [],
+          "clause_tokens": [
+            11,
+            11
+          ],
+          "d_form": "predicate",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 21
+          },
+          "hi_form": "predicate",
+          "rows": {
+            "test": 4,
+            "train": 11,
+            "validation": 6
+          },
+          "words_changed": 2
+        },
+        "r9_rule_unified_ser_v2_17": {
+          "borderline": [
+            "B2",
+            "B4"
+          ],
+          "clause_tokens": [
+            13,
+            13
+          ],
+          "d_form": "other",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 49
+          },
+          "hi_form": "other",
+          "rows": {
+            "test": 25,
+            "train": 11,
+            "validation": 13
+          },
+          "words_changed": 1
+        },
+        "r9_rule_unified_ser_v2_18": {
+          "borderline": [],
+          "clause_tokens": [
+            13,
+            13
+          ],
+          "d_form": "predicate",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 47
+          },
+          "hi_form": "predicate",
+          "rows": {
+            "test": 18,
+            "train": 14,
+            "validation": 15
+          },
+          "words_changed": 1
+        },
+        "r9_rule_unified_ser_v2_19": {
+          "borderline": [
+            "B2",
+            "B4"
+          ],
+          "clause_tokens": [
+            12,
+            12
+          ],
+          "d_form": "other",
+          "fallback": 0,
+          "full_prompt_diff": {
+            "0": 41
+          },
+          "hi_form": "other",
+          "rows": {
+            "test": 18,
+            "train": 8,
+            "validation": 15
+          },
+          "words_changed": 1
+        }
+      },
+      "per_split": {
+        "test": {
+          "clause_hi_minus_d": {
+            "0": 249
+          },
+          "d_forms": {
+            "act": 1,
+            "other": 100,
+            "predicate": 148
+          },
+          "fallback": 0,
+          "form_mismatch": 0,
+          "full_prompt_hi_minus_d": {
+            "0": 249
+          },
+          "hi_aligned_with_d": 249,
+          "ids": 249,
+          "mirror": 249
+        },
+        "train": {
+          "clause_hi_minus_d": {
+            "0": 200
+          },
+          "d_forms": {
+            "act": 19,
+            "other": 49,
+            "predicate": 132
+          },
+          "fallback": 0,
+          "form_mismatch": 0,
+          "full_prompt_hi_minus_d": {
+            "0": 200
+          },
+          "hi_aligned_with_d": 200,
+          "ids": 200,
+          "mirror": 200
+        },
+        "validation": {
+          "clause_hi_minus_d": {
+            "0": 200
+          },
+          "d_forms": {
+            "act": 15,
+            "other": 64,
+            "predicate": 121
+          },
+          "fallback": 0,
+          "form_mismatch": 0,
+          "full_prompt_hi_minus_d": {
+            "0": 200
+          },
+          "hi_aligned_with_d": 200,
+          "ids": 200,
+          "mirror": 200
+        }
+      },
+      "picks": {
+        "test:mirror": 249,
+        "train:mirror": 200,
+        "validation:mirror": 200
+      },
+      "problems": [],
+      "rows": {
+        "anchor:D": 200,
+        "fit:HI": 200,
+        "gate:HI": 200,
+        "test:DT": 249,
+        "test:HI": 249,
+        "test:HT": 249
+      },
+      "rows_ablated_pass": 449,
+      "rows_unablated_pass": 1347,
+      "seconds_cpu": 11.6,
+      "task": "ser_v2",
+      "test_ids_sha256": "0a38027438883cdaa5efdfe51be3ca167aa8d1ff610b92b9d7dfbf38c973df12",
+      "tokens": {
+        "acts_turn_max": 29,
+        "full_path_tokens_per_row": 7036.1,
+        "mean_prefix": 104.6,
+        "probe_turn_max": 39
+      }
+    }
+  }
+}
