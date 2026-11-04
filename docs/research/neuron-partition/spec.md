@@ -122,7 +122,7 @@ as a ruling before that run.
   IOI row set the recipe supports (up to 1,000 rows), IOI condition and mean reference only, to report what 100
   rows could resolve. Its result is descriptive and does not alter N1; a follow-up would need its own
   pre-registered bars.
-- **R14 (Tue 3 Nov 2026, 9:55 pm EST, before any draw): pre-registered confirmation test of the size-500 lead.**
+- **R14 (Tue 3 Nov 2026, 8:30 pm EST, before any draw): pre-registered confirmation test of the size-500 lead.**
   Fixed, unchanged inputs: the all-position deception-only class at size 500 (338 neurons, from
   `sets/far_atp_all_c3d7763/far_all_sets_k500_with_nulls.json`) and its 20 matched nulls, as held in
   `outputs/_analyses/neuron-partition/ablation/ioi_resolution_sets.json`. Fresh data, drawn only after this ruling:
