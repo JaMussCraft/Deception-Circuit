@@ -165,3 +165,6 @@ as a ruling before that run.
     N1 and N2 for SER, reported beside FAR's.
   - Budget: (a) to (c) at most 3.5 GPU-hours reserved, within the 20-hour cap; (d) at most 4 more, only after the
     cap is raised. Every outcome is preliminary until an independent recomputation matches.
+- **R16 (Wed 4 Nov 2026, 11:00 am EST, user decision): budget.** The GPU cap of item 7 is raised from 20 to 30
+  reserved GPU-hours and the 36-hour wall-clock stop is removed; at most 3 concurrent GPU jobs still holds. SER
+  (R15 d) runs on GPU under this cap.
