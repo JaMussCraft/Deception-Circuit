@@ -204,14 +204,19 @@ as a ruling before that run.
 - **R20 (Wed 4 Nov 2026, 12:40 pm EST, after the R15 (d) SER cell): SER at size 500 fails N1 on collateral; N2
   is suppression or shared.** On the predicate-naming SER sample (300 D, 300 H, 300 F, 300 I, 300 N; seed 2; 1,000
   IOI rows at seed 2) the SER all-position deception-only class (386 neurons) removes 0.96 of the deception margin
-  under twin (0.73 under mean, rate 1.0), with inversion 0.09 (twin) and 0.20 (mean) and IOI minus 2.7, but honest
+  under twin (0.73 under mean; rate 0.998 under twin and 1.051 under mean, above 1 because ablated H rows turn
+  deceptive), with inversion 0.09 (twin) and 0.20 (mean) and IOI minus 2.7, but honest
   accuracy falls 15.8 points and no-pressure accuracy 6.3 under mean, so the collateral bars fail on the whole
   sample and both halves. N1 fails on SER at size 500; the deception effect transfers but the class is not
   collateral-free. The shared and all-shared classes remove under 0.4 of the margin. The honest-only class (403
   neurons) gives H minus 44.8 and a deceptive-rate fall of 14.0 under mean (null H shift 1.4), so N2 on SER is
   suppression or shared, as on FAR (R18). Any per-layer reading is against Codex A3 (SER layers 5 to 8, 11, 13, 16)
-  per R17 (4). Pending the independent recomputation (review 07) and W10's reading. Bridges-2 job 50213549,
-  3,572 s of 7,200 reserved.
+  per R17 (4); 210 of the 386 class neurons lie in those layers. Confirmed with corrections by the independent
+  recomputation (review 07, 12:55 pm EST: 2,640 quantities match to 2e-16; the rate wording corrected as above).
+  Review 07 adds, descriptively, that 94 of the 95 lost H pairs and all 38 lost F pairs are identity rows, where
+  the honest answer is the other item, while the matched nulls move H by at most 2.5 points; and that on SER no
+  honest-only null reaches the 14.0-point rate fall (null range minus 5.7 to plus 1.5), so review 05's rate
+  caution does not apply here. Bridges-2 job 50213549, 3,572 s of 7,200 reserved.
 - **R21 (Wed 4 Nov 2026, 12:50 pm EST, after the R15 (c) check): the one-neuron interchange check (descriptive).**
   For the top 20 neurons by s_D and the top 20 by s_H of the all-position ranking (36 distinct; 4 appear in both
   lists), single-neuron twin interchange on the seed-2 D and H rows moves the D margin in the direction the
