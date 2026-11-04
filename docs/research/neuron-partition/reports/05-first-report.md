@@ -10,7 +10,9 @@ discrepancy (`../reviews/03-verdict-review.md`). Ruling R13 keeps N1 failed and 
 2. **Method.** Rank all 458,752 down-projection-input neurons by attribution patching summed over every position, cut
    four classes by rule R6, and ablate each against 20 matched random sets under three references
    (`01-w1-scorer-handback.md`).
-3. **Headline, N1.** N1 fails at every set size under the frozen bars, with a near miss at size 500. The deception-only
+3. **Headline, N1, two decisions.** On the original ladder N1 fails at every set size under the frozen bars (R13); a
+   pre-registered confirmation of the size-500 class on fresh data then meets every N1 bar (R14, item 7, reviewed).
+   The ladder's near miss is at size 500. The deception-only
    class of 338 neurons removes 0.813 of the deception margin under twin interchange and 0.724 under mean ablation,
    and fails only the IOI bar, at -6.0 points against 5 on 100 IOI rows
    (`outputs/_analyses/neuron-partition/verdict/far_atp_all_c3d7763/verdict.md`, `02-w2-ablation-handback.md`). An
@@ -28,7 +30,7 @@ discrepancy (`../reviews/03-verdict-review.md`). Ruling R13 keeps N1 failed and 
    0.62 to 0.65 in layers 0 to 9, unlike every other class (`04-w4-partition-handback.md`).
 7. **Confirmation, pre-registered (R14).** On fresh ids and 1,000 fresh IOI rows the same 338-neuron class meets every
    N1 bar under twin and mean, whole and both halves: D removed 0.822 and 0.748, I removed 0.141 and 0.154, IOI -2.7
-   points. N1 passes for this class there (F6, independent review pending); the ladder decision stays failed
+   points. N1 passes for this class there (F6, confirmed by review 04 to zero difference); the ladder decision stays failed
    (`outputs/_analyses/neuron-partition/verdict/confirm_k500-d3d842b/verdict.md`, `08-w8-confirmation-handback.md`).
 
 ## What changed
