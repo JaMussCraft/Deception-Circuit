@@ -201,3 +201,14 @@ as a ruling before that run.
   recomputation (review 06, 12:25 pm EST, all 1,128 quantities within 1e-16; the trend sentence corrected as
   above; the IOI minus 2.7 at sizes 250 and 500 is a coincidence of different losses and gains). Bridges-2 job
   50212883, 3,041 s of 5,400 reserved.
+- **R20 (Wed 4 Nov 2026, 12:40 pm EST, after the R15 (d) SER cell): SER at size 500 fails N1 on collateral; N2
+  is suppression or shared.** On the predicate-naming SER sample (300 D, 300 H, 300 F, 300 I, 300 N; seed 2; 1,000
+  IOI rows at seed 2) the SER all-position deception-only class (386 neurons) removes 0.96 of the deception margin
+  under twin (0.73 under mean, rate 1.0), with inversion 0.09 (twin) and 0.20 (mean) and IOI minus 2.7, but honest
+  accuracy falls 15.8 points and no-pressure accuracy 6.3 under mean, so the collateral bars fail on the whole
+  sample and both halves. N1 fails on SER at size 500; the deception effect transfers but the class is not
+  collateral-free. The shared and all-shared classes remove under 0.4 of the margin. The honest-only class (403
+  neurons) gives H minus 44.8 and a deceptive-rate fall of 14.0 under mean (null H shift 1.4), so N2 on SER is
+  suppression or shared, as on FAR (R18). Any per-layer reading is against Codex A3 (SER layers 5 to 8, 11, 13, 16)
+  per R17 (4). Pending the independent recomputation (review 07) and W10's reading. Bridges-2 job 50213549,
+  3,572 s of 7,200 reserved.
