@@ -1,4 +1,4 @@
-# Report 05: First report on neuron-partition, for the advisor meeting of Wed 4 Nov 2026
+# Report 05: First report on neuron-partition, for the week of Tue 3 Nov 2026 (presented Wed 4 Nov)
 
 Report writer (Claude, Opus), item 8 of `../START.md`. Bare file names are in `reports/`; `../` is the direction.
 
@@ -287,8 +287,9 @@ Cell counts are in `02-w2-ablation-handback.md`; output paths are under `outputs
 ## Open questions
 
 - **The near miss.** The exploratory, not pre-registered (R13) 1,000-row measurement puts the class's IOI cost at
-  about 4 points. Does the advisor read the size-500 class as a lead worth a pre-registered follow-up with a 1,000-row
+  about 4 points. The user's call: is the size-500 class a lead worth a pre-registered follow-up with a 1,000-row
   IOI bar, given that the bars were frozen? Default: N1 stays failed and the class is a descriptive lead (`../spec.md`).
+  A pre-registered confirmation test on fresh ids and a fresh IOI draw (ruling R14) was started the same evening.
 - **Rate or margin (R2).** The bars read the margin effect, and the rate at margin 0.7 sits beside it (`../spec.md`).
   The rate is close to saturated: at the smallest size D-and-I shared removes 0.856 of the D rate but 0.257 of the D
   margin under twin (`outputs/_analyses/neuron-partition/verdict/far_atp_all_c3d7763/verdict.json`). Default: margin.
