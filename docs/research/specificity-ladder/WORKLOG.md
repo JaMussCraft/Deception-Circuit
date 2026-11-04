@@ -5,9 +5,9 @@
 |---|---|
 | State | Paused for usage cap until Fri 6 Nov 11:07 am EST |
 | Directions | 1. Control ladder: Complete and independently audited; tested sets fail specificity. · 2. Matched masks: All eighteen complete and source-audited; functional scoring preparation continues. · 3. Below-head tests: Mask timing failed at its bound; direction preparation and edge readiness continue. |
-| Started / last updated | Sun 1 Nov 2026, 12:59 pm EST / Tue 3 Nov 2026, 7:08 pm EST |
+| Started / last updated | Sun 1 Nov 2026, 12:59 pm EST / Wed 4 Nov 2026, 8:42 am EST |
 | Orchestrator auto-compactions | 11, counted by the compaction hook |
-| Weekly usage, all models | account reads 99%; +14 points this session |
+| Weekly usage, all models | account reads 100%; +15 points this session |
 | Weekly usage, Fable | no Fable reading |
 | Review checkpoints | none yet; first at +16 session points; cadence 16 points; cap pause at 80% |
 | GPU budget | 19.4 of 125 GPU-h actual (34.4 reserved); at most 99 jobs at once; clusters: Delta, Bridges-2 |
@@ -15,7 +15,7 @@
 | Open needs from you | 0 |
 | Transcripts (for audits) | not recorded yet |
 
-**Right now.** Paused at the preserved usage checkpoint. The corrected original-reference CPU run continues; the unstarted H100 timing job is held pending fresh CPU support.
+**Right now.** Paused at one hundred percent weekly usage. The original A3 reference completed; independent audit and candidate comparison remain unfinished. The GPU timing job remains held.
 
 **Terms.** None yet.
 
@@ -265,3 +265,7 @@ Strength is one of: preliminary, reviewed by an independent agent, or final.
 **7:01 pm EST · Corrected metadata candidate passed both supported environments.** The corrected candidate passed all one hundred fifty-eight selected checks in each interpreter. The packet retained the failing regression and added dummy-row coverage. Source fingerprints stayed unchanged during the run. These checks establish fixture equivalence and guard behavior, not a genuine speedup or production admission. The complete original-input CPU reference is now running separately under its reviewed limit.
 **7:01 pm EST · Hold the unstarted GPU job after the actual queue estimate moved.** The actual GPU queue estimate moved beyond the lifetime of its CPU support allocation. Root held the unstarted GPU job, stopped its phase watcher and cancelled the unused CPU support after confirming that no phase request or model execution occurred. The GPU charge remains. Independent review permits fresh CPU support through new immutable bindings and an append-only continuation record, preserving the GPU configuration and all original gates.
 **7:08 pm EST · Cooperative pause at the preserved usage checkpoint.** Live usage reached ninety-nine percent, the checkpoint preserved from before the reboot. The recovery thread has only fourteen points since its new registration, so its native counter refused a checkpoint entry. Root will not alter private counters. New research work is cooperatively paused, all workers are held, and the model producer refuses this usage level. The bounded original-reference CPU job continues; the unstarted GPU job stays held. Await the user’s continuation.
+
+### Wednesday 4 November 2026
+**8:40 am EST · User authorized the remaining usage headroom.** The user explicitly authorized spending the remaining usage point. Live account usage remains ninety-nine percent and the session exception remains active. Resume bounded research work with a cooperative stop at one hundred percent or a service limit, preserving all GPU budgets and scientific gates. Prioritize the completed original-reference audit and the optimized metadata comparison; the GPU timing job remains held.
+**8:41 am EST · Authorized final usage point reached its limit.** The live account meter reached one hundred percent used and zero remaining, returning a pause signal. Stop new research work and hold all workers. The original full-size metadata reference completed successfully, but independent audit remains unfinished and no optimized comparison was launched. The GPU timing job remains held. The conversation has not yet shown a hard service rejection; no inference about further available capacity is made.

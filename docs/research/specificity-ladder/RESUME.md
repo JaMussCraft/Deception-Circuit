@@ -2,7 +2,7 @@
 
 ## Status
 
-Cooperatively paused at the preserved account-99 checkpoint after reboot recovery. Current thread is codex-01a1a2f4 (01a1a2f4-dbc1-7551-bf86-d1d0f99ad6e2). The user activated cadence sixteen and the reset-bound cap exception for this thread. The live reading reached 99 percent on November 3; reset is epoch 1793981261, November 6 at 11:07 am EST. All workers are held. One bounded original-reference CPU job continues; the unstarted GPU job is held. Recheck actual scheduler and usage before resuming.
+Paused at the user-authorized account-100 stop on November 4. Current thread is codex-01a1a2f4 (01a1a2f4-dbc1-7551-bf86-d1d0f99ad6e2). The user activated cadence sixteen and the reset-bound cap exception for this thread. The user authorized the final remaining point on November 4; live usage then reached 100 percent with zero remaining and a pause signal. No hard service rejection was observed. The reset is epoch 1793981261, November 6 at 11:07 am EST. All workers are held. The original-reference CPU job completed; the unstarted GPU job is held. Recheck actual scheduler and usage before resuming.
 
 The new thread registered at account 85, so its native display has fourteen points since registration at account 99. The native checkpoint command refused to record checkpoint one because its new sixteen-point boundary has not crossed. No private counters were changed; the cooperative pause and producer usage gate enforce the preserved boundary. This checkpoint preserves the earlier thread's next account-99 boundary rather than restarting the sixteen-point interval after the reboot. The old thread codex-01a1987e has ten compactions and acknowledged checkpoint five; this thread has one compaction. Target the actual current thread explicitly.
 
@@ -28,9 +28,9 @@ The earlier A1 source remains `5f450dc93dac707af649dee8c8ca60888b2831db`, and A2
 
 ## In-flight jobs
 
-A3 original-reference job 23491516 is RUNNING on Delta, using bimc-delta-cpu/cpu-interactive, four CPUs, 192 GiB and sixty minutes. The actual working directory is W. Packet plan-a3/direction-metadata-optionA-plan/genuine-oracle-cpu-r2 has manifest 21122c2077c367c7ccf9b08f8b865f263b7dcba66bf0480af25e14757973ed4d and config fingerprint 77ec8f936b216bd5cd5a6e0e1945bf0b5e2be8903dc43b1b1cb6594387fc791e. It runs original mode under mgnp, with a 3300-second child limit and fifteen-second kill grace. No automatic retry.
+A3 original-reference job 23491516 COMPLETED on Delta with exit 0:0 after 3203 seconds, using bimc-delta-cpu/cpu-interactive, four CPUs, 192 GiB and sixty minutes. The actual working directory is W. Packet plan-a3/direction-metadata-optionA-plan/genuine-oracle-cpu-r2 has manifest 21122c2077c367c7ccf9b08f8b865f263b7dcba66bf0480af25e14757973ed4d and config fingerprint 77ec8f936b216bd5cd5a6e0e1945bf0b5e2be8903dc43b1b1cb6594387fc791e. It runs original mode under mgnp, with a 3300-second child limit and fifteen-second kill grace. No automatic retry.
 
-The reference output is plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/original-mgnp-r2-02. Only COMPLETE_ORACLE.json after normal child exit and supervisor checks is an acceptable reference. Watcher 50439 lasts at most sixty minutes and must be rearmed after compaction. The prior submission 23491494 failed after eight seconds because root omitted the required working directory; it never constructed the reference. P21 and its distinct output remain preserved.
+The reference output is plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/original-mgnp-r2-02. Only COMPLETE_ORACLE.json after normal child exit and supervisor checks is an acceptable reference. The original watcher is finished; do not rerun this completed reference. The prior submission 23491494 failed after eight seconds because root omitted the required working directory; it never constructed the reference. P21 and its distinct output remain preserved.
 
 Bridges GPU job 50189932 is HELD and unstarted, with reservation r-041 charged one GPU-hour under cis260382p/GPU-shared. Its actual scheduler forecast moved to 9:04 pm EST, beyond the support CPU window. Root held it before any model or phase request, stopped root-watch-phases.py and cancelled unused support CPU job 23488288. No model has started, no bank exists and no phase release was published. Do not run old helper-bindings.json: it references cancelled CPU support.
 
@@ -84,4 +84,11 @@ Keep seeds 42/1/123, FAR/SER Holm 0.05, SDR descriptive, 199 assessment nulls an
 
 ## Open decisions for the user
 
-The current checkpoint requires a continuation before new research work. No new cap increase, model retry or scientific relaxation is requested. Existing usage controls are implemented and active; the pause is the preserved checkpoint. The running original-reference CPU job may finish under its existing bound, and the H100 job stays held until fresh support and its continuation are reviewed.
+The authorized final point is exhausted; stop research work until usable quota returns. No new cap increase, model retry or scientific relaxation is requested. Existing usage controls are implemented and active; the pause is the preserved checkpoint. The original-reference CPU run is complete, and the H100 job stays held until fresh support and its continuation are reviewed.
+
+
+Final-point outcome, November 4:
+
+The completed mgnp reference contains a full 11421127399-byte publisher stream with fingerprint c738a185b9a79ef8873113e63aefa197a820f0a5c117159db055de6f70e0a6c9. Construction took 2339.692 seconds and streaming took 735.192 seconds. The child exited normally with no termination signal; its total recorded wall time was 3194.588 seconds. This establishes a completed reference record, not candidate equivalence or speedup.
+
+Independent audit was restarted but stopped at the authorized 100-percent limit before issuing acceptance. Corrected candidate review also received HOLD. No candidate comparison, new CPU job or model execution was launched during this final-point continuation. Preserve all existing source and resource gates; do not treat the incomplete review as acceptance.
