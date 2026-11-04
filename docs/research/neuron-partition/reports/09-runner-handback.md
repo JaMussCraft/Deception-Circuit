@@ -32,3 +32,13 @@ Addendum: np-n2 (N2 honest-only class, size 2,000, with 20 nulls, seed-3 sample)
 ## Open questions
 
 - The manifest commit differs from the 3486f1a in the job line and ledger. Default: treat the manifest value as the one the run used, and leave the ledger as is.
+
+## Addendum: np-ladder (R15(b), Bridges-2)
+
+- Job id and cluster: 50212883 on Bridges-2, GPU-shared, allocation cis260372p, ledger r-015. The job record tool caps its timeout at 60 minutes, so the 90-minute reservation sits only in the ledger.
+- Slurm state: COMPLETED, 3041 s elapsed against 5400 s reserved.
+- Row counts: 227,136 rows against 227,136 expected, which is 84 sets times 2,704 rows per set.
+- Baseline reproduces: intact IOI accuracy 0.511 against 0.510 in the ladder reference. Self-replay error 0.0 for D and I.
+- Transfer: sha256 of summary.json, rows.jsonl, cells_partial.jsonl and run_manifest.json match on Bridges-2 and Delta. Input and code hashes matched the expected values before submission.
+- Provenance file: `/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/neuron-partition/outputs/_analyses/neuron-partition/ablation/ladder-92fc6fb/run_manifest.json`, commit `d5f6b1750e5b5a770d48b5c44cd4cb2c688236c6`. The manifest commit differs from 92fc6fb in the job name, as in the N2 cell.
+- Verdict: `/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/neuron-partition/outputs/_analyses/neuron-partition/verdict/ladder-92fc6fb/verdict.md`. N1 passes at k 250, 375, 625 and 750 under both references, on the whole sample and both halves.

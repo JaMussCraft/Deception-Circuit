@@ -188,3 +188,11 @@ as a ruling before that run.
   nulls also lower D's rate by at least 12.7 points (null median 9.7), so the deceptive-rate clause of the rule
   does not beat the null band; only the H fall does (every null 0.0). The outcome stands as the rule names it,
   but the evidence that the class is shared rests on the H and F falls and the margin rise, not on the rate fall.
+- **R19 (Wed 4 Nov 2026, 12:15 pm EST, after the R15 (b) ladder): the finer ladder passes.** The all-position
+  deception-only class of c3d7763 at sizes 250, 375, 625 and 750 (152, 243, 424 and 524 neurons after set
+  construction) on the seed-3 sample with the same 1,000-row IOI draw meets every N1 bar under twin and mean on the
+  whole sample and both halves. D removed (margin) 0.81 to 0.82 under twin and 0.69 to 0.78 under mean, rate 1.0
+  everywhere; I removed 0.01 to 0.22 (twin) and 0.13 to 0.18 (mean); null 95th percentile at most 0.066; H and F
+  shift 0.0; IOI shift minus 2.7, 3.2, 1.4 and 0.9 points. The pass is not specific to size 500 but holds from 250
+  to 750, with the deception effect flat and the inversion cost rising with size. Pending the independent
+  recomputation (review 06). Bridges-2 job 50212883, 3,041 s of 5,400 reserved.
