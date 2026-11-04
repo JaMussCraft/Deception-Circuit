@@ -43,8 +43,10 @@ completed).
    reviewed in the WORKLOG, commit the reviews and report 13.
 2. The user decides what follows (options in report 13 section 5): a SER ladder at smaller sizes, an all-forms
    SER run, a FAR ladder above 750, or wrap-up. New runs need a new pre-registered ruling.
-3. Before Bridges-2 goes offline (about Sun 9 Nov 2026): copy the clone's `logs/` entries for jobs 50182995,
-   50183187, 50183194, 50212883 and 50213549 under the primary checkout on Delta.
+3. Done 4 Nov 2026, 1:05 pm EST: the clone's `logs/` entries for jobs 50182995, 50183187, 50183194, 50212883 and
+   50213549 are copied to `outputs/_analyses/neuron-partition/bridges2_logs/` in the worktree (they move to the
+   primary checkout with the other outputs at wrap-up). The ablation outputs were fetched by the runners when each
+   job finished.
 4. Wrap-up when the user says so: merge the branch into main, delete branch and worktree, keep the worktree's
    untracked outputs under the primary checkout, copy the Bridges-2 outputs and logs to Delta.
 
