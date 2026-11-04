@@ -19,6 +19,10 @@ session hook asks for this file; the lead's brief named only the report.
 - **IOI fold-in.** The 1,000-row result is in the report, labelled exploratory, not pre-registered (R13), in a
   paragraph after the IOI resolution reading, the evidence table, "What is NOT done" and open question 1. N1 stays
   failed. The numbers match the results table of hand-back 02 and finding F5 (`02-w2-ablation-handback.md`).
+- **Confirmation fold-in.** A new section "Confirmation test, pre-registered (R14)" sits before How verified. It
+  has a "Review 04 pending" line, the design, the six-row bar table, the IOI significance and both decisions. Summary
+  item 7, the evidence row, the scope of the not-done list and open question 1 were added or updated. The N1
+  decision text is unchanged (`08-w8-confirmation-handback.md`).
 - **Length.** The report is under 300 lines. To fit, the conditions and baseline tables became prose, the test table
   became one paragraph, and the zero table keeps only its D-only rows.
 
