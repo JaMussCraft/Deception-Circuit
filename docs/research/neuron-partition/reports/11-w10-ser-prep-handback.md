@@ -358,3 +358,23 @@ Bridges-2 ablation, twin and mean references, `--ioi-rows 1000 --ioi-seed 2`, wi
   the ablation and verdict lines.
 - **Open questions.** The clause-form ruling, Open question 1 above. Default: predicate. The ablation line will
   carry `--max-length 136`, Open question 2, unless team-lead rules otherwise.
+
+## Addendum 2: R17 and line (a) handed off (Wed 4 Nov 2026)
+
+- **What changed.** The team lead committed the four files at `a41752a8f88b9990a6a74d84bfa3891d78b32705` with
+  ruling R17. R17 sets predicate-only clause form, `--max-length 136` on SER cells, and the full 84-set cell at k 500
+  with nulls and a 2-hour reservation. The verdict notes A3 overlap per layer. Open questions 1 to 4 are closed by
+  it. Line (a) went to r2-runner with `<C>=a41752a` and `<form>=predicate`. The handoff lists the ten expected
+  directories and their row counts (253, 201, 253, 201, 127, 97, 127, 126, 104, 126). It also lists the score keys
+  (`atp_all_*`, `rev_atp_all_*`, each [32, 14336] finite), the manifest commit and the mean-m sanity values.
+- **How verified.** The branch ref `refs/heads/neuron-partition` reads `a41752a8…2705`, by reading the ref file, not
+  running git. The output layout was checked against FAR's `far_v2_dh_train+validation_c3d7763_rev/`: its
+  `scores.pt`, `rows.json` and `run_manifest.json` keys.
+- **Execution evidence.** Not applicable: no runs by W10. The ranking job is r2-runner's and has not reported.
+- **What is NOT done.** The partition (b) waits on the ranking, and the ablation line (c) and the verdict wait on
+  the partition. Line (c) will use `rsync -rl --checksum` through b2dtn for these: the SER pools,
+  `pools_manifest_ser.json`, `ser_predicate_test_sample_seed2.json` and `sets/ser_predicate_atp_all_a41752a/`. It
+  will carry `--references twin,mean --ioi-rows 1000 --ioi-seed 2 --max-length 136`.
+- **Open questions.** Is the Bridges-2 clone synced to `a41752a`? That needs the branch pushed, which is the team
+  lead's job. Default: the ablation code SER uses is unchanged since FAR's cells, so a clone at an earlier commit runs
+  the same code. However, its manifest would then name the older commit, and I will ask team-lead before handing (c).
