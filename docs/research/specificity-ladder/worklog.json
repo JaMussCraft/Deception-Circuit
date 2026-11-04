@@ -1,13 +1,240 @@
 {
   "budgets": {
-    "gpu": "0.0 of 125 GPU-h actual (0.0 reserved)",
+    "gpu": "19.4 of 125 GPU-h actual (34.4 reserved)",
     "openrouter": "$0.00 of $10.00 cap"
   },
-  "directions": [],
-  "findings": [],
-  "incidents": [],
-  "needs": [],
-  "right_now": "The direction was just created from the templates; no work has started yet.",
+  "directions": [
+    {
+      "name": "Control ladder",
+      "state": "Complete and independently audited; tested sets fail specificity."
+    },
+    {
+      "name": "Matched masks",
+      "state": "All eighteen complete and source-audited; functional scoring preparation continues."
+    },
+    {
+      "name": "Below-head tests",
+      "state": "Mask timing failed at its bound; direction preparation and edge readiness continue."
+    }
+  ],
+  "findings": [
+    {
+      "at": "2026-11-01T16:52:22-05:00",
+      "evidence": "docs/research/specificity-ladder/reports/34-full-control-audit-handback.md",
+      "id": "F1",
+      "plain": "The transparent user-turn control passes the required pool-size gate at the original margin: fabrication retains 891 of 1000 test identities and emphasis retains 835 of 1000. Neither fallback is needed.",
+      "setup": "Both designation streams must choose the requested opposite answer with the required native margin. Neutral-baseline competence stays diagnostic; these pool counts do not establish causal specificity.",
+      "strength": "reviewed"
+    },
+    {
+      "at": "2026-11-01T22:48:50-05:00",
+      "evidence": "docs/research/specificity-ladder/reports/98-full-a1-audit-handback.md",
+      "id": "F2",
+      "plain": "The tested fabrication and emphasis deciding sets fail deception specificity. Primary interventions remove 23.9 and 23.5 percent of their pressure effects, while removing 31.6 and 30.4 percent of transparent inversion and causing substantial honest collateral harm.",
+      "setup": "Each task uses 100 fixed assessment identities in both streams, paired donor interchange and complete utility floors. Independent artifact and numerical audit passed. The conclusion concerns these tested sets; the mover-excluded contrast collapsed because no candidate passed its frozen screen.",
+      "strength": "reviewed"
+    }
+  ],
+  "incidents": [
+    {
+      "at": "2026-11-01T14:11:26-05:00",
+      "effect": "Cadence setup needs a human command, and status inspection must use the dedicated tool.",
+      "fix": "The session is registered; preparation continues under the existing checkpoint interval.",
+      "id": "P1",
+      "what": "The hook rejected read-only help and record inspection commands."
+    },
+    {
+      "at": "2026-11-02T03:21:57-05:00",
+      "effect": "Completed measurement bundles and logs survived, but proof reconciliation and the remaining joined verification did not finish. A shared memory-limit event is consistent with the termination; exact attribution is unconfirmed.",
+      "fix": "Preserve the evidence and repair repeated proof processing with bounded immutable reuse, alongside the independently identified authority defects, before another long run.",
+      "id": "P2",
+      "what": "The full-count CPU verification process was killed after native timing measurements completed."
+    },
+    {
+      "at": "2026-11-02T09:03:26-05:00",
+      "effect": "The cost-accounting correction remains unapplied, blocking full runtime acceptance and below-head production work.",
+      "fix": "Preserved the exact reviewable patch, opened an explicit user authorization request and completed unaffected verification without bypassing the rejection.",
+      "id": "P3",
+      "what": "Automatic approval review rejected the production timing-instrumentation patch twice."
+    },
+    {
+      "at": "2026-11-02T13:18:07-05:00",
+      "effect": "Earlier preparation, fitting, validation and selection outputs remain complete, but the remaining direction verification is unfinished. No new memory-limit event was observed.",
+      "fix": "Preserved the failed attempt and stopped automatic continuation. A bounded read-only startup diagnostic will identify where time is spent before another case is attempted.",
+      "id": "P4",
+      "what": "The first selected-direction timing chunk reached its configured CPU timeout before completing a case."
+    },
+    {
+      "at": "2026-11-02T13:48:19-05:00",
+      "effect": "Two local checks took tens of seconds each, while the pilot repeats that check over a thousand times. The still-pending job is held and has used no GPU time; its original reservation remains charged.",
+      "fix": "Preserve the original source and admission, diagnose the repeated work, and require a practical cost justification before release. Continue independent edge preparation and direction verification.",
+      "id": "P5",
+      "what": "A source-validation cost concern was identified after the mask timing pilot was reserved and queued."
+    },
+    {
+      "at": "2026-11-02T14:01:59-05:00",
+      "effect": "The attempt ended before case completion. The core trace implicates the diagnostic thread; it does not establish a numerical model failure. Earlier completed stages remain preserved.",
+      "fix": "Preserve the fault evidence, remove only periodic traceback dumping and attempt one case on unchanged source with passive timing and memory logs. Stop on any further failure.",
+      "id": "P6",
+      "what": "The instrumented single-case direction check crashed inside the added periodic traceback logger."
+    },
+    {
+      "at": "2026-11-02T15:56:15-05:00",
+      "effect": "The timing pilot was briefly released, then held again while still pending with no GPU execution. Its original reservation remains charged.",
+      "fix": "Preserved the scheduler response, corrected the parser without weakening resource checks, and required scoped review before releasing the same job.",
+      "id": "P7",
+      "what": "The remote scheduler uses a different resource-field name than the local monitor expected; an allocation check raised an error."
+    },
+    {
+      "at": "2026-11-02T16:38:03-05:00",
+      "effect": "The fully prepared replacement jobs and original jobs remain held; none was cancelled and no replacement GPU work began.",
+      "fix": "Completed read-only allocation and accounting checks, requested explicit cancellation approval, and continued unaffected below-head work and training audits.",
+      "id": "P8",
+      "what": "Automatic approval review rejected cancelling the six unstarted Delta originals because trying the second cluster did not explicitly authorize cancellation."
+    },
+    {
+      "at": "2026-11-02T21:05:13-05:00",
+      "effect": "Existing jobs continued successfully, but the next review did not start until the user asked whether progress was continuing.",
+      "fix": "Submitted the prepared CPU review, resumed native batch planning and began retrieving completed training artifacts. Continue coordination through the active phase instead of leaving a ready submission idle.",
+      "id": "P9",
+      "what": "The orchestrator ended its response while an independent review was waiting for a root-owned job submission."
+    },
+    {
+      "at": "2026-11-03T07:44:49-05:00",
+      "effect": "Native verification remained at thirty-two of sixty-three cases despite an executable next-batch proposal and sufficient usage budget.",
+      "fix": "Submitted the prepared batch and resumed the reviews. Prepare the final reviewed batch with a success dependency and explicit parent checks so it can advance without another chat turn; stop on failures rather than retry automatically.",
+      "id": "P10",
+      "what": "The submitted jobs completed overnight, but the orchestrator did not consume the handbacks and submit the prepared continuation until the user returned."
+    },
+    {
+      "at": "2026-11-03T09:50:23-05:00",
+      "effect": "All independent probes failed before reaching the new policy logic; no source acceptance or model admission was granted.",
+      "fix": "Preserved the failed attempt and authorized only isolated test discovery plus explicit module-origin assertions in a new review packet.",
+      "id": "P11",
+      "what": "The independent review harness imported old worktree modules instead of the frozen candidate."
+    },
+    {
+      "at": "2026-11-03T12:00:45-05:00",
+      "effect": "Preflight failed before source and bank validation or any model execution. No GPU reservation was created.",
+      "fix": "Preserved the failed packet and narrowed the correction to the external check, retaining actual artifact and live-source validation. Independent review will check the corrected packet before a new CPU preflight.",
+      "id": "P12",
+      "what": "The full-scoring CPU preflight accessed an injection flag that the owning parser does not provide."
+    },
+    {
+      "at": "2026-11-03T13:54:21-05:00",
+      "effect": "All five selected tests failed during setup before reaching the intended contract assertions; no repair or model execution occurred.",
+      "fix": "Preserved the failed CPU evidence and authorized copying the required original files into the fixture, followed by a separate bounded regression run. Production source remains unchanged.",
+      "id": "P13",
+      "what": "The first catalogue-binding regression fixture omitted source files required by the real selection reader."
+    },
+    {
+      "at": "2026-11-03T15:10:38-05:00",
+      "effect": "Pipeline tests passed in the first interpreter, but comparison setup failed before its assertions and the second interpreter did not run.",
+      "fix": "Preserved the failed run. Diagnose and restore the exact original fixture input, then use a separate test packet. Independent review remains pending; no source acceptance or model execution is claimed.",
+      "id": "P14",
+      "what": "The complete A2 test packet omitted an authentic timing-config dependency used by the existing comparison fixture."
+    },
+    {
+      "at": "2026-11-03T15:12:35-05:00",
+      "effect": "Twenty-eight independent cases passed, while three failed before their target assertions; the second interpreter did not run.",
+      "fix": "Preserved the failed evidence and requested a complete helper-dependency check plus exact source-file copies in a separate review fixture. Candidate source remains unchanged and acceptance stays pending.",
+      "id": "P15",
+      "what": "The independent review fixture omitted genuine source files needed by completed-stage manifest hashing."
+    },
+    {
+      "at": "2026-11-03T16:05:12-05:00",
+      "effect": "The prepared Bridges validation packet waited for corrections while the other research work continued.",
+      "fix": "The reviewer restarted the worker with an explicit follow-up task. Future action requests to completed workers must use the follow-up mechanism rather than a queued message.",
+      "id": "P16",
+      "what": "Operational review corrections were sent to a worker that had already ended its turn, so the messages did not restart its work."
+    },
+    {
+      "at": "2026-11-03T16:34:40-05:00",
+      "effect": "Bridges owning validation stopped on a missing original no-pressure dataset config after its release and source checks. No model loaded or GPU reservation was added.",
+      "fix": "Preserved the failed CPU evidence. Prepare a complete read-trace supplement anchored to the actual reader directory, then transfer and verify the missing original inputs without changing source or receipts.",
+      "id": "P17",
+      "what": "The input-transfer collector discarded relative file paths, including keys in source-hash dictionaries."
+    },
+    {
+      "at": "2026-11-03T17:10:35-05:00",
+      "effect": "The renewed Bridges validation stopped without a root release or model execution; the stale release producer refused publication.",
+      "fix": "Preserve the failed attempt and run one distinct CPU validation under the unchanged reviewed packet, keeping root available for the fresh release. No lease extension or automatic retry is introduced.",
+      "id": "P18",
+      "what": "Root compacted after submitting CPU validation and recovered after its finite release window had expired."
+    },
+    {
+      "at": "2026-11-03T17:18:00-05:00",
+      "effect": "Bridges CPU validation entered successfully but stopped before model execution on the missing input. The accepted supplement did not establish complete transfer closure.",
+      "fix": "Preserve the failed attempt and independently inspect all exclusion rules against actual read traces and source-hash dictionaries. Keep GPU admission stopped until the complete input closure is demonstrated.",
+      "id": "P19",
+      "what": "The corrected input supplement still omitted an original dataset state file required by the owning source validator."
+    },
+    {
+      "at": "2026-11-03T17:31:13-05:00",
+      "effect": "The release helper rejected the changed fingerprint before any new CPU submission or model admission.",
+      "fix": "Recovered the exact originally reviewed bytes, checked their original fingerprint, and froze a separate root-owned copy. The next helper references that immutable copy; historical transfer evidence remains unchanged.",
+      "id": "P20",
+      "what": "The input-audit author added descriptive count fields after root had bound the proof fingerprint."
+    },
+    {
+      "at": "2026-11-03T18:56:52-05:00",
+      "effect": "The allocation guard stopped the CPU job before reference construction began; no source or model work occurred.",
+      "fix": "Preserve the failed submission and inspect all allocation requirements. A distinct corrected submission must set the actual worktree directory explicitly while retaining the same reviewed packet and resource limits.",
+      "id": "P21",
+      "what": "Root omitted the required working directory from the full-size reference submission."
+    }
+  ],
+  "needs": [
+    {
+      "answer": "The user applied the targeted cadence command to this Codex session. The temporary interval ends at the observed weekly reset; returning to the original interval also requires a human command.",
+      "answered_at": "2026-11-01T14:18:50-05:00",
+      "at": "2026-11-01T14:10:50-05:00",
+      "default": "Keep the enforced cadence until the user changes it; continue preparation within the existing budget.",
+      "id": "N1",
+      "text": "The requested temporary checkpoint cadence requires a human command, and its expiry needs clarification because the live reset is later than expected."
+    },
+    {
+      "answer": "The prescribed worker model became available on retry. Independent review is running on the required model; no fallback model change or user decision is needed.",
+      "answered_at": "2026-11-02T02:16:25-05:00",
+      "at": "2026-11-02T02:04:52-05:00",
+      "default": "Keep the prescribed model and retry after a backoff while monitoring existing training jobs.",
+      "id": "N2",
+      "text": "The prescribed worker model has rejected repeated review launches as at capacity. May the pending work try the previous-generation Sol model, or should it continue waiting for the prescribed model?"
+    },
+    {
+      "answer": "The user explicitly approved the concrete production timing-instrumentation patch. Apply the reviewed proposal and continue affected verification and independent review within the existing research scope and caps.",
+      "answered_at": "2026-11-02T09:23:03-05:00",
+      "at": "2026-11-02T08:45:45-05:00",
+      "default": "Keep the patch unapplied and continue unaffected harness verification.",
+      "id": "N3",
+      "text": "May the proposed production timing instrumentation be applied to measure evidence-validation and serialization overhead? Automatic approval review rejected it twice and requires explicit user authorization. The reviewable patch preserves scientific counts and public interfaces and adds no model forwards."
+    },
+    {
+      "answer": "The user explicitly approved cancelling the six unstarted Delta originals and running their reviewed replacements on Bridges-2. Recheck current state and carry out the approved migration within the existing caps.",
+      "answered_at": "2026-11-02T18:06:38-05:00",
+      "at": "2026-11-02T16:38:02-05:00",
+      "default": "Keep both groups held and continue independent below-head work until the user decides.",
+      "id": "N4",
+      "text": "May the six still-unstarted self-doubt training jobs on Delta be cancelled and their reviewed Bridges-2 replacements released? Automatic approval review requires explicit cancellation authorization; all replacements and accounting are prepared."
+    },
+    {
+      "answer": "The user approved cancelling the unstarted old mask job while retaining its charge and transferring three-quarters of a GPU-hour from contingency for exactly one replacement forty-five-minute H200 timing attempt. Total below-head budget stays forty GPU-hours. The synchronized budget amendment and new source-bound admission must pass review before launch; no automatic retry or reduced controls.",
+      "answered_at": "2026-11-03T08:50:42-05:00",
+      "at": "2026-11-03T08:30:54-05:00",
+      "default": "Keep the original job held and original caps enforced; continue independent direction verification and planned training-mask analysis.",
+      "id": "N5",
+      "text": "May we cancel the unstarted old mask pilot, retain its charge, and transfer three-quarters of a GPU-hour from existing contingency for exactly one replacement forty-five-minute timing attempt? This raises the internal pilot ceiling while keeping the total below-head budget unchanged."
+    },
+    {
+      "answer": "The user applied the sixteen-point cadence and reset-bound cap exception to the recovery thread and continued. Root verified both settings on the actual current thread; resume saved CPU work without repeating completed jobs.",
+      "answered_at": "2026-11-03T14:58:01-05:00",
+      "at": "2026-11-03T14:55:59-05:00",
+      "default": "Keep workers held and preserve the prepared CPU packets until the current hook permits continuation.",
+      "id": "N6",
+      "text": "Please apply the already authorized sixteen-point cadence and temporary reset-bound cap exception to this new recovery thread using the targeted human commands in chat. The previous settings remain on the old thread."
+    }
+  ],
+  "right_now": "Paused at the preserved usage checkpoint. The corrected original-reference CPU run continues; the unstarted H100 timing job is held pending fresh CPU support.",
   "schema": 1,
   "state": "Running",
   "terms": [],

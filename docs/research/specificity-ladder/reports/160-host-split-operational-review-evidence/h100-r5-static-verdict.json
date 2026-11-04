@@ -1,0 +1,39 @@
+{
+  "verdict": "PASS_STATIC_PROSPECTIVE_H100_R5_60MIN_CONTRACT_ONLY",
+  "manifest_sha256": "661d16c5f38149b4d258fa372472dd5aab57cd0afe0a131aa6b5683b735657bc",
+  "source_commit": "50e947bb852613e3a270082651f2bd1b7bb0c525",
+  "resource_proposal": {
+    "minutes": 60,
+    "gpus": 1,
+    "cpus": 4,
+    "memory_GiB": 64,
+    "canonical_GPU_hours": 1.0,
+    "exact_GPU_seconds": 3600,
+    "prior_preserved_unlaunched_minutes": 50
+  },
+  "resource_basis": {
+    "component_seconds": 3423.4381539297756,
+    "additional_buffer_seconds": 176.56184607022442,
+    "completion_guarantee": false
+  },
+  "checks": [
+    "allmember/source/capreferencehashes verified",
+    "resourcebasis arithmetic verified",
+    "R4diff onlyprospective envelope/allocation/ledgerrow/endceiling/resourcebasis",
+    "allnativecontrols/floor1950/finish300/distinctfresh300sreleases unchanged",
+    "exactphase/totalallchargecaps andowninground4normalizer unchanged",
+    "oldpackets/reservations untouched, nonewcap/refund/runningjobextension"
+  ],
+  "actual_admission": false,
+  "pending": [
+    "renewedBridgeCPUowningPASS",
+    "standingCPUbindsR5SHA beforeREADY, norunningR4retarget",
+    "actualnew60minjob/canonical1.0row/source/input/cache/proof/config/placement/completeimmutablemapping",
+    "actualnewDeltaowningCPUproofbeforeeachstage androotliveledger/stableprotectiontransfer/releases"
+  ],
+  "limitations": [
+    "failedcontext313.1697s is orientation, not completedBridgeupperbound",
+    "phasepublicationorientation60s doesnotextend hardremote300swait or standingCPU270swindow",
+    "fixedfloor permitsBANK_ONLY ifinsufficientremainingtime; no completionforecast/retry"
+  ]
+}

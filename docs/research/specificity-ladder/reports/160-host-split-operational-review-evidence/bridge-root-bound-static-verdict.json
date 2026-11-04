@@ -1,0 +1,34 @@
+{
+  "verdict": "PASS_STATIC_ROOT_BOUND_BRIDGES_CPU_PRE_SUBMISSION_ONLY",
+  "config_sha256": "524fd6466be3aa844e5fae4d0a20bb96827e318155aac3a8b6c2edc6feddb9b8",
+  "validator_parameters_sha256": "54d6e5ca94aa1a21be515e1c72f7927c36833c8a28903025d76eb3dd9f7833fe",
+  "packet_manifest_sha256": "09aab7c9c5ad457dba833903e446929dee3ee8d0242963edef401eb3bcebc2d0",
+  "source_commit": "50e947bb852613e3a270082651f2bd1b7bb0c525",
+  "groups_sha256": "c3095b10aac09a23ee35e4620402581b0407623d1e111a2407a691f60f599de4",
+  "resources": {
+    "account": "cis260361p",
+    "qos": "rm",
+    "partition": "RM-shared",
+    "cpus": 5,
+    "memory_GiB": 8,
+    "minutes": 15,
+    "gpus": 0
+  },
+  "checks": [
+    "allthreeactualacceptedsource/prooflocalcopies matchremoteSHArefs",
+    "actualDeltaG3readinessproof matches exactsource and groupsbytes",
+    "rootmap equalsaccepted511sourcesnapshot",
+    "fouractualcurrentphysicalcataloguehashes matchboundconfig",
+    "elevenliteralnamespacealiases matchDeltaidentities",
+    "source/grader/scientific owningchecks and no-secondfreeze validator remain unchanged",
+    "distinctnestedmounttarget createdempty byhostsupervisor",
+    "dynamicallocation andvalidationoutput filledonce bysupervisor"
+  ],
+  "dynamic_release_required": [
+    "actualREADYjob/allocation/SIF/source/G3/proposal/config/parameter bindings",
+    "freshactualDelta owningpreflight stablecapture/transfer/actualremotehash/Delta-reread",
+    "atomicphase-specificrootrelease and postactivationfreshentryfacts"
+  ],
+  "actual_execution_observed": false,
+  "no_model_or_GPU_authority": true
+}

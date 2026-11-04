@@ -1,0 +1,183 @@
+--- baseline/component_analysis/a2_pipeline.py
++++ candidate/component_analysis/a2_pipeline.py
+@@ -9,6 +9,8 @@
+ 
+ import argparse
+ import copy
++import datetime
++import hashlib
+ import itertools
+ import json
+ import os
+@@ -1098,6 +1100,127 @@
+     )
+ 
+ 
++_CATALOGUE_KIND = "a2_specificity_catalogue_binding_v1"
++_FOREIGN_FIELDS = frozenset((
++    "id", "title", "status", "summary", "claimed_by", "claimed_at", "dir",
++    "updated", "status_source", "branch", "worktree", "spec", "resume",
++    "worklog", "state", "ledger", "parent_findings", "do_not_touch",
++    "archive", "legacy_scratch", "frozen_grader_sha256",
++))
++
++
++def _catalogue_canonical(value):
++    # JSON text preserves bool/int/float distinctions that Python equality loses.
++    return json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False)
++
++
++def _catalogue_digest(value):
++    return hashlib.sha256(_catalogue_canonical(value).encode("utf-8")).hexdigest()
++
++
++def _catalogue_routes():
++    # Keep lexical routes: resolving symlinks would erase an original guard site.
++    return {str(root / "docs/research/directions.json") for root in (a1.PRIMARY, a1.REPO)}
++
++
++def _catalogue_provenance(value):
++    require(isinstance(value, dict) and set(value) == _catalogue_routes(),
++            "grader catalogue route drift")
++    require(all(isinstance(v, str) and re.fullmatch("[0-9a-f]{64}", v)
++                for v in value.values()), "invalid grader catalogue provenance")
++
++
++def _catalogue_pairs(pairs):
++    result = {}
++    for key, value in pairs:
++        require(key not in result, "duplicate grader catalogue JSON key")
++        result[key] = value
++    return result
++
++
++def _catalogue_nonfinite(value):
++    raise ValueError("nonfinite grader catalogue JSON: " + value)
++
++
++def _observe_grader_catalogue():
++    # Always retain the original actual source hash and current own-pin checks.
++    provenance = a1.grader_registry()
++    _catalogue_provenance(provenance)
++    routes = {}
++    for path in sorted(provenance):
++        raw = Path(path).read_bytes()
++        require(hashlib.sha256(raw).hexdigest() == provenance[path],
++                "grader catalogue same-buffer hash mismatch")
++        data = json.loads(raw, object_pairs_hook=_catalogue_pairs,
++                          parse_constant=_catalogue_nonfinite)
++        require(isinstance(data, dict), "invalid grader catalogue object")
++        _catalogue_canonical(data)
++        updated = data.get("updated")
++        require(isinstance(updated, str) and
++                re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", updated),
++                "invalid grader catalogue updated date")
++        datetime.date.fromisoformat(updated)
++        rows = data.get("directions")
++        require(isinstance(rows, list) and all(isinstance(r, dict) for r in rows),
++                "invalid grader catalogue rows")
++        own = [r for r in rows if r.get("id") == "specificity-ladder"]
++        require(len(own) == 1 and own[0].get("frozen_grader_sha256") == a1.GRADER,
++                "missing/duplicate/stale own grader entry")
++        foreign = []
++        for row in rows:
++            if row.get("id") == "specificity-ladder":
++                continue
++            require(set(row) <= _FOREIGN_FIELDS, "unknown foreign catalogue field")
++            require(isinstance(row.get("id"), str) and row["id"],
++                    "invalid foreign catalogue identity")
++            declarations = {}
++            for key in ("do_not_touch", "archive", "legacy_scratch"):
++                if key in row:
++                    require(isinstance(row[key], list) and
++                            all(isinstance(v, str) for v in row[key]),
++                            "invalid foreign catalogue path declaration")
++                    if row[key]:
++                        declarations[key] = row[key]
++            pin = row.get("frozen_grader_sha256")
++            require(pin is None or (isinstance(pin, str) and
++                    re.fullmatch("[0-9a-f]{64}", pin)),
++                    "invalid foreign catalogue grader pin")
++            if pin is not None:
++                declarations["frozen_grader_sha256"] = pin
++            if declarations:
++                foreign.append(dict(id=row["id"], declarations=declarations))
++        # Sorted list is a multiset: retain duplicate rows and declaration values.
++        record = dict(own_entry=own[0],
++                      foreign_declarations=sorted(foreign, key=_catalogue_canonical),
++                      top={k: v for k, v in data.items() if k not in ("directions", "updated")})
++        record["sha256"] = _catalogue_digest(record)
++        routes[path] = record
++    binding = dict(kind=_CATALOGUE_KIND, routes=routes)
++    # Reject nonfinite values anywhere, including nonauthoritative metadata.
++    # Capture a separate JSON object, never a mutable decoded-data alias.
++    return copy.deepcopy(provenance), json.loads(_catalogue_canonical(binding))
++
++
++def _validate_grader_catalogue(receipt):
++    current_provenance, current = _observe_grader_catalogue()
++    _catalogue_provenance(receipt.get("grader_registry"))
++    frozen = receipt.get("grader_binding")
++    require(isinstance(frozen, dict) and set(frozen) == {"kind", "routes"}
++            and frozen.get("kind") == _CATALOGUE_KIND
++            and isinstance(frozen.get("routes"), dict)
++            and set(frozen["routes"]) == set(current_provenance),
++            "missing/invalid A2 grader binding")
++    for record in frozen["routes"].values():
++        require(isinstance(record, dict) and
++                set(record) == {"own_entry", "foreign_declarations", "top", "sha256"}
++                and record["sha256"] == _catalogue_digest(
++                    {k: v for k, v in record.items() if k != "sha256"}),
++                "invalid A2 grader binding digest")
++    require(_catalogue_canonical(frozen) == _catalogue_canonical(current),
++            "A2 grader catalogue binding drift")
++    return copy.deepcopy(receipt["grader_registry"]), copy.deepcopy(frozen)
++
++
+ def _validate_live(args, receipt, prepared):
+     validate_receipt(receipt, prepared)
+     require(receipt.get("execution_commit") == args.commit, "A2 execution commit drift")
+@@ -1118,13 +1241,11 @@
+         == a1.utility_registries(args, prepared["utility"]),
+         "protected registry snapshot drift",
+     )
+-    require(
+-        receipt["grader_registry"] == a1.grader_registry(),
+-        "grader registry snapshot drift",
+-    )
++    _validate_grader_catalogue(receipt)
+ 
+ 
+ def _manifest(args, receipt, payload):
++    provenance, binding = _validate_grader_catalogue(receipt)
+     return dict(
+         kind="a2_" + args.stage,
+         execution_commit=args.commit,
+@@ -1136,7 +1257,8 @@
+         source_artifacts=receipt["file_references"],
+         registry_hashes=receipt["registry_hashes"],
+         utility_registry_hashes=receipt["utility_registry_hashes"],
+-        grader_registry=a1.grader_registry(),
++        grader_registry=provenance,
++        grader_binding=binding,
+         model_identity=receipt["model_identity"],
+         execution=payload.get("execution_provenance"),
+         payload_sha256=hash_content(payload),
+@@ -1236,6 +1358,7 @@
+         if args.independent_donors:
+             receipt["operations"].append("independent_resample")
+             receipt["independent_donor_seeds"] = [101, 102, 103]
++        provenance, binding = _observe_grader_catalogue()
+         receipt.update(
+             execution_commit=args.commit,
+             runtime_code_hashes=runtime_hashes(),
+@@ -1251,7 +1374,8 @@
+             },
+             registry_hashes=a1.registries(args, prepared["rows"]),
+             utility_registry_hashes=a1.utility_registries(args, prepared["utility"]),
+-            grader_registry=a1.grader_registry(),
++            grader_registry=provenance,
++            grader_binding=binding,
+         )
+         receipt["receipt_sha256"] = hash_content(
+             {k: v for k, v in receipt.items() if k != "receipt_sha256"}

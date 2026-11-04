@@ -1,0 +1,83 @@
+{
+  "baseline": {
+    "job_id": "23478850",
+    "cluster": "delta",
+    "expected_failures_each_interpreter": 5,
+    "source_unchanged": true,
+    "mgnp": {
+      "pytest_exit": 1,
+      "actual_expected_call_failures": 5
+    },
+    "base": {
+      "pytest_exit": 1,
+      "actual_expected_call_failures": 5
+    }
+  },
+  "green": {
+    "job_id": "23482387",
+    "cluster": "delta",
+    "expected_collected_each_interpreter": 158,
+    "interpreters": {
+      "mgnp": {
+        "pytest_exit": 0,
+        "call_outcome_counts": {
+          "passed": 157,
+          "failed": 0,
+          "skipped": 1
+        },
+        "elapsed_seconds": 243.7372419834137,
+        "source_unchanged": true,
+        "warning_count": 1,
+        "skipped_tests": [
+          "tests/test_a2_mask_comparison.py::test_actual_timing_receipt_rejected"
+        ]
+      },
+      "base": {
+        "pytest_exit": 0,
+        "call_outcome_counts": {
+          "passed": 156,
+          "failed": 0,
+          "skipped": 2
+        },
+        "elapsed_seconds": 257.0848593711853,
+        "source_unchanged": true,
+        "warning_count": 3,
+        "skipped_tests": [
+          "tests/test_a2_pipeline.py::test_tiny_actual_hooks_new_bank_scoring_and_references",
+          "tests/test_a2_mask_comparison.py::test_actual_timing_receipt_rejected"
+        ]
+      }
+    },
+    "slurm_state": "COMPLETED",
+    "slurm_exit": "0:0",
+    "slurm_elapsed_seconds": 511,
+    "terminal_confirmation": "root scheduler confirmation, relayed directly to worker"
+  },
+  "attempts": [
+    {
+      "job_id": "23478635",
+      "result": "RED fixture setup failed; preserved"
+    },
+    {
+      "job_id": "23478850",
+      "result": "expected five RED call failures per interpreter"
+    },
+    {
+      "job_id": "23482237",
+      "result": "first GREEN47setup errors from missing authentic config;110passed1skipped; base not run"
+    },
+    {
+      "job_id": "23482347",
+      "result": "second GREEN watchdog180s; incomplete mgnp, base not run"
+    },
+    {
+      "job_id": "23482387",
+      "result": "full affected suite both interpreters pytest exit0"
+    }
+  ],
+  "metadata_correction": {
+    "original_field": "models_or_tokenizers_loaded=False",
+    "interpretation": "Overbroad inherited runner metadata. Existing tiny-hooks test constructs a random tiny Llama on mgnp; it skips on base due NNsight version. No pretrained/scientific model weights were loaded. Catalogue guard fixtures explicitly forbid model/tokenizer access."
+  },
+  "scientific_rows": "not applicable: software fixtures only"
+}

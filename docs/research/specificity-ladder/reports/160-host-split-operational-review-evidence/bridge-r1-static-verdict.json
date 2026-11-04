@@ -1,0 +1,23 @@
+{
+  "verdict": "BLOCKED_STATIC_BRIDGES_CPU_PENDING_ENTRY_FRESHNESS_REPAIR_AND_ROOT_BINDINGS",
+  "packet_manifest_sha256": "3f027ddf4357fd15372f1f263302591ef406cc8949d83ad2abf0ef4341825a16",
+  "supervisor_sha256": "59a41b10018cbc22b6e097cbb89c6b4faf9c1a4d6ca39ba6d4b394c0f2bb0c36",
+  "findings": [
+    {
+      "id": "R160-lease-entry",
+      "severity": "blocking",
+      "file": "supervisor.py + run-in-container.sh",
+      "problem": "Release age/expiry is checked before currentcataloguehash, scontrol, container startup and packedprofile activation; no final owningentry recheck. Near-expiry lease could expire during startup yet validator begins.",
+      "required": "Recheck unchangedrelease and fresh age/expiry immediately before childlaunch, and again after activation immediately before owningvalidator, using a narrow external entryguard; preserve reviewed validator bytes."
+    },
+    {
+      "id": "R160-image-entry",
+      "severity": "blocking",
+      "file": "supervisor.py",
+      "problem": "ActualSIF hashed only before up-to300s rootrelease wait; entry checks refresh packet/catalogue/G3 but not image.",
+      "required": "Rehash actual pinnedSIF before final lease/Popen check."
+    }
+  ],
+  "not_executed": true,
+  "model_authority": false
+}

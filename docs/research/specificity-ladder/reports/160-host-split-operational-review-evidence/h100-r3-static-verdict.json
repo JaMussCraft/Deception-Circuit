@@ -1,0 +1,33 @@
+{
+  "verdict": "BLOCKED_STATIC_H100_RESERVATION_SCHEMA_CONFLICT_AND_UNBOUND_ACTUAL_AUTHORITY",
+  "manifest_sha256": "7dca22a08f901dfd3a0d5e4a006ae4ed0d242a870293d64a571e867c1f87aaec",
+  "findings": [
+    {
+      "id": "R160-H100-ledger-rounding",
+      "severity": "blocking",
+      "owning_source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/component_analysis/a3_direction_runtime.py",
+      "line": 312,
+      "requirement": "hours == round(now['gpus']*now['requested_minutes']/60,4)",
+      "actual_minutes": 50,
+      "normalizer_required_hours": 0.8333,
+      "proposal_hours": 0.8334,
+      "exact_required_seconds": 3000,
+      "conflict": "Proposed0.8334with50min fails unchanged owningnormalizer. Owning0.8333 with50min fails proposal>=3000second assertion.",
+      "resolution": "Root must choose explicit schema-compatible conservativecharge without editing acceptednormalizer/caps; actualjob and chargedminutes relation must be bound/reviewed."
+    }
+  ],
+  "prior_operational_fixes_reviewed": [
+    "HostfreshactualSlurmcapture avoids inSIFscontrol",
+    "Finalimmutable releasefilehash and phaseentrytime check",
+    "Closedexact511files+4literalaliases with projectorigin probes",
+    "CurrentEndTime included even with staticSLURM_JOB_END_TIME",
+    "Finalprefix1950floor check"
+  ],
+  "pending": [
+    "actualrootboundconfiguration",
+    "completedBridgeCPUvalidationreceipt",
+    "actualjob/reservation/successormapping and modelreleaseproducer",
+    "rootroundingdecision"
+  ],
+  "no_model_or_GPU_admission": true
+}

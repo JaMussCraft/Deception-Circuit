@@ -1,0 +1,19 @@
+{
+  "verdict": "PASS_STATIC_NARROW_ROOT_HELD_CPU_BOOTSTRAP_ADAPTER_ONLY",
+  "manifest_sha256": "9a304c7cc473a7311e9a96d18f694f30dcbafc0fa2255c3ea0a3ad9e9e6ac278",
+  "dispatch_sha256": "1cfbee750553f4c3d24dc3c0656a3d05a8d2dfb4fb3a9fe7602ee73c1d0b7733",
+  "accepted_CPU_manifest": "6c0fa366c2176f61999c86240b8d3049608eb5ce3c833fc817a241962215c42a",
+  "accepted_H100_R5_manifest": "661d16c5f38149b4d258fa372472dd5aab57cd0afe0a131aa6b5683b735657bc",
+  "checks": [
+    "allmemberpins/bashsyntax",
+    "rootactualjobderivedleaf/configSHA andnosymlinkcfg/hashfiles",
+    "acceptedCPU+R5manifestpins beforeunchangedlaunch",
+    "seedbaseparameter existingacceptedreceipt/proof/source/historicalrefs checked",
+    "futureGPU/config notstartupdependency",
+    "heldsubmit/exclusivefinalconfigpublication/read-only/release/READY ordering",
+    "explicitCPU4cores16G75minnormalcpu/no-requeue/emptyCUDA"
+  ],
+  "actualconfig_still_required": true,
+  "admission": false,
+  "scope": "No scheduler/source/modelactions byadapter; root alone submitsheldjob/publishesactualimmutableconfig/releasesit, then independentlyadmitsfutureGPUifallgatespass."
+}

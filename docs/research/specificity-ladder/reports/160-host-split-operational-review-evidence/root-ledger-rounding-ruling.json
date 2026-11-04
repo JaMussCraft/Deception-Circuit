@@ -1,0 +1,20 @@
+{
+  "kind": "explicit_root_ruling_schema_rounding_and_exact_GPU_seconds",
+  "canonical_requested_minutes": 50,
+  "canonical_reserved_gpu_hours": 0.8333,
+  "normalizer_unchanged": true,
+  "reservation_minutes_increased": false,
+  "authoritative_execution_seconds": 3000,
+  "gpus": 1,
+  "rule": "Preserve accepted normalize_ledger canonical four-decimal round(gpus*requested_minutes/60,4). Independently enforce exact GPU-seconds from gpus*requested_minutes*60 for every reservation including failed/cancelled originalcharges, both phase and total caps. Do not reinterpret roundeddisplayhours as fullprecisionfraction or expand execution authority.",
+  "phase_caps_hours": {
+    "A1": 25,
+    "A2": 60,
+    "A3": 40
+  },
+  "global_cap_hours": 125,
+  "no_refund": true,
+  "no_walltime_or_cap_increase": true,
+  "external_guard_change_only": true,
+  "decision_origin": "Root direct message after independent160 actual normalizer API review"
+}

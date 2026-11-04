@@ -1,0 +1,131 @@
+{
+  "status": "STATIC_REVIEW_PENDING_ROOT_WRAPPERS_AND_ACTUAL_CPU_EXECUTION",
+  "scope": "independent operational review only; accepted161 source implementation excluded",
+  "raw_reviewed_sha256": {
+    "cpu-G3-host-split-proposal.json": "bfba681bd2a9cd1061c5a000a5634790971d84b9a1caa844d341b9d437cb0ec8",
+    "cpu-freeze-G3-delta.py": "d0f1a10e0139c50f8d9984b336b5b6248e8e1b1b816b587ed1f163849e8e5eb2",
+    "cpu-validate-existing-G3.py": "04fdef93545c9538514fca08a97af0e3a8ac3d868792cdbbce127fe46004e567",
+    "cpu-freeze-G3-delta.parameters.template.json": "647dbc7c414b163bbd009ff5539cf6f217e964de318f5f5ff32ae90175707569",
+    "cpu-validate-existing-G3.parameters.template.json": "3f35a0e7465b31729cdc2e9fe9920ea15154347571cf84708f93c6bb527e678e",
+    "160-crosscluster-live-protection-lease-plan.json": "b2013814b44e8521bd7358cbf988c8aa62916a19e6c08a53ff2a0e6ffec3ac46",
+    "160-crosscluster-live-protection-lease-plan-host-split.json": "b459fff031f5218b055e49f1fb27c18bed32fdc7c077fa71f242873d44655738"
+  },
+  "historical_G2_keyset": [
+    "a1_ancestor_commit",
+    "a1_design_sha256",
+    "a1_selected_sha256",
+    "a2_training_execution_commit",
+    "assessment",
+    "bank_keys",
+    "comparison",
+    "comparison_sha256",
+    "compute_groups",
+    "execution_commit",
+    "file_references",
+    "grader_registry",
+    "group_source",
+    "groups",
+    "independent_donor_seeds",
+    "injected",
+    "limitations",
+    "model_geometry",
+    "model_identity",
+    "operations",
+    "receipt_sha256",
+    "registry_hashes",
+    "runtime_code_hashes",
+    "schema",
+    "selection_receipt",
+    "selection_sidecar_sha256",
+    "source_kind",
+    "tasks",
+    "utility_registry_hashes"
+  ],
+  "science_fields": [
+    "schema",
+    "group_source",
+    "source_kind",
+    "groups",
+    "compute_groups",
+    "bank_keys",
+    "tasks",
+    "comparison",
+    "comparison_sha256",
+    "a1_design_sha256",
+    "a1_selected_sha256",
+    "selection_receipt",
+    "selection_sidecar_sha256",
+    "assessment",
+    "model_geometry",
+    "model_identity",
+    "a1_ancestor_commit",
+    "a2_training_execution_commit",
+    "operations",
+    "independent_donor_seeds",
+    "injected",
+    "limitations"
+  ],
+  "provenance_fields": [
+    "execution_commit",
+    "file_references",
+    "grader_registry",
+    "receipt_sha256",
+    "registry_hashes",
+    "runtime_code_hashes",
+    "utility_registry_hashes"
+  ],
+  "unknown_actual_science_keys": [],
+  "expected_G3_addition": [
+    "grader_binding"
+  ],
+  "keyset_assertion_required": "Assert old exact science+seven provenance keyset and G3 exact old+grader_binding; do not silently omit future unknown science.",
+  "current_direct_catalogue_reader_closure": [
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/held_out.json",
+      "target": "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/held_out.json",
+      "literal_link": null,
+      "reader": "common.check_registry primary",
+      "sha256": "801b24e37c3315a8e58aa2ad5007f7831822fc2636d1e61837ad3652c370425e"
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/docs/research/held_out.json",
+      "target": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
+      "literal_link": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
+      "reader": "common.check_registry accepted runtime",
+      "sha256": "801b24e37c3315a8e58aa2ad5007f7831822fc2636d1e61837ad3652c370425e"
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
+      "target": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
+      "literal_link": null,
+      "reader": "common.check_registry explicit --registry",
+      "sha256": "801b24e37c3315a8e58aa2ad5007f7831822fc2636d1e61837ad3652c370425e"
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/directions.json",
+      "target": "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/directions.json",
+      "literal_link": null,
+      "reader": "a1.grader_registry primary",
+      "sha256": "b1cf09a06662438569e7f5f670bc85fe3de5e3d2436f375a64ae308b73694a6d"
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/docs/research/directions.json",
+      "target": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/directions.json",
+      "literal_link": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/directions.json",
+      "reader": "a1.grader_registry accepted runtime",
+      "sha256": "f8c7dbb92f2edc509c7bb8e94624a5c8adabddd103a8c48db1cc59bd69a3c6b0"
+    }
+  ],
+  "physical_minimum_current_sets_empty": true,
+  "dynamic_protection_rule": "Every nonempty registry sets entry.path adds its resolved registry_root-relative ID JSON file with hash/count/disjointness validation; inline IDs covered by catalogue bytes. Any such addition needs complete closure review.",
+  "extra_alias_identity": "Original6bd runtime/docs/research/held_out.json identity is checked by comparison frozen execution snapshot; its target is W heldout.",
+  "grader_reader_rule": "Actual accepted-runtime evaluation/benchmarks/*.py and evaluation/benchmark_eval.py; glob membership is part of actual original hash. Exact511 inventory catches added or removed source.",
+  "owning_API_wrong_call_found": false,
+  "outstanding_gates": [
+    "root wrappers and bound parameter references not yet available",
+    "stable actual Delta catalogue capture/preflight/transfer/remote hashes/re-read including runtime lexicalaliases",
+    "fresh finite remote phase-specific release validation before Bridges existing-G3 consumer",
+    "actual allocation/container/namespace/read-only G3+runtime/output/cache evidence",
+    "actual Delta once-only freeze and exact-byte Bridges owning validation"
+  ]
+}

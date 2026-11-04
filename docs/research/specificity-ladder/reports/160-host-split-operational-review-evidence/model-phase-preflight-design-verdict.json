@@ -1,0 +1,28 @@
+{
+  "verdict": "PASS_SCOPED_MODEL_PHASE_DELTA_CPU_PREFLIGHT_DESIGN_ONLY",
+  "design_sha256": "95ceaff6c9b6f082133a24ff710e9f800412948a349ade7ef40a2d198373a73b",
+  "source_commit": "50e947bb852613e3a270082651f2bd1b7bb0c525",
+  "resource_plan": {
+    "cpus": 4,
+    "memory_GiB": 16,
+    "minutes": 75,
+    "partition": "normalCPUonly",
+    "gpus": 0
+  },
+  "phases": [
+    "bank",
+    "prefix4"
+  ],
+  "guards_required": [
+    "exact immutable once-onlybankthenprefix requests tiedactualCPU/GPU/source/G3/config/WAITINGmarker",
+    "nonfuturefresh request/actualwaitingbody/hash/time",
+    "actualowning_load_context/_validate_live geometry/tokenizer then_validate_live, nomodel/main/freeze",
+    "closed511+4/importclosure and exactG3/currentcatalogue before/after",
+    "childdeadline min720s,CPUmininitial/currentEnd-60,GPUWAITING+270 with15sTERM/KILL",
+    "durablefailure/stop/noPASSonwindowmiss",
+    "rootactualledger/caps/protectiontransfer/admission separate"
+  ],
+  "runtime_execution_observed": false,
+  "model_or_GPU_authority": false,
+  "limitations": "270s usablewindow is a hardbound, not measuredperformanceforecast;75minCPUlease can expire beforeGPUqueue, failclosed/noextension"
+}

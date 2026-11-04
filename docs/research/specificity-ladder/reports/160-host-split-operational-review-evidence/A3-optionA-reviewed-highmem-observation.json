@@ -1,0 +1,93 @@
+{
+  "observed_UTC": "2026-11-03T22:26:23.995338+00:00",
+  "job_id": "23485753",
+  "accounting": "23485753|RUNNING|0:0|2095|cn023\n23485753.batch|RUNNING|0:0|2095|cn023\n23485753.extern|RUNNING|0:0|2095|cn023\n23485753.0|RUNNING|0:0|2088|cn023\n",
+  "actual_last_sample": {
+    "elapsed_seconds": 2084.089392799,
+    "pid": 329361,
+    "cgroup_memory": [
+      {
+        "path": "/sys/fs/cgroup/system.slice/slurmstepd.scope/job_23485753/step_0/user/task_0",
+        "controller": "v2",
+        "memory.current": "25886498816",
+        "memory.peak": "123087593472",
+        "memory.max": "max",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+        "cpu.max": "max 100000",
+        "cpuset.cpus.effective": "5-8",
+        "v2_memory_events_available": true
+      },
+      {
+        "path": "/sys/fs/cgroup/system.slice/slurmstepd.scope/job_23485753/step_0/user",
+        "controller": "v2",
+        "memory.current": "25888276480",
+        "memory.peak": "123089371136",
+        "memory.max": "206158430208",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+        "cpu.max": "max 100000",
+        "cpuset.cpus.effective": "5-8",
+        "v2_memory_events_available": true,
+        "headroom_bytes": 180270153728
+      },
+      {
+        "path": "/sys/fs/cgroup/system.slice/slurmstepd.scope/job_23485753/step_0",
+        "controller": "v2",
+        "memory.current": "25892728832",
+        "memory.peak": "123093823488",
+        "memory.max": "max",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+        "cpu.max": "max 100000",
+        "cpuset.cpus.effective": "5-8",
+        "v2_memory_events_available": true
+      },
+      {
+        "path": "/sys/fs/cgroup/system.slice/slurmstepd.scope/job_23485753",
+        "controller": "v2",
+        "memory.current": "25911373824",
+        "memory.peak": "123112206336",
+        "memory.max": "206158430208",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+        "cpu.max": "max 100000",
+        "cpuset.cpus.effective": "5-8",
+        "v2_memory_events_available": true,
+        "headroom_bytes": 180247056384
+      },
+      {
+        "path": "/sys/fs/cgroup/system.slice/slurmstepd.scope",
+        "controller": "v2",
+        "memory.current": "30287540224",
+        "memory.peak": "136938627072",
+        "memory.max": "max",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+        "cpu.max": "max 100000",
+        "cpuset.cpus.effective": "0-127",
+        "v2_memory_events_available": true
+      },
+      {
+        "path": "/sys/fs/cgroup/system.slice",
+        "controller": "v2",
+        "memory.current": "40590716928",
+        "memory.peak": "147249029120",
+        "memory.max": "max",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+        "cpu.max": "max 100000",
+        "cpuset.cpus.effective": "0-127",
+        "v2_memory_events_available": true
+      },
+      {
+        "path": "/sys/fs/cgroup",
+        "controller": "v2",
+        "cpuset.cpus.effective": "0-127",
+        "v2_memory_events_available": false
+      }
+    ],
+    "host_memory_pressure": null,
+    "VmRSS": "21504 kB",
+    "VmHWM": "21504 kB",
+    "Threads": "1",
+    "State": "S (sleeping)"
+  },
+  "original_telemetry": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-direction-fit-select-highmem-861f84a3938a-proposed/evidence/child-samples.jsonl",
+  "run_terminal": false,
+  "completed_inventory_observed": false
+}

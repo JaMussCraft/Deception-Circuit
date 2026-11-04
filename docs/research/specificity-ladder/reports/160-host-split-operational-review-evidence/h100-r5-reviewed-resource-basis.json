@@ -1,0 +1,59 @@
+{
+  "kind": "R5_unlaunched_H100_resource_revision_basis",
+  "status": "BOUNDED_PROPOSAL_NOT_H100_RUNTIME_GUARANTEE",
+  "requested_seconds": 3600,
+  "requested_minutes": 60,
+  "canonical_reserved_GPU_hours": 1.0,
+  "exact_requested_GPU_seconds": 3600,
+  "prior_unlaunched_minutes": 50,
+  "reason": "R4 omitted mandatory fresh actual Delta owning preflight before each model phase. No reservation or model attempt has been admitted under R4; this changes the prospective request inside existing A2 and global caps.",
+  "actual_G2_outer_command_seconds": {
+    "bank": 273.5758249759674,
+    "prefix4": 838.2285499572754
+  },
+  "actual_G2_compute_seconds": {
+    "bank": 148.73118084017187,
+    "prefix4": 714.5478384736925
+  },
+  "historical_Bridges_model_startup_seconds_each": 458,
+  "actual_Delta_owning_read_job": "23486081",
+  "actual_Delta_whole_CPU_job_seconds": 191,
+  "actual_Bridges_failed_context_job": "50187032",
+  "actual_Bridges_failed_context_seconds": 313.16968989372253,
+  "component_seconds": {
+    "H200_compute_orientation_with_25percent_buffer": 1079.0987741423305,
+    "two_historical_Bridges_model_startups": 916,
+    "two_Bridges_native_context_orientations": 626.3393797874451,
+    "two_new_Delta_model_phase_CPU_preflights": 382,
+    "two_root_capture_transfer_publication_allowances": 120,
+    "fixed_finish_reserve": 300
+  },
+  "component_sum_seconds": 3423.4381539297756,
+  "additional_remaining_buffer_seconds": 176.56184607022442,
+  "formula": "1.25*(148.73118084017187+714.5478384736925) +2*458 +2*313.16968989372253 +2*191 +2*60 +300 +remaining_buffer =3600",
+  "interpretation": "Compute orientation is matched H200 work with a modest buffer; startup is historical Bridges evidence; failed-context time is a conservative host-overhead orientation, not a completed H100 pass or upper bound. Mandatory new Delta CPU calls are counted twice in addition to native CLI checks. Root waits/source transfer and system variance can still exhaust the bound; fixed floor yields BANK_ONLY rather than extension/retry.",
+  "bank_and_prefix_scope_unchanged": true,
+  "score_entry_floor_seconds": 1950,
+  "finish_reserve_seconds": 300,
+  "no_guaranteed_prefix_completion": true,
+  "source_refs": {
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/real-input-readiness/bank-scoring-timing/launch-g2/gpu-result/bank-command.json": "e00905f949e404d92e1f5ab53ea83966cf5cd554449cac9edc4dd9f511b9137d",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/real-input-readiness/bank-scoring-timing/launch-g2/gpu-result/score-prefix4-command.json": "002525a73279e6d71cde9578b1592e899776b15c71509fde0a3a00aaadaad03b",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/real-input-readiness/bank-scoring-timing/launch-g2/gpu-result/COMPLETE.json": "61a248e0a09486ad7c7f2a4168d65d3d5bee96c2d76fecaddb71a1d0d272a2c2",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/data-closure-supplement/result-23486081/terminal-accounting.txt": "f78db2214793cc2ab0f0ad37db3bf5da95cfcf2c8af6424457a88da17c9b7c77",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/data-closure-supplement/result-23486081/owning-proof.json": "58e0b26c0268228142645da62762d4e3d33e1d97b9196a8beb3ff0c7d33a4f0b",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/bridge-cpu-result-50187032/result.json": "743a7ed90de714eb12d9c2936f28ccf8a1ee60468c1a2a3acbcb5f6681a3dd42",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/plan.json": "f6c2b288ee61e6310be5381426874973f814b77ddd3a10fbe4e45f566ac68edd"
+  },
+  "cap_scope": {
+    "A2_GPU_hours": 60,
+    "total_GPU_hours": 125,
+    "A3_direction_M1_GPU_hours": 0.5,
+    "source_changes": false,
+    "raising_phase_or_global_cap": false
+  },
+  "cap_review": "Primary and worktree plan-a2-analysis.md require A2<=60h including pilots/failures and separately reviewed timing with measured overhead; no fixed50min analysis-pilot cap appears there. D159 plan explicitly labels50min proposed. Existing25min DeltaG2 reservation is historical and unchanged.",
+  "cap_evidence": {
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/plan-a2-analysis.md": "8f94a6bbe709ccd7318fcf6452cc473b2b62817d287fd78b9f322e9d5822fd21"
+  }
+}

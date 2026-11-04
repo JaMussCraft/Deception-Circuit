@@ -1,0 +1,32 @@
+{
+  "verdict": "PASS_STATIC_STANDING_CPU_R3_RESOURCE_VARIANT_AND_BOOTSTRAP_ONLY",
+  "CPU_manifest_sha256": "4875845ad3b728980c494657aac2935e29a8a215885ddc1b9bfd81f7ba2b13f9",
+  "dispatch_manifest_sha256": "d98d61caf422603e6be11a6a21feed1cfee1bee8de7a9d96fb61701c5566329a",
+  "resource": {
+    "minutes": 60,
+    "seconds": 3600,
+    "cpus": 4,
+    "memory_GiB": 16,
+    "partitions": [
+      "cpu",
+      "cpu-interactive"
+    ],
+    "gpus": 0
+  },
+  "validator_byte_identical_to_R2": true,
+  "unchanged": [
+    "source50e/G3/owningguards",
+    "stickybankthenprefixactualGPU/config/sourceidentities",
+    "270sphasewindow/720schildcap/60sCPUfinish/15skill",
+    "once-only/no-retry/no-extension"
+  ],
+  "conditional_alignment": {
+    "helper_usable_seconds": 3540,
+    "latest_GPU_prefix_entry_seconds": 1650,
+    "theoretical_start_gap_seconds": 1890,
+    "guarantee": false
+  },
+  "actual_configuration_and_READY_required": true,
+  "Bridge_owning_PASS_still_required": true,
+  "model_or_GPU_admission": false
+}

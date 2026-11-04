@@ -1,0 +1,65 @@
+{
+  "kind": "independent_operational_review_provenance_not_model_admission",
+  "source_commit": "50e947bb852613e3a270082651f2bd1b7bb0c525",
+  "scope": "accepted source dependency, no re-review of161 implementation",
+  "actual_Delta_CPU": {
+    "job_id": "23483002",
+    "cluster": "delta",
+    "state": "COMPLETED",
+    "exit": "0:0",
+    "elapsed_seconds": 248,
+    "owning_readiness_sha256": "d197e6650404ca8b5c18163fbd456fc689ea88b92bea5f2828eed16f5d3779c3"
+  },
+  "actual_Bridges_CPU": {
+    "job_id": "50187032",
+    "cluster": "bridges2",
+    "state": "FAILED",
+    "exit": "1:0",
+    "elapsed_seconds": 449,
+    "no_owning_readiness": true
+  },
+  "groups_sha256": "c3095b10aac09a23ee35e4620402581b0407623d1e111a2407a691f60f599de4",
+  "model_or_GPU_admission": false,
+  "actual_input_trace_CPU": {
+    "job_id": "23486081",
+    "cluster": "delta",
+    "state": "COMPLETED",
+    "exit": "0:0",
+    "elapsed_seconds": 191,
+    "scope": "owningtracevalid; original24filefilteredclosureincomplete, supersededbyexactrole33fileclosure",
+    "supplement_count": 24,
+    "supplement_bytes": 13555414,
+    "verdict_sha256": "edd90225b2841ce52014083fc4361553f9116f2d5d3a4e4b1f3fe95d34d7621e"
+  },
+  "actual_second_Bridges_CPU": {
+    "job_id": "50188685",
+    "cluster": "bridges2",
+    "state": "FAILED",
+    "exit": "1:0",
+    "elapsed_seconds": 179,
+    "reason": "required datasetstate incorrectlyexcluded bybroadbasenamefilter"
+  },
+  "corrected_input_closure": {
+    "coverage_sha256": "91d46efa8f7068f91224ac94e65fa0133487f9eeb8e09fc22dad6293ee30b8a5",
+    "observed_files": 1131,
+    "frozen_keys": 227,
+    "unresolved": 0,
+    "new_state_files": 9,
+    "new_state_bytes": 2223,
+    "corrected_supplement_files": 33,
+    "corrected_supplement_bytes": 13557637,
+    "combined_files": 422
+  },
+  "actual_successful_Bridges_CPU": {
+    "job_id": "50189110",
+    "cluster": "bridges2",
+    "state": "COMPLETED",
+    "exit": "0:0",
+    "elapsed_seconds": 430,
+    "readiness_sha256": "94dc817e9d2fb793a28406c7e7748221510909701471599105f7a85844033d1a",
+    "source_commit": "50e947bb852613e3a270082651f2bd1b7bb0c525",
+    "groups_sha256": "c3095b10aac09a23ee35e4620402581b0407623d1e111a2407a691f60f599de4",
+    "freeze_executed": false,
+    "model_loaded": false
+  }
+}
