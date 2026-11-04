@@ -342,3 +342,19 @@ and nothing was synced to Bridges-2.
 4. **The A3 cell overlap.** On SER, the Codex A3 cell covers layers 5 to 8, 11, 13 and 16. Any SER pass is recorded as
    a descriptive lead outside that cell, as on FAR (START item 6). Default: the verdict notes the per-layer counts of
    any passing class.
+
+## Addendum: status after ruling R16 (Wed 4 Nov 2026)
+
+The team lead reported R16: the GPU cap is now 30 hours, the wall-clock stop is removed, and SER runs on GPU. The
+plan is that r2-runner submits the ranking line, W10 runs the partition on CPU, and r2-runner then submits the
+Bridges-2 ablation, twin and mean references, `--ioi-rows 1000 --ioi-seed 2`, with a 2-hour reservation.
+
+- **What changed.** Nothing in code or data since the sections above. I asked team-lead for the commit sha and the
+  clause-form ruling, and told r2-runner to stand by.
+- **How verified.** Not applicable: no new checks.
+- **Execution evidence.** Not applicable: no runs.
+- **What is NOT done.** All of the R16 plan waits on team-lead's "committed at <sha>": the ranking job, the partition
+  into `sets/ser_<form>_atp_all_<sha>/` at k 500, 1,000 and 2,000 with nulls, the k-500 four-class sets file, and
+  the ablation and verdict lines.
+- **Open questions.** The clause-form ruling, Open question 1 above. Default: predicate. The ablation line will
+  carry `--max-length 136`, Open question 2, unless team-lead rules otherwise.
