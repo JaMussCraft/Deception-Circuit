@@ -194,5 +194,10 @@ as a ruling before that run.
   whole sample and both halves. D removed (margin) 0.81 to 0.82 under twin and 0.69 to 0.78 under mean, rate 1.0
   everywhere; I removed 0.01 to 0.22 (twin) and 0.13 to 0.18 (mean); null 95th percentile at most 0.066; H and F
   shift 0.0; IOI shift minus 2.7, 3.2, 1.4 and 0.9 points. The pass is not specific to size 500 but holds from 250
-  to 750, with the deception effect flat and the inversion cost rising with size. Pending the independent
-  recomputation (review 06). Bridges-2 job 50212883, 3,041 s of 5,400 reserved.
+  to 750. Under the twin interchange the deception effect is flat and the inversion cost rises with size; under
+  mean ablation the deception effect rises from 0.69 to 0.78 and the inversion cost stays between 0.13 and 0.18
+  with no trend. The tightest bar is inversion under twin at size 750 (0.217 against 0.25), and 750 is the
+  largest size tested, so the ladder does not bound the class's size from above. Confirmed by the independent
+  recomputation (review 06, 12:25 pm EST, all 1,128 quantities within 1e-16; the trend sentence corrected as
+  above; the IOI minus 2.7 at sizes 250 and 500 is a coincidence of different losses and gains). Bridges-2 job
+  50212883, 3,041 s of 5,400 reserved.
