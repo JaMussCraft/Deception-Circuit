@@ -15,7 +15,8 @@ discrepancy (`../reviews/03-verdict-review.md`). Ruling R13 keeps N1 failed and 
    and fails only the IOI bar, at -6.0 points against 5 on 100 IOI rows
    (`outputs/_analyses/neuron-partition/verdict/far_atp_all_c3d7763/verdict.md`, `02-w2-ablation-handback.md`). An
    exploratory, not pre-registered measurement on 1,000 IOI rows puts that cost at -3.7 points, interval -5.2 to
-   -2.4, outside the null band of -2.3 to +1.1 (finding F5 in `../WORKLOG.md`); the decision stands (R13).
+   -2.4: the point estimate is under the bar but the interval reaches it, so a 5-point shift is not excluded; the
+   cost is well outside the null band of -2.3 to +1.1 (finding F5 in `../WORKLOG.md`). The decision stands (R13).
 4. **N2.** The honest-only class is "undetermined at this size" at every size. At 2,000 it drops H accuracy by 23.5
    points while D's deceptive rate moves 5.2 points, just over the bar of 5
    (`outputs/_analyses/neuron-partition/verdict/far_atp_all_c3d7763/verdict.md`).

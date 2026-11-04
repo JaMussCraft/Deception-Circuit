@@ -33,7 +33,9 @@ Reservations r-001 to r-003 (ranking pilot, full ranking, split halves; 89, 252 
    finding F5); run `research-session lint` and `scripts/check_report_numbers.py` on the report; push.
 2. Ask the user to revert `CAP_PERCENT` to 80 in `/projects/beto/swong2/Alignment/.agents/research_session/usage.py`
    after the 8:00 am EST reset, and to note the cadence (26) for the record.
-3. Hand the report to the user; the advisor meeting decides whether the size-500 lead gets a pre-registered
+3. Before Bridges-2 goes offline (about Sun 9 Nov 2026): copy the clone's `logs/` entries for jobs 50182995,
+   50183187 and 50183194 under the primary checkout on Delta, so the evidence blocks stay traceable.
+4. Hand the report to the user; the advisor meeting decides whether the size-500 lead gets a pre-registered
    follow-up (a 1,000-row IOI bar, SER, the one-neuron interchange check of review 01). No further GPU work is
    planned in this session.
 
