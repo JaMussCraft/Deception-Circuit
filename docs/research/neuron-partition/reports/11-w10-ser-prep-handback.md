@@ -462,3 +462,69 @@ cells and the readout-position comparison sets are not built or run, because R17
 
 None open from W10. The A3 overlap of the D_only class (layers 5 to 9) will be noted per layer in the verdict, as
 R17 rules.
+
+## Addendum 4: the SER k-500 cell and its verdict (Wed 4 Nov 2026)
+
+### What changed
+
+Nothing in code. r2-runner's job wrote `WT/outputs/_analyses/neuron-partition/ablation/ser_predicate_k500-d5f6b17/`,
+and its verdict pass wrote `WT/outputs/_analyses/neuron-partition/verdict/ser_predicate_k500-d5f6b17/`. Both are
+git-ignored.
+
+| file | sha256 |
+| --- | --- |
+| `verdict.json` | `f65e74212bb4cb6fa427bcfd8dafdd41de9f35187742178eae5e0ea3e0983b4a` |
+| `verdict.md` | `6992cf0c327911ca9745947c45bedb91e0371784d09fa15711d7093e31cd9a12` |
+
+### How verified
+
+I read `verdict.md` and the D_only entries of `verdict.json` myself. I did not run an independent recomputation.
+
+The result is "N1 pass at any k: False." The SER D_only class at k 500 has 386 neurons. It meets every N1 bar except
+the H and F collateral bars, which it fails on every subset under the deciding mean reference (R7). Removed fractions
+are on the margin (R2), and collateral is in points.
+
+| reference, subset | D removed | I removed | H shift | F shift | IOI shift |
+| --- | --- | --- | --- | --- | --- |
+| twin, whole | 0.956 | 0.094 | -7.2 (reverse patch, descriptive) | none | none |
+| twin, half 1 | 0.953 | 0.094 | -6.5 | none | none |
+| twin, half 2 | 0.958 | 0.094 | -7.8 | none | none |
+| mean, whole | 0.734 | 0.196 | -15.8 | -6.3 | -2.7 |
+| mean, half 1 | 0.746 | 0.201 | -16.8 | -6.5 | -2.7 |
+| mean, half 2 | 0.723 | 0.192 | -14.9 | -6.2 | -2.7 |
+
+The null p95 of D removed is 0.022 under twin and 0.067 under mean on the whole sample, far below the class.
+
+- **The other classes.** None passes. DI_shared (28 neurons) removes 0.26 to 0.27 of D and 0.34 of I. all_shared (36
+  neurons) removes 0.19 to 0.37 of D and 0.26 to 0.43 of I, at minus 6.1 points of IOI.
+- **N2 (H_only, 403 neurons).** The verdict reads "suppression or shared" on the whole sample and both halves under
+  the mean reference. H accuracy falls 44.8 points (whole) and the D rate falls 14.0, against a null p95 of the H
+  shift of 1.4. F falls 40.3 points.
+- **A3 overlap (R17).** 210 of the 386 D_only neurons lie in the A3 cell's SER layers (5 to 8, 11, 13 and 16). Per
+  layer:
+
+| layer | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 16 | 17 | 20 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| neurons | 5 | 6 | 22 | 18 | 22 | 36 | 42 | 51 | 49 | 36 | 35 | 30 | 25 | 1 | 5 | 1 | 1 | 1 |
+
+### Execution evidence
+
+These are r2-runner's figures; W10 ran only the CPU reads above.
+
+- **Job.** Bridges-2 50213549 on w008 (H100), COMPLETED 0:0, 3,572 s of 7,200 reserved, 0.042 s per forward.
+- **Rows.** `rows.jsonl` has 310,800 lines, equal to 84 × (1,200 + 1,500 + 1,000). `unpaired` is empty.
+- **Baselines.** The self-replay error is 0.0 for D and I, and the twin cross-check maximum difference is 0.0.
+  Intact IOI accuracy is 0.511, against the ladder's 0.51.
+- **Provenance.** The manifest names commit `d5f6b1750e5b5a770d48b5c44cd4cb2c688236c6`, `git_dirty` false.
+  `summary.json` is `0e868dc5…`.
+
+### What is NOT done
+
+- **Recomputation and review.** No independent recomputation has been run. That and the review are the team lead's
+  to assign.
+- **Other cells.** The k-1,000 and k-2,000 cells and the zero reference were not run, under R17.
+
+### Open questions
+
+None from W10. Whether the SER result goes beside FAR's F6 as "SER fails N1 on H and F collateral" is the team lead's
+call.
