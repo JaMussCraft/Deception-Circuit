@@ -16,6 +16,9 @@ session hook asks for this file; the lead's brief named only the report.
   paragraph gives the IOI resolution reading, and the zero table's caption notes zero's own IOI shift of -17.0 at
   size 500. "What is NOT done" lists the 1,000-row IOI measurement as pending under R13
   (`../reviews/03-verdict-review.md`).
+- **IOI fold-in.** The 1,000-row result is in the report, labelled exploratory, not pre-registered (R13), in a
+  paragraph after the IOI resolution reading, the evidence table, "What is NOT done" and open question 1. N1 stays
+  failed. The numbers match the results table of hand-back 02 and finding F5 (`02-w2-ablation-handback.md`).
 - **Length.** The report is under 300 lines. To fit, the conditions and baseline tables became prose, the test table
   became one paragraph, and the zero table keeps only its D-only rows.
 
@@ -28,6 +31,10 @@ session hook asks for this file; the lead's brief named only the report.
   `outputs/_analyses/neuron-partition/verdict/far_atp_all_c3d7763/verdict.json`. At size 500 only the IOI bar fails,
   on every subset. The 20 null IOI shifts run from -3 to +6. The N2 "D rate change" is D's own deceptive rate, which
   falls from 0.985 to 0.933 at size 2,000.
+
+- **Recheck after the lead's commit.** The lead reported a "Review pending" line at line 7. The file on disk had
+  none: the review 03 edits were already in, so the commit had caught the earlier draft. The lint and the number check
+  were rerun, both clean except the title's "05", and the lead was asked to recommit.
 
 ## Execution evidence
 

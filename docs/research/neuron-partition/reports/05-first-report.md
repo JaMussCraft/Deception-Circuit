@@ -1,7 +1,6 @@
 # Report 05: First report on neuron-partition, for the advisor meeting of Wed 4 Nov 2026
 
-Agent: report writer (Claude, Opus). Ticket: item 8 of `../START.md`. Status: complete; findings are preliminary. Bare
-file names are in `docs/research/neuron-partition/reports/`, and `../` is `docs/research/neuron-partition/`.
+Report writer (Claude, Opus), item 8 of `../START.md`. Bare file names are in `reports/`; `../` is the direction.
 
 **Review 03: CONFIRMED WITH NOTES.** Every D-only number, recomputed from the rows, matches the verdict with no
 discrepancy (`../reviews/03-verdict-review.md`). Ruling R13 keeps N1 failed and the size-500 class a descriptive lead.
@@ -34,9 +33,6 @@ twin (N). N1 partitions the scored neurons into D-only, D-and-I shared, H-only a
 by set ablation. N2 asks whether ablating H-only drops honest accuracy while the deceptive rate stays, which would mean
 deception bypasses the honest neurons. N3 measures split-half stability (`../START.md`, items 1 and 2).
 
-**Where this sits.** At head level no exclusive or difference head set is deception-specific (F-mech-005 in
-`../../FINDINGS.md`), and no row had intervened below the head or block. This session leaves the Codex A3 cell alone.
-
 ### (b) The method
 
 **Unit and conditions.** The unit is one input of the MLP down-projection after the SwiGLU gate, 32 layers by 14,336.
@@ -51,9 +47,8 @@ Review 01 found that the readout score misses the 43 positions between the claus
 interchange writes. Ruling R11 therefore made the attribution summed over every position the primary ranking, with
 the readout score and the activation contrast as comparisons (`../reviews/01-scorer-review.md`).
 
-**The partition (R6).** Three signed scores per neuron: s_D from D against H, s_I from I against N, and s_H from the
-reverse run with H clean, sign flipped so that positive supports the honest answer. For each k on the ladder 500,
-1,000 and 2,000, T_D, T_I and T_H are the top k positive neurons of each score. The classes are D-only = T_D minus
+**The partition (R6).** s_D scores D against H, s_I scores I against N, and s_H is the reverse run with H clean, sign
+flipped. For k of 500, 1,000 and 2,000, T_D, T_I and T_H are the top k positive neurons of each. D-only = T_D minus
 (T_I union T_H); D-and-I shared = (T_D and T_I) minus T_H; H-only = T_H minus (T_D union T_I); all-shared = all three.
 Every class is ablated at every k, and k is never chosen on the test sample (`../spec.md`).
 
@@ -76,8 +71,7 @@ and 14.979. The all-position rerun reproduces every earlier key exactly (`01-w1-
 24,998 and 206, against 6,338 and 114. The D/H and I/N maps correlate at 0.355 over all positions and at 0.775 at the
 readout, and s_D and s_H correlate at 0.007 (`01-w1-scorer-handback.md`, addendum "all-position run").
 
-**Class sizes and overlaps, both rankings.** The all-position rows are the primary cut under R11; the readout rows
-are the comparison (`04-w4-partition-handback.md`, addenda "all-position partition (R11)" and "real partition").
+**Class sizes and overlaps.** All-position rows are primary (R11), readout rows the comparison (`04-w4-partition-handback.md`).
 
 | k | Ranking | D-only | D-and-I shared | H-only | all-shared | Jaccard T_D, T_I | Jaccard T_D, T_H |
 |---|---|---|---|---|---|---|---|
@@ -186,15 +180,22 @@ p of 0.031. Its 95% interval runs from about 2 to 13 points lost, so the sample 
 side of the 5-point bar. The 20 matched nulls span -3 to +6 at size 500, with a 95th percentile of the absolute shift
 of 3.15, and reach -9 at size 1,000 (`../reviews/03-verdict-review.md`, section "IOI resolution").
 
+**On 1,000 IOI rows, exploratory, not pre-registered (R13).** Intact accuracy is 0.554, and the size-500 class shifts
+IOI by -3.7 points, 95% paired-bootstrap interval -5.2 to -2.4, with 45 rows lost and 8 gained. Its 20 matched nulls
+move IOI by -2.3 to +1.1, with a 95th percentile of the absolute shift of 1.8. The first 100 rows of the same run
+reproduce -6.0, interval -12.0 to -1.0, nulls -3.0 to +5.0. The 100-row -6 was a noisy over-estimate of a real cost
+of about 4 points, under the bar at its point estimate (the interval reaches -5.2) and outside the null band. N1
+stays failed under the frozen bars (finding F5; `02-w2-ablation-handback.md`;
+`outputs/_analyses/neuron-partition/ablation/ioi_resolution-delta-e8dd8a8/summary.json`).
+
 **Larger sets fail two bars, and the references agree.** At 1,000 and 2,000 the class also removes 0.340 and 0.495 of
 the I margin under twin and 0.414 and 0.573 under mean, above the bar of a quarter, and moves IOI by -11.0 and -13.0
 points. Zero ablation fails the same bars with the smallest D removed, 0.550 to 0.583. D-and-I shared and all-shared
 remove more of the I margin than of the D margin under every reference
 (`outputs/_analyses/neuron-partition/verdict/far_atp_all_c3d7763/verdict.md`).
 
-**The comparison rankings fail more widely.** D-only rows at size 1,000 under twin and mean, from
-`outputs/_analyses/neuron-partition/verdict/far_atp_readout_c3d7763/verdict.md` and
-`outputs/_analyses/neuron-partition/verdict/far_contrast_66741d7/verdict.md`.
+**The comparison rankings fail more widely** (`outputs/_analyses/neuron-partition/verdict/far_atp_readout_c3d7763/verdict.md`,
+`outputs/_analyses/neuron-partition/verdict/far_contrast_66741d7/verdict.md`).
 
 | Ranking | Reference | size | D removed (margin) | D removed (rate) | I removed (margin) | null p95 of D removed | H shift | F shift | IOI shift |
 |---|---|---|---|---|---|---|---|---|---|
@@ -248,11 +249,10 @@ IOI rows' sha256 `61ebeea3…5e59` and hash seed 0, reads W3's sample file direc
 
 ## Execution evidence
 
-Five Delta jobs ran on interactive A40 nodes under account beto-delta-gpu. Three Bridges-2 jobs ran, and a fourth is
-queued, on partition GPU-shared with one H100-80 GB each under allocation cis260372p. Totals are 13.5 of 20 GPU-hours
-reserved and 25,104 GPU-seconds used, with no OpenRouter spend. The ledger is
-`/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/neuron-partition/ledger.json`; the cell counts are in
-`02-w2-ablation-handback.md`. Output paths are under `outputs/_analyses/neuron-partition/`.
+Delta jobs ran on interactive A40 nodes under account beto-delta-gpu, and Bridges-2 jobs on partition GPU-shared with
+one H100-80 GB each under allocation cis260372p. Totals are 14.8334 of 20 GPU-hours reserved and 25,416 GPU-seconds
+used, with no OpenRouter spend (`/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/neuron-partition/ledger.json`).
+Cell counts are in `02-w2-ablation-handback.md`; output paths are under `outputs/_analyses/neuron-partition/`.
 
 | Job | Cluster and node | Slurm id | Reserved | Actual | State | Output and commit |
 |---|---|---|---|---|---|---|
@@ -264,17 +264,18 @@ reserved and 25,104 GPU-seconds used, with no OpenRouter spend. The ledger is
 | C: contrast sets, k 1,000 | Bridges-2, H100, w010 | 50182995 | 2 h | 4,035 s | COMPLETED, 30 of 30 cells | `ablation/jobC-fe2db9e`, fe2db9e, clean |
 | A: all-position sets, k 500 and 1,000 | Bridges-2, H100, w007 | 50183187 | 4 h | 9,584 s | COMPLETED, 2 x 30 of 30 cells | `ablation/jobA-fe2db9e`, fe2db9e, clean |
 | B: all-position k 2,000, readout k 1,000 | Bridges-2, H100, w008 | 50183194 | 4 h | 9,724 s | COMPLETED, 2 x 30 of 30 cells | `ablation/jobB-fe2db9e`, fe2db9e, clean |
-| IOI resolution, 1,000 IOI rows, D-only k 500 and nulls, mean only | Bridges-2, H100 | 50189921 | 45 min | none yet | PENDING when this was written | `ablation/ioi_resolution-38c51db`, 38c51db |
+| IOI resolution, exploratory, not pre-registered (R13): queued copy, first attempt | Bridges-2, H100; Delta, A40, gpub001 | 50189921; 23493221 | 45 min; 40 min | 0 s; 41 s | CANCELLED unstarted, no charge; FAILED at CUDA initialisation | none |
+| IOI resolution, exploratory, not pre-registered (R13), 1,000 rows, D-only k 500 and nulls, mean only | Delta, A40, gpub002 | 23493280 | 40 min | 271 s | COMPLETED | `ablation/ioi_resolution-delta-e8dd8a8`, code e8dd8a8 by sha256, head 3c50669, dirty |
 
-**Checks inside the full cells.** All five full cells scored 300 of 300 ids per condition, self-replay error 0.0,
-and intact G 9.834 for D and 14.708 for I against the ladder audit's 10.087 and 14.979. Intact IOI accuracy is 0.51
-on 100 rows in each, against the brief's 0.51 (R4); the pilot read 0.48 before the fixes (`02-w2-ablation-handback.md`).
+**Checks.** All five full cells scored 300 of 300 ids per condition, self-replay error 0.0, intact G 9.834 for D and
+14.708 for I (ladder audit 10.087 and 14.979), and IOI 0.51 on 100 rows against the brief's 0.51 (R4)
+(`02-w2-ablation-handback.md`).
 
 ## What is NOT done
 
-- **A larger IOI measurement.** The IOI bar was read on 100 rows. Under ruling R13 an exploratory, not pre-registered
-  measurement on 1,000 IOI rows is running tonight on Bridges-2. It is pending, will be an addendum, and cannot
-  change the N1 decision (`../spec.md`, R13).
+- **A pre-registered larger IOI bar.** The N1 IOI bar was read on 100 rows. The 1,000-row measurement is exploratory,
+  not pre-registered (R13), and covers only the size-500 D-only class under mean; no other class, size or reference
+  was measured on 1,000 rows (`02-w2-ablation-handback.md`).
 - **The one-neuron interchange check** of the scorer review's second major is descriptive and was not run.
 - **SER.** No SER ranking or ablation has run. START makes SER a bonus.
 - **Dropped or unused.** The N3 rotation test is dropped, as START's fallback allows, and no verdict is recorded in
@@ -282,9 +283,9 @@ on 100 rows in each, against the brief's 0.51 (R4); the pilot read 0.48 before t
 
 ## Open questions
 
-- **The near miss.** Does the advisor read the size-500 result as a lead worth a larger IOI measurement and a
-  pre-registered follow-up, given that the bars were frozen? Default: as ruling R13 records, N1 stays failed and the
-  class is a descriptive lead; any follow-up gets its own pre-registered bars (`../spec.md`).
+- **The near miss.** The exploratory, not pre-registered (R13) 1,000-row measurement puts the class's IOI cost at
+  about 4 points. Does the advisor read the size-500 class as a lead worth a pre-registered follow-up with a 1,000-row
+  IOI bar, given that the bars were frozen? Default: N1 stays failed and the class is a descriptive lead (`../spec.md`).
 - **Rate or margin (R2).** The bars read the margin effect, and the rate at margin 0.7 sits beside it (`../spec.md`).
   The rate is close to saturated: at the smallest size D-and-I shared removes 0.856 of the D rate but 0.257 of the D
   margin under twin (`outputs/_analyses/neuron-partition/verdict/far_atp_all_c3d7763/verdict.json`). Default: margin.
@@ -294,5 +295,5 @@ on 100 rows in each, against the brief's 0.51 (R4); the pilot read 0.48 before t
   answer back, and how does that change the N2 reading? Default: report it descriptively and check per-row margins.
 - **The I sample.** It overlaps the D sample on 164 of 300 ids (`03-w3-data-handback.md`), so D and I effects come
   from partly different instances. Default: report it as a caveat.
-- **SER.** Should the unreserved 6.5 of 20 GPU-hours, derived from the ledger's 13.5 reserved, go to SER, whose
+- **SER.** Should the unreserved 5.17 of 20 GPU-hours, derived from the ledger's 14.83 reserved, go to SER, whose
   act-naming test rows number only 72 (`00-reader-brief.md`)? Default: only with the user's go, after the review.
