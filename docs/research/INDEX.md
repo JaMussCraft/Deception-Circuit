@@ -69,5 +69,6 @@ The session protocols live in the Alignment checkout under `docs/agents/`:
 - `research-session.md` describes how a research session starts, records its work, pauses at checkpoints and hands back.
 - `synthesis-session.md` describes how a synthesis session reads the recorded state, proposes the next research sessions and writes their starting prompts.
 - `session-audit.md` gives the rubric for deciding whether a finished or paused session's outputs can be trusted.
+- `weekly-report.md` describes how a weekly report session turns the recorded state into the report the user presents to their PI.
 
 The command reference is `research-session --help`.
