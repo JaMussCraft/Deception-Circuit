@@ -80,6 +80,98 @@ def test_form_filter_by_id_reads_the_d_row():
         keep({"instance_id": "missing"})
 
 
+# ------------------------------------------------------------------------------ --exclude-ids
+
+def test_load_exclude_file_reads_per_condition_dicts_and_flat_lists(tmp_path):
+    per = tmp_path / "per.json"
+    per.write_text(json.dumps({"seed": 2, "ids": {"D": ["a", "b"], "H": ["a", "b"], "I": ["c"]}}))
+    flat_ids = tmp_path / "flat_ids.json"
+    flat_ids.write_text(json.dumps({"ids": ["x", "y", "x"]}))
+    flat = tmp_path / "flat.json"
+    flat.write_text(json.dumps(["p", "q"]))
+    a = npd.load_exclude_file(str(per))
+    assert a["ids"] == ["a", "b", "c"] and a["per_condition_in_file"] == {"D": 2, "H": 2, "I": 1}
+    assert a["sha256"] == npd.sha256_file(str(per))
+    assert npd.load_exclude_file(str(flat_ids))["ids"] == ["x", "y"]
+    assert npd.load_exclude_file(str(flat))["ids"] == ["p", "q"]
+    bad = tmp_path / "bad.json"
+    bad.write_text(json.dumps({"ids": {"D": "a"}}))
+    with pytest.raises(ValueError):
+        npd.load_exclude_file(str(bad))
+
+
+def _fake_sample_env(monkeypatch, tmp_path, n_d=240, n_i=200):
+    """Synthetic D/H/F and I/N splits behind `cmd_sample`, with the real-file readers stubbed."""
+    d = {split: _records(n_d, prefix=f"{split[:2]}") for split in ("train", "validation", "test")}
+    pool = {split: [dict(r) for r in rows[:n_i]] for split, rows in d.items()}
+    by_cond = {"far_v2": d, "far_v2_honest": d, "far_v2_nopressure": d,
+               "far_v2_user_inversion": pool, "far_v2_user_neutral": pool}
+    monkeypatch.setattr(npd, "load_split_records",
+                        lambda path, split: [dict(r) for r in by_cond[os.path.basename(path)][split]])
+    monkeypatch.setattr(npd, "hash_tree", lambda root: {})
+    real_sha = npd.sha256_file
+    monkeypatch.setattr(npd, "sha256_file",
+                        lambda path: real_sha(path) if os.path.isfile(path) else "absent")
+    fixed = {"a1_assessment": {"path": "design.json", "sha256": "x",
+                               "ids": [f"te{i:04d}" for i in range(0, 20)]}}
+    monkeypatch.setattr(npd, "exclusion_sources", lambda task_key="far_v2": {
+        k: dict(v) for k, v in fixed.items()})
+    out = tmp_path / "data"
+    out.mkdir()
+    (out / "pools_manifest.json").write_text(json.dumps({"pools": {
+        "far_v2_user_inversion": {"files": {}, "source": "s"},
+        "far_v2_user_neutral": {"files": {}, "source": "s"}}}))
+    return out, fixed["a1_assessment"]["ids"]
+
+
+def test_sample_exclude_ids_removes_a_prior_sample_from_every_pool(monkeypatch, tmp_path, capsys):
+    out, fixed = _fake_sample_env(monkeypatch, tmp_path)
+    assert npd.main(["sample", "--n", "60", "--seed", "2", "--out-dir", str(out),
+                     "--no-rank-ids"]) == 0
+    prior_path = out / "far_test_sample_seed2.json"
+    prior = json.loads(prior_path.read_text())
+    assert not (out / "far_rank_ids.json").exists()             # --no-rank-ids writes none
+    capsys.readouterr()
+    assert npd.main(["sample", "--n", "60", "--seed", "3", "--out-dir", str(out), "--no-rank-ids",
+                     "--exclude-ids", str(prior_path)]) == 0
+    fresh = json.loads((out / "far_test_sample_seed3.json").read_text())
+    barred = set(fixed) | {i for v in prior["ids"].values() for i in v}
+    for cond in ("D", "H", "F", "I", "N"):
+        assert len(fresh["ids"][cond]) == 60
+        assert not set(fresh["ids"][cond]) & barred, cond
+    ex = fresh["excluded"]["exclude_ids_0"]
+    assert ex["sha256"] == npd.sha256_file(str(prior_path))
+    assert ex["path"].endswith("far_test_sample_seed2.json")
+    assert ex["per_condition_in_file"] == {c: 60 for c in ("D", "H", "F", "I", "N")}
+    # the draw is balanced as before: the 8 strata of the 3 factors within one of each other
+    for label in ("D", "I"):
+        counts = [len(s["instance_ids"]) for s in fresh["samples"][label]["strata"]]
+        assert len(counts) == 8 and max(counts) - min(counts) <= 1
+    # every pool shrank by exactly the prior sample's ids it held, from every condition of
+    # the prior file (a prior I id is barred from the fresh D pool too)
+    prior_union = set(prior["ids"]["D"]) | set(prior["ids"]["I"])
+    assert len(prior_union) > 60
+    assert fresh["counts"]["D"]["eligible"] == prior["counts"]["D"]["eligible"] - len(prior_union)
+    i_pool = {f"te{i:04d}" for i in range(200)}
+    assert fresh["counts"]["I"]["eligible"] == prior["counts"]["I"]["eligible"] - len(
+        prior_union & i_pool)
+
+
+def test_sample_count_only_counts_without_drawing(monkeypatch, tmp_path, capsys):
+    out, fixed = _fake_sample_env(monkeypatch, tmp_path)
+    flat = tmp_path / "more.json"
+    flat.write_text(json.dumps([f"te{i:04d}" for i in range(20, 60)]))
+    capsys.readouterr()
+    assert npd.main(["sample", "--count-only", "--out-dir", str(out),
+                     "--exclude-ids", str(flat)]) == 0
+    got = json.loads(capsys.readouterr().out)
+    assert got["D"]["eligible"] == 240 - 60 and got["D"]["max_n_balanced_draw"] == 180
+    assert got["I"]["eligible"] == 200 - 60
+    assert got["D"]["n_strata"] == 8
+    assert got["D"]["max_n_equal_share"] == 8 * min(got["D"]["strata"].values())
+    assert not list(out.glob("far_test_sample_seed*.json"))     # nothing drawn or written
+
+
 # ------------------------------------------------------------------------------ split halves
 
 def test_split_halves_balanced_per_cluster_and_overall():

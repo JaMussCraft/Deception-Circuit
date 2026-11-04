@@ -265,6 +265,33 @@ def exclusion_sources(task_key: str = "far_v2") -> Dict[str, dict]:
     return out
 
 
+def load_exclude_file(path: str) -> dict:
+    """One `--exclude-ids` file: its ids (every id of a per-condition "ids" dict, of a flat
+    "ids" list, or of a top-level flat list), with path, sha256 and count.
+
+    A sample file such as `far_test_sample_seed2.json` qualifies as it stands: the union of
+    its per-condition lists is excluded from every pool of the new draw.
+    """
+    raw = json.load(open(path))
+    ids = raw.get("ids") if isinstance(raw, dict) else raw
+    if isinstance(ids, dict):
+        if not all(isinstance(v, list) for v in ids.values()):
+            raise ValueError(f"{path}: 'ids' must map conditions to lists of ids")
+        flat = [str(i) for v in ids.values() for i in v]
+        per_condition = {str(k): len(v) for k, v in ids.items()}
+    elif isinstance(ids, list):
+        flat = [str(i) for i in ids]
+        per_condition = None
+    else:
+        raise ValueError(f"{path}: expected a list of ids or a dict whose 'ids' is a "
+                         "per-condition dict or a list")
+    out = {"path": _display(path), "sha256": sha256_file(path), "ids": sorted(set(flat)),
+           "why": "--exclude-ids: removed from every pool before the balanced draw"}
+    if per_condition is not None:
+        out["per_condition_in_file"] = per_condition
+    return out
+
+
 def act_naming(record: dict) -> bool:
     """True iff the row's D pressure clause is act-naming. Only meaningful on D rows: an I or
     user-neutral row's `pressure` field holds the neutral sentence, so pool rows are judged by
@@ -287,6 +314,31 @@ def act_naming_by_id(d_records: Sequence[dict]):
 
 
 # ------------------------------------------------------------------------------ commands
+
+def count_eligible(recs: dict, ids: dict, union: Sequence[str],
+                   factors: Sequence[str] = ("designation_polarity", "item_polarity",
+                                             "template_variant")) -> dict:
+    """What the test-split draw could take, without drawing: per pool, the eligible ids after
+    the form filter, the pairing check and the exclusions, their strata, the largest n the
+    balanced draw gives (every eligible id: `allocate` caps each stratum and hands the surplus
+    to the smallest stratum with room) and the largest n at which every stratum gets an equal
+    share (strata times the smallest stratum)."""
+    barred = set(map(str, union))
+    out = {}
+    for label, twins, form in (("D", ("H", "F"), act_naming),
+                               ("I", ("N",), act_naming_by_id(recs["D"]["test"]))):
+        records = [r for r in recs[label]["test"] if form(r)]
+        keep, dropped = paired_records(records, [ids[t]["test"] for t in twins])
+        eligible = [r for r, rid in zip(keep, record_ids(keep)) if rid not in barred]
+        strata = Counter(tuple(str(r.get(f)) for f in factors) for r in eligible)
+        out[label] = {"test_rows": len(recs[label]["test"]), "dropped_no_twin": len(dropped),
+                      "removed_by_exclusion": len(keep) - len(eligible),
+                      "eligible": len(eligible), "max_n_balanced_draw": len(eligible),
+                      "n_strata": len(strata),
+                      "max_n_equal_share": len(strata) * min(strata.values()) if strata else 0,
+                      "strata": {"|".join(k): v for k, v in sorted(strata.items())}}
+    return out
+
 
 def cmd_copy_pools(args) -> int:
     dest_root = os.path.join(args.out_dir, "pools")
@@ -340,11 +392,17 @@ def cmd_sample(args) -> int:
             raise SystemExit(f"{paths[cond]} no longer matches pools_manifest.json")
 
     excl = exclusion_sources()
+    for k, path in enumerate(args.exclude_ids or []):
+        excl[f"exclude_ids_{k}"] = load_exclude_file(path)
     union = sorted({i for src in excl.values() for i in src["ids"]})
 
     recs = {cond: {split: load_split_records(paths[cond], split)
                    for split in ("train", "validation", "test")} for cond in paths}
     ids = {cond: {split: record_ids(r) for split, r in by.items()} for cond, by in recs.items()}
+
+    if args.count_only:
+        print(json.dumps(count_eligible(recs, ids, union), indent=1))
+        return 0
 
     # --- the fresh test sample
     d_draw = draw_condition(recs["D"]["test"], twin_id_sets=[ids["H"]["test"], ids["F"]["test"]],
@@ -413,8 +471,16 @@ def cmd_sample(args) -> int:
                          "D_and_I_overlap": len(set(sample_ids["D"]) & set(sample_ids["I"]))},
               "samples": {"D": d_draw["sample"], "I": i_draw["sample"]},
               "dataset_files": dataset_files}
-    out_sample = os.path.join(args.out_dir, "far_test_sample_seed2.json")
+    out_sample = os.path.join(args.out_dir, f"far_test_sample_seed{args.seed}.json")
     sha_s = write_json(out_sample, sample)
+    if args.no_rank_ids:
+        print(json.dumps({"per_condition": sample["counts"]["per_condition"],
+                          "D": d_draw["counts"], "I": i_draw["counts"],
+                          "D_and_I_overlap": sample["counts"]["D_and_I_overlap"],
+                          "excluded": {k: (v["n"], v["in_D_test"], v["in_I_test"])
+                                       for k, v in excluded.items()},
+                          "sha256": {os.path.basename(out_sample): sha_s}}, indent=1))
+        return 0
 
     # --- the rank ids (train + validation), with the split-half assignment
     rank = {"D": {}, "I": {}}
@@ -463,7 +529,8 @@ def cmd_sample(args) -> int:
                            "marginals": marg},
                 "excluded_union_n": len(union),
                 "test_sample": {"path": _display(out_sample), "sha256": sha_s}}
-    out_rank = os.path.join(args.out_dir, "far_rank_ids.json")
+    out_rank = os.path.join(args.out_dir, "far_rank_ids.json" if args.seed == SEED
+                            else f"far_rank_ids_seed{args.seed}.json")
     sha_r = write_json(out_rank, rank_out)
     print(json.dumps({"per_condition": sample["counts"]["per_condition"],
                       "D": d_draw["counts"], "I": i_draw["counts"],
@@ -472,7 +539,8 @@ def cmd_sample(args) -> int:
                                    for k, v in excluded.items()},
                       "rank": rank_counts,
                       "halves": {h: len(rank_out["halves"][h]) for h in ("A", "B", "I_A", "I_B")},
-                      "sha256": {"far_test_sample_seed2.json": sha_s, "far_rank_ids.json": sha_r}},
+                      "sha256": {os.path.basename(out_sample): sha_s,
+                                 os.path.basename(out_rank): sha_r}},
                      indent=1))
     return 0
 
@@ -527,6 +595,14 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     s.add_argument("--n", type=int, default=N_TEST)
     s.add_argument("--seed", type=int, default=SEED)
     s.add_argument("--out-dir", default=OUT_DIR)
+    s.add_argument("--exclude-ids", action="append", default=[], metavar="JSON",
+                   help=("repeatable: a file whose ids (a per-condition 'ids' dict, a flat 'ids' "
+                         "list or a flat list) are removed from every pool before the draw; its "
+                         "sha256 is recorded in the sample's 'excluded' block"))
+    s.add_argument("--count-only", action="store_true",
+                   help="print the eligible counts and strata per pool; draw and write nothing")
+    s.add_argument("--no-rank-ids", action="store_true",
+                   help="write only the test sample, not far_rank_ids*.json")
     n = sub.add_parser("nulls", help="size- and layer-matched random neuron sets")
     n.add_argument("neurons", help="JSON {name: [['mlp_hidden', layer, index], ...]}")
     n.add_argument("--out", required=True)

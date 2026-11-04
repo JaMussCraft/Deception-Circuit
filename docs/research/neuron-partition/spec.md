@@ -122,3 +122,23 @@ as a ruling before that run.
   IOI row set the recipe supports (up to 1,000 rows), IOI condition and mean reference only, to report what 100
   rows could resolve. Its result is descriptive and does not alter N1; a follow-up would need its own
   pre-registered bars.
+- **R14 (Tue 3 Nov 2026, 9:55 pm EST, before any draw): pre-registered confirmation test of the size-500 lead.**
+  Fixed, unchanged inputs: the all-position deception-only class at size 500 (338 neurons, from
+  `sets/far_atp_all_c3d7763/far_all_sets_k500_with_nulls.json`) and its 20 matched nulls, as held in
+  `outputs/_analyses/neuron-partition/ablation/ioi_resolution_sets.json`. Fresh data, drawn only after this ruling:
+  a seed-3 test sample by W3's balanced sampler from the eligible test pools after removing the 356 excluded ids and
+  every id of the seed-2 sample from every pool (fully fresh instances), taking every eligible id: 208 rows each for
+  D, H and F and 166 each for I and N; and 1,000 fresh IOI rows drawn with IOI seed 2, any sentence shared with the
+  seed-1 draw dropped and counted. The bars are those of item 10 N1, unchanged and read on the point estimate as the
+  verdict script reads them: under the twin interchange and under the mean reference, each on the whole sample and
+  on both seed-3 halves (R10), the class removes at least 0.50 of the deception margin effect (R2), removes under
+  0.25 of the inversion margin effect, moves H, F and IOI accuracy by under 5 points (mean reference, R7; IOI on
+  the 1,000 fresh rows), and removes more than the 95th percentile of its 20 nulls. The zero reference is not run.
+  Outcome: every bar met is "the size-500 lead is confirmed on fresh data" and N1 is recorded as passed for that
+  class on the confirmation sample (preliminary until an independent recomputation matches); any bar missed is
+  "not confirmed", with the bars named, and R13 stands. Optional second cell, run only if the first is running on an
+  H200: the honest-only class at size 2,000 and its 20 nulls on the same fresh sample under twin and mean, read by
+  the N2 rule of item 10 under the mean reference (bypass if H accuracy falls at least 20 points while the
+  deceptive rate moves under 5 and the nulls' 95th percentile of the H shift is under 5; suppression or shared if
+  the deceptive rate also falls at least 10 points; otherwise undetermined). Budget: at most 2 GPU-hours reserved
+  for both cells.
