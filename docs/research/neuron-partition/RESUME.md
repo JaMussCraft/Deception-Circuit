@@ -1,19 +1,27 @@
 # Resume: neuron-partition
 
-Last rewritten: Tue 3 Nov 2026, 9:45 pm EST by claude-5201d56c, after the confirmation test.
+Last rewritten: Wed 4 Nov 2026, 1:00 pm EST by claude-5201d56c, after the four pre-registered follow-ups.
 
 ## Status
 
-Two decisions stand side by side. R13: on the original ladder, N1 FAILED at every set size under the frozen bars
-(the size-500 class missed only the IOI bar on 100 rows) and N2 is UNDETERMINED. R14: a pre-registered
-confirmation test of that fixed size-500 all-position deception-only class (338 neurons, layers 0 to 9) on fresh
-ids (208 D, 166 I) and 1,000 fresh IOI rows met every N1 bar under twin and mean on the whole sample and both
-halves: 0.82 and 0.75 of the deception effect removed, 0.14 to 0.15 of inversion, H and F at zero shift, IOI minus
-2.7 points, 35 times the null 95th percentile. Findings F1 to F6 are in `WORKLOG.md`; F3, F4 and F6 are reviewed
-(reviews 03 and 04). The report is `reports/05-first-report.md` (final, both decisions and the confirmation
-section). Every GPU job is reconciled: 15.83 of 20 GPU-hours reserved, about 10.3 used. The optional N2 fresh-data
-cell (honest-only at size 2,000) was not run (no H200 available); its sets file is
-`outputs/_analyses/neuron-partition/ablation/confirm_h_only_k2000_sets.json`.
+The first report (`reports/05-first-report.md`, final) carries two decisions: R13 (N1 FAILED on the original
+ladder, N2 UNDETERMINED) and R14 (the size-500 all-position deception-only class passed a pre-registered
+confirmation on fresh ids). On Wed 4 Nov 2026 the user approved four follow-ups, pre-registered as R15 and run the
+same day under a 30 GPU-hour cap (R16, user decision, need N1 resolved):
+
+- R19, finding F8 (reviewed, review 06): the finer ladder passes every N1 bar at sizes 250, 375, 625 and 750 on
+  the seed-3 sample; 750 is the largest size tested, so the class's size is not bounded above.
+- R18, finding F7 (reviewed, review 05): N2 on FAR at size 2,000 on fresh data is "suppression or shared" (H minus
+  21.9, rate minus 12.7); the rate clause is inside the null band, the H fall is not.
+- R20, finding F9 (review 07 pending): SER at size 500 (predicate-naming rows, R17, need N2 resolved at its
+  default) removes 0.96 of the deception margin under twin but fails N1 on collateral (H minus 15.8, F minus 6.3);
+  N2 on SER is suppression or shared; 210 of the 386 class neurons lie in the Codex A3 SER layers.
+- R21, finding F10 (review 08 pending): the one-neuron interchange check finds the attribution ranking predicts
+  single-neuron twin interchange effects (sign 40 of 40 for D, 39 of 40 for H; Spearman 0.93 and 0.998).
+
+Findings F1 to F10 are in `WORKLOG.md`. The follow-up results report is `reports/13-followups-4nov.md` (W11,
+Sonnet, in progress at the time of writing). Every GPU job is reconciled: 21.58 of 30 GPU-hours reserved,
+38,632 GPU-seconds (10.7 hours) actually used. No job of this session is queued on Delta or Bridges-2.
 
 ## Branch, worktree and commit
 
@@ -26,17 +34,17 @@ cell (honest-only at size 2,000) was not run (no H200 available); its sets file 
 
 ## In-flight jobs
 
-Reservations r-001 to r-003 (ranking pilot, full ranking, split halves; 89, 252 and 259 s) are reconciled r-004 (ablation pilot, 679 s) and r-005 (all-position ranking, 482 s) are reconciled; r-006 is job C (2 h). 4.75 of 20 GPU-hours reserved before jobs A and B (8 h more).
+None. Reservations r-001 to r-017 are all reconciled (r-009 cancelled, r-010 failed on gpub001, the rest
+completed).
 
 ## Next action
 
-1. The user decides: release the direction as done, or pause it for a follow-up (candidates: the N2 fresh-data
-   cell above, about 40 min on an A40; SER; the one-neuron interchange check of review 01; a finer size ladder
-   around 500 with a 1,000-row IOI bar, each needing its own pre-registration).
-2. After the Wed 4 Nov 2026 8:00 am EST reset, the user reverts `CAP_PERCENT` to 80 in
-   `/projects/beto/swong2/Alignment/.agents/research_session/usage.py`.
+1. When reviews 07 (SER) and 08 (one-neuron) report: fold corrections into R20 and R21, mark F9 and F10
+   reviewed in the WORKLOG, commit the reviews and report 13.
+2. The user decides what follows (options in report 13 section 5): a SER ladder at smaller sizes, an all-forms
+   SER run, a FAR ladder above 750, or wrap-up. New runs need a new pre-registered ruling.
 3. Before Bridges-2 goes offline (about Sun 9 Nov 2026): copy the clone's `logs/` entries for jobs 50182995,
-   50183187 and 50183194 under the primary checkout on Delta, so the evidence blocks stay traceable.
+   50183187, 50183194, 50212883 and 50213549 under the primary checkout on Delta.
 4. Wrap-up when the user says so: merge the branch into main, delete branch and worktree, keep the worktree's
    untracked outputs under the primary checkout, copy the Bridges-2 outputs and logs to Delta.
 
@@ -56,5 +64,5 @@ Reservations r-001 to r-003 (ranking pilot, full ranking, split halves; 89, 252 
 
 ## Open decisions for the user
 
-- Cadence: START says 24 points; only the user can set it with the research-session cadence command; the default
-  16 is in force until then.
+- None pending in the WORKLOG needs section (N1 and N2 resolved on 4 Nov 2026). The next research step is the
+  user's choice (report 13, section 5).
