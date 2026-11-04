@@ -217,8 +217,15 @@ as a ruling before that run.
   lists), single-neuron twin interchange on the seed-2 D and H rows moves the D margin in the direction the
   attribution score predicts in 40 of 40 groups and the H margin in 39 of 40, with Spearman 0.93 between s_D and
   the measured D shift and 0.998 between s_H and the measured H shift (the clean-stream read agrees). Each top
-  neuron alone removes at most 0.05 of the D margin. The top single neurons sit in layers 8 to 19, not in the
-  layers 0 to 9 where the size-500 class is dense, so the class effect is carried by many small early-layer
-  contributions rather than by the largest single neurons. The attribution ranking is therefore a faithful
-  predictor of single-neuron interchange effects at the top of the ranking, answering review 01's one-neuron
-  question. Pending the independent recomputation (review 08). Delta job 23520193, 1,447 s of 2,700 reserved.
+  neuron alone removes at most 0.052 of the D margin. The top 20 by s_D span layers 0 to 19 and the top 20 by
+  s_H span layers 12 to 21. The 14 top s_D neurons in layers 12 to 19 are outside the deception-only class
+  because 13 are also in the inversion top 500 and one in the honest top 500; the six that are in the class
+  include the three largest single-neuron effects (layers 8, 0 and 9, 0.044 to 0.052 each) and together remove
+  0.21 of the D margin one at a time, against 0.81 for the whole class, so most of the class effect is carried
+  by its other 332 members. The ranking is faithful in sign for every neuron and in size for the layer 13 to
+  19 neurons; it under-predicts the early-layer neurons by up to a factor of 2.5, so the top of the s_D list
+  is ordered less well (Spearman 0.65 within that list). The one H sign miss is a zero-sized prediction
+  (s_H minus 0.0004 against a measured plus 0.003), not a disagreement. This answers review 01's one-neuron
+  question. Confirmed with corrections by the independent recomputation (review 08, 12:50 pm EST: every
+  number matches; the layer sentence of the first draft was wrong and is replaced above). Delta job 23520193,
+  1,447 s of 2,700 reserved.
