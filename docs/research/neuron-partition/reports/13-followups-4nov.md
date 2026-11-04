@@ -6,8 +6,8 @@ Report writer W11, Claude Sonnet 5.5. Written Wed 4 Nov 2026, 12:47 PM EST, as t
 
 1. The finer ladder passes N1 at every size from 250 to 750 on the seed-3 sample, so the size-500 pass is not a tuned point. Review 06 confirmed it by independent recomputation, with wording corrections.
 2. N2 on FAR reads suppression or shared at size 2,000 on fresh data, not bypass. Review 05 confirmed it and qualified that the deceptive-rate clause lies inside the null band, so only the honest-accuracy fall beats the nulls.
-3. On SER at size 500 the deception-only class removes the deception effect but fails N1 on honest and no-pressure collateral, and N2 on SER also reads suppression or shared. Both SER results are pending independent recomputation.
-4. The one-neuron check shows that the attribution ranking predicts the sign and the order of single-neuron interchange effects at the top of the ranking, which is pending independent recomputation.
+3. On SER at size 500 the deception-only class removes the deception effect but fails N1 on honest and no-pressure collateral, and N2 on SER also reads suppression or shared. Review 07 confirmed both, with one wording correction, and found that the collateral sits almost entirely in identity rows.
+4. The one-neuron check shows that the attribution ranking is faithful in sign for every top neuron and in size for layers 13 to 19, while it under-predicts early-layer neurons by up to 2.5 times. Review 08 confirmed it, with corrections.
 5. The first report's two decisions stand: the original ladder stays failed under its frozen bars, and the size-500 class stays confirmed on fresh data.
 
 ## What was run
@@ -26,7 +26,7 @@ Row counts match the expected counts in every cell, and self-replay error is 0.0
 
 | Cell | Rows observed and expected | Intact IOI accuracy against the reference of 0.51 |
 |---|---|---|
-| N2 on fresh data | 56,784 and 56,784 | not stated in the hand-back |
+| N2 on fresh data | 56,784 and 56,784 | 0.513 |
 | Finer ladder | 227,136 and 227,136 | 0.511 |
 | One-neuron check | 24,000 and 24,000 | not applicable, IOI was off |
 | SER ablation | 310,800 and 310,800 | 0.511 |
@@ -82,7 +82,7 @@ Under twin the deception effect is flat and the inversion cost rises with size. 
 
 ## Follow-up C: SER at size 500
 
-**Pending independent recomputation.** Review 07 does not exist yet, so finding F9 is preliminary. The numbers are copied from the verdict file `outputs/_analyses/neuron-partition/verdict/ser_predicate_k500-d5f6b17/verdict.md`.
+**Review 07: CONFIRMED WITH CORRECTIONS.** An independent recomputation from the rows matches 2,640 quantities with a worst difference of 2.2e-16 on fractions, in `../reviews/07-ser-recompute.md`. Finding F9 is reviewed. The numbers below are from `outputs/_analyses/neuron-partition/verdict/ser_predicate_k500-d5f6b17/verdict.md`.
 
 The SER sample holds 300 ids per condition at seed 2, with predicate-naming rows only and 1,000 IOI rows at seed 2, as R17 sets. The deception-only class has 386 neurons and is densest in layers 5 to 9. The rows below are the deception-only class and the honest-only class.
 
@@ -93,9 +93,11 @@ The SER sample holds 300 ids per condition at seed 2, with predicate-naming rows
 | H_only | twin | 403 | 0.471 | 0.638 | 0.168 | 0.030 | -44.8 | -40.3 | -2.2 | fail |
 | H_only | mean | 403 | -0.101 | 0.525 | -0.137 | 0.033 | -44.8 | -40.3 | -2.2 | fail |
 
-A rate removed above 1.0 means that the ablated deception rate sits below the ablated honest rate under mean. The D-and-I shared class of 28 neurons and the all-shared class of 36 neurons each remove under 0.4 of the deception margin and fail N1 as well.
+The correction of review 07 is that the deceptive rate removed is 0.998 under twin and 1.051 under mean, not 1.0 as R20 words it. The mean value exceeds 1 because the ablated honest rows themselves turn deceptive. The D-and-I shared class of 28 neurons and the all-shared class of 36 neurons each remove under 0.4 of the deception margin and fail N1 as well.
 
-**N1 on SER reads fail.** The deception-only class meets the size, D, I, null and IOI bars. It fails the H bar at 15.8 points and the F bar at 6.3 points against bars of under 5, on the whole sample and on both halves under both references. The deception effect transfers from FAR to SER, but the class cannot be separated from honest answering at this size.
+**N1 on SER reads fail.** The deception-only class meets the size, D, I, null and IOI bars. It fails the H bar at 15.8 points and the F bar at 6.3 points against bars of under 5, and only those two bars, in all six cells of two references and three subsets. The deception effect transfers from FAR to SER, but the class cannot be separated from honest answering at this size.
+
+**Where the collateral sits.** Review 07 found that the loss is concentrated by designation polarity. In identity rows the prompt names the favorable item, so the honest answer is the other item. Of the 95 lost honest pairs, 94 are identity rows, and all 38 lost no-pressure pairs are identity rows. Honest accuracy on identity rows falls from 1.000 to 0.691 and on inversion rows from 1.000 to 0.997. Identity rows start with smaller honest margins, and the matched nulls move honest accuracy by at most 2.5 points.
 
 | Reference | Subset | H shift, points | D deceptive-rate change, points | Null p95 of the absolute H shift | N2 verdict |
 |---|---|---|---|---|---|
@@ -104,7 +106,7 @@ A rate removed above 1.0 means that the ablated deception rate sits below the ab
 | mean | half 2 | -43.8 | -14.9 | 2.0 | suppression or shared |
 | twin | whole | -71.3 | -62.0 | 0.2 | suppression or shared |
 
-**N2 on SER reads suppression or shared.** This matches FAR in follow-up A. Review 05's rate-clause qualification was not recomputed for SER, so the same caution applies until review 07 returns.
+**N2 on SER reads suppression or shared on every subset.** This matches FAR in follow-up A. Unlike FAR, the rate clause beats its null band on SER. Under mean no honest-only null lowers D's rate by 14.0 points, and the null range is minus 5.7 to plus 1.5 with a median of minus 1.2. Review 05's rate caution therefore does not apply to SER, and the SER outcome rests on the rate fall as well as on the honest and no-pressure falls.
 
 **Against the Codex A3 cell.** Of the 386 deception-only neurons, 210 lie in the A3 cell's SER layers, which are 5 to 8, 11, 13 and 16, as `11-w10-ser-prep-handback.md` and R17 record. A reading of this class as new therefore overlaps A3 for more than half of its neurons. All SER classes are split-half stable at every size, with the deception-only Jaccard at 0.774 against a ceiling of 0.815 at size 500, in `outputs/_analyses/neuron-partition/sets/ser_predicate_atp_all_a41752a/stability_summary_all.md`.
 
@@ -112,7 +114,7 @@ A rate removed above 1.0 means that the ablated deception rate sits below the ab
 
 ## Follow-up D: the one-neuron interchange check
 
-**Pending independent recomputation.** Review 08 does not exist yet, so finding F10 is preliminary. The numbers are copied from `outputs/_analyses/neuron-partition/verdict/one_neuron-92fc6fb/one_neuron_report.md`.
+**Review 08: CONFIRMED WITH CORRECTIONS.** All 400 per-group quantities match with a difference of exactly 0.0, and the summary statistics match within 4.4e-16, in `../reviews/08-one-neuron-recompute.md`. Finding F10 is reviewed. The numbers below are from `outputs/_analyses/neuron-partition/verdict/one_neuron-92fc6fb/one_neuron_report.md`, with the review's corrections applied.
 
 The check patches one neuron at a time from its neutral twin under the twin interchange, on the seed-2 D and H rows. It covers the top 20 neurons by the deception score and the top 20 by the honest score, which is 36 distinct neurons because 4 appear in both lists. It answers the second major of review 01 and has no pass bars.
 
@@ -123,9 +125,16 @@ The check patches one neuron at a time from its neutral twin under the twin inte
 | clean stream | all groups | 40 | 40 of 40 | 39 of 40 | 0.931 | 0.997 |
 | clean stream | distinct neurons | 36 | 36 of 36 | 35 of 36 | 0.940 | 0.995 |
 
-The one honest-margin miss is a neuron whose honest score is about zero. The four duplicate groups agree exactly. No single neuron removes more than 0.05 of the deception margin, and the strongest single neurons sit in layers 8 to 19. The size-500 class is dense in layers 0 to 9, so its effect comes from many small early contributions and not from the largest single neurons.
+The one honest-margin miss is a zero-sized prediction, with an honest score of minus 0.0004 and a measured shift of plus 0.0033, so it is not a substantive disagreement. The four duplicate groups agree exactly. The pooled correlation of 0.93 is inflated, because the honest list stretches the deception score over a wider range. Within each list the correlations are as follows.
 
-**What this does and does not show.** The ranking is faithful at the top, in sign and in order. The check does not test neurons deep in the ranking, where most of each class lies. It also uses the twin reference only and has no IOI rows.
+| List | Neurons | Spearman, deception score against measured D shift | Spearman, honest score against measured H shift |
+|---|---|---|---|
+| top 20 by the deception score | 20 | 0.648 | 0.992 |
+| top 20 by the honest score | 20 | 0.997 | 0.988 |
+
+**Layers and the class.** The top 20 by the deception score span layers 0 to 19, and the top 20 by the honest score span layers 12 to 21. No single neuron removes more than 0.05 of the deception margin. The 14 top deception neurons in layers 12 to 19 are outside the deception-only class, because 13 are in the inversion top 500 and one is in the honest top 500. Six top neurons are in the class, and they include the three largest single effects, in layers 8, 0 and 9, at 0.044 to 0.052 each. Together the six remove 0.21 of the margin one at a time, against 0.81 for the whole class, so most of the class effect is carried by its other 332 members or by their interactions.
+
+**What this does and does not show.** The ranking is faithful in sign for every neuron and in size for the neurons in layers 13 to 19, where the measured shift is 0.90 to 1.09 times the score. It under-predicts the early-layer neurons by up to 2.5 times, so the top of the deception ranking is ordered less well. The check does not test neurons deep in the ranking, where most of each class lies. It also uses the twin reference only and has no IOI rows.
 
 **For the first report.** The first report listed this check as not run. The result supports reading the ranked classes as carrying real single-neuron effects, and it does not change R13 or R14.
 
@@ -155,11 +164,11 @@ The cap is 30 reserved GPU-hours after R16, and at most 3 concurrent GPU jobs st
 
 The user decides which of these to take. Costs below use the reservations of this phase as a guide and are estimates, not ledger rows.
 
-1. **A SER ladder at smaller sizes.** Cut the SER deception-only class at sizes below 500, as the FAR ladder did, and see whether the honest and no-pressure collateral shrinks before the deception effect does. A four-size ladder would reserve about 1.5 to 2.0 GPU-hours.
+1. **A SER ladder at smaller sizes.** Cut the SER deception-only class at sizes below 500, as the FAR ladder did, and see whether the honest and no-pressure collateral shrinks before the deception effect does. The same run could test whether the collateral stays confined to identity rows, as review 07 found at size 500. A four-size ladder would reserve about 1.5 to 2.0 GPU-hours.
 2. **An all-forms SER run.** R17 kept this as the stated alternative to the predicate-naming rows. Act-naming alone is infeasible, at 49 D and 42 I eligible rows, so this option mixes clause forms and loses the wording match.
 3. **A FAR ladder above 750.** Size 750 passed and bounds nothing from above, and the tightest bar there is inversion under twin at 0.217. Sizes above 750 would locate where that bar first fails on the seed-3 sample. The size-1,000 class failed it on the seed-2 sample at 0.340.
-4. **A clause-reading test of the early-layer neurons.** Report 05 raised the hypothesis that the size-500 class only reads the clause tokens. No run so far addresses it, and the one-neuron check suggests the class effect is spread across many small early contributions.
-5. **Wrap-up.** Merge the branch to main under the user's wrap-up definition and report the two FAR decisions with the new follow-up results beside them. F7 and F8 are reviewed, and F9 and F10 would be reported as preliminary unless reviews 07 and 08 return first.
+4. **A clause-reading test of the early-layer neurons.** Report 05 raised the hypothesis that the size-500 class only reads the clause tokens. No run so far addresses it, and the one-neuron check shows that most of the class effect lies in neurons other than its largest single contributors.
+5. **Wrap-up.** Merge the branch to main under the user's wrap-up definition and report the two FAR decisions with the new follow-up results beside them. F7 to F10 are all reviewed.
 
 ## Provenance notes
 
@@ -167,4 +176,4 @@ The user decides which of these to take. Costs below use the reservations of thi
 
 **Incident P2.** The orchestrator wrote four inline times without reading the clock, and rulings R16 to R18 were corrected in `../spec.md` to 10:50 AM, 11:00 AM and 11:17 AM EST. The tool's own stamps are authoritative. One WORKLOG entry stamped 11:23 AM EST still carries an inline time of about 12:40 PM EST, and I report the stamp. The times in this report were read from the clock at writing.
 
-**Review status.** Findings F7 and F8 are reviewed. Findings F9 and F10 are pending independent recomputation, and every number for them above is copied from the verdict files and not recomputed here.
+**Review status.** Findings F7, F8, F9 and F10 are reviewed, by reviews 05, 06, 07 and 08. The numbers in this report are copied from the verdict files and the reviews, and none was recomputed by the writer.

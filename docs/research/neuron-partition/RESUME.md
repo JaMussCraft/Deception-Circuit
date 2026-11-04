@@ -1,6 +1,6 @@
 # Resume: neuron-partition
 
-Last rewritten: Wed 4 Nov 2026, 1:00 pm EST by claude-5201d56c, after the four pre-registered follow-ups.
+Last rewritten: Wed 4 Nov 2026, 1:00 pm EST by claude-5201d56c, after the four pre-registered follow-ups and their reviews.
 
 ## Status
 
@@ -13,14 +13,16 @@ same day under a 30 GPU-hour cap (R16, user decision, need N1 resolved):
   the seed-3 sample; 750 is the largest size tested, so the class's size is not bounded above.
 - R18, finding F7 (reviewed, review 05): N2 on FAR at size 2,000 on fresh data is "suppression or shared" (H minus
   21.9, rate minus 12.7); the rate clause is inside the null band, the H fall is not.
-- R20, finding F9 (review 07 pending): SER at size 500 (predicate-naming rows, R17, need N2 resolved at its
+- R20, finding F9 (reviewed, review 07): SER at size 500 (predicate-naming rows, R17, need N2 resolved at its
   default) removes 0.96 of the deception margin under twin but fails N1 on collateral (H minus 15.8, F minus 6.3);
-  N2 on SER is suppression or shared; 210 of the 386 class neurons lie in the Codex A3 SER layers.
-- R21, finding F10 (review 08 pending): the one-neuron interchange check finds the attribution ranking predicts
-  single-neuron twin interchange effects (sign 40 of 40 for D, 39 of 40 for H; Spearman 0.93 and 0.998).
+  N2 on SER is suppression or shared; 210 of the 386 class neurons lie in the Codex A3 SER layers; the lost
+  H and F pairs are almost all identity rows (honest answer is the other item).
+- R21, finding F10 (reviewed, review 08): the one-neuron interchange check finds the attribution ranking predicts
+  single-neuron twin interchange effects in sign (40 of 40 for D, 39 of 40 for H) and in size for layers 13 to
+  19; the top 20 by s_D span layers 0 to 19 and the six class members among them carry 0.21 of the class's 0.81.
 
-Findings F1 to F10 are in `WORKLOG.md`. The follow-up results report is `reports/13-followups-4nov.md` (W11,
-Sonnet, in progress at the time of writing). Every GPU job is reconciled: 21.58 of 30 GPU-hours reserved,
+Findings F1 to F10 are in `WORKLOG.md`. The follow-up results report is `reports/13-followups-4nov.md` (final,
+all four results reviewed). Every GPU job is reconciled: 21.58 of 30 GPU-hours reserved,
 38,632 GPU-seconds (10.7 hours) actually used. No job of this session is queued on Delta or Bridges-2.
 
 ## Branch, worktree and commit
@@ -39,8 +41,8 @@ completed).
 
 ## Next action
 
-1. When reviews 07 (SER) and 08 (one-neuron) report: fold corrections into R20 and R21, mark F9 and F10
-   reviewed in the WORKLOG, commit the reviews and report 13.
+1. Done 4 Nov 2026, 1:00 pm EST: reviews 07 and 08 folded into R20 and R21; F9 and F10 reviewed; report 13
+   final.
 2. The user decides what follows (options in report 13 section 5): a SER ladder at smaller sizes, an all-forms
    SER run, a FAR ladder above 750, or wrap-up. New runs need a new pre-registered ruling.
 3. Done 4 Nov 2026, 1:05 pm EST: the clone's `logs/` entries for jobs 50182995, 50183187, 50183194, 50212883 and

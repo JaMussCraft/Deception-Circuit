@@ -1,6 +1,6 @@
 # Hand-back 13: Results report of the four follow-ups of Wed 4 Nov 2026
 
-Agent: report writer W11, Claude Sonnet 5.5. Ticket: the message from the team lead of session claude-5201d56c. Status: resolved, with F9 and F10 marked pending independent recomputation.
+Agent: report writer W11, Claude Sonnet 5.5. Ticket: the message from the team lead of session claude-5201d56c. Status: resolved. Report 13 was amended after reviews 05 to 08 landed, so F7 to F10 are all marked reviewed.
 
 ## What changed
 
@@ -22,7 +22,7 @@ Not applicable: no runs. The report quotes runs by other agents and I did not ru
 
 ## What is NOT done
 
-- Reviews 07 and 08 did not exist at 12:47 PM EST, so the SER and one-neuron results are marked pending independent recomputation.
+- Nothing from the report is left pending. Reviews 07 and 08 were folded in after they landed.
 - I did not verify that code is identical between commit 800c903, named by the one-neuron manifest, and the commit in its job name. The report says so.
 - The rows of the N2 cell and the one-neuron cell for intact IOI accuracy are not in the hand-backs I read, so the report states them as not stated or not applicable.
 - The costs in the options section are estimates from this phase's reservations, not ledger rows.
