@@ -142,7 +142,7 @@ as a ruling before that run.
   deceptive rate moves under 5 and the nulls' 95th percentile of the H shift is under 5; suppression or shared if
   the deceptive rate also falls at least 10 points; otherwise undetermined). Budget: at most 2 GPU-hours reserved
   for both cells.
-- **R15 (Wed 4 Nov 2026, 9:05 am EST, before any run): the approved follow-ups, pre-registered.** The user
+- **R15 (Wed 4 Nov 2026, 10:35 am EST, before any run): the approved follow-ups, pre-registered.** The user
   approved them on Wed 4 Nov 2026. All use the fixed all-position ranking of c3d7763 and rule R6; nothing is
   re-ranked.
   - **(a) N2 on fresh data.** The optional cell of R14 runs as written there (honest-only at size 2,000 and its
