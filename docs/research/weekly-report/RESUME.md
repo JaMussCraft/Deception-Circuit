@@ -39,9 +39,9 @@ review fixes landed test-first (`reports/05-review-fixes-handback.md`; both suit
 10 being the baseline cap-exception names), and the protocol wordings are fixed. The memory note
 `weekly-report-design.md` exists with its MEMORY.md line.
 
-1. Commit by file list in both repositories (section above, plus `.agents/tests/fixtures/weekly/` which now holds
-   the live name-map fixture, and `reports/05-review-fixes-handback.md`), when the user asks.
-2. Set the tickets' `Status:` lines to `resolved`. The registry row stays `proposed` with the init placeholder
+1. Done: committed on Alignment main (0852b1e) and Deception-Circuit main (c274661) on Wed 4 Nov 2026, with the
+   tickets marked resolved. This RESUME edit itself is uncommitted.
+2. The registry row stays `proposed` with the init placeholder
    summary: there is no sanctioned command to set a summary (`rs-direction-summary-command` is itself a proposed
    row) and `release` applies to claimed rows only; the README explains the feature's state.
 
