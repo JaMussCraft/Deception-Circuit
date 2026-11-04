@@ -1,15 +1,17 @@
 # Resume: neuron-partition
 
-Last rewritten: Tue 3 Nov 2026, 3:05 pm EST by claude-5201d56c, after a login-node reboot.
+Last rewritten: Tue 3 Nov 2026, 8:40 pm EST by claude-5201d56c, after the ablation cells.
 
 ## Status
 
-N1 is active. Done: the attribution scorer (reviewed, PASS WITH FIXES), the full and split-half FAR rankings at the
-readout position, the partition under R6 (sets under `outputs/_analyses/neuron-partition/sets/far_atp_66741d7/`),
-the N3 stability report (preliminary finding F1: every class stable), the neuron set-ablation machinery (reviewed,
-PASS WITH FIXES; two majors being fixed), the seed-2 test sample (300 per condition), the verdict script, and the
-first report draft with placeholders (`reports/05-first-report.md`). In progress after the reboot of about 2:30 pm EST (which killed the workers, not the Slurm jobs): the all-position ranking (Delta job 23478550, 482 s) is done and reconciled; job C (contrast k 1,000, Bridges-2 job 50182995, 2 h) is submitted; worker w5-sets builds the all-position and readout sets at c3d7763, syncs them to the clone and submits jobs A and B (4 h each); worker w6-babysit waits on all three, fetches the cells, runs the verdict script and writes the addenda to hand-back 02. Rulings R1 to R12 are in `spec.md`. The first report is due Wed 4
-Nov 2026, 12:00 pm EST.
+Item 10 is decided (ruling R13): N1 FAILED at every set size under the frozen bars and N2 is UNDETERMINED. Findings
+F1 to F5 are in `WORKLOG.md` (F3 and F4 confirmed by review 03). The near miss: the all-position deception-only
+class at size 500 (338 neurons, layers 0 to 9) removes 0.81 of the deception margin under the twin interchange
+and 0.72 under mean, 0.15 of the inversion margin, leaves H and F unmoved, and failed only the IOI bar (minus 6.0 on
+100 rows); an exploratory 1,000-row IOI measurement (F5) puts that cost at 3.7 points, under the bar and outside
+the null band. It is a descriptive lead, not a pass. The first report is `reports/05-first-report.md` (review 03
+folded in; the 1,000-row IOI result being folded in at 8:40 pm EST), due Wed 4 Nov 2026, 12:00 pm EST. Every
+GPU job is reconciled: 14.83 of 20 GPU-hours reserved, about 9.5 used.
 
 ## Branch, worktree and commit
 
@@ -26,12 +28,14 @@ Reservations r-001 to r-003 (ranking pilot, full ranking, split halves; 89, 252 
 
 ## Next action
 
-1. Read w5-sets' reply: commit its files (hand-backs 01 and 04 addenda) and confirm jobs A and B are in the
-   ledger and job list; read w6-babysit's timing message and its per-job completion messages.
-2. If a worker died (login-node reboot), find the live jobs with `squeue -u swong2` on bridges2 and the
-   ledger, and respawn one Opus worker with the dead worker's brief; the outputs on the clone survive.
-3. Fetch the cells, run `scripts/neuron_partition_verdict.py`, log the N1 and N2 decisions, fill the placeholders of
-   `reports/05-first-report.md`, run `scripts/check_report_numbers.py`, hand back by Wed noon EST.
+1. Morning of Wed 4 Nov: confirm hand-back 02's IOI addendum and the report's IOI fold-in are committed (if not,
+   write them from `outputs/_analyses/neuron-partition/ablation/ioi_resolution-delta-e8dd8a8/summary.json` and
+   finding F5); run `research-session lint` and `scripts/check_report_numbers.py` on the report; push.
+2. Ask the user to revert `CAP_PERCENT` to 80 in `/projects/beto/swong2/Alignment/.agents/research_session/usage.py`
+   after the 8:00 am EST reset, and to note the cadence (26) for the record.
+3. Hand the report to the user; the advisor meeting decides whether the size-500 lead gets a pre-registered
+   follow-up (a 1,000-row IOI bar, SER, the one-neuron interchange check of review 01). No further GPU work is
+   planned in this session.
 
 ## Do not
 
