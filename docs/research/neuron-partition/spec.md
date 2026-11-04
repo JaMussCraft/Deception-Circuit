@@ -177,3 +177,11 @@ as a ruling before that run.
   condition, test ids disjoint from the 360 excluded ids listed in report 11. (4) Codex A3 covers SER layers 5 to
   8, 11, 13 and 16; any passing class is recorded as a descriptive lead outside that cell with per-layer counts
   (START item 6). The user may overrule (1) in the WORKLOG needs section; the default runs now.
+- **R18 (Wed 4 Nov 2026, 12:25 pm EST, after the R15 (a) cell): N2 on fresh data.** The honest-only class at size
+  2,000 (1,623 neurons after set construction) on the seed-3 sample gives, under the mean reference, an H accuracy
+  shift of minus 21.9 points with a deceptive-rate fall of 12.7 points on the whole sample (half 1: 21.6 and
+  10.6; half 2: 22.1 and 14.9), null 95th percentile of the H shift 0.0. By the item 10 rule this is
+  **suppression or shared** on every row, not a bypass. N2's outcome for FAR is therefore "suppression or shared"
+  at size 2,000; the class is not a pure honest route that deception bypasses. Deception margin rises when the
+  class is ablated (D removed minus 0.64 under mean, minus 0.53 under twin), consistent with F4. Pending the
+  independent recomputation (review 05).
