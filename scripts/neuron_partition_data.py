@@ -25,6 +25,16 @@ Conventions recorded here because the data decides them (verified 2026-11-03):
 - far_v2, far_v2_honest and far_v2_nopressure carry the same instance ids per split; the I and
   user-neutral pools carry the same ids per split, and every pool id is a far_v2 id of the same
   split.
+
+`--task ser` (W10, 2026-11-04) runs `copy-pools` and `sample` on SER, the secondary task. Its
+pool copies are recorded in `pools_manifest_ser.json` (FAR's `pools_manifest.json` is not
+touched), and its files are named `ser_<form>_test_sample_seed<seed>.json` and
+`ser_<form>_rank_ids[_seed<seed>].json`, where `<form>` is the `--clause-form` filter. SER needs
+an explicit `--clause-form`: only 72 of its 1,000 D test rows are act-naming, every SER I
+request is predicate-naming ("recommend the favorable result instead of the unfavorable
+result"), and which filter START's "act-naming clauses only" implies for SER is a ruling, not
+a default. FAR keeps `act` and its original file names and bytes. Any task other than FAR also
+writes `rank_all` to its rank file, the flat list of D rank ids, for the scorer's `--ids-key`.
 """
 
 from __future__ import annotations
@@ -62,11 +72,40 @@ LADDER = ("/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/"
           "specificity-ladder/outputs/_analyses/specificity-ladder")
 POOL_SOURCE = os.path.join(LADDER, "a1-control-77b6487-m07")
 POOL_NAMES = ("far_v2_user_inversion", "far_v2_user_neutral")
+TASKS = ("far", "ser")
+#: `--clause-form`: the D clause forms kept (`clause_form` of dataset/build_inversion_v2.py).
+CLAUSE_FORMS = ("act", "predicate", "other", "all")
+#: FAR's filter is START's "act-naming clauses only"; SER has no default (module docstring).
+DEFAULT_CLAUSE_FORM = {"far": "act"}
 LADDER_DESIGN = os.path.join(LADDER, "ladder-5f450dc", "design.json")
 LADDER_SELECTED = os.path.join(LADDER, "ladder-5f450dc", "selected.json")
 MECH_GROUPS = os.path.join(REPO, "docs", "research", "mechanism-analysis", "phase1", "groups")
 HELD_OUT_JSON = os.path.join(REPO, "docs", "research", "held_out.json")
-CLAUSE_FORMS = os.path.join(REPO, "docs", "research", "mechanism-analysis", "clause-forms.csv")
+CLAUSE_FORMS_CSV = os.path.join(REPO, "docs", "research", "mechanism-analysis", "clause-forms.csv")
+
+
+def pool_names(task: str = "far") -> Tuple[str, str]:
+    return (f"{task}_v2_user_inversion", f"{task}_v2_user_neutral")
+
+
+def pools_manifest_name(task: str = "far") -> str:
+    """FAR's manifest keeps W3's name; another task gets its own file, so FAR's is never rewritten."""
+    return "pools_manifest.json" if task == "far" else f"pools_manifest_{task}.json"
+
+
+def is_legacy(task: str, form: str) -> bool:
+    """FAR under its START filter: W3's file names and byte layout."""
+    return task == "far" and form == "act"
+
+
+def sample_name(task: str, form: str, seed: int) -> str:
+    stem = task if is_legacy(task, form) else f"{task}_{form}"
+    return f"{stem}_test_sample_seed{seed}.json"
+
+
+def rank_name(task: str, form: str, seed: int) -> str:
+    stem = task if is_legacy(task, form) else f"{task}_{form}"
+    return f"{stem}_rank_ids.json" if seed == SEED else f"{stem}_rank_ids_seed{seed}.json"
 
 
 # ------------------------------------------------------------------------------ hashing
@@ -243,6 +282,7 @@ def load_split_records(path: str, split: str) -> List[dict]:
 def exclusion_sources(task_key: str = "far_v2") -> Dict[str, dict]:
     """The id lists the fresh sample must avoid, each with path, sha256 and count."""
     out = {}
+    task = task_key.split("_")[0]
     design = json.load(open(LADDER_DESIGN))["payload"]["designs"][task_key]
     out["a1_assessment"] = {"path": LADDER_DESIGN, "key": f"payload.designs.{task_key}.assessment_ids",
                             "sha256": sha256_file(LADDER_DESIGN), "ids": list(design["assessment_ids"])}
@@ -250,16 +290,16 @@ def exclusion_sources(task_key: str = "far_v2") -> Dict[str, dict]:
         "path": LADDER_DESIGN, "key": f"payload.designs.{task_key}.mover_selection_ids",
         "also_at": [LADDER_SELECTED + f" payload.groups.{task_key}.screen.selection_ids"],
         "sha256": sha256_file(LADDER_DESIGN), "ids": list(design["mover_selection_ids"]),
-        "why": ("the ladder's second 100-id FAR test list (its selection sample); the brief "
+        "why": (f"the ladder's second 100-id {task.upper()} test list (its selection sample); the brief "
                 "says to exclude the union when several candidates exist")}
-    for label, name in (("mech_heldout_D", "far_heldout_D_sample.json"),
-                        ("mech_heldout_I", "far_heldout_I_sample.json")):
+    for label, name in (("mech_heldout_D", f"{task}_heldout_D_sample.json"),
+                        ("mech_heldout_I", f"{task}_heldout_I_sample.json")):
         path = os.path.join(MECH_GROUPS, name)
         out[label] = {"path": _display(path), "sha256": sha256_file(path),
                       "ids": [str(i) for i in json.load(open(path))["instance_ids"]]}
     held = json.load(open(HELD_OUT_JSON))
     held_ids = [str(i) for s in held.get("sets", [])
-                if str(s.get("task", "")).startswith("far") for i in s.get("instance_ids", [])]
+                if str(s.get("task", "")).startswith(task) for i in s.get("instance_ids", [])]
     out["held_out_json"] = {"path": _display(HELD_OUT_JSON), "sha256": sha256_file(HELD_OUT_JSON),
                             "ids": held_ids, "n_sets": len(held.get("sets", []))}
     return out
@@ -303,7 +343,30 @@ def act_naming(record: dict) -> bool:
 
 def act_naming_by_id(d_records: Sequence[dict]):
     """A form filter for pool rows: the clause form of the D row with the same instance id."""
-    forms = {rid: act_naming(r) for rid, r in zip(record_ids(d_records), d_records)}
+    return form_filter_by_id(d_records, "far", "act")
+
+
+def form_filter(task: str, form: str):
+    """The D-row filter of `--clause-form`: None for `all`, else a predicate on the D row's
+    `pressure` clause under `clause_form(text, "<task>_v2")`. FAR's `act` is `act_naming`."""
+    if form == "all":
+        return None
+    if task == "far" and form == "act":
+        return act_naming
+    from dataset.build_inversion_v2 import clause_form
+
+    def keep(record: dict) -> bool:
+        return clause_form(record["pressure"], f"{task}_v2") == form
+    return keep
+
+
+def form_filter_by_id(d_records: Sequence[dict], task: str, form: str):
+    """The pool-row filter of `--clause-form`: the form of the D row with the same instance id
+    (pool rows hold the neutral sentence in `pressure`). None for `all`."""
+    on_d = form_filter(task, form)
+    if on_d is None:
+        return None
+    forms = {rid: on_d(r) for rid, r in zip(record_ids(d_records), d_records)}
 
     def keep(record: dict) -> bool:
         rid = str(record["instance_id"])
@@ -313,11 +376,22 @@ def act_naming_by_id(d_records: Sequence[dict]):
     return keep
 
 
+def _apply(form, records: Sequence[dict]) -> List[dict]:
+    return list(records) if form is None else [r for r in records if form(r)]
+
+
+def _form_of(record: dict, task: str) -> str:
+    from dataset.build_inversion_v2 import clause_form
+
+    return clause_form(record["pressure"], f"{task}_v2")
+
+
 # ------------------------------------------------------------------------------ commands
 
 def count_eligible(recs: dict, ids: dict, union: Sequence[str],
                    factors: Sequence[str] = ("designation_polarity", "item_polarity",
-                                             "template_variant")) -> dict:
+                                             "template_variant"),
+                   task: str = "far", form: str = "act") -> dict:
     """What the test-split draw could take, without drawing: per pool, the eligible ids after
     the form filter, the pairing check and the exclusions, their strata, the largest n the
     balanced draw gives (every eligible id: `allocate` caps each stratum and hands the surplus
@@ -325,9 +399,9 @@ def count_eligible(recs: dict, ids: dict, union: Sequence[str],
     share (strata times the smallest stratum)."""
     barred = set(map(str, union))
     out = {}
-    for label, twins, form in (("D", ("H", "F"), act_naming),
-                               ("I", ("N",), act_naming_by_id(recs["D"]["test"]))):
-        records = [r for r in recs[label]["test"] if form(r)]
+    for label, twins, keep_form in (("D", ("H", "F"), form_filter(task, form)),
+                                    ("I", ("N",), form_filter_by_id(recs["D"]["test"], task, form))):
+        records = _apply(keep_form, recs[label]["test"])
         keep, dropped = paired_records(records, [ids[t]["test"] for t in twins])
         eligible = [r for r, rid in zip(keep, record_ids(keep)) if rid not in barred]
         strata = Counter(tuple(str(r.get(f)) for f in factors) for r in eligible)
@@ -345,7 +419,7 @@ def cmd_copy_pools(args) -> int:
     manifest = {"note": ("Copied read-only from the specificity-ladder worktree (Codex, unmerged "
                          "into main); the copies exist so Bridges-2 jobs can read them."),
                 "pools": {}}
-    for name in POOL_NAMES:
+    for name in pool_names(args.task):
         src = os.path.join(args.pool_source, name)
         dst = os.path.join(dest_root, name)
         src_hashes = hash_tree(src)
@@ -371,27 +445,38 @@ def cmd_copy_pools(args) -> int:
         print(f"{name}: {len(dst_hashes)} files; provenance matched {len(check['matched'])}, "
               f"mismatched {len(check['mismatched'])}, missing {len(check['missing'])}, "
               f"not listed {check['not_listed']}")
-    sha = write_json(os.path.join(args.out_dir, "pools_manifest.json"), manifest)
-    print(f"wrote {_display(os.path.join(args.out_dir, 'pools_manifest.json'))} sha256 {sha}")
+    manifest_path = os.path.join(args.out_dir, pools_manifest_name(args.task))
+    sha = write_json(manifest_path, manifest)
+    print(f"wrote {_display(manifest_path)} sha256 {sha}")
     return 0
 
 
 def cmd_sample(args) -> int:
+    task = args.task
+    form = args.clause_form or DEFAULT_CLAUSE_FORM.get(task)
+    if form is None:
+        raise SystemExit(f"--task {task} needs an explicit --clause-form ({', '.join(CLAUSE_FORMS)}); "
+                         "see the module docstring")
+    legacy = is_legacy(task, form)
     pools = os.path.join(args.out_dir, "pools")
-    pool_manifest_path = os.path.join(args.out_dir, "pools_manifest.json")
+    manifest_name = pools_manifest_name(task)
+    pool_manifest_path = os.path.join(args.out_dir, manifest_name)
     if not os.path.exists(pool_manifest_path):
-        raise SystemExit("run copy-pools first: the sample reads the pool copies")
+        raise SystemExit(f"run copy-pools{'' if task == 'far' else ' --task ' + task} first: "
+                         "the sample reads the pool copies")
     pool_manifest = json.load(open(pool_manifest_path))
-    paths = {"D": os.path.join(DATASETS, "far_v2"), "H": os.path.join(DATASETS, "far_v2_honest"),
-             "F": os.path.join(DATASETS, "far_v2_nopressure"),
-             "I": os.path.join(pools, "far_v2_user_inversion"),
-             "N": os.path.join(pools, "far_v2_user_neutral")}
+    inv_name, neu_name = pool_names(task)
+    paths = {"D": os.path.join(DATASETS, f"{task}_v2"),
+             "H": os.path.join(DATASETS, f"{task}_v2_honest"),
+             "F": os.path.join(DATASETS, f"{task}_v2_nopressure"),
+             "I": os.path.join(pools, inv_name),
+             "N": os.path.join(pools, neu_name)}
     for cond in ("I", "N"):
         name = os.path.basename(paths[cond])
         if hash_tree(paths[cond]) != pool_manifest["pools"][name]["files"]:
-            raise SystemExit(f"{paths[cond]} no longer matches pools_manifest.json")
+            raise SystemExit(f"{paths[cond]} no longer matches {manifest_name}")
 
-    excl = exclusion_sources()
+    excl = exclusion_sources(f"{task}_v2")
     for k, path in enumerate(args.exclude_ids or []):
         excl[f"exclude_ids_{k}"] = load_exclude_file(path)
     union = sorted({i for src in excl.values() for i in src["ids"]})
@@ -401,15 +486,19 @@ def cmd_sample(args) -> int:
     ids = {cond: {split: record_ids(r) for split, r in by.items()} for cond, by in recs.items()}
 
     if args.count_only:
-        print(json.dumps(count_eligible(recs, ids, union), indent=1))
+        counted = count_eligible(recs, ids, union, task=task, form=form)
+        if not legacy:
+            counted = {"task": task, "clause_form": form, "excluded_union_n": len(union), **counted}
+        print(json.dumps(counted, indent=1))
         return 0
 
     # --- the fresh test sample
     d_draw = draw_condition(recs["D"]["test"], twin_id_sets=[ids["H"]["test"], ids["F"]["test"]],
-                            exclude_ids=union, n=args.n, seed=args.seed, form_filter=act_naming)
+                            exclude_ids=union, n=args.n, seed=args.seed,
+                            form_filter=form_filter(task, form))
     i_draw = draw_condition(recs["I"]["test"], twin_id_sets=[ids["N"]["test"]],
                             exclude_ids=union, n=args.n, seed=args.seed,
-                            form_filter=act_naming_by_id(recs["D"]["test"]))
+                            form_filter=form_filter_by_id(recs["D"]["test"], task, form))
     for label, draw in (("D", d_draw), ("I", i_draw)):
         if draw["counts"]["drawn"] < args.n:
             print(f"warning: {label} drew {draw['counts']['drawn']} of {args.n} (START allows "
@@ -429,9 +518,9 @@ def cmd_sample(args) -> int:
     for cond in ("I", "N"):
         for rel, sha in hash_tree(paths[cond]).items():
             dataset_files[_display(os.path.join(paths[cond], rel))] = sha
-    for extra in (LADDER_DESIGN, LADDER_SELECTED, CLAUSE_FORMS, HELD_OUT_JSON,
-                  os.path.join(MECH_GROUPS, "far_heldout_D_sample.json"),
-                  os.path.join(MECH_GROUPS, "far_heldout_I_sample.json")):
+    for extra in (LADDER_DESIGN, LADDER_SELECTED, CLAUSE_FORMS_CSV, HELD_OUT_JSON,
+                  os.path.join(MECH_GROUPS, f"{task}_heldout_D_sample.json"),
+                  os.path.join(MECH_GROUPS, f"{task}_heldout_I_sample.json")):
         dataset_files[_display(extra)] = sha256_file(extra)
 
     pool_files = {}
@@ -454,16 +543,28 @@ def cmd_sample(args) -> int:
     excluded["union"] = {"n": len(union), "in_D_test": len(set(union) & test_d),
                          "in_I_test": len(set(union) & test_i)}
 
-    sample = {"task": "far", "seed": args.seed, "split": "test",
+    if legacy:
+        filter_record = {"act_naming_filter": ("clause_form of dataset/build_inversion_v2.py on the "
+                                               "pressure clause; FAR v2 is act-naming throughout, so the "
+                                               "filter keeps every row")}
+    else:
+        filter_record = {"clause_form_filter": {
+            "form": form,
+            "rule": (f"clause_form(pressure, '{task}_v2') of dataset/build_inversion_v2.py on the D "
+                     "row's clause; pool rows (I, N) take the form of the D row with the same id"
+                     if form != "all" else "none: every clause form is kept"),
+            "test_D_forms": dict(sorted(Counter(_form_of(r, task) for r in recs["D"]["test"]).items())),
+            "why_explicit": ("START item 10 names act-naming for FAR only; SER is act-naming in 72 of "
+                             "1,000 D test rows and its I request is predicate-naming, so the filter "
+                             "is the orchestrator's ruling")}}
+    sample = {"task": task, "seed": args.seed, "split": "test",
               "ids": sample_ids,
-              "pairing": {"H": "far_v2_honest, the neutral twin, same instance_id as D",
-                          "F": "far_v2_nopressure, same instance_id as D",
-                          "N": "far_v2_user_neutral, same instance_id as I",
+              "pairing": {"H": f"{task}_v2_honest, the neutral twin, same instance_id as D",
+                          "F": f"{task}_v2_nopressure, same instance_id as D",
+                          "N": f"{task}_v2_user_neutral, same instance_id as I",
                           "I_vs_D": ("drawn independently from the I pool test split with the "
                                      "same exclusions; overlap with D recorded in counts")},
-              "act_naming_filter": ("clause_form of dataset/build_inversion_v2.py on the "
-                                    "pressure clause; FAR v2 is act-naming throughout, so the "
-                                    "filter keeps every row"),
+              **filter_record,
               "excluded": excluded,
               "pool_files": pool_files,
               "counts": {"D": d_draw["counts"], "I": i_draw["counts"],
@@ -471,7 +572,7 @@ def cmd_sample(args) -> int:
                          "D_and_I_overlap": len(set(sample_ids["D"]) & set(sample_ids["I"]))},
               "samples": {"D": d_draw["sample"], "I": i_draw["sample"]},
               "dataset_files": dataset_files}
-    out_sample = os.path.join(args.out_dir, f"far_test_sample_seed{args.seed}.json")
+    out_sample = os.path.join(args.out_dir, sample_name(task, form, args.seed))
     sha_s = write_json(out_sample, sample)
     if args.no_rank_ids:
         print(json.dumps({"per_condition": sample["counts"]["per_condition"],
@@ -487,8 +588,9 @@ def cmd_sample(args) -> int:
     rank_counts = {}
     for cond, twins in (("D", ("H", "F")), ("I", ("N",))):
         for split in ("train", "validation"):
-            form = act_naming if cond == "D" else act_naming_by_id(recs["D"][split])
-            records = [r for r in recs[cond][split] if form(r)]
+            keep_form = (form_filter(task, form) if cond == "D"
+                         else form_filter_by_id(recs["D"][split], task, form))
+            records = _apply(keep_form, recs[cond][split])
             keep, dropped = paired_records(records, [ids[t][split] for t in twins])
             kept = [rid for rid in record_ids(keep) if rid not in set(union)]
             rank[cond][split] = kept
@@ -515,7 +617,7 @@ def cmd_sample(args) -> int:
             level = str(d_rows[rid][factor])
             c.setdefault(level, Counter())[halves[rid]] += 1
         marg[factor] = {k: dict(sorted(v.items())) for k, v in sorted(c.items())}
-    rank_out = {"task": "far", "seed": args.seed,
+    rank_out = {"task": task, "seed": args.seed,
                 "rule": "rank on train and validation only (START item 10, Ids)",
                 "ids": rank,
                 "counts": rank_counts,
@@ -529,8 +631,13 @@ def cmd_sample(args) -> int:
                            "marginals": marg},
                 "excluded_union_n": len(union),
                 "test_sample": {"path": _display(out_sample), "sha256": sha_s}}
-    out_rank = os.path.join(args.out_dir, "far_rank_ids.json" if args.seed == SEED
-                            else f"far_rank_ids_seed{args.seed}.json")
+    if not legacy:
+        # One flat list for the scorer's `--ids-key rank_all` (a form filter can drop ranking
+        # rows, so the full ranking cannot simply omit --ids as FAR's did).
+        rank_out["clause_form"] = form
+        rank_out["rank_all"] = sorted(d_rank)
+        rank_out["rank_all_I"] = sorted(i_rank)
+    out_rank = os.path.join(args.out_dir, rank_name(task, form, args.seed))
     sha_r = write_json(out_rank, rank_out)
     print(json.dumps({"per_condition": sample["counts"]["per_condition"],
                       "D": d_draw["counts"], "I": i_draw["counts"],
@@ -591,7 +698,13 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     c = sub.add_parser("copy-pools", help="copy and hash the user-turn I and N pools")
     c.add_argument("--pool-source", default=POOL_SOURCE)
     c.add_argument("--out-dir", default=OUT_DIR)
-    s = sub.add_parser("sample", help="the fresh FAR test sample and the rank ids")
+    c.add_argument("--task", choices=TASKS, default="far",
+                   help="which task's pools (far writes pools_manifest.json, ser pools_manifest_ser.json)")
+    s = sub.add_parser("sample", help="the fresh test sample and the rank ids of one task")
+    s.add_argument("--task", choices=TASKS, default="far")
+    s.add_argument("--clause-form", choices=CLAUSE_FORMS, default=None,
+                   help=("D clause forms kept (pool rows follow their D row). Default act for far; "
+                         "ser has no default and must name one"))
     s.add_argument("--n", type=int, default=N_TEST)
     s.add_argument("--seed", type=int, default=SEED)
     s.add_argument("--out-dir", default=OUT_DIR)

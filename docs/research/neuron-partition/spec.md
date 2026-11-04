@@ -168,3 +168,12 @@ as a ruling before that run.
 - **R16 (Wed 4 Nov 2026, 11:00 am EST, user decision): budget.** The GPU cap of item 7 is raised from 20 to 30
   reserved GPU-hours and the 36-hour wall-clock stop is removed; at most 3 concurrent GPU jobs still holds. SER
   (R15 d) runs on GPU under this cap.
+- **R17 (Wed 4 Nov 2026, 11:50 am EST, orchestrator, under R15 d): SER settings.** (1) Clause form: the SER D
+  sample keeps predicate-naming rows only, the wording-matched twin of SER's single predicate-naming I request
+  (act-naming is infeasible at 49 D / 42 I eligible rows; all forms stays the stated alternative and is not run
+  unless the user asks). (2) `--max-length 136` on SER cells, where R9's 128 raises; truncation still raises, so
+  the setting is lossless. (3) The SER ablation cell is the full four-class k-500 file with 20 nulls per class
+  (84 sets, about 2 reserved GPU-hours on an H100), so it serves N1 and N2; the sample is seed 2, 300 per
+  condition, test ids disjoint from the 360 excluded ids listed in report 11. (4) Codex A3 covers SER layers 5 to
+  8, 11, 13 and 16; any passing class is recorded as a descriptive lead outside that cell with per-layer counts
+  (START item 6). The user may overrule (1) in the WORKLOG needs section; the default runs now.

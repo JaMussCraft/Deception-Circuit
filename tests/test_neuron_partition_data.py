@@ -172,6 +172,127 @@ def test_sample_count_only_counts_without_drawing(monkeypatch, tmp_path, capsys)
     assert not list(out.glob("far_test_sample_seed*.json"))     # nothing drawn or written
 
 
+# ------------------------------------------------------------------------------ --task ser
+
+SER_CLAUSES = ("Recommend the favorable result to the client.",       # predicate
+               "Give the client the wrong recommendation.",            # act
+               "Keep the client happy with your recommendation.")      # other
+
+
+def _ser_records(n, prefix):
+    rows = _records(n, prefix=prefix)
+    for i, row in enumerate(rows):
+        row["pressure"] = SER_CLAUSES[i % 3]
+    return rows
+
+
+def test_ser_form_filters_read_the_ser_predicate_words_and_all_keeps_everything():
+    d_rows = _ser_records(6, "s")
+    pool = [dict(r, pressure="The client asked about two options.") for r in d_rows]
+    assert npd.form_filter("ser", "all") is None and npd.form_filter_by_id(d_rows, "ser", "all") is None
+    for form, want in (("predicate", [True, False, False] * 2), ("act", [False, True, False] * 2),
+                       ("other", [False, False, True] * 2)):
+        assert [npd.form_filter("ser", form)(r) for r in d_rows] == want, form
+        assert [npd.form_filter_by_id(d_rows, "ser", form)(r) for r in pool] == want, form
+    # FAR's act filter is unchanged and still the module's act_naming
+    assert npd.form_filter("far", "act") is npd.act_naming
+
+
+def _fake_ser_env(monkeypatch, tmp_path, n_d=240, n_i=200):
+    d = {split: _ser_records(n_d, prefix=f"{split[:2]}") for split in ("train", "validation", "test")}
+    pool = {split: [dict(r) for r in rows[:n_i]] for split, rows in d.items()}
+    by_cond = {"ser_v2": d, "ser_v2_honest": d, "ser_v2_nopressure": d,
+               "ser_v2_user_inversion": pool, "ser_v2_user_neutral": pool}
+    monkeypatch.setattr(npd, "load_split_records",
+                        lambda path, split: [dict(r) for r in by_cond[os.path.basename(path)][split]])
+    monkeypatch.setattr(npd, "hash_tree", lambda root: {})
+    real_sha = npd.sha256_file
+    monkeypatch.setattr(npd, "sha256_file",
+                        lambda path: real_sha(path) if os.path.isfile(path) else "absent")
+    seen = []
+
+    def sources(task_key="far_v2"):
+        seen.append(task_key)
+        return {"a1_assessment": {"path": "design.json", "sha256": "x",
+                                  "ids": [f"te{i:04d}" for i in range(0, 30)]}}
+    monkeypatch.setattr(npd, "exclusion_sources", sources)
+    out = tmp_path / "data"
+    out.mkdir()
+    (out / "pools_manifest_ser.json").write_text(json.dumps({"pools": {
+        "ser_v2_user_inversion": {"files": {}, "source": "s"},
+        "ser_v2_user_neutral": {"files": {}, "source": "s"}}}))
+    return out, seen
+
+
+def test_ser_sample_needs_an_explicit_clause_form(monkeypatch, tmp_path):
+    out, _ = _fake_ser_env(monkeypatch, tmp_path)
+    with pytest.raises(SystemExit, match="clause-form"):
+        npd.main(["sample", "--task", "ser", "--out-dir", str(out)])
+    assert not list(out.glob("ser*.json"))
+
+
+def test_ser_sample_filters_by_form_names_its_files_and_writes_rank_all(monkeypatch, tmp_path, capsys):
+    out, seen = _fake_ser_env(monkeypatch, tmp_path)
+    assert npd.main(["sample", "--task", "ser", "--clause-form", "predicate", "--n", "40",
+                     "--out-dir", str(out)]) == 0
+    assert seen == ["ser_v2"]                                  # SER's own exclusion lists
+    s = json.loads((out / "ser_predicate_test_sample_seed2.json").read_text())
+    r = json.loads((out / "ser_predicate_rank_ids.json").read_text())
+    assert not (out / "far_test_sample_seed2.json").exists() and not (out / "pools_manifest.json").exists()
+    assert s["task"] == "ser" and s["clause_form_filter"]["form"] == "predicate"
+    assert "act_naming_filter" not in s
+    assert s["pairing"]["N"].startswith("ser_v2_user_neutral")
+    predicate_ids = {row["instance_id"] for row in _ser_records(240, "te")[::3]}
+    barred = {f"te{i:04d}" for i in range(30)}
+    for cond in ("D", "H", "F"):
+        assert len(s["ids"][cond]) == 40 and set(s["ids"][cond]) <= predicate_ids - barred, cond
+    i_pool = {f"te{i:04d}" for i in range(200)}
+    assert set(s["ids"]["I"]) <= (predicate_ids & i_pool) - barred and s["ids"]["N"] == s["ids"]["I"]
+    assert s["counts"]["D"]["after_form_filter"] == 80        # 240 rows, every third predicate
+    # rank ids: train + validation predicate rows only, flat lists for --ids-key
+    want_d = sorted(row["instance_id"] for split in ("tr", "va")
+                    for row in _ser_records(240, split)[::3])
+    assert r["clause_form"] == "predicate" and r["rank_all"] == want_d
+    assert sorted(r["halves"]["A"] + r["halves"]["B"]) == want_d
+    assert sorted(r["rank_all_I"]) == sorted(r["halves"]["I_A"] + r["halves"]["I_B"])
+    assert set(r["rank_all_I"]) <= set(r["rank_all"])
+    # all forms keeps every row and writes its own files beside the predicate ones
+    capsys.readouterr()
+    assert npd.main(["sample", "--task", "ser", "--clause-form", "all", "--n", "40",
+                     "--out-dir", str(out), "--no-rank-ids"]) == 0
+    a = json.loads((out / "ser_all_test_sample_seed2.json").read_text())
+    assert a["counts"]["D"]["after_form_filter"] == 240
+    assert (out / "ser_predicate_test_sample_seed2.json").exists()
+
+
+def test_far_sample_keeps_its_legacy_names_and_layout(monkeypatch, tmp_path):
+    out, _ = _fake_sample_env(monkeypatch, tmp_path)
+    assert npd.main(["sample", "--n", "40", "--out-dir", str(out)]) == 0
+    s = json.loads((out / "far_test_sample_seed2.json").read_text())
+    r = json.loads((out / "far_rank_ids.json").read_text())
+    assert "act_naming_filter" in s and "clause_form_filter" not in s
+    assert "rank_all" not in r and "clause_form" not in r
+
+
+def test_copy_pools_ser_writes_its_own_manifest(tmp_path):
+    src = tmp_path / "src"
+    for name in npd.pool_names("ser"):
+        (src / name / "train").mkdir(parents=True)
+        (src / name / "train" / "data-00000-of-00001.arrow").write_bytes(name.encode())
+        listed = {"train/data-00000-of-00001.arrow": npd.sha256_file(
+            str(src / name / "train" / "data-00000-of-00001.arrow"))}
+        (src / name / "assembly_provenance.json").write_text(json.dumps({"files": listed}))
+    out = tmp_path / "data"
+    assert npd.main(["copy-pools", "--task", "ser", "--pool-source", str(src),
+                     "--out-dir", str(out)]) == 0
+    m = json.loads((out / "pools_manifest_ser.json").read_text())
+    assert not (out / "pools_manifest.json").exists()
+    assert sorted(m["pools"]) == ["ser_v2_user_inversion", "ser_v2_user_neutral"]
+    for entry in m["pools"].values():
+        assert entry["assembly_provenance_check"]["matched"] == 1
+        assert entry["assembly_provenance_check"]["mismatched"] == []
+
+
 # ------------------------------------------------------------------------------ split halves
 
 def test_split_halves_balanced_per_cluster_and_overall():
@@ -298,6 +419,25 @@ def test_written_rank_ids_are_train_and_validation_and_halves_balance():
     i_rank = set(r["ids"]["I"]["train"]) | set(r["ids"]["I"]["validation"])
     assert set(r["halves"]["I_A"]) | set(r["halves"]["I_B"]) == i_rank
     assert set(r["halves"]["I_A"]) <= a and set(r["halves"]["I_B"]) <= b
+
+
+@pytest.mark.parametrize("form", ["predicate", "all"])
+def test_written_ser_sample_meets_the_id_contract(form):
+    s = _load(f"ser_{form}_test_sample_seed2.json")
+    r = _load(f"ser_{form}_rank_ids.json")
+    ids = s["ids"]
+    assert s["seed"] == 2 and s["task"] == "ser" and s["clause_form_filter"]["form"] == form
+    assert all(len(ids[c]) >= 300 for c in ("D", "H", "F", "I", "N"))
+    assert ids["H"] == ids["D"] and ids["F"] == ids["D"] and ids["N"] == ids["I"]
+    for label, ex in s["excluded"].items():
+        if label != "union":
+            assert not set(ex["ids"]) & (set(ids["D"]) | set(ids["I"])), label
+    assert s["excluded"]["mech_heldout_D"]["path"].endswith("ser_heldout_D_sample.json")
+    assert s["excluded"]["a1_assessment"]["key"] == "payload.designs.ser_v2.assessment_ids"
+    rank = set(r["rank_all"])
+    assert rank == set(r["ids"]["D"]["train"]) | set(r["ids"]["D"]["validation"])
+    assert not rank & (set(ids["D"]) | set(ids["I"]))
+    assert set(r["halves"]["A"]) | set(r["halves"]["B"]) == rank
 
 
 # ------------------------------------------------------------------------------ the fetch glob
