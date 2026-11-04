@@ -866,7 +866,9 @@ under the frozen bars on 100 rows, and that stands.
   shift lies outside all 20 nulls, so the D_only class costs IOI more than a random matched set does. Its point
   estimate of -3.7 is inside the 5-point bar. The interval's far end of -5.2 is just past it, so 1,000 rows still
   cannot exclude a true shift of 5 points.
-- **Scope.** These numbers describe resolution only. N1's decision rests on the frozen 100-row bar and is unchanged.
+- **Reading.** The 100-row -6.0 was a noisy over-estimate of a real IOI cost of about 4 points.
+- **Scope.** These numbers describe resolution only. Under R13 the N1 decision stands as failed on the frozen 100-row
+  bar.
 
 ### How verified
 
