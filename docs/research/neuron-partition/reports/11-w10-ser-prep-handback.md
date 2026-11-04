@@ -378,3 +378,87 @@ Bridges-2 ablation, twin and mean references, `--ioi-rows 1000 --ioi-seed 2`, wi
 - **Open questions.** Is the Bridges-2 clone synced to `a41752a`? That needs the branch pushed, which is the team
   lead's job. Default: the ablation code SER uses is unchanged since FAR's cells, so a clone at an earlier commit runs
   the same code. However, its manifest would then name the older commit, and I will ask team-lead before handing (c).
+
+## Addendum 3: SER ranking in, partition done, line (c) handed off (Wed 4 Nov 2026)
+
+### What changed
+
+No code changed. These outputs are new and git-ignored, under
+`WT/outputs/_analyses/neuron-partition/sets/ser_predicate_atp_all_a41752a/`:
+
+| file | sha256 or contents |
+| --- | --- |
+| `ser_all_sets_k500_with_nulls.json` | `45e962b22ce6dea1f421944f919c716e1828e0dc4d18050475d6878ee60e30aa` |
+| `partition_summary_all.json` | `0d0eb9354d27f5dd60b58e08801371b9c92552d6899d7c49829d73b0baba9e00` |
+| other files | `ser_all_sets_k{500,1000,2000}[_with_nulls].json`, `stability_summary_all.{json,md}` and `nulls/` |
+
+Line (c) went to r2-runner. The handoff covers the rsync list, a test submission, the twin and mean references,
+`--ioi-rows 1000 --ioi-seed 2 --max-length 136`, a 2-hour reservation, the output
+`ablation/ser_predicate_k500-d5f6b17`, the fetch, the checks and the verdict line. The Bridges-2 clone is at
+`d5f6b17` (team lead), and the ablation code is identical to `a41752a`.
+
+### How verified
+
+- **The ranking.** r2-runner reported Delta job 23520107 as COMPLETED 0:0, 360 s of 1,800 reserved, ledger r-014.
+  All ten directories have the expected row counts, there are no clause fallbacks, and every tensor is
+  [32, 14336] and finite. The mean margins are positive on the clean stream and negative on the twin:
+
+  | pair | m_clean | m_twin |
+  | --- | --- | --- |
+  | D against H | 2.906 | -3.671 |
+  | I against N | 3.838 | -3.715 |
+
+- **The commit names.** The manifests name later HEADs: d5f6b17 per r2-runner, and `09b9a7b…` in the dh `_rev`
+  directory I read. Both `code_sha256` entries of that manifest match `component_analysis/neuron_attribution.py` and
+  `scripts/neuron_attribution.py` on disk, so the code that ran is the committed code.
+- **The partition and stability runs**, from `WT`:
+
+```
+/u/swong2/.conda/envs/mgnp/bin/python scripts/neuron_partition_sets.py partition --position all --dh ATT/ser_v2_dh_train+validation_predicate_a41752a_rev --in ATT/ser_v2_in_train+validation_predicate_a41752a --dh-reverse ATT/ser_v2_dh_train+validation_predicate_a41752a_rev --label "SER predicate full ranking, train+validation, AtP all positions (R11 primary)" --out-dir SETS/ser_predicate_atp_all_a41752a
+```
+
+  Observed class sizes:
+
+  | k | D_only | DI_shared | H_only | all_shared |
+  | --- | --- | --- | --- | --- |
+  | 500 | 386 | 28 | 403 | 36 |
+  | 1,000 | 775 | 55 | 800 | 59 |
+  | 2,000 | 1,581 | 108 | 1,617 | 89 |
+
+  At k 500, D_only is densest in layers 7, 8, 6, 5 and 9, all inside or next to the A3 cell's 5 to 8. H_only is
+  densest in layers 13, 14, 11, 15 and 12.
+
+```
+/u/swong2/.conda/envs/mgnp/bin/python scripts/neuron_partition_sets.py stability --position all --dh <half1_rev> <half2_rev> --in <in half1> <in half2> --dh-reverse <half1_rev> <half2_rev> --label "SER predicate split halves, AtP all positions (R11 primary)" --out-dir SETS/ser_predicate_atp_all_a41752a
+```
+
+  Observed: every class at every k is "stable", with Jaccard at least half the ceiling. Jaccard and ceiling at k 500:
+
+  | set | Jaccard | ceiling |
+  | --- | --- | --- |
+  | D_only | 0.774 | 0.815 |
+  | DI_shared | 0.667 | 0.815 |
+  | H_only | 0.699 | 0.815 |
+  | all_shared | 0.775 | 0.815 |
+
+- **The k-500 sets file.** `knockout.load_groups` read 84 groups. Every null matches its class's per-layer counts
+  and is disjoint from it.
+- **The real-cell dry run.** It used the sets file, `--references twin,mean --max-length 136 --ioi-rows 1000
+  --ioi-seed 2`, 0.046 s per forward and a 904 s load. Observed: 300 rows per condition and 1,000 IOI rows, with IOI
+  sentences sha256 `906a93ed…`, the seed-2 rows of W8's R14 cell. The total was 72,307 forwards, about 66.5 min.
+
+### Execution evidence
+
+The ranking job is r2-runner's: Delta 23520107, COMPLETED 0:0, 360 s, ledger r-014. Its run manifests name
+`09b9a7b…` (dh `_rev` directory) with `git_dirty` false. r2-runner reports d5f6b17 from the directory it read. Both
+moved past a41752a after the line was handed. W10 ran only CPU commands.
+
+### What is NOT done
+
+The Bridges-2 ablation and the verdict are r2-runner's next job and have not reported. The k-1,000 and k-2,000
+cells and the readout-position comparison sets are not built or run, because R17 named only the k-500 84-set cell.
+
+### Open questions
+
+None open from W10. The A3 overlap of the D_only class (layers 5 to 9) will be noted per layer in the verdict, as
+R17 rules.
