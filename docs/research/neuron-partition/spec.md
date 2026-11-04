@@ -165,10 +165,10 @@ as a ruling before that run.
     N1 and N2 for SER, reported beside FAR's.
   - Budget: (a) to (c) at most 3.5 GPU-hours reserved, within the 20-hour cap; (d) at most 4 more, only after the
     cap is raised. Every outcome is preliminary until an independent recomputation matches.
-- **R16 (Wed 4 Nov 2026, 11:00 am EST, user decision): budget.** The GPU cap of item 7 is raised from 20 to 30
+- **R16 (Wed 4 Nov 2026, 10:50 am EST, user decision): budget.** The GPU cap of item 7 is raised from 20 to 30
   reserved GPU-hours and the 36-hour wall-clock stop is removed; at most 3 concurrent GPU jobs still holds. SER
   (R15 d) runs on GPU under this cap.
-- **R17 (Wed 4 Nov 2026, 11:50 am EST, orchestrator, under R15 d): SER settings.** (1) Clause form: the SER D
+- **R17 (Wed 4 Nov 2026, 11:00 am EST, orchestrator, under R15 d): SER settings.** (1) Clause form: the SER D
   sample keeps predicate-naming rows only, the wording-matched twin of SER's single predicate-naming I request
   (act-naming is infeasible at 49 D / 42 I eligible rows; all forms stays the stated alternative and is not run
   unless the user asks). (2) `--max-length 136` on SER cells, where R9's 128 raises; truncation still raises, so
@@ -177,11 +177,14 @@ as a ruling before that run.
   condition, test ids disjoint from the 360 excluded ids listed in report 11. (4) Codex A3 covers SER layers 5 to
   8, 11, 13 and 16; any passing class is recorded as a descriptive lead outside that cell with per-layer counts
   (START item 6). The user may overrule (1) in the WORKLOG needs section; the default runs now.
-- **R18 (Wed 4 Nov 2026, 12:25 pm EST, after the R15 (a) cell): N2 on fresh data.** The honest-only class at size
+- **R18 (Wed 4 Nov 2026, 11:17 am EST, after the R15 (a) cell): N2 on fresh data.** The honest-only class at size
   2,000 (1,623 neurons after set construction) on the seed-3 sample gives, under the mean reference, an H accuracy
   shift of minus 21.9 points with a deceptive-rate fall of 12.7 points on the whole sample (half 1: 21.6 and
   10.6; half 2: 22.1 and 14.9), null 95th percentile of the H shift 0.0. By the item 10 rule this is
   **suppression or shared** on every row, not a bypass. N2's outcome for FAR is therefore "suppression or shared"
   at size 2,000; the class is not a pure honest route that deception bypasses. Deception margin rises when the
-  class is ablated (D removed minus 0.64 under mean, minus 0.53 under twin), consistent with F4. Pending the
-  independent recomputation (review 05).
+  class is ablated (D removed minus 0.64 under mean, minus 0.53 under twin), consistent with F4. Confirmed by the
+  independent recomputation (review 05, 11:30 am EST) with one qualification: under mean, 9 of the 20 matched
+  nulls also lower D's rate by at least 12.7 points (null median 9.7), so the deceptive-rate clause of the rule
+  does not beat the null band; only the H fall does (every null 0.0). The outcome stands as the rule names it,
+  but the evidence that the class is shared rests on the H and F falls and the margin rise, not on the rate fall.
