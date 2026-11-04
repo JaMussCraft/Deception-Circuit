@@ -212,3 +212,13 @@ as a ruling before that run.
   suppression or shared, as on FAR (R18). Any per-layer reading is against Codex A3 (SER layers 5 to 8, 11, 13, 16)
   per R17 (4). Pending the independent recomputation (review 07) and W10's reading. Bridges-2 job 50213549,
   3,572 s of 7,200 reserved.
+- **R21 (Wed 4 Nov 2026, 12:50 pm EST, after the R15 (c) check): the one-neuron interchange check (descriptive).**
+  For the top 20 neurons by s_D and the top 20 by s_H of the all-position ranking (36 distinct; 4 appear in both
+  lists), single-neuron twin interchange on the seed-2 D and H rows moves the D margin in the direction the
+  attribution score predicts in 40 of 40 groups and the H margin in 39 of 40, with Spearman 0.93 between s_D and
+  the measured D shift and 0.998 between s_H and the measured H shift (the clean-stream read agrees). Each top
+  neuron alone removes at most 0.05 of the D margin. The top single neurons sit in layers 8 to 19, not in the
+  layers 0 to 9 where the size-500 class is dense, so the class effect is carried by many small early-layer
+  contributions rather than by the largest single neurons. The attribution ranking is therefore a faithful
+  predictor of single-neuron interchange effects at the top of the ranking, answering review 01's one-neuron
+  question. Pending the independent recomputation (review 08). Delta job 23520193, 1,447 s of 2,700 reserved.

@@ -42,3 +42,12 @@ Addendum: np-n2 (N2 honest-only class, size 2,000, with 20 nulls, seed-3 sample)
 - Transfer: sha256 of summary.json, rows.jsonl, cells_partial.jsonl and run_manifest.json match on Bridges-2 and Delta. Input and code hashes matched the expected values before submission.
 - Provenance file: `/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/neuron-partition/outputs/_analyses/neuron-partition/ablation/ladder-92fc6fb/run_manifest.json`, commit `d5f6b1750e5b5a770d48b5c44cd4cb2c688236c6`. The manifest commit differs from 92fc6fb in the job name, as in the N2 cell.
 - Verdict: `/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/neuron-partition/outputs/_analyses/neuron-partition/verdict/ladder-92fc6fb/verdict.md`. N1 passes at k 250, 375, 625 and 750 under both references, on the whole sample and both halves.
+
+## Addendum: np-one-neuron (R15(c), Delta)
+
+- Job id and cluster: 23520193 on Delta, gpuH200x8-interactive, node gpub059, account beto-delta-gpu, ledger r-016. The A40 interactive slot was held by another worker's job, so the two-partition submit was refused and the job went to H200 only.
+- Slurm state: COMPLETED, 1447 s elapsed against 2700 s reserved.
+- Row counts: 24,000 rows against 24,000 expected, which is 40 sets times 300 ids times conditions D and H, twin reference only, no IOI. The 300-id sample is far_test_sample_seed2.
+- Baseline reproduces: not applicable, the IOI check was off by the job line.
+- Provenance file: `/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/neuron-partition/outputs/_analyses/neuron-partition/ablation/one_neuron-92fc6fb/run_manifest.json`, commit `800c9037c22c54256a049a4615b4f06f00493f46`. This commit differs from the d5f6b17 of the other two runs and from 92fc6fb in the job name.
+- Report: `/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/neuron-partition/outputs/_analyses/neuron-partition/verdict/one_neuron-92fc6fb/one_neuron_report.md`. Duplicate groups differ by at most 0. Sign agreement 40 of 40 on D and 39 of 40 on H. Spearman of s_D against minus dD is 0.929 and of s_H against dH is 0.998, over all groups and both streams.
