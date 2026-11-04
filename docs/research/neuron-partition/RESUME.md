@@ -1,17 +1,19 @@
 # Resume: neuron-partition
 
-Last rewritten: Tue 3 Nov 2026, 8:40 pm EST by claude-5201d56c, after the ablation cells.
+Last rewritten: Tue 3 Nov 2026, 9:45 pm EST by claude-5201d56c, after the confirmation test.
 
 ## Status
 
-Item 10 is decided (ruling R13): N1 FAILED at every set size under the frozen bars and N2 is UNDETERMINED. Findings
-F1 to F5 are in `WORKLOG.md` (F3 and F4 confirmed by review 03). The near miss: the all-position deception-only
-class at size 500 (338 neurons, layers 0 to 9) removes 0.81 of the deception margin under the twin interchange
-and 0.72 under mean, 0.15 of the inversion margin, leaves H and F unmoved, and failed only the IOI bar (minus 6.0 on
-100 rows); an exploratory 1,000-row IOI measurement (F5) puts that cost at 3.7 points, under the bar and outside
-the null band. It is a descriptive lead, not a pass. The first report is `reports/05-first-report.md` (review 03
-folded in; the 1,000-row IOI result being folded in at 8:40 pm EST), due Wed 4 Nov 2026, 12:00 pm EST. Every
-GPU job is reconciled: 14.83 of 20 GPU-hours reserved, about 9.5 used.
+Two decisions stand side by side. R13: on the original ladder, N1 FAILED at every set size under the frozen bars
+(the size-500 class missed only the IOI bar on 100 rows) and N2 is UNDETERMINED. R14: a pre-registered
+confirmation test of that fixed size-500 all-position deception-only class (338 neurons, layers 0 to 9) on fresh
+ids (208 D, 166 I) and 1,000 fresh IOI rows met every N1 bar under twin and mean on the whole sample and both
+halves: 0.82 and 0.75 of the deception effect removed, 0.14 to 0.15 of inversion, H and F at zero shift, IOI minus
+2.7 points, 35 times the null 95th percentile. Findings F1 to F6 are in `WORKLOG.md`; F3, F4 and F6 are reviewed
+(reviews 03 and 04). The report is `reports/05-first-report.md` (final, both decisions and the confirmation
+section). Every GPU job is reconciled: 15.83 of 20 GPU-hours reserved, about 10.3 used. The optional N2 fresh-data
+cell (honest-only at size 2,000) was not run (no H200 available); its sets file is
+`outputs/_analyses/neuron-partition/ablation/confirm_h_only_k2000_sets.json`.
 
 ## Branch, worktree and commit
 
@@ -28,16 +30,15 @@ Reservations r-001 to r-003 (ranking pilot, full ranking, split halves; 89, 252 
 
 ## Next action
 
-1. Morning of Wed 4 Nov: confirm hand-back 02's IOI addendum and the report's IOI fold-in are committed (if not,
-   write them from `outputs/_analyses/neuron-partition/ablation/ioi_resolution-delta-e8dd8a8/summary.json` and
-   finding F5); run `research-session lint` and `scripts/check_report_numbers.py` on the report; push.
-2. Ask the user to revert `CAP_PERCENT` to 80 in `/projects/beto/swong2/Alignment/.agents/research_session/usage.py`
-   after the 8:00 am EST reset, and to note the cadence (26) for the record.
+1. The user decides: release the direction as done, or pause it for a follow-up (candidates: the N2 fresh-data
+   cell above, about 40 min on an A40; SER; the one-neuron interchange check of review 01; a finer size ladder
+   around 500 with a 1,000-row IOI bar, each needing its own pre-registration).
+2. After the Wed 4 Nov 2026 8:00 am EST reset, the user reverts `CAP_PERCENT` to 80 in
+   `/projects/beto/swong2/Alignment/.agents/research_session/usage.py`.
 3. Before Bridges-2 goes offline (about Sun 9 Nov 2026): copy the clone's `logs/` entries for jobs 50182995,
    50183187 and 50183194 under the primary checkout on Delta, so the evidence blocks stay traceable.
-4. Hand the report to the user; the advisor meeting decides whether the size-500 lead gets a pre-registered
-   follow-up (a 1,000-row IOI bar, SER, the one-neuron interchange check of review 01). No further GPU work is
-   planned in this session.
+4. Wrap-up when the user says so: merge the branch into main, delete branch and worktree, keep the worktree's
+   untracked outputs under the primary checkout, copy the Bridges-2 outputs and logs to Delta.
 
 ## Do not
 

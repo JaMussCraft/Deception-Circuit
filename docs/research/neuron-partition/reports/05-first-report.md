@@ -206,7 +206,12 @@ and -11.2 points, short of the bypass drop; the rows at 2,000 follow
 
 ## Confirmation test, pre-registered (R14)
 
-**Review 04 pending.** An independent recomputation of this section is running; this line will be replaced.
+**Review 04: CONFIRMED WITH NOTES.** An independent recomputation from the rows matches every number of this
+section (188 quantities, worst difference 0.0), so finding F6 is reviewed (`../reviews/04-confirmation-review.md`).
+Two notes from it: the inversion sample has 166 rows, under item 10's floor of 300 (the pool had no more fresh
+ids); and under the mean reference the user-neutral margin also moves 1.08 logits toward the inverted answer, so a
+second reading of the inversion effect (the ablated gap over the intact gap) is 0.230, under the 0.25 bar by 0.02,
+where the registered reading (R2) is 0.154.
 
 **Design, fixed before any draw.** Ruling R14 tested the fixed size-500 all-position D-only class (338 neurons) and
 its 20 nulls on fresh data. The seed-3 sample holds 208 D, H and F ids and 166 I and N ids, disjoint from every seed-2
