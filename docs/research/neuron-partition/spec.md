@@ -142,3 +142,26 @@ as a ruling before that run.
   deceptive rate moves under 5 and the nulls' 95th percentile of the H shift is under 5; suppression or shared if
   the deceptive rate also falls at least 10 points; otherwise undetermined). Budget: at most 2 GPU-hours reserved
   for both cells.
+- **R15 (Wed 4 Nov 2026, 9:05 am EST, before any run): the approved follow-ups, pre-registered.** The user
+  approved them on Wed 4 Nov 2026. All use the fixed all-position ranking of c3d7763 and rule R6; nothing is
+  re-ranked.
+  - **(a) N2 on fresh data.** The optional cell of R14 runs as written there (honest-only at size 2,000 and its
+    20 nulls, seed-3 sample, 1,000 fresh IOI rows at IOI seed 2, twin and mean; N2 read under mean by the item 10
+    rule). Outcomes: bypass, suppression or shared, or undetermined, as item 10 names them.
+  - **(b) The finer size ladder.** Deception-only classes cut at sizes 250, 375, 625 and 750 (the 500 class is
+    F6's), each with 20 matched nulls, scored on the seed-3 sample and the same 1,000-row IOI draw under twin and
+    mean, with the N1 bars unchanged, on the whole sample and both R10 halves. Disclosure: the seed-3 sample has
+    already been scored for the size-500 class, so this is a characterisation of where the class stops meeting the
+    bars, not a second confirmation; the sizes are fixed here before any run. Outcome: the largest size that meets
+    every bar is recorded as the class's specific size, and the first bar to fail as the size grows is named.
+  - **(c) The one-neuron interchange check.** Descriptive, no bars (review 01 major 2): the top 20 neurons by the
+    deception score and the top 20 by the honest score, each patched alone under the twin interchange on the
+    seed-2 sample's D and H rows, reporting the per-neuron margin change, its sign agreement with the score, and
+    the rank correlation across the 40 neurons.
+  - **(d) SER.** The secondary task, run only if the user raises the GPU cap (worklog need of Wed 4 Nov): the FAR
+    pipeline replayed on SER with the same rulings (R5 and R12 exclusions assembled for SER, a seed-2 sample of
+    300 per condition, the all-position ranking with reverse, R6 classes at sizes 500, 1,000 and 2,000 with 20
+    nulls, ablation under twin and mean with a 1,000-row IOI draw) and the item 10 bars unchanged. Its outcome is
+    N1 and N2 for SER, reported beside FAR's.
+  - Budget: (a) to (c) at most 3.5 GPU-hours reserved, within the 20-hour cap; (d) at most 4 more, only after the
+    cap is raised. Every outcome is preliminary until an independent recomputation matches.
