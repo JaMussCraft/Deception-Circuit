@@ -13,7 +13,9 @@ discrepancy (`../reviews/03-verdict-review.md`). Ruling R13 keeps N1 failed and 
 3. **Headline, N1.** N1 fails at every set size under the frozen bars, with a near miss at size 500. The deception-only
    class of 338 neurons removes 0.813 of the deception margin under twin interchange and 0.724 under mean ablation,
    and fails only the IOI bar, at -6.0 points against 5 on 100 IOI rows
-   (`outputs/_analyses/neuron-partition/verdict/far_atp_all_c3d7763/verdict.md`, `02-w2-ablation-handback.md`).
+   (`outputs/_analyses/neuron-partition/verdict/far_atp_all_c3d7763/verdict.md`, `02-w2-ablation-handback.md`). An
+   exploratory, not pre-registered measurement on 1,000 IOI rows puts that cost at -3.7 points, interval -5.2 to
+   -2.4, outside the null band of -2.3 to +1.1 (finding F5 in `../WORKLOG.md`); the decision stands (R13).
 4. **N2.** The honest-only class is "undetermined at this size" at every size. At 2,000 it drops H accuracy by 23.5
    points while D's deceptive rate moves 5.2 points, just over the bar of 5
    (`outputs/_analyses/neuron-partition/verdict/far_atp_all_c3d7763/verdict.md`).
