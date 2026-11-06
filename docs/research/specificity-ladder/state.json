@@ -1456,9 +1456,41 @@
       "status": "COMPLETED",
       "submitted_at": "2026-11-03T18:57:48-05:00",
       "waiter": "timeout 60m sh -c 'until sacct -j 23491516 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'"
+    },
+    {
+      "cluster": "delta",
+      "expected_terminal": [
+        "COMPLETED",
+        "FAILED",
+        "CANCELLED",
+        "TIMEOUT",
+        "OUT_OF_MEMORY",
+        "NODE_FAIL"
+      ],
+      "job_id": "23605749",
+      "last_progress_at": "2026-11-06T11:27:47-05:00",
+      "status": "RUNNING",
+      "submitted_at": "2026-11-06T11:24:45-05:00",
+      "waiter": "timeout 60m sh -c 'until sacct -j 23605749 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'"
+    },
+    {
+      "cluster": "delta",
+      "expected_terminal": [
+        "COMPLETED",
+        "FAILED",
+        "CANCELLED",
+        "TIMEOUT",
+        "OUT_OF_MEMORY",
+        "NODE_FAIL"
+      ],
+      "job_id": "23605794",
+      "last_progress_at": "2026-11-06T11:30:09-05:00",
+      "status": "PENDING",
+      "submitted_at": "2026-11-06T11:30:09-05:00",
+      "waiter": "timeout 60m sh -c 'until sacct -j 23605794 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'"
     }
   ],
-  "last_worklog_entry_at": "2026-11-04T08:41:59-05:00",
+  "last_worklog_entry_at": "2026-11-06T11:33:07-05:00",
   "schema": 1,
   "session_state": "running",
   "sessions": {
@@ -1992,19 +2024,39 @@
           "agent_type": "worker",
           "started_at": "2026-11-03T14:50:38-05:00",
           "stop_blocks": 1
+        },
+        "01a1b1a9-d90e-7472-a2b9-196231a319cc": {
+          "agent_type": "default",
+          "started_at": "2026-11-06T11:21:02-05:00",
+          "stop_blocks": 0
         }
       },
-      "checkpoints": [],
+      "checkpoints": [
+        {
+          "acked_at": null,
+          "acked_by": null,
+          "all_models": 1,
+          "at": "2026-11-06T11:29:42-05:00",
+          "fable": null,
+          "n": 1,
+          "session_points": 17
+        }
+      ],
       "compaction_log": [
         {
           "at": "2026-11-03T17:08:30-05:00",
           "n": 1,
           "trigger": null
+        },
+        {
+          "at": "2026-11-04T08:45:24-05:00",
+          "n": 2,
+          "trigger": null
         }
       ],
-      "compactions": 1,
+      "compactions": 2,
       "cwd": "/projects/beto/swong2/Alignment",
-      "orchestrator_model": null,
+      "orchestrator_model": "gpt-6-astra",
       "session_id": "01a1a2f4-dbc1-7551-bf86-d1d0f99ad6e2",
       "started_at": "2026-11-03T14:49:15-05:00",
       "tool": "codex",
@@ -2012,25 +2064,32 @@
         "acked_through": 0,
         "cadence": 16,
         "cap_exception": {
+          "expired_at": "2026-11-06T11:18:30-05:00",
           "granted_at": "2026-11-03T14:57:14-05:00",
           "granted_by": "cap-exception",
           "last": 100,
+          "reason": "observed window, segment or meter reset",
           "resets_at": 1793981261,
           "segment": 1,
           "session_id": "01a1a2f4-dbc1-7551-bf86-d1d0f99ad6e2",
-          "status": "active",
+          "status": "expired",
           "tool": "codex"
         },
-        "freeze": null,
+        "freeze": {
+          "checkpoint": 1,
+          "crossed_at": "2026-11-06T11:29:42-05:00",
+          "recorded_at": "2026-11-06T11:33:07-05:00",
+          "stage": "recorded"
+        },
         "last_reading": {
           "fable": null,
           "five_hour": null,
           "fresh": true,
-          "read_at": "2026-11-04T08:40:38-05:00",
-          "seven_day": 100
+          "read_at": "2026-11-06T11:33:03-05:00",
+          "seven_day": 1
         },
         "metric": "codex weekly",
-        "next_checkpoint": 1,
+        "next_checkpoint": 2,
         "points_at_register": 1,
         "registered_at": "2026-11-03T14:54:49-05:00",
         "segments": [
@@ -2038,9 +2097,14 @@
             "baseline": 84,
             "last": 100,
             "resets_at": 1793981261
+          },
+          {
+            "baseline": 0,
+            "last": 1,
+            "resets_at": 1794586709
           }
         ],
-        "session_points": 16,
+        "session_points": 17,
         "stale_ok_until": null
       }
     }

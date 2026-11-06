@@ -1,0 +1,836 @@
+{
+  "observed_unix": 1793982696.302958,
+  "ledger_sha256": "c299d64d35d2d3d97464f311c5e0225efb32f23df6c2b3f5e81268a28e6742b4",
+  "reservations": 41,
+  "reserved_gpu_hours": 34.3668,
+  "actual_gpu_seconds": 69729,
+  "actual_gpu_hours": 19.36916666666667,
+  "api_calls_count": 0,
+  "api_spend_basis": "No API calls recorded or made by this session; no OpenRouter request this continuation.",
+  "raw_sacct": {
+    "bridges2": "50147300|COMPLETED|481|billing=4,cpu=4,gres/gpu=1,mem=64G,node=1\n50148389|COMPLETED|3764|billing=4,cpu=4,gres/gpu=1,mem=64G,node=1\n50148398|COMPLETED|3187|billing=4,cpu=4,gres/gpu=1,mem=64G,node=1\n50148399|COMPLETED|3187|billing=4,cpu=4,gres/gpu=1,mem=64G,node=1\n50148404|COMPLETED|3720|billing=4,cpu=4,gres/gpu=1,mem=64G,node=1\n50148405|COMPLETED|3860|billing=4,cpu=4,gres/gpu=1,mem=64G,node=1\n50148407|COMPLETED|3240|billing=4,cpu=4,gres/gpu=1,mem=64G,node=1\n50189932|PENDING|0|\n",
+    "delta": "23411942|COMPLETED|95|billing=2048,cpu=2,gres/gpu=1,mem=64G,node=1\n23412323|COMPLETED|101|billing=1024,cpu=2,gres/gpu=1,mem=64G,node=1\n23412591|COMPLETED|429|billing=1024,cpu=2,gres/gpu=1,mem=64G,node=1\n23414452|FAILED|157|billing=1024,cpu=4,gres/gpu=1,mem=64G,node=1\n23414611|COMPLETED|235|billing=6000,cpu=4,gres/gpu:h200=1,gres/gpu=1,mem=64G,node=1\n23415106|COMPLETED|974|billing=6000,cpu=4,gres/gpu:h200=1,gres/gpu=1,mem=64G,node=1\n23415379|COMPLETED|195|billing=2048,cpu=4,gres/gpu=1,mem=64G,node=1\n23415975|FAILED|314|billing=2048,cpu=4,gres/gpu=1,mem=64G,node=1\n23416716|COMPLETED|254|billing=2048,cpu=4,gres/gpu=1,mem=64G,node=1\n23416761|COMPLETED|2660|billing=6000,cpu=4,gres/gpu:h200=1,gres/gpu=1,mem=64G,node=1\n23416841|COMPLETED|2902|billing=3000,cpu=4,gres/gpu:h200=1,gres/gpu=1,mem=64G,node=1\n23416842|COMPLETED|2895|billing=3000,cpu=4,gres/gpu:h200=1,gres/gpu=1,mem=64G,node=1\n23416843|COMPLETED|2827|billing=6000,cpu=4,gres/gpu:h200=1,gres/gpu=1,mem=64G,node=1\n23416844|COMPLETED|2842|billing=3000,cpu=4,gres/gpu:h200=1,gres/gpu=1,mem=64G,node=1\n23416845|COMPLETED|2849|billing=3000,cpu=4,gres/gpu:h200=1,gres/gpu=1,mem=64G,node=1\n23416846|COMPLETED|2868|billing=3000,cpu=4,gres/gpu:h200=1,gres/gpu=1,mem=64G,node=1\n23416847|CANCELLED by 78031|0|\n23416848|CANCELLED by 78031|0|\n23416849|CANCELLED by 78031|0|\n23416850|CANCELLED by 78031|0|\n23416851|CANCELLED by 78031|0|\n23416852|CANCELLED by 78031|0|\n23416853|COMPLETED|2705|billing=6000,cpu=4,gres/gpu:h200=1,gres/gpu=1,mem=64G,node=1\n23416854|COMPLETED|2670|billing=6000,cpu=4,gres/gpu:h200=1,gres/gpu=1,mem=64G,node=1\n23416855|COMPLETED|2692|billing=6000,cpu=4,gres/gpu:h200=1,gres/gpu=1,mem=64G,node=1\n23416856|COMPLETED|2699|billing=6000,cpu=4,gres/gpu:h200=1,gres/gpu=1,mem=64G,node=1\n23416857|COMPLETED|2688|billing=6000,cpu=4,gres/gpu:h200=1,gres/gpu=1,mem=64G,node=1\n23417240|COMPLETED|205|billing=2048,cpu=4,gres/gpu=1,mem=64G,node=1\n23417413|COMPLETED|399|billing=2048,cpu=4,gres/gpu=1,mem=64G,node=1\n23417811|COMPLETED|8158|billing=1024,cpu=4,gres/gpu=1,mem=64G,node=1\n23444798|CANCELLED by 78031|0|\n23473669|COMPLETED|1135|billing=6000,cpu=4,gres/gpu:h200=1,gres/gpu=1,mem=64G,node=1\n23474289|FAILED|2342|billing=6000,cpu=4,gres/gpu:h200=1,gres/gpu=1,mem=64G,node=1\n"
+  },
+  "job_rows": [
+    {
+      "account": "bimc-delta-gpu",
+      "actual_seconds": 95,
+      "cluster": "delta",
+      "gpus": 1,
+      "id": "r-001",
+      "job_id": "23411942",
+      "manifest_hash": null,
+      "output_dir": ".claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a1-pilot-dd9aed6",
+      "partition": "gpuA100x4-interactive",
+      "requested_minutes": 15.0,
+      "reserved_gpu_hours": 0.25,
+      "source_commit": "dd9aed6",
+      "status": "COMPLETED",
+      "actual_observation": {
+        "state": "COMPLETED",
+        "elapsed_seconds": 95,
+        "alloc_tres": "billing=2048,cpu=2,gres/gpu=1,mem=64G,node=1"
+      }
+    },
+    {
+      "account": "bimc-delta-gpu",
+      "actual_seconds": 101,
+      "cluster": "delta",
+      "gpus": 1,
+      "id": "r-002",
+      "job_id": "23412323",
+      "manifest_hash": null,
+      "output_dir": ".claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a1-a40-pilot-dd9aed6",
+      "partition": "gpuA40x4-interactive",
+      "requested_minutes": 5.0,
+      "reserved_gpu_hours": 0.0833,
+      "source_commit": "dd9aed6",
+      "status": "COMPLETED",
+      "actual_observation": {
+        "state": "COMPLETED",
+        "elapsed_seconds": 101,
+        "alloc_tres": "billing=1024,cpu=2,gres/gpu=1,mem=64G,node=1"
+      }
+    },
+    {
+      "account": "bimc-delta-gpu",
+      "actual_seconds": 429,
+      "cluster": "delta",
+      "gpus": 1,
+      "id": "r-003",
+      "job_id": "23412591",
+      "manifest_hash": null,
+      "output_dir": ".claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a1-full-77b6487-a100",
+      "partition": "gpuA100x4,gpuA100x8",
+      "requested_minutes": 12.0,
+      "reserved_gpu_hours": 0.2,
+      "source_commit": "77b6487",
+      "status": "COMPLETED",
+      "actual_observation": {
+        "state": "COMPLETED",
+        "elapsed_seconds": 429,
+        "alloc_tres": "billing=1024,cpu=2,gres/gpu=1,mem=64G,node=1"
+      }
+    },
+    {
+      "account": "bimc-delta-gpu",
+      "actual_seconds": 157,
+      "cluster": "delta",
+      "gpus": 1,
+      "id": "r-004",
+      "job_id": "23414452",
+      "manifest_hash": null,
+      "output_dir": "outputs/_analyses/specificity-ladder/a2-timing-224823f-a40",
+      "partition": "gpuA40x4-interactive",
+      "requested_minutes": 20.0,
+      "reserved_gpu_hours": 0.3333,
+      "source_commit": "224823f",
+      "status": "FAILED",
+      "actual_observation": {
+        "state": "FAILED",
+        "elapsed_seconds": 157,
+        "alloc_tres": "billing=1024,cpu=4,gres/gpu=1,mem=64G,node=1"
+      }
+    },
+    {
+      "account": "bgrb-delta-gpu",
+      "actual_seconds": 235,
+      "cluster": "delta",
+      "gpus": 1,
+      "id": "r-005",
+      "job_id": "23414611",
+      "manifest_hash": null,
+      "output_dir": "outputs/_analyses/specificity-ladder/a2-timing-6bd8bf5-h200",
+      "partition": "gpuH200x8-interactive",
+      "requested_minutes": 12.0,
+      "reserved_gpu_hours": 0.2,
+      "source_commit": "6bd8bf5",
+      "status": "COMPLETED",
+      "actual_observation": {
+        "state": "COMPLETED",
+        "elapsed_seconds": 235,
+        "alloc_tres": "billing=6000,cpu=4,gres/gpu:h200=1,gres/gpu=1,mem=64G,node=1"
+      }
+    },
+    {
+      "account": "bgrb-delta-gpu",
+      "actual_seconds": 974,
+      "cluster": "delta",
+      "gpus": 1,
+      "id": "r-006",
+      "job_id": "23415106",
+      "manifest_hash": null,
+      "output_dir": "outputs/_analyses/specificity-ladder/a2-timing-6bd8bf5-h200",
+      "partition": "gpuH200x8-interactive",
+      "requested_minutes": 26.0,
+      "reserved_gpu_hours": 0.4333,
+      "source_commit": "6bd8bf5",
+      "status": "COMPLETED",
+      "actual_observation": {
+        "state": "COMPLETED",
+        "elapsed_seconds": 974,
+        "alloc_tres": "billing=6000,cpu=4,gres/gpu:h200=1,gres/gpu=1,mem=64G,node=1"
+      }
+    },
+    {
+      "account": "bimc-delta-gpu",
+      "actual_seconds": 195,
+      "cluster": "delta",
+      "gpus": 1,
+      "id": "r-007",
+      "job_id": "23415379",
+      "manifest_hash": null,
+      "output_dir": "outputs/_analyses/specificity-ladder/ladder-0253f49",
+      "partition": "gpuA100x4-interactive,gpuA100x8-interactive",
+      "requested_minutes": 15.0,
+      "reserved_gpu_hours": 0.25,
+      "source_commit": "0253f49",
+      "status": "COMPLETED",
+      "actual_observation": {
+        "state": "COMPLETED",
+        "elapsed_seconds": 195,
+        "alloc_tres": "billing=2048,cpu=4,gres/gpu=1,mem=64G,node=1"
+      }
+    },
+    {
+      "account": "bimc-delta-gpu",
+      "actual_seconds": 314,
+      "cluster": "delta",
+      "gpus": 1,
+      "id": "r-008",
+      "job_id": "23415975",
+      "manifest_hash": null,
+      "output_dir": "outputs/_analyses/specificity-ladder/ladder-0253f49/pilot-4",
+      "partition": "gpuA100x4-interactive,gpuA100x8-interactive",
+      "requested_minutes": 15.0,
+      "reserved_gpu_hours": 0.25,
+      "source_commit": "0253f49",
+      "status": "FAILED",
+      "actual_observation": {
+        "state": "FAILED",
+        "elapsed_seconds": 314,
+        "alloc_tres": "billing=2048,cpu=4,gres/gpu=1,mem=64G,node=1"
+      }
+    },
+    {
+      "account": "bimc-delta-gpu",
+      "actual_seconds": 254,
+      "cluster": "delta",
+      "gpus": 1,
+      "id": "r-009",
+      "job_id": "23416716",
+      "manifest_hash": null,
+      "output_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/calibration-diagnostic-0253f49",
+      "partition": "gpuA100x4-interactive",
+      "requested_minutes": 10.0,
+      "reserved_gpu_hours": 0.1667,
+      "source_commit": "0253f494af007f93b2a00cb1e63cb3cdf1a8b519",
+      "status": "COMPLETED",
+      "actual_observation": {
+        "state": "COMPLETED",
+        "elapsed_seconds": 254,
+        "alloc_tres": "billing=2048,cpu=4,gres/gpu=1,mem=64G,node=1"
+      }
+    },
+    {
+      "account": "bgrb-delta-gpu",
+      "actual_seconds": 2660,
+      "cluster": "delta",
+      "gpus": 1,
+      "id": "r-010",
+      "job_id": "23416761",
+      "manifest_hash": null,
+      "output_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200",
+      "partition": "gpuH200x8-interactive",
+      "requested_minutes": 57.0,
+      "reserved_gpu_hours": 0.95,
+      "source_commit": "6bd8bf5334f2e83613a129d2fcfeacf83e762191",
+      "status": "COMPLETED",
+      "actual_observation": {
+        "state": "COMPLETED",
+        "elapsed_seconds": 2660,
+        "alloc_tres": "billing=6000,cpu=4,gres/gpu:h200=1,gres/gpu=1,mem=64G,node=1"
+      }
+    },
+    {
+      "account": "bjhz-delta-gpu",
+      "actual_seconds": 2902,
+      "cluster": "delta",
+      "gpus": 1,
+      "id": "r-011",
+      "job_id": "23416841",
+      "manifest_hash": null,
+      "output_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200",
+      "partition": "gpuH200x8",
+      "requested_minutes": 63.0,
+      "reserved_gpu_hours": 1.05,
+      "source_commit": "6bd8bf5334f2e83613a129d2fcfeacf83e762191",
+      "status": "COMPLETED",
+      "actual_observation": {
+        "state": "COMPLETED",
+        "elapsed_seconds": 2902,
+        "alloc_tres": "billing=3000,cpu=4,gres/gpu:h200=1,gres/gpu=1,mem=64G,node=1"
+      }
+    },
+    {
+      "account": "bjhz-delta-gpu",
+      "actual_seconds": 2895,
+      "cluster": "delta",
+      "gpus": 1,
+      "id": "r-012",
+      "job_id": "23416842",
+      "manifest_hash": null,
+      "output_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200",
+      "partition": "gpuH200x8",
+      "requested_minutes": 63.0,
+      "reserved_gpu_hours": 1.05,
+      "source_commit": "6bd8bf5334f2e83613a129d2fcfeacf83e762191",
+      "status": "COMPLETED",
+      "actual_observation": {
+        "state": "COMPLETED",
+        "elapsed_seconds": 2895,
+        "alloc_tres": "billing=3000,cpu=4,gres/gpu:h200=1,gres/gpu=1,mem=64G,node=1"
+      }
+    },
+    {
+      "account": "bjhz-delta-gpu",
+      "actual_seconds": 2827,
+      "cluster": "delta",
+      "gpus": 1,
+      "id": "r-013",
+      "job_id": "23416843",
+      "manifest_hash": null,
+      "output_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200",
+      "partition": "gpuH200x8",
+      "requested_minutes": 63.0,
+      "reserved_gpu_hours": 1.05,
+      "source_commit": "6bd8bf5334f2e83613a129d2fcfeacf83e762191",
+      "status": "COMPLETED",
+      "actual_observation": {
+        "state": "COMPLETED",
+        "elapsed_seconds": 2827,
+        "alloc_tres": "billing=6000,cpu=4,gres/gpu:h200=1,gres/gpu=1,mem=64G,node=1"
+      }
+    },
+    {
+      "account": "bjhz-delta-gpu",
+      "actual_seconds": 2842,
+      "cluster": "delta",
+      "gpus": 1,
+      "id": "r-014",
+      "job_id": "23416844",
+      "manifest_hash": null,
+      "output_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200",
+      "partition": "gpuH200x8",
+      "requested_minutes": 61.0,
+      "reserved_gpu_hours": 1.0167,
+      "source_commit": "6bd8bf5334f2e83613a129d2fcfeacf83e762191",
+      "status": "COMPLETED",
+      "actual_observation": {
+        "state": "COMPLETED",
+        "elapsed_seconds": 2842,
+        "alloc_tres": "billing=3000,cpu=4,gres/gpu:h200=1,gres/gpu=1,mem=64G,node=1"
+      }
+    },
+    {
+      "account": "bjhz-delta-gpu",
+      "actual_seconds": 2849,
+      "cluster": "delta",
+      "gpus": 1,
+      "id": "r-015",
+      "job_id": "23416845",
+      "manifest_hash": null,
+      "output_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200",
+      "partition": "gpuH200x8",
+      "requested_minutes": 61.0,
+      "reserved_gpu_hours": 1.0167,
+      "source_commit": "6bd8bf5334f2e83613a129d2fcfeacf83e762191",
+      "status": "COMPLETED",
+      "actual_observation": {
+        "state": "COMPLETED",
+        "elapsed_seconds": 2849,
+        "alloc_tres": "billing=3000,cpu=4,gres/gpu:h200=1,gres/gpu=1,mem=64G,node=1"
+      }
+    },
+    {
+      "account": "bjhz-delta-gpu",
+      "actual_seconds": 2868,
+      "cluster": "delta",
+      "gpus": 1,
+      "id": "r-016",
+      "job_id": "23416846",
+      "manifest_hash": null,
+      "output_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200",
+      "partition": "gpuH200x8",
+      "requested_minutes": 61.0,
+      "reserved_gpu_hours": 1.0167,
+      "source_commit": "6bd8bf5334f2e83613a129d2fcfeacf83e762191",
+      "status": "COMPLETED",
+      "actual_observation": {
+        "state": "COMPLETED",
+        "elapsed_seconds": 2868,
+        "alloc_tres": "billing=3000,cpu=4,gres/gpu:h200=1,gres/gpu=1,mem=64G,node=1"
+      }
+    },
+    {
+      "account": "bjhz-delta-gpu",
+      "actual_seconds": 0,
+      "cluster": "delta",
+      "gpus": 1,
+      "id": "r-017",
+      "job_id": "23416847",
+      "manifest_hash": null,
+      "output_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200",
+      "partition": "gpuH200x8",
+      "requested_minutes": 63.0,
+      "reserved_gpu_hours": 1.05,
+      "source_commit": "6bd8bf5334f2e83613a129d2fcfeacf83e762191",
+      "status": "CANCELLED",
+      "actual_observation": {
+        "state": "CANCELLED by 78031",
+        "elapsed_seconds": 0,
+        "alloc_tres": ""
+      }
+    },
+    {
+      "account": "bjhz-delta-gpu",
+      "actual_seconds": 0,
+      "cluster": "delta",
+      "gpus": 1,
+      "id": "r-018",
+      "job_id": "23416848",
+      "manifest_hash": null,
+      "output_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200",
+      "partition": "gpuH200x8",
+      "requested_minutes": 63.0,
+      "reserved_gpu_hours": 1.05,
+      "source_commit": "6bd8bf5334f2e83613a129d2fcfeacf83e762191",
+      "status": "CANCELLED",
+      "actual_observation": {
+        "state": "CANCELLED by 78031",
+        "elapsed_seconds": 0,
+        "alloc_tres": ""
+      }
+    },
+    {
+      "account": "bjhz-delta-gpu",
+      "actual_seconds": 0,
+      "cluster": "delta",
+      "gpus": 1,
+      "id": "r-019",
+      "job_id": "23416849",
+      "manifest_hash": null,
+      "output_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200",
+      "partition": "gpuH200x8",
+      "requested_minutes": 63.0,
+      "reserved_gpu_hours": 1.05,
+      "source_commit": "6bd8bf5334f2e83613a129d2fcfeacf83e762191",
+      "status": "CANCELLED",
+      "actual_observation": {
+        "state": "CANCELLED by 78031",
+        "elapsed_seconds": 0,
+        "alloc_tres": ""
+      }
+    },
+    {
+      "account": "bjhz-delta-gpu",
+      "actual_seconds": 0,
+      "cluster": "delta",
+      "gpus": 1,
+      "id": "r-020",
+      "job_id": "23416850",
+      "manifest_hash": null,
+      "output_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200",
+      "partition": "gpuH200x8",
+      "requested_minutes": 64.0,
+      "reserved_gpu_hours": 1.0667,
+      "source_commit": "6bd8bf5334f2e83613a129d2fcfeacf83e762191",
+      "status": "CANCELLED",
+      "actual_observation": {
+        "state": "CANCELLED by 78031",
+        "elapsed_seconds": 0,
+        "alloc_tres": ""
+      }
+    },
+    {
+      "account": "bjhz-delta-gpu",
+      "actual_seconds": 0,
+      "cluster": "delta",
+      "gpus": 1,
+      "id": "r-021",
+      "job_id": "23416851",
+      "manifest_hash": null,
+      "output_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200",
+      "partition": "gpuH200x8",
+      "requested_minutes": 64.0,
+      "reserved_gpu_hours": 1.0667,
+      "source_commit": "6bd8bf5334f2e83613a129d2fcfeacf83e762191",
+      "status": "CANCELLED",
+      "actual_observation": {
+        "state": "CANCELLED by 78031",
+        "elapsed_seconds": 0,
+        "alloc_tres": ""
+      }
+    },
+    {
+      "account": "bjhz-delta-gpu",
+      "actual_seconds": 0,
+      "cluster": "delta",
+      "gpus": 1,
+      "id": "r-022",
+      "job_id": "23416852",
+      "manifest_hash": null,
+      "output_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200",
+      "partition": "gpuH200x8",
+      "requested_minutes": 64.0,
+      "reserved_gpu_hours": 1.0667,
+      "source_commit": "6bd8bf5334f2e83613a129d2fcfeacf83e762191",
+      "status": "CANCELLED",
+      "actual_observation": {
+        "state": "CANCELLED by 78031",
+        "elapsed_seconds": 0,
+        "alloc_tres": ""
+      }
+    },
+    {
+      "account": "bjhz-delta-gpu",
+      "actual_seconds": 2705,
+      "cluster": "delta",
+      "gpus": 1,
+      "id": "r-023",
+      "job_id": "23416853",
+      "manifest_hash": null,
+      "output_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200",
+      "partition": "gpuH200x8",
+      "requested_minutes": 57.0,
+      "reserved_gpu_hours": 0.95,
+      "source_commit": "6bd8bf5334f2e83613a129d2fcfeacf83e762191",
+      "status": "COMPLETED",
+      "actual_observation": {
+        "state": "COMPLETED",
+        "elapsed_seconds": 2705,
+        "alloc_tres": "billing=6000,cpu=4,gres/gpu:h200=1,gres/gpu=1,mem=64G,node=1"
+      }
+    },
+    {
+      "account": "bjhz-delta-gpu",
+      "actual_seconds": 2670,
+      "cluster": "delta",
+      "gpus": 1,
+      "id": "r-024",
+      "job_id": "23416854",
+      "manifest_hash": null,
+      "output_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200",
+      "partition": "gpuH200x8",
+      "requested_minutes": 57.0,
+      "reserved_gpu_hours": 0.95,
+      "source_commit": "6bd8bf5334f2e83613a129d2fcfeacf83e762191",
+      "status": "COMPLETED",
+      "actual_observation": {
+        "state": "COMPLETED",
+        "elapsed_seconds": 2670,
+        "alloc_tres": "billing=6000,cpu=4,gres/gpu:h200=1,gres/gpu=1,mem=64G,node=1"
+      }
+    },
+    {
+      "account": "bjhz-delta-gpu",
+      "actual_seconds": 2692,
+      "cluster": "delta",
+      "gpus": 1,
+      "id": "r-025",
+      "job_id": "23416855",
+      "manifest_hash": null,
+      "output_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200",
+      "partition": "gpuH200x8",
+      "requested_minutes": 57.0,
+      "reserved_gpu_hours": 0.95,
+      "source_commit": "6bd8bf5334f2e83613a129d2fcfeacf83e762191",
+      "status": "COMPLETED",
+      "actual_observation": {
+        "state": "COMPLETED",
+        "elapsed_seconds": 2692,
+        "alloc_tres": "billing=6000,cpu=4,gres/gpu:h200=1,gres/gpu=1,mem=64G,node=1"
+      }
+    },
+    {
+      "account": "bjhz-delta-gpu",
+      "actual_seconds": 2699,
+      "cluster": "delta",
+      "gpus": 1,
+      "id": "r-026",
+      "job_id": "23416856",
+      "manifest_hash": null,
+      "output_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200",
+      "partition": "gpuH200x8",
+      "requested_minutes": 57.0,
+      "reserved_gpu_hours": 0.95,
+      "source_commit": "6bd8bf5334f2e83613a129d2fcfeacf83e762191",
+      "status": "COMPLETED",
+      "actual_observation": {
+        "state": "COMPLETED",
+        "elapsed_seconds": 2699,
+        "alloc_tres": "billing=6000,cpu=4,gres/gpu:h200=1,gres/gpu=1,mem=64G,node=1"
+      }
+    },
+    {
+      "account": "bjhz-delta-gpu",
+      "actual_seconds": 2688,
+      "cluster": "delta",
+      "gpus": 1,
+      "id": "r-027",
+      "job_id": "23416857",
+      "manifest_hash": null,
+      "output_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200",
+      "partition": "gpuH200x8",
+      "requested_minutes": 57.0,
+      "reserved_gpu_hours": 0.95,
+      "source_commit": "6bd8bf5334f2e83613a129d2fcfeacf83e762191",
+      "status": "COMPLETED",
+      "actual_observation": {
+        "state": "COMPLETED",
+        "elapsed_seconds": 2688,
+        "alloc_tres": "billing=6000,cpu=4,gres/gpu:h200=1,gres/gpu=1,mem=64G,node=1"
+      }
+    },
+    {
+      "account": "bimc-delta-gpu",
+      "actual_seconds": 205,
+      "cluster": "delta",
+      "gpus": 1,
+      "id": "r-028",
+      "job_id": "23417240",
+      "manifest_hash": null,
+      "output_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc",
+      "partition": "gpuA100x4-interactive",
+      "requested_minutes": 6.0,
+      "reserved_gpu_hours": 0.1,
+      "source_commit": "5f450dc93dac707af649dee8c8ca60888b2831db",
+      "status": "COMPLETED",
+      "actual_observation": {
+        "state": "COMPLETED",
+        "elapsed_seconds": 205,
+        "alloc_tres": "billing=2048,cpu=4,gres/gpu=1,mem=64G,node=1"
+      }
+    },
+    {
+      "account": "bimc-delta-gpu",
+      "actual_seconds": 399,
+      "cluster": "delta",
+      "gpus": 1,
+      "id": "r-029",
+      "job_id": "23417413",
+      "manifest_hash": null,
+      "output_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/pilot-4",
+      "partition": "gpuA100x4-interactive",
+      "requested_minutes": 12.0,
+      "reserved_gpu_hours": 0.2,
+      "source_commit": "5f450dc93dac707af649dee8c8ca60888b2831db",
+      "status": "COMPLETED",
+      "actual_observation": {
+        "state": "COMPLETED",
+        "elapsed_seconds": 399,
+        "alloc_tres": "billing=2048,cpu=4,gres/gpu=1,mem=64G,node=1"
+      }
+    },
+    {
+      "account": "beto-delta-gpu",
+      "actual_seconds": 8158,
+      "cluster": "delta",
+      "gpus": 1,
+      "id": "r-030",
+      "job_id": "23417811",
+      "manifest_hash": null,
+      "output_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/full",
+      "partition": "gpuA100x4",
+      "requested_minutes": 180.0,
+      "reserved_gpu_hours": 3.0,
+      "source_commit": "5f450dc93dac707af649dee8c8ca60888b2831db",
+      "status": "COMPLETED",
+      "actual_observation": {
+        "state": "COMPLETED",
+        "elapsed_seconds": 8158,
+        "alloc_tres": "billing=1024,cpu=4,gres/gpu=1,mem=64G,node=1"
+      }
+    },
+    {
+      "account": "bimc-delta-gpu",
+      "actual_seconds": 0,
+      "cluster": "delta",
+      "gpus": 1,
+      "id": "r-031",
+      "job_id": "23444798",
+      "manifest_hash": null,
+      "output_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-independent-pilots-74efb4d04819/mask-pilot-1",
+      "partition": "gpuH200x8",
+      "requested_minutes": 45.0,
+      "reserved_gpu_hours": 0.75,
+      "source_commit": "74efb4d0481968a1d0138eb1a79b97f302fd3c3b",
+      "status": "CANCELLED",
+      "actual_observation": {
+        "state": "CANCELLED by 78031",
+        "elapsed_seconds": 0,
+        "alloc_tres": ""
+      }
+    },
+    {
+      "account": "cis260361p",
+      "actual_seconds": 481,
+      "cluster": "bridges2",
+      "gpus": 1,
+      "id": "r-032",
+      "job_id": "50147300",
+      "manifest_hash": null,
+      "output_dir": "/ocean/projects/cis260361p/swong2/specificity-ladder-20261102/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-timing",
+      "partition": "GPU-shared",
+      "requested_minutes": 50.0,
+      "reserved_gpu_hours": 0.8333,
+      "source_commit": "6bd8bf5334f2e83613a129d2fcfeacf83e762191",
+      "status": "COMPLETED",
+      "actual_observation": {
+        "state": "COMPLETED",
+        "elapsed_seconds": 481,
+        "alloc_tres": "billing=4,cpu=4,gres/gpu=1,mem=64G,node=1"
+      }
+    },
+    {
+      "account": "cis260361p",
+      "actual_seconds": 3764,
+      "cluster": "bridges2",
+      "gpus": 1,
+      "id": "r-033",
+      "job_id": "50148389",
+      "manifest_hash": null,
+      "output_dir": "/ocean/projects/cis260361p/swong2/specificity-ladder-20261102/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_full",
+      "partition": "GPU-shared",
+      "requested_minutes": 71.0,
+      "reserved_gpu_hours": 1.1833,
+      "source_commit": "6bd8bf5334f2e83613a129d2fcfeacf83e762191",
+      "status": "COMPLETED",
+      "actual_observation": {
+        "state": "COMPLETED",
+        "elapsed_seconds": 3764,
+        "alloc_tres": "billing=4,cpu=4,gres/gpu=1,mem=64G,node=1"
+      }
+    },
+    {
+      "account": "cis260361p",
+      "actual_seconds": 3187,
+      "cluster": "bridges2",
+      "gpus": 1,
+      "id": "r-034",
+      "job_id": "50148398",
+      "manifest_hash": null,
+      "output_dir": "/ocean/projects/cis260361p/swong2/specificity-ladder-20261102/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_D_seed1_heads-mlp_b8cf3de656d58e28_full",
+      "partition": "GPU-shared",
+      "requested_minutes": 71.0,
+      "reserved_gpu_hours": 1.1833,
+      "source_commit": "6bd8bf5334f2e83613a129d2fcfeacf83e762191",
+      "status": "COMPLETED",
+      "actual_observation": {
+        "state": "COMPLETED",
+        "elapsed_seconds": 3187,
+        "alloc_tres": "billing=4,cpu=4,gres/gpu=1,mem=64G,node=1"
+      }
+    },
+    {
+      "account": "cis260361p",
+      "actual_seconds": 3187,
+      "cluster": "bridges2",
+      "gpus": 1,
+      "id": "r-035",
+      "job_id": "50148399",
+      "manifest_hash": null,
+      "output_dir": "/ocean/projects/cis260361p/swong2/specificity-ladder-20261102/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_D_seed123_heads-mlp_b8cf3de656d58e28_full",
+      "partition": "GPU-shared",
+      "requested_minutes": 71.0,
+      "reserved_gpu_hours": 1.1833,
+      "source_commit": "6bd8bf5334f2e83613a129d2fcfeacf83e762191",
+      "status": "COMPLETED",
+      "actual_observation": {
+        "state": "COMPLETED",
+        "elapsed_seconds": 3187,
+        "alloc_tres": "billing=4,cpu=4,gres/gpu=1,mem=64G,node=1"
+      }
+    },
+    {
+      "account": "cis260361p",
+      "actual_seconds": 3720,
+      "cluster": "bridges2",
+      "gpus": 1,
+      "id": "r-036",
+      "job_id": "50148404",
+      "manifest_hash": null,
+      "output_dir": "/ocean/projects/cis260361p/swong2/specificity-ladder-20261102/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_full",
+      "partition": "GPU-shared",
+      "requested_minutes": 67.0,
+      "reserved_gpu_hours": 1.1167,
+      "source_commit": "6bd8bf5334f2e83613a129d2fcfeacf83e762191",
+      "status": "COMPLETED",
+      "actual_observation": {
+        "state": "COMPLETED",
+        "elapsed_seconds": 3720,
+        "alloc_tres": "billing=4,cpu=4,gres/gpu=1,mem=64G,node=1"
+      }
+    },
+    {
+      "account": "cis260361p",
+      "actual_seconds": 3860,
+      "cluster": "bridges2",
+      "gpus": 1,
+      "id": "r-037",
+      "job_id": "50148405",
+      "manifest_hash": null,
+      "output_dir": "/ocean/projects/cis260361p/swong2/specificity-ladder-20261102/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_I_seed1_heads-mlp_b8cf3de656d58e28_full",
+      "partition": "GPU-shared",
+      "requested_minutes": 67.0,
+      "reserved_gpu_hours": 1.1167,
+      "source_commit": "6bd8bf5334f2e83613a129d2fcfeacf83e762191",
+      "status": "COMPLETED",
+      "actual_observation": {
+        "state": "COMPLETED",
+        "elapsed_seconds": 3860,
+        "alloc_tres": "billing=4,cpu=4,gres/gpu=1,mem=64G,node=1"
+      }
+    },
+    {
+      "account": "cis260361p",
+      "actual_seconds": 3240,
+      "cluster": "bridges2",
+      "gpus": 1,
+      "id": "r-038",
+      "job_id": "50148407",
+      "manifest_hash": null,
+      "output_dir": "/ocean/projects/cis260361p/swong2/specificity-ladder-20261102/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_I_seed123_heads-mlp_b8cf3de656d58e28_full",
+      "partition": "GPU-shared",
+      "requested_minutes": 67.0,
+      "reserved_gpu_hours": 1.1167,
+      "source_commit": "6bd8bf5334f2e83613a129d2fcfeacf83e762191",
+      "status": "COMPLETED",
+      "actual_observation": {
+        "state": "COMPLETED",
+        "elapsed_seconds": 3240,
+        "alloc_tres": "billing=4,cpu=4,gres/gpu=1,mem=64G,node=1"
+      }
+    },
+    {
+      "account": "beto-delta-gpu",
+      "actual_seconds": 1135,
+      "cluster": "delta",
+      "gpus": 1,
+      "id": "r-039",
+      "job_id": "23473669",
+      "manifest_hash": null,
+      "output_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/all18-40fe57289405-v2",
+      "partition": "gpuH200x8-interactive",
+      "requested_minutes": 25.0,
+      "reserved_gpu_hours": 0.4167,
+      "source_commit": "40fe57289405fd53a3fce02e5d4e47a0ebf78b64",
+      "status": "COMPLETED",
+      "actual_observation": {
+        "state": "COMPLETED",
+        "elapsed_seconds": 1135,
+        "alloc_tres": "billing=6000,cpu=4,gres/gpu:h200=1,gres/gpu=1,mem=64G,node=1"
+      }
+    },
+    {
+      "account": "beto-delta-gpu",
+      "actual_seconds": 2342,
+      "cluster": "delta",
+      "gpus": 1,
+      "id": "r-040",
+      "job_id": "23474289",
+      "manifest_hash": null,
+      "output_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-mask-n5-pilots-861f84a3938a/mask-pilot-1",
+      "partition": "gpuH200x8,gpuH200x8-interactive",
+      "requested_minutes": 45.0,
+      "reserved_gpu_hours": 0.75,
+      "source_commit": "861f84a3938a5e22fa329af0c469b2dd812fe68a",
+      "status": "FAILED",
+      "actual_observation": {
+        "state": "FAILED",
+        "elapsed_seconds": 2342,
+        "alloc_tres": "billing=6000,cpu=4,gres/gpu:h200=1,gres/gpu=1,mem=64G,node=1"
+      }
+    },
+    {
+      "account": "cis260382p",
+      "actual_seconds": null,
+      "cluster": "bridges2",
+      "gpus": 1,
+      "id": "r-041",
+      "job_id": "50189932",
+      "manifest_hash": null,
+      "output_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/bridges-h100-G3-v1",
+      "partition": "GPU-shared",
+      "requested_minutes": 60.0,
+      "reserved_gpu_hours": 1.0,
+      "source_commit": "50e947bb852613e3a270082651f2bd1b7bb0c525",
+      "status": "PENDING",
+      "actual_observation": {
+        "state": "PENDING",
+        "elapsed_seconds": 0,
+        "alloc_tres": ""
+      }
+    }
+  ]
+}

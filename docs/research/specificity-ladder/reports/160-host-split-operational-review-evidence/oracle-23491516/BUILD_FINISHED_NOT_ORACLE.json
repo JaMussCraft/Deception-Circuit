@@ -1,0 +1,62 @@
+{
+  "complete": false,
+  "build_seconds": 2339.692041463999,
+  "summary": {
+    "inventory_sha256": "daf672c166396518e9ed207e7c2dc14a5ff4adcc3f2b763d5fbf95b1fc83d9db",
+    "raw_keys": 246486,
+    "shards": 81904,
+    "capture_shards": 4256,
+    "requirements": 618117,
+    "captures": 45042,
+    "forward_counts": {
+      "capture_train": 4256,
+      "capture_intact": 39486,
+      "intact": 81904,
+      "empty": 81904,
+      "head_self": 81904,
+      "zero_coefficient": 81904,
+      "patched": 81904,
+      "positive_control": 244938,
+      "capture_donor": 1300,
+      "warmup": 2
+    },
+    "operation_counts": {
+      "capture_train": 4256,
+      "capture_intact": 39486,
+      "packing_lookup": 81904,
+      "intact": 81904,
+      "empty": 81904,
+      "head_self": 81904,
+      "zero_coefficient": 81904,
+      "patched": 81904,
+      "positive_control": 244938,
+      "capture_donor": 1300,
+      "guard_refresh": 954170,
+      "warmup": 2,
+      "serialization": 289640
+    },
+    "storage_requirements": {
+      "schema": "a3_target_storage_bound_v1",
+      "tiers": {
+        "host_ram": 1396027015524,
+        "cache_disk": 322508933404,
+        "output_disk": 5916288259710,
+        "scratch_disk": 25587887242
+      },
+      "components": {
+        "capture_source_records": 1629864009,
+        "capture_readout_numeric": 98200576,
+        "clause_summary_numeric": 98200576,
+        "capture_payloads": 322222709312,
+        "execution_dummy_capture_allowance": 31483126,
+        "scientific_rows": 14981030274,
+        "positive_evidence": 19525821574,
+        "projection_and_fit_arrays": 277651440,
+        "publication_metadata": 5881781407862,
+        "authority_key_proof_host_bytes": 252467200
+      },
+      "policy": "full target retention plus largest atomic publication; optional summaries included; no pilot-size inference"
+    }
+  },
+  "reason": "Full publisher-format byte stream and postguards must still complete."
+}

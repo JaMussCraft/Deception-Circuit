@@ -1,0 +1,35 @@
+{
+  "status": "PROPOSED_DESIGN_NOT_IMPLEMENTED",
+  "predecessor_manifest_sha256": "959b5987ea6bc22bd3d6cedcd07bc15a56edf72838d79f320c9548e5c3f02efc",
+  "scope": "Only successor root helper validate_usage and focused pure tests; preserve immutable predecessor; no usage infrastructure, session files, synthetic hook, RS writer, source, lease, budget or scheduler changes.",
+  "problem": "Unconditional equality of expired captured exception reset and live reset rejects legitimate below-cap work after observed weekly reset.",
+  "decision": "Add a separate explicit-expired/post-reset/below-cap branch. Preserve existing matching-reset path and all checkpoint arithmetic.",
+  "common_requirements": [
+    "Fresh actual codex-usage via existing read-only call: status ok, should_pause exactly false; targeted current public RS status, no freeze. No fallback to cached quota.",
+    "Known finite numeric live and cached percentages in [0,100], excluding booleans. Existing decimal counter validation and strict projected checkpoint comparison unchanged. Live >= cached; live <99.",
+    "projected_points = points + (live - cached); next_absolute = (points - since_register) + printed_next_at_plus_N; require projected_points < next_absolute. Do not zero since_register or refund pre-reset accumulated points."
+  ],
+  "routes": {
+    "matching_reset": "Keep r4 captured_reset == live_reset behavior: live >=80 requires explicitly active exception. Below80 an explicit recognized active or expired state is sufficient; unknown states fail closed. Existing unknown, missing or mismatched resets remain rejected outside the one new branch.",
+    "new_expired_post_reset": "Only live <80 AND exception status exactly expired. Require positive strict integer captured_old_reset and live_reset, old < live_reset, and captured_old_reset <= cached_read_at <= live_checked_at <= now < live_reset. Require timezone-aware parseable cached read_at and live checked_at, finite actual now, and 0 <= now-live_checked_at <=60 seconds. Live read is obtained immediately before current targeted status by unchanged usage() sequence. cached read_at establishes post-reset bookkeeping epoch only; its stored fresh label and age are telemetry, not a quota authority or TTL. On any unknown, unsupported, future or inconsistent fact reject."
+  },
+  "why_epoch_guard": "Explicit expired status alone can be stale after a segment reset. Requiring an elapsed captured boundary and a post-boundary cached read prevents silently subtracting a reset from pre-reset bookkeeping. A normal existing hook may refresh stale bookkeeping; helper must not fabricate that action.",
+  "freshness_60_second_basis": "New-branch checked_at bound covers existing sequential read-only calls (status subprocess timeout25 seconds) with buffer, without treating cached age as a meter. This is a proposed bounded freshness rule for the new branch, not a cached status expiry or authorization extension.",
+  "telemetry": [
+    "selected route",
+    "captured and live reset epochs",
+    "live checked_at/age",
+    "cached read_at/age and stored label",
+    "live/cached percentages",
+    "unmodified points/since/cadence/threshold and projected points",
+    "explicit below-cap/no-exception-authority flag for new branch"
+  ],
+  "approaches_rejected": {
+    "ignore_exception_below80": "Too broad: hides unknown reset/expiry state and fails the requested conservative post-reset diagnosis.",
+    "require_captured_reset_match_unconditionally": "Current false blocker; an expired grant belongs to its old window.",
+    "subtract_reset_or_restart_counters": "Would erase accumulated cadence points and invent private accounting.",
+    "automatically_grant_or_refresh_exception": "Unauthorized usage infrastructure or human-controlled exception mutation."
+  },
+  "acceptance_bar": "Root accepts design first; another worker creates immutable successor and test-first focused pure fixtures on both supported interpreters; independent source review before operational use. Original r4 and its reports remain unchanged. All pre-existing cache/allocation/catalogue/source/lease/budget tests remain passing; no real release operation in tests.",
+  "no_execution": true
+}

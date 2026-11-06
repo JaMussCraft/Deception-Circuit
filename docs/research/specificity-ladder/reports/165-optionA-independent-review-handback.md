@@ -1,0 +1,33 @@
+# Hand-back `165`: corrected option-A independent review
+
+Agent: Codex Sol independent reviewer. Status: resolved. Scoped PASS for the corrected algorithm and the root-bound mgnp genuine comparison packet; genuine comparison results and production admission remain separate gates.
+
+## What changed
+
+Review evidence only: [exact-source verdict](/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-independent-review/review-round2-verdict.json) and [root-bound configuration check](/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-independent-review/root-bound-mgnp-comparison-check.json). The candidate workload is `765b22a006ab519186a168bf455f4084915457d4ffce88881e76bf31b71a37cb`; its test file is `846427fc2f4aa048f652d18c48715eda7eedcac3f4422adbded6be6c781a46dc`. No candidate, original runtime or other author's report was edited or consumed.
+
+Only 2 declared source files differ from the frozen 511-file baseline. Production changes remain within `build_inventory` and `derive_storage_requirements`; `digest`, `_source_rows`, `_validate_inventory` and the entire runtime file remain unchanged. [Independent scope evidence](/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-independent-review/review-round2-verdict.json).
+
+The capture-only `retain_records=False` view is temporary: only IDs and dummy-source maps escape it. Default retained timing inputs still receive independent deep copies, including dummy records. Ordered deduplication, first-row tail lengths, source/readout/width checks and dummy alias/source digests remain intact. Invocation-local row caches and full-profile storage caches preserve the original fields and bound expressions. No blocking correctness or scope issue remains in this revision.
+
+## How verified
+
+Read the exact baseline/candidate diff and added multi-dummy utility tests; checked candidate hashes, source-member scope, unchanged guard AST and runtime bytes. Parsed raw test results instead of rerunning the completed suite or reading the author's handback. Both environments record 158 passing calls with no failed calls. [Raw mgnp result](/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/green-cpu-r3/result-23490357-mgnp.json), [raw base result](/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/green-cpu-r3/result-23490357-base.json), [review summary](/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-independent-review/review-round2-verdict.json).
+
+The bound comparison config SHA is `7bc61f11333de793185ac0a95bdcb7acb7df6f69ab5e73048af3032060093321`. Exactly 4 permitted null fields changed: candidate path/hash and complete original-oracle path/hash. All other fields match the reviewed packet template. The same-environment complete mgnp oracle is pinned to `1685fca54172ab3de7a8003b8503fdf2a9ac184e684ae1c17a52493fcc7ca991`. [Exact binding check](/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-independent-review/root-bound-mgnp-comparison-check.json).
+
+## Execution evidence
+
+- Job id and cluster: reused GREEN job `23490357` on Delta; no new job or suite run by this reviewer. [mgnp evidence](/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/green-cpu-r3/result-23490357-mgnp.json), [base evidence](/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/green-cpu-r3/result-23490357-base.json).
+- Exit code: pytest exit 0 in both environments. [mgnp evidence](/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/green-cpu-r3/result-23490357-mgnp.json), [base evidence](/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/green-cpu-r3/result-23490357-base.json).
+- Row counts: 158 passing test calls per environment. [Parsed review evidence](/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-independent-review/review-round2-verdict.json).
+- Baseline reproduces: synthetic whole-output, canonical hash, bounds, malformed-input and independent-record tests passed; the actual candidate full-size comparison has not run. The accepted original oracle completed its entire 11421127399-byte publisher stream and postguards. [Complete original oracle](/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/original-mgnp-r2-02/COMPLETE_ORACLE.json).
+- Provenance: [review verdict](/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-independent-review/review-round2-verdict.json), frozen baseline commit `861f84a3938a5e22fa329af0c469b2dd812fe68a`, [comparison packet manifest](/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-cpu-r2/manifest.json). The packet verifies original live guards before/after, full-stream hash/length and complete summary equality, plus normal child completion before publishing final acceptance.
+
+## What is NOT done
+
+No genuine candidate equivalence, speedup, memory improvement, cross-environment oracle substitution, source publication, fresh-source prefit/aggregate readiness or model/numerical/GPU admission is accepted here. The earlier failed candidate and its GREEN failure remain preserved. The mgnp oracle cannot substitute for a complete base oracle.
+
+## Open questions
+
+No blocking issue remains for root to submit the exact bound mgnp comparison config under the reviewed CPU envelope with a fresh output directory. Root owns that submission and subsequent full-result review. Other environments require their own complete matching oracle. No automatic retry or scientific-admission exemption follows from this scoped acceptance.
