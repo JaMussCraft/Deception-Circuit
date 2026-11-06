@@ -5,9 +5,9 @@
 |---|---|
 | State | Running |
 | Directions | 1. Control ladder: Complete and independently audited; tested sets fail specificity. · 2. Matched masks: All eighteen complete and source-audited; functional scoring preparation continues. · 3. Below-head tests: Mask timing failed at its bound; direction preparation and edge readiness continue. |
-| Started / last updated | Sun 1 Nov 2026, 12:59 pm EST / Fri 6 Nov 2026, 3:58 pm EST |
-| Orchestrator auto-compactions | 13, counted by the compaction hook |
-| Weekly usage, all models | account reads 12%; +27 points this session |
+| Started / last updated | Sun 1 Nov 2026, 12:59 pm EST / Fri 6 Nov 2026, 5:33 pm EST |
+| Orchestrator auto-compactions | 14, counted by the compaction hook |
+| Weekly usage, all models | account reads 16%; +31 points this session |
 | Weekly usage, Fable | no Fable reading |
 | Review checkpoints | 1 of 1 acknowledged; next at +32 session points; cadence 16 points; cap pause at 80% |
 | GPU budget | 20.0 of 125 GPU-h actual (34.4 reserved); at most 99 jobs at once; clusters: Delta, Bridges-2 |
@@ -15,7 +15,7 @@
 | Open needs from you | 0 |
 | Transcripts (for audits) | not recorded yet |
 
-**Right now.** The full base reference is complete. Its optimized comparison and the corrected transport validation are queued on Delta. Full-scoring workload coverage passed audit; controller implementation and CPU resource-proof review continue, with a separate Bridges CPU preflight being prepared.
+**Right now.** A3 transport accepted; producer and runtime integration tests are being prepared as one coherent CPU validation. The second-environment metadata comparison remains queued with interactive CPU eligibility. New A2 expansion is held.
 
 **Terms.** None yet.
 
@@ -301,3 +301,8 @@ Strength is one of: preliminary, reviewed by an independent agent, or final.
 **3:16 pm EST · Process incident P24.** The native transport test expected the in-memory builder object to equal its JSON round trip, including tuple types. Effect: The first implementation run passed fifty-four of fifty-five checks in the base environment, then stopped. The unchanged publisher already converts tuples to JSON arrays, so the remaining assertion demanded more than the existing transport contract. Fix: Preserve the failed run and original tests. Correct only that test expectation against the untouched published representation, retain canonical digest and coverage checks, then rerun both environments before acceptance.
 **3:28 pm EST · Second-environment full reference completed.** The longer CPU reference completed its entire original serialized stream and final guards within the reviewed bound. Construction and streaming timings are now available for the optimized comparison in that same environment. Independent audit of the reference, exact comparison bindings and proposed CPU resources is underway. This clears a missing-reference dependency without establishing candidate equivalence or model admission.
 **3:28 pm EST · Full-score controller regressions reproduced before implementation.** The CPU job reproduced all eighty-two expected missing-feature failures in each supported interpreter, with no setup errors. Root authorized the isolated controller implementation against those tests. It remains separate from the frozen scientific pipeline, and unbound resources or historical timing releases must never authorize full scoring.
+**4:28 pm EST · Unstarted controller test stopped for final-entry corrections.** Independent review identified two gaps after costly entry checks: authority bytes could change without a final recheck, and record writing could consume the required entry time reserve. Root cancelled the still-unstarted CPU validation and preserved the exact candidate. A distinct correction must add mutation and slow-write regressions before another validation. No test, model or GPU ran in this cancelled job.
+**4:37 pm EST · A3 CPU queue stalled; critical path under independent audit.** Both bounded waiters expired while the short transport validation and optimized base comparison remained unstarted. Preserve both jobs and rearm their waiters. The user requested an Astra audit of A3 delays and acceleration; root is prioritizing it and holding new A2 tasks after current atomic corrections. Bridges started a diagnostic promptly, but its container needs a verified memory-controller bind before resource work.
+**4:57 pm EST · Resumed after compaction #4.** Recovered the current A3 critical-path audit and completed handbacks without restarting finished work. Astra recommends finishing the accepted metadata preallocation repair, consolidating validation rounds and keeping the bounded storage-writer audit separate. Live weekly usage is sixteen percent; the next checkpoint remains seventeen percent.
+**4:59 pm EST · A3 transport validation passed; remaining integration prioritized.** The CPU transport validation completed normally with every test passing in both supported environments. Its scoped independent acceptance is underway. Astra recommends finishing the current preallocation repair and consolidating validation rounds, with new A2 expansion held. A bounded writer audit found a global metadata overcount, but no replacement storage bound is accepted; that separate work does not block the timing-pilot repair.
+**5:33 pm EST · Resumed coordination and consolidated A3 integration.** Root ended active coordination after answering a status question even though research remained authorized. The user flagged the stall. Root accepted the completed transport review and resumed the same implementer on producer and runtime integration, beginning with one combined test-first CPU packet. Every original assertion and later scientific gate remains. The existing unstarted base comparison now also permits the interactive CPU partition; its source, resources and job identity are unchanged.

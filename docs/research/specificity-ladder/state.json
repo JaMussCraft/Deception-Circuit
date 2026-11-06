@@ -1628,8 +1628,8 @@
         "NODE_FAIL"
       ],
       "job_id": "23613149",
-      "last_progress_at": "2026-11-06T15:27:49-05:00",
-      "status": "PENDING",
+      "last_progress_at": "2026-11-06T16:58:20-05:00",
+      "status": "COMPLETED",
       "submitted_at": "2026-11-06T15:27:49-05:00",
       "waiter": "timeout 60m sh -c 'until sacct -j 23613149 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'"
     },
@@ -1660,13 +1660,29 @@
         "NODE_FAIL"
       ],
       "job_id": "23613976",
-      "last_progress_at": "2026-11-06T16:08:40-05:00",
-      "status": "PENDING",
+      "last_progress_at": "2026-11-06T16:28:27-05:00",
+      "status": "CANCELLED",
       "submitted_at": "2026-11-06T16:08:40-05:00",
       "waiter": "timeout 60m sh -c 'until sacct -j 23613976 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'"
+    },
+    {
+      "cluster": "bridges2",
+      "expected_terminal": [
+        "COMPLETED",
+        "FAILED",
+        "CANCELLED",
+        "TIMEOUT",
+        "OUT_OF_MEMORY",
+        "NODE_FAIL"
+      ],
+      "job_id": "50309188",
+      "last_progress_at": "2026-11-06T16:20:45-05:00",
+      "status": "FAILED",
+      "submitted_at": "2026-11-06T16:17:56-05:00",
+      "waiter": "timeout 60m sh -c 'until ssh -o BatchMode=yes bridges2 sacct -j 50309188 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'"
     }
   ],
-  "last_worklog_entry_at": "2026-11-06T15:28:37-05:00",
+  "last_worklog_entry_at": "2026-11-06T17:33:13-05:00",
   "schema": 1,
   "session_state": "running",
   "sessions": {
@@ -2220,6 +2236,11 @@
           "agent_type": "worker",
           "started_at": "2026-11-06T15:03:22-05:00",
           "stop_blocks": 1
+        },
+        "01a1b2c9-63cb-7d70-83a0-15bc6eb9954a": {
+          "agent_type": "default",
+          "started_at": "2026-11-06T16:35:07-05:00",
+          "stop_blocks": 0
         }
       },
       "checkpoints": [
@@ -2248,9 +2269,14 @@
           "at": "2026-11-06T14:29:57-05:00",
           "n": 3,
           "trigger": null
+        },
+        {
+          "at": "2026-11-06T16:56:40-05:00",
+          "n": 4,
+          "trigger": null
         }
       ],
-      "compactions": 3,
+      "compactions": 4,
       "cwd": "/projects/beto/swong2/Alignment",
       "orchestrator_model": "gpt-6-astra",
       "session_id": "01a1a2f4-dbc1-7551-bf86-d1d0f99ad6e2",
@@ -2276,8 +2302,8 @@
           "fable": null,
           "five_hour": null,
           "fresh": true,
-          "read_at": "2026-11-06T16:08:55-05:00",
-          "seven_day": 13
+          "read_at": "2026-11-06T16:56:46-05:00",
+          "seven_day": 16
         },
         "metric": "codex weekly",
         "next_checkpoint": 2,
@@ -2291,11 +2317,11 @@
           },
           {
             "baseline": 0,
-            "last": 13,
+            "last": 16,
             "resets_at": 1794586709
           }
         ],
-        "session_points": 29,
+        "session_points": 32,
         "stale_ok_until": null
       }
     }
