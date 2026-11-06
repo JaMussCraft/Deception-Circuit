@@ -1,0 +1,41 @@
+{
+  "verdict": "CONDITIONAL_PLAN_ACCEPTANCE_NOT_LAUNCH_AUTHORITY",
+  "plan_manifest_sha256": "2fe03374ccb61c2a1ede14d93100081f115c15829288254e4c9f970c5ec48584",
+  "source_commit": "50e947bb852613e3a270082651f2bd1b7bb0c525",
+  "frozen_G3_file_sha256": "c3095b10aac09a23ee35e4620402581b0407623d1e111a2407a691f60f599de4",
+  "bank_payload_sha256": "17045db1a43c7a4e53f31edb2e2719367b2efc1665dc6081880dc45f122ec1a1",
+  "bank_file_sha256": "a8afbd51a994a6346d1bb8c832b68cab0ea42c83a195c22a29aae4016723e00b",
+  "bank_manifest_sha256": "3fdff794cb9bba609ee3d181af24c02b1734796270c07985c020345b238b360f",
+  "full_expected_rows": 59652,
+  "full_expected_controls": 3396,
+  "provisional_GPU_hours": 4.75,
+  "provisional_GPU_seconds": 17100,
+  "modeled_seconds": 16694.319215118114,
+  "remaining_model_slack_seconds": 405.6807848818862,
+  "sizing_assessment": "One20percent core-only judgment margin, single cold load,900second combined outer allowance and300finish avoid obvious duplicate buffers. Provisionally coherent but full shape, memory and size proof is still required; row-linear core is not a measured bound and405.68seconds remaining envelope is not guaranteed spare runtime.",
+  "bank_reuse": "Owning bank/scoring check matches dtype/device type, exact numeric_environment and GPU architecture name. Reuse authentic bank on exact NVIDIA H10080GBHBM3 name with a new UUID recorded separately; do not rewrite historical UUID or rerun bank. Bind both bank file SHA and internal payload SHA plus native manifest.",
+  "required_clarifications_before_implementation": [
+    "Frozen specificity_ladder.score_cell iterates _rows(b) singletons. Distinguish recipient staging/batch8 from actual model-call batch1; do not infer GPU batch doubling solely from prefix4/full8. Positive-control call path must also be traced.",
+    "Replace blanket fail-on-unsupported with reject unexpected support-domain mismatch. Frozen native scope permits explicitly unsupported rows; preserve every expected key and support mask, reject unexpected unsupported or missing rows, never filter scientific sample or change controls.",
+    "Finite permission is to enter one bounded original full-score CLI stage. Retain final freshness check immediately before process entry; no new internal-loader-time freshness claim.",
+    "No active A3 ledger reader during cutover. Pending23608994 may be held only after fresh confirmation it is unstarted and then released after complete mapping/native validation; running readers are allowed to end naturally, never paused or cancelled. Even if this oracle live_guard currently skips normalize_ledger when inventory=None, do not infer global reader quiescence from that fact alone."
+  ],
+  "missing_proof_before_any_reservation_or_launch": [
+    "Metadata-only full shape audit on frozen prepared inputs and original donor mappings:59652 unique expected keys/3396 controls, original support masks, full/prefix task-condition-stream lengths/padding/token totals, actual singleton model batches vs staging8, complete donors, group unions/aliases/operation counts. No effects.",
+    "Resource review supporting20percent compute margin and900second combined outer allowance against full work mix, lengths and publication scaling; host64GiB/GPU80GiB feasibility evidence and schema-derived output/transient-copy size plus actual filesystem free bytes/inodes. Prefix20.789GB CUDA reserve is not a full-domain upper bound.",
+    "Entire fresh deployment closure and same numeric_environment before owning bank reuse; source511+4,422 authentic ordinary input files, exact aliases, actual SIF/cache/tokenizer/model identity/protection closure. No spoofing, new source or re-signing G3.",
+    "Separately reviewed full_score-only controller/CPU preflight/producer and closed schemas/rejection tests. Score CLI has no --limit, no bank/summarize path, injectedfalse and exact source/G3/bank/job/admission/domain. Old R5 false full-scoring flags and prefix releases can never authorize this.",
+    "Fresh actual-reader inventory and explicitly quiescent ledger transition; all inherited charges/admission/mapping lineage preserved, completed native successor and actual normalize_ledger plus exact seconds/rounded caps before admitting any budget reader. No assumption of atomicity across ledger and successor files.",
+    "New actual reservation and admission bind duration/GPUcount/packet/source/G3/bank/newfullscope/completed mapping; fresh current totals/caps, concurrent-job check, ordinary weekly cap80 and cadence16. Hard-pin usagecall80; no historical99 override or expired exception.",
+    "Actual full-score job allocation/GPU name/numeric env/import/source/cache/storage and fresh Delta owning CPU proof, current protection stable transfer/reread, exact root once-only full_score release <=300seconds, current/initial deadline min and300finish margin; no retry/extension/renewal/fallback.",
+    "After normal exit, native bank/score/source/completion revalidation and exact59652/3396 domain/control audit precede any result acceptance; effects/summarization and full-result scientific inference remain separate."
+  ],
+  "source_sites": {
+    "bank_numeric_contract": "a2_pipeline.py bank_contract/numeric_environment/validate_banks",
+    "GPU_name_not_UUID": "a2_pipeline.py score current_gpu==bank_execution.gpu_name",
+    "singleton_execution": "specificity_ladder.py score_cell loop for batch in _rows(b)",
+    "unsupported_native_rows": "specificity_ladder.py score_cell unsupported branch; a2_pipeline.py validate_a2_scope validates keys/membership/provenance without blanket support requirement",
+    "A3_oracle_live_guard": "a3_direction_runtime.py live_guard normalize_ledger only when inventory is not None; unchanged original oracle run.py calls without inventory"
+  },
+  "reviewer_execution": "Metadata/hash/source review only; no job/model/RS/git/remote/source edits."
+}

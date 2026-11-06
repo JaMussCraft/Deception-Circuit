@@ -1,0 +1,23 @@
+{
+  "command": [
+    "sbatch",
+    "--account=beto-delta-cpu",
+    "--partition=cpu-interactive",
+    "--constraint=projects",
+    "--nodes=1",
+    "--ntasks=1",
+    "--cpus-per-task=4",
+    "--mem=16G",
+    "--time=00:12:00",
+    "--no-requeue",
+    "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+    "--job-name=lad-H100-audit",
+    "--export=ALL,CUDA_VISIBLE_DEVICES=",
+    "--output=/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/specificity-ladder/reports/177-h100-timing-evidence/executions/delta-r2-01-%j.log",
+    "--wrap=bash /projects/beto/swong2/Alignment/Deception-Circuit/docs/research/specificity-ladder/reports/177-h100-timing-evidence/cpu-audit-r2/run.sh /projects/beto/swong2/Alignment/Deception-Circuit/docs/research/specificity-ladder/reports/177-h100-timing-evidence/executions/delta-r2-01 f7652cd907122cdd2e003a4b95ea2dce91970487a562deeb16d85102bfa85189"
+  ],
+  "output": "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/specificity-ladder/reports/177-h100-timing-evidence/executions/delta-r2-01",
+  "packet_manifest_sha256": "f7652cd907122cdd2e003a4b95ea2dce91970487a562deeb16d85102bfa85189",
+  "no_models": true,
+  "no_assessment_effect_summaries": true
+}

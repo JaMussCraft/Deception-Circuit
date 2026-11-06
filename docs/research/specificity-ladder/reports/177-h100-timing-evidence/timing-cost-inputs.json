@@ -1,0 +1,29 @@
+{
+  "bank_cold_load_seconds": 555.7060698261485,
+  "bank_compute_seconds": 109.02882971707731,
+  "bank_native_stage_seconds": 664.8189254421741,
+  "bank_CLI_seconds": 970.7686667442322,
+  "bank_CLI_outside_native_stage_seconds": 305.9497413020581,
+  "score_warm_load_seconds": 9.603312622755766,
+  "score_compute_seconds": 518.3888086024672,
+  "score_native_stage_seconds": 534.4008195307106,
+  "score_native_stage_other_seconds": 6.408698305487633,
+  "score_CLI_seconds": 638.8853619098663,
+  "score_CLI_outside_native_stage_seconds": 104.48454237915576,
+  "full_rows": 59652,
+  "prefix_rows": 2484,
+  "full_controls": 3396,
+  "prefix_controls": 144,
+  "row_ratio": 24.014492753623188,
+  "control_ratio": 23.583333333333332,
+  "row_ratio_scaled_score_compute_seconds_orientation": 12448.844287743306,
+  "scaling_is_not_a_bound": true,
+  "limitations": [
+    "Prefix4 has different row/control mix; alias work, sequence lengths and utility paths can scale differently.",
+    "Warm second-stage9.603s load is not a cold-start allowance; observed bank555.706s cold load must remain a separate input.",
+    "Native compute/stage excludes publication; CLI-outside-native contains guard/import/input/read/publication work and is not proven constant at full size.",
+    "Fresh Delta proof/transfer/root cache/protection/budget/publication waits and finish reserve are additional execution-envelope costs.",
+    "GPU memory peaks include resident model only within measured compute scope; they do not bound all full-domain host/disk use.",
+    "No full-score launch admission, runtime guarantee or specificity inference."
+  ]
+}

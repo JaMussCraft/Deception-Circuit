@@ -1,0 +1,20 @@
+{
+  "kind": "phase_scoped_transport_namespace_policy",
+  "root_bound_at_admission": [
+    "Absolute normalized lexical work_dir and its canonical target/preparation suffixes; no dot-dot or alternate caller path.",
+    "Exact resolved content-reference paths and explicit ordered literal alias chain for every allowed root/ancestor symlink; an unlisted alias or literal target/resolution change rejects, even if bytes match."
+  ],
+  "entry_policy": [
+    "Target and descriptor artifact roots and both leaf files must be ordinary directories/regular files; root and leaf symlinks are forbidden. Existing contract exact child sets remain.",
+    "Byte-identical ordinary directory replacement that completed BEFORE entry may be accepted only at the same allowed lexical path and exact approved resolution/content reference. No cross-host historical inode identity is claimed.",
+    "Capture entry-local namespace identity (device/inode/type for work_dir and relevant ordinary directories below it) and literal alias identity/resolution without mutable ancestor mtime. New sibling output creation must not invalidate a stable namespace.",
+    "Create the existing _FileWitness on RESOLVED artifact roots, avoiding mutable ancestor-alias directory timestamps in that content witness; lexical aliases are checked separately by the namespace policy. This witness/namespace seal remains PID-local and nonserializable."
+  ],
+  "final_policy": [
+    "Compare current lexical/resolved paths, allowed literal aliases and entry-local namespace/root/leaf identities to the original entry state.",
+    "Reject target/descriptor root replacement DURING the phase, including byte-identical replacements with equal object_reference values. Reject ordinary ancestor replacement below the admitted work_dir and any changed allowed alias.",
+    "Run fresh full-byte witness comparison, then fresh live guard/deadline, then a cheap unchanged identity/alias seal and deadline check immediately before receipt writer.",
+    "The content reference alone never proves inode/root or alias history. The phase identity seal is not used instead of full bytes. No inode/device value is trusted across CPU and GPU hosts."
+  ],
+  "scope_limit": "No claim is made to detect history before entry or unrelated ordinary ancestor replacement above the admitted work_dir if approved resolution and the same scoped objects remain unchanged. All source/numeric/live guards retain their own stronger existing rules."
+}

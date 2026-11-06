@@ -1,0 +1,58 @@
+{
+  "verdict": "BLOCKED_PROOF_RECONSTRUCTION_ONLY",
+  "packet_manifest_sha256": "7e3f46a554fd558bcaf7ea085d7d85ad1b5b697ee023b3ce69aed36a41384503",
+  "shape_script_sha256": "82574a4143c8f1f05f14d01b45a19fcab66dd68db34ce29817914660e0a9802c",
+  "source_commit": "50e947bb852613e3a270082651f2bd1b7bb0c525",
+  "trusted_native_runtime_unchanged": true,
+  "findings": [
+    {
+      "id": "B1",
+      "finding": "Utility donor parent padding differs from actual source",
+      "native": "a2_pipeline.score calls utility donor task_batches without batch_size; ladder_tasks.task_batches default16; recipients explicitly8. _rows retains parent padded widths.",
+      "proof": "shape.py passes batch_size8 for complete utility donor pools.",
+      "required": "Use actual donor default16 and test width-sensitive fixtures for positive max pair padding."
+    },
+    {
+      "id": "B2",
+      "finding": "Utility support and patched capture semantics differ",
+      "native": "Assessment passes operation-filtered donor maps; utilities pass full utility maps for every operation. score_cell maps by recipient identity and applies mapping.supported even to zero/h_mean/self_replay/empty.",
+      "proof": "shape.py by-operation map lookup and forced supported for nondonor operations can overcount patched captures and misreport unsupported masks.",
+      "required": "Separate native assessment and utility lookup rules; preserve unsupported diagnostics and reasons, never filter output domain. Model positive calibration separately: forced-supported readout maps for assessment/IOI, unchanged MMLU maps, three captures at max retained parent widths."
+    },
+    {
+      "id": "B3",
+      "finding": "Reconstructed work domain is not cross-checked to original domain",
+      "proof": "Script checks native expected-key counts but does not compare its reconstructed recipient/groupalias/op key set and positive-pair key set against those authoritative domains. Support counters omit full keys/reasons.",
+      "required": "Assert exact reconstructed row/positive key equality and emit keyed support/reason mask or immutable digest/counts; add native-seam tests."
+    }
+  ],
+  "pure_tests": {
+    "base_observed": 2,
+    "base_expected": 2,
+    "mgnp_observed": 2,
+    "mgnp_expected": 2,
+    "exit_codes": [
+      0,
+      0
+    ],
+    "coverage": "Arithmetic distribution/exposure only; insufficient for native seam claims."
+  },
+  "raw_RED": "ImportError missing shape module, not semantic red evidence.",
+  "work_exposure_limit": "Corrected forward, padded-linear and padded-squared counts describe assumed capture work only. They do not establish runtime, attention/backend allocation bounds, GPU peak or serialized output size.",
+  "minimum_remaining_after_genuine_corrected_shape_result": [
+    "Review actual native batch/token/full-prefix/support/operation/control distributions and work ratios before accepting4.75hour cost model.",
+    "Separate source-grounded conservative GPU and retained-host memory proof; prefix peak is not a full-domain bound.",
+    "Schema/JSON/source-record representation size plus atomic temporary copies and failure evidence; confirm actual Bridges output filesystem free bytes/inodes. Delta statvfs is not Bridges capacity.",
+    "All new full-only packet/admission/reader-quiescent ledger/native successor/current live-entry gates from179 remain required."
+  ],
+  "plan178_r2": {
+    "manifest_sha256": "8e6718d523866dcc644f846b162c8e4b745c7f54b1e7cfd16c0778b62d5be202",
+    "verdict": "CONDITIONAL_PLAN_DELTA_ACCEPTED",
+    "closed": "Binds177 accepted timing/counts, singleton versus staging distinction, preserves legitimate unsupported diagnostics, explicit quiescent ledger cutover, CLI-entry lease boundary and provisional resources.",
+    "additional_clarification": "Recipient staging8 and utility donor staging16 must be distinguished in geometry proof; full shape/resource and operational admission still unaccepted."
+  },
+  "no_genuine_job_or_model_executed_by_reviewer": true,
+  "native_utility_donor_staging_batch_size": 16,
+  "native_recipient_staging_batch_size": 8,
+  "incorrect_proof_donor_staging_batch_size": 8
+}

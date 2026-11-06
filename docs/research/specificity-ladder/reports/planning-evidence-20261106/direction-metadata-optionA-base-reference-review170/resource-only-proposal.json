@@ -1,0 +1,93 @@
+{
+  "status": "PROPOSAL_ONLY_REQUIRES_INDEPENDENT_REVIEW_AND_ROOT_AUTHORIZATION_NO_RETRY_SUBMITTED",
+  "purpose": "One distinct complete original BASE-environment reference; preserve failed attempt and complete mgnp oracle",
+  "future_packet": "new ordinary copy of genuine-oracle-cpu-r2 only after plan acceptance; do not edit existing packet",
+  "resources_proposed": {
+    "CPUs": 4,
+    "memory_GiB": 192,
+    "GPUs": 0,
+    "Slurm_minutes": 90,
+    "Slurm_seconds": 5400,
+    "partition": "cpu",
+    "CPU_child_seconds": 5100,
+    "kill_grace_seconds": 15,
+    "finish_margin_seconds": 285,
+    "minimum_initial_remaining_seconds": 5300,
+    "automatic_retry": false
+  },
+  "sizing": {
+    "observed_base_build_seconds": 2653.111457766994,
+    "actual_complete_mgnp_stream_seconds": 735.1920098650007,
+    "unmeasured_base_stream_orientation_multiplier": 2.0,
+    "other_work_allowance_seconds": 300,
+    "actual_mgnp_other_work_seconds": 119.70442466399982,
+    "subtotal_seconds": 4423.495477496996,
+    "planning_buffer_fraction": 0.15,
+    "unrounded_child_orientation_seconds": 5087.019799121545,
+    "rounding_quantum_seconds": 30,
+    "rounded_child_cap_seconds": 5100,
+    "formula": "ceil30(1.15*(2653.111457766994+2*735.1920098650007+300))=5100; +15grace+285finish=5400seconds=90minutes",
+    "interpretation": "Measured base build + explicit unmeasured-stream orientation and bounded margin. The 2x stream and15% margins are planning allowances, NOT observed base stream performance or a completion guarantee.",
+    "why_old_cap_failed": "Base build alone consumed44.2minutes; old55minute child cap also had to include import/source guards, entire stream and postguards. Actual stream neverfinished. No partial-progress fraction or base stream speed can be recovered from existing markers.",
+    "memory_basis": "Actual peak134158635008 below192GiB206158430208; no job OOM events. Keep memory/CPUs unchanged.",
+    "interactive_placement": "90min exceeds known60min interactive cap; request regular cpu only, root rechecks placement before submission."
+  },
+  "only_future_operational_edits": [
+    {
+      "file": "config bound copy",
+      "changes": [
+        "Slurm_minutes60->90",
+        "CPU_child_seconds3300->5100"
+      ]
+    },
+    {
+      "file": "supervisor.py copied packet",
+      "changes": [
+        "requiredCPU_child_seconds3300->5100",
+        "kill threshold3300->5100",
+        "minimumremaining3500->5300",
+        "exactallocationtime3600->5400"
+      ]
+    },
+    {
+      "file": "allocation_facts.py copied packet",
+      "changes": [
+        "permitted bounded allocationlimit3600->5400 (supervisor still exact5400)",
+        "regularcpu placement only if explicit partition assertion added; allrealCPU4/memory192/noGPU/user/node/cwd/TRES checks unchanged"
+      ]
+    },
+    {
+      "file": "root submit parameters and new packet manifest",
+      "changes": [
+        "time01:00->01:30",
+        "regularcpu partition",
+        "new immutable packet/config/output SHA identities; neverretarget old job/output/reference"
+      ]
+    }
+  ],
+  "must_remain_byte_identical": [
+    "original run.py builder/oracle/stream/postguard logic",
+    "original runtime and511source/4inputlinks",
+    "canonical design/protocol/source13/pinned input identities",
+    "base interpreter path",
+    "writer json.dump defaults+LF and complete summary/hash/byte equality contract",
+    "normal childexit and noTERM prerequisite for final COMPLETE_ORACLE",
+    "original complete mgnp oracle and failed base markers"
+  ],
+  "tests_required_before_implementation_acceptance": [
+    "Staticdiff allowlist resource-only copiedpacket/config; originalsource/run.py fullSHA unchanged",
+    "Tinyfakeschedulerfacts acceptsactual4CPU192GiB5400s/cpu and rejects wrongGPU/CPU/memory/user/node/cwd/partition/limit",
+    "Tinyfakeclock/child shows no TERM before5100, TERM at5100, KILL after15; any timeout/TERM including childexit0 yieldsfailure/no completeoracle",
+    "Completion remains fullbuild+entirestream+finalLF+bothpostguards+allsource/harnesspins+normalexit; missing stream/postguard/partialpayload cannot serve asoracle",
+    "Bashsyntax+PythonAST on both supported interpreters; no full genuine run merely to test resource wrapper",
+    "Root independentreview exactnewpacket+config/absentoutput before a single deliberate submission; no automaticretry/extension"
+  ],
+  "future_candidate_base_comparison": "Requires its own complete base oracle and separately reviewed matching resource/measurement boundaries; this proposal does not admit any candidate comparison or source/model execution.",
+  "actions_taken": {
+    "source_edits": false,
+    "packet_implementation": false,
+    "tests_run": false,
+    "jobs_or_scheduler_actions": false,
+    "RS_git_remote_actions": false
+  }
+}
