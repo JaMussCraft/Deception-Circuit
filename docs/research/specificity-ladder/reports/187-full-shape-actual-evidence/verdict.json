@@ -1,0 +1,70 @@
+{
+  "verdict": "ACCEPT_GENUINE_CPU_SHAPE_AND_KEYED_SUPPORT_PROOF_ONLY",
+  "job_id": "23612256",
+  "cluster": "delta",
+  "state": "COMPLETED",
+  "exit_code": "0:0",
+  "Slurm_elapsed_seconds": 235,
+  "program_elapsed_seconds": 224.99630246000015,
+  "peak_metadata_CPU_RSS_bytes": 1902784512,
+  "source_commit": "50e947bb852613e3a270082651f2bd1b7bb0c525",
+  "packet_manifest_sha256": "bd12ebd27853dd63156dc2d1b2662688d4e8c2513269e4ef872db557538a821b",
+  "shape_sha256": "b30a79cbaac9d62b7d825dc810e3b57cb1f82591bb4a7b0b736aa7e3b9385fd9",
+  "RESULT_sha256": "6397572fc6eb140697a51c76c01138f704f7fa111661088bd35c0fce55cf4d73",
+  "G3_sha256": "c3095b10aac09a23ee35e4620402581b0407623d1e111a2407a691f60f599de4",
+  "bank_file_sha256": "a8afbd51a994a6346d1bb8c832b68cab0ea42c83a195c22a29aae4016723e00b",
+  "source_files": 511,
+  "literal_links": 4,
+  "full_rows_observed": 59652,
+  "full_rows_expected": 59652,
+  "full_control_pairs_observed": 3396,
+  "full_control_pairs_expected": 3396,
+  "prefix_rows_observed": 2484,
+  "prefix_rows_expected": 2484,
+  "prefix_control_pairs_observed": 144,
+  "prefix_control_pairs_expected": 144,
+  "baseline_assertion": "Original prefix domain reproduces prior accepted177 counts:2484 reconstructed rows equals2484,144 reconstructed control pairs equals144. This is structural reproduction, not a new GPU numerical-control execution.",
+  "full_legitimate_unsupported_row_aliases": 1800,
+  "prefix_legitimate_unsupported_row_aliases": 72,
+  "full_support_reason_mask_sha256": "73002c8b74d13947aeb9bf1f6e09d50544b549ea51ab00a50b9510bd6404ffd8",
+  "prefix_support_reason_mask_sha256": "b3e4f01c39f5c8152683fcfb8b88acd14574e97d3354021ed5c31248fd947b6c",
+  "full_capture_calls": 212928,
+  "prefix_capture_calls": 8868,
+  "aggregate_exposure_ratios": {
+    "forwards": 24.010825439783492,
+    "padded_tokens": 24.38873854064477,
+    "padded_squared_tokens": 26.584174781925647,
+    "rows": 24.014492753623188
+  },
+  "classwise_max_ratios": {
+    "forwards": 25.0,
+    "padded_tokens": 27.444444444444443,
+    "padded_squared_tokens": 54.39161796932067
+  },
+  "recipient_max_parent_width_prefix": 148,
+  "recipient_max_parent_width_full": 526,
+  "prefix_positive_captured_width526_support": {
+    "forwards": 12,
+    "padded_tokens": 6312,
+    "padded_squared_tokens": 3320112,
+    "interpretation": "Native prefix MMLU positive calibration already invokes526-wide singleton captures; full recipient width526 is not entirely new to measured execution, but retention/component differences still need comparison."
+  },
+  "proof_checks": [
+    "Exact reviewed manifest/member/submission chain and unchanged accepted source/bank/G3 input assertions; realCPUidentity/owner/node/TRES/time/WorkDir fromjob.",
+    "Full511ordinary+4literal source checks before/after, original point-in-time live protection/tokenizer/bank validators and exactmoduleorigins withinruntime. This is not a model-phase fresh root release or a preserved catalogue byte snapshot.",
+    "Native singleton retainedparent padding, donor16default, correct operation filter, calibratedpair mapping, aliasexpanded rowkeys and supportreason digest validated by accepted proof code.",
+    "Independent metadata histogramcounts/unpadded/padded/squared sums and per-operation capture-count reconstruction match output. No new bulk genuine construction."
+  ],
+  "remaining_checks": {
+    "cost": "Use per-family forward/linear/squared exposures and native kernel/hook work to assess provisionalcost. Classwise squaredratio54.3916 exceedsrowratio*1.2=28.8174; global26.5842 alone cannot justify uniform20percentcoverage. Do not multiply54.3916 byallprefixcompute as if everyclass had thatcost; no per-class timingcoefficients measured. Retain coldstartup555.7061 separately fromwarm9.6033, root/currentproof/cache/import/publication/I-O/finish costs.",
+    "GPU_memory": "Trace exact captured component unions, tensor dtypes/lifetimes and largest live recipient/donor/control/patched tensors against prefix526-wide all-component positive calibration and CUDA peak. Same maximum width alone is not a bound. No new model run needed to perform this source-grounded conservative accounting.",
+    "host_memory": "Bound full input/recipient/donor retained buffers, accumulated59652 row metadata, model-loading resident/temporary CPU memory, and canonical serialization/hash copies. Metadata-only1.903GBpeak does not measure fullmodel-host peak.",
+    "storage": "Derive worst-case native supported/unsupported row schema bytes from actual frozen metadata, IDs/maps/group members and finite metric representation widths; include wrapper/manifest/atomic temporary/failure copies. Row-linear540.8MB is orientation only; verify actualBridgesoutputfilesystemfreebytes/inodes, not Delta349GBfree.",
+    "operational": "Newfull-only controller/CPUproof/once-onlyCLIentry release, actualallocation/cache/protection/source/numericenvironment, ordinary80cap/cadence16/allcaps, and no-active-A3-reader complete ledger successor/admission remain mandatory."
+  },
+  "no_effects_file_read": true,
+  "model_loaded": false,
+  "full_controls_numerically_tested_here": false,
+  "full_GPU_memory_or_runtime_or_storage_bound_established": false,
+  "full_score_launch_admitted": false
+}

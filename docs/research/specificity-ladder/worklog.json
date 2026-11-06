@@ -189,6 +189,20 @@
       "fix": "Preserve the historical review, retain the actual native filter, add a direct seam test and obtain an append-only independent correction.",
       "id": "P22",
       "what": "An independent workload review and root summary omitted the native operation filter before donor-map lookup."
+    },
+    {
+      "at": "2026-11-06T14:43:08-05:00",
+      "effect": "Slurm relocated that shell file into its spool directory, so the job failed before the workload script or any scientific input ran. Syntax and direct-script dry runs had not exercised relocation.",
+      "fix": "Preserve the failure. Build a distinct wrapper revision with an immutable absolute script path and a relocation regression test, then review before one deliberate new submission.",
+      "id": "P23",
+      "what": "The reviewed CPU wrapper resolved its sibling Python script relative to the submitted shell file."
+    },
+    {
+      "at": "2026-11-06T15:16:42-05:00",
+      "effect": "The first implementation run passed fifty-four of fifty-five checks in the base environment, then stopped. The unchanged publisher already converts tuples to JSON arrays, so the remaining assertion demanded more than the existing transport contract.",
+      "fix": "Preserve the failed run and original tests. Correct only that test expectation against the untouched published representation, retain canonical digest and coverage checks, then rerun both environments before acceptance.",
+      "id": "P24",
+      "what": "The native transport test expected the in-memory builder object to equal its JSON round trip, including tuple types."
     }
   ],
   "needs": [
@@ -241,7 +255,7 @@
       "text": "Please apply the already authorized sixteen-point cadence and temporary reset-bound cap exception to this new recovery thread using the targeted human commands in chat. The previous settings remain on the old thread."
     }
   ],
-  "right_now": "H100 bank and prefix timing/control evidence passed independent audit. Full-scoring admission awaits corrected workload geometry and resource proofs. The longer A3 base reference is queued; metadata preallocation has an accepted design and a concrete implementation plan in preparation.",
+  "right_now": "The full base reference is complete. Its optimized comparison and the corrected transport validation are queued on Delta. Full-scoring workload coverage passed audit; controller implementation and CPU resource-proof review continue, with a separate Bridges CPU preflight being prepared.",
   "schema": 1,
   "state": "Running",
   "terms": [],

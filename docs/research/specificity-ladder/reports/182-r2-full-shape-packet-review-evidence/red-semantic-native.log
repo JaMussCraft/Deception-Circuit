@@ -1,0 +1,14 @@
+test_original_proof_utility_donor_width (red_native_original.RedOriginal.test_original_proof_utility_donor_width) ... FAIL
+
+======================================================================
+FAIL: test_original_proof_utility_donor_width (red_native_original.RedOriginal.test_original_proof_utility_donor_width)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-plan178/full-shape-cpu181-r2/red_native_original.py", line 7, in test_original_proof_utility_donor_width
+    self.assertEqual(int(next(_rows(donor[0])).input_ids.shape[1]),9)
+AssertionError: 2 != 9
+
+----------------------------------------------------------------------
+Ran 1 test in 0.008s
+
+FAILED (failures=1)

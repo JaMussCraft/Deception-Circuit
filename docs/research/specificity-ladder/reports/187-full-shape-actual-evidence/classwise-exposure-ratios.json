@@ -1,0 +1,82 @@
+{
+  "forwards": {
+    "max_ratio": 25.0,
+    "max_class": "ser_v2|ioi|zero|recipient",
+    "top5": [
+      [
+        25.0,
+        "ser_v2|ioi|zero|recipient"
+      ],
+      [
+        25.0,
+        "ser_v2|ioi|self_replay|recipient"
+      ],
+      [
+        25.0,
+        "ser_v2|ioi|positive"
+      ],
+      [
+        25.0,
+        "ser_v2|ioi|item_swap|recipient"
+      ],
+      [
+        25.0,
+        "ser_v2|ioi|item_swap|donor"
+      ]
+    ]
+  },
+  "padded_tokens": {
+    "max_ratio": 27.444444444444443,
+    "max_class": "ser_v2|ioi|positive",
+    "top5": [
+      [
+        27.444444444444443,
+        "ser_v2|ioi|positive"
+      ],
+      [
+        27.444444444444443,
+        "ser_v2|ioi|item_swap|donor"
+      ],
+      [
+        27.444444444444443,
+        "sdr_v2|ioi|positive"
+      ],
+      [
+        27.444444444444443,
+        "sdr_v2|ioi|item_swap|donor"
+      ],
+      [
+        27.444444444444443,
+        "far_v2|ioi|positive"
+      ]
+    ]
+  },
+  "padded_squared_tokens": {
+    "max_ratio": 54.39161796932067,
+    "max_class": "ser_v2|mmlu|zero|recipient",
+    "top5": [
+      [
+        54.39161796932067,
+        "ser_v2|mmlu|zero|recipient"
+      ],
+      [
+        54.39161796932067,
+        "ser_v2|mmlu|self_replay|recipient"
+      ],
+      [
+        54.39161796932067,
+        "ser_v2|mmlu|h_mean|recipient"
+      ],
+      [
+        54.39161796932067,
+        "ser_v2|mmlu|empty|recipient"
+      ],
+      [
+        54.39161796932067,
+        "sdr_v2|mmlu|zero|recipient"
+      ]
+    ]
+  },
+  "row_ratio_times_1p2": 28.817391304347822,
+  "limitations": "Even classwise ratios are exposures; no fitted runtime coefficients or GPU/host/output bounds."
+}

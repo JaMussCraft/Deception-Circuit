@@ -1,0 +1,27 @@
+{
+  "verdict": "WRAPPER_ONLY_CPU_PACKET_READY",
+  "manifest_sha256": "bd12ebd27853dd63156dc2d1b2662688d4e8c2513269e4ef872db557538a821b",
+  "wrapper_sha256": "e8ea857d88e49841d393fcb5d32ef3902ef8d31d43de315b2b43e24496ba56c8",
+  "unchanged_shape_sha256": "b30a79cbaac9d62b7d825dc810e3b57cb1f82591bb4a7b0b736aa7e3b9385fd9",
+  "retained_science_review": "182-r2-full-shape-packet-review-evidence/verdict.json",
+  "retained_science_verdict_sha256": "fe390d33a8dfebe9c87acdf9993b479ccc99798c9138884214251c3eba15e737",
+  "delta": "Only dirname($0)/shape.py replaced with exact absolute immutable r3 shape.py path. Slurm may spool wrapper under /var/spool/slurmd; script path now survives relocation. Timeout/interpreter/cache/thread/offline/output/manifest arguments unchanged.",
+  "resource_and_science_identity": "shape.py, test_shape.py, test_native_seams.py, red_native_original.py and request.json byte-identical to r2; all manifest members match.",
+  "tests": {
+    "base_observed": 1,
+    "base_expected": 1,
+    "mgnp_observed": 1,
+    "mgnp_expected": 1,
+    "exit_codes": [
+      0,
+      0
+    ],
+    "raw_RED_expected_path_failures": 1,
+    "raw_RED_observed_path_failures": 1,
+    "prior_six_semantic_tests_not_repeated": true
+  },
+  "fixture_scope": "Copies shell wrapper to temporary spool path, intercepts timeout with argument recorder, verifies unchanged exact argv. Does not invoke shape.py, actual Python/model, scheduler or real timeout.",
+  "root_next_action": "One deliberate new CPU run, exact reviewed manifest and runtime WorkDir,4CPU16GiB15min/840+15, initialremaining850 and absentnewoutput; preserve prior failed23612166 artifacts and charge records. No automaticretry or GPU admission.",
+  "source_commit": "50e947bb852613e3a270082651f2bd1b7bb0c525",
+  "reviewer_operational_execution": false
+}

@@ -1,0 +1,49 @@
+{
+  "verdict": "PACKET_SEMANTICS_ACCEPTED_RESOURCES_AND_BINDINGS_UNDECIDED",
+  "packet_manifest_sha256": "a52c8696e83b525f64347ec8d714fb9bc450befa2e4638d6a46a6192eea8befe",
+  "original_packet_manifest_sha256": "21122c2077c367c7ccf9b08f8b865f263b7dcba66bf0480af25e14757973ed4d",
+  "run_py_sha256": "4b696366f1e0808212feeff0772160472e630811af9ba8381ebce664c6651dca",
+  "config_sha256": "77ec8f936b216bd5cd5a6e0e1945bf0b5e2be8903dc43b1b1cb6594387fc791e",
+  "sole_production_delta": "supervisor finalcompletion requires observed elapsed < configured childcap even if normalzeroexit was already reaped; copied resource settings are not a resource decision.",
+  "unchanged": [
+    "run.py",
+    "allocation_facts.py",
+    "oracle_cpu.sh",
+    "config.template.json"
+  ],
+  "unbound_fields": [
+    "candidate_workload",
+    "candidate_workload_sha256",
+    "complete_original_oracle",
+    "complete_original_oracle_sha256"
+  ],
+  "all_four_bindings_NULL": true,
+  "pure_tests": {
+    "base_observed": 5,
+    "base_expected": 5,
+    "mgnp_observed": 5,
+    "mgnp_expected": 5,
+    "exit_codes": [
+      0,
+      0
+    ],
+    "raw_RED_expected_boundary_failures": 2,
+    "raw_RED_observed_boundary_failures_per_environment": 2
+  },
+  "test_semantics": "Beforecapnormal completes; at/aftercapnormal and terminatedexit0 never promote. Missingstream/postguard tests represent failedchild, not complete genuine builder/stream/guard simulation. Fixtures isolated and not scientific artifacts.",
+  "resource_decision": {
+    "status": "NOT_MADE",
+    "copied_Slurm_minutes_not_admitted": 60,
+    "copied_child_seconds_not_admitted": 3300
+  },
+  "remaining_gates": [
+    "Complete genuine original BASE same-environment oracle with immutable hash and independent evidence acceptance; preserve prior failed attempts.",
+    "Use actual BASE baseline and measured candidate costs to make explicit root resource decision; no automatic3300-second/60-minute admission from inherited constants.",
+    "Distinct immutable bound config pins exact accepted candidate workload and complete BASE oracle path/SHA while preserving old frozen input/design/source identities. Independent exact config/resource/outputnamespace review before one deliberate comparison.",
+    "Full original builder+entire untouched publisher-default stream plus newline+allsummary/source/input/postguards and normalexitbelowcap; no partial/subset oracle or automaticretry."
+  ],
+  "old_frozen_input_source_commit": "861f84a3938a5e22fa329af0c469b2dd812fe68a",
+  "candidate_source_modified": false,
+  "new_T1_candidate_touched": false,
+  "model_or_job_or_source_admission": false
+}

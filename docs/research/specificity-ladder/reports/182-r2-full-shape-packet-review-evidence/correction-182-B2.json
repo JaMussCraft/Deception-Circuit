@@ -1,0 +1,10 @@
+{
+  "kind": "append_only_review_correction",
+  "corrected_review": "182-B2",
+  "preserved_original_verdict_sha256": "cad4d162f82a798930067d9bc4e24b039d065cb349515b9a17deed2f681c4207",
+  "finding_withdrawn": "Claim that native utility map lookup ignores operation and can attach item_swap unsupported status to zero/h_mean/self_replay/empty.",
+  "source_fact": "Frozen specificity_ladder._map_index lines166-173 filters m[operation]!=operation, and score_cell invokes it before identity lookup at241. Utility caller passing all maps does not remove that filter.",
+  "consequence": "Original181 per-operation lookup was correct. New correction must preserve operation filtering; no requirement to propagate other-operation support flags. Prior source-grounded donor batch16 and keyed reconstruction concerns remain distinct.",
+  "responsibility": "Reviewer misread the call path; Terra identified the contradiction and root independently confirmed it. No production/runtime change is required.",
+  "source_commit": "50e947bb852613e3a270082651f2bd1b7bb0c525"
+}

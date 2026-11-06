@@ -1,0 +1,45 @@
+{
+  "verdict": "GENUINE_CPU_SHAPE_PACKET_READY_ONLY",
+  "packet_manifest_sha256": "71af5046b4701991fd3d444f1fb70c9e03304a5b2d723363757579877be8fa97",
+  "shape_sha256": "b30a79cbaac9d62b7d825dc810e3b57cb1f82591bb4a7b0b736aa7e3b9385fd9",
+  "source_commit": "50e947bb852613e3a270082651f2bd1b7bb0c525",
+  "prior182_B2_correction_sha256": "6595ea8db22ad0f1070781304e61d06921648708370a3722d1e2206ccb5cae49",
+  "prior_packet_and_review_preserved": true,
+  "source_semantics": [
+    "Native_map_index filtersoperation before identity lookup. Both caller allmaps and operation subsets retain that filter; prior review claim otherwise withdrawn.",
+    "Utility donors use native default16, recipients8; native_rows preserves parent padding.",
+    "Assay captures: intact1 plus optionalsupported donor1; peruniquegroup empty/self2 always, patched1 onlysupported; alias expansion changes rowkeys not work.",
+    "Matching-operation map supported flag is respected even for nondonor operations; absentmap defaults supported. This correct rule does not imply cross-operation propagation.",
+    "Positive calibration is separate: assessment/IOI forcedsupported readout pairs, MMLUunchanged explicitmap,3captures at max retainedparent widths. Same-row itemSwap identity is asserted consistently with frozen donor constructor.",
+    "Reconstructed expected row/control keysets equal native authoritative domain; full-key support/reason mask digest includes legitimate unsupported diagnostics. Optional independentdonorseeds stop explicitly rather than guessing."
+  ],
+  "tests": {
+    "base_observed_total": 6,
+    "base_expected_total": 6,
+    "mgnp_observed_total": 6,
+    "mgnp_expected_total": 6,
+    "native_seam_test_methods": 4,
+    "arithmetic_test_methods": 2,
+    "exit_codes": [
+      0,
+      0
+    ],
+    "semantic_RED_expected_failures": 1,
+    "semantic_RED_observed_failures": 1,
+    "original_width": 2,
+    "native_expected_width": 9
+  },
+  "resources": {
+    "CPUs": 4,
+    "memory_GiB": 16,
+    "minutes": 15,
+    "child_seconds": 840,
+    "kill_grace_seconds": 15,
+    "minimum_initial_remaining_seconds": 850,
+    "GPU_count": 0,
+    "required_scheduler_WorkDir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime"
+  },
+  "guard_scope": "ExactCPUidentity/user/node/TRES/time/WorkDir, closed511+4source/hash/origins, accepted177/G3/bank, originalcontext/live/tokenizer/bank readers, packet before/after; no model/score/forward/effectfilecontent path.",
+  "remaining": "Genuine CPU result still required. Capture count/token-linear/token-squared exposure is not a runtime bound or measurement; singleton width/work distributions do not establish GPU/retainedhost memory or serializedoutput upper bounds. Need independent cost/resource/storage review and actualBridgescapacity, plus all full-only operational/admission/quiescentledger gates before any GPU launch.",
+  "operational_or_scientific_admission": false
+}

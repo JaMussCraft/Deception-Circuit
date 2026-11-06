@@ -1,0 +1,30 @@
+test_spooled_wrapper_uses_immutable_script (test_wrapper_relocation.WrapperRelocation) ... FAIL
+
+======================================================================
+FAIL: test_spooled_wrapper_uses_immutable_script (test_wrapper_relocation.WrapperRelocation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-plan178/full-shape-cpu181-r3/test_wrapper_relocation.py", line 14, in test_spooled_wrapper_uses_immutable_script
+    self.assertEqual(args,['--signal=TERM','--kill-after=15','840','/u/swong2/.conda/envs/mgnp/bin/python','-B',str(P/'shape.py'),'--output','/tmp/proof-output','--manifest-sha256','fixture-manifest'])
+AssertionError: Lists differ: ['--s[83 chars]', '/tmp/tmp5txk1pi4/slurm-spool/shape.py', '-[66 chars]est'] != ['--s[83 chars]', '/projects/beto/swong2/Alignment/Deception-[189 chars]est']
+
+First differing element 5:
+'/tmp/tmp5txk1pi4/slurm-spool/shape.py'
+'/projects/beto/swong2/Alignment/Deception-[114 chars]e.py'
+
+  ['--signal=TERM',
+   '--kill-after=15',
+   '840',
+   '/u/swong2/.conda/envs/mgnp/bin/python',
+   '-B',
+-  '/tmp/tmp5txk1pi4/slurm-spool/shape.py',
++  '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-plan178/full-shape-cpu181-r3/shape.py',
+   '--output',
+   '/tmp/proof-output',
+   '--manifest-sha256',
+   'fixture-manifest']
+
+----------------------------------------------------------------------
+Ran 1 test in 0.067s
+
+FAILED (failures=1)
