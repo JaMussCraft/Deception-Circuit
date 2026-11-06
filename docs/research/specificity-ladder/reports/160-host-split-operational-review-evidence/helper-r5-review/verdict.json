@@ -1,0 +1,50 @@
+{
+  "verdict": "BLOCKED_MALFORMED_CAPTURED_RESET_PREFIX_ACCEPTANCE",
+  "candidate_manifest_sha256": "67d7ff0345b268f508a75f636224c0bef9f8e109f2e7f87fbaad972e73174a89",
+  "candidate_helper_sha256": "35959ca0f1d20b0140d2c2d18f080cc2b7283f26e7219e166fb1331db24c698c",
+  "predecessor_manifest_sha256": "959b5987ea6bc22bd3d6cedcd07bc15a56edf72838d79f320c9548e5c3f02efc",
+  "scope_check": "All bytes outside validate_usage identical; original test_helper/test_cache_gate/cache_gate/bindings template unchanged. Manifest and all members match.",
+  "focused_tests": {
+    "base": {
+      "observed": 46,
+      "expected": 46,
+      "exit_code": 0
+    },
+    "mgnp": {
+      "observed": 46,
+      "expected": 46,
+      "exit_code": 0
+    },
+    "baseline_original_cases": 42,
+    "new_unittest_methods": 4,
+    "approved_matrix_cases": 37
+  },
+  "red_analysis": {
+    "observed_errors": 7,
+    "behavioral_rejection_cases": 5,
+    "result_route_key_missing_cases": 2,
+    "cause": "Old reset equality rejects legitimate expired-post-reset branches; existing-route probes additionally expect new route telemetry absent in predecessor. No environment/setup/import failure."
+  },
+  "finding": {
+    "location": "validate_usage exception regex",
+    "problem": "Unanchored captured reset ([0-9]+) truncates malformed token and accepts its integer prefix.",
+    "actual_pure_probes": [
+      {
+        "printed_reset": "1000.5",
+        "accepted_as": 1000
+      },
+      {
+        "printed_reset": "1000unknown",
+        "accepted_as": 1000
+      },
+      {
+        "printed_reset": "1000e9",
+        "accepted_as": 1000
+      }
+    ],
+    "expected": "Reject malformed or noninteger full reset token, including fractional/exponent/suffix content; accept ordinary complete native status line.",
+    "requested_fix": "Complete-line or complete-token validation plus focused rejection tests, published as new immutable successor revision; do not edit reviewed r5."
+  },
+  "other_checks": "Boolean/nonfinite live values, boolean/noninteger live reset, unknown state, invalid timezone, bad epochs, stale/future observation, cached rollback, cap and checkpoint cases reject. Future live-reset variation plus/minus one second accepts only genuinely expired old-window path; active reset mismatch remains rejected.",
+  "operational_actions": false
+}

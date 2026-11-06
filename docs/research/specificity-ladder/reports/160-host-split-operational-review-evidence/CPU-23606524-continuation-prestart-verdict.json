@@ -1,0 +1,36 @@
+{
+  "verdict": "SCOPED_CPU_RELEASE_AND_PRESTART_BINDINGS_PASS",
+  "prestart_manifest_sha256": "dff5bfad435e54cf39320d726b2943fafacd70cab6725d654e11e0cac2b92c2e",
+  "new_helper_bindings_sha256": "c3eec41b5ca2331ebdb6fa387fa45159894fc8559d09df5e00202030387f09bd",
+  "new_watcher_sha256": "37934105f0ea56ba961eca8b2eb6b9de27f809c68be4c5b9feee6733a211e4c6",
+  "actual_CPU_job": "23606524",
+  "CPU_config_sha256": "5765542bee38108f07a605452af0d3ce518fd28bfdc19921f1b504a4cb25a06c",
+  "all_direct_file_pins_match": true,
+  "binding_delta_only": [
+    "status",
+    "helper_manifest_sha256",
+    "standing_config",
+    "state_directory",
+    "usage_pause_percent"
+  ],
+  "watcher_delta_only": [
+    "new bindings filename/hash",
+    "accepted helper path"
+  ],
+  "usage_diagnostic_replayed": {
+    "route": "expired_post_reset",
+    "projected_points": "17",
+    "next_checkpoint_points": "33",
+    "cached_and_live_usage": "1",
+    "exception_status": "expired",
+    "scope": "Diagnostic at captured time only; does not extend its authority or replace per-trigger/publication checks."
+  },
+  "scope": "Root may release reviewed CPU23606524 validation-only support. Does not approve GPU unhold, phase/model entry or a root phase release. OriginalGPU50189932/config1d96/placement8587/r041 remain immutable.",
+  "remaining_before_GPU_unhold": [
+    "Actual CPU RUNNING allocation and READY bound to exact CPU23606524/config576/source50e/packet487/G3c309/R5661, with adequate original finish/deadline windows.",
+    "Append immutable final READY continuation attestation referencing these prestart bytes, actual READY/allocation, accepted helper and fresh unchanged original GPU/config/placement/reservation and unused-phase facts; independent review of exact attestation.",
+    "Root verifies all required transfers/pins/current allocation and starts exact new watcher; no old watcher/helper concurrent or preexisting requests/releases/phase outputs.",
+    "Before each original bank/prefix entry retain actual fresh Delta phase owning COMPLETE, full accepted root cache/source/catalogue/budget/mapping/usage checks and finite root release; same replacementCPU for both phases. Original300s release,1950 prefix floor,300 finish and60min1GPUh envelope unchanged."
+  ],
+  "operational_action_by_reviewer": false
+}

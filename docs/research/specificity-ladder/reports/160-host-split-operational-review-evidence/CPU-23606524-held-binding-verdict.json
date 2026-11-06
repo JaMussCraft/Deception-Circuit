@@ -1,0 +1,37 @@
+{
+  "verdict": "SCOPED_HELD_CPU_BINDING_PASS",
+  "actual_CPU_job": "23606524",
+  "config_sha256": "5765542bee38108f07a605452af0d3ce518fd28bfdc19921f1b504a4cb25a06c",
+  "publication_sha256": "289f4754e68a626df34c7a8e9a5ddccc03ce8d4dd6e8bca436fb6cabe569cda3",
+  "dispatch_sha256": "66e92f77c293af4d12b9e523c2edbaf2042214b569d0332d585c1a9f11a83cd3",
+  "seed_changes": {
+    "standing_CPU_job_id": [
+      null,
+      "23606524"
+    ],
+    "request_directory": [
+      null,
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-Delta-model-preflight/job-23606524/requests"
+    ],
+    "evidence_output": [
+      null,
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-Delta-model-preflight/job-23606524/evidence"
+    ]
+  },
+  "actual_held_resources": {
+    "account": "beto-delta-cpu",
+    "partition": "cpu",
+    "CPU_count": 4,
+    "memory_GiB": 16,
+    "minutes": 60,
+    "GPU_count": 0,
+    "no_requeue": true
+  },
+  "source_commit": "50e947bb852613e3a270082651f2bd1b7bb0c525",
+  "CPU_packet_manifest_sha256": "4875845ad3b728980c494657aac2935e29a8a215885ddc1b9bfd81f7ba2b13f9",
+  "H100_packet_manifest_sha256": "661d16c5f38149b4d258fa372472dd5aab57cd0afe0a131aa6b5683b735657bc",
+  "base_parameters_sha256": "12e1e370d176c09b8f8287c0b772bad16fcffae4ba9a9839e9f3420ef0314c4f",
+  "READY_observed": false,
+  "scope": "Held validation-only replacement CPU configuration and bootstrap accepted. No allocation has run and no owning result is claimed. Same unstarted GPU50189932/config1d96/placement8587/reservationr041 must remain immutable; later root continuation attestation and separately accepted new helper bindings identify current replacement support while historical CPU23488288 fields remain historical. No GPU phase or root release authority granted by this verdict.",
+  "operational_action_by_reviewer": false
+}

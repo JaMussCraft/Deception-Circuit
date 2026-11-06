@@ -1,0 +1,28 @@
+{
+  "verdict": "SCOPED_HELPER_STATIC_AND_PURE_TEST_PASS",
+  "manifest_sha256": "74f29f489229fe533ed6a7c6d07b13a24e3a2fb8c2c4555edda8b65b48b7f1e4",
+  "helper_sha256": "096e0216d9ddce55a38ff401e3759fa021a6208ecb4e58405991248337c0a392",
+  "prior_blocker": "Malformed integer-prefix acceptance closed by exact full exception-line anchors with multiline matching.",
+  "code_scope": "Only full-line regex differs from r5; all bytes outside validate_usage identical to r4. All three immutable manifests and their complete members rehashed unchanged. Approved test matrix byte-identical.",
+  "red": {
+    "expected_malformed_failures": 3,
+    "observed_malformed_failures": 3,
+    "valid_context_passed": true
+  },
+  "green": {
+    "base_observed": 48,
+    "base_expected": 48,
+    "mgnp_observed": 48,
+    "mgnp_expected": 48,
+    "exit_codes": [
+      0,
+      0
+    ],
+    "independent_base_seconds": 0.068,
+    "independent_mgnp_seconds": 0.062
+  },
+  "baseline_original_tests": 42,
+  "approved_matrix_cases": 37,
+  "scope": "Pure helper acceptance only. No operational release, new actual bindings, actual CPU proof, source admission, scientific execution, model or GPU phase authorization.",
+  "no_operational_execution": true
+}

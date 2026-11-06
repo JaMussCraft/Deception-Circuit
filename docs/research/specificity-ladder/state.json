@@ -1484,13 +1484,29 @@
         "NODE_FAIL"
       ],
       "job_id": "23605794",
-      "last_progress_at": "2026-11-06T11:30:09-05:00",
-      "status": "PENDING",
+      "last_progress_at": "2026-11-06T11:50:37-05:00",
+      "status": "RUNNING",
       "submitted_at": "2026-11-06T11:30:09-05:00",
       "waiter": "timeout 60m sh -c 'until sacct -j 23605794 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'"
+    },
+    {
+      "cluster": "delta",
+      "expected_terminal": [
+        "COMPLETED",
+        "FAILED",
+        "CANCELLED",
+        "TIMEOUT",
+        "OUT_OF_MEMORY",
+        "NODE_FAIL"
+      ],
+      "job_id": "23606524",
+      "last_progress_at": "2026-11-06T11:44:38-05:00",
+      "status": "PENDING",
+      "submitted_at": "2026-11-06T11:44:38-05:00",
+      "waiter": "timeout 60m sh -c 'until sacct -j 23606524 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'"
     }
   ],
-  "last_worklog_entry_at": "2026-11-06T11:33:07-05:00",
+  "last_worklog_entry_at": "2026-11-06T11:50:19-05:00",
   "schema": 1,
   "session_state": "running",
   "sessions": {
@@ -2028,13 +2044,18 @@
         "01a1b1a9-d90e-7472-a2b9-196231a319cc": {
           "agent_type": "default",
           "started_at": "2026-11-06T11:21:02-05:00",
-          "stop_blocks": 0
+          "stop_blocks": 1
+        },
+        "01a1b1ba-5599-71c1-8241-9c7fd2c25d25": {
+          "agent_type": "default",
+          "started_at": "2026-11-06T11:39:03-05:00",
+          "stop_blocks": 1
         }
       },
       "checkpoints": [
         {
-          "acked_at": null,
-          "acked_by": null,
+          "acked_at": "2026-11-06T11:37:55-05:00",
+          "acked_by": "prompt",
           "all_models": 1,
           "at": "2026-11-06T11:29:42-05:00",
           "fable": null,
@@ -2061,7 +2082,7 @@
       "started_at": "2026-11-03T14:49:15-05:00",
       "tool": "codex",
       "usage": {
-        "acked_through": 0,
+        "acked_through": 1,
         "cadence": 16,
         "cap_exception": {
           "expired_at": "2026-11-06T11:18:30-05:00",
@@ -2075,17 +2096,12 @@
           "status": "expired",
           "tool": "codex"
         },
-        "freeze": {
-          "checkpoint": 1,
-          "crossed_at": "2026-11-06T11:29:42-05:00",
-          "recorded_at": "2026-11-06T11:33:07-05:00",
-          "stage": "recorded"
-        },
+        "freeze": null,
         "last_reading": {
           "fable": null,
           "five_hour": null,
           "fresh": true,
-          "read_at": "2026-11-06T11:33:03-05:00",
+          "read_at": "2026-11-06T11:41:22-05:00",
           "seven_day": 1
         },
         "metric": "codex weekly",

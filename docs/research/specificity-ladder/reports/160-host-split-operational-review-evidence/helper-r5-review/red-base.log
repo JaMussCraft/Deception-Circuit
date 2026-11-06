@@ -1,0 +1,81 @@
+test_approved_matrix (test_usage_reset.ResetTests) ... 
+======================================================================
+ERROR: test_approved_matrix (test_usage_reset.ResetTests) (case='new reset legitimate')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-model-phase-release-helper/r5/test_usage_reset.py", line 31, in test_approved_matrix
+    result=h.validate_usage(u,status,'exact')
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-model-phase-release-helper/r5/helper.py", line 69, in validate_usage
+    need(exception and int(exception.group(2))==u['weekly']['resets_at'],'unknown/mismatched captured reset')
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-model-phase-release-helper/r5/helper.py", line 16, in need
+    if not ok:raise Rejected(msg)
+helper.Rejected: unknown/mismatched captured reset
+
+======================================================================
+ERROR: test_approved_matrix (test_usage_reset.ResetTests) (case='cache stale label but post-reset timestamp')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-model-phase-release-helper/r5/test_usage_reset.py", line 31, in test_approved_matrix
+    result=h.validate_usage(u,status,'exact')
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-model-phase-release-helper/r5/helper.py", line 69, in validate_usage
+    need(exception and int(exception.group(2))==u['weekly']['resets_at'],'unknown/mismatched captured reset')
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-model-phase-release-helper/r5/helper.py", line 16, in need
+    if not ok:raise Rejected(msg)
+helper.Rejected: unknown/mismatched captured reset
+
+======================================================================
+ERROR: test_approved_matrix (test_usage_reset.ResetTests) (case='cache old but post-reset')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-model-phase-release-helper/r5/test_usage_reset.py", line 31, in test_approved_matrix
+    result=h.validate_usage(u,status,'exact')
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-model-phase-release-helper/r5/helper.py", line 69, in validate_usage
+    need(exception and int(exception.group(2))==u['weekly']['resets_at'],'unknown/mismatched captured reset')
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-model-phase-release-helper/r5/helper.py", line 16, in need
+    if not ok:raise Rejected(msg)
+helper.Rejected: unknown/mismatched captured reset
+
+======================================================================
+ERROR: test_approved_matrix (test_usage_reset.ResetTests) (case='cached lags within checkpoint')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-model-phase-release-helper/r5/test_usage_reset.py", line 31, in test_approved_matrix
+    result=h.validate_usage(u,status,'exact')
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-model-phase-release-helper/r5/helper.py", line 69, in validate_usage
+    need(exception and int(exception.group(2))==u['weekly']['resets_at'],'unknown/mismatched captured reset')
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-model-phase-release-helper/r5/helper.py", line 16, in need
+    if not ok:raise Rejected(msg)
+helper.Rejected: unknown/mismatched captured reset
+
+======================================================================
+ERROR: test_approved_matrix (test_usage_reset.ResetTests) (case='same reset expired below80 existing route')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-model-phase-release-helper/r5/test_usage_reset.py", line 32, in test_approved_matrix
+    self.assertEqual(result['route'],'matching_reset' if case['expected']=='PASS_EXISTING_ROUTE' else 'expired_post_reset')
+KeyError: 'route'
+
+======================================================================
+ERROR: test_approved_matrix (test_usage_reset.ResetTests) (case='live observation exact60s')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-model-phase-release-helper/r5/test_usage_reset.py", line 31, in test_approved_matrix
+    result=h.validate_usage(u,status,'exact')
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-model-phase-release-helper/r5/helper.py", line 69, in validate_usage
+    need(exception and int(exception.group(2))==u['weekly']['resets_at'],'unknown/mismatched captured reset')
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-model-phase-release-helper/r5/helper.py", line 16, in need
+    if not ok:raise Rejected(msg)
+helper.Rejected: unknown/mismatched captured reset
+
+======================================================================
+ERROR: test_approved_matrix (test_usage_reset.ResetTests) (case='matching active existing over80')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-model-phase-release-helper/r5/test_usage_reset.py", line 32, in test_approved_matrix
+    self.assertEqual(result['route'],'matching_reset' if case['expected']=='PASS_EXISTING_ROUTE' else 'expired_post_reset')
+KeyError: 'route'
+
+----------------------------------------------------------------------
+Ran 1 test in 0.033s
+
+FAILED (errors=7)
