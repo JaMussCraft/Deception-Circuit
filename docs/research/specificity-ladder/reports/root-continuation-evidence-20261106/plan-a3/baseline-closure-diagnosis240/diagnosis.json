@@ -1,0 +1,72 @@
+{
+  "status": "handed-back",
+  "verdict": "LOCAL_AND_STAGED_BASELINE_CONTEXT_CLOSURE_INCOMPLETE",
+  "Delta_same_packet_also_affected": true,
+  "case_failures": [
+    {
+      "name": "test_prepared_anchored_cgroup_scope_mismatch_rejects_before_loader[False-True]",
+      "failure": "ValueError: missing required protected registry: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r4/baseline-source/docs/research/held_out.json"
+    },
+    {
+      "name": "test_prepared_anchored_cgroup_scope_mismatch_rejects_before_loader[True-False]",
+      "failure": "ValueError: missing required protected registry: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r4/baseline-source/docs/research/held_out.json"
+    },
+    {
+      "name": "test_prepared_anchored_cold_warm_cgroup_scope_disagreement_rejects",
+      "failure": "ValueError: missing required protected registry: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r4/baseline-source/docs/research/held_out.json"
+    },
+    {
+      "name": "test_prepared_completed_intake_rejects_anchored_cgroup_scope_mismatch[False-True]",
+      "failure": "Failed: DID NOT RAISE ValueError"
+    },
+    {
+      "name": "test_prepared_completed_intake_rejects_anchored_cgroup_scope_mismatch[True-False]",
+      "failure": "Failed: DID NOT RAISE ValueError"
+    }
+  ],
+  "missing_dependencies": [
+    {
+      "missing_baseline_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r4/baseline-source/docs/research/held_out.json",
+      "exists": false,
+      "included_in_baseline_pins": false,
+      "included_in_transport_config": false,
+      "proposed_ordinary_copy_source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
+      "source_sha256": "801b24e37c3315a8e58aa2ad5007f7831822fc2636d1e61837ad3652c370425e",
+      "source_bytes": 32
+    },
+    {
+      "missing_baseline_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r4/baseline-source/docs/research/directions.json",
+      "exists": false,
+      "included_in_baseline_pins": false,
+      "included_in_transport_config": false,
+      "proposed_ordinary_copy_source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/directions.json",
+      "source_sha256": "f8c7dbb92f2edc509c7bb8e94624a5c8adabddd103a8c48db1cc59bd69a3c6b0",
+      "source_bytes": 21212
+    }
+  ],
+  "baseline_aliases": [],
+  "protected_registry_path_entries": {
+    "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/held_out.json": [],
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json": []
+  },
+  "pure_probe": {
+    "scope": "AST-extracted unchanged check_registry, stdlib only, empty contexts; actual primary registry and missing baseline path; temporary ordinary registry copy only, no production source writes",
+    "original_missing_registry_reproduced": "missing required protected registry: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r4/baseline-source/docs/research/held_out.json",
+    "ordinary_copy_satisfies_same_guard": true,
+    "temporary_copy_was_not_a_runtime_or_test_acceptance": true
+  },
+  "why_missed": [
+    "source pins list code files only and check_pins verifies listed members, not runtime context closure",
+    "baseline source-origin assertion imports modules without calling live guards",
+    "observer --dry-run checks pins/count/command construction, not baseline fixture setup",
+    "host/container alias inventory test explicitly asserted baseline has zero symlinks, never required ordinary docs registry files",
+    "source review preserved test/algorithm controls but did not establish complete file-relative fixture context on baseline revision"
+  ],
+  "minimal_correction": [
+    "new immutable observer/baseline export with exact ordinary held_out.json and directions.json registry context copies and hashes",
+    "keep baseline runtime r3/old code, all5 failure assertions and all223GREEN functions unchanged",
+    "extend baseline context inventory and pin/source/config/deployment receipts; preserve zero baseline aliases so existing transport8 policy stays unchanged",
+    "add stdlib mandatory registry/dependency preflight, including protected-set path references when present; never bypass or monkeypatch original validators",
+    "fresh both-environment five intended DID NOT RAISE baseline cases then all223GREEN; preserve failed50316834 evidence"
+  ]
+}
