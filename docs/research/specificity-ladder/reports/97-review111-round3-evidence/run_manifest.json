@@ -1,0 +1,175 @@
+{
+  "status": "round3 author fix frozen for scoped review",
+  "accepted": false,
+  "whole_unit_complete": false,
+  "fix_round": 3,
+  "baseline_commit_supplied_by_root": "538109e809285b6ddc45d42df8786270a65f7b12",
+  "uncommitted_overlay": true,
+  "source_manifest": "/tmp/report97-review111-round3-frozen-source.json",
+  "source_hashes": {
+    "component_analysis/a3_direction_pipeline.py": "96678db186078ab37cad108e2d1e71ffdccf1fb3dd157c35cdc57a91b2ebd4a0",
+    "component_analysis/a3_direction_runner.py": "89a62335665595533204006c3eca28d14ca9c42eb600879c235e9c6370739429",
+    "component_analysis/a3_direction_runtime.py": "b66c2d8cd26c36f321b5079758209214746b0e4eec16a6c801742086d729c0cc",
+    "component_analysis/a3_direction_workload.py": "3e43aaf2b4cacb99df87593ae377c8fdf3eb7b223b258ed8873853841404d8f9",
+    "component_analysis/a3_directions.py": "ed882d4e12a396e03e73671e588beba5b1a8c90ab9d31e7ee73d4194430b4a86",
+    "component_analysis/a3_pipeline.py": "310eb53427ad4ac32522dfd0d6cd3b33e4ec887af1776579845f8953bdbe83f5",
+    "scripts/jobs/specificity_a3.sh": "936dfb7f8b9c2d267d52f1e199ed431275e6527cbfc3a105a22e3812289a9b96",
+    "tests/test_a3_direction_runner.py": "3ea945d5b23b4eef7d56139758c7075ea1b56ac612f1923590b7978628ca0120",
+    "tests/test_a3_direction_runtime.py": "5a41e89b0b2bd5fd59553f5f5a63260638e3547a63c31a615d84da08f796fb6a",
+    "tests/test_a3_direction_workload.py": "91eb6f874e180c5ffb362daba231631b7bea21c224446580efccfe20a9007300",
+    "tests/test_a3_directions.py": "cd8471b1524ad7b8f1b7c87f9eb5fec5724b3ab2980027ef7aadfea3fc3bb1c1",
+    "tests/test_a3_pipeline.py": "bbb3efdba075cc14c2997cc11ae44bab268bdea56459c0574d6bfc21b62f4a18",
+    "tests/a3_direction_native_scenario.py": "9b5061ab9618222b23230917f446abcaa73747f3d216f69c77b9218feec6297b"
+  },
+  "changed_since_round2": [
+    "component_analysis/a3_direction_runtime.py",
+    "tests/test_a3_direction_runtime.py"
+  ],
+  "accepted_B1_B2_preserved": true,
+  "read_only_footprint_loop_AST_identical": true,
+  "existing_accepted_startup_test_AST_identical": true,
+  "preserved_baseline": ".superpowers/sdd/plan-a3/unit-f-review111-round2-source",
+  "frozen_A1_dependencies": {
+    "component_analysis/dla.py": "61476cd4607f240bcdac567a7005cf86379cae0d4f2606dba2a60c6401d68073",
+    "component_analysis/hooks.py": "fdc8f325884e88c4168a2c9e9fde731b98be3d608ac15f1f0a39278044d7cfba",
+    "component_analysis/knockout.py": "3b5599f12bcdc6731965e3fb2c374dabad5a064b38863b1b756d4a30078b5b7b",
+    "component_analysis/ladder_design.py": "a9752ff2bca91d7d04957fb867adcdc5640d94b47bf11d9593a3657a0f9c533b",
+    "component_analysis/ladder_metrics.py": "9cc369e3e929b474052a5a142890a16615d804ce64b415e919e347af4675cfad",
+    "component_analysis/ladder_pipeline.py": "f0955e8df5215e27cb3eff06cd28f7230b1de7d2a6c20e202854bc73c1280b56",
+    "component_analysis/ladder_tasks.py": "7f53a2210450e4264089a60da31739d2c0c187b0dcd778b203997b9bd873e847",
+    "component_analysis/specificity_ladder.py": "93a22eb6b51cf6ea081b37dd354179cd56aa89def6bb50337b40fc2937b9170e",
+    "dataset/build_user_inversion_v2.py": "47cb1e1dd84d6efc43474c6ce9fc10b30f111a96f083aa370a0d9ac01c827b2a",
+    "dataset/matched_honest.py": "cb30aa003b22a0cb940bb2fb16e0f67be77f0f5e433d7a4d9b52f1fd059f13f0",
+    "dataset/user_inversion_pipeline.py": "4d49697731f291339262fe6ebc6a5909601a26fcf5d31ff562b55d1d74b2a0ee",
+    "evaluation/benchmarks/sandbagging.py": "67fce74fe14e45abb6b7ea57e96a1382ef19fa0e74ea1f40126f4adfc61a7039",
+    "evaluation/benchmarks/sources.py": "06b9286567467bf37a52faaf9ee8fff41b4c1dc8ce8e348b2f2b032b7eac633f",
+    "evaluation/grader_hash.py": "6b26c4c4cd111fe3056f8a0b1119eabf51ab367eb242588a73b9cb3f85b13a19",
+    "models/__init__.py": "ef3796de0c3e9ca6e0760fe72764241664f2d81055a891ebd5d47c9c43aef210",
+    "models/_compat.py": "449b03c2232a539dc590fed795ca2a55a045c27ce99b13b9a5204363970d2737"
+  },
+  "command": "env PYTHONDONTWRITEBYTECODE=1 OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHON -m pytest -q -s -p no:cacheprovider docs/research/specificity-ladder/reports/111-round2-evidence/test_independent_round2_extra.py tests/test_a3_direction_runtime.py -k 'admission_dry_run_preserves' --basetemp=/tmp/review111-round3-final-ENV",
+  "interpreters": {
+    "mgnp": "/u/swong2/.conda/envs/mgnp/bin/python",
+    "base": "/sw/external/python/anaconda3/bin/python3.9"
+  },
+  "results": {
+    "final-mgnp": {
+      "exit_code": 0,
+      "passed": 3,
+      "deselected": 156,
+      "seconds": 34.76
+    },
+    "final-base": {
+      "exit_code": 0,
+      "passed": 3,
+      "deselected": 156,
+      "seconds": 46.53
+    },
+    "red-mgnp": {
+      "exit_code": 1,
+      "failed": 1,
+      "seconds": 14.14
+    },
+    "red-base": {
+      "exit_code": 1,
+      "failed": 1,
+      "seconds": 12.87
+    }
+  },
+  "observed": {
+    "mgnp": [
+      {
+        "exit_code": 0,
+        "files_before": 23,
+        "files_after": 23,
+        "added_files": [],
+        "cli_output": "{\"action\": \"admit\", \"commit\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"design_sha256\": \"720c7067673597e607e1980a4d17a5bae8b682ffaf4fdb4e6fe87db70dd08c64\", \"dry_run\": true, \"execution_authorized\": false, \"inventory_sha256\": \"2318eefa8c0626c0d6d55157bf40b0d15899dee571955f22a642b59cd6620072\", \"live_allocation_admission\": \"deferred/unverified\", \"missing_prerequisites\": [\"completed authentication/index startup measurement\"], \"model_loaded\": false, \"protocol_sha256\": \"1a36f274f4fe5a0d77f9d5ee3d0fbc418555477f9dd157bb58aca24363a5f2d1\", \"stage\": \"prepare\", \"writes\": false}\n"
+      },
+      {
+        "dry_run": true,
+        "files_before": 23,
+        "files_after": 23,
+        "directories_before": 16,
+        "directories_after": 16,
+        "tree_unchanged": true
+      },
+      {
+        "dry_run": false,
+        "files_before": 23,
+        "files_after": 27,
+        "directories_before": 16,
+        "directories_after": 20,
+        "tree_unchanged": false
+      }
+    ],
+    "base": [
+      {
+        "exit_code": 0,
+        "files_before": 23,
+        "files_after": 23,
+        "added_files": [],
+        "cli_output": "{\"action\": \"admit\", \"commit\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"design_sha256\": \"720c7067673597e607e1980a4d17a5bae8b682ffaf4fdb4e6fe87db70dd08c64\", \"dry_run\": true, \"execution_authorized\": false, \"inventory_sha256\": \"2318eefa8c0626c0d6d55157bf40b0d15899dee571955f22a642b59cd6620072\", \"live_allocation_admission\": \"deferred/unverified\", \"missing_prerequisites\": [\"completed authentication/index startup measurement\"], \"model_loaded\": false, \"protocol_sha256\": \"1a36f274f4fe5a0d77f9d5ee3d0fbc418555477f9dd157bb58aca24363a5f2d1\", \"stage\": \"prepare\", \"writes\": false}\n"
+      },
+      {
+        "dry_run": true,
+        "files_before": 23,
+        "files_after": 23,
+        "directories_before": 16,
+        "directories_after": 16,
+        "tree_unchanged": true
+      },
+      {
+        "dry_run": false,
+        "files_before": 23,
+        "files_after": 27,
+        "directories_before": 16,
+        "directories_after": 20,
+        "tree_unchanged": false
+      }
+    ]
+  },
+  "coverage": [
+    "unchanged original CLI probe",
+    "full file/directory path/inode/mode/mtime/content snapshot equality",
+    "dry-run forbidden from reaching publishing constructor",
+    "read-only invalid actual-execution and footprint refusals",
+    "real non-dry CLI creates one startup record and admission proposal",
+    "exact original-plus-completed startup charge"
+  ],
+  "limitations": [
+    "full native scenario not run",
+    "independent scoped acceptance pending",
+    "host startup portability remains conditional as previously accepted"
+  ],
+  "all_owned_processes_terminal": true,
+  "artifacts": {
+    "report97-review111-round3-final-mgnp.log": {
+      "sha256": "76cb4e58cbbefaac601a8804b6b343feab1761262ce6808b4d6eb7093a06ae2c",
+      "bytes": 1014
+    },
+    "report97-review111-round3-green-mgnp.log": {
+      "sha256": "cb2bf4cdaee0442aa3fc7c34babf448dd518d820df3c104962b5b4d395b6c3eb",
+      "bytes": 1014
+    },
+    "report97-review111-round3-green-base.log": {
+      "sha256": "e0fb5c35557352257c6393292b410d5f0ebd8817ee96053217e3a7fc882b9f00",
+      "bytes": 1498
+    },
+    "report97-review111-round3-red-mgnp.log": {
+      "sha256": "f620739f6fd1803a986d7e3478e733536ba2ff46f51d220ee43c6a3b30dc84e3",
+      "bytes": 4131
+    },
+    "report97-review111-round3-final-base.log": {
+      "sha256": "5cc9678b0802528ad72ad39cbd06fda82e44e517cf6c4e1b60037efd531bcb55",
+      "bytes": 1498
+    },
+    "report97-review111-round3-red-base.log": {
+      "sha256": "550d6275ba595c152ec4ccb91576d6861eaa7b54e1c956094a9448bf276ae53d",
+      "bytes": 4615
+    },
+    "source_snapshot.json": {
+      "sha256": "9ad60a15ca5738c1e492e8e06f5afc95f3ea24086e958dc435d91a90807c4ca1",
+      "bytes": 1423
+    }
+  }
+}

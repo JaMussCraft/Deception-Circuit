@@ -1,0 +1,66 @@
+{
+  "method": "AST-extracted unchanged pure validator/environment functions; dependency hashes stubbed uniformly; no runtime imports, model, inventory or admission",
+  "result": {
+    "retained_metadata_bytes": 20,
+    "extra_transient_bytes": 30
+  },
+  "accepted_record": {
+    "kind": "a3_prepared_target_receiver_resources_v1",
+    "references": {
+      "target": {
+        "path": "target"
+      },
+      "preparation": {
+        "path": "descriptor"
+      }
+    },
+    "source_identity": {
+      "code_hashes": {
+        "runtime": "code-hash"
+      }
+    },
+    "reader_sha256": "code-hash",
+    "freeze_sha256": "code-hash",
+    "environment": {
+      "python_implementation": "CPython",
+      "python_version": "3.9.18",
+      "numpy_version": "fixture",
+      "torch_version": "fixture",
+      "platform": "Linux",
+      "deployment_family": "slurm-receiver",
+      "storage_family": "lustre"
+    },
+    "recipe": "a3_prepared_reader_unique_graph_buffers_v1",
+    "scope": "scope",
+    "observed_io": {
+      "full_payload_reads": 2,
+      "SHA_passes": 2,
+      "parse_passes": 1,
+      "freeze_passes": 1,
+      "target_writes": 0
+    },
+    "provenance": {
+      "normal_completion": true,
+      "exit_code": 0,
+      "source_before": {
+        "runtime": "code-hash"
+      },
+      "source_after": {
+        "runtime": "code-hash"
+      }
+    },
+    "model_loaded": false,
+    "execution_authorized": false,
+    "retained_metadata_bytes_bound": 20,
+    "extra_transient_bytes_bound": 30,
+    "process_peak_rss_bytes_bound": 1000,
+    "cgroup_peak_bytes_bound": 1000
+  },
+  "missing_evidence": [
+    "allocation/CPU family",
+    "actual receiver storage family/path witness",
+    "cold/warm wall and CPU scopes",
+    "measurement run/allocation provenance",
+    "cgroup current/peak/events scope"
+  ]
+}

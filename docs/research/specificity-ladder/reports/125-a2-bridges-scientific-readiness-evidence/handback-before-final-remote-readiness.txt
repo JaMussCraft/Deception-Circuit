@@ -1,0 +1,43 @@
+# Independent scientific Bridges replacement readiness review
+
+Status: handed-back
+
+## What changed
+
+**Stored timing integrity/drift: PASS. Logical replacement proposal: ACCEPT subject to the stated gates. Frozen outer source controls: PASS. Scientific launch: PENDING.** This review supports the proposed complete SDR arm/seed replacement on homogeneous H100 hardware; it grants no automatic submission, cancellation, model work or scientific intake. Exact execution source remains `6bd8bf5334f2e83613a129d2fcfeacf83e762191`. [Review binding](125-a2-bridges-scientific-readiness-evidence/run_manifest.json).
+
+The proposal preserves every original fleet logical cell and its canonical virtual paths. Placement and actual resources belong in a new immutable appendix rather than a rewritten old fleet plan. Inspection of the unchanged `audit_source` contract supports this approach: its original archive, snapshot, full scientific schedule, source, config, data, native manifest, mask and output checks can remain intact, with an additional independent hardware/origin/placement audit.
+
+## How verified
+
+Independently authenticated the original native references and returned receipts/artifacts. In each arm, config, active nodes, results and history are byte identical. Both native manifests have valid self-hashes and correct execution/build/config/argv/model-revision/job identities; their code and dataset inventories match the original references. Their actual host/job differences are expected provenance, not drift. [Native evidence](125-a2-bridges-scientific-readiness-evidence/native-and-proposal-check.json), [manifest checks](125-a2-bridges-scientific-readiness-evidence/native-manifest-check.json).
+
+Independently checked exact saved test and validation ID order, selected-logit and decoded-choice fields, validation trajectories and the full binary masks. Also read every row in the completed raw paired comparison and reconciled exact values and zero deltas with the independently authenticated native bytes. The predeclared comparison rules were unchanged. [Raw comparison reconciliation](125-a2-bridges-scientific-readiness-evidence/raw-comparison-reconciliation.json), [raw owner comparison](125-a2-bridges-scientific-readiness-evidence/owner-raw-comparison.json). Author handback prose was excluded.
+
+Ran the genuine frozen CPU planning API for every proposed full scientific cell, using original config/build/inputs and actual protection checks. Each plan retains scientific purpose and the full schedule; exact resolved canonical full output and receipt destinations were absent locally at inspection. Local absence is not proof of future absence or of remote cancellation. [Full plans and absence](125-a2-bridges-scientific-readiness-evidence/full-scientific-local-plans.json).
+
+The proposed cell objects match the immutable original fleet byte-for-byte as JSON objects. Runtime projection and rounded reservation arithmetic recompute from genuine returned arm timing. Current ledger rows match original job IDs and retained charges, and the proposed additional total remains within the existing caps. These are observed timing-based projections, not guarantees for other seeds or the full schedule. [Projection](125-a2-bridges-scientific-readiness-evidence/native-and-proposal-check.json), [ledger snapshot](125-a2-bridges-scientific-readiness-evidence/ledger-proposal-crosscheck.json).
+
+## Execution evidence
+
+The actual timing job completed successfully under the declared allocation, according to returned terminal accounting. This review made no remote or scheduler calls. [Actual accounting](125-a2-bridges-scientific-readiness-evidence/terminal-accounting.txt).
+
+Final immutable outer launcher, authorizer and job-wrapper copies match the declared freeze. Their hashes are `91af50383a2545b885ed417909998295e91910e60b06eda5b0c128a2f2011957`, `20223c9ac9a5ffe11557e8cb3fe3089726fb38fb098f8f7cd67d51dcbabafcd5` and `f6da2914b95d34f6c6a84406d3aa9ba7bb14284745f2709bb9077bcfd9766f3f`, respectively. The final proposal changes only by adding output paths matching the independently derived full scientific plans. [Freeze](125-a2-bridges-scientific-readiness-evidence/final-scientific-script-freeze.json), [proposal delta](125-a2-bridges-scientific-readiness-evidence/final-proposal-delta-check.json).
+
+The frozen main path passed focused temporary fixture transport checks. The positive path checks cache, authorizes, checks cache again, then invokes the stub child. Existing/dangling receipt or output, post-authorization output appearance or changed cache, false cancellation, wrong cell and wrong launcher all reject before the stub child. No real child/model/remote operation occurred. Receipt-predicate tests separately reject the actual timing receipt and malformed synthetic scientific receipts; their positive is schema-only. [Final boundary probes](125-a2-bridges-scientific-readiness-evidence/final-outer-boundary-check.json), [predicate cases](125-a2-bridges-scientific-readiness-evidence/provisional-receipt-gate-check.json).
+
+The final authorizer preserves actual original-job cancellation/zero-runtime checks, typed allocation/account/partition/resource/time-limit checks, live ledger and cap checks, and real current source/catalog preflights. The placement template correctly remains nonauthorizing with empty jobs and an unset cancellation gate. Final remote dry-runs on these frozen outer bytes remain pending; earlier provisional application dry-runs cannot serve as final outer-wrapper execution evidence. [Placement template](125-a2-bridges-scientific-readiness-evidence/final-scientific-placement-template.json), [pending contract](125-a2-bridges-scientific-readiness-evidence/pending-contract-checklist.json).
+
+## What is NOT done
+
+No application edits, model/weight access, GPU execution, remote access, git, reservation writes, scheduler changes, notebooks or subagents. No scientific run, fleet migration, cancellation, canonical publication or final scientific audit has been performed by this reviewer. Source-cost review remains separately closed as blocked pending its successor.
+
+Exact equality applies to the saved timing scope. Full vocabulary tensors, original runtime token arrays, optimizer checkpoints and all-seed/full-schedule hardware equivalence are not available from these artifacts. The actual timing cosine schedule is the genuine short schedule; its trained endpoints are not a prefix of the scientific schedule. Retained non-SDR H200 work must remain visible when describing hardware coverage.
+
+## Open questions
+
+Before replacement release, finish the actual placement appendix and obtain final frozen-wrapper remote full scientific dry-runs. Bind each new unique job/reservation to its exact logical cell, source, resource/lease, hardware, container/cache, original charge and current caps; publish the monotone mapping successor without dropping old rows.
+
+Fresh scheduler evidence must first show every original SDR job still unstarted; then verify terminal cancellation with zero runtime before releasing any replacement. If an original job started or a canonical destination exists, stop and revise rather than overwrite or silently choose a run. The actual monitor must recheck these conditions and the live ledger/allocation/protection state at each start. A bounded monitor must be kept alive or explicitly re-armed if queue waits outlast it.
+
+Fetch completed scientific artifacts into isolated staging. Authenticate receipt/native bytes and job/source/hardware/container/cache identity before publishing only absent original canonical full-output and receipt destinations. Preserve all historical timing artifacts and other tasks. Final intake requires unchanged canonical `audit_source` plus the replacement appendix audit; proposal acceptance and exact timing drift alone do not satisfy those gates.

@@ -1,0 +1,63 @@
+{
+  "kind": "UNBOUND_TASK3_CPU_FIXTURES_ONLY",
+  "commit": "538109e809285b6ddc45d42df8786270a65f7b12",
+  "source_commit": "50e947bb852613e3a270082651f2bd1b7bb0c525",
+  "commit_basis": "root supplied frozen identity, no worker git",
+  "host": "cn096.delta.ncsa.illinois.edu",
+  "actual_job_id": "23632112",
+  "cluster": "delta",
+  "Slurm_env": {
+    "SLURM_JOB_ID": "23632112",
+    "SLURM_CPUS_PER_TASK": "2",
+    "SLURM_MEM_PER_NODE": "8192",
+    "SLURM_JOB_PARTITION": "cpu-interactive"
+  },
+  "packet_pins_sha256": "ccdc7493aae4f4e45ed35d1d6ed67fd1b0c5ced36808449a364f464cb9203bf5",
+  "original_source_pins_sha256": "56c763fbbd910a890e3fdeafe87337257d82dceb182916f0d3d7b93c64dad0e7",
+  "started_utc": "2026-11-07T09:21:44.077231+00:00",
+  "resources": {
+    "cpus": 2,
+    "memory": "8G",
+    "walltime": "00:07:00",
+    "GPUs": 0,
+    "full_timeout_seconds": 150,
+    "baseline_timeout_seconds": 20,
+    "expected_baseline_cases": 98,
+    "accepted_Task1_Task2_cases": 226,
+    "new_case_counts": {
+      "test_full_score_release.py": 64,
+      "test_full_score_usage.py": 23,
+      "test_full_score_cache.py": 11,
+      "test_full_score_root_integration.py": 42,
+      "test_full_score_root_wait.py": 11,
+      "test_full_score_root_identity.py": 2
+    },
+    "expected_GREEN_cases": 379,
+    "interpreters": [
+      {
+        "label": "base39",
+        "python": "/sw/external/python/anaconda3/bin/python3.9",
+        "pytest": "8.3.3",
+        "python_minor": [
+          3,
+          9
+        ]
+      },
+      {
+        "label": "mgnp",
+        "python": "/u/swong2/.conda/envs/mgnp/bin/python",
+        "pytest": "9.1.1",
+        "python_minor": [
+          3,
+          12
+        ]
+      }
+    ],
+    "prior_226_case_seconds": [
+      35.692,
+      34.586
+    ],
+    "fixture_only": true,
+    "actual_resources_or_admission_bound": false
+  }
+}

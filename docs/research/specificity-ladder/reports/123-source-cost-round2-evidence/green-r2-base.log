@@ -1,0 +1,108 @@
+........................................FF...........                    [100%]
+=================================== FAILURES ===================================
+______ test_current_grader_code_and_glob_membership_are_not_cached[code] _______
+
+tmp_path = PosixPath('/tmp/source-cost-123-green-r2-base/test_current_grader_code_and_g0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f38a4fb6490>
+damage = 'code'
+
+    @pytest.mark.parametrize('damage',['code','new_glob'])
+    def test_current_grader_code_and_glob_membership_are_not_cached(tmp_path,monkeypatch,damage):
+        c=setup_case(tmp_path,monkeypatch);state=c.build()
+        path=c.runtime/('evaluation/benchmark_eval.py' if damage=='code' else 'evaluation/benchmarks/new_grader.py')
+        with path.open('a') as handle:handle.write('\n# changed grader\n')
+>       with pytest.raises(ValueError,match='grader'):refresh(c,state)
+
+tests/test_a3_source_validation.py:338: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_a3_source_validation.py:49: in refresh
+    return state.refresh(owner='fixture',bound_inputs={'design':case.design,'prepared':case.prepared},
+component_analysis/a3_source_validation.py:212: in refresh
+    authority._check_file_witness(self._witness)
+component_analysis/a3_direction_runtime.py:2464: in _check_file_witness
+    require(tuple(_file_tree_identity(p) for p in witness.paths)==witness.identities,'immutable referenced file/tree fingerprint changed')
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False
+message = 'immutable referenced file/tree fingerprint changed'
+
+    def require(condition, message):
+        if not condition:
+>           raise ValueError(message)
+E           ValueError: immutable referenced file/tree fingerprint changed
+
+dataset/user_inversion_pipeline.py:32: ValueError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/source-cost-123-green-r2-base/test_current_grader_code_and_g0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f38a4fb6490>
+damage = 'code'
+
+    @pytest.mark.parametrize('damage',['code','new_glob'])
+    def test_current_grader_code_and_glob_membership_are_not_cached(tmp_path,monkeypatch,damage):
+        c=setup_case(tmp_path,monkeypatch);state=c.build()
+        path=c.runtime/('evaluation/benchmark_eval.py' if damage=='code' else 'evaluation/benchmarks/new_grader.py')
+        with path.open('a') as handle:handle.write('\n# changed grader\n')
+>       with pytest.raises(ValueError,match='grader'):refresh(c,state)
+E       AssertionError: Regex pattern did not match.
+E        Regex: 'grader'
+E        Input: 'immutable referenced file/tree fingerprint changed'
+
+tests/test_a3_source_validation.py:338: AssertionError
+____ test_current_grader_code_and_glob_membership_are_not_cached[new_glob] _____
+
+tmp_path = PosixPath('/tmp/source-cost-123-green-r2-base/test_current_grader_code_and_g1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f39bafbb250>
+damage = 'new_glob'
+
+    @pytest.mark.parametrize('damage',['code','new_glob'])
+    def test_current_grader_code_and_glob_membership_are_not_cached(tmp_path,monkeypatch,damage):
+        c=setup_case(tmp_path,monkeypatch);state=c.build()
+        path=c.runtime/('evaluation/benchmark_eval.py' if damage=='code' else 'evaluation/benchmarks/new_grader.py')
+        with path.open('a') as handle:handle.write('\n# changed grader\n')
+>       with pytest.raises(ValueError,match='grader'):refresh(c,state)
+
+tests/test_a3_source_validation.py:338: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_a3_source_validation.py:49: in refresh
+    return state.refresh(owner='fixture',bound_inputs={'design':case.design,'prepared':case.prepared},
+component_analysis/a3_source_validation.py:216: in refresh
+    require(tuple(str(p) for p in sorted(Path(folder).glob(pattern)))==expected,'source closure membership changed')
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+value = False, message = 'source closure membership changed'
+
+    def require(value,message):
+>       if not value:raise ValueError(message)
+E       ValueError: source closure membership changed
+
+component_analysis/a3_source_validation.py:23: ValueError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/source-cost-123-green-r2-base/test_current_grader_code_and_g1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f39bafbb250>
+damage = 'new_glob'
+
+    @pytest.mark.parametrize('damage',['code','new_glob'])
+    def test_current_grader_code_and_glob_membership_are_not_cached(tmp_path,monkeypatch,damage):
+        c=setup_case(tmp_path,monkeypatch);state=c.build()
+        path=c.runtime/('evaluation/benchmark_eval.py' if damage=='code' else 'evaluation/benchmarks/new_grader.py')
+        with path.open('a') as handle:handle.write('\n# changed grader\n')
+>       with pytest.raises(ValueError,match='grader'):refresh(c,state)
+E       AssertionError: Regex pattern did not match.
+E        Regex: 'grader'
+E        Input: 'source closure membership changed'
+
+tests/test_a3_source_validation.py:338: AssertionError
+=============================== warnings summary ===============================
+.superpowers/sdd/plan-a3/source-guard-cost-fix-source-r2/tests/test_a3_source_validation.py::test_context_retains_validated_owned_snapshot_and_fresh_evidence
+  /u/swong2/.local/lib/python3.9/site-packages/pandas/core/arrays/masked.py:61: UserWarning: Pandas requires version '1.3.6' or newer of 'bottleneck' (version '1.3.5' currently installed).
+    from pandas.core import (
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_a3_source_validation.py::test_current_grader_code_and_glob_membership_are_not_cached[code]
+FAILED tests/test_a3_source_validation.py::test_current_grader_code_and_glob_membership_are_not_cached[new_glob]
+2 failed, 51 passed, 1 warning in 8.97s

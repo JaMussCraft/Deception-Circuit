@@ -1,0 +1,122 @@
+{
+  "verdict": "BLOCKED_DIAGNOSTIC_TRANSPORT_FIXES_REQUIRED",
+  "packet_manifest_sha256": "8df6759644ae549869a8d4d0675d20b86a0e856e2ababfb6a0f131142f1d2e0d",
+  "superseded_initial_brief_manifest_sha256": "d3c7a0bed95a04a510ba8b66c744e123d25bc4ebdeb1f4c7cd840aa6414c9fcd",
+  "review_bound_only_to_final_frozen_identity": true,
+  "active_recipe_sha256": "96c57370c5bbc3883eab47774d85d5c38d7c27c2ee5fa1586f246e2082f2c7fb",
+  "findings": [
+    {
+      "id": "B1",
+      "severity": "high",
+      "file": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-transport254/inner.py",
+      "line": 12,
+      "related_line": 22,
+      "title": "Effective readonly stack is rejected as writable",
+      "observed": "Known successful Bridges v1 memory mount evidence has hidden lower rw and upper ro at the same path, with actual statvfs ST_RDONLY set. mount_for max(tuple) selects rw by lexicographic options on equal paths, and main separately rejects every hidden rw row. Both prevent pytest from starting on that valid layout.",
+      "reproduction": "test_B1_known_effective_ro_stack_is_falsely_rejected; actual50316939 memory lines/read_only evidence, no real container launched.",
+      "minimal_fix": "Check effective declared readonly mount targets using actual path flags or correctly resolved topmost mount IDs; do not reject hidden lower mounts. Keep raw mount evidence and the intended readonly guard; do not weaken it to a bind-string assertion."
+    },
+    {
+      "id": "B2",
+      "severity": "medium",
+      "file": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-transport254/host.py",
+      "line": 86,
+      "title": "Budget can expire during log opening before Popen",
+      "observed": "Last allocation/clock decision occurs before opening stdout/stderr. Advancing time past the phase deadline while opening pytest.stdout still calls Popen; only afterward is timed_out recorded.",
+      "reproduction": "test_B2_expired_after_log_open_still_launches: fake clock601 after deadline600, one Popen call, no real child launched.",
+      "minimal_fix": "After final prelaunch I/O, immediately recheck/clamp actual allocation and wall/monotonic budget before Popen; refuse expired launch without increasing an existing deadline."
+    },
+    {
+      "id": "B3",
+      "severity": "medium",
+      "file": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-transport254/host.py",
+      "line": 103,
+      "related_line": 97,
+      "title": "Cleanup failure resets a second full grace period",
+      "observed": "cleanup_group called normally may exhaust15TERM+5KILL/reap and raise; execute_phase except calls cleanup_group again, resetting the full budget. This exceeds the claimed one20second cleanup allowance.",
+      "reproduction": "test_B3_cleanup_error_restarts_cleanup_budget observes2cleanup invocations when the first cleanup raises.",
+      "minimal_fix": "Use one shared absolute cleanup budget or do not restart grace after cleanup itself failed. Preserve primary and cleanup error evidence and retain best-effort KILL/reap within that single bound."
+    }
+  ],
+  "positive_checks": {
+    "all4_executable_members_rehashed": true,
+    "frozen1120_source_plus6_diagnostic_file_records_and8aliases_digest_matches": true,
+    "six_recipe_plugin_node_input_pins_match": true,
+    "original223_collection_conftest_preflight_assertion_sources_retained": true,
+    "selection_ordinals": [
+      85,
+      86,
+      87,
+      88,
+      117,
+      120
+    ],
+    "next_candidate_ordinal": 122,
+    "ordinal121_teardown_ambiguity_preserved": true,
+    "separate_phase_RW_only_and_host_previous_receipts_RO_command": true,
+    "source_SIF_prechecks_before_last_allocation_and_end_bound_nonincreasing": true,
+    "scheduler_poll_timeout_capped_by_remaining_child_time": true,
+    "cleanup_before_post_reap_scheduler_read": true,
+    "post_reap_shortenedEnd_reproduction_clamps_correctly": true,
+    "real_owned_group_reaped_after_leader_exit_tiny_case": true,
+    "normal_pytest_protocol_hook_and_immediate_JSONL_flush_fsync_probe": true,
+    "plugin_does_not_modify_session_items_or_test_assertions": true,
+    "no_periodic_traceback_thread_in_reviewed_plugin_wrapper_recipe": true,
+    "all_statuses_DIAGNOSTIC_PARTIAL_no_acceptance_or_GPU_authority": true,
+    "host_Python36_grammar_pass": true,
+    "actual_hostPython36_container_gates_not_tested": true,
+    "shell_syntax_pass": true
+  },
+  "tests": {
+    "supplied_expected_each": 8,
+    "supplied_observed_pass_base": 8,
+    "supplied_observed_pass_mgnp": 8,
+    "independent_expected_each": 5,
+    "independent_observed_pass_each": 5,
+    "independent_meaning": "Three successful defect reproductions, plus two correct-path checks; not a clean source acceptance.",
+    "all4_unittest_exit_codes": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "real_group_case_local_only": true,
+    "isolated_pytest_probe_each": {
+      "collected": 3,
+      "executed": 1,
+      "expected_failed_selected_case": 1,
+      "expected_pytest_exit": 1,
+      "observed_pytest_exit": 1,
+      "setup_call_teardown_preserved": true,
+      "session_items_preserved": true,
+      "failed_call_JSONL_seen_before_process_exit": true
+    },
+    "production223_suite_native_model_executed": false,
+    "author_report_read": false,
+    "source_cache_isolation": "Exact frozen copies in source-snapshot; no old pyc reused."
+  },
+  "prior_evidence_scope": {
+    "actual_job": "50316975",
+    "raw_files_rehashed": 21,
+    "baseline_gate": "Five of five expected failures, zero errors/skips; pytestexit1, baseline observerexit0. Not five passing tests.",
+    "full_collected_nodes": 223,
+    "full_suite_timed_out_seconds": 2700,
+    "normal_completion": false,
+    "progress_reports": 121,
+    "F_glyphs": 6,
+    "next122_not_proven_hang_site": true,
+    "full_suite_or_model_or_GPU_authority": false
+  },
+  "required_successor_scope": [
+    "Distinct corrected frozen packet addressingB1-B3 with targeted regressions; preserve reviewed8df and all prior failure evidence.",
+    "Retain same recipe/selection/conftest/assertions/P6passive-only scope unless root separately authorizes a recipe revision. No generic authority or supervisor framework expansion needed.",
+    "After source acceptance, root binds actual25min18CPU32GiB Bridges allocation, exact source/aliases/SIF/env and phase-private output namespaces; actual3.6/container mount/cleanup/provenance checks remain before diagnostic execution.",
+    "Diagnostic output is partial regardless of selected-case outcomes; no223GREEN acceptance, source repair, GPU or science admission."
+  ],
+  "implementation_edits": false,
+  "scheduler_actions": false,
+  "remote_actions": false,
+  "live_usage_percent": 35,
+  "ordinary_cap_percent": 80,
+  "cadence_points": 40
+}

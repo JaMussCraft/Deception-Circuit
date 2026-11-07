@@ -1,0 +1,33 @@
+{
+  "status": "handed-back",
+  "release_verdict": "DO_NOT_RELEASE_CURRENTLY_BOUND_JOB",
+  "job_id": "50316662",
+  "blocking_finding": "R236-A launcher consumes positional args but held job supplies named flags",
+  "pending_actual_gate": "effective source/HF/cgroup read-only and output-writable mount options not observed in supplied container dryrun",
+  "source_closure": {
+    "files": 1112,
+    "total_bytes": 24256092,
+    "all_current_local_hashes_match": true,
+    "all_frozen_source_pin_members_covered": true,
+    "six_stage_filelists_exactly_equal_config": true,
+    "literal_aliases": 8
+  },
+  "config_sha256": "2fd8748eec825bcc379cb54f40be89c9dac2dceb00fff3433994e900d8e42895",
+  "container_inventory_case_exit_code": 0,
+  "container_observer_dryrun_exit_code": 0,
+  "container_environment": {
+    "python": "3.12.13 | packaged by Anaconda, Inc. | (main, Jul  9 2026, 14:38:16) [GCC 14.3.0]",
+    "executable": "/u/swong2/.conda/envs/mgnp/bin/python",
+    "pytest_path": "/u/swong2/.conda/envs/mgnp/lib/python3.12/site-packages/pytest/__init__.py",
+    "versions": {
+      "pytest": "9.1.1",
+      "numpy": "2.5.1",
+      "torch": "2.11.0+cu128",
+      "transformers": "5.13.0"
+    }
+  },
+  "observer_output_created": false,
+  "held_state": "JobId=50316662 JobName=lad-A3-mgnp-green UserId=swong2(105853) GroupId=cis260361p(28343) MCS_label=N/A Priority=0 Nice=0 Account=cis260361p QOS=rm JobState=PENDING Reason=JobHeldUser Dependency=(null) Requeue=0 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=0:0 RunTime=00:00:00 TimeLimit=00:59:00 TimeMin=N/A SubmitTime=2026-11-06T22:22:11 EligibleTime=Unknown AccrueTime=Unknown StartTime=Unknown EndTime=Unknown Deadline=N/A SuspendTime=None SecsPreSuspend=0 LastSchedEval=2026-11-06T22:22:11 Scheduler=Main Partition=RM-shared AllocNode:Sid=br013:3848189 ReqNodeList=(null) ExcNodeList=(null) NodeList= NumNodes=1-1 NumCPUs=18 NumTasks=1 CPUs/Task=18 ReqB:S:C:T=0:0:*:* TRES=cpu=18,mem=32G,node=1,billing=18 Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=* MinCPUsNode=18 MinMemoryNode=32G MinTmpDiskNode=0 Features=(null) DelayBoot=00:00:00 OverSubscribe=OK Contiguous=0 Licenses=(null) Network=(null) Command=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/a3-green-bridges-transport229-r3/launch.sh --config /ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/a3-green-bridges-deployment234/config.json --config-sha256 2fd8748eec825bcc379cb54f40be89c9dac2dceb00fff3433994e900d8e42895 --manifest-sha256 bd3533cc18025d7d2bf97515060a46f793abd4f4a43609e8dc6c9626d8a6e6e2 WorkDir=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/a3-green-bridges-transport229-r3 StdErr=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/a3-green-bridges-transport229-r3/jobs/job-50316662.log StdIn=/dev/null StdOut=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/a3-green-bridges-transport229-r3/jobs/job-50316662.log Power= \n",
+  "spooled_sha256": "e015a251ff55de96fc495628b3095dbbbd09481f3b90b2474f4727bbc8ec711d",
+  "actual_runtime_allocation_not_yet_started": true
+}

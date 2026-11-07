@@ -1,0 +1,20 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______ test_batch_plan_constructor_cannot_mint_from_copied_caller_witness ______
+
+tmp_path = PosixPath('/tmp/a3-source-batch-red-owner-mint-mgnp/test_batch_plan_constructor_ca0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f146c8de240>
+
+    def test_batch_plan_constructor_cannot_mint_from_copied_caller_witness(tmp_path,monkeypatch):
+        c=setup_case(tmp_path,monkeypatch);state=c.build()
+        from component_analysis import a3_direction_runtime as authority
+        raw=object.__new__(authority._FileWitness)
+        raw.pid=os.getpid();raw.paths=state._witness.paths;raw.identities=state._witness.identities;raw._sealed=True
+>       with pytest.raises((ValueError,TypeError)):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE any of (ValueError, TypeError)
+
+tests/test_a3_source_validation.py:538: Failed
+=========================== short test summary info ============================
+FAILED tests/test_a3_source_validation.py::test_batch_plan_constructor_cannot_mint_from_copied_caller_witness
+1 failed, 71 deselected in 2.88s

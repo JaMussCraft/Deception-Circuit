@@ -1,0 +1,21 @@
+{
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "-o",
+    "ControlMaster=no",
+    "-o",
+    "ControlPath=none",
+    "-o",
+    "HostName=br013.bridges2.psc.edu",
+    "bridges2",
+    "python3 -B -c 'import json,subprocess,sys,time\nfrom pathlib import Path\nx=json.load(sys.stdin);ops=Path(x['\"'\"'ops'\"'\"']);ops.mkdir(exist_ok=False);a=x['\"'\"'argv'\"'\"'];assert '\"'\"'--hold'\"'\"' in a\nwith(ops/'\"'\"'submission-intent.json'\"'\"').open('\"'\"'x'\"'\"') as f:json.dump({'\"'\"'argv'\"'\"':a,'\"'\"'observed_unix'\"'\"':time.time()},f)\nr=subprocess.run(a,stdout=subprocess.PIPE,stderr=subprocess.PIPE,universal_newlines=True,timeout=30);v={'\"'\"'argv'\"'\"':a,'\"'\"'exit_code'\"'\"':r.returncode,'\"'\"'stdout'\"'\"':r.stdout,'\"'\"'stderr'\"'\"':r.stderr,'\"'\"'observed_unix'\"'\"':time.time()}\nwith(ops/'\"'\"'submission-result.json'\"'\"').open('\"'\"'x'\"'\"') as f:json.dump(v,f,indent=2)\nprint(json.dumps(v));sys.exit(r.returncode)\n'"
+  ],
+  "exit_code": 0,
+  "stdout": "{\"argv\": [\"sbatch\", \"--hold\", \"--parsable\", \"--account=cis260361p\", \"--partition=RM-shared\", \"--qos=rm\", \"--nodes=1\", \"--ntasks=1\", \"--cpus-per-task=26\", \"--mem=48G\", \"--time=00:45:00\", \"--no-requeue\", \"--export=ALL,CUDA_VISIBLE_DEVICES=\", \"--chdir=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime\", \"--job-name=lad-A2-proof-r5\", \"--output=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-genuine-proof-r2/job-%j.log\", \"/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-proof-dispatch237/dispatch.sh\"], \"exit_code\": 0, \"stdout\": \"50316939\\n\", \"stderr\": \"\", \"observed_unix\": 1794024519.2004166}\n",
+  "stderr": "",
+  "observed_unix": 1794024519.2172132
+}

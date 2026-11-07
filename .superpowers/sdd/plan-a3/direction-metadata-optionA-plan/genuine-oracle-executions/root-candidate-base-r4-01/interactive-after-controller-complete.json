@@ -1,0 +1,37 @@
+{
+  "observed_unix": 1794011107.2131302,
+  "reason": "Controller23617533 terminal; no ready short packet; avoid starving full BASE comparison while next fixtures are prepared.",
+  "before": {
+    "argv": [
+      "scontrol",
+      "show",
+      "job",
+      "23613360"
+    ],
+    "exit_code": 0,
+    "stdout": "JobId=23613360 JobName=lad-A3-base-compare\n   UserId=swong2(78031) GroupId=grp_202(202) MCS_label=N/A\n   Priority=300 Nice=0 Account=bimc-delta-cpu QOS=bimc-delta-cpu\n   JobState=PENDING Reason=None Dependency=(null)\n   Requeue=0 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=0:0\n   RunTime=00:00:00 TimeLimit=01:00:00 TimeMin=N/A\n   SubmitTime=2026-11-06T14:31:49 EligibleTime=2026-11-06T14:31:49\n   AccrueTime=2026-11-06T14:31:49\n   StartTime=Unknown EndTime=Unknown Deadline=N/A\n   SuspendTime=None SecsPreSuspend=0 LastSchedEval=2026-11-06T16:47:33 Scheduler=Main\n   Partition=cpu AllocNode:Sid=dt-login04:882191\n   ReqNodeList=(null) ExcNodeList=(null)\n   NodeList=\n   NumNodes=1-1 NumCPUs=4 NumTasks=1 CPUs/Task=4 ReqB:S:C:T=0:0:*:*\n   ReqTRES=cpu=4,mem=192G,node=1,billing=98304\n   AllocTRES=(null)\n   Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=*\n   MinCPUsNode=4 MinMemoryNode=192G MinTmpDiskNode=0\n   Features=projects DelayBoot=00:00:00\n   OverSubscribe=OK Contiguous=0 Licenses=(null) LicensesAlloc=(null) Network=(null)\n   Command=(null)\n   SubmitLine=sbatch --parsable --account=beto-delta-cpu --partition=cpu --constraint=projects --nodes=1 --ntasks=1 --cpus-per-task=4 --mem=192G --time=01:00:00 --no-requeue --chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder --job-name=lad-A3-base-compare --export=ALL,CUDA_VISIBLE_DEVICES= --output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/candidate-base-r4-01-%j.log --wrap=bash /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-candidate-base-cpu-r4/oracle_cpu.sh --packet-sha256 a52c8696e83b525f64347ec8d714fb9bc450befa2e4638d6a46a6192eea8befe --config /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/candidate-base-r4-01-config.json --config-sha256 ac2a0bf852e53a863dc0e46c4a303e54de015b5493a8bdfee67a837d20ba6773 --mode candidate --environment base --output /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/candidate-base-r4-01\n   WorkDir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder\n   StdErr=\n   StdIn=/dev/null\n   StdOut=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/candidate-base-r4-01-23613360.log\n   TresPerTask=cpu=4\n\n",
+    "stderr": ""
+  },
+  "update": {
+    "argv": [
+      "scontrol",
+      "update",
+      "JobId=23613360",
+      "Partition=cpu,cpu-interactive"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "after": {
+    "argv": [
+      "scontrol",
+      "show",
+      "job",
+      "23613360"
+    ],
+    "exit_code": 0,
+    "stdout": "JobId=23613360 JobName=lad-A3-base-compare\n   UserId=swong2(78031) GroupId=grp_202(202) MCS_label=N/A\n   Priority=1210 Nice=0 Account=bimc-delta-cpu QOS=bimc-delta-cpu\n   JobState=PENDING Reason=None Dependency=(null)\n   Requeue=0 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=0:0\n   RunTime=00:00:00 TimeLimit=01:00:00 TimeMin=N/A\n   SubmitTime=2026-11-06T14:31:49 EligibleTime=2026-11-06T14:31:49\n   AccrueTime=Unknown\n   StartTime=Unknown EndTime=Unknown Deadline=N/A\n   SuspendTime=None SecsPreSuspend=0 LastSchedEval=2026-11-06T16:47:33 Scheduler=Main\n   Partition=cpu,cpu-interactive AllocNode:Sid=dt-login04:882191\n   ReqNodeList=(null) ExcNodeList=(null)\n   NodeList=\n   NumNodes=1-1 NumCPUs=4 NumTasks=1 CPUs/Task=4 ReqB:S:C:T=0:0:*:*\n   ReqTRES=cpu=4,mem=192G,node=1,billing=98304\n   AllocTRES=(null)\n   Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=*\n   MinCPUsNode=4 MinMemoryNode=192G MinTmpDiskNode=0\n   Features=projects DelayBoot=00:00:00\n   OverSubscribe=OK Contiguous=0 Licenses=(null) LicensesAlloc=(null) Network=(null)\n   Command=(null)\n   SubmitLine=sbatch --parsable --account=beto-delta-cpu --partition=cpu --constraint=projects --nodes=1 --ntasks=1 --cpus-per-task=4 --mem=192G --time=01:00:00 --no-requeue --chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder --job-name=lad-A3-base-compare --export=ALL,CUDA_VISIBLE_DEVICES= --output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/candidate-base-r4-01-%j.log --wrap=bash /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-candidate-base-cpu-r4/oracle_cpu.sh --packet-sha256 a52c8696e83b525f64347ec8d714fb9bc450befa2e4638d6a46a6192eea8befe --config /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/candidate-base-r4-01-config.json --config-sha256 ac2a0bf852e53a863dc0e46c4a303e54de015b5493a8bdfee67a837d20ba6773 --mode candidate --environment base --output /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/candidate-base-r4-01\n   WorkDir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder\n   StdErr=\n   StdIn=/dev/null\n   StdOut=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/candidate-base-r4-01-23613360.log\n   TresPerTask=cpu=4\n\n",
+    "stderr": ""
+  }
+}

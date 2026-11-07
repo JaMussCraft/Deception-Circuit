@@ -1,0 +1,43 @@
+{
+  "kind": "prospective_CPU_all18_comparison_and_group_freeze",
+  "status": "PROPOSAL_ONLY_NOT_EXECUTED",
+  "command": [
+    "bash",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/real-input-readiness/cpu-job.sh"
+  ],
+  "account": "beto-delta-cpu",
+  "partition": "cpu",
+  "cpus": 4,
+  "memory_GiB": 32,
+  "minutes": 15,
+  "gpus": 0,
+  "sizing_basis": {
+    "six_audit_seconds": 53.7412793636322,
+    "two_serial_18_source_pass_seconds_before_shared_cache_savings": 322.4476761817932,
+    "extra_work": "A1 context/model-config metadata/group publication;15min observed-work buffer, no automatic rerun"
+  },
+  "analysis_execution_commit": "40fe57289405fd53a3fce02e5d4e47a0ebf78b64",
+  "source_binding_sha256": "7863124523384083d5749a3b8201aff7860dc7a075fe4fb0da21333749a8b83c",
+  "source_records_sha256": "478f73ee31289ac42395e8268470a77b24ef0e69da22e26af0f2fcdd250d5b1e",
+  "fresh_output_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/all18-40fe57289405-v1",
+  "source_records": 18,
+  "prospective_aliases": 9,
+  "default_operations": [
+    "item_swap",
+    "zero",
+    "h_mean",
+    "h_twin",
+    "self_replay",
+    "empty"
+  ],
+  "optional_independent_donors": false,
+  "no_analysis_execution_or_assessment_outcome_inspection_here": true,
+  "root_fresh_test_only_and_submission_required": true,
+  "source_harness_sha256": {
+    "source-binding.json": "7863124523384083d5749a3b8201aff7860dc7a075fe4fb0da21333749a8b83c",
+    "source-records.json": "478f73ee31289ac42395e8268470a77b24ef0e69da22e26af0f2fcdd250d5b1e",
+    "comparison-freeze-driver.py": "4f1df50a90e029b36eb8c602803cd73ef8e1ec62656d71a31f45432a061ca317",
+    "cpu-job.sh": "3f2f67ae8e3e7403aa931c2763791e43e57cbe23af24c9ce3894917522a1cd69"
+  },
+  "packet_frozen_for_root_submission": true
+}

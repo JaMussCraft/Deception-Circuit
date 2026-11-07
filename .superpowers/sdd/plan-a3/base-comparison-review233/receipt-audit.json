@@ -1,0 +1,214 @@
+{
+  "status": "handed-back",
+  "verdict": "ACCEPT_COMPLETE_BASE_SAME_ENVIRONMENT_ALGORITHM_EQUIVALENCE_ONLY",
+  "equal_full_summary": {
+    "inventory_sha256": "daf672c166396518e9ed207e7c2dc14a5ff4adcc3f2b763d5fbf95b1fc83d9db",
+    "raw_keys": 246486,
+    "shards": 81904,
+    "capture_shards": 4256,
+    "requirements": 618117,
+    "captures": 45042,
+    "forward_counts": {
+      "capture_train": 4256,
+      "capture_intact": 39486,
+      "intact": 81904,
+      "empty": 81904,
+      "head_self": 81904,
+      "zero_coefficient": 81904,
+      "patched": 81904,
+      "positive_control": 244938,
+      "capture_donor": 1300,
+      "warmup": 2
+    },
+    "operation_counts": {
+      "capture_train": 4256,
+      "capture_intact": 39486,
+      "packing_lookup": 81904,
+      "intact": 81904,
+      "empty": 81904,
+      "head_self": 81904,
+      "zero_coefficient": 81904,
+      "patched": 81904,
+      "positive_control": 244938,
+      "capture_donor": 1300,
+      "guard_refresh": 954170,
+      "warmup": 2,
+      "serialization": 289640
+    },
+    "storage_requirements": {
+      "schema": "a3_target_storage_bound_v1",
+      "tiers": {
+        "host_ram": 1396027015524,
+        "cache_disk": 322508933404,
+        "output_disk": 5916288259710,
+        "scratch_disk": 25587887242
+      },
+      "components": {
+        "capture_source_records": 1629864009,
+        "capture_readout_numeric": 98200576,
+        "clause_summary_numeric": 98200576,
+        "capture_payloads": 322222709312,
+        "execution_dummy_capture_allowance": 31483126,
+        "scientific_rows": 14981030274,
+        "positive_evidence": 19525821574,
+        "projection_and_fit_arrays": 277651440,
+        "publication_metadata": 5881781407862,
+        "authority_key_proof_host_bytes": 252467200
+      },
+      "policy": "full target retention plus largest atomic publication; optional summaries included; no pilot-size inference"
+    }
+  },
+  "full_stream_bytes": 11421127399,
+  "full_stream_sha256": "c738a185b9a79ef8873113e63aefa197a820f0a5c117159db055de6f70e0a6c9",
+  "candidate_receipt_sha256": "fd2ab6676feffc036bbc52828e9fdf36c06366623ef10f619f5c12dc8de9b7c5",
+  "original_receipt_sha256": "463591fc08f04a8275042a68e9c884b22c264eac5bf11bd87679a17a5594973a",
+  "config_sha256": "ac2a0bf852e53a863dc0e46c4a303e54de015b5493a8bdfee67a837d20ba6773",
+  "metrics": {
+    "build_seconds": {
+      "original": 2628.6614440809935,
+      "candidate": 1882.7424833039986,
+      "candidate_minus_original": -745.9189607769949,
+      "percent_change": -28.376380018681935
+    },
+    "stream_seconds": {
+      "original": 986.9338401540008,
+      "candidate": 1004.6465365020267,
+      "candidate_minus_original": 17.71269634802593,
+      "percent_change": 1.7947197296692252
+    },
+    "actual_CPU_wall_seconds": {
+      "original": 3748.8046583050163,
+      "candidate": 2996.171678505023,
+      "candidate_minus_original": -752.6329797999933,
+      "percent_change": -20.076612371162827
+    },
+    "actual_CPU_user_seconds": {
+      "original": 3459.304569,
+      "candidate": 2724.989372,
+      "candidate_minus_original": -734.3151969999999,
+      "percent_change": -21.22724907140143
+    },
+    "actual_CPU_system_seconds": {
+      "original": 243.165237,
+      "candidate": 238.233636,
+      "candidate_minus_original": -4.931601000000001,
+      "percent_change": -2.0280863584131503
+    },
+    "peak_wait4_rss_bytes": {
+      "original": 133804548096,
+      "candidate": 133830811648,
+      "candidate_minus_original": 26263552,
+      "percent_change": 0.019628295430695886
+    }
+  },
+  "checks": {
+    "candidate-base-r4-01": {
+      "host": "cn034.delta.ncsa.illinois.edu",
+      "cpu_model": "AMD EPYC 7763 64-Core Processor",
+      "child": {
+        "command": [
+          "/sw/external/python/anaconda3/bin/python3.9",
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-candidate-base-cpu-r4/run.py",
+          "--packet-sha256",
+          "a52c8696e83b525f64347ec8d714fb9bc450befa2e4638d6a46a6192eea8befe",
+          "--config",
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/candidate-base-r4-01-config.json",
+          "--config-sha256",
+          "ac2a0bf852e53a863dc0e46c4a303e54de015b5493a8bdfee67a837d20ba6773",
+          "--mode",
+          "candidate",
+          "--environment",
+          "base",
+          "--output",
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/candidate-base-r4-01"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 2996.171678505023,
+        "user_seconds": 2724.989372,
+        "system_seconds": 238.233636,
+        "peak_wait4_rss_bytes": 133830811648,
+        "term_sent_at": null
+      },
+      "job_cgroup_peak_bytes": 133858664448,
+      "own_job_memory_events_zero": true,
+      "sample_count": 599,
+      "last_sample_seconds": 2994.667564241012,
+      "after_allocation_remaining_seconds": 592.1063759326935,
+      "packet_manifest_sha256": "a52c8696e83b525f64347ec8d714fb9bc450befa2e4638d6a46a6192eea8befe"
+    },
+    "original-base-r3-01": {
+      "host": "cn034.delta.ncsa.illinois.edu",
+      "cpu_model": "AMD EPYC 7763 64-Core Processor",
+      "child": {
+        "command": [
+          "/sw/external/python/anaconda3/bin/python3.9",
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-base-cpu-r3/run.py",
+          "--packet-sha256",
+          "fdebb58e74c75bdd83c3c616a496988e6dfb80a9a1c5fbcddda3a22181a925ef",
+          "--config",
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-base-cpu-r3/config.template.json",
+          "--config-sha256",
+          "6e9c0de2ae7c208b8b0933f5ca3630cedcf6f655e35c7e947a90fee4addca58c",
+          "--mode",
+          "original",
+          "--environment",
+          "base",
+          "--output",
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/original-base-r3-01"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 3748.8046583050163,
+        "user_seconds": 3459.304569,
+        "system_seconds": 243.165237,
+        "peak_wait4_rss_bytes": 133804548096,
+        "term_sent_at": null
+      },
+      "job_cgroup_peak_bytes": 134215749632,
+      "own_job_memory_events_zero": true,
+      "sample_count": 749,
+      "last_sample_seconds": 3745.7985910560237,
+      "after_allocation_remaining_seconds": 740.2439949512482,
+      "packet_manifest_sha256": "fdebb58e74c75bdd83c3c616a496988e6dfb80a9a1c5fbcddda3a22181a925ef"
+    },
+    "candidate_accounting": {
+      "stdout": "23613360|COMPLETED|0:0|00:50:07|2026-11-06T19:59:28|2026-11-06T20:49:35||49:25.025\n23613360.batch|COMPLETED|0:0|00:50:07|2026-11-06T19:59:28|2026-11-06T20:49:35|130713880K|49:25.025\n23613360.extern|COMPLETED|0:0|00:50:07|2026-11-06T19:59:28|2026-11-06T20:49:35||00:00:00\n",
+      "observed_unix": 1794019888.8852005
+    },
+    "original_accounting": {
+      "observed_utc": "2026-11-06T20:27:49.195484+00:00",
+      "timezone": "UTC",
+      "results": [
+        {
+          "command": [
+            "sacct",
+            "-j",
+            "23608994",
+            "--format=JobID,State,ExitCode,Elapsed,ElapsedRaw,Start,End,NodeList,AllocTRES",
+            "-n",
+            "-P"
+          ],
+          "returncode": 0,
+          "output": "23608994|COMPLETED|0:0|01:02:39|3759|2026-11-06T19:16:46|2026-11-06T20:19:25|cn034|billing=98304,cpu=4,mem=192G,node=1\n23608994.batch|COMPLETED|0:0|01:02:39|3759|2026-11-06T19:16:46|2026-11-06T20:19:25|cn034|cpu=4,mem=192G,node=1\n23608994.extern|COMPLETED|0:0|01:02:39|3759|2026-11-06T19:16:46|2026-11-06T20:19:25|cn034|billing=98304,cpu=4,mem=192G,node=1\n"
+        },
+        {
+          "command": [
+            "scontrol",
+            "show",
+            "job",
+            "23608994",
+            "-o"
+          ],
+          "returncode": 1,
+          "output": "slurm_load_jobs error: Invalid job id specified\n"
+        }
+      ]
+    }
+  },
+  "source_commit": null,
+  "frozen_input_source_commit": "861f84a3938a5e22fa329af0c469b2dd812fe68a",
+  "limitations": [
+    "one pair at different times, same recorded node",
+    "hash-to-sink stream not retained file",
+    "no prepared runtime/resource/numerical/model/GPU admission"
+  ]
+}

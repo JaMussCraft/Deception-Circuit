@@ -1,0 +1,14 @@
+{
+  "What changed": "Read-only, bounded feasibility estimate only. No port, copy, tests, model imports, job, scheduler action, or active-candidate change.",
+  "Execution evidence": {
+    "local_base_python": {"path": "/sw/external/python/anaconda3/bin/python3.9", "size_bytes": 16269152, "ldd": "Resolves libc/libm/libpthread/libdl/libutil from /lib64; no missing links reported."},
+    "base_site_versions_and_du": {"torch": "2.2.0.dev20231003+cu121; 3.9G", "transformers": "4.32.1; 56M", "numpy": "1.24.3; 30M", "pandas": "2.0.3; 56M", "datasets": "2.14.5; 3.5M", "nnsight": "absent"},
+    "user_site_versions_and_du": {"torch": "2.8.0; 1.6G", "transformers": "4.57.3; 53M", "numpy": "1.26.4; 28M", "pandas": "2.3.3; 47M", "datasets": "4.5.0; 3.4M", "nnsight": "0.5.12; 506K"},
+    "bridges2": "Read-only ssh path check succeeded. /sw/external/python/anaconda3/bin/python3.9 and its site-packages path do not exist there. User-site path /u/swong2/.local/lib/python3.9/site-packages also does not exist there. Allocation root /ocean/projects/cis260361p/swong2 exists.",
+    "probe_limits": "Whole-tree du probes did not finish within individual 12-second bounds; only named package directories were measured."
+  },
+  "What is NOT done": "No total environment size, dependency closure, native-extension ldd closure, disk/inode requirement, Python 3.9 ABI/platform compatibility, remote transfer throughput, archive feasibility, or runtime import-path equivalence established. No numerical packages imported.",
+  "Open questions": ["BASE and user-site package trees contain divergent versions of key libraries, including 3.9G base torch and 1.6G user-site torch. Which tree is actually selected depends on exact Python startup/site/PYTHONPATH behavior; copying both risks selecting the wrong versions and duplicates substantial payload.", "The six named user-site package payloads alone are about 1.7G by du, before transitive dependencies, interpreter/stdlib, metadata, and required native libraries. This is a lower-bound indicator, not a complete transfer estimate."],
+  "Go/no-go": "NO-GO for staging/porting now: destination lacks all exact BASE paths, and the measured payload plus unresolved version precedence makes a quick exact port unsafe. GO for one further bounded feasibility step only if multiple future BASE checks justify amortizing a >=1.7G package payload: inspect Python 3.9 startup path/version selection without importing numerical packages, and measure the exact dependency/native closure and archive size. The existing queued Delta BASE comparison remains the right route for that single comparison; this estimate does not supersede it or current jobs.",
+  "Usage checkpoint": "Pre-work codex-usage --pause-at 17 returned status ok, used 16%, should_pause=false; reset 2026-11-13T16:18:29Z."
+}

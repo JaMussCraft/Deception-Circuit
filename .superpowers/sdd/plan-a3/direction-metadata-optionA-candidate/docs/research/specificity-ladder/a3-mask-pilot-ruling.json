@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "kind": "a3_mask_pilot_context_ruling_v1",
+  "session": "codex-01a1987e",
+  "recorded_at": "2026-11-02T04:11:09.572232+00:00",
+  "status": "prospective before any A3 GPU work",
+  "parent_ruling_path": "docs/research/specificity-ladder/a3-mask-operational-ruling.json",
+  "parent_ruling_file_sha256": "40e9cef75f9e62e99081105157dbba54a2ccaf085306061ef6669e51a032980c",
+  "scientific_default": {
+    "purpose": "scientific_training",
+    "source_split": "train"
+  },
+  "timing_exception": {
+    "purpose": "validation_timing",
+    "source_split": "validation",
+    "role": "disposable bounded M1 measurement of both real objective arms, validation and checkpoint costs",
+    "actual_split_retained": true,
+    "relabel_validation_as_train": false,
+    "numerical_objective_changed": false,
+    "weighting_rng_and_replay_changed": false,
+    "checkpoint_and_resume_bind_purpose": true,
+    "cross_purpose_restore": "reject",
+    "model_and_state": "discard before real fitting",
+    "outputs": "explicit timing-only/nonfinal; cannot enter scientific fit, selection or assessment"
+  },
+  "scope": "Explicit core API admission context, not new scientific data access or spending authority. Existing M1, phase, source, registry and reservation limits remain required."
+}

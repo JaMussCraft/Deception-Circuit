@@ -1,0 +1,30 @@
+{
+  "argv": [
+    "sbatch",
+    "--parsable",
+    "--account=bimc-delta-cpu",
+    "--partition=cpu",
+    "--constraint=projects",
+    "--nodes=1",
+    "--ntasks=1",
+    "--cpus-per-task=2",
+    "--mem=32G",
+    "--time=00:42:00",
+    "--no-requeue",
+    "--export=ALL,CUDA_VISIBLE_DEVICES=",
+    "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+    "--job-name=lad-A3-green-mgnp",
+    "--output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r2/green-mgnp-slurm-%j.log",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r2/cpu.sbatch",
+    "--mode",
+    "GREEN",
+    "--environment",
+    "mgnp",
+    "--output",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r2/green-mgnp-run-01"
+  ],
+  "exit_code": 0,
+  "stdout": "23620420\n",
+  "stderr": "",
+  "observed_unix": 1794017367.8079002
+}

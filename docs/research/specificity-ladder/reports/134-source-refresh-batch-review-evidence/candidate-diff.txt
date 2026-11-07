@@ -1,0 +1,495 @@
+--- f5/component_analysis/a3_source_validation.py
++++ 40fe/component_analysis/a3_source_validation.py
+@@ -13,9 +13,14 @@
+ import resource
+ import sys
+ import time
++import stat
++import weakref
+ 
+ _JSON_SEAL=object()
+ _STATE_SEAL=object()
++_SCAN_SEAL=object()
++_SCAN_PLANS=weakref.WeakKeyDictionary()
++_SCAN_MINTS=weakref.WeakKeyDictionary()
+ _clock=time.perf_counter
+ 
+ 
+@@ -170,8 +175,153 @@
+ def _outer(value):return tuple((k,id(v)) for k,v in value.items())
+ 
+ 
++def _scan_identity(st):
++    return (st.st_dev,st.st_ino,st.st_mode,st.st_size,st.st_mtime_ns,st.st_ctime_ns)
++
++
++def _scan_lstat(path):
++    try:return _scan_identity(Path(path).lstat())
++    except (OSError,RuntimeError) as error:raise ValueError('immutable referenced source path missing/invalid') from error
++
++
++def _copy_scan_tuple(value):
++    if type(value) in (str,int):return value
++    require(type(value) is tuple,'invalid source scan identity shape')
++    return tuple(_copy_scan_tuple(item) for item in value)
++
++
++def _compile_scan_routes(paths):
++    """Mint-only graph discovery, retaining lexical literals and all target routes."""
++    nodes={}
++    def visit(node):
++        node=Path(node).absolute()
++        for candidate in [node]+list(node.parents):
++            key=str(candidate)
++            if key in nodes:continue
++            identity=_scan_lstat(candidate);mode=identity[2]
++            if stat.S_ISLNK(mode):
++                literal=os.readlink(candidate)
++                nodes[key]=(key,'symlink',identity,literal)
++                try:target=candidate.resolve(strict=True)
++                except (OSError,RuntimeError) as error:raise ValueError('immutable referenced source route dangling/cycle') from error
++                spelling=Path(literal)
++                visit(spelling if spelling.is_absolute() else candidate.parent/spelling)
++                visit(target)
++            else:
++                require(stat.S_ISDIR(mode) or stat.S_ISREG(mode),'unsupported source route kind')
++                nodes[key]=(key,'directory' if stat.S_ISDIR(mode) else 'file')
++    for path in paths:visit(path)
++    return tuple(nodes[key] for key in sorted(nodes,key=lambda key:(len(Path(key).parts),key)))
++
++
++def _read_source_file(path,expected):
++    """One complete occurrence, bound to its opened regular-file descriptor."""
++    try:
++        with Path(path).open('rb') as handle:
++            before=_scan_identity(os.fstat(handle.fileno()))
++            require(stat.S_ISREG(before[2]) and before==expected,'immutable referenced source descriptor changed')
++            content=handle.read()
++            require(len(content)==expected[3] and handle.read(1)==b'','immutable referenced source incomplete read')
++            digest=hashlib.sha256(content).hexdigest()
++            require(_scan_identity(os.fstat(handle.fileno()))==expected,'immutable referenced source changed during read')
++        require(_scan_lstat(path)==expected,'immutable referenced source path replaced after read')
++        return digest
++    except (OSError,RuntimeError) as error:raise ValueError('immutable referenced source file unreadable') from error
++
++
++class _SourceScanPlan:
++    """Private mint-registered plan; the legacy witness itself is not a mint token."""
++    __slots__=('_seal','_pid','_owner','_owner_seal','_witness','_dictionary','_binding','_paths_ref','_rows_ref','_roots','_rows','_routes','_record','__weakref__')
++    def __init__(self,witness,*,_token=None,owner=None,owner_seal=None):
++        from component_analysis.a3_direction_runtime import _FileWitness
++        if _token is None or _token is not _SCAN_MINTS.get(witness) or hasattr(self,'_seal') or self in _SCAN_PLANS:raise TypeError('source scan plan construction is private')
++        require(type(witness) is _FileWitness and witness.pid==os.getpid() and witness._sealed is True,'invalid owner source witness')
++        roots=_copy_scan_tuple(witness.paths);rows=_copy_scan_tuple(witness.identities)
++        require(bool(roots) and len(roots)==len(rows) and all(rows),'empty/incomplete owner source witness')
++        paths=list(roots)
++        for tree in rows:
++            for row in tree:
++                paths.append(row[1])
++                if row[0]=='symlink':
++                    literal=Path(row[3]);paths.extend((str(literal if literal.is_absolute() else Path(row[1]).parent/literal),row[4]))
++        values=dict(_pid=os.getpid(),_owner=owner,_owner_seal=owner_seal,_witness=witness,_dictionary=vars(witness),
++            _binding=tuple((key,id(value)) for key,value in vars(witness).items()),_paths_ref=witness.paths,_rows_ref=witness.identities,
++            _roots=roots,_rows=rows,_routes=_compile_scan_routes(paths))
++        for key,value in values.items():object.__setattr__(self,key,value)
++        object.__setattr__(self,'_seal',_SCAN_SEAL)
++        record=tuple((key,getattr(self,key)) for key in self.__slots__ if key not in ('_record','__weakref__'))
++        object.__setattr__(self,'_record',record)
++        _SCAN_PLANS[self]=record
++        self._authenticate(witness)
++    def __setattr__(self,*args):raise TypeError('source scan plan is immutable')
++    def __delattr__(self,*args):raise TypeError('source scan plan is immutable')
++    def __reduce__(self):raise TypeError('source scan plans are process-local')
++    def _authenticate(self,witness):
++        from component_analysis.a3_direction_runtime import _FileWitness
++        require(type(self) is _SourceScanPlan and self in _SCAN_PLANS,'unminted source scan plan')
++        record=_SCAN_PLANS[self]
++        require(record is self._record and all(getattr(self,key,None) is value for key,value in record),'source scan plan fields changed')
++        require(self._seal is _SCAN_SEAL and self._pid==os.getpid(),'source scan plan process changed')
++        require(type(witness) is _FileWitness and witness is self._witness,'source witness replaced')
++        require(vars(witness) is self._dictionary and tuple((key,id(value)) for key,value in vars(witness).items())==self._binding,'source witness reinitialized/altered')
++        require(witness.pid==self._pid and witness._sealed is True and witness.paths is self._paths_ref and witness.identities is self._rows_ref,'source witness binding changed')
++        require(witness.paths==self._roots and witness.identities==self._rows and bool(self._roots) and all(self._rows),'source witness rows changed')
++    def _routes_now(self):
++        observed=[]
++        for row in self._routes:
++            identity=_scan_lstat(row[0]);mode=identity[2]
++            if row[1]=='symlink':
++                require(stat.S_ISLNK(mode) and identity==row[2] and os.readlink(row[0])==row[3],'immutable referenced source route provenance changed')
++                observed.append((row[0],identity,row[3]))
++            else:
++                require((stat.S_ISDIR(mode) if row[1]=='directory' else stat.S_ISREG(mode)),'immutable referenced source route kind changed')
++                # Ordinary parent content times/membership are not frozen source.
++                # Their routing identities must remain coherent within THIS scan.
++                observed.append((row[0],identity[:3]))
++        return tuple(observed)
++    def _rows_now(self,*,hash_files):
++        self._authenticate(self._witness)
++        result=[]
++        for tree in self._rows:
++            observed=[]
++            for row in tree:
++                identity=_scan_lstat(row[1])
++                require(identity==row[2],'immutable referenced source file/tree fingerprint changed')
++                if row[0]=='file':
++                    require(stat.S_ISREG(identity[2]),'immutable referenced source file kind changed')
++                    digest=_read_source_file(row[1],row[2]) if hash_files else row[3]
++                    observed.append(('file',row[1],identity,digest))
++                elif row[0]=='directory':
++                    require(stat.S_ISDIR(identity[2]),'immutable referenced source directory kind changed')
++                    children=tuple(sorted(p.name for p in Path(row[1]).iterdir()))
++                    observed.append(('directory',row[1],identity,children))
++                else:
++                    require(row[0]=='symlink' and stat.S_ISLNK(identity[2]),'immutable referenced source link kind changed')
++                    observed.append(('symlink',row[1],identity,os.readlink(row[1]),row[4],_scan_lstat(row[4])))
++            result.append(tuple(observed))
++        actual=tuple(result)
++        require(actual==self._rows,'immutable referenced source file/tree fingerprint changed')
++        return actual
++
++
++def _check_source_file_witness(witness,plan):
++    require(type(plan) is _SourceScanPlan,'invalid source scan plan')
++    plan._authenticate(witness)
++    before=plan._routes_now()
++    plan._rows_now(hash_files=True)
++    return before
++
++
++def _close_source_file_witness(witness,plan,before):
++    plan._authenticate(witness)
++    # Independent closing PATH/membership checks cover replacement of an earlier
++    # file, not merely the last opened descriptor. All route metadata is fresh.
++    plan._rows_now(hash_files=False)
++    require(plan._routes_now()==before,'immutable referenced source routing changed during scan')
++
++
+ class _SourceState:
+-    __slots__=('_seal','_pid','_owner','_owner_seal','_scope','_originals','_bindings','_views','_witness','_static_paths','_static_links','_missing','_glob','_protection','_base','_initialization','_stats')
++    __slots__=('_seal','_pid','_owner','_owner_seal','_scope','_originals','_bindings','_views','_witness','_scan_plan','_static_paths','_static_links','_missing','_glob','_protection','_base','_initialization','_stats')
+     def __init__(self,*,_token=None,**values):
+         if _token is not _STATE_SEAL or hasattr(self,'_seal'):raise TypeError('source state construction is private')
+         for key,value in values.items():object.__setattr__(self,key,value)
+@@ -182,6 +332,9 @@
+     def _check(self):
+         require(getattr(self,'_seal',None) is _STATE_SEAL,'unsealed source state')
+         require(self._pid==os.getpid(),'source state cannot cross process/restart')
++        require(type(self._scan_plan) is _SourceScanPlan,'invalid source scan plan')
++        self._scan_plan._authenticate(self._witness)
++        require(self._scan_plan._owner==self._owner and self._scan_plan._owner_seal is self._owner_seal,'source scan owner changed')
+     def view(self,name):self._check();return self._views[name]
+     def stats(self):
+         self._check()
+@@ -194,12 +347,17 @@
+             seen.add(id(value));total=sys.getsizeof(value)
+             if isinstance(value,dict):total+=sum(size(k)+size(v) for k,v in value.items())
+             elif isinstance(value,(list,tuple,set,frozenset)):total+=sum(size(v) for v in value)
+-            if type(value) in (_SourceState,_Protection,_SourceDict,_SourceList):
++            if type(value) in (_SourceState,_SourceScanPlan,_Protection,_SourceDict,_SourceList):
+                 for name in value.__slots__:
+                     if hasattr(value,name):total+=size(getattr(value,name))
+             elif type(value) is _FileWitness:total+=size(vars(value))
+             return total
+-        result={**self._stats,**self._initialization,'retained_bytes':size(self)}
++        plan_bytes=size(self._scan_plan);seen.clear();retained=size(self)
++        # Charge the actual shared weak mint table conservatively; never follow
++        # its weak references into other owners' retained source graphs.
++        registration=sum(sys.getsizeof(table)+sys.getsizeof(table.data)+sum(size(ref) for ref in table.data) for table in (_SCAN_PLANS,_SCAN_MINTS))
++        result={**self._stats,**self._initialization,'retained_bytes':retained+registration,
++            'scan_plan_bytes':plan_bytes,'scan_registration_bytes':registration}
+         return copy.deepcopy(result)
+     def refresh(self,*,owner,bound_inputs,registry_paths,scope):
+         self._check();require(owner==self._owner and scope==self._scope,'source owner/scope changed')
+@@ -208,14 +366,13 @@
+         for name,value in self._originals.items():require(_outer(value)==self._bindings[name],'source outer binding changed')
+         from component_analysis import a3_direction_runtime as authority
+         started=_clock()
+-        require(_links_many(self._static_paths)==self._static_links,'immutable source path provenance changed')
+-        authority._check_file_witness(self._witness)
++        scan_before=_check_source_file_witness(self._witness,self._scan_plan)
+         for path,links in self._missing:
+             require(not Path(path).exists() and not Path(path).is_symlink() and _links(path)==links,'missing source dependency appeared/redirected')
+         for folder,pattern,expected in self._glob:
+             require(tuple(str(p) for p in sorted(Path(folder).glob(pattern)))==expected,'source closure membership changed')
+         registries,graders=self._protection.refresh(registry_paths)
+-        require(_links_many(self._static_paths)==self._static_links,'immutable source path provenance changed during refresh')
++        _close_source_file_witness(self._witness,self._scan_plan,scan_before)
+         self._stats['refreshes']+=1;self._stats['refresh_seconds']+=_clock()-started
+         evidence=copy.deepcopy(self._base)
+         evidence.update(registry_hashes=registries,grader_registry=graders)
+@@ -254,6 +411,12 @@
+     roots.extend(grader_root/name for name in grader_files(root=str(grader_root)))
+     glob=list(glob)+[(grader_root,pattern) for pattern in GRADER_GLOBS]
+     witness=authority._make_file_witness(sorted(set(map(str,roots))))
++    # Only this owner factory creates a one-shot receipt for its exact witness.
++    # A caller-made exact-type/PID/sealed witness is not mint provenance.
++    scan_mint=object();_SCAN_MINTS[witness]=scan_mint
++    try:scan_plan=_SourceScanPlan(witness,_token=scan_mint,owner=owner,owner_seal=owner_seal)
++    finally:_SCAN_MINTS.pop(witness,None)
++    del scan_mint
+     static_paths=tuple(sorted(set(witness.paths)|{row[1] for tree in witness.identities for row in tree}))
+     static_links=_links_many(static_paths)
+     absent=[]
+@@ -267,6 +430,8 @@
+     authority._check_file_witness(artifact_witness)
+     require(_links_many(artifact_paths)==artifact_links,'source envelope provenance changed during initialization')
+     authority._check_file_witness(witness)
++    scan_plan._authenticate(witness)
++    scan_plan._routes_now()
+     require(_links_many(static_paths)==static_links,'immutable source path provenance changed during initialization')
+     for path,links in absent:
+         require(not Path(path).exists() and not Path(path).is_symlink() and _links(path)==links,'missing source changed during initialization')
+@@ -278,7 +443,7 @@
+         for key,item in owned[name].items():value[key]=item
+     static_base={k:v for k,v in base.items() if k not in ('registry_hashes','grader_registry','H_bank_protection')}
+     state=_SourceState(_token=_STATE_SEAL,_pid=os.getpid(),_owner=owner,_owner_seal=owner_seal,_scope=freeze(scope),_originals=dict(originals),
+-        _bindings={name:_outer(value) for name,value in originals.items()},_views=freeze(owned),_witness=witness,_static_paths=static_paths,_static_links=static_links,
++        _bindings={name:_outer(value) for name,value in originals.items()},_views=freeze(owned),_witness=witness,_scan_plan=scan_plan,_static_paths=static_paths,_static_links=static_links,
+         _missing=tuple(absent),_glob=tuple(watched),_protection=protection,_base=freeze(static_base),
+         _initialization=None,_stats=dict(refreshes=0,refresh_seconds=0.))
+     # Discard parse/validation-only payloads and callbacks before sampling the
+@@ -286,7 +451,7 @@
+     del actual,base,extra,static_base,owned,semantic,dependencies,precheck,artifact_witness,artifact_paths,artifact_links
+     # Finalize measured facts after construction and transient payload release.
+     peak=_peak_bytes();rss_after=_rss_bytes()
+-    facts=dict(roots=len(witness.paths),verified_bytes=sum(row[2][3] for tree in witness.identities for row in tree if row[0]=='file'),
++    facts=dict(roots=len(scan_plan._roots),verified_bytes=sum(row[2][3] for tree in scan_plan._rows for row in tree if row[0]=='file'),
+         host_peak_bytes=peak,host_peak_before_bytes=peak_before,rss_before_bytes=rss_before,rss_after_bytes=rss_after,
+         initialization_transient_upper_bytes=max(0,peak-rss_after))
+     facts['initialization_seconds']=_clock()-started
+--- f5/tests/test_a3_source_validation.py
++++ 40fe/tests/test_a3_source_validation.py
+@@ -385,3 +385,233 @@
+     c=setup_case(tmp_path,monkeypatch);state=c.build()
+     grader=c.runtime/'evaluation/benchmark_eval.py';outside=tmp_path/'outside-grader.py';outside.write_bytes(grader.read_bytes());grader.unlink();grader.symlink_to(outside)
+     with pytest.raises(ValueError):refresh(c,state)
++
++
++@pytest.mark.parametrize('damage',['empty_reinit','same_reinit','raw_empty','raw_copy'])
++def test_batch_scan_rejects_reinitialized_or_replaced_legacy_witness(tmp_path,monkeypatch,damage):
++    c=setup_case(tmp_path,monkeypatch);state=c.build();witness=state._witness
++    from component_analysis import a3_direction_runtime as authority
++    if damage.endswith('reinit'):
++        roots=witness.paths;del witness._sealed;witness.__init__([] if damage=='empty_reinit' else roots)
++    else:
++        raw=object.__new__(authority._FileWitness)
++        raw.pid=os.getpid();raw.paths=() if damage=='raw_empty' else witness.paths
++        raw.identities=() if damage=='raw_empty' else witness.identities;raw._sealed=True
++        object.__setattr__(state,'_witness',raw)
++    with pytest.raises(ValueError,match='witness|scan'):refresh(c,state)
++
++
++def batch_tree_case(tmp_path,monkeypatch):
++    c=setup_case(tmp_path,monkeypatch)
++    tree=tmp_path/'tree';tree.mkdir();(tree/'a').write_bytes(b'first');(tree/'b').write_bytes(b'second')
++    target=tmp_path/'target';target.mkdir();(target/'value').write_bytes(b'linked')
++    middle=tmp_path/'middle';middle.symlink_to(target)
++    (tree/'relative').symlink_to('../middle/value')
++    alias=tmp_path/'alias';alias.symlink_to(tree)
++    state=c.s.build_state(owner='fixture',originals={'design':c.design,'prepared':c.prepared},
++        artifacts={'design':('artifact',c.design_path),'prepared':('object',c.prepared_path)},
++        dependencies=lambda owned:([tree,tree/'a',alias/'a'],[],[]),semantic=lambda owned:({},{}),registry_paths=[],scope={'commit':'a'*40})
++    return c,state,tree,target,middle
++
++
++def test_batch_rows_exactly_match_oracle_and_hash_every_occurrence_each_refresh(tmp_path,monkeypatch):
++    c,state,tree,target,middle=batch_tree_case(tmp_path,monkeypatch)
++    from component_analysis import a3_direction_runtime as authority
++    plan=state._scan_plan
++    assert plan._rows_now(hash_files=True)==tuple(authority._file_tree_identity(p) for p in state._witness.paths)
++    expected=[row[1] for rows in state._witness.identities for row in rows if row[0]=='file']
++    calls=[];actual=c.s._read_source_file
++    def counting(path,identity):calls.append(str(path));return actual(path,identity)
++    monkeypatch.setattr(c.s,'_read_source_file',counting)
++    def old_walk(*args):raise AssertionError('per-root ancestry reconstruction reached hot source check')
++    monkeypatch.setattr(authority,'_file_tree_identity',old_walk)
++    refresh(c,state);refresh(c,state)
++    assert calls==expected+expected and expected.count(str(tree/'a'))>=2
++
++
++@pytest.mark.parametrize('damage',['raw','raw_copy','reinit','set','delete','pickle','empty'])
++def test_batch_plan_is_private_immutable_and_cannot_be_cloned(tmp_path,monkeypatch,damage):
++    c=setup_case(tmp_path,monkeypatch);state=c.build();plan=state._scan_plan
++    if damage=='raw':
++        raw=object.__new__(type(plan))
++        with pytest.raises((ValueError,TypeError)):c.s._check_source_file_witness(state._witness,raw)
++    elif damage=='raw_copy':
++        raw=object.__new__(type(plan))
++        for key in type(plan).__slots__:
++            if key!='__weakref__' and hasattr(plan,key):object.__setattr__(raw,key,getattr(plan,key))
++        with pytest.raises((ValueError,TypeError)):c.s._check_source_file_witness(state._witness,raw)
++    elif damage=='reinit':
++        with pytest.raises((ValueError,TypeError)):plan.__init__(state._witness)
++    elif damage=='set':
++        with pytest.raises(TypeError):plan._roots=()
++    elif damage=='delete':
++        with pytest.raises(TypeError):del plan._seal
++    elif damage=='pickle':
++        with pytest.raises(TypeError):pickle.dumps(plan)
++    else:
++        with pytest.raises((ValueError,TypeError)):type(plan)(None)
++    assert not hasattr(plan,'__dict__')
++    refresh(c,state)
++
++
++@pytest.mark.parametrize('damage',['content','replace','disappear','member','ancestor_alias','literal_alias'])
++def test_batch_closing_checks_reject_changes_after_an_earlier_file_read(tmp_path,monkeypatch,damage):
++    c,state,tree,target,middle=batch_tree_case(tmp_path,monkeypatch)
++    actual=c.s._read_source_file;changed=[False]
++    def changing(path,identity):
++        digest=actual(path,identity)
++        if str(path)==str(tree/'b') and not changed[0]:
++            changed[0]=True
++            if damage=='content':(tree/'a').write_bytes(b'other')
++            elif damage=='replace':
++                new=tmp_path/'replacement';new.write_bytes((tree/'a').read_bytes());new.replace(tree/'a')
++            elif damage=='disappear':(tree/'a').unlink()
++            elif damage=='member':(tree/'extra').write_bytes(b'new')
++            elif damage=='ancestor_alias':
++                moved=tmp_path/'moved-tree';tree.rename(moved);tree.symlink_to(moved)
++            else:
++                middle.unlink();middle.symlink_to(target)
++        return digest
++    monkeypatch.setattr(c.s,'_read_source_file',changing)
++    with pytest.raises(ValueError):refresh(c,state)
++    assert changed[0]
++
++
++def test_batch_route_only_parent_catalog_update_during_read_is_allowed(tmp_path,monkeypatch):
++    c=setup_case(tmp_path,monkeypatch);state=c.build();actual=c.s._read_source_file;changed=[False]
++    def updating(path,identity):
++        value=actual(path,identity)
++        if str(path)==str(c.static) and not changed[0]:
++            changed[0]=True;temporary=tmp_path/'catalog.new';temporary.write_text('{}');temporary.replace(tmp_path/'catalog.json')
++        return value
++    monkeypatch.setattr(c.s,'_read_source_file',updating)
++    refresh(c,state);assert changed[0]
++
++
++@pytest.mark.parametrize('damage',['wrong_descriptor','replace_after_open','short_read'])
++def test_batch_read_binds_descriptor_complete_bytes_and_closes_on_error(tmp_path,monkeypatch,damage):
++    c=setup_case(tmp_path,monkeypatch);state=c.build();actual=Path.open;handles=[];original_bytes=c.static.read_bytes();other=tmp_path/'other';other.write_bytes(original_bytes)
++    class Reader:
++        def __init__(self,handle):self.handle=handle;handles.append(handle)
++        def __enter__(self):return self
++        def __exit__(self,*args):self.handle.close()
++        def fileno(self):return self.handle.fileno()
++        def read(self,*args):
++            content=self.handle.read(*args)
++            if damage=='short_read' and content:return content[:-1]
++            return content
++    def opening(path,*args,**kwargs):
++        if path==c.static and (args and args[0]=='rb'):
++            handle=actual(other if damage=='wrong_descriptor' else path,*args,**kwargs)
++            if damage=='replace_after_open':
++                replacement=tmp_path/'replace';replacement.write_bytes(original_bytes);replacement.replace(c.static)
++            return Reader(handle)
++        return actual(path,*args,**kwargs)
++    monkeypatch.setattr(Path,'open',opening)
++    with pytest.raises(ValueError):refresh(c,state)
++    assert handles and all(handle.closed for handle in handles)
++
++
++def test_batch_plan_allocation_is_in_consumed_initialization_and_retained_size(tmp_path,monkeypatch):
++    c=setup_case(tmp_path,monkeypatch);ticks=[0.];constructor=c.s._SourceScanPlan.__init__
++    monkeypatch.setattr(c.s,'_clock',lambda:ticks[0])
++    def constructing(self,*args,**kwargs):constructor(self,*args,**kwargs);ticks[0]+=9.
++    monkeypatch.setattr(c.s._SourceScanPlan,'__init__',constructing)
++    state=c.build();assert c.s.startup_seconds(0.,state)==9.
++    stats=state.stats();assert stats['scan_plan_bytes']>0 and stats['retained_bytes']>=stats['scan_plan_bytes']
++    assert stats['scan_registration_bytes']>0
++
++
++def test_batch_registered_plan_changed_routes_cannot_drop_ancestry_checks(tmp_path,monkeypatch):
++    c=setup_case(tmp_path,monkeypatch);state=c.build()
++    # Raw-slot manipulation cannot turn a genuine mint registration into a new
++    # proof. The registration must bind its INITIAL graph, not just membership.
++    object.__setattr__(state._scan_plan,'_routes',())
++    with pytest.raises(ValueError,match='scan'):refresh(c,state)
++
++
++def test_batch_plan_constructor_cannot_mint_from_copied_caller_witness(tmp_path,monkeypatch):
++    c=setup_case(tmp_path,monkeypatch);state=c.build()
++    from component_analysis import a3_direction_runtime as authority
++    raw=object.__new__(authority._FileWitness)
++    raw.pid=os.getpid();raw.paths=state._witness.paths;raw.identities=state._witness.identities;raw._sealed=True
++    with pytest.raises((ValueError,TypeError)):
++        c.s._SourceScanPlan(raw,_token=c.s._SCAN_SEAL,owner='fixture')
++
++
++@pytest.mark.parametrize('field',['_roots','_rows','_record'])
++def test_batch_initial_nonempty_roots_rows_and_order_cannot_be_replaced(tmp_path,monkeypatch,field):
++    c=setup_case(tmp_path,monkeypatch);state=c.build();plan=state._scan_plan
++    assert plan._roots==state._witness.paths and plan._roots is not state._witness.paths
++    assert plan._rows==state._witness.identities and plan._rows is not state._witness.identities
++    object.__setattr__(plan,field,tuple(reversed(getattr(plan,field))) if field!='_record' else ())
++    with pytest.raises(ValueError):refresh(c,state)
++
++
++def test_batch_plan_wrong_process_and_registration_do_not_retain_source_graph(tmp_path,monkeypatch):
++    import gc,weakref
++    c=setup_case(tmp_path,monkeypatch);state=c.build()
++    with monkeypatch.context() as local:
++        local.setattr(os,'getpid',lambda:-1)
++        with pytest.raises(ValueError):c.s._check_source_file_witness(state._witness,state._scan_plan)
++    for clone in (copy.copy,copy.deepcopy):
++        with pytest.raises(TypeError):clone(state._scan_plan)
++    plan=weakref.ref(state._scan_plan);witness=weakref.ref(state._witness)
++    del state;gc.collect();assert plan() is None and witness() is None
++    assert not c.s._SCAN_MINTS
++
++
++def test_batch_compile_is_inside_original_stable_artifact_envelope(tmp_path,monkeypatch):
++    c=setup_case(tmp_path,monkeypatch);compile_routes=c.s._compile_scan_routes
++    from component_analysis import a3_direction_artifacts as artifacts
++    def changing(paths):
++        routes=compile_routes(paths)
++        (c.prepared_path/'payload.json').write_text(json.dumps({'changed':'valid replacement envelope'}))
++        (c.prepared_path/'COMPLETE.json').unlink();artifacts._finish(c.prepared_path)
++        return routes
++    monkeypatch.setattr(c.s,'_compile_scan_routes',changing)
++    with pytest.raises(ValueError):c.build(semantic=lambda owned:({},{}))
++    assert not c.s._SCAN_MINTS
++
++
++def test_batch_closing_route_detects_alias_added_after_shared_prefix_observation(tmp_path,monkeypatch):
++    c=setup_case(tmp_path,monkeypatch);folder=tmp_path/'route-only';folder.mkdir();(folder/'file').write_bytes(b'same inode and bytes')
++    state=c.s.build_state(owner='fixture',originals={'design':c.design,'prepared':c.prepared},
++        artifacts={'design':('artifact',c.design_path),'prepared':('object',c.prepared_path)},
++        dependencies=lambda owned:([folder/'file'],[],[]),semantic=lambda owned:({},{}),registry_paths=[],scope={'commit':'a'*40})
++    actual=c.s._scan_lstat;changed=[False]
++    def observing(path):
++        identity=actual(path)
++        if str(path)==str(folder) and not changed[0]:
++            changed[0]=True;moved=tmp_path/'moved';folder.rename(moved);folder.symlink_to(moved)
++        return identity
++    monkeypatch.setattr(c.s,'_scan_lstat',observing)
++    with pytest.raises(ValueError):refresh(c,state)
++    assert changed[0]
++
++
++def test_batch_current_registry_atomic_update_during_source_read_revalidates(tmp_path,monkeypatch):
++    c=setup_case(tmp_path,monkeypatch);state=c.build();actual=c.s._read_source_file;changed=[False]
++    registry=c.primary/'docs/research/held_out.json'
++    def updating(path,identity):
++        digest=actual(path,identity)
++        if str(path)==str(c.static) and not changed[0]:
++            changed[0]=True;new=registry.with_suffix('.new');new.write_text(json.dumps({'schema':1,'sets':[{'ids':['unrelated']}]}));new.replace(registry)
++        return digest
++    monkeypatch.setattr(c.s,'_read_source_file',updating)
++    evidence=refresh(c,state)
++    import hashlib
++    assert changed[0] and evidence['registry_hashes'][str(registry)]==hashlib.sha256(registry.read_bytes()).hexdigest()
++
++
++@pytest.mark.parametrize('when',['before','after'])
++def test_batch_cycle_or_dangling_source_link_never_mints_or_refreshes(tmp_path,monkeypatch,when):
++    c,state,tree,target,middle=batch_tree_case(tmp_path,monkeypatch)
++    link=tree/'relative';link.unlink();link.symlink_to('relative')
++    if when=='after':
++        with pytest.raises(ValueError):refresh(c,state)
++    else:
++        with pytest.raises(ValueError):
++            c.s.build_state(owner='fixture',originals={'design':c.design,'prepared':c.prepared},
++                artifacts={'design':('artifact',c.design_path),'prepared':('object',c.prepared_path)},
++                dependencies=lambda owned:([tree],[],[]),semantic=lambda owned:({},{}),registry_paths=[],scope={'commit':'a'*40})

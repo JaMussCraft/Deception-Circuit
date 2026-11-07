@@ -1,0 +1,59 @@
+{
+  "kind": "a3_independent_pilot_preparation_execution_evidence_v1",
+  "commit": "74efb4d0481968a1d0138eb1a79b97f302fd3c3b",
+  "local_cpu": true,
+  "job_id": null,
+  "cluster": null,
+  "stage_exit_codes": {
+    "canonical_prepare": 0,
+    "edge_prepare": 1,
+    "mask_source_settings": 0,
+    "mask_prepare": 0,
+    "mask_pilot_inventory": 0,
+    "mask_full_inventory": 0,
+    "edge_tokenizer_diagnosis": 0,
+    "mask_wrapper_dry_run": 0,
+    "owning_validation": 0
+  },
+  "row_counts": {
+    "mask_pilot_keys_observed": 31191,
+    "mask_pilot_keys_expected": 31191,
+    "mask_full_keys_observed": 3437966,
+    "mask_full_keys_expected": 3437966,
+    "scientific_rows_observed": 0
+  },
+  "assessment_membership_baseline": {
+    "expected_per_task": 100,
+    "observed_per_task": {
+      "far_v2": 100,
+      "sdr_v2": 100,
+      "ser_v2": 100
+    },
+    "original_streams_tokens_order_preserved": true,
+    "ioi_expected": 100,
+    "ioi_observed": 100,
+    "mmlu_expected": 32,
+    "mmlu_observed": 32
+  },
+  "numerical_baseline": "not run: CPU metadata preparation only; no numerical-scientific observations",
+  "raw_run_manifest": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-independent-pilots-74efb4d04819/run_manifest.json",
+  "raw_run_manifest_sha256": "99c2995d720680601298612ebf13bb8c48465147ab0ceef96a9d74fd6d3463b6",
+  "edge_blocker": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-independent-pilots-74efb4d04819/evidence/edge-tokenizer-diagnosis.json",
+  "source_export_unchanged": true,
+  "source_files": 509,
+  "a1_dependencies": 16,
+  "weekly_usage": {
+    "source": "codex app-server account/rateLimits/read",
+    "checked_at": "2026-11-02T17:25:58.043434+00:00",
+    "limit_id": "codex",
+    "pause_at_used_percent": 80.0,
+    "weekly": {
+      "used_percent": 52,
+      "remaining_percent": 48,
+      "resets_at": 1793981261,
+      "resets_at_utc": "2026-11-06T16:07:41+00:00"
+    },
+    "should_pause": false,
+    "status": "ok"
+  }
+}

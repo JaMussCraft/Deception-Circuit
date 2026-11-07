@@ -1,0 +1,28 @@
+{
+  "status": "NOT_RESERVED_NOT_SUBMITTED",
+  "scope": "score-only all9groups59652rows with existing G2 H200 bank, no summary/finalization",
+  "command": [
+    "sbatch",
+    "--hold",
+    "--no-requeue",
+    "--account=ROOT_SELECTED_ACCOUNT",
+    "--partition=gpuH200x8",
+    "--gpus=1",
+    "--cpus-per-task=4",
+    "--mem=64G",
+    "--time=07:30:00",
+    "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/full-score-H200-40fe-v2-proposal/launch/gpu-score.sh"
+  ],
+  "requested_GPU_hours": 7.5,
+  "required_environment": {
+    "A2_SCORE_ROOT_RELEASE": "ROOT_ACTUAL_RELEASE_PATH",
+    "A2_SCORE_EXECUTION_OUTPUT": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/full-score-H200-40fe-v2-proposal/gpu-result"
+  },
+  "root_still_required": [
+    "fresh long-H200 queue comparison vs Bridges route",
+    "CPUpreflight and independent157",
+    "actual heldjob/resource/RS/cap/mapping review",
+    "bound true root release; no modelcall here"
+  ]
+}

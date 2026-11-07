@@ -1,0 +1,13 @@
+{
+  "kind": "independent200_r3_diagnostic_delta_review",
+  "source_commit": "50e947bb852613e3a270082651f2bd1b7bb0c525",
+  "source_commit_role": "Original source/runtime dependency only; no scientific source publication.",
+  "packet_manifest_sha256": "4a096d2c1eb020da99853959a3c26e4948a9c240618958accea0b80e553997d5",
+  "prior_job_id": "50309188",
+  "new_job_id": null,
+  "commands": [
+    "base python3.9 -B -m unittest -q test_preflight.py test_bind_failures.py",
+    "mgnp python -B -m unittest -q test_preflight.py test_bind_failures.py"
+  ],
+  "no_actual_probe_by_reviewer": true
+}

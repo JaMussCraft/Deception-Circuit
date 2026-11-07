@@ -1,0 +1,17 @@
+test_sealed_source_mapping (test_host.Checks) ... FAIL
+test_actual_candidate_and_oracle_alias_inventory (test_host.Checks) ... ok
+
+======================================================================
+FAIL: test_sealed_source_mapping (test_host.Checks)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/a3-green-bridges-transport229-r3/test_host.py", line 34, in test_sealed_source_mapping
+    c={'status':'ROOT_BOUND_A3_GREEN_MGNP_TRANSPORT','observer_virtual':str(host.VIRT/'run_packet.py'),'expected_cases':1,'expected_file_count':1,'files':files,'aliases':aliases};host.check_config(c)
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/a3-green-bridges-transport229-r3/host.py", line 28, in check_config
+    files=c['files'];aliases=c['aliases'];assert type(files) is list and files and type(c['expected_file_count']) is int and len(files)==c['expected_file_count'] and type(aliases) is list and len(aliases)==4
+AssertionError
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.472s
+
+FAILED (failures=1)

@@ -1,0 +1,11 @@
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task1/source-before-review198/common.py
++++ common.py:groups-digest-key-only
+@@ -157,7 +157,7 @@
+         path = Path(c[key])
+         require(path == expected and path.is_file() and not path.is_symlink()
+                 and not path.parent.is_symlink() and inside(path, root), 'immutable original path: ' + key)
+-        require(sha(path) == c[key + '_sha256'], 'stale pinned ' + key)
++        require(sha(path) == c['groups_file_sha256' if key == 'groups' else key + '_sha256'], 'stale pinned ' + key)
+     artifact = read(c['bank_file'])
+     require(set(artifact) == {'payload', 'sha256'}, 'native bank envelope')
+     bank = artifact['payload']

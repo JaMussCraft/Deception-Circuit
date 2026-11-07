@@ -1,0 +1,30 @@
+{
+  "job_id": "23472930",
+  "cluster": "delta",
+  "submitted_utc": "2026-11-03T14:09:59.859458+00:00",
+  "command": [
+    "sbatch",
+    "--parsable",
+    "--export=ALL",
+    "--account=bjhz-delta-cpu",
+    "--partition=cpu-interactive",
+    "--constraint=projects",
+    "--ntasks=1",
+    "--cpus-per-task=4",
+    "--mem=32G",
+    "--time=00:05:00",
+    "--job-name=lad-a2-fresh-groups",
+    "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+    "--output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/refreeze-current-registry-20261103/slurm-%j.log",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/refreeze-current-registry-20261103/launch.sh"
+  ],
+  "gpus": 0,
+  "cpus": 4,
+  "memory_GiB": 32,
+  "time_minutes": 5,
+  "script_sha256": {
+    "run.py": "4e74c80b7c8afba1f9f089ca9d86bf93f424b821f0d5f46ecbfe83a8b6591a6e",
+    "launch.sh": "0e78de292de54bb0008ac20c86075abf784d15e74b6a6e523972068a526042ce",
+    "remedy.json": "382fa18f5fabb4aec45dfdc11c24c9c2b2764bc670069e15fc4eb5165d14e3ff"
+  }
+}

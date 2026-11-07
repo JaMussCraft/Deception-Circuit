@@ -1,0 +1,486 @@
+{
+  "status": "author repair round2 frozen for scoped independent review",
+  "accepted": false,
+  "whole_unit_complete": false,
+  "fix_round": 2,
+  "baseline_commit_supplied_by_root": "538109e809285b6ddc45d42df8786270a65f7b12",
+  "uncommitted_source_overlay": true,
+  "source_manifest": "/tmp/report97-review111-round2-frozen-source.json",
+  "source_hashes": {
+    "component_analysis/a3_direction_pipeline.py": "96678db186078ab37cad108e2d1e71ffdccf1fb3dd157c35cdc57a91b2ebd4a0",
+    "component_analysis/a3_direction_runner.py": "89a62335665595533204006c3eca28d14ca9c42eb600879c235e9c6370739429",
+    "component_analysis/a3_direction_runtime.py": "0401c7a2750cf66ef5508d2dbbaed2f9bcea5f83918d6503e6a8f6b809a44867",
+    "component_analysis/a3_direction_workload.py": "3e43aaf2b4cacb99df87593ae377c8fdf3eb7b223b258ed8873853841404d8f9",
+    "component_analysis/a3_directions.py": "ed882d4e12a396e03e73671e588beba5b1a8c90ab9d31e7ee73d4194430b4a86",
+    "component_analysis/a3_pipeline.py": "310eb53427ad4ac32522dfd0d6cd3b33e4ec887af1776579845f8953bdbe83f5",
+    "scripts/jobs/specificity_a3.sh": "936dfb7f8b9c2d267d52f1e199ed431275e6527cbfc3a105a22e3812289a9b96",
+    "tests/test_a3_direction_runner.py": "3ea945d5b23b4eef7d56139758c7075ea1b56ac612f1923590b7978628ca0120",
+    "tests/test_a3_direction_runtime.py": "20145bbe615d270cc812e566d30d36eb1cf3aa6dc5ca269043a16db135550268",
+    "tests/test_a3_direction_workload.py": "91eb6f874e180c5ffb362daba231631b7bea21c224446580efccfe20a9007300",
+    "tests/test_a3_directions.py": "cd8471b1524ad7b8f1b7c87f9eb5fec5724b3ab2980027ef7aadfea3fc3bb1c1",
+    "tests/test_a3_pipeline.py": "bbb3efdba075cc14c2997cc11ae44bab268bdea56459c0574d6bfc21b62f4a18",
+    "tests/a3_direction_native_scenario.py": "9b5061ab9618222b23230917f446abcaa73747f3d216f69c77b9218feec6297b"
+  },
+  "preserved_review_baseline": ".superpowers/sdd/plan-a3/unit-f-review111-round1-source",
+  "root_package_diff": ".superpowers/sdd/plan-a3/unit-f-review111-round2.diff",
+  "commands": {
+    "final": "env PYTHONDONTWRITEBYTECODE=1 OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHON -m pytest -q -s -p no:cacheprovider docs/research/specificity-ladder/reports/111-round1-evidence/test_independent_round1.py::test_serial_evidence_rejects_wrong_donor_convention docs/research/specificity-ladder/reports/111-round1-evidence/test_independent_round1_more.py::test_serial_measured_guard_covers_actual_scoring_dependency_union tests/test_a3_direction_runtime.py -k 'wrong_donor_convention or serial_measured_guard_covers or serial_donor_cache or completed_index_startup or production_shaped_completed_startup' --basetemp=/tmp/review111-round2-final-ENV",
+    "independent": "env PYTHONDONTWRITEBYTECODE=1 OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHON -m pytest -q -s -p no:cacheprovider docs/research/specificity-ladder/reports/111-round1-evidence/test_independent_round1.py docs/research/specificity-ladder/reports/111-round1-evidence/test_independent_round1_more.py --basetemp=/tmp/review111-round2-independent-ENV",
+    "owning": "env PYTHONDONTWRITEBYTECODE=1 OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHON -m pytest -q -s -p no:cacheprovider tests/test_a3_direction_runtime.py tests/test_a3_direction_workload.py -k 'serial_donor_cache or guard_benchmark_covers or completed_index_startup or production_shaped_completed_startup or prefit_pilot or bounded_pilot_cases or runtime_shard_evidence_counts or packing_lookup_and or serialization_count_is_derived or startup_and_shared_m1' --basetemp=/tmp/review111-round2-owning-ENV",
+    "publication-final": "env PYTHONDONTWRITEBYTECODE=1 OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHON -m pytest -q -s -p no:cacheprovider tests/test_a3_direction_runtime.py -k 'completed_index_startup or guard_benchmark_covers or production_shaped_completed_startup or bounded_pilot_cases or runtime_shard_evidence_counts or prefit_pilot' --basetemp=/tmp/review111-round2-publication-final-ENV",
+    "linked-final": "env PYTHONDONTWRITEBYTECODE=1 OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHON -m pytest -q -s -p no:cacheprovider tests/test_a3_direction_runtime.py::test_completed_index_startup_is_measured_conditionally_and_charged_per_job --basetemp=/tmp/review111-round2-linked-final-ENV"
+  },
+  "interpreters": {
+    "mgnp": "/u/swong2/.conda/envs/mgnp/bin/python",
+    "base": "/sw/external/python/anaconda3/bin/python3.9"
+  },
+  "results": {
+    "final-mgnp": {
+      "exit_code": 0,
+      "passed": 5,
+      "deselected": 153,
+      "seconds": 84.83,
+      "log": "report97-review111-round2-final-mgnp.log",
+      "source_epoch": "source_snapshot.json"
+    },
+    "final-base": {
+      "exit_code": 0,
+      "passed": 5,
+      "deselected": 153,
+      "seconds": 96.6,
+      "log": "report97-review111-round2-final-base.log",
+      "source_epoch": "source_snapshot.json"
+    },
+    "independent-mgnp": {
+      "exit_code": 0,
+      "passed": 13,
+      "deselected": null,
+      "seconds": 12.68,
+      "log": "report97-review111-round2-independent-mgnp.log",
+      "source_epoch": "preceding focused epoch; final targeted deltas cover subsequent changes"
+    },
+    "independent-base": {
+      "exit_code": 0,
+      "passed": 13,
+      "deselected": null,
+      "seconds": 15.12,
+      "log": "report97-review111-round2-independent-base.log",
+      "source_epoch": "preceding focused epoch; final targeted deltas cover subsequent changes"
+    },
+    "owning-mgnp": {
+      "exit_code": 0,
+      "passed": 13,
+      "deselected": 246,
+      "seconds": 143.16,
+      "log": "report97-review111-round2-owning-mgnp.log",
+      "source_epoch": "preceding focused epoch; final targeted deltas cover subsequent changes"
+    },
+    "owning-base": {
+      "exit_code": 0,
+      "passed": 13,
+      "deselected": 246,
+      "seconds": 167.7,
+      "log": "report97-review111-round2-owning-base.log",
+      "source_epoch": "preceding focused epoch; final targeted deltas cover subsequent changes"
+    },
+    "publication-final-mgnp": {
+      "exit_code": 0,
+      "passed": 9,
+      "deselected": 147,
+      "seconds": 150.94,
+      "log": "report97-review111-round2-publication-final-mgnp.log",
+      "source_epoch": "preceding focused epoch; final targeted deltas cover subsequent changes"
+    },
+    "publication-final-base": {
+      "exit_code": 0,
+      "passed": 9,
+      "deselected": 147,
+      "seconds": 174.66,
+      "log": "report97-review111-round2-publication-final-base.log",
+      "source_epoch": "preceding focused epoch; final targeted deltas cover subsequent changes"
+    },
+    "linked-final-mgnp": {
+      "exit_code": 0,
+      "passed": 1,
+      "deselected": null,
+      "seconds": 20.15,
+      "log": "report97-review111-round2-linked-final-mgnp.log",
+      "source_epoch": "preceding focused epoch; final targeted deltas cover subsequent changes"
+    },
+    "linked-final-base": {
+      "exit_code": 0,
+      "passed": 1,
+      "deselected": null,
+      "seconds": 21.32,
+      "log": "report97-review111-round2-linked-final-base.log",
+      "source_epoch": "preceding focused epoch; final targeted deltas cover subsequent changes"
+    },
+    "original-red": {
+      "exit_code": 1,
+      "failed": 2,
+      "seconds": 8.58,
+      "log": "report97-review111-round2-original-red.log"
+    },
+    "source-provenance-red": {
+      "exit_code": 1,
+      "failed": 1,
+      "seconds": 8.42,
+      "log": "report97-review111-round2-source-provenance-red.log"
+    },
+    "startup-red": {
+      "exit_code": 1,
+      "failed": 1,
+      "seconds": 7.72,
+      "log": "report97-review111-round2-startup-red.log"
+    },
+    "publication-red": {
+      "exit_code": 1,
+      "failed": 1,
+      "seconds": 12.58,
+      "log": "report97-review111-round2-publication-red.log"
+    },
+    "publication-green-first": {
+      "exit_code": 1,
+      "failed": 2,
+      "passed": 5,
+      "seconds": 132.06,
+      "log": "report97-review111-round2-publication-green.log",
+      "classification": "stale expected dependency-root set after introducing the separately recorded startup root; byte bound checks already passed"
+    }
+  },
+  "observed": {
+    "mgnp": [
+      {
+        "measured_guard_dependency_bytes": 196436338,
+        "scoring_dependency_roots": 11,
+        "actual_scoring_dependency_bytes": 16457580,
+        "serial_reference_count": 9,
+        "source_unchanged": true,
+        "model_is_explicit_fake_cpu": true
+      },
+      {
+        "host_startup_seconds": 1.3497079919907264,
+        "guard_seconds": [
+          0.005149474018253386,
+          0.005004213016945869,
+          0.0073953220271505415
+        ],
+        "dependency_roots": 11,
+        "dependency_bytes": 4114173,
+        "retained_bytes": 59460,
+        "peak_host_bytes": 675852288,
+        "conditional": true,
+        "source_reference_count": 1,
+        "cpu_model": "AMD EPYC 7763 64-Core Processor"
+      }
+    ],
+    "base": [
+      {
+        "measured_guard_dependency_bytes": 196439200,
+        "scoring_dependency_roots": 11,
+        "actual_scoring_dependency_bytes": 16458176,
+        "serial_reference_count": 9,
+        "source_unchanged": true,
+        "model_is_explicit_fake_cpu": true
+      },
+      {
+        "host_startup_seconds": 1.490978324029129,
+        "guard_seconds": [
+          0.007509664981625974,
+          0.005197043996304274,
+          0.005118657019920647
+        ],
+        "dependency_roots": 11,
+        "dependency_bytes": 4114294,
+        "retained_bytes": 62598,
+        "peak_host_bytes": 656834560,
+        "conditional": true,
+        "source_reference_count": 1,
+        "cpu_model": "AMD EPYC 7763 64-Core Processor"
+      }
+    ]
+  },
+  "conditional_startup": true,
+  "target_host_portability_bound_established": false,
+  "process_local_cold_not_OS_cache_cold": true,
+  "one_startup_record_per_scoring_process": true,
+  "immutable_record_timing": "construction recorded before publication; actual publication and total returned afterward without record rewrite",
+  "source_scenario_job_PID_bound": true,
+  "linked_shard_validation": "dedup complete record validation, per-shard job/PID checks, final fresh complete-byte witnesses",
+  "byte_bounds": {
+    "startup_record_payload": 65536,
+    "per_shard_startup_metadata": 8192,
+    "receipt_metadata_allowance": 4096,
+    "actual_payload_and_marker_shape_checked_before_publish": true
+  },
+  "bounded_plan": "report97-review111-bounded-plan-v2.sh",
+  "bounded_plan_executed": false,
+  "no_large_scenario": true,
+  "all_owned_processes_terminal": true,
+  "limitations": [
+    "independent scoped review pending",
+    "allocated-host startup timing conditional until matched/conservatively bounded",
+    "full fresh native pilot/calibration/assessment/summary not run"
+  ],
+  "prior_evidence_preserved": [
+    "../111-round1-evidence/run_manifest.json",
+    "../97-review111-round1-evidence/run_manifest.json"
+  ],
+  "artifacts": {
+    "report97-review111-round2-linked-final-mgnp.log": {
+      "sha256": "a97e3d8297e57d4503bcc7f63c6d0a6774f5e838722f4b50d19fe7cdacb8526c",
+      "bytes": 355
+    },
+    "report97-review111-round2-final-mgnp.log": {
+      "sha256": "bda0db2afabfd112d09be99956e46fde880be44ffb6f9ec066e1f919f2880ef0",
+      "bytes": 603
+    },
+    "report97-review111-round2-publication-red.log": {
+      "sha256": "dd8157fc0ad04dd92f6fcfb451008b5ce0987850571726218e33408e0bf3a370",
+      "bytes": 1964
+    },
+    "review111-round2-rejected-envelope.patch": {
+      "sha256": "c9d3bc9ab0e35f5653d032a969a0e86103f90d837cf546ce3066ecee8eb1ecca",
+      "bytes": 4443
+    },
+    "report97-review111-round2-publication-final-base.log": {
+      "sha256": "b4f9dff88d31a441e90159f5ac1d3bfed2a86359d63264de5d9f271dc7d507a6",
+      "bytes": 3103
+    },
+    "report97-review111-round2-lifecycle.log": {
+      "sha256": "95c3f3d61865e36d4b7f0ecd253cabe9d39280bfec5a58681ea9c5dfd5c2f5d5",
+      "bytes": 205
+    },
+    "report97-review111-round2-source-provenance-red.log": {
+      "sha256": "bc9e5b5475a380408db093e72462f950b437dd673aa971e8e41454a3e382830c",
+      "bytes": 4028
+    },
+    "report97-review111-bounded-plan-v2.sh": {
+      "sha256": "86ece340c0791f60a0752cdd8cebcc870c55daa6ea8e4e4e1f871cf7cef875ec",
+      "bytes": 4395
+    },
+    "review111-round2-envelope-review.json": {
+      "sha256": "42f9c7eda8034936c7a06ef5f3f2f41ffa2e2fdd30bbd2f918c75edae9d1a89d",
+      "bytes": 461
+    },
+    "report97-review111-round2-original-red.log": {
+      "sha256": "ffd09bf50d5fbd0b9d03ffe6abe1b5b072aee07a1f59ca95d1edeee4699ae615",
+      "bytes": 4790
+    },
+    "report97-review111-round2-final-base.log": {
+      "sha256": "65ef8207c06da6e45b5ede72d9784d7c5568d479ec3415e08ca7c0e813d450f8",
+      "bytes": 1085
+    },
+    "report97-review111-round2-linked-final-base.log": {
+      "sha256": "2939fb82f421b1e39b372179d5dfdd6b80e1756beb54a3d306e82a41902db08d",
+      "bytes": 852
+    },
+    "report97-review111-round2-donor-green.log": {
+      "sha256": "204894fa83ef5c40f5661286c9a3d5554eb22f1f778d7256aae041fed0b3cc25",
+      "bytes": 22
+    },
+    "report97-review111-round2-donor-footprint.log": {
+      "sha256": "fa58d59e32c005cdcef47f2252ad82f95d11527d55291f2aa33e6e1ac14c41dc",
+      "bytes": 193
+    },
+    "report97-review111-round2-owning-mgnp.log": {
+      "sha256": "9551624bc6eedd36e8a92d42dc163e0731e848d5f9ed70e2854b0ad849703db6",
+      "bytes": 805
+    },
+    "report97-review111-round2-independent-base.log": {
+      "sha256": "4a376c0f0e7e6fdff6237491e4c4efcb42d54975c2fd7c874adc40d6baa3eefb",
+      "bytes": 733
+    },
+    "report97-review111-round2-startup-green.log": {
+      "sha256": "6a8aa3c738e67c5b6637004d18be58ff5f5aac485e3087a4df188e24abd998af",
+      "bytes": 177
+    },
+    "report97-review111-round2-startup-red.log": {
+      "sha256": "e55b886cc5c0035b893d787ed38d1f95c2f2a07f70f37b3d1fcc67d42272fb4f",
+      "bytes": 1732
+    },
+    "report97-review111-round2-independent-mgnp.log": {
+      "sha256": "c60302f350f7ca74fc0920416c9b351e1d394599e26b952869ca82b88b0bac08",
+      "bytes": 249
+    },
+    "report97-review111-round2-union-green.log": {
+      "sha256": "963fa62bc4b2980f831315af336a9ed65b015344ed47c72b1ae530fb04848a71",
+      "bytes": 236
+    },
+    "report97-review111-round2-publication-final-mgnp.log": {
+      "sha256": "a239152d327bff19ab4def84fbb7cb5d8072e6c184e3ec620f62d98e386e6ef9",
+      "bytes": 799
+    },
+    "report97-review111-round2-owning-base.log": {
+      "sha256": "33d742896cc136a8f3ebda10698d59e63adcf50bc75a7df43bcf150f2afb2265",
+      "bytes": 3106
+    },
+    "source_snapshot.json": {
+      "sha256": "dffe84c26b3400eb27e7028be1413864ddd8d3effa1cef7f2504ccbf9221c28a",
+      "bytes": 1423
+    },
+    "raw_object_index.json": {
+      "sha256": "304130e3475ee5b015ef180cffc71e285bfe17115fd366e1c6e10fb3ff1793ff",
+      "bytes": 16695
+    },
+    "report97-review111-round1-frozen-source.json": {
+      "sha256": "444de238beb270171bef3b0dd97e4f6aaf8c850cdcfddd2041ff6ce8831c6e0d",
+      "bytes": 1423
+    },
+    "report97-review111-round2-publication-green.log": {
+      "sha256": "958a17facf6d6799b09198622201531a0ba5cc1bcf47793a3f24c46bab0e87d3",
+      "bytes": 4762
+    },
+    "report97-review111-round2-prepublication-source.json": {
+      "sha256": "01b6ecee72aa0eb113d1b1b74e47c5607b6040e76435da955238d85142e503e0",
+      "bytes": 1423
+    },
+    "startup-objects/mgnp/valid-record/COMPLETE.json": {
+      "sha256": "2409ddd3f620e9fbdcc456226d5bdf7997c1fffc348c642a00e04fb5ff6f57f7",
+      "bytes": 201
+    },
+    "startup-objects/mgnp/valid-record/payload.json": {
+      "sha256": "5db02a964597b7edec70fc928f866250578e8c09d3815e1c447c5dea1d85af63",
+      "bytes": 8791
+    },
+    "startup-objects/mgnp/changed-record/COMPLETE.json": {
+      "sha256": "c64f4d9dfabb2940f78dae6600569e68625ffb2ccddc599ee97781bf14e332f5",
+      "bytes": 201
+    },
+    "startup-objects/mgnp/changed-record/payload.json": {
+      "sha256": "6b5bf4fed9caad957153a80662bdefa646b9d97d191d27572cde2a65afa01d47",
+      "bytes": 8799
+    },
+    "startup-objects/base/valid-record/COMPLETE.json": {
+      "sha256": "af5ac482d3950b41e357c953714846c431900bbe3738a98bbe454a144002dd2a",
+      "bytes": 201
+    },
+    "startup-objects/base/valid-record/payload.json": {
+      "sha256": "27699208512391dd46fdbc73a0a0a2f74293435089657498e092e54f7cf4f0d2",
+      "bytes": 8789
+    },
+    "startup-objects/base/changed-record/COMPLETE.json": {
+      "sha256": "dd6adf5a916a58cba4f789b1a8ad97b7ec4098842c83d68a0cc50b0b72e3a6be",
+      "bytes": 201
+    },
+    "startup-objects/base/changed-record/payload.json": {
+      "sha256": "93a4a22063a33e29cd10c46955f4ec880b4f18e00b16b8d0cf2126629a639ac2",
+      "bytes": 8798
+    },
+    "serial-objects/mgnp/observation/COMPLETE.json": {
+      "sha256": "aacfd43e8c4df510b2094acf6980290e2678536f173eb0619242af8e0c0715b9",
+      "bytes": 203
+    },
+    "serial-objects/mgnp/observation/payload.json": {
+      "sha256": "3aaa1309bfa6f3463e2dc8c191f3cf62a89123a09db78344105cd69ac81dafe8",
+      "bytes": 495679
+    },
+    "serial-objects/mgnp/baseline/COMPLETE.json": {
+      "sha256": "f9eb91930bdcf171169621a6368ee025539ad186bd25792c4f391e69dfc1ea4f",
+      "bytes": 203
+    },
+    "serial-objects/mgnp/baseline/payload.json": {
+      "sha256": "4287e6d981a1584aa59c1ebcfc94a5ae9f51468dfc18953385a16809a86ee2f6",
+      "bytes": 495679
+    },
+    "serial-objects/mgnp/stream/COMPLETE.json": {
+      "sha256": "f31ba1fb9d0f146fc158517392b89891d02c252ec13f2297eb6183a253ed9932",
+      "bytes": 203
+    },
+    "serial-objects/mgnp/stream/payload.json": {
+      "sha256": "89e269b2c1f4077e6b6500fa545c7c288494b11b5a54deb6243be342a73c47aa",
+      "bytes": 495689
+    },
+    "serial-objects/mgnp/cache_source/COMPLETE.json": {
+      "sha256": "f90caa500b22d7df83b1c01c912100d6a4cd7e6483f0d7b6cfa80ef4c0307898",
+      "bytes": 203
+    },
+    "serial-objects/mgnp/cache_source/payload.json": {
+      "sha256": "ec1f5fb0a721e7deec6c7b37c9b37d3565cd2fd72e27ed50e5338ba91460c867",
+      "bytes": 495679
+    },
+    "serial-objects/mgnp/source_id/COMPLETE.json": {
+      "sha256": "c5f6310728f9f9e6f34b8e8d06962bfe2cd1a824f9202927d94f3de7ec0af9be",
+      "bytes": 203
+    },
+    "serial-objects/mgnp/source_id/payload.json": {
+      "sha256": "c088c7f88be9a8d8475e0380f7d8488a6fe8a4cceb4afe54cc1f3b366fac7905",
+      "bytes": 495559
+    },
+    "serial-objects/mgnp/split/COMPLETE.json": {
+      "sha256": "2cdab2aa2d90cbfa51071771a54c6913452ed31b140bba69606d2666338d591b",
+      "bytes": 203
+    },
+    "serial-objects/mgnp/split/payload.json": {
+      "sha256": "8ba6f2a02871bc1a5a439c786177314b9ecb587194354b37ffa88ae85f966a3e",
+      "bytes": 495319
+    },
+    "serial-objects/base/observation/COMPLETE.json": {
+      "sha256": "a87b12c3eb1f73ad4d02ca4dddae97175b86610ff5fa8ac092a0166b4aae93e4",
+      "bytes": 203
+    },
+    "serial-objects/base/observation/payload.json": {
+      "sha256": "8d7e7adb5bf0210fb2fb4112b4cc22d6b2c3295730a9c0973882b01ae4b3e24f",
+      "bytes": 495518
+    },
+    "serial-objects/base/baseline/COMPLETE.json": {
+      "sha256": "f685553e25b27116e79a6beca31725c7e329b4a25ee581efb092c8adac8b954e",
+      "bytes": 203
+    },
+    "serial-objects/base/baseline/payload.json": {
+      "sha256": "6bb51a973f94fcbe63bda3349865f32de7c23e52b56abc53c17ed19bf7660fc2",
+      "bytes": 495518
+    },
+    "serial-objects/base/stream/COMPLETE.json": {
+      "sha256": "f8807c19978b6d1453d93ff601d8de00ea37fb24e4d039298b803852f772d1a8",
+      "bytes": 203
+    },
+    "serial-objects/base/stream/payload.json": {
+      "sha256": "92a5a7e5b813211c2e00ea2ddbdd610ac096a9870d3bc1a9182a7626fb8e0dce",
+      "bytes": 495528
+    },
+    "serial-objects/base/cache_source/COMPLETE.json": {
+      "sha256": "7cae734b589f6a60f0d10f180e0c566e277da757d908d03f9f3f5875f710f3bf",
+      "bytes": 203
+    },
+    "serial-objects/base/cache_source/payload.json": {
+      "sha256": "c34f1f565f1b370d17dc06461fcc26d959bc573014882382ecd2fb711c0f3495",
+      "bytes": 495518
+    },
+    "serial-objects/base/source_id/COMPLETE.json": {
+      "sha256": "930e0df0bf8d3ef61b7327fc4cf87d883eab31b4ee8438b0610817e05a171228",
+      "bytes": 203
+    },
+    "serial-objects/base/source_id/payload.json": {
+      "sha256": "040211ca2ce335d171db2a87e7ebde280b9b62626f36d182c9a208871236c096",
+      "bytes": 495398
+    },
+    "serial-objects/base/split/COMPLETE.json": {
+      "sha256": "847f570532b62e2ff2ce2f10de6bb0c1420dbbb72584a69e76b4a66b447d6a7e",
+      "bytes": 203
+    },
+    "serial-objects/base/split/payload.json": {
+      "sha256": "b79fa871625eaa4cb7c731c39735cdc2fa57bb4dcc9233beda02881837319a98",
+      "bytes": 495158
+    }
+  },
+  "frozen_A1_dependencies": {
+    "component_analysis/dla.py": "61476cd4607f240bcdac567a7005cf86379cae0d4f2606dba2a60c6401d68073",
+    "component_analysis/hooks.py": "fdc8f325884e88c4168a2c9e9fde731b98be3d608ac15f1f0a39278044d7cfba",
+    "component_analysis/knockout.py": "3b5599f12bcdc6731965e3fb2c374dabad5a064b38863b1b756d4a30078b5b7b",
+    "component_analysis/ladder_design.py": "a9752ff2bca91d7d04957fb867adcdc5640d94b47bf11d9593a3657a0f9c533b",
+    "component_analysis/ladder_metrics.py": "9cc369e3e929b474052a5a142890a16615d804ce64b415e919e347af4675cfad",
+    "component_analysis/ladder_pipeline.py": "f0955e8df5215e27cb3eff06cd28f7230b1de7d2a6c20e202854bc73c1280b56",
+    "component_analysis/ladder_tasks.py": "7f53a2210450e4264089a60da31739d2c0c187b0dcd778b203997b9bd873e847",
+    "component_analysis/specificity_ladder.py": "93a22eb6b51cf6ea081b37dd354179cd56aa89def6bb50337b40fc2937b9170e",
+    "dataset/build_user_inversion_v2.py": "47cb1e1dd84d6efc43474c6ce9fc10b30f111a96f083aa370a0d9ac01c827b2a",
+    "dataset/matched_honest.py": "cb30aa003b22a0cb940bb2fb16e0f67be77f0f5e433d7a4d9b52f1fd059f13f0",
+    "dataset/user_inversion_pipeline.py": "4d49697731f291339262fe6ebc6a5909601a26fcf5d31ff562b55d1d74b2a0ee",
+    "evaluation/benchmarks/sandbagging.py": "67fce74fe14e45abb6b7ea57e96a1382ef19fa0e74ea1f40126f4adfc61a7039",
+    "evaluation/benchmarks/sources.py": "06b9286567467bf37a52faaf9ee8fff41b4c1dc8ce8e348b2f2b032b7eac633f",
+    "evaluation/grader_hash.py": "6b26c4c4cd111fe3056f8a0b1119eabf51ab367eb242588a73b9cb3f85b13a19",
+    "models/__init__.py": "ef3796de0c3e9ca6e0760fe72764241664f2d81055a891ebd5d47c9c43aef210",
+    "models/_compat.py": "449b03c2232a539dc590fed795ca2a55a045c27ce99b13b9a5204363970d2737"
+  },
+  "raw_objects": "raw_object_index.json"
+}

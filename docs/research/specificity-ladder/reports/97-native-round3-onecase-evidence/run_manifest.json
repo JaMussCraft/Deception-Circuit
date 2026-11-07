@@ -1,0 +1,348 @@
+{
+  "status": "verification incomplete; no-periodic case numerics returned, but mandatory case authentication timed out; stopped",
+  "scenario_root": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8",
+  "core": {
+    "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/core.python.1793645437.78031.1342751.dt-login04.delta.ncsa.illinois.edu",
+    "bytes": 2544443392,
+    "mtime_ns": 1793645455000000000,
+    "inode": 612497271287743898,
+    "preserved_in_place": true,
+    "not_copied_to_docs": true
+  },
+  "source_unchanged": true,
+  "source_hashes": {
+    "component_analysis/a3_direction_pipeline.py": "96678db186078ab37cad108e2d1e71ffdccf1fb3dd157c35cdc57a91b2ebd4a0",
+    "component_analysis/a3_direction_runner.py": "89a62335665595533204006c3eca28d14ca9c42eb600879c235e9c6370739429",
+    "component_analysis/a3_direction_runtime.py": "b66c2d8cd26c36f321b5079758209214746b0e4eec16a6c801742086d729c0cc",
+    "component_analysis/a3_direction_workload.py": "3e43aaf2b4cacb99df87593ae377c8fdf3eb7b223b258ed8873853841404d8f9",
+    "component_analysis/a3_directions.py": "ed882d4e12a396e03e73671e588beba5b1a8c90ab9d31e7ee73d4194430b4a86",
+    "component_analysis/a3_pipeline.py": "310eb53427ad4ac32522dfd0d6cd3b33e4ec887af1776579845f8953bdbe83f5",
+    "scripts/jobs/specificity_a3.sh": "936dfb7f8b9c2d267d52f1e199ed431275e6527cbfc3a105a22e3812289a9b96",
+    "tests/test_a3_direction_runner.py": "3ea945d5b23b4eef7d56139758c7075ea1b56ac612f1923590b7978628ca0120",
+    "tests/test_a3_direction_runtime.py": "5a41e89b0b2bd5fd59553f5f5a63260638e3547a63c31a615d84da08f796fb6a",
+    "tests/test_a3_direction_workload.py": "91eb6f874e180c5ffb362daba231631b7bea21c224446580efccfe20a9007300",
+    "tests/test_a3_directions.py": "cd8471b1524ad7b8f1b7c87f9eb5fec5724b3ab2980027ef7aadfea3fc3bb1c1",
+    "tests/test_a3_pipeline.py": "bbb3efdba075cc14c2997cc11ae44bab268bdea56459c0574d6bfc21b62f4a18",
+    "tests/a3_direction_native_scenario.py": "9b5061ab9618222b23230917f446abcaa73747f3d216f69c77b9218feec6297b"
+  },
+  "partial_state_before_next_attempt": {
+    "pilot-verification-cases/selected": [],
+    "pilot-scratch": []
+  },
+  "failed_result": {
+    "command": [
+      "/u/swong2/.conda/envs/mgnp/bin/python",
+      "/tmp/report97-native-onecase-instrumented.py",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/diagnostics/selected-onecase-01"
+    ],
+    "pid": 1342751,
+    "exit_code": -11,
+    "elapsed_seconds": 629.1689032019931,
+    "user_seconds": 212.371587,
+    "system_seconds": 97.071839,
+    "peak_child_rss_bytes": 6612692992,
+    "timeout_seconds": 900,
+    "kill_grace_seconds": 15,
+    "term_sent_at": null,
+    "logging_only_instrumentation": true,
+    "selected_case_start": 0,
+    "selected_case_count": 1,
+    "source_unchanged": true
+  },
+  "fault_thread": {
+    "lwp": 1342809,
+    "stack": [
+      "dump_frame traceback.c:1259",
+      "dump_traceback",
+      "_Py_DumpTracebackThreads",
+      "faulthandler_thread"
+    ]
+  },
+  "conclusion": "Scheduled external traceback dumper is the faulting thread. This is not evidence of a native numeric operation fault.",
+  "limits": [
+    "No safe minimal crash reproducer established; exact wrapper regression passes.",
+    "Periodic final traceback is truncated; actual completed forward count unavailable.",
+    "GDB warned core may not match executable; explicit resolved interpreter path was used and Python frame symbols resolved."
+  ],
+  "next_attempt": {
+    "authorized_by_root": true,
+    "start": 0,
+    "count": 1,
+    "timeout_seconds": 900,
+    "kill_grace_seconds": 15,
+    "only_change": "Remove recurring faulthandler thread; retain fatal handler and passive logs/samples",
+    "supervisor": "/tmp/report97-native-onecase-no-periodic-supervisor.py"
+  },
+  "all_current_owned_processes_terminal": true,
+  "artifacts": {
+    "run_manifest-before-no-periodic.json": {
+      "bytes": 6545,
+      "sha256": "da641cd26194e69dec486486704549a3bfc4b54d04ac0aab9a2fc8d110c90f98"
+    },
+    "number-check.json": {
+      "bytes": 3727,
+      "sha256": "9fc4a9ab96ffef1a7b5892f9559f553009309b8812f7c088e45666a745ae6da5"
+    },
+    "wrapper-regression.py": {
+      "bytes": 734,
+      "sha256": "8f5a4a75815c1cd2736e233044bf0d9d6488d40968f62d39ed19a83ee10d9d82"
+    },
+    "result.json": {
+      "bytes": 876,
+      "sha256": "37efcc37de781581d16300174dd6cfa145cdb653756bb2a544e50b21731a0525"
+    },
+    "steps.log": {
+      "bytes": 3224,
+      "sha256": "65c0762743f3730739cb40e0e54e0099d11449f41dff95341e17a0f3038a9c58"
+    },
+    "memory-before.json": {
+      "bytes": 730,
+      "sha256": "a468483b18cb443b9298db93e6126e113c7c6acce48fa93006f690c9dcaa6cba"
+    },
+    "wrapper-regression.json": {
+      "bytes": 649,
+      "sha256": "eecaa0e296d5be91a5ff13f5b6b1c29cdb3a161ed0e7204fc2b8fe622708b538"
+    },
+    "gdb-backtrace.log": {
+      "bytes": 8765,
+      "sha256": "62833e1135fee55c49d13b20ac059af9c9d06ed932bf34d76e01ce5603007b93"
+    },
+    "published-case-COMPLETE.json": {
+      "bytes": 487,
+      "sha256": "96b3ed354fdb068c406a2afdfe8c2c566b9be856ae3e34b0414316a9d1a09110"
+    },
+    "gdb-python-only.log": {
+      "bytes": 3937,
+      "sha256": "ab921e301891c2059f30e736e1a70813d48daae6b2c3163a0df425fe819909e5"
+    },
+    "report97-native-onecase-supervisor.py": {
+      "bytes": 2910,
+      "sha256": "2ab6ef05e3317d16a900a8299db162f29f25e45da5595186d812990bb8689483"
+    },
+    "memory-after.json": {
+      "bytes": 730,
+      "sha256": "509de636c9c594bb317c6be3798d2bf726fd70d1e85d2c196520fe3aa1dbcfec"
+    },
+    "stacks.log": {
+      "bytes": 8361,
+      "sha256": "b035e361c67ed837385f72447106d8be847783d7c1b1a4c5ef92e4a712649b8b"
+    },
+    "published-case-state.json": {
+      "bytes": 2080,
+      "sha256": "1741024d661372027c194a0e10005f9707e422c3431375e512f7f497fdcc296d"
+    },
+    "report97-native-onecase-no-periodic.py": {
+      "bytes": 1645,
+      "sha256": "2052408d190f4b751aef88646cd50f6aa1b24deaf991fe107eb9de77c2d0f83b"
+    },
+    "gdb-fault-detail.log": {
+      "bytes": 133,
+      "sha256": "09761372685b45010a60846fb11be77c74eed357a08543362a9d6bf983d0f302"
+    },
+    "child-samples.jsonl": {
+      "bytes": 17516,
+      "sha256": "35a85dc1abad6c610eb2d32dc22a407b2e96226128c82e83cdfbc544e8cdb29a"
+    },
+    "published-case-numeric-COMPLETE.json": {
+      "bytes": 204,
+      "sha256": "605b0bba9a2f377acf906644d9592cd72f0d7d95ad50f0409f82d9de07aee6d1"
+    },
+    "report97-native-onecase-instrumented.py": {
+      "bytes": 1677,
+      "sha256": "2d7a0deb8b0e84995e2c2a79fd36d055a8c052945ec1a4b6872d9532cdd32522"
+    },
+    "source_snapshot.json": {
+      "bytes": 1423,
+      "sha256": "9ad60a15ca5738c1e492e8e06f5afc95f3ea24086e958dc435d91a90807c4ca1"
+    },
+    "instrumentation-only.diff": {
+      "bytes": 923,
+      "sha256": "c503c5f6d553ddf64e6ceb9d226d7102d855b2812f262af796d48966174bc6c2"
+    },
+    "report97-native-onecase-no-periodic-supervisor.py": {
+      "bytes": 2921,
+      "sha256": "b330c5701fa379c43aa7e81f65e65029e4549c65fa9ce83383b9c7178bdff0c2"
+    },
+    "selected-onecase-02-no-periodic/result.json": {
+      "bytes": 900,
+      "sha256": "08128c396b5fa8638a07ff518d24eaf1c431a510fed8c6303e963e9e28f3146d"
+    },
+    "selected-onecase-02-no-periodic/steps.log": {
+      "bytes": 5438,
+      "sha256": "6c11130e15cedb7e2b9b0a081ce9e7356ad9dec5cb2ce01c9dbe0a257257eca6"
+    },
+    "selected-onecase-02-no-periodic/memory-before.json": {
+      "bytes": 731,
+      "sha256": "3275025e0ec364e90804ab00a7e4a89a0ce1a2b2a0b282906ff3e39891f80b01"
+    },
+    "selected-onecase-02-no-periodic/memory-after.json": {
+      "bytes": 731,
+      "sha256": "62294f981c5f283fe7a78e26af5f2d7c35d0345dac95f2e004a323b5c88e61e6"
+    },
+    "selected-onecase-02-no-periodic/stacks.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "selected-onecase-02-no-periodic/child-samples.jsonl": {
+      "bytes": 25333,
+      "sha256": "facbce59996294c4e273852699b3aa5f3888d070bd6ac8001118c42f6518c700"
+    }
+  },
+  "latest_attempt": {
+    "result": {
+      "command": [
+        "/u/swong2/.conda/envs/mgnp/bin/python",
+        "/tmp/report97-native-onecase-no-periodic.py",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/diagnostics/selected-onecase-02-no-periodic"
+      ],
+      "pid": 1857983,
+      "exit_code": -15,
+      "elapsed_seconds": 911.6437627699925,
+      "user_seconds": 287.94796,
+      "system_seconds": 118.400857,
+      "peak_child_rss_bytes": 6799953920,
+      "timeout_seconds": 900,
+      "kill_grace_seconds": 15,
+      "term_sent_at": 900.1059420289821,
+      "logging_only_instrumentation": true,
+      "selected_case_start": 0,
+      "selected_case_count": 1,
+      "source_unchanged": true
+    },
+    "startup_to_invocation_seconds": 583.167560715985,
+    "actual_invocation_seconds": 59.27958186197793,
+    "observed_forward_calls": 11100,
+    "post_invocation_until_reap_seconds": 269.1965501609957,
+    "last_completed_step": {
+      "event": "call_end",
+      "elapsed_seconds": 885.7520383310039,
+      "peak_rss_bytes": 6799953920,
+      "observed_forward_calls": 11100,
+      "function": "_numeric_backing_proof",
+      "call_seconds": 183.24889286700636
+    },
+    "memory_event_deltas": {
+      "/sys/fs/cgroup/user.slice/user-78031.slice/session-6591.scope": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "/sys/fs/cgroup/user.slice/user-78031.slice": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "/sys/fs/cgroup/user.slice": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "/sys/fs/cgroup": {}
+    },
+    "case_state": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-verification-cases/selected/4318f65b0a320e883897ca95ad472e2d1a0a11f53abea6ce1a848853d9fb57f1",
+      "byte_completion_checks": {
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-verification-cases/selected/4318f65b0a320e883897ca95ad472e2d1a0a11f53abea6ce1a848853d9fb57f1": {
+          "marker_bytes_match": true,
+          "files": {
+            "case.json": {
+              "bytes": 10958264,
+              "sha256": "f41ffd4fd5873611b89b11b7fb205d81251877f6b92cf4530aa2ac686060ffb0"
+            },
+            "numeric/COMPLETE.json": {
+              "bytes": 204,
+              "sha256": "605b0bba9a2f377acf906644d9592cd72f0d7d95ad50f0409f82d9de07aee6d1"
+            },
+            "numeric/payload.json": {
+              "bytes": 8326458,
+              "sha256": "6d795ea426d92aa84e65f66992d46948cca795e413657a6623ba9529565d0c50"
+            }
+          }
+        },
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-verification-cases/selected/4318f65b0a320e883897ca95ad472e2d1a0a11f53abea6ce1a848853d9fb57f1/numeric": {
+          "marker_bytes_match": true,
+          "files": {
+            "payload.json": {
+              "bytes": 8326458,
+              "sha256": "6d795ea426d92aa84e65f66992d46948cca795e413657a6623ba9529565d0c50"
+            }
+          }
+        }
+      },
+      "semantic_case_authentication_complete": false,
+      "enclosing_process_completed": false,
+      "original_case_seconds": 102.63064642000245,
+      "original_case_forward_calls": 11100,
+      "original_samples_are_actual": true,
+      "aggregate_reexecutes_case": false,
+      "binding_kind": "a3_injected_verification_pilot_case_v1",
+      "execution_authorized": false,
+      "invocation_id": "4318f65b0a320e883897ca95ad472e2d1a0a11f53abea6ce1a848853d9fb57f1",
+      "scratch_children": []
+    },
+    "aggregate_executed": false
+  },
+  "completed_before_failure": {
+    "prefit_cases": 9,
+    "fit_capture_pieces": 48,
+    "fit_records": 9,
+    "validation_shards": 210,
+    "selected_records": 9,
+    "selected_numpy_files": 8392,
+    "selected_all_files": 8394,
+    "selected_pilot_cases_fully_authenticated_in_process": 0,
+    "selected_pilot_cases_byte_complete_published": 1,
+    "calibration_shards": 0,
+    "assessment_shards": 0
+  },
+  "historical_manifest_correction": "Earlier timeout manifest selected_numpy_files=0 used a nonrecursive count; recursive observed count is8392. Prior manifest preserved unchanged.",
+  "next_safe_boundary": "Preserve byte-complete case4318f65... and resume only through original full authentication, without rerunning or resigning numeric evidence. No further run is released. A reviewed operational bound/context repair is needed before more cases; measured900s was insufficient for one complete case process.",
+  "commands": [
+    {
+      "command": "/sw/external/python/anaconda3/bin/python3.9 /tmp/report97-native-onecase-supervisor.py",
+      "shell_exit": 139,
+      "result": "result.json",
+      "child_exit": -11
+    },
+    {
+      "command": "/sw/external/python/anaconda3/bin/python3.9 /tmp/report97-native-onecase-no-periodic-supervisor.py",
+      "shell_exit": 143,
+      "result": "selected-onecase-02-no-periodic/result.json",
+      "child_exit": -15
+    },
+    {
+      "command": "/sw/external/python/anaconda3/bin/python3.9 docs/research/specificity-ladder/reports/97-native-round3-onecase-evidence/wrapper-regression.py",
+      "exit_code": 0
+    },
+    {
+      "command": "/usr/bin/timeout 60s gdb -nx -batch -iex 'set auto-load off' -iex 'set auto-solib-add off' -iex 'set debuginfod enabled off' -ex 'sharedlibrary libpython' -ex 'info threads' -ex 'thread apply all bt 12' /u/swong2/.conda/envs/mgnp/bin/python3.12 core.python.1793645437.78031.1342751.dt-login04.delta.ncsa.illinois.edu",
+      "output": "gdb-python-only.log",
+      "exit_code_not_captured": true
+    },
+    {
+      "command": "/usr/bin/timeout 45s gdb -nx -batch -iex 'set auto-load off' -iex 'set auto-solib-add off' -iex 'set debuginfod enabled off' -ex 'info locals' -ex 'p *frame' -ex 'x/10i $pc-16' -ex 'info registers' /u/swong2/.conda/envs/mgnp/bin/python3.12 core.python.1793645437.78031.1342751.dt-login04.delta.ncsa.illinois.edu",
+      "output": "gdb-fault-detail.log",
+      "exit_code": 124
+    },
+    {
+      "command": "research-session lint docs/research/specificity-ladder/reports/97-native-round3-timeout-handback.md",
+      "exit_code": 0
+    },
+    {
+      "command": "/sw/external/python/anaconda3/bin/python3.9 scripts/check_report_numbers.py docs/research/specificity-ladder/reports/97-native-round3-timeout-handback.md --strict --json",
+      "exit_code": 0,
+      "output": "number-check.json"
+    }
+  ]
+}

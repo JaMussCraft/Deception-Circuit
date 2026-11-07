@@ -1,0 +1,25 @@
+{
+  "at_utc": "2026-11-06T19:50:18.633686+00:00",
+  "command": [
+    "sbatch",
+    "--parsable",
+    "--account=beto-delta-cpu",
+    "--partition=cpu",
+    "--nodes=1",
+    "--ntasks=1",
+    "--cpus-per-task=1",
+    "--mem=4G",
+    "--time=00:05:00",
+    "--no-requeue",
+    "--export=ALL",
+    "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+    "--output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-slurm-%j.log",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/cpu.sbatch",
+    "--mode",
+    "RED",
+    "--output",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01"
+  ],
+  "exit_code": 0,
+  "output": "23612303\n"
+}

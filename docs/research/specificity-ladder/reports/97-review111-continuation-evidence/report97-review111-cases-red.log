@@ -1,0 +1,22 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_bounded_pilot_cases_resume_authenticates_original_numbers_and_full_coverage _
+
+tmp_path = PosixPath('/tmp/review111-cases-red/test_bounded_pilot_cases_resum0')
+fake = []
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59ca36df10>
+
+    def test_bounded_pilot_cases_resume_authenticates_original_numbers_and_full_coverage(tmp_path,fake,monkeypatch):
+        from tests import a3_direction_native_scenario as scenario
+        r,d,p=_fake_pilot_inputs(2);inv=r.workload.build_inventory(d,p,stage='prefit')
+        binding={'kind':'explicit_fake_cpu_case_binding','source':scenario.source_identity()}
+        ids=[x['invocation_id'] for x in inv['packing_invocations']]
+        for selected_ids in (['missing'],[ids[0],ids[0]]):
+>           with pytest.raises(ValueError):scenario.pilot_cases(object(),d,p,inv,root=tmp_path,part='prefit',case_ids=selected_ids,binding=binding)
+                                           ^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: module 'tests.a3_direction_native_scenario' has no attribute 'pilot_cases'
+
+tests/test_a3_direction_runtime.py:1547: AttributeError
+=========================== short test summary info ============================
+FAILED tests/test_a3_direction_runtime.py::test_bounded_pilot_cases_resume_authenticates_original_numbers_and_full_coverage
+1 failed in 18.24s

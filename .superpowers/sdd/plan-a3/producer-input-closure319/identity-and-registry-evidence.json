@@ -1,0 +1,66 @@
+{
+  "candidate_source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/candidate-source310/candidate-source.json",
+  "candidate_commit": "2ba697d7f5fdfd7cebc7225ae004ec9e731e434f",
+  "registry_semantics": [
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/directions.json",
+      "observed_frozen_grader_field": "866fd15dd30b695e46ffe955b09894fb831af92e2b9015eafbd7f0eee151d2f9",
+      "historical_A1_raw_sha256": "c2ff4b3a3793fb186a88ae607a60cd0fa0fe3387fdc97033f92157d69039c337",
+      "proposed317_raw_sha256": "508092548c76deef7dc3339cec990d1a62cbd455ac0117e8ada215755a591ada",
+      "root_fresh_snapshot_capture_required": true
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/directions.json",
+      "observed_frozen_grader_field": "866fd15dd30b695e46ffe955b09894fb831af92e2b9015eafbd7f0eee151d2f9",
+      "historical_A1_raw_sha256": "f8c7dbb92f2edc509c7bb8e94624a5c8adabddd103a8c48db1cc59bd69a3c6b0",
+      "proposed317_raw_sha256": "f8c7dbb92f2edc509c7bb8e94624a5c8adabddd103a8c48db1cc59bd69a3c6b0",
+      "root_fresh_snapshot_capture_required": true
+    }
+  ],
+  "A1_identity_tokenizer": {
+    "tokenizer": "meta-llama/Llama-3.1-8B-Instruct",
+    "tokenizer_revision": "0e9e39f249a16976918f6564b8830bc894c89659"
+  },
+  "A1_diagnostic_tokenizer_loading": {
+    "actual_load_path": "meta-llama/Llama-3.1-8B-Instruct",
+    "compatibility_reason": null,
+    "identity_normalized": false,
+    "logical_identifier": "meta-llama/Llama-3.1-8B-Instruct",
+    "resolved_snapshot": "/work/nvme/beto/swong2/hub/models--meta-llama--Llama-3.1-8B-Instruct/snapshots/0e9e39f249a16976918f6564b8830bc894c89659",
+    "tokenizer_config_sha256": "177c7b61e616fecb84c17ce0591acb92c6c4d60e9ac5ababfb940ff23bbcd424"
+  },
+  "A1_mmlu_manifest": {
+    "snapshot": "/work/nvme/beto/swong2/hub/datasets--cais--mmlu/snapshots/c30699e8356da336a370243923dbaf21066bb9fe",
+    "revision": "c30699e8356da336a370243923dbaf21066bb9fe",
+    "parquet_hashes": {
+      "all/test-00000-of-00001.parquet": "74a41822ce7d3def56e1682f958469c04642a5336a5ce912fa375fdb90fb25d7"
+    }
+  },
+  "historical_A3_model_config_identity": {
+    "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+    "path": "/work/nvme/beto/swong2/hub/models--meta-llama--Llama-3.1-8B-Instruct/snapshots/0e9e39f249a16976918f6564b8830bc894c89659/config.json",
+    "sha256": "29e4c210b0d6ac178b16b2a255a568bdb23b581e50ca1ef6a6d071dd85704e6e",
+    "snapshot": "/work/nvme/beto/swong2/hub/models--meta-llama--Llama-3.1-8B-Instruct/snapshots/0e9e39f249a16976918f6564b8830bc894c89659"
+  },
+  "HF_judgment": "The hub child namespace aligns actual historical A3 tokenizer diagnostics, original utility source and original model-config identity. Parent-only binding misses frozen A1 MMLU hub path unless both namespaces are supplied. A2 model_geometry receipt is a different contract.",
+  "literal_wrapper_semantics": "specificity_a3.sh exports HF_HOME=DC_HF_HOME and leaves HF_HUB_CACHE untouched. Historical/current delta.env sets DC_HF_HOME=/work/nvme/beto/swong2; standard default uses hub child but an inherited A2 override would survive. Pin future A3 H200 consumer HF_HUB_CACHE explicitly to hub child.",
+  "generated_outputs_are_not_inputs": true,
+  "no_native_tests_or_imports": true,
+  "no_actual_remote_hash_readback": true,
+  "protected_registry_local_inspection": [
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/held_out.json",
+      "schema": 1,
+      "sets": 0,
+      "external_path_entries": 0,
+      "scope": "local JSON inspection only; root must capture/authenticate fresh remote CPU snapshot"
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
+      "schema": 1,
+      "sets": 0,
+      "external_path_entries": 0,
+      "scope": "local JSON inspection only; root must capture/authenticate fresh remote CPU snapshot"
+    }
+  ]
+}

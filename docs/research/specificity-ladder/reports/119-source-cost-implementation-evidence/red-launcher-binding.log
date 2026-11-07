@@ -1,0 +1,44 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_cached_mask_source_refresh_preserves_current_protection_and_semantic_work_once _
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-launcher-binding/test_cached_mask_source_refres0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f1e9d8b1e50>
+
+    def test_cached_mask_source_refresh_preserves_current_protection_and_semantic_work_once(tmp_path,monkeypatch):
+        from tests.test_a3_source_validation import setup_case
+        from component_analysis import a3_source_validation as sources, a3_direction_artifacts as artifacts, a3_pipeline
+        from component_analysis import a3_direction_runtime as authority, ladder_pipeline as ladder
+        from types import SimpleNamespace
+        p=driver();c=setup_case(tmp_path,monkeypatch);calls=[]
+        design=c.design;design.update(direction_protocol={},parent_evidence={'prepared_path':'parent','selected_path':'selected'})
+        design_path=tmp_path/'mask-design.json';ladder.write_artifact(design_path,design)
+        rule=tmp_path/'rule.json';rule.write_text('{}');bundle=tmp_path/'root-bundle';authority.publish_object(bundle,{})
+        widths={'ioi':4,'mmlu':4}
+        prepared=dict(kind='a3_mask_prepared_v1',injected=False,candidates=[['head',0,0]],chunk_size=1,seeds=[42,1,123],arms=['constrained','unconstrained'],
+            updates=200,validation_every=20,validation_donors='opposite',root_ruling={},random_controls={'count':19},timing_protocol={},new30={'status':'missing_comparison'},hbank_sources={},widths=widths)
+        prepared['identity']=dict(commit='a'*40,design_path=str(design_path),design_file_sha256=p.common.file_hash(design_path),code_hashes={},operational_ruling_path=str(rule),operational_ruling_sha256=p.common.file_hash(rule),pilot_ruling_path=str(rule),pilot_ruling_sha256=p.common.file_hash(rule),root_bundle_reference=authority.object_reference(bundle),physical_widths=widths)
+        prepared['identity']['mask_protocol_sha256']=p.digest(p.mask_protocol(prepared));path=tmp_path/'mask-prepared';authority.publish_object(path,prepared)
+        monkeypatch.setattr(p,'new30_reference',lambda:prepared['new30']);monkeypatch.setattr(p,'mask_code_hashes',lambda:{})
+        monkeypatch.setattr(p,'execution_widths',lambda *a,**k:widths)
+        monkeypatch.setattr(a3_pipeline,'load_a1_parents',lambda *a:({'rows':{}},{'banks':{}},{}))
+        monkeypatch.setattr(artifacts,'validate_live',lambda *a,**k:calls.append('semantic') or {'commit':'a'*40,'injected':False})
+        monkeypatch.setattr(sources,'source_dependencies',lambda *a,**k:([c.static,rule,bundle],[],[]))
+        monkeypatch.setattr(sources,'new30_dependencies',lambda:([],[]))
+        args=SimpleNamespace(commit='a'*40,registry=[],prepared=str(path),design=str(design_path),work_dir=str(tmp_path))
+        first,evidence=p._live_mask(prepared,args);second,again=p._live_mask(prepared,args)
+        assert calls==['semantic']
+        assert sources.is_view(first) and sources.is_view(second)
+        assert first==second and again['registry_hashes']
+        copied=copy.deepcopy(second['access_rows']);copied['far_v2'][0]['instance_id']='copy-only'
+        assert first['access_rows']['far_v2'][0]['instance_id']=='recipient'
+        with monkeypatch.context() as changed:
+            changed.setenv('SPECIFICITY_A3_MASK_LAUNCH_EXECUTABLE',str(tmp_path/'different-python'))
+>           with pytest.raises(ValueError,match='scope'):p._live_mask(prepared,args)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE ValueError
+
+tests/test_a3_mask_pipeline.py:759: Failed
+=========================== short test summary info ============================
+FAILED tests/test_a3_mask_pipeline.py::test_cached_mask_source_refresh_preserves_current_protection_and_semantic_work_once
+1 failed, 89 deselected in 3.17s

@@ -1,0 +1,111 @@
+{
+  "status": "scoped R1 repair accepted",
+  "whole_unit_accepted": false,
+  "scientific_execution": false,
+  "source_hashes": {
+    "component_analysis/a3_direction_pipeline.py": "96678db186078ab37cad108e2d1e71ffdccf1fb3dd157c35cdc57a91b2ebd4a0",
+    "component_analysis/a3_direction_runner.py": "89a62335665595533204006c3eca28d14ca9c42eb600879c235e9c6370739429",
+    "component_analysis/a3_direction_runtime.py": "b66c2d8cd26c36f321b5079758209214746b0e4eec16a6c801742086d729c0cc",
+    "component_analysis/a3_direction_workload.py": "3e43aaf2b4cacb99df87593ae377c8fdf3eb7b223b258ed8873853841404d8f9",
+    "component_analysis/a3_directions.py": "ed882d4e12a396e03e73671e588beba5b1a8c90ab9d31e7ee73d4194430b4a86",
+    "component_analysis/a3_pipeline.py": "310eb53427ad4ac32522dfd0d6cd3b33e4ec887af1776579845f8953bdbe83f5",
+    "scripts/jobs/specificity_a3.sh": "936dfb7f8b9c2d267d52f1e199ed431275e6527cbfc3a105a22e3812289a9b96",
+    "tests/test_a3_direction_runner.py": "3ea945d5b23b4eef7d56139758c7075ea1b56ac612f1923590b7978628ca0120",
+    "tests/test_a3_direction_runtime.py": "5a41e89b0b2bd5fd59553f5f5a63260638e3547a63c31a615d84da08f796fb6a",
+    "tests/test_a3_direction_workload.py": "91eb6f874e180c5ffb362daba231631b7bea21c224446580efccfe20a9007300",
+    "tests/test_a3_directions.py": "cd8471b1524ad7b8f1b7c87f9eb5fec5724b3ab2980027ef7aadfea3fc3bb1c1",
+    "tests/test_a3_pipeline.py": "bbb3efdba075cc14c2997cc11ae44bab268bdea56459c0574d6bfc21b62f4a18",
+    "tests/a3_direction_native_scenario.py": "9b5061ab9618222b23230917f446abcaa73747f3d216f69c77b9218feec6297b"
+  },
+  "source_unchanged": true,
+  "preserved_baseline": ".superpowers/sdd/plan-a3/unit-f-review111-round2-source",
+  "results": {
+    "mgnp": {
+      "exit_code": 0,
+      "passed": 3,
+      "deselected": 156
+    },
+    "base": {
+      "exit_code": 0,
+      "passed": 3,
+      "deselected": 156
+    }
+  },
+  "observations": {
+    "mgnp": [
+      {
+        "exit_code": 0,
+        "files_before": 23,
+        "files_after": 23,
+        "added_files": [],
+        "cli_output": "{\"action\": \"admit\", \"commit\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"design_sha256\": \"720c7067673597e607e1980a4d17a5bae8b682ffaf4fdb4e6fe87db70dd08c64\", \"dry_run\": true, \"execution_authorized\": false, \"inventory_sha256\": \"2318eefa8c0626c0d6d55157bf40b0d15899dee571955f22a642b59cd6620072\", \"live_allocation_admission\": \"deferred/unverified\", \"missing_prerequisites\": [\"completed authentication/index startup measurement\"], \"model_loaded\": false, \"protocol_sha256\": \"1a36f274f4fe5a0d77f9d5ee3d0fbc418555477f9dd157bb58aca24363a5f2d1\", \"stage\": \"prepare\", \"writes\": false}\n"
+      },
+      {
+        "dry_run": true,
+        "files_before": 23,
+        "files_after": 23,
+        "directories_before": 16,
+        "directories_after": 16,
+        "tree_unchanged": true
+      },
+      {
+        "dry_run": false,
+        "files_before": 23,
+        "files_after": 27,
+        "directories_before": 16,
+        "directories_after": 20,
+        "tree_unchanged": false
+      }
+    ],
+    "base": [
+      {
+        "exit_code": 0,
+        "files_before": 23,
+        "files_after": 23,
+        "added_files": [],
+        "cli_output": "{\"action\": \"admit\", \"commit\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"design_sha256\": \"720c7067673597e607e1980a4d17a5bae8b682ffaf4fdb4e6fe87db70dd08c64\", \"dry_run\": true, \"execution_authorized\": false, \"inventory_sha256\": \"2318eefa8c0626c0d6d55157bf40b0d15899dee571955f22a642b59cd6620072\", \"live_allocation_admission\": \"deferred/unverified\", \"missing_prerequisites\": [\"completed authentication/index startup measurement\"], \"model_loaded\": false, \"protocol_sha256\": \"1a36f274f4fe5a0d77f9d5ee3d0fbc418555477f9dd157bb58aca24363a5f2d1\", \"stage\": \"prepare\", \"writes\": false}\n"
+      },
+      {
+        "dry_run": true,
+        "files_before": 23,
+        "files_after": 23,
+        "directories_before": 16,
+        "directories_after": 16,
+        "tree_unchanged": true
+      },
+      {
+        "dry_run": false,
+        "files_before": 23,
+        "files_after": 27,
+        "directories_before": 16,
+        "directories_after": 20,
+        "tree_unchanged": false
+      }
+    ]
+  },
+  "AST_comparison": {
+    "footprint_loop_AST_identical": true,
+    "actual_constructor_AST_identical_after_extraction": true,
+    "accepted_startup_test_AST_identical": true,
+    "source_files": 13,
+    "all_source_hashes_match": true
+  },
+  "interpreters": {
+    "mgnp": "/u/swong2/.conda/envs/mgnp/bin/python",
+    "base": "/sw/external/python/anaconda3/bin/python3.9"
+  },
+  "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. <python> -m pytest -q -s -p no:cacheprovider --basetemp=/tmp/review111-round3-independent-<env> docs/research/specificity-ladder/reports/111-round2-evidence/test_independent_round2_extra.py tests/test_a3_direction_runtime.py -k admission_dry_run_preserves",
+  "AST_command": "/sw/external/python/anaconda3/bin/python3.9 docs/research/specificity-ladder/reports/111-round3-evidence/check_extraction.py",
+  "limitations": [
+    "No full native run or production admission.",
+    "Prior B1/B2 acceptance and conditional target-host startup caveat remain."
+  ],
+  "evidence_sha256": {
+    "extraction.json": "101c8deea67041eec5c77ada11efd1813665ee656ed0040c2c2d6bbed3ca9b56",
+    "reviewed-fix.diff": "b70cb6fc552f278084e41f5a02cd3afa3bba7c8430013426735467a4acd5ce9c",
+    "reviewed_runtime.py": "b66c2d8cd26c36f321b5079758209214746b0e4eec16a6c801742086d729c0cc",
+    "mgnp.log": "edab73e571f4893638d3005d0bce9fd0743e2c5eb2f224d4b56616c044171c28",
+    "check_extraction.py": "eb4b4fb5fd7bc51cdfadb201b69481500b062cf761b8405c197ca0d1d1e8bb9b",
+    "base.log": "dd7ba5fde38ef39f0c9215f16cbc8fcbd1d7e61f31e3ea3710f9a19c07ea797d"
+  }
+}

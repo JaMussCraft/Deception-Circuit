@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "sbatch",
+    "--test-only",
+    "--account=bimc-delta-cpu",
+    "--partition=cpu,cpu-interactive",
+    "--constraint=projects",
+    "--nodes=1",
+    "--ntasks=1",
+    "--cpus-per-task=2",
+    "--mem=32G",
+    "--time=00:20:00",
+    "--no-requeue",
+    "--export=ALL,CUDA_VISIBLE_DEVICES=",
+    "--job-name=lad-a2-a3-red",
+    "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+    "--output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/root-a2-a3-red-20261106/job-%j.log",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/root-a2-a3-red-20261106/launch.sh"
+  ],
+  "exit_code": 0,
+  "stdout": "",
+  "stderr": "sbatch: Job 23618374 to start at 2026-11-17T10:32:56 a using 2 processors on nodes cn094 in partition cpu\n"
+}

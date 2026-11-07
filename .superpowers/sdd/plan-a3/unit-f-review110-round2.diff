@@ -1,0 +1,124 @@
+--- a/component_analysis/a3_direction_workload.py
++++ b/component_analysis/a3_direction_workload.py
+@@ -795,34 +795,49 @@
+         else: sums['actual_unknown_entries']+=1
+         sums['all']+=h; sums[e['phase']]+=h
+         if e.get('subphase')=='directions': sums['direction_'+e['phase']]+=h
+     contingency=_finite(ledger.get('contingency_gpu_hours'),'contingency reserve')
+     _require(contingency+sums['contingency']>=6,'full A3 contingency must remain counted')
+     sums['contingency_remaining']=contingency
+     return sums
+ 
+ 
+ class _FrozenJSONDict(dict):
++    __slots__=('_initialized',)
++    def __init__(self,*args,**kwargs):
++        if getattr(self,'_initialized',False):self._immutable()
++        values=dict(*args,**kwargs)
++        dict.__init__(self,((key,_freeze_json(value)) for key,value in values.items()))
++        object.__setattr__(self,'_initialized',True)
+     def _immutable(self,*args,**kwargs):raise TypeError('validated inventory is immutable')
+-    __setitem__=__delitem__=clear=pop=popitem=setdefault=update=__ior__=_immutable
++    __setitem__=__delitem__=clear=pop=popitem=setdefault=update=__ior__=__setattr__=__delattr__=_immutable
++    def __copy__(self):return self
+     def __deepcopy__(self,memo):return self
+ 
+ 
+ class _FrozenJSONList(list):
++    __slots__=('_initialized',)
++    def __init__(self,*args,**kwargs):
++        if getattr(self,'_initialized',False):self._immutable()
++        values=list(*args,**kwargs)
++        list.__init__(self,(_freeze_json(value) for value in values))
++        object.__setattr__(self,'_initialized',True)
+     def _immutable(self,*args,**kwargs):raise TypeError('validated inventory is immutable')
+-    __setitem__=__delitem__=append=clear=extend=insert=pop=remove=reverse=sort=__iadd__=__imul__=_immutable
++    __setitem__=__delitem__=append=clear=extend=insert=pop=remove=reverse=sort=__iadd__=__imul__=__setattr__=__delattr__=_immutable
++    def __copy__(self):return self
+     def __deepcopy__(self,memo):return self
+ 
+ 
+ def _freeze_json(value,memo=None):
+     if memo is None:memo={}
+-    if type(value) not in (dict,list,tuple):return value
++    if type(value) in (_FrozenJSONDict,_FrozenJSONList) and getattr(value,'_initialized',False):return value
++    if not isinstance(value,(dict,list,tuple)):return value
+     if id(value) in memo:return memo[id(value)]
+     if isinstance(value,dict):out=_FrozenJSONDict({k:_freeze_json(v,memo) for k,v in value.items()})
+     else:out=_FrozenJSONList(_freeze_json(v,memo) for v in value)
+     memo[id(value)]=out
+     return out
+ 
+ 
+ def _packing_evidence(evidence, measurement):
+     """Validate the reviewed runner v2 receipt without importing a model runtime.
+ 
+--- a/tests/test_a3_direction_runtime.py
++++ b/tests/test_a3_direction_runtime.py
+@@ -1152,10 +1152,66 @@
+ 
+ 
+ def test_atomic_reconciliation_rechecks_deadline_without_caching_live_authority(monkeypatch):
+     import time
+     r=runtime();end=time.time()+100
+     def guard():return {'reservation':{'allocation_verified':True,'execution_authorized':True,'allocation':{'end_time_unix':end},'reservation':{'minimum_shard_seconds':1}}}
+     with r._PilotReconciliationPass([],dict(requirements=[],finish_reserve_seconds=1),guard=guard,injected=True) as reconciliation:
+         with monkeypatch.context() as scoped:
+             scoped.setattr(r.time,'time',lambda:end)
+             with pytest.raises(ValueError,match='finish'):reconciliation.check_deadline()
++
++
++@pytest.mark.parametrize('target',['dict','list','empty_dict','empty_list'])
++def test_cached_authority_rejects_public_reinitialization_including_empty_containers(tmp_path,target):
++    key={} if target=='empty_dict' else {'ids':[]} if target=='empty_list' else {'id':'original'}
++    inv=dict(identity={'injected':True,'commit':'a'*40},inventory_sha256='c'*64,phase='M2',expected_keys=[key],finish_reserve_seconds=10)
++    r,ledger,inv,path,_,_=_authority_case(tmp_path,inventory=inv);original=json.loads(json.dumps(inv));calls=[]
++    context=r.make_authority_context(path,ledger=ledger,inventory=inv,work_dir='/output',injected=True,inventory_validator=lambda _:calls.append(1))
++    container=inv['expected_keys'] if target=='list' else inv['expected_keys'][0]['ids'] if target=='empty_list' else inv['expected_keys'][0]
++    with pytest.raises(TypeError):
++        if target in ('dict','empty_dict'):container.__init__(id='outside')
++        elif target=='list':container.__init__([{'id':'outside'}])
++        else:container.__init__(['outside'])
++    with pytest.raises(TypeError):container._initialized=False
++    with pytest.raises(TypeError):del container._initialized
++    assert not hasattr(container,'__dict__')
++    assert json.loads(json.dumps(inv))==original and copy.deepcopy(inv)==inv
++    assert r.validate_reservation(path,ledger=ledger,inventory=inv,work_dir='/output',injected=True,authority_context=context,
++        inventory_validator=lambda _:pytest.fail('reconstructed proof'))['execution_authorized'] is True
++    assert calls==[1]
++
++
++@pytest.mark.parametrize('constructor',['dict','list','dict_subclass','list_subclass'])
++def test_frozen_construction_recursively_owns_mutable_children_and_preserves_json(constructor):
++    r=runtime();mutable={'id':'original'}
++    if constructor=='dict':value=r._FrozenJSONDict(child=mutable)
++    elif constructor=='list':value=r._FrozenJSONList([mutable])
++    elif constructor=='dict_subclass':
++        class Mapping(dict):pass
++        value=r._freeze_json(Mapping(child=mutable))
++    else:
++        class Sequence(list):pass
++        value=r._freeze_json(Sequence([mutable]))
++    mutable['id']='outside';child=value['child'] if isinstance(value,dict) else value[0]
++    assert child['id']=='original'
++    with pytest.raises(TypeError):child.__init__(id='outside')
++    with pytest.raises(TypeError):child['id']='outside'
++    assert copy.copy(value) is value and copy.deepcopy(value) is value
++    assert json.loads(json.dumps(value))==({'child':{'id':'original'}} if isinstance(value,dict) else [{'id':'original'}])
++
++
++@pytest.mark.parametrize('container_kind',['dict','list'])
++def test_context_mint_reconstructs_uninitialized_frozen_instances(tmp_path,container_kind):
++    r=runtime();cls=r._FrozenJSONDict if container_kind=='dict' else r._FrozenJSONList
++    unsealed=cls.__new__(cls)
++    key=unsealed if container_kind=='dict' else {'ids':unsealed}
++    inv=dict(identity={'injected':True,'commit':'a'*40},inventory_sha256='c'*64,phase='M2',expected_keys=[key],finish_reserve_seconds=10)
++    r,ledger,inv,path,_,_=_authority_case(tmp_path,inventory=inv);original=json.loads(json.dumps(inv))
++    context=r.make_authority_context(path,ledger=ledger,inventory=inv,work_dir='/output',injected=True,inventory_validator=lambda _:None)
++    consumed=inv['expected_keys'][0] if container_kind=='dict' else inv['expected_keys'][0]['ids']
++    assert consumed is not unsealed and consumed._initialized is True
++    unsealed.__init__({'outside':1} if container_kind=='dict' else ['outside'])
++    with pytest.raises(TypeError):consumed.__init__({'outside':1} if container_kind=='dict' else ['outside'])
++    assert json.loads(json.dumps(inv))==original
++    assert r.validate_reservation(path,ledger=ledger,inventory=inv,work_dir='/output',injected=True,authority_context=context,
++        inventory_validator=lambda _:pytest.fail('reconstructed proof'))['execution_authorized'] is True

@@ -1,0 +1,18 @@
+{
+  "kind": "root_read_only_usage_projection_ruling",
+  "root_authorized": true,
+  "interfaces": [
+    "live codex-usage account meter/reset",
+    "targeted research-session status freeze/cadence/points/exception/capturedreset"
+  ],
+  "formula": "projected_points=status_points+(live_used-cached_used); next_checkpoint_points=(status_points-points_since_register)+CLI_next_at_plusN; require projected<next_checkpoint_points and live<99",
+  "requirements": [
+    "live known and not pause",
+    "status targeted, nofreeze, known/fresh",
+    "live>=cached; rollback/resetmismatch/unknownfailclosed",
+    "capturedreset==actual live reset",
+    "active exception whenlive>=80",
+    "no hook/privatefile/usage-infrastructure mutation"
+  ],
+  "preserved_prior_manifest": "9a789bb341c98bdbc0d96c0fe3b70478d2128e320bae6ef6e45fddf9d7a36f76"
+}

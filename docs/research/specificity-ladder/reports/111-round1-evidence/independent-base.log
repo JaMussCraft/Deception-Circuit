@@ -1,0 +1,39 @@
+.....F                                                                   [100%]
+=================================== FAILURES ===================================
+_____________ test_serial_evidence_rejects_wrong_donor_convention ______________
+
+tmp_path = PosixPath('/tmp/review111-round1-independent-base/test_serial_evidence_rejects_w0')
+fake = [(tensor([[2, 3, 6, 0],
+        [2, 3, 5, 0]]), None), (tensor([[1, 2, 4, 0],
+        [1, 2, 3, 0]]), None), (tensor([...None), (tensor([[2, 3, 5, 0],
+        [2, 3, 7, 0]]), None), (tensor([[1, 2, 3, 0],
+        [1, 2, 5, 0]]), None), ...]
+
+    def test_serial_evidence_rejects_wrong_donor_convention(tmp_path,fake):
+        d,p=_fake_pilot_inputs(1)[1:];inv=r.workload.build_inventory(d,p,stage='prefit')
+        invocation=next(x for x in r._serial_invocations(inv) if any(c['operation']=='interchange' for c in x['cells']))
+        result=r._pilot_invocation(object(),d,p,invocation,axes=None,root=tmp_path,guard=lambda:None)
+        payload=dict(kind='a3_serial_numeric_invocation_v1',actual_execution=True,injected=True,timing_only=True,source_commit=p['commit'],runtime_profile=r.runtime_kernel_identity(object()),receipt=result['receipt'],positive_controls=result['positive_controls'],numeric_backing_references={})
+        baseline=tmp_path/'baseline';r.publish_object(baseline,payload);proof=r._SerialNumericProof(baseline)
+        measurement=r._pilot_scope_measurement(d,invocation);proof.check_scope(measurement);r._exact_pilot_scope(proof.rows,proof.specs,measurement)
+        altered=copy.deepcopy(payload)
+        for specs in altered['receipt']['batches'].values():
+            for spec in specs:
+                if spec['operation']=='interchange':
+                    for donor in spec['donors']:donor['mapping']['donor_stream']='not-a-real-stream'
+        altered['receipt']['receipt_sha256']=r.workload.digest({k:v for k,v in altered['receipt'].items() if k!='receipt_sha256'})
+        changed=tmp_path/'wrong-donor';r.publish_object(changed,altered)
+        with pytest.raises(ValueError):
+>           bad=r._SerialNumericProof(changed);bad.check_scope(measurement);r._exact_pilot_scope(bad.rows,bad.specs,measurement)
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+docs/research/specificity-ladder/reports/111-round1-evidence/test_independent_round1.py:74: Failed
+=============================== warnings summary ===============================
+../../../../../../../../u/swong2/.local/lib/python3.9/site-packages/pandas/core/arrays/masked.py:61
+  /u/swong2/.local/lib/python3.9/site-packages/pandas/core/arrays/masked.py:61: UserWarning: Pandas requires version '1.3.6' or newer of 'bottleneck' (version '1.3.5' currently installed).
+    from pandas.core import (
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED docs/research/specificity-ladder/reports/111-round1-evidence/test_independent_round1.py::test_serial_evidence_rejects_wrong_donor_convention
+1 failed, 5 passed, 1 warning in 5.70s

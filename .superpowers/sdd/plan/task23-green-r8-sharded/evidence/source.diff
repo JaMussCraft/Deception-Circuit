@@ -1,0 +1,241 @@
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-preallocation-candidate282/tests/test_a3_direction_runtime.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-preallocation-candidate287/tests/test_a3_direction_runtime.py
+@@ -1393,7 +1393,9 @@
+ 
+ def test_completed_index_startup_is_measured_conditionally_and_charged_per_job(tmp_path,fake,monkeypatch):
+     from types import SimpleNamespace
++    import os
+     from tests.test_a3_direction_workload import ledger
++    expected_job_id=os.environ.get('SLURM_JOB_ID','injected-cpu');expected_pid=os.getpid()
+     r,d,p=_fake_pilot_inputs(1);inv=r.workload.build_inventory(d,p,stage='prefit')
+     receipt=r.run_pilot(object(),d,p,inv,root=tmp_path,args=SimpleNamespace(pilot_part='prefit',selected=None),guard=lambda:None,startup_seconds=0)
+     target=r.read_object(tmp_path/'pilot-target-inventory'/'prefit');path=tmp_path/'pilot'/'prefit'
+@@ -1408,8 +1410,10 @@
+     assert 'publication_seconds' not in record and cost['publication_seconds']>0
+     assert cost['seconds']>=record['construction']['seconds']+cost['publication_seconds']
+     assert r._object_payload_size(reference)<=r.workload.STARTUP_REFERENCE_BYTES
+-    assert r._validate_startup_record(reference,d,p,expected_job_id='injected-cpu')==record
+-    with pytest.raises(ValueError):r._validate_startup_record(reference,d,p,expected_job_id='injected-cpu',expected_pid=record['process']['pid']+1)
++    assert record['process']['job_id']==expected_job_id and record['process']['pid']==expected_pid
++    assert r._validate_startup_record(reference,d,p,expected_job_id=expected_job_id,expected_pid=expected_pid)==record
++    with pytest.raises(ValueError):r._validate_startup_record(reference,d,p,expected_job_id=expected_job_id,expected_pid=expected_pid+1)
++    with pytest.raises(ValueError):r._validate_startup_record(reference,d,p,expected_job_id=expected_job_id+':wrong-job',expected_pid=expected_pid)
+     budget=ledger(target);budget['storage_capacities']['host_ram']['available_bytes']=10**12
+     plain=r.workload.project_cost(receipts,target,budget)
+     proposal=r.workload.project_cost(receipts,target,budget,runtime_cost=cost)
+@@ -1453,12 +1457,12 @@
+         dependency_bytes=cost['dependency_bytes_per_refresh'],retained_bytes=cost['retained_bytes'],peak_host_bytes=cost['peak_host_bytes'],
+         conditional=cost['conditional'],source_reference_count=len(cost['pilot_references']),cpu_model=cost['host_profile']['cpu_model'])))
+     marker=Path(reference['path'])/'COMPLETE.json';original_marker=marker.read_bytes();marker.unlink()
+-    with pytest.raises((ValueError,FileNotFoundError)):r._validate_startup_record(reference,d,p,expected_job_id='injected-cpu')
++    with pytest.raises((ValueError,FileNotFoundError)):r._validate_startup_record(reference,d,p,expected_job_id=expected_job_id)
+     with pytest.raises((ValueError,FileNotFoundError)):r.read_runtime_rows(d,p,one,tmp_path/'runtime-shards')
+     marker.write_bytes(original_marker)
+     payload=Path(reference['path'])/'payload.json';payload.write_bytes(payload.read_bytes()+b' ')
+     with pytest.raises(ValueError):index.refresh_dependencies()
+-    with pytest.raises(ValueError):r._validate_startup_record(reference,d,p,expected_job_id='injected-cpu')
++    with pytest.raises(ValueError):r._validate_startup_record(reference,d,p,expected_job_id=expected_job_id)
+     with pytest.raises(ValueError):r.read_runtime_rows(d,p,one,tmp_path/'runtime-shards')
+ 
+ 
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r7-sharded/suite/test_a3_direction_runtime.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r8-sharded/suite/test_a3_direction_runtime.py
+@@ -1393,7 +1393,9 @@
+ 
+ def test_completed_index_startup_is_measured_conditionally_and_charged_per_job(tmp_path,fake,monkeypatch):
+     from types import SimpleNamespace
++    import os
+     from tests.test_a3_direction_workload import ledger
++    expected_job_id=os.environ.get('SLURM_JOB_ID','injected-cpu');expected_pid=os.getpid()
+     r,d,p=_fake_pilot_inputs(1);inv=r.workload.build_inventory(d,p,stage='prefit')
+     receipt=r.run_pilot(object(),d,p,inv,root=tmp_path,args=SimpleNamespace(pilot_part='prefit',selected=None),guard=lambda:None,startup_seconds=0)
+     target=r.read_object(tmp_path/'pilot-target-inventory'/'prefit');path=tmp_path/'pilot'/'prefit'
+@@ -1408,8 +1410,10 @@
+     assert 'publication_seconds' not in record and cost['publication_seconds']>0
+     assert cost['seconds']>=record['construction']['seconds']+cost['publication_seconds']
+     assert r._object_payload_size(reference)<=r.workload.STARTUP_REFERENCE_BYTES
+-    assert r._validate_startup_record(reference,d,p,expected_job_id='injected-cpu')==record
+-    with pytest.raises(ValueError):r._validate_startup_record(reference,d,p,expected_job_id='injected-cpu',expected_pid=record['process']['pid']+1)
++    assert record['process']['job_id']==expected_job_id and record['process']['pid']==expected_pid
++    assert r._validate_startup_record(reference,d,p,expected_job_id=expected_job_id,expected_pid=expected_pid)==record
++    with pytest.raises(ValueError):r._validate_startup_record(reference,d,p,expected_job_id=expected_job_id,expected_pid=expected_pid+1)
++    with pytest.raises(ValueError):r._validate_startup_record(reference,d,p,expected_job_id=expected_job_id+':wrong-job',expected_pid=expected_pid)
+     budget=ledger(target);budget['storage_capacities']['host_ram']['available_bytes']=10**12
+     plain=r.workload.project_cost(receipts,target,budget)
+     proposal=r.workload.project_cost(receipts,target,budget,runtime_cost=cost)
+@@ -1453,12 +1457,12 @@
+         dependency_bytes=cost['dependency_bytes_per_refresh'],retained_bytes=cost['retained_bytes'],peak_host_bytes=cost['peak_host_bytes'],
+         conditional=cost['conditional'],source_reference_count=len(cost['pilot_references']),cpu_model=cost['host_profile']['cpu_model'])))
+     marker=Path(reference['path'])/'COMPLETE.json';original_marker=marker.read_bytes();marker.unlink()
+-    with pytest.raises((ValueError,FileNotFoundError)):r._validate_startup_record(reference,d,p,expected_job_id='injected-cpu')
++    with pytest.raises((ValueError,FileNotFoundError)):r._validate_startup_record(reference,d,p,expected_job_id=expected_job_id)
+     with pytest.raises((ValueError,FileNotFoundError)):r.read_runtime_rows(d,p,one,tmp_path/'runtime-shards')
+     marker.write_bytes(original_marker)
+     payload=Path(reference['path'])/'payload.json';payload.write_bytes(payload.read_bytes()+b' ')
+     with pytest.raises(ValueError):index.refresh_dependencies()
+-    with pytest.raises(ValueError):r._validate_startup_record(reference,d,p,expected_job_id='injected-cpu')
++    with pytest.raises(ValueError):r._validate_startup_record(reference,d,p,expected_job_id=expected_job_id)
+     with pytest.raises(ValueError):r.read_runtime_rows(d,p,one,tmp_path/'runtime-shards')
+ 
+ 
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r7-sharded/run_packet.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r8-sharded/run_packet.py
+@@ -16,7 +16,7 @@
+ from closure_preflight import check_context
+ 
+ PACKET = Path(__file__).resolve().parent
+-CANDIDATE = PACKET.parents[1] / 'plan-a3/direction-preallocation-candidate282'
++CANDIDATE = PACKET.parents[1] / 'plan-a3/direction-preallocation-candidate287'
+ ORACLE = PACKET.parents[1] / 'plan-a3/direction-metadata-optionA-candidate'
+ TEST = 'test_a3_prepared_pilot_target.py'
+ ENVS = {'base': '/sw/external/python/anaconda3/bin/python3.9', 'mgnp': '/u/swong2/.conda/envs/mgnp/bin/python'}
+@@ -102,7 +102,7 @@
+ 
+ 
+ def source_identity():
+-    return dict(revision='r7-sharded', runtime_sha256=sha(CANDIDATE/'component_analysis/a3_direction_runtime.py'),
++    return dict(revision='r8-sharded', runtime_sha256=sha(CANDIDATE/'component_analysis/a3_direction_runtime.py'),
+         fixture_sha256=sha(PACKET/'suite'/TEST), partition_sha256=sha(PACKET/'partition.json'),
+         source_pins_sha256=sha(PACKET/'source-pins.json'))
+ 
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r7-sharded/fixture_preflight.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r8-sharded/fixture_preflight.py
+@@ -74,7 +74,7 @@
+     import sys
+     from tests.a3_prepared_integration_cases import PreparedCase, runtime
+     from component_analysis import a3_pipeline
+-    candidate = Path(__file__).resolve().parents[2] / 'plan-a3/direction-preallocation-candidate282'
++    candidate = Path(__file__).resolve().parents[2] / 'plan-a3/direction-preallocation-candidate287'
+     assert Path(sys.modules[PreparedCase.__module__].__file__).resolve() == (candidate / 'tests/a3_prepared_integration_cases.py').resolve()
+     r = runtime(); recorder = StageRecorder(output, r._prepared_process_observation)
+     manifest = recorder.manifest
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r7-sharded/bridges/host.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r8-sharded/bridges/host.py
+@@ -20,7 +20,7 @@
+ import supervisor
+ import transport229 as old
+ 
+-PACKET_REL = Path('Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r7-sharded')
++PACKET_REL = Path('Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r8-sharded')
+ 
+ def durable(path, value):
+     with path.open('x') as stream:
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r7-sharded/bridges/transport229.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r8-sharded/bridges/transport229.py
+@@ -27,7 +27,7 @@
+  assert c['status']=='ROOT_BOUND_A3_GREEN_MGNP_TRANSPORT' and type(c['expected_cases']) is int and c['expected_cases']>0
+  files=c['files'];aliases=c['aliases'];assert type(files) is list and files and type(c['expected_file_count']) is int and len(files)==c['expected_file_count'] and type(aliases) is list and len(aliases)==8
+  alias_root=VIRT/'Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3'
+- required={str(alias_root/source/rel) for source in ('direction-preallocation-candidate282','direction-metadata-optionA-candidate') for rel in ('data','docs/research/directions.json','docs/research/held_out.json','outputs/_analyses/specificity-ladder/a1-control-77b6487-m07')}
++ required={str(alias_root/source/rel) for source in ('direction-preallocation-candidate287','direction-metadata-optionA-candidate') for rel in ('data','docs/research/directions.json','docs/research/held_out.json','outputs/_analyses/specificity-ladder/a1-control-77b6487-m07')}
+  assert {x['virtual'] for x in aliases}==required,'candidate and oracle aliases must be complete'
+  for rows in (files,aliases):
+   assert len({x['virtual'] for x in rows})==len(rows) and len({x['physical'] for x in rows})==len(rows)
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r7-sharded/aggregate.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r8-sharded/aggregate.py
+@@ -83,7 +83,7 @@
+     Root must authenticate the complete map before calling this pure function.
+     """
+     validate_partition(expected_partition)
+-    require(expected_source['revision'] == 'r7-sharded', 'wrong packet revision')
++    require(expected_source['revision'] == 'r8-sharded', 'wrong packet revision')
+     observed = {}; jobs = set(); outputs = set()
+     for ref in records:
+         m = read_ref(ref)
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r7-sharded/test_packet.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r8-sharded/test_packet.py
+@@ -46,7 +46,7 @@
+     with pytest.raises((AssertionError,ValueError)):a.validate_partition(p)
+ 
+ def terminal(tmp_path):
+-    a=module('aggregate'); p=contract(); source={'revision':'r7-sharded','runtime_sha256':'runtime','fixture_sha256':'fixture','partition_sha256':a.digest(HERE/'partition.json'),'source_pins_sha256':'pins'}
++    a=module('aggregate'); p=contract(); source={'revision':'r8-sharded','runtime_sha256':'runtime','fixture_sha256':'fixture','partition_sha256':a.digest(HERE/'partition.json'),'source_pins_sha256':'pins'}
+     bindings={}; records=[]
+     for env,py in a.ENVS.items():
+         bindings[py]={}
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r7-sharded/partition.json
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r8-sharded/partition.json
+@@ -1,6 +1,6 @@
+ {
+   "schema": 1,
+-  "revision": "r7-sharded",
++  "revision": "r8-sharded",
+   "full_collection": [
+     "test_a3_prepared_pilot_target.py::test_prepared_writer_matches_untouched_publisher[payload0-{\"a\": -0.0, \"z\": 1.25}\\n]",
+     "test_a3_prepared_pilot_target.py::test_prepared_writer_matches_untouched_publisher[payload1-{\"text\": \"\\u03bb\\u96ea\"}\\n]",
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r7-sharded/proposal.json
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r8-sharded/proposal.json
+@@ -1,6 +1,6 @@
+ {
+   "status": "UNBOUND_NOT_RUNNABLE",
+-  "revision": "r7-sharded",
++  "revision": "r8-sharded",
+   "allocation_seconds": 4800,
+   "stage_caps_seconds": {
+     "baseline": 610,
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r7-sharded/resource-proposal.json
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r8-sharded/resource-proposal.json
+@@ -1,6 +1,6 @@
+ {
+   "status": "UNBOUND_NOT_RUNNABLE",
+-  "revision": "r7-sharded",
++  "revision": "r8-sharded",
+   "allocation_seconds": 4800,
+   "stage_caps_seconds": {
+     "baseline": 610,
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r7-sharded/source-pins.json
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r8-sharded/source-pins.json
+@@ -575,7 +575,7 @@
+     "tests/test_a3_direction_fit.py": "5407d6c4a5c34db69974d709e547746be31e74c2f79d002329b7891ceec3d8e7",
+     "tests/test_a3_direction_reporting.py": "7a48095ed602f5616a5a4d4eadf5353721767eeb3788b220fd09750e48eba9ae",
+     "tests/test_a3_direction_runner.py": "3ea945d5b23b4eef7d56139758c7075ea1b56ac612f1923590b7978628ca0120",
+-    "tests/test_a3_direction_runtime.py": "8a314262a2c4fb09c9f6ca883264e072d475affde7a4b927a4379b9c276ec112",
++    "tests/test_a3_direction_runtime.py": "760cfe9c9aef14b0ab3a0b41eaba526b2aa64376334be1bea5a710978f9c6f23",
+     "tests/test_a3_direction_selection.py": "bdf92e44bb36b9c13c5c8e129296dfc26b50057c17ef3ff457d874298c269ea2",
+     "tests/test_a3_direction_workload.py": "846427fc2f4aa048f652d18c48715eda7eedcac3f4422adbded6be6c781a46dc",
+     "tests/test_a3_directions.py": "cd8471b1524ad7b8f1b7c87f9eb5fec5724b3ab2980027ef7aadfea3fc3bb1c1",
+@@ -1096,32 +1096,32 @@
+     "write_format_control_summary.py": "641aa8a2dcb5f830c0316d88503185272b6738c1dc487a7efedeb46b17d1d6ff"
+   },
+   "packet": {
+-    "aggregate.py": "d006594f0d95baebc3cc5570960ea50e3cfe82da01782fc83a729f8f8646f201",
++    "aggregate.py": "b34b3b04586600bb1ef1993084ba03dc95fb2f64b3b1ceb0f8baedd89273bbb6",
+     "baseline-suite/conftest.py": "d13ffc3bf9ec4d2cbad8ae425c0e116a5d2ce9a7911e1f76dd7c2130758576ce",
+     "baseline-suite/test_a3_prepared_pilot_target.py": "ccdecf2545b4bbc5ab9448f2c2114c72c3e2c6d4a0fbce8dcad7fdb76fdf8bf1",
+     "baseline_red.py": "8451fd6cee8cee442d66f3f7d53ff09f77544723468a965278743a99de4495df",
+-    "bridges/host.py": "7f5f6d881d92239d807950104c8025a0b8cbb671621ff445b9763f7c65a56999",
++    "bridges/host.py": "bc545aa60b3b19b5614047ae1ab0d9fec31788f9e8f7bd4d8b71bbd087f722e5",
+     "bridges/inner.py": "0268945f1bdf4c79ec1e2dc0e0540c5a4d2932afb619383d34971d0a928b6a93",
+     "bridges/launch.sh": "43ed6e7816db0ec391cf27973fedc12b2bd7a2978364e822b2254a4982a84b20",
+-    "bridges/manifest.json": "9b3188730d6690ddecd7fccdd401b001dd4082762c51a60f10302ae331d6f2f9",
+-    "bridges/transport229.py": "6ed7f7503bdb1b08a0d75a9ca767655feb6309a5afa69ec71975abfced2554bb",
++    "bridges/manifest.json": "d471c56a4548bb5fc39cd7a635a0426e1f22b769dee5fae058244e1a052f0797",
++    "bridges/transport229.py": "df6a473a90a6b474b85e4404fd4c717b95cab0d003ba4e68bff2e461c8aac34c",
+     "closure_preflight.py": "bc6e63f4600280347c695879a1ab41de5044b522b2c544dd25178986ea7419a7",
+-    "copy-manifest.json": "3a405cf1772b17084344e44658b3fda795ff93d90c6a3c5e4b6f6bc6e92e040d",
++    "copy-manifest.json": "d524ffa13631a82fdb4e8d666c23e7976f52ca8a6a501241318414d38fb1e35d",
+     "cpu.sbatch": "78b9f5e3d0c8cef46fe40336f939e222af87fd405abd552e8de1a1ac264ea427",
+-    "fixture_preflight.py": "d98cfcf43ad392ec5993b75f113be0b7b29b2b2f07d3cb74917df07acb1b7ee2",
+-    "partition.json": "76ee856c6c7cde2d38b2fdea01f8b3c8816a116866aacbf0a536244fa8bdf62d",
+-    "proposal.json": "03f77fd414de070e11f4a860eabe8db261c3e749f71d82f8c879e89b7fa482d1",
++    "fixture_preflight.py": "3478a269af62e03fcb258f4ed5324d5d1083b0d110255df826bef65a12c77c28",
++    "partition.json": "88f74d6348e24d828c34b4c9901e988a8c6564eb2ed60e614fe0c1a1e71ddc29",
++    "proposal.json": "2387e75faa9ebe90f8f8af04b28e6d96b3470783df887fab2dc260286db403bb",
+     "pure_cgroup_comparability.py": "6fab4a66567c9c3a54be1ddd2e19f7d04cfa24712abe8fbf40d59f70e35d7d87",
+-    "resource-proposal.json": "03f77fd414de070e11f4a860eabe8db261c3e749f71d82f8c879e89b7fa482d1",
+-    "run_packet.py": "2f51c4a14b987a07c5220d36d1d578e05a8eafa30fc48df28356517eb975f1af",
++    "resource-proposal.json": "2387e75faa9ebe90f8f8af04b28e6d96b3470783df887fab2dc260286db403bb",
++    "run_packet.py": "b6d574cf7efe5026c4e2651719e7ba228f3ce4205afbb41368812bd82b245003",
+     "selector.py": "c6d4b401dc4136046d9524af7b028572005ce2ea493465a1bc6d711855c63b5b",
+     "suite/conftest.py": "a39319b5ae932f897c8032ac0e89d6e034491604d9ec3e9dedfcc7ecd8b98415",
+-    "suite/test_a3_direction_runtime.py": "8a314262a2c4fb09c9f6ca883264e072d475affde7a4b927a4379b9c276ec112",
++    "suite/test_a3_direction_runtime.py": "760cfe9c9aef14b0ab3a0b41eaba526b2aa64376334be1bea5a710978f9c6f23",
+     "suite/test_a3_prepared_pilot_target.py": "2f89de3edb0ac5d513b98c018c6ab1393179b73d9ee67c64d725a064eaa09fb3",
+     "supervisor.py": "9c4099cbc1214e3111727c978325d855c0949193b0683832c75926818bf226a6",
+     "test-groups.json": "766ded5b4b8f3dc83d4d1685e88edfea08d64a93abb8ee5ce8a6814b6ebc683b",
+     "test_closure_preflight.py": "6eeb9c1fe7d4c4ccc39fbccc7f58b8f71fd0dc5815d3ee323fced2a683826f72",
+-    "test_packet.py": "2468a6b4d575d6e8b75d844f3c77d5c5f6b3ed0bb483ee901a6da9da0b350ddf",
++    "test_packet.py": "3d0ef18772871d42f7abbc5aaf9770e0879b2fa1c9bc971d53ac51d6e1f8ccd4",
+     "test_review272.py": "99c0dd910de6efe13ec9f319ca057d4c388c339e7d198ecafa584eabe455bcf5",
+     "verification-scope.json": "f2dae62f5731ce1a0375713f5e16425c8d8c5e55a66a4fb08023be6f95eab1fe"
+   }

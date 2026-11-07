@@ -1,0 +1,268 @@
+{
+  "complete": false,
+  "status": "CHILD_NORMAL_POSTGUARDS_AWAIT_SUPERVISOR",
+  "MODEL_LOADED": false,
+  "EFFECTS_READ": false,
+  "SYNTHETIC_SCHEMA_ONLY": true,
+  "NUMERICAL_CONTROLS_TESTED": false,
+  "GPU_ADMITTED": false,
+  "source_commit": "50e947bb852613e3a270082651f2bd1b7bb0c525",
+  "metadata": {
+    "h_mean_pairs": {
+      "far_v2": 3396,
+      "sdr_v2": 3396,
+      "ser_v2": 3396
+    },
+    "support_reason_mask_sha256": "73002c8b74d13947aeb9bf1f6e09d50544b549ea51ab00a50b9510bd6404ffd8",
+    "maximum_current_parent_tensor_bytes": 27399680,
+    "maximum_parent_python_bound_bytes": 350010672,
+    "maximum_score_cell_return_rows": 3000
+  },
+  "budget_reconciliation": {
+    "measured_full_CPU_hash_seconds": 799.072110587731,
+    "measured_prefix_CPU_hash_seconds": 33.898901022970676,
+    "measured_CPU_hash_growth": 23.57221285864876,
+    "whole_core_orientation_seconds": 13780.93869288219,
+    "whole_core_single_allowance_fraction": 0.2,
+    "measured_CPU_hash_excess_over_sameplatform_exposure_charge_seconds": 0.0,
+    "publication_charge_once_seconds": 51.046780600212514,
+    "combined_fixed_allowance_seconds": 900,
+    "unmeasured_fixed_remainder_seconds": 848.9532193997875,
+    "cold_load_once_seconds": 555.7060698261485,
+    "finish_seconds": 300,
+    "proposed_seconds": 19800,
+    "engineering_total_before_platform_decision_seconds": 18292.832501284774,
+    "CPU_timing_platform_host": "r029.ib.bridges2.psc.edu",
+    "subtraction_from_observed_prefix518_permitted": false,
+    "resource_admission": false,
+    "qualification": "CPU stress costs are platform measurements. Whole-core orientation already contains CPU; publication charged once within900, never add all hash stress again. Independent root review must resolve platform/fixed-envelope/excess and remaining margin; no GPU theorem or automatic acceptance."
+  },
+  "full_rows": 59652,
+  "expected_control_pairs": 3396,
+  "prefix_h_mean_pairs": {
+    "far_v2": 144,
+    "sdr_v2": 144,
+    "ser_v2": 144
+  },
+  "full_h_mean_timing": [
+    {
+      "task": "far_v2",
+      "hash_pairs": 3396,
+      "hash_calls": 6792,
+      "wall_seconds": 265.9051234032959,
+      "user_seconds": 264.77657199999993,
+      "system_seconds": 0.03288699999999878
+    },
+    {
+      "task": "sdr_v2",
+      "hash_pairs": 3396,
+      "hash_calls": 6792,
+      "wall_seconds": 265.52568105701357,
+      "user_seconds": 264.40896599999996,
+      "system_seconds": 0.030859999999998777
+    },
+    {
+      "task": "ser_v2",
+      "hash_pairs": 3396,
+      "hash_calls": 6792,
+      "wall_seconds": 267.64130612742156,
+      "user_seconds": 266.41496099999995,
+      "system_seconds": 0.04068900000000042
+    }
+  ],
+  "prefix_h_mean_timing": [
+    {
+      "task": "far_v2",
+      "hash_pairs": 144,
+      "hash_calls": 288,
+      "wall_seconds": 11.382960285060108,
+      "user_seconds": 11.334362000000056,
+      "system_seconds": 0.001994999999999081
+    },
+    {
+      "task": "sdr_v2",
+      "hash_pairs": 144,
+      "hash_calls": 288,
+      "wall_seconds": 11.212676784023643,
+      "user_seconds": 11.166590000000042,
+      "system_seconds": 0.0
+    },
+    {
+      "task": "ser_v2",
+      "hash_pairs": 144,
+      "hash_calls": 288,
+      "wall_seconds": 11.303263953886926,
+      "user_seconds": 11.243041000000176,
+      "system_seconds": 1.0000000010279564e-06
+    }
+  ],
+  "fixed_initial_three_bank_references": [
+    {
+      "task": "far_v2",
+      "wall_seconds": 0.9555665226653218,
+      "user_seconds": 0.9470249999999965,
+      "system_seconds": 0.003975000000000506
+    },
+    {
+      "task": "sdr_v2",
+      "wall_seconds": 0.9605288365855813,
+      "user_seconds": 0.9500580000000127,
+      "system_seconds": 0.005963000000000385
+    },
+    {
+      "task": "ser_v2",
+      "wall_seconds": 0.9673377089202404,
+      "user_seconds": 0.9582300000000146,
+      "system_seconds": 0.0049440000000000595
+    }
+  ],
+  "native_full_scope_final_three_references": {
+    "wall_seconds": 5.181686653755605,
+    "user_seconds": 4.931610999999975,
+    "system_seconds": 0.22802600000000073
+  },
+  "owning_context_timing": {
+    "wall_seconds": 297.23895236384124,
+    "user_seconds": 142.867851,
+    "system_seconds": 5.906364
+  },
+  "prefix_bound_build_timing": {
+    "wall_seconds": 19.984807319007814,
+    "user_seconds": 17.07952899999998,
+    "system_seconds": 0.06344399999999961
+  },
+  "full_bound_build_timing": {
+    "wall_seconds": 35.33418293017894,
+    "user_seconds": 34.82966200000001,
+    "system_seconds": 0.34123400000000004
+  },
+  "graph_unique_bytes": 933434215,
+  "graph_no_sharing_bound_bytes": 3618688316,
+  "context_unique_bytes": 516893021,
+  "context_no_sharing_bound_bytes": 901961650,
+  "validation_bytes_bound": 81762842,
+  "score_cell_raw_return_overlap_bound_bytes": 66615056,
+  "task_bank_CPU_tensor_bytes": 185344,
+  "encoder": {
+    "bytes": 561988080,
+    "chunks": 96477554,
+    "chunk_object_bytes": 4517567794,
+    "full_encoding_overlap_bound": 7747176994
+  },
+  "canonical_encoder": {
+    "bytes": 497460747,
+    "chunks": 96477554,
+    "chunk_object_bytes": 4453040461,
+    "full_encoding_overlap_bound": 7489067662
+  },
+  "incremental_host_bound_bytes": 17981898394,
+  "actual_peak_RSS_bytes": 4273631232,
+  "cgroup": {
+    "path": "/sys/fs/cgroup/memory/slurm/uid_105853/job_50315944/step_batch/task_0",
+    "job_scoped": true,
+    "memory.usage_in_bytes": "3415703552\n",
+    "memory.max_usage_in_bytes": "5260496896\n",
+    "memory.failcnt": "0\n",
+    "memory.oom_control": "oom_kill_disable 0\nunder_oom 0\noom_kill 0\n"
+  },
+  "cgroup_initial": {
+    "path": "/sys/fs/cgroup/memory/slurm/uid_105853/job_50315944/step_batch/task_0",
+    "job_scoped": true,
+    "memory.usage_in_bytes": "206770176\n",
+    "memory.max_usage_in_bytes": "212226048\n",
+    "memory.failcnt": "0\n",
+    "memory.oom_control": "oom_kill_disable 0\nunder_oom 0\noom_kill 0\n"
+  },
+  "guard_timings": {
+    "before": {
+      "wall_seconds": 11.20809951145202,
+      "user_seconds": 0.486582,
+      "system_seconds": 0.510664
+    },
+    "ready": {
+      "wall_seconds": 0.7922590188682079,
+      "user_seconds": 0.5015459999999905,
+      "system_seconds": 0.21123099999999972
+    },
+    "after": {
+      "wall_seconds": 0.8005561800673604,
+      "user_seconds": 0.47600999999986016,
+      "system_seconds": 0.24379699999999893
+    }
+  },
+  "serialization": {
+    "native_hash_repeated_probes": [
+      {
+        "index": 0,
+        "digest": "64d6c3c25d9b3afd070dbf152a7cd6a4b0e815c495aa32a9d2f42e885752ea45",
+        "diagnostic_repeat": true,
+        "wall_seconds": 7.407526645809412,
+        "user_seconds": 7.250064000000009,
+        "system_seconds": 0.12750199999999978
+      },
+      {
+        "index": 1,
+        "digest": "64d6c3c25d9b3afd070dbf152a7cd6a4b0e815c495aa32a9d2f42e885752ea45",
+        "diagnostic_repeat": true,
+        "wall_seconds": 7.318986251018941,
+        "user_seconds": 7.186356999999987,
+        "system_seconds": 0.10054600000000136
+      }
+    ],
+    "native_writer_includes_its_own_payload_hash": true,
+    "production_publication_charge_seconds": 51.046780600212514,
+    "stress_payload_hash_calls": 3,
+    "production_payload_hash_calls": 2,
+    "native_writer": {
+      "wall_seconds": 43.6392539544031,
+      "user_seconds": 42.88190100000003,
+      "system_seconds": 0.5714609999999993
+    },
+    "actual_synthetic_file_bytes": 561988172,
+    "analytic_native_file_ceiling": 561988172,
+    "synthetic_labels": {
+      "MODEL_LOADED": false,
+      "EFFECTS_READ": false,
+      "SYNTHETIC_SCHEMA_ONLY": true,
+      "NUMERICAL_CONTROLS_TESTED": false,
+      "GPU_ADMITTED": false
+    }
+  },
+  "walk_timing": {
+    "wall_seconds": 22.900143812410533,
+    "user_seconds": 22.566069,
+    "system_seconds": 0.2339089999999997
+  },
+  "encoder_count_timing": {
+    "wall_seconds": 54.9547066828236,
+    "user_seconds": 54.565572,
+    "system_seconds": 0.16527899999999995
+  },
+  "compact_count_timing": {
+    "wall_seconds": 54.596649350598454,
+    "user_seconds": 54.27364899999998,
+    "system_seconds": 0.10554599999999947
+  },
+  "elapsed_seconds": 1434.4239924577996,
+  "native_JSON_ceiling_bytes": 561988172,
+  "native_manifest_ceiling_bytes": 18911,
+  "native_stage_ceiling_bytes": 562007083,
+  "operational_disk_reserve_bytes": 536870912,
+  "required_output_free_bytes": 4294967296,
+  "GPU_operational_admission_pending": true,
+  "source_event_table": {
+    "h_mean_pairs_per_prefix": 432,
+    "h_mean_pairs_per_full": 10188,
+    "bank_reference_calls_per_native_score": 6,
+    "bank_payload_return_hash_calls_inside_native_compute": 1,
+    "initial_validate_banks_before_native_compute_timer": true,
+    "full_payload_hashes_outside_native_compute": 2,
+    "streamed_native_writer_calls": 1,
+    "CPU_hash_times_are_platform_measurements_not_permission_to_subtract_from_prefix518": true
+  },
+  "execution_label_constraints": {
+    "future_GPU_job_id_max_chars": 32,
+    "cluster_max_chars": 64,
+    "gpu_name_exact": "NVIDIA H100 80GB HBM3"
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "verdict": "ACCEPT_EXACT_ROOT_LATEBIND_DISPATCH_TRANSPORT_ONLY",
+  "dispatch_sha256": "8abf86b1295addd5cd8b41f13176199fb0fcf753cf6f1c40c044a073fa05e6aa",
+  "test_dispatch_sha256": "47855038052b2ffc3f14365df70858fac1e1cd6493ee69c756dbca6d90076afe",
+  "packet_manifest_sha256": "4e4b4bcf1ddcd6481fac1eccd966a2a1cbfa385b2bd16a9a00504cfaa05def3f",
+  "findings": [],
+  "scope": "Exact new Bash transport follows historical accepted per-job sealed-digest sidecar bootstrap; no new native authority or proof/source alteration. Root must seal and readback actual perjob bytes before heldjob release.",
+  "verified": {
+    "numeric_actual_job_ID_required": true,
+    "exact_root_owned_job_directory_and_no_symlink_ancestors": true,
+    "job_path_resolves_exactly": true,
+    "binding_and_sidecar_regular_nonsymlink_leaves": true,
+    "sidecar_exact64lowerhex_plus_optional_one_newline": true,
+    "extra_lines_whitespace_CRLF_NUL_split_uppercase_and_empty_digest_rejected": true,
+    "binding_rawSHA_must_match_independent_sidecar_not_computed_adopted": true,
+    "reviewed_combined_manifest_SHA_pinned": true,
+    "exact_existing_allowed_output_root_r2_perjob_execution": true,
+    "unchanged_launch_receives_output_packet_binding_expectedSHA": true,
+    "spooled_script_ignores_its_dirname": true,
+    "wrong_job_correctly_hashed_binding_still_rejected_by_unchanged_host": true,
+    "occupied_execution_namespace_rejected_by_unchanged_host": true,
+    "no_scheduler_remote_or_model_entry_in_wrapper": true,
+    "bash_n_pass": true,
+    "no_Python_dependency_added_by_dispatch": true
+  },
+  "tests": {
+    "supplied_expected_each": 9,
+    "supplied_observed_base": 9,
+    "supplied_observed_mgnp": 9,
+    "independent_expected_each": 3,
+    "independent_observed_base": 3,
+    "independent_observed_mgnp": 3,
+    "all4_exit_codes": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "fixture_launch_recorder_only": true,
+    "actual_root_paths_not_executed": true,
+    "independent_test_sha256": "35312a1d0c413b1527295fe4e3bbb1c7334e24a7650e89e4172b535515e19a7a"
+  },
+  "remaining_root_gates": [
+    "Stage/readback exact accepted dispatch and all accepted combined packet members before held submission. Pin the exact dispatcher bytes in actual submission evidence.",
+    "With actual held jobID, create exclusive owned root-genuine-proof-r2/job-ID directory and seal final bindings.json plus separate expected bindings.sha256 once; validate actual job/packet/output/probe/review/transfer/witness references, then remote readback exact known bytes before release. Do not rewrite sealed files or self-adopt an arbitrary remote binding digest.",
+    "Finish all immutable deployment routes and actual fresh four-catalogue witness. Existing source219 acceptance and actual218 diagnostic remain their own scopes.",
+    "Keep actual allocation/source/cache/protection/usage/checkpoint/cgroup/deadline and normal CPU terminal/resource interpretation gates. No automatic job/retry or GPU/full-score admission."
+  ],
+  "implementation_edits": false,
+  "scheduler_actions": false,
+  "remote_actions": false,
+  "cadence_points": 40,
+  "tool_next_checkpoint_index": 3,
+  "tool_next_at_plus_points_since_registration": 120,
+  "ordinary_cap_percent": 80
+}

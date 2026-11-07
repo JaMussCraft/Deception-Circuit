@@ -1,0 +1,34 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___ test_reuse_overhead_records_observed_scope_calls_without_model_forwards ____
+
+tmp_path = PosixPath('/tmp/review111-scope-observed-red/test_reuse_overhead_records_ob0')
+fake = [(tensor([[1, 2, 3, 0, 0],
+        [3, 4, 5, 6, 7]]), None), (tensor([[3, 4, 5, 2, 2],
+        [5, 6, 7, 8, 9]]), None... 14.]]]), positions=tensor([[False, False,  True, False, False],
+        [False, False, False, False,  True]]))}), ...]
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f88486bb110>
+
+    def test_reuse_overhead_records_observed_scope_calls_without_model_forwards(tmp_path,fake,monkeypatch):
+        from tests.test_a3_direction_runner import measured_setup,batch
+        r=runtime();ident,index,axes,cells=measured_setup(fake)
+        evidence=r.packing_evidence(ident['packed_equivalence'],[batch()]);scope_calls=[]
+        original_scope=r._ValidatedReuseContext.scope
+        def observed(context,*args,**kwargs):
+            scope_calls.append(1);return original_scope(context,*args,**kwargs)
+        original_receipt=r.runner._packing_receipt
+        def extra_valid_lookup(*args,**kwargs):
+            original_receipt(*args,**kwargs);return original_receipt(*args,**kwargs)
+        monkeypatch.setattr(r._ValidatedReuseContext,'scope',observed)
+        monkeypatch.setattr(r.runner,'_packing_receipt',extra_valid_lookup)
+        before=len(fake)
+        overhead=r._measure_reuse_overhead(tmp_path,ident['numeric_profile'],evidence,[batch()],cells,axes,index,None)
+        assert len(fake)==before
+>       assert overhead['scope_checks']==len(scope_calls)==4
+E       assert 2 == 4
+E        +  where 4 = len([1, 1, 1, 1])
+
+tests/test_a3_direction_runtime.py:1330: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_a3_direction_runtime.py::test_reuse_overhead_records_observed_scope_calls_without_model_forwards
+1 failed in 2.86s

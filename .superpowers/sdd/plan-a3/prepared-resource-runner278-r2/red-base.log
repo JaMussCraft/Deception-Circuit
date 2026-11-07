@@ -1,0 +1,56 @@
+..........FFF                                                            [100%]
+=================================== FAILURES ===================================
+_ Correction279Tests.test_entry_final_split_rejects_three_zero_and_preserves_two_one _
+
+self = <test_runner.Correction279Tests testMethod=test_entry_final_split_rejects_three_zero_and_preserves_two_one>
+
+    def test_entry_final_split_rejects_three_zero_and_preserves_two_one(self):
+        with tempfile.TemporaryDirectory() as td:
+            (Path(td)/'payload.json').write_text('{"x":1}')
+            records=[]
+            with self.assertRaisesRegex(ValueError,'entry.*operation'):
+>               r.receiver(self.runtime(extra_entry=True),{'path':td},{},{},records.append)
+E               AssertionError: ValueError not raised
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278-r2/test_runner.py:185: AssertionError
+_ Correction279Tests.test_partial_counts_and_provenance_survive_entry_and_final_failures _
+
+self = <test_runner.Correction279Tests testMethod=test_partial_counts_and_provenance_survive_entry_and_final_failures>
+
+    def test_partial_counts_and_provenance_survive_entry_and_final_failures(self):
+        with tempfile.TemporaryDirectory() as td:
+            (Path(td)/'payload.json').write_text('{"x":1}')
+            for phase,reads in [('entry',1),('final',3)]:
+                with self.subTest(phase=phase):
+                    records=[]
+                    with self.assertRaisesRegex(ValueError,'synthetic '+phase+' rejection'):
+                        r.receiver(self.runtime(failure=phase),{'path':td},{},{},records.append)
+                    row=records[0]
+>                   self.assertIn('actual_operations',row)
+E                   AssertionError: 'actual_operations' not found in {'trial': 'fresh-process', 'pid': 3538464, 'status': 'failed', 'observations_are_upper_bounds': False, 'filesystem_cache_claim': None, 'release_policy': 'drop exact result after final check; gc.collect before repeat', 'process_before': {'pid': 3538464, 'process_peak_rss_bytes': 28311552, 'process_peak_scope': 'process lifetime high-water RSS on Linux', 'process_rss_bytes': 28311552, 'observations_are_upper_bounds': False, 'cgroup_membership': '0::/user.slice/user-78031.slice/session-84.scope\n', 'cgroup_rows': [{'path': '/sys/fs/cgroup/user.slice/user-78031.slice/session-84.scope', 'controller': 'v2', 'memory.current': '4431888384', 'memory.peak': '12185391104', 'memory.events': 'low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0', 'memory.max': 'max'}, {'path': '/sys/fs/cgroup/user.slice/user-78031.slice', 'controller': 'v2', 'memory.current': '4621123584', 'memory.peak': '20334260224', 'memory.events': 'low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0', 'memory.max': '40320221184'}, {'path': '/sys/fs/cgroup/user.slice', 'controller': 'v2', 'memory.current': '163854086144', 'memory.peak': '210225704960', 'memory.events': 'low 0\nhigh 21\nmax 8130834\noom 25\noom_kill 6\noom_group_kill 0', 'memory.max': 'max'}, {'path': '/sys/fs/cgroup', 'controller': 'v2', 'memory.current': None, 'memory.peak': None, 'memory.events': None, 'memory.max': None}], 'cgroup_scope': 'entire memory-controller cgroup ancestry including other processes; lifetime peaks', 'cgroup_applicability': 'v2 actual ancestry; missing values remain unavailable'}, 'error_type': 'ValueError', 'error': 'synthetic entry rejection after real read/hash', 'timing': {'wall_seconds': 0.00313644198467955, 'user_seconds': 8.599999999991947e-05, 'system_seconds': 0.003028000000000003}, 'process_after_final': {'pid': 3538464, 'process_peak_rss_bytes': 28311552, 'process_peak_scope': 'process lifetime high-water RSS on Linux', 'process_rss_bytes': 28311552, 'observations_are_upper_bounds': False, 'cgroup_membership': '0::/user.slice/user-78031.slice/session-84.scope\n', 'cgroup_rows': [{'path': '/sys/fs/cgroup/user.slice/user-78031.slice/session-84.scope', 'controller': 'v2', 'memory.current': '4432936960', 'memory.peak': '12185391104', 'memory.events': 'low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0', 'memory.max': 'max'}, {'path': '/sys/fs/cgroup/user.slice/user-78031.slice', 'controller': 'v2', 'memory.current': '4621914112', 'memory.peak': '20334260224', 'memory.events': 'low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0', 'memory.max': '40320221184'}, {'path': '/sys/fs/cgroup/user.slice', 'controller': 'v2', 'memory.current': '163854372864', 'memory.peak': '210225704960', 'memory.events': 'low 0\nhigh 21\nmax 8130834\noom 25\noom_kill 6\noom_group_kill 0', 'memory.max': 'max'}, {'path': '/sys/fs/cgroup', 'controller': 'v2', 'memory.current': None, 'memory.peak': None, 'memory.events': None, 'memory.max': None}], 'cgroup_scope': 'entire memory-controller cgroup ancestry including other processes; lifetime peaks', 'cgroup_applicability': 'v2 actual ancestry; missing values remain unavailable'}, 'process_after_release': {'pid': 3538464, 'process_peak_rss_bytes': 28311552, 'process_peak_scope': 'process lifetime high-water RSS on Linux', 'process_rss_bytes': 28311552, 'observations_are_upper_bounds': False, 'cgroup_membership': '0::/user.slice/user-78031.slice/session-84.scope\n', 'cgroup_rows': [{'path': '/sys/fs/cgroup/user.slice/user-78031.slice/session-84.scope', 'controller': 'v2', 'memory.current': '4434178048', 'memory.peak': '12185391104', 'memory.events': 'low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0', 'memory.max': 'max'}, {'path': '/sys/fs/cgroup/user.slice/user-78031.slice', 'controller': 'v2', 'memory.current': '4623155200', 'memory.peak': '20334260224', 'memory.events': 'low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0', 'memory.max': '40320221184'}, {'path': '/sys/fs/cgroup/user.slice', 'controller': 'v2', 'memory.current': '163856130048', 'memory.peak': '210225704960', 'memory.events': 'low 0\nhigh 21\nmax 8130834\noom 25\noom_kill 6\noom_group_kill 0', 'memory.max': 'max'}, {'path': '/sys/fs/cgroup', 'controller': 'v2', 'memory.current': None, 'memory.peak': None, 'memory.events': None, 'memory.max': None}], 'cgroup_scope': 'entire memory-controller cgroup ancestry including other processes; lifetime peaks', 'cgroup_applicability': 'v2 actual ancestry; missing values remain unavailable'}}
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278-r2/test_runner.py:211: AssertionError
+_ Correction279Tests.test_phase_writer_separates_unicode_characters_from_raw_bytes _
+
+self = <test_runner.Correction279Tests testMethod=test_phase_writer_separates_unicode_characters_from_raw_bytes>
+
+    def test_phase_writer_separates_unicode_characters_from_raw_bytes(self):
+        with tempfile.TemporaryDirectory() as td:
+            text=Path(td)/'unicode.txt';binary=Path(td)/'binary.dat'
+            def publication():
+                text.write_text('λ雪',encoding='utf-8')
+                binary.write_bytes(b'\xff\x00\x01')
+            with r.PhaseObserver({'publication':publication}) as observed: publication()
+            row=observed.rows[0]
+            self.assertEqual(text.stat().st_size,5)
+            self.assertEqual(binary.stat().st_size,3)
+            self.assertEqual(row['file_write_completions'],2)
+>           self.assertEqual(row['file_write_bytes'],3)
+E           AssertionError: 5 != 3
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278-r2/test_runner.py:241: AssertionError
+=========================== short test summary info ============================
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278-r2/test_runner.py::Correction279Tests::test_entry_final_split_rejects_three_zero_and_preserves_two_one
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278-r2/test_runner.py::Correction279Tests::test_partial_counts_and_provenance_survive_entry_and_final_failures
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278-r2/test_runner.py::Correction279Tests::test_phase_writer_separates_unicode_characters_from_raw_bytes
+3 failed, 10 passed in 0.43s

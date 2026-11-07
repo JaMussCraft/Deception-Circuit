@@ -1,0 +1,25 @@
+{
+  "job_id": "23455139",
+  "cluster": "delta",
+  "submitted_utc": "2026-11-03T00:33:23.162577+00:00",
+  "command": [
+    "sbatch",
+    "--parsable",
+    "--export=ALL",
+    "--constraint=projects",
+    "--partition=cpu-interactive",
+    "--time=00:45:00",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu-proposal/launch.sbatch"
+  ],
+  "stdout": "23455139\n",
+  "stderr": "",
+  "driver_manifest_sha256": "692c735257633efb0f91273dd4a6b3a4d3b98313e32442861ee3b0b73f4049d6",
+  "cpus": 4,
+  "memory_GiB": 32,
+  "gpus": 0,
+  "time_minutes": 45,
+  "account": "bjhz-delta-cpu",
+  "partition": "cpu-interactive",
+  "original_five_cases_preserved": true,
+  "reason": "User-directed move of long native verification to real CPU allocation; interactive-only test forecast was immediate"
+}

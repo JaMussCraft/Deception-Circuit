@@ -1,0 +1,24 @@
+{
+  "command": [
+    "sbatch",
+    "--account=cis260382p",
+    "--qos=gpu",
+    "--partition=GPU-shared",
+    "--nodes=1",
+    "--ntasks=1",
+    "--cpus-per-task=4",
+    "--mem=64G",
+    "--gpus-per-node=h100-80:1",
+    "--time=01:00:00",
+    "--no-requeue",
+    "--export=ALL",
+    "--job-name=lad-G3-H100timing",
+    "--chdir=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+    "--output=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-H100-R5/timing-%j.log",
+    "--wrap=bash /ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-H100-R5/dispatch.sh"
+  ],
+  "stdout": "",
+  "stderr": "sbatch: Job 50189929 to start at 2026-11-03T18:42:28 using 4 processors on nodes w007 in partition GPU-shared\n",
+  "checked_unix": 1793747877.7186368,
+  "CPU_READY_SHA256": "14705b772437cfa736f8d59ef66231db6b35892a03e02518db8077e3b6c4d8e1"
+}

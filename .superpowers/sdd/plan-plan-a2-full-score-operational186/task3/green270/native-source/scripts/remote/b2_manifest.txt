@@ -1,0 +1,17 @@
+# Repo-relative paths that `scripts/remote/b2.sh sync-data --what runs` rsyncs from Delta to Bridges-2.
+# One path per line; '#' starts a comment. Absolute paths, '..', and anything that looks like a secret
+# (.bashrc, token, key, .ssh, .netrc) are refused.
+#
+# The six coarse v2 run dirs are tracked in git (bd67758), so `sync-code` already brings them; listing them
+# here makes a Bridges-2 checkout complete even before a pull, and rsync skips files that are identical.
+# history.json and train.log are excluded by b2.sh (not needed for evaluation).
+# Never list the failed ser D dir outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323
+# or outputs/_build_v2/ (both untracked).
+outputs/llama-8b-instruct_far_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140717
+outputs/llama-8b-instruct_far_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323
+outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-140323
+outputs/llama-8b-instruct_sdr_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323
+outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_noedge_noan_nomh_nomo_nomb_261021-173101
+outputs/llama-8b-instruct_ser_v2_coarse/nls0.3_honest_noedge_noan_nomh_nomo_nomb_261021-140323
+# All-MLP operand (ticket 06 builds it from a v2 run) and the nopressure config-only stand-ins: add their
+# paths here once they exist.

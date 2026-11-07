@@ -1,0 +1,418 @@
+FFFFFFFFFFFFFFFFFFFFFFF                                                  [100%]
+=================================== FAILURES ===================================
+_ test_batch_scan_rejects_reinitialized_or_replaced_legacy_witness[empty_reinit] _
+
+tmp_path = PosixPath('/tmp/a3-source-batch-red-mgnp/test_batch_scan_rejects_reinit0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8b472ad8e0>
+damage = 'empty_reinit'
+
+    @pytest.mark.parametrize('damage',['empty_reinit','same_reinit','raw_empty','raw_copy'])
+    def test_batch_scan_rejects_reinitialized_or_replaced_legacy_witness(tmp_path,monkeypatch,damage):
+        c=setup_case(tmp_path,monkeypatch);state=c.build();witness=state._witness
+        from component_analysis import a3_direction_runtime as authority
+        if damage.endswith('reinit'):
+            roots=witness.paths;del witness._sealed;witness.__init__([] if damage=='empty_reinit' else roots)
+        else:
+            raw=object.__new__(authority._FileWitness)
+            raw.pid=os.getpid();raw.paths=() if damage=='raw_empty' else witness.paths
+            raw.identities=() if damage=='raw_empty' else witness.identities;raw._sealed=True
+            object.__setattr__(state,'_witness',raw)
+>       with pytest.raises(ValueError,match='witness|scan'):refresh(c,state)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_a3_source_validation.py:401: Failed
+_ test_batch_scan_rejects_reinitialized_or_replaced_legacy_witness[same_reinit] _
+
+tmp_path = PosixPath('/tmp/a3-source-batch-red-mgnp/test_batch_scan_rejects_reinit1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8b3900eae0>
+damage = 'same_reinit'
+
+    @pytest.mark.parametrize('damage',['empty_reinit','same_reinit','raw_empty','raw_copy'])
+    def test_batch_scan_rejects_reinitialized_or_replaced_legacy_witness(tmp_path,monkeypatch,damage):
+        c=setup_case(tmp_path,monkeypatch);state=c.build();witness=state._witness
+        from component_analysis import a3_direction_runtime as authority
+        if damage.endswith('reinit'):
+            roots=witness.paths;del witness._sealed;witness.__init__([] if damage=='empty_reinit' else roots)
+        else:
+            raw=object.__new__(authority._FileWitness)
+            raw.pid=os.getpid();raw.paths=() if damage=='raw_empty' else witness.paths
+            raw.identities=() if damage=='raw_empty' else witness.identities;raw._sealed=True
+            object.__setattr__(state,'_witness',raw)
+>       with pytest.raises(ValueError,match='witness|scan'):refresh(c,state)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_a3_source_validation.py:401: Failed
+_ test_batch_scan_rejects_reinitialized_or_replaced_legacy_witness[raw_empty] __
+
+tmp_path = PosixPath('/tmp/a3-source-batch-red-mgnp/test_batch_scan_rejects_reinit2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8b390302c0>
+damage = 'raw_empty'
+
+    @pytest.mark.parametrize('damage',['empty_reinit','same_reinit','raw_empty','raw_copy'])
+    def test_batch_scan_rejects_reinitialized_or_replaced_legacy_witness(tmp_path,monkeypatch,damage):
+        c=setup_case(tmp_path,monkeypatch);state=c.build();witness=state._witness
+        from component_analysis import a3_direction_runtime as authority
+        if damage.endswith('reinit'):
+            roots=witness.paths;del witness._sealed;witness.__init__([] if damage=='empty_reinit' else roots)
+        else:
+            raw=object.__new__(authority._FileWitness)
+            raw.pid=os.getpid();raw.paths=() if damage=='raw_empty' else witness.paths
+            raw.identities=() if damage=='raw_empty' else witness.identities;raw._sealed=True
+            object.__setattr__(state,'_witness',raw)
+>       with pytest.raises(ValueError,match='witness|scan'):refresh(c,state)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_a3_source_validation.py:401: Failed
+__ test_batch_scan_rejects_reinitialized_or_replaced_legacy_witness[raw_copy] __
+
+tmp_path = PosixPath('/tmp/a3-source-batch-red-mgnp/test_batch_scan_rejects_reinit3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8b3900dd60>
+damage = 'raw_copy'
+
+    @pytest.mark.parametrize('damage',['empty_reinit','same_reinit','raw_empty','raw_copy'])
+    def test_batch_scan_rejects_reinitialized_or_replaced_legacy_witness(tmp_path,monkeypatch,damage):
+        c=setup_case(tmp_path,monkeypatch);state=c.build();witness=state._witness
+        from component_analysis import a3_direction_runtime as authority
+        if damage.endswith('reinit'):
+            roots=witness.paths;del witness._sealed;witness.__init__([] if damage=='empty_reinit' else roots)
+        else:
+            raw=object.__new__(authority._FileWitness)
+            raw.pid=os.getpid();raw.paths=() if damage=='raw_empty' else witness.paths
+            raw.identities=() if damage=='raw_empty' else witness.identities;raw._sealed=True
+            object.__setattr__(state,'_witness',raw)
+>       with pytest.raises(ValueError,match='witness|scan'):refresh(c,state)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_a3_source_validation.py:401: Failed
+_ test_batch_rows_exactly_match_oracle_and_hash_every_occurrence_each_refresh __
+
+tmp_path = PosixPath('/tmp/a3-source-batch-red-mgnp/test_batch_rows_exactly_match_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8b3900dfa0>
+
+    def test_batch_rows_exactly_match_oracle_and_hash_every_occurrence_each_refresh(tmp_path,monkeypatch):
+        c,state,tree,target,middle=batch_tree_case(tmp_path,monkeypatch)
+        from component_analysis import a3_direction_runtime as authority
+>       plan=state._scan_plan
+             ^^^^^^^^^^^^^^^^
+E       AttributeError: '_SourceState' object has no attribute '_scan_plan'
+
+tests/test_a3_source_validation.py:420: AttributeError
+________ test_batch_plan_is_private_immutable_and_cannot_be_cloned[raw] ________
+
+tmp_path = PosixPath('/tmp/a3-source-batch-red-mgnp/test_batch_plan_is_private_imm0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8b39031dc0>
+damage = 'raw'
+
+    @pytest.mark.parametrize('damage',['raw','raw_copy','reinit','set','delete','pickle','empty'])
+    def test_batch_plan_is_private_immutable_and_cannot_be_cloned(tmp_path,monkeypatch,damage):
+>       c=setup_case(tmp_path,monkeypatch);state=c.build();plan=state._scan_plan
+                                                                ^^^^^^^^^^^^^^^^
+E       AttributeError: '_SourceState' object has no attribute '_scan_plan'
+
+tests/test_a3_source_validation.py:434: AttributeError
+_____ test_batch_plan_is_private_immutable_and_cannot_be_cloned[raw_copy] ______
+
+tmp_path = PosixPath('/tmp/a3-source-batch-red-mgnp/test_batch_plan_is_private_imm1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8b39031640>
+damage = 'raw_copy'
+
+    @pytest.mark.parametrize('damage',['raw','raw_copy','reinit','set','delete','pickle','empty'])
+    def test_batch_plan_is_private_immutable_and_cannot_be_cloned(tmp_path,monkeypatch,damage):
+>       c=setup_case(tmp_path,monkeypatch);state=c.build();plan=state._scan_plan
+                                                                ^^^^^^^^^^^^^^^^
+E       AttributeError: '_SourceState' object has no attribute '_scan_plan'
+
+tests/test_a3_source_validation.py:434: AttributeError
+______ test_batch_plan_is_private_immutable_and_cannot_be_cloned[reinit] _______
+
+tmp_path = PosixPath('/tmp/a3-source-batch-red-mgnp/test_batch_plan_is_private_imm2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8b390496a0>
+damage = 'reinit'
+
+    @pytest.mark.parametrize('damage',['raw','raw_copy','reinit','set','delete','pickle','empty'])
+    def test_batch_plan_is_private_immutable_and_cannot_be_cloned(tmp_path,monkeypatch,damage):
+>       c=setup_case(tmp_path,monkeypatch);state=c.build();plan=state._scan_plan
+                                                                ^^^^^^^^^^^^^^^^
+E       AttributeError: '_SourceState' object has no attribute '_scan_plan'
+
+tests/test_a3_source_validation.py:434: AttributeError
+________ test_batch_plan_is_private_immutable_and_cannot_be_cloned[set] ________
+
+tmp_path = PosixPath('/tmp/a3-source-batch-red-mgnp/test_batch_plan_is_private_imm3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8b3900e240>
+damage = 'set'
+
+    @pytest.mark.parametrize('damage',['raw','raw_copy','reinit','set','delete','pickle','empty'])
+    def test_batch_plan_is_private_immutable_and_cannot_be_cloned(tmp_path,monkeypatch,damage):
+>       c=setup_case(tmp_path,monkeypatch);state=c.build();plan=state._scan_plan
+                                                                ^^^^^^^^^^^^^^^^
+E       AttributeError: '_SourceState' object has no attribute '_scan_plan'
+
+tests/test_a3_source_validation.py:434: AttributeError
+______ test_batch_plan_is_private_immutable_and_cannot_be_cloned[delete] _______
+
+tmp_path = PosixPath('/tmp/a3-source-batch-red-mgnp/test_batch_plan_is_private_imm4')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8b3900eb40>
+damage = 'delete'
+
+    @pytest.mark.parametrize('damage',['raw','raw_copy','reinit','set','delete','pickle','empty'])
+    def test_batch_plan_is_private_immutable_and_cannot_be_cloned(tmp_path,monkeypatch,damage):
+>       c=setup_case(tmp_path,monkeypatch);state=c.build();plan=state._scan_plan
+                                                                ^^^^^^^^^^^^^^^^
+E       AttributeError: '_SourceState' object has no attribute '_scan_plan'
+
+tests/test_a3_source_validation.py:434: AttributeError
+______ test_batch_plan_is_private_immutable_and_cannot_be_cloned[pickle] _______
+
+tmp_path = PosixPath('/tmp/a3-source-batch-red-mgnp/test_batch_plan_is_private_imm5')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8b39049a90>
+damage = 'pickle'
+
+    @pytest.mark.parametrize('damage',['raw','raw_copy','reinit','set','delete','pickle','empty'])
+    def test_batch_plan_is_private_immutable_and_cannot_be_cloned(tmp_path,monkeypatch,damage):
+>       c=setup_case(tmp_path,monkeypatch);state=c.build();plan=state._scan_plan
+                                                                ^^^^^^^^^^^^^^^^
+E       AttributeError: '_SourceState' object has no attribute '_scan_plan'
+
+tests/test_a3_source_validation.py:434: AttributeError
+_______ test_batch_plan_is_private_immutable_and_cannot_be_cloned[empty] _______
+
+tmp_path = PosixPath('/tmp/a3-source-batch-red-mgnp/test_batch_plan_is_private_imm6')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8b3904b7a0>
+damage = 'empty'
+
+    @pytest.mark.parametrize('damage',['raw','raw_copy','reinit','set','delete','pickle','empty'])
+    def test_batch_plan_is_private_immutable_and_cannot_be_cloned(tmp_path,monkeypatch,damage):
+>       c=setup_case(tmp_path,monkeypatch);state=c.build();plan=state._scan_plan
+                                                                ^^^^^^^^^^^^^^^^
+E       AttributeError: '_SourceState' object has no attribute '_scan_plan'
+
+tests/test_a3_source_validation.py:434: AttributeError
+_ test_batch_closing_checks_reject_changes_after_an_earlier_file_read[content] _
+
+tmp_path = PosixPath('/tmp/a3-source-batch-red-mgnp/test_batch_closing_checks_reje0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8b3904a690>
+damage = 'content'
+
+    @pytest.mark.parametrize('damage',['content','replace','disappear','member','ancestor_alias','literal_alias'])
+    def test_batch_closing_checks_reject_changes_after_an_earlier_file_read(tmp_path,monkeypatch,damage):
+        c,state,tree,target,middle=batch_tree_case(tmp_path,monkeypatch)
+>       actual=c.s._read_source_file;changed=[False]
+               ^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_source_validation' has no attribute '_read_source_file'
+
+tests/test_a3_source_validation.py:460: AttributeError
+_ test_batch_closing_checks_reject_changes_after_an_earlier_file_read[replace] _
+
+tmp_path = PosixPath('/tmp/a3-source-batch-red-mgnp/test_batch_closing_checks_reje1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8b3904b440>
+damage = 'replace'
+
+    @pytest.mark.parametrize('damage',['content','replace','disappear','member','ancestor_alias','literal_alias'])
+    def test_batch_closing_checks_reject_changes_after_an_earlier_file_read(tmp_path,monkeypatch,damage):
+        c,state,tree,target,middle=batch_tree_case(tmp_path,monkeypatch)
+>       actual=c.s._read_source_file;changed=[False]
+               ^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_source_validation' has no attribute '_read_source_file'
+
+tests/test_a3_source_validation.py:460: AttributeError
+_ test_batch_closing_checks_reject_changes_after_an_earlier_file_read[disappear] _
+
+tmp_path = PosixPath('/tmp/a3-source-batch-red-mgnp/test_batch_closing_checks_reje2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8b3900fda0>
+damage = 'disappear'
+
+    @pytest.mark.parametrize('damage',['content','replace','disappear','member','ancestor_alias','literal_alias'])
+    def test_batch_closing_checks_reject_changes_after_an_earlier_file_read(tmp_path,monkeypatch,damage):
+        c,state,tree,target,middle=batch_tree_case(tmp_path,monkeypatch)
+>       actual=c.s._read_source_file;changed=[False]
+               ^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_source_validation' has no attribute '_read_source_file'
+
+tests/test_a3_source_validation.py:460: AttributeError
+_ test_batch_closing_checks_reject_changes_after_an_earlier_file_read[member] __
+
+tmp_path = PosixPath('/tmp/a3-source-batch-red-mgnp/test_batch_closing_checks_reje3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8b3900e210>
+damage = 'member'
+
+    @pytest.mark.parametrize('damage',['content','replace','disappear','member','ancestor_alias','literal_alias'])
+    def test_batch_closing_checks_reject_changes_after_an_earlier_file_read(tmp_path,monkeypatch,damage):
+        c,state,tree,target,middle=batch_tree_case(tmp_path,monkeypatch)
+>       actual=c.s._read_source_file;changed=[False]
+               ^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_source_validation' has no attribute '_read_source_file'
+
+tests/test_a3_source_validation.py:460: AttributeError
+_ test_batch_closing_checks_reject_changes_after_an_earlier_file_read[ancestor_alias] _
+
+tmp_path = PosixPath('/tmp/a3-source-batch-red-mgnp/test_batch_closing_checks_reje4')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8b39033ce0>
+damage = 'ancestor_alias'
+
+    @pytest.mark.parametrize('damage',['content','replace','disappear','member','ancestor_alias','literal_alias'])
+    def test_batch_closing_checks_reject_changes_after_an_earlier_file_read(tmp_path,monkeypatch,damage):
+        c,state,tree,target,middle=batch_tree_case(tmp_path,monkeypatch)
+>       actual=c.s._read_source_file;changed=[False]
+               ^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_source_validation' has no attribute '_read_source_file'
+
+tests/test_a3_source_validation.py:460: AttributeError
+_ test_batch_closing_checks_reject_changes_after_an_earlier_file_read[literal_alias] _
+
+tmp_path = PosixPath('/tmp/a3-source-batch-red-mgnp/test_batch_closing_checks_reje5')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8b3900edb0>
+damage = 'literal_alias'
+
+    @pytest.mark.parametrize('damage',['content','replace','disappear','member','ancestor_alias','literal_alias'])
+    def test_batch_closing_checks_reject_changes_after_an_earlier_file_read(tmp_path,monkeypatch,damage):
+        c,state,tree,target,middle=batch_tree_case(tmp_path,monkeypatch)
+>       actual=c.s._read_source_file;changed=[False]
+               ^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_source_validation' has no attribute '_read_source_file'
+
+tests/test_a3_source_validation.py:460: AttributeError
+______ test_batch_route_only_parent_catalog_update_during_read_is_allowed ______
+
+tmp_path = PosixPath('/tmp/a3-source-batch-red-mgnp/test_batch_route_only_parent_c0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8b3904a300>
+
+    def test_batch_route_only_parent_catalog_update_during_read_is_allowed(tmp_path,monkeypatch):
+>       c=setup_case(tmp_path,monkeypatch);state=c.build();actual=c.s._read_source_file;changed=[False]
+                                                                  ^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_source_validation' has no attribute '_read_source_file'
+
+tests/test_a3_source_validation.py:481: AttributeError
+_ test_batch_read_binds_descriptor_complete_bytes_and_closes_on_error[wrong_descriptor] _
+
+tmp_path = PosixPath('/tmp/a3-source-batch-red-mgnp/test_batch_read_binds_descript0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8b39048650>
+damage = 'wrong_descriptor'
+
+    @pytest.mark.parametrize('damage',['wrong_descriptor','replace_after_open','short_read'])
+    def test_batch_read_binds_descriptor_complete_bytes_and_closes_on_error(tmp_path,monkeypatch,damage):
+        c=setup_case(tmp_path,monkeypatch);state=c.build();actual=Path.open;handles=[];other=tmp_path/'other';other.write_bytes(c.static.read_bytes())
+        class Reader:
+            def __init__(self,handle):self.handle=handle;handles.append(handle)
+            def __enter__(self):return self
+            def __exit__(self,*args):self.handle.close()
+            def fileno(self):return self.handle.fileno()
+            def read(self,*args):
+                content=self.handle.read(*args)
+                if damage=='short_read' and content:return content[:-1]
+                return content
+        def opening(path,*args,**kwargs):
+            if path==c.static and (args and args[0]=='rb'):
+                handle=actual(other if damage=='wrong_descriptor' else path,*args,**kwargs)
+                if damage=='replace_after_open':
+                    replacement=tmp_path/'replace';replacement.write_bytes(c.static.read_bytes());replacement.replace(c.static)
+                return Reader(handle)
+            return actual(path,*args,**kwargs)
+        monkeypatch.setattr(Path,'open',opening)
+>       with pytest.raises(ValueError):refresh(c,state)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_a3_source_validation.py:511: Failed
+_ test_batch_read_binds_descriptor_complete_bytes_and_closes_on_error[replace_after_open] _
+
+tmp_path = PosixPath('/tmp/a3-source-batch-red-mgnp/test_batch_read_binds_descript1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8b39071490>
+damage = 'replace_after_open'
+
+    @pytest.mark.parametrize('damage',['wrong_descriptor','replace_after_open','short_read'])
+    def test_batch_read_binds_descriptor_complete_bytes_and_closes_on_error(tmp_path,monkeypatch,damage):
+        c=setup_case(tmp_path,monkeypatch);state=c.build();actual=Path.open;handles=[];other=tmp_path/'other';other.write_bytes(c.static.read_bytes())
+        class Reader:
+            def __init__(self,handle):self.handle=handle;handles.append(handle)
+            def __enter__(self):return self
+            def __exit__(self,*args):self.handle.close()
+            def fileno(self):return self.handle.fileno()
+            def read(self,*args):
+                content=self.handle.read(*args)
+                if damage=='short_read' and content:return content[:-1]
+                return content
+        def opening(path,*args,**kwargs):
+            if path==c.static and (args and args[0]=='rb'):
+                handle=actual(other if damage=='wrong_descriptor' else path,*args,**kwargs)
+                if damage=='replace_after_open':
+                    replacement=tmp_path/'replace';replacement.write_bytes(c.static.read_bytes());replacement.replace(c.static)
+                return Reader(handle)
+            return actual(path,*args,**kwargs)
+        monkeypatch.setattr(Path,'open',opening)
+>       with pytest.raises(ValueError):refresh(c,state)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_a3_source_validation.py:511: Failed
+_ test_batch_read_binds_descriptor_complete_bytes_and_closes_on_error[short_read] _
+
+tmp_path = PosixPath('/tmp/a3-source-batch-red-mgnp/test_batch_read_binds_descript2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8b39075460>
+damage = 'short_read'
+
+    @pytest.mark.parametrize('damage',['wrong_descriptor','replace_after_open','short_read'])
+    def test_batch_read_binds_descriptor_complete_bytes_and_closes_on_error(tmp_path,monkeypatch,damage):
+        c=setup_case(tmp_path,monkeypatch);state=c.build();actual=Path.open;handles=[];other=tmp_path/'other';other.write_bytes(c.static.read_bytes())
+        class Reader:
+            def __init__(self,handle):self.handle=handle;handles.append(handle)
+            def __enter__(self):return self
+            def __exit__(self,*args):self.handle.close()
+            def fileno(self):return self.handle.fileno()
+            def read(self,*args):
+                content=self.handle.read(*args)
+                if damage=='short_read' and content:return content[:-1]
+                return content
+        def opening(path,*args,**kwargs):
+            if path==c.static and (args and args[0]=='rb'):
+                handle=actual(other if damage=='wrong_descriptor' else path,*args,**kwargs)
+                if damage=='replace_after_open':
+                    replacement=tmp_path/'replace';replacement.write_bytes(c.static.read_bytes());replacement.replace(c.static)
+                return Reader(handle)
+            return actual(path,*args,**kwargs)
+        monkeypatch.setattr(Path,'open',opening)
+>       with pytest.raises(ValueError):refresh(c,state)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_a3_source_validation.py:511: Failed
+__ test_batch_plan_allocation_is_in_consumed_initialization_and_retained_size __
+
+tmp_path = PosixPath('/tmp/a3-source-batch-red-mgnp/test_batch_plan_allocation_is_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8b39075670>
+
+    def test_batch_plan_allocation_is_in_consumed_initialization_and_retained_size(tmp_path,monkeypatch):
+>       c=setup_case(tmp_path,monkeypatch);ticks=[0.];constructor=c.s._SourceScanPlan.__init__
+                                                                  ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_source_validation' has no attribute '_SourceScanPlan'
+
+tests/test_a3_source_validation.py:516: AttributeError
+=========================== short test summary info ============================
+FAILED tests/test_a3_source_validation.py::test_batch_scan_rejects_reinitialized_or_replaced_legacy_witness[empty_reinit]
+FAILED tests/test_a3_source_validation.py::test_batch_scan_rejects_reinitialized_or_replaced_legacy_witness[same_reinit]
+FAILED tests/test_a3_source_validation.py::test_batch_scan_rejects_reinitialized_or_replaced_legacy_witness[raw_empty]
+FAILED tests/test_a3_source_validation.py::test_batch_scan_rejects_reinitialized_or_replaced_legacy_witness[raw_copy]
+FAILED tests/test_a3_source_validation.py::test_batch_rows_exactly_match_oracle_and_hash_every_occurrence_each_refresh
+FAILED tests/test_a3_source_validation.py::test_batch_plan_is_private_immutable_and_cannot_be_cloned[raw]
+FAILED tests/test_a3_source_validation.py::test_batch_plan_is_private_immutable_and_cannot_be_cloned[raw_copy]
+FAILED tests/test_a3_source_validation.py::test_batch_plan_is_private_immutable_and_cannot_be_cloned[reinit]
+FAILED tests/test_a3_source_validation.py::test_batch_plan_is_private_immutable_and_cannot_be_cloned[set]
+FAILED tests/test_a3_source_validation.py::test_batch_plan_is_private_immutable_and_cannot_be_cloned[delete]
+FAILED tests/test_a3_source_validation.py::test_batch_plan_is_private_immutable_and_cannot_be_cloned[pickle]
+FAILED tests/test_a3_source_validation.py::test_batch_plan_is_private_immutable_and_cannot_be_cloned[empty]
+FAILED tests/test_a3_source_validation.py::test_batch_closing_checks_reject_changes_after_an_earlier_file_read[content]
+FAILED tests/test_a3_source_validation.py::test_batch_closing_checks_reject_changes_after_an_earlier_file_read[replace]
+FAILED tests/test_a3_source_validation.py::test_batch_closing_checks_reject_changes_after_an_earlier_file_read[disappear]
+FAILED tests/test_a3_source_validation.py::test_batch_closing_checks_reject_changes_after_an_earlier_file_read[member]
+FAILED tests/test_a3_source_validation.py::test_batch_closing_checks_reject_changes_after_an_earlier_file_read[ancestor_alias]
+FAILED tests/test_a3_source_validation.py::test_batch_closing_checks_reject_changes_after_an_earlier_file_read[literal_alias]
+FAILED tests/test_a3_source_validation.py::test_batch_route_only_parent_catalog_update_during_read_is_allowed
+FAILED tests/test_a3_source_validation.py::test_batch_read_binds_descriptor_complete_bytes_and_closes_on_error[wrong_descriptor]
+FAILED tests/test_a3_source_validation.py::test_batch_read_binds_descriptor_complete_bytes_and_closes_on_error[replace_after_open]
+FAILED tests/test_a3_source_validation.py::test_batch_read_binds_descriptor_complete_bytes_and_closes_on_error[short_read]
+FAILED tests/test_a3_source_validation.py::test_batch_plan_allocation_is_in_consumed_initialization_and_retained_size
+23 failed, 47 deselected in 4.86s

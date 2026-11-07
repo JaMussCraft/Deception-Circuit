@@ -1,0 +1,201 @@
+--- r3/test_full_score_integration.py
++++ consolidated-r4/test_full_score_integration.py
+@@ -33,16 +33,27 @@
+ import test_full_score_usage as usage_fixtures
+ 
+ 
+-def native_modules(monkeypatch):
++def native_modules(monkeypatch,observation_path=None):
+     # Match the unchanged CPU validate-phase and GPU host original cwd contract.
+     # Native prepared artifacts retain relative source keys; never rewrite them.
+     monkeypatch.chdir(str(SOURCE))
+     assert Path.cwd().resolve()==SOURCE.resolve()
++    required=dict(HF_HUB_CACHE='/work/nvme/beto/swong2',TRANSFORMERS_CACHE='/work/nvme/beto/swong2',
++        HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1',HF_DATASETS_OFFLINE='1')
++    assert {key:os.environ.get(key) for key in required}==required
++    hf=importlib.import_module('huggingface_hub.constants')
++    namespace=dict(environment={key:os.environ.get(key) for key in ('HF_HOME','HF_HUB_CACHE','HUGGINGFACE_HUB_CACHE','TRANSFORMERS_CACHE','HF_HUB_OFFLINE','TRANSFORMERS_OFFLINE','HF_DATASETS_OFFLINE')},
++        constants_origin=hf.__file__,constants_origin_sha256=t1.sha(hf.__file__),
++        constants=dict({key:str(getattr(hf,key)) for key in ('HF_HOME','HUGGINGFACE_HUB_CACHE','HF_HUB_CACHE')},HF_HUB_OFFLINE=bool(hf.HF_HUB_OFFLINE)),
++        cwd=str(Path.cwd()),synthetic_fixture=True,model_loaded=False)
++    if observation_path is not None:t1.save(observation_path,namespace)
++    assert str(hf.HF_HUB_CACHE)==required['HF_HUB_CACHE']
+     monkeypatch.syspath_prepend(str(SOURCE))
+     p = importlib.import_module('component_analysis.a2_pipeline')
+     ar = importlib.import_module('component_analysis.a3_direction_runtime')
+     assert Path(p.__file__).resolve() == SOURCE / 'component_analysis/a2_pipeline.py'
+     assert Path(ar.__file__).resolve() == SOURCE / 'component_analysis/a3_direction_runtime.py'
++    monkeypatch.setattr(p,'_TASK4_HF_OBSERVATION',namespace,raising=False)
+     model_calls=[]
+     monkeypatch.setattr(p,'_TASK4_MODEL_CALLS',model_calls,raising=False)
+     def forbidden(*a, **kw):
+@@ -88,13 +99,17 @@
+     attestation = m.read(producer.b['cutover_attestation']['path'])
+     attestation.update(mapping_origin_sha256=g['mapping_origin_sha256'],
+         active_mapping_reference=normalized['active_mapping_reference'],
+-        mapping_lineage_references=normalized['mapping_lineage_references'], ledger_sha256=m.sha(old_file))
++        mapping_lineage_references=normalized['mapping_lineage_references'], ledger_sha256=m.sha(normalized['original_snapshot_path']))
+     t1.save(producer.b['cutover_attestation']['path'], attestation)
+     producer.b['cutover_attestation']['sha256'] = m.sha(producer.b['cutover_attestation']['path'])
++    # Authenticate the completed active transition immediately, not only later
++    # after a CPU proof/capture has consumed substantial fixture work.
++    m.authenticate_cutover(producer.b,g,normalized)
++    assert m.sha(old_file)==original['ledger_sha256']
+     return normalized
+ 
+ 
+-def rebind(m, x, producer, cpu):
++def rebind(m, x, producer, cpu, support_sha256=None):
+     """Bind only temporary synthetic bytes before request and normal COMPLETE."""
+     g, c = producer.g, producer.c
+     t1.save(x.guard.CONFIG, g)
+@@ -121,6 +136,9 @@
+     child = m.read(cpu/'child-execution.json'); result=m.read(cpu/'guard-result.json')
+     child['request_sha256']=rsha
+     result.update(request_sha256=rsha, groups_file_sha256=g['groups_file_sha256'])
++    if support_sha256 is not None:
++        assert support_sha256==META['accepted_native_support_reason_mask_sha256']
++        result['support_reason_mask_sha256']=support_sha256
+     # COMPLETE receives bank identity from the actual closed CPU configuration.
+     for name,value in [('request.json',r),('guard-result.json',result)]:
+         (cpu/name).write_bytes(m.encoded(value))
+@@ -133,6 +151,7 @@
+     q=x.supervisor.validate_child_completion(c,r,child,result,now=1201.)
+     q.update(CPU_bound_config_sha256=producer.b['standing_config']['sha256'],
+         parameters_sha256=m.sha(cpu/'parameters.json'),child_execution_sha256=m.sha(cpu/'child-execution.json'))
++    if support_sha256 is not None:assert q['support_reason_mask_sha256']==support_sha256
+     t1.save(cpu/'COMPLETE.json',q)
+     record.update(GPU_config_sha256=m.sha(x.guard.CONFIG),request_sha256=rsha,marker_sha256=m.sha(x.marker))
+     t1.save(producer.work/'trigger-record.json',record)
+@@ -291,16 +310,18 @@
+ 
+ def joined(chain,tmp_path,monkeypatch,full=False):
+     m=module();real_verify_runtime_pins=m.verify_runtime_pins
+-    p,ar=native_modules(monkeypatch)
++    p,ar=native_modules(monkeypatch,tmp_path/'HF-namespace.json')
+     producer,events,cpu,remote,_=publish_fixture(m,chain,tmp_path,monkeypatch)
+     source_join(m,producer,remote,monkeypatch)
+     # Keep the unchanged protection validator: missing explicit closure flags
+     # must not be hidden by the root fixture's independently reviewed proof.
+     proof=m.read(producer.g['protection_proof']);proof['nonempty_heldout']=False
+     t1.save(producer.g['protection_proof'],proof);producer.g['protection_proof_sha256']=m.sha(producer.g['protection_proof'])
+-    scored=None
++    receipt=full_group_binding(m,p,producer.g,tmp_path) if full else None
++    normalized=native_lineage(m,producer,tmp_path,monkeypatch,ar)
++    scored=None;support_sha256=None
+     if full:
+-        scored=full_native_score(m,p,producer.g,tmp_path,monkeypatch)
++        scored,support_sha256=full_native_score(m,p,producer.g,tmp_path,monkeypatch,receipt)
+         for key in ('bank_file','bank_manifest','groups'):remote[m.physical(producer.g,producer.g[key])]=Path(producer.g[key]).read_bytes()
+     # Accepted cache algorithm on tiny files, never actual full weight reads.
+     cache_root=tmp_path/'tiny-cache';cache_root.mkdir()
+@@ -322,26 +343,43 @@
+         events.append('usage:'+label)
+         return m.validate_usage(usage_observation['payload'],usage_observation['status'],'exact')
+     monkeypatch.setattr(m,'usage',ordinary_usage)
+-    normalized=native_lineage(m,producer,tmp_path,monkeypatch,ar)
+     closed_evidence(m,producer,tmp_path,remote)
+-    rebind(m,chain,producer,cpu)
++    rebind(m,chain,producer,cpu,support_sha256=support_sha256)
+     restore_root_gates(m,producer,events,real_verify_runtime_pins,monkeypatch)
+     m.verify_runtime_pins(producer.b,producer.g,producer.c)
+     return SimpleNamespace(m=m,p=p,ar=ar,producer=producer,events=events,cpu=cpu,remote=remote,
+-        normalized=normalized,scored=scored,x=chain,usage=usage_observation)
+-
+-
+-def full_native_score(m,p,g,tmp_path,monkeypatch):
++        normalized=normalized,scored=scored,x=chain,usage=usage_observation,full_support_sha256=support_sha256)
++
++
++
++def full_group_binding(m,p,g,tmp_path):
++    """Cheap original metadata check before full context; no geometry injection."""
++    owning=json.loads((CANDIDATE/'gpu/config.template.json').read_text())
++    receipt=p.a1.read_artifact(owning['groups'])
++    shutil.copyfile(owning['groups'],g['groups'])
++    g['groups_file_sha256']=m.sha(g['groups']);g['groups_receipt_sha256']=receipt['receipt_sha256']
++    metadata=dict(receipt['model_identity'],injected=False)
++    observed=p.model_geometry_receipt(metadata)
++    t1.save(tmp_path/'geometry-before-context.json',dict(kind='SYNTHETIC_FIXTURE_REAL_METADATA_OBSERVATION',
++        inputs='frozen model identity only; complete native prepared-context validation follows unchanged',
++        frozen=receipt['model_geometry'],observed=observed,HF=p._TASK4_HF_OBSERVATION,model_loaded=False))
++    assert observed==receipt['model_geometry']
++    assert m.sha(observed['source']['path'])==observed['source']['file_sha256']
++    return receipt
++
++
++def full_native_score(m,p,g,tmp_path,monkeypatch,receipt):
+     """Full native keys/support/control/manifest, synthetic numerical values only."""
+     owning=json.loads((CANDIDATE/'gpu/config.template.json').read_text())
+-    receipt=p.a1.read_artifact(owning['groups'])
+-    # Authentic groups are copied byte for byte. No original MAIN write occurs.
+-    shutil.copyfile(owning['groups'],g['groups'])
+-    g['groups_file_sha256']=m.sha(g['groups']);g['groups_receipt_sha256']=receipt['receipt_sha256']
+     args=p.parser().parse_args([
+         '--stage','score','--design',g['a1_design'],'--selected',g['a1_selected'],
+         '--work-dir',g['main_root'],'--commit',m.SOURCE,'--batch-size','8','--registry',g['registry']])
+-    prepared,_,_=p._load_context(args);p._validate_live(args,receipt,prepared)
++    prepared,_,_=p._load_context(args)
++    observed=p.model_geometry_receipt(prepared)
++    t1.save(tmp_path/'geometry-from-prepared.json',dict(kind='SYNTHETIC_FIXTURE_REAL_METADATA_OBSERVATION',
++        frozen=receipt['model_geometry'],observed=observed,HF=p._TASK4_HF_OBSERVATION,model_loaded=False))
++    assert observed==receipt['model_geometry']
++    p._validate_live(args,receipt,prepared)
+     banks=p.a1.read_artifact(owning['bank_file'])
+     banks=copy.deepcopy(banks);banks['synthetic_fixture']=True
+     banks['execution_provenance']['synthetic_fixture']=True
+@@ -357,6 +395,13 @@
+     boundary=t2.module('validate-phase')
+     mask,controls=boundary.reconstruct_domain(p,prepared,receipt)
+     keys=p.expected_keys(receipt,0);assert len(keys)==len(mask)==59652 and len(controls)==3396
++    positive_keys=p.a1.positive_keys(p._prepared_domain(receipt),0)
++    domain_check=boundary.validate_domain_identity(keys,positive_keys,mask,controls,dict(
++        rows=59652,reconstructed_rows=59652,positive_controls=3396,reconstructed_controls=3396,
++        support_reason_mask_sha256=META['accepted_native_support_reason_mask_sha256']))
++    support_sha256=domain_check['support_reason_mask_sha256']
++    t1.save(tmp_path/'native-domain-observation.json',dict(domain_check,synthetic_fixture=True,
++        accepted_evidence=META['accepted_support_evidence'],model_loaded=False))
+     bank_references={task:p.bank_reference(banks,Path(g['bank_file']),task) for task in p.TASKS}
+     rows=[]
+     for key in keys:
+@@ -369,19 +414,20 @@
+             row['mean_bank_provenance']=bank_references[group['task']]
+         rows.append(row)
+     positive=[dict(zip(('mechanism_task','task','instance_id','condition','stream'),key),valid=True,synthetic_fixture=True)
+-              for key in p.a1.positive_keys(p._prepared_domain(receipt),0)]
++              for key in positive_keys]
+     p.validate_a2_scope(receipt,rows,limit=0,banks=banks,bank_path=Path(g['bank_file']))
+     p.a1.validate_positive_controls(positive,p._prepared_domain(receipt),0)
+     domain=dict(complete=True,source_commit=m.SOURCE,groups_file_sha256=g['groups_file_sha256'],
+         rows=[dict(key=list(key),supported=mask[tuple(key)][0],unsupported_reason=mask[tuple(key)][1]) for key in keys],
+-        positive_control_keys=[list(k) for k in p.a1.positive_keys(p._prepared_domain(receipt),0)],synthetic_fixture=True)
++        positive_control_keys=[list(k) for k in positive_keys],support_reason_mask_sha256=support_sha256,synthetic_fixture=True)
+     reference=tmp_path/'SYNTHETIC-full-domain.json';t1.save(reference,domain)
+     resource=m.read(g['resource_proof']);resource['full_domain_reference']=dict(path=str(reference),sha256=m.sha(reference))
+     t1.save(g['resource_proof'],resource);g['resource_proof_sha256']=m.sha(g['resource_proof'])
+     execution=dict(gpu_name=t1.NAME,dtype=g['dtype'],device='cuda:0',slurm_job_id=g['actual_job_id'],synthetic_fixture=True)
+-    return dict(kind='a2_scored',limit=0,pilot=False,injected=False,synthetic_fixture=True,
++    payload=dict(kind='a2_scored',limit=0,pilot=False,injected=False,synthetic_fixture=True,
+         expected=[list(k) for k in keys],bank_artifact_sha256=p.hash_content(banks),rows=rows,
+         positive_controls=positive,counts=dict(rows=59652,expected=59652,positive_controls=3396),execution_provenance=execution)
++    return payload,support_sha256
+ 
+ 
+ def consumer(j,monkeypatch,child_fault=None,entry_fault=None):
+@@ -446,6 +492,7 @@
+ def test_whole_chain_normal_native_full_publication(chain,tmp_path,monkeypatch):
+     j=joined(chain,tmp_path,monkeypatch,full=True)
+     before=(j.cpu/'COMPLETE.json').read_bytes()
++    assert j.m.read(j.cpu/'COMPLETE.json')['support_reason_mask_sha256']==j.full_support_sha256==META['accepted_native_support_reason_mask_sha256']
+     assert j.producer.publish()['published']
+     controller,guard,r,calls=consumer(j,monkeypatch)
+     result=controller.run_full_score(j.producer.g,r)
+@@ -523,7 +570,7 @@
+     # Reuse the accepted mount policy assertions, then join real native stage
+     # writer+manifest+read_stage; no Apptainer or model process is started.
+     t1.test_atomic_score_mount_policy(chain.g,monkeypatch,tmp_path)
+-    p,_=native_modules(monkeypatch)
++    p,_=native_modules(monkeypatch,tmp_path/'HF-namespace.json')
+     owning=json.loads((CANDIDATE/'gpu/config.template.json').read_text())
+     receipt=p.a1.read_artifact(owning['groups'])
+     args=p.parser().parse_args(['--stage','score','--design',chain.g['a1_design'],'--selected',chain.g['a1_selected'],

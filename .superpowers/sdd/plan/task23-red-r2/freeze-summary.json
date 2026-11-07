@@ -1,0 +1,62 @@
+{
+  "actual_preflight_or_pytest_run": false,
+  "all_137_test_cases_bytes_unchanged": true,
+  "argument_graph_retention": false,
+  "changed_candidate_files": [
+    "tests/a3_prepared_integration_cases.py"
+  ],
+  "expected_cases": {
+    "T1": 55,
+    "T2": 52,
+    "T3": 30
+  },
+  "fixture_sha256": "dbd44de8a938490066cd2f216a1a11fbd6607b49ca08e497cb2e04640780cedc",
+  "graph_observer_depth_guard": true,
+  "local_pure_checks": {
+    "RED_accepted": false,
+    "argument_graph_retained": false,
+    "exit_code": 0,
+    "full_preflight_executed": false,
+    "missing_JUnit_explicit": true,
+    "model_loaded": false,
+    "oracle_raw_kill_preserved": -9,
+    "original_exception_propagated": true,
+    "pytest_executed": false,
+    "pytest_raw_kill_preserved": -9,
+    "recursive_calls": 9,
+    "recursive_expected_events": 2,
+    "recursive_observed_events": 2,
+    "status": "PURE_PACKET_CHECKS_PASS",
+    "wall_seconds": 1.5635115670156665
+  },
+  "missing_JUnit_is_explicit_failure": true,
+  "preflight_sha256": "407e5c0a9bebbefc7065db0058b863d37f5b3cab1e9e81d75498c0071565aea7",
+  "raw_oracle_and_pytest_exit_saved_before_assertions": true,
+  "relocated_wrapper_dry_run_equal": true,
+  "resource_proposal": {
+    "BLAS_threads": 1,
+    "actual_memory_upper_bound_established": false,
+    "automatic_retry": false,
+    "cpus_per_task": 2,
+    "environment_order": [
+      "base",
+      "mgnp"
+    ],
+    "genuine_receiver_admission": false,
+    "memory_GiB": 32,
+    "normal_selected_preflight_complete": false,
+    "oracle_timeout_seconds_per_environment": 90,
+    "prior_failed_job": "23616760",
+    "prior_limit_GiB": 8,
+    "pytest_plus_inline_preflight_timeout_seconds_per_environment": 360,
+    "role": "ROOT_AUTHORIZED_DIAGNOSTIC_HEADROOM_NOT_ADMISSION",
+    "scope": "one staged preflight then unchanged combined RED per environment in one allocation; no production/model/GPU work",
+    "walltime_seconds": 1200
+  },
+  "runner_sha256": "a66a60bf2103b62651ee6b023f34dcc2fe959a774dcfbdc4960cddd196d89783",
+  "runtime_sha256": "f39162481d54b9e86119cf4528ba0d9a9c90809e41daf101053891206ee2c6b9",
+  "source_pins_sha256": "4a91a94024038efd14b9f87a3062816abe8249cd1d88025167d5b5438551c5e0",
+  "staged_preflight_then_tests_only_after_pass": true,
+  "status": "RED_R2_READY_AWAIT_REVIEW214_AND_ROOT_CPU",
+  "test_sha256": "80f05b6e2af82cd600fd966496da0ad5709ae350930fcb183353f6991799d531"
+}

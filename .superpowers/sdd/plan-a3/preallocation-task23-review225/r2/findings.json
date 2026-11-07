@@ -1,0 +1,18 @@
+{
+  "verdict": "CHANGES_REQUIRED_FOR_REMAINING_R225_B_COMPARABILITY",
+  "R225_A": "STATICALLY_CLOSED_UNDER_ROOT_INJECTED_HARNESS_RULING",
+  "R225_B": "SUBSTANTIALLY_CORRECTED_ONE_COMPARABILITY_GAP_REMAINS",
+  "findings": [
+    {
+      "id": "R225-B-r2",
+      "priority": "high",
+      "status": "open",
+      "source": "component_analysis/a3_direction_runtime.py:338-391 and 538-551",
+      "problem": "Measurement cgroup applicability/scope is checked internally but never reconciled with current receiver applicability/scope. Both mismatch directions pass validator plus current-process comparison.",
+      "contract": "implementation183-r2 contracts.json receiver_observation_contract: same accounting/environment/scope between bound evidence and production receiver; fail when observations unavailable or scope cannot be reconciled. accepted175-r2 receiver-graph-and-RAM.json binding and conservative_accounting.",
+      "minimal_correction": "Reconcile each bound cold/warm phase applicable cgroup/process observation scope with current receiver observations before loader. Fail closed on applicable/unavailable mismatch or incomparable scope; no literal cgroup path equality across runs required. Keep sampled observations distinct from bounds and preserve peak comparisons.",
+      "regression": "Correctly originally anchored complete record, unchanged source/artifact/deployment/recipe, ample capacity and below-bound peaks: (1) measured cgroup unavailable/current applicable; (2) measured applicable/current unavailable; zero loader calls. Add internal cold/warm applicability/scope disagreement if permitted by schema. Existing genuine measurement gate remains separate.",
+      "probe": "cgroup-comparability-probe.json"
+    }
+  ]
+}

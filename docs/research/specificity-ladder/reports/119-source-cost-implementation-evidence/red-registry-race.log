@@ -1,0 +1,28 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______ test_registry_discovery_binds_the_same_bytes_as_current_checker ________
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-registry-race/test_registry_discovery_binds_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f13b82476b0>
+
+    def test_registry_discovery_binds_the_same_bytes_as_current_checker(tmp_path,monkeypatch):
+        c=setup_case(tmp_path,monkeypatch);state=c.build()
+        from dataset import user_inversion_pipeline as common
+        import hashlib
+        registry=c.primary/'docs/research/held_out.json';data=c.primary/'new-set.json';data.write_text(json.dumps(['unrelated']))
+        added={'schema':1,'sets':[{'path':'new-set.json','sha256':hashlib.sha256(data.read_bytes()).hexdigest(),'n':1}]}
+        read=common.read_json;once=[True]
+        def changing(path):
+            value=read(path)
+            if Path(path)==registry and once[0]:
+                once[0]=False;registry.write_text(json.dumps(added))
+            return value
+        monkeypatch.setattr(common,'read_json',changing)
+>       with pytest.raises(ValueError,match='changed during refresh'):refresh(c,state)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_a3_source_validation.py:267: Failed
+=========================== short test summary info ============================
+FAILED tests/test_a3_source_validation.py::test_registry_discovery_binds_the_same_bytes_as_current_checker
+1 failed, 32 deselected in 2.59s

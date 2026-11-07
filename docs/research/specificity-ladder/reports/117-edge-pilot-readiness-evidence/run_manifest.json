@@ -1,0 +1,110 @@
+{
+  "kind": "independent_edge_M1_readiness_review",
+  "status": "handed-back",
+  "commit": "87fceb28b3b46f4a406c0280db785697a0bbd3fc",
+  "source_data_verdict": "PASS",
+  "operational_M1_admission_verdict": "BLOCKED",
+  "blockers": [
+    "B1 repeated full source validation lacks feasible admitted CPU cost bound",
+    "B2 staged timing plan must fit shared original edge M1 ceiling"
+  ],
+  "source_files": 509,
+  "ancestry_files": 75,
+  "mechanism_assessment_expected": 100,
+  "mechanism_assessment_observed": 100,
+  "IOI_expected": 100,
+  "IOI_observed": 100,
+  "MMLU_expected": 32,
+  "MMLU_observed": 32,
+  "initial_source_pairs_expected": 96,
+  "initial_source_pairs_supported": 96,
+  "guard_count_lower_bound": 9667,
+  "derived_same_rate_wall_hours": 98.35328000812616,
+  "all_review_checks_exit_zero": true,
+  "review_jobs_submitted": 0,
+  "large_weights_loaded": false,
+  "scientific_execution": false,
+  "execution_authorized": false,
+  "review_cpu_only": true,
+  "source_hashes": {
+    "component_analysis/a3_edge_pipeline.py": "4be709a243fa603e285efd5a4f10e2e26252f06c8410718a6d6fe15bce019d71",
+    "component_analysis/a3_edge_workload.py": "400c98aea4881a3cac0c5fbbc6498824be938b48a5d1f3ff30745691e87b53aa",
+    "component_analysis/a3_direction_runtime.py": "0401c7a2750cf66ef5508d2dbbaed2f9bcea5f83918d6503e6a8f6b809a44867",
+    "scripts/jobs/specificity_a3_edges.sh": "41e3856a903e2e235f33ca229ecea2022915b4d6fa683239c7d88a989df20be1"
+  },
+  "used_interpreter": "/u/swong2/.conda/envs/mgnp/bin/python",
+  "owning_CPU_timing_reused": true,
+  "actual_producer_replays_reused_from_review115": true,
+  "inventory_counts": {
+    "pilot": {
+      "stage": "pilot",
+      "phase": "M1",
+      "inventory_sha256": "5901800f36a0af4534ebcdb60a2b0b140166e930f68ce196ab045239b758c373",
+      "keys": 96,
+      "requirements": 604,
+      "physical_calls": 9664,
+      "model_loads": 2,
+      "finish_reserve_seconds": 300,
+      "storage_requirements": {
+        "components": {
+          "authority_key_proof_host_bytes": 0
+        },
+        "policy": "complete source-derived scalar caches, full-union bank, aliases, immutable rows plus atomic temporary publication; no saved vocabulary arrays",
+        "tiers": {
+          "cache_disk": 3848848595,
+          "host_ram": 7697697190,
+          "output_disk": 3848848595,
+          "scratch_disk": 3848848595
+        }
+      },
+      "shared_disk_pool_required": 11546545785
+    },
+    "fit": {
+      "stage": "fit",
+      "phase": "M4",
+      "inventory_sha256": "7991be5ca8f1ca93badbed05ed306a8ef9f74b83f402f49f988250e2169c6b00",
+      "keys": 6384,
+      "requirements": 302,
+      "physical_calls": 106684,
+      "model_loads": 1,
+      "finish_reserve_seconds": 300,
+      "storage_requirements": {
+        "components": {
+          "authority_key_proof_host_bytes": 0
+        },
+        "policy": "complete source-derived scalar caches, full-union bank, aliases, immutable rows plus atomic temporary publication; no saved vocabulary arrays",
+        "tiers": {
+          "cache_disk": 33803392147,
+          "host_ram": 67606784294,
+          "output_disk": 33803392147,
+          "scratch_disk": 33803392147
+        }
+      },
+      "shared_disk_pool_required": 101410176441
+    }
+  },
+  "evidence_hashes": {
+    "control-counts.json": "d0c8ac0f16f34a2d7ec07e5babcfd3935be8a2a84b397e12caed1f6769b27c3e",
+    "raw-final-validate-command.json": "99bfe0a990a5ee0705949e2894306a9143159b9d85b1d57a49303b9d4e57f008",
+    "pilot-source-support.log": "59f6dadccb6f21d6c2fb400916c823e3891c718e2834a86053603076f705a127",
+    "usage-final.json": "1b9ebba9e411b540d94a2e19cc35ddf2dc13a56c64e2a5359becf7a6368d68c6",
+    "artifact-check.log": "b6d30b5b13720628cf6f9e0669212520e0224256f1f1499660d7c9d5d70407ac",
+    "artifact-check.json": "f65fa453749706ccac21f0ac81439df873124b549ae10264bcd95705ec742053",
+    "raw-first-validate.log": "ce09db9690e49b5c18dd7af2fb4e40a09eeb36fb03a96c3462730ce3ae0ea6b2",
+    "usage-handback.json": "f0c1bbdb4912e8bae68c47aa826efe28c1b2bcf7ac9172356fbf05521720b41f",
+    "source-path-analysis.json": "bcbdcd4686b6909cf1b4b15f7b99da9995199deb591af7cbf199c4a4fe3cf730",
+    "raw-final-validate.log": "19533bafda098943f4f8c38cea396732b1e713e19d8758958328bd148ead62ef",
+    "source.json": "0adc086b748e41082794a8d9916f84f0dfbfae11228151760c14a96b968770b2",
+    "receiver-groups.json": "b6e65ec26f6a2a8ed80d0cafbd3cdb92acc495297c2d3575a6e621830f7e9533",
+    "raw-publication-receipt.json": "71e0293d660256982522dc859f9301f9c4aa90413b41985cbc876299be47bf59",
+    "pilot-source-support.json": "641e0d78daadaa5a46b3f7bbcbcb81371c08f15a1193873d1307dc4b093cfbba",
+    "check_completed_edge.py": "888a7cfc0484bfe01e0fe8b3250c129e102c6cdaeba047aa8b9985018f5247bd",
+    "raw-first-validate-command.json": "c7add85c3efbedbf4cf2d794450d0b0d9d127cbaf6c171c8c3c1706c76df0653",
+    "guard-sizing.json": "40e47693ed59e27c3bda76df89d18a1dbec996fdcd3c5d22911ac601f3533279",
+    "raw-owner-run_manifest.json": "3a580b14d222bf78e0f8fa3c187b40d2341406c92ae321c99336e62b8ace9e53",
+    "first-validate-prepared-timing.json": "8ace5e296604ca816a04e69d6ed3df6dbd2d73115ffcf39b9dcf31ddb78e0ce7",
+    "raw-dry-run-command.json": "f5b02e15edb8739fd48e7fcc91572d3e153971223ceaf5884bfbe2914544a56f",
+    "check_pilot_support.py": "99260d139905db6090193ffae79485c2271b8c8084cdc1ba2c7ac7ec45adf186",
+    "raw-dry-run.log": "e71560c5f7aaa7e120e4f4cc623b60bb7ed26ed405fc1f9fa18320385cf6cfb5"
+  }
+}

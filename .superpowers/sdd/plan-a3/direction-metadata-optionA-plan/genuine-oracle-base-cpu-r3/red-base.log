@@ -1,0 +1,36 @@
+test_accept_reviewed_allocation (test_resource_packet.AllocationTests) ... FAIL
+test_reject_insufficient_remaining (test_resource_packet.AllocationTests) ... ok
+test_reject_wrong_allocation (test_resource_packet.AllocationTests) ... ok
+test_limits_and_unmodified_child_contract (test_resource_packet.StaticContract) ... FAIL
+
+======================================================================
+FAIL: test_accept_reviewed_allocation (test_resource_packet.AllocationTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-base-cpu-r3/test_resource_packet.py", line 17, in test_accept_reviewed_allocation
+    def test_accept_reviewed_allocation(self):self.assertEqual(self.exercise()['time_limit_seconds'],4500)
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-base-cpu-r3/test_resource_packet.py", line 16, in exercise
+    return af.read_current('/tmp',minimum_remaining_seconds=remaining)
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-base-cpu-r3/allocation_facts.py", line 32, in read_current
+    limit=duration(fields['TimeLimit']);assert 0<limit<=3600,'CPU job must be bounded below one hour'
+AssertionError: CPU job must be bounded below one hour
+
+======================================================================
+FAIL: test_limits_and_unmodified_child_contract (test_resource_packet.StaticContract)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-base-cpu-r3/test_resource_packet.py", line 27, in test_limits_and_unmodified_child_contract
+    c=json.loads((P/'config.template.json').read_text());self.assertEqual((c['CPU_child_seconds'],c['Slurm_minutes'],c['kill_grace_seconds']),(4200,75,15))
+AssertionError: Tuples differ: (3300, 60, 15) != (4200, 75, 15)
+
+First differing element 0:
+3300
+4200
+
+- (3300, 60, 15)
++ (4200, 75, 15)
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.043s
+
+FAILED (failures=2)

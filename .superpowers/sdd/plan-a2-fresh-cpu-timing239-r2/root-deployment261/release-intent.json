@@ -1,0 +1,21 @@
+{
+  "actual_job_id": "23624978",
+  "review_sha256": "15039a20654d0667043bf3693661a7721f01b21757385db8e9e60c0046f97282",
+  "scontrol": "JobId=23624978 JobName=lad-A2-data239 UserId=swong2(78031) GroupId=grp_202(202) MCS_label=N/A Priority=0 Nice=0 Account=bjhz-delta-cpu QOS=bjhz-delta-cpu JobState=PENDING Reason=JobHeldUser Dependency=(null) Requeue=0 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=0:0 RunTime=00:00:00 TimeLimit=00:15:00 TimeMin=N/A SubmitTime=2026-11-07T00:18:25 EligibleTime=Unknown AccrueTime=Unknown StartTime=Unknown EndTime=Unknown Deadline=N/A SuspendTime=None SecsPreSuspend=0 LastSchedEval=2026-11-07T00:18:25 Scheduler=Main Partition=cpu-interactive AllocNode:Sid=dt-login04:1006519 ReqNodeList=(null) ExcNodeList=(null) NodeList= NumNodes=1-1 NumCPUs=4 NumTasks=1 CPUs/Task=4 ReqB:S:C:T=0:0:*:* ReqTRES=cpu=4,mem=32G,node=1,billing=32768 AllocTRES=(null) Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=* MinCPUsNode=4 MinMemoryNode=32G MinTmpDiskNode=0 Features=projects DelayBoot=00:00:00 OverSubscribe=OK Contiguous=0 Licenses=(null) LicensesAlloc=(null) Network=(null) Command=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/root-deployment261/dispatch.sh SubmitLine=sbatch --hold --parsable --account=bjhz-delta-cpu --partition=cpu-interactive --constraint=projects --nodes=1 --ntasks=1 --cpus-per-task=4 --mem=32G --time=00:15:00 --no-requeue --export=ALL,CUDA_VISIBLE_DEVICES= --chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime --job-name=lad-A2-data239 --output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/root-deployment261/slurm-%j.log /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/root-deployment261/dispatch.sh WorkDir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime StdErr= StdIn=/dev/null StdOut=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/root-deployment261/slurm-23624978.log TresPerTask=cpu=4\n",
+  "usage": {
+    "source": "codex app-server account/rateLimits/read",
+    "checked_at": "2026-11-07T06:26:28.205871+00:00",
+    "limit_id": "codex",
+    "pause_at_used_percent": 80.0,
+    "weekly": {
+      "used_percent": 36,
+      "remaining_percent": 64,
+      "resets_at": 1794586709,
+      "resets_at_utc": "2026-11-13T16:18:29+00:00"
+    },
+    "should_pause": false,
+    "status": "ok"
+  },
+  "session_status": "session codex-01a1a2f4 (01a1a2f4-dbc1-7551-bf86-d1d0f99ad6e2), cwd /projects/beto/swong2/Alignment\ndirection: specificity-ladder (registered 2026-11-03T14:54:49-05:00)\nlast reading: five-hour not applicable, seven-day 36%, Fable unknown% at 2026-11-07T01:26:21-05:00 (fresh)\nsession points 52 (51 since register); cadence 40; next checkpoint 3 at +120\nfreeze: none; acked through checkpoint 2\nweekly cap exception: expired (last observed); captured reset 1793981261\ncompactions: 7\n",
+  "observed_unix": 1794032790.2218103
+}

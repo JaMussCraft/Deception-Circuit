@@ -1,0 +1,136 @@
+{
+  "status": "scoped repair review failed with bounded residuals",
+  "scientific_execution": false,
+  "whole_unit_accepted": false,
+  "baseline_commit_supplied_by_root": "538109e809285b6ddc45d42df8786270a65f7b12",
+  "uncommitted_source_overlay": true,
+  "source_hashes": {
+    "component_analysis/a3_direction_pipeline.py": "96678db186078ab37cad108e2d1e71ffdccf1fb3dd157c35cdc57a91b2ebd4a0",
+    "component_analysis/a3_direction_runner.py": "89a62335665595533204006c3eca28d14ca9c42eb600879c235e9c6370739429",
+    "component_analysis/a3_direction_runtime.py": "5c3da215ec2246649054cc6ae05d613122c56bfcb1ff6f5cdaf6b8a1f8d70891",
+    "component_analysis/a3_direction_workload.py": "41476c316eb4cb11f69de4c8f429fcfc4431e3985a23f2d178f6f5b5be675541",
+    "component_analysis/a3_directions.py": "ed882d4e12a396e03e73671e588beba5b1a8c90ab9d31e7ee73d4194430b4a86",
+    "component_analysis/a3_pipeline.py": "310eb53427ad4ac32522dfd0d6cd3b33e4ec887af1776579845f8953bdbe83f5",
+    "scripts/jobs/specificity_a3.sh": "936dfb7f8b9c2d267d52f1e199ed431275e6527cbfc3a105a22e3812289a9b96",
+    "tests/test_a3_direction_runner.py": "3ea945d5b23b4eef7d56139758c7075ea1b56ac612f1923590b7978628ca0120",
+    "tests/test_a3_direction_runtime.py": "9fdd97169d3c64e139f1ef6a3a4f85e35d4fb61ac222634e7b28bb7e02be865f",
+    "tests/test_a3_direction_workload.py": "91eb6f874e180c5ffb362daba231631b7bea21c224446580efccfe20a9007300",
+    "tests/test_a3_directions.py": "cd8471b1524ad7b8f1b7c87f9eb5fec5724b3ab2980027ef7aadfea3fc3bb1c1",
+    "tests/test_a3_pipeline.py": "bbb3efdba075cc14c2997cc11ae44bab268bdea56459c0574d6bfc21b62f4a18",
+    "tests/a3_direction_native_scenario.py": "9b5061ab9618222b23230917f446abcaa73747f3d216f69c77b9218feec6297b"
+  },
+  "source_files": 13,
+  "source_unchanged": true,
+  "results": {
+    "independent": {
+      "mgnp": {
+        "exit_code": 1,
+        "passed": 5,
+        "failed": 1
+      },
+      "base": {
+        "exit_code": 1,
+        "passed": 5,
+        "failed": 1
+      }
+    },
+    "more": {
+      "mgnp": {
+        "exit_code": 1,
+        "passed": 6,
+        "failed": 1
+      },
+      "base": {
+        "exit_code": 1,
+        "passed": 6,
+        "failed": 1
+      }
+    },
+    "owning": {
+      "mgnp": {
+        "exit_code": 0,
+        "passed": 11
+      },
+      "base": {
+        "exit_code": 0,
+        "passed": 11
+      }
+    },
+    "tokenizer": {
+      "mgnp": {
+        "exit_code": 0,
+        "passed": 2
+      },
+      "base": {
+        "exit_code": 0,
+        "passed": 2
+      }
+    }
+  },
+  "observations": {
+    "mgnp": {
+      "baseline_rows": 60,
+      "altered_rows": 60,
+      "baseline_accepted": true,
+      "wrong_donor_accepted": true,
+      "altered_donor_streams": [
+        "not-a-real-stream"
+      ],
+      "measured_guard_dependency_bytes": 0,
+      "scoring_dependency_roots": 10,
+      "serial_reference_count": 9,
+      "actual_scoring_dependency_bytes": 3997892
+    },
+    "base": {
+      "baseline_rows": 60,
+      "altered_rows": 60,
+      "baseline_accepted": true,
+      "wrong_donor_accepted": true,
+      "altered_donor_streams": [
+        "not-a-real-stream"
+      ],
+      "measured_guard_dependency_bytes": 0,
+      "scoring_dependency_roots": 10,
+      "serial_reference_count": 9,
+      "actual_scoring_dependency_bytes": 3997486
+    }
+  },
+  "interpreters": {
+    "mgnp": "/u/swong2/.conda/envs/mgnp/bin/python",
+    "base": "/sw/external/python/anaconda3/bin/python3.9"
+  },
+  "commands": {
+    "environment": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=.",
+    "independent": "<python> -m pytest -q -p no:cacheprovider --basetemp=/tmp/review111-round1-independent-<env> docs/research/specificity-ladder/reports/111-round1-evidence/test_independent_round1.py",
+    "more": "<python> -m pytest -q -s -p no:cacheprovider --basetemp=/tmp/review111-round1-more-<env> docs/research/specificity-ladder/reports/111-round1-evidence/test_independent_round1_more.py",
+    "owning": "<python> -m pytest -q -p no:cacheprovider --basetemp=/tmp/review111-round1-owning-<env> tests/test_a3_direction_runtime.py tests/test_a3_pipeline.py -k \"production_shaped_completed_pilot_full_projector or production_cost_intake_rejects or runtime_shard_evidence_counts or reuse_overhead_records or bounded_pilot_cases or bounded_verification_shards or prepare_tokenizer\"",
+    "tokenizer": "<python> -m pytest -q -p no:cacheprovider --basetemp=/tmp/review111-round1-tokenizer-<env> tests/test_a3_pipeline.py -k \"production_tokenizer_adapter or pinned_standard_tokenizer\""
+  },
+  "limits": [
+    "No source edits, git, scheduler, RS, GPU, large weights, APIs, notebook execution or subagents.",
+    "No broad author suite or full native scenario repeated.",
+    "CPU fake tiny positive paths only; no production timing or scientific effect estimates."
+  ],
+  "evidence_sha256": {
+    "owning-mgnp.log": "94dce41e5978aaae5135987d38ab0cb53e81b7457e44b32ac13066575c5a91b5",
+    "independent-base.log": "b42eaebe2e5daf68a76978f45bb2e4d85a5a4e00790690914749f3799345972f",
+    "independent-mgnp.log": "abb1b1ac5bbfce803796ae4cf6d887b998d12215fd040f23f9b935fe36f38578",
+    "more-mgnp.log": "6368d1c422fe2265a5a0f53448374c7403c9ababd4e32a7e1a544c2d20c6cf0e",
+    "test_independent_round1_more.py": "1a5368def67a599de09bc928004743d3f1278145e720e1edb2a24eb70994a719",
+    "test_independent_round1.py": "6e181502d5d77b92bddbeca64bb98f5c9351387bd93303275c9040f62a13b940",
+    "owning-base.log": "fecf4a28c208d82cb9e97b9cf96de109d588ca23137ab703595a29b14b594a55",
+    "more-base.log": "359f2c0302840163b6b3a32f012663cd3197b1525be64bb1356381d3f011b82e",
+    "tokenizer-base.log": "b263a64294289d4ba255aa1762a84ae28cb51890243e682d62ff867e93e1c760",
+    "tokenizer-mgnp.log": "2df1cadad570f875090d76b39b68fc487501ee1d27609a32540ae40e6900f4af",
+    "serial-baseline-base/baseline/COMPLETE.json": "09bfac62353bbc9433487c60d3c5e1cc735de1e3efb12ff7fca4ef3e6d687a85",
+    "serial-baseline-base/baseline/payload.json": "aadc7ce427f69e2da799534ba2025608512ea13099aad8ebbc31232aa481e053",
+    "serial-baseline-base/wrong-donor/COMPLETE.json": "c18ebc866ffbebe5de76a283640970b9fcbb3bf89b36133bba5ca2b0ff5d0a65",
+    "serial-baseline-base/wrong-donor/payload.json": "eb8c2bd15ed4098550fbbf87b958186ab54b7f265f1a0df71e6d4ab9e5fdd01b",
+    "serial-baseline-mgnp/baseline/COMPLETE.json": "296b00bf08bb846b92bb0caa0c78d1a9a4914ad3d6511da7f7d9ed11152d772e",
+    "serial-baseline-mgnp/baseline/payload.json": "1bcb489e84c68335faf637f823dc9f6ab31c7ec126f125fac1c448ccfd53c26a",
+    "serial-baseline-mgnp/wrong-donor/COMPLETE.json": "9b0a95853bd5ee5efdca87e6bf193d74bc8cff33ee1fbfd2a14aa3e87819fb4a",
+    "serial-baseline-mgnp/wrong-donor/payload.json": "ccb655a847f58f6c0edf56ec2f6808e1fa7fca9a53a66703e736d06da59f2167",
+    "reviewed_runtime.py": "5c3da215ec2246649054cc6ae05d613122c56bfcb1ff6f5cdaf6b8a1f8d70891",
+    "reviewed-fix.diff": "9eca94e88498544f7f4b3131ceedded7ef04bac0cfdeaeb1c54bd7dff2d3828b"
+  }
+}

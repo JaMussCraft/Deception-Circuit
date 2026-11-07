@@ -1,0 +1,52 @@
+........................................................................ [ 32%]
+.........................................F.............................. [ 65%]
+........................................................................ [ 97%]
+.....                                                                    [100%]
+=================================== FAILURES ===================================
+___ test_actual_a1_parent_schema_derives_masks_without_serialized_attention ____
+
+    def test_actual_a1_parent_schema_derives_masks_without_serialized_attention():
+        from component_analysis import ladder_pipeline as ladder,ladder_design
+        import os
+        p=driver();path=Path(os.environ.get('A3_A1_SCHEMA_TEST_DESIGN',str(Path(__file__).resolve().parents[1]/'outputs/_analyses/specificity-ladder/ladder-5f450dc/design.json')))
+>       parent=ladder.read_artifact(path);conditions=parent['rows']['far_v2']
+
+tests/test_a3_mask_pipeline.py:506: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+component_analysis/ladder_pipeline.py:37: in read_artifact
+    raw=common.read_json(path)
+dataset/user_inversion_pipeline.py:36: in read_json
+    return json.loads(Path(path).read_text())
+/sw/external/python/anaconda3/lib/python3.9/pathlib.py:1266: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+/sw/external/python/anaconda3/lib/python3.9/pathlib.py:1252: in open
+    return io.open(self, mode, buffering, encoding, errors, newline,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-refresh-batch-source/outputs/_analyses/specificity-ladder/ladder-5f450dc/design.json')
+name = '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-refresh-batch-source/outputs/_analyses/specificity-ladder/ladder-5f450dc/design.json'
+flags = 524288, mode = 438
+
+    def _opener(self, name, flags, mode=0o666):
+        # A stub for the opener argument to built-in open()
+>       return self._accessor.open(self, flags, mode)
+E       FileNotFoundError: [Errno 2] No such file or directory: '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-refresh-batch-source/outputs/_analyses/specificity-ladder/ladder-5f450dc/design.json'
+
+/sw/external/python/anaconda3/lib/python3.9/pathlib.py:1120: FileNotFoundError
+=============================== warnings summary ===============================
+../../../../../../../../../../../../u/swong2/.local/lib/python3.9/site-packages/transformers/utils/hub.py:110
+  /u/swong2/.local/lib/python3.9/site-packages/transformers/utils/hub.py:110: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+    warnings.warn(
+
+../../../../../../../../../../../../sw/external/python/anaconda3/lib/python3.9/site-packages/tensorflow/python/framework/dtypes.py:35
+  /sw/external/python/anaconda3/lib/python3.9/site-packages/tensorflow/python/framework/dtypes.py:35: DeprecationWarning: ml_dtypes.float8_e4m3b11 is deprecated. Use ml_dtypes.float8_e4m3b11fnuz
+    from tensorflow.tsl.python.lib.core import pywrap_ml_dtypes
+
+../../../../../../../../../../../../u/swong2/.local/lib/python3.9/site-packages/pandas/core/arrays/masked.py:61
+  /u/swong2/.local/lib/python3.9/site-packages/pandas/core/arrays/masked.py:61: UserWarning: Pandas requires version '1.3.6' or newer of 'bottleneck' (version '1.3.5' currently installed).
+    from pandas.core import (
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_a3_mask_pipeline.py::test_actual_a1_parent_schema_derives_masks_without_serialized_attention
+1 failed, 220 passed, 3 warnings in 256.84s (0:04:16)

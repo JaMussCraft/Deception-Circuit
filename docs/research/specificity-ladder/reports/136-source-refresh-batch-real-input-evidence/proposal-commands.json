@@ -1,0 +1,238 @@
+[
+  {
+    "stage": "canonical",
+    "command": [
+      "bash",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime/scripts/jobs/specificity_a3.sh",
+      "--experiment",
+      "directions",
+      "--stage",
+      "prepare",
+      "--action",
+      "freeze",
+      "--design",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-pilots-40fe57289405/canonical/design.json",
+      "--commit",
+      "40fe57289405fd53a3fce02e5d4e47a0ebf78b64",
+      "--work-dir",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-pilots-40fe57289405/canonical",
+      "--a1-design",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/design.json",
+      "--a1-selected",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/selected.json",
+      "--matched-root",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07",
+      "--historical-csv",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/mechanism-analysis/phase3/a_prime.csv",
+      "--root-ruling",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-pilots-40fe57289405/root-ruling.json",
+      "--execution-settings",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-pilots-40fe57289405/execution-settings.json",
+      "--registry",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json"
+    ],
+    "cwd": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime"
+  },
+  {
+    "stage": "mask-settings",
+    "command": [
+      "/u/swong2/.conda/envs/mgnp/bin/python",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-refresh-batch-real-input-cpu-proposal/prepare-mask-settings.py"
+    ],
+    "cwd": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime"
+  },
+  {
+    "stage": "mask",
+    "command": [
+      "bash",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime/scripts/jobs/specificity_a3_mask.sh",
+      "--stage",
+      "prepare",
+      "--design",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-pilots-40fe57289405/canonical/design.json",
+      "--commit",
+      "40fe57289405fd53a3fce02e5d4e47a0ebf78b64",
+      "--work-dir",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-pilots-40fe57289405/mask",
+      "--chunk-size",
+      "4",
+      "--registry",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
+      "--action",
+      "freeze",
+      "--root-bundle",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-pilots-40fe57289405/mask-source-settings"
+    ],
+    "cwd": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime"
+  },
+  {
+    "stage": "mask-inventory-pilot",
+    "command": [
+      "bash",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime/scripts/jobs/specificity_a3_mask.sh",
+      "--stage",
+      "prepare",
+      "--design",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-pilots-40fe57289405/canonical/design.json",
+      "--commit",
+      "40fe57289405fd53a3fce02e5d4e47a0ebf78b64",
+      "--work-dir",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-pilots-40fe57289405/mask",
+      "--chunk-size",
+      "4",
+      "--registry",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
+      "--action",
+      "inventory",
+      "--inventory-stage",
+      "pilot",
+      "--finish-reserve-seconds",
+      "300"
+    ],
+    "cwd": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime"
+  },
+  {
+    "stage": "mask-inventory-full",
+    "command": [
+      "bash",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime/scripts/jobs/specificity_a3_mask.sh",
+      "--stage",
+      "prepare",
+      "--design",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-pilots-40fe57289405/canonical/design.json",
+      "--commit",
+      "40fe57289405fd53a3fce02e5d4e47a0ebf78b64",
+      "--work-dir",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-pilots-40fe57289405/mask",
+      "--chunk-size",
+      "4",
+      "--registry",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
+      "--action",
+      "inventory",
+      "--inventory-stage",
+      "full",
+      "--finish-reserve-seconds",
+      "300"
+    ],
+    "cwd": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime"
+  },
+  {
+    "stage": "edge",
+    "command": [
+      "bash",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime/scripts/jobs/specificity_a3_edges.sh",
+      "--stage",
+      "prepare",
+      "--design",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-pilots-40fe57289405/canonical/design.json",
+      "--commit",
+      "40fe57289405fd53a3fce02e5d4e47a0ebf78b64",
+      "--work-dir",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-pilots-40fe57289405/edge",
+      "--registry",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json"
+    ],
+    "cwd": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime"
+  },
+  {
+    "stage": "inventories",
+    "command": [
+      "/u/swong2/.conda/envs/mgnp/bin/python",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-refresh-batch-real-input-cpu-proposal/prepare-inventories.py"
+    ],
+    "cwd": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime"
+  },
+  {
+    "stage": "mask-dry-run",
+    "command": [
+      "bash",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime/scripts/jobs/specificity_a3_mask.sh",
+      "--stage",
+      "pilot",
+      "--design",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-pilots-40fe57289405/canonical/design.json",
+      "--commit",
+      "40fe57289405fd53a3fce02e5d4e47a0ebf78b64",
+      "--work-dir",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-pilots-40fe57289405/mask",
+      "--chunk-size",
+      "4",
+      "--registry",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
+      "--dry-run"
+    ],
+    "cwd": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime"
+  },
+  {
+    "stage": "dry-run",
+    "command": [
+      "bash",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime/scripts/jobs/specificity_a3_edges.sh",
+      "--stage",
+      "pilot",
+      "--design",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-pilots-40fe57289405/canonical/design.json",
+      "--commit",
+      "40fe57289405fd53a3fce02e5d4e47a0ebf78b64",
+      "--work-dir",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-pilots-40fe57289405/edge",
+      "--registry",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
+      "--dry-run"
+    ],
+    "cwd": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime"
+  },
+  {
+    "stage": "validate",
+    "command": [
+      "/u/swong2/.conda/envs/mgnp/bin/python",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-refresh-batch-real-input-cpu-proposal/validate-preparation.py"
+    ],
+    "cwd": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime"
+  },
+  {
+    "stage": "measure-mask",
+    "command": [
+      "/u/swong2/.conda/envs/mgnp/bin/python",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-refresh-batch-real-input-cpu-proposal/measure-source-cost.py",
+      "mask"
+    ],
+    "cwd": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime"
+  },
+  {
+    "stage": "measure-edge",
+    "command": [
+      "/u/swong2/.conda/envs/mgnp/bin/python",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-refresh-batch-real-input-cpu-proposal/measure-source-cost.py",
+      "edge"
+    ],
+    "cwd": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime"
+  },
+  {
+    "stage": "negatives-mask",
+    "command": [
+      "/u/swong2/.conda/envs/mgnp/bin/python",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-refresh-batch-real-input-cpu-proposal/copied-negatives.py",
+      "mask"
+    ],
+    "cwd": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime"
+  },
+  {
+    "stage": "negatives-edge",
+    "command": [
+      "/u/swong2/.conda/envs/mgnp/bin/python",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-refresh-batch-real-input-cpu-proposal/copied-negatives.py",
+      "edge"
+    ],
+    "cwd": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime"
+  },
+  {
+    "stage": "comparison",
+    "command": [
+      "/sw/external/python/anaconda3/bin/python3.9",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-refresh-batch-real-input-cpu-proposal/compare-compute.py"
+    ],
+    "cwd": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime"
+  }
+]

@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "rsync",
+    "-rlp",
+    "--ignore-existing",
+    "-e",
+    "ssh -o BatchMode=yes -o ConnectTimeout=15 -o ControlMaster=no -o ControlPath=none",
+    "--files-from=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/original-6bd-source-files.txt",
+    "--",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-runtime-6bd8bf5/",
+    "b2dtn:/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-runtime-6bd8bf5/"
+  ],
+  "exit_code": 0,
+  "source_commit": "6bd8bf5334f2e83613a129d2fcfeacf83e762191",
+  "full_CPU_verification_pending": true
+}

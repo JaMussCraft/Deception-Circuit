@@ -1,0 +1,45 @@
+--- r3/run_cpu.py
++++ consolidated-r4/run_cpu.py
+@@ -14,6 +14,8 @@
+ import xml.etree.ElementTree as ET
+ 
+ P=Path(__file__).resolve().parent
++A2_HF_ENV=dict(HF_HUB_CACHE='/work/nvme/beto/swong2',TRANSFORMERS_CACHE='/work/nvme/beto/swong2',
++    HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1',HF_DATASETS_OFFLINE='1')
+ 
+ def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+ def read(path):return json.loads(Path(path).read_text())
+@@ -29,6 +31,10 @@
+         for path,digest in read(frozen/name).items():
+             target=Path(path) if name=='original-source-pins.json' else frozen/path
+             if sha(target)!=digest:raise RuntimeError('frozen dependency bytes changed: '+str(target))
++    support=d['accepted_support_evidence']
++    if sha(support['path'])!=support['sha256']:raise RuntimeError('accepted support evidence changed')
++    if read(support['path'])['verified']['support_reason_mask_sha256']!=d['accepted_native_support_reason_mask_sha256']:
++        raise RuntimeError('accepted native support identity changed')
+     snapshot=read(frozen/'native-snapshot.json');source=Path(d['original_runtime'])
+     if str(source)!=snapshot['runtime_root']:raise RuntimeError('original runtime namespace mismatch')
+     for name,digest in snapshot['source_sha256'].items():
+@@ -59,17 +65,20 @@
+         cluster=os.environ.get('SLURM_CLUSTER_NAME'),host=socket.gethostname(),
+         Slurm_env={k:os.environ.get(k) for k in ('SLURM_JOB_ID','SLURM_CPUS_PER_TASK','SLURM_MEM_PER_NODE','SLURM_JOB_PARTITION')},
+         packet_pins_sha256=sha(P/'packet-pins.json'),dependencies=d,
+-        started_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),execution_authority=False))
++        started_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),execution_authority=False,child_HF_environment_contract=A2_HF_ENV))
+     observations=[];test=P/'candidate/tests/test_full_score_integration.py'
+     for target in proposal['CPU_test_proposal']['interpreters']:
+         verify();label=target['label'];xml=output/(label+'.xml')
+         env=dict(os.environ,PYTHONDONTWRITEBYTECODE='1',PYTEST_DISABLE_PLUGIN_AUTOLOAD='1',CUDA_VISIBLE_DEVICES='',
+             OMP_NUM_THREADS='1',OPENBLAS_NUM_THREADS='1',MKL_NUM_THREADS='1',NUMEXPR_NUM_THREADS='1')
++        # A2-only child environment, fixed before any project/HF import.
++        # No parent environment, shared cache, or independent A3 process changes.
++        env.update(A2_HF_ENV)
+         env.pop('PYTHONPATH',None)
+         for key in list(env):
+             if key.startswith('A2_FULL_SCORE_') or key.startswith('A2_TASK3_') or key in ('A2_ROOT_UNDER_TEST','A2_CPU_UNDER_TEST'):
+                 env.pop(key)
+-        identity_program="import json,sys,pytest;print(json.dumps({'python':sys.version,'minor':list(sys.version_info[:2]),'pytest':pytest.__version__,'pytest_origin':pytest.__file__,'optimize':sys.flags.optimize}))"
++        identity_program="import json,sys,pytest;print(json.dumps({'python':sys.version,'minor':list(sys.version_info[:2]),'pytest':pytest.__version__,'pytest_origin':pytest.__file__,'optimize':sys.flags.optimize,'HF_environment':{k:__import__('os').environ.get(k) for k in ('HF_HOME','HF_HUB_CACHE','HUGGINGFACE_HUB_CACHE','TRANSFORMERS_CACHE','HF_HUB_OFFLINE','TRANSFORMERS_OFFLINE','HF_DATASETS_OFFLINE')}}))"
+         identity=json.loads(subprocess.check_output([target['python'],'-B','-c',identity_program],cwd=str(output),env=env,universal_newlines=True,timeout=15))
+         if identity['minor']!=target['python_minor'] or identity['pytest']!=target['pytest'] or identity['optimize']!=0:
+             raise RuntimeError('unsupported normal interpreter identity: '+json.dumps(identity))

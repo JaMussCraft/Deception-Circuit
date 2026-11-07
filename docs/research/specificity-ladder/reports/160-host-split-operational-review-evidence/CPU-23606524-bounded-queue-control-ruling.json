@@ -1,0 +1,33 @@
+{
+  "verdict": "SCOPED_CONDITIONAL_EXECUTION_RULE_ACCEPTED",
+  "actual_GPU_job": "50189932",
+  "actual_CPU_job": "23606524",
+  "reservation": "r-041",
+  "basis": "Existing accepted bank-first exploratory plus conditionalprefix scope; explicit conditional execution authorization, not observation-only. Root owns all operations.",
+  "cutoff_formula": "min(CPU_initial_end, fresh_actual_CPU_current_end) - 60 - 1650 - 300",
+  "cutoff_if_recorded_CPU_end_unchanged_UTC": "2026-11-06T17:50:36Z",
+  "pre_unhold": "Fresh exact CPU RUNNING/READY/config and immutable GPU bindings; immediately verify current_UTC+180 < cutoff. Arm only exact accepted watcher/helper.",
+  "operation_bound_seconds": 120,
+  "poll_seconds": 5,
+  "rules": [
+    "Same unstarted GPU job and immutable charge/config only; no cancellation, new GPU attempt, extension or refund.",
+    "Use UTC epochs for scheduler timestamps and monotonic elapsed bound; individually bound remote commands so operation plus hold confirmation fits safety margin.",
+    "Pending forecast greater than cutoff means prompt rehold. Plain Unknown forecast may be polled only inside the120-second operation; unknown at deadline means rehold. Pending at deadline is reheld even if forecast was earlier.",
+    "RUNNING success requires actual original job/resource facts and actualStartTime no later than cutoff and currentUTC. Existing per-phase helper gates remain necessary.",
+    "After rehold attempt positively reread state. If RUNNING beforecutoff, treat as this one authorized attempt; never cancel/retry. If hold state/timing/identity cannot be established, stop automatic phase publication and preserve/escalate uncertainty.",
+    "On confirmed still-unstarted JobHeldUser, stop watcher and confirm no phase/release/helper execution. Preserve observations and original charge."
+  ],
+  "unchanged_gates": [
+    "same replacement CPU for both proofs",
+    "fresh actual owning CPU results",
+    "source and current catalogue protection",
+    "per-phase cache metadata/stat/blob checks",
+    "ledger/mapping/all retained charges",
+    "live usage/cadence",
+    "finite300-second phase-entry release",
+    "1950-second prefix floor",
+    "300-second GPU finish margin",
+    "60-minute one-GPU envelope"
+  ],
+  "limitation": "No assertion that forecast or this ruling guarantees completion of bank and prefix. No actual unhold or phase action performed by reviewer."
+}

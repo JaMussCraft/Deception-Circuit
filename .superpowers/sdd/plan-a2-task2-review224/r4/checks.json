@@ -1,0 +1,45 @@
+{
+  "status": "ACCEPT_NARROW_RED_ORACLE_CORRECTION_ONLY",
+  "raw_members_checked": 266,
+  "all_prior_members_unchanged": 252,
+  "oracle_failed": 19,
+  "oracle_passed": 3,
+  "oracle_cases": 22,
+  "observed": [
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task2/green-r3/root-green-01/red-env1.xml",
+      "expected": 22,
+      "observed": 22,
+      "failed": 19,
+      "passed": 3,
+      "errors": 0,
+      "skips": 0,
+      "exact_sets_match": true
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task2/green-r3/root-green-01/red-env2.xml",
+      "expected": 22,
+      "observed": 22,
+      "failed": 19,
+      "passed": 3,
+      "errors": 0,
+      "skips": 0,
+      "exact_sets_match": true
+    }
+  ],
+  "actual_GREEN_ran": false,
+  "actual_GREEN_evidence_absent": true,
+  "unchanged_observer_functions": [
+    "sha",
+    "write",
+    "pins",
+    "command",
+    "bounded",
+    "observe"
+  ],
+  "source_job": "23620810",
+  "pins_sha256": "ddee7e6df8220e06212c56b4bf79e6e5fa659fb2cfd9e4ead1131c164d5456b4",
+  "reason": "timely_window=False is rejected by accepted Task1 ValueError before other missing CPU fields; positive None still fails in exact baseline set",
+  "no_production_or_test_mutations": true,
+  "no_tests_jobs_remote_git_RS_agents": true
+}

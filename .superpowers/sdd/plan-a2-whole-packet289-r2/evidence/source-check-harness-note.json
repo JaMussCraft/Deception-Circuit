@@ -1,0 +1,8 @@
+{
+  "scope": "STDLIB_CHECKER_ONLY",
+  "initial_mgnp_exit": 1,
+  "cause": "Redirect opened an empty evidence/source-check-mgnp.json before checker recursively parsed all JSON, including that output.",
+  "correction": "Parse only owned source JSON inputs; dynamic evidence outputs are excluded.",
+  "native_imports": false,
+  "pytest_runs": 0
+}

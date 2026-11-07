@@ -1,0 +1,25 @@
+test_actual_main_reclamps_after_poll_reap_shortening (__main__.DeadlineR2Tests.test_actual_main_reclamps_after_poll_reap_shortening) ... FAIL
+test_observed_before_at_after_cap (__main__.DeadlineR2Tests.test_observed_before_at_after_cap) ... FAIL
+
+======================================================================
+FAIL: test_actual_main_reclamps_after_poll_reap_shortening (__main__.DeadlineR2Tests.test_actual_main_reclamps_after_poll_reap_shortening)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-resource-proof194-r2/test_deadline_r2.py", line 29, in test_actual_main_reclamps_after_poll_reap_shortening
+    with self.assertRaises(ValueError):m.main()
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_observed_before_at_after_cap (__main__.DeadlineR2Tests.test_observed_before_at_after_cap)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-resource-proof194-r2/test_deadline_r2.py", line 11, in test_observed_before_at_after_cap
+    with self.assertRaises(ValueError):m.normal_child(0,None,100,100,report())
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.007s
+
+FAILED (failures=2)

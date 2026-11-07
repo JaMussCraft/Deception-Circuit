@@ -1,0 +1,67 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+__________ test_runtime_shard_evidence_counts_its_final_live_guard[1] __________
+
+tmp_path = PosixPath('/tmp/review111-shard-count-packed-red/test_runtime_shard_evidence_co0')
+fake = [(tensor([[1, 2, 4, 0],
+        [1, 2, 3, 0]]), None), (tensor([[2, 3, 6, 0],
+        [2, 3, 5, 0]]), None), (tensor([...12.],
+         [ 0.,  0.]]]), positions=tensor([[False, False,  True, False]]))}), (tensor([[1, 2, 3, 0]]), None), ...]
+tile = 1
+
+    @pytest.mark.parametrize('tile',[1,2])
+    def test_runtime_shard_evidence_counts_its_final_live_guard(tmp_path,fake,tile):
+        r,d,p=_fake_pilot_inputs(tile);inv=r.workload.build_inventory(d,p,stage='fit-select')
+        shard=copy.deepcopy(inv['shards'][0]);axes,shard['cells']=r._pilot_axes(object(),shard['cells'],None)
+        proofs=[]
+        if tile>1:
+            pilot=r.workload.build_inventory(d,p,stage='prefit')
+            invocation=next(x for x in pilot['packing_invocations'] if x['profile']==shard['profile']
+                and x['analysis_task']==shard['expected_keys'][0][1])
+            measured=r._pilot_invocation(object(),d,p,invocation,axes=None,root=tmp_path,guard=lambda:None)
+            path=tmp_path/'measured';r.publish_object(path,dict(injected=True,timing_only=True,source_commit=p['commit'],
+                runtime_profile=r.runtime_kernel_identity(object()),evidence=measured['evidence'],measurement=r._pilot_scope_measurement(d,invocation)))
+            proofs.append(r._CompletedPackingProof(path))
+        index=r._PackingCandidateIndex(proofs);live=[];guard=r._DependencyGuard(lambda:live.append(1),index)
+        rows,evidence,_=r.score_runtime_shard(object(),d,p,shard,axes=axes,output=tmp_path/'shard',guard=guard,measured_index=index,axis_class=True)
+        assert len(rows)==len(shard['expected_keys'])
+>       assert evidence['dependency_guard_calls']==len(live)==guard.calls
+E       assert 5 == 6
+E        +  where 6 = len([1, 1, 1, 1, 1, 1])
+
+tests/test_a3_direction_runtime.py:1551: AssertionError
+__________ test_runtime_shard_evidence_counts_its_final_live_guard[2] __________
+
+tmp_path = PosixPath('/tmp/review111-shard-count-packed-red/test_runtime_shard_evidence_co1')
+fake = [(tensor([[2, 3, 6, 0],
+        [2, 3, 5, 0]]), None), (tensor([[1, 2, 4, 0],
+        [1, 2, 3, 0]]), None), (tensor([...None), (tensor([[2, 3, 5, 0],
+        [2, 3, 7, 0]]), None), (tensor([[1, 2, 3, 0],
+        [1, 2, 5, 0]]), None), ...]
+tile = 2
+
+    @pytest.mark.parametrize('tile',[1,2])
+    def test_runtime_shard_evidence_counts_its_final_live_guard(tmp_path,fake,tile):
+        r,d,p=_fake_pilot_inputs(tile);inv=r.workload.build_inventory(d,p,stage='fit-select')
+        shard=copy.deepcopy(inv['shards'][0]);axes,shard['cells']=r._pilot_axes(object(),shard['cells'],None)
+        proofs=[]
+        if tile>1:
+            pilot=r.workload.build_inventory(d,p,stage='prefit')
+            invocation=next(x for x in pilot['packing_invocations'] if x['profile']==shard['profile']
+                and x['analysis_task']==shard['expected_keys'][0][1])
+            measured=r._pilot_invocation(object(),d,p,invocation,axes=None,root=tmp_path,guard=lambda:None)
+            path=tmp_path/'measured';r.publish_object(path,dict(injected=True,timing_only=True,source_commit=p['commit'],
+                runtime_profile=r.runtime_kernel_identity(object()),evidence=measured['evidence'],measurement=r._pilot_scope_measurement(d,invocation)))
+            proofs.append(r._CompletedPackingProof(path))
+        index=r._PackingCandidateIndex(proofs);live=[];guard=r._DependencyGuard(lambda:live.append(1),index)
+        rows,evidence,_=r.score_runtime_shard(object(),d,p,shard,axes=axes,output=tmp_path/'shard',guard=guard,measured_index=index,axis_class=True)
+        assert len(rows)==len(shard['expected_keys'])
+>       assert evidence['dependency_guard_calls']==len(live)==guard.calls
+E       assert 6 == 7
+E        +  where 7 = len([1, 1, 1, 1, 1, 1, ...])
+
+tests/test_a3_direction_runtime.py:1551: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_a3_direction_runtime.py::test_runtime_shard_evidence_counts_its_final_live_guard[1]
+FAILED tests/test_a3_direction_runtime.py::test_runtime_shard_evidence_counts_its_final_live_guard[2]
+2 failed in 6.96s

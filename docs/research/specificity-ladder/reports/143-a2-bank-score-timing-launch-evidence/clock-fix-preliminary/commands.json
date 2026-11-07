@@ -1,0 +1,69 @@
+{
+  "bank": [
+    "bash",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime/scripts/jobs/specificity_a2.sh",
+    "--design",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/design.json",
+    "--selected",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/selected.json",
+    "--commit",
+    "40fe57289405fd53a3fce02e5d4e47a0ebf78b64",
+    "--batch-size",
+    "8",
+    "--registry",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
+    "--stage",
+    "bank",
+    "--work-dir",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/all18-40fe57289405-v1"
+  ],
+  "score_prefix4": [
+    "bash",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime/scripts/jobs/specificity_a2.sh",
+    "--design",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/design.json",
+    "--selected",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/selected.json",
+    "--commit",
+    "40fe57289405fd53a3fce02e5d4e47a0ebf78b64",
+    "--batch-size",
+    "8",
+    "--registry",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
+    "--stage",
+    "score",
+    "--work-dir",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/all18-40fe57289405-v1-timing-limit4",
+    "--limit",
+    "4"
+  ],
+  "preflight": [
+    "bash",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/real-input-readiness/bank-scoring-timing/launch/cpu-preflight.sh"
+  ],
+  "pre_submission": [
+    "/u/swong2/.conda/envs/mgnp/bin/python",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/real-input-readiness/bank-scoring-timing/launch/pre-submit.py"
+  ],
+  "gpu_controller": [
+    "bash",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/real-input-readiness/bank-scoring-timing/launch/gpu-timing.sh"
+  ],
+  "GPU_submission_template": [
+    "sbatch",
+    "--hold",
+    "--parsable",
+    "--export=ALL",
+    "--account=ROOT_SELECTED_H200_ACCOUNT",
+    "--partition=ROOT_SELECTED_H200_PARTITION",
+    "--gres=gpu:h200:1",
+    "--constraint=projects",
+    "--ntasks=1",
+    "--cpus-per-task=4",
+    "--mem=64G",
+    "--time=00:25:00",
+    "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime",
+    "--output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/real-input-readiness/bank-scoring-timing/launch/logs/slurm-%j.out",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/real-input-readiness/bank-scoring-timing/launch/gpu-timing.sh"
+  ]
+}

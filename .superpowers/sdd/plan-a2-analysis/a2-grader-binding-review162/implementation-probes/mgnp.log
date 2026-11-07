@@ -1,0 +1,156 @@
+......................FF......F                                          [100%]
+=================================== FAILURES ===================================
+_____________ test_stage_read_allowed_metadata_keeps_all_bytes[0] ______________
+
+context = namespace(paths=[PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.su...lan-a2-analysis/a2-grader-binding-review162/implementation-probes/temp-23482257-mgnp/test_stage_read_allowed_metada0'))
+route = 0
+
+    @pytest.mark.parametrize('route',[0,1])
+    def test_stage_read_allowed_metadata_keeps_all_bytes(context,route):
+        c=context;payload=dict(kind='independent-software',counts={})
+>       stage=c.tmp/'stage';a2._publish_stage(stage,'payload.json',payload,a2._manifest(c.args,c.receipt,payload))
+                                                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+test_independent.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../a2-grader-binding-candidate161/component_analysis/a2_pipeline.py:1254: in _manifest
+    runtime_code_hashes=runtime_hashes(),
+                        ^^^^^^^^^^^^^^^^
+../../a2-grader-binding-candidate161/component_analysis/a2_pipeline.py:691: in runtime_hashes
+    result = a1.code_hashes()
+             ^^^^^^^^^^^^^^^^
+../../a2-grader-binding-candidate161/component_analysis/ladder_pipeline.py:180: in code_hashes
+    return {p:common.file_hash(REPO/p) for p in paths}
+              ^^^^^^^^^^^^^^^^^^^^^^^^
+../../a2-grader-binding-candidate161/dataset/user_inversion_pipeline.py:44: in file_hash
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+                          ^^^^^^^^^^^^^^^^^^^^^^^
+/u/swong2/.conda/envs/mgnp/lib/python3.12/pathlib.py:1019: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/pla...2/implementation-probes/temp-23482257-mgnp/test_stage_read_allowed_metada0/repo/component_analysis/ladder_pipeline.py')
+mode = 'rb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/a2-grader-binding-review162/implementation-probes/temp-23482257-mgnp/test_stage_read_allowed_metada0/repo/component_analysis/ladder_pipeline.py'
+
+/u/swong2/.conda/envs/mgnp/lib/python3.12/pathlib.py:1013: FileNotFoundError
+_____________ test_stage_read_allowed_metadata_keeps_all_bytes[1] ______________
+
+context = namespace(paths=[PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.su...lan-a2-analysis/a2-grader-binding-review162/implementation-probes/temp-23482257-mgnp/test_stage_read_allowed_metada1'))
+route = 1
+
+    @pytest.mark.parametrize('route',[0,1])
+    def test_stage_read_allowed_metadata_keeps_all_bytes(context,route):
+        c=context;payload=dict(kind='independent-software',counts={})
+>       stage=c.tmp/'stage';a2._publish_stage(stage,'payload.json',payload,a2._manifest(c.args,c.receipt,payload))
+                                                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+test_independent.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../a2-grader-binding-candidate161/component_analysis/a2_pipeline.py:1254: in _manifest
+    runtime_code_hashes=runtime_hashes(),
+                        ^^^^^^^^^^^^^^^^
+../../a2-grader-binding-candidate161/component_analysis/a2_pipeline.py:691: in runtime_hashes
+    result = a1.code_hashes()
+             ^^^^^^^^^^^^^^^^
+../../a2-grader-binding-candidate161/component_analysis/ladder_pipeline.py:180: in code_hashes
+    return {p:common.file_hash(REPO/p) for p in paths}
+              ^^^^^^^^^^^^^^^^^^^^^^^^
+../../a2-grader-binding-candidate161/dataset/user_inversion_pipeline.py:44: in file_hash
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+                          ^^^^^^^^^^^^^^^^^^^^^^^
+/u/swong2/.conda/envs/mgnp/lib/python3.12/pathlib.py:1019: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/pla...2/implementation-probes/temp-23482257-mgnp/test_stage_read_allowed_metada1/repo/component_analysis/ladder_pipeline.py')
+mode = 'rb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/a2-grader-binding-review162/implementation-probes/temp-23482257-mgnp/test_stage_read_allowed_metada1/repo/component_analysis/ladder_pipeline.py'
+
+/u/swong2/.conda/envs/mgnp/lib/python3.12/pathlib.py:1013: FileNotFoundError
+_______________________ test_returns_independent_copies ________________________
+
+context = namespace(paths=[PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.su...lan-a2-analysis/a2-grader-binding-review162/implementation-probes/temp-23482257-mgnp/test_returns_independent_copie0'))
+
+    def test_returns_independent_copies(context):
+        c=context;baseline=copy.deepcopy(c.receipt)
+        provenance,binding=a2._validate_grader_catalogue(c.receipt)
+        provenance.clear();next(iter(binding['routes'].values()))['own_entry']['typed']=False
+        assert c.receipt==baseline
+>       a2._manifest(c.args,c.receipt,dict(counts={}))
+
+test_independent.py:92: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../a2-grader-binding-candidate161/component_analysis/a2_pipeline.py:1254: in _manifest
+    runtime_code_hashes=runtime_hashes(),
+                        ^^^^^^^^^^^^^^^^
+../../a2-grader-binding-candidate161/component_analysis/a2_pipeline.py:691: in runtime_hashes
+    result = a1.code_hashes()
+             ^^^^^^^^^^^^^^^^
+../../a2-grader-binding-candidate161/component_analysis/ladder_pipeline.py:180: in code_hashes
+    return {p:common.file_hash(REPO/p) for p in paths}
+              ^^^^^^^^^^^^^^^^^^^^^^^^
+../../a2-grader-binding-candidate161/dataset/user_inversion_pipeline.py:44: in file_hash
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+                          ^^^^^^^^^^^^^^^^^^^^^^^
+/u/swong2/.conda/envs/mgnp/lib/python3.12/pathlib.py:1019: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/pla...2/implementation-probes/temp-23482257-mgnp/test_returns_independent_copie0/repo/component_analysis/ladder_pipeline.py')
+mode = 'rb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/a2-grader-binding-review162/implementation-probes/temp-23482257-mgnp/test_returns_independent_copie0/repo/component_analysis/ladder_pipeline.py'
+
+/u/swong2/.conda/envs/mgnp/lib/python3.12/pathlib.py:1013: FileNotFoundError
+=============================== warnings summary ===============================
+../../../../../../../../../../../../../u/swong2/.conda/envs/mgnp/lib/python3.12/site-packages/_pytest/config/__init__.py:1345
+  /u/swong2/.conda/envs/mgnp/lib/python3.12/site-packages/_pytest/config/__init__.py:1345: PytestAssertRewriteWarning: Module already imported so cannot be rewritten; anyio
+    self._mark_plugins_for_rewrite(hook, disable_autoload)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED test_independent.py::test_stage_read_allowed_metadata_keeps_all_bytes[0]
+FAILED test_independent.py::test_stage_read_allowed_metadata_keeps_all_bytes[1]
+FAILED test_independent.py::test_returns_independent_copies - FileNotFoundErr...
+3 failed, 28 passed, 1 warning in 3.76s
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/a2-grader-binding-review162/implementation-probes/run.py", line 19, in <module>
+    (E/('result-'+job+'-'+sys.argv[1]+'.json')).write_text(json.dumps(dict(job_id=job,allocation=raw,python=sys.executable,pytest_exit=int(code),elapsed_seconds=time.monotonic()-started,module_origins=origins,source_unchanged=True,actual_catalogue_routes=list(provenance),binding_kind=binding['kind'],models_requested=False),indent=2)+'\n');assert int(code)==0
+                                                                                                                                                                                                                                                                                                                                                            ^^^^^^^^^^^^
+AssertionError

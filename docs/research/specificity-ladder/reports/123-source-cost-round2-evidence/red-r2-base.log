@@ -1,0 +1,43 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+____ test_review_b1_dependency_discovery_cannot_rebind_a_validated_envelope ____
+
+tmp_path = PosixPath('/tmp/source-cost-123-red-r2-base/test_review_b1_dependency_disc0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f0fd6dadc70>
+
+    def test_review_b1_dependency_discovery_cannot_rebind_a_validated_envelope(tmp_path,monkeypatch):
+        c=setup_case(tmp_path,monkeypatch)
+        from component_analysis import a3_direction_artifacts as artifacts
+        def replace_envelope(owned):
+            changed=copy.deepcopy(c.prepared);changed['empty']=['not the retained source']
+            (c.prepared_path/'payload.json').write_text(json.dumps(changed))
+            (c.prepared_path/'COMPLETE.json').unlink();artifacts._finish(c.prepared_path)
+            return [c.static],[],[]
+        with pytest.raises(ValueError):
+>           c.s.build_state(owner='fixture',originals={'design':c.design,'prepared':c.prepared},artifacts={'design':('artifact',c.design_path),'prepared':('object',c.prepared_path)},
+                dependencies=replace_envelope,semantic=lambda owned:({},{}),registry_paths=[],scope={'commit':'a'*40})
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/test_a3_source_validation.py:380: Failed
+___ test_review_b2_actual_grader_same_byte_external_link_is_not_a_cache_hit ____
+
+tmp_path = PosixPath('/tmp/source-cost-123-red-r2-base/test_review_b2_actual_grader_s0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f0fc8ce9e50>
+
+    def test_review_b2_actual_grader_same_byte_external_link_is_not_a_cache_hit(tmp_path,monkeypatch):
+        c=setup_case(tmp_path,monkeypatch);state=c.build()
+        grader=c.runtime/'evaluation/benchmark_eval.py';outside=tmp_path/'outside-grader.py';outside.write_bytes(grader.read_bytes());grader.unlink();grader.symlink_to(outside)
+>       with pytest.raises(ValueError):refresh(c,state)
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/test_a3_source_validation.py:387: Failed
+=============================== warnings summary ===============================
+tests/test_a3_source_validation.py::test_review_b1_dependency_discovery_cannot_rebind_a_validated_envelope
+  /u/swong2/.local/lib/python3.9/site-packages/pandas/core/arrays/masked.py:61: UserWarning: Pandas requires version '1.3.6' or newer of 'bottleneck' (version '1.3.5' currently installed).
+    from pandas.core import (
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_a3_source_validation.py::test_review_b1_dependency_discovery_cannot_rebind_a_validated_envelope
+FAILED tests/test_a3_source_validation.py::test_review_b2_actual_grader_same_byte_external_link_is_not_a_cache_hit
+2 failed, 45 deselected, 1 warning in 3.69s

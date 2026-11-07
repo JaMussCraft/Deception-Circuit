@@ -1,0 +1,28 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__ test_completed_index_startup_is_measured_conditionally_and_charged_per_job __
+
+tmp_path = PosixPath('/tmp/review111-round2-publication-red/test_completed_index_startup_i0')
+fake = [(tensor([[2, 3, 6, 0],
+        [2, 3, 5, 0]]), None), (tensor([[1, 2, 4, 0],
+        [1, 2, 3, 0]]), None), (tensor([...None), (tensor([[2, 3, 5, 0],
+        [2, 3, 7, 0]]), None), (tensor([[1, 2, 3, 0],
+        [1, 2, 5, 0]]), None), ...]
+
+    def test_completed_index_startup_is_measured_conditionally_and_charged_per_job(tmp_path,fake):
+        from types import SimpleNamespace
+        from tests.test_a3_direction_workload import ledger
+        r,d,p=_fake_pilot_inputs(1);inv=r.workload.build_inventory(d,p,stage='prefit')
+        receipt=r.run_pilot(object(),d,p,inv,root=tmp_path,args=SimpleNamespace(pilot_part='prefit',selected=None),guard=lambda:None,startup_seconds=0)
+        target=r.read_object(tmp_path/'pilot-target-inventory'/'prefit');path=tmp_path/'pilot'/'prefit'
+        index,receipts,sources=r._completed_pilot_index(d,p,target,[path],ledger_path=None,host_capacity_bytes=10**12)
+        cost=index.startup_evidence
+        assert cost['seconds']==index.startup_seconds>0 and cost['process_local_cold'] and not cost['os_cache_cold_claimed']
+        assert cost['conditional'] and cost['execution_authorized'] is False and cost['host_profile']['threads']['OMP_NUM_THREADS']=='1'
+>       assert cost['dependency_roots']==11 and cost['dependency_bytes_per_refresh']>0 and cost['retained_bytes']>0
+E       assert (10 == 11)
+
+tests/test_a3_direction_runtime.py:1398: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_a3_direction_runtime.py::test_completed_index_startup_is_measured_conditionally_and_charged_per_job
+1 failed in 12.58s

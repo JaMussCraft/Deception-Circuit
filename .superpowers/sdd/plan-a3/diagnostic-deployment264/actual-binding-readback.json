@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "-o",
+    "ControlMaster=no",
+    "-o",
+    "ControlPath=none",
+    "-o",
+    "HostName=br013.bridges2.psc.edu",
+    "bridges2",
+    "python3 -B -c 'import sys,json,subprocess,hashlib,time,os\nfrom pathlib import Path\nx=json.load(sys.stdin);sys.path.insert(0,x['\"'\"'packet'\"'\"']);import host\nraw=subprocess.check_output(['\"'\"'scontrol'\"'\"','\"'\"'show'\"'\"','\"'\"'job'\"'\"',x['\"'\"'job'\"'\"'],'\"'\"'-o'\"'\"'],universal_newlines=True,timeout=15);f=dict(z.split('\"'\"'='\"'\"',1) for z in raw.split() if '\"'\"'='\"'\"' in z)\nexpected={'\"'\"'JobId'\"'\"':x['\"'\"'job'\"'\"'],'\"'\"'JobState'\"'\"':'\"'\"'PENDING'\"'\"','\"'\"'Reason'\"'\"':'\"'\"'JobHeldUser'\"'\"','\"'\"'RunTime'\"'\"':'\"'\"'00:00:00'\"'\"','\"'\"'Account'\"'\"':'\"'\"'cis260361p'\"'\"','\"'\"'QOS'\"'\"':'\"'\"'rm'\"'\"','\"'\"'Partition'\"'\"':'\"'\"'RM-shared'\"'\"','\"'\"'NumCPUs'\"'\"':'\"'\"'18'\"'\"','\"'\"'NumTasks'\"'\"':'\"'\"'1'\"'\"','\"'\"'TimeLimit'\"'\"':'\"'\"'00:25:00'\"'\"','\"'\"'Requeue'\"'\"':'\"'\"'0'\"'\"','\"'\"'Restarts'\"'\"':'\"'\"'0'\"'\"','\"'\"'WorkDir'\"'\"':x['\"'\"'packet'\"'\"']}\nfor k,v in expected.items():assert f[k]==v,(k,f.get(k))\nassert '\"'\"'mem=32G'\"'\"' in f['\"'\"'ReqTRES'\"'\"'] and '\"'\"'gres/gpu'\"'\"' not in f['\"'\"'ReqTRES'\"'\"']\nops=Path(x['\"'\"'ops'\"'\"']);spool=ops/'\"'\"'spooled-batch.sh'\"'\"';subprocess.check_call(['\"'\"'scontrol'\"'\"','\"'\"'write'\"'\"','\"'\"'batch_script'\"'\"',x['\"'\"'job'\"'\"'],str(spool)],stdout=sys.stderr,timeout=15)\nassert spool.read_bytes()==(Path(x['\"'\"'packet'\"'\"'])/'\"'\"'launch.sh'\"'\"').read_bytes();assert host.old.sha(Path(x['\"'\"'packet'\"'\"'])/'\"'\"'manifest.json'\"'\"')==x['\"'\"'manifest'\"'\"']\nfor n,h in json.loads((Path(x['\"'\"'packet'\"'\"'])/'\"'\"'manifest.json'\"'\"').read_text()).items():assert host.old.sha(Path(x['\"'\"'packet'\"'\"'])/n)==h\nassert host.old.sha(x['\"'\"'config'\"'\"'])==x['\"'\"'config_sha'\"'\"'];c=json.loads(Path(x['\"'\"'config'\"'\"']).read_text());host.source_check(c)\nroot=host.old.PHYS/host.REL/'\"'\"'jobs'\"'\"'/('\"'\"'job-'\"'\"'+x['\"'\"'job'\"'\"']);root.mkdir(parents=True,mode=0o700,exist_ok=False);assert root.resolve()==root and not root.is_symlink() and root.stat().st_uid==os.getuid() and not list(root.iterdir())\nb=dict(actual_job_id=x['\"'\"'job'\"'\"'],scontrol=raw,fields=f,config_sha256=x['\"'\"'config_sha'\"'\"'],manifest_sha256=x['\"'\"'manifest'\"'\"'],spooled_sha256=host.old.sha(spool),output_physical=str(root),output_mode=oct(root.stat().st_mode&0o777),files=len(c['\"'\"'files'\"'\"']),aliases=len(c['\"'\"'aliases'\"'\"']),observed_unix=time.time(),diagnostic_only=True,scientific_admission=False)\nwith(ops/'\"'\"'actual-binding.json'\"'\"').open('\"'\"'x'\"'\"') as s:json.dump(b,s,indent=2)\nprint(json.dumps(b))\n'"
+  ],
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 7, in <module>\nKeyError: 'ReqTRES'\n",
+  "observed_unix": 1794033251.2964053
+}

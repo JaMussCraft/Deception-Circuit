@@ -1,0 +1,44 @@
+{
+  "driver_manifest_sha256": "279fe57eb59b730b78988f00527992e702bec7eb8954334d6b5053712bea9ccb",
+  "cpus": 4,
+  "memory_GiB": 32,
+  "time_minutes": 44,
+  "account": "bimc-delta-cpu",
+  "partition": "cpu",
+  "parent_job": "23470779",
+  "case_indices": [
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62
+  ],
+  "placement_reason": "Interactive submit limit; choose authorized normal CPU allocation with earliest current forecast. Original allocation reader accepts CPU accounts and partitions; all source and parent checks unchanged.",
+  "test_only": {
+    "stdout": "",
+    "stderr": "sbatch: Job 23470885 to start at 2026-11-03T07:14:40 a using 4 processors on nodes cn093 in partition cpu\n"
+  },
+  "job_id": "23470886",
+  "cluster": "delta",
+  "submitted_utc": "2026-11-03T12:53:40.959790+00:00",
+  "command": [
+    "sbatch",
+    "--parsable",
+    "--export=ALL",
+    "--account=bimc-delta-cpu",
+    "--partition=cpu",
+    "--dependency=afterok:23470779",
+    "--time=00:44:00",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu49-62-proposal/launch.sbatch"
+  ],
+  "gpus": 0
+}

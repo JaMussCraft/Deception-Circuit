@@ -1,0 +1,38 @@
+{
+  "python_syntax_only": [
+    "gpu-probe.py",
+    "controller.py",
+    "pre-submit.py",
+    "common.py",
+    "preflight.py"
+  ],
+  "shell_checks": [
+    {
+      "command": [
+        "bash",
+        "-n",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/real-input-readiness/bank-scoring-timing/launch/gpu-timing.sh"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "bash",
+        "-n",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/real-input-readiness/bank-scoring-timing/launch/cpu-preflight.sh"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "bash",
+        "-n",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/real-input-readiness/bank-scoring-timing/launch/environment.sh"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "no_pipeline_import_or_heavy_validation": true,
+  "no_submission": true,
+  "no_model_or_GPU": true
+}

@@ -1,0 +1,74 @@
+{
+  "kind": "isolated_a3_edge_tokenizer_fix_candidate_tests_v1",
+  "status": "handed-back",
+  "candidate_only": true,
+  "accepted_production": false,
+  "baseline_source_commit": "74efb4d0481968a1d0138eb1a79b97f302fd3c3b",
+  "commit": "74efb4d0481968a1d0138eb1a79b97f302fd3c3b",
+  "commit_scope": "Baseline only; candidate modifications identified by source-post.json and candidate-diff.txt are uncommitted.",
+  "baseline_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/snapshot.json",
+  "candidate_root": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/edge-tokenizer-fix-source-v2",
+  "job_id": null,
+  "cluster": null,
+  "execution": "local CPU software tests and pinned tokenizer-only checks",
+  "large_weights_loaded": false,
+  "gpu_jobs_submitted": false,
+  "apis_called": false,
+  "scientific_verdict": null,
+  "source_pre": "source-pre.json",
+  "source_post": "source-post.json",
+  "scope_check": "candidate-scope-check.json",
+  "raw_runs": [
+    "direct-pinned-base.json",
+    "direct-pinned-mgnp.json",
+    "green-edge-base.json",
+    "green-edge-mgnp.json",
+    "green-pinned-base.json",
+    "green-pinned-mgnp.json",
+    "red-mgnp.json",
+    "red-pinned-base.json",
+    "red-pinned-mgnp.json"
+  ],
+  "pinned_tokenizer": {
+    "model": "meta-llama/Llama-3.1-8B-Instruct",
+    "revision": "0e9e39f249a16976918f6564b8830bc894c89659"
+  },
+  "red_green_summary": {
+    "mgnp_red_failed": 1,
+    "mgnp_red_passed": 1,
+    "base_red_failed": 2,
+    "base_red_cause": "Raw factory triggers blocked offline model_info; not a signature mismatch on this interpreter",
+    "pinned_green_expected_each": 2,
+    "full_edge_expected_each": 40,
+    "prompt_stream_checks_expected_each": 30
+  },
+  "limitations": [
+    "Producer replay mocked at prepare boundary while tokenizer validation is real",
+    "Direct prompt checks sample first row per task/condition, both streams; not full corpus",
+    "No candidate source accepted, frozen, prepared or published"
+  ],
+  "results": {
+    "green-pinned-base": 0,
+    "red-pinned-base": 1,
+    "red-mgnp": 1,
+    "green-edge-mgnp": 0,
+    "direct-pinned-base": 0,
+    "green-edge-base": 0,
+    "red-pinned-mgnp": 1,
+    "direct-pinned-mgnp": 0,
+    "green-pinned-mgnp": 0
+  },
+  "observed_full_edge_passed_each": 40,
+  "observed_pinned_passed_each": 2,
+  "observed_prompt_stream_checks_each": 30,
+  "stage_input_hashes": {
+    "red": {
+      "component_analysis/a3_edge_pipeline.py": "acc0b7953af131bc65e328a38e8464f900775470ec00acf413984a4f2778f020",
+      "tests/test_a3_edge_pipeline.py": "832f01e2f18faa00f24567e3565a9a2e8a60b2251905bab299ca869750e98d68"
+    },
+    "green": {
+      "component_analysis/a3_edge_pipeline.py": "4be709a243fa603e285efd5a4f10e2e26252f06c8410718a6d6fe15bce019d71",
+      "tests/test_a3_edge_pipeline.py": "832f01e2f18faa00f24567e3565a9a2e8a60b2251905bab299ca869750e98d68"
+    }
+  }
+}

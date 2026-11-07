@@ -1,0 +1,30 @@
+{
+  "label": "red-pinned-mgnp",
+  "command": [
+    "/u/swong2/.conda/envs/mgnp/bin/python",
+    "-m",
+    "pytest",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp=/tmp/a3-edge-114-red-pinned-mgnp",
+    "tests/test_a3_edge_pipeline.py",
+    "-q",
+    "-k",
+    "parent_admission"
+  ],
+  "cwd": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/edge-tokenizer-fix-source-v2",
+  "environment": {
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "HF_HUB_OFFLINE": "1",
+    "TRANSFORMERS_OFFLINE": "1",
+    "TOKENIZERS_PARALLELISM": "false"
+  },
+  "start_utc": "2026-11-02T18:07:54.600255+00:00",
+  "elapsed_seconds": 21.713054180145264,
+  "exit_code": 1,
+  "log": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/114-edge-tokenizer-evidence/red-pinned-mgnp.log"
+}

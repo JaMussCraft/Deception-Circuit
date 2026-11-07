@@ -1,0 +1,50 @@
+{
+  "command": [
+    "bash",
+    "/tmp/a2-t2-relocated-7w9hlm_f/slurm_script",
+    "--dry-run",
+    "--output",
+    "/tmp/a2-task2-relocated-unused"
+  ],
+  "exit_code": 0,
+  "observed": {
+    "packet": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task2/red",
+    "test": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_cpu.py",
+    "commands": [
+      [
+        "/sw/external/python/anaconda3/bin/python3.9",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--noconftest",
+        "--confcutdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests",
+        "--tb=short",
+        "--junitxml=/tmp/a2-task2-relocated-unused/env1.xml",
+        "--basetemp=/tmp/a2-task2-relocated-unused/tmp-env1",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_cpu.py"
+      ],
+      [
+        "/u/swong2/.conda/envs/mgnp/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--noconftest",
+        "--confcutdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests",
+        "--tb=short",
+        "--junitxml=/tmp/a2-task2-relocated-unused/env2.xml",
+        "--basetemp=/tmp/a2-task2-relocated-unused/tmp-env2",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_cpu.py"
+      ]
+    ],
+    "timeout_seconds_per_environment": 90,
+    "no_native_import": true,
+    "no_model": true,
+    "no_GPU": true
+  },
+  "stderr": "",
+  "not_scientific_execution": true
+}

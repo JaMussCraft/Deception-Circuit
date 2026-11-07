@@ -1,0 +1,22 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/a3_edge_pipeline.py", line 1909, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/a3_edge_pipeline.py", line 1022, in main
+    prepare(design,_metadata_geometry(design,args),commit=args.commit,registry_paths=args.registry,output=Path(args.work_dir)/'prepared',design_path=args.design)
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/a3_edge_pipeline.py", line 612, in prepare
+    result=dict(kind='a3_edge_prepared',design_reference=design_reference,design_sha256=digest(design),commit=commit,graphs=graphs,source_admission=admit_parent_sources(design,registry_paths=registry_paths),rules=copy.deepcopy(RULES),ruling=ruling_reference(),code_hashes=code_hashes(),injected=bool(design.get('injected')),source_evidence=live,bank_sources=ancestral_bank_sources(design))
+                                                                                                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/a3_edge_pipeline.py", line 1730, in admit_parent_sources
+    rebuilt=a3_pipeline.prepare(a1_design=evidence['prepared_path'],a1_selected=evidence['selected_path'],matched_root=Path(design['matched_build_path']).parent,
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/a3_pipeline.py", line 275, in prepare
+    tokenizer=_validated_prepare_tokenizer(tokenizer,p)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/a3_pipeline.py", line 258, in _validated_prepare_tokenizer
+    require(signature(tokenizer)==signature(expected),'production tokenizer configuration differs from pinned standard')
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/dataset/user_inversion_pipeline.py", line 32, in require
+    raise ValueError(message)
+ValueError: production tokenizer configuration differs from pinned standard

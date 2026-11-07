@@ -1,0 +1,85 @@
+{
+  "kind": "independent_final_scientific_wrapper_readiness",
+  "verdict": "PASS_FOR_HELD_SUBMISSION",
+  "scope": "six exact proposed SDR H100 scientific replacements; held submission only",
+  "source_commit": "6bd8bf5334f2e83613a129d2fcfeacf83e762191",
+  "proposal_sha256": "096a156058bd16b664d4d4ec2e19da29492a3b5b5aa4b922eda8dc72658e1316",
+  "script_sha256": {
+    "a2-b2-scientific-launch.py": "91af50383a2545b885ed417909998295e91910e60b06eda5b0c128a2f2011957",
+    "a2-b2-scientific-authorize.py": "20223c9ac9a5ffe11557e8cb3fe3089726fb38fb098f8f7cd67d51dcbabafcd5",
+    "a2-b2-scientific-job.sh": "f6da2914b95d34f6c6a84406d3aa9ba7bb14284745f2709bb9077bcfd9766f3f"
+  },
+  "remote_frozen_full_preflights": [
+    {
+      "cell_key": "sdr_v2-D-seed42",
+      "exit_code": 0,
+      "source_config_rows_argv_exact": true,
+      "launcher_sha256": "91af50383a2545b885ed417909998295e91910e60b06eda5b0c128a2f2011957",
+      "seconds": 52.45205736160278,
+      "execution_file_sha256": "96228df8f769e10b6b60e097dfbbcd8c171bad813adb53b1bc22aa2c7a42d098",
+      "stdout_sha256": "dc7f6200b5449df46a151eb1721dce4ac2355d0d974a46c959be23c2d9ec70cb",
+      "stderr_bytes": 0
+    },
+    {
+      "cell_key": "sdr_v2-D-seed1",
+      "exit_code": 0,
+      "source_config_rows_argv_exact": true,
+      "launcher_sha256": "91af50383a2545b885ed417909998295e91910e60b06eda5b0c128a2f2011957",
+      "seconds": 52.44747281074524,
+      "execution_file_sha256": "3437739b7f05634b22c826f5b901e8c48c8c83a3fbff4c97fc778b047bb6f56c",
+      "stdout_sha256": "bfd0ee22a9e58c7ec63d06b953beb2b727146800fbcd8f94a9ed54efe3e8116a",
+      "stderr_bytes": 0
+    },
+    {
+      "cell_key": "sdr_v2-D-seed123",
+      "exit_code": 0,
+      "source_config_rows_argv_exact": true,
+      "launcher_sha256": "91af50383a2545b885ed417909998295e91910e60b06eda5b0c128a2f2011957",
+      "seconds": 36.66374754905701,
+      "execution_file_sha256": "ed765185cc2ff38491d4258c2843b5b2f37892cda54784d6b64c536c332fc24d",
+      "stdout_sha256": "5ffa7df052b528d7c3422d703f0a7da0cfc5b35b28ac659c00b3ab012c6a5764",
+      "stderr_bytes": 0
+    },
+    {
+      "cell_key": "sdr_v2-I-seed42",
+      "exit_code": 0,
+      "source_config_rows_argv_exact": true,
+      "launcher_sha256": "91af50383a2545b885ed417909998295e91910e60b06eda5b0c128a2f2011957",
+      "seconds": 36.673094749450684,
+      "execution_file_sha256": "ae4c021c0a58f884a0035615c50c554fa1856b255e9df4a928a007822b3891de",
+      "stdout_sha256": "811d8a42a96b905ee46e9c39b1894d15151dbf349f024587f5eaae20a5fddd11",
+      "stderr_bytes": 0
+    },
+    {
+      "cell_key": "sdr_v2-I-seed1",
+      "exit_code": 0,
+      "source_config_rows_argv_exact": true,
+      "launcher_sha256": "91af50383a2545b885ed417909998295e91910e60b06eda5b0c128a2f2011957",
+      "seconds": 47.582167863845825,
+      "execution_file_sha256": "4231c333a443db872e72fd4bf7d9a43d5ea12937c6c639cd46208b3000cfb3ea",
+      "stdout_sha256": "4fa27d6d6ecc37692b0ca4d5b8882173a283f6ac23c13f737c493bdc154888e9",
+      "stderr_bytes": 0
+    },
+    {
+      "cell_key": "sdr_v2-I-seed123",
+      "exit_code": 0,
+      "source_config_rows_argv_exact": true,
+      "launcher_sha256": "91af50383a2545b885ed417909998295e91910e60b06eda5b0c128a2f2011957",
+      "seconds": 47.57882285118103,
+      "execution_file_sha256": "d1d0c672e5acfd86f960653bbf7892d8234104822dcbb77281b8facd77f9c3cb",
+      "stdout_sha256": "87fddb9ce7472fa3a327a9d8356a2218608ce5ac4ae7bd6239457b36995ea053",
+      "stderr_bytes": 0
+    }
+  ],
+  "original_pending_zero_runtime_and_hold_evidence_checked": true,
+  "originals_cancelled": false,
+  "new_actual_job_placement_not_yet_exists": true,
+  "root_release_gates": [
+    "record held jobs/reservations and retain original charges",
+    "publish immutable complete placement and monotone mapping successor",
+    "verify all originals terminal CANCELLED zero runtime before release",
+    "fresh actual job ledger/allocation/protection authorization at start",
+    "staged verified nonoverwriting canonical publication; unchanged audit_source plus appendix audit"
+  ],
+  "reviewer_models_remote_or_scheduler_actions": false
+}

@@ -1,0 +1,83 @@
+F..
+=================================== FAILURES ===================================
+___ test_production_shaped_completed_pilot_full_projector_and_numeric_tamper ___
+
+tmp_path = PosixPath('/tmp/review111-projector-green/test_production_shaped_complet0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f38871695b0>
+fake = [(tensor([[1, 2, 3, 0],
+        [1, 2, 3, 0],
+        [1, 2, 3, 0],
+        [1, 2, 3, 0]]), None), (tensor([[1, 2, 3, ... 3, 0]]), None), (tensor([[1, 2, 3, 0],
+        [1, 2, 3, 0],
+        [1, 2, 3, 0],
+        [1, 2, 3, 0]]), None), ...]
+
+    def test_production_shaped_completed_pilot_full_projector_and_numeric_tamper(tmp_path,monkeypatch,fake):
+        """Production-shaped files and fake CPU numbers, never production admission."""
+        from tests.test_a3_direction_workload import ledger
+        import shutil
+        r,d,p,target,path,mapping,_,_=_production_cost_source_case(tmp_path,monkeypatch,capture_model=object())
+>       receipts,sources=r._authenticated_pilot_receipts(d,p,target,[path],ledger_path=mapping)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_a3_direction_runtime.py:1435: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+design = {'tasks': {'far_v2': {'fit_ids': ['far_v2t0', 'far_v2t1'], 'selection_ids': ['far_v2v0', 'far_v2v1'], 'assessment_ids'...t': 2, 'prompt': 'sdr_v2t1Dcorrupt', 'layout': None, ...}}, ...}, ...]}, 'seeds': [42, 1, 123], 'injected': False, ...}
+protocol = {'identity': {'commit': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'code_hashes': {'source.py': 'bbbbbbbbbbbbbbbbbbbb.....}, 'task_order': ['far_v2', 'ser_v2', 'sdr_v2'], 'numeric_profile': {'dtype': 'torch.bfloat16', 'backend': 'native'}}
+target = {'schema_version': 1, 'kind': 'a3_direction_inventory', 'stage': 'fit-select', 'phase': 'M2', ...}
+receipt_paths = [PosixPath('/tmp/review111-projector-green/test_production_shaped_complet0/output/pilot/prefit')]
+ledger_path = PosixPath('/tmp/review111-projector-green/test_production_shaped_complet0/original-mapping')
+
+    def _authenticated_pilot_receipts(design,protocol,target,receipt_paths,*,ledger_path):
+        """Authenticate measured production sources before the pure cost projector."""
+        require(target['stage'] in ('fit-select','remaining'),'cost intake requires frozen fit/remaining target')
+        selected=target.get('frozen_inputs',{}).get('selected');fits=target.get('frozen_inputs',{}).get('fits')
+        rebuilt=workload.build_inventory(design,protocol,stage=target['stage'],selected=selected,fits=fits)
+        require(workload.digest(rebuilt)==workload.digest(target),'cost target differs from independent rebuilt inventory')
+        part='prefit' if target['stage']=='fit-select' else 'selected'
+        expected=workload.build_inventory(design,protocol,stage='prefit' if part=='prefit' else 'selected-pilot',selected=selected)
+        receipts=[];sources=[]
+        for path in receipt_paths:
+            receipt=read_object(path)
+            require(type(receipt.get('injected')) is bool and receipt['injected'] is bool(design.get('injected')),'pilot execution class differs from target')
+            require(receipt.get('actual_execution') is True and receipt.get('status')=='completed' and receipt.get('complete') is True
+                and type(receipt.get('exit_code')) is int and receipt['exit_code']==0,'successful actual native pilot required')
+            require(receipt.get('part')==part and receipt.get('source_split')=='validation'
+                and receipt.get('pilot_inventory_sha256')==expected['inventory_sha256'] and receipt.get('inventory_sha256')==target['inventory_sha256'],
+                'completed pilot stage/part/target scope differs')
+            require(receipt['identity']==target['identity'] and receipt['hardware']==target['hardware'],'pilot source/model/hardware differs')
+            runtime=receipt.get('runtime',{});kernel=receipt.get('runtime_profile')
+            require(isinstance(kernel,dict) and runtime.get('runtime_profile')==kernel,'actual consistent pilot runtime/kernel required')
+            if not design.get('injected'):
+                require(runtime.get('device','').startswith('cuda') and kernel.get('device_type')=='cuda'
+                    and 'h200' in kernel.get('hardware',{}).get('name','').lower(),'production pilot must use measured H200 CUDA runtime')
+                require(kernel.get('backend')==protocol['numeric_profile']['backend']
+                    and str(kernel.get('dtype')).removeprefix('torch.')==str(protocol['numeric_profile']['dtype']).removeprefix('torch.'),'pilot kernel differs from frozen numeric profile')
+                source=_completed_pilot_source(path,receipt,expected,receipt.get('origin'),injected=False)
+                origin=receipt['origin'];ref=origin['target_inventory_reference'];require(object_reference(ref['path'])==ref,'pilot target inventory bytes changed')
+                original_target=read_object(ref['path']);workload._validate_inventory(original_target)
+                require(workload.digest(original_target)==workload.digest(target),'pilot original target differs from admission target')
+                sources.append(source)
+            expected_ids={x['invocation_id'] for x in expected['packing_invocations']}
+            evidence=receipt.get('packing_evidence',{});references=receipt.get('packing_references',{})
+            if expected_ids:
+                require(set(evidence)==expected_ids,'complete original packed pilot invocation references required')
+                for invocation_id,value in evidence.items():
+                    require(value.get('kind')=='a3_packing_proof_reference_v1','production/native intake refuses synthetic inline packing evidence')
+                    measured_path=value['measured_path'];reference=value['measured_reference']
+                    require(references.get(str(Path(measured_path).resolve()))==reference,'pilot packing reference mapping differs')
+                    proof=_completed_packing_proof(measured_path,expected_reference=reference)
+                    invocation=next(x for x in expected['packing_invocations'] if x['invocation_id']==invocation_id)
+                    measurement=_pilot_scope_measurement(design,invocation)
+                    proof.proof.check(measurement);_exact_pilot_scope(proof.proof._rows,list(proof.proof._specs.values()),measurement)
+                    require(proof.proof.source_digest==value['evidence_sha256'] and proof.metadata.get('injected') is receipt['injected']
+>                       and proof.metadata.get('runtime_profile')==kernel and proof.metadata.get('source_commit')==protocol['commit']
+                                                                                                                   ^^^^^^^^^^^^^^^^^^
+                        and proof.metadata.get('timing_only') is (part=='prefit'),'pilot measured numeric execution/source/stage differs')
+E                   KeyError: 'commit'
+
+component_analysis/a3_direction_runtime.py:2051: KeyError
+=========================== short test summary info ============================
+FAILED tests/test_a3_direction_runtime.py::test_production_shaped_completed_pilot_full_projector_and_numeric_tamper
+1 failed, 2 passed in 30.38s

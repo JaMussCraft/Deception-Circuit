@@ -1,0 +1,854 @@
+{
+  "status": "three_original_cases_and_full_authentication_passed; full_native_verification_incomplete",
+  "scenario_root": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8",
+  "process": {
+    "command": [
+      "/u/swong2/.conda/envs/mgnp/bin/python",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-proposal/coordinator.py",
+      "--root",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8",
+      "--out",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/diagnostics/next-cases2-4-01"
+    ],
+    "pid": 1625126,
+    "exit_code": 0,
+    "elapsed_seconds": 843.4278079189826,
+    "user_seconds": 226.011637,
+    "system_seconds": 139.900665,
+    "peak_child_rss_bytes": 6825312256,
+    "timeout_seconds": 1500,
+    "kill_grace_seconds": 15,
+    "term_sent_at": null,
+    "operational_existing_API_coordinator": true,
+    "selected_case_start": 2,
+    "selected_case_count": 3,
+    "source_unchanged": true
+  },
+  "coordinator": {
+    "kind": "injected_native_operational_chunk",
+    "indices": [
+      2,
+      3,
+      4
+    ],
+    "new_native_case_count": 3,
+    "new_case_ids": [
+      "83a2ffde546a0776df0d08fb27abf14381516a83a642c337521e6a44aa57c063",
+      "f7e34290fa268cca16634b7b597fdec2fd5d7ee2f61c20ebd3a7573569c3c54d",
+      "b78f0ec2e42db6bafa0f8cd18e01b8d2240506c81627e32ec6813f5bf019cb3f"
+    ],
+    "preserved_case_ids": [
+      "4318f65b0a320e883897ca95ad472e2d1a0a11f53abea6ce1a848853d9fb57f1",
+      "d5738bfcdec6990c3b6e77b2c7e625d46562ea134457f5de2896af9600db7ceb"
+    ],
+    "preserved_case_references_unchanged": true,
+    "actual_new_forward_calls": 7306,
+    "forbidden_auth_model_forwards": 0,
+    "native": [
+      {
+        "case_id": "83a2ffde546a0776df0d08fb27abf14381516a83a642c337521e6a44aa57c063",
+        "native_seconds": 7.501505736028776,
+        "actual_forward_calls": 1110
+      },
+      {
+        "case_id": "f7e34290fa268cca16634b7b597fdec2fd5d7ee2f61c20ebd3a7573569c3c54d",
+        "native_seconds": 23.389510403969325,
+        "actual_forward_calls": 4246
+      },
+      {
+        "case_id": "b78f0ec2e42db6bafa0f8cd18e01b8d2240506c81627e32ec6813f5bf019cb3f",
+        "native_seconds": 12.415164339996409,
+        "actual_forward_calls": 1950
+      }
+    ],
+    "authentication": [
+      {
+        "case_id": "83a2ffde546a0776df0d08fb27abf14381516a83a642c337521e6a44aa57c063",
+        "authentication_seconds": 181.1200988769997,
+        "new_model_forwards": 0,
+        "numeric_backing_cache_roots_before": [],
+        "numeric_backing_cache_roots_after": [
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+        ]
+      },
+      {
+        "case_id": "f7e34290fa268cca16634b7b597fdec2fd5d7ee2f61c20ebd3a7573569c3c54d",
+        "authentication_seconds": 65.77036287100054,
+        "new_model_forwards": 0,
+        "numeric_backing_cache_roots_before": [
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+        ],
+        "numeric_backing_cache_roots_after": [
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+        ]
+      },
+      {
+        "case_id": "b78f0ec2e42db6bafa0f8cd18e01b8d2240506c81627e32ec6813f5bf019cb3f",
+        "authentication_seconds": 74.88386674999492,
+        "new_model_forwards": 0,
+        "numeric_backing_cache_roots_before": [
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+        ],
+        "numeric_backing_cache_roots_after": [
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+        ]
+      }
+    ],
+    "original_case_records": [
+      {
+        "case_id": "83a2ffde546a0776df0d08fb27abf14381516a83a642c337521e6a44aa57c063",
+        "original_case_seconds": 31.003702065965626,
+        "original_case_forward_calls": 1110,
+        "reference": {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-verification-cases/selected/83a2ffde546a0776df0d08fb27abf14381516a83a642c337521e6a44aa57c063",
+          "files": {
+            "COMPLETE.json": {
+              "sha256": "12931dca1b2bd7b2e02b294412157243c2db692ea408ff7acca1f5ca56060cb2",
+              "nbytes": 486
+            },
+            "case.json": {
+              "sha256": "d3d2a7a85984d6732801e5bae7db33d34bb83f4f08fc1aeb754069415bfac125",
+              "nbytes": 2511206
+            }
+          }
+        }
+      },
+      {
+        "case_id": "f7e34290fa268cca16634b7b597fdec2fd5d7ee2f61c20ebd3a7573569c3c54d",
+        "original_case_seconds": 48.80006223998498,
+        "original_case_forward_calls": 4246,
+        "reference": {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-verification-cases/selected/f7e34290fa268cca16634b7b597fdec2fd5d7ee2f61c20ebd3a7573569c3c54d",
+          "files": {
+            "COMPLETE.json": {
+              "sha256": "4eeccc593c3ef8fd78381fd735ac214e0c6e63b53091e87052288380e5c22dfa",
+              "nbytes": 486
+            },
+            "case.json": {
+              "sha256": "cbca3d62f85d09c7fadf52ef5c16508b9ac7ce5bf853dfc0b2de112813285bf9",
+              "nbytes": 5241762
+            }
+          }
+        }
+      },
+      {
+        "case_id": "b78f0ec2e42db6bafa0f8cd18e01b8d2240506c81627e32ec6813f5bf019cb3f",
+        "original_case_seconds": 62.37449319998268,
+        "original_case_forward_calls": 1950,
+        "reference": {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-verification-cases/selected/b78f0ec2e42db6bafa0f8cd18e01b8d2240506c81627e32ec6813f5bf019cb3f",
+          "files": {
+            "COMPLETE.json": {
+              "sha256": "f6f42c6a5f0ea864ecaad6ffafc95e421404e2a9139233d1e3e385765b144823",
+              "nbytes": 486
+            },
+            "case.json": {
+              "sha256": "81415d4078b88a31861df4e729b8ab0ef924011b752b0d69598e34a9d502ac3f",
+              "nbytes": 3116979
+            }
+          }
+        }
+      }
+    ],
+    "full_pilot_complete": false,
+    "aggregate_executed": false,
+    "scientific_execution": false,
+    "execution_authorized": false,
+    "wall_seconds": 829.542264276999
+  },
+  "per_case": [
+    {
+      "index": 2,
+      "case_id": "83a2ffde546a0776df0d08fb27abf14381516a83a642c337521e6a44aa57c063",
+      "case_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-verification-cases/selected/83a2ffde546a0776df0d08fb27abf14381516a83a642c337521e6a44aa57c063",
+      "source_task": "ioi",
+      "panel": "selected_pilot",
+      "profile": {
+        "axis_tile_size": 32,
+        "backend": "sdpa",
+        "capture_scope": "requested_head_union",
+        "dtype": "torch.float32",
+        "model": "fixture",
+        "model_revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "padded_width": 4,
+        "physical_batch_size": 64,
+        "positive_singleton": false,
+        "sites": [
+          [
+            "head",
+            0,
+            0
+          ]
+        ],
+        "source_sha256": "d3b8be155d3390009795c62942be15c62395dd3feb30aed8c92c5984122a6ec2",
+        "source_task": "ioi"
+      },
+      "native_seconds": 7.501505736028776,
+      "actual_forward_calls": 1110,
+      "original_case_seconds": 31.003702065965626,
+      "authentication_seconds": 181.1200988769997,
+      "authentication_new_forwards": 0,
+      "numeric_cache_before": [],
+      "numeric_cache_after": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+      ],
+      "operation_timing_samples": 1104,
+      "positive_batch_timing_samples": 1,
+      "positive_control_rows": 2,
+      "actual_synchronized_timers_positive": true,
+      "marker_checks": {
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-verification-cases/selected/83a2ffde546a0776df0d08fb27abf14381516a83a642c337521e6a44aa57c063": {
+          "case.json": {
+            "bytes": 2511206,
+            "sha256": "d3d2a7a85984d6732801e5bae7db33d34bb83f4f08fc1aeb754069415bfac125"
+          },
+          "numeric/COMPLETE.json": {
+            "bytes": 204,
+            "sha256": "a178ee55452da61ad0437e09d553e6ee6a2a90f9fb895e7efaef3533f6b079bc"
+          },
+          "numeric/payload.json": {
+            "bytes": 1881709,
+            "sha256": "e7cea57a4e26a424be5b1e3e32cfc78d211b4e83a99d222c16da7117113cd7ea"
+          }
+        },
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-verification-cases/selected/83a2ffde546a0776df0d08fb27abf14381516a83a642c337521e6a44aa57c063/numeric": {
+          "payload.json": {
+            "bytes": 1881709,
+            "sha256": "e7cea57a4e26a424be5b1e3e32cfc78d211b4e83a99d222c16da7117113cd7ea"
+          }
+        }
+      },
+      "reference": {
+        "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-verification-cases/selected/83a2ffde546a0776df0d08fb27abf14381516a83a642c337521e6a44aa57c063",
+        "files": {
+          "COMPLETE.json": {
+            "sha256": "12931dca1b2bd7b2e02b294412157243c2db692ea408ff7acca1f5ca56060cb2",
+            "nbytes": 486
+          },
+          "case.json": {
+            "sha256": "d3d2a7a85984d6732801e5bae7db33d34bb83f4f08fc1aeb754069415bfac125",
+            "nbytes": 2511206
+          }
+        }
+      }
+    },
+    {
+      "index": 3,
+      "case_id": "f7e34290fa268cca16634b7b597fdec2fd5d7ee2f61c20ebd3a7573569c3c54d",
+      "case_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-verification-cases/selected/f7e34290fa268cca16634b7b597fdec2fd5d7ee2f61c20ebd3a7573569c3c54d",
+      "source_task": "mmlu",
+      "panel": "selected_pilot",
+      "profile": {
+        "axis_tile_size": 32,
+        "backend": "sdpa",
+        "capture_scope": "requested_head_union",
+        "dtype": "torch.float32",
+        "model": "fixture",
+        "model_revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "padded_width": 4,
+        "physical_batch_size": 64,
+        "positive_singleton": false,
+        "sites": [
+          [
+            "head",
+            0,
+            0
+          ]
+        ],
+        "source_sha256": "d3b8be155d3390009795c62942be15c62395dd3feb30aed8c92c5984122a6ec2",
+        "source_task": "mmlu"
+      },
+      "native_seconds": 23.389510403969325,
+      "actual_forward_calls": 4246,
+      "original_case_seconds": 48.80006223998498,
+      "authentication_seconds": 65.77036287100054,
+      "authentication_new_forwards": 0,
+      "numeric_cache_before": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+      ],
+      "numeric_cache_after": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+      ],
+      "operation_timing_samples": 4234,
+      "positive_batch_timing_samples": 2,
+      "positive_control_rows": 4,
+      "actual_synchronized_timers_positive": true,
+      "marker_checks": {
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-verification-cases/selected/f7e34290fa268cca16634b7b597fdec2fd5d7ee2f61c20ebd3a7573569c3c54d": {
+          "case.json": {
+            "bytes": 5241762,
+            "sha256": "cbca3d62f85d09c7fadf52ef5c16508b9ac7ce5bf853dfc0b2de112813285bf9"
+          },
+          "numeric/COMPLETE.json": {
+            "bytes": 204,
+            "sha256": "1854e9e6bddcbb3db8f6218c5f89001701bd86f248061dcdcb494263b880559f"
+          },
+          "numeric/payload.json": {
+            "bytes": 2849160,
+            "sha256": "fb5f86746fa4c61a2b2f456a3add72e526578784aa6835a02466d14d7d71de2c"
+          }
+        },
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-verification-cases/selected/f7e34290fa268cca16634b7b597fdec2fd5d7ee2f61c20ebd3a7573569c3c54d/numeric": {
+          "payload.json": {
+            "bytes": 2849160,
+            "sha256": "fb5f86746fa4c61a2b2f456a3add72e526578784aa6835a02466d14d7d71de2c"
+          }
+        }
+      },
+      "reference": {
+        "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-verification-cases/selected/f7e34290fa268cca16634b7b597fdec2fd5d7ee2f61c20ebd3a7573569c3c54d",
+        "files": {
+          "COMPLETE.json": {
+            "sha256": "4eeccc593c3ef8fd78381fd735ac214e0c6e63b53091e87052288380e5c22dfa",
+            "nbytes": 486
+          },
+          "case.json": {
+            "sha256": "cbca3d62f85d09c7fadf52ef5c16508b9ac7ce5bf853dfc0b2de112813285bf9",
+            "nbytes": 5241762
+          }
+        }
+      }
+    },
+    {
+      "index": 4,
+      "case_id": "b78f0ec2e42db6bafa0f8cd18e01b8d2240506c81627e32ec6813f5bf019cb3f",
+      "case_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-verification-cases/selected/b78f0ec2e42db6bafa0f8cd18e01b8d2240506c81627e32ec6813f5bf019cb3f",
+      "source_task": "far_v2",
+      "panel": "calibration_pilot",
+      "profile": {
+        "axis_tile_size": 32,
+        "backend": "sdpa",
+        "capture_scope": "requested_head_union",
+        "dtype": "torch.float32",
+        "model": "fixture",
+        "model_revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "padded_width": 4,
+        "physical_batch_size": 64,
+        "positive_singleton": false,
+        "sites": [
+          [
+            "head",
+            0,
+            0
+          ]
+        ],
+        "source_sha256": "d3b8be155d3390009795c62942be15c62395dd3feb30aed8c92c5984122a6ec2",
+        "source_task": "far_v2"
+      },
+      "native_seconds": 12.415164339996409,
+      "actual_forward_calls": 1950,
+      "original_case_seconds": 62.37449319998268,
+      "authentication_seconds": 74.88386674999492,
+      "authentication_new_forwards": 0,
+      "numeric_cache_before": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+      ],
+      "numeric_cache_after": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+      ],
+      "operation_timing_samples": 1890,
+      "positive_batch_timing_samples": 10,
+      "positive_control_rows": 20,
+      "actual_synchronized_timers_positive": true,
+      "marker_checks": {
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-verification-cases/selected/b78f0ec2e42db6bafa0f8cd18e01b8d2240506c81627e32ec6813f5bf019cb3f": {
+          "case.json": {
+            "bytes": 3116979,
+            "sha256": "81415d4078b88a31861df4e729b8ab0ef924011b752b0d69598e34a9d502ac3f"
+          },
+          "numeric/COMPLETE.json": {
+            "bytes": 204,
+            "sha256": "aeabe50e795c3223db002e37136f885236909d70eaab717d7d300149431c99aa"
+          },
+          "numeric/payload.json": {
+            "bytes": 2439675,
+            "sha256": "451ec0b89e0a3b6f2dad880b49d30fc3fc331f024d7e3f7167fa507622560d51"
+          }
+        },
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-verification-cases/selected/b78f0ec2e42db6bafa0f8cd18e01b8d2240506c81627e32ec6813f5bf019cb3f/numeric": {
+          "payload.json": {
+            "bytes": 2439675,
+            "sha256": "451ec0b89e0a3b6f2dad880b49d30fc3fc331f024d7e3f7167fa507622560d51"
+          }
+        }
+      },
+      "reference": {
+        "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-verification-cases/selected/b78f0ec2e42db6bafa0f8cd18e01b8d2240506c81627e32ec6813f5bf019cb3f",
+        "files": {
+          "COMPLETE.json": {
+            "sha256": "f6f42c6a5f0ea864ecaad6ffafc95e421404e2a9139233d1e3e385765b144823",
+            "nbytes": 486
+          },
+          "case.json": {
+            "sha256": "81415d4078b88a31861df4e729b8ab0ef924011b752b0d69598e34a9d502ac3f",
+            "nbytes": 3116979
+          }
+        }
+      }
+    }
+  ],
+  "observed_steps": [
+    {
+      "event": "step_start",
+      "elapsed_seconds": 0.008506258018314838,
+      "peak_rss_bytes": 17825792,
+      "observed_model_forward_calls": 0,
+      "step": "frozen_source_before"
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 0.6260815600398928,
+      "peak_rss_bytes": 17825792,
+      "observed_model_forward_calls": 0,
+      "step": "frozen_source_before",
+      "step_seconds": 0.613758419000078
+    },
+    {
+      "event": "import_start",
+      "elapsed_seconds": 0.6337262670276687,
+      "peak_rss_bytes": 17825792,
+      "observed_model_forward_calls": 0
+    },
+    {
+      "event": "import_end",
+      "elapsed_seconds": 30.199352969008032,
+      "peak_rss_bytes": 762314752,
+      "observed_model_forward_calls": 0
+    },
+    {
+      "event": "step_start",
+      "elapsed_seconds": 30.232855843030848,
+      "peak_rss_bytes": 762314752,
+      "observed_model_forward_calls": 0,
+      "step": "preserved_case_references"
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 30.70807348098606,
+      "peak_rss_bytes": 772800512,
+      "observed_model_forward_calls": 0,
+      "step": "preserved_case_references",
+      "step_seconds": 0.4751132730161771
+    },
+    {
+      "event": "step_start",
+      "elapsed_seconds": 30.740189653006382,
+      "peak_rss_bytes": 772800512,
+      "observed_model_forward_calls": 0,
+      "step": "verify_scenario"
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 32.1925266670296,
+      "peak_rss_bytes": 794607616,
+      "observed_model_forward_calls": 0,
+      "step": "verify_scenario",
+      "step_seconds": 1.4522838149568997
+    },
+    {
+      "event": "step_start",
+      "elapsed_seconds": 32.19260630599456,
+      "peak_rss_bytes": 794607616,
+      "observed_model_forward_calls": 0,
+      "step": "read_selected"
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 149.85464048100403,
+      "peak_rss_bytes": 829407232,
+      "observed_model_forward_calls": 0,
+      "step": "read_selected",
+      "step_seconds": 117.66200003103586
+    },
+    {
+      "event": "step_start",
+      "elapsed_seconds": 149.8553883290151,
+      "peak_rss_bytes": 829407232,
+      "observed_model_forward_calls": 0,
+      "step": "existing_inventory_canonical_rebuild_compare"
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 218.9415110030095,
+      "peak_rss_bytes": 6481002496,
+      "observed_model_forward_calls": 0,
+      "step": "existing_inventory_canonical_rebuild_compare",
+      "step_seconds": 69.08606563799549
+    },
+    {
+      "event": "step_start",
+      "elapsed_seconds": 218.94612012803555,
+      "peak_rss_bytes": 6481002496,
+      "observed_model_forward_calls": 0,
+      "step": "read_scenario_binding"
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 218.96936406200984,
+      "peak_rss_bytes": 6481002496,
+      "observed_model_forward_calls": 0,
+      "step": "read_scenario_binding",
+      "step_seconds": 0.023205532983411103
+    },
+    {
+      "event": "step_start",
+      "elapsed_seconds": 218.96945350902388,
+      "peak_rss_bytes": 6481002496,
+      "observed_model_forward_calls": 0,
+      "step": "original_pilot_cases_contiguous_chunk"
+    },
+    {
+      "event": "native_start",
+      "elapsed_seconds": 361.6787090850412,
+      "peak_rss_bytes": 6825312256,
+      "observed_model_forward_calls": 0,
+      "case_id": "83a2ffde546a0776df0d08fb27abf14381516a83a642c337521e6a44aa57c063"
+    },
+    {
+      "event": "native_end",
+      "elapsed_seconds": 369.1802224960411,
+      "peak_rss_bytes": 6825312256,
+      "observed_model_forward_calls": 1110,
+      "case_id": "83a2ffde546a0776df0d08fb27abf14381516a83a642c337521e6a44aa57c063",
+      "native_seconds": 7.501505736028776,
+      "actual_forward_calls": 1110
+    },
+    {
+      "event": "auth_start",
+      "elapsed_seconds": 393.1221621889854,
+      "peak_rss_bytes": 6825312256,
+      "observed_model_forward_calls": 1110,
+      "case_id": "83a2ffde546a0776df0d08fb27abf14381516a83a642c337521e6a44aa57c063",
+      "numeric_backing_cache_roots": []
+    },
+    {
+      "event": "auth_end",
+      "elapsed_seconds": 574.2422607550398,
+      "peak_rss_bytes": 6825312256,
+      "observed_model_forward_calls": 1110,
+      "case_id": "83a2ffde546a0776df0d08fb27abf14381516a83a642c337521e6a44aa57c063",
+      "authentication_seconds": 181.1200988769997,
+      "new_model_forwards": 0,
+      "numeric_backing_cache_roots_before": [],
+      "numeric_backing_cache_roots_after": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+      ]
+    },
+    {
+      "event": "native_start",
+      "elapsed_seconds": 574.2539298349875,
+      "peak_rss_bytes": 6825312256,
+      "observed_model_forward_calls": 1110,
+      "case_id": "f7e34290fa268cca16634b7b597fdec2fd5d7ee2f61c20ebd3a7573569c3c54d"
+    },
+    {
+      "event": "native_end",
+      "elapsed_seconds": 597.643454716017,
+      "peak_rss_bytes": 6825312256,
+      "observed_model_forward_calls": 5356,
+      "case_id": "f7e34290fa268cca16634b7b597fdec2fd5d7ee2f61c20ebd3a7573569c3c54d",
+      "native_seconds": 23.389510403969325,
+      "actual_forward_calls": 4246
+    },
+    {
+      "event": "auth_start",
+      "elapsed_seconds": 623.7188869790407,
+      "peak_rss_bytes": 6825312256,
+      "observed_model_forward_calls": 5356,
+      "case_id": "f7e34290fa268cca16634b7b597fdec2fd5d7ee2f61c20ebd3a7573569c3c54d",
+      "numeric_backing_cache_roots": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+      ]
+    },
+    {
+      "event": "auth_end",
+      "elapsed_seconds": 689.4892516729888,
+      "peak_rss_bytes": 6825312256,
+      "observed_model_forward_calls": 5356,
+      "case_id": "f7e34290fa268cca16634b7b597fdec2fd5d7ee2f61c20ebd3a7573569c3c54d",
+      "authentication_seconds": 65.77036287100054,
+      "new_model_forwards": 0,
+      "numeric_backing_cache_roots_before": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+      ],
+      "numeric_backing_cache_roots_after": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+      ]
+    },
+    {
+      "event": "native_start",
+      "elapsed_seconds": 689.5241045890143,
+      "peak_rss_bytes": 6825312256,
+      "observed_model_forward_calls": 5356,
+      "case_id": "b78f0ec2e42db6bafa0f8cd18e01b8d2240506c81627e32ec6813f5bf019cb3f"
+    },
+    {
+      "event": "native_end",
+      "elapsed_seconds": 701.9392921330291,
+      "peak_rss_bytes": 6825312256,
+      "observed_model_forward_calls": 7306,
+      "case_id": "b78f0ec2e42db6bafa0f8cd18e01b8d2240506c81627e32ec6813f5bf019cb3f",
+      "native_seconds": 12.415164339996409,
+      "actual_forward_calls": 1950
+    },
+    {
+      "event": "auth_start",
+      "elapsed_seconds": 752.3662551300367,
+      "peak_rss_bytes": 6825312256,
+      "observed_model_forward_calls": 7306,
+      "case_id": "b78f0ec2e42db6bafa0f8cd18e01b8d2240506c81627e32ec6813f5bf019cb3f",
+      "numeric_backing_cache_roots": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+      ]
+    },
+    {
+      "event": "auth_end",
+      "elapsed_seconds": 827.2501326110214,
+      "peak_rss_bytes": 6825312256,
+      "observed_model_forward_calls": 7306,
+      "case_id": "b78f0ec2e42db6bafa0f8cd18e01b8d2240506c81627e32ec6813f5bf019cb3f",
+      "authentication_seconds": 74.88386674999492,
+      "new_model_forwards": 0,
+      "numeric_backing_cache_roots_before": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+      ],
+      "numeric_backing_cache_roots_after": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+      ]
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 827.8807370340219,
+      "peak_rss_bytes": 6825312256,
+      "observed_model_forward_calls": 7306,
+      "step": "original_pilot_cases_contiguous_chunk",
+      "step_seconds": 608.9112362060114
+    },
+    {
+      "event": "step_start",
+      "elapsed_seconds": 828.6366524290061,
+      "peak_rss_bytes": 6825312256,
+      "observed_model_forward_calls": 7306,
+      "step": "final_scenario_backing_check"
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 829.2874216170167,
+      "peak_rss_bytes": 6825312256,
+      "observed_model_forward_calls": 7306,
+      "step": "final_scenario_backing_check",
+      "step_seconds": 0.6506880460074171
+    },
+    {
+      "event": "step_start",
+      "elapsed_seconds": 829.2887619520188,
+      "peak_rss_bytes": 6825312256,
+      "observed_model_forward_calls": 7306,
+      "step": "frozen_source_after"
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 829.5421529790037,
+      "peak_rss_bytes": 6825312256,
+      "observed_model_forward_calls": 7306,
+      "step": "frozen_source_after",
+      "step_seconds": 0.25334535201545805
+    },
+    {
+      "event": "coordinator_complete",
+      "elapsed_seconds": 829.5448868779931,
+      "peak_rss_bytes": 6825312256,
+      "observed_model_forward_calls": 7306,
+      "case_ids": [
+        "83a2ffde546a0776df0d08fb27abf14381516a83a642c337521e6a44aa57c063",
+        "f7e34290fa268cca16634b7b597fdec2fd5d7ee2f61c20ebd3a7573569c3c54d",
+        "b78f0ec2e42db6bafa0f8cd18e01b8d2240506c81627e32ec6813f5bf019cb3f"
+      ],
+      "full_pilot_complete": false
+    }
+  ],
+  "counts": {
+    "new_cases": 3,
+    "total_authenticated": 5,
+    "required_selected_cases": 63,
+    "remaining_cases": 58,
+    "new_actual_forwards": 7306,
+    "authentication_forwards": 0,
+    "aggregate_executed": false,
+    "calibration_shards": 0,
+    "assessment_shards": 0
+  },
+  "source_hashes": {
+    "component_analysis/a3_direction_pipeline.py": "96678db186078ab37cad108e2d1e71ffdccf1fb3dd157c35cdc57a91b2ebd4a0",
+    "component_analysis/a3_direction_runner.py": "89a62335665595533204006c3eca28d14ca9c42eb600879c235e9c6370739429",
+    "component_analysis/a3_direction_runtime.py": "b66c2d8cd26c36f321b5079758209214746b0e4eec16a6c801742086d729c0cc",
+    "component_analysis/a3_direction_workload.py": "3e43aaf2b4cacb99df87593ae377c8fdf3eb7b223b258ed8873853841404d8f9",
+    "component_analysis/a3_directions.py": "ed882d4e12a396e03e73671e588beba5b1a8c90ab9d31e7ee73d4194430b4a86",
+    "component_analysis/a3_pipeline.py": "310eb53427ad4ac32522dfd0d6cd3b33e4ec887af1776579845f8953bdbe83f5",
+    "scripts/jobs/specificity_a3.sh": "936dfb7f8b9c2d267d52f1e199ed431275e6527cbfc3a105a22e3812289a9b96",
+    "tests/test_a3_direction_runner.py": "3ea945d5b23b4eef7d56139758c7075ea1b56ac612f1923590b7978628ca0120",
+    "tests/test_a3_direction_runtime.py": "5a41e89b0b2bd5fd59553f5f5a63260638e3547a63c31a615d84da08f796fb6a",
+    "tests/test_a3_direction_workload.py": "91eb6f874e180c5ffb362daba231631b7bea21c224446580efccfe20a9007300",
+    "tests/test_a3_directions.py": "cd8471b1524ad7b8f1b7c87f9eb5fec5724b3ab2980027ef7aadfea3fc3bb1c1",
+    "tests/test_a3_pipeline.py": "bbb3efdba075cc14c2997cc11ae44bab268bdea56459c0574d6bfc21b62f4a18",
+    "tests/a3_direction_native_scenario.py": "9b5061ab9618222b23230917f446abcaa73747f3d216f69c77b9218feec6297b"
+  },
+  "source_unchanged": true,
+  "preserved_old_case_bytes_unchanged": true,
+  "memory_event_deltas": {
+    "/sys/fs/cgroup/user.slice/user-78031.slice/session-6591.scope": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "/sys/fs/cgroup/user.slice/user-78031.slice": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "/sys/fs/cgroup/user.slice": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "/sys/fs/cgroup": {}
+  },
+  "resource_provenance": {
+    "host": "dt-login04.delta.ncsa.illinois.edu",
+    "cpu_model": "AMD EPYC 7763 64-Core Processor",
+    "filesystem": "lustre",
+    "threads": {
+      "OPENBLAS_NUM_THREADS": 1,
+      "OMP_NUM_THREADS": 1,
+      "MKL_NUM_THREADS": 1
+    },
+    "meaning": "Observed login CPU tiny fixture, no allocated-host or cold-filesystem bound"
+  },
+  "commands": [
+    {
+      "command": "/sw/external/python/anaconda3/bin/python3.9 .superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-proposal/supervisor.py",
+      "cwd": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+      "exit_code": 0,
+      "child_command": [
+        "/u/swong2/.conda/envs/mgnp/bin/python",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-proposal/coordinator.py",
+        "--root",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8",
+        "--out",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/diagnostics/next-cases2-4-01"
+      ]
+    },
+    {
+      "command": "research-session lint docs/research/specificity-ladder/reports/131-native-chunk2-4-handback.md",
+      "exit_code": 0
+    },
+    {
+      "command": "/sw/external/python/anaconda3/bin/python3.9 scripts/check_report_numbers.py /projects/beto/swong2/Alignment/Deception-Circuit/docs/research/specificity-ladder/reports/131-native-chunk2-4-handback.md --strict --json",
+      "exit_code": 0,
+      "output": "number-check.json"
+    }
+  ],
+  "all_owned_processes_terminal": true,
+  "no_further_chunk_or_aggregate": true,
+  "no_production_admission": true,
+  "artifacts": {
+    "number-check.json": {
+      "bytes": 4376,
+      "sha256": "ca7861215920bdce8ef6e37fb9357b7b0a1880244a14f10213163c93240c40fb"
+    },
+    "case4-numeric-COMPLETE.json": {
+      "bytes": 204,
+      "sha256": "aeabe50e795c3223db002e37136f885236909d70eaab717d7d300149431c99aa"
+    },
+    "case2-numeric-COMPLETE.json": {
+      "bytes": 204,
+      "sha256": "a178ee55452da61ad0437e09d553e6ee6a2a90f9fb895e7efaef3533f6b079bc"
+    },
+    "driver-identity.json": {
+      "bytes": 2115,
+      "sha256": "877e4bf44fe3a1fc75dcbd161ebb03062ae7f58a87811aebc52b61509f7b3db5"
+    },
+    "result.json": {
+      "bytes": 1035,
+      "sha256": "af39ae3d391b2fc7f500fdfcb4dedabff391e1559276e06f1f9013f2d4e6e66e"
+    },
+    "steps.log": {
+      "bytes": 8411,
+      "sha256": "310c6e1541793abbb53b99024e95e58c8ce3e93937bcfa00dc78f7118c568844"
+    },
+    "memory-before.json": {
+      "bytes": 730,
+      "sha256": "5995a7793504073e3d674ee9ae3188957c8a5d9f1e57b33205942808395e0f36"
+    },
+    "proposal.json": {
+      "bytes": 10446,
+      "sha256": "8c300ed85a9709c898a90615e258f06a253bf69ce216658b949eac3eb8da92ef"
+    },
+    "coordinator-result.json": {
+      "bytes": 5754,
+      "sha256": "2fe91dfc2f0a780d4d2c3d5c1806361a4fef3e3ce8a7a89c1a87f3c15ac09116"
+    },
+    "coordinator.py": {
+      "bytes": 7161,
+      "sha256": "a11c694ef3fce8ba8dd28635aa2df08d27fb299ea42b66dd5c42659994a46309"
+    },
+    "number-check-before-title-clarification.json": {
+      "bytes": 4572,
+      "sha256": "2ff7bd3c509813ec6b7d0feddeb7285b8718144d6b404174024c21a60c214774"
+    },
+    "per-case-observations.json": {
+      "bytes": 10817,
+      "sha256": "6c2f748514d3ff1cf582eb416c70273d37c5dd40b715ba4aa0edb2c7495806f7"
+    },
+    "memory-after.json": {
+      "bytes": 730,
+      "sha256": "2b0cc8263cd57a8c685a8bbd380f26c0c873c4dd889b23b37149e130afae084f"
+    },
+    "preserved-references.json": {
+      "bytes": 1927,
+      "sha256": "486306e1f2b03017eede719eeabfca204352a36b197aa698c61ba351559f8466"
+    },
+    "case4-COMPLETE.json": {
+      "bytes": 486,
+      "sha256": "f6f42c6a5f0ea864ecaad6ffafc95e421404e2a9139233d1e3e385765b144823"
+    },
+    "child-samples.jsonl": {
+      "bytes": 23548,
+      "sha256": "66adcbac223083a139065a8255ba8b55a4df81e9f78a84a7d94f60700b5da730"
+    },
+    "case3-COMPLETE.json": {
+      "bytes": 486,
+      "sha256": "4eeccc593c3ef8fd78381fd735ac214e0c6e63b53091e87052288380e5c22dfa"
+    },
+    "source_snapshot.json": {
+      "bytes": 1423,
+      "sha256": "9ad60a15ca5738c1e492e8e06f5afc95f3ea24086e958dc435d91a90807c4ca1"
+    },
+    "protocol-checks.json": {
+      "bytes": 707,
+      "sha256": "a897b3323940c2a87d7c03efa500a5a2ff44aeb78129f1d3b29addaa16d145d2"
+    },
+    "supervisor.py": {
+      "bytes": 3023,
+      "sha256": "0da49615818b651eeed90bdaf98608d6c5e41106ef9296cb052f2a8171d6905e"
+    },
+    "case3-numeric-COMPLETE.json": {
+      "bytes": 204,
+      "sha256": "1854e9e6bddcbb3db8f6218c5f89001701bd86f248061dcdcb494263b880559f"
+    },
+    "case2-COMPLETE.json": {
+      "bytes": 486,
+      "sha256": "12931dca1b2bd7b2e02b294412157243c2db692ea408ff7acca1f5ca56060cb2"
+    }
+  },
+  "metadata_note": "Initial numeric scan requested a citation for title indices; final title avoids repeating quantities. No observed data changed."
+}

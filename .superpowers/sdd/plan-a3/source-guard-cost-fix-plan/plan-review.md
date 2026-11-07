@@ -1,0 +1,45 @@
+# Independent source-refresh repair plan review
+
+Status: handed-back
+
+## What changed
+
+**Scoped design verdict: ACCEPT.** No blocking architectural contradiction was found. The plan targets the measured repeated semantic work with a private process-local source proof, keeps actual byte/current protection/grader checks fresh, and leaves live execution authority at the existing boundaries. Ownership is appropriately limited to the owner pipelines/tests and one explicitly source-bound helper/test. No original A1 dependency, direction runtime/workload or scientific policy needs to change.
+
+This accepts the technical design for root's implementation decision, not an implementation, new source lineage, reservation exception or model admission. Exact reviewed plan SHA256 is `6504f7ec2d8f25114dff3de7bd86074fc762171f88b7a3ba227a798fc689712f`; scope SHA256 is `1adc3191450dbf4314ce6f8f204cf42591931a54b072fc25fd09692106ce03a0`. See `plan-review-evidence/review-manifest.json`.
+
+The following details are binding implementation acceptance clarifications within the existing plan, rather than requests for a broader redesign.
+
+- **Validate the same owned snapshot that is retained.** Authenticate real artifact payloads against the supplied in-memory design/prepared values, create the owned sealed view before full semantic validation/context compilation, and perform those checks against that view. Before/after file witnesses alone cannot detect an in-memory mutation occurring between validation and later freezing. Recheck original outer bindings across minting, or reject such mutation outright. Add a regression that mutates an input via a validator-boundary callback while file bytes remain fixed; no altered, unvalidated source may enter a minted state. Source-only calls without genuine artifact bindings remain slow and cannot create this proof.
+
+- **Keep content freshness and path provenance separate for mutable registries.** Discover primary/default/explicit registry paths, including the original lexical explicit aliases before the existing checker resolves them. Cover newly introduced file-backed set references through the actual current checker and a defined structural-provenance policy; do not leave new references outside provenance checking. A valid atomic replacement of a regular registry file must pass, while retargeting an existing leaf/ancestor link fails even for identical bytes. Do not pin ordinary mutable-file inode/mtime as static content identity. Test a relative explicit path after CWD change, default branch aliases, an added nonoverlapping file-backed set and subsequent overlap/link attacks. Preserve actual schema/count/hash/confinement checks and current evidence keys.
+
+- **Make initialization consumption observable, not merely diagnostic.** New source initialization happens before existing main-stage startup timers in some paths. Its real freeze/validation/witness/context cost must reach the already consumed startup/guard accounting fields, with conservative per-process/job treatment documented. Adding only a new stats field would not satisfy the plan. Tests must show that existing owner projectors change their charged cost when this initialization cost changes, without changing phase or denominator semantics. Record retained unique objects and absolute/transient host peaks, including contexts, witnesses/provenance metadata, bindings and source views; release validation-only parents and do not hide callable/closure retention. No direction-workload edit is needed to fold genuine owner initialization into existing consumed startup accounting.
+
+- **Carry forward the initializer/seal and returned-evidence lessons.** Cover direct constructors, initially empty containers, ordinary attribute reset/deletion, missing mutable instance dictionaries, raw uninitialized exact-class instances and dict/list subclasses. A raw unsealed instance must be reconstructed or rejected, not trusted by an exact-type fast path. Source-state PID/owner/scope checks and replacement rejection remain independent of counters. `deepcopy` must produce ordinary independently mutable descendants, and shallow copies may share only sealed children. Returned evidence/stats dictionaries cannot expose mutable proof internals or alias a previous refresh's critical data. Test actual edge map updates, utility enrichment and mask timing copies, not only equality of synthetic containers.
+
+## How verified
+
+Read the proposed repair plan/scope, raw source-only timing/profile and the concrete baseline source. Author handback prose was excluded. Independently compared every ordinary candidate source file with the frozen successor snapshot: the source is unchanged and the proposed helper does not exist yet. Baseline is `87fceb28b3b46f4a406c0280db785697a0bbd3fc`; source evidence is `plan-review-evidence/review-manifest.json`.
+
+The actual baseline supports the design's compact-ID optimization. `a3_design.validate_access` expands recognized instance/source/donor references, utility pools, validation utilities and declared donors; `common.check_registry` consumes the resulting per-task ID membership. One superset context may satisfy base plus exact H-bank protection only after set equality is checked against both original expansions. Reusing `_utility_identity` avoids an incomplete alternate ID parser. Fresh calls to actual `check_registry` and `ladder.grader_registry` preserve dynamic registry contents, file-backed sets and grader glob membership; no validated decision is cached.
+
+The static closure described in the plan is sufficiently complete if implemented literally: actual canonical/prepared envelopes, original parent/selection/mandatory sidecar, owner root settings, original source/selection/code/grader hashes, both runtime closures including the helper, rulings, history/matched manifests, permitted parquet snapshot/blob links, original New30 receipt/JSON links or absence, and mask interpreter/launcher aliases. The read/hash audit must retain lexical paths before resolution and distinguish mutable registry content from static sources. Include missing receipt and first-missing-linked-JSON cases plus dangling/missing-parent cases as applicable. Do not widen directory witnesses into mutable output roots, unrelated study trees or weights; directory membership is required where the consumed artifact/glob contract requires it.
+
+Freeze/thaw compatibility is a substantive requirement. The existing inventory frozen classes intentionally return themselves from deepcopy, so they cannot be reused for source views. Owner code makes legitimate mutable copies in `source_pair`, `_utility_batch` and mask timing task subsets. The plan's independent ordinary deepcopies preserve those semantics while protecting the proof. Minting before identity/workload consumers and preserving strict fallback for unbound callers are appropriate boundaries.
+
+The postfreeze sequence is also appropriate: focused meaningful red/green checks on both interpreters, root freeze, genuine fresh namespace preparation, then serial real-input initialization/hit/invalidations and memory/byte measurements. Base mask measurements need genuinely interpreter-matched preparation. Benchmark labels must distinguish source-only CPU work, process-local cold construction and OS/filesystem cache state. Actual wrappers/source hashes and original scientific digests must remain bound. Initialization timing and fresh byte IO still may prevent admitted viability; the plan correctly leaves that unresolved.
+
+## Execution evidence
+
+Plan/source inspection only; no implementation or new runtime benchmark was performed. The unchanged source comparison covers `509` ordinary files and confirms no helper implementation has landed. Exact plan/scope/baseline/raw-evidence hashes are in `plan-review-evidence/review-manifest.json`. There is no scheduler job, allocated cluster, model run, scientific row count or scientific baseline result from this review.
+
+Raw baseline measurements are `evidence/source-guard-cpu-profile.json`, `evidence/source-guard-profile.txt` and `evidence/first-validate-prepared-timing.json`. They establish that deepcopy, encoding and reconstruction are material source-only costs; they are not GPU forecasts. No new success claim is made about the eventual repair.
+
+## What is NOT done
+
+No implementation, source edits, new preparation, git, RS writes, scheduler/GPU/weights/API/notebook work or subagents. No source/reservation/cap exception, held-job source change, phase-budget redesign or model admission. The original byte-witness and live authority semantics remain requirements, not things relaxed by this acceptance.
+
+## Open questions
+
+No blocking design question remains after applying the implementation clarifications above as acceptance tests. Root can authorize the bounded implementation, then require independent exact-source review and genuine fresh-input measurements. Remaining byte IO, total used-path feasibility and the separate staged M1 budget issue remain open gates. A faster cache benchmark alone cannot close them or authorize a held old-source reservation.

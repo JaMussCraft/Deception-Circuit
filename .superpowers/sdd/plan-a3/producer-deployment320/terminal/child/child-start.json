@@ -1,0 +1,82 @@
+{
+  "argv": [
+    "/ocean/projects/cis260361p/swong2/specificity-ladder-a3-producer-2ba697d7f5fd/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/candidate-producer311/driver.py",
+    "--config",
+    "/ocean/projects/cis260361p/swong2/specificity-ladder-a3-producer-2ba697d7f5fd/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/producer-deployment320/config.json",
+    "--config-sha256",
+    "ce924437438d95b8d3048688ebd9dec0dae9095f0209526009aecbfdb441b104"
+  ],
+  "candidate_only": true,
+  "child_start_seconds": 1794055193.4087317,
+  "execution_authorized": false,
+  "pid": 13448,
+  "process": {
+    "cgroup_applicability": "v1 actual ancestry; missing values remain unavailable",
+    "cgroup_membership": "12:hugetlb:/\n11:freezer:/slurm/uid_105853/job_50319720/step_batch\n10:blkio:/system.slice/slurmd.service\n9:pids:/system.slice/slurmd.service\n8:memory:/slurm/uid_105853/job_50319720/step_batch/task_0\n7:net_cls,net_prio:/\n6:devices:/slurm/uid_105853/job_50319720/step_batch/task_0\n5:cpu,cpuacct:/slurm/uid_105853/job_50319720/step_batch/task_0\n4:perf_event:/\n3:cpuset:/slurm/uid_105853/job_50319720/step_batch\n2:rdma:/\n1:name=systemd:/system.slice/slurmd.service\n",
+    "cgroup_rows": [
+      {
+        "controller": "v1",
+        "memory.failcnt": "0",
+        "memory.limit_in_bytes": "9223372036854771712",
+        "memory.max_usage_in_bytes": "502534144",
+        "memory.oom_control": "oom_kill_disable 0\nunder_oom 0\noom_kill 0",
+        "memory.usage_in_bytes": "502423552",
+        "path": "/sys/fs/cgroup/memory/slurm/uid_105853/job_50319720/step_batch/task_0"
+      },
+      {
+        "controller": "v1",
+        "memory.failcnt": "0",
+        "memory.limit_in_bytes": "206158430208",
+        "memory.max_usage_in_bytes": "503787520",
+        "memory.oom_control": "oom_kill_disable 0\nunder_oom 0\noom_kill 0",
+        "memory.usage_in_bytes": "503676928",
+        "path": "/sys/fs/cgroup/memory/slurm/uid_105853/job_50319720/step_batch"
+      },
+      {
+        "controller": "v1",
+        "memory.failcnt": "0",
+        "memory.limit_in_bytes": "206158430208",
+        "memory.max_usage_in_bytes": "504950784",
+        "memory.oom_control": "oom_kill_disable 0\nunder_oom 0\noom_kill 0",
+        "memory.usage_in_bytes": "504840192",
+        "path": "/sys/fs/cgroup/memory/slurm/uid_105853/job_50319720"
+      },
+      {
+        "controller": "v1",
+        "memory.failcnt": "0",
+        "memory.limit_in_bytes": "9223372036854771712",
+        "memory.max_usage_in_bytes": "505389056",
+        "memory.oom_control": "oom_kill_disable 0\nunder_oom 0\noom_kill 0",
+        "memory.usage_in_bytes": "505389056",
+        "path": "/sys/fs/cgroup/memory/slurm/uid_105853"
+      },
+      {
+        "controller": "v1",
+        "memory.failcnt": "0",
+        "memory.limit_in_bytes": "9223372036854771712",
+        "memory.max_usage_in_bytes": "258920824832",
+        "memory.oom_control": "oom_kill_disable 0\nunder_oom 0\noom_kill 0",
+        "memory.usage_in_bytes": "6313738240",
+        "path": "/sys/fs/cgroup/memory/slurm"
+      },
+      {
+        "controller": "v1",
+        "memory.failcnt": "0",
+        "memory.limit_in_bytes": "9223372036854771712",
+        "memory.max_usage_in_bytes": "263095771136",
+        "memory.oom_control": "oom_kill_disable 0\nunder_oom 0\noom_kill 0",
+        "memory.usage_in_bytes": "9150558208",
+        "path": "/sys/fs/cgroup/memory"
+      }
+    ],
+    "cgroup_scope": "entire memory-controller cgroup ancestry including other processes; lifetime peaks",
+    "observations_are_upper_bounds": false,
+    "pid": 13448,
+    "process_peak_rss_bytes": 40976384,
+    "process_peak_scope": "process lifetime high-water RSS on Linux",
+    "process_rss_bytes": 17797120
+  },
+  "python": "/u/swong2/.conda/envs/mgnp/bin/python",
+  "version": "3.12.13 | packaged by Anaconda, Inc. | (main, Jul  9 2026, 14:38:16) [GCC 14.3.0]",
+  "wrapper_start_seconds": "1794055179.4173658"
+}

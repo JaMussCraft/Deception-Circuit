@@ -1,0 +1,72 @@
+.F..                                                                     [100%]
+=================================== FAILURES ===================================
+___ test_bounded_scenario_verifies_full_model_config_state_source_and_tamper ___
+
+tmp_path = PosixPath('/tmp/review111-harness-final-mgnp/test_bounded_scenario_verifies0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc7ba78e4b0>
+
+    def test_bounded_scenario_verifies_full_model_config_state_source_and_tamper(tmp_path,monkeypatch):
+        import sys,os
+        if sys.version_info[:2]<(3,12):pytest.skip('pinned NNsight scenario runs on mgnp')
+        from tests import a3_direction_native_scenario as scenario
+        scenario.scenario_init(tmp_path)
+        _,_,model,plain=scenario.verify_scenario(tmp_path)
+        identity=scenario.model_identity(plain)
+        _,_,model2,plain2=scenario.verify_scenario(tmp_path)
+        assert scenario.model_identity(plain2)==identity
+        with torch.no_grad():plain2(torch.tensor([[1,2,3]]))
+        assert scenario.model_identity(plain2)==identity
+        real_sources=scenario.source_identity
+        with monkeypatch.context() as scoped:
+            scoped.setattr(scenario,'source_identity',lambda:dict(real_sources(),changed='0'*64))
+            with pytest.raises(ValueError,match='source changed'):scenario.verify_scenario(tmp_path,load_model=False)
+        original_model=scenario.tiny_model
+        def changed_config():
+            wrapped,plain=original_model();plain.config.rope_theta+=1;return wrapped,plain
+        with monkeypatch.context() as scoped:
+            scoped.setattr(scenario,'tiny_model',changed_config)
+>           with pytest.raises(ValueError,match='state/config'):scenario.verify_scenario(tmp_path)
+                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_a3_direction_runtime.py:1551: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/a3_direction_native_scenario.py:80: in verify_scenario
+    model,plain=tiny_model()
+                ^^^^^^^^^^^^
+tests/test_a3_direction_runtime.py:1548: in changed_config
+    wrapped,plain=original_model();plain.config.rope_theta+=1;return wrapped,plain
+                                   ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = LlamaConfig {
+  "attention_bias": false,
+  "attention_dropout": 0.0,
+  "bos_token_id": 1,
+  "eos_token_id": 2,
+  "head...t"
+  },
+  "tie_word_embeddings": false,
+  "transformers_version": "5.13.0",
+  "use_cache": true,
+  "vocab_size": 101
+}
+
+key = 'rope_theta'
+
+    def __getattribute__(self, key):
+        if key != "attribute_map" and key in super().__getattribute__("attribute_map"):
+            key = super().__getattribute__("attribute_map")[key]
+>       return super().__getattribute__(key)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'LlamaConfig' object has no attribute 'rope_theta'
+
+/u/swong2/.conda/envs/mgnp/lib/python3.12/site-packages/transformers/configuration_utils.py:454: AttributeError
+=============================== warnings summary ===============================
+tests/test_a3_direction_runtime.py::test_bounded_scenario_verifies_full_model_config_state_source_and_tamper
+  /u/swong2/.conda/envs/mgnp/lib/python3.12/site-packages/astor/op_util.py:92: DeprecationWarning: ast.Num is deprecated and will be removed in Python 3.14; use ast.Constant instead
+    precedence_data = dict((getattr(ast, x, None), z) for x, y, z in op_data)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_a3_direction_runtime.py::test_bounded_scenario_verifies_full_model_config_state_source_and_tamper
+1 failed, 3 passed, 144 deselected, 1 warning in 33.12s

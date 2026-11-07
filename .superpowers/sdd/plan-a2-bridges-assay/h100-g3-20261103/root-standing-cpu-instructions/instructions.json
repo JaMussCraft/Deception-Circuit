@@ -1,0 +1,111 @@
+{
+  "kind": "root_only_standing_Delta_CPU_binding_instructions",
+  "status": "INSTRUCTIONS_ONLY_NO_JOB_OR_RS_ACTIONS_PERFORMED",
+  "packet": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/delta-model-phase-preflight-r2",
+  "accepted_CPU_packet_manifest_sha256": "6c0fa366c2176f61999c86240b8d3049608eb5ce3c833fc817a241962215c42a",
+  "accepted_static_H100_R5_manifest_sha256": "661d16c5f38149b4d258fa372472dd5aab57cd0afe0a131aa6b5683b735657bc",
+  "read_only_seed": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-standing-cpu-instructions/config.seed.json",
+  "seed_sha256": "52bc95b18f98fc85dee71f01dbe1f7478630dc50f6d185d10b5a5995dc5276c5",
+  "dispatch": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-standing-cpu-instructions/dispatch.sh",
+  "dispatch_sha256": "1cfbee750553f4c3d24dc3c0656a3d05a8d2dfb4fb3a9fe7602ee73c1d0b7733",
+  "dispatch_scope": "Narrow bootstrap adapter only: derives actual CPU job directory, reads root-finalized config SHA after held submission, verifies immutable config and accepted CPU/R5 manifest pins, then execs unchanged accepted launch.sh. Does not edit source, authorize model stages, wait for mutable configuration or contact scheduler.",
+  "placement_observation": {
+    "source": "Actual sinfo/squeue/sshare read-only commands in this worker turn",
+    "normal_CPU_time_limit": "2-00:00:00",
+    "interactive_CPU_time_limit": "1:00:00",
+    "normal_CPU_states": {
+      "comp": 1,
+      "mix-": 19,
+      "drng@": 114,
+      "resv": 1,
+      "alloc": 1
+    },
+    "idle_nodes_observed": 0,
+    "reported_user_fairshare": {
+      "bimc-delta-cpu": 0.065645,
+      "beto-delta-cpu": 0.027627,
+      "bjhz-delta-cpu": 0.022449
+    },
+    "recommended_initial_account": "bimc-delta-cpu",
+    "reason": "Highest currently reported user fairshare among returned CPU accounts; no start-time guarantee. Root should compare actual test-only forecasts with beto and bjhz immediately before submission.75min requires normal cpu only; never widen this job to cpu-interactive."
+  },
+  "root_sequence": [
+    {
+      "step": 1,
+      "action": "Verify live usage/session and read current primary RESUME; keep all GPU/model admission gates. Create the dedicated root bootstrap log directory; all future per-job directories are new, no historical output reuse."
+    },
+    {
+      "step": 2,
+      "action": "Root test-only placement forecast may use identical resource arguments below with --test-only instead of --hold/--parsable. This worker has not run a test-only submission."
+    },
+    {
+      "step": 3,
+      "action": "Root held-submit exact normal-CPU request using held_submit_argv. Record actual job through RS immediately. The fixed dispatch path exists before submission and needs no future GPU identity."
+    },
+    {
+      "step": 4,
+      "action": "Read actual held job identity/account/partition/time/CPUs/memory/noGPU/no-requeue. Create rootbase/job-CPUJOB only after actual ID is known. Copy config.seed.json to that new directory with exclusive creation, replacing ONLY the fields listed below."
+    },
+    {
+      "step": 5,
+      "action": "Compute canonical config.json SHA; write config.sha256 as one lowercase64hex line using exclusive creation. Root independently reviews complete config/base parameters/all source and G3/ref pins; publish an immutable publication.json binding actual CPUjob, config SHA, dispatch SHA, accepted CPU manifest, R5 manifest and placement. Make finalized config/digest/publication read-only. Never modify after release."
+    },
+    {
+      "step": 6,
+      "action": "Root releases that held CPU job only after publication checks; accepted supervisor validates actual allocation and emits evidence/READY.json. Root arms/re-arms its actual job waiter and records RS state. READY grants no model or GPU authority."
+    },
+    {
+      "step": 7,
+      "action": "Only after actual CPU READY, root may perform separately approved GPU held-submit/reservation/completed successor mapping/final R5 binding. First fresh actual bank WAITING request binds actual GPUjob and final GPU-config SHA; preserve those sticky identities through prefix. Root request must arrive within15s and guard must finish before WAITING+270s. No request retry/retarget."
+    },
+    {
+      "step": 8,
+      "action": "Root uses only timely phase COMPLETE plus separately fresh actual ledger/mapping/exact+rounded caps to create a new composite model-phase preflight attestation. CPU COMPLETE stays immutable. Repeat actual Delta owning calls for prefix; Bridge byte-equivalence is not a model-phase substitute."
+    }
+  ],
+  "root_fields_to_finalize": {
+    "standing_CPU_job_id": "actual held-submitted numeric CPU job ID, as a string",
+    "request_directory": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-Delta-model-preflight/job-CPUJOB/requests (create empty directory)",
+    "evidence_output": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-Delta-model-preflight/job-CPUJOB/evidence (must NOT exist; supervisor creates exclusively)"
+  },
+  "fields_not_to_change": [
+    "source_commit",
+    "runtime",
+    "python",
+    "base_parameters",
+    "base_parameters_sha256",
+    "packet_manifest_sha256",
+    "frozen_G3_root",
+    "frozen_G3_sha256",
+    "H100_packet_manifest_sha256",
+    "total_seconds4500",
+    "finish_reserve_seconds60",
+    "child_cap_seconds720",
+    "publication_margin_seconds30",
+    "kill_grace_seconds15"
+  ],
+  "future_GPU_bindings": "Do not add future final_GPU_bound_config_sha256 to startup config. It is learned once from root bank request and checked against the actual WAITING marker; same value required for prefix.",
+  "held_submit_argv": [
+    "sbatch",
+    "--parsable",
+    "--hold",
+    "--account=bimc-delta-cpu",
+    "--partition=cpu",
+    "--constraint=projects",
+    "--nodes=1",
+    "--ntasks=1",
+    "--cpus-per-task=4",
+    "--mem=16G",
+    "--time=01:15:00",
+    "--no-requeue",
+    "--job-name=lad-a2-phasecpu",
+    "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+    "--export=ALL,CUDA_VISIBLE_DEVICES=",
+    "--output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-Delta-model-preflight/bootstrap-%j.log",
+    "--wrap=bash /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-standing-cpu-instructions/dispatch.sh"
+  ],
+  "no_actual_submission": true,
+  "no_RS_or_git": true,
+  "no_source_or_G3_change": true,
+  "no_model_admission": true
+}

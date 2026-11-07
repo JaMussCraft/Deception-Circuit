@@ -1,0 +1,53 @@
+{
+  "source_commit": "40fe57289405fd53a3fce02e5d4e47a0ebf78b64",
+  "source_file": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime/component_analysis/a3_mask_pipeline.py",
+  "source_sha256": "98c6b4addef010944aabc547b939585679072fbe931feb64b2b4548d9de9172a",
+  "successful_fresh_main_pilot": {
+    "initial_source_without_inventory": 1,
+    "entry_with_inventory_before_model": 1,
+    "pilot_initial": 1,
+    "arm_entries": 2,
+    "task_entries": 3,
+    "H_bank_rows_by_task": [
+      177,
+      187,
+      167
+    ],
+    "H_bank_streams": 2,
+    "H_bank_refreshes": 1062,
+    "mechanism_operation_condition_guards_per_task": 30,
+    "IOI_operation_guards_per_task": 5,
+    "MMLU_operation_guards_per_task": 4,
+    "assessment_refreshes": 117,
+    "inside_mask_pilot": 1185,
+    "total_source_refresh_invocations": 1187,
+    "owner_mask_reservation_invocations": 1186,
+    "extra_initial_context_mint_validate_reservation": 1,
+    "full_validate_reservation_executions": 1187,
+    "read_current_allocation_calls_per_validation": 2,
+    "current_allocation_reads": 2374
+  },
+  "mandatory_native_work_separate_from_guards": {
+    "arms": [
+      "constrained",
+      "unconstrained"
+    ],
+    "updates_per_arm": 1,
+    "full_FAR_validation_per_arm": 1,
+    "binary_parity_per_arm": 1,
+    "checkpoint_per_arm": 1,
+    "restore_export_random_control_serialization_per_arm": 1,
+    "base_hash_before_arms": 1,
+    "H_bank_tasks": 3,
+    "validation_only_crossed_assessment_tasks": 3,
+    "complete_target_proof": 1
+  },
+  "physical_forward_count": "Not derived by source-refresh arithmetic: score_chunks performs multiple intact/donor/patched executions; updates add backward, validations add self replay and positives. Inventory keys are accounting cells, not forward count. No model execution measured in this review.",
+  "logical_mask_pilot_inventory_keys": 31191,
+  "edge_stability_keys": 9664,
+  "edge_index_guards": 3,
+  "edge_stability_source_refresh_subset": 9667,
+  "limits": "Fresh successful path, unchanged valid current inputs, no retries/resume/failure. Source initialization and proof metadata work separately consumed. All callback sites and call targets inspected; nested native phases accept no guard callback.",
+  "authority_source_file": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime/component_analysis/a3_direction_runtime.py",
+  "authority_source_sha256": "0401c7a2750cf66ef5508d2dbbaed2f9bcea5f83918d6503e6a8f6b809a44867"
+}

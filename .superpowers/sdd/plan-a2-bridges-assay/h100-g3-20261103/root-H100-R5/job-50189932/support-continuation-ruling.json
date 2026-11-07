@@ -1,0 +1,27 @@
+{
+  "kind": "reviewed_unused_CPU_support_continuation_ruling",
+  "reviewer": "independent160",
+  "GPU_job": "50189932",
+  "reservation": "r-041",
+  "GPU_config_sha256": "1d96dd830d0f0bb4bf375ba99af676e8ee7ece322ec87ff5ae317edc1fd4533a",
+  "original_placement_sha256": "8587c5bb292f2a840a9af64b8080edc0a934c0ae13e39ed78001a2c44ae67551",
+  "cancelled_unused_CPU_job": "23488288",
+  "no_model_or_phase_started": true,
+  "allowed": "New actual CPU allocation and immutable helper bindings plus append-only continuation attestation before first model phase; preserve GPU config, placement, job and reservation bytes/anchors.",
+  "requirements": [
+    "Bind original placement/config/CPU cancellation and empty requests, absent model markers/releases",
+    "Pin new actual CPU/config/READY with unchanged CPU packet, helper and H100 packet",
+    "Treat original placement CPU fields as historical; new phase evidence identifies actual current support",
+    "Use the same replacement CPU for bank and prefix with unchanged sticky GPU/config identities",
+    "Review exact new CPU/bindings/continuation bytes before unhold",
+    "Preserve source/cache/protection/live ledger/usage/300-second release/1950-second floor/300-second finish gates"
+  ],
+  "not_authorized": [
+    "GPU or model retry",
+    "lease extension or renewal",
+    "reservation retarget or refund",
+    "source, GPU resource, time or cap increase"
+  ],
+  "new_CPU_submitted": false,
+  "created_unix": 1793750586.041646
+}

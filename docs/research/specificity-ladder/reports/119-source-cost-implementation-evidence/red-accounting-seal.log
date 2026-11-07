@@ -1,0 +1,20 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____ test_mutable_diagnostic_counters_cannot_change_charged_initialization _____
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-accounting-seal/test_mutable_diagnostic_counte0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f98f317ba40>
+
+    def test_mutable_diagnostic_counters_cannot_change_charged_initialization(tmp_path,monkeypatch):
+        c=setup_case(tmp_path,monkeypatch);state=c.build();before=c.s.startup_seconds(0.,state)
+        state._stats['initialization_seconds']=0.
+>       assert c.s.startup_seconds(0.,state)==before and before>0
+E       AssertionError: assert (0.0 == 0.016531656961888075)
+E        +  where 0.0 = <function startup_seconds at 0x7f98f3198ae0>(0.0, <component_analysis.a3_source_validation._SourceState object at 0x7f98e4e87b50>)
+E        +    where <function startup_seconds at 0x7f98f3198ae0> = <module 'component_analysis.a3_source_validation' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/work...s/specificity-ladder/.superpowers/sdd/plan-a3/source-guard-cost-fix-source/component_analysis/a3_source_validation.py'>.startup_seconds
+E        +      where <module 'component_analysis.a3_source_validation' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/work...s/specificity-ladder/.superpowers/sdd/plan-a3/source-guard-cost-fix-source/component_analysis/a3_source_validation.py'> = namespace(s=<module 'component_analysis.a3_source_validation' from '/projects/beto/swong2/Alignment/Deception-Circuit/...iagnostic_counte0/static'), calls=['semantic'], build=<function setup_case.<locals>.build at 0x7f98e4f2e020>, extra=[]).s
+
+tests/test_a3_source_validation.py:298: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_a3_source_validation.py::test_mutable_diagnostic_counters_cannot_change_charged_initialization
+1 failed, 37 deselected in 2.86s

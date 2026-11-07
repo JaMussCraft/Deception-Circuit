@@ -1,0 +1,86 @@
+FFFFFFFFF                                                                [100%]
+=================================== FAILURES ===================================
+____ test_expired_post_reset_metadata_never_grants_above80_authority[None] _____
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_root_integration.py:349: in test_expired_post_reset_metadata_never_grants_above80_authority
+    result=m.validate_usage(u,s,'exact')
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:166: in validate_usage
+    need(type(actual) is int and actual>time.time() and captured==actual,'reset mismatch/unknown/expired')
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: reset mismatch/unknown/expired
+_ test_expired_post_reset_metadata_never_grants_above80_authority[active-mismatch] _
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_root_integration.py:349: in test_expired_post_reset_metadata_never_grants_above80_authority
+    result=m.validate_usage(u,s,'exact')
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:166: in validate_usage
+    need(type(actual) is int and actual>time.time() and captured==actual,'reset mismatch/unknown/expired')
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: reset mismatch/unknown/expired
+_ test_expired_post_reset_metadata_never_grants_above80_authority[backward-reset] _
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_root_integration.py:349: in test_expired_post_reset_metadata_never_grants_above80_authority
+    result=m.validate_usage(u,s,'exact')
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:166: in validate_usage
+    need(type(actual) is int and actual>time.time() and captured==actual,'reset mismatch/unknown/expired')
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: reset mismatch/unknown/expired
+_ test_expired_post_reset_metadata_never_grants_above80_authority[cached-before-reset] _
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_root_integration.py:349: in test_expired_post_reset_metadata_never_grants_above80_authority
+    result=m.validate_usage(u,s,'exact')
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:166: in validate_usage
+    need(type(actual) is int and actual>time.time() and captured==actual,'reset mismatch/unknown/expired')
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: reset mismatch/unknown/expired
+_ test_expired_post_reset_metadata_never_grants_above80_authority[future-checked] _
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_root_integration.py:349: in test_expired_post_reset_metadata_never_grants_above80_authority
+    result=m.validate_usage(u,s,'exact')
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:166: in validate_usage
+    need(type(actual) is int and actual>time.time() and captured==actual,'reset mismatch/unknown/expired')
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: reset mismatch/unknown/expired
+_ test_expired_post_reset_metadata_never_grants_above80_authority[stale-live] __
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_root_integration.py:349: in test_expired_post_reset_metadata_never_grants_above80_authority
+    result=m.validate_usage(u,s,'exact')
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:166: in validate_usage
+    need(type(actual) is int and actual>time.time() and captured==actual,'reset mismatch/unknown/expired')
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: reset mismatch/unknown/expired
+_ test_expired_post_reset_metadata_never_grants_above80_authority[naive-timestamp] _
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_root_integration.py:349: in test_expired_post_reset_metadata_never_grants_above80_authority
+    result=m.validate_usage(u,s,'exact')
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:166: in validate_usage
+    need(type(actual) is int and actual>time.time() and captured==actual,'reset mismatch/unknown/expired')
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: reset mismatch/unknown/expired
+____ test_expired_post_reset_metadata_never_grants_above80_authority[at80] _____
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_root_integration.py:349: in test_expired_post_reset_metadata_never_grants_above80_authority
+    result=m.validate_usage(u,s,'exact')
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:166: in validate_usage
+    need(type(actual) is int and actual>time.time() and captured==actual,'reset mismatch/unknown/expired')
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: reset mismatch/unknown/expired
+__ test_expired_post_reset_metadata_never_grants_above80_authority[rollback] ___
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_root_integration.py:349: in test_expired_post_reset_metadata_never_grants_above80_authority
+    result=m.validate_usage(u,s,'exact')
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:166: in validate_usage
+    need(type(actual) is int and actual>time.time() and captured==actual,'reset mismatch/unknown/expired')
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: reset mismatch/unknown/expired
+- generated xml file: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/reset-red270/base.xml -
+=========================== short test summary info ============================
+FAILED ../../../../dev::test_expired_post_reset_metadata_never_grants_above80_authority[None]
+FAILED ../../../../dev::test_expired_post_reset_metadata_never_grants_above80_authority[active-mismatch]
+FAILED ../../../../dev::test_expired_post_reset_metadata_never_grants_above80_authority[backward-reset]
+FAILED ../../../../dev::test_expired_post_reset_metadata_never_grants_above80_authority[cached-before-reset]
+FAILED ../../../../dev::test_expired_post_reset_metadata_never_grants_above80_authority[future-checked]
+FAILED ../../../../dev::test_expired_post_reset_metadata_never_grants_above80_authority[stale-live]
+FAILED ../../../../dev::test_expired_post_reset_metadata_never_grants_above80_authority[naive-timestamp]
+FAILED ../../../../dev::test_expired_post_reset_metadata_never_grants_above80_authority[at80]
+FAILED ../../../../dev::test_expired_post_reset_metadata_never_grants_above80_authority[rollback]
+9 failed in 0.87s

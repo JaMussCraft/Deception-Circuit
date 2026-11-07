@@ -1,0 +1,38 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+________ test_generic_proof_cannot_impersonate_an_owner_validator[mask] ________
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-owner-seal/test_generic_proof_cannot_impe0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fddb4336fc0>
+owner = 'mask'
+
+    @pytest.mark.parametrize('owner',['mask','edge'])
+    def test_generic_proof_cannot_impersonate_an_owner_validator(tmp_path,monkeypatch,owner):
+        c=setup_case(tmp_path,monkeypatch);state=c.build(owner=owner)
+        from component_analysis import a3_mask_pipeline as mask,a3_edge_pipeline as edge
+        module=mask if owner=='mask' else edge
+>       with pytest.raises(ValueError):module._source_startup_seconds(0.,SimpleNamespace(**{'_'+owner+'_source_context':state}))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_a3_source_validation.py:251: Failed
+________ test_generic_proof_cannot_impersonate_an_owner_validator[edge] ________
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-owner-seal/test_generic_proof_cannot_impe1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fdda6376510>
+owner = 'edge'
+
+    @pytest.mark.parametrize('owner',['mask','edge'])
+    def test_generic_proof_cannot_impersonate_an_owner_validator(tmp_path,monkeypatch,owner):
+        c=setup_case(tmp_path,monkeypatch);state=c.build(owner=owner)
+        from component_analysis import a3_mask_pipeline as mask,a3_edge_pipeline as edge
+        module=mask if owner=='mask' else edge
+>       with pytest.raises(ValueError):module._source_startup_seconds(0.,SimpleNamespace(**{'_'+owner+'_source_context':state}))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_a3_source_validation.py:251: Failed
+=========================== short test summary info ============================
+FAILED tests/test_a3_source_validation.py::test_generic_proof_cannot_impersonate_an_owner_validator[mask]
+FAILED tests/test_a3_source_validation.py::test_generic_proof_cannot_impersonate_an_owner_validator[edge]
+2 failed, 29 deselected in 3.00s

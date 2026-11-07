@@ -1,0 +1,98 @@
+{
+  "kind": "read_only_A3_metadata_cost_constraints",
+  "status": "NO_GPU_ADMISSION_OR_SOURCE_CHANGE",
+  "source_commit": "861f84a3938a5e22fa329af0c469b2dd812fe68a",
+  "source_files": {
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime/component_analysis/a3_direction_runtime.py": "ac56b1ce177a095115e4f9cca7b61519e6c3344acd50ec218832e2908aad1b07",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime/component_analysis/a3_direction_workload.py": "1b0f6110a39b5d50342b95fe7ee2d6b643fce20feb2ae4448403c1bc8c52d1b3"
+  },
+  "actual_failed_creation_evidence": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-prefit-remaining-cpu-r163-r2-execution-review/run_manifest.json",
+  "active_high_memory_job": "23485753",
+  "observed_failed_path": {
+    "job": "23482242",
+    "allocation_GiB": 32,
+    "fit_select_wall_seconds": 2125.837917497,
+    "user_seconds": 1392.228096,
+    "system_seconds": 547.769743,
+    "exit_code": -9,
+    "OOM": true,
+    "no_completed_inventory": true
+  },
+  "static_scope": {
+    "raw_expected_keys": 246486,
+    "scoring_shards": 81904,
+    "train_capture_batches": 4256,
+    "basis": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-fit-select-highmem-cpu-proposal/static-workload-basis.json"
+  },
+  "execution_constraints": [
+    {
+      "site": "runtime dispatch model load then run_pilot, lines899-906",
+      "constraint": "Full fit-select inventory is rebuilt inside run_pilot AFTER original model construction; successful separate CPU artifact creation does not make this GPU-reserved cost vanish."
+    },
+    {
+      "site": "runtime run_pilot line1632",
+      "constraint": "Prefit rebuilds full fit-select target; selected rebuilds full remaining target with actual selected axes. Current accepted code does not reuse prepared target object for this call."
+    },
+    {
+      "site": "runtime _read_stage_inventory lines800-805",
+      "constraint": "Before model load, original pilot inventory is read and _validate_inventory independently rebuilds it. Preserve this authentication work in timing and memory budgets."
+    },
+    {
+      "site": "runtime _PilotReconciliationPass line1577",
+      "constraint": "Reconciliation freezes target into a private immutable object while model and pilot evidence remain resident; additional retention/copy cost is not covered by inventory creation alone."
+    },
+    {
+      "site": "workload _validate_inventory lines768-781",
+      "constraint": "Full digest, independent build_inventory reconstruction, more full digests and row-key counter coverage are repeated per validator invocation. Later readiness/admission paths repeat original authentication and may read target simultaneously with rebuilt target."
+    },
+    {
+      "site": "runtime authenticated pilot intake lines2310-2340",
+      "constraint": "Admission independently rebuilds target and expected pilot inventories, reads original pilot/reservation/upper/target objects and validates them. This later CPU cost is separate from GPU M1, but must not be treated as a free completed marker."
+    }
+  ],
+  "candidate_hotspots_not_profiled": [
+    {
+      "rank": 1,
+      "site": "workload input_scope/req lines417-457",
+      "mechanism": "req materializes timing_inputs with deep copies of complete source records, then calls input_scope again solely to derive target lengths and discards those copied records. Each requirement also canonicalizes its full nested contents for requirement_id. Retained duplicates plus ephemeral copies amplify memory and CPU.",
+      "possible_minimal_future_change": "Measure first; a length-only lookup for discarded target-length copies might preserve serialized artifact bytes. Requires new isolated source, exact whole-artifact identity comparisons and negative source/control tests; no change applied."
+    },
+    {
+      "rank": 2,
+      "site": "workload _source_rows/groups/capture lines153-165,477-526",
+      "mechanism": "Source filtering reconstructs set(ids) inside a row comprehension and source-row maps are rebuilt in capture loops. input_scope caches its own group index, but the other paths repeatedly scan and allocate.",
+      "possible_minimal_future_change": "Profile counts/cumulative time; any local immutable per-build source index/cache requires exact scientific scope/order and guard preservation tests."
+    },
+    {
+      "rank": 3,
+      "site": "workload derive_storage_requirements lines203-350",
+      "mechanism": "Every capture/row/control is walked to form conservative source-sized serialized envelopes and host bounds. It serializes the metadata base and computes host bounds, then builder serializes expected keys and the complete inventory digest again.",
+      "possible_minimal_future_change": "Profile original helpers without altering source or model callbacks in a new approved CPU-only run. Preserve conservative bound semantics and exact bytes; no optimistic scalar approximation."
+    },
+    {
+      "rank": 4,
+      "site": "runtime immutable target freeze and workload full digest/reconstruction",
+      "mechanism": "Complete graph traversal/immutable copies and whole-object JSON strings/bytes coexist with large inventory and model/evidence. Readiness peak can exceed creation peak.",
+      "possible_minimal_future_change": "Do not replace reauthentication with unchecked reuse. Any deeper verified reuse design must bind original bytes/source/inputs and retain independent authenticity/negative controls; not proposed as an immediate patch."
+    }
+  ],
+  "paired_M1": {
+    "total_reserved_GPU_hours": 0.5,
+    "total_seconds": 1800,
+    "parts": [
+      "prefit",
+      "later selected"
+    ],
+    "finish_reserve_per_part_seconds": 90,
+    "combined_minimum_finish_seconds": 180,
+    "remaining_seconds_if_all_other_overheads_zero": 1620,
+    "prefit_serial_forward_lower_count": 16770,
+    "selected_serial_forward_lower_count": 272610,
+    "combined_serial_forward_lower_count": 289380,
+    "max_average_serial_forward_ms_if_every_other_cost_zero": 5.5981754094961635,
+    "required_inequality": "Both model startups + native guards + pilot inventory reads/rebuilds + full target rebuilds after load + all timing/control forwards + proof/reconciliation/serialization/publication work + both finish reserves <=1800. Separate M2 fitting/capture/validation/CPU selection remains between the two M1 parts.",
+    "feasibility": "UNESTABLISHED; failed32GiB creation wall cost already exceeds total1800s on that CPU, but memory pressure and differing hardware prevent treating it as a matched H200 lower bound or proof of global infeasibility.",
+    "no_automatic_split": true
+  },
+  "next_decision": "Consume actual high-memory creation telemetry/result. Even success establishes only original CPU object creation, not complete readiness or H200 timing feasibility. If clean metadata cost still threatens paired M1, root may separately review a bounded CPU profiler/correction plan before any new GPU reservation. No source edit, GC hook, model/runtime injection, control reduction or cap increase is authorized here."
+}

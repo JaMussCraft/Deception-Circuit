@@ -1,0 +1,106 @@
+[
+  {
+    "command": [
+      "/sw/external/python/anaconda3/bin/python3.9",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/validation-failure281/startup-diagnosis/identity_probe.py"
+    ],
+    "exit_code": 0,
+    "result": {
+      "scope": "NON_NATIVE_EXTRACTED_PROCESS_EXPRESSION_AND_TWO_GUARDS_ONLY",
+      "cases": [
+        {
+          "case": "injected-no-slurm",
+          "expected_job": "injected-cpu",
+          "hardcoded_injected_rejects": false,
+          "correct_identity_passes": true,
+          "rejected": [
+            "wrong-job",
+            "wrong-pid"
+          ]
+        },
+        {
+          "case": "injected-slurm",
+          "expected_job": "50319108",
+          "hardcoded_injected_rejects": true,
+          "correct_identity_passes": true,
+          "rejected": [
+            "wrong-job",
+            "wrong-pid"
+          ]
+        },
+        {
+          "case": "production-no-slurm",
+          "expected_job": "host-cpu",
+          "hardcoded_injected_rejects": true,
+          "correct_identity_passes": true,
+          "rejected": [
+            "wrong-job",
+            "wrong-pid"
+          ]
+        },
+        {
+          "case": "production-slurm",
+          "expected_job": "50319108",
+          "hardcoded_injected_rejects": true,
+          "correct_identity_passes": true,
+          "rejected": [
+            "wrong-job",
+            "wrong-pid"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "command": [
+      "/u/swong2/.conda/envs/mgnp/bin/python",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/validation-failure281/startup-diagnosis/identity_probe.py"
+    ],
+    "exit_code": 0,
+    "result": {
+      "scope": "NON_NATIVE_EXTRACTED_PROCESS_EXPRESSION_AND_TWO_GUARDS_ONLY",
+      "cases": [
+        {
+          "case": "injected-no-slurm",
+          "expected_job": "injected-cpu",
+          "hardcoded_injected_rejects": false,
+          "correct_identity_passes": true,
+          "rejected": [
+            "wrong-job",
+            "wrong-pid"
+          ]
+        },
+        {
+          "case": "injected-slurm",
+          "expected_job": "50319108",
+          "hardcoded_injected_rejects": true,
+          "correct_identity_passes": true,
+          "rejected": [
+            "wrong-job",
+            "wrong-pid"
+          ]
+        },
+        {
+          "case": "production-no-slurm",
+          "expected_job": "host-cpu",
+          "hardcoded_injected_rejects": true,
+          "correct_identity_passes": true,
+          "rejected": [
+            "wrong-job",
+            "wrong-pid"
+          ]
+        },
+        {
+          "case": "production-slurm",
+          "expected_job": "50319108",
+          "hardcoded_injected_rejects": true,
+          "correct_identity_passes": true,
+          "rejected": [
+            "wrong-job",
+            "wrong-pid"
+          ]
+        }
+      ]
+    }
+  }
+]

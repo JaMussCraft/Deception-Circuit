@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="14" skipped="0" tests="14" time="5.560" timestamp="2026-11-06T15:33:05.687608-06:00" hostname="dt-login04.delta.ncsa.illinois.edu"><testcase classname="test_full_score_entry198" name="test_real_entry_rechecks_immutable_files_after_costly_IO[release-bank]" time="0.325"><failure message="KeyError: 'groups_sha256'">test_full_score_entry198.py:109: in test_real_entry_rechecks_immutable_files_after_costly_IO
+    error = execute(c, controller, r, observed)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_full_score_entry198.py:72: in execute
+    controller.run_full_score(c, r)
+../gpu/controller.py:150: in run_full_score
+    verify_existing_bank(c)
+../gpu/common.py:181: in verify_existing_bank
+    return _bank_binding(c, allow_score=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../gpu/common.py:160: in _bank_binding
+    require(sha(path) == c[key + '_sha256'], 'stale pinned ' + key)
+                         ^^^^^^^^^^^^^^^^^^
+E   KeyError: 'groups_sha256'</failure></testcase><testcase classname="test_full_score_entry198" name="test_real_entry_rechecks_immutable_files_after_costly_IO[release-allocation]" time="0.408"><failure message="KeyError: 'groups_sha256'">test_full_score_entry198.py:109: in test_real_entry_rechecks_immutable_files_after_costly_IO
+    error = execute(c, controller, r, observed)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_full_score_entry198.py:72: in execute
+    controller.run_full_score(c, r)
+../gpu/controller.py:150: in run_full_score
+    verify_existing_bank(c)
+../gpu/common.py:181: in verify_existing_bank
+    return _bank_binding(c, allow_score=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../gpu/common.py:160: in _bank_binding
+    require(sha(path) == c[key + '_sha256'], 'stale pinned ' + key)
+                         ^^^^^^^^^^^^^^^^^^
+E   KeyError: 'groups_sha256'</failure></testcase><testcase classname="test_full_score_entry198" name="test_real_entry_rechecks_immutable_files_after_costly_IO[config-bank]" time="0.450"><failure message="KeyError: 'groups_sha256'">test_full_score_entry198.py:109: in test_real_entry_rechecks_immutable_files_after_costly_IO
+    error = execute(c, controller, r, observed)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_full_score_entry198.py:72: in execute
+    controller.run_full_score(c, r)
+../gpu/controller.py:150: in run_full_score
+    verify_existing_bank(c)
+../gpu/common.py:181: in verify_existing_bank
+    return _bank_binding(c, allow_score=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../gpu/common.py:160: in _bank_binding
+    require(sha(path) == c[key + '_sha256'], 'stale pinned ' + key)
+                         ^^^^^^^^^^^^^^^^^^
+E   KeyError: 'groups_sha256'</failure></testcase><testcase classname="test_full_score_entry198" name="test_real_entry_rechecks_immutable_files_after_costly_IO[config-allocation]" time="0.304"><failure message="KeyError: 'groups_sha256'">test_full_score_entry198.py:109: in test_real_entry_rechecks_immutable_files_after_costly_IO
+    error = execute(c, controller, r, observed)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_full_score_entry198.py:72: in execute
+    controller.run_full_score(c, r)
+../gpu/controller.py:150: in run_full_score
+    verify_existing_bank(c)
+../gpu/common.py:181: in verify_existing_bank
+    return _bank_binding(c, allow_score=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../gpu/common.py:160: in _bank_binding
+    require(sha(path) == c[key + '_sha256'], 'stale pinned ' + key)
+                         ^^^^^^^^^^^^^^^^^^
+E   KeyError: 'groups_sha256'</failure></testcase><testcase classname="test_full_score_entry198" name="test_real_entry_rechecks_immutable_files_after_costly_IO[WAITING-bank]" time="0.294"><failure message="KeyError: 'groups_sha256'">test_full_score_entry198.py:109: in test_real_entry_rechecks_immutable_files_after_costly_IO
+    error = execute(c, controller, r, observed)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_full_score_entry198.py:72: in execute
+    controller.run_full_score(c, r)
+../gpu/controller.py:150: in run_full_score
+    verify_existing_bank(c)
+../gpu/common.py:181: in verify_existing_bank
+    return _bank_binding(c, allow_score=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../gpu/common.py:160: in _bank_binding
+    require(sha(path) == c[key + '_sha256'], 'stale pinned ' + key)
+                         ^^^^^^^^^^^^^^^^^^
+E   KeyError: 'groups_sha256'</failure></testcase><testcase classname="test_full_score_entry198" name="test_real_entry_rechecks_immutable_files_after_costly_IO[WAITING-allocation]" time="0.364"><failure message="KeyError: 'groups_sha256'">test_full_score_entry198.py:109: in test_real_entry_rechecks_immutable_files_after_costly_IO
+    error = execute(c, controller, r, observed)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_full_score_entry198.py:72: in execute
+    controller.run_full_score(c, r)
+../gpu/controller.py:150: in run_full_score
+    verify_existing_bank(c)
+../gpu/common.py:181: in verify_existing_bank
+    return _bank_binding(c, allow_score=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../gpu/common.py:160: in _bank_binding
+    require(sha(path) == c[key + '_sha256'], 'stale pinned ' + key)
+                         ^^^^^^^^^^^^^^^^^^
+E   KeyError: 'groups_sha256'</failure></testcase><testcase classname="test_full_score_entry198" name="test_real_entry_rechecks_immutable_files_after_costly_IO[catalogue-bank]" time="0.381"><failure message="KeyError: 'groups_sha256'">test_full_score_entry198.py:109: in test_real_entry_rechecks_immutable_files_after_costly_IO
+    error = execute(c, controller, r, observed)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_full_score_entry198.py:72: in execute
+    controller.run_full_score(c, r)
+../gpu/controller.py:150: in run_full_score
+    verify_existing_bank(c)
+../gpu/common.py:181: in verify_existing_bank
+    return _bank_binding(c, allow_score=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../gpu/common.py:160: in _bank_binding
+    require(sha(path) == c[key + '_sha256'], 'stale pinned ' + key)
+                         ^^^^^^^^^^^^^^^^^^
+E   KeyError: 'groups_sha256'</failure></testcase><testcase classname="test_full_score_entry198" name="test_real_entry_rechecks_immutable_files_after_costly_IO[catalogue-allocation]" time="0.313"><failure message="KeyError: 'groups_sha256'">test_full_score_entry198.py:109: in test_real_entry_rechecks_immutable_files_after_costly_IO
+    error = execute(c, controller, r, observed)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_full_score_entry198.py:72: in execute
+    controller.run_full_score(c, r)
+../gpu/controller.py:150: in run_full_score
+    verify_existing_bank(c)
+../gpu/common.py:181: in verify_existing_bank
+    return _bank_binding(c, allow_score=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../gpu/common.py:160: in _bank_binding
+    require(sha(path) == c[key + '_sha256'], 'stale pinned ' + key)
+                         ^^^^^^^^^^^^^^^^^^
+E   KeyError: 'groups_sha256'</failure></testcase><testcase classname="test_full_score_entry198" name="test_real_entry_slow_consume_cannot_drop_below_reviewed_floor[allocation]" time="0.316"><failure message="KeyError: 'groups_sha256'">test_full_score_entry198.py:121: in test_real_entry_slow_consume_cannot_drop_below_reviewed_floor
+    error = execute(c, controller, r, observed)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_full_score_entry198.py:72: in execute
+    controller.run_full_score(c, r)
+../gpu/controller.py:150: in run_full_score
+    verify_existing_bank(c)
+../gpu/common.py:181: in verify_existing_bank
+    return _bank_binding(c, allow_score=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../gpu/common.py:160: in _bank_binding
+    require(sha(path) == c[key + '_sha256'], 'stale pinned ' + key)
+                         ^^^^^^^^^^^^^^^^^^
+E   KeyError: 'groups_sha256'</failure></testcase><testcase classname="test_full_score_entry198" name="test_real_entry_slow_consume_cannot_drop_below_reviewed_floor[context]" time="0.314"><failure message="KeyError: 'groups_sha256'">test_full_score_entry198.py:121: in test_real_entry_slow_consume_cannot_drop_below_reviewed_floor
+    error = execute(c, controller, r, observed)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_full_score_entry198.py:72: in execute
+    controller.run_full_score(c, r)
+../gpu/controller.py:150: in run_full_score
+    verify_existing_bank(c)
+../gpu/common.py:181: in verify_existing_bank
+    return _bank_binding(c, allow_score=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../gpu/common.py:160: in _bank_binding
+    require(sha(path) == c[key + '_sha256'], 'stale pinned ' + key)
+                         ^^^^^^^^^^^^^^^^^^
+E   KeyError: 'groups_sha256'</failure></testcase><testcase classname="test_full_score_entry198" name="test_real_entry_positive_and_exact_floor_survive_slow_consume[2000-750]" time="0.370"><failure message="KeyError: 'groups_sha256'">test_full_score_entry198.py:132: in test_real_entry_positive_and_exact_floor_survive_slow_consume
+    error = execute(c, controller, r, observed)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_full_score_entry198.py:72: in execute
+    controller.run_full_score(c, r)
+../gpu/controller.py:150: in run_full_score
+    verify_existing_bank(c)
+../gpu/common.py:181: in verify_existing_bank
+    return _bank_binding(c, allow_score=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../gpu/common.py:160: in _bank_binding
+    require(sha(path) == c[key + '_sha256'], 'stale pinned ' + key)
+                         ^^^^^^^^^^^^^^^^^^
+E   KeyError: 'groups_sha256'</failure></testcase><testcase classname="test_full_score_entry198" name="test_real_entry_positive_and_exact_floor_survive_slow_consume[1850-600]" time="0.331"><failure message="KeyError: 'groups_sha256'">test_full_score_entry198.py:132: in test_real_entry_positive_and_exact_floor_survive_slow_consume
+    error = execute(c, controller, r, observed)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_full_score_entry198.py:72: in execute
+    controller.run_full_score(c, r)
+../gpu/controller.py:150: in run_full_score
+    verify_existing_bank(c)
+../gpu/common.py:181: in verify_existing_bank
+    return _bank_binding(c, allow_score=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../gpu/common.py:160: in _bank_binding
+    require(sha(path) == c[key + '_sha256'], 'stale pinned ' + key)
+                         ^^^^^^^^^^^^^^^^^^
+E   KeyError: 'groups_sha256'</failure></testcase><testcase classname="test_full_score_entry198" name="test_real_entry_reobserves_shortened_allocation_after_consume" time="0.322"><failure message="KeyError: 'groups_sha256'">test_full_score_entry198.py:141: in test_real_entry_reobserves_shortened_allocation_after_consume
+    error = execute(c, controller, r, observed)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_full_score_entry198.py:72: in execute
+    controller.run_full_score(c, r)
+../gpu/controller.py:150: in run_full_score
+    verify_existing_bank(c)
+../gpu/common.py:181: in verify_existing_bank
+    return _bank_binding(c, allow_score=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../gpu/common.py:160: in _bank_binding
+    require(sha(path) == c[key + '_sha256'], 'stale pinned ' + key)
+                         ^^^^^^^^^^^^^^^^^^
+E   KeyError: 'groups_sha256'</failure></testcase><testcase classname="test_full_score_entry198" name="test_real_entry_allowed_shortening_sets_exact_Popen_timeout" time="0.322"><failure message="KeyError: 'groups_sha256'">test_full_score_entry198.py:150: in test_real_entry_allowed_shortening_sets_exact_Popen_timeout
+    error = execute(c, controller, r, observed)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_full_score_entry198.py:72: in execute
+    controller.run_full_score(c, r)
+../gpu/controller.py:150: in run_full_score
+    verify_existing_bank(c)
+../gpu/common.py:181: in verify_existing_bank
+    return _bank_binding(c, allow_score=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../gpu/common.py:160: in _bank_binding
+    require(sha(path) == c[key + '_sha256'], 'stale pinned ' + key)
+                         ^^^^^^^^^^^^^^^^^^
+E   KeyError: 'groups_sha256'</failure></testcase></testsuite></testsuites>

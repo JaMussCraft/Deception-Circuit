@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "-o",
+    "ControlMaster=no",
+    "-o",
+    "ControlPath=none",
+    "-o",
+    "HostName=br013.bridges2.psc.edu",
+    "bridges2",
+    "python3 -B -c 'import json,sys,subprocess,time,os\nfrom pathlib import Path\nx=json.load(sys.stdin);sys.path.insert(0,x['\"'\"'packet'\"'\"']);import host\nops=Path(x['\"'\"'ops'\"'\"']);assert host.old.sha(Path(x['\"'\"'packet'\"'\"'])/'\"'\"'manifest.json'\"'\"')==x['\"'\"'manifest'\"'\"']\nfor n,h in json.loads((Path(x['\"'\"'packet'\"'\"'])/'\"'\"'manifest.json'\"'\"').read_text()).items():assert host.old.sha(Path(x['\"'\"'packet'\"'\"'])/n)==h\nassert host.old.sha(x['\"'\"'config'\"'\"'])==x['\"'\"'config_sha'\"'\"'];host.source_check(json.loads(Path(x['\"'\"'config'\"'\"']).read_text()))\nroot=host.old.PHYS/host.REL/'\"'\"'jobs'\"'\"'/('\"'\"'job-'\"'\"'+x['\"'\"'job'\"'\"']);assert root.resolve()==root and not root.is_symlink() and root.stat().st_uid==os.getuid() and (root.stat().st_mode&0o777)==0o700 and not list(root.iterdir())\nspool=ops/'\"'\"'release-spooled-batch.sh'\"'\"';subprocess.check_call(['\"'\"'scontrol'\"'\"','\"'\"'write'\"'\"','\"'\"'batch_script'\"'\"',x['\"'\"'job'\"'\"'],str(spool)],stdout=sys.stderr,timeout=15);assert host.old.sha(spool)==x['\"'\"'spool'\"'\"'] and spool.read_bytes()==(Path(x['\"'\"'packet'\"'\"'])/'\"'\"'launch.sh'\"'\"').read_bytes()\nraw=subprocess.check_output(['\"'\"'scontrol'\"'\"','\"'\"'show'\"'\"','\"'\"'job'\"'\"',x['\"'\"'job'\"'\"'],'\"'\"'-o'\"'\"'],universal_newlines=True,timeout=15);f=dict(z.split('\"'\"'='\"'\"',1) for z in raw.split() if '\"'\"'='\"'\"' in z)\nfor k,v in {'\"'\"'JobId'\"'\"':x['\"'\"'job'\"'\"'],'\"'\"'JobState'\"'\"':'\"'\"'PENDING'\"'\"','\"'\"'Reason'\"'\"':'\"'\"'JobHeldUser'\"'\"','\"'\"'RunTime'\"'\"':'\"'\"'00:00:00'\"'\"','\"'\"'Account'\"'\"':'\"'\"'cis260361p'\"'\"','\"'\"'QOS'\"'\"':'\"'\"'rm'\"'\"','\"'\"'Partition'\"'\"':'\"'\"'RM-shared'\"'\"','\"'\"'NumCPUs'\"'\"':'\"'\"'18'\"'\"','\"'\"'NumTasks'\"'\"':'\"'\"'1'\"'\"','\"'\"'TimeLimit'\"'\"':'\"'\"'00:25:00'\"'\"','\"'\"'Requeue'\"'\"':'\"'\"'0'\"'\"','\"'\"'Restarts'\"'\"':'\"'\"'0'\"'\"','\"'\"'WorkDir'\"'\"':x['\"'\"'packet'\"'\"']}.items():assert f[k]==v,(k,f.get(k))\nt=dict(z.split('\"'\"'='\"'\"',1) for z in f.get('\"'\"'ReqTRES'\"'\"',f.get('\"'\"'TRES'\"'\"','\"'\"''\"'\"')).split('\"'\"','\"'\"') if '\"'\"'='\"'\"' in z);assert t['\"'\"'cpu'\"'\"']=='\"'\"'18'\"'\"' and t['\"'\"'mem'\"'\"'] in ('\"'\"'32G'\"'\"','\"'\"'32768M'\"'\"') and not any(k.startswith('\"'\"'gres/gpu'\"'\"') for k in t)\nwith(ops/'\"'\"'release-intent.json'\"'\"').open('\"'\"'x'\"'\"') as f:json.dump(dict(actual_job_id=x['\"'\"'job'\"'\"'],scontrol=raw,review_sha256=x['\"'\"'review_sha'\"'\"'],observed_unix=time.time()),f,indent=2)\nr=subprocess.run(['\"'\"'scontrol'\"'\"','\"'\"'release'\"'\"',x['\"'\"'job'\"'\"']],stdout=subprocess.PIPE,stderr=subprocess.PIPE,universal_newlines=True,timeout=20);out=dict(actual_job_id=x['\"'\"'job'\"'\"'],exit_code=r.returncode,stdout=r.stdout,stderr=r.stderr,observed_unix=time.time())\nwith(ops/'\"'\"'release.json'\"'\"').open('\"'\"'x'\"'\"') as f:json.dump(out,f,indent=2)\nprint(json.dumps(out));sys.exit(r.returncode)\n'"
+  ],
+  "exit_code": 0,
+  "stdout": "{\"actual_job_id\": \"50318613\", \"exit_code\": 0, \"stdout\": \"\", \"stderr\": \"\", \"observed_unix\": 1794033512.584783}\n",
+  "stderr": "batch script for job 50318613 written to /ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-deployment264/release-spooled-batch.sh\n",
+  "observed_unix": 1794033512.6085367
+}

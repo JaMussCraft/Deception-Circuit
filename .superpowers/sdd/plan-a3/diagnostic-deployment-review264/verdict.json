@@ -1,0 +1,25 @@
+{
+  "accepted_source_review_sha256": "53a51ed4cb4cefb7cddab14a174f544ac8a6ca5445e0263d895d802f55958fbc",
+  "actual_job_id": "50318613",
+  "config_sha256": "542ac9de7049ec24e14ac858223cb696a550606f52944a64a56cb80f8de81bab",
+  "evidence": "receipt-checks.json; raw deployment264 receipts rehashed; no source/native/full tests rerun",
+  "execution_authority": "Root may release this one existing held diagnostic attempt once, after final checks. No auto retry or replacement.",
+  "launch_blockers": [],
+  "not_proven": [
+    "actual compute-node own-job cgroup/native environment and numeric allocation guards until job starts",
+    "selected diagnostic outcomes or full223GREEN",
+    "GPU/scientific admission"
+  ],
+  "prior_failure": "Initial readback ReqTRES KeyError preserved; corrected reader accepts actual TRES under same exact CPU/memory/noGPU checks before binding/rootcreation.",
+  "required_final_root_checks": [
+    "live usage below80 and no native cadence freeze",
+    "job50318613 remains held/unstarted, exact resource tuple and same command/workdir/output/spooled/source/config pins",
+    "actual owned private0700 job root remains empty and physical; no competing execution/output",
+    "record release receipt; runtime must independently pass actual own-job/controller/source/image/allocation/deadline gates"
+  ],
+  "resource_tuple": "cis260361p/RM-shared/rm; one node/task;18CPU;32GiB;25min;noGPU;no-requeue",
+  "runtime_limits": "two600s selected children;15sTERM+5sKILL/reap per phase;120sfinal reserve;nonincreasing scheduler bounds",
+  "source_manifest_sha256": "ded29ff237b436215d80db6408a878d513b79ffbb0ba7c4ba10fd2c7b391ba2a",
+  "spooled_sha256": "917235f21f8c1af586d58297162c407347982f4e7d9a49038ef9d35561b19a8f",
+  "verdict": "ACCEPT_ONE_HELD_CPU_DIAGNOSTIC_RELEASE_AFTER_ROOT_FINAL_LIVE_CHECKS"
+}

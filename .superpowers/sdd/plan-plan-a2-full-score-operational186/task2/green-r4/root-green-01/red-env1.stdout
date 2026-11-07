@@ -1,0 +1,138 @@
+FFF..F.FFFFFFFFFFFFFFF                                                   [100%]
+=================================== FAILURES ===================================
+_ test_review224_actual_Task1_marker_is_accepted_without_renaming[1300.0-1250.0] _
+test_full_score_cpu.py:531: in test_review224_actual_Task1_marker_is_accepted_without_renaming
+    assert need(m,'validate_request')(c,r,waiting,now=1010.)['actual_future_GPU_job_id'] == gpu_c['actual_job_id']
+../../../plan-plan-a2-full-score-operational186/task2/green/root-dispatch/candidate-before-interface-review/cpu/supervisor.py:82: in validate_request
+    require(r[request_key] == waiting[waiting_key], 'WAITING binding: ' + waiting_key)
+E   KeyError: 'packet_manifest_sha256'
+_ test_review224_actual_Task1_marker_is_accepted_without_renaming[1140.0-1125.0] _
+test_full_score_cpu.py:531: in test_review224_actual_Task1_marker_is_accepted_without_renaming
+    assert need(m,'validate_request')(c,r,waiting,now=1010.)['actual_future_GPU_job_id'] == gpu_c['actual_job_id']
+../../../plan-plan-a2-full-score-operational186/task2/green/root-dispatch/candidate-before-interface-review/cpu/supervisor.py:82: in validate_request
+    require(r[request_key] == waiting[waiting_key], 'WAITING binding: ' + waiting_key)
+E   KeyError: 'packet_manifest_sha256'
+____ test_review224_actual_422_manifest_preserves_all_eleven_aliases[None] _____
+test_full_score_cpu.py:564: in test_review224_actual_422_manifest_preserves_all_eleven_aliases
+    result = need(m,'verify_input_closure')(manifest,current,read_bytes=read)
+../../../plan-plan-a2-full-score-operational186/task2/green/root-dispatch/candidate-before-interface-review/cpu/validate-phase.py:168: in verify_input_closure
+    require(len(rows) == 422 and set(CATALOGUES) <= set(rows) and len(aliases) == 5,
+../../../plan-plan-a2-full-score-operational186/task2/green/root-dispatch/candidate-before-interface-review/cpu/validate-phase.py:26: in require
+    if not ok: raise ValueError(message)
+E   ValueError: exact corrected422 plus five aliases
+__ test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[None] __
+test_full_score_cpu.py:594: in test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer
+    assert guard.validate_release(release) == composite
+../gpu/common.py:448: in validate_release
+    require(cpu['complete'] is True and cpu['phase'] == 'full_score' and cpu['timely_window'] is True
+E   KeyError: 'timely_window'
+_ test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[bank_file_sha256] _
+test_full_score_cpu.py:592: in test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer
+    with pytest.raises(ValueError): guard.validate_release(release)
+../gpu/common.py:448: in validate_release
+    require(cpu['complete'] is True and cpu['phase'] == 'full_score' and cpu['timely_window'] is True
+E   KeyError: 'timely_window'
+_ test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[bank_manifest_sha256] _
+test_full_score_cpu.py:592: in test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer
+    with pytest.raises(ValueError): guard.validate_release(release)
+../gpu/common.py:448: in validate_release
+    require(cpu['complete'] is True and cpu['phase'] == 'full_score' and cpu['timely_window'] is True
+E   KeyError: 'timely_window'
+_ test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[full_rows] _
+test_full_score_cpu.py:592: in test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer
+    with pytest.raises(ValueError): guard.validate_release(release)
+../gpu/common.py:448: in validate_release
+    require(cpu['complete'] is True and cpu['phase'] == 'full_score' and cpu['timely_window'] is True
+E   KeyError: 'timely_window'
+_ test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[full_controls] _
+test_full_score_cpu.py:592: in test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer
+    with pytest.raises(ValueError): guard.validate_release(release)
+../gpu/common.py:448: in validate_release
+    require(cpu['complete'] is True and cpu['phase'] == 'full_score' and cpu['timely_window'] is True
+E   KeyError: 'timely_window'
+_ test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[full_domain_support_audit_complete] _
+test_full_score_cpu.py:592: in test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer
+    with pytest.raises(ValueError): guard.validate_release(release)
+../gpu/common.py:448: in validate_release
+    require(cpu['complete'] is True and cpu['phase'] == 'full_score' and cpu['timely_window'] is True
+E   KeyError: 'timely_window'
+_ test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[waiting_sha256] _
+test_full_score_cpu.py:592: in test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer
+    with pytest.raises(ValueError): guard.validate_release(release)
+../gpu/common.py:448: in validate_release
+    require(cpu['complete'] is True and cpu['phase'] == 'full_score' and cpu['timely_window'] is True
+E   KeyError: 'timely_window'
+_ test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[bound_gpu_config_sha256] _
+test_full_score_cpu.py:592: in test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer
+    with pytest.raises(ValueError): guard.validate_release(release)
+../gpu/common.py:448: in validate_release
+    require(cpu['complete'] is True and cpu['phase'] == 'full_score' and cpu['timely_window'] is True
+E   KeyError: 'timely_window'
+_ test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[launch_packet_manifest_sha256] _
+test_full_score_cpu.py:592: in test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer
+    with pytest.raises(ValueError): guard.validate_release(release)
+../gpu/common.py:448: in validate_release
+    require(cpu['complete'] is True and cpu['phase'] == 'full_score' and cpu['timely_window'] is True
+E   KeyError: 'timely_window'
+__ test_review224_COMPLETE_requires_completed_domain_support_evidence[audit] ___
+test_full_score_cpu.py:605: in test_review224_COMPLETE_requires_completed_domain_support_evidence
+    with pytest.raises(ValueError): need(m,'validate_child_completion')(c,r,child,result,now=1201.)
+E   Failed: DID NOT RAISE <class 'ValueError'>
+___ test_review224_COMPLETE_requires_completed_domain_support_evidence[rows] ___
+test_full_score_cpu.py:605: in test_review224_COMPLETE_requires_completed_domain_support_evidence
+    with pytest.raises(ValueError): need(m,'validate_child_completion')(c,r,child,result,now=1201.)
+E   Failed: DID NOT RAISE <class 'ValueError'>
+_ test_review224_COMPLETE_requires_completed_domain_support_evidence[controls] _
+test_full_score_cpu.py:605: in test_review224_COMPLETE_requires_completed_domain_support_evidence
+    with pytest.raises(ValueError): need(m,'validate_child_completion')(c,r,child,result,now=1201.)
+E   Failed: DID NOT RAISE <class 'ValueError'>
+___ test_review224_COMPLETE_requires_completed_domain_support_evidence[mask] ___
+test_full_score_cpu.py:605: in test_review224_COMPLETE_requires_completed_domain_support_evidence
+    with pytest.raises(ValueError): need(m,'validate_child_completion')(c,r,child,result,now=1201.)
+E   Failed: DID NOT RAISE <class 'ValueError'>
+_ test_review224_marker_swap_never_reaches_Popen_or_extends_deadline[decoded-buffer] _
+test_full_score_cpu.py:638: in test_review224_marker_swap_never_reaches_Popen_or_extends_deadline
+    with pytest.raises(ValueError): m.supervise_once(c,request,cfg_ref)
+../../../plan-plan-a2-full-score-operational186/task2/green/root-dispatch/candidate-before-interface-review/cpu/supervisor.py:286: in supervise_once
+    child = subprocess.Popen(command,cwd=c['runtime'],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
+test_full_score_cpu.py:636: in popen
+    def popen(*a,**k): calls['Popen']+=1;raise AssertionError('Popen reached after marker mutation')
+E   AssertionError: Popen reached after marker mutation
+_ test_review224_marker_swap_never_reaches_Popen_or_extends_deadline[before-Popen] _
+test_full_score_cpu.py:638: in test_review224_marker_swap_never_reaches_Popen_or_extends_deadline
+    with pytest.raises(ValueError): m.supervise_once(c,request,cfg_ref)
+../../../plan-plan-a2-full-score-operational186/task2/green/root-dispatch/candidate-before-interface-review/cpu/supervisor.py:286: in supervise_once
+    child = subprocess.Popen(command,cwd=c['runtime'],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
+test_full_score_cpu.py:636: in popen
+    def popen(*a,**k): calls['Popen']+=1;raise AssertionError('Popen reached after marker mutation')
+E   AssertionError: Popen reached after marker mutation
+_____ test_review224_GREEN_command_includes_original107_and_all_accepted97 _____
+test_full_score_cpu.py:650: in test_review224_GREEN_command_includes_original107_and_all_accepted97
+    assert selected=={'test_full_score_cpu.py','test_full_score_controller.py','test_full_score_entry198.py'}
+E   AssertionError: assert {'test_full_s...score_cpu.py'} == {'test_full_s..._entry198.py'}
+E     
+E     Extra items in the right set:
+E     'test_full_score_entry198.py'
+E     Use -v to get more diff
+- generated xml file: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task2/green-r4/root-green-01/red-env1.xml -
+=========================== short test summary info ============================
+FAILED test_full_score_cpu.py::test_review224_actual_Task1_marker_is_accepted_without_renaming[1300.0-1250.0]
+FAILED test_full_score_cpu.py::test_review224_actual_Task1_marker_is_accepted_without_renaming[1140.0-1125.0]
+FAILED test_full_score_cpu.py::test_review224_actual_422_manifest_preserves_all_eleven_aliases[None]
+FAILED test_full_score_cpu.py::test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[None]
+FAILED test_full_score_cpu.py::test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[bank_file_sha256]
+FAILED test_full_score_cpu.py::test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[bank_manifest_sha256]
+FAILED test_full_score_cpu.py::test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[full_rows]
+FAILED test_full_score_cpu.py::test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[full_controls]
+FAILED test_full_score_cpu.py::test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[full_domain_support_audit_complete]
+FAILED test_full_score_cpu.py::test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[waiting_sha256]
+FAILED test_full_score_cpu.py::test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[bound_gpu_config_sha256]
+FAILED test_full_score_cpu.py::test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[launch_packet_manifest_sha256]
+FAILED test_full_score_cpu.py::test_review224_COMPLETE_requires_completed_domain_support_evidence[audit]
+FAILED test_full_score_cpu.py::test_review224_COMPLETE_requires_completed_domain_support_evidence[rows]
+FAILED test_full_score_cpu.py::test_review224_COMPLETE_requires_completed_domain_support_evidence[controls]
+FAILED test_full_score_cpu.py::test_review224_COMPLETE_requires_completed_domain_support_evidence[mask]
+FAILED test_full_score_cpu.py::test_review224_marker_swap_never_reaches_Popen_or_extends_deadline[decoded-buffer]
+FAILED test_full_score_cpu.py::test_review224_marker_swap_never_reaches_Popen_or_extends_deadline[before-Popen]
+FAILED test_full_score_cpu.py::test_review224_GREEN_command_includes_original107_and_all_accepted97
+19 failed, 3 passed, 107 deselected in 3.66s

@@ -1,0 +1,43 @@
+{
+  "mode": "full",
+  "commit": "74efb4d0481968a1d0138eb1a79b97f302fd3c3b",
+  "python": "/u/swong2/.conda/envs/mgnp/bin/python",
+  "cgroup_before": {
+    "memory.current": "10791190528",
+    "memory.max": "40320217088",
+    "memory.events": "low 0\nhigh 6\nmax 129883\noom 1\noom_kill 1\noom_group_kill 0"
+  },
+  "weights_loaded": false,
+  "execution_authorized": false,
+  "full_target_validator": true,
+  "expected_keys": 3437966,
+  "inventory_sha256": "c0bda345d9085ead991511b327174b25f0b20079ea1f18eeb6ea53bbac5092be",
+  "storage_requirements": {
+    "components": {
+      "H_banks": 415432704,
+      "binary_parity_logit_caches": 726441984,
+      "checkpoint_retention": 14516855616,
+      "metadata": 320123941,
+      "native_gate_elements": 722016,
+      "scientific_scalar_rows": 121956141976,
+      "target_I_logits": 181610496,
+      "target_fixed_GPU_data": 910056828
+    },
+    "policy": "full source/row/inventory retention, all1200 boundaries, immutable validation artifacts and largest atomic publication; measured host peak added separately",
+    "schema": "a3_mask_target_storage_bound_v1",
+    "tiers": {
+      "cache_disk": 415432704,
+      "host_ram": 6867056528,
+      "output_disk": 136793121533,
+      "scratch_disk": 335482000
+    }
+  },
+  "pilot_key_count": 31191,
+  "exit_code": 0,
+  "elapsed_seconds": 46.578372218005825,
+  "cgroup_after": {
+    "memory.current": "12639498240",
+    "memory.max": "40320217088",
+    "memory.events": "low 0\nhigh 6\nmax 129883\noom 1\noom_kill 1\noom_group_kill 0"
+  }
+}

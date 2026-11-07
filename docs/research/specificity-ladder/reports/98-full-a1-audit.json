@@ -1,0 +1,753 @@
+{
+  "accounting_main_record": {
+    "allocated_tres": "billing=1024,cpu=4,gres/gpu=1,mem=64G,node=1",
+    "cluster": "delta",
+    "elapsed_seconds": 8158,
+    "exit_code": "0:0",
+    "job_id": "23417811",
+    "state": "COMPLETED"
+  },
+  "by_task_rows": {
+    "far_v2": 9000,
+    "ioi": 1500,
+    "mmlu": 384,
+    "sdr_v2": 9000,
+    "ser_v2": 9000
+  },
+  "canonical_summary_examined": true,
+  "canonical_summary_final": true,
+  "execution": {
+    "cluster": "delta",
+    "cluster_source": "SLURM_CLUSTER_NAME",
+    "device": "cuda:0",
+    "dtype": "torch.bfloat16",
+    "gpu_name": "NVIDIA A100-SXM4-40GB",
+    "memory_scope": "scoring compute after model load; includes resident model",
+    "model_load_seconds": 39.311663357075304,
+    "peak_allocated_memory_bytes": 19582702592,
+    "peak_reserved_memory_bytes": 20797456384,
+    "scoring_compute_seconds": 8059.250294802012,
+    "scoring_stage_seconds": 8099.647825964959,
+    "slurm_job_id": "23417811",
+    "stage_time_scope": "model load plus scoring compute; excludes artifact publication"
+  },
+  "expected_full_positive_controls": 3396,
+  "expected_full_rows": 28884,
+  "full_counts": {
+    "expected": 28884,
+    "positive_controls": 3396,
+    "rows": 28884
+  },
+  "full_noop_max_error": 0.0,
+  "full_positive_max_error": 0.0,
+  "full_row_statuses": {
+    "assay_valid": 28884,
+    "degenerate": 7992,
+    "gate_valid": 18120,
+    "supported": 23112
+  },
+  "full_run_examined": true,
+  "independent_primary": [
+    {
+      "assay_readiness": {
+        "IOI": {
+          "complete": true,
+          "n_rows": 100
+        },
+        "MMLU": {
+          "complete": true,
+          "missing_operations": [],
+          "operations": {
+            "h_mean": {
+              "additional_errors": 7.0,
+              "complete": true,
+              "ids": [
+                "mmlu:all/test-00000-of-00001.parquet:00002201",
+                "mmlu:all/test-00000-of-00001.parquet:00009325",
+                "mmlu:all/test-00000-of-00001.parquet:00013884",
+                "mmlu:all/test-00000-of-00001.parquet:00013144",
+                "mmlu:all/test-00000-of-00001.parquet:00012513",
+                "mmlu:all/test-00000-of-00001.parquet:00001033",
+                "mmlu:all/test-00000-of-00001.parquet:00004179",
+                "mmlu:all/test-00000-of-00001.parquet:00001931",
+                "mmlu:all/test-00000-of-00001.parquet:00008117",
+                "mmlu:all/test-00000-of-00001.parquet:00012467",
+                "mmlu:all/test-00000-of-00001.parquet:00007364",
+                "mmlu:all/test-00000-of-00001.parquet:00007737",
+                "mmlu:all/test-00000-of-00001.parquet:00010675",
+                "mmlu:all/test-00000-of-00001.parquet:00006219",
+                "mmlu:all/test-00000-of-00001.parquet:00012922",
+                "mmlu:all/test-00000-of-00001.parquet:00003439",
+                "mmlu:all/test-00000-of-00001.parquet:00001537",
+                "mmlu:all/test-00000-of-00001.parquet:00007993",
+                "mmlu:all/test-00000-of-00001.parquet:00000464",
+                "mmlu:all/test-00000-of-00001.parquet:00013693",
+                "mmlu:all/test-00000-of-00001.parquet:00006386",
+                "mmlu:all/test-00000-of-00001.parquet:00007090",
+                "mmlu:all/test-00000-of-00001.parquet:00009952",
+                "mmlu:all/test-00000-of-00001.parquet:00012489",
+                "mmlu:all/test-00000-of-00001.parquet:00012569",
+                "mmlu:all/test-00000-of-00001.parquet:00000034",
+                "mmlu:all/test-00000-of-00001.parquet:00011400",
+                "mmlu:all/test-00000-of-00001.parquet:00007297",
+                "mmlu:all/test-00000-of-00001.parquet:00004363",
+                "mmlu:all/test-00000-of-00001.parquet:00011821",
+                "mmlu:all/test-00000-of-00001.parquet:00013137",
+                "mmlu:all/test-00000-of-00001.parquet:00003748"
+              ],
+              "n_rows": 32,
+              "passed": false
+            },
+            "zero": {
+              "additional_errors": 15.0,
+              "complete": true,
+              "ids": [
+                "mmlu:all/test-00000-of-00001.parquet:00002201",
+                "mmlu:all/test-00000-of-00001.parquet:00009325",
+                "mmlu:all/test-00000-of-00001.parquet:00013884",
+                "mmlu:all/test-00000-of-00001.parquet:00013144",
+                "mmlu:all/test-00000-of-00001.parquet:00012513",
+                "mmlu:all/test-00000-of-00001.parquet:00001033",
+                "mmlu:all/test-00000-of-00001.parquet:00004179",
+                "mmlu:all/test-00000-of-00001.parquet:00001931",
+                "mmlu:all/test-00000-of-00001.parquet:00008117",
+                "mmlu:all/test-00000-of-00001.parquet:00012467",
+                "mmlu:all/test-00000-of-00001.parquet:00007364",
+                "mmlu:all/test-00000-of-00001.parquet:00007737",
+                "mmlu:all/test-00000-of-00001.parquet:00010675",
+                "mmlu:all/test-00000-of-00001.parquet:00006219",
+                "mmlu:all/test-00000-of-00001.parquet:00012922",
+                "mmlu:all/test-00000-of-00001.parquet:00003439",
+                "mmlu:all/test-00000-of-00001.parquet:00001537",
+                "mmlu:all/test-00000-of-00001.parquet:00007993",
+                "mmlu:all/test-00000-of-00001.parquet:00000464",
+                "mmlu:all/test-00000-of-00001.parquet:00013693",
+                "mmlu:all/test-00000-of-00001.parquet:00006386",
+                "mmlu:all/test-00000-of-00001.parquet:00007090",
+                "mmlu:all/test-00000-of-00001.parquet:00009952",
+                "mmlu:all/test-00000-of-00001.parquet:00012489",
+                "mmlu:all/test-00000-of-00001.parquet:00012569",
+                "mmlu:all/test-00000-of-00001.parquet:00000034",
+                "mmlu:all/test-00000-of-00001.parquet:00011400",
+                "mmlu:all/test-00000-of-00001.parquet:00007297",
+                "mmlu:all/test-00000-of-00001.parquet:00004363",
+                "mmlu:all/test-00000-of-00001.parquet:00011821",
+                "mmlu:all/test-00000-of-00001.parquet:00013137",
+                "mmlu:all/test-00000-of-00001.parquet:00003748"
+              ],
+              "n_rows": 32,
+              "passed": false
+            }
+          },
+          "passed": false,
+          "same_ids": true
+        },
+        "complete": true,
+        "missing_crossed_operations": []
+      },
+      "descriptive": false,
+      "group": "far_v2_full",
+      "independent_estimates": {
+        "D": {
+          "drop": 2.4134485006332396,
+          "fraction_interval": [
+            0.21676232688894695,
+            0.2597397366116797
+          ],
+          "fraction_removed": 0.23926295187611102,
+          "gap": 10.087012977600098,
+          "interpretable": true,
+          "stream_gaps": {
+            "clean": 9.914715976715089,
+            "corrupt": 10.259309978485108
+          },
+          "streams": {
+            "clean": {
+              "drop": 2.3703776359558106,
+              "fraction_removed": 0.23907670593113212,
+              "gap": 9.914715976715089
+            },
+            "corrupt": {
+              "drop": 2.456519365310669,
+              "fraction_removed": 0.2394429421142609,
+              "gap": 10.259309978485108
+            }
+          },
+          "valid_bootstrap_draws": 2000
+        },
+        "I": {
+          "drop": 4.734283962249756,
+          "fraction_interval": [
+            0.3050156531130073,
+            0.3265090978454608
+          ],
+          "fraction_removed": 0.3160719354264534,
+          "gap": 14.978501510620116,
+          "interpretable": true,
+          "stream_gaps": {
+            "clean": 14.75296404838562,
+            "corrupt": 15.204038972854613
+          },
+          "streams": {
+            "clean": {
+              "drop": 4.729181756973267,
+              "fraction_removed": 0.3205580750731084,
+              "gap": 14.75296404838562
+            },
+            "corrupt": {
+              "drop": 4.739386167526245,
+              "fraction_removed": 0.3117188910123142,
+              "gap": 15.204038972854613
+            }
+          },
+          "valid_bootstrap_draws": 2000
+        },
+        "MMLU": {
+          "accuracy_shift": null,
+          "additional_errors": 0,
+          "additional_errors_interval": null,
+          "intact_accuracy": null,
+          "nontrivial": false,
+          "pass": null,
+          "patched_accuracy": null,
+          "shift_interval": null
+        },
+        "collateral": {
+          "F": {
+            "accuracy_shift": -0.345,
+            "intact_accuracy": 1.0,
+            "nontrivial": true,
+            "patched_accuracy": 0.655,
+            "shift_interval": [
+              -0.40517823858341095,
+              -0.2777777777777778
+            ]
+          },
+          "H": {
+            "accuracy_shift": -0.325,
+            "intact_accuracy": 1.0,
+            "nontrivial": true,
+            "patched_accuracy": 0.675,
+            "shift_interval": [
+              -0.3920482397504456,
+              -0.25
+            ]
+          },
+          "IOI": {
+            "accuracy_shift": -0.05,
+            "intact_accuracy": 0.51,
+            "nontrivial": true,
+            "patched_accuracy": 0.46,
+            "shift_interval": [
+              -0.12,
+              0.02
+            ]
+          }
+        },
+        "coverage": {
+          "degenerate": 0,
+          "invalid": 0,
+          "total": 1100,
+          "unsupported": 0
+        },
+        "epsilon": 1e-06,
+        "interpretable": true,
+        "n_assessment_ids": 100,
+        "n_clusters": 11,
+        "n_ids": 100,
+        "point_pass": false,
+        "raw": {
+          "D": {
+            "accuracy_shift": -0.47,
+            "intact_accuracy": 1.0,
+            "nontrivial": true,
+            "patched_accuracy": 0.53
+          }
+        },
+        "status": "fails",
+        "strong": false
+      },
+      "joined_primary_point_pass": false,
+      "joined_primary_strong": false,
+      "task": "far_v2"
+    },
+    {
+      "assay_readiness": {
+        "IOI": {
+          "complete": true,
+          "n_rows": 100
+        },
+        "MMLU": {
+          "complete": true,
+          "missing_operations": [],
+          "operations": {
+            "h_mean": {
+              "additional_errors": 14.0,
+              "complete": true,
+              "ids": [
+                "mmlu:all/test-00000-of-00001.parquet:00002201",
+                "mmlu:all/test-00000-of-00001.parquet:00009325",
+                "mmlu:all/test-00000-of-00001.parquet:00013884",
+                "mmlu:all/test-00000-of-00001.parquet:00013144",
+                "mmlu:all/test-00000-of-00001.parquet:00012513",
+                "mmlu:all/test-00000-of-00001.parquet:00001033",
+                "mmlu:all/test-00000-of-00001.parquet:00004179",
+                "mmlu:all/test-00000-of-00001.parquet:00001931",
+                "mmlu:all/test-00000-of-00001.parquet:00008117",
+                "mmlu:all/test-00000-of-00001.parquet:00012467",
+                "mmlu:all/test-00000-of-00001.parquet:00007364",
+                "mmlu:all/test-00000-of-00001.parquet:00007737",
+                "mmlu:all/test-00000-of-00001.parquet:00010675",
+                "mmlu:all/test-00000-of-00001.parquet:00006219",
+                "mmlu:all/test-00000-of-00001.parquet:00012922",
+                "mmlu:all/test-00000-of-00001.parquet:00003439",
+                "mmlu:all/test-00000-of-00001.parquet:00001537",
+                "mmlu:all/test-00000-of-00001.parquet:00007993",
+                "mmlu:all/test-00000-of-00001.parquet:00000464",
+                "mmlu:all/test-00000-of-00001.parquet:00013693",
+                "mmlu:all/test-00000-of-00001.parquet:00006386",
+                "mmlu:all/test-00000-of-00001.parquet:00007090",
+                "mmlu:all/test-00000-of-00001.parquet:00009952",
+                "mmlu:all/test-00000-of-00001.parquet:00012489",
+                "mmlu:all/test-00000-of-00001.parquet:00012569",
+                "mmlu:all/test-00000-of-00001.parquet:00000034",
+                "mmlu:all/test-00000-of-00001.parquet:00011400",
+                "mmlu:all/test-00000-of-00001.parquet:00007297",
+                "mmlu:all/test-00000-of-00001.parquet:00004363",
+                "mmlu:all/test-00000-of-00001.parquet:00011821",
+                "mmlu:all/test-00000-of-00001.parquet:00013137",
+                "mmlu:all/test-00000-of-00001.parquet:00003748"
+              ],
+              "n_rows": 32,
+              "passed": false
+            },
+            "zero": {
+              "additional_errors": 17.0,
+              "complete": true,
+              "ids": [
+                "mmlu:all/test-00000-of-00001.parquet:00002201",
+                "mmlu:all/test-00000-of-00001.parquet:00009325",
+                "mmlu:all/test-00000-of-00001.parquet:00013884",
+                "mmlu:all/test-00000-of-00001.parquet:00013144",
+                "mmlu:all/test-00000-of-00001.parquet:00012513",
+                "mmlu:all/test-00000-of-00001.parquet:00001033",
+                "mmlu:all/test-00000-of-00001.parquet:00004179",
+                "mmlu:all/test-00000-of-00001.parquet:00001931",
+                "mmlu:all/test-00000-of-00001.parquet:00008117",
+                "mmlu:all/test-00000-of-00001.parquet:00012467",
+                "mmlu:all/test-00000-of-00001.parquet:00007364",
+                "mmlu:all/test-00000-of-00001.parquet:00007737",
+                "mmlu:all/test-00000-of-00001.parquet:00010675",
+                "mmlu:all/test-00000-of-00001.parquet:00006219",
+                "mmlu:all/test-00000-of-00001.parquet:00012922",
+                "mmlu:all/test-00000-of-00001.parquet:00003439",
+                "mmlu:all/test-00000-of-00001.parquet:00001537",
+                "mmlu:all/test-00000-of-00001.parquet:00007993",
+                "mmlu:all/test-00000-of-00001.parquet:00000464",
+                "mmlu:all/test-00000-of-00001.parquet:00013693",
+                "mmlu:all/test-00000-of-00001.parquet:00006386",
+                "mmlu:all/test-00000-of-00001.parquet:00007090",
+                "mmlu:all/test-00000-of-00001.parquet:00009952",
+                "mmlu:all/test-00000-of-00001.parquet:00012489",
+                "mmlu:all/test-00000-of-00001.parquet:00012569",
+                "mmlu:all/test-00000-of-00001.parquet:00000034",
+                "mmlu:all/test-00000-of-00001.parquet:00011400",
+                "mmlu:all/test-00000-of-00001.parquet:00007297",
+                "mmlu:all/test-00000-of-00001.parquet:00004363",
+                "mmlu:all/test-00000-of-00001.parquet:00011821",
+                "mmlu:all/test-00000-of-00001.parquet:00013137",
+                "mmlu:all/test-00000-of-00001.parquet:00003748"
+              ],
+              "n_rows": 32,
+              "passed": false
+            }
+          },
+          "passed": false,
+          "same_ids": true
+        },
+        "complete": true,
+        "missing_crossed_operations": []
+      },
+      "descriptive": true,
+      "group": "sdr_v2_full",
+      "independent_estimates": {
+        "D": {
+          "drop": 7.130848360061646,
+          "fraction_interval": [
+            0.9881515899681443,
+            1.19835507765488
+          ],
+          "fraction_removed": 1.1056786933993643,
+          "gap": 6.449295263290406,
+          "interpretable": true,
+          "stream_gaps": {
+            "clean": 6.485020599365234,
+            "corrupt": 6.413569927215576
+          },
+          "streams": {
+            "clean": {
+              "drop": 7.1120444107055665,
+              "fraction_removed": 1.0966880215309889,
+              "gap": 6.485020599365234
+            },
+            "corrupt": {
+              "drop": 7.149652309417725,
+              "fraction_removed": 1.114769526263155,
+              "gap": 6.413569927215576
+            }
+          },
+          "valid_bootstrap_draws": 2000
+        },
+        "I": {
+          "drop": 8.318448128700256,
+          "fraction_interval": [
+            1.2498373239194072,
+            1.332182145809808
+          ],
+          "fraction_removed": 1.291523754180777,
+          "gap": 6.440801496505737,
+          "interpretable": true,
+          "stream_gaps": {
+            "clean": 6.44898775100708,
+            "corrupt": 6.4326152420043945
+          },
+          "streams": {
+            "clean": {
+              "drop": 8.297899312973023,
+              "fraction_removed": 1.2866979490970833,
+              "gap": 6.44898775100708
+            },
+            "corrupt": {
+              "drop": 8.33899694442749,
+              "fraction_removed": 1.2963618420661314,
+              "gap": 6.4326152420043945
+            }
+          },
+          "valid_bootstrap_draws": 2000
+        },
+        "MMLU": {
+          "accuracy_shift": null,
+          "additional_errors": 0,
+          "additional_errors_interval": null,
+          "intact_accuracy": null,
+          "nontrivial": false,
+          "pass": null,
+          "patched_accuracy": null,
+          "shift_interval": null
+        },
+        "collateral": {
+          "F": {
+            "accuracy_shift": -0.99,
+            "intact_accuracy": 1.0,
+            "nontrivial": true,
+            "patched_accuracy": 0.01,
+            "shift_interval": [
+              -1.0,
+              -0.9759615384615384
+            ]
+          },
+          "H": {
+            "accuracy_shift": -0.985,
+            "intact_accuracy": 1.0,
+            "nontrivial": true,
+            "patched_accuracy": 0.015,
+            "shift_interval": [
+              -1.0,
+              -0.9700833333333333
+            ]
+          },
+          "IOI": {
+            "accuracy_shift": -0.51,
+            "intact_accuracy": 0.51,
+            "nontrivial": true,
+            "patched_accuracy": 0.0,
+            "shift_interval": [
+              -0.61,
+              -0.41975000000000134
+            ]
+          }
+        },
+        "coverage": {
+          "degenerate": 0,
+          "invalid": 0,
+          "total": 1100,
+          "unsupported": 0
+        },
+        "epsilon": 1e-06,
+        "interpretable": true,
+        "n_assessment_ids": 100,
+        "n_clusters": 19,
+        "n_ids": 100,
+        "point_pass": false,
+        "raw": {
+          "D": {
+            "accuracy_shift": -0.99,
+            "intact_accuracy": 1.0,
+            "nontrivial": true,
+            "patched_accuracy": 0.01
+          }
+        },
+        "status": "fails",
+        "strong": false
+      },
+      "joined_primary_point_pass": false,
+      "joined_primary_strong": false,
+      "task": "sdr_v2"
+    },
+    {
+      "assay_readiness": {
+        "IOI": {
+          "complete": true,
+          "n_rows": 100
+        },
+        "MMLU": {
+          "complete": true,
+          "missing_operations": [],
+          "operations": {
+            "h_mean": {
+              "additional_errors": 4.0,
+              "complete": true,
+              "ids": [
+                "mmlu:all/test-00000-of-00001.parquet:00002201",
+                "mmlu:all/test-00000-of-00001.parquet:00009325",
+                "mmlu:all/test-00000-of-00001.parquet:00013884",
+                "mmlu:all/test-00000-of-00001.parquet:00013144",
+                "mmlu:all/test-00000-of-00001.parquet:00012513",
+                "mmlu:all/test-00000-of-00001.parquet:00001033",
+                "mmlu:all/test-00000-of-00001.parquet:00004179",
+                "mmlu:all/test-00000-of-00001.parquet:00001931",
+                "mmlu:all/test-00000-of-00001.parquet:00008117",
+                "mmlu:all/test-00000-of-00001.parquet:00012467",
+                "mmlu:all/test-00000-of-00001.parquet:00007364",
+                "mmlu:all/test-00000-of-00001.parquet:00007737",
+                "mmlu:all/test-00000-of-00001.parquet:00010675",
+                "mmlu:all/test-00000-of-00001.parquet:00006219",
+                "mmlu:all/test-00000-of-00001.parquet:00012922",
+                "mmlu:all/test-00000-of-00001.parquet:00003439",
+                "mmlu:all/test-00000-of-00001.parquet:00001537",
+                "mmlu:all/test-00000-of-00001.parquet:00007993",
+                "mmlu:all/test-00000-of-00001.parquet:00000464",
+                "mmlu:all/test-00000-of-00001.parquet:00013693",
+                "mmlu:all/test-00000-of-00001.parquet:00006386",
+                "mmlu:all/test-00000-of-00001.parquet:00007090",
+                "mmlu:all/test-00000-of-00001.parquet:00009952",
+                "mmlu:all/test-00000-of-00001.parquet:00012489",
+                "mmlu:all/test-00000-of-00001.parquet:00012569",
+                "mmlu:all/test-00000-of-00001.parquet:00000034",
+                "mmlu:all/test-00000-of-00001.parquet:00011400",
+                "mmlu:all/test-00000-of-00001.parquet:00007297",
+                "mmlu:all/test-00000-of-00001.parquet:00004363",
+                "mmlu:all/test-00000-of-00001.parquet:00011821",
+                "mmlu:all/test-00000-of-00001.parquet:00013137",
+                "mmlu:all/test-00000-of-00001.parquet:00003748"
+              ],
+              "n_rows": 32,
+              "passed": false
+            },
+            "zero": {
+              "additional_errors": 7.0,
+              "complete": true,
+              "ids": [
+                "mmlu:all/test-00000-of-00001.parquet:00002201",
+                "mmlu:all/test-00000-of-00001.parquet:00009325",
+                "mmlu:all/test-00000-of-00001.parquet:00013884",
+                "mmlu:all/test-00000-of-00001.parquet:00013144",
+                "mmlu:all/test-00000-of-00001.parquet:00012513",
+                "mmlu:all/test-00000-of-00001.parquet:00001033",
+                "mmlu:all/test-00000-of-00001.parquet:00004179",
+                "mmlu:all/test-00000-of-00001.parquet:00001931",
+                "mmlu:all/test-00000-of-00001.parquet:00008117",
+                "mmlu:all/test-00000-of-00001.parquet:00012467",
+                "mmlu:all/test-00000-of-00001.parquet:00007364",
+                "mmlu:all/test-00000-of-00001.parquet:00007737",
+                "mmlu:all/test-00000-of-00001.parquet:00010675",
+                "mmlu:all/test-00000-of-00001.parquet:00006219",
+                "mmlu:all/test-00000-of-00001.parquet:00012922",
+                "mmlu:all/test-00000-of-00001.parquet:00003439",
+                "mmlu:all/test-00000-of-00001.parquet:00001537",
+                "mmlu:all/test-00000-of-00001.parquet:00007993",
+                "mmlu:all/test-00000-of-00001.parquet:00000464",
+                "mmlu:all/test-00000-of-00001.parquet:00013693",
+                "mmlu:all/test-00000-of-00001.parquet:00006386",
+                "mmlu:all/test-00000-of-00001.parquet:00007090",
+                "mmlu:all/test-00000-of-00001.parquet:00009952",
+                "mmlu:all/test-00000-of-00001.parquet:00012489",
+                "mmlu:all/test-00000-of-00001.parquet:00012569",
+                "mmlu:all/test-00000-of-00001.parquet:00000034",
+                "mmlu:all/test-00000-of-00001.parquet:00011400",
+                "mmlu:all/test-00000-of-00001.parquet:00007297",
+                "mmlu:all/test-00000-of-00001.parquet:00004363",
+                "mmlu:all/test-00000-of-00001.parquet:00011821",
+                "mmlu:all/test-00000-of-00001.parquet:00013137",
+                "mmlu:all/test-00000-of-00001.parquet:00003748"
+              ],
+              "n_rows": 32,
+              "passed": false
+            }
+          },
+          "passed": false,
+          "same_ids": true
+        },
+        "complete": true,
+        "missing_crossed_operations": []
+      },
+      "descriptive": false,
+      "group": "ser_v2_full",
+      "independent_estimates": {
+        "D": {
+          "drop": 1.4814722776412963,
+          "fraction_interval": [
+            0.18796001526108896,
+            0.26821312773386147
+          ],
+          "fraction_removed": 0.23494154519301694,
+          "gap": 6.305705857276917,
+          "interpretable": true,
+          "stream_gaps": {
+            "clean": 6.179300937652588,
+            "corrupt": 6.432110776901245
+          },
+          "streams": {
+            "clean": {
+              "drop": 1.5528361701965332,
+              "fraction_removed": 0.25129641457249197,
+              "gap": 6.179300937652588
+            },
+            "corrupt": {
+              "drop": 1.4101083850860596,
+              "fraction_removed": 0.21922949308491202,
+              "gap": 6.432110776901245
+            }
+          },
+          "valid_bootstrap_draws": 2000
+        },
+        "I": {
+          "drop": 2.3065966463088987,
+          "fraction_interval": [
+            0.2813764924213727,
+            0.32323417074641064
+          ],
+          "fraction_removed": 0.30353633783250805,
+          "gap": 7.599079117774964,
+          "interpretable": true,
+          "stream_gaps": {
+            "clean": 7.255077457427978,
+            "corrupt": 7.943080778121948
+          },
+          "streams": {
+            "clean": {
+              "drop": 2.3862209701538086,
+              "fraction_removed": 0.32890358292601274,
+              "gap": 7.255077457427978
+            },
+            "corrupt": {
+              "drop": 2.2269723224639892,
+              "fraction_removed": 0.28036631940063583,
+              "gap": 7.943080778121948
+            }
+          },
+          "valid_bootstrap_draws": 2000
+        },
+        "MMLU": {
+          "accuracy_shift": null,
+          "additional_errors": 0,
+          "additional_errors_interval": null,
+          "intact_accuracy": null,
+          "nontrivial": false,
+          "pass": null,
+          "patched_accuracy": null,
+          "shift_interval": null
+        },
+        "collateral": {
+          "F": {
+            "accuracy_shift": -0.175,
+            "intact_accuracy": 1.0,
+            "nontrivial": true,
+            "patched_accuracy": 0.825,
+            "shift_interval": [
+              -0.22353641456582635,
+              -0.125
+            ]
+          },
+          "H": {
+            "accuracy_shift": -0.22,
+            "intact_accuracy": 1.0,
+            "nontrivial": true,
+            "patched_accuracy": 0.78,
+            "shift_interval": [
+              -0.28090021401819154,
+              -0.14515375339161898
+            ]
+          },
+          "IOI": {
+            "accuracy_shift": -0.01,
+            "intact_accuracy": 0.51,
+            "nontrivial": true,
+            "patched_accuracy": 0.5,
+            "shift_interval": [
+              -0.07,
+              0.05
+            ]
+          }
+        },
+        "coverage": {
+          "degenerate": 0,
+          "invalid": 0,
+          "total": 1100,
+          "unsupported": 0
+        },
+        "epsilon": 1e-06,
+        "interpretable": true,
+        "n_assessment_ids": 100,
+        "n_clusters": 16,
+        "n_ids": 100,
+        "point_pass": false,
+        "raw": {
+          "D": {
+            "accuracy_shift": -0.2,
+            "intact_accuracy": 1.0,
+            "nontrivial": true,
+            "patched_accuracy": 0.8
+          }
+        },
+        "status": "fails",
+        "strong": false
+      },
+      "joined_primary_point_pass": false,
+      "joined_primary_strong": false,
+      "task": "ser_v2"
+    }
+  ],
+  "mover_screen": {
+    "far_v2": {
+      "descriptive": false,
+      "duplicate_group": true,
+      "interpretation": "answer-contribution screen only; zero candidates do not establish absence of answer copying",
+      "n_removed": 0,
+      "removed_keys": []
+    },
+    "sdr_v2": {
+      "descriptive": true,
+      "duplicate_group": true,
+      "interpretation": "answer-contribution screen only; zero candidates do not establish absence of answer copying",
+      "n_removed": 0,
+      "removed_keys": []
+    },
+    "ser_v2": {
+      "descriptive": false,
+      "duplicate_group": true,
+      "interpretation": "answer-contribution screen only; zero candidates do not establish absence of answer copying",
+      "n_removed": 0,
+      "removed_keys": []
+    }
+  },
+  "parent_design_sha256": "680e4c6f7463d3f5f4950a682d1a9653114284f456d209f23c7239d93266b0a8",
+  "parent_selection_sha256": "7cded7905affd5673bbc8d29298e85613de50445b0e0ba5683d4fa45b915190a",
+  "pilot_counts": {
+    "expected": 1188,
+    "positive_controls": 144,
+    "rows": 1188
+  },
+  "source_commit": "5f450dc93dac707af649dee8c8ca60888b2831db",
+  "status": "full_audit_passed"
+}

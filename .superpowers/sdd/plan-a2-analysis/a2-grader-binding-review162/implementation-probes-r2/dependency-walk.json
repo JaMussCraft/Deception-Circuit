@@ -1,0 +1,58 @@
+{
+  "kind": "static_full_target_helper_dependency_walk",
+  "call_graph": {
+    "a2._manifest": [
+      "a2._validate_grader_catalogue",
+      "a2.runtime_hashes",
+      "a2.hash_content"
+    ],
+    "a2._validate_grader_catalogue": [
+      "a2._observe_grader_catalogue",
+      "a2._catalogue_provenance",
+      "a2._catalogue_digest",
+      "a2._catalogue_canonical"
+    ],
+    "a2._observe_grader_catalogue": [
+      "a1.grader_registry",
+      "read exact primary/repo catalogue bytes",
+      "hash same buffer",
+      "strict JSON parser",
+      "datetime.date.fromisoformat",
+      "copy.deepcopy"
+    ],
+    "a1.grader_registry": [
+      "evaluation.grader_hash.grader_sha256(root=REPO)",
+      "common.read_json(canonical routes)",
+      "common.file_hash(canonical routes)"
+    ],
+    "a2.runtime_hashes": [
+      "a1.code_hashes",
+      "hash a2_pipeline.py and a2_mask_comparison.py under a1.REPO"
+    ],
+    "a1.code_hashes": [
+      "fixed original source path list; no import or data load"
+    ],
+    "a2._publish_stage": [
+      "common.publish staged temporary directory",
+      "a1.write_artifact payload envelope",
+      "common.write_json manifest"
+    ],
+    "a2.read_stage": [
+      "common.read_json manifest",
+      "a1.read_artifact payload envelope/hash",
+      "a2._manifest"
+    ]
+  },
+  "filesystem_closure": [
+    "temporary repo copies union of actual runtime_hashes keys and original grader_files glob members",
+    "temporary repo/primary catalogues written before observer",
+    "temporary stage payload/manifest created by original publisher",
+    "no selection, bank, datasets or timing fixtures needed"
+  ],
+  "dynamic_closure_assertions": [
+    "original grader_sha256(tempREPO)==frozen GRADER",
+    "runtime_hashes after temp REPO rebind equals prebind full runtime hash map"
+  ],
+  "mocked_production_checks": [],
+  "candidate_changes": false
+}

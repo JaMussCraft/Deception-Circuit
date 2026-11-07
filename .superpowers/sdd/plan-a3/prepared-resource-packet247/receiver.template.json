@@ -1,0 +1,80 @@
+{
+  "accounting_recipe": "a3_prepared_reader_unique_graph_buffers_v1",
+  "actual_allocation_required": [
+    "job_id",
+    "cluster",
+    "node",
+    "cpus",
+    "memory_bytes",
+    "start/end/deadline",
+    "AllocTRES",
+    "actual affinity",
+    "actual cgroup membership"
+  ],
+  "actual_job": null,
+  "admission": null,
+  "automatic_retries": false,
+  "bounds_rule": "Observe actual returned graphs and overlapping raw/decoder/decoded/freeze-memo/accounting workspaces using exact recipe. Process/cgroup observations are labeled lifetime/scope evidence, not inferred upper bounds. No producer peak, overlap, baseline or alias subtraction.",
+  "candidate_reader_sha256": "aea07dbf153824f373be70629dd24edc28dd6566cafa5955f43c69fd1119ec90",
+  "cgroup_peak_bytes_bound": null,
+  "cold": {
+    "cache_scope": "fresh-process",
+    "filesystem_cache_claim": null,
+    "new_process": true
+  },
+  "design": null,
+  "execution_authorized": false,
+  "export_inventory": {
+    "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-packet247/source-export-inventory.json",
+    "sha256": "49a2293f778aa3507b6a675e44b5037bbe3e4925e6e050cd7502f86430ebc7ae"
+  },
+  "extra_transient_bytes_bound": null,
+  "fail_closed": "check_ready.py rejects unbound templates. It only validates description shape and never authorizes execution. Root native provenance/live guards remain required; successful shape checking alone grants nothing.",
+  "final_check": "_check_file_witness(returned_witness) exactly once per trial; production final barrier/live deadline remains separate",
+  "freeze_sha256": "765b22a006ab519186a168bf455f4084915457d4ffce88881e76bf31b71a37cb",
+  "model_loaded": false,
+  "namespace_policy": null,
+  "output_run_manifest": null,
+  "part": "prefit",
+  "per_step_required": [
+    "wall_seconds",
+    "user_seconds",
+    "system_seconds",
+    "actual target read/hash/parse/freeze/write observers",
+    "process RSS/high-water with PID and scope",
+    "cgroup current/peak/events with applicability/path/scope",
+    "normal exit or failure/timeout/signal",
+    "source-before/after",
+    "actual allocation and storage identity"
+  ],
+  "phase": "receiver",
+  "pilot_inventory": null,
+  "preparation_reference": null,
+  "process_peak_rss_bytes_bound": null,
+  "protocol": null,
+  "resources": null,
+  "retained_handle_accounting": "Root must separately account authentic production handle retention; CPU lower reader cannot mint an authority handle.",
+  "retained_metadata_bytes_bound": null,
+  "selected": null,
+  "software_required": [
+    "interpreter executable/version",
+    "numpy/torch versions",
+    "CPU family",
+    "exact runtime/workload origins and code hashes"
+  ],
+  "source_commit": null,
+  "source_publication": null,
+  "status": "UNBOUND_DESCRIPTION_TEMPLATE_NOT_RUNNABLE",
+  "storage_required": [
+    "resolved work/target/preparation/output paths",
+    "mountinfo filesystem/source/device",
+    "namespace literal aliases",
+    "free bytes before/after"
+  ],
+  "target_reference": null,
+  "warm": {
+    "cache_scope": "same-process-repeat",
+    "filesystem_cache_claim": null,
+    "new_process": false
+  }
+}

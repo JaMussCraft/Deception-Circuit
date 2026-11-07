@@ -1,0 +1,19 @@
+........................................................................ [ 34%]
+........................................................................ [ 69%]
+..........F...................................................           [100%]
+=================================== FAILURES ===================================
+________ test_hyperparameters_are_identical_across_the_three_mechanisms ________
+
+    def test_hyperparameters_are_identical_across_the_three_mechanisms():
+        """A circuit difference between mechanisms must not be a difference in how
+        hard each task was trained."""
+        hp = [default_hyperparams("llama", name) for name in TASKS]
+        assert hp[0] == hp[1] == hp[2]
+>       assert hp[0]["max_seq_length"] >= dc.MAX_SEQ_LENGTH
+E       assert 120 >= 128
+E        +  where 128 = dc.MAX_SEQ_LENGTH
+
+tests/test_deception_tasks.py:40: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_deception_tasks.py::test_hyperparameters_are_identical_across_the_three_mechanisms
+1 failed, 205 passed in 72.70s (0:01:12)

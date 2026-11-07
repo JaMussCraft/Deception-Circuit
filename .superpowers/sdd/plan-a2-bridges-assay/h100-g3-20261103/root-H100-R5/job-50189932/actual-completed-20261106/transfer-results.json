@@ -1,0 +1,70 @@
+[
+  {
+    "name": "execution",
+    "command": [
+      "rsync",
+      "-rl",
+      "--no-perms",
+      "--no-times",
+      "-e",
+      "ssh -o BatchMode=yes -o ConnectTimeout=15 -o ControlMaster=no -o ControlPath=none",
+      "--",
+      "b2dtn:/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-H100-R5/job-50189932/execution/",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-H100-R5/job-50189932/actual-completed-20261106/execution/"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "name": "bank",
+    "command": [
+      "rsync",
+      "-rl",
+      "--no-perms",
+      "--no-times",
+      "-e",
+      "ssh -o BatchMode=yes -o ConnectTimeout=15 -o ControlMaster=no -o ControlPath=none",
+      "--",
+      "b2dtn:/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/bridges-h100-G3-v1/bank/",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-H100-R5/job-50189932/actual-completed-20261106/bank/"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "name": "pilot",
+    "command": [
+      "rsync",
+      "-rl",
+      "--no-perms",
+      "--no-times",
+      "-e",
+      "ssh -o BatchMode=yes -o ConnectTimeout=15 -o ControlMaster=no -o ControlPath=none",
+      "--",
+      "b2dtn:/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/bridges-h100-G3-v1-timing-limit4/",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-H100-R5/job-50189932/actual-completed-20261106/pilot/"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "name": "job_log",
+    "command": [
+      "rsync",
+      "-rl",
+      "--no-perms",
+      "--no-times",
+      "-e",
+      "ssh -o BatchMode=yes -o ConnectTimeout=15 -o ControlMaster=no -o ControlPath=none",
+      "--",
+      "b2dtn:/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-H100-R5/timing-50189932.log",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-H100-R5/job-50189932/actual-completed-20261106/job_log"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  }
+]

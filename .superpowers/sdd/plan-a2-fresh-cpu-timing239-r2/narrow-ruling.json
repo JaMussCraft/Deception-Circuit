@@ -1,0 +1,29 @@
+{
+  "status": "R244_ONE_NARROW_PREPOPEN_DEADLINE_CORRECTION_REQUIRES_INDEPENDENT_REVIEW",
+  "original_manifest_sha256": "63743b3e980ce194a5cbbc8fe0415aaf486c4f78967250751f025b1b5365180e",
+  "original546_pins_unchanged": true,
+  "changed_files": [
+    "runner.py",
+    "launch.sh",
+    "test_timing239.py",
+    "request.json"
+  ],
+  "only_changed_runner_function": [
+    "run_stage"
+  ],
+  "correction": "recheck retains a nonincreasing deadline; params/command are serialized from its current min-bound; fresh time is checked immediately before the only Popen",
+  "caps_and_schema_unchanged": true,
+  "prime_seconds": 480,
+  "fresh_seconds": 240,
+  "total_seconds": 900,
+  "operational_feasible": null,
+  "remote_costs_unmeasured": true,
+  "original19_pure_cases_retained": true,
+  "new_actual_boundary_cases": 7,
+  "RED": {
+    "failed": 5,
+    "passed": 2
+  },
+  "GREEN_per_environment": 26,
+  "setup_failure_preserved": "First full pure run passed25/26; relocated launcher caught copied old absolute packet path, corrected before freeze; original logs/XML retained."
+}

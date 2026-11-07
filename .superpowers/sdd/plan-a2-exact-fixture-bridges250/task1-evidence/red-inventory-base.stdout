@@ -1,0 +1,28 @@
+.........................................FF                              [100%]
+=================================== FAILURES ===================================
+______________ test_inventory_bytes_and_aliases_cannot_be_trimmed ______________
+
+probe = <module 'fixture_runtime_probe' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/runtime-probe.py'>
+tree = ({'/tmp/pytest-of-swong2/pytest-2703/test_inventory_bytes_and_alias0/lib.so': {'bytes': 19, 'kind': 'file', 'physical_..._bytes_and_alias0/lib.so'), PosixPath('/tmp/pytest-of-swong2/pytest-2703/test_inventory_bytes_and_alias0/libalias.so'))
+
+    def test_inventory_bytes_and_aliases_cannot_be_trimmed(probe, tree):
+        entries,leaf,alias=tree
+        proposed=[dict(path=str(leaf),type='file',bytes=entries[str(leaf)]['bytes'],sha256=entries[str(leaf)]['sha256']),
+                  dict(path=str(alias),type='symlink',target='lib.so')]
+>       probe.check_inventory(proposed,entries)
+E       AttributeError: module 'fixture_runtime_probe' has no attribute 'check_inventory'
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:227: AttributeError
+_______________________ test_hard_gate_deadline_rejects ________________________
+
+probe = <module 'fixture_runtime_probe' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/runtime-probe.py'>
+
+    def test_hard_gate_deadline_rejects(probe):
+>       with pytest.raises(probe.Rejected):probe.deadline_expired(None,None)
+E       AttributeError: module 'fixture_runtime_probe' has no attribute 'deadline_expired'
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:232: AttributeError
+=========================== short test summary info ============================
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_inventory_bytes_and_aliases_cannot_be_trimmed
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_hard_gate_deadline_rejects
+2 failed, 41 passed in 0.90s

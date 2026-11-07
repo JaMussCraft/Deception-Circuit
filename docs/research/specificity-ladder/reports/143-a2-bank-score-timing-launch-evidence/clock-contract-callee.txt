@@ -1,0 +1,20 @@
+def _current_root_mapping(origin,*,injected,refresh_deadline):
+    initial=read_object(origin);wait=initial.get('refresh_wait_seconds',0)
+    require(type(wait) in (int,float) and math.isfinite(wait) and 0<=wait<=60,'root mapping refresh wait must be explicitly bounded')
+    start=time.monotonic();deadline=time.time()+wait
+    if refresh_deadline is not None:deadline=min(deadline,refresh_deadline)
+    while True:
+        mapping,path,refs=_mapping_chain(origin)
+        live=artifacts._strict_json(mapping['ledger_path']);actual={r['id']:r for r in live['reservations']}
+        expected=set(mapping['expected_entry_ids'])
+        # Old immutable facts are checked before any wait for appended work.
+        for entry in mapping['entries']:
+            rid=entry['reservation_id']
+            require(rid in actual and all(actual[rid].get(k)==entry['actual_entry'].get(k) for k in RESERVATION_FIELDS),
+                'changed/omitted live original reservation anchor')
+        if set(actual)==expected:return mapping,path,refs,time.monotonic()-start
+        require(expected<=set(actual),'live RS omitted an original reservation')
+        remaining=deadline-time.time()
+        require(mapping.get('successor_directory') is not None and wait>0 and remaining>0,
+            'unmapped new reservation requires completed current root successor')
+        time.sleep(min(.1,remaining))

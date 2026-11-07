@@ -1,0 +1,23 @@
+{
+  "command": [
+    "/sw/external/python/anaconda3/bin/python3.9",
+    "-B",
+    "-m",
+    "pytest",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--noconftest",
+    "--confcutdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2",
+    "--tb=short",
+    "--basetemp=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-timing-review244/r2/tiny-temp",
+    "--junitxml=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-timing-review244/r2/tiny-boundaries.xml",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/test_timing239.py::test_review244_final_authentication_or_current_end_expiry_prevents_Popen[fresh-1240.0-1900.0]",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/test_timing239.py::test_review244_valid_normal_child_starts_once_with_nonincreasing_bound[1160.0-1100.0]",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/test_timing239.py::test_review244_actual_observer_rejects_late_reaped_zero"
+  ],
+  "exit_code": 0,
+  "expected": 3,
+  "observed": 3,
+  "no_actual_process_or_native_execution": true
+}

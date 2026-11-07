@@ -1,0 +1,36 @@
+{
+  "status": "PREPARATION_ONLY_ROOT_MUST_BIND_G3_AND_FRESH_CATALOGUES_THEN_REVIEW",
+  "phase": "existing_G3_validation",
+  "resources": {
+    "account": "cis260361p",
+    "qos": "rm",
+    "partition": "RM-shared",
+    "nodes": 1,
+    "ntasks": 1,
+    "cpus_per_task": 5,
+    "mem": "8G",
+    "minutes": 15,
+    "requeue": false,
+    "GPUs": 0
+  },
+  "root_only_sequence": [
+    "Bind Delta-owning G3 PASS proof+exact groupsSHA, accepted161/162/publication pins and source snapshot; copy byte-identical runtime511+4/original source+inputclosure/G3.",
+    "Bind initial catalogue snapshot hashes to config; catalogue copies are snapshots only.",
+    "Bind packet manifest/proposal/base-parameter SHA; stage package and config. Root constructs actual CPU command invoking entry.sh CONFIG CONFIG_SHA.",
+    "After READY actualjob/source/proposal/groups/catalogue/parameters/allocation evidence, root rechecks actual current Delta fourcatalogues before and after accepted preflight; transfers stable exactbytes, hashes actualremote targets, and rereads Delta. If unequal, stop; do not edit active immutable config to reusejob.",
+    "Only root constructs matching release with issued_at/expires_at <=300s, phase existing_G3_validation, READY identity fields and Delta_current_catalogues_rechecked=true. Transfer as root-release.json.pending then atomicrename to root-release.json. No supervisorreleasecreation. Include Delta_current_catalogue_proof path+SHA to the actual newly copied Delta preflight/recapture/transfer-check receipt; remote pins its bytes at phase entry.",
+    "Fetch complete evidence and terminal CPUaccounting; no model/GPUledger/retry."
+  ],
+  "freshness": "Root-owned phase-entry release; maxage300s and maxlifetime300s; wait<=300s. Exact immutable catalogue snapshot changes require new reviewed packet/job, no silentretarget.",
+  "deadline": "min(initial,currentEnd); fixed45sfinishreserve,15sTERMtoKILL, noextension/requeue/automaticretry",
+  "model_execution": false,
+  "GPU_reservation": false,
+  "continuous_live_Delta": false,
+  "root_command_argv": [
+    "bash",
+    "REMOTE_PACKET/entry.sh",
+    "ROOT_BOUND_CONFIG_JSON",
+    "ROOT_BOUND_CONFIG_SHA256"
+  ],
+  "validation_scope": "Reviewed r2 owning validator unchanged; source/G3 readonly; only dedicated evidence writable."
+}

@@ -1,0 +1,730 @@
+{
+  "status": "UNEXECUTED_requires_root_acceptance_and_submission",
+  "scope": "Next17 contiguous original cases32\u201348; later14 cases49\u201362 remain conditional; no aggregate",
+  "scenario_root": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8",
+  "source_hashes": {
+    "component_analysis/a3_direction_pipeline.py": "96678db186078ab37cad108e2d1e71ffdccf1fb3dd157c35cdc57a91b2ebd4a0",
+    "component_analysis/a3_direction_runner.py": "89a62335665595533204006c3eca28d14ca9c42eb600879c235e9c6370739429",
+    "component_analysis/a3_direction_runtime.py": "b66c2d8cd26c36f321b5079758209214746b0e4eec16a6c801742086d729c0cc",
+    "component_analysis/a3_direction_workload.py": "3e43aaf2b4cacb99df87593ae377c8fdf3eb7b223b258ed8873853841404d8f9",
+    "component_analysis/a3_directions.py": "ed882d4e12a396e03e73671e588beba5b1a8c90ab9d31e7ee73d4194430b4a86",
+    "component_analysis/a3_pipeline.py": "310eb53427ad4ac32522dfd0d6cd3b33e4ec887af1776579845f8953bdbe83f5",
+    "scripts/jobs/specificity_a3.sh": "936dfb7f8b9c2d267d52f1e199ed431275e6527cbfc3a105a22e3812289a9b96",
+    "tests/test_a3_direction_runner.py": "3ea945d5b23b4eef7d56139758c7075ea1b56ac612f1923590b7978628ca0120",
+    "tests/test_a3_direction_runtime.py": "5a41e89b0b2bd5fd59553f5f5a63260638e3547a63c31a615d84da08f796fb6a",
+    "tests/test_a3_direction_workload.py": "91eb6f874e180c5ffb362daba231631b7bea21c224446580efccfe20a9007300",
+    "tests/test_a3_directions.py": "cd8471b1524ad7b8f1b7c87f9eb5fec5724b3ab2980027ef7aadfea3fc3bb1c1",
+    "tests/test_a3_pipeline.py": "bbb3efdba075cc14c2997cc11ae44bab268bdea56459c0574d6bfc21b62f4a18",
+    "tests/a3_direction_native_scenario.py": "9b5061ab9618222b23230917f446abcaa73747f3d216f69c77b9218feec6297b"
+  },
+  "case_catalogue": {
+    "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/native-continuation-plan/source-and-cases.json",
+    "sha256": "3bd3c48fa7ccb1a43c2fea82504dc5d0e4129c0c9d57accd0bd25b7d10ebd7f5"
+  },
+  "measurement_inputs": [
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/135-native-cpu-job23455139-evidence/per-case-observations.json",
+      "sha256": "c0f2675eca3b8ff3b00d38f94e781a2040c542ee96a0801e4c1d7cd7b8646004"
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/137-native-cpu-job23458182-evidence/per-case-observations.json",
+      "sha256": "309c4ae90a63deb3cd3c9466ff567de41d015af50552d9e0a2507c3ea547f516"
+    }
+  ],
+  "derived_cost_method": "Maximum observed compute-node setup and first authentication; maximum later authentication across jobs 135 and 137; per-operation/shape-class maximum original case work across both CPU jobs; 2 seconds per case for sidecar work and 30 seconds for final exit; 20 percent buffer. Native timing is contained in original case time and is not added again.",
+  "observed_domains": "actual CPU compute-node observations only; caches uncontrolled; no performance guarantee or allocated-GPU cost claim",
+  "all_remaining31_envelope": {
+    "start": 32,
+    "last": 62,
+    "count": 31,
+    "setup_seconds": 359.24090781994164,
+    "cold_first_auth_seconds": 159.50660318601876,
+    "warm_auth_seconds": 66.09009669604711,
+    "original_case_work_max_sum_seconds": 1274.6824234323576,
+    "sidecar_seconds_per_case": 2,
+    "final_exit_seconds": 30,
+    "subtotal_seconds": 3868.1328353197314,
+    "buffer_fraction": 0.2,
+    "buffered_seconds": 4641.759402383677
+  },
+  "next17_envelope": {
+    "start": 32,
+    "last": 48,
+    "count": 17,
+    "setup_seconds": 359.24090781994164,
+    "cold_first_auth_seconds": 159.50660318601876,
+    "warm_auth_seconds": 66.09009669604711,
+    "original_case_work_max_sum_seconds": 680.3243695942219,
+    "sidecar_seconds_per_case": 2,
+    "final_exit_seconds": 30,
+    "subtotal_seconds": 2320.513427736936,
+    "buffer_fraction": 0.2,
+    "buffered_seconds": 2784.616113284323
+  },
+  "later14_conditional_envelope": {
+    "start": 49,
+    "last": 62,
+    "count": 14,
+    "setup_seconds": 359.24090781994164,
+    "cold_first_auth_seconds": 159.50660318601876,
+    "warm_auth_seconds": 66.09009669604711,
+    "original_case_work_max_sum_seconds": 594.3580538381357,
+    "sidecar_seconds_per_case": 2,
+    "final_exit_seconds": 30,
+    "subtotal_seconds": 2030.2768218927085,
+    "buffer_fraction": 0.2,
+    "buffered_seconds": 2436.33218627125
+  },
+  "cases": [
+    {
+      "index": 32,
+      "invocation_id": "a9128e2551536f2f42cfc20dd9be1431f0343920f7ddb27380f58683c6e07f13",
+      "analysis_task": "sdr_v2",
+      "source_task": "sdr_v2",
+      "panel": "calibration_pilot",
+      "cells": 33,
+      "batch_groups": 10,
+      "operation_shape_signature": "{\"batch_groups\": 10, \"cells\": 33, \"families\": {\"calibration_null\": 32, \"learned\": 1}, \"group_sizes\": [2, 2, 2, 2, 2, 2, 2, 2, 2, 2], \"mmlu_branch\": false, \"operations\": {\"interchange\": 33}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        11,
+        18,
+        25
+      ],
+      "observed_matching_original_case_max_seconds": 31.985078952042386,
+      "actual_SER_runtime_observed": null
+    },
+    {
+      "index": 33,
+      "invocation_id": "55c24741940d5aa1905f732a4749febacd853f01104d6606bd5df1c0c6981b47",
+      "analysis_task": "sdr_v2",
+      "source_task": "ioi",
+      "panel": "calibration_pilot",
+      "cells": 33,
+      "batch_groups": 1,
+      "operation_shape_signature": "{\"batch_groups\": 1, \"cells\": 33, \"families\": {\"calibration_null\": 32, \"learned\": 1}, \"group_sizes\": [2], \"mmlu_branch\": false, \"operations\": {\"interchange\": 33}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        5,
+        12,
+        19,
+        26
+      ],
+      "observed_matching_original_case_max_seconds": 27.40703174006194,
+      "actual_SER_runtime_observed": null
+    },
+    {
+      "index": 34,
+      "invocation_id": "658e20db8201412649955d1b94bd4a64186f2fc854f643a3071bf3468407fa37",
+      "analysis_task": "sdr_v2",
+      "source_task": "mmlu",
+      "panel": "calibration_pilot",
+      "cells": 66,
+      "batch_groups": 2,
+      "operation_shape_signature": "{\"batch_groups\": 2, \"cells\": 66, \"families\": {\"calibration_null\": 64, \"learned\": 2}, \"group_sizes\": [2, 2], \"mmlu_branch\": true, \"operations\": {\"h_mean\": 33, \"zero\": 33}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        6,
+        13,
+        20,
+        27
+      ],
+      "observed_matching_original_case_max_seconds": 26.574205063981935,
+      "actual_SER_runtime_observed": null
+    },
+    {
+      "index": 35,
+      "invocation_id": "7bcfe7b84e0ca9cfc25bc6fd7039b59ba40d5653354bf8da867e489a4926bf9a",
+      "analysis_task": "sdr_v2",
+      "source_task": "sdr_v2",
+      "panel": "selected_pilot",
+      "cells": 211,
+      "batch_groups": 10,
+      "operation_shape_signature": "{\"batch_groups\": 10, \"cells\": 211, \"families\": {\"assessment_null\": 199, \"learned\": 3, \"nuisance\": 3, \"steering_learned\": 2, \"steering_nuisance\": 2, \"steering_random\": 2}, \"group_sizes\": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1], \"mmlu_branch\": false, \"operations\": {\"h_mean\": 2, \"interchange\": 201, \"steer_negative\": 3, \"steer_positive\": 3, \"zero\": 2}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        7,
+        14,
+        21,
+        28
+      ],
+      "observed_matching_original_case_max_seconds": 70.68714533001184,
+      "actual_SER_runtime_observed": null
+    },
+    {
+      "index": 36,
+      "invocation_id": "35b680a34a767a2b2992f571e5ae484a09325888cefa940b9c37dd407cec0af0",
+      "analysis_task": "sdr_v2",
+      "source_task": "sdr_v2",
+      "panel": "selected_pilot",
+      "cells": 211,
+      "batch_groups": 10,
+      "operation_shape_signature": "{\"batch_groups\": 10, \"cells\": 211, \"families\": {\"assessment_null\": 199, \"learned\": 3, \"nuisance\": 3, \"steering_learned\": 2, \"steering_nuisance\": 2, \"steering_random\": 2}, \"group_sizes\": [2, 2, 2, 2, 2, 2, 2, 2, 2, 2], \"mmlu_branch\": false, \"operations\": {\"h_mean\": 2, \"interchange\": 201, \"steer_negative\": 3, \"steer_positive\": 3, \"zero\": 2}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        8,
+        15,
+        22,
+        29
+      ],
+      "observed_matching_original_case_max_seconds": 69.93302771495655,
+      "actual_SER_runtime_observed": null
+    },
+    {
+      "index": 37,
+      "invocation_id": "ea651d8a75c5f1d4d8fc0f0476660e8f3df7d7c160494fec02138864d9dc14d5",
+      "analysis_task": "sdr_v2",
+      "source_task": "ioi",
+      "panel": "selected_pilot",
+      "cells": 211,
+      "batch_groups": 1,
+      "operation_shape_signature": "{\"batch_groups\": 1, \"cells\": 211, \"families\": {\"assessment_null\": 199, \"learned\": 3, \"nuisance\": 3, \"steering_learned\": 2, \"steering_nuisance\": 2, \"steering_random\": 2}, \"group_sizes\": [2], \"mmlu_branch\": false, \"operations\": {\"h_mean\": 2, \"interchange\": 201, \"steer_negative\": 3, \"steer_positive\": 3, \"zero\": 2}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        9,
+        16,
+        23,
+        30
+      ],
+      "observed_matching_original_case_max_seconds": 28.518431831966154,
+      "actual_SER_runtime_observed": null
+    },
+    {
+      "index": 38,
+      "invocation_id": "96c74558b78020dc596eeb3fa44a09a91e14aece57fc3ec340d37632853e7f41",
+      "analysis_task": "sdr_v2",
+      "source_task": "mmlu",
+      "panel": "selected_pilot",
+      "cells": 408,
+      "batch_groups": 2,
+      "operation_shape_signature": "{\"batch_groups\": 2, \"cells\": 408, \"families\": {\"assessment_null\": 398, \"learned\": 2, \"nuisance\": 2, \"steering_learned\": 2, \"steering_nuisance\": 2, \"steering_random\": 2}, \"group_sizes\": [2, 2], \"mmlu_branch\": true, \"operations\": {\"h_mean\": 201, \"steer_negative\": 3, \"steer_positive\": 3, \"zero\": 201}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        10,
+        17,
+        24,
+        31
+      ],
+      "observed_matching_original_case_max_seconds": 42.07410628604703,
+      "actual_SER_runtime_observed": null
+    },
+    {
+      "index": 39,
+      "invocation_id": "b6662a52bf53147f7c36f81dfb3bdd0abf77704317d3a9bc9b3ae6516d4db48b",
+      "analysis_task": "sdr_v2",
+      "source_task": "sdr_v2",
+      "panel": "calibration_pilot",
+      "cells": 33,
+      "batch_groups": 10,
+      "operation_shape_signature": "{\"batch_groups\": 10, \"cells\": 33, \"families\": {\"calibration_null\": 32, \"learned\": 1}, \"group_sizes\": [2, 2, 2, 2, 2, 2, 2, 2, 2, 2], \"mmlu_branch\": false, \"operations\": {\"interchange\": 33}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        11,
+        18,
+        25
+      ],
+      "observed_matching_original_case_max_seconds": 31.985078952042386,
+      "actual_SER_runtime_observed": null
+    },
+    {
+      "index": 40,
+      "invocation_id": "73a35b4e1fe31e204238c5cb7271104ed1356e2ed1d9df2218c74b3dcf5499c0",
+      "analysis_task": "sdr_v2",
+      "source_task": "ioi",
+      "panel": "calibration_pilot",
+      "cells": 33,
+      "batch_groups": 1,
+      "operation_shape_signature": "{\"batch_groups\": 1, \"cells\": 33, \"families\": {\"calibration_null\": 32, \"learned\": 1}, \"group_sizes\": [2], \"mmlu_branch\": false, \"operations\": {\"interchange\": 33}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        5,
+        12,
+        19,
+        26
+      ],
+      "observed_matching_original_case_max_seconds": 27.40703174006194,
+      "actual_SER_runtime_observed": null
+    },
+    {
+      "index": 41,
+      "invocation_id": "1197fb77187ade3f65a3abb80de77bf43c12cfc6397c70f36fab77f6368168cc",
+      "analysis_task": "sdr_v2",
+      "source_task": "mmlu",
+      "panel": "calibration_pilot",
+      "cells": 66,
+      "batch_groups": 2,
+      "operation_shape_signature": "{\"batch_groups\": 2, \"cells\": 66, \"families\": {\"calibration_null\": 64, \"learned\": 2}, \"group_sizes\": [2, 2], \"mmlu_branch\": true, \"operations\": {\"h_mean\": 33, \"zero\": 33}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        6,
+        13,
+        20,
+        27
+      ],
+      "observed_matching_original_case_max_seconds": 26.574205063981935,
+      "actual_SER_runtime_observed": null
+    },
+    {
+      "index": 42,
+      "invocation_id": "54c44d8ee858c2a35f91719c8a895258a2ceb5fe6298acd801e0669d002c9da0",
+      "analysis_task": "ser_v2",
+      "source_task": "ser_v2",
+      "panel": "selected_pilot",
+      "cells": 211,
+      "batch_groups": 10,
+      "operation_shape_signature": "{\"batch_groups\": 10, \"cells\": 211, \"families\": {\"assessment_null\": 199, \"learned\": 3, \"nuisance\": 3, \"steering_learned\": 2, \"steering_nuisance\": 2, \"steering_random\": 2}, \"group_sizes\": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1], \"mmlu_branch\": false, \"operations\": {\"h_mean\": 2, \"interchange\": 201, \"steer_negative\": 3, \"steer_positive\": 3, \"zero\": 2}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        7,
+        14,
+        21,
+        28
+      ],
+      "observed_matching_original_case_max_seconds": 70.68714533001184,
+      "actual_SER_runtime_observed": false
+    },
+    {
+      "index": 43,
+      "invocation_id": "0f4352a4c30bdf58030cde11dc5cc5ecce6292bae9b575c8f2bc018edad27af5",
+      "analysis_task": "ser_v2",
+      "source_task": "ser_v2",
+      "panel": "selected_pilot",
+      "cells": 211,
+      "batch_groups": 10,
+      "operation_shape_signature": "{\"batch_groups\": 10, \"cells\": 211, \"families\": {\"assessment_null\": 199, \"learned\": 3, \"nuisance\": 3, \"steering_learned\": 2, \"steering_nuisance\": 2, \"steering_random\": 2}, \"group_sizes\": [2, 2, 2, 2, 2, 2, 2, 2, 2, 2], \"mmlu_branch\": false, \"operations\": {\"h_mean\": 2, \"interchange\": 201, \"steer_negative\": 3, \"steer_positive\": 3, \"zero\": 2}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        8,
+        15,
+        22,
+        29
+      ],
+      "observed_matching_original_case_max_seconds": 69.93302771495655,
+      "actual_SER_runtime_observed": false
+    },
+    {
+      "index": 44,
+      "invocation_id": "3da1e9bda49f0380a837c2da9197cf37b355df218c64e3dbd13674f7fb9abc83",
+      "analysis_task": "ser_v2",
+      "source_task": "ioi",
+      "panel": "selected_pilot",
+      "cells": 211,
+      "batch_groups": 1,
+      "operation_shape_signature": "{\"batch_groups\": 1, \"cells\": 211, \"families\": {\"assessment_null\": 199, \"learned\": 3, \"nuisance\": 3, \"steering_learned\": 2, \"steering_nuisance\": 2, \"steering_random\": 2}, \"group_sizes\": [2], \"mmlu_branch\": false, \"operations\": {\"h_mean\": 2, \"interchange\": 201, \"steer_negative\": 3, \"steer_positive\": 3, \"zero\": 2}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        9,
+        16,
+        23,
+        30
+      ],
+      "observed_matching_original_case_max_seconds": 28.518431831966154,
+      "actual_SER_runtime_observed": null
+    },
+    {
+      "index": 45,
+      "invocation_id": "864be1d071a545d8b60077b8c7b602795f085aab232164a0c727b1e5cd5ea2eb",
+      "analysis_task": "ser_v2",
+      "source_task": "mmlu",
+      "panel": "selected_pilot",
+      "cells": 408,
+      "batch_groups": 2,
+      "operation_shape_signature": "{\"batch_groups\": 2, \"cells\": 408, \"families\": {\"assessment_null\": 398, \"learned\": 2, \"nuisance\": 2, \"steering_learned\": 2, \"steering_nuisance\": 2, \"steering_random\": 2}, \"group_sizes\": [2, 2], \"mmlu_branch\": true, \"operations\": {\"h_mean\": 201, \"steer_negative\": 3, \"steer_positive\": 3, \"zero\": 201}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        10,
+        17,
+        24,
+        31
+      ],
+      "observed_matching_original_case_max_seconds": 42.07410628604703,
+      "actual_SER_runtime_observed": null
+    },
+    {
+      "index": 46,
+      "invocation_id": "fa2da4f56ba65e6d366b8dd98ee640d0068c9e372224f4ef93746a266b1d76dc",
+      "analysis_task": "ser_v2",
+      "source_task": "ser_v2",
+      "panel": "calibration_pilot",
+      "cells": 33,
+      "batch_groups": 10,
+      "operation_shape_signature": "{\"batch_groups\": 10, \"cells\": 33, \"families\": {\"calibration_null\": 32, \"learned\": 1}, \"group_sizes\": [2, 2, 2, 2, 2, 2, 2, 2, 2, 2], \"mmlu_branch\": false, \"operations\": {\"interchange\": 33}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        11,
+        18,
+        25
+      ],
+      "observed_matching_original_case_max_seconds": 31.985078952042386,
+      "actual_SER_runtime_observed": false
+    },
+    {
+      "index": 47,
+      "invocation_id": "5672734719c93d17c08bbe01315d2fd9a35885af2259051106d3088c17910644",
+      "analysis_task": "ser_v2",
+      "source_task": "ioi",
+      "panel": "calibration_pilot",
+      "cells": 33,
+      "batch_groups": 1,
+      "operation_shape_signature": "{\"batch_groups\": 1, \"cells\": 33, \"families\": {\"calibration_null\": 32, \"learned\": 1}, \"group_sizes\": [2], \"mmlu_branch\": false, \"operations\": {\"interchange\": 33}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        5,
+        12,
+        19,
+        26
+      ],
+      "observed_matching_original_case_max_seconds": 27.40703174006194,
+      "actual_SER_runtime_observed": null
+    },
+    {
+      "index": 48,
+      "invocation_id": "f772eb5c8b2ec07209d00e173d8dece4aa598410aeea19257b78b607d636115e",
+      "analysis_task": "ser_v2",
+      "source_task": "mmlu",
+      "panel": "calibration_pilot",
+      "cells": 66,
+      "batch_groups": 2,
+      "operation_shape_signature": "{\"batch_groups\": 2, \"cells\": 66, \"families\": {\"calibration_null\": 64, \"learned\": 2}, \"group_sizes\": [2, 2], \"mmlu_branch\": true, \"operations\": {\"h_mean\": 33, \"zero\": 33}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        6,
+        13,
+        20,
+        27
+      ],
+      "observed_matching_original_case_max_seconds": 26.574205063981935,
+      "actual_SER_runtime_observed": null
+    },
+    {
+      "index": 49,
+      "invocation_id": "55ca1d24b5ae58656f7bcfcdb80a99bce784aff9eea801713e29725c71b2f93c",
+      "analysis_task": "ser_v2",
+      "source_task": "ser_v2",
+      "panel": "selected_pilot",
+      "cells": 211,
+      "batch_groups": 10,
+      "operation_shape_signature": "{\"batch_groups\": 10, \"cells\": 211, \"families\": {\"assessment_null\": 199, \"learned\": 3, \"nuisance\": 3, \"steering_learned\": 2, \"steering_nuisance\": 2, \"steering_random\": 2}, \"group_sizes\": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1], \"mmlu_branch\": false, \"operations\": {\"h_mean\": 2, \"interchange\": 201, \"steer_negative\": 3, \"steer_positive\": 3, \"zero\": 2}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        7,
+        14,
+        21,
+        28
+      ],
+      "observed_matching_original_case_max_seconds": 70.68714533001184,
+      "actual_SER_runtime_observed": false
+    },
+    {
+      "index": 50,
+      "invocation_id": "c04577a6af89a571eee759187a1a37a3e1ab02ee08d5bdae3e2c46c3970b56e5",
+      "analysis_task": "ser_v2",
+      "source_task": "ser_v2",
+      "panel": "selected_pilot",
+      "cells": 211,
+      "batch_groups": 10,
+      "operation_shape_signature": "{\"batch_groups\": 10, \"cells\": 211, \"families\": {\"assessment_null\": 199, \"learned\": 3, \"nuisance\": 3, \"steering_learned\": 2, \"steering_nuisance\": 2, \"steering_random\": 2}, \"group_sizes\": [2, 2, 2, 2, 2, 2, 2, 2, 2, 2], \"mmlu_branch\": false, \"operations\": {\"h_mean\": 2, \"interchange\": 201, \"steer_negative\": 3, \"steer_positive\": 3, \"zero\": 2}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        8,
+        15,
+        22,
+        29
+      ],
+      "observed_matching_original_case_max_seconds": 69.93302771495655,
+      "actual_SER_runtime_observed": false
+    },
+    {
+      "index": 51,
+      "invocation_id": "debc963ec3a1c857268c19c0af3af92a495c15f1be195a63cd3a112a45212c10",
+      "analysis_task": "ser_v2",
+      "source_task": "ioi",
+      "panel": "selected_pilot",
+      "cells": 211,
+      "batch_groups": 1,
+      "operation_shape_signature": "{\"batch_groups\": 1, \"cells\": 211, \"families\": {\"assessment_null\": 199, \"learned\": 3, \"nuisance\": 3, \"steering_learned\": 2, \"steering_nuisance\": 2, \"steering_random\": 2}, \"group_sizes\": [2], \"mmlu_branch\": false, \"operations\": {\"h_mean\": 2, \"interchange\": 201, \"steer_negative\": 3, \"steer_positive\": 3, \"zero\": 2}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        9,
+        16,
+        23,
+        30
+      ],
+      "observed_matching_original_case_max_seconds": 28.518431831966154,
+      "actual_SER_runtime_observed": null
+    },
+    {
+      "index": 52,
+      "invocation_id": "4fe85b7963acbbb10ef4373c1aafe19bd4bc7ea659dda6f90a0ecd85535f9980",
+      "analysis_task": "ser_v2",
+      "source_task": "mmlu",
+      "panel": "selected_pilot",
+      "cells": 408,
+      "batch_groups": 2,
+      "operation_shape_signature": "{\"batch_groups\": 2, \"cells\": 408, \"families\": {\"assessment_null\": 398, \"learned\": 2, \"nuisance\": 2, \"steering_learned\": 2, \"steering_nuisance\": 2, \"steering_random\": 2}, \"group_sizes\": [2, 2], \"mmlu_branch\": true, \"operations\": {\"h_mean\": 201, \"steer_negative\": 3, \"steer_positive\": 3, \"zero\": 201}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        10,
+        17,
+        24,
+        31
+      ],
+      "observed_matching_original_case_max_seconds": 42.07410628604703,
+      "actual_SER_runtime_observed": null
+    },
+    {
+      "index": 53,
+      "invocation_id": "844e097a17a2631c82ac995973dfdec46b0b3b7f0670ef1f8933931bbbd61c12",
+      "analysis_task": "ser_v2",
+      "source_task": "ser_v2",
+      "panel": "calibration_pilot",
+      "cells": 33,
+      "batch_groups": 10,
+      "operation_shape_signature": "{\"batch_groups\": 10, \"cells\": 33, \"families\": {\"calibration_null\": 32, \"learned\": 1}, \"group_sizes\": [2, 2, 2, 2, 2, 2, 2, 2, 2, 2], \"mmlu_branch\": false, \"operations\": {\"interchange\": 33}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        11,
+        18,
+        25
+      ],
+      "observed_matching_original_case_max_seconds": 31.985078952042386,
+      "actual_SER_runtime_observed": false
+    },
+    {
+      "index": 54,
+      "invocation_id": "a83bc256e79eb904efef036f770ce045318bc7e57ac0c2e86473676d4c9f71a1",
+      "analysis_task": "ser_v2",
+      "source_task": "ioi",
+      "panel": "calibration_pilot",
+      "cells": 33,
+      "batch_groups": 1,
+      "operation_shape_signature": "{\"batch_groups\": 1, \"cells\": 33, \"families\": {\"calibration_null\": 32, \"learned\": 1}, \"group_sizes\": [2], \"mmlu_branch\": false, \"operations\": {\"interchange\": 33}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        5,
+        12,
+        19,
+        26
+      ],
+      "observed_matching_original_case_max_seconds": 27.40703174006194,
+      "actual_SER_runtime_observed": null
+    },
+    {
+      "index": 55,
+      "invocation_id": "c840e02711ec12881b4c050a119dd0f813d19f826e4fdde58a78d4bd134c6681",
+      "analysis_task": "ser_v2",
+      "source_task": "mmlu",
+      "panel": "calibration_pilot",
+      "cells": 66,
+      "batch_groups": 2,
+      "operation_shape_signature": "{\"batch_groups\": 2, \"cells\": 66, \"families\": {\"calibration_null\": 64, \"learned\": 2}, \"group_sizes\": [2, 2], \"mmlu_branch\": true, \"operations\": {\"h_mean\": 33, \"zero\": 33}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        6,
+        13,
+        20,
+        27
+      ],
+      "observed_matching_original_case_max_seconds": 26.574205063981935,
+      "actual_SER_runtime_observed": null
+    },
+    {
+      "index": 56,
+      "invocation_id": "c9e3df1e8d0c1b23b5efe2a2fe2a15abe19818fcf6bfe1d84c279e865382df38",
+      "analysis_task": "ser_v2",
+      "source_task": "ser_v2",
+      "panel": "selected_pilot",
+      "cells": 211,
+      "batch_groups": 10,
+      "operation_shape_signature": "{\"batch_groups\": 10, \"cells\": 211, \"families\": {\"assessment_null\": 199, \"learned\": 3, \"nuisance\": 3, \"steering_learned\": 2, \"steering_nuisance\": 2, \"steering_random\": 2}, \"group_sizes\": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1], \"mmlu_branch\": false, \"operations\": {\"h_mean\": 2, \"interchange\": 201, \"steer_negative\": 3, \"steer_positive\": 3, \"zero\": 2}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        7,
+        14,
+        21,
+        28
+      ],
+      "observed_matching_original_case_max_seconds": 70.68714533001184,
+      "actual_SER_runtime_observed": false
+    },
+    {
+      "index": 57,
+      "invocation_id": "bca7dda98d2faebf47ffc5d79450cc0641176c070bcbe50ab5d104d09541c7ea",
+      "analysis_task": "ser_v2",
+      "source_task": "ser_v2",
+      "panel": "selected_pilot",
+      "cells": 211,
+      "batch_groups": 10,
+      "operation_shape_signature": "{\"batch_groups\": 10, \"cells\": 211, \"families\": {\"assessment_null\": 199, \"learned\": 3, \"nuisance\": 3, \"steering_learned\": 2, \"steering_nuisance\": 2, \"steering_random\": 2}, \"group_sizes\": [2, 2, 2, 2, 2, 2, 2, 2, 2, 2], \"mmlu_branch\": false, \"operations\": {\"h_mean\": 2, \"interchange\": 201, \"steer_negative\": 3, \"steer_positive\": 3, \"zero\": 2}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        8,
+        15,
+        22,
+        29
+      ],
+      "observed_matching_original_case_max_seconds": 69.93302771495655,
+      "actual_SER_runtime_observed": false
+    },
+    {
+      "index": 58,
+      "invocation_id": "26d031097b7fc6eac8a1b71f8078c778783baa527c7d3fe81708caffb1800b36",
+      "analysis_task": "ser_v2",
+      "source_task": "ioi",
+      "panel": "selected_pilot",
+      "cells": 211,
+      "batch_groups": 1,
+      "operation_shape_signature": "{\"batch_groups\": 1, \"cells\": 211, \"families\": {\"assessment_null\": 199, \"learned\": 3, \"nuisance\": 3, \"steering_learned\": 2, \"steering_nuisance\": 2, \"steering_random\": 2}, \"group_sizes\": [2], \"mmlu_branch\": false, \"operations\": {\"h_mean\": 2, \"interchange\": 201, \"steer_negative\": 3, \"steer_positive\": 3, \"zero\": 2}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        9,
+        16,
+        23,
+        30
+      ],
+      "observed_matching_original_case_max_seconds": 28.518431831966154,
+      "actual_SER_runtime_observed": null
+    },
+    {
+      "index": 59,
+      "invocation_id": "2d423ca93ae64db5cece9ac542e00261648c6e1038260d2bef1597db71873442",
+      "analysis_task": "ser_v2",
+      "source_task": "mmlu",
+      "panel": "selected_pilot",
+      "cells": 408,
+      "batch_groups": 2,
+      "operation_shape_signature": "{\"batch_groups\": 2, \"cells\": 408, \"families\": {\"assessment_null\": 398, \"learned\": 2, \"nuisance\": 2, \"steering_learned\": 2, \"steering_nuisance\": 2, \"steering_random\": 2}, \"group_sizes\": [2, 2], \"mmlu_branch\": true, \"operations\": {\"h_mean\": 201, \"steer_negative\": 3, \"steer_positive\": 3, \"zero\": 201}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        10,
+        17,
+        24,
+        31
+      ],
+      "observed_matching_original_case_max_seconds": 42.07410628604703,
+      "actual_SER_runtime_observed": null
+    },
+    {
+      "index": 60,
+      "invocation_id": "7162a3af2f2595014f72914cd34a7137bfdedfa919fef1d1161ee8bb91df282c",
+      "analysis_task": "ser_v2",
+      "source_task": "ser_v2",
+      "panel": "calibration_pilot",
+      "cells": 33,
+      "batch_groups": 10,
+      "operation_shape_signature": "{\"batch_groups\": 10, \"cells\": 33, \"families\": {\"calibration_null\": 32, \"learned\": 1}, \"group_sizes\": [2, 2, 2, 2, 2, 2, 2, 2, 2, 2], \"mmlu_branch\": false, \"operations\": {\"interchange\": 33}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        11,
+        18,
+        25
+      ],
+      "observed_matching_original_case_max_seconds": 31.985078952042386,
+      "actual_SER_runtime_observed": false
+    },
+    {
+      "index": 61,
+      "invocation_id": "9861b5c5e4ccb1eb2cd974433e7455df7883f1a77262b71660977d8e53206983",
+      "analysis_task": "ser_v2",
+      "source_task": "ioi",
+      "panel": "calibration_pilot",
+      "cells": 33,
+      "batch_groups": 1,
+      "operation_shape_signature": "{\"batch_groups\": 1, \"cells\": 33, \"families\": {\"calibration_null\": 32, \"learned\": 1}, \"group_sizes\": [2], \"mmlu_branch\": false, \"operations\": {\"interchange\": 33}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        5,
+        12,
+        19,
+        26
+      ],
+      "observed_matching_original_case_max_seconds": 27.40703174006194,
+      "actual_SER_runtime_observed": null
+    },
+    {
+      "index": 62,
+      "invocation_id": "152789d51416e2fa97cc19e35d9caa3bce552c92f2c9e0d1c44980b7e845aeb4",
+      "analysis_task": "ser_v2",
+      "source_task": "mmlu",
+      "panel": "calibration_pilot",
+      "cells": 66,
+      "batch_groups": 2,
+      "operation_shape_signature": "{\"batch_groups\": 2, \"cells\": 66, \"families\": {\"calibration_null\": 64, \"learned\": 2}, \"group_sizes\": [2, 2], \"mmlu_branch\": true, \"operations\": {\"h_mean\": 33, \"zero\": 33}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        6,
+        13,
+        20,
+        27
+      ],
+      "observed_matching_original_case_max_seconds": 26.574205063981935,
+      "actual_SER_runtime_observed": null
+    }
+  ],
+  "requested_next": {
+    "indices": [
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48
+    ],
+    "preserve_indices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31
+    ],
+    "child_cap_seconds": 2820,
+    "kill_grace_seconds": 15,
+    "Slurm_time_minutes": 49,
+    "account": "bjhz-delta-cpu",
+    "partition": "cpu-interactive",
+    "constraint": "projects",
+    "CPUs": 4,
+    "memory_GiB": 32,
+    "GPUs": 0
+  },
+  "later_scope_not_authorized_for_execution": {
+    "indices": [
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62
+    ],
+    "current_buffered_seconds": 2436.33218627125,
+    "illustrative_child_cap_seconds": 2460,
+    "illustrative_Slurm_time_minutes": 43,
+    "recompute_after_next_actual_chunk": true
+  },
+  "limitations": [
+    "SER has no observed original invocation runtime yet; its exact operation/shape matches existing generic paired-source classes, not a demonstrated host/source runtime bound.",
+    "All 31 cases in one process exceed one hour with the same buffer even when using only the latest job 137 measurements. No unbounded interactive attempt.",
+    "No process-local cache survives restart. Original full validation/authentication and controls remain.",
+    "Stop on any failure/timeout; preserve partials, no automatic rerun.",
+    "No pilot aggregate/calibration/assessment/production admission."
+  ],
+  "root_commands": {
+    "test_only": "sbatch --test-only --export=ALL --time=00:49:00 /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu32-48-proposal/launch.sbatch",
+    "submit_after_acceptance": "sbatch --parsable --export=ALL --time=00:49:00 /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu32-48-proposal/launch.sbatch"
+  }
+}

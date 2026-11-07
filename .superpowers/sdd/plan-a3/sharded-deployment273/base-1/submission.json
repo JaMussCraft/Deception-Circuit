@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "sbatch",
+    "--hold",
+    "--parsable",
+    "--constraint=projects",
+    "--account=beto-delta-cpu",
+    "--partition=cpu-preempt",
+    "--nodes=1",
+    "--ntasks=1",
+    "--cpus-per-task=2",
+    "--mem=32G",
+    "--time=01:20:00",
+    "--no-requeue",
+    "--export=ALL,CUDA_VISIBLE_DEVICES=,A3_HOST_PYTHON=/sw/external/python/anaconda3/bin/python3.9",
+    "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded",
+    "--job-name=lad-A3-base-1",
+    "--output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/sharded-deployment273/base-1/slurm-%j.log",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/sharded-deployment273/base-1/dispatch.sh"
+  ],
+  "exit_code": 0,
+  "stdout": "23631880\n",
+  "stderr": "",
+  "observed_unix": 1794039600.3660953
+}

@@ -1,0 +1,35 @@
+{
+  "status": "handed-back",
+  "verdict": "ACCEPT_CORRECTED_DIAGNOSTIC_SOURCE_ONLY",
+  "findings": [],
+  "R244_A": "closed: sticky min(original,current CPU end-minus60); params+command bind effective entry bound; final fresh clock rejects >=deadline before Popen",
+  "manifest_sha256": "c43d084973d38dbb2367b269879f23cc2d42383784f65d9abde937d4232573e6",
+  "members_checked": 577,
+  "all_original546_pins_unchanged": true,
+  "only_behavior_delta": "runner.run_stage",
+  "Task2_helpers_and_data_factor_unchanged": true,
+  "recorded_RED": {
+    "cases": 7,
+    "failures": 5,
+    "prior_passes": 2
+  },
+  "recorded_GREEN_each": 26,
+  "independent_tiny_boundary_cases": {
+    "expected": 3,
+    "observed": 3,
+    "exit_code": 0
+  },
+  "policy_preserved": {
+    "prime": 480,
+    "fresh": 240,
+    "total": 900,
+    "publication": 45,
+    "finish": 60,
+    "kill_grace": 15
+  },
+  "operational_feasible": null,
+  "remote_request_transfer_publication_unmeasured": true,
+  "actual_Task2_GREEN_source_and_root_bindings_still_required": true,
+  "diagnostic_launch_or_resource_or_GPU_admitted": false,
+  "no_author_handback_or_source_edits_or_native_full_tests_or_jobs_remote_git_RS_agents": true
+}

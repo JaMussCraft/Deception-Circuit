@@ -1,0 +1,32 @@
+.....................................................F.                  [100%]
+=================================== FAILURES ===================================
+___________ test_prepared_native_prefit_inventory_seam_without_model ___________
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1-green-r2/green-run-01/base/tmp/test_prepared_native_prefit_in0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fe89a397490>
+
+    def test_prepared_native_prefit_inventory_seam_without_model(tmp_path, monkeypatch):
+        r = runtime(); read = r._read_prepared_target_object
+        from tests.a3_direction_native_scenario import inventory
+        from tests.test_a3_direction_runtime import _real_injected_design
+        # Use the unchanged native builder/publisher seam, never tiny_model/scenario_init.
+        design, protocol = _real_injected_design()
+        native = tmp_path / 'native'; native.mkdir()
+        value = inventory(native, design, protocol, 'prefit')
+        target, preparation, tr, pr, policy = object_case(tmp_path, payload=value)
+        frozen, _, _, witness, _, _ = unpack(read(tr, pr, policy))
+>       assert frozen == value == r.read_object(target)
+E       AssertionError: assert {'admission_s...lidation:1']}} == {'admission_s...rds': [], ...}
+E         
+E         Omitting 27 identical items, use -vv to show
+E         Differing items:
+E         {'requirements': [{'axis_class': None, 'axis_ids': [], 'axis_scope': [], 'batches': 1, 'call_index': 0, 'declared_job_...rget_keys': [], 'target_unmasked_lengths': [], 'timing_inputs': [], 'timing_keys': [], 'timing_unmasked_lengths': []}]} != {'requirements': [{'axis_class': None, 'axis_ids': [], 'axis_scope': [], 'batches': 1, ...}, {'axis_class': None, 'axi... 'axis_scope': [], 'batches': 1, ...}, {'axis_class': None, 'axis_ids': [], 'axis_scope': [], 'batches': 1, ...}, ...]}
+E         {'shards': [{'cells': [{'axis_in...
+E         
+E         ...Full output truncated (3 lines hidden), use '-vv' to show
+
+suite/test_a3_prepared_pilot_target.py:329: AssertionError
+- generated xml file: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1-green-r2/green-run-01/base/junit.xml -
+=========================== short test summary info ============================
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_native_prefit_inventory_seam_without_model
+1 failed, 54 passed in 9.91s

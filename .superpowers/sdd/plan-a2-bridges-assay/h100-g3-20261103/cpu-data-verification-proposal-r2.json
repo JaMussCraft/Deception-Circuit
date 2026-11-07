@@ -1,0 +1,39 @@
+{
+  "status": "READY_FOR_ROOT_R2_CPU_PLACEMENT_CHECK",
+  "source_independent": true,
+  "model_execution": false,
+  "final_source_choice_pending": true,
+  "local_packet": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103",
+  "remote_deployment": "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/deployment",
+  "transfer_files": [
+    "verify-transferred-data-r2.py",
+    "cpu-verify-transferred-data-r2.sh"
+  ],
+  "resource_proposal": {
+    "cluster": "bridges2",
+    "partition": "RM-shared",
+    "account": "cis260361p",
+    "nodes": 1,
+    "ntasks": 1,
+    "cpus_per_task": 5,
+    "mem": "8G",
+    "time": "00:10:00",
+    "requeue": false,
+    "qos": "rm"
+  },
+  "expected_counts": {
+    "ordinary_files": 389,
+    "bytes": 436913681,
+    "aliases": 5
+  },
+  "limits": [
+    "no retry",
+    "not final source/G3/geometry authority",
+    "no model/cache weight loading or GPU admission"
+  ],
+  "packet_sha256": {
+    "verify-transferred-data-r2.py": "9309cd66762a755010c4ecc2a14bd35b2055ebc629cdecd1aaee5f90e4351329",
+    "cpu-verify-transferred-data-r2.sh": "599bbc43d9389805f5f39675240c041581b3ef4e9496279e252f3f7b3a48ef15"
+  },
+  "supersedes_placement_only": "Original packet remains unexecuted; 382 lacks rm QoS, 361 has rm. Same manifest/container/input checks, no model admission."
+}

@@ -1,0 +1,5 @@
+# Accepted scope for the proposed source-refresh repair
+
+Diagnosis and concrete plan only until root acceptance. Candidate source is an ordinary isolated copy of the frozen edge successor. Proposed ownership is the mask and edge pipelines and their corresponding tests, plus one named shared source-validation helper and its test if needed.
+
+Preserve complete scientific coverage, all source/ancestry bytes and lexical symlink ancestors, actual current protected sets and graders, source/data/in-memory boundaries, and existing ledger/reservation/budget/lease checks. No original A1 dependency, direction runtime/workload, scientific parameter or public execution authority changes. No source edits, git, research-session state, scheduler, GPU, large weights, paid API, notebooks or subagents during planning. Existing artifacts and the held mask reservation are immutable. Root may freeze a fresh exact candidate after focused tests; genuine fresh preparation and real-input benchmarks precede final review. User involvement is reserved for any eventual explicit source/reservation or cap exception after a concrete tested repair.

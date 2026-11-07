@@ -1,0 +1,42 @@
+{
+  "kind": "independent_account_only_amendment_source_review",
+  "verdict": "SOURCE_PASS_PENDING_ACTUAL_APPLIED_AMENDMENT",
+  "authorizer_sha256": "220b0888a23ad5d0f7c77b64deb80ef5bc1a80b5ae02f4a8e533aa71c25c9c4f",
+  "original_placement_sha256": "fed51952deb8a1237a26edbb02083d6fc9bc3aa9f40f142009e9d56c99b311fd",
+  "synthetic_after_records_only": true,
+  "genuine_before_records_used": true,
+  "amended_job_ids": [
+    "50148398",
+    "50148399",
+    "50148404",
+    "50148405",
+    "50148407"
+  ],
+  "unchanged_original_running_job": "50148389",
+  "positive_five_job_amendment_pass": true,
+  "positive_live_amended_and_original_account_pass": true,
+  "negative_cases": {
+    "unknown_job": "reject",
+    "new_account": "reject",
+    "source": "reject",
+    "parent": "reject",
+    "new_sha": "reject",
+    "old_sha": "reject",
+    "resource_after": "reject",
+    "wrong_after_account": "reject",
+    "wrong_cell": "reject",
+    "wrong_reservation": "reject",
+    "unapplied": "reject",
+    "not_held": "reject",
+    "nonzero_runtime": "reject",
+    "old_account_after_amend": "reject",
+    "wrong_live_account": "reject",
+    "wrong_live_cpu": "reject",
+    "wrong_live_gpu": "reject"
+  },
+  "actual_changes_or_remote_or_jobs": false,
+  "native_SAFE_ENV_does_not_store_account": true,
+  "actual_billing_bound_by_outer_amendment_and_authorization": true,
+  "amended_job_count": 5,
+  "negative_case_count": 17
+}

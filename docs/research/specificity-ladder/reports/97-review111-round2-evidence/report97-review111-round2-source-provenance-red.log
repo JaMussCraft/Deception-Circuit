@@ -1,0 +1,55 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____ test_serial_donor_cache_maps_and_observed_rows_match_rebuilt_source ______
+
+tmp_path = PosixPath('/tmp/review111-round2-source-provenance-red/test_serial_donor_cache_maps_a0')
+fake = [(tensor([[2, 3, 6, 0],
+        [2, 3, 5, 0]]), None), (tensor([[1, 2, 4, 0],
+        [1, 2, 3, 0]]), None), (tensor([...None), (tensor([[2, 3, 5, 0],
+        [2, 3, 7, 0]]), None), (tensor([[1, 2, 3, 0],
+        [1, 2, 5, 0]]), None), ...]
+
+    def test_serial_donor_cache_maps_and_observed_rows_match_rebuilt_source(tmp_path,fake):
+        r,d,p=_fake_pilot_inputs(1);inv=r.workload.build_inventory(d,p,stage='prefit')
+        invocation=next(x for x in r._serial_invocations(inv) if x['source_task']=='far_v2')
+        result=r._pilot_invocation(object(),d,p,invocation,axes=None,root=tmp_path,guard=lambda:None)
+        original=dict(kind='a3_serial_numeric_invocation_v1',actual_execution=True,injected=True,timing_only=True,
+            source_commit=p['commit'],runtime_profile=r.runtime_kernel_identity(object()),receipt=result['receipt'],
+            positive_controls=result['positive_controls'],numeric_backing_references={})
+        measurement=r._pilot_scope_measurement(d,invocation)
+        for damage in (None,'id','condition','stream','readout','cache_hash','cache_missing','cache_source','observation','source_id','split'):
+            value=copy.deepcopy(original);raw=value['receipt']
+            descriptor=next(s['donors'][0] for ss in raw['batches'].values() for s in ss if s['operation']=='interchange')
+            if damage=='id':descriptor['mapping']['donor_id']='other'
+            if damage=='condition':descriptor['mapping']['donor_condition']='other'
+            if damage=='stream':descriptor['mapping']['donor_stream']='not-a-real-stream'
+            if damage=='readout':descriptor['mapping']['donor_positions']=[0]
+            if damage=='cache_hash':descriptor['cached_donor_sha256']='0'*64
+            if damage=='cache_missing':raw['donor_cache']=[]
+            if damage=='cache_source':
+                changed=raw['donor_cache'][0];changed['row']['tokens'][0]+=1
+                cache_value=r._serial_cache_wire(changed['row'],decode=True);new_hash=r.runner._digest(cache_value)
+                for ss in raw['batches'].values():
+                    for spec in ss:
+                        for item in spec.get('donors',[]):
+                            m=item['mapping'];key=[m['donor_profile_id'],cache_value['task'],m['donor_condition'],m['donor_stream'],m['donor_id']]
+                            if key==changed['key']:item['cached_donor_sha256']=new_hash
+            if damage=='observation':next(x for x in raw['rows'] if x['operation']=='interchange')['donor_mapping']['donor_positions']=[0]
+            if damage in ('source_id','split'):
+                for ss in raw['batches'].values():
+                    for spec in ss:
+                        for item in spec.get('donors',[]):item['mapping']['donor_'+damage]='foreign'
+                for row in raw['rows']:
+                    if row['operation']=='interchange':row['donor_mapping']['donor_'+damage]='foreign'
+            raw['receipt_sha256']=r.workload.digest({k:v for k,v in raw.items() if k!='receipt_sha256'})
+            path=tmp_path/('baseline' if damage is None else damage);r.publish_object(path,value)
+            if damage is None:r._SerialNumericProof(path).check_scope(measurement)
+            else:
+>               with pytest.raises(ValueError):r._SerialNumericProof(path).check_scope(measurement)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+E               Failed: DID NOT RAISE ValueError
+
+tests/test_a3_direction_runtime.py:1372: Failed
+=========================== short test summary info ============================
+FAILED tests/test_a3_direction_runtime.py::test_serial_donor_cache_maps_and_observed_rows_match_rebuilt_source
+1 failed in 8.42s

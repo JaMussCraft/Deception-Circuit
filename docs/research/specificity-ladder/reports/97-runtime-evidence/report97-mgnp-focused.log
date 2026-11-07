@@ -1,0 +1,18 @@
+........................................................................ [ 16%]
+........................................................................ [ 33%]
+........................................................................ [ 50%]
+........................................................................ [ 67%]
+........................................................................ [ 83%]
+.....................................................................    [100%]
+=============================== warnings summary ===============================
+tests/test_a3_direction_runtime.py::test_actual_tiny_runtime_shard_runs_positive_replays_and_atomic_restart
+  /u/swong2/.conda/envs/mgnp/lib/python3.12/site-packages/astor/op_util.py:92: DeprecationWarning: ast.Num is deprecated and will be removed in Python 3.14; use ast.Constant instead
+    precedence_data = dict((getattr(ast, x, None), z) for x, y, z in op_data)
+
+tests/test_a3_directions.py::test_tiny_llama_native_replay_and_adjacent_head_isolation
+tests/test_a3_directions.py::test_tiny_llama_direction_replays_through_existing_inference_hooks
+  /u/swong2/.conda/envs/mgnp/lib/python3.12/site-packages/torch/cuda/__init__.py:1061: UserWarning: Can't initialize NVML
+    raw_cnt = _raw_device_count_nvml()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+429 passed, 1 deselected, 3 warnings in 478.99s (0:07:58)

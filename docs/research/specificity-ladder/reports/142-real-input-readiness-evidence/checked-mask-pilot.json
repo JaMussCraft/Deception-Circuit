@@ -1,0 +1,39 @@
+{
+  "owner": "mask",
+  "stage": "pilot",
+  "owning_complete_validator_pass": true,
+  "identity_actual_prepared_match": true,
+  "scope_actual_canonical_and_banks_match": true,
+  "expected_keys": 31191,
+  "inventory_sha256": "c8ff6d6685cbb5b07c13edbc4df996b572631f1201b701c266dc12a6aa389d6f",
+  "requirements": 0,
+  "physical_calls": 0,
+  "storage_requirements": {
+    "components": {
+      "H_banks": 415432704,
+      "binary_parity_logit_caches": 726441984,
+      "checkpoint_retention": 14521823616,
+      "metadata": 2266568,
+      "native_gate_elements": 722016,
+      "scientific_scalar_rows": 123009637840,
+      "target_I_logits": 181610496,
+      "target_fixed_GPU_data": 910056828
+    },
+    "policy": "full source/row/inventory retention, all1200 boundaries, immutable validation artifacts and largest atomic publication; measured host peak added separately",
+    "schema": "a3_mask_target_storage_bound_v1",
+    "tiers": {
+      "cache_disk": 415432704,
+      "host_ram": 902495080,
+      "output_disk": 137533728024,
+      "scratch_disk": 338380000
+    }
+  },
+  "control_inventory": null,
+  "model_loads": null,
+  "finish_reserve_seconds": 300.0,
+  "mode": "mask:pilot",
+  "wall_seconds": 1.4642743261065334,
+  "host_peak_bytes": 1004302336,
+  "models_loaded": false,
+  "authority_exercised": false
+}

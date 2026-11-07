@@ -1,0 +1,882 @@
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF                                         [100%]
+=================================== FAILURES ===================================
+________________________ test_frozen_original_partition ________________________
+
+    def test_frozen_original_partition():
+>       a = module('aggregate'); p = contract(); a.validate_partition(p)
+            ^^^^^^^^^^^^^^^^^^^
+
+test_packet.py:30: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'aggregate'
+
+    def module(name):
+        path = HERE / (name + '.py')
+>       assert path.is_file(), 'missing required ' + name
+E       AssertionError: missing required aggregate
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/aggregate.py').is_file
+
+test_packet.py:15: AssertionError
+___________________ test_partition_rejects_damage[duplicate] ___________________
+
+damage = 'duplicate'
+
+    @pytest.mark.parametrize('damage', ['duplicate','omit','substitute','count','order'])
+    def test_partition_rejects_damage(damage):
+>       a=module('aggregate'); p=contract()
+          ^^^^^^^^^^^^^^^^^^^
+
+test_packet.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'aggregate'
+
+    def module(name):
+        path = HERE / (name + '.py')
+>       assert path.is_file(), 'missing required ' + name
+E       AssertionError: missing required aggregate
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/aggregate.py').is_file
+
+test_packet.py:15: AssertionError
+_____________________ test_partition_rejects_damage[omit] ______________________
+
+damage = 'omit'
+
+    @pytest.mark.parametrize('damage', ['duplicate','omit','substitute','count','order'])
+    def test_partition_rejects_damage(damage):
+>       a=module('aggregate'); p=contract()
+          ^^^^^^^^^^^^^^^^^^^
+
+test_packet.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'aggregate'
+
+    def module(name):
+        path = HERE / (name + '.py')
+>       assert path.is_file(), 'missing required ' + name
+E       AssertionError: missing required aggregate
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/aggregate.py').is_file
+
+test_packet.py:15: AssertionError
+__________________ test_partition_rejects_damage[substitute] ___________________
+
+damage = 'substitute'
+
+    @pytest.mark.parametrize('damage', ['duplicate','omit','substitute','count','order'])
+    def test_partition_rejects_damage(damage):
+>       a=module('aggregate'); p=contract()
+          ^^^^^^^^^^^^^^^^^^^
+
+test_packet.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'aggregate'
+
+    def module(name):
+        path = HERE / (name + '.py')
+>       assert path.is_file(), 'missing required ' + name
+E       AssertionError: missing required aggregate
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/aggregate.py').is_file
+
+test_packet.py:15: AssertionError
+_____________________ test_partition_rejects_damage[count] _____________________
+
+damage = 'count'
+
+    @pytest.mark.parametrize('damage', ['duplicate','omit','substitute','count','order'])
+    def test_partition_rejects_damage(damage):
+>       a=module('aggregate'); p=contract()
+          ^^^^^^^^^^^^^^^^^^^
+
+test_packet.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'aggregate'
+
+    def module(name):
+        path = HERE / (name + '.py')
+>       assert path.is_file(), 'missing required ' + name
+E       AssertionError: missing required aggregate
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/aggregate.py').is_file
+
+test_packet.py:15: AssertionError
+_____________________ test_partition_rejects_damage[order] _____________________
+
+damage = 'order'
+
+    @pytest.mark.parametrize('damage', ['duplicate','omit','substitute','count','order'])
+    def test_partition_rejects_damage(damage):
+>       a=module('aggregate'); p=contract()
+          ^^^^^^^^^^^^^^^^^^^
+
+test_packet.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'aggregate'
+
+    def module(name):
+        path = HERE / (name + '.py')
+>       assert path.is_file(), 'missing required ' + name
+E       AssertionError: missing required aggregate
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/aggregate.py').is_file
+
+test_packet.py:15: AssertionError
+____________________ test_complete_and_partial_are_separate ____________________
+
+tmp_path = PosixPath('/tmp/a3-r6-red-mgnp/test_complete_and_partial_are_0')
+
+    def test_complete_and_partial_are_separate(tmp_path):
+>       a,p,s,b,r=terminal(tmp_path)
+                  ^^^^^^^^^^^^^^^^^^
+
+test_packet.py:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test_packet.py:49: in terminal
+    a=module('aggregate'); p=contract(); source={'revision':'r6-sharded','runtime_sha256':'runtime','fixture_sha256':'fixture','partition_sha256':a.digest(HERE/'partition.json'),'source_pins_sha256':'pins'}
+      ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'aggregate'
+
+    def module(name):
+        path = HERE / (name + '.py')
+>       assert path.is_file(), 'missing required ' + name
+E       AssertionError: missing required aggregate
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/aggregate.py').is_file
+
+test_packet.py:15: AssertionError
+____________________ test_aggregate_fails_closed[duplicate] ____________________
+
+tmp_path = PosixPath('/tmp/a3-r6-red-mgnp/test_aggregate_fails_closed_du0')
+damage = 'duplicate'
+
+    @pytest.mark.parametrize('damage',['duplicate','omit','substitute','phase','fail','skip','setup-error','teardown-error','late','nonzero','source','source-after','interpreter','job','baseline','oracle','preflight','host','partition-after','old-r5','config','accounting','overlap-binding'])
+    def test_aggregate_fails_closed(tmp_path,damage):
+>       a,p,s,b,records=terminal(tmp_path); ref=records[0]; m=json.loads(Path(ref['path']).read_text())
+                        ^^^^^^^^^^^^^^^^^^
+
+test_packet.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test_packet.py:49: in terminal
+    a=module('aggregate'); p=contract(); source={'revision':'r6-sharded','runtime_sha256':'runtime','fixture_sha256':'fixture','partition_sha256':a.digest(HERE/'partition.json'),'source_pins_sha256':'pins'}
+      ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'aggregate'
+
+    def module(name):
+        path = HERE / (name + '.py')
+>       assert path.is_file(), 'missing required ' + name
+E       AssertionError: missing required aggregate
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/aggregate.py').is_file
+
+test_packet.py:15: AssertionError
+______________________ test_aggregate_fails_closed[omit] _______________________
+
+tmp_path = PosixPath('/tmp/a3-r6-red-mgnp/test_aggregate_fails_closed_om0')
+damage = 'omit'
+
+    @pytest.mark.parametrize('damage',['duplicate','omit','substitute','phase','fail','skip','setup-error','teardown-error','late','nonzero','source','source-after','interpreter','job','baseline','oracle','preflight','host','partition-after','old-r5','config','accounting','overlap-binding'])
+    def test_aggregate_fails_closed(tmp_path,damage):
+>       a,p,s,b,records=terminal(tmp_path); ref=records[0]; m=json.loads(Path(ref['path']).read_text())
+                        ^^^^^^^^^^^^^^^^^^
+
+test_packet.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test_packet.py:49: in terminal
+    a=module('aggregate'); p=contract(); source={'revision':'r6-sharded','runtime_sha256':'runtime','fixture_sha256':'fixture','partition_sha256':a.digest(HERE/'partition.json'),'source_pins_sha256':'pins'}
+      ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'aggregate'
+
+    def module(name):
+        path = HERE / (name + '.py')
+>       assert path.is_file(), 'missing required ' + name
+E       AssertionError: missing required aggregate
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/aggregate.py').is_file
+
+test_packet.py:15: AssertionError
+___________________ test_aggregate_fails_closed[substitute] ____________________
+
+tmp_path = PosixPath('/tmp/a3-r6-red-mgnp/test_aggregate_fails_closed_su0')
+damage = 'substitute'
+
+    @pytest.mark.parametrize('damage',['duplicate','omit','substitute','phase','fail','skip','setup-error','teardown-error','late','nonzero','source','source-after','interpreter','job','baseline','oracle','preflight','host','partition-after','old-r5','config','accounting','overlap-binding'])
+    def test_aggregate_fails_closed(tmp_path,damage):
+>       a,p,s,b,records=terminal(tmp_path); ref=records[0]; m=json.loads(Path(ref['path']).read_text())
+                        ^^^^^^^^^^^^^^^^^^
+
+test_packet.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test_packet.py:49: in terminal
+    a=module('aggregate'); p=contract(); source={'revision':'r6-sharded','runtime_sha256':'runtime','fixture_sha256':'fixture','partition_sha256':a.digest(HERE/'partition.json'),'source_pins_sha256':'pins'}
+      ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'aggregate'
+
+    def module(name):
+        path = HERE / (name + '.py')
+>       assert path.is_file(), 'missing required ' + name
+E       AssertionError: missing required aggregate
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/aggregate.py').is_file
+
+test_packet.py:15: AssertionError
+______________________ test_aggregate_fails_closed[phase] ______________________
+
+tmp_path = PosixPath('/tmp/a3-r6-red-mgnp/test_aggregate_fails_closed_ph0')
+damage = 'phase'
+
+    @pytest.mark.parametrize('damage',['duplicate','omit','substitute','phase','fail','skip','setup-error','teardown-error','late','nonzero','source','source-after','interpreter','job','baseline','oracle','preflight','host','partition-after','old-r5','config','accounting','overlap-binding'])
+    def test_aggregate_fails_closed(tmp_path,damage):
+>       a,p,s,b,records=terminal(tmp_path); ref=records[0]; m=json.loads(Path(ref['path']).read_text())
+                        ^^^^^^^^^^^^^^^^^^
+
+test_packet.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test_packet.py:49: in terminal
+    a=module('aggregate'); p=contract(); source={'revision':'r6-sharded','runtime_sha256':'runtime','fixture_sha256':'fixture','partition_sha256':a.digest(HERE/'partition.json'),'source_pins_sha256':'pins'}
+      ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'aggregate'
+
+    def module(name):
+        path = HERE / (name + '.py')
+>       assert path.is_file(), 'missing required ' + name
+E       AssertionError: missing required aggregate
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/aggregate.py').is_file
+
+test_packet.py:15: AssertionError
+______________________ test_aggregate_fails_closed[fail] _______________________
+
+tmp_path = PosixPath('/tmp/a3-r6-red-mgnp/test_aggregate_fails_closed_fa0')
+damage = 'fail'
+
+    @pytest.mark.parametrize('damage',['duplicate','omit','substitute','phase','fail','skip','setup-error','teardown-error','late','nonzero','source','source-after','interpreter','job','baseline','oracle','preflight','host','partition-after','old-r5','config','accounting','overlap-binding'])
+    def test_aggregate_fails_closed(tmp_path,damage):
+>       a,p,s,b,records=terminal(tmp_path); ref=records[0]; m=json.loads(Path(ref['path']).read_text())
+                        ^^^^^^^^^^^^^^^^^^
+
+test_packet.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test_packet.py:49: in terminal
+    a=module('aggregate'); p=contract(); source={'revision':'r6-sharded','runtime_sha256':'runtime','fixture_sha256':'fixture','partition_sha256':a.digest(HERE/'partition.json'),'source_pins_sha256':'pins'}
+      ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'aggregate'
+
+    def module(name):
+        path = HERE / (name + '.py')
+>       assert path.is_file(), 'missing required ' + name
+E       AssertionError: missing required aggregate
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/aggregate.py').is_file
+
+test_packet.py:15: AssertionError
+______________________ test_aggregate_fails_closed[skip] _______________________
+
+tmp_path = PosixPath('/tmp/a3-r6-red-mgnp/test_aggregate_fails_closed_sk0')
+damage = 'skip'
+
+    @pytest.mark.parametrize('damage',['duplicate','omit','substitute','phase','fail','skip','setup-error','teardown-error','late','nonzero','source','source-after','interpreter','job','baseline','oracle','preflight','host','partition-after','old-r5','config','accounting','overlap-binding'])
+    def test_aggregate_fails_closed(tmp_path,damage):
+>       a,p,s,b,records=terminal(tmp_path); ref=records[0]; m=json.loads(Path(ref['path']).read_text())
+                        ^^^^^^^^^^^^^^^^^^
+
+test_packet.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test_packet.py:49: in terminal
+    a=module('aggregate'); p=contract(); source={'revision':'r6-sharded','runtime_sha256':'runtime','fixture_sha256':'fixture','partition_sha256':a.digest(HERE/'partition.json'),'source_pins_sha256':'pins'}
+      ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'aggregate'
+
+    def module(name):
+        path = HERE / (name + '.py')
+>       assert path.is_file(), 'missing required ' + name
+E       AssertionError: missing required aggregate
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/aggregate.py').is_file
+
+test_packet.py:15: AssertionError
+___________________ test_aggregate_fails_closed[setup-error] ___________________
+
+tmp_path = PosixPath('/tmp/a3-r6-red-mgnp/test_aggregate_fails_closed_se0')
+damage = 'setup-error'
+
+    @pytest.mark.parametrize('damage',['duplicate','omit','substitute','phase','fail','skip','setup-error','teardown-error','late','nonzero','source','source-after','interpreter','job','baseline','oracle','preflight','host','partition-after','old-r5','config','accounting','overlap-binding'])
+    def test_aggregate_fails_closed(tmp_path,damage):
+>       a,p,s,b,records=terminal(tmp_path); ref=records[0]; m=json.loads(Path(ref['path']).read_text())
+                        ^^^^^^^^^^^^^^^^^^
+
+test_packet.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test_packet.py:49: in terminal
+    a=module('aggregate'); p=contract(); source={'revision':'r6-sharded','runtime_sha256':'runtime','fixture_sha256':'fixture','partition_sha256':a.digest(HERE/'partition.json'),'source_pins_sha256':'pins'}
+      ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'aggregate'
+
+    def module(name):
+        path = HERE / (name + '.py')
+>       assert path.is_file(), 'missing required ' + name
+E       AssertionError: missing required aggregate
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/aggregate.py').is_file
+
+test_packet.py:15: AssertionError
+_________________ test_aggregate_fails_closed[teardown-error] __________________
+
+tmp_path = PosixPath('/tmp/a3-r6-red-mgnp/test_aggregate_fails_closed_te0')
+damage = 'teardown-error'
+
+    @pytest.mark.parametrize('damage',['duplicate','omit','substitute','phase','fail','skip','setup-error','teardown-error','late','nonzero','source','source-after','interpreter','job','baseline','oracle','preflight','host','partition-after','old-r5','config','accounting','overlap-binding'])
+    def test_aggregate_fails_closed(tmp_path,damage):
+>       a,p,s,b,records=terminal(tmp_path); ref=records[0]; m=json.loads(Path(ref['path']).read_text())
+                        ^^^^^^^^^^^^^^^^^^
+
+test_packet.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test_packet.py:49: in terminal
+    a=module('aggregate'); p=contract(); source={'revision':'r6-sharded','runtime_sha256':'runtime','fixture_sha256':'fixture','partition_sha256':a.digest(HERE/'partition.json'),'source_pins_sha256':'pins'}
+      ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'aggregate'
+
+    def module(name):
+        path = HERE / (name + '.py')
+>       assert path.is_file(), 'missing required ' + name
+E       AssertionError: missing required aggregate
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/aggregate.py').is_file
+
+test_packet.py:15: AssertionError
+______________________ test_aggregate_fails_closed[late] _______________________
+
+tmp_path = PosixPath('/tmp/a3-r6-red-mgnp/test_aggregate_fails_closed_la0')
+damage = 'late'
+
+    @pytest.mark.parametrize('damage',['duplicate','omit','substitute','phase','fail','skip','setup-error','teardown-error','late','nonzero','source','source-after','interpreter','job','baseline','oracle','preflight','host','partition-after','old-r5','config','accounting','overlap-binding'])
+    def test_aggregate_fails_closed(tmp_path,damage):
+>       a,p,s,b,records=terminal(tmp_path); ref=records[0]; m=json.loads(Path(ref['path']).read_text())
+                        ^^^^^^^^^^^^^^^^^^
+
+test_packet.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test_packet.py:49: in terminal
+    a=module('aggregate'); p=contract(); source={'revision':'r6-sharded','runtime_sha256':'runtime','fixture_sha256':'fixture','partition_sha256':a.digest(HERE/'partition.json'),'source_pins_sha256':'pins'}
+      ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'aggregate'
+
+    def module(name):
+        path = HERE / (name + '.py')
+>       assert path.is_file(), 'missing required ' + name
+E       AssertionError: missing required aggregate
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/aggregate.py').is_file
+
+test_packet.py:15: AssertionError
+_____________________ test_aggregate_fails_closed[nonzero] _____________________
+
+tmp_path = PosixPath('/tmp/a3-r6-red-mgnp/test_aggregate_fails_closed_no0')
+damage = 'nonzero'
+
+    @pytest.mark.parametrize('damage',['duplicate','omit','substitute','phase','fail','skip','setup-error','teardown-error','late','nonzero','source','source-after','interpreter','job','baseline','oracle','preflight','host','partition-after','old-r5','config','accounting','overlap-binding'])
+    def test_aggregate_fails_closed(tmp_path,damage):
+>       a,p,s,b,records=terminal(tmp_path); ref=records[0]; m=json.loads(Path(ref['path']).read_text())
+                        ^^^^^^^^^^^^^^^^^^
+
+test_packet.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test_packet.py:49: in terminal
+    a=module('aggregate'); p=contract(); source={'revision':'r6-sharded','runtime_sha256':'runtime','fixture_sha256':'fixture','partition_sha256':a.digest(HERE/'partition.json'),'source_pins_sha256':'pins'}
+      ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'aggregate'
+
+    def module(name):
+        path = HERE / (name + '.py')
+>       assert path.is_file(), 'missing required ' + name
+E       AssertionError: missing required aggregate
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/aggregate.py').is_file
+
+test_packet.py:15: AssertionError
+_____________________ test_aggregate_fails_closed[source] ______________________
+
+tmp_path = PosixPath('/tmp/a3-r6-red-mgnp/test_aggregate_fails_closed_so0')
+damage = 'source'
+
+    @pytest.mark.parametrize('damage',['duplicate','omit','substitute','phase','fail','skip','setup-error','teardown-error','late','nonzero','source','source-after','interpreter','job','baseline','oracle','preflight','host','partition-after','old-r5','config','accounting','overlap-binding'])
+    def test_aggregate_fails_closed(tmp_path,damage):
+>       a,p,s,b,records=terminal(tmp_path); ref=records[0]; m=json.loads(Path(ref['path']).read_text())
+                        ^^^^^^^^^^^^^^^^^^
+
+test_packet.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test_packet.py:49: in terminal
+    a=module('aggregate'); p=contract(); source={'revision':'r6-sharded','runtime_sha256':'runtime','fixture_sha256':'fixture','partition_sha256':a.digest(HERE/'partition.json'),'source_pins_sha256':'pins'}
+      ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'aggregate'
+
+    def module(name):
+        path = HERE / (name + '.py')
+>       assert path.is_file(), 'missing required ' + name
+E       AssertionError: missing required aggregate
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/aggregate.py').is_file
+
+test_packet.py:15: AssertionError
+__________________ test_aggregate_fails_closed[source-after] ___________________
+
+tmp_path = PosixPath('/tmp/a3-r6-red-mgnp/test_aggregate_fails_closed_so1')
+damage = 'source-after'
+
+    @pytest.mark.parametrize('damage',['duplicate','omit','substitute','phase','fail','skip','setup-error','teardown-error','late','nonzero','source','source-after','interpreter','job','baseline','oracle','preflight','host','partition-after','old-r5','config','accounting','overlap-binding'])
+    def test_aggregate_fails_closed(tmp_path,damage):
+>       a,p,s,b,records=terminal(tmp_path); ref=records[0]; m=json.loads(Path(ref['path']).read_text())
+                        ^^^^^^^^^^^^^^^^^^
+
+test_packet.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test_packet.py:49: in terminal
+    a=module('aggregate'); p=contract(); source={'revision':'r6-sharded','runtime_sha256':'runtime','fixture_sha256':'fixture','partition_sha256':a.digest(HERE/'partition.json'),'source_pins_sha256':'pins'}
+      ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'aggregate'
+
+    def module(name):
+        path = HERE / (name + '.py')
+>       assert path.is_file(), 'missing required ' + name
+E       AssertionError: missing required aggregate
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/aggregate.py').is_file
+
+test_packet.py:15: AssertionError
+___________________ test_aggregate_fails_closed[interpreter] ___________________
+
+tmp_path = PosixPath('/tmp/a3-r6-red-mgnp/test_aggregate_fails_closed_in0')
+damage = 'interpreter'
+
+    @pytest.mark.parametrize('damage',['duplicate','omit','substitute','phase','fail','skip','setup-error','teardown-error','late','nonzero','source','source-after','interpreter','job','baseline','oracle','preflight','host','partition-after','old-r5','config','accounting','overlap-binding'])
+    def test_aggregate_fails_closed(tmp_path,damage):
+>       a,p,s,b,records=terminal(tmp_path); ref=records[0]; m=json.loads(Path(ref['path']).read_text())
+                        ^^^^^^^^^^^^^^^^^^
+
+test_packet.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test_packet.py:49: in terminal
+    a=module('aggregate'); p=contract(); source={'revision':'r6-sharded','runtime_sha256':'runtime','fixture_sha256':'fixture','partition_sha256':a.digest(HERE/'partition.json'),'source_pins_sha256':'pins'}
+      ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'aggregate'
+
+    def module(name):
+        path = HERE / (name + '.py')
+>       assert path.is_file(), 'missing required ' + name
+E       AssertionError: missing required aggregate
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/aggregate.py').is_file
+
+test_packet.py:15: AssertionError
+_______________________ test_aggregate_fails_closed[job] _______________________
+
+tmp_path = PosixPath('/tmp/a3-r6-red-mgnp/test_aggregate_fails_closed_jo0')
+damage = 'job'
+
+    @pytest.mark.parametrize('damage',['duplicate','omit','substitute','phase','fail','skip','setup-error','teardown-error','late','nonzero','source','source-after','interpreter','job','baseline','oracle','preflight','host','partition-after','old-r5','config','accounting','overlap-binding'])
+    def test_aggregate_fails_closed(tmp_path,damage):
+>       a,p,s,b,records=terminal(tmp_path); ref=records[0]; m=json.loads(Path(ref['path']).read_text())
+                        ^^^^^^^^^^^^^^^^^^
+
+test_packet.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test_packet.py:49: in terminal
+    a=module('aggregate'); p=contract(); source={'revision':'r6-sharded','runtime_sha256':'runtime','fixture_sha256':'fixture','partition_sha256':a.digest(HERE/'partition.json'),'source_pins_sha256':'pins'}
+      ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'aggregate'
+
+    def module(name):
+        path = HERE / (name + '.py')
+>       assert path.is_file(), 'missing required ' + name
+E       AssertionError: missing required aggregate
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/aggregate.py').is_file
+
+test_packet.py:15: AssertionError
+____________________ test_aggregate_fails_closed[baseline] _____________________
+
+tmp_path = PosixPath('/tmp/a3-r6-red-mgnp/test_aggregate_fails_closed_ba0')
+damage = 'baseline'
+
+    @pytest.mark.parametrize('damage',['duplicate','omit','substitute','phase','fail','skip','setup-error','teardown-error','late','nonzero','source','source-after','interpreter','job','baseline','oracle','preflight','host','partition-after','old-r5','config','accounting','overlap-binding'])
+    def test_aggregate_fails_closed(tmp_path,damage):
+>       a,p,s,b,records=terminal(tmp_path); ref=records[0]; m=json.loads(Path(ref['path']).read_text())
+                        ^^^^^^^^^^^^^^^^^^
+
+test_packet.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test_packet.py:49: in terminal
+    a=module('aggregate'); p=contract(); source={'revision':'r6-sharded','runtime_sha256':'runtime','fixture_sha256':'fixture','partition_sha256':a.digest(HERE/'partition.json'),'source_pins_sha256':'pins'}
+      ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'aggregate'
+
+    def module(name):
+        path = HERE / (name + '.py')
+>       assert path.is_file(), 'missing required ' + name
+E       AssertionError: missing required aggregate
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/aggregate.py').is_file
+
+test_packet.py:15: AssertionError
+_____________________ test_aggregate_fails_closed[oracle] ______________________
+
+tmp_path = PosixPath('/tmp/a3-r6-red-mgnp/test_aggregate_fails_closed_or0')
+damage = 'oracle'
+
+    @pytest.mark.parametrize('damage',['duplicate','omit','substitute','phase','fail','skip','setup-error','teardown-error','late','nonzero','source','source-after','interpreter','job','baseline','oracle','preflight','host','partition-after','old-r5','config','accounting','overlap-binding'])
+    def test_aggregate_fails_closed(tmp_path,damage):
+>       a,p,s,b,records=terminal(tmp_path); ref=records[0]; m=json.loads(Path(ref['path']).read_text())
+                        ^^^^^^^^^^^^^^^^^^
+
+test_packet.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test_packet.py:49: in terminal
+    a=module('aggregate'); p=contract(); source={'revision':'r6-sharded','runtime_sha256':'runtime','fixture_sha256':'fixture','partition_sha256':a.digest(HERE/'partition.json'),'source_pins_sha256':'pins'}
+      ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'aggregate'
+
+    def module(name):
+        path = HERE / (name + '.py')
+>       assert path.is_file(), 'missing required ' + name
+E       AssertionError: missing required aggregate
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/aggregate.py').is_file
+
+test_packet.py:15: AssertionError
+____________________ test_aggregate_fails_closed[preflight] ____________________
+
+tmp_path = PosixPath('/tmp/a3-r6-red-mgnp/test_aggregate_fails_closed_pr0')
+damage = 'preflight'
+
+    @pytest.mark.parametrize('damage',['duplicate','omit','substitute','phase','fail','skip','setup-error','teardown-error','late','nonzero','source','source-after','interpreter','job','baseline','oracle','preflight','host','partition-after','old-r5','config','accounting','overlap-binding'])
+    def test_aggregate_fails_closed(tmp_path,damage):
+>       a,p,s,b,records=terminal(tmp_path); ref=records[0]; m=json.loads(Path(ref['path']).read_text())
+                        ^^^^^^^^^^^^^^^^^^
+
+test_packet.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test_packet.py:49: in terminal
+    a=module('aggregate'); p=contract(); source={'revision':'r6-sharded','runtime_sha256':'runtime','fixture_sha256':'fixture','partition_sha256':a.digest(HERE/'partition.json'),'source_pins_sha256':'pins'}
+      ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'aggregate'
+
+    def module(name):
+        path = HERE / (name + '.py')
+>       assert path.is_file(), 'missing required ' + name
+E       AssertionError: missing required aggregate
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/aggregate.py').is_file
+
+test_packet.py:15: AssertionError
+______________________ test_aggregate_fails_closed[host] _______________________
+
+tmp_path = PosixPath('/tmp/a3-r6-red-mgnp/test_aggregate_fails_closed_ho0')
+damage = 'host'
+
+    @pytest.mark.parametrize('damage',['duplicate','omit','substitute','phase','fail','skip','setup-error','teardown-error','late','nonzero','source','source-after','interpreter','job','baseline','oracle','preflight','host','partition-after','old-r5','config','accounting','overlap-binding'])
+    def test_aggregate_fails_closed(tmp_path,damage):
+>       a,p,s,b,records=terminal(tmp_path); ref=records[0]; m=json.loads(Path(ref['path']).read_text())
+                        ^^^^^^^^^^^^^^^^^^
+
+test_packet.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test_packet.py:49: in terminal
+    a=module('aggregate'); p=contract(); source={'revision':'r6-sharded','runtime_sha256':'runtime','fixture_sha256':'fixture','partition_sha256':a.digest(HERE/'partition.json'),'source_pins_sha256':'pins'}
+      ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'aggregate'
+
+    def module(name):
+        path = HERE / (name + '.py')
+>       assert path.is_file(), 'missing required ' + name
+E       AssertionError: missing required aggregate
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/aggregate.py').is_file
+
+test_packet.py:15: AssertionError
+_________________ test_aggregate_fails_closed[partition-after] _________________
+
+tmp_path = PosixPath('/tmp/a3-r6-red-mgnp/test_aggregate_fails_closed_pa0')
+damage = 'partition-after'
+
+    @pytest.mark.parametrize('damage',['duplicate','omit','substitute','phase','fail','skip','setup-error','teardown-error','late','nonzero','source','source-after','interpreter','job','baseline','oracle','preflight','host','partition-after','old-r5','config','accounting','overlap-binding'])
+    def test_aggregate_fails_closed(tmp_path,damage):
+>       a,p,s,b,records=terminal(tmp_path); ref=records[0]; m=json.loads(Path(ref['path']).read_text())
+                        ^^^^^^^^^^^^^^^^^^
+
+test_packet.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test_packet.py:49: in terminal
+    a=module('aggregate'); p=contract(); source={'revision':'r6-sharded','runtime_sha256':'runtime','fixture_sha256':'fixture','partition_sha256':a.digest(HERE/'partition.json'),'source_pins_sha256':'pins'}
+      ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'aggregate'
+
+    def module(name):
+        path = HERE / (name + '.py')
+>       assert path.is_file(), 'missing required ' + name
+E       AssertionError: missing required aggregate
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/aggregate.py').is_file
+
+test_packet.py:15: AssertionError
+_____________________ test_aggregate_fails_closed[old-r5] ______________________
+
+tmp_path = PosixPath('/tmp/a3-r6-red-mgnp/test_aggregate_fails_closed_ol0')
+damage = 'old-r5'
+
+    @pytest.mark.parametrize('damage',['duplicate','omit','substitute','phase','fail','skip','setup-error','teardown-error','late','nonzero','source','source-after','interpreter','job','baseline','oracle','preflight','host','partition-after','old-r5','config','accounting','overlap-binding'])
+    def test_aggregate_fails_closed(tmp_path,damage):
+>       a,p,s,b,records=terminal(tmp_path); ref=records[0]; m=json.loads(Path(ref['path']).read_text())
+                        ^^^^^^^^^^^^^^^^^^
+
+test_packet.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test_packet.py:49: in terminal
+    a=module('aggregate'); p=contract(); source={'revision':'r6-sharded','runtime_sha256':'runtime','fixture_sha256':'fixture','partition_sha256':a.digest(HERE/'partition.json'),'source_pins_sha256':'pins'}
+      ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'aggregate'
+
+    def module(name):
+        path = HERE / (name + '.py')
+>       assert path.is_file(), 'missing required ' + name
+E       AssertionError: missing required aggregate
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/aggregate.py').is_file
+
+test_packet.py:15: AssertionError
+_____________________ test_aggregate_fails_closed[config] ______________________
+
+tmp_path = PosixPath('/tmp/a3-r6-red-mgnp/test_aggregate_fails_closed_co0')
+damage = 'config'
+
+    @pytest.mark.parametrize('damage',['duplicate','omit','substitute','phase','fail','skip','setup-error','teardown-error','late','nonzero','source','source-after','interpreter','job','baseline','oracle','preflight','host','partition-after','old-r5','config','accounting','overlap-binding'])
+    def test_aggregate_fails_closed(tmp_path,damage):
+>       a,p,s,b,records=terminal(tmp_path); ref=records[0]; m=json.loads(Path(ref['path']).read_text())
+                        ^^^^^^^^^^^^^^^^^^
+
+test_packet.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test_packet.py:49: in terminal
+    a=module('aggregate'); p=contract(); source={'revision':'r6-sharded','runtime_sha256':'runtime','fixture_sha256':'fixture','partition_sha256':a.digest(HERE/'partition.json'),'source_pins_sha256':'pins'}
+      ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'aggregate'
+
+    def module(name):
+        path = HERE / (name + '.py')
+>       assert path.is_file(), 'missing required ' + name
+E       AssertionError: missing required aggregate
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/aggregate.py').is_file
+
+test_packet.py:15: AssertionError
+___________________ test_aggregate_fails_closed[accounting] ____________________
+
+tmp_path = PosixPath('/tmp/a3-r6-red-mgnp/test_aggregate_fails_closed_ac0')
+damage = 'accounting'
+
+    @pytest.mark.parametrize('damage',['duplicate','omit','substitute','phase','fail','skip','setup-error','teardown-error','late','nonzero','source','source-after','interpreter','job','baseline','oracle','preflight','host','partition-after','old-r5','config','accounting','overlap-binding'])
+    def test_aggregate_fails_closed(tmp_path,damage):
+>       a,p,s,b,records=terminal(tmp_path); ref=records[0]; m=json.loads(Path(ref['path']).read_text())
+                        ^^^^^^^^^^^^^^^^^^
+
+test_packet.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test_packet.py:49: in terminal
+    a=module('aggregate'); p=contract(); source={'revision':'r6-sharded','runtime_sha256':'runtime','fixture_sha256':'fixture','partition_sha256':a.digest(HERE/'partition.json'),'source_pins_sha256':'pins'}
+      ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'aggregate'
+
+    def module(name):
+        path = HERE / (name + '.py')
+>       assert path.is_file(), 'missing required ' + name
+E       AssertionError: missing required aggregate
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/aggregate.py').is_file
+
+test_packet.py:15: AssertionError
+_________________ test_aggregate_fails_closed[overlap-binding] _________________
+
+tmp_path = PosixPath('/tmp/a3-r6-red-mgnp/test_aggregate_fails_closed_ov0')
+damage = 'overlap-binding'
+
+    @pytest.mark.parametrize('damage',['duplicate','omit','substitute','phase','fail','skip','setup-error','teardown-error','late','nonzero','source','source-after','interpreter','job','baseline','oracle','preflight','host','partition-after','old-r5','config','accounting','overlap-binding'])
+    def test_aggregate_fails_closed(tmp_path,damage):
+>       a,p,s,b,records=terminal(tmp_path); ref=records[0]; m=json.loads(Path(ref['path']).read_text())
+                        ^^^^^^^^^^^^^^^^^^
+
+test_packet.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test_packet.py:49: in terminal
+    a=module('aggregate'); p=contract(); source={'revision':'r6-sharded','runtime_sha256':'runtime','fixture_sha256':'fixture','partition_sha256':a.digest(HERE/'partition.json'),'source_pins_sha256':'pins'}
+      ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'aggregate'
+
+    def module(name):
+        path = HERE / (name + '.py')
+>       assert path.is_file(), 'missing required ' + name
+E       AssertionError: missing required aggregate
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/aggregate.py').is_file
+
+test_packet.py:15: AssertionError
+_______________ test_selector_real_pytest_keeps_full_collection ________________
+
+tmp_path = PosixPath('/tmp/a3-r6-red-mgnp/test_selector_real_pytest_keep0')
+
+    def test_selector_real_pytest_keeps_full_collection(tmp_path):
+>       module('selector')
+
+test_packet.py:115: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'selector'
+
+    def module(name):
+        path = HERE / (name + '.py')
+>       assert path.is_file(), 'missing required ' + name
+E       AssertionError: missing required selector
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/selector.py').is_file
+
+test_packet.py:15: AssertionError
+_____________________ test_deadline_caps_and_late_success ______________________
+
+    def test_deadline_caps_and_late_success():
+>       h=module('supervisor')
+          ^^^^^^^^^^^^^^^^^^^^
+
+test_packet.py:133: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'supervisor'
+
+    def module(name):
+        path = HERE / (name + '.py')
+>       assert path.is_file(), 'missing required ' + name
+E       AssertionError: missing required supervisor
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/supervisor.py').is_file
+
+test_packet.py:15: AssertionError
+=========================== short test summary info ============================
+FAILED test_packet.py::test_frozen_original_partition - AssertionError: missi...
+FAILED test_packet.py::test_partition_rejects_damage[duplicate] - AssertionEr...
+FAILED test_packet.py::test_partition_rejects_damage[omit] - AssertionError: ...
+FAILED test_packet.py::test_partition_rejects_damage[substitute] - AssertionE...
+FAILED test_packet.py::test_partition_rejects_damage[count] - AssertionError:...
+FAILED test_packet.py::test_partition_rejects_damage[order] - AssertionError:...
+FAILED test_packet.py::test_complete_and_partial_are_separate - AssertionErro...
+FAILED test_packet.py::test_aggregate_fails_closed[duplicate] - AssertionErro...
+FAILED test_packet.py::test_aggregate_fails_closed[omit] - AssertionError: mi...
+FAILED test_packet.py::test_aggregate_fails_closed[substitute] - AssertionErr...
+FAILED test_packet.py::test_aggregate_fails_closed[phase] - AssertionError: m...
+FAILED test_packet.py::test_aggregate_fails_closed[fail] - AssertionError: mi...
+FAILED test_packet.py::test_aggregate_fails_closed[skip] - AssertionError: mi...
+FAILED test_packet.py::test_aggregate_fails_closed[setup-error] - AssertionEr...
+FAILED test_packet.py::test_aggregate_fails_closed[teardown-error] - Assertio...
+FAILED test_packet.py::test_aggregate_fails_closed[late] - AssertionError: mi...
+FAILED test_packet.py::test_aggregate_fails_closed[nonzero] - AssertionError:...
+FAILED test_packet.py::test_aggregate_fails_closed[source] - AssertionError: ...
+FAILED test_packet.py::test_aggregate_fails_closed[source-after] - AssertionE...
+FAILED test_packet.py::test_aggregate_fails_closed[interpreter] - AssertionEr...
+FAILED test_packet.py::test_aggregate_fails_closed[job] - AssertionError: mis...
+FAILED test_packet.py::test_aggregate_fails_closed[baseline] - AssertionError...
+FAILED test_packet.py::test_aggregate_fails_closed[oracle] - AssertionError: ...
+FAILED test_packet.py::test_aggregate_fails_closed[preflight] - AssertionErro...
+FAILED test_packet.py::test_aggregate_fails_closed[host] - AssertionError: mi...
+FAILED test_packet.py::test_aggregate_fails_closed[partition-after] - Asserti...
+FAILED test_packet.py::test_aggregate_fails_closed[old-r5] - AssertionError: ...
+FAILED test_packet.py::test_aggregate_fails_closed[config] - AssertionError: ...
+FAILED test_packet.py::test_aggregate_fails_closed[accounting] - AssertionErr...
+FAILED test_packet.py::test_aggregate_fails_closed[overlap-binding] - Asserti...
+FAILED test_packet.py::test_selector_real_pytest_keeps_full_collection - Asse...
+FAILED test_packet.py::test_deadline_caps_and_late_success - AssertionError: ...
+32 failed in 0.48s

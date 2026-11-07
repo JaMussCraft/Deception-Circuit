@@ -1,0 +1,53 @@
+{
+  "verdict": "HAND_BACK_FAILED_GREEN_TEST_ORACLE_REPRESENTATION_MISMATCH",
+  "candidate_runtime_sha256": "f39162481d54b9e86119cf4528ba0d9a9c90809e41daf101053891206ee2c6b9",
+  "source_pins_sha256": "aa06aaa8e3e73e873a9beebddece6cb7cc55887b0ba1a6d5befc5f20d42a1f76",
+  "tests_sha256": "9a9ae6e2eff235e4ddf95447681204e9a03eb74adc149a1dcc30788aa9e53790",
+  "unchanged_original_AST_definitions": 113,
+  "new_private_helpers": 8,
+  "generic_original_module_AST_unchanged": true,
+  "workload_sha256": "765b22a006ab519186a168bf455f4084915457d4ffce88881e76bf31b71a37cb",
+  "workload_tests_sha256": "846427fc2f4aa048f652d18c48715eda7eedcac3f4422adbded6be6c781a46dc",
+  "RED": {
+    "job_id": "23612303",
+    "Slurm_state": "COMPLETED",
+    "Slurm_exit_code": "0:0",
+    "elapsed_seconds": 139,
+    "expected_cases_each": 55,
+    "observed_failures_each": 55,
+    "base_errors": 0,
+    "mgnp_errors": 0,
+    "environments": [
+      "base",
+      "mgnp"
+    ],
+    "note": "Missing helper calls yield attributable expected failures, no collection/setup errors; source pins stable."
+  },
+  "GREEN": {
+    "job_id": "23612764",
+    "Slurm_state": "FAILED",
+    "Slurm_exit_code": "1:0",
+    "elapsed_seconds": 86,
+    "base_observed_cases": 55,
+    "base_expected_cases": 55,
+    "base_passed": 54,
+    "base_failures": 1,
+    "base_errors": 0,
+    "base_skipped": 0,
+    "mgnp_executed": false,
+    "source_pins_before_after_equal": true,
+    "baseline_publisher_expected_bytes": 62,
+    "baseline_publisher_observed_bytes": 62
+  },
+  "actual_failure": "test_prepared_native_prefit_inventory_seam_without_model line329 assert frozen == native_pre_JSON_value == unchanged_read_object(target)",
+  "cause": "Pre-JSON native target/shard tuples normalize to JSON arrays; existing reader returns lists. The assertion conflates native in-memory representation with established serialized transport contract. No helper production change is indicated by this failure.",
+  "static_review": "No additional blocking defect identified within Task1 codec/namespace/race/reader/data-only-resource scope. Exact emitted bytes/UTF8/native duplicate-key policy, reference/marker identity and original witness integration reviewed; entry2targetreads/hashes+explicitfinal1 and single parse/freeze test passed among54. This does not replace missing dual-environmentGREEN.",
+  "resources": "Identified retained graph/overlapping temporary recipe, process/cgroup snapshots and scopes are observational DATA with observations_are_upper_bounds false. T2 must bind matching measured/anchored record, reject unavailable required observations/understated bounds and refresh actual capacity before model. No memory or execution authority granted here.",
+  "remaining": [
+    "Root must rule/test-only representation correction preserving exact ordinary byte contract and native canonical identity; preserve failed frozenr2 source/tests/results.",
+    "New immutable source/test/packet pins and actual dual-environment55caseGREEN before Task1 acceptance or Task2 implementation.",
+    "Later production wiring/final barrier/resource accounting/sourcepublication/genuine transport measurement/numerical gates/admission remain outside current scope."
+  ],
+  "worker_changed_source_or_tests": false,
+  "new_model_or_operational_authority": false
+}

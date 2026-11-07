@@ -1,0 +1,57 @@
+{
+  "actual_Task1_WAITING_keys": [
+    "bank_file_sha256",
+    "bank_internal_payload_sha256",
+    "bank_manifest_sha256",
+    "bound_config_sha256",
+    "groups_file_sha256",
+    "job_id",
+    "launch_packet_manifest_sha256",
+    "phase",
+    "publication_deadline",
+    "requested_at",
+    "resources",
+    "source_commit"
+  ],
+  "Task2_consumption_errors": {
+    "validate_request": "KeyError('packet_manifest_sha256')",
+    "child_deadline": "KeyError('deadline_unix')"
+  },
+  "original_input_manifest_sha256": "ff11c97d3fc0d279cf4d4f5c9c545ad8e8783778d75d45ef6f87fe8373e4aaad",
+  "ordinary_count": 422,
+  "actual_alias_count": 11,
+  "alias_rejection": "exact corrected422 plus five aliases",
+  "Task1_required_CPU_fields": [
+    "actual_future_GPU_job_id",
+    "bank_file_sha256",
+    "bank_manifest_sha256",
+    "bound_gpu_config_sha256",
+    "complete",
+    "full_controls",
+    "full_domain_support_audit_complete",
+    "full_rows",
+    "groups_file_sha256",
+    "launch_packet_manifest_sha256",
+    "phase",
+    "source_commit",
+    "timely_window",
+    "waiting_sha256"
+  ],
+  "missing_Task2_COMPLETE_fields": [
+    "bank_file_sha256",
+    "bank_manifest_sha256",
+    "bound_gpu_config_sha256",
+    "full_controls",
+    "full_domain_support_audit_complete",
+    "full_rows",
+    "launch_packet_manifest_sha256",
+    "timely_window",
+    "waiting_sha256"
+  ],
+  "GREEN_test_files": [
+    "test_full_score_controller.py",
+    "test_full_score_cpu.py"
+  ],
+  "GREEN_expected": 204,
+  "GREEN_effective_scope": 189
+}

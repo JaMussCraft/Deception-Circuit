@@ -1,0 +1,31 @@
+{
+  "a1_parent_execution_commit": "5f450dc93dac707af649dee8c8ca60888b2831db",
+  "accepted_prior_reviews": [
+    108,
+    109,
+    110
+  ],
+  "base_commit": "538109e809285b6ddc45d42df8786270a65f7b12",
+  "caps_gpu_hours": {
+    "A3": 40,
+    "M1_directions": 0.5,
+    "M1_edges": 0.75,
+    "M1_masks": 0.75,
+    "M1_total": 2
+  },
+  "direction_production_authorized": false,
+  "kind": "a3_independent_pilot_candidate_v1",
+  "original_admission_and_live_authority_required": true,
+  "pilot_integration_review_required": true,
+  "rationale": "Edge and mask M1 reach accepted shared authority and own numeric drivers, not direction-specific admission/index/serial machinery. Narrow the internal integration gate only after isolated integration review; retain direction production closure and all original budgets/controls.",
+  "scientific_parameters_changed": false,
+  "scope": [
+    "canonical_cpu_prepare",
+    "edge_prepare",
+    "edge_M1",
+    "mask_prepare",
+    "mask_M1"
+  ],
+  "source_overlay_sha256": "dffe84c26b3400eb27e7028be1413864ddd8d3effa1cef7f2504ccbf9221c28a",
+  "whole_direction_runtime_accepted": false
+}

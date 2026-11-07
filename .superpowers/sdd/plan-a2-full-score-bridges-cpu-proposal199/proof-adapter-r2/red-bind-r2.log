@@ -1,0 +1,14 @@
+test_container_cgroup_bind_is_not_omitted (__main__.HostTests) ... FAIL
+
+======================================================================
+FAIL: test_container_cgroup_bind_is_not_omitted (__main__.HostTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r2/test_host.py", line 48, in test_container_cgroup_bind_is_not_omitted
+    self.assertIn('/sys/fs/cgroup/memory:/sys/fs/cgroup/memory:ro',cmd);self.assertNotIn('--nv',cmd)
+AssertionError: '/sys/fs/cgroup/memory:/sys/fs/cgroup/memory:ro' not found in ['apptainer', 'exec', '--cleanenv', '--contain', '--no-home', '--writable-tmpfs', '--pwd', '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime', '--bind', '/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment:/projects/beto/swong2/Alignment:ro', '--bind', '/ocean:/ocean:ro', '--bind', '/ocean/projects/cis260361p/swong2/hf/hub:/work/nvme/beto/swong2:ro', '--bind', '/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/out:/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/out:rw', '--env', 'CUDA_VISIBLE_DEVICES=', '--env', 'DC_B2_ALLOC=cis260361p', '--env', 'DC_CLUSTER=bridges2', '--env', 'HF_DATASETS_OFFLINE=1', '--env', 'HF_HUB_CACHE=/work/nvme/beto/swong2', '--env', 'HF_HUB_OFFLINE=1', '--env', 'MKL_NUM_THREADS=1', '--env', 'NUMEXPR_NUM_THREADS=1', '--env', 'OMP_NUM_THREADS=1', '--env', 'OPENBLAS_NUM_THREADS=1', '--env', 'PYTHONDONTWRITEBYTECODE=1', '--env', 'PYTHONPATH=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime', '--env', 'TRANSFORMERS_CACHE=/work/nvme/beto/swong2', '--env', 'TRANSFORMERS_OFFLINE=1', '/ocean/projects/cis260361p/swong2/specificity-ladder-20261102/containers/ubuntu2204.sif', 'bash', '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/packet/inner.sh', '--output', '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/out', '--manifest-sha256', 'manifest', '--deadline-monotonic', '123']
+
+----------------------------------------------------------------------
+Ran 1 test in 0.006s
+
+FAILED (failures=1)

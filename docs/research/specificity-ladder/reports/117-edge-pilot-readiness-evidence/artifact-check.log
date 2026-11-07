@@ -1,0 +1,153 @@
+{
+  "kind": "independent_edge_successor_artifact_check",
+  "commit": "87fceb28b3b46f4a406c0280db785697a0bbd3fc",
+  "exit_code": 0,
+  "elapsed_seconds": 227.5156131919939,
+  "actual_completed_object_hashes_match": true,
+  "owning_inventory_validators_and_exact_rebuilds": true,
+  "prepared_constituent_checks": true,
+  "owner_full_validate_prepared_timing_reused": true,
+  "accepted115_actual_producer_replay_reused": true,
+  "source_rows_digest": "03e3ade260b726dd8c1c89b1dc5a40038db432976f008cc72f01e9dd66e0182c",
+  "cohorts": {
+    "far_v2": {
+      "fit_ids": 177,
+      "selection_ids": 177,
+      "assessment_ids": 100
+    },
+    "sdr_v2": {
+      "fit_ids": 187,
+      "selection_ids": 187,
+      "assessment_ids": 100
+    },
+    "ser_v2": {
+      "fit_ids": 168,
+      "selection_ids": 167,
+      "assessment_ids": 100
+    }
+  },
+  "utilities": {
+    "ioi": 100,
+    "mmlu": 32
+  },
+  "validation_utilities": {
+    "ioi": 100,
+    "mmlu": 32
+  },
+  "receiver_groups": {
+    "far_v2": {
+      "graph_edges": 2172,
+      "receiver_count": 54,
+      "by_kind": {
+        "k": 15,
+        "mlp_in": 1,
+        "q": 22,
+        "readout": 1,
+        "v": 15
+      },
+      "cached_pilot_keys": 3456
+    },
+    "sdr_v2": {
+      "graph_edges": 1695,
+      "receiver_count": 43,
+      "by_kind": {
+        "k": 10,
+        "mlp_in": 5,
+        "q": 17,
+        "readout": 1,
+        "v": 10
+      },
+      "cached_pilot_keys": 2752
+    },
+    "ser_v2": {
+      "graph_edges": 2044,
+      "receiver_count": 54,
+      "by_kind": {
+        "k": 15,
+        "q": 23,
+        "readout": 1,
+        "v": 15
+      },
+      "cached_pilot_keys": 3456
+    }
+  },
+  "inventories": {
+    "pilot": {
+      "stage": "pilot",
+      "phase": "M1",
+      "inventory_sha256": "5901800f36a0af4534ebcdb60a2b0b140166e930f68ce196ab045239b758c373",
+      "keys": 96,
+      "requirements": 604,
+      "physical_calls": 9664,
+      "model_loads": 2,
+      "finish_reserve_seconds": 300,
+      "storage_requirements": {
+        "components": {
+          "authority_key_proof_host_bytes": 0
+        },
+        "policy": "complete source-derived scalar caches, full-union bank, aliases, immutable rows plus atomic temporary publication; no saved vocabulary arrays",
+        "tiers": {
+          "cache_disk": 3848848595,
+          "host_ram": 7697697190,
+          "output_disk": 3848848595,
+          "scratch_disk": 3848848595
+        }
+      },
+      "shared_disk_pool_required": 11546545785
+    },
+    "fit": {
+      "stage": "fit",
+      "phase": "M4",
+      "inventory_sha256": "7991be5ca8f1ca93badbed05ed306a8ef9f74b83f402f49f988250e2169c6b00",
+      "keys": 6384,
+      "requirements": 302,
+      "physical_calls": 106684,
+      "model_loads": 1,
+      "finish_reserve_seconds": 300,
+      "storage_requirements": {
+        "components": {
+          "authority_key_proof_host_bytes": 0
+        },
+        "policy": "complete source-derived scalar caches, full-union bank, aliases, immutable rows plus atomic temporary publication; no saved vocabulary arrays",
+        "tiers": {
+          "cache_disk": 33803392147,
+          "host_ram": 67606784294,
+          "output_disk": 33803392147,
+          "scratch_disk": 33803392147
+        }
+      },
+      "shared_disk_pool_required": 101410176441
+    }
+  },
+  "runtime_signature": {
+    "python": "3.12.13",
+    "packages": {
+      "torch": "2.11.0+cu128",
+      "transformers": "5.13.0",
+      "numpy": "2.5.1"
+    },
+    "cuda_build": "12.8"
+  },
+  "numeric_profile": {
+    "backend": "sdpa",
+    "dtype": "torch.bfloat16",
+    "gradients": false,
+    "matched_shape_controls": true,
+    "readout": "last unpadded assistant readout"
+  },
+  "ancestry_files": 75,
+  "ancestry_bytes_unchanged": true,
+  "cgroup_before": {
+    "memory.current": "8365850624",
+    "memory.max": "40320217088",
+    "memory.events": "low 0\nhigh 6\nmax 129883\noom 1\noom_kill 1\noom_group_kill 0"
+  },
+  "cgroup_after": {
+    "memory.current": "10818744320",
+    "memory.max": "40320217088",
+    "memory.events": "low 0\nhigh 6\nmax 129883\noom 1\noom_kill 1\noom_group_kill 0"
+  },
+  "weights_loaded": false,
+  "execution_authorized": false,
+  "readiness_admission": "BLOCKED: CPU source guard cost and staged M1 timing budget"
+}

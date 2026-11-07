@@ -1,0 +1,18 @@
+test_sealed_source_mapping (test_host.Checks.test_sealed_source_mapping) ... FAIL
+
+======================================================================
+FAIL: test_sealed_source_mapping (test_host.Checks.test_sealed_source_mapping)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/a3-alias-red-0tukuwz6/test_host.py", line 34, in test_sealed_source_mapping
+    c={'status':'ROOT_BOUND_A3_GREEN_MGNP_TRANSPORT','observer_virtual':str(host.VIRT/'run_packet.py'),'expected_cases':1,'expected_file_count':1,'files':files,'aliases':aliases};host.check_config(c)
+                                                                                                                                                                                   ^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/a3-alias-red-0tukuwz6/host.py", line 28, in check_config
+    files=c['files'];aliases=c['aliases'];assert type(files) is list and files and type(c['expected_file_count']) is int and len(files)==c['expected_file_count'] and type(aliases) is list and len(aliases)==4
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+
+----------------------------------------------------------------------
+Ran 1 test in 0.004s
+
+FAILED (failures=1)

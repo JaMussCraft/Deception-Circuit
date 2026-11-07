@@ -1,0 +1,91 @@
+{
+  "kind": "actual_CPU_A2_comparison_and_prospective_freeze",
+  "status": "handed-back",
+  "verdict": "CPU_COMPARISON_AND_PROSPECTIVE_FREEZE_COMPLETE",
+  "source_commit": "40fe57289405fd53a3fce02e5d4e47a0ebf78b64",
+  "training_execution_commit": "6bd8bf5334f2e83613a129d2fcfeacf83e762191",
+  "a1_ancestor_commit": "5f450dc93dac707af649dee8c8ca60888b2831db",
+  "job_id": "23459504",
+  "node": "cn061",
+  "account": "beto-delta-cpu",
+  "partition": "cpu",
+  "CPUs": 4,
+  "memory_GiB": 32,
+  "requested_minutes": 15,
+  "gpus": 0,
+  "elapsed_seconds": 95,
+  "terminal_state": "COMPLETED",
+  "exit_code": "0:0",
+  "source_count": 18,
+  "prospective_aliases": 9,
+  "output_root": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/all18-40fe57289405-v1",
+  "comparison_file_sha256": "634aab7b1a9ecf87d23b9797e319028da77e2f982118af62c3917e6221df3063",
+  "comparison_content_sha256": "50b11f26173cf668027c4f20db562d8cc416655d30835ec7e03f4fc20471e4ca",
+  "groups_file_sha256": "8879dbaae5a5f69a801574eb67deab9c7fc5a037eb89963ed606a265580a74c8",
+  "groups_content_sha256": "bcab9e9603b4a3291d5c052f78c1908717feb45e53277a8479270feb3410a42e",
+  "packet_source_harness_unchanged": true,
+  "predeclared_thresholds": {
+    "minimum_each_mixed_Jaccard": 0.5,
+    "minimum_each_head_containment": 0.9
+  },
+  "seed_stability_task_pass": {
+    "far_v2": false,
+    "sdr_v2": false,
+    "ser_v2": false
+  },
+  "head_containment_task_pass": {
+    "far_v2": false,
+    "sdr_v2": false,
+    "ser_v2": false
+  },
+  "functional_assay_outcomes": "UNMEASURED",
+  "GPU_admission": false,
+  "brief_independent_export_metadata_check_only": true,
+  "no_new_local_heavy_reaudit_or_model_execution": true,
+  "actual_terminal_accounting": {
+    "scontrol": {
+      "command": [
+        "scontrol",
+        "show",
+        "job",
+        "23459504",
+        "-o"
+      ],
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "slurm_load_jobs error: Invalid job id specified\n"
+    },
+    "sacct": {
+      "command": [
+        "sacct",
+        "-j",
+        "23459504",
+        "-n",
+        "-P",
+        "-o",
+        "JobIDRaw,JobName,State,ExitCode,ElapsedRaw,TimelimitRaw,AllocCPUS,AllocTRES,MaxRSS,NodeList"
+      ],
+      "exit_code": 0,
+      "stdout": "23459504|lad-a2-compare-freeze|COMPLETED|0:0|95|15|4|billing=16384,cpu=4,mem=32G,node=1||cn061\n23459504.batch|batch|COMPLETED|0:0|95||4|cpu=4,mem=32G,node=1|2243104K|cn061\n23459504.extern|extern|COMPLETED|0:0|95||4|billing=16384,cpu=4,mem=32G,node=1||cn061\n",
+      "stderr": ""
+    }
+  },
+  "evidence_sha256": {
+    "sacct-terminal-23459504.txt": "8c608d12bb4b7deb501eb4da760a3f67966741053bc39a5c283cfd82b08fd13b",
+    "submission.json": "f0678263a38833dbe322e41eeaf8588b25b8aed36a671d3210f6833d626f1368",
+    "final-manifest.json": "62b757f7176306ace414e50c28a52359a53534e1a41b42f97df8ce1cdf139535",
+    "source-binding.json": "7863124523384083d5749a3b8201aff7860dc7a075fe4fb0da21333749a8b83c",
+    "allocation-initial.json": "129a3da5d124314692436fecd586def379f92ec4741b121523282a59a39308f6",
+    "scontrol-initial-23459504.txt": "a66ee120ac859a2c655c8d62b8aa8fbb7a076431456bd2691bdc2a938fe40822",
+    "membership-recomputation.json": "35626a856e3993d8494f24ce10b011ca4f122d621139fea5359d927824c17fcc",
+    "sacct-initial-23459504.txt": "8c608d12bb4b7deb501eb4da760a3f67966741053bc39a5c283cfd82b08fd13b",
+    "source-records.json": "478f73ee31289ac42395e8268470a77b24ef0e69da22e26af0f2fcdd250d5b1e",
+    "comparison-freeze-driver.py": "4f1df50a90e029b36eb8c602803cd73ef8e1ec62656d71a31f45432a061ca317",
+    "slurm-23459504.log": "7c362574a2e213f74e13b652db01ddb98f7531d92adc552befd5fed1cd7c547c",
+    "COMPLETE.json": "d144ec7314c1fd54ca794c30eec96c378879bb9f6c2dd3d7a200332b894623b4",
+    "scontrol-terminal-23459504.txt": "e7cbc19b304ce7fb323ea1ccae489c74fbc1bdf5635781d0999740708566b8df",
+    "allocation.json": "8bfb3d94365a7ca920148a46007ba264c41e5a3e0d7caaf9779eb87b49e19133",
+    "job-proposal.json": "003cb9fe7b45819bb244a8246262119a54d66555007742da956a6653f36f8b02",
+    "freeze-command.json": "adf924328284b61754b1b4a51c1550dde3dda457af54d49649d3c980d7cf689c"
+  }
+}

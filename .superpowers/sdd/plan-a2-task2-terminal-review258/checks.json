@@ -1,0 +1,127 @@
+{
+  "status": "ACTUAL_TASK2_RED_AND_GREEN_OBSERVED_INDEPENDENTLY",
+  "job_id": "23623058",
+  "cluster": "delta",
+  "terminal": {
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "elapsed_seconds": 92,
+    "node": "cn095",
+    "account": "bjhz-delta-cpu",
+    "partition": "cpu-interactive",
+    "CPU_count": 2,
+    "RAM_GiB": 8,
+    "GPU_count": 0
+  },
+  "pins_sha256": "ddee7e6df8220e06212c56b4bf79e6e5fa659fb2cfd9e4ead1131c164d5456b4",
+  "raw_members_rehashed": 266,
+  "observations": [
+    {
+      "mode": "red",
+      "environment": {
+        "python": [
+          3,
+          9,
+          18
+        ],
+        "executable": "/sw/external/python/anaconda3/bin/python3.9",
+        "pytest": "8.3.3"
+      },
+      "expected": 22,
+      "observed": 22,
+      "failures": 19,
+      "passes": 3,
+      "errors": 0,
+      "skips": 0,
+      "exit_code": 1,
+      "class_counts": {
+        "test_full_score_cpu": 22
+      },
+      "XML_sha256": "1cc4c826223148a73513f2573abf8caa177711538f48be18db644397dd4a1eeb"
+    },
+    {
+      "mode": "red",
+      "environment": {
+        "python": [
+          3,
+          12,
+          13
+        ],
+        "executable": "/u/swong2/.conda/envs/mgnp/bin/python",
+        "pytest": "9.1.1"
+      },
+      "expected": 22,
+      "observed": 22,
+      "failures": 19,
+      "passes": 3,
+      "errors": 0,
+      "skips": 0,
+      "exit_code": 1,
+      "class_counts": {
+        "test_full_score_cpu": 22
+      },
+      "XML_sha256": "c034e4a538e75e9b0dd78dafbcccb1eb94fec55ea585fffed00bdb676703fc59"
+    },
+    {
+      "mode": "green",
+      "environment": {
+        "python": [
+          3,
+          9,
+          18
+        ],
+        "executable": "/sw/external/python/anaconda3/bin/python3.9",
+        "pytest": "8.3.3"
+      },
+      "expected": 226,
+      "observed": 226,
+      "failures": 0,
+      "passes": 226,
+      "errors": 0,
+      "skips": 0,
+      "exit_code": 0,
+      "class_counts": {
+        "test_full_score_cpu": 129,
+        "test_full_score_controller": 82,
+        "test_full_score_entry198": 15
+      },
+      "XML_sha256": "4a7ed6f7f768f6cea95defa2550c45d27c9587e9c07af45c3ec9e4939cc4f339"
+    },
+    {
+      "mode": "green",
+      "environment": {
+        "python": [
+          3,
+          12,
+          13
+        ],
+        "executable": "/u/swong2/.conda/envs/mgnp/bin/python",
+        "pytest": "9.1.1"
+      },
+      "expected": 226,
+      "observed": 226,
+      "failures": 0,
+      "passes": 226,
+      "errors": 0,
+      "skips": 0,
+      "exit_code": 0,
+      "class_counts": {
+        "test_full_score_cpu": 129,
+        "test_full_score_controller": 82,
+        "test_full_score_entry198": 15
+      },
+      "XML_sha256": "f18b7ea6f4ff2fb058af3c3420d3914f767688b6fa2ddb792829cbf7569c749a"
+    }
+  ],
+  "original_Task2_baseline_expected": 107,
+  "original_Task2_baseline_observed_each": 107,
+  "accepted_Task1_baseline_expected": 97,
+  "accepted_Task1_baseline_observed_each": 97,
+  "added_R224_expected": 22,
+  "added_R224_observed_each": 22,
+  "source_commit_context": "50e947bb852613e3a270082651f2bd1b7bb0c525",
+  "source_scientific_execution": false,
+  "elapsed_receipt_check_seconds": 1.0554433789802715,
+  "result_sha256": "1f17197dce6d86c1728ddaf50f8f83eab5aa886c3a1e724c8c50e2cfc3af792f",
+  "accounting_sha256": "206cc9c11decfb58de5d4b84e03951cf4de15ad55dccb8784f2acdd364d8db07"
+}

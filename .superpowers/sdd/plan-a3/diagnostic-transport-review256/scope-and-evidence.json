@@ -1,0 +1,49 @@
+{
+  "source_manifest_sha256": "8df6759644ae549869a8d4d0675d20b86a0e856e2ababfb6a0f131142f1d2e0d",
+  "recipe_sha256": "96c57370c5bbc3883eab47774d85d5c38d7c27c2ee5fa1586f246e2082f2c7fb",
+  "frozen_file_records": 1126,
+  "source_records_excluding6diagnostic_files": 1120,
+  "aliases": 8,
+  "inventory_digest": "b5946b6cb6aff9c2fad0047f61affaacd0b5ec13e5b832c92e19a6fdd4f63af5",
+  "config_unbound": true,
+  "actual_host_or_container_validation_claimed": false,
+  "failed_job50316975_files_verified": 21,
+  "failed_job_normal_completion": false,
+  "failed_job_error": "RuntimeError('pytest timed out; no RED evidence')",
+  "baseline": {
+    "status": "CORRECTION_RED_EXPECTED",
+    "argv": [
+      "/u/swong2/.conda/envs/mgnp/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--import-mode=importlib",
+      "--confcutdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r5/baseline-suite",
+      "--rootdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r5/baseline-suite",
+      "--basetemp=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/a3-green-bridges-transport229-r3/jobs/job-50316975/execution/mgnp/baseline-red/tmp",
+      "--junitxml=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/a3-green-bridges-transport229-r3/jobs/job-50316975/execution/mgnp/baseline-red/junit.xml",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r5/baseline-suite/test_a3_prepared_pilot_target.py::test_prepared_anchored_cgroup_scope_mismatch_rejects_before_loader",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r5/baseline-suite/test_a3_prepared_pilot_target.py::test_prepared_anchored_cold_warm_cgroup_scope_disagreement_rejects",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r5/baseline-suite/test_a3_prepared_pilot_target.py::test_prepared_completed_intake_rejects_anchored_cgroup_scope_mismatch"
+    ],
+    "normal_completion": true,
+    "expected_cases": 5,
+    "model_loaded": false,
+    "execution_authorized": false,
+    "pytest_exit_code": 1,
+    "termination_signal": null,
+    "observed_cases": 5,
+    "failures": 5,
+    "errors": 0,
+    "skipped": 0,
+    "exit_code": 0,
+    "per_function_case_counts": {
+      "test_prepared_anchored_cgroup_scope_mismatch_rejects_before_loader": 2,
+      "test_prepared_anchored_cold_warm_cgroup_scope_disagreement_rejects": 1,
+      "test_prepared_completed_intake_rejects_anchored_cgroup_scope_mismatch": 2
+    },
+    "wall_seconds": 345.7751021385193
+  }
+}

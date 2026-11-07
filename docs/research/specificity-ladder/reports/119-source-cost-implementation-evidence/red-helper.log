@@ -1,0 +1,467 @@
+FFFFFFFFFFFFFFFFFFFFFF                                                   [100%]
+=================================== FAILURES ===================================
+___ test_source_views_seal_empty_and_nested_values_and_deepcopy_thaws[raw0] ____
+
+raw = {}
+
+    @pytest.mark.parametrize('raw',[{},[],{'nested':[{'empty':[]}]}])
+    def test_source_views_seal_empty_and_nested_values_and_deepcopy_thaws(raw):
+>       from component_analysis import a3_source_validation as s
+E       ImportError: cannot import name 'a3_source_validation' from 'component_analysis' (/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-guard-cost-fix-source/component_analysis/__init__.py)
+
+tests/test_a3_source_validation.py:55: ImportError
+___ test_source_views_seal_empty_and_nested_values_and_deepcopy_thaws[raw1] ____
+
+raw = []
+
+    @pytest.mark.parametrize('raw',[{},[],{'nested':[{'empty':[]}]}])
+    def test_source_views_seal_empty_and_nested_values_and_deepcopy_thaws(raw):
+>       from component_analysis import a3_source_validation as s
+E       ImportError: cannot import name 'a3_source_validation' from 'component_analysis' (/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-guard-cost-fix-source/component_analysis/__init__.py)
+
+tests/test_a3_source_validation.py:55: ImportError
+___ test_source_views_seal_empty_and_nested_values_and_deepcopy_thaws[raw2] ____
+
+raw = {'nested': [{'empty': []}]}
+
+    @pytest.mark.parametrize('raw',[{},[],{'nested':[{'empty':[]}]}])
+    def test_source_views_seal_empty_and_nested_values_and_deepcopy_thaws(raw):
+>       from component_analysis import a3_source_validation as s
+E       ImportError: cannot import name 'a3_source_validation' from 'component_analysis' (/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-guard-cost-fix-source/component_analysis/__init__.py)
+
+tests/test_a3_source_validation.py:55: ImportError
+________ test_raw_unsealed_and_subclass_source_views_cannot_be_trusted _________
+
+    def test_raw_unsealed_and_subclass_source_views_cannot_be_trusted():
+>       from component_analysis import a3_source_validation as s
+E       ImportError: cannot import name 'a3_source_validation' from 'component_analysis' (/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-guard-cost-fix-source/component_analysis/__init__.py)
+
+tests/test_a3_source_validation.py:77: ImportError
+_______ test_context_retains_validated_owned_snapshot_and_fresh_evidence _______
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-helper/test_context_retains_validated0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59971b55b0>
+
+    def test_context_retains_validated_owned_snapshot_and_fresh_evidence(tmp_path,monkeypatch):
+>       c=setup_case(tmp_path,monkeypatch);state=c.build();first=refresh(c,state);second=refresh(c,state)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_a3_source_validation.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-helper/test_context_retains_validated0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59971b55b0>
+extra_registry = ()
+
+    def setup_case(tmp_path, monkeypatch, *, extra_registry=()):
+>       from component_analysis import a3_source_validation as s
+E       ImportError: cannot import name 'a3_source_validation' from 'component_analysis' (/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-guard-cost-fix-source/component_analysis/__init__.py)
+
+tests/test_a3_source_validation.py:14: ImportError
+__ test_mutation_during_semantic_validation_cannot_enter_minted_source[outer] __
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-helper/test_mutation_during_semantic_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59971b6450>
+mutation = 'outer'
+
+    @pytest.mark.parametrize('mutation',['outer','nested','owned'])
+    def test_mutation_during_semantic_validation_cannot_enter_minted_source(tmp_path,monkeypatch,mutation):
+>       c=setup_case(tmp_path,monkeypatch)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_a3_source_validation.py:105: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-helper/test_mutation_during_semantic_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59971b6450>
+extra_registry = ()
+
+    def setup_case(tmp_path, monkeypatch, *, extra_registry=()):
+>       from component_analysis import a3_source_validation as s
+E       ImportError: cannot import name 'a3_source_validation' from 'component_analysis' (/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-guard-cost-fix-source/component_analysis/__init__.py)
+
+tests/test_a3_source_validation.py:14: ImportError
+_ test_mutation_during_semantic_validation_cannot_enter_minted_source[nested] __
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-helper/test_mutation_during_semantic_1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59971b6570>
+mutation = 'nested'
+
+    @pytest.mark.parametrize('mutation',['outer','nested','owned'])
+    def test_mutation_during_semantic_validation_cannot_enter_minted_source(tmp_path,monkeypatch,mutation):
+>       c=setup_case(tmp_path,monkeypatch)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_a3_source_validation.py:105: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-helper/test_mutation_during_semantic_1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59971b6570>
+extra_registry = ()
+
+    def setup_case(tmp_path, monkeypatch, *, extra_registry=()):
+>       from component_analysis import a3_source_validation as s
+E       ImportError: cannot import name 'a3_source_validation' from 'component_analysis' (/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-guard-cost-fix-source/component_analysis/__init__.py)
+
+tests/test_a3_source_validation.py:14: ImportError
+__ test_mutation_during_semantic_validation_cannot_enter_minted_source[owned] __
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-helper/test_mutation_during_semantic_2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59971b59a0>
+mutation = 'owned'
+
+    @pytest.mark.parametrize('mutation',['outer','nested','owned'])
+    def test_mutation_during_semantic_validation_cannot_enter_minted_source(tmp_path,monkeypatch,mutation):
+>       c=setup_case(tmp_path,monkeypatch)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_a3_source_validation.py:105: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-helper/test_mutation_during_semantic_2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59971b59a0>
+extra_registry = ()
+
+    def setup_case(tmp_path, monkeypatch, *, extra_registry=()):
+>       from component_analysis import a3_source_validation as s
+E       ImportError: cannot import name 'a3_source_validation' from 'component_analysis' (/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-guard-cost-fix-source/component_analysis/__init__.py)
+
+tests/test_a3_source_validation.py:14: ImportError
+_______ test_static_artifact_and_input_scope_changes_fail_closed[bytes] ________
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-helper/test_static_artifact_and_input0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59971b7140>
+damage = 'bytes'
+
+    @pytest.mark.parametrize('damage',['bytes','marker','child','outer','scope','owner'])
+    def test_static_artifact_and_input_scope_changes_fail_closed(tmp_path,monkeypatch,damage):
+>       c=setup_case(tmp_path,monkeypatch);state=c.build()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_a3_source_validation.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-helper/test_static_artifact_and_input0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59971b7140>
+extra_registry = ()
+
+    def setup_case(tmp_path, monkeypatch, *, extra_registry=()):
+>       from component_analysis import a3_source_validation as s
+E       ImportError: cannot import name 'a3_source_validation' from 'component_analysis' (/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-guard-cost-fix-source/component_analysis/__init__.py)
+
+tests/test_a3_source_validation.py:14: ImportError
+_______ test_static_artifact_and_input_scope_changes_fail_closed[marker] _______
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-helper/test_static_artifact_and_input1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59971b79e0>
+damage = 'marker'
+
+    @pytest.mark.parametrize('damage',['bytes','marker','child','outer','scope','owner'])
+    def test_static_artifact_and_input_scope_changes_fail_closed(tmp_path,monkeypatch,damage):
+>       c=setup_case(tmp_path,monkeypatch);state=c.build()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_a3_source_validation.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-helper/test_static_artifact_and_input1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59971b79e0>
+extra_registry = ()
+
+    def setup_case(tmp_path, monkeypatch, *, extra_registry=()):
+>       from component_analysis import a3_source_validation as s
+E       ImportError: cannot import name 'a3_source_validation' from 'component_analysis' (/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-guard-cost-fix-source/component_analysis/__init__.py)
+
+tests/test_a3_source_validation.py:14: ImportError
+_______ test_static_artifact_and_input_scope_changes_fail_closed[child] ________
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-helper/test_static_artifact_and_input2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59971caa50>
+damage = 'child'
+
+    @pytest.mark.parametrize('damage',['bytes','marker','child','outer','scope','owner'])
+    def test_static_artifact_and_input_scope_changes_fail_closed(tmp_path,monkeypatch,damage):
+>       c=setup_case(tmp_path,monkeypatch);state=c.build()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_a3_source_validation.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-helper/test_static_artifact_and_input2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59971caa50>
+extra_registry = ()
+
+    def setup_case(tmp_path, monkeypatch, *, extra_registry=()):
+>       from component_analysis import a3_source_validation as s
+E       ImportError: cannot import name 'a3_source_validation' from 'component_analysis' (/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-guard-cost-fix-source/component_analysis/__init__.py)
+
+tests/test_a3_source_validation.py:14: ImportError
+_______ test_static_artifact_and_input_scope_changes_fail_closed[outer] ________
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-helper/test_static_artifact_and_input3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59971c8cb0>
+damage = 'outer'
+
+    @pytest.mark.parametrize('damage',['bytes','marker','child','outer','scope','owner'])
+    def test_static_artifact_and_input_scope_changes_fail_closed(tmp_path,monkeypatch,damage):
+>       c=setup_case(tmp_path,monkeypatch);state=c.build()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_a3_source_validation.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-helper/test_static_artifact_and_input3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59971c8cb0>
+extra_registry = ()
+
+    def setup_case(tmp_path, monkeypatch, *, extra_registry=()):
+>       from component_analysis import a3_source_validation as s
+E       ImportError: cannot import name 'a3_source_validation' from 'component_analysis' (/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-guard-cost-fix-source/component_analysis/__init__.py)
+
+tests/test_a3_source_validation.py:14: ImportError
+_______ test_static_artifact_and_input_scope_changes_fail_closed[scope] ________
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-helper/test_static_artifact_and_input4')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59971ca7b0>
+damage = 'scope'
+
+    @pytest.mark.parametrize('damage',['bytes','marker','child','outer','scope','owner'])
+    def test_static_artifact_and_input_scope_changes_fail_closed(tmp_path,monkeypatch,damage):
+>       c=setup_case(tmp_path,monkeypatch);state=c.build()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_a3_source_validation.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-helper/test_static_artifact_and_input4')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59971ca7b0>
+extra_registry = ()
+
+    def setup_case(tmp_path, monkeypatch, *, extra_registry=()):
+>       from component_analysis import a3_source_validation as s
+E       ImportError: cannot import name 'a3_source_validation' from 'component_analysis' (/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-guard-cost-fix-source/component_analysis/__init__.py)
+
+tests/test_a3_source_validation.py:14: ImportError
+_______ test_static_artifact_and_input_scope_changes_fail_closed[owner] ________
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-helper/test_static_artifact_and_input5')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59971c9970>
+damage = 'owner'
+
+    @pytest.mark.parametrize('damage',['bytes','marker','child','outer','scope','owner'])
+    def test_static_artifact_and_input_scope_changes_fail_closed(tmp_path,monkeypatch,damage):
+>       c=setup_case(tmp_path,monkeypatch);state=c.build()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_a3_source_validation.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-helper/test_static_artifact_and_input5')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59971c9970>
+extra_registry = ()
+
+    def setup_case(tmp_path, monkeypatch, *, extra_registry=()):
+>       from component_analysis import a3_source_validation as s
+E       ImportError: cannot import name 'a3_source_validation' from 'component_analysis' (/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-guard-cost-fix-source/component_analysis/__init__.py)
+
+tests/test_a3_source_validation.py:14: ImportError
+______________ test_static_same_bytes_link_retargets_reject[leaf] ______________
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-helper/test_static_same_bytes_link_re0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59971c9f70>
+kind = 'leaf'
+
+    @pytest.mark.parametrize('kind',['leaf','ancestor'])
+    def test_static_same_bytes_link_retargets_reject(tmp_path,monkeypatch,kind):
+>       c=setup_case(tmp_path,monkeypatch)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_a3_source_validation.py:133: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-helper/test_static_same_bytes_link_re0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59971c9f70>
+extra_registry = ()
+
+    def setup_case(tmp_path, monkeypatch, *, extra_registry=()):
+>       from component_analysis import a3_source_validation as s
+E       ImportError: cannot import name 'a3_source_validation' from 'component_analysis' (/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-guard-cost-fix-source/component_analysis/__init__.py)
+
+tests/test_a3_source_validation.py:14: ImportError
+____________ test_static_same_bytes_link_retargets_reject[ancestor] ____________
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-helper/test_static_same_bytes_link_re1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59971ec8f0>
+kind = 'ancestor'
+
+    @pytest.mark.parametrize('kind',['leaf','ancestor'])
+    def test_static_same_bytes_link_retargets_reject(tmp_path,monkeypatch,kind):
+>       c=setup_case(tmp_path,monkeypatch)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_a3_source_validation.py:133: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-helper/test_static_same_bytes_link_re1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59971ec8f0>
+extra_registry = ()
+
+    def setup_case(tmp_path, monkeypatch, *, extra_registry=()):
+>       from component_analysis import a3_source_validation as s
+E       ImportError: cannot import name 'a3_source_validation' from 'component_analysis' (/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-guard-cost-fix-source/component_analysis/__init__.py)
+
+tests/test_a3_source_validation.py:14: ImportError
+________ test_exact_id_union_matches_original_base_and_bank_expansions _________
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-helper/test_exact_id_union_matches_or0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59971eeb10>
+
+    def test_exact_id_union_matches_original_base_and_bank_expansions(tmp_path,monkeypatch):
+>       c=setup_case(tmp_path,monkeypatch)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_a3_source_validation.py:145: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-helper/test_exact_id_union_matches_or0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59971eeb10>
+extra_registry = ()
+
+    def setup_case(tmp_path, monkeypatch, *, extra_registry=()):
+>       from component_analysis import a3_source_validation as s
+E       ImportError: cannot import name 'a3_source_validation' from 'component_analysis' (/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-guard-cost-fix-source/component_analysis/__init__.py)
+
+tests/test_a3_source_validation.py:14: ImportError
+______ test_current_registry_atomic_updates_new_sets_and_new_link_attacks ______
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-helper/test_current_registry_atomic_u0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59971ede50>
+
+    def test_current_registry_atomic_updates_new_sets_and_new_link_attacks(tmp_path,monkeypatch):
+>       c=setup_case(tmp_path,monkeypatch);state=c.build();registry=c.primary/'docs/research/held_out.json'
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_a3_source_validation.py:164: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-helper/test_current_registry_atomic_u0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59971ede50>
+extra_registry = ()
+
+    def setup_case(tmp_path, monkeypatch, *, extra_registry=()):
+>       from component_analysis import a3_source_validation as s
+E       ImportError: cannot import name 'a3_source_validation' from 'component_analysis' (/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-guard-cost-fix-source/component_analysis/__init__.py)
+
+tests/test_a3_source_validation.py:14: ImportError
+________ test_new_file_protected_overlap_and_grader_changes_still_fail _________
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-helper/test_new_file_protected_overla0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59971c9ca0>
+
+    def test_new_file_protected_overlap_and_grader_changes_still_fail(tmp_path,monkeypatch):
+>       c=setup_case(tmp_path,monkeypatch);state=c.build();registry=c.primary/'docs/research/held_out.json'
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_a3_source_validation.py:177: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-helper/test_new_file_protected_overla0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59971c9ca0>
+extra_registry = ()
+
+    def setup_case(tmp_path, monkeypatch, *, extra_registry=()):
+>       from component_analysis import a3_source_validation as s
+E       ImportError: cannot import name 'a3_source_validation' from 'component_analysis' (/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-guard-cost-fix-source/component_analysis/__init__.py)
+
+tests/test_a3_source_validation.py:14: ImportError
+______ test_mutable_registry_lexical_provenance_and_relative_cwd[default] ______
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-helper/test_mutable_registry_lexical_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59971c8f80>
+pathkind = 'default'
+
+    @pytest.mark.parametrize('pathkind',['default','explicit'])
+    def test_mutable_registry_lexical_provenance_and_relative_cwd(tmp_path,monkeypatch,pathkind):
+>       c=setup_case(tmp_path,monkeypatch)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_a3_source_validation.py:187: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-helper/test_mutable_registry_lexical_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59971c8f80>
+extra_registry = ()
+
+    def setup_case(tmp_path, monkeypatch, *, extra_registry=()):
+>       from component_analysis import a3_source_validation as s
+E       ImportError: cannot import name 'a3_source_validation' from 'component_analysis' (/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-guard-cost-fix-source/component_analysis/__init__.py)
+
+tests/test_a3_source_validation.py:14: ImportError
+_____ test_mutable_registry_lexical_provenance_and_relative_cwd[explicit] ______
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-helper/test_mutable_registry_lexical_1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59971c8650>
+pathkind = 'explicit'
+
+    @pytest.mark.parametrize('pathkind',['default','explicit'])
+    def test_mutable_registry_lexical_provenance_and_relative_cwd(tmp_path,monkeypatch,pathkind):
+>       c=setup_case(tmp_path,monkeypatch)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_a3_source_validation.py:187: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-helper/test_mutable_registry_lexical_1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59971c8650>
+extra_registry = ()
+
+    def setup_case(tmp_path, monkeypatch, *, extra_registry=()):
+>       from component_analysis import a3_source_validation as s
+E       ImportError: cannot import name 'a3_source_validation' from 'component_analysis' (/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-guard-cost-fix-source/component_analysis/__init__.py)
+
+tests/test_a3_source_validation.py:14: ImportError
+_______ test_missing_static_source_appearance_and_glob_change_invalidate _______
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-helper/test_missing_static_source_app0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59971c98e0>
+
+    def test_missing_static_source_appearance_and_glob_change_invalidate(tmp_path,monkeypatch):
+>       c=setup_case(tmp_path,monkeypatch);missing=tmp_path/'missing/receipt.json';watch=tmp_path/'watch';watch.mkdir();(watch/'source.py').write_text('a')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_a3_source_validation.py:200: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-helper/test_missing_static_source_app0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f59971c98e0>
+extra_registry = ()
+
+    def setup_case(tmp_path, monkeypatch, *, extra_registry=()):
+>       from component_analysis import a3_source_validation as s
+E       ImportError: cannot import name 'a3_source_validation' from 'component_analysis' (/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-guard-cost-fix-source/component_analysis/__init__.py)
+
+tests/test_a3_source_validation.py:14: ImportError
+=========================== short test summary info ============================
+FAILED tests/test_a3_source_validation.py::test_source_views_seal_empty_and_nested_values_and_deepcopy_thaws[raw0]
+FAILED tests/test_a3_source_validation.py::test_source_views_seal_empty_and_nested_values_and_deepcopy_thaws[raw1]
+FAILED tests/test_a3_source_validation.py::test_source_views_seal_empty_and_nested_values_and_deepcopy_thaws[raw2]
+FAILED tests/test_a3_source_validation.py::test_raw_unsealed_and_subclass_source_views_cannot_be_trusted
+FAILED tests/test_a3_source_validation.py::test_context_retains_validated_owned_snapshot_and_fresh_evidence
+FAILED tests/test_a3_source_validation.py::test_mutation_during_semantic_validation_cannot_enter_minted_source[outer]
+FAILED tests/test_a3_source_validation.py::test_mutation_during_semantic_validation_cannot_enter_minted_source[nested]
+FAILED tests/test_a3_source_validation.py::test_mutation_during_semantic_validation_cannot_enter_minted_source[owned]
+FAILED tests/test_a3_source_validation.py::test_static_artifact_and_input_scope_changes_fail_closed[bytes]
+FAILED tests/test_a3_source_validation.py::test_static_artifact_and_input_scope_changes_fail_closed[marker]
+FAILED tests/test_a3_source_validation.py::test_static_artifact_and_input_scope_changes_fail_closed[child]
+FAILED tests/test_a3_source_validation.py::test_static_artifact_and_input_scope_changes_fail_closed[outer]
+FAILED tests/test_a3_source_validation.py::test_static_artifact_and_input_scope_changes_fail_closed[scope]
+FAILED tests/test_a3_source_validation.py::test_static_artifact_and_input_scope_changes_fail_closed[owner]
+FAILED tests/test_a3_source_validation.py::test_static_same_bytes_link_retargets_reject[leaf]
+FAILED tests/test_a3_source_validation.py::test_static_same_bytes_link_retargets_reject[ancestor]
+FAILED tests/test_a3_source_validation.py::test_exact_id_union_matches_original_base_and_bank_expansions
+FAILED tests/test_a3_source_validation.py::test_current_registry_atomic_updates_new_sets_and_new_link_attacks
+FAILED tests/test_a3_source_validation.py::test_new_file_protected_overlap_and_grader_changes_still_fail
+FAILED tests/test_a3_source_validation.py::test_mutable_registry_lexical_provenance_and_relative_cwd[default]
+FAILED tests/test_a3_source_validation.py::test_mutable_registry_lexical_provenance_and_relative_cwd[explicit]
+FAILED tests/test_a3_source_validation.py::test_missing_static_source_appearance_and_glob_change_invalidate
+22 failed in 0.83s

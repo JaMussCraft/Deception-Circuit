@@ -1,0 +1,59 @@
+{
+  "scope": "one measured original-H bank + prefix4 scoring only",
+  "complete": true,
+  "full_scoring_admitted": false,
+  "source_commit": "50e947bb852613e3a270082651f2bd1b7bb0c525",
+  "gpu_uuid": "GPU-c9b7d223-a915-50ec-4eaf-a09dfec26fba",
+  "gpu_name": "NVIDIA H100 80GB HBM3",
+  "bank_binding": {
+    "source_commit": "50e947bb852613e3a270082651f2bd1b7bb0c525",
+    "groups_file_sha256": "c3095b10aac09a23ee35e4620402581b0407623d1e111a2407a691f60f599de4",
+    "bank_file": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/bridges-h100-G3-v1/bank/banks.json",
+    "bank_file_sha256": "a8afbd51a994a6346d1bb8c832b68cab0ea42c83a195c22a29aae4016723e00b",
+    "bank_manifest_sha256": "3fdff794cb9bba609ee3d181af24c02b1734796270c07985c020345b238b360f",
+    "gpu_uuid": "GPU-c9b7d223-a915-50ec-4eaf-a09dfec26fba",
+    "gpu_name": "NVIDIA H100 80GB HBM3",
+    "dtype": "torch.bfloat16",
+    "device": "cuda:0",
+    "bank_execution": {
+      "bank_compute_seconds": 109.02882971707731,
+      "bank_stage_seconds": 664.8189254421741,
+      "cluster": "bridges2",
+      "cluster_source": "SLURM_CLUSTER_NAME",
+      "device": "cuda:0",
+      "dtype": "torch.bfloat16",
+      "gpu_name": "NVIDIA H100 80GB HBM3",
+      "memory_scope": "bank compute after model load; includes resident model",
+      "model_load_seconds": 555.7060698261485,
+      "peak_allocated_memory_bytes": 16194887168,
+      "peak_reserved_memory_bytes": 16240345088,
+      "slurm_job_id": "50189932",
+      "stage_time_scope": "model load plus bank compute; excludes artifact publication"
+    }
+  },
+  "score_manifest_sha256": "85b610395f9c4cdb85abafa1c1a3f20b0d86bd665356ed08e29d3fd5446c9045",
+  "score_execution": {
+    "cluster": "bridges2",
+    "cluster_source": "SLURM_CLUSTER_NAME",
+    "device": "cuda:0",
+    "dtype": "torch.bfloat16",
+    "gpu_name": "NVIDIA H100 80GB HBM3",
+    "memory_scope": "scoring compute after model load; includes resident model",
+    "model_load_seconds": 9.603312622755766,
+    "peak_allocated_memory_bytes": 19600040960,
+    "peak_reserved_memory_bytes": 20789067776,
+    "scoring_compute_seconds": 518.3888086024672,
+    "scoring_stage_seconds": 534.4008195307106,
+    "slurm_job_id": "50189932",
+    "stage_time_scope": "model load plus scoring compute; excludes artifact publication"
+  },
+  "counts": {
+    "expected": 2484,
+    "positive_controls": 144,
+    "rows": 2484
+  },
+  "job_id": "50189932",
+  "wall_seconds": 2248.018194437027,
+  "assessment_effects_inspected": false,
+  "automatic_retry": false
+}

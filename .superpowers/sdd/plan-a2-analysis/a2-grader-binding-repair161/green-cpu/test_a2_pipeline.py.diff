@@ -1,0 +1,314 @@
+--- baseline/tests/test_a2_pipeline.py
++++ candidate/tests/test_a2_pipeline.py
+@@ -492,7 +492,7 @@
+     monkeypatch.setattr(a1, "validate_prepared", lambda args, value: None)
+     monkeypatch.setattr(a1, "registries", lambda *args: {})
+     monkeypatch.setattr(a1, "utility_registries", lambda *args: {})
+-    monkeypatch.setattr(a1, "grader_registry", lambda: {})
++    monkeypatch.setattr(a1, "grader_registry", lambda: {str(root / "docs/research/directions.json"): a1.common.file_hash(root / "docs/research/directions.json") for root in (a1.PRIMARY, a1.REPO)})
+ 
+     def forbidden(*args):
+         raise AssertionError("model/tokenizer loaded")
+@@ -634,7 +634,7 @@
+         "#!"
+         + sys.executable
+         + "\n"
+-        + f"""import sys,json\nfrom pathlib import Path\nsys.path.insert(0,{str(Path(__file__).resolve().parents[1])!r})\nfrom component_analysis import a2_pipeline as p\np.comparison.compare_masks=lambda records:json.loads(Path({str(cp)!r}).read_text())\np.a1.validate_prepared=lambda *args:None\np.a1.registries=lambda *args:{{}}\np.a1.utility_registries=lambda *args:{{}}\np.a1.grader_registry=lambda:{{}}\ndef forbidden(*args):raise AssertionError('weights/tokenizer loaded')\np.a1.common.load_tokenizer=forbidden\nraise SystemExit(p.main(sys.argv[3:],model_loader=forbidden))\n"""
++        + f"""import sys,json\nfrom pathlib import Path\nsys.path.insert(0,{str(Path(__file__).resolve().parents[1])!r})\nfrom component_analysis import a2_pipeline as p\np.comparison.compare_masks=lambda records:json.loads(Path({str(cp)!r}).read_text())\np.a1.validate_prepared=lambda *args:None\np.a1.registries=lambda *args:{{}}\np.a1.utility_registries=lambda *args:{{}}\np.a1.grader_registry=lambda:{{str(root / "docs/research/directions.json"):p.a1.common.file_hash(root / "docs/research/directions.json") for root in (p.a1.PRIMARY,p.a1.REPO)}}\ndef forbidden(*args):raise AssertionError('weights/tokenizer loaded')\np.a1.common.load_tokenizer=forbidden\nraise SystemExit(p.main(sys.argv[3:],model_loader=forbidden))\n"""
+     )
+     driver.chmod(0o700)
+     result = subprocess.run(
+@@ -933,3 +933,293 @@
+     assert summary["collection_complete"]
+     assert result["assessment_status"] == "blocked_uninterpretable"
+     assert not result["specificity_assessment_complete"]
++
++
++@pytest.fixture
++def a2_catalogue_context(inputs, tmp_path, monkeypatch):
++    """Real original grader checks; only scientific source context is synthetic."""
++    import shutil
++    from evaluation.grader_hash import grader_files, grader_sha256
++
++    original_repo = a1.REPO
++    repo, primary = tmp_path / "repo", tmp_path / "primary"
++    for relative in sorted(set(grader_files(str(original_repo))) | set(inputs[1]["code_hashes"])):
++        target = repo / relative
++        target.parent.mkdir(parents=True, exist_ok=True)
++        shutil.copyfile(original_repo / relative, target)
++    assert grader_sha256(str(repo)) == a1.GRADER
++    own = dict(id="specificity-ladder", title="fixture", status="active",
++               claimed_by="codex-01234567", frozen_grader_sha256=a1.GRADER,
++               do_not_touch=["own/*"], future_metadata=dict(strict=True))
++    foreign = dict(id="other", title="foreign", status="paused",
++                   do_not_touch=["outputs/_analyses", "duplicate", "duplicate"],
++                   archive=["archive"], legacy_scratch=["legacy"],
++                   frozen_grader_sha256=a1.GRADER)
++    catalogues = []
++    for root in (primary, repo):
++        path = root / "docs/research/directions.json"
++        path.parent.mkdir(parents=True, exist_ok=True)
++        path.write_text(json.dumps(dict(schema=1, updated="2026-11-03",
++                                       directions=[own, foreign])))
++        catalogues.append(path)
++    monkeypatch.setattr(a1, "REPO", repo)
++    monkeypatch.setattr(a1, "PRIMARY", primary)
++    original_grader = a1.grader_registry
++    calls = []
++
++    def grader():
++        calls.append(True)
++        return original_grader()
++
++    monkeypatch.setattr(a1, "grader_registry", grader)
++    comp, prepared, selected, sidecar = inputs
++    monkeypatch.setattr(a2, "_load_context", lambda args: (prepared, selected, sidecar))
++    monkeypatch.setattr(comparison, "compare_masks", lambda records: comp)
++    monkeypatch.setattr(a2, "runtime_hashes", lambda: {"fixture": "c" * 64})
++    monkeypatch.setattr(a1, "registries", lambda *args: {"protected": "d" * 64})
++    monkeypatch.setattr(a1, "utility_registries", lambda *args: {"utility": "e" * 64})
++    design, cp, sources = (tmp_path / n for n in ("design.json", "comparison.json", "sources.json"))
++    a1.write_artifact(design, prepared)
++    cp.write_text(json.dumps(comp))
++    sources.write_text(json.dumps(dict(records=[dict(synthetic=True)])))
++    output = tmp_path / "freeze"
++    argv = ["--stage", "freeze", "--design", str(design), "--selected",
++            sidecar["selection_artifact"], "--comparison", str(cp),
++            "--source-records", str(sources), "--work-dir", str(output),
++            "--commit", "b" * 40]
++
++    def forbidden(*args):
++        raise AssertionError("model/tokenizer access forbidden")
++
++    monkeypatch.setattr(a1.common, "load_tokenizer", forbidden)
++    assert a2.main(argv, model_loader=forbidden) == 0
++    receipt = a1.read_artifact(output / "groups.json")
++    args = a2.parser().parse_args(argv)
++    args.stage = "bank"
++    return SimpleNamespace(receipt=receipt, prepared=prepared, args=args,
++                           catalogues=catalogues, calls=calls, repo=repo,
++                           output=output, comp=comp, source=sources)
++
++
++def _catalogue_edit(path, edit):
++    data = json.loads(path.read_text())
++    edit(data)
++    path.write_text(json.dumps(data))
++
++
++@pytest.mark.parametrize("change", ["foreign_metadata", "empty_row", "updated"])
++def test_a2_catalogue_unrelated_live_change_allowed(a2_catalogue_context, change):
++    c = a2_catalogue_context
++    frozen = copy.deepcopy(c.receipt["grader_registry"])
++    for path in c.catalogues:
++        def edit(data):
++            if change == "foreign_metadata":
++                data["directions"][1].update(status="active", title="changed")
++            elif change == "empty_row":
++                data["directions"].append(dict(id="new-empty", title="new",
++                    do_not_touch=[], archive=[], legacy_scratch=[], frozen_grader_sha256=None))
++            else:
++                data["updated"] = "2026-11-04"
++        _catalogue_edit(path, edit)
++    before = len(c.calls)
++    a2._validate_live(c.args, c.receipt, c.prepared)
++    assert len(c.calls) > before
++    assert c.receipt["grader_registry"] == frozen
++
++
++def test_a2_catalogue_existing_stage_read_requires_no_rewrite(a2_catalogue_context):
++    c = a2_catalogue_context
++    payload = dict(kind="software-stage", execution_provenance=None, counts={})
++    manifest = a2._manifest(c.args, c.receipt, payload)
++    stage = c.output / "software-stage"
++    a2._publish_stage(stage, "payload.json", payload, manifest)
++    original = {p.name: p.read_bytes() for p in stage.iterdir()}
++    groups_bytes = (c.output / "groups.json").read_bytes()
++    for path in c.catalogues:
++        _catalogue_edit(path, lambda data: data["directions"][1].update(status="done"))
++    before = len(c.calls)
++    assert a2.read_stage(stage, "payload.json", "bank", c.args, c.receipt) == payload
++    assert len(c.calls) > before
++    assert {p.name: p.read_bytes() for p in stage.iterdir()} == original
++    assert (c.output / "groups.json").read_bytes() == groups_bytes
++
++
++def test_a2_catalogue_freeze_has_new_binding_and_legacy_is_rejected(a2_catalogue_context):
++    c = a2_catalogue_context
++    assert "grader_binding" in c.receipt
++    legacy = copy.deepcopy(c.receipt)
++    del legacy["grader_binding"]
++    legacy["receipt_sha256"] = a2.hash_content({k: v for k, v in legacy.items() if k != "receipt_sha256"})
++    with pytest.raises(ValueError):
++        a2._validate_live(c.args, legacy, c.prepared)
++
++
++@pytest.mark.parametrize("route", [0, 1])
++@pytest.mark.parametrize("field,value", [("status", "paused"), ("claimed_by", None),
++    ("title", "changed"), ("do_not_touch", []), ("future_metadata", dict(strict=1)),
++    ("branch", "new-branch"), ("worktree", "new-worktree")])
++def test_a2_catalogue_own_entry_mutation_rejected(a2_catalogue_context, route, field, value):
++    c = a2_catalogue_context
++    _catalogue_edit(c.catalogues[route], lambda data: data["directions"][0].update({field: value}))
++    with pytest.raises(ValueError):
++        a2._validate_live(c.args, c.receipt, c.prepared)
++
++
++@pytest.mark.parametrize("route", [0, 1])
++@pytest.mark.parametrize("change", ["missing", "duplicate", "wrong_fingerprint"])
++def test_a2_catalogue_own_identity_rejected(a2_catalogue_context, route, change):
++    c = a2_catalogue_context
++    def edit(data):
++        if change == "missing":
++            del data["directions"][0]
++        elif change == "duplicate":
++            data["directions"].append(copy.deepcopy(data["directions"][0]))
++        else:
++            data["directions"][0]["frozen_grader_sha256"] = "0" * 64
++    _catalogue_edit(c.catalogues[route], edit)
++    with pytest.raises(ValueError):
++        a2._validate_live(c.args, c.receipt, c.prepared)
++
++
++@pytest.mark.parametrize("change", ["path_duplicate_removed", "row_duplicate_added", "new_protected_row",
++    "archive", "legacy_scratch", "frozen_grader_sha256", "none_path", "empty_pin"])
++def test_a2_catalogue_foreign_protection_rejected(a2_catalogue_context, change):
++    c = a2_catalogue_context
++    def edit(data):
++        foreign = data["directions"][1]
++        if change == "path_duplicate_removed":
++            foreign["do_not_touch"].pop()
++        elif change == "row_duplicate_added":
++            data["directions"].append(copy.deepcopy(foreign))
++        elif change == "new_protected_row":
++            data["directions"].append(dict(id="new-protected", do_not_touch=["new/*"]))
++        elif change == "none_path":
++            foreign["do_not_touch"] = None
++        elif change == "empty_pin":
++            foreign["frozen_grader_sha256"] = ""
++        else:
++            foreign[change] = ["changed"] if change != "frozen_grader_sha256" else "0" * 64
++    _catalogue_edit(c.catalogues[0], edit)
++    with pytest.raises(ValueError):
++        a2._validate_live(c.args, c.receipt, c.prepared)
++
++
++@pytest.mark.parametrize("change", ["schema_type", "new_version", "unknown_foreign", "bad_updated", "missing_updated"])
++def test_a2_catalogue_authoritative_schema_rejected(a2_catalogue_context, change):
++    c = a2_catalogue_context
++    def edit(data):
++        if change == "schema_type":
++            data["schema"] = True
++        elif change == "new_version":
++            data["version"] = 2
++        elif change == "unknown_foreign":
++            data["directions"][1]["unknown_protection"] = []
++        elif change == "bad_updated":
++            data["updated"] = 123
++        else:
++            del data["updated"]
++    _catalogue_edit(c.catalogues[0], edit)
++    with pytest.raises(ValueError):
++        a2._validate_live(c.args, c.receipt, c.prepared)
++
++
++@pytest.mark.parametrize("change", ["byte", "new_file"])
++def test_a2_catalogue_actual_original_grader_rejected(a2_catalogue_context, change):
++    c = a2_catalogue_context
++    path = c.repo / "evaluation/benchmark_eval.py" if change == "byte" else c.repo / "evaluation/benchmarks/new_grader.py"
++    path.write_text(path.read_text() + "\n# changed\n" if path.exists() else "# added\n")
++    with pytest.raises(ValueError, match="grader source"):
++        a2._validate_live(c.args, c.receipt, c.prepared)
++
++
++@pytest.mark.parametrize("guard", ["protected", "utility", "runtime", "source_reference", "comparison"])
++def test_a2_catalogue_original_other_guards_retained(a2_catalogue_context, monkeypatch, guard):
++    c = a2_catalogue_context
++    if guard == "protected":
++        monkeypatch.setattr(a1, "registries", lambda *args: {"changed": "0" * 64})
++    elif guard == "utility":
++        monkeypatch.setattr(a1, "utility_registries", lambda *args: {"changed": "0" * 64})
++    elif guard == "runtime":
++        monkeypatch.setattr(a2, "runtime_hashes", lambda: {"changed": "0" * 64})
++    elif guard == "source_reference":
++        c.source.write_text('{"records": []}')
++    else:
++        monkeypatch.setattr(comparison, "compare_masks", lambda records: {})
++    with pytest.raises(ValueError):
++        a2._validate_live(c.args, c.receipt, c.prepared)
++
++
++@pytest.mark.parametrize("target", ["provenance", "binding_route", "binding_digest", "binding_type"])
++def test_a2_catalogue_frozen_binding_tamper_rejected(a2_catalogue_context, target):
++    c = a2_catalogue_context
++    receipt = copy.deepcopy(c.receipt)
++    if target == "provenance":
++        receipt["grader_registry"]["unexpected"] = "0" * 64
++    elif target == "binding_route":
++        receipt["grader_binding"]["routes"]["unexpected"] = {}
++    else:
++        record = next(iter(receipt["grader_binding"]["routes"].values()))
++        if target == "binding_digest":
++            record["sha256"] = "0" * 64
++        else:
++            record["own_entry"]["future_metadata"]["strict"] = 1
++            record["sha256"] = a2._catalogue_digest({k:v for k,v in record.items() if k != "sha256"})
++    receipt["receipt_sha256"] = a2.hash_content({k:v for k,v in receipt.items() if k != "receipt_sha256"})
++    with pytest.raises(ValueError):
++        a2._validate_live(c.args, receipt, c.prepared)
++
++
++@pytest.mark.parametrize("change", ["duplicate_key", "nonfinite", "overflow", "bad_calendar"])
++def test_a2_catalogue_strict_json_rejected(a2_catalogue_context, change):
++    c = a2_catalogue_context
++    path = c.catalogues[0]
++    raw = path.read_text()
++    if change == "duplicate_key":
++        raw = raw.replace('"schema": 1', '"schema": 1, "schema": 1')
++    elif change == "bad_calendar":
++        raw = raw.replace('2026-11-03', '2026-02-30')
++    else:
++        raw = raw.replace('"title": "foreign"', '"title": ' + ('NaN' if change == "nonfinite" else '1e999'))
++    path.write_text(raw)
++    with pytest.raises(ValueError):
++        a2._validate_live(c.args, c.receipt, c.prepared)
++
++
++@pytest.mark.parametrize("target", ["missing", "extra", "substitution", "same_buffer"])
++def test_a2_catalogue_original_observation_routes_rejected(a2_catalogue_context, monkeypatch, target):
++    c = a2_catalogue_context
++    original = a1.grader_registry
++    def changed():
++        value = original()
++        if target == "missing":
++            value.pop(next(iter(value)))
++        elif target == "extra":
++            value["unexpected"] = "0" * 64
++        elif target == "substitution":
++            value["unexpected"] = value.pop(next(iter(value)))
++        else:
++            value[next(iter(value))] = "0" * 64
++        return value
++    monkeypatch.setattr(a1, "grader_registry", changed)
++    with pytest.raises(ValueError):
++        a2._validate_live(c.args, c.receipt, c.prepared)
++
++
++@pytest.mark.parametrize("damage", ["payload", "manifest", "marker", "binding"])
++def test_a2_catalogue_stage_tamper_rejected(a2_catalogue_context, damage):
++    c = a2_catalogue_context
++    payload = dict(kind="software-stage", execution_provenance=None, counts={})
++    stage = c.output / "software-stage"
++    a2._publish_stage(stage, "payload.json", payload, a2._manifest(c.args, c.receipt, payload))
++    if damage == "marker":
++        (stage / "run_manifest.json").unlink()
++    elif damage == "payload":
++        (stage / "payload.json").write_text('{}')
++    elif damage == "manifest":
++        value = json.loads((stage / "run_manifest.json").read_text())
++        value["execution_commit"] = "0" * 40
++        (stage / "run_manifest.json").write_text(json.dumps(value))
++    else:
++        _catalogue_edit(c.catalogues[0], lambda data: data["directions"][0].update(title="changed"))
++    with pytest.raises((ValueError, KeyError)):
++        a2.read_stage(stage, "payload.json", "bank", c.args, c.receipt)

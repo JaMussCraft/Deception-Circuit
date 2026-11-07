@@ -1,0 +1,163 @@
+--- a/.agents/research_session/registry.py
++++ b/.agents/research_session/registry.py
+@@ -766,6 +766,36 @@
+     return 0
+ 
+ 
++def cmd_freeze_grader(args):
++    try:
++        if not isinstance(args.sha256, str) or re.fullmatch(r"[0-9a-f]{64}", args.sha256) is None:
++            raise ValueError("SHA256 must be exactly 64 lowercase hexadecimal characters")
++        if not args.session or not args.session.strip():
++            raise ValueError("--session must be a non-empty session selector")
++        session = state.find_session(paths.Config.from_env(), args.session)
++        tag = session.get("tag") or paths.session_tag(session["tool"], session["session_id"])
++    except (ValueError, state.StateError) as exc:
++        sys.stderr.write("research-session: %s\n" % exc)
++        return 2
++
++    def freeze(row):
++        if row["status"] not in ("claimed", "active") or row.get("claimed_by") != tag:
++            raise RegistryError("direction %s must be claimed or active and owned by %s" % (row["id"], tag))
++        existing = row.get("frozen_grader_sha256")
++        if existing is not None and existing != args.sha256:
++            raise RegistryError("direction %s already has a different frozen grader hash" % row["id"])
++        row["frozen_grader_sha256"] = args.sha256
++        return "grader frozen at %s" % args.sha256
++
++    try:
++        msg = _edit_directions(args.root or default_root(), args.slug, freeze)
++    except RegistryError as exc:
++        sys.stderr.write("research-session: refused: %s\n" % exc)
++        return 1
++    print("%s: %s." % (args.slug, msg))
++    return 0
++
++
+ def cmd_release(args):
+     try:
+         tag = _caller_tag(args)
+@@ -815,6 +845,13 @@
+     p = sub.add_parser("ledger-rollup", help="write the global ledger.json from every direction ledger (spec 4.4)")
+     _root_arg(p)
+     p.set_defaults(func=cmd_ledger_rollup)
++
++    p = sub.add_parser("freeze-grader", help="freeze the initial grader hash for a session-owned direction")
++    p.add_argument("slug")
++    p.add_argument("sha256", metavar="SHA256")
++    p.add_argument("--session", required=True, help="session id, tag or unique prefix")
++    _root_arg(p)
++    p.set_defaults(func=cmd_freeze_grader)
+ 
+     for name, fn, helptext in (("claim", cmd_claim, "claim a direction for this session (R23, orchestrator only)"),
+                                ("release", cmd_release, "release a claimed direction with a final status")):
+--- a/.agents/tests/test_research_session_registry.py
++++ b/.agents/tests/test_research_session_registry.py
+@@ -290,6 +290,107 @@
+         self.assertIsNone(rows["free"]["claimed_by"])
+         self.assertEqual(registry.validate_directions(self.read_json_file(self.root / "directions.json"))[0], [])
+ 
++    def freeze_fixture(self, status="claimed", owner="codex-0a1b2c3d", frozen=None):
++        session = self.make_session(sid="0a1b2c3d-owner", tool="codex", cwd=str(self.DC))
++        row = self._claimed("demo", owner)
++        row.update(status=status, frozen_grader_sha256=frozen)
++        if owner is None:
++            row["claimed_at"] = None
++        self.directions([row, _row()])
++        self.make_direction("demo")
++        self.write_usage()
++        return session
++
++    def freeze(self, digest="a" * 64, selector="codex-0a1b2c3d", slug="demo"):
++        return self.run_cli("freeze-grader", slug, digest, "--session", selector, "--root", str(self.root))
++
++    def assert_freeze_refused(self, code=1, **kwargs):
++        path = self.root / "directions.json"
++        before = path.read_bytes()
++        result, out, err = self.freeze(**kwargs)
++        self.assertEqual(result, code, out + err)
++        self.assertTrue(err)
++        self.assertEqual(path.read_bytes(), before)
++        return err
++
++    def test_freeze_grader_owned_initial_and_idempotent(self):
++        for status in ("claimed", "active"):
++            with self.subTest(status=status):
++                self.freeze_fixture(status=status)
++                # Another same-cwd session must not override the explicit owner selector.
++                self.make_session(sid="ffffffff-newer", tool="codex", cwd=str(self.DC))
++                other_paths = [p for p in Path(self.tmp).rglob("*")
++                               if p.is_file() and p.name != "directions.json"]
++                before = {p: p.read_bytes() for p in other_paths}
++                rows_before = self.read_json_file(self.root / "directions.json")["directions"]
++                for selector in ("0a1b2c3d-owner", "codex-0a1b2c3d", "0a1b2c3d-o"):
++                    code, out, err = self.freeze(selector=selector)
++                    self.assertEqual(code, 0, err)
++                rows_after = self.read_json_file(self.root / "directions.json")["directions"]
++                expected = copy.deepcopy(rows_before)
++                expected[0]["frozen_grader_sha256"] = "a" * 64
++                expected[0]["updated"] = rows_after[0]["updated"]
++                self.assertEqual(rows_after, expected)
++                self.assertEqual({p: p.read_bytes() for p in before}, before)
++
++    def test_freeze_grader_strict_hashes(self):
++        self.freeze_fixture()
++        for digest in ("", "a" * 63, "a" * 65, "A" * 64, "g" * 64,
++                       "a" * 64 + "\n", " " + "a" * 64, "a" * 63 + " "):
++            with self.subTest(digest=digest):
++                self.assert_freeze_refused(code=2, digest=digest)
++
++    def test_freeze_grader_selector_required_no_override(self):
++        self.freeze_fixture()
++        for extra in ([], ["--as", "codex-0a1b2c3d"],
++                      ["--session", "codex-0a1b2c3d", "--as", "codex-0a1b2c3d"]):
++            before = (self.root / "directions.json").read_bytes()
++            with self.assertRaises(SystemExit) as raised:
++                self.run_cli("freeze-grader", "demo", "a" * 64, "--root", str(self.root), *extra)
++            self.assertEqual(raised.exception.code, 2)
++            self.assertEqual((self.root / "directions.json").read_bytes(), before)
++        for selector in ("", " ", "\t", "missing"):
++            self.assert_freeze_refused(code=2, selector=selector)
++        self.make_session(sid="0a1b2c3d-another", tool="codex")
++        self.assertIn("matches", self.assert_freeze_refused(code=2, selector="0a1b2c3d"))
++
++    def test_freeze_grader_status_owner_conflict_unknown_and_invalid(self):
++        for status, owner in (("open", None), ("proposed", None), ("paused", None),
++                              ("done", None), ("abandoned", None), ("claimed", "claude-12345678"),
++                              ("active", "claude-12345678"), ("paused", "codex-0a1b2c3d")):
++            with self.subTest(status=status, owner=owner):
++                self.freeze_fixture(status=status, owner=owner)
++                self.assert_freeze_refused()
++        self.freeze_fixture(frozen="b" * 64)
++        self.assert_freeze_refused()
++        self.assertIn("unknown", self.assert_freeze_refused(slug="missing"))
++        data = self.read_json_file(self.root / "directions.json")
++        data["directions"][0]["surprise"] = True
++        self.write_json_file(self.root / "directions.json", data)
++        self.assert_freeze_refused()
++
++    def test_freeze_grader_uses_locked_edit_and_preserves_new_fields(self):
++        from unittest import mock
++        self.freeze_fixture()
++        edit = registry._edit_directions
++
++        def intervening_edit(root, slug, fn):
++            # Simulate a separate completed writer before our lock/load.
++            data = self.read_json_file(self.root / "directions.json")
++            data["directions"][0]["summary"] = "Another writer updated this."
++            data["directions"][1]["summary"] = "Another row changed."
++            self.write_json_file(self.root / "directions.json", data)
++            return edit(root, slug, fn)
++
++        with mock.patch.object(registry, "_edit_directions", side_effect=intervening_edit) as helper:
++            code, out, err = self.freeze()
++        self.assertEqual(code, 0, err)
++        helper.assert_called_once()
++        rows = self.read_json_file(self.root / "directions.json")["directions"]
++        self.assertEqual(rows[0]["frozen_grader_sha256"], "a" * 64)
++        self.assertEqual(rows[0]["summary"], "Another writer updated this.")
++        self.assertEqual(rows[1]["summary"], "Another row changed.")
++
+     def test_claim_uses_the_session_tag(self):
+         self.directions([_row(id="free", status="open")])
+         self.make_session(sid="b2cb53cd-1111-2222", cwd=str(self.DC))

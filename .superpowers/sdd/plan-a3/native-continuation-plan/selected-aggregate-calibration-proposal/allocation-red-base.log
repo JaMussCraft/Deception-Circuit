@@ -1,0 +1,37 @@
+F......                                                                  [100%]
+=================================== FAILURES ===================================
+________________ test_exact_authorized_normal_cpu_bound_accepts ________________
+
+allocation = (PosixPath('/tmp/pytest-of-swong2/pytest-2672/test_exact_authorized_normal_c0'), {'Account': 'bimc-delta-cpu', 'AllocTRES': 'cpu=4,mem=32G,node=1', 'EndTime': '2026-11-03T16:36:46.765760', 'JobId': '999', ...})
+
+    def test_exact_authorized_normal_cpu_bound_accepts(allocation):
+>    p,f=allocation;result=a.read_current(p,minimum_remaining_seconds=7275);assert result['time_limit_seconds']==7500 and result['actual_GPU_count']==0
+
+.superpowers/sdd/plan-a3/native-continuation-plan/selected-aggregate-calibration-proposal/test_allocation_bound.py:15: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+workdir = PosixPath('/tmp/pytest-of-swong2/pytest-2672/test_exact_authorized_normal_c0')
+
+    def read_current(workdir,*,minimum_remaining_seconds=0):
+     job=os.environ.get('SLURM_JOB_ID','');assert re.fullmatch(r'\d+',job),'Actual non-array Slurm job required; no login execution'
+     env=environment();assert env.get('SLURM_CLUSTER_NAME')=='delta';assert os.environ.get('SLURM_CPUS_PER_TASK')=='4','Actual4CPU task required'
+     raw=subprocess.run(['scontrol','-o','show','job',job],capture_output=True,text=True,check=True,timeout=15,env=dict(os.environ,TZ='UTC')).stdout
+     fields=dict(word.split('=',1) for word in raw.split() if '=' in word);assert fields.get('JobId')==job and fields.get('JobState')=='RUNNING'
+     assert re.search(r'\('+str(os.getuid())+r'\)',fields.get('UserId','')),'Allocation user differs'
+     tres=dict(item.split('=',1) for item in fields.get('AllocTRES','').split(',') if '=' in item)
+     assert int(tres.get('cpu','0'))==4 and int(fields.get('NumNodes','0'))==1
+     assert not any(key.startswith('gres/gpu') and float(value)>0 for key,value in tres.items()),'GPU allocation forbidden'
+     assert memory_bytes(tres['mem'])==32*1024**3,'Exact32GiB actual allocation required'
+     for name in ('SLURM_JOB_GPUS','SLURM_STEP_GPUS'):assert not os.environ.get(name),'GPU-ID environment present; refuse rather than unset it'
+     for name in ('SLURM_GPUS','SLURM_GPUS_ON_NODE','SLURM_GPUS_PER_NODE','SLURM_GPUS_PER_TASK'):assert os.environ.get(name,'') in ('','0'),'GPU-count environment present'
+     assert fields.get('Account','').endswith('-cpu') and fields.get('Partition','').startswith('cpu')
+     assert Path(fields['WorkDir']).resolve()==Path(workdir).resolve()
+     hosts=subprocess.run(['scontrol','show','hostnames',fields['NodeList']],capture_output=True,text=True,check=True,timeout=15).stdout.split()
+     host=os.uname().nodename;assert host.split('.')[0] in {h.split('.')[0] for h in hosts},'This process is not on allocated compute node'
+>    limit=duration(fields['TimeLimit']);assert 0<limit<3600,'CPU job must be bounded below one hour'
+E    AssertionError: CPU job must be bounded below one hour
+
+.superpowers/sdd/plan-a3/native-continuation-plan/selected-aggregate-calibration-proposal/allocation_facts.py:32: AssertionError
+=========================== short test summary info ============================
+FAILED .superpowers/sdd/plan-a3/native-continuation-plan/selected-aggregate-calibration-proposal/test_allocation_bound.py::test_exact_authorized_normal_cpu_bound_accepts
+1 failed, 6 passed in 0.50s

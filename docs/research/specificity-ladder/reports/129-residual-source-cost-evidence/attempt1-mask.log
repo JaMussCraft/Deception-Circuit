@@ -1,0 +1,36 @@
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-pilots-f5a5687ec120/evidence/residual-profile/profile-refresh.py", line 32, in <module>
+    (prepared,design,state),cold_time=observe(cold)
+                                      ^^^^^^^^^^^^^
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-pilots-f5a5687ec120/evidence/residual-profile/profile-refresh.py", line 26, in observe
+    usage=resource.getrusage(resource.RUSAGE_SELF);start=time.perf_counter();utc=datetime.datetime.now(datetime.timezone.utc).isoformat();value=fn();after=resource.getrusage(resource.RUSAGE_SELF)
+                                                                                                                                                ^^^^
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-pilots-f5a5687ec120/evidence/residual-profile/profile-refresh.py", line 30, in cold
+    args._mask_source_started=time.perf_counter();prepared=authority.read_object(args.prepared);mask._live_mask(prepared,args,inventory=None);state=args._mask_source_context;return prepared,None,state
+                                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-f5a5687ec120/runtime/component_analysis/a3_mask_pipeline.py", line 683, in _live_mask
+    state=_make_mask_source_state(prepared,args)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-f5a5687ec120/runtime/component_analysis/a3_mask_pipeline.py", line 664, in _make_mask_source_state
+    return source_validation.build_state(owner='mask',originals={'prepared':prepared,'design':design},
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-f5a5687ec120/runtime/component_analysis/a3_source_validation.py", line 264, in build_state
+    base,extra=semantic(owned)
+               ^^^^^^^^^^^^^^^
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-f5a5687ec120/runtime/component_analysis/a3_mask_pipeline.py", line 662, in semantic
+    _,evidence=_validate_mask_source(owned['prepared'],args,design=owned['design'],extra_rows=extra)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-f5a5687ec120/runtime/component_analysis/a3_mask_pipeline.py", line 615, in _validate_mask_source
+    evidence=artifacts.validate_live(design,design['direction_protocol'],registry_paths=args.registry)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-f5a5687ec120/runtime/component_analysis/a3_direction_artifacts.py", line 376, in validate_live
+    registries=a3_design.validate_access(design,list(registry_paths))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-f5a5687ec120/runtime/component_analysis/a3_design.py", line 305, in validate_access
+    return common.check_registry(args,contexts)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-f5a5687ec120/runtime/dataset/user_inversion_pipeline.py", line 251, in check_registry
+    require(registry_path.is_file(), 'missing required protected registry: ' + str(registry_path))
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-f5a5687ec120/runtime/dataset/user_inversion_pipeline.py", line 32, in require
+    raise ValueError(message)
+ValueError: missing required protected registry: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/docs/research/held_out.json

@@ -1,0 +1,20 @@
+{
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "-o",
+    "ControlMaster=no",
+    "-o",
+    "ControlPath=none",
+    "-o",
+    "HostName=br013.bridges2.psc.edu",
+    "bridges2",
+    "python3 -B -c 'import json,hashlib,os\nfrom pathlib import Path\np=Path('\"'\"'/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/preflight-r3'\"'\"');h='\"'\"'4a096d2c1eb020da99853959a3c26e4948a9c240618958accea0b80e553997d5'\"'\"';m=json.loads((p/'\"'\"'manifest.json'\"'\"').read_text());assert hashlib.sha256((p/'\"'\"'manifest.json'\"'\"').read_bytes()).hexdigest()==h\nassert sorted(q.name for q in p.iterdir())==sorted(list(m)+['\"'\"'manifest.json'\"'\"'])\nfor n,v in m.items():assert not(p/n).is_symlink() and hashlib.sha256((p/n).read_bytes()).hexdigest()==v,n\nprint(json.dumps({'\"'\"'packet'\"'\"':str(p),'\"'\"'manifest_sha256'\"'\"':h,'\"'\"'members'\"'\"':m,'\"'\"'ordinary_files'\"'\"':len(m)+1,'\"'\"'verified'\"'\"':True},sort_keys=True))\n'"
+  ],
+  "returncode": 0,
+  "output": "{\"manifest_sha256\": \"4a096d2c1eb020da99853959a3c26e4948a9c240618958accea0b80e553997d5\", \"members\": {\"allocation_helper.py\": \"c08c99de710a08dde1082d2954c3c535576840b911570b4665c5284520094c6f\", \"cgroup_probe.py\": \"f1e74318020223321cf02fc23bd548461f16c845600a6d4193896cccb0849e68\", \"guards.py\": \"f64d3bac2223cad8e6e9b85350cedeae626cbfbb20f38c789c300effe92841ea\", \"host_probe.py\": \"914116cd9b48e6f7ead5155f4ea25dc58bbc93616b1c178496909c43942fa72b\", \"inner.sh\": \"fb3b378544d814593ecc1c57b682b47dacaf343ad84bee7a30049cf58cceccb6\", \"launch.sh\": \"14f7c4314d1a1e283bb69d4cba0050a672e303af4f73e069464175d854cc61e9\", \"test_bind_failures.py\": \"cb46306da89ba2cc2f5620d9811d42a56580e79ee254b662c6c3313a0e079799\", \"test_preflight.py\": \"b1bfb9edbaddce1a939a419b18d95286808ef8e3c5f02cb700bb47b5c3d13ba3\"}, \"ordinary_files\": 9, \"packet\": \"/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/preflight-r3\", \"verified\": true}\n",
+  "stderr": ""
+}

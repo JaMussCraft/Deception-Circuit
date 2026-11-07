@@ -1,0 +1,238 @@
+FFFFFFFFFFFFFFF                                                          [100%]
+=================================== FAILURES ===================================
+__________ test_actual_undeclared_cache_executed_before_hook_rejects ___________
+
+probe = <module 'r2_probe' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/runtime-probe.py'>
+actual_startup = {'raw': 'execve("/u/swong2/.conda/envs/mgnp/bin/python", ["/u/swong2/.conda/envs/mgnp/bin/python", "/tmp/pytest-of-swo...12.pyc', 'bytes': 61720, 'sha256': '89c510420b5270689d87ef38835dc4c5e4ec4f4c47889988e8fa54ec1d18e203', ...}, ...}, ...}
+
+    def test_actual_undeclared_cache_executed_before_hook_rejects(probe,actual_startup):
+        f=actual_startup;entries=dict(f['entries']);entries.pop(f['cache'])
+        # Feature assertion occurs only after the real mismatch has reproduced.
+>       assert hasattr(probe,'check_startup_trace'),'missing external executed-byte gate'
+E       AssertionError: missing external executed-byte gate
+E       assert False
+E        +  where False = hasattr(<module 'r2_probe' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/runtime-probe.py'>, 'check_startup_trace')
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/test_startup_closure.py:79: AssertionError
+__________ test_actual_resource_read_leaves_no_module_origin_rejects ___________
+
+probe = <module 'r2_probe' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/runtime-probe.py'>
+actual_startup = {'raw': 'execve("/u/swong2/.conda/envs/mgnp/bin/python", ["/u/swong2/.conda/envs/mgnp/bin/python", "/tmp/pytest-of-swo...12.pyc', 'bytes': 61720, 'sha256': '89c510420b5270689d87ef38835dc4c5e4ec4f4c47889988e8fa54ec1d18e203', ...}, ...}, ...}
+
+    def test_actual_resource_read_leaves_no_module_origin_rejects(probe,actual_startup):
+        f=actual_startup;entries=dict(f['entries']);entries.pop(f['resource'])
+>       assert hasattr(probe,'check_startup_trace'),'missing external startup resource gate'
+E       AssertionError: missing external startup resource gate
+E       assert False
+E        +  where False = hasattr(<module 'r2_probe' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/runtime-probe.py'>, 'check_startup_trace')
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/test_startup_closure.py:85: AssertionError
+___________ test_actual_explicitly_pinned_consumed_cache_is_reported ___________
+
+probe = <module 'r2_probe' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/runtime-probe.py'>
+actual_startup = {'raw': 'execve("/u/swong2/.conda/envs/mgnp/bin/python", ["/u/swong2/.conda/envs/mgnp/bin/python", "/tmp/pytest-of-swo...12.pyc', 'bytes': 61720, 'sha256': '89c510420b5270689d87ef38835dc4c5e4ec4f4c47889988e8fa54ec1d18e203', ...}, ...}, ...}
+
+    def test_actual_explicitly_pinned_consumed_cache_is_reported(probe,actual_startup):
+        f=actual_startup
+>       assert hasattr(probe,'check_startup_trace'),'missing external executed-byte gate'
+E       AssertionError: missing external executed-byte gate
+E       assert False
+E        +  where False = hasattr(<module 'r2_probe' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/runtime-probe.py'>, 'check_startup_trace')
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/test_startup_closure.py:91: AssertionError
+__________________ test_changed_consumed_cache_bytes_rejects ___________________
+
+probe = <module 'r2_probe' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/runtime-probe.py'>
+actual_startup = {'raw': 'execve("/u/swong2/.conda/envs/mgnp/bin/python", ["/u/swong2/.conda/envs/mgnp/bin/python", "/tmp/pytest-of-swo...12.pyc', 'bytes': 61720, 'sha256': '89c510420b5270689d87ef38835dc4c5e4ec4f4c47889988e8fa54ec1d18e203', ...}, ...}, ...}
+
+    def test_changed_consumed_cache_bytes_rejects(probe,actual_startup):
+        f=actual_startup
+        Path(f['cache']).write_bytes(b'replaced after recorded closure')
+>       assert hasattr(probe,'check_startup_trace'),'missing external executed-byte gate'
+E       AssertionError: missing external executed-byte gate
+E       assert False
+E        +  where False = hasattr(<module 'r2_probe' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/runtime-probe.py'>, 'check_startup_trace')
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/test_startup_closure.py:98: AssertionError
+_______ test_incomplete_or_other_invocation_trace_rejects[missing_exec] ________
+
+probe = <module 'r2_probe' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/runtime-probe.py'>
+actual_startup = {'raw': 'execve("/u/swong2/.conda/envs/mgnp/bin/python", ["/u/swong2/.conda/envs/mgnp/bin/python", "/tmp/pytest-of-swo...rse.py', 'bytes': 45676, 'sha256': 'e6af7f475262f1de335bb2e41e26adb94d6103977cf5fe1ddc430dc6a3b1623f', ...}, ...}, ...}
+mutation = 'missing_exec'
+
+    @pytest.mark.parametrize('mutation',['missing_exec','missing_barrier','unfinished','wrong_argv'])
+    def test_incomplete_or_other_invocation_trace_rejects(probe,actual_startup,mutation):
+        f=actual_startup;raw=f['raw'];argv=f['argv']
+        if mutation=='missing_exec':raw='\n'.join(raw.splitlines()[1:])+'\n'
+        if mutation=='missing_barrier':raw='\n'.join(raw.splitlines()[:-1])+'\n'
+        if mutation=='unfinished':raw=raw.replace('openat(', 'openat(<unfinished ...> ',1)
+        if mutation=='wrong_argv':argv=argv+['different']
+>       assert hasattr(probe,'check_startup_trace'),'missing complete same-invocation gate'
+E       AssertionError: missing complete same-invocation gate
+E       assert False
+E        +  where False = hasattr(<module 'r2_probe' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/runtime-probe.py'>, 'check_startup_trace')
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/test_startup_closure.py:109: AssertionError
+______ test_incomplete_or_other_invocation_trace_rejects[missing_barrier] ______
+
+probe = <module 'r2_probe' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/runtime-probe.py'>
+actual_startup = {'raw': 'execve("/u/swong2/.conda/envs/mgnp/bin/python", ["/u/swong2/.conda/envs/mgnp/bin/python", "/tmp/pytest-of-swo...12.pyc', 'bytes': 61720, 'sha256': '89c510420b5270689d87ef38835dc4c5e4ec4f4c47889988e8fa54ec1d18e203', ...}, ...}, ...}
+mutation = 'missing_barrier'
+
+    @pytest.mark.parametrize('mutation',['missing_exec','missing_barrier','unfinished','wrong_argv'])
+    def test_incomplete_or_other_invocation_trace_rejects(probe,actual_startup,mutation):
+        f=actual_startup;raw=f['raw'];argv=f['argv']
+        if mutation=='missing_exec':raw='\n'.join(raw.splitlines()[1:])+'\n'
+        if mutation=='missing_barrier':raw='\n'.join(raw.splitlines()[:-1])+'\n'
+        if mutation=='unfinished':raw=raw.replace('openat(', 'openat(<unfinished ...> ',1)
+        if mutation=='wrong_argv':argv=argv+['different']
+>       assert hasattr(probe,'check_startup_trace'),'missing complete same-invocation gate'
+E       AssertionError: missing complete same-invocation gate
+E       assert False
+E        +  where False = hasattr(<module 'r2_probe' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/runtime-probe.py'>, 'check_startup_trace')
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/test_startup_closure.py:109: AssertionError
+________ test_incomplete_or_other_invocation_trace_rejects[unfinished] _________
+
+probe = <module 'r2_probe' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/runtime-probe.py'>
+actual_startup = {'raw': 'execve("/u/swong2/.conda/envs/mgnp/bin/python", ["/u/swong2/.conda/envs/mgnp/bin/python", "/tmp/pytest-of-swo...12.pyc', 'bytes': 61720, 'sha256': '89c510420b5270689d87ef38835dc4c5e4ec4f4c47889988e8fa54ec1d18e203', ...}, ...}, ...}
+mutation = 'unfinished'
+
+    @pytest.mark.parametrize('mutation',['missing_exec','missing_barrier','unfinished','wrong_argv'])
+    def test_incomplete_or_other_invocation_trace_rejects(probe,actual_startup,mutation):
+        f=actual_startup;raw=f['raw'];argv=f['argv']
+        if mutation=='missing_exec':raw='\n'.join(raw.splitlines()[1:])+'\n'
+        if mutation=='missing_barrier':raw='\n'.join(raw.splitlines()[:-1])+'\n'
+        if mutation=='unfinished':raw=raw.replace('openat(', 'openat(<unfinished ...> ',1)
+        if mutation=='wrong_argv':argv=argv+['different']
+>       assert hasattr(probe,'check_startup_trace'),'missing complete same-invocation gate'
+E       AssertionError: missing complete same-invocation gate
+E       assert False
+E        +  where False = hasattr(<module 'r2_probe' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/runtime-probe.py'>, 'check_startup_trace')
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/test_startup_closure.py:109: AssertionError
+________ test_incomplete_or_other_invocation_trace_rejects[wrong_argv] _________
+
+probe = <module 'r2_probe' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/runtime-probe.py'>
+actual_startup = {'raw': 'execve("/u/swong2/.conda/envs/mgnp/bin/python", ["/u/swong2/.conda/envs/mgnp/bin/python", "/tmp/pytest-of-swo...12.pyc', 'bytes': 61720, 'sha256': '89c510420b5270689d87ef38835dc4c5e4ec4f4c47889988e8fa54ec1d18e203', ...}, ...}, ...}
+mutation = 'wrong_argv'
+
+    @pytest.mark.parametrize('mutation',['missing_exec','missing_barrier','unfinished','wrong_argv'])
+    def test_incomplete_or_other_invocation_trace_rejects(probe,actual_startup,mutation):
+        f=actual_startup;raw=f['raw'];argv=f['argv']
+        if mutation=='missing_exec':raw='\n'.join(raw.splitlines()[1:])+'\n'
+        if mutation=='missing_barrier':raw='\n'.join(raw.splitlines()[:-1])+'\n'
+        if mutation=='unfinished':raw=raw.replace('openat(', 'openat(<unfinished ...> ',1)
+        if mutation=='wrong_argv':argv=argv+['different']
+>       assert hasattr(probe,'check_startup_trace'),'missing complete same-invocation gate'
+E       AssertionError: missing complete same-invocation gate
+E       assert False
+E        +  where False = hasattr(<module 'r2_probe' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/runtime-probe.py'>, 'check_startup_trace')
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/test_startup_closure.py:109: AssertionError
+______________________ test_startup_binding_is_mandatory _______________________
+
+probe = <module 'r2_probe' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/runtime-probe.py'>
+
+    def test_startup_binding_is_mandatory(probe):
+>       assert hasattr(probe,'check_external_startup_binding'),'missing external-startup binding gate'
+E       AssertionError: missing external-startup binding gate
+E       assert False
+E        +  where False = hasattr(<module 'r2_probe' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/runtime-probe.py'>, 'check_external_startup_binding')
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/test_startup_closure.py:113: AssertionError
+________________ test_witness_is_bound_to_current_process[pid] _________________
+
+probe = <module 'r2_probe' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/runtime-probe.py'>
+field = 'pid'
+
+    @pytest.mark.parametrize('field',['pid','proc_start_ticks','nonce','role','closure_sha256','argv'])
+    def test_witness_is_bound_to_current_process(probe,field):
+>       assert hasattr(probe,'check_startup_witness'),'missing same-process witness gate'
+E       AssertionError: missing same-process witness gate
+E       assert False
+E        +  where False = hasattr(<module 'r2_probe' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/runtime-probe.py'>, 'check_startup_witness')
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/test_startup_closure.py:118: AssertionError
+__________ test_witness_is_bound_to_current_process[proc_start_ticks] __________
+
+probe = <module 'r2_probe' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/runtime-probe.py'>
+field = 'proc_start_ticks'
+
+    @pytest.mark.parametrize('field',['pid','proc_start_ticks','nonce','role','closure_sha256','argv'])
+    def test_witness_is_bound_to_current_process(probe,field):
+>       assert hasattr(probe,'check_startup_witness'),'missing same-process witness gate'
+E       AssertionError: missing same-process witness gate
+E       assert False
+E        +  where False = hasattr(<module 'r2_probe' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/runtime-probe.py'>, 'check_startup_witness')
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/test_startup_closure.py:118: AssertionError
+_______________ test_witness_is_bound_to_current_process[nonce] ________________
+
+probe = <module 'r2_probe' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/runtime-probe.py'>
+field = 'nonce'
+
+    @pytest.mark.parametrize('field',['pid','proc_start_ticks','nonce','role','closure_sha256','argv'])
+    def test_witness_is_bound_to_current_process(probe,field):
+>       assert hasattr(probe,'check_startup_witness'),'missing same-process witness gate'
+E       AssertionError: missing same-process witness gate
+E       assert False
+E        +  where False = hasattr(<module 'r2_probe' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/runtime-probe.py'>, 'check_startup_witness')
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/test_startup_closure.py:118: AssertionError
+________________ test_witness_is_bound_to_current_process[role] ________________
+
+probe = <module 'r2_probe' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/runtime-probe.py'>
+field = 'role'
+
+    @pytest.mark.parametrize('field',['pid','proc_start_ticks','nonce','role','closure_sha256','argv'])
+    def test_witness_is_bound_to_current_process(probe,field):
+>       assert hasattr(probe,'check_startup_witness'),'missing same-process witness gate'
+E       AssertionError: missing same-process witness gate
+E       assert False
+E        +  where False = hasattr(<module 'r2_probe' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/runtime-probe.py'>, 'check_startup_witness')
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/test_startup_closure.py:118: AssertionError
+___________ test_witness_is_bound_to_current_process[closure_sha256] ___________
+
+probe = <module 'r2_probe' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/runtime-probe.py'>
+field = 'closure_sha256'
+
+    @pytest.mark.parametrize('field',['pid','proc_start_ticks','nonce','role','closure_sha256','argv'])
+    def test_witness_is_bound_to_current_process(probe,field):
+>       assert hasattr(probe,'check_startup_witness'),'missing same-process witness gate'
+E       AssertionError: missing same-process witness gate
+E       assert False
+E        +  where False = hasattr(<module 'r2_probe' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/runtime-probe.py'>, 'check_startup_witness')
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/test_startup_closure.py:118: AssertionError
+________________ test_witness_is_bound_to_current_process[argv] ________________
+
+probe = <module 'r2_probe' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/runtime-probe.py'>
+field = 'argv'
+
+    @pytest.mark.parametrize('field',['pid','proc_start_ticks','nonce','role','closure_sha256','argv'])
+    def test_witness_is_bound_to_current_process(probe,field):
+>       assert hasattr(probe,'check_startup_witness'),'missing same-process witness gate'
+E       AssertionError: missing same-process witness gate
+E       assert False
+E        +  where False = hasattr(<module 'r2_probe' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/runtime-probe.py'>, 'check_startup_witness')
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/test_startup_closure.py:118: AssertionError
+=========================== short test summary info ============================
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/test_startup_closure.py::test_actual_undeclared_cache_executed_before_hook_rejects
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/test_startup_closure.py::test_actual_resource_read_leaves_no_module_origin_rejects
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/test_startup_closure.py::test_actual_explicitly_pinned_consumed_cache_is_reported
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/test_startup_closure.py::test_changed_consumed_cache_bytes_rejects
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/test_startup_closure.py::test_incomplete_or_other_invocation_trace_rejects[missing_exec]
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/test_startup_closure.py::test_incomplete_or_other_invocation_trace_rejects[missing_barrier]
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/test_startup_closure.py::test_incomplete_or_other_invocation_trace_rejects[unfinished]
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/test_startup_closure.py::test_incomplete_or_other_invocation_trace_rejects[wrong_argv]
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/test_startup_closure.py::test_startup_binding_is_mandatory
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/test_startup_closure.py::test_witness_is_bound_to_current_process[pid]
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/test_startup_closure.py::test_witness_is_bound_to_current_process[proc_start_ticks]
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/test_startup_closure.py::test_witness_is_bound_to_current_process[nonce]
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/test_startup_closure.py::test_witness_is_bound_to_current_process[role]
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/test_startup_closure.py::test_witness_is_bound_to_current_process[closure_sha256]
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/test_startup_closure.py::test_witness_is_bound_to_current_process[argv]
+15 failed in 6.13s

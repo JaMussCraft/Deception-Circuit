@@ -1,0 +1,63 @@
+         854024 function calls (811938 primitive calls) in 2.696 seconds
+
+   Ordered by: cumulative time
+   List reduced from 185 to 55 due to restriction <55>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    2.696    2.696 profile-refresh.py:25(observe)
+        1    0.000    0.000    2.696    2.696 profile-refresh.py:33(refresh)
+        1    0.000    0.000    2.695    2.695 a3_source_validation.py:204(refresh)
+        1    0.001    0.001    1.884    1.884 a3_direction_runtime.py:2462(_check_file_witness)
+      265    0.001    0.000    1.883    0.007 a3_direction_runtime.py:2464(<genexpr>)
+      264    0.003    0.000    1.883    0.007 a3_direction_runtime.py:2411(_file_tree_identity)
+  266/264    0.002    0.000    1.129    0.004 a3_direction_runtime.py:2426(visit)
+      270    0.020    0.000    1.111    0.004 user_inversion_pipeline.py:43(file_hash)
+      273    0.001    0.000    0.861    0.003 pathlib.py:1015(read_bytes)
+     7712    0.756    0.000    0.778    0.000 {built-in method posix.stat}
+     7702    0.003    0.000    0.761    0.000 pathlib.py:835(stat)
+       12    0.003    0.000    0.693    0.058 a3_source_validation.py:74(_links_many)
+  972/962    0.019    0.000    0.684    0.001 a3_source_validation.py:77(visit)
+     7161    0.003    0.000    0.550    0.000 pathlib.py:842(lstat)
+     6469    0.006    0.000    0.533    0.000 pathlib.py:909(is_symlink)
+      288    0.414    0.001    0.414    0.001 {method '__exit__' of '_io._IOBase' objects}
+      264    0.008    0.000    0.371    0.001 a3_direction_runtime.py:2415(record_links)
+      484    0.001    0.000    0.335    0.001 pathlib.py:1228(resolve)
+      484    0.001    0.000    0.330    0.001 <frozen posixpath>:420(realpath)
+  910/484    0.024    0.000    0.326    0.001 <frozen posixpath>:429(_joinrealpath)
+      288    0.313    0.001    0.319    0.001 {built-in method _io.open}
+      278    0.000    0.000    0.308    0.001 pathlib.py:1005(open)
+    12528    0.251    0.000    0.251    0.000 {built-in method posix.lstat}
+      284    0.236    0.001    0.236    0.001 {built-in method _hashlib.openssl_sha256}
+      530    0.001    0.000    0.214    0.000 pathlib.py:852(exists)
+    21427    0.010    0.000    0.195    0.000 <frozen _collections_abc>:1022(__iter__)
+    21427    0.028    0.000    0.184    0.000 pathlib.py:277(__getitem__)
+      264    0.000    0.000    0.180    0.001 a3_direction_runtime.py:2423(resolved)
+      293    0.170    0.001    0.170    0.001 {method 'read' of '_io.BufferedReader' objects}
+    20202    0.017    0.000    0.123    0.000 pathlib.py:420(_from_parsed_parts)
+        1    0.000    0.000    0.118    0.118 a3_source_validation.py:131(refresh)
+    20713    0.021    0.000    0.091    0.000 pathlib.py:380(with_segments)
+    23133    0.032    0.000    0.077    0.000 pathlib.py:524(__hash__)
+        1    0.000    0.000    0.067    0.067 ladder_pipeline.py:165(grader_registry)
+    22236    0.019    0.000    0.064    0.000 pathlib.py:1157(__init__)
+        1    0.000    0.000    0.055    0.055 grader_hash.py:60(grader_sha256)
+        1    0.000    0.000    0.055    0.055 grader_hash.py:49(grader_files)
+    22236    0.029    0.000    0.046    0.000 pathlib.py:358(__init__)
+     3279    0.004    0.000    0.043    0.000 pathlib.py:551(drive)
+    51364    0.035    0.000    0.043    0.000 pathlib.py:484(_str_normcase)
+     2011    0.004    0.000    0.039    0.000 pathlib.py:407(_load_parts)
+    30906    0.011    0.000    0.038    0.000 pathlib.py:437(__str__)
+    12560    0.021    0.000    0.036    0.000 <frozen posixpath>:71(join)
+     2014    0.017    0.000    0.035    0.000 pathlib.py:387(_parse_path)
+       10    0.000    0.000    0.031    0.003 grader_hash.py:41(_sha256)
+88539/46921    0.020    0.000    0.031    0.000 {built-in method builtins.len}
+     8699    0.005    0.000    0.029    0.000 pathlib.py:447(__fspath__)
+      682    0.001    0.000    0.025    0.000 a3_direction_runtime.py:2406(_stat_identity)
+       18    0.000    0.000    0.024    0.001 {built-in method builtins.sorted}
+     1236    0.001    0.000    0.023    0.000 pathlib.py:741(parents)
+     1236    0.001    0.000    0.022    0.000 pathlib.py:268(__init__)
+    22213    0.013    0.000    0.022    0.000 pathlib.py:429(_format_parsed_parts)
+       10    0.000    0.000    0.022    0.002 a3_source_validation.py:92(_links)
+       19    0.000    0.000    0.021    0.001 pathlib.py:1081(glob)
+       10    0.000    0.000    0.021    0.002 <frozen genericpath>:27(isfile)
+
+

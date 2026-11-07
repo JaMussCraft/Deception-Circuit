@@ -1,0 +1,30 @@
+{
+  "kind": "a2_bridges_scientific_placement_v1",
+  "proposal_sha256": "096a156058bd16b664d4d4ec2e19da29492a3b5b5aa4b922eda8dc72658e1316",
+  "launcher_sha256": "91af50383a2545b885ed417909998295e91910e60b06eda5b0c128a2f2011957",
+  "job_script_sha256": "f6da2914b95d34f6c6a84406d3aa9ba7bb14284745f2709bb9077bcfd9766f3f",
+  "authorizer_sha256": "20223c9ac9a5ffe11557e8cb3fe3089726fb38fb098f8f7cd67d51dcbabafcd5",
+  "source_commit": "6bd8bf5334f2e83613a129d2fcfeacf83e762191",
+  "original_fleet_plan_sha256": "b424e10e7d13e7c7686df9753f08f45fc84da37bce44bb99ae4df270c4395ae8",
+  "all_original_delta_jobs_cancelled_before_release": false,
+  "original_cancellation_evidence": null,
+  "jobs": {},
+  "required_job_fields": [
+    "cell_key",
+    "job_name",
+    "requested_minutes",
+    "source_commit",
+    "virtual_output_dir",
+    "original_delta_job_id",
+    "original_reservation_id",
+    "new_reservation_id",
+    "account",
+    "partition",
+    "gpus",
+    "gpu_type",
+    "cpus",
+    "memory_bytes",
+    "canonical_receipt"
+  ],
+  "publication_policy": "stage first; verify hashes and replacement contract; require original Delta jobs cancelled with zero runtime; publish ONLY absent original full-output and receipt paths; unchanged audit_source plus hardware/origin appendix"
+}

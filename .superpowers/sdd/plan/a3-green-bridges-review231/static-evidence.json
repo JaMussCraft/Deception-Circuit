@@ -1,0 +1,36 @@
+{
+  "manifest_sha256": "14adee247cdf1138eeeb0a19ce2536cacc35fc3fd09df8febf578a68d0266a7c",
+  "source_members_match_manifest": true,
+  "pure_wrapper_tests": {
+    "command": "python -B -m unittest -v test_host",
+    "exit_code": 0,
+    "cases": 7,
+    "wall_seconds_reported": 0.06,
+    "scope": "local Python; no production/native tests/model/remote"
+  },
+  "stop_probe": [
+    {
+      "scenario": "leader-already-exited-with-live-descendant",
+      "group_signals": [],
+      "leader_waits": [],
+      "descendant_liveness_checked": false
+    },
+    {
+      "scenario": "leader-exits-on-TERM-descendant-ignores-TERM",
+      "group_signals": [
+        [
+          123,
+          15
+        ]
+      ],
+      "leader_waits": [
+        {
+          "timeout": 10
+        }
+      ],
+      "descendant_liveness_checked": false
+    }
+  ],
+  "actual_Bridges_host_or_container_tests": false,
+  "final_config_bound": false
+}

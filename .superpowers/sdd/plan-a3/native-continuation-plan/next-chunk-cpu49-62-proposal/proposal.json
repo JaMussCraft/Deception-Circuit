@@ -1,0 +1,394 @@
+{
+  "status": "FROZEN_CONDITIONAL_UNEXECUTED_requires_root_review_and_afterok_submission",
+  "scenario_root": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8",
+  "parent_job_id": "23470779",
+  "parent_expectation_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu49-62-proposal/parent-expectation.json",
+  "source_hashes": {
+    "component_analysis/a3_direction_pipeline.py": "96678db186078ab37cad108e2d1e71ffdccf1fb3dd157c35cdc57a91b2ebd4a0",
+    "component_analysis/a3_direction_runner.py": "89a62335665595533204006c3eca28d14ca9c42eb600879c235e9c6370739429",
+    "component_analysis/a3_direction_runtime.py": "b66c2d8cd26c36f321b5079758209214746b0e4eec16a6c801742086d729c0cc",
+    "component_analysis/a3_direction_workload.py": "3e43aaf2b4cacb99df87593ae377c8fdf3eb7b223b258ed8873853841404d8f9",
+    "component_analysis/a3_directions.py": "ed882d4e12a396e03e73671e588beba5b1a8c90ab9d31e7ee73d4194430b4a86",
+    "component_analysis/a3_pipeline.py": "310eb53427ad4ac32522dfd0d6cd3b33e4ec887af1776579845f8953bdbe83f5",
+    "scripts/jobs/specificity_a3.sh": "936dfb7f8b9c2d267d52f1e199ed431275e6527cbfc3a105a22e3812289a9b96",
+    "tests/test_a3_direction_runner.py": "3ea945d5b23b4eef7d56139758c7075ea1b56ac612f1923590b7978628ca0120",
+    "tests/test_a3_direction_runtime.py": "5a41e89b0b2bd5fd59553f5f5a63260638e3547a63c31a615d84da08f796fb6a",
+    "tests/test_a3_direction_workload.py": "91eb6f874e180c5ffb362daba231631b7bea21c224446580efccfe20a9007300",
+    "tests/test_a3_directions.py": "cd8471b1524ad7b8f1b7c87f9eb5fec5724b3ab2980027ef7aadfea3fc3bb1c1",
+    "tests/test_a3_pipeline.py": "bbb3efdba075cc14c2997cc11ae44bab268bdea56459c0574d6bfc21b62f4a18",
+    "tests/a3_direction_native_scenario.py": "9b5061ab9618222b23230917f446abcaa73747f3d216f69c77b9218feec6297b"
+  },
+  "indices": [
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62
+  ],
+  "preserve_indices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48
+  ],
+  "cases": [
+    {
+      "index": 49,
+      "invocation_id": "55ca1d24b5ae58656f7bcfcdb80a99bce784aff9eea801713e29725c71b2f93c",
+      "analysis_task": "ser_v2",
+      "source_task": "ser_v2",
+      "panel": "selected_pilot",
+      "cells": 211,
+      "batch_groups": 10,
+      "operation_shape_signature": "{\"batch_groups\": 10, \"cells\": 211, \"families\": {\"assessment_null\": 199, \"learned\": 3, \"nuisance\": 3, \"steering_learned\": 2, \"steering_nuisance\": 2, \"steering_random\": 2}, \"group_sizes\": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1], \"mmlu_branch\": false, \"operations\": {\"h_mean\": 2, \"interchange\": 201, \"steer_negative\": 3, \"steer_positive\": 3, \"zero\": 2}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        7,
+        14,
+        21,
+        28
+      ],
+      "observed_matching_original_case_max_seconds": 70.68714533001184,
+      "actual_SER_runtime_observed": false
+    },
+    {
+      "index": 50,
+      "invocation_id": "c04577a6af89a571eee759187a1a37a3e1ab02ee08d5bdae3e2c46c3970b56e5",
+      "analysis_task": "ser_v2",
+      "source_task": "ser_v2",
+      "panel": "selected_pilot",
+      "cells": 211,
+      "batch_groups": 10,
+      "operation_shape_signature": "{\"batch_groups\": 10, \"cells\": 211, \"families\": {\"assessment_null\": 199, \"learned\": 3, \"nuisance\": 3, \"steering_learned\": 2, \"steering_nuisance\": 2, \"steering_random\": 2}, \"group_sizes\": [2, 2, 2, 2, 2, 2, 2, 2, 2, 2], \"mmlu_branch\": false, \"operations\": {\"h_mean\": 2, \"interchange\": 201, \"steer_negative\": 3, \"steer_positive\": 3, \"zero\": 2}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        8,
+        15,
+        22,
+        29
+      ],
+      "observed_matching_original_case_max_seconds": 69.93302771495655,
+      "actual_SER_runtime_observed": false
+    },
+    {
+      "index": 51,
+      "invocation_id": "debc963ec3a1c857268c19c0af3af92a495c15f1be195a63cd3a112a45212c10",
+      "analysis_task": "ser_v2",
+      "source_task": "ioi",
+      "panel": "selected_pilot",
+      "cells": 211,
+      "batch_groups": 1,
+      "operation_shape_signature": "{\"batch_groups\": 1, \"cells\": 211, \"families\": {\"assessment_null\": 199, \"learned\": 3, \"nuisance\": 3, \"steering_learned\": 2, \"steering_nuisance\": 2, \"steering_random\": 2}, \"group_sizes\": [2], \"mmlu_branch\": false, \"operations\": {\"h_mean\": 2, \"interchange\": 201, \"steer_negative\": 3, \"steer_positive\": 3, \"zero\": 2}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        9,
+        16,
+        23,
+        30
+      ],
+      "observed_matching_original_case_max_seconds": 28.518431831966154,
+      "actual_SER_runtime_observed": null
+    },
+    {
+      "index": 52,
+      "invocation_id": "4fe85b7963acbbb10ef4373c1aafe19bd4bc7ea659dda6f90a0ecd85535f9980",
+      "analysis_task": "ser_v2",
+      "source_task": "mmlu",
+      "panel": "selected_pilot",
+      "cells": 408,
+      "batch_groups": 2,
+      "operation_shape_signature": "{\"batch_groups\": 2, \"cells\": 408, \"families\": {\"assessment_null\": 398, \"learned\": 2, \"nuisance\": 2, \"steering_learned\": 2, \"steering_nuisance\": 2, \"steering_random\": 2}, \"group_sizes\": [2, 2], \"mmlu_branch\": true, \"operations\": {\"h_mean\": 201, \"steer_negative\": 3, \"steer_positive\": 3, \"zero\": 201}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        10,
+        17,
+        24,
+        31
+      ],
+      "observed_matching_original_case_max_seconds": 42.07410628604703,
+      "actual_SER_runtime_observed": null
+    },
+    {
+      "index": 53,
+      "invocation_id": "844e097a17a2631c82ac995973dfdec46b0b3b7f0670ef1f8933931bbbd61c12",
+      "analysis_task": "ser_v2",
+      "source_task": "ser_v2",
+      "panel": "calibration_pilot",
+      "cells": 33,
+      "batch_groups": 10,
+      "operation_shape_signature": "{\"batch_groups\": 10, \"cells\": 33, \"families\": {\"calibration_null\": 32, \"learned\": 1}, \"group_sizes\": [2, 2, 2, 2, 2, 2, 2, 2, 2, 2], \"mmlu_branch\": false, \"operations\": {\"interchange\": 33}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        11,
+        18,
+        25
+      ],
+      "observed_matching_original_case_max_seconds": 31.985078952042386,
+      "actual_SER_runtime_observed": false
+    },
+    {
+      "index": 54,
+      "invocation_id": "a83bc256e79eb904efef036f770ce045318bc7e57ac0c2e86473676d4c9f71a1",
+      "analysis_task": "ser_v2",
+      "source_task": "ioi",
+      "panel": "calibration_pilot",
+      "cells": 33,
+      "batch_groups": 1,
+      "operation_shape_signature": "{\"batch_groups\": 1, \"cells\": 33, \"families\": {\"calibration_null\": 32, \"learned\": 1}, \"group_sizes\": [2], \"mmlu_branch\": false, \"operations\": {\"interchange\": 33}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        5,
+        12,
+        19,
+        26
+      ],
+      "observed_matching_original_case_max_seconds": 27.40703174006194,
+      "actual_SER_runtime_observed": null
+    },
+    {
+      "index": 55,
+      "invocation_id": "c840e02711ec12881b4c050a119dd0f813d19f826e4fdde58a78d4bd134c6681",
+      "analysis_task": "ser_v2",
+      "source_task": "mmlu",
+      "panel": "calibration_pilot",
+      "cells": 66,
+      "batch_groups": 2,
+      "operation_shape_signature": "{\"batch_groups\": 2, \"cells\": 66, \"families\": {\"calibration_null\": 64, \"learned\": 2}, \"group_sizes\": [2, 2], \"mmlu_branch\": true, \"operations\": {\"h_mean\": 33, \"zero\": 33}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        6,
+        13,
+        20,
+        27
+      ],
+      "observed_matching_original_case_max_seconds": 26.574205063981935,
+      "actual_SER_runtime_observed": null
+    },
+    {
+      "index": 56,
+      "invocation_id": "c9e3df1e8d0c1b23b5efe2a2fe2a15abe19818fcf6bfe1d84c279e865382df38",
+      "analysis_task": "ser_v2",
+      "source_task": "ser_v2",
+      "panel": "selected_pilot",
+      "cells": 211,
+      "batch_groups": 10,
+      "operation_shape_signature": "{\"batch_groups\": 10, \"cells\": 211, \"families\": {\"assessment_null\": 199, \"learned\": 3, \"nuisance\": 3, \"steering_learned\": 2, \"steering_nuisance\": 2, \"steering_random\": 2}, \"group_sizes\": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1], \"mmlu_branch\": false, \"operations\": {\"h_mean\": 2, \"interchange\": 201, \"steer_negative\": 3, \"steer_positive\": 3, \"zero\": 2}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        7,
+        14,
+        21,
+        28
+      ],
+      "observed_matching_original_case_max_seconds": 70.68714533001184,
+      "actual_SER_runtime_observed": false
+    },
+    {
+      "index": 57,
+      "invocation_id": "bca7dda98d2faebf47ffc5d79450cc0641176c070bcbe50ab5d104d09541c7ea",
+      "analysis_task": "ser_v2",
+      "source_task": "ser_v2",
+      "panel": "selected_pilot",
+      "cells": 211,
+      "batch_groups": 10,
+      "operation_shape_signature": "{\"batch_groups\": 10, \"cells\": 211, \"families\": {\"assessment_null\": 199, \"learned\": 3, \"nuisance\": 3, \"steering_learned\": 2, \"steering_nuisance\": 2, \"steering_random\": 2}, \"group_sizes\": [2, 2, 2, 2, 2, 2, 2, 2, 2, 2], \"mmlu_branch\": false, \"operations\": {\"h_mean\": 2, \"interchange\": 201, \"steer_negative\": 3, \"steer_positive\": 3, \"zero\": 2}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        8,
+        15,
+        22,
+        29
+      ],
+      "observed_matching_original_case_max_seconds": 69.93302771495655,
+      "actual_SER_runtime_observed": false
+    },
+    {
+      "index": 58,
+      "invocation_id": "26d031097b7fc6eac8a1b71f8078c778783baa527c7d3fe81708caffb1800b36",
+      "analysis_task": "ser_v2",
+      "source_task": "ioi",
+      "panel": "selected_pilot",
+      "cells": 211,
+      "batch_groups": 1,
+      "operation_shape_signature": "{\"batch_groups\": 1, \"cells\": 211, \"families\": {\"assessment_null\": 199, \"learned\": 3, \"nuisance\": 3, \"steering_learned\": 2, \"steering_nuisance\": 2, \"steering_random\": 2}, \"group_sizes\": [2], \"mmlu_branch\": false, \"operations\": {\"h_mean\": 2, \"interchange\": 201, \"steer_negative\": 3, \"steer_positive\": 3, \"zero\": 2}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        9,
+        16,
+        23,
+        30
+      ],
+      "observed_matching_original_case_max_seconds": 28.518431831966154,
+      "actual_SER_runtime_observed": null
+    },
+    {
+      "index": 59,
+      "invocation_id": "2d423ca93ae64db5cece9ac542e00261648c6e1038260d2bef1597db71873442",
+      "analysis_task": "ser_v2",
+      "source_task": "mmlu",
+      "panel": "selected_pilot",
+      "cells": 408,
+      "batch_groups": 2,
+      "operation_shape_signature": "{\"batch_groups\": 2, \"cells\": 408, \"families\": {\"assessment_null\": 398, \"learned\": 2, \"nuisance\": 2, \"steering_learned\": 2, \"steering_nuisance\": 2, \"steering_random\": 2}, \"group_sizes\": [2, 2], \"mmlu_branch\": true, \"operations\": {\"h_mean\": 201, \"steer_negative\": 3, \"steer_positive\": 3, \"zero\": 201}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        10,
+        17,
+        24,
+        31
+      ],
+      "observed_matching_original_case_max_seconds": 42.07410628604703,
+      "actual_SER_runtime_observed": null
+    },
+    {
+      "index": 60,
+      "invocation_id": "7162a3af2f2595014f72914cd34a7137bfdedfa919fef1d1161ee8bb91df282c",
+      "analysis_task": "ser_v2",
+      "source_task": "ser_v2",
+      "panel": "calibration_pilot",
+      "cells": 33,
+      "batch_groups": 10,
+      "operation_shape_signature": "{\"batch_groups\": 10, \"cells\": 33, \"families\": {\"calibration_null\": 32, \"learned\": 1}, \"group_sizes\": [2, 2, 2, 2, 2, 2, 2, 2, 2, 2], \"mmlu_branch\": false, \"operations\": {\"interchange\": 33}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        11,
+        18,
+        25
+      ],
+      "observed_matching_original_case_max_seconds": 31.985078952042386,
+      "actual_SER_runtime_observed": false
+    },
+    {
+      "index": 61,
+      "invocation_id": "9861b5c5e4ccb1eb2cd974433e7455df7883f1a77262b71660977d8e53206983",
+      "analysis_task": "ser_v2",
+      "source_task": "ioi",
+      "panel": "calibration_pilot",
+      "cells": 33,
+      "batch_groups": 1,
+      "operation_shape_signature": "{\"batch_groups\": 1, \"cells\": 33, \"families\": {\"calibration_null\": 32, \"learned\": 1}, \"group_sizes\": [2], \"mmlu_branch\": false, \"operations\": {\"interchange\": 33}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        5,
+        12,
+        19,
+        26
+      ],
+      "observed_matching_original_case_max_seconds": 27.40703174006194,
+      "actual_SER_runtime_observed": null
+    },
+    {
+      "index": 62,
+      "invocation_id": "152789d51416e2fa97cc19e35d9caa3bce552c92f2c9e0d1c44980b7e845aeb4",
+      "analysis_task": "ser_v2",
+      "source_task": "mmlu",
+      "panel": "calibration_pilot",
+      "cells": 66,
+      "batch_groups": 2,
+      "operation_shape_signature": "{\"batch_groups\": 2, \"cells\": 66, \"families\": {\"calibration_null\": 64, \"learned\": 2}, \"group_sizes\": [2, 2], \"mmlu_branch\": true, \"operations\": {\"h_mean\": 33, \"zero\": 33}, \"profile\": {\"axis_tile_size\": 32, \"backend\": \"sdpa\", \"capture_scope\": \"requested_head_union\", \"dtype\": \"torch.float32\", \"model\": \"fixture\", \"model_revision\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"padded_width\": 4, \"physical_batch_size\": 64, \"positive_singleton\": false, \"sites\": [[\"head\", 0, 0]]}}",
+      "observed_match_indices": [
+        6,
+        13,
+        20,
+        27
+      ],
+      "observed_matching_original_case_max_seconds": 26.574205063981935,
+      "actual_SER_runtime_observed": null
+    }
+  ],
+  "base_cost_envelope": {
+    "start": 49,
+    "last": 62,
+    "count": 14,
+    "setup_seconds": 359.24090781994164,
+    "cold_first_auth_seconds": 159.50660318601876,
+    "warm_auth_seconds": 66.09009669604711,
+    "original_case_work_max_sum_seconds": 594.3580538381357,
+    "sidecar_seconds_per_case": 2,
+    "final_exit_seconds": 30,
+    "subtotal_seconds": 2030.2768218927085,
+    "buffer_fraction": 0.2,
+    "buffered_seconds": 2436.33218627125
+  },
+  "extra_gate_allowance_seconds": 60,
+  "gate_allowance_explanation": "Explicit added minute: up to 30 seconds accounting propagation plus 30 seconds metadata/gate allowance. Actual time is recorded in a separate gate step. No new model or proof replay; consume the existing original 49-case reference scan.",
+  "augmented_envelope_seconds": 2496.33218627125,
+  "child_cap_seconds": 2520,
+  "kill_grace_seconds": 15,
+  "Slurm_minutes": 44,
+  "CPUs": 4,
+  "memory_GiB": 32,
+  "GPUs": 0,
+  "account": "bjhz-delta-cpu",
+  "partition": "cpu-interactive",
+  "constraint": "projects",
+  "afterok_required": "23470779",
+  "new_case_count": 14,
+  "expected_prior_case_count": 49,
+  "expected_total_case_count_after_success": 63,
+  "full_pilot_aggregate_remains_unexecuted": true,
+  "scientific_execution": false,
+  "production_admission": false,
+  "source_unchanged": true,
+  "cost_inputs": [
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/135-native-cpu-job23455139-evidence/per-case-observations.json",
+      "sha256": "c0f2675eca3b8ff3b00d38f94e781a2040c542ee96a0801e4c1d7cd7b8646004"
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/137-native-cpu-job23458182-evidence/per-case-observations.json",
+      "sha256": "309c4ae90a63deb3cd3c9466ff567de41d015af50552d9e0a2507c3ea547f516"
+    }
+  ],
+  "limitations": [
+    "SER runtime is being observed in the parent job, but this bound retains the already declared operation/shape-matched maxima from jobs 135 and 137; no new observed timing is invented.",
+    "Process-local cache is fresh; no restart cache or proof/receipt re-signing.",
+    "Missing, failed, changed or incomplete parent evidence refuses before model construction. Only accounting visibility may wait within the stated bound.",
+    "No automatic retry, aggregate, calibration or assessment follows."
+  ],
+  "root_commands": {
+    "test_only": "sbatch --test-only --export=ALL --dependency=afterok:23470779 --time=00:44:00 /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu49-62-proposal/launch.sbatch",
+    "submit_after_review": "sbatch --parsable --export=ALL --dependency=afterok:23470779 --time=00:44:00 /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu49-62-proposal/launch.sbatch"
+  }
+}

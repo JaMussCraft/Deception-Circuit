@@ -1,0 +1,37 @@
+FFF.                                                                     [100%]
+=================================== FAILURES ===================================
+_ test_cached_mask_source_refresh_preserves_current_protection_and_semantic_work_once _
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-owners/test_cached_mask_source_refres0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fcd2849e1e0>
+
+    def test_cached_mask_source_refresh_preserves_current_protection_and_semantic_work_once(tmp_path,monkeypatch):
+>       from test_a3_source_validation import setup_case
+E       ModuleNotFoundError: No module named 'test_a3_source_validation'
+
+tests/test_a3_mask_pipeline.py:730: ModuleNotFoundError
+___ test_mask_source_initialization_reaches_existing_projector_startup_cost ____
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-owners/test_mask_source_initializatio0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fcd234b2cf0>
+
+    def test_mask_source_initialization_reaches_existing_projector_startup_cost(tmp_path,monkeypatch):
+>       from test_a3_source_validation import setup_case
+E       ModuleNotFoundError: No module named 'test_a3_source_validation'
+
+tests/test_a3_mask_pipeline.py:761: ModuleNotFoundError
+____ test_cached_edge_source_keeps_fresh_authority_and_runs_semantics_once _____
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-owners/test_cached_edge_source_keeps_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fcd234d5ee0>
+
+    def test_cached_edge_source_keeps_fresh_authority_and_runs_semantics_once(tmp_path,monkeypatch):
+>       from test_a3_source_validation import setup_case
+E       ModuleNotFoundError: No module named 'test_a3_source_validation'
+
+tests/test_a3_edge_pipeline.py:652: ModuleNotFoundError
+=========================== short test summary info ============================
+FAILED tests/test_a3_mask_pipeline.py::test_cached_mask_source_refresh_preserves_current_protection_and_semantic_work_once
+FAILED tests/test_a3_mask_pipeline.py::test_mask_source_initialization_reaches_existing_projector_startup_cost
+FAILED tests/test_a3_edge_pipeline.py::test_cached_edge_source_keeps_fresh_authority_and_runs_semantics_once
+3 failed, 1 passed, 128 deselected in 20.77s

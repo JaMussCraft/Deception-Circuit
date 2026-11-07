@@ -1,0 +1,70 @@
+{
+  "status": "FALLBACK_PROPOSAL_ONLY_DO_NOT_LAUNCH",
+  "root_current_preference": "Continue exact existing Delta packet on recovered cn137 after short GREEN job finishes. Do not hold Delta job for this proposal.",
+  "existing_Delta_job_id": "23482242",
+  "accepted_source_commit": "861f84a3938a5e22fa329af0c469b2dd812fe68a",
+  "runtime": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime",
+  "snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/snapshot.json",
+  "source_ordinary_count": 511,
+  "required_runtime_input_links": {
+    "data": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/data",
+    "docs/research/directions.json": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/directions.json",
+    "docs/research/held_out.json": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
+    "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a1-control-77b6487-m07"
+  },
+  "existing_r163_r2": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-prefit-remaining-cpu-r163-r2",
+  "original_packet_untouched": true,
+  "adapters_implemented": false,
+  "full_closure_inventoried": false,
+  "static_seed_count": 547,
+  "completed_stages_must_not_repeat": [
+    "canonical design/direction protocol",
+    "prefit inventory"
+  ],
+  "only_remaining_stages": [
+    "fit-select inventory",
+    "original prefit wrapper dry-run without authority",
+    "original science/current-protection/inventory/budget/import-origin validation"
+  ],
+  "resource_proposal": {
+    "cluster": "bridges2",
+    "account": "cis260361p",
+    "qos": "rm",
+    "partition": "RM-shared",
+    "nodes": 1,
+    "tasks": 1,
+    "CPUs": 17,
+    "memory_GiB": 32,
+    "minutes": 45,
+    "GPUs": 0,
+    "child_cap_seconds": 2520,
+    "kill_grace_seconds": 15,
+    "minimum_initial_remaining_seconds": 2610,
+    "no_automatic_retry": true
+  },
+  "CPU_memory_derivation": "ceil(32*1024MiB/2000MiB_per_core)=17cores; root must confirm current placement and actual granted memory. This is resource arithmetic, not a performance forecast.",
+  "blockers": [
+    "Original allocation_facts enforces Delta cluster/4CPU/-cpu account/cpu partition/AllocTRES; cannot reuse unchanged on Bridges or falsify SLURM environment.",
+    "Supervisor calls literal base Python3.9 path; prepare/validation call literal Delta /u mgnp interpreter and DC_CLUSTER=delta. A separately reviewed operational adapter must name actual packed3.12. No fake Python3.9 or source edits.",
+    "Python3.12 stdlib compatibility is plausible from inspection (Path, subprocess, os.wait4, processgroups); needs real CPU smoke test with actual environment/cgroup mount visibility. No execution equivalence claim.",
+    "Full reference closure must be generated/hashed on CPU; static seeds are explicitly incomplete. Include original projects paths, all source511/input4, native13, archived/prior canonical, preserved1GBprefit, every design/inventory path, live registries and cache metadata.",
+    "Real SIF original/projects mount and physical HF hub/work binding are mandatory, plus explicit cache env after actual packed activation.",
+    "Root must hold and verify original Delta job unstarted before any later alternate launch; no alternate exists and no hold is requested now.",
+    "Need fresh Bridges allocation/account/QoS/CPU/memory/node/deadline/cgroup metadata and TRES fallback, same finite processgroup cap, sequential child only, immutable inputs before/after, no model or GPU admission."
+  ],
+  "candidate_operational_environment": {
+    "SIF": "/ocean/projects/cis260361p/swong2/specificity-ladder-20261102/containers/ubuntu2204.sif",
+    "SIF_sha256": "f50c8e39dd5e2ac1c1a4bdfd443351cb970513fdb10a572725eb53d7396f8697",
+    "actual_packed_python": "/ocean/projects/cis260361p/swong2/envs/mgnp/bin/python",
+    "actual_packed_python_major_minor": "3.12",
+    "physical_Alignment": "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment",
+    "virtual_Alignment": "/projects/beto/swong2/Alignment",
+    "physical_HF_hub": "/ocean/projects/cis260361p/swong2/hf/hub",
+    "virtual_HF_hub": "/work/nvme/beto/swong2"
+  },
+  "stop_if": "Any required port changes accepted scientific source, original inputs, completed artifacts or owning science/protection semantics. Report to root; do not implement.",
+  "remote_actions": false,
+  "scheduler_actions": false,
+  "scientific_execution": false,
+  "GPU_admission": false
+}

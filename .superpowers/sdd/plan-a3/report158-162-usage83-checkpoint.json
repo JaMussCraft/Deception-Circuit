@@ -1,0 +1,48 @@
+{
+  "status": "USAGE83_CHECKPOINT_HOLD_NO_FURTHER_MONITORING_OR_REVIEW",
+  "observed_UTC": "2026-11-03T17:38:06.551667+00:00",
+  "usage_percent": 83,
+  "next_checkpoint": 83,
+  "captured_reset_UTC": "2026-11-06T16:07:41+00:00",
+  "exception_still_same_window": true,
+  "CPU158": {
+    "job_id": "23475935",
+    "watchdog": "root90727",
+    "last_observed_state": "RUNNING12min/25min,cn137,bjhz-delta-cpu/cpu-interactive,4CPU32GiB0GPU",
+    "canonical": {
+      "exit_code": 0,
+      "wall_seconds": 246.54344908404164,
+      "peak_wait4_rss_bytes": 1877893120
+    },
+    "prefit_inventory": {
+      "exit_code": 0,
+      "wall_seconds": 244.54940440598875,
+      "peak_wait4_rss_bytes": 12368396288
+    },
+    "fit_select_inventory": "started; terminal outcome not checked",
+    "last_controller_sample": {
+      "elapsed_seconds": 710.8405382300261,
+      "pid": 3575659,
+      "VmRSS": "14336kB",
+      "note": "Controller waiting for active command; not grandchild memory"
+    },
+    "raw_evidence": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-direction-prefit-preparation-861f84a3938a-r158/evidence",
+    "terminal_check_command": "TZ=UTC sacct -j 23475935 --format=JobIDRaw,JobName,State,ExitCode,ElapsedRaw,TimelimitRaw,AllocTRES,MaxRSS,Start,End -P",
+    "caps_unchanged": true,
+    "automatic_retry": false,
+    "submission_or_cancel_by_worker": false
+  },
+  "review162": {
+    "raw_design": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/a2-grader-binding-repair161/design.json",
+    "reviewed_design_sha256": "1bda0420225dc35d5d1cca75f4c40e8b2768d37be9e0b7448b4d6d72053fadf4",
+    "grader_binding_design": "Exact full own entry per lexical canonical route, same read bytes hashed/parsed, typed canonical digest, duplicate/missing own entry reject; both _validate_live and _manifest/read_stage sites addressed.",
+    "protected_input_trace": "Original A2 current held_out guards protect instance IDs and referenced ID-file bytes/counts; they do not consume foreign directions[].do_not_touch path declarations. Original whole-catalogue equality incidentally rejected all such drift.",
+    "new_root_ruling_received": "Bind all nonempty foreign protective declarations exactly per route, preserving duplicates/counts, plus exact own entry and authoritative top-level schema/global fields. Only known non-authoritative timestamp metadata and foreign nonprotective changes/new empty rows may vary. No generic overlap framework.",
+    "updated_design_review_pending": true,
+    "design_unconditional_acceptance": false,
+    "production_edits_by_reviewer": false
+  },
+  "source_changes": false,
+  "live_settings_or_admission_changes": false,
+  "next_owner": "Root checkpoint/watchdog; resume only after acknowledgement with live usage recheck"
+}

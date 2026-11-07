@@ -1,0 +1,30 @@
+test_malformed_captured_reset_fails_closed (test_reset_token.ResetTokenTests) ... test_valid_line_with_following_status_and_newline (test_reset_token.ResetTokenTests) ... ok
+
+======================================================================
+FAIL: test_malformed_captured_reset_fails_closed (test_reset_token.ResetTokenTests) (suffix='.5')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-model-phase-release-helper/r5-r2/test_reset_token.py", line 13, in test_malformed_captured_reset_fails_closed
+    with self.assertRaises(h.Rejected):h.validate_usage(u,status,'exact')
+AssertionError: Rejected not raised
+
+======================================================================
+FAIL: test_malformed_captured_reset_fails_closed (test_reset_token.ResetTokenTests) (suffix='e9')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-model-phase-release-helper/r5-r2/test_reset_token.py", line 13, in test_malformed_captured_reset_fails_closed
+    with self.assertRaises(h.Rejected):h.validate_usage(u,status,'exact')
+AssertionError: Rejected not raised
+
+======================================================================
+FAIL: test_malformed_captured_reset_fails_closed (test_reset_token.ResetTokenTests) (suffix='unknown')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-model-phase-release-helper/r5-r2/test_reset_token.py", line 13, in test_malformed_captured_reset_fails_closed
+    with self.assertRaises(h.Rejected):h.validate_usage(u,status,'exact')
+AssertionError: Rejected not raised
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.005s
+
+FAILED (failures=3)

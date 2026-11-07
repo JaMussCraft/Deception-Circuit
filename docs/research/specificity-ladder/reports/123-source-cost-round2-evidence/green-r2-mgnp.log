@@ -1,0 +1,42 @@
+........................................FF...........                    [100%]
+=================================== FAILURES ===================================
+______ test_current_grader_code_and_glob_membership_are_not_cached[code] _______
+
+tmp_path = PosixPath('/tmp/source-cost-123-green-r2-mgnp/test_current_grader_code_and_g0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8595419400>
+damage = 'code'
+
+    @pytest.mark.parametrize('damage',['code','new_glob'])
+    def test_current_grader_code_and_glob_membership_are_not_cached(tmp_path,monkeypatch,damage):
+        c=setup_case(tmp_path,monkeypatch);state=c.build()
+        path=c.runtime/('evaluation/benchmark_eval.py' if damage=='code' else 'evaluation/benchmarks/new_grader.py')
+        with path.open('a') as handle:handle.write('\n# changed grader\n')
+>       with pytest.raises(ValueError,match='grader'):refresh(c,state)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'grader'
+E         Actual message: 'immutable referenced file/tree fingerprint changed'
+
+tests/test_a3_source_validation.py:338: AssertionError
+____ test_current_grader_code_and_glob_membership_are_not_cached[new_glob] _____
+
+tmp_path = PosixPath('/tmp/source-cost-123-green-r2-mgnp/test_current_grader_code_and_g1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f859541bb30>
+damage = 'new_glob'
+
+    @pytest.mark.parametrize('damage',['code','new_glob'])
+    def test_current_grader_code_and_glob_membership_are_not_cached(tmp_path,monkeypatch,damage):
+        c=setup_case(tmp_path,monkeypatch);state=c.build()
+        path=c.runtime/('evaluation/benchmark_eval.py' if damage=='code' else 'evaluation/benchmarks/new_grader.py')
+        with path.open('a') as handle:handle.write('\n# changed grader\n')
+>       with pytest.raises(ValueError,match='grader'):refresh(c,state)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'grader'
+E         Actual message: 'source closure membership changed'
+
+tests/test_a3_source_validation.py:338: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_a3_source_validation.py::test_current_grader_code_and_glob_membership_are_not_cached[code]
+FAILED tests/test_a3_source_validation.py::test_current_grader_code_and_glob_membership_are_not_cached[new_glob]
+2 failed, 51 passed in 7.62s

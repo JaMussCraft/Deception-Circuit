@@ -1,0 +1,59 @@
+{
+  "kind": "independent_source_cost_safety_review",
+  "status": "handed-back",
+  "source_commit": "caae47195503460c1df63670d23448c49b316a67",
+  "baseline_commit": "87fceb28b3b46f4a406c0280db785697a0bbd3fc",
+  "source_safety_spec_verdict": "BLOCKED",
+  "source_safety_quality_verdict": "BLOCKED",
+  "practical_timing_budget_verdict": "UNRESOLVED; new genuine input measurement owner stopped at root direction",
+  "frozen_source_verification": {
+    "files": 511,
+    "changed": {
+      "component_analysis/a3_edge_pipeline.py": "f8212df3f2b3a70b10e884164cc1e0b1781622553c2d95b77413a3fbb7cb20ce",
+      "component_analysis/a3_mask_pipeline.py": "98c6b4addef010944aabc547b939585679072fbe931feb64b2b4548d9de9172a",
+      "component_analysis/a3_source_validation.py": "264f02fd842290fe48f943fb2cde5a0c86f1ecbfe081c1fae2175f415c172fc8",
+      "tests/test_a3_edge_pipeline.py": "60f4b49e734b786b3b5942e8e6ccac4173119c9580db8d9319931f1d66118f9f",
+      "tests/test_a3_mask_pipeline.py": "26210c570aae88edbaf4979e859e9071b6bb76e6949b71f5f395911b1fd08e34",
+      "tests/test_a3_source_validation.py": "8930c1858718b05d403c1efb2073b3ee2d707b8a3e8feb16ed11c032c5200850"
+    },
+    "all_snapshot_hashes_match": true,
+    "snapshot_code_file_count_field": 509
+  },
+  "independent_tests": {
+    "mgnp": {
+      "rejection_failures": 2,
+      "positive_passes": 4,
+      "seconds": 7.07
+    },
+    "base": {
+      "rejection_failures": 2,
+      "positive_passes": 4,
+      "seconds": 4.64
+    }
+  },
+  "blockers": {
+    "B1": "Artifact-to-owned comparison precedes initial envelope witness; dependency discovery can replace prepared artifact and proof accepts mismatch",
+    "B2": "Current grader content checks omit static lexical/target provenance for full grader glob; same-byte benchmark_eval link redirect passes"
+  },
+  "limits": [
+    "fixture CPU only",
+    "no model or job authority",
+    "no full numerical or broad owning suite repeated",
+    "no author handback read",
+    "no original source/artifact changes"
+  ],
+  "test_transport_corrections": [
+    "initial pytest inherited active worktree conftest; corrected confcutdir/import isolation",
+    "base copy2 ACL failure; corrected only reviewer fixture transport to byte-only copyfile"
+  ],
+  "evidence_sha256": {
+    "independent-initial-import-error.log": "fd4ec38ec51c4c02507ce497534e012eb1367d769eb5a87d3c14a28c8c936c66",
+    "test_independent_source_boundaries.py": "54b24e2b56325da734a38a519b3003771494d3a9c25ca29b7c38c42717768202",
+    "closure-crosscheck.json": "faaa9950948a7277953243f2dac523caa8151498942f89c461b8c84c9b3e1df3",
+    "independent-base-initial-xattr-error.log": "052218b6f3fdbe929f14f6c2ad5f604972be2f82b6ec2af66953ab724115ca3f",
+    "independent-base.log": "cb49f94546c3cf074848349a6b61b012a2cd5f19974470861228f69afc58c9f1",
+    "independent-mgnp.log": "b6e39f914ebdf5b3d32b26878b515bbd8198eb90bd30468c9b64714dc8112e62",
+    "source-verification.json": "9f552718d4a7872f55a05511d50c23baeba934836aabc7035057e3727b82e70c",
+    "test_independent_source_boundaries-initial.py": "80e60edb983c5e3bc67cd70afc591af8edf75cf39eec1e60a47b96a0fb425da3"
+  }
+}

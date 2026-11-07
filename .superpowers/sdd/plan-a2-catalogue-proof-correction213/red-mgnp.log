@@ -1,0 +1,104 @@
+test_actual_catalogue_conflict_is_resolved_by_bound_current_bytes (test_catalogues.CatalogueTests.test_actual_catalogue_conflict_is_resolved_by_bound_current_bytes) ... FAIL
+test_current_catalogue_mutation_rejects_without_hash_adoption (test_catalogues.CatalogueTests.test_current_catalogue_mutation_rejects_without_hash_adoption) ... FAIL
+test_environment_witness_is_revalidated_on_every_capture_read (test_catalogues.CatalogueTests.test_environment_witness_is_revalidated_on_every_capture_read) ... FAIL
+test_exact_four_lexical_paths_not_basename_or_prefix (test_catalogues.CatalogueTests.test_exact_four_lexical_paths_not_basename_or_prefix) ... ok
+test_four_fresh_rows_replace_only_historical_byte_expectations (test_catalogues.CatalogueTests.test_four_fresh_rows_replace_only_historical_byte_expectations) ... FAIL
+test_historical_rows_and_expected_map_unchanged (test_catalogues.CatalogueTests.test_historical_rows_and_expected_map_unchanged) ... FAIL
+test_host_forwards_pinned_transfer_reference_through_clean_environment (test_catalogues.CatalogueTests.test_host_forwards_pinned_transfer_reference_through_clean_environment) ... FAIL
+test_malformed_or_inconsistent_capture_records_reject (test_catalogues.CatalogueTests.test_malformed_or_inconsistent_capture_records_reject) ... ok
+test_missing_witness_environment_never_adopts_current_hashes (test_catalogues.CatalogueTests.test_missing_witness_environment_never_adopts_current_hashes) ... FAIL
+test_ordinary_mutation_and_same_basename_still_reject (test_catalogues.CatalogueTests.test_ordinary_mutation_and_same_basename_still_reject) ... FAIL
+test_pinned_same_buffer_and_duplicate_keys_reject (test_catalogues.CatalogueTests.test_pinned_same_buffer_and_duplicate_keys_reject) ... FAIL
+test_wrong_job_packet_flags_or_counts_reject (test_catalogues.CatalogueTests.test_wrong_job_packet_flags_or_counts_reject) ... ok
+
+======================================================================
+FAIL: test_actual_catalogue_conflict_is_resolved_by_bound_current_bytes (test_catalogues.CatalogueTests.test_actual_catalogue_conflict_is_resolved_by_bound_current_bytes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/test_catalogues.py", line 38, in test_actual_catalogue_conflict_is_resolved_by_bound_current_bytes
+    expected=self.load(witness());inputs=self.inputs();n=str(g.REG[1]);self.assertNotEqual(inputs['ordinary_files'][n]['sha256'],expected[n]['sha256']);self.verify(inputs,expected)
+             ^^^^^^^^^^^^^^^^^^^^
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/test_catalogues.py", line 23, in load
+    self.assertTrue(callable(getattr(g,'catalogue_expectations',None)),'CATALOGUE_CORRECTION_MISSING: authenticated expectations')
+AssertionError: False is not true : CATALOGUE_CORRECTION_MISSING: authenticated expectations
+
+======================================================================
+FAIL: test_current_catalogue_mutation_rejects_without_hash_adoption (test_catalogues.CatalogueTests.test_current_catalogue_mutation_rejects_without_hash_adoption)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/test_catalogues.py", line 83, in test_current_catalogue_mutation_rejects_without_hash_adoption
+    expected=self.load(witness());inputs=self.inputs();real_sha=g.sha;n=str(g.REG[0])
+             ^^^^^^^^^^^^^^^^^^^^
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/test_catalogues.py", line 23, in load
+    self.assertTrue(callable(getattr(g,'catalogue_expectations',None)),'CATALOGUE_CORRECTION_MISSING: authenticated expectations')
+AssertionError: False is not true : CATALOGUE_CORRECTION_MISSING: authenticated expectations
+
+======================================================================
+FAIL: test_environment_witness_is_revalidated_on_every_capture_read (test_catalogues.CatalogueTests.test_environment_witness_is_revalidated_on_every_capture_read)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/test_catalogues.py", line 95, in test_environment_witness_is_revalidated_on_every_capture_read
+    self.assertTrue(callable(getattr(g,'current_catalogues',None)),'CATALOGUE_CORRECTION_MISSING')
+AssertionError: False is not true : CATALOGUE_CORRECTION_MISSING
+
+======================================================================
+FAIL: test_four_fresh_rows_replace_only_historical_byte_expectations (test_catalogues.CatalogueTests.test_four_fresh_rows_replace_only_historical_byte_expectations)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/test_catalogues.py", line 35, in test_four_fresh_rows_replace_only_historical_byte_expectations
+    expected=self.load(witness());result=self.verify(self.inputs(),expected)
+             ^^^^^^^^^^^^^^^^^^^^
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/test_catalogues.py", line 23, in load
+    self.assertTrue(callable(getattr(g,'catalogue_expectations',None)),'CATALOGUE_CORRECTION_MISSING: authenticated expectations')
+AssertionError: False is not true : CATALOGUE_CORRECTION_MISSING: authenticated expectations
+
+======================================================================
+FAIL: test_historical_rows_and_expected_map_unchanged (test_catalogues.CatalogueTests.test_historical_rows_and_expected_map_unchanged)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/test_catalogues.py", line 86, in test_historical_rows_and_expected_map_unchanged
+    expected=self.load(witness());inputs=self.inputs();before=copy.deepcopy(inputs);saved=copy.deepcopy(expected);self.verify(inputs,expected);self.assertEqual(inputs,before);self.assertEqual(expected,saved)
+             ^^^^^^^^^^^^^^^^^^^^
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/test_catalogues.py", line 23, in load
+    self.assertTrue(callable(getattr(g,'catalogue_expectations',None)),'CATALOGUE_CORRECTION_MISSING: authenticated expectations')
+AssertionError: False is not true : CATALOGUE_CORRECTION_MISSING: authenticated expectations
+
+======================================================================
+FAIL: test_host_forwards_pinned_transfer_reference_through_clean_environment (test_catalogues.CatalogueTests.test_host_forwards_pinned_transfer_reference_through_clean_environment)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/test_catalogues.py", line 90, in test_host_forwards_pinned_transfer_reference_through_clean_environment
+    self.assertIn('catalogue_ref',h.container_command.__code__.co_varnames,'CATALOGUE_CORRECTION_MISSING: forwarding')
+AssertionError: 'catalogue_ref' not found in ('packet', 'output', 'manifest', 'deadline', 'cgroup_record', 'virtual_packet', 'virtual_out', 'k', 'v', 'env', 'cmd') : CATALOGUE_CORRECTION_MISSING: forwarding
+
+======================================================================
+FAIL: test_missing_witness_environment_never_adopts_current_hashes (test_catalogues.CatalogueTests.test_missing_witness_environment_never_adopts_current_hashes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/test_catalogues.py", line 76, in test_missing_witness_environment_never_adopts_current_hashes
+    self.assertTrue(callable(getattr(g,'current_catalogues',None)),'CATALOGUE_CORRECTION_MISSING: mandatory environment')
+AssertionError: False is not true : CATALOGUE_CORRECTION_MISSING: mandatory environment
+
+======================================================================
+FAIL: test_ordinary_mutation_and_same_basename_still_reject (test_catalogues.CatalogueTests.test_ordinary_mutation_and_same_basename_still_reject)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/test_catalogues.py", line 79, in test_ordinary_mutation_and_same_basename_still_reject
+    expected=self.load(witness());inputs=self.inputs();old=next(iter(inputs['ordinary_files']));path=self.root/'directions.json';path.write_bytes(b'original');row=inputs['ordinary_files'].pop(old);row['path']=str(path);inputs['ordinary_files'][str(path)]=row
+             ^^^^^^^^^^^^^^^^^^^^
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/test_catalogues.py", line 23, in load
+    self.assertTrue(callable(getattr(g,'catalogue_expectations',None)),'CATALOGUE_CORRECTION_MISSING: authenticated expectations')
+AssertionError: False is not true : CATALOGUE_CORRECTION_MISSING: authenticated expectations
+
+======================================================================
+FAIL: test_pinned_same_buffer_and_duplicate_keys_reject (test_catalogues.CatalogueTests.test_pinned_same_buffer_and_duplicate_keys_reject)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/test_catalogues.py", line 64, in test_pinned_same_buffer_and_duplicate_keys_reject
+    self.assertTrue(callable(getattr(g,'catalogue_expectations',None)),'CATALOGUE_CORRECTION_MISSING')
+AssertionError: False is not true : CATALOGUE_CORRECTION_MISSING
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.150s
+
+FAILED (failures=9)

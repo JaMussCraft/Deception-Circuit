@@ -1,0 +1,117 @@
+..........F....FFFFFF........                                            [100%]
+=================================== FAILURES ===================================
+__________ test_index_matches_full_validator_input_rejection[stream] ___________
+
+proof_case = ({'axis_class': None, 'axis_ids': [], 'axis_scope': [], 'batch_seconds': [0.01, 0.02], ...}, {'runner_receipt': {'comp...ken': 0, 'honest_token': 0, ...}]}}, <component_analysis.a3_direction_workload._PackingProof object at 0x7fd7ca0e77b0>)
+field = 'stream'
+
+    @pytest.mark.parametrize('field',['tokens','readout','condition','stream','instance_id','record','mask_length','donor'])
+    def test_index_matches_full_validator_input_rejection(proof_case,field):
+        m,evidence,proof=proof_case;changed=copy.deepcopy(m);row=changed['timing_inputs'][0]
+        if field=='tokens':row['record']['streams'][row['stream']]['tokens'][0]+=1
+        elif field=='readout':row['readout']+=1
+        elif field=='record':row['record']['unexpected_source_field']='changed'
+        elif field=='mask_length':row['unpadded_length']-=1
+        elif field=='donor':changed['donor_convention']='unknown'
+        else:row[field]+='-changed'
+        if field!='donor':
+>           with pytest.raises(ValueError):w._packing_evidence(evidence,changed)
+
+docs/research/specificity-ladder/reports/111-numerical-evidence/test_independent_numerical.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+component_analysis/a3_direction_workload.py:920: in _packing_evidence
+    _packing_measurement_scope(measured_rows,measured_specs,measurement)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+measured_rows = {('far_v2', 'D', 'clean', 'far_v2v0'): {'choice_tokens': None, 'condition': 'D', 'expected_token': 0, 'honest_token': ...v2', 'D', 'clean', 'far_v2v1'): {'choice_tokens': None, 'condition': 'D', 'expected_token': 0, 'honest_token': 0, ...}}
+measured_specs = [{'axis_index': 999, 'axis_sha256': '87d265d08728cd81da16c5afdc453355f7d8a841468628e1ff2c406f5c3a998c', 'donors': [], ...s_sha256': '87d265d08728cd81da16c5afdc453355f7d8a841468628e1ff2c406f5c3a998c', 'donors': [], 'family': 'learned', ...}]
+measurement = {'axis_class': None, 'axis_ids': [], 'axis_scope': [], 'batch_seconds': [0.01, 0.02], ...}
+
+    def _packing_measurement_scope(measured_rows,measured_specs,measurement):
+        for frozen in measurement['timing_inputs']:
+            k=(frozen['source_task'],frozen['condition'],frozen['stream'],frozen['instance_id'])
+>           row=measured_rows.get(k); data=frozen['record']['streams'][frozen['stream']]
+E           KeyError: 'clean-changed'
+
+component_analysis/a3_direction_workload.py:927: KeyError
+____________ test_index_matches_full_validator_axis_rejection[site] ____________
+
+proof_case = ({'axis_class': None, 'axis_ids': [], 'axis_scope': [], 'batch_seconds': [0.01, 0.02], ...}, {'runner_receipt': {'comp...ken': 0, 'honest_token': 0, ...}]}}, <component_analysis.a3_direction_workload._PackingProof object at 0x7fd7ca0e77b0>)
+field = 'site'
+
+    @pytest.mark.parametrize('field',['site','seed','family','axis_index','operation','axis_sha256'])
+    def test_index_matches_full_validator_axis_rejection(proof_case,field):
+>       m,evidence,proof=proof_case;changed=copy.deepcopy(m);a=changed['axis_scope'][0]
+E       IndexError: list index out of range
+
+docs/research/specificity-ladder/reports/111-numerical-evidence/test_independent_numerical.py:39: IndexError
+____________ test_index_matches_full_validator_axis_rejection[seed] ____________
+
+proof_case = ({'axis_class': None, 'axis_ids': [], 'axis_scope': [], 'batch_seconds': [0.01, 0.02], ...}, {'runner_receipt': {'comp...ken': 0, 'honest_token': 0, ...}]}}, <component_analysis.a3_direction_workload._PackingProof object at 0x7fd7ca0e77b0>)
+field = 'seed'
+
+    @pytest.mark.parametrize('field',['site','seed','family','axis_index','operation','axis_sha256'])
+    def test_index_matches_full_validator_axis_rejection(proof_case,field):
+>       m,evidence,proof=proof_case;changed=copy.deepcopy(m);a=changed['axis_scope'][0]
+E       IndexError: list index out of range
+
+docs/research/specificity-ladder/reports/111-numerical-evidence/test_independent_numerical.py:39: IndexError
+___________ test_index_matches_full_validator_axis_rejection[family] ___________
+
+proof_case = ({'axis_class': None, 'axis_ids': [], 'axis_scope': [], 'batch_seconds': [0.01, 0.02], ...}, {'runner_receipt': {'comp...ken': 0, 'honest_token': 0, ...}]}}, <component_analysis.a3_direction_workload._PackingProof object at 0x7fd7ca0e77b0>)
+field = 'family'
+
+    @pytest.mark.parametrize('field',['site','seed','family','axis_index','operation','axis_sha256'])
+    def test_index_matches_full_validator_axis_rejection(proof_case,field):
+>       m,evidence,proof=proof_case;changed=copy.deepcopy(m);a=changed['axis_scope'][0]
+E       IndexError: list index out of range
+
+docs/research/specificity-ladder/reports/111-numerical-evidence/test_independent_numerical.py:39: IndexError
+_________ test_index_matches_full_validator_axis_rejection[axis_index] _________
+
+proof_case = ({'axis_class': None, 'axis_ids': [], 'axis_scope': [], 'batch_seconds': [0.01, 0.02], ...}, {'runner_receipt': {'comp...ken': 0, 'honest_token': 0, ...}]}}, <component_analysis.a3_direction_workload._PackingProof object at 0x7fd7ca0e77b0>)
+field = 'axis_index'
+
+    @pytest.mark.parametrize('field',['site','seed','family','axis_index','operation','axis_sha256'])
+    def test_index_matches_full_validator_axis_rejection(proof_case,field):
+>       m,evidence,proof=proof_case;changed=copy.deepcopy(m);a=changed['axis_scope'][0]
+E       IndexError: list index out of range
+
+docs/research/specificity-ladder/reports/111-numerical-evidence/test_independent_numerical.py:39: IndexError
+_________ test_index_matches_full_validator_axis_rejection[operation] __________
+
+proof_case = ({'axis_class': None, 'axis_ids': [], 'axis_scope': [], 'batch_seconds': [0.01, 0.02], ...}, {'runner_receipt': {'comp...ken': 0, 'honest_token': 0, ...}]}}, <component_analysis.a3_direction_workload._PackingProof object at 0x7fd7ca0e77b0>)
+field = 'operation'
+
+    @pytest.mark.parametrize('field',['site','seed','family','axis_index','operation','axis_sha256'])
+    def test_index_matches_full_validator_axis_rejection(proof_case,field):
+>       m,evidence,proof=proof_case;changed=copy.deepcopy(m);a=changed['axis_scope'][0]
+E       IndexError: list index out of range
+
+docs/research/specificity-ladder/reports/111-numerical-evidence/test_independent_numerical.py:39: IndexError
+________ test_index_matches_full_validator_axis_rejection[axis_sha256] _________
+
+proof_case = ({'axis_class': None, 'axis_ids': [], 'axis_scope': [], 'batch_seconds': [0.01, 0.02], ...}, {'runner_receipt': {'comp...ken': 0, 'honest_token': 0, ...}]}}, <component_analysis.a3_direction_workload._PackingProof object at 0x7fd7ca0e77b0>)
+field = 'axis_sha256'
+
+    @pytest.mark.parametrize('field',['site','seed','family','axis_index','operation','axis_sha256'])
+    def test_index_matches_full_validator_axis_rejection(proof_case,field):
+>       m,evidence,proof=proof_case;changed=copy.deepcopy(m);a=changed['axis_scope'][0]
+E       IndexError: list index out of range
+
+docs/research/specificity-ladder/reports/111-numerical-evidence/test_independent_numerical.py:39: IndexError
+=============================== warnings summary ===============================
+../../../../../../../../u/swong2/.local/lib/python3.9/site-packages/pandas/core/arrays/masked.py:61
+  /u/swong2/.local/lib/python3.9/site-packages/pandas/core/arrays/masked.py:61: UserWarning: Pandas requires version '1.3.6' or newer of 'bottleneck' (version '1.3.5' currently installed).
+    from pandas.core import (
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED docs/research/specificity-ladder/reports/111-numerical-evidence/test_independent_numerical.py::test_index_matches_full_validator_input_rejection[stream]
+FAILED docs/research/specificity-ladder/reports/111-numerical-evidence/test_independent_numerical.py::test_index_matches_full_validator_axis_rejection[site]
+FAILED docs/research/specificity-ladder/reports/111-numerical-evidence/test_independent_numerical.py::test_index_matches_full_validator_axis_rejection[seed]
+FAILED docs/research/specificity-ladder/reports/111-numerical-evidence/test_independent_numerical.py::test_index_matches_full_validator_axis_rejection[family]
+FAILED docs/research/specificity-ladder/reports/111-numerical-evidence/test_independent_numerical.py::test_index_matches_full_validator_axis_rejection[axis_index]
+FAILED docs/research/specificity-ladder/reports/111-numerical-evidence/test_independent_numerical.py::test_index_matches_full_validator_axis_rejection[operation]
+FAILED docs/research/specificity-ladder/reports/111-numerical-evidence/test_independent_numerical.py::test_index_matches_full_validator_axis_rejection[axis_sha256]
+7 failed, 22 passed, 1 warning in 7.60s

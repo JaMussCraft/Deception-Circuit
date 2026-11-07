@@ -1,0 +1,21 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_static_link_target_ancestor_replacement_is_not_hidden_by_same_resolution _
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-static-alias-chain/test_static_link_target_ancest0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f2b405ac5c0>
+
+    def test_static_link_target_ancestor_replacement_is_not_hidden_by_same_resolution(tmp_path,monkeypatch):
+        c=setup_case(tmp_path,monkeypatch);target=tmp_path/'target';target.mkdir();(target/'file').write_text('same')
+        middle=tmp_path/'middle';middle.symlink_to(target);leaf=tmp_path/'leaf';leaf.symlink_to(middle/'file')
+        state=c.s.build_state(owner='fixture',originals={'design':c.design,'prepared':c.prepared},artifacts={'design':('artifact',c.design_path),'prepared':('object',c.prepared_path)},
+            dependencies=lambda owned:([leaf],[],[]),semantic=lambda owned:({},{}),registry_paths=[],scope={'commit':'a'*40})
+        middle.unlink();middle.symlink_to(target)
+>       with pytest.raises(ValueError):refresh(c,state)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_a3_source_validation.py:368: Failed
+=========================== short test summary info ============================
+FAILED tests/test_a3_source_validation.py::test_static_link_target_ancestor_replacement_is_not_hidden_by_same_resolution
+1 failed, 44 deselected in 2.94s

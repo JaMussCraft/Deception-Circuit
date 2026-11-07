@@ -1,0 +1,10 @@
+Scoped test execution, observed from tool output:
+mgnp: 39 passed in 9.22s; exit 0; tiny NNsight test executed.
+base: 38 passed, 1 skipped in 12.63s; exit 0.
+Skip: tests/test_a3_direction_runner.py:469 base pinned-NNsight mismatch: 0.5.12.
+CPU reproduction, exit 0:
+tile 1 accepted rows 8 max replay error 0.0
+tile 3 accepted rows 8 max replay error 0.0
+serial==packed False [[-6.0, -14.0, -6.0, -14.0, -6.0, -14.0, -6.0, -14.0], [-9.0, -21.0, -9.0, -21.0, -9.0, -21.0, -9.0, -21.0]]
+fabricated production positive controls gate_valid [True, True]
+Live usage checkpoint: used_percent 23, remaining_percent 77, should_pause false.

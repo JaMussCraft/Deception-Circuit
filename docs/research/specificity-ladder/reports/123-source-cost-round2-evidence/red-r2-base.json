@@ -1,0 +1,38 @@
+{
+  "source_sha256": {
+    "component_analysis/a3_source_validation.py": "264f02fd842290fe48f943fb2cde5a0c86f1ecbfe081c1fae2175f415c172fc8",
+    "component_analysis/a3_mask_pipeline.py": "98c6b4addef010944aabc547b939585679072fbe931feb64b2b4548d9de9172a",
+    "component_analysis/a3_edge_pipeline.py": "f8212df3f2b3a70b10e884164cc1e0b1781622553c2d95b77413a3fbb7cb20ce",
+    "tests/test_a3_source_validation.py": "ae679d6186f75332c39d9276d461fb28bcf266f613b05bf853e1bfea4df539c1",
+    "tests/test_a3_mask_pipeline.py": "26210c570aae88edbaf4979e859e9071b6bb76e6949b71f5f395911b1fd08e34",
+    "tests/test_a3_edge_pipeline.py": "60f4b49e734b786b3b5942e8e6ccac4173119c9580db8d9319931f1d66118f9f"
+  },
+  "source_unchanged": true,
+  "command": [
+    "/sw/external/python/anaconda3/bin/python3.9",
+    "-m",
+    "pytest",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp=/tmp/source-cost-123-red-r2-base",
+    "tests/test_a3_source_validation.py",
+    "-k",
+    "review_b"
+  ],
+  "cwd": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-guard-cost-fix-source-r2",
+  "start_utc": "2026-11-02T21:17:06.965260+00:00",
+  "elapsed_seconds": 9.445106744766235,
+  "exit_code": 1,
+  "environment": {
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1",
+    "HF_HUB_OFFLINE": "1",
+    "TRANSFORMERS_OFFLINE": "1",
+    "A3_A1_SCHEMA_TEST_DESIGN": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/design.json"
+  },
+  "log": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/123-source-cost-round2-evidence/red-r2-base.log"
+}

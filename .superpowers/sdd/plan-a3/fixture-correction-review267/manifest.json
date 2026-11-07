@@ -1,0 +1,36 @@
+{
+  "status": "FROZEN_TEST_ONLY_ROOT_REVIEW_REQUIRED",
+  "original": {
+    "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r5/suite/test_a3_prepared_pilot_target.py",
+    "sha256": "ccdecf2545b4bbc5ab9448f2c2114c72c3e2c6d4a0fbce8dcad7fdb76fdf8bf1"
+  },
+  "candidate": {
+    "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/fixture-correction265/test_a3_prepared_pilot_target.py",
+    "sha256": "e2a7c5622508974fafafe016e9c3d1d55903302f646f05c5f35630570a1f6e86"
+  },
+  "production_unchanged_read_dependencies": {
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-preallocation-candidate183/component_analysis/a3_direction_runtime.py": "aea07dbf153824f373be70629dd24edc28dd6566cafa5955f43c69fd1119ec90",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-preallocation-candidate183/component_analysis/a3_direction_workload.py": "765b22a006ab519186a168bf455f4084915457d4ffce88881e76bf31b71a37cb"
+  },
+  "artifacts": {
+    "existing-red-evidence.json": "8ad21cd441343f5567c7762cb68041a2f29993943b3aee5d05ba1dfab1dd1572",
+    "fixture.patch": "22ad972c1ab8ccd8feaa5124c4203a878a05c1ad415caa87dd2b5b720d9e9638",
+    "pure-check-base.stdout": "b5ae6b76f47e81254b40e12833f5bab952f6819bf12409a962951145c34d782d",
+    "pure-check-mgnp.stdout": "b5ae6b76f47e81254b40e12833f5bab952f6819bf12409a962951145c34d782d",
+    "pure-check.json": "b5ae6b76f47e81254b40e12833f5bab952f6819bf12409a962951145c34d782d",
+    "pure_check.py": "3b2933ed70bda2f6fbc81f8c1f610945dcb6168e8d240f7c93121dedf808ab74",
+    "test_a3_prepared_pilot_target.py": "e2a7c5622508974fafafe016e9c3d1d55903302f646f05c5f35630570a1f6e86"
+  },
+  "native_acceptance": false,
+  "native_collection": false,
+  "runtime_source_edited": false,
+  "historical_count": 223,
+  "change_scope": "two test function bodies; same parameters and original rejection/mutation/nonpublication assertions; additional final module guard call count assertion",
+  "remaining": [
+    "Independent review of correction",
+    "Fresh full 223-node collection with exact expected identities",
+    "Complete native validation on both interpreters including affected positive/rejection controls",
+    "Full source-bound packet built separately by root",
+    "Descriptor-marker actual call outcome not observed in diagnostic snapshot"
+  ]
+}

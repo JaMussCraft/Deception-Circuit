@@ -1,0 +1,162 @@
+{
+  "checks": {
+    "base_independent_oracles": {
+      "exit_code": 0,
+      "passed": 4,
+      "seconds": 15.66
+    },
+    "base_interrupted": {
+      "exit_code": 1,
+      "failed": 1,
+      "failure": "changed producer source closure during independently concurrent shared runtime edit",
+      "passed": 23,
+      "seconds": 109.68
+    },
+    "base_stable_complete_case": {
+      "exit_code": 0,
+      "failed": 0,
+      "passed": 1,
+      "seconds": 103.49
+    },
+    "mgnp_independent_oracles": {
+      "exit_code": 0,
+      "passed": 4,
+      "seconds": 19.87
+    },
+    "mgnp_scoped": {
+      "exit_code": 0,
+      "failed": 0,
+      "passed": 24,
+      "seconds": 83.58
+    }
+  },
+  "files": {
+    "/tmp/report109-r1-base-stable.log": "7f797d0bd5768e516cd8d8d04fe6795cc8fe1be0229798a73921403a72c91537",
+    "/tmp/report109-r1-base.log": "871256a6bcd1f69f7bab7ad13ddbb2274401af2615eaffd41baf07d6141bb4d3",
+    "/tmp/report109-r1-mgnp.log": "755ef8d79b4d350e863f6b3e1de5856dbc60205723d2e7dd0f2fa7dc56b6f14c",
+    "/tmp/report109-r1-oracle-base.log": "5d8a994a62c275b1134f180638b150033c036a25d5ba63de1d7cf4c389b3078f",
+    "/tmp/report109-r1-oracle-mgnp.log": "146a57a7b4f17f6956319cdf7aa0bf126a8bcbbf9b131eca5d1290951089941a",
+    "/tmp/report109_r1_oracles.py": "a93aadbabb2c06360b187a21bbe972c4bdc4924e8b9e030f7462705d2ea19e35"
+  },
+  "kind": "independent_review109_B1_round1_evidence",
+  "positive_paths": {
+    "base_stable": {
+      "artifact_root": "/tmp/report109-r1-base-stable/test_B1_complete_panel_require0",
+      "baseline": {
+        "case": {
+          "condition": "D",
+          "instance_id": "v0",
+          "source": "far_v2",
+          "stream": "clean"
+        },
+        "expected": {
+          "binary_correct": true,
+          "correct": true,
+          "fp32_argmax": 9,
+          "margin": 20735.4765625,
+          "native_argmax": 9,
+          "native_binary_correct": true,
+          "native_correct": true,
+          "native_margin": 20735.48046875,
+          "native_raw_margin": 20735.48046875,
+          "raw_margin": 20735.4765625,
+          "readout_sha256": "5cb97ca9716f119f11d9bd7f57cdf717cc988cabb26076160c9ad3430d7e5b5b"
+        },
+        "input_sha256": "213fc932ca1827052731246ba68f06ab2a4f191f27b88bda9d94c68fbf01b660",
+        "observed": {
+          "binary_correct": true,
+          "correct": true,
+          "fp32_argmax": 9,
+          "margin": 20735.4765625,
+          "native_argmax": 9,
+          "native_binary_correct": true,
+          "native_correct": true,
+          "native_margin": 20735.48046875,
+          "native_raw_margin": 20735.48046875,
+          "raw_margin": 20735.4765625,
+          "readout_sha256": "5cb97ca9716f119f11d9bd7f57cdf717cc988cabb26076160c9ad3430d7e5b5b"
+        }
+      },
+      "expected_slots": 120,
+      "finalized": false,
+      "logical_slots": 120,
+      "mechanism_rows": 10,
+      "physical_panels": 2,
+      "runtime_identity": {
+        "complete": true,
+        "injected": true,
+        "pilot": false,
+        "source_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "tested_shared_runtime": "aa08fb5479c9fe608fb948c6ee83884d4ee8b65500e716d1ca9ebe8b25687368",
+      "tested_shared_workload": "0ec802383ab248a8b4863ab84b683912cc76cc9e0a3d6d16ed1b6717c27d397a",
+      "utility_rows": {
+        "IOI": 100,
+        "MMLU_h_mean": 32,
+        "MMLU_zero": 32
+      }
+    },
+    "mgnp": {
+      "artifact_root": "/tmp/report109-r1-mgnp/test_B1_complete_panel_require0",
+      "baseline": {
+        "case": {
+          "condition": "D",
+          "instance_id": "v0",
+          "source": "far_v2",
+          "stream": "clean"
+        },
+        "expected": {
+          "binary_correct": true,
+          "correct": true,
+          "fp32_argmax": 9,
+          "margin": 20735.4765625,
+          "native_argmax": 9,
+          "native_binary_correct": true,
+          "native_correct": true,
+          "native_margin": 20735.48046875,
+          "native_raw_margin": 20735.48046875,
+          "raw_margin": 20735.4765625,
+          "readout_sha256": "5cb97ca9716f119f11d9bd7f57cdf717cc988cabb26076160c9ad3430d7e5b5b"
+        },
+        "input_sha256": "213fc932ca1827052731246ba68f06ab2a4f191f27b88bda9d94c68fbf01b660",
+        "observed": {
+          "binary_correct": true,
+          "correct": true,
+          "fp32_argmax": 9,
+          "margin": 20735.4765625,
+          "native_argmax": 9,
+          "native_binary_correct": true,
+          "native_correct": true,
+          "native_margin": 20735.48046875,
+          "native_raw_margin": 20735.48046875,
+          "raw_margin": 20735.4765625,
+          "readout_sha256": "5cb97ca9716f119f11d9bd7f57cdf717cc988cabb26076160c9ad3430d7e5b5b"
+        }
+      },
+      "expected_slots": 120,
+      "finalized": false,
+      "logical_slots": 120,
+      "mechanism_rows": 10,
+      "physical_panels": 2,
+      "runtime_identity": {
+        "complete": true,
+        "injected": true,
+        "pilot": false,
+        "source_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "tested_shared_runtime": "df70c2d0c8823d2fe0b428b6fa41cab213833e6e43685864f01db405d32f56a6",
+      "tested_shared_workload": "e4ce667750d5b67efa0d458c41910596b3f84c3e3b8bcabb556306d53b0e576f",
+      "utility_rows": {
+        "IOI": 100,
+        "MMLU_h_mean": 32,
+        "MMLU_zero": 32
+      }
+    }
+  },
+  "scientific_execution": false,
+  "source_package": {
+    "component_analysis/a3_edge_pipeline.py": "acc0b7953af131bc65e328a38e8464f900775470ec00acf413984a4f2778f020",
+    "tests/test_a3_edge_bank_contract.py": "33e6652e3114ca6e8ee1857cdbd37aa16895d19c49dae9710eafec76aa4b9a25",
+    "tests/test_a3_edge_pipeline.py": "2963d1e1745b51bbd4a46d462ade2cc6f1d0571abf3c55c0e64c7b949ced413e"
+  }
+}

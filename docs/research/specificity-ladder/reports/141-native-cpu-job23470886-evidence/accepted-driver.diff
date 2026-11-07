@@ -1,0 +1,104 @@
+--- accepted140/coordinator.py
++++ proposed141/coordinator.py
+@@ -1,16 +1,16 @@
+-"""UNEXECUTED Slurm CPU proposal: original cases32 through48, real allocation retained."""
++"""UNEXECUTED Slurm CPU proposal: original cases49 through62, real allocation retained."""
+ from pathlib import Path
+ import argparse,hashlib,json,os,resource,time
+-START=32
+-COUNT=17
+-PRESERVED=32
++START=49
++COUNT=14
++PRESERVED=49
+ 
+ def main():
+  parser=argparse.ArgumentParser(allow_abbrev=False);parser.add_argument('--root',required=True);parser.add_argument('--out',required=True);args=parser.parse_args()
+  root=Path(args.root).resolve();out=Path(args.out).resolve();w=Path.cwd();began=time.perf_counter();phase='startup';forwards=[0];auth_active=[False];forbidden=[0];authenticated=[];native=[]
+  catalog_path=Path(__file__).resolve().parents[1]/'source-and-cases.json';catalog=json.loads(catalog_path.read_text());assert root==Path(catalog['scenario_root']) and out.is_dir()
+  from allocation_facts import read_current
+- allocation=read_current(w,minimum_remaining_seconds=2895)
++ allocation=read_current(w,minimum_remaining_seconds=2595)
+  expected=json.loads((out/'allocation-before.json').read_text());assert allocation['job_id']==expected['job_id'] and allocation['host']==expected['host'] and allocation['slurm_environment']==expected['slurm_environment']
+  def write(name,value):
+   with (out/name).open('x') as stream:json.dump(value,stream,indent=2,allow_nan=False);stream.write('\n')
+@@ -31,6 +31,10 @@
+  base=root/'pilot-verification-cases/selected';assert {p.name for p in base.iterdir()}==set(old_ids)
+  assert not any((base/name).exists() for name in new_ids) and not list((root/'pilot-scratch').iterdir())
+  old_refs=step('preserved_case_references',lambda:{name:r.object_reference(base/name) for name in old_ids})
++ from parent_gate import require_parent
++ parent_expectation=json.loads(Path(__file__).with_name('parent-expectation.json').read_text())
++ parent_evidence=step('completed_parent_gate_before_model',lambda:require_parent(w,root,parent_expectation,old_refs))
++ write('parent-gate.json',parent_evidence)
+  for name in ('scenario','tiny-model','selected','inventory/selected-pilot'):assert (root/name/'COMPLETE.json').is_file(),name
+  design,protocol,model,plain=step('verify_scenario',lambda:s.verify_scenario(root))
+  assert design['injected'] is True and s.model_identity(plain)['device']=='cpu'
+@@ -75,7 +79,7 @@
+   assert {p.name for p in base.iterdir()}==set(old_ids+new_ids) and not list((root/'pilot-scratch').iterdir())
+   assert s.model_identity(plain)==binding['model_identity']
+   step('final_scenario_backing_check',lambda:s.verify_scenario(root,load_model=False));step('frozen_source_after',sources)
+-  write('coordinator-result.json',dict(kind='injected_native_slurm_cpu_chunk',actual_job_id=allocation['job_id'],actual_step_id=allocation['step_id'],execution_host=allocation['host'],slurm_allocation_reference=allocation_ref,prior_login_timings_are_planning_inputs_only=True,indices=list(range(START,START+COUNT)),new_native_case_count=COUNT,new_case_ids=new_ids,preserved_case_ids=old_ids,preserved_case_references_unchanged=True,actual_new_forward_calls=forwards[0],forbidden_auth_model_forwards=forbidden[0],native=native,authentication=authenticated,original_case_records=rows,full_pilot_complete=False,aggregate_executed=False,scientific_execution=False,execution_authorized=False,wall_seconds=time.perf_counter()-began));mark('coordinator_complete',case_ids=new_ids,full_pilot_complete=False)
++  write('coordinator-result.json',dict(parent_gate_reference=dict(path=str(out/'parent-gate.json'),sha256=hashlib.sha256((out/'parent-gate.json').read_bytes()).hexdigest()),kind='injected_native_slurm_cpu_chunk',actual_job_id=allocation['job_id'],actual_step_id=allocation['step_id'],execution_host=allocation['host'],slurm_allocation_reference=allocation_ref,prior_login_timings_are_planning_inputs_only=True,indices=list(range(START,START+COUNT)),new_native_case_count=COUNT,new_case_ids=new_ids,preserved_case_ids=old_ids,preserved_case_references_unchanged=True,actual_new_forward_calls=forwards[0],forbidden_auth_model_forwards=forbidden[0],native=native,authentication=authenticated,original_case_records=rows,full_pilot_complete=False,aggregate_executed=False,scientific_execution=False,execution_authorized=False,wall_seconds=time.perf_counter()-began));mark('coordinator_complete',case_ids=new_ids,full_pilot_complete=False)
+  except BaseException as error:
+   write('coordinator-failure.json',dict(phase=phase,error=repr(error),elapsed_seconds=time.perf_counter()-began,actual_observed_model_forward_calls=forwards[0],completed_full_authentication_ids=[x['case_id'] for x in authenticated],native=native,full_pilot_complete=False));raise
+  finally:hooks.capture_forward=original_capture;r._pilot_invocation=original_invocation;s._read_pilot_case=original_read
+--- accepted140/supervisor.py
++++ proposed141/supervisor.py
+@@ -2,7 +2,7 @@
+ from pathlib import Path
+ import hashlib,json,os,signal,subprocess,time
+ from allocation_facts import environment,read_current,cgroup_snapshot
+-CAP=2820
++CAP=2520
+ GRACE=15
+ ROOT=Path('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder')
+ SCENARIO=ROOT/'outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8'
+@@ -12,7 +12,7 @@
+ def main():
+  assert Path.cwd().resolve()==ROOT
+  allocation=read_current(ROOT,minimum_remaining_seconds=CAP+GRACE+60)
+- out=SCENARIO/('diagnostics/cpu-next-cases32-48-job'+allocation['job_id']);out.mkdir(parents=True,exist_ok=False)
++ out=SCENARIO/('diagnostics/cpu-next-cases49-62-job'+allocation['job_id']);out.mkdir(parents=True,exist_ok=False)
+  write(out/'allocation-before.json',allocation)
+  before=cgroup_snapshot();write(out/'memory-before.json',before);assert any('headroom_bytes' in item for item in before),'Visible finite memory-controller headroom required';assert all(item.get('headroom_bytes',2**64)>=16*1024**3 for item in before),'Insufficient finite ancestor headroom'
+  slurm_original={k:v for k,v in os.environ.items() if k.startswith('SLURM_')}
+@@ -34,7 +34,7 @@
+   if term is not None and elapsed>=term+GRACE:os.killpg(child.pid,signal.SIGKILL)
+   time.sleep(.5)
+  code=os.waitstatus_to_exitcode(status);child.returncode=code;log.close();samples.close()
+- result=dict(command=command,pid=child.pid,exit_code=code,elapsed_seconds=elapsed,user_seconds=usage.ru_utime,system_seconds=usage.ru_stime,peak_child_rss_bytes=usage.ru_maxrss*1024,timeout_seconds=CAP,kill_grace_seconds=GRACE,term_sent_at=term,actual_slurm_job_id=allocation['job_id'],actual_step_id=allocation['step_id'],host=allocation['host'],allocated_CPU_memory_bytes=allocation['allocation_memory_bytes'],allocated_GPUs=0,selected_case_start=32,selected_case_count=17,injected_fixture=True,scientific_execution=False,production_admission=False,prior_login_timings_not_relabelled=True)
++ result=dict(command=command,pid=child.pid,exit_code=code,elapsed_seconds=elapsed,user_seconds=usage.ru_utime,system_seconds=usage.ru_stime,peak_child_rss_bytes=usage.ru_maxrss*1024,timeout_seconds=CAP,kill_grace_seconds=GRACE,term_sent_at=term,actual_slurm_job_id=allocation['job_id'],actual_step_id=allocation['step_id'],host=allocation['host'],allocated_CPU_memory_bytes=allocation['allocation_memory_bytes'],allocated_GPUs=0,selected_case_start=49,selected_case_count=14,injected_fixture=True,scientific_execution=False,production_admission=False,prior_login_timings_not_relabelled=True)
+  write(out/'result.json',result);write(out/'memory-after.json',cgroup_snapshot())
+  try:write(out/'allocation-after.json',read_current(ROOT))
+  except BaseException as error:write(out/'allocation-after-read-error.json',dict(error=repr(error)));raise
+--- accepted140/launch.sbatch
++++ proposed141/launch.sbatch
+@@ -1,17 +1,18 @@
+ #!/bin/bash
+-#SBATCH --job-name=lad-a3-native-cpu32-48
++#SBATCH --job-name=lad-a3-native-cpu49-62
+ #SBATCH --account=bjhz-delta-cpu
+ #SBATCH --partition=cpu-interactive
+ #SBATCH --constraint=projects
++#SBATCH --dependency=afterok:23470779
+ #SBATCH --nodes=1
+ #SBATCH --ntasks=1
+ #SBATCH --cpus-per-task=4
+ #SBATCH --mem=32G
+ #SBATCH --gres=none
+-#SBATCH --time=00:49:00
++#SBATCH --time=00:44:00
+ #SBATCH --chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder
+-#SBATCH --output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/logs/lad-a3-native-cpu32-48-%j.out
+-#SBATCH --error=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/logs/lad-a3-native-cpu32-48-%j.err
++#SBATCH --output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/logs/lad-a3-native-cpu49-62-%j.out
++#SBATCH --error=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/logs/lad-a3-native-cpu49-62-%j.err
+ set -euo pipefail
+ : "${SLURM_JOB_ID:?Real Slurm CPU allocation required; do not run on login}"
+ cd /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder
+@@ -20,4 +21,4 @@
+ # No source ~/.bashrc, no allocation-variable edits, no GPU visibility workaround.
+ exec srun --ntasks=1 --cpus-per-task=4 --cpu-bind=cores --gres=none \
+   /sw/external/python/anaconda3/bin/python3.9 \
+-  .superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu32-48-proposal/supervisor.py
++  .superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu49-62-proposal/supervisor.py

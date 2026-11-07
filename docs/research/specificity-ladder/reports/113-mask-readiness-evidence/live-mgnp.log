@@ -1,0 +1,57 @@
+{
+  "mode": "live",
+  "commit": "74efb4d0481968a1d0138eb1a79b97f302fd3c3b",
+  "python": "/u/swong2/.conda/envs/mgnp/bin/python",
+  "cgroup_before": {
+    "memory.current": "10625466368",
+    "memory.max": "40320217088",
+    "memory.events": "low 0\nhigh 6\nmax 129883\noom 1\noom_kill 1\noom_group_kill 0"
+  },
+  "weights_loaded": false,
+  "execution_authorized": false,
+  "missing_root_authority_rejected": "fresh root ledger mapping/reservation required before model access",
+  "production_mask_live_static": "passes under pinned interpreter",
+  "canonical_live": true,
+  "cohorts": {
+    "far_v2": {
+      "fit_ids": 177,
+      "selection_ids": 177,
+      "assessment_ids": 100
+    },
+    "sdr_v2": {
+      "fit_ids": 187,
+      "selection_ids": 187,
+      "assessment_ids": 100
+    },
+    "ser_v2": {
+      "fit_ids": 168,
+      "selection_ids": 167,
+      "assessment_ids": 100
+    }
+  },
+  "utility_assessment": {
+    "ioi": 100,
+    "mmlu": 32
+  },
+  "utility_validation": {
+    "ioi": 100,
+    "mmlu": 32
+  },
+  "mask_profile": {
+    "backend": "eager",
+    "chunk_size": 4,
+    "dtype": "bfloat16",
+    "hardware": "H200",
+    "model": "meta-llama/Llama-3.1-8B-Instruct",
+    "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+    "tokenizer_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+    "vocab_size": 128256
+  },
+  "exit_code": 0,
+  "elapsed_seconds": 102.37471814698074,
+  "cgroup_after": {
+    "memory.current": "12442718208",
+    "memory.max": "40320217088",
+    "memory.events": "low 0\nhigh 6\nmax 129883\noom 1\noom_kill 1\noom_group_kill 0"
+  }
+}

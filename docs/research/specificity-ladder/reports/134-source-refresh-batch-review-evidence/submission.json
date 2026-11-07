@@ -1,0 +1,27 @@
+{
+  "job_id": "23456990",
+  "cluster": "delta",
+  "submitted_utc": "2026-11-03T02:03:28.428034+00:00",
+  "command": [
+    "sbatch",
+    "--parsable",
+    "--export=ALL",
+    "--account=bjhz-delta-cpu",
+    "--partition=cpu-interactive",
+    "--constraint=projects",
+    "--nodes=1",
+    "--ntasks=1",
+    "--cpus-per-task=4",
+    "--mem=16G",
+    "--time=00:15:00",
+    "--job-name=lad-a3-review134",
+    "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+    "--output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/134-source-refresh-batch-review-evidence/slurm-%j.log",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/134-source-refresh-batch-review-evidence/review134_cpu.sh"
+  ],
+  "proposal_sha256": "ed47e82263079dd7a38637b7f0045a32e909908e58ee020174cac82c83fe34e0",
+  "cpus": 4,
+  "memory_GiB": 16,
+  "gpus": 0,
+  "minutes": 15
+}

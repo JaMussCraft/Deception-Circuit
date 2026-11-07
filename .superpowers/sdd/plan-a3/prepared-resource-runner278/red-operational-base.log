@@ -1,0 +1,42 @@
+.......FFF                                                               [100%]
+=================================== FAILURES ===================================
+_ OperationalAdapterTests.test_native_receiver_requires_launch_before_reader_and_preserves_inputs _
+
+self = <Deception-Circuit._claude.worktrees.specificity-ladder._superpowers.sdd.plan-a3.prepared-resource-runner278.test_runner.OperationalAdapterTests testMethod=test_native_receiver_requires_launch_before_reader_and_preserves_inputs>
+
+    def test_native_receiver_requires_launch_before_reader_and_preserves_inputs(self):
+        def forbidden(*args): raise AssertionError('reader called before launch check')
+        runtime=types.SimpleNamespace(_read_prepared_target_object=forbidden)
+        with self.assertRaises(ValueError):
+>           r.receive_native(runtime,{}, {}, {},lambda row:None,launcher_pid=None)
+E           AttributeError: module 'measurement278' has no attribute 'receive_native'
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/test_runner.py:148: AttributeError
+_ OperationalAdapterTests.test_operational_producer_enters_unchanged_native_main_and_records_failure _
+
+self = <Deception-Circuit._claude.worktrees.specificity-ladder._superpowers.sdd.plan-a3.prepared-resource-runner278.test_runner.OperationalAdapterTests testMethod=test_operational_producer_enters_unchanged_native_main_and_records_failure>
+
+    def test_operational_producer_enters_unchanged_native_main_and_records_failure(self):
+        records=[];argv=['actual-root-native-arguments'];seen=[]
+        def main(args): seen.append(args);return 0
+        runtime=types.SimpleNamespace(main=main)
+>       self.assertEqual(r.produce_native(runtime,argv,records.append),0)
+E       AttributeError: module 'measurement278' has no attribute 'produce_native'
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/test_runner.py:134: AttributeError
+_ OperationalAdapterTests.test_phase_observer_records_actual_nested_calls_without_retaining_return _
+
+self = <Deception-Circuit._claude.worktrees.specificity-ladder._superpowers.sdd.plan-a3.prepared-resource-runner278.test_runner.OperationalAdapterTests testMethod=test_phase_observer_records_actual_nested_calls_without_retaining_return>
+
+    def test_phase_observer_records_actual_nested_calls_without_retaining_return(self):
+        def build(): return object()
+        def publish(): return build()
+>       with r.PhaseObserver({'build':build,'publish':publish}) as phases:
+E       AttributeError: module 'measurement278' has no attribute 'PhaseObserver'
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/test_runner.py:153: AttributeError
+=========================== short test summary info ============================
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/test_runner.py::OperationalAdapterTests::test_native_receiver_requires_launch_before_reader_and_preserves_inputs
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/test_runner.py::OperationalAdapterTests::test_operational_producer_enters_unchanged_native_main_and_records_failure
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/test_runner.py::OperationalAdapterTests::test_phase_observer_records_actual_nested_calls_without_retaining_return
+3 failed, 7 passed in 0.36s

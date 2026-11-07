@@ -1,0 +1,142 @@
+FF...F                                                                   [100%]
+=================================== FAILURES ===================================
+_______ test_prepared_envelope_replaced_after_first_read_before_witness ________
+
+tmp_path = PosixPath('/tmp/review121-independent-base/test_prepared_envelope_replace0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f405375d340>
+
+    def test_prepared_envelope_replaced_after_first_read_before_witness(tmp_path,monkeypatch):
+>       c=f.setup_case(tmp_path,monkeypatch)
+
+../../../../../docs/research/specificity-ladder/reports/121-source-cost-review-evidence/test_independent_source_boundaries.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_a3_source_validation.py:24: in setup_case
+    target=runtime/rel;target.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(original/rel,target)
+/sw/external/python/anaconda3/lib/python3.9/shutil.py:445: in copy2
+    copystat(src, dst, follow_symlinks=follow_symlinks)
+/sw/external/python/anaconda3/lib/python3.9/shutil.py:388: in copystat
+    _copyxattr(src, dst, follow_symlinks=follow)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+src = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-caae47195503/runtime/evaluation/benchmark_eval.py')
+dst = PosixPath('/tmp/review121-independent-base/test_prepared_envelope_replace0/runtime/evaluation/benchmark_eval.py')
+
+    def _copyxattr(src, dst, *, follow_symlinks=True):
+        """Copy extended filesystem attributes from `src` to `dst`.
+    
+        Overwrite existing attributes.
+    
+        If `follow_symlinks` is false, symlinks won't be followed.
+    
+        """
+    
+        try:
+            names = os.listxattr(src, follow_symlinks=follow_symlinks)
+        except OSError as e:
+            if e.errno not in (errno.ENOTSUP, errno.ENODATA, errno.EINVAL):
+                raise
+            return
+        for name in names:
+            try:
+                value = os.getxattr(src, name, follow_symlinks=follow_symlinks)
+>               os.setxattr(dst, name, value, follow_symlinks=follow_symlinks)
+E               PermissionError: [Errno 13] Permission denied: '/tmp/review121-independent-base/test_prepared_envelope_replace0/runtime/evaluation/benchmark_eval.py'
+
+/sw/external/python/anaconda3/lib/python3.9/shutil.py:338: PermissionError
+___________ test_current_grader_same_bytes_symlink_redirect_rejected ___________
+
+tmp_path = PosixPath('/tmp/review121-independent-base/test_current_grader_same_bytes0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f3f3d8dbbe0>
+
+    def test_current_grader_same_bytes_symlink_redirect_rejected(tmp_path,monkeypatch):
+>       c=f.setup_case(tmp_path,monkeypatch);state=c.build()
+
+../../../../../docs/research/specificity-ladder/reports/121-source-cost-review-evidence/test_independent_source_boundaries.py:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_a3_source_validation.py:24: in setup_case
+    target=runtime/rel;target.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(original/rel,target)
+/sw/external/python/anaconda3/lib/python3.9/shutil.py:445: in copy2
+    copystat(src, dst, follow_symlinks=follow_symlinks)
+/sw/external/python/anaconda3/lib/python3.9/shutil.py:388: in copystat
+    _copyxattr(src, dst, follow_symlinks=follow)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+src = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-caae47195503/runtime/evaluation/benchmark_eval.py')
+dst = PosixPath('/tmp/review121-independent-base/test_current_grader_same_bytes0/runtime/evaluation/benchmark_eval.py')
+
+    def _copyxattr(src, dst, *, follow_symlinks=True):
+        """Copy extended filesystem attributes from `src` to `dst`.
+    
+        Overwrite existing attributes.
+    
+        If `follow_symlinks` is false, symlinks won't be followed.
+    
+        """
+    
+        try:
+            names = os.listxattr(src, follow_symlinks=follow_symlinks)
+        except OSError as e:
+            if e.errno not in (errno.ENOTSUP, errno.ENODATA, errno.EINVAL):
+                raise
+            return
+        for name in names:
+            try:
+                value = os.getxattr(src, name, follow_symlinks=follow_symlinks)
+>               os.setxattr(dst, name, value, follow_symlinks=follow_symlinks)
+E               PermissionError: [Errno 13] Permission denied: '/tmp/review121-independent-base/test_current_grader_same_bytes0/runtime/evaluation/benchmark_eval.py'
+
+/sw/external/python/anaconda3/lib/python3.9/shutil.py:338: PermissionError
+___________ test_real_registry_updates_and_static_mutation_controls ____________
+
+tmp_path = PosixPath('/tmp/review121-independent-base/test_real_registry_updates_and0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f3f3d827850>
+
+    def test_real_registry_updates_and_static_mutation_controls(tmp_path,monkeypatch):
+>       c=f.setup_case(tmp_path,monkeypatch);state=c.build()
+
+../../../../../docs/research/specificity-ladder/reports/121-source-cost-review-evidence/test_independent_source_boundaries.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_a3_source_validation.py:24: in setup_case
+    target=runtime/rel;target.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(original/rel,target)
+/sw/external/python/anaconda3/lib/python3.9/shutil.py:445: in copy2
+    copystat(src, dst, follow_symlinks=follow_symlinks)
+/sw/external/python/anaconda3/lib/python3.9/shutil.py:388: in copystat
+    _copyxattr(src, dst, follow_symlinks=follow)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+src = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-caae47195503/runtime/evaluation/benchmark_eval.py')
+dst = PosixPath('/tmp/review121-independent-base/test_real_registry_updates_and0/runtime/evaluation/benchmark_eval.py')
+
+    def _copyxattr(src, dst, *, follow_symlinks=True):
+        """Copy extended filesystem attributes from `src` to `dst`.
+    
+        Overwrite existing attributes.
+    
+        If `follow_symlinks` is false, symlinks won't be followed.
+    
+        """
+    
+        try:
+            names = os.listxattr(src, follow_symlinks=follow_symlinks)
+        except OSError as e:
+            if e.errno not in (errno.ENOTSUP, errno.ENODATA, errno.EINVAL):
+                raise
+            return
+        for name in names:
+            try:
+                value = os.getxattr(src, name, follow_symlinks=follow_symlinks)
+>               os.setxattr(dst, name, value, follow_symlinks=follow_symlinks)
+E               PermissionError: [Errno 13] Permission denied: '/tmp/review121-independent-base/test_real_registry_updates_and0/runtime/evaluation/benchmark_eval.py'
+
+/sw/external/python/anaconda3/lib/python3.9/shutil.py:338: PermissionError
+=============================== warnings summary ===============================
+docs/research/specificity-ladder/reports/121-source-cost-review-evidence/test_independent_source_boundaries.py::test_prepared_envelope_replaced_after_first_read_before_witness
+  /u/swong2/.local/lib/python3.9/site-packages/pandas/core/arrays/masked.py:61: UserWarning: Pandas requires version '1.3.6' or newer of 'bottleneck' (version '1.3.5' currently installed).
+    from pandas.core import (
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED ../../../../../docs/research/specificity-ladder/reports/121-source-cost-review-evidence/test_independent_source_boundaries.py::test_prepared_envelope_replaced_after_first_read_before_witness
+FAILED ../../../../../docs/research/specificity-ladder/reports/121-source-cost-review-evidence/test_independent_source_boundaries.py::test_current_grader_same_bytes_symlink_redirect_rejected
+FAILED ../../../../../docs/research/specificity-ladder/reports/121-source-cost-review-evidence/test_independent_source_boundaries.py::test_real_registry_updates_and_static_mutation_controls
+3 failed, 3 passed, 1 warning in 8.22s

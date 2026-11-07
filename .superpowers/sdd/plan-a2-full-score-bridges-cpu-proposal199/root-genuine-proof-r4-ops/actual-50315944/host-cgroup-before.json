@@ -1,0 +1,33 @@
+{
+  "job": "50315944",
+  "memory_membership_lines": [
+    "6:memory:/slurm/uid_105853/job_50315944/step_batch/task_0"
+  ],
+  "memory_mount_lines": [
+    "2060 2054 0:34 / /sys/fs/cgroup/memory rw,nosuid,nodev,noexec,relatime master:10 - cgroup cgroup rw,memory"
+  ],
+  "records": [
+    {
+      "controller": "v1",
+      "membership": "/slurm/uid_105853/job_50315944/step_batch/task_0",
+      "job_scoped": true,
+      "values": {
+        "memory.usage_in_bytes": "68866048\n",
+        "memory.max_usage_in_bytes": "68866048\n",
+        "memory.failcnt": "0\n",
+        "memory.oom_control": "oom_kill_disable 0\nunder_oom 0\noom_kill 0\n"
+      },
+      "candidate_path_errors": {},
+      "path": "/sys/fs/cgroup/memory/slurm/uid_105853/job_50315944/step_batch/task_0",
+      "frozen_worker_path": "/sys/fs/cgroup/memory/slurm/uid_105853/job_50315944/step_batch/task_0",
+      "same_as_frozen_worker_path": true,
+      "live_directory_stat": [
+        34,
+        6024579,
+        16877
+      ]
+    }
+  ],
+  "required_194_counter_visible": true,
+  "read_errors": {}
+}

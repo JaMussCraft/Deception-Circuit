@@ -1,0 +1,1432 @@
+{
+  "status": "real_Slurm_CPU_chunk_completed_with_original_injected_semantics",
+  "job_id": "23455139",
+  "process": {
+    "command": [
+      "/u/swong2/.conda/envs/mgnp/bin/python",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu-proposal/coordinator.py",
+      "--root",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8",
+      "--out",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/diagnostics/cpu-next-cases5-11-job23455139"
+    ],
+    "pid": 3339436,
+    "exit_code": 0,
+    "elapsed_seconds": 1204.2342443920206,
+    "user_seconds": 321.550551,
+    "system_seconds": 144.892684,
+    "peak_child_rss_bytes": 6888169472,
+    "timeout_seconds": 2400,
+    "kill_grace_seconds": 15,
+    "term_sent_at": null,
+    "actual_slurm_job_id": "23455139",
+    "actual_step_id": "0",
+    "host": "cn002.delta.ncsa.illinois.edu",
+    "allocated_CPU_memory_bytes": 34359738368,
+    "allocated_GPUs": 0,
+    "selected_case_start": 5,
+    "selected_case_count": 7,
+    "injected_fixture": true,
+    "scientific_execution": false,
+    "production_admission": false,
+    "prior_login_timings_not_relabelled": true
+  },
+  "coordinator": {
+    "kind": "injected_native_slurm_cpu_chunk",
+    "actual_job_id": "23455139",
+    "actual_step_id": "0",
+    "execution_host": "cn002.delta.ncsa.illinois.edu",
+    "slurm_allocation_reference": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/diagnostics/cpu-next-cases5-11-job23455139/coordinator-allocation.json",
+      "sha256": "83fef2cec2ad120ea2e0a73bc54d46deeec7473281b427687514ea5e323855dd"
+    },
+    "prior_login_timings_are_planning_inputs_only": true,
+    "indices": [
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "new_native_case_count": 7,
+    "new_case_ids": [
+      "a8404c4ddd3367b64515b6503940852ce05181cb56ba1327a20bf4be27dcb939",
+      "c5151f79afd7c35ef8357d76e2f50ff0cc6b644147e365ce5ff009ba30ec3848",
+      "75460fe31425c8a7f68fe7ad51960991d8e4467fadc2d93ef9b294903775f73f",
+      "5110a5cf1c9baaab8db4009b2dbf12502f273588d42508c89850bc6382e73ae8",
+      "5e5b03c6ce4cfcba43be2731cd568d2465834ecf357db2d6602c9709824f0191",
+      "5ad5152f8af02319b8f31448b56f67a6f336bf6df33dfae79830fcd3c2656268",
+      "4255ef15798e7fddbb1afc95cd76b77a84ce54a63985c3cdfaffb8c4c48f6bf4"
+    ],
+    "preserved_case_ids": [
+      "4318f65b0a320e883897ca95ad472e2d1a0a11f53abea6ce1a848853d9fb57f1",
+      "d5738bfcdec6990c3b6e77b2c7e625d46562ea134457f5de2896af9600db7ceb",
+      "83a2ffde546a0776df0d08fb27abf14381516a83a642c337521e6a44aa57c063",
+      "f7e34290fa268cca16634b7b597fdec2fd5d7ee2f61c20ebd3a7573569c3c54d",
+      "b78f0ec2e42db6bafa0f8cd18e01b8d2240506c81627e32ec6813f5bf019cb3f"
+    ],
+    "preserved_case_references_unchanged": true,
+    "actual_new_forward_calls": 30427,
+    "forbidden_auth_model_forwards": 0,
+    "native": [
+      {
+        "case_id": "a8404c4ddd3367b64515b6503940852ce05181cb56ba1327a20bf4be27dcb939",
+        "native_seconds": 1.7560219429433346,
+        "actual_forward_calls": 195
+      },
+      {
+        "case_id": "c5151f79afd7c35ef8357d76e2f50ff0cc6b644147e365ce5ff009ba30ec3848",
+        "native_seconds": 2.9277931849937886,
+        "actual_forward_calls": 726
+      },
+      {
+        "case_id": "75460fe31425c8a7f68fe7ad51960991d8e4467fadc2d93ef9b294903775f73f",
+        "native_seconds": 45.3209136138903,
+        "actual_forward_calls": 11100
+      },
+      {
+        "case_id": "5110a5cf1c9baaab8db4009b2dbf12502f273588d42508c89850bc6382e73ae8",
+        "native_seconds": 45.16299199103378,
+        "actual_forward_calls": 11100
+      },
+      {
+        "case_id": "5e5b03c6ce4cfcba43be2731cd568d2465834ecf357db2d6602c9709824f0191",
+        "native_seconds": 4.364708443055861,
+        "actual_forward_calls": 1110
+      },
+      {
+        "case_id": "5ad5152f8af02319b8f31448b56f67a6f336bf6df33dfae79830fcd3c2656268",
+        "native_seconds": 15.544497565017082,
+        "actual_forward_calls": 4246
+      },
+      {
+        "case_id": "4255ef15798e7fddbb1afc95cd76b77a84ce54a63985c3cdfaffb8c4c48f6bf4",
+        "native_seconds": 8.314055113005452,
+        "actual_forward_calls": 1950
+      }
+    ],
+    "authentication": [
+      {
+        "case_id": "a8404c4ddd3367b64515b6503940852ce05181cb56ba1327a20bf4be27dcb939",
+        "authentication_seconds": 159.50660318601876,
+        "new_model_forwards": 0,
+        "numeric_backing_cache_roots_before": [],
+        "numeric_backing_cache_roots_after": [
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+        ]
+      },
+      {
+        "case_id": "c5151f79afd7c35ef8357d76e2f50ff0cc6b644147e365ce5ff009ba30ec3848",
+        "authentication_seconds": 57.32640236802399,
+        "new_model_forwards": 0,
+        "numeric_backing_cache_roots_before": [
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+        ],
+        "numeric_backing_cache_roots_after": [
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+        ]
+      },
+      {
+        "case_id": "75460fe31425c8a7f68fe7ad51960991d8e4467fadc2d93ef9b294903775f73f",
+        "authentication_seconds": 65.30693342501763,
+        "new_model_forwards": 0,
+        "numeric_backing_cache_roots_before": [
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+        ],
+        "numeric_backing_cache_roots_after": [
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+        ]
+      },
+      {
+        "case_id": "5110a5cf1c9baaab8db4009b2dbf12502f273588d42508c89850bc6382e73ae8",
+        "authentication_seconds": 58.64628346893005,
+        "new_model_forwards": 0,
+        "numeric_backing_cache_roots_before": [
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+        ],
+        "numeric_backing_cache_roots_after": [
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+        ]
+      },
+      {
+        "case_id": "5e5b03c6ce4cfcba43be2731cd568d2465834ecf357db2d6602c9709824f0191",
+        "authentication_seconds": 58.67203937692102,
+        "new_model_forwards": 0,
+        "numeric_backing_cache_roots_before": [
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+        ],
+        "numeric_backing_cache_roots_after": [
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+        ]
+      },
+      {
+        "case_id": "5ad5152f8af02319b8f31448b56f67a6f336bf6df33dfae79830fcd3c2656268",
+        "authentication_seconds": 61.185548193985596,
+        "new_model_forwards": 0,
+        "numeric_backing_cache_roots_before": [
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+        ],
+        "numeric_backing_cache_roots_after": [
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+        ]
+      },
+      {
+        "case_id": "4255ef15798e7fddbb1afc95cd76b77a84ce54a63985c3cdfaffb8c4c48f6bf4",
+        "authentication_seconds": 66.09009669604711,
+        "new_model_forwards": 0,
+        "numeric_backing_cache_roots_before": [
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+        ],
+        "numeric_backing_cache_roots_after": [
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+        ]
+      }
+    ],
+    "original_case_records": [
+      {
+        "case_id": "a8404c4ddd3367b64515b6503940852ce05181cb56ba1327a20bf4be27dcb939",
+        "original_case_seconds": 27.40703174006194,
+        "original_case_forward_calls": 195,
+        "reference": {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-verification-cases/selected/a8404c4ddd3367b64515b6503940852ce05181cb56ba1327a20bf4be27dcb939",
+          "files": {
+            "COMPLETE.json": {
+              "sha256": "bee5c66f82be3d13cdff27a84d5d31c0106df54aae6658c888ad9630a32c9f6c",
+              "nbytes": 486
+            },
+            "case.json": {
+              "sha256": "74fed8d8a2b78bd34d2861bd1da789c96d1dddf27f78aa7ce14205550a5160c7",
+              "nbytes": 1669707
+            }
+          }
+        }
+      },
+      {
+        "case_id": "c5151f79afd7c35ef8357d76e2f50ff0cc6b644147e365ce5ff009ba30ec3848",
+        "original_case_seconds": 26.574205063981935,
+        "original_case_forward_calls": 726,
+        "reference": {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-verification-cases/selected/c5151f79afd7c35ef8357d76e2f50ff0cc6b644147e365ce5ff009ba30ec3848",
+          "files": {
+            "COMPLETE.json": {
+              "sha256": "8ef87ab995e805585bd2cca9b9ede13a16cb9a97f71574537a49aa3d8f6fa0d7",
+              "nbytes": 486
+            },
+            "case.json": {
+              "sha256": "dd0ceebfe5ecce0026969e537629f6b81a43de1796e64f6d8f57d9bd46d21f49",
+              "nbytes": 2127327
+            }
+          }
+        }
+      },
+      {
+        "case_id": "75460fe31425c8a7f68fe7ad51960991d8e4467fadc2d93ef9b294903775f73f",
+        "original_case_seconds": 70.68714533001184,
+        "original_case_forward_calls": 11100,
+        "reference": {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-verification-cases/selected/75460fe31425c8a7f68fe7ad51960991d8e4467fadc2d93ef9b294903775f73f",
+          "files": {
+            "COMPLETE.json": {
+              "sha256": "2c197039037d0e46e92d23965d8216f72f2479decd315d939a62feed4d57ca0a",
+              "nbytes": 487
+            },
+            "case.json": {
+              "sha256": "e68bc29bf0ba11bc1c26d05656f940eda8e8a77c1efe4162d53992011d20ac3a",
+              "nbytes": 10963204
+            }
+          }
+        }
+      },
+      {
+        "case_id": "5110a5cf1c9baaab8db4009b2dbf12502f273588d42508c89850bc6382e73ae8",
+        "original_case_seconds": 69.93302771495655,
+        "original_case_forward_calls": 11100,
+        "reference": {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-verification-cases/selected/5110a5cf1c9baaab8db4009b2dbf12502f273588d42508c89850bc6382e73ae8",
+          "files": {
+            "COMPLETE.json": {
+              "sha256": "b6ca018260f6e6520efa17e65868241fd0d1cefa5eb14130933f50cee30a1b1d",
+              "nbytes": 487
+            },
+            "case.json": {
+              "sha256": "ea294f757b2cd71e7a6f8aaea1e17d931e84d722b88dc7e49d79471feafa235e",
+              "nbytes": 10963491
+            }
+          }
+        }
+      },
+      {
+        "case_id": "5e5b03c6ce4cfcba43be2731cd568d2465834ecf357db2d6602c9709824f0191",
+        "original_case_seconds": 28.518431831966154,
+        "original_case_forward_calls": 1110,
+        "reference": {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-verification-cases/selected/5e5b03c6ce4cfcba43be2731cd568d2465834ecf357db2d6602c9709824f0191",
+          "files": {
+            "COMPLETE.json": {
+              "sha256": "988a4218451f2012c867218aa553fec4258e1b903000aae31aa2bb144a6eb6f1",
+              "nbytes": 486
+            },
+            "case.json": {
+              "sha256": "ab721a60f0650eb667f5d899acdfd03857b8f1207130617f0d141c2d7781fd21",
+              "nbytes": 2512628
+            }
+          }
+        }
+      },
+      {
+        "case_id": "5ad5152f8af02319b8f31448b56f67a6f336bf6df33dfae79830fcd3c2656268",
+        "original_case_seconds": 42.07410628604703,
+        "original_case_forward_calls": 4246,
+        "reference": {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-verification-cases/selected/5ad5152f8af02319b8f31448b56f67a6f336bf6df33dfae79830fcd3c2656268",
+          "files": {
+            "COMPLETE.json": {
+              "sha256": "bba2df4ed42167c97efcc101605b52bbc6ddd8f48757b08c3207f1dc157395fa",
+              "nbytes": 486
+            },
+            "case.json": {
+              "sha256": "a781409ef918e246401a3ef04e6c2cb4f88ea64a184632319eb7578cbd218b6b",
+              "nbytes": 5239076
+            }
+          }
+        }
+      },
+      {
+        "case_id": "4255ef15798e7fddbb1afc95cd76b77a84ce54a63985c3cdfaffb8c4c48f6bf4",
+        "original_case_seconds": 31.985078952042386,
+        "original_case_forward_calls": 1950,
+        "reference": {
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-verification-cases/selected/4255ef15798e7fddbb1afc95cd76b77a84ce54a63985c3cdfaffb8c4c48f6bf4",
+          "files": {
+            "COMPLETE.json": {
+              "sha256": "f656db7ede7be0646fc8dacf4d5a7e2f049bd1ce0105c2bacfac315168185f4f",
+              "nbytes": 486
+            },
+            "case.json": {
+              "sha256": "3b9d93d803cd862f424b444910ad8ab960f535b22ebc7d6a0db193e48821377b",
+              "nbytes": 3118031
+            }
+          }
+        }
+      }
+    ],
+    "full_pilot_complete": false,
+    "aggregate_executed": false,
+    "scientific_execution": false,
+    "execution_authorized": false,
+    "wall_seconds": 1190.988808301976
+  },
+  "per_case": [
+    {
+      "index": 5,
+      "case_id": "a8404c4ddd3367b64515b6503940852ce05181cb56ba1327a20bf4be27dcb939",
+      "source_task": "ioi",
+      "panel": "calibration_pilot",
+      "native_seconds": 1.7560219429433346,
+      "actual_forwards": 195,
+      "original_case_seconds": 27.40703174006194,
+      "authentication_seconds": 159.50660318601876,
+      "auth_new_forwards": 0,
+      "actual_job_id": "23455139",
+      "actual_step_id": "0",
+      "actual_node": "cn002.delta.ncsa.illinois.edu",
+      "case_reference": {
+        "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-verification-cases/selected/a8404c4ddd3367b64515b6503940852ce05181cb56ba1327a20bf4be27dcb939",
+        "files": {
+          "COMPLETE.json": {
+            "sha256": "bee5c66f82be3d13cdff27a84d5d31c0106df54aae6658c888ad9630a32c9f6c",
+            "nbytes": 486
+          },
+          "case.json": {
+            "sha256": "74fed8d8a2b78bd34d2861bd1da789c96d1dddf27f78aa7ce14205550a5160c7",
+            "nbytes": 1669707
+          }
+        }
+      },
+      "sidecar_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/diagnostics/cpu-next-cases5-11-job23455139/slurm-case-a8404c4ddd3367b64515b6503940852ce05181cb56ba1327a20bf4be27dcb939.json",
+      "sidecar_sha256": "e12ec05f059a8df1f2d49bb7f7c91f5fae7ad5bf40fb7b74aa4bdebcf3ff59a3"
+    },
+    {
+      "index": 6,
+      "case_id": "c5151f79afd7c35ef8357d76e2f50ff0cc6b644147e365ce5ff009ba30ec3848",
+      "source_task": "mmlu",
+      "panel": "calibration_pilot",
+      "native_seconds": 2.9277931849937886,
+      "actual_forwards": 726,
+      "original_case_seconds": 26.574205063981935,
+      "authentication_seconds": 57.32640236802399,
+      "auth_new_forwards": 0,
+      "actual_job_id": "23455139",
+      "actual_step_id": "0",
+      "actual_node": "cn002.delta.ncsa.illinois.edu",
+      "case_reference": {
+        "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-verification-cases/selected/c5151f79afd7c35ef8357d76e2f50ff0cc6b644147e365ce5ff009ba30ec3848",
+        "files": {
+          "COMPLETE.json": {
+            "sha256": "8ef87ab995e805585bd2cca9b9ede13a16cb9a97f71574537a49aa3d8f6fa0d7",
+            "nbytes": 486
+          },
+          "case.json": {
+            "sha256": "dd0ceebfe5ecce0026969e537629f6b81a43de1796e64f6d8f57d9bd46d21f49",
+            "nbytes": 2127327
+          }
+        }
+      },
+      "sidecar_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/diagnostics/cpu-next-cases5-11-job23455139/slurm-case-c5151f79afd7c35ef8357d76e2f50ff0cc6b644147e365ce5ff009ba30ec3848.json",
+      "sidecar_sha256": "9fa3adf0702ce7105a19ce780da1dbb06f5b13b576043a75b5265d9281b44bac"
+    },
+    {
+      "index": 7,
+      "case_id": "75460fe31425c8a7f68fe7ad51960991d8e4467fadc2d93ef9b294903775f73f",
+      "source_task": "far_v2",
+      "panel": "selected_pilot",
+      "native_seconds": 45.3209136138903,
+      "actual_forwards": 11100,
+      "original_case_seconds": 70.68714533001184,
+      "authentication_seconds": 65.30693342501763,
+      "auth_new_forwards": 0,
+      "actual_job_id": "23455139",
+      "actual_step_id": "0",
+      "actual_node": "cn002.delta.ncsa.illinois.edu",
+      "case_reference": {
+        "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-verification-cases/selected/75460fe31425c8a7f68fe7ad51960991d8e4467fadc2d93ef9b294903775f73f",
+        "files": {
+          "COMPLETE.json": {
+            "sha256": "2c197039037d0e46e92d23965d8216f72f2479decd315d939a62feed4d57ca0a",
+            "nbytes": 487
+          },
+          "case.json": {
+            "sha256": "e68bc29bf0ba11bc1c26d05656f940eda8e8a77c1efe4162d53992011d20ac3a",
+            "nbytes": 10963204
+          }
+        }
+      },
+      "sidecar_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/diagnostics/cpu-next-cases5-11-job23455139/slurm-case-75460fe31425c8a7f68fe7ad51960991d8e4467fadc2d93ef9b294903775f73f.json",
+      "sidecar_sha256": "924db9dd95e940600c8d1100538a7b6172b2a26da9a618d6174c3121b3c76cfb"
+    },
+    {
+      "index": 8,
+      "case_id": "5110a5cf1c9baaab8db4009b2dbf12502f273588d42508c89850bc6382e73ae8",
+      "source_task": "far_v2",
+      "panel": "selected_pilot",
+      "native_seconds": 45.16299199103378,
+      "actual_forwards": 11100,
+      "original_case_seconds": 69.93302771495655,
+      "authentication_seconds": 58.64628346893005,
+      "auth_new_forwards": 0,
+      "actual_job_id": "23455139",
+      "actual_step_id": "0",
+      "actual_node": "cn002.delta.ncsa.illinois.edu",
+      "case_reference": {
+        "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-verification-cases/selected/5110a5cf1c9baaab8db4009b2dbf12502f273588d42508c89850bc6382e73ae8",
+        "files": {
+          "COMPLETE.json": {
+            "sha256": "b6ca018260f6e6520efa17e65868241fd0d1cefa5eb14130933f50cee30a1b1d",
+            "nbytes": 487
+          },
+          "case.json": {
+            "sha256": "ea294f757b2cd71e7a6f8aaea1e17d931e84d722b88dc7e49d79471feafa235e",
+            "nbytes": 10963491
+          }
+        }
+      },
+      "sidecar_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/diagnostics/cpu-next-cases5-11-job23455139/slurm-case-5110a5cf1c9baaab8db4009b2dbf12502f273588d42508c89850bc6382e73ae8.json",
+      "sidecar_sha256": "b34885d5661eafde76f07eaca7a87db5272a49d8f521f0de8ccbc66027655667"
+    },
+    {
+      "index": 9,
+      "case_id": "5e5b03c6ce4cfcba43be2731cd568d2465834ecf357db2d6602c9709824f0191",
+      "source_task": "ioi",
+      "panel": "selected_pilot",
+      "native_seconds": 4.364708443055861,
+      "actual_forwards": 1110,
+      "original_case_seconds": 28.518431831966154,
+      "authentication_seconds": 58.67203937692102,
+      "auth_new_forwards": 0,
+      "actual_job_id": "23455139",
+      "actual_step_id": "0",
+      "actual_node": "cn002.delta.ncsa.illinois.edu",
+      "case_reference": {
+        "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-verification-cases/selected/5e5b03c6ce4cfcba43be2731cd568d2465834ecf357db2d6602c9709824f0191",
+        "files": {
+          "COMPLETE.json": {
+            "sha256": "988a4218451f2012c867218aa553fec4258e1b903000aae31aa2bb144a6eb6f1",
+            "nbytes": 486
+          },
+          "case.json": {
+            "sha256": "ab721a60f0650eb667f5d899acdfd03857b8f1207130617f0d141c2d7781fd21",
+            "nbytes": 2512628
+          }
+        }
+      },
+      "sidecar_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/diagnostics/cpu-next-cases5-11-job23455139/slurm-case-5e5b03c6ce4cfcba43be2731cd568d2465834ecf357db2d6602c9709824f0191.json",
+      "sidecar_sha256": "128d3d598d3e5b22305626fdfcc009f6643ca910f29bc5160af880198605ea86"
+    },
+    {
+      "index": 10,
+      "case_id": "5ad5152f8af02319b8f31448b56f67a6f336bf6df33dfae79830fcd3c2656268",
+      "source_task": "mmlu",
+      "panel": "selected_pilot",
+      "native_seconds": 15.544497565017082,
+      "actual_forwards": 4246,
+      "original_case_seconds": 42.07410628604703,
+      "authentication_seconds": 61.185548193985596,
+      "auth_new_forwards": 0,
+      "actual_job_id": "23455139",
+      "actual_step_id": "0",
+      "actual_node": "cn002.delta.ncsa.illinois.edu",
+      "case_reference": {
+        "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-verification-cases/selected/5ad5152f8af02319b8f31448b56f67a6f336bf6df33dfae79830fcd3c2656268",
+        "files": {
+          "COMPLETE.json": {
+            "sha256": "bba2df4ed42167c97efcc101605b52bbc6ddd8f48757b08c3207f1dc157395fa",
+            "nbytes": 486
+          },
+          "case.json": {
+            "sha256": "a781409ef918e246401a3ef04e6c2cb4f88ea64a184632319eb7578cbd218b6b",
+            "nbytes": 5239076
+          }
+        }
+      },
+      "sidecar_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/diagnostics/cpu-next-cases5-11-job23455139/slurm-case-5ad5152f8af02319b8f31448b56f67a6f336bf6df33dfae79830fcd3c2656268.json",
+      "sidecar_sha256": "d0c1099aa8082f636637c3315be5cea073b6f144439c8ae2ee821e6d130ce383"
+    },
+    {
+      "index": 11,
+      "case_id": "4255ef15798e7fddbb1afc95cd76b77a84ce54a63985c3cdfaffb8c4c48f6bf4",
+      "source_task": "far_v2",
+      "panel": "calibration_pilot",
+      "native_seconds": 8.314055113005452,
+      "actual_forwards": 1950,
+      "original_case_seconds": 31.985078952042386,
+      "authentication_seconds": 66.09009669604711,
+      "auth_new_forwards": 0,
+      "actual_job_id": "23455139",
+      "actual_step_id": "0",
+      "actual_node": "cn002.delta.ncsa.illinois.edu",
+      "case_reference": {
+        "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-verification-cases/selected/4255ef15798e7fddbb1afc95cd76b77a84ce54a63985c3cdfaffb8c4c48f6bf4",
+        "files": {
+          "COMPLETE.json": {
+            "sha256": "f656db7ede7be0646fc8dacf4d5a7e2f049bd1ce0105c2bacfac315168185f4f",
+            "nbytes": 486
+          },
+          "case.json": {
+            "sha256": "3b9d93d803cd862f424b444910ad8ab960f535b22ebc7d6a0db193e48821377b",
+            "nbytes": 3118031
+          }
+        }
+      },
+      "sidecar_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/diagnostics/cpu-next-cases5-11-job23455139/slurm-case-4255ef15798e7fddbb1afc95cd76b77a84ce54a63985c3cdfaffb8c4c48f6bf4.json",
+      "sidecar_sha256": "a1f8102f93ca8bcad05f109e544815624c78128fdd06950a34b20bc3cb93ddb5"
+    }
+  ],
+  "actual_allocation": {
+    "kind": "actual_slurm_cpu_fixture_provenance",
+    "job_id": "23455139",
+    "step_id": "0",
+    "host": "cn002.delta.ncsa.illinois.edu",
+    "pid": 3339436,
+    "observed_utc": "2026-11-03T00:33:31.165575+00:00",
+    "slurm_environment": {
+      "SLURM_JOB_ID": "23455139",
+      "SLURM_JOBID": "23455139",
+      "SLURM_STEP_ID": "0",
+      "SLURM_STEPID": "0",
+      "SLURM_CLUSTER_NAME": "delta",
+      "SLURM_JOB_ACCOUNT": "bjhz-delta-cpu",
+      "SLURM_JOB_PARTITION": "cpu-interactive",
+      "SLURM_JOB_NODELIST": "cn002",
+      "SLURM_NODELIST": "cn002",
+      "SLURM_CPUS_PER_TASK": "4",
+      "SLURM_JOB_CPUS_PER_NODE": "4",
+      "SLURM_CPUS_ON_NODE": "4",
+      "SLURM_JOB_NUM_NODES": "1",
+      "SLURM_NNODES": "1",
+      "SLURM_NTASKS": "1",
+      "SLURM_MEM_PER_NODE": "32768"
+    },
+    "allocation_fields": {
+      "JobId": "23455139",
+      "JobName": "lad-a3-native-cpu5-11",
+      "UserId": "swong2(78031)",
+      "GroupId": "grp_202(202)",
+      "MCS_label": "N/A",
+      "Priority": "2622",
+      "Nice": "0",
+      "Account": "bjhz-delta-cpu",
+      "QOS": "bjhz-delta-cpu",
+      "JobState": "RUNNING",
+      "Reason": "None",
+      "Dependency": "(null)",
+      "Requeue": "0",
+      "Restarts": "0",
+      "BatchFlag": "1",
+      "Reboot": "0",
+      "ExitCode": "0:0",
+      "RunTime": "00:00:06",
+      "TimeLimit": "00:45:00",
+      "TimeMin": "N/A",
+      "SubmitTime": "2026-11-03T00:33:23",
+      "EligibleTime": "2026-11-03T00:33:23",
+      "AccrueTime": "2026-11-03T00:33:23",
+      "StartTime": "2026-11-03T00:33:25",
+      "EndTime": "2026-11-03T01:18:25",
+      "Deadline": "N/A",
+      "SuspendTime": "None",
+      "SecsPreSuspend": "0",
+      "LastSchedEval": "2026-11-03T00:33:25",
+      "Scheduler": "Main",
+      "Partition": "cpu-interactive",
+      "AllocNode:Sid": "dt-login04:136984",
+      "ReqNodeList": "(null)",
+      "ExcNodeList": "(null)",
+      "NodeList": "cn002",
+      "BatchHost": "cn002",
+      "NumNodes": "1",
+      "NumCPUs": "4",
+      "NumTasks": "1",
+      "CPUs/Task": "4",
+      "ReqB:S:C:T": "0:0:*:*",
+      "ReqTRES": "cpu=4,mem=32G,node=1,billing=32768",
+      "AllocTRES": "cpu=4,mem=32G,node=1,billing=32768",
+      "Socks/Node": "*",
+      "NtasksPerN:B:S:C": "0:0:*:*",
+      "CoreSpec": "*",
+      "MinCPUsNode": "4",
+      "MinMemoryNode": "32G",
+      "MinTmpDiskNode": "0",
+      "Features": "projects",
+      "DelayBoot": "00:00:00",
+      "OverSubscribe": "OK",
+      "Contiguous": "0",
+      "Licenses": "(null)",
+      "LicensesAlloc": "(null)",
+      "Network": "(null)",
+      "Command": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu-proposal/launch.sbatch",
+      "SubmitLine": "sbatch",
+      "--export": "ALL",
+      "--constraint": "projects",
+      "--partition": "cpu-interactive",
+      "--time": "00:45:00",
+      "WorkDir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+      "StdErr": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/logs/lad-a3-native-cpu5-11-23455139.err",
+      "StdIn": "/dev/null",
+      "StdOut": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/logs/lad-a3-native-cpu5-11-23455139.out",
+      "TresPerTask": "cpu=4"
+    },
+    "allocation_tres": {
+      "cpu": "4",
+      "mem": "32G",
+      "node": "1",
+      "billing": "32768"
+    },
+    "allocation_memory_bytes": 34359738368,
+    "time_limit_seconds": 2700,
+    "end_time_unix": 1793668705.0,
+    "actual_GPU_count": 0,
+    "raw_scontrol": "JobId=23455139 JobName=lad-a3-native-cpu5-11 UserId=swong2(78031) GroupId=grp_202(202) MCS_label=N/A Priority=2622 Nice=0 Account=bjhz-delta-cpu QOS=bjhz-delta-cpu JobState=RUNNING Reason=None Dependency=(null) Requeue=0 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=0:0 RunTime=00:00:06 TimeLimit=00:45:00 TimeMin=N/A SubmitTime=2026-11-03T00:33:23 EligibleTime=2026-11-03T00:33:23 AccrueTime=2026-11-03T00:33:23 StartTime=2026-11-03T00:33:25 EndTime=2026-11-03T01:18:25 Deadline=N/A SuspendTime=None SecsPreSuspend=0 LastSchedEval=2026-11-03T00:33:25 Scheduler=Main Partition=cpu-interactive AllocNode:Sid=dt-login04:136984 ReqNodeList=(null) ExcNodeList=(null) NodeList=cn002 BatchHost=cn002 NumNodes=1 NumCPUs=4 NumTasks=1 CPUs/Task=4 ReqB:S:C:T=0:0:*:* ReqTRES=cpu=4,mem=32G,node=1,billing=32768 AllocTRES=cpu=4,mem=32G,node=1,billing=32768 Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=* MinCPUsNode=4 MinMemoryNode=32G MinTmpDiskNode=0 Features=projects DelayBoot=00:00:00 OverSubscribe=OK Contiguous=0 Licenses=(null) LicensesAlloc=(null) Network=(null) Command=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu-proposal/launch.sbatch SubmitLine=sbatch --parsable --export=ALL --constraint=projects --partition=cpu-interactive --time=00:45:00 /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu-proposal/launch.sbatch WorkDir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder StdErr=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/logs/lad-a3-native-cpu5-11-23455139.err StdIn=/dev/null StdOut=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/logs/lad-a3-native-cpu5-11-23455139.out TresPerTask=cpu=4\n",
+    "raw_scontrol_sha256": "773493736bb13afa35992c4bd1663456921b059899da6e22a26fdb33a108f105",
+    "cpu_model": "AMD EPYC 7763 64-Core Processor",
+    "affinity_CPUs": [
+      48,
+      54,
+      62,
+      63
+    ],
+    "process_cgroup": "0::/system.slice/slurmstepd.scope/job_23455139/step_0/user/task_0\n",
+    "scientific_execution": false,
+    "production_admission": false
+  },
+  "terminal_accounting": {
+    "23455139": {
+      "JobIDRaw": "23455139",
+      "JobName": "lad-a3-native-cpu5-11",
+      "State": "COMPLETED",
+      "ExitCode": "0:0",
+      "ElapsedRaw": "1210",
+      "TimelimitRaw": "45",
+      "AllocTRES": "billing=32768,cpu=4,mem=32G,node=1",
+      "MaxRSS": "",
+      "Start": "2026-11-03T00:33:25",
+      "End": "2026-11-03T00:53:35"
+    },
+    "23455139.batch": {
+      "JobIDRaw": "23455139.batch",
+      "JobName": "batch",
+      "State": "COMPLETED",
+      "ExitCode": "0:0",
+      "ElapsedRaw": "1210",
+      "TimelimitRaw": "",
+      "AllocTRES": "cpu=4,mem=32G,node=1",
+      "MaxRSS": "6816K",
+      "Start": "2026-11-03T00:33:25",
+      "End": "2026-11-03T00:53:35"
+    },
+    "23455139.extern": {
+      "JobIDRaw": "23455139.extern",
+      "JobName": "extern",
+      "State": "COMPLETED",
+      "ExitCode": "0:0",
+      "ElapsedRaw": "1210",
+      "TimelimitRaw": "",
+      "AllocTRES": "billing=32768,cpu=4,mem=32G,node=1",
+      "MaxRSS": "",
+      "Start": "2026-11-03T00:33:25",
+      "End": "2026-11-03T00:53:35"
+    },
+    "23455139.0": {
+      "JobIDRaw": "23455139.0",
+      "JobName": "python3.9",
+      "State": "COMPLETED",
+      "ExitCode": "0:0",
+      "ElapsedRaw": "1205",
+      "TimelimitRaw": "",
+      "AllocTRES": "cpu=4,mem=32G,node=1",
+      "MaxRSS": "7252296K",
+      "Start": "2026-11-03T00:33:30",
+      "End": "2026-11-03T00:53:35"
+    }
+  },
+  "cgroup_event_deltas": {
+    "/sys/fs/cgroup/system.slice/slurmstepd.scope/job_23455139/step_0/user/task_0": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "/sys/fs/cgroup/system.slice/slurmstepd.scope/job_23455139/step_0/user": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "/sys/fs/cgroup/system.slice/slurmstepd.scope/job_23455139/step_0": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "/sys/fs/cgroup/system.slice/slurmstepd.scope/job_23455139": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "/sys/fs/cgroup/system.slice/slurmstepd.scope": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "/sys/fs/cgroup/system.slice": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "/sys/fs/cgroup": {
+      "status": "v2 counters unavailable; see unmodified raw controller fields"
+    }
+  },
+  "observed_steps": [
+    {
+      "event": "step_start",
+      "elapsed_seconds": 0.17506816098466516,
+      "peak_rss_bytes": 21848064,
+      "observed_model_forward_calls": 0,
+      "step": "frozen_source_before"
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 0.26814010296948254,
+      "peak_rss_bytes": 21848064,
+      "observed_model_forward_calls": 0,
+      "step": "frozen_source_before",
+      "step_seconds": 0.09248351899441332
+    },
+    {
+      "event": "import_start",
+      "elapsed_seconds": 0.27589657495263964,
+      "peak_rss_bytes": 21848064,
+      "observed_model_forward_calls": 0
+    },
+    {
+      "event": "import_end",
+      "elapsed_seconds": 29.10672696097754,
+      "peak_rss_bytes": 820797440,
+      "observed_model_forward_calls": 0
+    },
+    {
+      "event": "step_start",
+      "elapsed_seconds": 29.145664649899118,
+      "peak_rss_bytes": 820797440,
+      "observed_model_forward_calls": 0,
+      "step": "preserved_case_references"
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 30.035059671965428,
+      "peak_rss_bytes": 832532480,
+      "observed_model_forward_calls": 0,
+      "step": "preserved_case_references",
+      "step_seconds": 0.8893535149982199
+    },
+    {
+      "event": "step_start",
+      "elapsed_seconds": 30.06763088388834,
+      "peak_rss_bytes": 832532480,
+      "observed_model_forward_calls": 0,
+      "step": "verify_scenario"
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 31.627167749917135,
+      "peak_rss_bytes": 856555520,
+      "observed_model_forward_calls": 0,
+      "step": "verify_scenario",
+      "step_seconds": 1.5594893569359556
+    },
+    {
+      "event": "step_start",
+      "elapsed_seconds": 31.633253040956333,
+      "peak_rss_bytes": 856555520,
+      "observed_model_forward_calls": 0,
+      "step": "read_selected"
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 154.1515563899884,
+      "peak_rss_bytes": 893022208,
+      "observed_model_forward_calls": 0,
+      "step": "read_selected",
+      "step_seconds": 122.51826307293959
+    },
+    {
+      "event": "step_start",
+      "elapsed_seconds": 154.15248390694614,
+      "peak_rss_bytes": 893022208,
+      "observed_model_forward_calls": 0,
+      "step": "existing_inventory_canonical_rebuild_compare"
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 216.61686818196904,
+      "peak_rss_bytes": 6545223680,
+      "observed_model_forward_calls": 0,
+      "step": "existing_inventory_canonical_rebuild_compare",
+      "step_seconds": 62.464354199008085
+    },
+    {
+      "event": "step_start",
+      "elapsed_seconds": 216.61799300892744,
+      "peak_rss_bytes": 6545223680,
+      "observed_model_forward_calls": 0,
+      "step": "read_scenario_binding"
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 216.65130773291457,
+      "peak_rss_bytes": 6545223680,
+      "observed_model_forward_calls": 0,
+      "step": "read_scenario_binding",
+      "step_seconds": 0.03328176203649491
+    },
+    {
+      "event": "step_start",
+      "elapsed_seconds": 216.65141629695427,
+      "peak_rss_bytes": 6545223680,
+      "observed_model_forward_calls": 0,
+      "step": "original_pilot_cases_contiguous_chunk"
+    },
+    {
+      "event": "native_start",
+      "elapsed_seconds": 359.24090781994164,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 0,
+      "case_id": "a8404c4ddd3367b64515b6503940852ce05181cb56ba1327a20bf4be27dcb939"
+    },
+    {
+      "event": "native_end",
+      "elapsed_seconds": 360.9969409639016,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 195,
+      "case_id": "a8404c4ddd3367b64515b6503940852ce05181cb56ba1327a20bf4be27dcb939",
+      "native_seconds": 1.7560219429433346,
+      "actual_forward_calls": 195
+    },
+    {
+      "event": "auth_start",
+      "elapsed_seconds": 386.90368465695065,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 195,
+      "case_id": "a8404c4ddd3367b64515b6503940852ce05181cb56ba1327a20bf4be27dcb939",
+      "numeric_backing_cache_roots": []
+    },
+    {
+      "event": "auth_end",
+      "elapsed_seconds": 546.4102887749905,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 195,
+      "case_id": "a8404c4ddd3367b64515b6503940852ce05181cb56ba1327a20bf4be27dcb939",
+      "authentication_seconds": 159.50660318601876,
+      "new_model_forwards": 0,
+      "numeric_backing_cache_roots_before": [],
+      "numeric_backing_cache_roots_after": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+      ]
+    },
+    {
+      "event": "case_allocation_sidecar_published",
+      "elapsed_seconds": 546.4582498099189,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 195,
+      "case_id": "a8404c4ddd3367b64515b6503940852ce05181cb56ba1327a20bf4be27dcb939",
+      "actual_publication_and_reference_seconds": 0.04743738402612507
+    },
+    {
+      "event": "native_start",
+      "elapsed_seconds": 546.4596682569245,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 195,
+      "case_id": "c5151f79afd7c35ef8357d76e2f50ff0cc6b644147e365ce5ff009ba30ec3848"
+    },
+    {
+      "event": "native_end",
+      "elapsed_seconds": 549.3874648789642,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 921,
+      "case_id": "c5151f79afd7c35ef8357d76e2f50ff0cc6b644147e365ce5ff009ba30ec3848",
+      "native_seconds": 2.9277931849937886,
+      "actual_forward_calls": 726
+    },
+    {
+      "event": "auth_start",
+      "elapsed_seconds": 573.3006442888873,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 921,
+      "case_id": "c5151f79afd7c35ef8357d76e2f50ff0cc6b644147e365ce5ff009ba30ec3848",
+      "numeric_backing_cache_roots": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+      ]
+    },
+    {
+      "event": "auth_end",
+      "elapsed_seconds": 630.6270445738919,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 921,
+      "case_id": "c5151f79afd7c35ef8357d76e2f50ff0cc6b644147e365ce5ff009ba30ec3848",
+      "authentication_seconds": 57.32640236802399,
+      "new_model_forwards": 0,
+      "numeric_backing_cache_roots_before": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+      ],
+      "numeric_backing_cache_roots_after": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+      ]
+    },
+    {
+      "event": "case_allocation_sidecar_published",
+      "elapsed_seconds": 630.681793505908,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 921,
+      "case_id": "c5151f79afd7c35ef8357d76e2f50ff0cc6b644147e365ce5ff009ba30ec3848",
+      "actual_publication_and_reference_seconds": 0.053962609032168984
+    },
+    {
+      "event": "native_start",
+      "elapsed_seconds": 630.6853353918996,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 921,
+      "case_id": "75460fe31425c8a7f68fe7ad51960991d8e4467fadc2d93ef9b294903775f73f"
+    },
+    {
+      "event": "native_end",
+      "elapsed_seconds": 676.0062523819506,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 12021,
+      "case_id": "75460fe31425c8a7f68fe7ad51960991d8e4467fadc2d93ef9b294903775f73f",
+      "native_seconds": 45.3209136138903,
+      "actual_forward_calls": 11100
+    },
+    {
+      "event": "auth_start",
+      "elapsed_seconds": 702.354425733909,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 12021,
+      "case_id": "75460fe31425c8a7f68fe7ad51960991d8e4467fadc2d93ef9b294903775f73f",
+      "numeric_backing_cache_roots": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+      ]
+    },
+    {
+      "event": "auth_end",
+      "elapsed_seconds": 767.6613602309953,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 12021,
+      "case_id": "75460fe31425c8a7f68fe7ad51960991d8e4467fadc2d93ef9b294903775f73f",
+      "authentication_seconds": 65.30693342501763,
+      "new_model_forwards": 0,
+      "numeric_backing_cache_roots_before": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+      ],
+      "numeric_backing_cache_roots_after": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+      ]
+    },
+    {
+      "event": "case_allocation_sidecar_published",
+      "elapsed_seconds": 767.7788815249223,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 12021,
+      "case_id": "75460fe31425c8a7f68fe7ad51960991d8e4467fadc2d93ef9b294903775f73f",
+      "actual_publication_and_reference_seconds": 0.11651731294114143
+    },
+    {
+      "event": "native_start",
+      "elapsed_seconds": 767.7987708,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 12021,
+      "case_id": "5110a5cf1c9baaab8db4009b2dbf12502f273588d42508c89850bc6382e73ae8"
+    },
+    {
+      "event": "native_end",
+      "elapsed_seconds": 812.9617655769689,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 23121,
+      "case_id": "5110a5cf1c9baaab8db4009b2dbf12502f273588d42508c89850bc6382e73ae8",
+      "native_seconds": 45.16299199103378,
+      "actual_forward_calls": 11100
+    },
+    {
+      "event": "auth_start",
+      "elapsed_seconds": 838.6411563259317,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 23121,
+      "case_id": "5110a5cf1c9baaab8db4009b2dbf12502f273588d42508c89850bc6382e73ae8",
+      "numeric_backing_cache_roots": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+      ]
+    },
+    {
+      "event": "auth_end",
+      "elapsed_seconds": 897.2874418389983,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 23121,
+      "case_id": "5110a5cf1c9baaab8db4009b2dbf12502f273588d42508c89850bc6382e73ae8",
+      "authentication_seconds": 58.64628346893005,
+      "new_model_forwards": 0,
+      "numeric_backing_cache_roots_before": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+      ],
+      "numeric_backing_cache_roots_after": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+      ]
+    },
+    {
+      "event": "case_allocation_sidecar_published",
+      "elapsed_seconds": 897.3544871809427,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 23121,
+      "case_id": "5110a5cf1c9baaab8db4009b2dbf12502f273588d42508c89850bc6382e73ae8",
+      "actual_publication_and_reference_seconds": 0.06387626403011382
+    },
+    {
+      "event": "native_start",
+      "elapsed_seconds": 897.3751248059561,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 23121,
+      "case_id": "5e5b03c6ce4cfcba43be2731cd568d2465834ecf357db2d6602c9709824f0191"
+    },
+    {
+      "event": "native_end",
+      "elapsed_seconds": 901.7398383188993,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 24231,
+      "case_id": "5e5b03c6ce4cfcba43be2731cd568d2465834ecf357db2d6602c9709824f0191",
+      "native_seconds": 4.364708443055861,
+      "actual_forward_calls": 1110
+    },
+    {
+      "event": "auth_start",
+      "elapsed_seconds": 926.2133095979225,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 24231,
+      "case_id": "5e5b03c6ce4cfcba43be2731cd568d2465834ecf357db2d6602c9709824f0191",
+      "numeric_backing_cache_roots": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+      ]
+    },
+    {
+      "event": "auth_end",
+      "elapsed_seconds": 984.8853482539998,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 24231,
+      "case_id": "5e5b03c6ce4cfcba43be2731cd568d2465834ecf357db2d6602c9709824f0191",
+      "authentication_seconds": 58.67203937692102,
+      "new_model_forwards": 0,
+      "numeric_backing_cache_roots_before": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+      ],
+      "numeric_backing_cache_roots_after": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+      ]
+    },
+    {
+      "event": "case_allocation_sidecar_published",
+      "elapsed_seconds": 984.9339608179871,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 24231,
+      "case_id": "5e5b03c6ce4cfcba43be2731cd568d2465834ecf357db2d6602c9709824f0191",
+      "actual_publication_and_reference_seconds": 0.046998301055282354
+    },
+    {
+      "event": "native_start",
+      "elapsed_seconds": 984.9362632419216,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 24231,
+      "case_id": "5ad5152f8af02319b8f31448b56f67a6f336bf6df33dfae79830fcd3c2656268"
+    },
+    {
+      "event": "native_end",
+      "elapsed_seconds": 1000.4807687419234,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 28477,
+      "case_id": "5ad5152f8af02319b8f31448b56f67a6f336bf6df33dfae79830fcd3c2656268",
+      "native_seconds": 15.544497565017082,
+      "actual_forward_calls": 4246
+    },
+    {
+      "event": "auth_start",
+      "elapsed_seconds": 1027.4632508099312,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 28477,
+      "case_id": "5ad5152f8af02319b8f31448b56f67a6f336bf6df33dfae79830fcd3c2656268",
+      "numeric_backing_cache_roots": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+      ]
+    },
+    {
+      "event": "auth_end",
+      "elapsed_seconds": 1088.6488007059088,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 28477,
+      "case_id": "5ad5152f8af02319b8f31448b56f67a6f336bf6df33dfae79830fcd3c2656268",
+      "authentication_seconds": 61.185548193985596,
+      "new_model_forwards": 0,
+      "numeric_backing_cache_roots_before": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+      ],
+      "numeric_backing_cache_roots_after": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+      ]
+    },
+    {
+      "event": "case_allocation_sidecar_published",
+      "elapsed_seconds": 1088.712863691966,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 28477,
+      "case_id": "5ad5152f8af02319b8f31448b56f67a6f336bf6df33dfae79830fcd3c2656268",
+      "actual_publication_and_reference_seconds": 0.062372889020480216
+    },
+    {
+      "event": "native_start",
+      "elapsed_seconds": 1088.7231280729175,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 28477,
+      "case_id": "4255ef15798e7fddbb1afc95cd76b77a84ce54a63985c3cdfaffb8c4c48f6bf4"
+    },
+    {
+      "event": "native_end",
+      "elapsed_seconds": 1097.0371864018962,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 30427,
+      "case_id": "4255ef15798e7fddbb1afc95cd76b77a84ce54a63985c3cdfaffb8c4c48f6bf4",
+      "native_seconds": 8.314055113005452,
+      "actual_forward_calls": 1950
+    },
+    {
+      "event": "auth_start",
+      "elapsed_seconds": 1121.105364244897,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 30427,
+      "case_id": "4255ef15798e7fddbb1afc95cd76b77a84ce54a63985c3cdfaffb8c4c48f6bf4",
+      "numeric_backing_cache_roots": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+      ]
+    },
+    {
+      "event": "auth_end",
+      "elapsed_seconds": 1187.1954580949387,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 30427,
+      "case_id": "4255ef15798e7fddbb1afc95cd76b77a84ce54a63985c3cdfaffb8c4c48f6bf4",
+      "authentication_seconds": 66.09009669604711,
+      "new_model_forwards": 0,
+      "numeric_backing_cache_roots_before": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+      ],
+      "numeric_backing_cache_roots_after": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+      ]
+    },
+    {
+      "event": "case_allocation_sidecar_published",
+      "elapsed_seconds": 1187.277347509982,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 30427,
+      "case_id": "4255ef15798e7fddbb1afc95cd76b77a84ce54a63985c3cdfaffb8c4c48f6bf4",
+      "actual_publication_and_reference_seconds": 0.08101044804789126
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 1187.9263575709192,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 30427,
+      "step": "original_pilot_cases_contiguous_chunk",
+      "step_seconds": 971.2749129009899
+    },
+    {
+      "event": "step_start",
+      "elapsed_seconds": 1189.2871696559014,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 30427,
+      "step": "final_scenario_backing_check"
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 1190.713275643997,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 30427,
+      "step": "final_scenario_backing_check",
+      "step_seconds": 1.4244964920217171
+    },
+    {
+      "event": "step_start",
+      "elapsed_seconds": 1190.7134330789559,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 30427,
+      "step": "frozen_source_after"
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 1190.988750673947,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 30427,
+      "step": "frozen_source_after",
+      "step_seconds": 0.2749664461007342
+    },
+    {
+      "event": "coordinator_complete",
+      "elapsed_seconds": 1190.995580639923,
+      "peak_rss_bytes": 6888169472,
+      "observed_model_forward_calls": 30427,
+      "case_ids": [
+        "a8404c4ddd3367b64515b6503940852ce05181cb56ba1327a20bf4be27dcb939",
+        "c5151f79afd7c35ef8357d76e2f50ff0cc6b644147e365ce5ff009ba30ec3848",
+        "75460fe31425c8a7f68fe7ad51960991d8e4467fadc2d93ef9b294903775f73f",
+        "5110a5cf1c9baaab8db4009b2dbf12502f273588d42508c89850bc6382e73ae8",
+        "5e5b03c6ce4cfcba43be2731cd568d2465834ecf357db2d6602c9709824f0191",
+        "5ad5152f8af02319b8f31448b56f67a6f336bf6df33dfae79830fcd3c2656268",
+        "4255ef15798e7fddbb1afc95cd76b77a84ce54a63985c3cdfaffb8c4c48f6bf4"
+      ],
+      "full_pilot_complete": false
+    }
+  ],
+  "counts": {
+    "new_cases": 7,
+    "known_authenticated_cases": 12,
+    "required_selected_cases": 63,
+    "remaining_cases": 51,
+    "actual_new_forward_calls": 30427,
+    "auth_model_forwards": 0,
+    "old_cases_preserved": 5,
+    "aggregate": false,
+    "calibration_shards": 0,
+    "assessment_shards": 0
+  },
+  "source_hashes": {
+    "component_analysis/a3_direction_pipeline.py": "96678db186078ab37cad108e2d1e71ffdccf1fb3dd157c35cdc57a91b2ebd4a0",
+    "component_analysis/a3_direction_runner.py": "89a62335665595533204006c3eca28d14ca9c42eb600879c235e9c6370739429",
+    "component_analysis/a3_direction_runtime.py": "b66c2d8cd26c36f321b5079758209214746b0e4eec16a6c801742086d729c0cc",
+    "component_analysis/a3_direction_workload.py": "3e43aaf2b4cacb99df87593ae377c8fdf3eb7b223b258ed8873853841404d8f9",
+    "component_analysis/a3_directions.py": "ed882d4e12a396e03e73671e588beba5b1a8c90ab9d31e7ee73d4194430b4a86",
+    "component_analysis/a3_pipeline.py": "310eb53427ad4ac32522dfd0d6cd3b33e4ec887af1776579845f8953bdbe83f5",
+    "scripts/jobs/specificity_a3.sh": "936dfb7f8b9c2d267d52f1e199ed431275e6527cbfc3a105a22e3812289a9b96",
+    "tests/test_a3_direction_runner.py": "3ea945d5b23b4eef7d56139758c7075ea1b56ac612f1923590b7978628ca0120",
+    "tests/test_a3_direction_runtime.py": "5a41e89b0b2bd5fd59553f5f5a63260638e3547a63c31a615d84da08f796fb6a",
+    "tests/test_a3_direction_workload.py": "91eb6f874e180c5ffb362daba231631b7bea21c224446580efccfe20a9007300",
+    "tests/test_a3_directions.py": "cd8471b1524ad7b8f1b7c87f9eb5fec5724b3ab2980027ef7aadfea3fc3bb1c1",
+    "tests/test_a3_pipeline.py": "bbb3efdba075cc14c2997cc11ae44bab268bdea56459c0574d6bfc21b62f4a18",
+    "tests/a3_direction_native_scenario.py": "9b5061ab9618222b23230917f446abcaa73747f3d216f69c77b9218feec6297b"
+  },
+  "source_checks_domain": "Original live before/after source/model/scenario checks executed in CPU job; local follow-up reads compact job metadata only",
+  "source_and_driver_hashes_unchanged": true,
+  "old_references_unchanged": true,
+  "Slurm_ID_not_unset_or_spoofed": true,
+  "actual_CPU_job_separate_from_prior_login_timings": true,
+  "no_allocated_GPU_cost_or_production_admission": true,
+  "commands": [
+    {
+      "command": "Root submission command preserved in submission.json",
+      "author_submitted": false
+    },
+    {
+      "command": "TZ=UTC sacct -j 23455139 --format=JobIDRaw,JobName,State,ExitCode,ElapsedRaw,TimelimitRaw,AllocTRES,MaxRSS,Start,End -P",
+      "exit_code": 0,
+      "output": "terminal-accounting.txt"
+    },
+    {
+      "command": "research-session lint docs/research/specificity-ladder/reports/135-native-cpu-job23455139-handback.md",
+      "exit_code": 0
+    },
+    {
+      "command": "/sw/external/python/anaconda3/bin/python3.9 scripts/check_report_numbers.py /projects/beto/swong2/Alignment/Deception-Circuit/docs/research/specificity-ladder/reports/135-native-cpu-job23455139-handback.md --strict --json",
+      "exit_code": 0,
+      "output": "number-check.json"
+    }
+  ],
+  "local_model_or_heavy_verification": false,
+  "no_further_chunk_or_retry": true,
+  "all_owned_job_processes_terminal": true,
+  "artifacts": {
+    "number-check.json": {
+      "bytes": 8532,
+      "sha256": "e38522f62433032d9ede21a85e1f1c26d9215ae6f191641803413e8e7d5d4482"
+    },
+    "submission.json": {
+      "bytes": 887,
+      "sha256": "6e0a76e2f9ce9b6f2e66a15ca541778ed8918d3f8f2722954bd4fd49e86c9324"
+    },
+    "slurm-case-75460fe31425c8a7f68fe7ad51960991d8e4467fadc2d93ef9b294903775f73f.json": {
+      "bytes": 2068,
+      "sha256": "924db9dd95e940600c8d1100538a7b6172b2a26da9a618d6174c3121b3c76cfb"
+    },
+    "driver-identity.json": {
+      "bytes": 2600,
+      "sha256": "b9d9208afdebc9c90b80ebaf889fa1d8fd29a7f9c5b7aaafd5c7ff45aa782f16"
+    },
+    "result.json": {
+      "bytes": 1291,
+      "sha256": "fc3812445a4930c6e50ba65ba88b1e7d6efe50262b32a0de2e5a9bfa18a4abe0"
+    },
+    "steps.log": {
+      "bytes": 17272,
+      "sha256": "ed3ff728910e5c79b017ab8efc56fa68cc2da5170f254238ad0a4f24e8484aa8"
+    },
+    "memory-before.json": {
+      "bytes": 2396,
+      "sha256": "6c703b35a2577c9e3f7d7f75323b471b6c901c219996265649bd57b9143315d8"
+    },
+    "slurm-case-5e5b03c6ce4cfcba43be2731cd568d2465834ecf357db2d6602c9709824f0191.json": {
+      "bytes": 2067,
+      "sha256": "128d3d598d3e5b22305626fdfcc009f6643ca910f29bc5160af880198605ea86"
+    },
+    "slurm-case-4255ef15798e7fddbb1afc95cd76b77a84ce54a63985c3cdfaffb8c4c48f6bf4.json": {
+      "bytes": 2067,
+      "sha256": "a1f8102f93ca8bcad05f109e544815624c78128fdd06950a34b20bc3cb93ddb5"
+    },
+    "coordinator-allocation.json": {
+      "bytes": 5725,
+      "sha256": "83fef2cec2ad120ea2e0a73bc54d46deeec7473281b427687514ea5e323855dd"
+    },
+    "slurm-23455139.out": {
+      "bytes": 1219,
+      "sha256": "6fd85962fae5bf37774ef4a80e9f2035da1aeae5839b0e6eb8d26c251d67bba4"
+    },
+    "proposal.json": {
+      "bytes": 20447,
+      "sha256": "20b67dda7bb6249223b9ee056807fe83708a1fd6a2083690fd349c3e4d39efba"
+    },
+    "coordinator-result.json": {
+      "bytes": 13559,
+      "sha256": "4c492d300ac2548445f0bc20efb2393eb38dffe39882cdd8436e4b2a858a4b12"
+    },
+    "coordinator.py": {
+      "bytes": 8774,
+      "sha256": "a7881131a291086201ba4ba5edffac0d291ad4cd0b734511bc5395e277fe113a"
+    },
+    "launch.sbatch": {
+      "bytes": 1316,
+      "sha256": "d298c30b34a44cc958454ec0589f5bad6797a59df5ef05ad428f90fe00430d5b"
+    },
+    "allocation_facts.py": {
+      "bytes": 6330,
+      "sha256": "2eccafbcd4006dedd5e08cf9219b0a70b594708f20843b6861795345a84c2b3d"
+    },
+    "per-case-observations.json": {
+      "bytes": 10611,
+      "sha256": "c0f2675eca3b8ff3b00d38f94e781a2040c542ee96a0801e4c1d7cd7b8646004"
+    },
+    "memory-after.json": {
+      "bytes": 2401,
+      "sha256": "d0b0697cd5a125afee253dc08bbb5ab849d302730b3abeb051f8a11247c8c829"
+    },
+    "slurm-case-a8404c4ddd3367b64515b6503940852ce05181cb56ba1327a20bf4be27dcb939.json": {
+      "bytes": 1880,
+      "sha256": "e12ec05f059a8df1f2d49bb7f7c91f5fae7ad5bf40fb7b74aa4bdebcf3ff59a3"
+    },
+    "supervisor-identity.json": {
+      "bytes": 1002,
+      "sha256": "b33d9506c8c7b888a2e92b92f8552de69224cef06c8325308d2d35243458a259"
+    },
+    "allocation-before.json": {
+      "bytes": 5725,
+      "sha256": "165353e51dc94bd46ebefc37082030b94e8544aa8a450c9deec811b39d1313f3"
+    },
+    "slurm-case-c5151f79afd7c35ef8357d76e2f50ff0cc6b644147e365ce5ff009ba30ec3848.json": {
+      "bytes": 2067,
+      "sha256": "9fa3adf0702ce7105a19ce780da1dbb06f5b13b576043a75b5265d9281b44bac"
+    },
+    "slurm-23455139.err": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "driver-hashes.json": {
+      "bytes": 3080,
+      "sha256": "692c735257633efb0f91273dd4a6b3a4d3b98313e32442861ee3b0b73f4049d6"
+    },
+    "allocation-after.json": {
+      "bytes": 5725,
+      "sha256": "ca829ea7956bdb5425b94695c48d03fbb40adaf6e94bf38705882cca735b0169"
+    },
+    "terminal-accounting.txt": {
+      "bytes": 550,
+      "sha256": "b0fcebeb555f19f41b1aeadd38ae84ed06ce781ddae9012da56f0ae6d7bab471"
+    },
+    "child-samples.jsonl": {
+      "bytes": 33580,
+      "sha256": "63fa2e474b4fa66c8ef482931c4ecc7e9dc1a0768b5aef0e522f256e5d0f8bd8"
+    },
+    "slurm-case-5110a5cf1c9baaab8db4009b2dbf12502f273588d42508c89850bc6382e73ae8.json": {
+      "bytes": 2069,
+      "sha256": "b34885d5661eafde76f07eaca7a87db5272a49d8f521f0de8ccbc66027655667"
+    },
+    "slurm-case-5ad5152f8af02319b8f31448b56f67a6f336bf6df33dfae79830fcd3c2656268.json": {
+      "bytes": 2069,
+      "sha256": "d0c1099aa8082f636637c3315be5cea073b6f144439c8ae2ee821e6d130ce383"
+    },
+    "protocol-checks.json": {
+      "bytes": 1025,
+      "sha256": "553c2b5d24815b06d1ba5130be83e6256a047dd090ed6af4922c8d3fe6587edb"
+    },
+    "supervisor.py": {
+      "bytes": 3743,
+      "sha256": "0b7231ddc96f07058926b3f6597b3c8698c4fd1f4f7e97d0b911c9e3c06c38c4"
+    }
+  }
+}

@@ -1,0 +1,116 @@
+"""Tiny stdlib boundary fixtures only; no native/model imports or jobs."""
+import hashlib,importlib.util,json,os,sys,tempfile,types,unittest
+from pathlib import Path
+P=Path(__file__).resolve().parent
+
+def load(name):
+ spec=importlib.util.spec_from_file_location('packet311_'+name,P/(name+'.py'))
+ module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);return module
+c=load('common');d=load('driver');h=load('host')
+
+def config(root):
+ return dict(kind='ROOT_BOUND_PROVISIONAL_CPU_PRODUCER',candidate_only=True,execution_authorized=False,
+  candidate_commit='a'*40,export=str(root/'export'),canonical=str(root/'child'/'canonical'),
+  run_root=str(root),job_id='123',cluster='bridges2',account='cis260361p',partition='RM',qos='rm',
+  cpus=128,memory_bytes=192*1024**3,allocation_seconds=5400,child_cap_seconds=5040,
+  physical_alignment='/ocean/projects/cis260361p/swong2/test/Alignment',virtual_alignment='/projects/beto/swong2/Alignment',
+  image='/ocean/projects/cis260361p/swong2/test/image.sif',image_sha256='0'*64,
+  packed_env='/ocean/projects/cis260361p/swong2/envs/mgnp',python='/u/swong2/.conda/envs/mgnp/bin/python',
+  candidate_source=dict(path=str(root/'candidate-source.json'),sha256='1'*64),
+  input_files=[],input_aliases=[],packet_manifest=dict(path=str(P/'manifest.json'),sha256='2'*64),
+  inputs=dict(a1_design='/original/design.json',a1_selected='/original/selected.json',matched_root='/original/matched',
+   historical_csv='/original/a_prime.csv',root_ruling='/original/root-ruling.json',execution_settings=str(P/'execution-settings.json'),
+   registries=['/original/held_out.json']),storage_free_bytes_required=40*1024**3)
+
+class Packet(unittest.TestCase):
+ def test_native_plan_is_exact_fresh_freeze_prefit_then_saved_producer(self):
+  cfg=config(Path('/synthetic'))
+  steps=c.commands(cfg)
+  self.assertEqual([name for name,argv in steps],['freeze','prefit-inventory','pilot-target'])
+  for name,argv in steps:
+   self.assertEqual(argv[argv.index('--commit')+1],cfg['candidate_commit'])
+   self.assertEqual(argv[argv.index('--design')+1],cfg['canonical']+'/design.json')
+   self.assertEqual(argv[argv.index('--stage')+1],'prepare')
+   self.assertFalse(set(argv)&{'--dry-run','--admission','--reservation','--ledger-snapshot','--selected','--final'})
+  self.assertEqual(steps[0][1][steps[0][1].index('--a1-design')+1],cfg['inputs']['a1_design'])
+  self.assertEqual(steps[1][1][-2:],['--inventory-stage','prefit'])
+  self.assertEqual(steps[2][1][-4:],['--action','pilot-target','--pilot-part','prefit'])
+
+ def test_unbound_rejected_before_import_or_source_access(self):
+  with self.assertRaisesRegex(ValueError,'unbound'):c.validate({'kind':'UNBOUND_CANDIDATE_ONLY'})
+  import subprocess
+  probe="import importlib.abc,runpy,sys\nclass Deny(importlib.abc.MetaPathFinder):\n def find_spec(self,name,path=None,target=None):\n  if name.split('.')[0] in {'component_analysis','dataset','torch','numpy'}:raise AssertionError('native import attempted')\nsys.meta_path.insert(0,Deny());sys.argv=[sys.argv[1],'--config',sys.argv[2],'--config-sha256',sys.argv[3]];runpy.run_path(sys.argv[0],run_name='__main__')"
+  with tempfile.TemporaryDirectory() as td:
+   path=Path(td)/'unbound.json';path.write_text('{"kind":"UNBOUND_CANDIDATE_ONLY"}')
+   digest=hashlib.sha256(path.read_bytes()).hexdigest()
+   for script in ('driver.py','host.py'):
+    result=subprocess.run([sys.executable,'-B','-c',probe,str(P/script),str(path),digest],capture_output=True,text=True)
+    self.assertEqual(result.returncode,2,result.stderr)
+    self.assertIn('unbound',result.stderr.lower())
+
+ def test_source_mutation_extra_file_alias_and_foreign_origin_reject(self):
+  with tempfile.TemporaryDirectory() as td:
+   root=Path(td);export=root/'export';export.mkdir();source=export/'native.py';source.write_text('x=1\n')
+   original=root/'registry.json';original.write_text('{}');alias=export/'registry.json';alias.symlink_to(original)
+   manifest=dict(kind='PROVISIONAL_CANDIDATE_EXECUTION_SOURCE_NOT_PUBLICATION_OR_ADMISSION',commit='a'*40,export_root=str(export),
+    files=[dict(relative='native.py',sha256=hashlib.sha256(source.read_bytes()).hexdigest(),bytes=4)],source_publication=False)
+   path=root/'candidate-source.json';path.write_text(json.dumps(manifest));cfg=config(root)
+   cfg['candidate_source']=dict(path=str(path),sha256=hashlib.sha256(path.read_bytes()).hexdigest())
+   cfg['input_aliases']=[dict(path=str(alias),literal_target=str(original))]
+   c.check_sources(cfg)
+   source.write_text('x=2\n')
+   with self.assertRaises(AssertionError):c.check_sources(cfg)
+   source.write_text('x=1\n');(export/'extra.py').write_text('pass')
+   with self.assertRaises(AssertionError):c.check_sources(cfg)
+   (export/'extra.py').unlink();alias.unlink();alias.symlink_to(source)
+   with self.assertRaises(AssertionError):c.check_sources(cfg)
+   c.check_origins(export,{'component_analysis.fake':types.SimpleNamespace(__file__=str(source))})
+   with self.assertRaises(AssertionError):c.check_origins(export,{'component_analysis.fake':types.SimpleNamespace(__file__=str(root/'foreign.py'))})
+
+ def test_saved_target_inventory_uses_real_bytes_and_rejects_sink_or_drift(self):
+  with tempfile.TemporaryDirectory() as td:
+   cfg=config(Path(td));work=Path(cfg['canonical']);work.mkdir(parents=True)
+   def object_(root,payload):
+    root.mkdir(parents=True);raw=json.dumps(payload).encode();(root/'payload.json').write_bytes(raw)
+    (root/'COMPLETE.json').write_text(json.dumps(dict(schema_version=1,kind='a3_complete',files={'payload.json':dict(sha256=hashlib.sha256(raw).hexdigest(),bytes=len(raw))})))
+    return dict(path=str(root),files={name:dict(sha256=hashlib.sha256((root/name).read_bytes()).hexdigest(),nbytes=(root/name).stat().st_size) for name in ('payload.json','COMPLETE.json')})
+   target=object_(work/'pilot-target-inventory'/'prefit',dict(inventory_sha256='canonical'))
+   payload=target['files']['payload.json'];descriptor=dict(kind='a3_pilot_target_preparation_v1',part='prefit',target_stage='fit-select',injected=False,
+    model_loaded=False,execution_authorized=False,selected_reference=None,source_identity=dict(commit=cfg['candidate_commit']),target_reference=target,
+    emitted_payload_sha256=payload['sha256'],emitted_payload_bytes=payload['nbytes'],provenance=dict(normal_completion=True,exit_code=0))
+   object_(work/'pilot-target-preparation'/'prefit',descriptor)
+   actual=c.inventory_outputs(cfg)
+   self.assertEqual(actual['target_reference'],target)
+   self.assertEqual(actual['target_payload_sha256'],payload['sha256'])
+   (Path(target['path'])/'payload.json').write_bytes(b'changed')
+   with self.assertRaises(AssertionError):c.inventory_outputs(cfg)
+  with tempfile.TemporaryDirectory() as td:
+   with self.assertRaises((OSError,AssertionError)):c.inventory_outputs(config(Path(td)))
+
+ def test_transport_preserves_slurm_and_writes_only_private_child(self):
+  cfg=config(Path('/projects/beto/swong2/Alignment/run311'))
+  argv=h.container_command(cfg,'v1',{'SLURM_JOB_ID':'123','SLURM_CPUS_PER_TASK':'128'},9999)
+  binds=[argv[i+1] for i,x in enumerate(argv) if x=='--bind']
+  writable=[x for x in binds if x.endswith(':rw')]
+  self.assertEqual(len(writable),1)
+  self.assertTrue(writable[0].endswith('/child:'+cfg['run_root']+'/child:rw'))
+  self.assertIn('/sys/fs/cgroup/memory:/sys/fs/cgroup/memory:ro',','.join(binds))
+  self.assertIn('SLURM_JOB_ID=123',argv)
+  self.assertIn('SLURM_CPUS_PER_TASK=128',argv)
+  self.assertIn('A3_WRAPPER_START_SECONDS=9999',argv)
+  self.assertIn(str(P/'driver.py'),argv)
+
+ def test_driver_orders_native_steps_and_stops_with_partial_evidence(self):
+  cfg=config(Path('/synthetic'));calls=[];records=[];checks=[]
+  def produce(runtime,argv,emit):
+   action=argv[argv.index('--action')+1];calls.append(action);emit({'native':'observed'})
+   if action=='inventory':raise ValueError('native guard failed')
+   return 0
+  adapter=types.SimpleNamespace(produce_native=produce)
+  with self.assertRaisesRegex(ValueError,'native guard failed'):
+   d.run_steps(cfg,object(),adapter,records.append,checks.append)
+  self.assertEqual(calls,['freeze','inventory'])
+  self.assertEqual([row['operation'] for row in records],['freeze','prefit-inventory'])
+  self.assertEqual(checks,['before-freeze','after-freeze','before-prefit-inventory','after-prefit-inventory'])
+
+if __name__=='__main__':unittest.main(verbosity=2)

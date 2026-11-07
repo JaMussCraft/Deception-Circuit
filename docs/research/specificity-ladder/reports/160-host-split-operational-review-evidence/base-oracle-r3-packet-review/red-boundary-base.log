@@ -1,0 +1,21 @@
+test_reaped_normal_exit_at_or_after_limit_fails (test_resource_packet.SupervisorTests) ... 
+======================================================================
+FAIL: test_reaped_normal_exit_at_or_after_limit_fails (test_resource_packet.SupervisorTests) (scenario='at_limit')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-base-cpu-r3/test_resource_packet.py", line 64, in test_reaped_normal_exit_at_or_after_limit_fails
+    calls,complete,failed=self.execute(scenario);self.assertFalse(complete);self.assertTrue(failed)
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_reaped_normal_exit_at_or_after_limit_fails (test_resource_packet.SupervisorTests) (scenario='after_limit')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-base-cpu-r3/test_resource_packet.py", line 64, in test_reaped_normal_exit_at_or_after_limit_fails
+    calls,complete,failed=self.execute(scenario);self.assertFalse(complete);self.assertTrue(failed)
+AssertionError: True is not false
+
+----------------------------------------------------------------------
+Ran 1 test in 0.064s
+
+FAILED (failures=2)

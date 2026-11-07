@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "ruling_id": "a2-matched-cohort-01",
+  "decision": "accept_exact_matched_cohort",
+  "session": "codex-01a1987e",
+  "build_hash": "c79830a14f94a6f8a7bce937dba8d2444abfc911676f7f71016b37ca6463781f",
+  "selected_ids_sha256": "347765e847f07a80be4e31742c01b1fd8d679e3540f25dfbbd5b84e8777bd039",
+  "counts": {
+    "far_v2": {
+      "train": 177,
+      "validation": 177,
+      "test": 891
+    },
+    "sdr_v2": {
+      "train": 187,
+      "validation": 187,
+      "test": 952
+    },
+    "ser_v2": {
+      "train": 168,
+      "validation": 167,
+      "test": 835
+    }
+  },
+  "conditions": [
+    "D",
+    "I"
+  ],
+  "selection_rule": "all_matched_survivors_no_baseline_competence_filter",
+  "scope": "cohort_size_only",
+  "rationale": "Use every verified inversion survivor and identical D/I IDs in each task and split. The approved plan permits lead review below 200 training rows. Timing and budget gates remain mandatory."
+}

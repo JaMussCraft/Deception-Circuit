@@ -1,0 +1,29 @@
+....................................F.F                                  [100%]
+=================================== FAILURES ===================================
+_______________________ test_audit_blocks_exec_and_fork ________________________
+
+probe = <module 'fixture_runtime_probe' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/runtime-probe.py'>
+tree = ({'/tmp/pytest-of-swong2/pytest-2699/test_audit_blocks_exec_and_for0/lib.so': {'bytes': 19, 'kind': 'file', 'physical_...cks_exec_and_for0/lib.so'), PosixPath('/tmp/pytest-of-swong2/pytest-2699/test_audit_blocks_exec_and_for0/libalias.so'))
+tmp_path = PosixPath('/tmp/pytest-of-swong2/pytest-2699/test_audit_blocks_exec_and_for0')
+
+    def test_audit_blocks_exec_and_fork(probe, tree, tmp_path):
+        entries,leaf,alias=tree
+        hook=probe.make_auditor(entries,str(tmp_path/'out'),set())
+        for event in ('os.exec','os.spawn','os.fork'):
+>           with pytest.raises(probe.Rejected):hook(event,())
+E           Failed: DID NOT RAISE <class 'fixture_runtime_probe.Rejected'>
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:182: Failed
+____________ test_required_distribution_metadata_cannot_be_unlisted ____________
+
+probe = <module 'fixture_runtime_probe' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/runtime-probe.py'>
+
+    def test_required_distribution_metadata_cannot_be_unlisted(probe):
+>       with pytest.raises(probe.Rejected):probe.check_metadata('base',{'pytest':'/tmp/shadow.dist-info'}, {})
+E       AttributeError: module 'fixture_runtime_probe' has no attribute 'check_metadata'
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:197: AttributeError
+=========================== short test summary info ============================
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_audit_blocks_exec_and_fork
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_required_distribution_metadata_cannot_be_unlisted
+2 failed, 37 passed in 0.44s

@@ -1,0 +1,126 @@
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239/runner.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/runner.py
+@@ -183,20 +183,23 @@
+     start_parent_usage=resource.getrusage(resource.RUSAGE_SELF)
+     before=s.allocation(allocation_config(c));deadline=diagnostic_deadline(stage,started,initial_end,before['end_epoch'])
+     out=root/stage;out.mkdir();write(out/'allocation-before.json',before);write(out/'parent-before.json',metrics())
+-    params=parameters(c,out,deadline);write(out/'data-parameters.json',params)
+-    command=child_command(c,config_ref['path'],config_ref['sha256'],stage,out,deadline)
+     env=dict(os.environ,CUDA_VISIBLE_DEVICES='',DC_CLUSTER='delta',DC_RUN_MANIFEST_GIT='0',DC_PYTHON=c['python'],
+         PYTHONDONTWRITEBYTECODE='1',PYTHONPATH=RUNTIME,HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1',HF_DATASETS_OFFLINE='1',
+         HF_HUB_CACHE='/work/nvme/beto/swong2',TRANSFORMERS_CACHE='/work/nvme/beto/swong2',
+         OMP_NUM_THREADS='1',MKL_NUM_THREADS='1',OPENBLAS_NUM_THREADS='1',NUMEXPR_NUM_THREADS='1')
+     child=None;execution=None
+     def recheck():
++        nonlocal deadline
+         require(read_ref(config_ref)==c,'diagnostic config changed');packet(c)
+         current=s.allocation(allocation_config(c))
+-        return min(deadline,current['end_epoch']-60)
++        deadline=min(deadline,current['end_epoch']-60)
++        return deadline
+     try:
+-        recheck()
++        deadline=min(deadline,recheck())
++        params=parameters(c,out,deadline);write(out/'data-parameters.json',params)
++        command=child_command(c,config_ref['path'],config_ref['sha256'],stage,out,deadline)
+         with (out/'child.log').open('x') as stream:
++            if time.time()>=deadline:raise TimeoutError('final diagnostic process-entry deadline exhausted')
+             child=subprocess.Popen(command,cwd=RUNTIME,env=env,stdout=stream,stderr=subprocess.STDOUT,start_new_session=True)
+             write(out/'child-entry-process.json',metrics(child.pid))
+             execution=s.observe_child(child,deadline,recheck)
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239/launch.sh
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/launch.sh
+@@ -1,4 +1,4 @@
+ #!/bin/bash
+ set -euo pipefail
+-packet=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239
++packet=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2
+ exec python3 "$packet/runner.py" "$@"
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239/test_timing239.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/test_timing239.py
+@@ -81,3 +81,74 @@
+     assert value['local_component_headroom_seconds']==25
+     assert value['operational_feasible'] is None and value['request_transfer_remote_publication_measured'] is False
+     assert m.local_orientation(260.,2.)['local_component_headroom_seconds']==-5
++
++# R244-A: real run_stage around its final metadata/process boundary.
++from types import SimpleNamespace
++
++
++def boundary_fixture(tmp_path,monkeypatch,stage,preentry_now,current_end,late_reap=False):
++    m=module('runner');clock={'now':1000.};calls=[];allocation_calls={'n':0}
++    c=dict(actual_CPU_job_id='123',expected_account='fixture-cpu',expected_qos='fixture',python='/u/swong2/.conda/envs/mgnp/bin/python')
++    def allocation(_):
++        allocation_calls['n']+=1
++        # The actual current end can later increase; entry's shorter bound sticks.
++        end=1900. if allocation_calls['n']!=2 else current_end
++        return dict(end_epoch=end)
++    def packet(_):clock['now']=preentry_now
++    real_read=m.read_ref
++    monkeypatch.setattr(m.time,'time',lambda:clock['now']);monkeypatch.setattr(m.time,'monotonic',lambda:clock['now'])
++    monkeypatch.setattr(m,'metrics',lambda *a:{})
++    monkeypatch.setattr(m,'parameters',lambda c,out,deadline:dict(bound_diagnostic_deadline=deadline))
++    monkeypatch.setattr(m,'read_ref',lambda ref:c if ref['path']=='/fixture' else real_read(ref))
++    monkeypatch.setattr(m,'packet',packet)
++    class Child:
++        pid=42
++        returncode=0
++        def poll(self):
++            if late_reap:clock['now']=1250.
++            return 0
++        def wait(self,timeout=None):return 0
++    def popen(command,**kwargs):
++        calls.append(dict(command=command,now=clock['now']))
++        if stage=='prime' and preentry_now>=1480. or stage=='fresh' and (preentry_now>=1240. or current_end-60<=preentry_now):
++            raise AssertionError('Popen reached after final bound expired')
++        out=tmp_path/stage;params=out/'data-parameters.json';catalogues=[];hashes={}
++        for n in range(4):
++            path=out/('catalogue-%d.json'%n);path.write_bytes(('fixture%d'%n).encode());h=m.sha(path)
++            catalogues.append(dict(virtual_path='catalogue%d'%n,sha256=h,bytes=path.stat().st_size,captured_bytes_path=str(path)))
++            hashes['catalogue%d'%n]=h
++        record=dict(kind='A2_DATA_TIMING_DIAGNOSTIC_V1',diagnostic_only=True,operational_admission=False,pid=42,parent_pid=os.getpid(),diagnostic_stage=stage,
++                    source_after=dict(catalogues=hashes),catalogue_capture_files=catalogues,data_parameters_sha256=m.sha(params))
++        m.write(out/'child-observation.json',record)
++        return Child()
++    monkeypatch.setattr(m.subprocess,'Popen',popen)
++    source_supervisor=P.parent/'plan-a2-full-score-operational186/candidate/cpu/supervisor.py'
++    sup=m.load_module('r244_real_observer',source_supervisor)
++    s=SimpleNamespace(allocation=allocation,terminate=lambda *a:None,observe_child=sup.observe_child)
++    v=SimpleNamespace(capture_identities=lambda _:dict(catalogues={row['virtual_path']:row['sha256'] for row in json.loads((tmp_path/stage/'child-observation.json').read_text())['catalogue_capture_files']}))
++    return m,c,dict(path='/fixture',sha256='a'*64),v,s,calls
++
++
++@pytest.mark.parametrize('stage,now,current_end',[
++    ('fresh',1250.,1900.),('prime',1490.,1900.),('fresh',1240.,1900.),('fresh',1010.,1050.)])
++def test_review244_final_authentication_or_current_end_expiry_prevents_Popen(tmp_path,monkeypatch,stage,now,current_end):
++    m,c,ref,v,s,calls=boundary_fixture(tmp_path,monkeypatch,stage,now,current_end)
++    with pytest.raises(TimeoutError):m.run_stage(c,ref,stage,tmp_path,2000.,v,s)
++    assert calls==[], 'No process boundary after original or current allocation expiry'
++
++
++@pytest.mark.parametrize('current_end,want',[(1900.,1240.),(1160.,1100.)])
++def test_review244_valid_normal_child_starts_once_with_nonincreasing_bound(tmp_path,monkeypatch,current_end,want):
++    m,c,ref,v,s,calls=boundary_fixture(tmp_path,monkeypatch,'fresh',1010.,current_end)
++    result=m.run_stage(c,ref,'fresh',tmp_path,2000.,v,s)
++    assert len(calls)==1 and result['exit_code']==0 and result['term_sent_at'] is None
++    assert result['deadline_unix']==want
++    command=calls[0]['command'];assert float(command[command.index('--deadline')+1])==want
++    assert json.loads((tmp_path/'fresh/data-parameters.json').read_text())['bound_diagnostic_deadline']==want
++    assert (tmp_path/'fresh/pipeline-observation.json').is_file()
++
++
++def test_review244_actual_observer_rejects_late_reaped_zero(tmp_path,monkeypatch):
++    m,c,ref,v,s,calls=boundary_fixture(tmp_path,monkeypatch,'fresh',1010.,1900.,late_reap=True)
++    with pytest.raises(TimeoutError):m.run_stage(c,ref,'fresh',tmp_path,2000.,v,s)
++    assert len(calls)==1 and not (tmp_path/'fresh/pipeline-observation.json').exists()
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239/request.json
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/request.json
+@@ -27,7 +27,7 @@
+   "current_catalogue_witness": null,
+   "launch_command": [
+     "bash",
+-    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239/launch.sh",
++    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/launch.sh",
+     "--config",
+     "ROOT_BOUND_ABSOLUTE_CONFIG",
+     "--config-sha256",

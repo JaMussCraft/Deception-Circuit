@@ -1,0 +1,29 @@
+{
+  "actual_container_evidence": {
+    "child_exit": 1,
+    "inner_mounts": null,
+    "outer_exit": 1,
+    "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-deployment262/container-pure-check.json",
+    "sha256": "a820519de32db45166db81c45d642597a41893d1113fba399c7ea58330fc691b",
+    "stderr": "Traceback (most recent call last):\n  File \"/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-transport254-r2/inner.py\", line 26, in <module>\n    if __name__=='__main__':main()\n                            ^^^^^^\n  File \"/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-transport254-r2/inner.py\", line 22, in main\n    assert all(flag & os.ST_RDONLY for flag in flags.values()),flags\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: {'/sys/fs/cgroup': 15, '/sys/fs/cgroup/blkio': 4110, '/sys/fs/cgroup/cpu,cpuacct': 4110, '/sys/fs/cgroup/cpuset': 4110, '/sys/fs/cgroup/devices': 4110, '/sys/fs/cgroup/freezer': 4110, '/sys/fs/cgroup/hugetlb': 4110, '/sys/fs/cgroup/memory': 4111, '/sys/fs/cgroup/net_cls,net_prio': 4110, '/sys/fs/cgroup/perf_event': 4110, '/sys/fs/cgroup/pids': 4110, '/sys/fs/cgroup/rdma': 4110, '/sys/fs/cgroup/systemd': 4110}\n"
+  },
+  "members": {
+    "host.py": "ee4b93003e1ed43f8559517bebde481fd27b0db64013b5c15ee01fdd70dcc4e3",
+    "inner.py": "4f8b852417222b11a832548bab2d6d1e23a55925fef6cc177f931c39675698a7",
+    "launch.sh": "f96e97c41d7ceffe41c44ff73004327be3b9390ef577a2d05ba00e186821efc7",
+    "transport229.py": "83594af1e7b665faf684af15f84b6c42534cf493db31298afb0c38c5c596bee4"
+  },
+  "snapshot_sha256": {
+    "host.py": "ee4b93003e1ed43f8559517bebde481fd27b0db64013b5c15ee01fdd70dcc4e3",
+    "inner.py": "4f8b852417222b11a832548bab2d6d1e23a55925fef6cc177f931c39675698a7",
+    "launch.sh": "f96e97c41d7ceffe41c44ff73004327be3b9390ef577a2d05ba00e186821efc7",
+    "manifest.json": "7ae57ad0089826888d8917e0c01da15d3d5108ff292200a8c26b99d5aeed9eea",
+    "r2.diff": "635b7e089da98a2cea3ac21b4d9014935b98a72bc07bad326437c33436ad6a1d",
+    "red-base.log": "6adbf1770c611673500b3aa9e2f0d11e30074b3ae0627a4324e05d90b592993b",
+    "test-results.log": "7bdc6a94877da02169c498b66bf379a6f63747a26be89341e607df642db4fe70",
+    "test_regressions.py": "2de74d5fe762be83b6c0480a7b9089ce49bed0a659f31146e470cb7c85f4a771",
+    "transport229.py": "83594af1e7b665faf684af15f84b6c42534cf493db31298afb0c38c5c596bee4"
+  },
+  "source_manifest_sha256": "7ae57ad0089826888d8917e0c01da15d3d5108ff292200a8c26b99d5aeed9eea",
+  "transport_unchanged": true
+}

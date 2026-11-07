@@ -1,0 +1,20 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____ test_edge_source_initialization_reaches_actual_receipt_and_projector _____
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-edge-accounting/test_edge_source_initializatio0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fccd62f28a0>
+
+    def test_edge_source_initialization_reaches_actual_receipt_and_projector(tmp_path,monkeypatch):
+        from tests.test_a3_source_validation import setup_case
+        from component_analysis import a3_edge_workload as w
+        from types import SimpleNamespace
+        c=setup_case(tmp_path,monkeypatch);state=c.build(owner='edge')
+>       startup=p._source_startup_seconds(0.,SimpleNamespace(_edge_source_context=state))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_edge_pipeline' has no attribute '_source_startup_seconds'
+
+tests/test_a3_edge_pipeline.py:696: AttributeError
+=========================== short test summary info ============================
+FAILED tests/test_a3_edge_pipeline.py::test_edge_source_initialization_reaches_actual_receipt_and_projector
+1 failed, 42 deselected in 15.54s

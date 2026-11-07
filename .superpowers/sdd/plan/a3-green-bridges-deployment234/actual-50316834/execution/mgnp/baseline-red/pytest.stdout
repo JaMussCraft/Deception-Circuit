@@ -1,0 +1,196 @@
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+_ test_prepared_anchored_cgroup_scope_mismatch_rejects_before_loader[False-True] _
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/a3-green-bridges-transport229-r3/jobs/job-50316834/execution/mgnp/baseline-red/tmp/test_prepared_anchored_cgroup_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x152694b48fb0>
+measured = False, current = True
+
+    @pytest.mark.parametrize('measured,current', [(False, True), (True, False)])
+    def test_prepared_anchored_cgroup_scope_mismatch_rejects_before_loader(tmp_path, monkeypatch, measured, current):
+        from tests.a3_prepared_integration_cases import rewrite_object
+>       c = integration_case(tmp_path, monkeypatch).anchor(); r = c.r
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+baseline-suite/test_a3_prepared_pilot_target.py:968: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+baseline-source/tests/a3_prepared_integration_cases.py:245: in anchor
+    r = self.r; self.prepare()
+                ^^^^^^^^^^^^^^
+baseline-source/tests/a3_prepared_integration_cases.py:242: in prepare
+    return self.r.prepare_pilot_target(args, self.design, self.protocol, selected=self.selected)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+baseline-source/component_analysis/a3_direction_runtime.py:407: in prepare_pilot_target
+    before=live_guard(design,protocol,args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+baseline-source/component_analysis/a3_direction_runtime.py:1113: in live_guard
+    evidence=artifacts.validate_live(design,protocol,registry_paths=args.registry)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+baseline-source/component_analysis/a3_direction_artifacts.py:376: in validate_live
+    registries=a3_design.validate_access(design,list(registry_paths))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+baseline-source/component_analysis/a3_design.py:305: in validate_access
+    return common.check_registry(args,contexts)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+baseline-source/dataset/user_inversion_pipeline.py:251: in check_registry
+    require(registry_path.is_file(), 'missing required protected registry: ' + str(registry_path))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False
+message = 'missing required protected registry: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r4/baseline-source/docs/research/held_out.json'
+
+    def require(condition, message):
+        if not condition:
+>           raise ValueError(message)
+E           ValueError: missing required protected registry: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r4/baseline-source/docs/research/held_out.json
+
+baseline-source/dataset/user_inversion_pipeline.py:32: ValueError
+_ test_prepared_anchored_cgroup_scope_mismatch_rejects_before_loader[True-False] _
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/a3-green-bridges-transport229-r3/jobs/job-50316834/execution/mgnp/baseline-red/tmp/test_prepared_anchored_cgroup_1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x152694b48ec0>
+measured = True, current = False
+
+    @pytest.mark.parametrize('measured,current', [(False, True), (True, False)])
+    def test_prepared_anchored_cgroup_scope_mismatch_rejects_before_loader(tmp_path, monkeypatch, measured, current):
+        from tests.a3_prepared_integration_cases import rewrite_object
+>       c = integration_case(tmp_path, monkeypatch).anchor(); r = c.r
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+baseline-suite/test_a3_prepared_pilot_target.py:968: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+baseline-source/tests/a3_prepared_integration_cases.py:245: in anchor
+    r = self.r; self.prepare()
+                ^^^^^^^^^^^^^^
+baseline-source/tests/a3_prepared_integration_cases.py:242: in prepare
+    return self.r.prepare_pilot_target(args, self.design, self.protocol, selected=self.selected)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+baseline-source/component_analysis/a3_direction_runtime.py:407: in prepare_pilot_target
+    before=live_guard(design,protocol,args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+baseline-source/component_analysis/a3_direction_runtime.py:1113: in live_guard
+    evidence=artifacts.validate_live(design,protocol,registry_paths=args.registry)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+baseline-source/component_analysis/a3_direction_artifacts.py:376: in validate_live
+    registries=a3_design.validate_access(design,list(registry_paths))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+baseline-source/component_analysis/a3_design.py:305: in validate_access
+    return common.check_registry(args,contexts)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+baseline-source/dataset/user_inversion_pipeline.py:251: in check_registry
+    require(registry_path.is_file(), 'missing required protected registry: ' + str(registry_path))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False
+message = 'missing required protected registry: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r4/baseline-source/docs/research/held_out.json'
+
+    def require(condition, message):
+        if not condition:
+>           raise ValueError(message)
+E           ValueError: missing required protected registry: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r4/baseline-source/docs/research/held_out.json
+
+baseline-source/dataset/user_inversion_pipeline.py:32: ValueError
+______ test_prepared_anchored_cold_warm_cgroup_scope_disagreement_rejects ______
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/a3-green-bridges-transport229-r3/jobs/job-50316834/execution/mgnp/baseline-red/tmp/test_prepared_anchored_cold_wa0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x152694b4fb00>
+
+    def test_prepared_anchored_cold_warm_cgroup_scope_disagreement_rejects(tmp_path, monkeypatch):
+        from tests.a3_prepared_integration_cases import rewrite_object
+>       c = integration_case(tmp_path, monkeypatch).anchor(); r = c.r
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+baseline-suite/test_a3_prepared_pilot_target.py:987: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+baseline-source/tests/a3_prepared_integration_cases.py:245: in anchor
+    r = self.r; self.prepare()
+                ^^^^^^^^^^^^^^
+baseline-source/tests/a3_prepared_integration_cases.py:242: in prepare
+    return self.r.prepare_pilot_target(args, self.design, self.protocol, selected=self.selected)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+baseline-source/component_analysis/a3_direction_runtime.py:407: in prepare_pilot_target
+    before=live_guard(design,protocol,args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+baseline-source/component_analysis/a3_direction_runtime.py:1113: in live_guard
+    evidence=artifacts.validate_live(design,protocol,registry_paths=args.registry)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+baseline-source/component_analysis/a3_direction_artifacts.py:376: in validate_live
+    registries=a3_design.validate_access(design,list(registry_paths))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+baseline-source/component_analysis/a3_design.py:305: in validate_access
+    return common.check_registry(args,contexts)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+baseline-source/dataset/user_inversion_pipeline.py:251: in check_registry
+    require(registry_path.is_file(), 'missing required protected registry: ' + str(registry_path))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False
+message = 'missing required protected registry: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r4/baseline-source/docs/research/held_out.json'
+
+    def require(condition, message):
+        if not condition:
+>           raise ValueError(message)
+E           ValueError: missing required protected registry: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r4/baseline-source/docs/research/held_out.json
+
+baseline-source/dataset/user_inversion_pipeline.py:32: ValueError
+_ test_prepared_completed_intake_rejects_anchored_cgroup_scope_mismatch[False-True] _
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/a3-green-bridges-transport229-r3/jobs/job-50316834/execution/mgnp/baseline-red/tmp/test_prepared_completed_intake0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x152686e68560>
+measured = False, current = True
+
+    @pytest.mark.parametrize('measured,current', [(False, True), (True, False)])
+    def test_prepared_completed_intake_rejects_anchored_cgroup_scope_mismatch(tmp_path, monkeypatch, measured, current):
+        from tests.test_a3_direction_runtime import _production_cost_source_case
+        r = runtime(); original = r.publish_object; changed = []
+        def publish(path, payload):
+            if payload.get('kind') == 'a3_prepared_target_receiver_resources_v1':
+                payload = copy.deepcopy(payload); set_anchored_measurement_cgroup_scope(r, payload, measured); changed.append(Path(path))
+            elif payload.get('kind') == 'a3_direction_timing_v1':
+                payload = copy.deepcopy(payload)
+                inject_current_receiver_cgroup_scope(payload['prepared_target_transport']['observed_resources']['process_after'], current)
+            return original(path, payload)
+        monkeypatch.setattr(r, 'publish_object', publish)
+        r, design, protocol, target, path, mapping, _, _ = _production_cost_source_case(tmp_path, monkeypatch)
+        assert len(changed) == 1
+        origin = r.read_object(path)['origin']; admission = r.read_object(origin['admission_reference']['path'])
+        assert admission['pilot_target_preparation']['receiver_resources_reference'] == r.object_reference(changed[0])
+>       with pytest.raises(ValueError, match='measured/current cgroup applicability'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+baseline-suite/test_a3_prepared_pilot_target.py:1012: Failed
+_ test_prepared_completed_intake_rejects_anchored_cgroup_scope_mismatch[True-False] _
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/a3-green-bridges-transport229-r3/jobs/job-50316834/execution/mgnp/baseline-red/tmp/test_prepared_completed_intake1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x15267415e930>
+measured = True, current = False
+
+    @pytest.mark.parametrize('measured,current', [(False, True), (True, False)])
+    def test_prepared_completed_intake_rejects_anchored_cgroup_scope_mismatch(tmp_path, monkeypatch, measured, current):
+        from tests.test_a3_direction_runtime import _production_cost_source_case
+        r = runtime(); original = r.publish_object; changed = []
+        def publish(path, payload):
+            if payload.get('kind') == 'a3_prepared_target_receiver_resources_v1':
+                payload = copy.deepcopy(payload); set_anchored_measurement_cgroup_scope(r, payload, measured); changed.append(Path(path))
+            elif payload.get('kind') == 'a3_direction_timing_v1':
+                payload = copy.deepcopy(payload)
+                inject_current_receiver_cgroup_scope(payload['prepared_target_transport']['observed_resources']['process_after'], current)
+            return original(path, payload)
+        monkeypatch.setattr(r, 'publish_object', publish)
+        r, design, protocol, target, path, mapping, _, _ = _production_cost_source_case(tmp_path, monkeypatch)
+        assert len(changed) == 1
+        origin = r.read_object(path)['origin']; admission = r.read_object(origin['admission_reference']['path'])
+        assert admission['pilot_target_preparation']['receiver_resources_reference'] == r.object_reference(changed[0])
+>       with pytest.raises(ValueError, match='measured/current cgroup applicability'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+baseline-suite/test_a3_prepared_pilot_target.py:1012: Failed
+=========================== short test summary info ============================
+FAILED baseline-suite/test_a3_prepared_pilot_target.py::test_prepared_anchored_cgroup_scope_mismatch_rejects_before_loader[False-True]
+FAILED baseline-suite/test_a3_prepared_pilot_target.py::test_prepared_anchored_cgroup_scope_mismatch_rejects_before_loader[True-False]
+FAILED baseline-suite/test_a3_prepared_pilot_target.py::test_prepared_anchored_cold_warm_cgroup_scope_disagreement_rejects
+FAILED baseline-suite/test_a3_prepared_pilot_target.py::test_prepared_completed_intake_rejects_anchored_cgroup_scope_mismatch[False-True]
+FAILED baseline-suite/test_a3_prepared_pilot_target.py::test_prepared_completed_intake_rejects_anchored_cgroup_scope_mismatch[True-False]
+5 failed in 86.65s (0:01:26)

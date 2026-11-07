@@ -1,0 +1,30 @@
+{
+  "job_id": "23471274",
+  "cluster": "delta",
+  "submitted_utc": "2026-11-03T13:21:04.745766+00:00",
+  "command": [
+    "sbatch",
+    "--parsable",
+    "--export=ALL",
+    "--account=bjhz-delta-cpu",
+    "--partition=cpu-interactive",
+    "--constraint=projects",
+    "--ntasks=1",
+    "--cpus-per-task=4",
+    "--mem=32G",
+    "--time=00:10:00",
+    "--job-name=lad-a3-mask-cost",
+    "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+    "--output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/mask-full-path-cost-diagnosis/slurm-%j.log",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/mask-full-path-cost-diagnosis/cpu-diagnosis.sh"
+  ],
+  "proposal_sha256": "56b5252d500b5e238385dc84504edb7816937c0b935dcd199bf0ac902f929610",
+  "cpus": 4,
+  "memory_GiB": 32,
+  "gpus": 0,
+  "time_minutes": 10,
+  "account": "bjhz-delta-cpu",
+  "partition": "cpu-interactive",
+  "test_only": "sbatch: Job 23471273 to start at 2026-11-03T07:21:04 a using 4 processors on nodes cn004 in partition cpu-interactive\n",
+  "scope": "Genuine disjoint static proof components and actual own-CPU-job scheduler queries; no production live admission"
+}

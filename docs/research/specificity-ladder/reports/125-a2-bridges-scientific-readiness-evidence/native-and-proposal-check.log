@@ -1,0 +1,91 @@
+{
+  "kind": "independent_stored_native_and_proposal_review",
+  "arms": {
+    "D": {
+      "original_receipt_sha256": "7f2709b1f3aec5f1fbdc470bdb1e2658c8d33f3e3cf38558d140186bf79e5d0a",
+      "returned_receipt_sha256": "7ffbaf74e5bec7841fd53a5e2a91eee3fa7ca081342689f711cbd985db394a7f",
+      "artifact_byte_identity": {
+        "config.json": true,
+        "active_nodes.json": true,
+        "results.json": true,
+        "history.json": true,
+        "run_manifest.json": false
+      },
+      "pretraining_rows": {
+        "test": 952,
+        "validation_epoch0": 187
+      },
+      "results": {
+        "baseline": {
+          "rows": 952,
+          "all_row_fields_exact": true
+        },
+        "node_eval": {
+          "rows": 952,
+          "all_row_fields_exact": true
+        }
+      },
+      "validation_epochs": [
+        0,
+        10,
+        20
+      ],
+      "validation_rows_each": 187,
+      "binary_mask_entries": 1056,
+      "active_heads": 796,
+      "active_mlps": 30,
+      "observed_total_seconds": 213.3371678639669,
+      "observed_pruning_seconds": 138.5,
+      "projected_process_seconds": 3537.337167863967,
+      "buffered_requested_minutes": 71
+    },
+    "I": {
+      "original_receipt_sha256": "13d90fe4756c3217a70b6a591268bb3ad6804ccb126ff8fcf60bc7d0f773c7c0",
+      "returned_receipt_sha256": "85a245a8f66bd6a085535f2785f4b09f89648020008902c28bd088ea6c9e5eb5",
+      "artifact_byte_identity": {
+        "config.json": true,
+        "active_nodes.json": true,
+        "results.json": true,
+        "history.json": true,
+        "run_manifest.json": false
+      },
+      "pretraining_rows": {
+        "test": 952,
+        "validation_epoch0": 187
+      },
+      "results": {
+        "baseline": {
+          "rows": 952,
+          "all_row_fields_exact": true
+        },
+        "node_eval": {
+          "rows": 952,
+          "all_row_fields_exact": true
+        }
+      },
+      "validation_epochs": [
+        0,
+        10,
+        20
+      ],
+      "validation_rows_each": 187,
+      "binary_mask_entries": 1056,
+      "active_heads": 735,
+      "active_mlps": 26,
+      "observed_total_seconds": 188.57914747297764,
+      "observed_pruning_seconds": 130.7,
+      "projected_process_seconds": 3325.3791474729774,
+      "buffered_requested_minutes": 67
+    }
+  },
+  "proposal_sha256": "2926dc81d222142915d3dc559d25c1a816edff7e750e398c09cc74fedd78107b",
+  "exact_original_six_cell_bytes": true,
+  "original_charges_retained_proposal_only": true,
+  "canonical_receipts_absent_at_local_inspection": true,
+  "new_gpu_hours": 6.9,
+  "combined_before": 25.3001,
+  "combined_after": 32.2001,
+  "combined_cap": 125,
+  "model_or_remote_calls": false,
+  "scientific_admission": false
+}

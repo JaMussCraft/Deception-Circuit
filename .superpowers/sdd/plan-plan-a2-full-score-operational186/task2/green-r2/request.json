@@ -1,0 +1,33 @@
+{
+  "status": "ROOT_CPU_FIXTURE_PROPOSAL_ONLY",
+  "nodes": 1,
+  "ntasks": 1,
+  "CPUs": 2,
+  "RAM_GiB": 8,
+  "GPUs": 0,
+  "walltime_seconds": 360,
+  "requeue": false,
+  "allowed_partitions": [
+    "cpu",
+    "cpu-interactive"
+  ],
+  "red_timeout_seconds_per_environment": 30,
+  "green_timeout_seconds_per_environment": 90,
+  "red_cases_per_environment": 22,
+  "red_expected_failures": 20,
+  "red_expected_passes": 2,
+  "green_cases_per_environment": 226,
+  "pins_sha256": "80b67c4aac5535dcbfe2b88e192c1cde270bde3b445bfccf97b2307abb628859",
+  "no_native_import": true,
+  "no_model": true,
+  "no_GPU": true,
+  "scientific_execution_authorized": false,
+  "command": [
+    "bash",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task2/green-r2/launch_cpu_green.sh",
+    "--pins-sha256",
+    "80b67c4aac5535dcbfe2b88e192c1cde270bde3b445bfccf97b2307abb628859",
+    "--output",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task2/green-r2/root-green-01"
+  ]
+}

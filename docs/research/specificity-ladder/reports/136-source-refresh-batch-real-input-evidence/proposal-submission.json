@@ -1,0 +1,30 @@
+{
+  "job_id": "23459447",
+  "cluster": "delta",
+  "submitted_utc": "2026-11-03T02:32:24.927550+00:00",
+  "command": [
+    "sbatch",
+    "--parsable",
+    "--export=ALL",
+    "--account=beto-delta-cpu",
+    "--partition=cpu",
+    "--constraint=projects",
+    "--ntasks=1",
+    "--cpus-per-task=4",
+    "--mem=32G",
+    "--time=00:35:00",
+    "--job-name=lad-a3-batch-prep",
+    "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+    "--output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-refresh-batch-real-input-cpu-proposal/logs/slurm-%j.out",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-refresh-batch-real-input-cpu-proposal/cpu-preparation.sh"
+  ],
+  "release_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-refresh-batch-root-release.json",
+  "release_sha256": "0904f0d13e559cffed0edb7085c9aa55d91e83df9a93d4dd82429815686d0320",
+  "proposal_manifest_sha256": "9e6d1bea7e9650298ca68f9a400734df65ffa444491293e78486775f37f99f73",
+  "cpus": 4,
+  "memory_GiB": 32,
+  "gpus": 0,
+  "time_minutes": 35,
+  "account": "beto-delta-cpu",
+  "partition": "cpu"
+}

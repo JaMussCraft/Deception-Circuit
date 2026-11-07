@@ -1,0 +1,85 @@
+[
+  {
+    "label": "base-isolated",
+    "argv": [
+      "/sw/external/python/anaconda3/bin/python3.9",
+      "-B",
+      "-I",
+      "-m",
+      "pytest",
+      "-c",
+      "/dev/null",
+      "--confcutdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259/tests",
+      "-p",
+      "no:cacheprovider",
+      "--collect-only",
+      "-q",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259/tests/test_full_score_release.py",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259/tests/test_full_score_cache.py",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259/tests/test_full_score_usage.py"
+    ],
+    "exit_code": 0,
+    "seconds": 0.5554758119978942,
+    "tail": [
+      "::test_unknown_frozen_mismatched_or_rollback_meter_fails_closed[missing-counters]",
+      "::test_usage_command_hardcodes80_and_targets_session_without_private_writes",
+      "",
+      "98 tests collected in 0.22s"
+    ]
+  },
+  {
+    "label": "base-normal",
+    "argv": [
+      "/sw/external/python/anaconda3/bin/python3.9",
+      "-B",
+      "-m",
+      "pytest",
+      "-c",
+      "/dev/null",
+      "--confcutdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259/tests",
+      "-p",
+      "no:cacheprovider",
+      "--collect-only",
+      "-q",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259/tests/test_full_score_release.py",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259/tests/test_full_score_cache.py",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259/tests/test_full_score_usage.py"
+    ],
+    "exit_code": 0,
+    "seconds": 0.5716554509708658,
+    "tail": [
+      "::test_unknown_frozen_mismatched_or_rollback_meter_fails_closed[missing-counters]",
+      "::test_usage_command_hardcodes80_and_targets_session_without_private_writes",
+      "",
+      "98 tests collected in 0.20s"
+    ]
+  },
+  {
+    "label": "mgnp-isolated",
+    "argv": [
+      "/u/swong2/.conda/envs/mgnp/bin/python",
+      "-B",
+      "-I",
+      "-m",
+      "pytest",
+      "-c",
+      "/dev/null",
+      "--confcutdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259/tests",
+      "-p",
+      "no:cacheprovider",
+      "--collect-only",
+      "-q",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259/tests/test_full_score_release.py",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259/tests/test_full_score_cache.py",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259/tests/test_full_score_usage.py"
+    ],
+    "exit_code": 0,
+    "seconds": 0.5582748129963875,
+    "tail": [
+      "::test_unknown_frozen_mismatched_or_rollback_meter_fails_closed[missing-counters]",
+      "::test_usage_command_hardcodes80_and_targets_session_without_private_writes",
+      "",
+      "98 tests collected in 0.16s"
+    ]
+  }
+]

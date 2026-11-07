@@ -1,0 +1,616 @@
+--- a/component_analysis/a3_edge_pipeline.py
++++ b/component_analysis/a3_edge_pipeline.py
+@@ -444,69 +444,73 @@
+ 
+ 
+ def _utility_batch(row,stream,*,physical_width=None):
+     raw=copy.deepcopy(row);s=raw['streams'][stream]
+     for name in ('opposite_token','honest_token','expected_token'):
+         if name not in s:s[name]=raw[name]
+     s['semantic']=dict(prompt_utf8_hex=s['prompt'].encode().hex(),sites={b:([s['readout']] if b=='assistant_readout' else []) for b in BINS})
+     return _batch(raw,stream,physical_width=physical_width)
+ 
+ 
+-def h_mean_bank(model,design,task,selected,*,guard,bank_sources=None,observer=None):
++def h_mean_bank(model,design,task,selected,*,guard,bank_sources=None,observer=None,timing_only=False):
+     """Ancestral A1 original-H train+validation, both streams, equal-token fp32.
+ 
+     Head contributions are actual projected additive residual outputs. This bank
+     is recollected in the native profile; archived coordinate means are not mixed.
+     """
+     from component_analysis.a3_native import native_forward
+     if bank_sources is None:
+         require(design.get('injected') is True,'authenticated ancestral H bank sources required')
+         bank_sources=ancestral_bank_sources(design)[task]
+     rows=bank_sources['rows'];ids=bank_sources['source_ids']
+     require(rows and [r['instance_id'] for r in rows]==ids and len(ids)==len(set(ids)),'changed/duplicate H bank membership')
+     require(bank_sources['source_sha256']==digest(rows),'changed H bank source bytes')
+     require(all(r['condition']=='H' and r['split'] in ('train','validation') for r in rows),'H bank must exclude all assessment rows')
+-    sources=sorted({tuple(e['sender']) for e in selected});totals={};tokens=0
++    expected=h_bank_contract(design,task,model=model,bank_sources=bank_sources,timing_only=timing_only)
++    sources=[tuple(site) for site in expected['sources']];totals={};tokens=0
+     width=bank_sources.get('padded_width',1+max(len(s['tokens']) for r in rows for s in r['streams'].values()))
+     for row in rows:
+         require(set(row['streams'])==set(STREAMS),'H bank needs both streams')
+         for stream in STREAMS:
+             guard();b=_move({'batch':_utility_batch(row,stream,physical_width=width)},model)['batch']
+             call=lambda:native_forward(model,b,capture_sites=sources)
+             out=observer('H_bank',b,sources,call) if observer else call()
+             mask=b['attention_mask'].bool();tokens+=int(mask.sum())
+             for site in sources:
+                 value=out['additive'][site][mask].detach().float().sum(0).cpu()
+                 totals[site]=totals.get(site,torch.zeros_like(value))+value
+             del out
+     require(tokens>0,'empty H token bank')
+     values={s:v/tokens for s,v in totals.items()}
+-    return dict(values=values,provenance=dict(task=task,source_ids=ids,source_sha256=bank_sources['source_sha256'],
+-        splits=sorted({r['split'] for r in rows}),streams=list(STREAMS),unpadded_tokens=tokens,
+-        representation='native projected additive head residual and whole-MLP additive residual',
+-        accumulation_dtype='torch.float32',native_dtype=str(next(model.parameters()).dtype),
+-        padded_width=width,weighting='equal unpadded token; both streams'))
+-
+-
+-def _utility_floor(model,batch,selected,mode,bank):
++    require(tokens==expected['provenance']['unpadded_tokens'],'H bank token coverage differs from ancestral contract')
++    return validate_h_bank(dict(values=values,contract=expected,provenance=copy.deepcopy(expected['provenance'])),expected)
++
++
++def _utility_floor(model,batch,selected,mode,bank,*,bank_contract=None):
+     from component_analysis.a3_native import native_forward,ResidualPatch
++    require(mode in ('zero','h_mean'),'unsupported utility floor')
++    if mode=='h_mean':
++        require(bank_contract is not None,'independent H bank contract required before intervention')
++        require(all(bank_contract['geometry'][k]==getattr(model.config,k) for k in ('hidden_size','num_hidden_layers','num_attention_heads','num_key_value_heads')) and bank_contract['numeric_profile']['dtype']==str(next(model.parameters()).dtype) and bank_contract['numeric_profile']['backend']==getattr(model.config,'_attn_implementation',bank_contract['numeric_profile']['backend']),'H bank contract differs from actual native model')
++        bank=validate_h_bank(bank,bank_contract)
+     receivers=sorted({tuple(e['receiver']) for e in selected});sources=sorted({tuple(e['sender']) for e in selected})
+     out=native_forward(model,batch,capture_sites=receivers+sources)
+     patches={};position=int(batch['readout'][0])
+     for receiver in receivers:
+         value=out['incoming'][receiver].clone()
+         for edge in sorted(selected,key=edge_key):
+             if tuple(edge['receiver'])!=receiver:continue
+             site=tuple(edge['sender']);intact=out['additive'][site][0,position]
+             donor=torch.zeros_like(intact) if mode=='zero' else bank['values'][site].to(intact)
+             value[0,position]+=donor-intact
+         mask=torch.zeros(batch['input_ids'].shape,dtype=torch.bool,device=value.device);mask[0,position]=True
++        require(bool(torch.isfinite(value[mask]).all()),'H utility clamp became nonfinite in native dtype')
+         patches[receiver]=ResidualPatch(value,mask)
+     del out
+     result=native_forward(model,batch,capture_sites=receivers,patches=patches)
+     return dict(result,clamps={r:p.value for r,p in patches.items()},patch_positions={r:p.positions for r,p in patches.items()},receiver_outputs=result['outputs'])
+ 
+ 
+ def score_utilities(model,design,task,split,selected,*,guard,bank=None,bank_sources=None,only_ids=None,timing_only=False):
+     from component_analysis.a3_native import native_forward
+     require(split in ('validation','test'),'utility source must be validation/test')
+     require(selected,'empty patch cannot establish utility preservation')
+@@ -519,37 +523,41 @@
+         return output
+     rows=[]
+     ioi=design.get('ioi_validation',[]) if split=='validation' else design['utility'].get('ioi',[])
+     mmlu=design.get('mmlu_validation',[]) if split=='validation' else design['utility'].get('mmlu',[])
+     maps=design.get('ioi_validation_maps',[]) if split=='validation' else design['utility'].get('ioi_maps',[])
+     if only_ids is not None:
+         require(set(only_ids)<={'ioi','mmlu'},'unknown utility timing source')
+         ioi=[r for r in ioi if r['instance_id'] in only_ids.get('ioi',[])]
+         mmlu=[r for r in mmlu if r['instance_id'] in only_ids.get('mmlu',[])]
+         require({r['instance_id'] for r in ioi}==set(only_ids.get('ioi',[])) and {r['instance_id'] for r in mmlu}==set(only_ids.get('mmlu',[])),'unknown utility source membership')
+-    if mmlu and bank is None:bank=h_mean_bank(model,design,task,selected,guard=guard,bank_sources=bank_sources)
++    expected_bank=None
++    if mmlu:
++        expected_bank=h_bank_contract(design,task,model=model,bank_sources=bank_sources,timing_only=timing_only)
++        if bank is None:bank=h_mean_bank(model,design,task,selected,guard=guard,bank_sources=bank_sources,timing_only=timing_only)
++        bank=validate_h_bank(bank,expected_bank)
+     for source,records in (('IOI',ioi),('MMLU',mmlu)):
+         for raw in records:
+             guard();batch=_move({'batch':_utility_batch(raw,'clean',physical_width=source_width(design,source.lower()))},model)['batch']
+             intact=native_forward(model,batch,capture_sites=[]);a=_observation(intact,batch);intact_vector=intact['fp32_logits'].detach();del intact
+             modes=('item_swap',) if source=='IOI' else ('zero','h_mean')
+             for mode in modes:
+                 condition='IOI' if source=='IOI' else 'MMLU_'+mode
+                 base=dict(condition=condition,source_condition=raw['condition'],instance_id=raw['instance_id'],source_id=raw.get('source_id'),source_hash=raw.get('source_hash'),stream='clean',split=raw.get('split'),source_split=raw.get('split'),analysis_split='validation' if split=='validation' else 'assessment')
+                 if source=='IOI':
+                     records_map=[m for m in maps if m['recipient_id']==raw['instance_id'] and m['operation']=='item_swap']
+                     require(len(records_map)==1,'missing/duplicate authenticated IOI map')
+                     if not records_map[0]['supported']:
+                         rows.append(dict(base,supported=False,reason='unsupported frozen IOI donor'));continue
+                     donor=_move({'batch':_utility_batch(raw,'corrupt',physical_width=source_width(design,source.lower()))},model)['batch']
+                     patched=core.exact_edge_patch(model,batch,donor,edges=selected,maps={'rows':records_map})
+-                else:patched=_utility_floor(model,batch,selected,mode,bank)
++                else:patched=_utility_floor(model,batch,selected,mode,bank,bank_contract=expected_bank)
+                 b=_observation(patched,batch);clamps=verify_effective_clamps(model,patched);del patched
+                 replay_map=dict(supported=True,recipient_id=raw['instance_id'],donor_id=raw['instance_id'],recipient_condition=batch['condition'],donor_condition=batch['condition'],recipient_stream='clean',donor_stream='clean',recipient_positions=[int(batch['readout'][0])],donor_positions=[int(batch['readout'][0])])
+                 replay=core.exact_edge_patch(model,batch,batch,edges=selected,maps={'rows':[replay_map]})
+                 replay_valid=bool(torch.allclose(replay['fp32_logits'],intact_vector,atol=1e-5,rtol=1e-5) and torch.equal(replay['fp32_logits'].argmax(-1),intact_vector.argmax(-1)))
+                 del replay
+                 rows.append(dict(base,supported=True,timing_only=bool(timing_only),replay_valid=replay_valid,effective_clamps=clamps,gate_valid=True,degenerate=False,intact_correct=a['correct'],patched_correct=b['correct'],intact_margin=a['margin'],patched_margin=b['margin']))
+     return rows
+ 
+ 
+ def select_native(model,design,task,graph,fit,*,guard):
+@@ -622,21 +630,21 @@
+     require(prepared.get('bank_sources')==ancestral_bank_sources(design),'changed ancestral A1 H bank sources')
+     require(prepared.get('source_admission',{}).get('source_sha256')==source_rows_digest(design),'changed admitted source/token/semantic/map memberships')
+     if not (design.get('injected') and not design.get('parent_evidence')):
+         from component_analysis.a3_pipeline import load_a1_parents
+         parent,_,_=load_a1_parents(design['parent_evidence']['prepared_path'],design['parent_evidence']['selected_path'])
+         validate_original_streams(design,parent)
+     extended=copy.deepcopy(design)
+     for task,bank in prepared['bank_sources'].items():extended['access_rows'][task]+=bank['rows']
+     a3_design.validate_access(extended,list(registry_paths))
+     for task,graph in prepared['graphs'].items():
+-        geom={k:graph['geometry'][k] for k in ('num_hidden_layers','num_attention_heads','num_key_value_heads')}
++        geom={k:v for k,v in graph['geometry'].items() if k!='position_cells'}
+         require(graph==prepare_graph(design,task,geom),'changed frozen graph/semantic coverage')
+     return live
+ 
+ 
+ def native_pilot_checks(model,batch,receivers):
+     """Actual native autograd readout plus local residual VJP finite differences.
+ 
+     Fixed fp32 diagnostic tolerance mirrors the reviewed tiny adapter tests.
+     Low-precision native runs which cannot meet it remain blocked, never waived.
+     """
+@@ -875,21 +883,21 @@
+ def _metadata_geometry(design,args):
+     from huggingface_hub import hf_hub_download
+     if args.geometry:
+         require(design.get('injected') is True,'caller geometry forbidden for production')
+         cfg=json.loads(Path(args.geometry).read_text())
+     else:
+         a1=design['a1_identity']
+         path=hf_hub_download(a1['model'],'config.json',revision=a1['model_revision'],local_files_only=True)
+         cfg=json.loads(Path(path).read_text())
+         require(cfg.get('model_type')=='llama' and cfg.get('hidden_size')==4096 and cfg.get('intermediate_size')==14336,'unsupported frozen native geometry')
+-    return {k:cfg[k] for k in ('num_hidden_layers','num_attention_heads','num_key_value_heads')}
++    return {k:cfg[k] for k in ('num_hidden_layers','num_attention_heads','num_key_value_heads','hidden_size')}
+ 
+ 
+ def _require_independent_controls(args,identity,design):
+     require(args.pilot_evidence,'completed native pilot required')
+     pilot=authority.read_object(args.pilot_evidence)
+     refs=pilot.get('control_references')
+     require(isinstance(refs,dict) and set(refs)=={'model_loading','serial_geometry','complete_toy_endpoint'},'actual pilot control objects required')
+     for name,reference in refs.items():
+         require(reference==authority.object_reference(reference['path']),'changed pilot control bytes')
+         validate_control(authority.read_object(reference['path']),design,identity)
+@@ -941,20 +949,21 @@
+         require(assessment['pilot_reference']==authority.object_reference(assessment['pilot_reference']['path']),'changed native pilot bytes')
+         validate_pilot(pilot,design,prepared,identity)
+     plan=paired_bootstrap_plan(design);hydrated={}
+     for chunk in chunks:
+         task=chunk['key'][0];reference=chunk['result'].get('panel_reference')
+         require(reference==authority.object_reference(reference['path']),'changed assessed panel bytes')
+         key=digest(reference)
+         if key not in hydrated:
+             panel=authority.read_object(reference['path'])
+             require(panel['identity']==identity and panel['task']==task,'changed panel source/profile identity')
++            validate_panel_bank(panel,design,prepared,identity)
+             panel['summary']=recompute_panel(design,task,panel,bootstrap_plan=plan)
+             approximation=bool(pilot and pilot['tasks'][task]['stable'])
+             panel['summary']['approximation_validated']=approximation
+             panel['summary']['edge_assay_ready']=bool(panel['summary'].get('edge_assay_ready') and approximation)
+             panel['summary']['full_edge_specificity_claim_allowed']=bool(panel['summary']['edge_assay_ready'] and panel['summary']['point_pass'] and panel['summary'].get('confidence_gate_support') and not design.get('injected'))
+             panel['summary']['exact_clamp_specificity']=bool(panel['summary'].get('point_pass') and panel['summary']['edge_assay_ready'])
+             panel['summary']['approximation_qualification']='validated8/16 agreement' if approximation else 'approximation unresolved/unreliable; exact causal quantities descriptive; no full edge-specificity claim'
+             hydrated[key]=panel
+         family=next(f for f in assessment['selected']['tasks'][task]['families'] if f['seed']==chunk['key'][1] and f['ranking_condition']==chunk['key'][2])
+         members=family['edges'] if chunk['key'][3]==0 else family['nulls']['sets'][chunk['key'][3]-1]
+@@ -1340,52 +1349,54 @@
+         rows=[copy.deepcopy(indexed[rid]) for rid in ids]
+         require(all(r['split'] in ('train','validation') and r['condition']=='H' for r in rows),'assessment row in ancestral H bank')
+         banks[task]=dict(source_ids=list(ids),rows=rows,source_sha256=digest(rows),a1_parent_sha256=digest(parent),a1_selection_sha256=digest(selected))
+     return banks
+ 
+ 
+ 
+ 
+ 
+ def cached_h_bank(model,design,prepared,task,*,identity,root,guard):
+-    contract=prepared['bank_sources'][task];sources=sorted({tuple(e['sender']) for e in prepared['graphs'][task]['edges']})
+-    key=dict(identity=identity,task=task,sources=[list(s) for s in sources],source_sha256=contract['source_sha256'])
++    source=prepared['bank_sources'][task]
++    expected=h_bank_contract(design,task,model=model,prepared=prepared,bank_sources=source)
++    sources=expected['sources']
++    key=dict(identity=identity,task=task,sources=sources,source_sha256=source['source_sha256'])
+     path=Path(root)/digest(key);guard()
+     if path.exists():
+         body=authority.read_object(path)
+-        require(body['key']==key and body['provenance']['source_ids']==contract['source_ids'],'changed source/profile H bank')
+-        values={tuple(r['site']):torch.tensor(r['value'],dtype=torch.float32) for r in body['values']}
+-        require(set(values)==set(sources),'incomplete full sender-union H bank')
+-        bank=dict(values=values,provenance=body['provenance'])
++        require(body.get('kind')=='a3_edge_H_bank' and body.get('key')==key,'changed source/profile H bank')
++        bank=validate_h_bank(body,expected)
+     else:
+-        bank=h_mean_bank(model,design,task,prepared['graphs'][task]['edges'],guard=guard,bank_sources=contract)
+-        body=dict(kind='a3_edge_H_bank',key=key,values=[dict(site=list(s),value=bank['values'][s].tolist()) for s in sources],provenance=bank['provenance'])
++        bank=h_mean_bank(model,design,task,prepared['graphs'][task]['edges'],guard=guard,bank_sources=source)
++        bank=validate_h_bank(bank,expected)
++        body=dict(kind='a3_edge_H_bank',key=key,contract=bank['contract'],values=[dict(site=list(site),value=value.tolist()) for site,value in bank['values'].items()],provenance=bank['provenance'])
+         authority.publish_object(path,body)
+     bank['reference']=authority.object_reference(path)
+     return bank
+ 
+ 
+ def cached_assessment_panel(model,design,prepared,task,selected,*,identity,root,guard):
+     """Exact same model/source/set outcomes may serve duplicate frozen null draws.
+ 
+     Draw memberships/indices remain distinct scientific slots. No receiver or
+     selected-set intervention is approximated, summed or treated as a replicate.
+     """
+     key=dict(identity=identity,task=task,edges=selected);path=Path(root)/'panels'/digest(key);guard()
+     if path.exists():
+         panel=authority.read_object(path)
+         require(panel['identity']==identity and panel['task']==task and panel['edges']==selected,'changed exact panel membership/source')
+     else:
+         bank=cached_h_bank(model,design,prepared,task,identity=identity,root=Path(root)/'banks',guard=guard) if design.get('utility',{}).get('mmlu') else None
+         panel=dict(identity=identity,task=task,edges=selected,**_assessment_panel(model,design,task,selected,guard=guard,bank_sources=prepared['bank_sources'][task],bank=bank))
+         panel['bank_reference']=bank.get('reference') if bank else None
+         authority.publish_object(path,panel)
++    validate_panel_bank(panel,design,prepared,identity,model=model)
+     return dict(panel_reference=authority.object_reference(path),summary=panel['summary'])
+ 
+ 
+ 
+ 
+ 
+ def _synchronize(model):
+     if next(model.parameters()).is_cuda:torch.cuda.synchronize(next(model.parameters()).device)
+ 
+ 
+@@ -1461,21 +1472,21 @@
+     startup_measured=startup_seconds is not None
+     if startup_seconds is None:
+         require(identity.get('injected') is True,'actual model-load timing required for production producer')
+         start=time.perf_counter();model=copy.deepcopy(model).eval().requires_grad_(False);startup_seconds=time.perf_counter()-start
+         startup_measured=True
+     runtime=authority.runtime_environment(model)
+     runtime['vocabulary_size']=int(model.config.vocab_size)
+     runtime['dtype_bytes']=int(next(model.parameters()).element_size())
+     target=identity.get('numeric_profile') or {}
+     require(runtime['dtype'].removeprefix('torch.')==target.get('dtype',runtime['dtype']).removeprefix('torch.') and runtime['backend']==target.get('backend',runtime['backend']),'producer native dtype/backend differs from frozen serial profile')
+-    measurements=[];guards=[];guard_evidence=[];banks={};scalar_records=[]
++    measurements=[];guards=[];guard_evidence=[];banks={};timing_bank_sources={};scalar_records=[]
+     root=Path(root);run_root=root/'measurement-runs'/uuid.uuid4().hex
+     def fresh():
+         t=time.perf_counter();proof=guard();guards.append(time.perf_counter()-t)
+         if proof is not None:guard_evidence.append(proof)
+     for requirement in inventory['requirements']:
+         p=requirement['profile'];cases=_measurement_cases(design,prepared,p)
+         require(cases,'no supported validation identity for required shape '+requirement['profile_id'])
+         cases=cases[:max_samples];samples=[];hashes=[];forward_calls=0;backward_calls=0;fwd=0.;bwd=0.;cache=0.;peak_allocated=0;peak_reserved=0;available=2**63-1;tokens=0
+         for case in cases:
+             fresh();batch=_move({'batch':_profile_case_batch(design,prepared,p,case)},model)['batch'];hashes.append(digest(batch_facts(batch)))
+@@ -1493,23 +1504,24 @@
+                     result=core.native_forward(model,batch,capture_sites=sources);mask=batch['attention_mask'].bool()
+                     return [dict(site=list(s),sum_norm=float(result['additive'][s][mask].float().sum(0).norm().detach().cpu()),tokens=int(mask.sum())) for s in sources]
+                 tokens=max(tokens,int(batch['attention_mask'].sum()))
+             elif operation in ('IOI','MMLU_floors'):
+                 source='ioi' if operation=='IOI' else 'mmlu'
+                 if operation=='MMLU_floors' and task not in banks:
+                     original=prepared['bank_sources'][task]
+                     rows=[r for r in original['rows'] if r['instance_id'] in set(_membership(design,task,'validation')[:8]) and r['split']=='validation']
+                     require(rows,'no ancestral H validation rows for timing-only mean bank')
+                     timing_sources=dict(source_ids=[r['instance_id'] for r in rows],rows=rows,source_sha256=digest(rows),padded_width=1+max(len(s['tokens']) for r in original['rows'] for s in r['streams'].values()))
+-                    banks[task]=h_mean_bank(model,design,task,prepared['graphs'][task]['edges'],guard=fresh,bank_sources=timing_sources)
++                    timing_bank_sources[task]=timing_sources
++                    banks[task]=h_mean_bank(model,design,task,prepared['graphs'][task]['edges'],guard=fresh,bank_sources=timing_sources,timing_only=True)
+                     banks[task]['provenance']['timing_only']=True
+-                call=lambda:score_utilities(model,design,task,'validation',edges,guard=lambda:None,bank=banks.get(task),only_ids={source:[case['instance_id']]},timing_only=True)
++                call=lambda:score_utilities(model,design,task,'validation',edges,guard=lambda:None,bank=banks.get(task),bank_sources=timing_bank_sources.get(task),only_ids={source:[case['instance_id']]},timing_only=True)
+                 tokens=max(tokens,len(edges))
+             else:raise ValueError('unsupported measurement primitive')
+             output,observed=observe_native_operation(model,call)
+             # Outputs are scalar diagnostic rows only; native vocab arrays never
+             # enter receipts. Keep a real payload for serialization/CPU overhead.
+             scalar_records.extend(output if isinstance(output,list) else [])
+             samples.append(observed['seconds']);forward_calls+=observed['forward_calls'];backward_calls+=observed['backward_calls'];fwd+=observed['forward_seconds'];bwd+=observed['backward_seconds'];cache+=observed['cache_contract_seconds']
+             peak_allocated=max(peak_allocated,observed['peak_allocated_bytes']);peak_reserved=max(peak_reserved,observed['peak_reserved_bytes']);available=min(available,observed['device_available_bytes'])
+         source_splits=sorted({measurement_source_split(design,prepared,p,c) for c in cases})
+         measurements.append(dict(profile_id=requirement['profile_id'],profile=p,analysis_split='validation',source_split=source_splits[0] if len(source_splits)==1 else 'mixed',source_splits=source_splits,source_cases=cases,input_hashes=hashes,batch_seconds=samples,tokens_measured=tokens,
+@@ -1531,24 +1543,25 @@
+         sorted(values);sum(values)
+     cpu_seconds=time.perf_counter()-t
+     bootstrap_calibrations=[]
+     if inventory['overhead']['cpu_summaries']:
+         for task,graph in prepared['graphs'].items():
+             probe=[min((e for e in graph['edges'] if e['receiver'][0]=='readout' and e['position']=='assistant_readout'),key=edge_key)]
+             ids=_membership(design,task,'validation')[:8]
+             if task not in banks:
+                 original=prepared['bank_sources'][task];source_rows=[r for r in original['rows'] if r['split']=='validation' and r['instance_id'] in set(ids)]
+                 contract=dict(source_ids=[r['instance_id'] for r in source_rows],rows=source_rows,source_sha256=digest(source_rows),padded_width=1+max(len(s['tokens']) for r in original['rows'] for s in r['streams'].values()))
+-                banks[task]=h_mean_bank(model,design,task,graph['edges'],guard=fresh,bank_sources=contract)
++                timing_bank_sources[task]=contract
++                banks[task]=h_mean_bank(model,design,task,graph['edges'],guard=fresh,bank_sources=contract,timing_only=True)
+             def capture():
+                 rows=score_mechanism(model,design,task,'validation',probe,guard=fresh,instance_ids=ids)
+-                utilities=score_utilities(model,design,task,'validation',probe,guard=fresh,bank=banks[task],timing_only=True)
++                utilities=score_utilities(model,design,task,'validation',probe,guard=fresh,bank=banks[task],bank_sources=timing_bank_sources[task],timing_only=True)
+                 return rows,utilities
+             captured,observed=observe_native_operation(model,capture)
+             rows,utilities=captured;t0=time.perf_counter()
+             summarize_rows(rows,expected_ids=ids,utility_rows=utilities,n_boot=2000)
+             seconds=time.perf_counter()-t0
+             bootstrap_calibrations.append(dict(task=task,seconds=seconds,rows=len(rows)+len(utilities),bootstrap_nodes=2000,capture_evidence=observed,validation_ids=ids,timing_only=True))
+         worst=max(bootstrap_calibrations,key=lambda r:r['seconds']/r['rows'])
+         cpu_seconds=worst['seconds'];values=[None]*worst['rows']
+     cuda=next(model.parameters()).is_cuda
+     result=dict(artifact_path=str((run_root/'receipt').resolve()),kind='a3_edge_measurements_v1',producer='a3_edge_pipeline',identity=identity,injected=bool(identity.get('injected')),code_hashes=code_hashes(),
+@@ -1778,11 +1791,119 @@
+     if source.startswith('H_bank:'):
+         rows=prepared['bank_sources'][p['analysis_task']]['rows']
+     elif source in ('ioi','mmlu'):
+         rows=design[source+'_validation']
+     else:rows=design['access_rows'][source]
+     matching=[r for r in rows if r['instance_id']==case['instance_id'] and r['condition']==case['condition']]
+     require(len(matching)==1,'ambiguous actual source split')
+     return matching[0]['split']
+ 
+ 
++
++
++
++H_BANK_REPRESENTATION='native projected additive head residual and whole-MLP additive residual'
++
++
++def _bank_site(site,geometry):
++    require(isinstance(site,(list,tuple)) and len(site)==3 and type(site[0]) is str and site[0] in ('head','mlp')
++        and type(site[1]) is int and type(site[2]) is int,'invalid typed H bank sender key')
++    kind,layer,index=site
++    require(0<=layer<geometry['num_hidden_layers'] and 0<=index<(geometry['num_attention_heads'] if kind=='head' else 1),'H bank sender outside authenticated model bounds')
++    return tuple(site)
++
++
++def h_bank_contract(design,task,*,model=None,prepared=None,bank_sources=None,timing_only=False):
++    """Expected bank facts from model/preparation and ancestral parents, not values."""
++    require(task in design['tasks'],'unknown H bank task')
++    frozen=design.get('direction_protocol',{});work=frozen.get('workload',{});numeric=frozen.get('numeric_profile',{})
++    stored=prepared['graphs'][task]['geometry'] if prepared is not None else {}
++    if model is not None:
++        cfg=model.config
++        geometry={k:getattr(cfg,k) for k in ('hidden_size','num_hidden_layers','num_attention_heads','num_key_value_heads')}
++        for key in geometry:
++            expected=stored.get(key,work.get(key))
++            if expected is not None:require(geometry[key]==expected,'H bank actual model/preparation geometry mismatch')
++        dtype=str(next(model.parameters()).dtype)
++        backend=getattr(cfg,'_attn_implementation',None) or numeric.get('backend','eager')
++    else:
++        geometry={k:stored.get(k,work.get(k)) for k in ('hidden_size','num_hidden_layers','num_attention_heads','num_key_value_heads')}
++        dtype=numeric.get('dtype');backend=numeric.get('backend')
++    require(all(type(v) is int and v>0 for v in geometry.values()),'independently authenticated H bank model geometry required')
++    require(isinstance(dtype,str) and dtype.removeprefix('torch.') in ('float32','bfloat16','float16'),'known native H bank dtype required')
++    dtype='torch.'+dtype.removeprefix('torch.')
++    if numeric.get('dtype') is not None:require(dtype.removeprefix('torch.')==numeric['dtype'].removeprefix('torch.'),'H bank native dtype differs from frozen profile')
++    if numeric.get('backend') is not None:require(backend==numeric['backend'],'H bank backend differs from frozen profile')
++    require(isinstance(backend,str) and backend,'known native H bank backend required')
++    declared=[_bank_site(s,geometry) for s in design['tasks'][task]['edge_nodes']]
++    require(declared and len(set(declared))==len(declared),'duplicate/empty required H sender union')
++    sources=sorted(declared)
++    if prepared is not None:
++        actual={_bank_site(e['sender'],geometry) for e in prepared['graphs'][task]['edges']}
++        require(actual==set(sources),'H bank graph and declared full sender union differ')
++    ancestral=(prepared['bank_sources'][task] if prepared is not None else ancestral_bank_sources(design)[task])
++    source=ancestral if bank_sources is None else bank_sources
++    rows=source['rows'];ids=source['source_ids']
++    require(rows and ids==[r['instance_id'] for r in rows] and len(ids)==len(set(ids)) and source['source_sha256']==digest(rows),'changed H bank source bytes/ID order')
++    original={r['instance_id']:r for r in ancestral['rows']}
++    require(len(original)==len(ancestral['rows']) and ancestral['source_ids']==list(original),'invalid ancestral H bank membership')
++    require(all(rid in original and row==original[rid] for rid,row in zip(ids,rows)),'H bank source differs from ancestral parent')
++    if timing_only:
++        require(all(r['split']=='validation' for r in rows) and set(ids)<=set(_membership(design,task,'validation')[:8]),'timing H bank must use fixed validation-only parents')
++        require(ids==[rid for rid in ancestral['source_ids'] if rid in set(ids)],'timing H bank source order changed')
++    else:require(ids==ancestral['source_ids'] and source['source_sha256']==ancestral['source_sha256'],'H bank must retain the full ancestral source order')
++    require(all(r['condition']=='H' and r['split'] in ('train','validation') and set(r['streams'])==set(STREAMS) for r in rows),'original H train/validation and both streams required')
++    width=1+max(len(s['tokens']) for r in ancestral['rows'] for s in r['streams'].values())
++    require(source.get('padded_width',width)==width,'H bank physical profile changed')
++    tokens=sum(len(s['tokens']) for r in rows for s in r['streams'].values())
++    provenance=dict(task=task,source_ids=list(ids),source_sha256=source['source_sha256'],splits=sorted({r['split'] for r in rows}),streams=list(STREAMS),
++        unpadded_tokens=tokens,representation=H_BANK_REPRESENTATION,accumulation_dtype='torch.float32',native_dtype=dtype,padded_width=width,
++        weighting='equal unpadded token; both streams',timing_only=bool(timing_only))
++    return dict(kind='a3_edge_h_bank_contract_v1',task=task,base_design_sha256=digest(design),base_identity=copy.deepcopy(design.get('a1_identity')),
++        geometry=geometry,sources=[list(s) for s in sources],numeric_profile=dict(dtype=dtype,backend=backend,padded_width=width,physical_batch_size=1),provenance=provenance)
++
++
++def validate_h_bank(bank,expected):
++    """One contract for producer, cache, intervention and linked report intake."""
++    require(isinstance(bank,dict) and bank.get('contract')==expected,'H bank base/source/numeric contract differs')
++    require(bank.get('provenance')==expected['provenance'],'H bank ancestral provenance/weighting differs')
++    serialized=bank.get('values')
++    if isinstance(serialized,dict):records=[dict(site=s,value=v) for s,v in serialized.items()]
++    else:
++        require(isinstance(serialized,list),'H bank sender records required')
++        records=serialized
++    wanted={tuple(s) for s in expected['sources']};seen=set();validated=[]
++    require(len(records)==len(wanted),'H bank full sender support count differs')
++    for record in records:
++        require(isinstance(record,dict) and set(record)=={'site','value'},'malformed H bank sender record')
++        site=_bank_site(record['site'],expected['geometry'])
++        require(site in wanted and site not in seen,'duplicate/missing/extra H bank sender support')
++        seen.add(site)
++        try:value=torch.as_tensor(record['value'],dtype=torch.float32,device='cpu').detach()
++        except (TypeError,ValueError,RuntimeError,OverflowError) as error:raise ValueError('H bank values cannot be decoded as float32') from error
++        require(value.ndim==1 and tuple(value.shape)==(expected['geometry']['hidden_size'],),'H bank must be an exact one-dimensional additive residual vector')
++        require(bool(torch.isfinite(value).all()),'H bank values nonfinite after float32 conversion')
++        native=getattr(torch,expected['numeric_profile']['dtype'].removeprefix('torch.'))
++        require(bool(torch.isfinite(value.to(dtype=native)).all()),'H bank values nonfinite after native dtype conversion')
++        validated.append((site,value))
++    require(seen==wanted,'incomplete required H bank sender union')
++    # Only now is a dict constructed; malformed or duplicate serialized keys
++    # cannot be collapsed into apparently complete support.
++    result=dict(values=dict(validated),contract=copy.deepcopy(expected),provenance=copy.deepcopy(expected['provenance']))
++    if 'reference' in bank:result['reference']=copy.deepcopy(bank['reference'])
++    return result
++
++
++def validate_panel_bank(panel,design,prepared,identity,*,model=None):
++    reference=panel.get('bank_reference')
++    required=any(r.get('supported') and r.get('condition')=='MMLU_h_mean' for r in panel.get('utility_rows',[]))
++    require(reference is not None or not required,'completed H-mean floor requires its linked bank artifact')
++    if reference is None:return None
++    require(reference==authority.object_reference(reference['path']),'linked H bank bytes changed')
++    body=authority.read_object(reference['path']);task=panel['task']
++    expected=h_bank_contract(design,task,model=model,prepared=prepared)
++    key=dict(identity=identity,task=task,sources=expected['sources'],source_sha256=prepared['bank_sources'][task]['source_sha256'])
++    require(body.get('kind')=='a3_edge_H_bank' and body.get('key')==key,'linked H bank task/base/source/profile differs')
++    return validate_h_bank(body,expected)
++
++
+ if __name__=='__main__':main()
+--- a/tests/test_a3_edge_pipeline.py
++++ b/tests/test_a3_edge_pipeline.py
+@@ -385,21 +385,25 @@
+ 
+ def test_H_bank_is_ancestral_both_stream_unpadded_token_pool(monkeypatch):
+     from component_analysis import a3_native
+     d=source_design();rows=[]
+     for rid,tokens in [('a',[1,2]),('v',[8,9,10,11])]:
+         r=copy.deepcopy(next(r for r in d['access_rows']['far_v2'] if r['instance_id']==rid and r['condition']=='H'))
+         for stream in p.STREAMS:
+             s=r['streams'][stream];s.update(tokens=tokens,attention_mask=[1]*len(tokens),readout=len(tokens)-1,prompt='x'*len(tokens))
+         rows.append(r)
+     contract=dict(source_ids=['a','v'],rows=rows,source_sha256=p.digest(rows))
+-    model=torch.nn.Linear(1,1).eval().requires_grad_(False)
++    from types import SimpleNamespace
++    model=torch.nn.Linear(2,2).eval().requires_grad_(False)
++    model.config=SimpleNamespace(hidden_size=2,num_hidden_layers=1,num_attention_heads=1,num_key_value_heads=1,_attn_implementation='eager')
++    d['tasks']['far_v2']['edge_nodes']=[['head',0,0]]
++    d['access_rows']['far_v2']=[r for r in d['access_rows']['far_v2'] if r['condition']!='H']+rows
+     def native(model,batch,*,capture_sites):
+         z=batch['input_ids'].float()
+         # Explicit projected additive head representation, not raw head coordinates.
+         return {'additive':{site:torch.stack([2*z,-z],-1) for site in capture_sites}}
+     monkeypatch.setattr(a3_native,'native_forward',native)
+     selected=[fake_edges()[0]]
+     bank=p.h_mean_bank(model,d,'far_v2',selected,guard=lambda:None,bank_sources=contract)
+     mean=(1+2+8+9+10+11)/6
+     torch.testing.assert_close(bank['values'][('head',0,0)],torch.tensor([2*mean,-mean]))
+     assert bank['provenance']['unpadded_tokens']==12 and bank['provenance']['source_ids']==['a','v']
+--- /dev/null
++++ b/tests/test_a3_edge_bank_contract.py
+@@ -0,0 +1,125 @@
++"""B1 regressions: bank shape/provenance and linked-artifact intake only."""
++import copy
++import importlib.util
++from pathlib import Path
++import pytest
++import torch
++
++_spec=importlib.util.spec_from_file_location('edge_bank_fixtures',Path(__file__).with_name('test_a3_edge_pipeline.py'))
++f=importlib.util.module_from_spec(_spec);_spec.loader.exec_module(f)
++p=f.p
++
++
++def bank_case():
++    design,model=f.complete_design_and_model()
++    graph=p.prepare_graph(design,'far_v2',f.geometry())
++    prepared={'graphs':{'far_v2':graph},'bank_sources':p.ancestral_bank_sources(design)}
++    identity={'injected':True}
++    sources=sorted({tuple(e['sender']) for e in graph['edges']})
++    source=prepared['bank_sources']['far_v2']
++    key=dict(identity=identity,task='far_v2',sources=[list(s) for s in sources],source_sha256=source['source_sha256'])
++    good=p.h_mean_bank(model,design,'far_v2',graph['edges'],guard=lambda:None,bank_sources=source)
++    body=dict(kind='a3_edge_H_bank',key=key,values=[dict(site=list(s),value=good['values'][s].tolist()) for s in sources],provenance=copy.deepcopy(good['provenance']))
++    if 'contract' in good:body['contract']=copy.deepcopy(good['contract'])
++    return design,model,prepared,identity,graph,good,body
++
++
++@pytest.mark.parametrize('defect',[
++    'scalar','matrix','duplicate','missing','extra','boolean_key','out_of_bounds',
++    'nan','overflow','false_source','reordered_ids','wrong_task','streams',
++    'weighting','representation','native_dtype','padded_width','base','profile',
++])
++def test_B1_cache_rejects_malformed_bank_before_native_intervention(tmp_path,defect):
++    d,m,prepared,identity,g,good,body=bank_case()
++    if defect=='scalar':body['values'][0]['value']=[.125]
++    elif defect=='matrix':body['values'][0]['value']=[body['values'][0]['value']]
++    elif defect=='duplicate':body['values'].append(copy.deepcopy(body['values'][0]))
++    elif defect=='missing':body['values'].pop()
++    elif defect=='extra':body['values'].append(dict(site=['mlp',0,0],value=[0.]*8))
++    elif defect=='boolean_key':body['values'][0]['site'][1]=False
++    elif defect=='out_of_bounds':body['values'][0]['site'][1]=m.config.num_hidden_layers
++    elif defect=='nan':
++        # In-memory validator must also reject NaN before JSON publication.
++        bad=copy.deepcopy(good);bad['values'][tuple(body['values'][0]['site'])][0]=float('nan')
++        batch=p._utility_batch(d['utility']['mmlu'][0],'clean',physical_width=p.source_width(d,'mmlu'))
++        with pytest.raises(ValueError):p._utility_floor(m,batch,[e for e in g['edges'] if e['position']=='assistant_readout'][:1],'h_mean',bad)
++        return
++    elif defect=='overflow':body['values'][0]['value'][0]=1e100
++    elif defect=='false_source':body['provenance']['source_sha256']='0'*64
++    elif defect=='reordered_ids':body['provenance']['source_ids'].reverse()
++    elif defect=='wrong_task':body['provenance']['task']='ser_v2'
++    elif defect=='streams':body['provenance']['streams']=['clean']
++    elif defect=='weighting':body['provenance']['weighting']='equal ID readout'
++    elif defect=='representation':body['provenance']['representation']='pre-o_proj head coordinates'
++    elif defect=='native_dtype':body['provenance']['native_dtype']='torch.float16'
++    elif defect=='padded_width':body['provenance']['padded_width']+=1
++    elif defect=='base':body.setdefault('contract',{})['base_design_sha256']='0'*64
++    elif defect=='profile':body.setdefault('contract',{})['numeric_profile']={'backend':'fabricated'}
++    p.authority.publish_object(tmp_path/p.digest(body['key']),body)
++    with pytest.raises(ValueError):p.cached_h_bank(m,d,prepared,'far_v2',identity=identity,root=tmp_path,guard=lambda:None)
++
++
++def test_B1_floor_requires_independent_contract_before_native_forward(monkeypatch):
++    d,m,prepared,identity,g,good,body=bank_case()
++    batch=p._utility_batch(d['utility']['mmlu'][0],'clean',physical_width=p.source_width(d,'mmlu'))
++    from component_analysis import a3_native
++    monkeypatch.setattr(a3_native,'native_forward',lambda *a,**k:pytest.fail('bank was not validated before forward'))
++    with pytest.raises(ValueError):p._utility_floor(m,batch,[e for e in g['edges'] if e['position']=='assistant_readout'][:1],'h_mean',good)
++
++
++def test_B1_complete_panel_requires_linked_bank_at_resume_and_summary(tmp_path,monkeypatch):
++    # The existing genuine numerical positive flow is retained; no injected
++    # outcome/header substitutes for actual native bank and floor computation.
++    f.test_complete_tiny_native_staged_path_reports_scientific_failure_not_missing_assay(tmp_path,monkeypatch)
++    d,m=f.complete_design_and_model();prepared=p.authority.read_object(tmp_path/'prepared')
++    identity=p._stage_identity(d,prepared);run=tmp_path/'run'
++    panel_path=next((run/'panels').iterdir());panel=p.authority.read_object(panel_path)
++    args=p.parser().parse_args(['--stage','summarize','--design','fixture','--commit','a'*40,'--work-dir',str(run),'--resume'])
++    original=run/'banks';absent=run/'banks-B1-unavailable';original.rename(absent)
++    try:
++        with pytest.raises((ValueError,OSError)):
++            p.cached_assessment_panel(m,d,prepared,'far_v2',panel['edges'],identity=identity,root=run,guard=lambda:None)
++        with pytest.raises((ValueError,OSError)):p._run_summary(d,prepared,args,identity)
++    finally:absent.rename(original)
++    # Every link is resolved even on an otherwise complete cached report.
++    result=p._run_summary(d,prepared,args,identity)
++    assert result['runtime_identity']['complete'] and not result['finalized']
++    missing=copy.deepcopy(panel);missing.pop('bank_reference')
++    with pytest.raises(ValueError):p.validate_panel_bank(missing,d,prepared,identity)
++    changed=copy.deepcopy(panel);changed['bank_reference']['files']['payload.json']['sha256']='0'*64
++    with pytest.raises(ValueError):p.validate_panel_bank(changed,d,prepared,identity)
++    # A freshly self-hashed foreign profile is not a valid linked bank either.
++    foreign=p.authority.read_object(panel['bank_reference']['path'])
++    foreign['provenance']['source_sha256']='0'*64
++    p.authority.publish_object(tmp_path/'foreign-bank',foreign)
++    changed['bank_reference']=p.authority.object_reference(tmp_path/'foreign-bank')
++    with pytest.raises(ValueError):p.validate_panel_bank(changed,d,prepared,identity)
++
++
++def test_B1_bfloat16_conversion_is_finite_before_any_native_forward(monkeypatch):
++    d,m,prepared,identity,g,_,_=bank_case()
++    m=m.to(torch.bfloat16);d['direction_protocol']['numeric_profile']['dtype']='torch.bfloat16'
++    source=prepared['bank_sources']['far_v2']
++    bank=p.h_mean_bank(m,d,'far_v2',g['edges'],guard=lambda:None,bank_sources=source)
++    expected=p.h_bank_contract(d,'far_v2',model=m,prepared=prepared,bank_sources=source)
++    # Finite float32, but not representable in the native BF16 clamp dtype.
++    bad=copy.deepcopy(bank);site=next(iter(bad['values']))
++    bad['values'][site]=torch.full((m.config.hidden_size,),3.4e38,dtype=torch.float32)
++    assert torch.isfinite(bad['values'][site]).all()
++    assert not torch.isfinite(bad['values'][site].to(torch.bfloat16)).all()
++    from component_analysis import a3_native
++    monkeypatch.setattr(a3_native,'native_forward',lambda *a,**k:pytest.fail('nonfinite native donor reached forward'))
++    batch=p._utility_batch(d['utility']['mmlu'][0],'clean',physical_width=p.source_width(d,'mmlu'))
++    with pytest.raises(ValueError,match='native dtype'):
++        p._utility_floor(m,batch,[e for e in g['edges'] if e['position']=='assistant_readout'][:1],'h_mean',bad,bank_contract=expected)
++
++
++def test_B1_projected_heads_and_MLP_use_residual_not_head_or_neuron_width():
++    d,m=f.complete_design_and_model();d['tasks']['far_v2']['edge_nodes'].append(['mlp',0,0])
++    graph=p.prepare_graph(d,'far_v2',f.geometry());source=p.ancestral_bank_sources(d)['far_v2']
++    bank=p.h_mean_bank(m,d,'far_v2',graph['edges'],guard=lambda:None,bank_sources=source)
++    expected=p.h_bank_contract(d,'far_v2',model=m,bank_sources=source)
++    assert all(v.shape==(8,) for v in bank['values'].values())
++    for site,width in [(('head',0,0),4),(('mlp',0,0),12)]:
++        bad=copy.deepcopy(bank);bad['values'][site]=torch.zeros(width)
++        with pytest.raises(ValueError,match='residual vector'):p.validate_h_bank(bad,expected)

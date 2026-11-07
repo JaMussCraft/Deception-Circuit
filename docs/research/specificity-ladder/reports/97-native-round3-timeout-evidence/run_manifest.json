@@ -1,0 +1,246 @@
+{
+  "status": "verification incomplete; first bounded failure preserved; diagnostic complete",
+  "scenario_root": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8",
+  "source_hashes": {
+    "component_analysis/a3_direction_pipeline.py": "96678db186078ab37cad108e2d1e71ffdccf1fb3dd157c35cdc57a91b2ebd4a0",
+    "component_analysis/a3_direction_runner.py": "89a62335665595533204006c3eca28d14ca9c42eb600879c235e9c6370739429",
+    "component_analysis/a3_direction_runtime.py": "b66c2d8cd26c36f321b5079758209214746b0e4eec16a6c801742086d729c0cc",
+    "component_analysis/a3_direction_workload.py": "3e43aaf2b4cacb99df87593ae377c8fdf3eb7b223b258ed8873853841404d8f9",
+    "component_analysis/a3_directions.py": "ed882d4e12a396e03e73671e588beba5b1a8c90ab9d31e7ee73d4194430b4a86",
+    "component_analysis/a3_pipeline.py": "310eb53427ad4ac32522dfd0d6cd3b33e4ec887af1776579845f8953bdbe83f5",
+    "scripts/jobs/specificity_a3.sh": "936dfb7f8b9c2d267d52f1e199ed431275e6527cbfc3a105a22e3812289a9b96",
+    "tests/test_a3_direction_runner.py": "3ea945d5b23b4eef7d56139758c7075ea1b56ac612f1923590b7978628ca0120",
+    "tests/test_a3_direction_runtime.py": "5a41e89b0b2bd5fd59553f5f5a63260638e3547a63c31a615d84da08f796fb6a",
+    "tests/test_a3_direction_workload.py": "91eb6f874e180c5ffb362daba231631b7bea21c224446580efccfe20a9007300",
+    "tests/test_a3_directions.py": "cd8471b1524ad7b8f1b7c87f9eb5fec5724b3ab2980027ef7aadfea3fc3bb1c1",
+    "tests/test_a3_pipeline.py": "bbb3efdba075cc14c2997cc11ae44bab268bdea56459c0574d6bfc21b62f4a18",
+    "tests/a3_direction_native_scenario.py": "9b5061ab9618222b23230917f446abcaa73747f3d216f69c77b9218feec6297b"
+  },
+  "baseline_commit_supplied_by_root": "538109e809285b6ddc45d42df8786270a65f7b12",
+  "source_unchanged": true,
+  "no_large_rerun_after_failure": true,
+  "completed": {
+    "prefit_cases": 9,
+    "fit_capture_pieces": 48,
+    "valid_fit_records": 9,
+    "validation_shards": 210,
+    "selected_records": 9,
+    "selected_numpy_files": 0,
+    "inventory_selected_pilot_complete": true,
+    "inventory_remaining_complete": true,
+    "selected_pilot_cases": 0,
+    "calibration_shards": 0,
+    "assessment_shards": 0
+  },
+  "first_failure": {
+    "phase": "selected-pilot",
+    "start": 0,
+    "count": 4,
+    "exit_code": 137,
+    "elapsed_seconds": 615.01,
+    "controller_elapsed_seconds": 615.907170987979,
+    "timeout_seconds": 600,
+    "kill_grace_seconds": 15,
+    "memory_event_deltas": {
+      "selected-pilot-0-4-1793642609573844695.memory-before.1.memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "selected-pilot-0-4-1793642609573844695.memory-before.2.memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "selected-pilot-0-4-1793642609573844695.memory-before.0.memory.events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "preflight_headroom_bytes": 32224493568,
+    "time_wrapper_peak_is_not_child_peak": true,
+    "child_peak_unavailable_for_failed_run": true,
+    "live_child_observation": {
+      "elapsed_seconds_approx": 277,
+      "rss_kib": 1653452,
+      "cpu_percent": 49.8,
+      "not_peak": true
+    },
+    "model_log_empty": true,
+    "selected_case_children": [],
+    "pilot_scratch_children": []
+  },
+  "diagnostic": {
+    "command": [
+      "/u/swong2/.conda/envs/mgnp/bin/python",
+      "/tmp/report97-native-startup-diagnostic.py",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/diagnostics/startup-01"
+    ],
+    "pid": 223187,
+    "exit_code": 0,
+    "elapsed_seconds": 567.1438983249827,
+    "user_seconds": 195.088776,
+    "system_seconds": 69.832507,
+    "peak_child_rss_bytes": 6693392384,
+    "timeout_seconds": 600,
+    "kill_grace_seconds": 15,
+    "term_sent_at": null,
+    "model_forwards_forbidden": true,
+    "publication_forbidden": true
+  },
+  "step_timings": {
+    "verify_scenario_full_model": 2.9012753380229697,
+    "read_selected_first": 234.2035620509996,
+    "inventory_rebuild_and_existing_compare": 71.62715355801629,
+    "run_phase_case_invocations_validation": 60.77959633199498,
+    "read_scenario_binding": 0.04893891600659117,
+    "pilot_cases_case_invocations_validation": 67.39189746900229,
+    "read_selected_second": 53.021240175003186,
+    "load_selected_axes": 39.640253373014275,
+    "final_source_model_backing_verification": 0.5479227710166015
+  },
+  "ready_for_model_seconds": 554.8022326750215,
+  "selected_bundle_reads_seconds": 326.86505559901707,
+  "inventory_build_validation_seconds": 199.79864735901356,
+  "all_owned_processes_terminal": true,
+  "scientific_execution": false,
+  "execution_authorized": false,
+  "proposed_next_action": "Review a test-only prepared process context to reuse one fully validated selection/axes and immutable independently validated inventory; preserve fresh source/byte/model checks and all coverage. No case retry authorized yet.",
+  "artifacts": {
+    "selected-pilot-0-4-1793642609573844695.memory-before.cgroup-paths": {
+      "sha256": "86c5a96756f1536be2841be5397400caeb013a081d745766347ef2a5dd6d32ff",
+      "bytes": 154
+    },
+    "selected-pilot-0-4-1793642609573844695.memory-after.2.memory.events": {
+      "sha256": "fe80be0f92f42aec1fae5fb22a00b62f3894dcaab34643022e3beda0ed2acfe7",
+      "bytes": 63
+    },
+    "selected-pilot-0-4-1793642609573844695.memory-after.2.memory.max": {
+      "sha256": "dbe7218fd3953d71eac340668b850fe4b57278326a462a0cf0ad506efbf8b02e",
+      "bytes": 4
+    },
+    "selected-pilot-0-4-1793642609573844695.memory-before.1.memory.events": {
+      "sha256": "9cd3ffe70fef710de023917db1ba0d69e287bb6c0809b7848147df7128dfd6ec",
+      "bytes": 58
+    },
+    "report97-native-round3-controller.py": {
+      "sha256": "7f972fb36bd9707d842bed2a6c2e88437f5c32b7500fb9c17f98c13672e15888",
+      "bytes": 2207
+    },
+    "selected-pilot-0-4-1793642609573844695.memory-before.2.memory.max": {
+      "sha256": "dbe7218fd3953d71eac340668b850fe4b57278326a462a0cf0ad506efbf8b02e",
+      "bytes": 4
+    },
+    "selected-pilot-0-4-1793642609573844695.memory-before.1.memory.max": {
+      "sha256": "13a972769faf7c9bfc7c275e0791721571331558f89fcbd43ea0946307851adf",
+      "bytes": 12
+    },
+    "report97-native-round3-phase.sh": {
+      "sha256": "c1cacd2566d18871b943c181500561e9bc9663c70936cd649a775b4d23814026",
+      "bytes": 4661
+    },
+    "selected-pilot-0-4-1793642609573844695.headroom-before.json": {
+      "sha256": "d75e9757014a4a0a72dd00e7860f844503fd5fd577bb6f99540d2fbe5f67dbc8",
+      "bytes": 538
+    },
+    "selected-pilot-0-4-1793642609573844695.memory-after.0.memory.max": {
+      "sha256": "dbe7218fd3953d71eac340668b850fe4b57278326a462a0cf0ad506efbf8b02e",
+      "bytes": 4
+    },
+    "report97-native-diagnostic-supervisor.py": {
+      "sha256": "06e9112a21a51cee6df2407d7d8e35fcbcdfd016a4df6b3993eaa36ecef4c14e",
+      "bytes": 2856
+    },
+    "report97-native-round3-controller.log": {
+      "sha256": "7cd5ec12959e20061f9a1c0213b670e92d2e96c0fa72213bc1029eae1c4d36fd",
+      "bytes": 4692
+    },
+    "selected-pilot-0-4-1793642609573844695.time": {
+      "sha256": "ac1e44586153c33352d15bd17d01291130277b5ff6a94f8e33e6e9d7ba107fc4",
+      "bytes": 1088
+    },
+    "selected-pilot-0-4-1793642609573844695.memory-before.0.memory.max": {
+      "sha256": "dbe7218fd3953d71eac340668b850fe4b57278326a462a0cf0ad506efbf8b02e",
+      "bytes": 4
+    },
+    "selected-pilot-0-4-1793642609573844695.memory-after.cgroup-paths": {
+      "sha256": "86c5a96756f1536be2841be5397400caeb013a081d745766347ef2a5dd6d32ff",
+      "bytes": 154
+    },
+    "selected-pilot-0-4-1793642609573844695.memory-before.2.memory.events": {
+      "sha256": "fe80be0f92f42aec1fae5fb22a00b62f3894dcaab34643022e3beda0ed2acfe7",
+      "bytes": 63
+    },
+    "selected-pilot-0-4-1793642609573844695.memory-after.1.memory.max": {
+      "sha256": "13a972769faf7c9bfc7c275e0791721571331558f89fcbd43ea0946307851adf",
+      "bytes": 12
+    },
+    "selected-pilot-0-4-1793642609573844695.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "selected-pilot-0-4-1793642609573844695.memory-after.0.memory.events": {
+      "sha256": "28fe05a1d7b8467a03fb54454f7b6a130fab752864d0454f5f6c4a4b6ce307f2",
+      "bytes": 53
+    },
+    "selected-pilot-0-4-1793642609573844695.exit": {
+      "sha256": "aec4d44e686c167c70ba4ccdce9760c9dff59a3fd548856ebfb81b570605c735",
+      "bytes": 34
+    },
+    "source_snapshot.json": {
+      "sha256": "9ad60a15ca5738c1e492e8e06f5afc95f3ea24086e958dc435d91a90807c4ca1",
+      "bytes": 1423
+    },
+    "report97-native-startup-diagnostic.py": {
+      "sha256": "2fa4e372ba4c8fee7fa911536e81fbadd26c9f35972a5fe8b8e3ba6dcc9d7087",
+      "bytes": 2146
+    },
+    "controller-state.json": {
+      "sha256": "f801be73f14913286c63f837876b88c58f48dfd3c3c24f1b3d1c4f726e4ae413",
+      "bytes": 3784
+    },
+    "selected-pilot-0-4-1793642609573844695.memory-after.1.memory.events": {
+      "sha256": "9cd3ffe70fef710de023917db1ba0d69e287bb6c0809b7848147df7128dfd6ec",
+      "bytes": 58
+    },
+    "selected-pilot-0-4-1793642609573844695.memory-before.0.memory.events": {
+      "sha256": "28fe05a1d7b8467a03fb54454f7b6a130fab752864d0454f5f6c4a4b6ce307f2",
+      "bytes": 53
+    },
+    "startup-01/result.json": {
+      "sha256": "80a56e8a20868923b1722237955b27e5b6d965f09e6695a21cf21ef020ecf440",
+      "bytes": 807
+    },
+    "startup-01/steps.log": {
+      "sha256": "4e9af9fa1314cd6794c4ad0545b784f9d5e3bb955422b7b9992e4d27d622ec1b",
+      "bytes": 3070
+    },
+    "startup-01/memory-before.json": {
+      "sha256": "75300f6273b90977c74705b84df75d82feaa289830043a216a92fbbbe4e696c6",
+      "bytes": 730
+    },
+    "startup-01/memory-after.json": {
+      "sha256": "ab9b48c6b6719d651f18219e0974a1685e48fc4ac208c0cfb6162f40d12c61d3",
+      "bytes": 730
+    },
+    "startup-01/stacks.log": {
+      "sha256": "1e48ec1214d849fd3287f4eacdcacc5b4e84dc19e855c700c8594dcd681870a9",
+      "bytes": 9452
+    },
+    "startup-01/child-samples.jsonl": {
+      "sha256": "e5bedc2e9935001f56b27bccbe96b2ce44bb2e8404975a26c89ddc498133fa6b",
+      "bytes": 15825
+    }
+  }
+}

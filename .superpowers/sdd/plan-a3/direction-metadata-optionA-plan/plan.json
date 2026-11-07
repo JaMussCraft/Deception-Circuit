@@ -1,0 +1,76 @@
+{
+  "status": "PLAN_ONLY_AWAIT_INDEPENDENT160_NO_CANDIDATE_OR_CODE_EDITS",
+  "baseline_commit": "861f84a3938a5e22fa329af0c469b2dd812fe68a",
+  "baseline_runtime": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime",
+  "candidate": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-candidate",
+  "owned_files": [
+    "component_analysis/a3_direction_workload.py",
+    "tests/test_a3_direction_workload.py"
+  ],
+  "unchanged_production_functions": [
+    "digest",
+    "_source_rows",
+    "_validate_inventory",
+    "runtime.run_pilot",
+    "runtime._AuthorityContext",
+    "runtime._PilotReconciliationPass"
+  ],
+  "baseline_evidence": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-fit-select-highmem-cpu-proposal-execution-review/run_manifest.json",
+  "partial_is_not_oracle": true,
+  "original_full_oracle": {
+    "kind": "complete_original_build_and_full_serialized_byte_stream_hash",
+    "algorithm": "Load exact genuine frozen design/protocol after original source/input/protection guards. Call ORIGINAL build_inventory without changing callbacks. Record its complete inventory_sha256. Stream the ENTIRE output through the unchanged original publisher JSON formatting into a UTF-8 SHA256+byte-count sink, including final newline. Commit COMPLETE_ORACLE only after the whole stream and all postguards succeed normally; time builder and stream separately. No partial payload or extracted partial digest is accepted.",
+    "reason": "Avoids treating the failed4.46GB payload as a reference, avoids retaining both full original/candidate graphs, and avoids another large incomplete artifact copy. It still traverses every output byte and stores an authenticated complete oracle from the original algorithm.",
+    "scope": "CPU algorithm-equivalence oracle only; not model/admission evidence or a rewritten scientific artifact."
+  },
+  "genuine_comparison": "Candidate pure metadata builder receives identical original frozen inputs in an explicitly nonproduction equivalence harness; it must match original complete canonical inventory hash, ENTIRE original-format serialized byte-stream SHA256 and exact length, every storage bound/count, keys and controls. Harness origins pin original module and candidate module separately. New accepted production source later gets fresh source-bound artifacts, never an old source identity exemption.",
+  "resources": {
+    "red_subset_dualenv": {
+      "CPUs": 4,
+      "GiB": 16,
+      "minutes": 10,
+      "seconds_per_env_cap": 180
+    },
+    "focused_full_dualenv": {
+      "CPUs": 4,
+      "GiB": 32,
+      "minutes": 20,
+      "seconds_per_env_cap": 540
+    },
+    "original_genuine_oracle_per_env": {
+      "CPUs": 4,
+      "GiB": 192,
+      "minutes": 60,
+      "child_seconds": 3300,
+      "grace_seconds": 15,
+      "finish_margin_seconds": 285
+    },
+    "candidate_genuine_comparison_per_env": {
+      "CPUs": 4,
+      "GiB": 192,
+      "minutes": 60,
+      "child_seconds": 3300,
+      "grace_seconds": 15,
+      "finish_margin_seconds": 285
+    }
+  },
+  "resource_basis": "Observed original build reached publication at roughly2334s by filesystem timestamps; full45min job terminated at2520s with123112206336-byte cgroup peak and no OOM.60min/192GiB per complete original oracle gives bounded additional serialization/postguard room without inventing a faster reference. Candidate gets the SAME conservative envelope until actual cost is measured. No completion guarantee or automatic retry; root schedules around the standing A2 CPU helper. Both interpreters require their own complete oracle unless independent review accepts a separately proven cross-version oracle.",
+  "telemetry": "Per-phase perf_counter wall + wait4 user/system; every5s actual cgroup current/peak/max/events/pressure and host PSI when available; actual allocation/CPU model/affinity/source/input hashes. Never substitute driver RSS for job peak.",
+  "profiling": "First use focused standard-library cProfile on complete small four-stage fixtures plus deterministic copy/source-scan/constant-bound call counts. This locates whether option A removes its stated work; it is not genuine timing evidence. Full genuine original/candidate runs remain unprofiled for fair wall/CPU/peak measurement. Only if remaining cost is unexplained should root approve another bounded genuine profiler run; no runtime monkeypatch, GC or model-loader/clock injection in production.",
+  "source_and_scope": "No candidate exists until plan acceptance. Ordinary copy of the full original511 source files and4 literal input links, never git/worktree/source mutation. Only the two owned copied files may change. Tests use synthetic fixtures and complete original module as oracle; all original source guards remain.",
+  "deferred": [
+    "B streaming production digest/wire algorithms",
+    "C authenticated cross-process target reuse or new authority",
+    "D any M1 budget change",
+    "Any retained timing-record sharing",
+    "Changing conservative storage bounds",
+    "Changing original validator/runtime post-model rebuild"
+  ],
+  "review_gates": [
+    "Independent160 accepts plan before candidate creation.",
+    "Root submits RED evidence before production edit.",
+    "Independent review of exact two-file diff and focused dualenv results before genuine candidate comparison.",
+    "Complete original and candidate genuine oracles on both interpreters; exact byte/hash/bound equivalence and actual CPU/peak results.",
+    "Preserve all live guards and required later original readiness/validation. No source publication/model reservation until root review; paired M1 feasibility remains separate."
+  ]
+}

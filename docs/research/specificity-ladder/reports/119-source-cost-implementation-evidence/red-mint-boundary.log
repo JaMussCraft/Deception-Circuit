@@ -1,0 +1,18 @@
+F......                                                                  [100%]
+=================================== FAILURES ===================================
+____________ test_static_absence_and_glob_are_rechecked_across_mint ____________
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-mint-boundary/test_static_absence_and_glob_a0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f2330e6e300>
+
+    def test_static_absence_and_glob_are_rechecked_across_mint(tmp_path,monkeypatch):
+        c=setup_case(tmp_path,monkeypatch);missing=tmp_path/'absent.json'
+        def mutation(owned):missing.write_text('{}');return {},{}
+>       with pytest.raises(ValueError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_a3_source_validation.py:209: Failed
+=========================== short test summary info ============================
+FAILED tests/test_a3_source_validation.py::test_static_absence_and_glob_are_rechecked_across_mint
+1 failed, 6 passed, 22 deselected in 3.47s

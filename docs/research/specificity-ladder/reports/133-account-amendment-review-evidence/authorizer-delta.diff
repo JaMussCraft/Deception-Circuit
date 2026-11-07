@@ -1,0 +1,67 @@
+--- 
++++ 
+@@ -28,10 +28,31 @@
+  assert ledger['totals']['reserved_gpu_hours']<=125 and sum(r['reserved_gpu_hours'] for r in ledger['reservations'] if 'a2-' in (r.get('output_dir') or ''))<=60
+  return r
+ 
+-def authorize(job,entry,plan,placement_path):
++def parse_job(raw):
++ return dict(x.split('=',1) for x in raw.split() if '=' in x)
++def validate_amendment(body,placement,placement_hash,authorizer_hash):
++ assert body['kind']=='a2_compute_account_amendment_v1' and body['applied'] is True
++ assert body['source_commit']==C and body['original_placement_sha256']==placement_hash
++ assert body['original_authorizer_sha256']==placement['authorizer_sha256']=='20223c9ac9a5ffe11557e8cb3fe3089726fb38fb098f8f7cd67d51dcbabafcd5'
++ assert body['authorizer_sha256']==authorizer_hash and body['storage_profile_account']=='cis260361p'
++ assert body['jobs'] and set(body['jobs'])<=set(placement['jobs'])
++ for job,row in body['jobs'].items():
++  old=placement['jobs'][job];before=parse_job(row['before_scontrol']);after=parse_job(row['after_scontrol'])
++  assert row['cell_key']==old['cell_key'] and row['reservation_id']==old['new_reservation_id']
++  assert row['original_account']==old['account']=='cis260361p' and row['new_account']=='cis260372p'
++  assert before['JobId']==after['JobId']==job and before['Account']==row['original_account'] and after['Account']==row['new_account']
++  assert before['JobState']==after['JobState']=='PENDING' and before['RunTime']==after['RunTime']=='00:00:00' and after['Reason']=='JobHeldUser'
++  for field in ('JobName','Partition','TimeLimit','NumCPUs','MinMemoryNode','TresPerNode','Command','WorkDir'):
++   assert before[field]==after[field]
++ return body
++
++def expected_account(job,entry,amendment):
++ return amendment['jobs'][job]['new_account'] if job in amendment['jobs'] else entry['account']
++
++def authorize(job,entry,plan,placement_path,amendment,amendment_path):
+  cell=next(c for c in plan['cells'] if key(c)==entry['cell_key']);row=reservation(job,cell);cancel=original_cancellations(plan)
+  facts=remote('scontrol show job '+job+' -o');f=dict(x.split('=',1) for x in facts.split() if '=' in x);minutes=cell['requested_minutes'];limit='%02d:%02d:00'%(minutes//60,minutes%60)
+- assert f['JobState']=='RUNNING' and f['Account']=='cis260361p' and f['Partition']=='GPU-shared' and f['TimeLimit']==limit and f['NumCPUs']=='4' and f['MinMemoryNode']=='64G'
++ assert f['JobState']=='RUNNING' and f['Account']==expected_account(job,entry,amendment) and f['Partition']=='GPU-shared' and f['TimeLimit']==limit and f['NumCPUs']=='4' and f['MinMemoryNode']=='64G'
+  tres=dict(x.split('=',1) for x in f.get('AllocTRES',f.get('TRES','')).split(',') if '=' in x)
+  assert tres.get('gres/gpu')=='1' and f['TresPerNode']=='gres:gpu:h100-80:1' and f['JobName']==entry['job_name'] and f['Command']==REMOTE+'/deployment/a2-b2-scientific-job.sh' and f['WorkDir']==REMOTE
+  local_receipt=Path(cell['original_fleet_cell']['receipt']);local_output=Path(cell['virtual_output_dir'])
+@@ -41,18 +62,18 @@
+   assert registries==registry_snapshot();rows=[]
+   for n,(path,data) in enumerate(registries):
+    local=stage/(str(n)+'.json');local.write_bytes(data);physical=REMOTE+'/Alignment/'+str(path.relative_to(V));run(['rsync','--no-perms','--no-times','-e','ssh -o BatchMode=yes',str(local),'b2dtn:'+physical]);digest=remote('sha256sum '+shlex.quote(physical)).split()[0];assert digest==sha(data);rows.append(dict(virtual_path=str(path),sha256=digest))
+-  assert registries==registry_snapshot();now=time.time();body=dict(job_id=job,cell_key=key(cell),source_commit=C,purpose='scientific-seed',issued_at=now,expires_at=now+300,registries=rows,reservation_id=row['id'],placement_sha256=sha(placement_path.read_bytes()),original_cancellation_check=cancel,local_preflight=str(B/(tag+'-preflight.json')));dest=B/(tag+'.json');assert not dest.exists();write(dest,body);target=REMOTE+'/deployment/'+dest.name;run(['rsync','--no-perms','--no-times','-e','ssh -o BatchMode=yes',str(dest),'b2dtn:'+target+'.pending']);remote('mv '+shlex.quote(target+'.pending')+' '+shlex.quote(target));print('authorized '+job+' '+key(cell),flush=True)
++  assert registries==registry_snapshot();now=time.time();body=dict(job_id=job,cell_key=key(cell),source_commit=C,purpose='scientific-seed',issued_at=now,expires_at=now+300,registries=rows,reservation_id=row['id'],placement_sha256=sha(placement_path.read_bytes()),original_cancellation_check=cancel,local_preflight=str(B/(tag+'-preflight.json')),account_amendment_sha256=sha(amendment_path.read_bytes()),actual_compute_account=f['Account'],storage_profile_account='cis260361p',authorizer_sha256=sha(Path(__file__).read_bytes()));dest=B/(tag+'.json');assert not dest.exists();write(dest,body);target=REMOTE+'/deployment/'+dest.name;run(['rsync','--no-perms','--no-times','-e','ssh -o BatchMode=yes',str(dest),'b2dtn:'+target+'.pending']);remote('mv '+shlex.quote(target+'.pending')+' '+shlex.quote(target));print('authorized '+job+' '+key(cell),flush=True)
+ 
+ def main():
+  plan=json.loads((B/'scientific-replacement-proposal.json').read_text())
+  if sys.argv[1]=='check':
+   for cell in plan['cells']:local_preflight(cell,'scientific-check-'+key(cell))
+   print('six actual full500 local preflights passed',flush=True);return
+- placement_path=B/'scientific-placement.json';raw=placement_path.read_bytes();placement=json.loads(raw);assert placement['proposal_sha256']==sha((B/'scientific-replacement-proposal.json').read_bytes());assert placement['authorizer_sha256']==sha(Path(__file__).read_bytes());jobs=placement['jobs'];assert len(jobs)==6 and len({v['cell_key'] for v in jobs.values()})==6
++ placement_path=B/'scientific-placement.json';raw=placement_path.read_bytes();placement=json.loads(raw);assert placement['proposal_sha256']==sha((B/'scientific-replacement-proposal.json').read_bytes());amendment_path=B/'compute-account-amendment-000001.json';amendment_raw=amendment_path.read_bytes();amendment=validate_amendment(json.loads(amendment_raw),placement,sha(raw),sha(Path(__file__).read_bytes()));jobs=placement['jobs'];assert len(jobs)==6 and len({v['cell_key'] for v in jobs.values()})==6
+  deadline=time.monotonic()+3540;last={};futures={};terminal=set()
+  with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:
+   while time.monotonic()<deadline and len(terminal)<len(jobs):
+-   assert placement_path.read_bytes()==raw;accounting=remote('sacct -j '+','.join(jobs)+' -X -n -P -o JobIDRaw,State,ElapsedRaw,ExitCode');write(B/'scientific-watcher-current.json',dict(checked_at=time.time(),accounting=accounting))
++   assert placement_path.read_bytes()==raw and amendment_path.read_bytes()==amendment_raw;accounting=remote('sacct -j '+','.join(jobs)+' -X -n -P -o JobIDRaw,State,ElapsedRaw,ExitCode');write(B/'scientific-watcher-current-account-v2.json',dict(checked_at=time.time(),accounting=accounting))
+    for record in accounting.splitlines():
+     row=record.split('|');job=row[0]
+     if job not in jobs:continue
+@@ -62,7 +83,7 @@
+     if state=='RUNNING' and job not in futures:
+      path=REMOTE+'/deployment/scientific-phase-'+job+'.json';phase=json.loads(remote('if test -f '+path+'; then cat '+path+'; else echo "{}"; fi'))
+      if phase.get('state')=='waiting_for_fresh_registry_authorization':
+-      assert phase['job_id']==job and phase['cell_key']==jobs[job]['cell_key'];futures[job]=pool.submit(authorize,job,jobs[job],plan,placement_path)
++      assert phase['job_id']==job and phase['cell_key']==jobs[job]['cell_key'];futures[job]=pool.submit(authorize,job,jobs[job],plan,placement_path,amendment,amendment_path)
+    for job,future in futures.items():
+     if future.done():future.result()
+    time.sleep(10)

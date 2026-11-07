@@ -1,0 +1,24 @@
+{
+  "kind": "independent134_Slurm_CPU_test_proposal",
+  "runtime": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime",
+  "source_commit": "40fe57289405fd53a3fce02e5d4e47a0ebf78b64",
+  "command": [
+    "bash",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/134-source-refresh-batch-review-evidence/review134_cpu.sh"
+  ],
+  "requested_cpus": 4,
+  "requested_memory_bytes": 17179869184,
+  "requested_minutes": 15,
+  "gpus": 0,
+  "partition_account": "root selects authorized Delta CPU allocation",
+  "rationale": "prior full owning raw suites189s mgnp/266s base; this narrower helper+independent+preserved probe selection runs sequentially with headroom",
+  "no_local_suite_or_perf_run": true,
+  "script_sha256": {
+    "run_review.py": "044972b888ae88986ab8672df562465ee2d587899ebb21f97407363fd92df8e4",
+    "review134_cpu.sh": "9a95e004086d82a454df2c811ab38638fc14f23e47285069fb20ad01af039edd",
+    "test_independent_batch.py": "64922fdda91a791863a21d544bca6e617991cdd3a9a51dc6684b3936a898827a",
+    "pytest_child.py": "085104e0653b29b7f5ce81fb4b9388afa5a004d9376c734b3fb7c4ee5b76ddad"
+  },
+  "selection": "entire candidate helper suite; independent reviewer batch probes; mandatory untouched121 probes; five fixed cached-source/copy/startup-projector owner integration cases",
+  "harness_frozen_for_root_submission": true
+}

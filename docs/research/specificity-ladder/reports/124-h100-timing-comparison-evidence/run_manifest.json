@@ -1,0 +1,105 @@
+{
+  "status": "comparison-passed-under-predeclared-rule",
+  "commands": [
+    {
+      "command": "/sw/external/python/anaconda3/bin/python3.9 outputs/_analyses/specificity-ladder/a2-bridges2-20261102/comparison/compare_saved_references-attempt1.py",
+      "exit_code": 1,
+      "reason": "Analysis schema assumption: receipt SHA is appended by parent completion, absent in per-arm executionJSON. Original inputs unchanged.",
+      "error_file": "comparison-attempt1-schema-failure.json"
+    },
+    {
+      "command": "/sw/external/python/anaconda3/bin/python3.9 outputs/_analyses/specificity-ladder/a2-bridges2-20261102/comparison/compare_saved_references.py",
+      "exit_code": 0
+    },
+    {
+      "command": "research-session lint docs/research/specificity-ladder/reports/124-h100-timing-comparison-handback.md",
+      "exit_code": 0
+    },
+    {
+      "command": "/sw/external/python/anaconda3/bin/python3.9 scripts/check_report_numbers.py /projects/beto/swong2/Alignment/Deception-Circuit/docs/research/specificity-ladder/reports/124-h100-timing-comparison-handback.md --strict --json",
+      "exit_code": 0,
+      "output": "report124-number-check.json"
+    }
+  ],
+  "actual_inputs_unmodified": true,
+  "predeclared_plan_sha256": "82e6d53617d4cb276b3596edf22327c7a6f47e54b3c1592b85127d706d97afc9",
+  "input_hashes": {
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges2/reference-check/predeclared-comparison.json": "82e6d53617d4cb276b3596edf22327c7a6f47e54b3c1592b85127d706d97afc9",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-timing-6bd8bf5-h200/sdr_v2-D-seed42.json": "7f2709b1f3aec5f1fbdc470bdb1e2658c8d33f3e3cf38558d140186bf79e5d0a",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-receipts/sdr_v2-D-seed42.json": "7ffbaf74e5bec7841fd53a5e2a91eee3fa7ca081342689f711cbd985db394a7f",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/config.json": "ff77b71906130fe1d0dba2c6357f209339c87590144b142d398492467bbba4f1",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/active_nodes.json": "41c8fafb3cbd89d66ce88e9afaaa89a2e11aff64b99346088761f68d62370e28",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/results.json": "88d21b347d57c855a6ff3a3aefaba63d4b921142c5243d2552b2e57c3ee62e3a",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/history.json": "ce6c292d6abbd430d7d3155522c2b58b17059304b6d95f796144a1cd864d2c8e",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/run_manifest.json": "15c9f88cd1a089cc2be9faac2aed6296b0e405d1424fe12e9d08a4a6382b7652",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-native/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/config.json": "ff77b71906130fe1d0dba2c6357f209339c87590144b142d398492467bbba4f1",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-native/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/active_nodes.json": "41c8fafb3cbd89d66ce88e9afaaa89a2e11aff64b99346088761f68d62370e28",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-native/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/results.json": "88d21b347d57c855a6ff3a3aefaba63d4b921142c5243d2552b2e57c3ee62e3a",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-native/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/history.json": "ce6c292d6abbd430d7d3155522c2b58b17059304b6d95f796144a1cd864d2c8e",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-native/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/run_manifest.json": "d74f06ae6f893ffd57ec962e5948c1a7b44cd878a80dfdc2aec14a9128374148",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-timing-6bd8bf5-h200/sdr_v2-D-seed42.stdout-stderr.log": "99ebfbcf0234a0aaa67e751089ec12efa84146d8376abaebfac257401fd6da97",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-receipts/sdr_v2-D-seed42.stdout-stderr.log": "9dbd89c60f511bab94632663083e0f8c2eae3379e8de0b1d3735ee8c9bcf41d6",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-timing-6bd8bf5-h200/sdr_v2-I-seed42.json": "13d90fe4756c3217a70b6a591268bb3ad6804ccb126ff8fcf60bc7d0f773c7c0",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-receipts/sdr_v2-I-seed42.json": "85a245a8f66bd6a085535f2785f4b09f89648020008902c28bd088ea6c9e5eb5",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/config.json": "1b83a5243c80e9a051b1ace0555a6f85a0d772a57b971a62409ee51f1de84780",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/active_nodes.json": "ad6f59e3240bed81a1137a1f84dc8d795344e2f192525271074816cef3d4bac2",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/results.json": "0cb8d96568090aa7bc22b97735924ea1f3f5c422a68c19130dc9e43cfb04d362",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/history.json": "84da570b955c2073f0e4db920f69399d81ce9c266d148e86bb2c156e685f63dc",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/run_manifest.json": "eb1c91f820ccc1359b193bc46ea7a8166f3704300f7d0572d431275482dda950",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-native/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/config.json": "1b83a5243c80e9a051b1ace0555a6f85a0d772a57b971a62409ee51f1de84780",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-native/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/active_nodes.json": "ad6f59e3240bed81a1137a1f84dc8d795344e2f192525271074816cef3d4bac2",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-native/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/results.json": "0cb8d96568090aa7bc22b97735924ea1f3f5c422a68c19130dc9e43cfb04d362",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-native/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/history.json": "84da570b955c2073f0e4db920f69399d81ce9c266d148e86bb2c156e685f63dc",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-native/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/run_manifest.json": "6f7828453e575980d8e83ea2230e4e284299a2d30266263490813e93decab6f5",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-timing-6bd8bf5-h200/sdr_v2-I-seed42.stdout-stderr.log": "bb12c0effe8b5cf82d33d5f837e93044872da00423ed2fdb5cf9e6a791fe586b",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-receipts/sdr_v2-I-seed42.stdout-stderr.log": "a537afcee2fc19afb9c8dedfcab94fb9e8a4d5c73793d54147108a79273f24c5",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/remote-deployment/50147300-completion.json": "f3fd46730d13857b879028ff260c9c9b7842cc2647986ca34d81e6f0469bfb6a",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/terminal-accounting.txt": "5221a3f01a9074c456d8d08942c869d5fa08b523f997ddaf79b9a5d7baa99a51",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/transfer-manifest.json": "951dc44134530da3d262280e1e48d23d6a98d7676678dc74d57e6b47ebf297be",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/remote-deployment/50147300-D-execution.json": "d90409dd6b324bf6e77c2c89041371636b5f6af78f2b935ce58d6cd8d7b0687b",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/remote-deployment/50147300-I-execution.json": "231a054006394fd3ce06bbda8a75231ba085bba3f55fd1b6453c672d4e569961"
+  },
+  "fetched_source_root": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102",
+  "explicit_native_mapping": {
+    "virtual_prefix": "outputs/_training_specificity_ladder/a2-h200",
+    "fetched_only_root": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-native",
+    "fallback_to_original_H200_for_H100": false
+  },
+  "models_or_forwards_or_GPU_or_remote_or_jobs_or_git_or_RS_or_source_edits": false,
+  "all_owned_processes_terminal": true,
+  "artifacts": {
+    "comparison.json": {
+      "bytes": 54199,
+      "sha256": "cf00d154933c5ed238ae69fa6d048643d81f6918b63e27bf53c6d7142d16d2d3"
+    },
+    "report124-number-check.json": {
+      "bytes": 4454,
+      "sha256": "cc824adef75f3d9047fecf07e3e50748b3a40ead73a01df947a89014e12a54c8"
+    },
+    "trajectories.csv": {
+      "bytes": 8896,
+      "sha256": "72424780766cf512e2964791055bf7c456b6a96e70a9f36e618a3116f717e93b"
+    },
+    "compare_saved_references.py": {
+      "bytes": 17468,
+      "sha256": "1960bd4135fa0b5307ec936a87727f736207fd5fabd6884eaf220f0874f1cb83"
+    },
+    "compare_saved_references-attempt1.py": {
+      "bytes": 17336,
+      "sha256": "4e3642a21f6155f4221a6f6c2f4238f915b02214add8e816b1e0b9677ca0ecf7"
+    },
+    "paired-rows.jsonl": {
+      "bytes": 5847473,
+      "sha256": "6e93f1fc5941b979f3532abf4d7afb7c617e82af3bbf75e7d2be4eeb5b5ce54b"
+    },
+    "comparison-attempt1-schema-failure.json": {
+      "bytes": 4286,
+      "sha256": "827ae528cf3941090aef75fd6d385e5bca5ef2d5756b69baf938dfa0e5cf89a0"
+    },
+    "mask-comparison.json": {
+      "bytes": 3163,
+      "sha256": "def8c7de771a39ef7c34886de843013ce810dc2f1b0dd2ca9516140a4caba9a0"
+    }
+  },
+  "metadata_check_note": "Initial strict scan treated hyphenated cluster product suffix as an unsupported numeric quantity; final text uses actual cluster identifier bridges2. No data claim changed."
+}

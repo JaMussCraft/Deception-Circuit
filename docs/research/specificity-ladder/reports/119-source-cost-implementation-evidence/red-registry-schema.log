@@ -1,0 +1,127 @@
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+_______ test_malformed_current_registry_fails_with_validation_error[[]] ________
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-registry-schema/test_malformed_current_registr0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f84144d1700>
+body = '[]'
+
+    @pytest.mark.parametrize('body',['[]','null','{"schema":1,"sets":null}'])
+    def test_malformed_current_registry_fails_with_validation_error(tmp_path,monkeypatch,body):
+        c=setup_case(tmp_path,monkeypatch);state=c.build();(c.primary/'docs/research/held_out.json').write_text(body)
+>       with pytest.raises(ValueError):refresh(c,state)
+                                       ^^^^^^^^^^^^^^^^
+
+tests/test_a3_source_validation.py:292: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_a3_source_validation.py:49: in refresh
+    return state.refresh(owner='fixture',bound_inputs={'design':case.design,'prepared':case.prepared},
+component_analysis/a3_source_validation.py:198: in refresh
+    registries,graders=self._protection.refresh(registry_paths)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <component_analysis.a3_source_validation._Protection object at 0x7f84142b5c10>
+registry_paths = []
+
+    def refresh(self,registry_paths):
+        from types import SimpleNamespace
+        from dataset import user_inversion_pipeline as common
+        from component_analysis import ladder_pipeline as ladder
+        require(tuple(str(Path(p).absolute()) for p in registry_paths)==self.explicit,'source registry scope changed')
+        for path,expected in self.registry_links.items():require(_links(path)==expected,'registry path provenance changed')
+        paths=list(dict.fromkeys([Path(common.PRIMARY_REGISTRY),common.REPO/'docs/research/held_out.json']+[Path(p).resolve() for p in self.explicit]))
+        # Read only small CURRENT registries to discover new file-backed sets.
+        current={};references={}
+        for path in paths:
+            raw=common.read_json(path);current[str(path)]=common.file_hash(path)
+>           for entry in raw.get('sets',[]):
+                         ^^^^^^^
+E           AttributeError: 'list' object has no attribute 'get'
+
+component_analysis/a3_source_validation.py:128: AttributeError
+______ test_malformed_current_registry_fails_with_validation_error[null] _______
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-registry-schema/test_malformed_current_registr1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f840697a540>
+body = 'null'
+
+    @pytest.mark.parametrize('body',['[]','null','{"schema":1,"sets":null}'])
+    def test_malformed_current_registry_fails_with_validation_error(tmp_path,monkeypatch,body):
+        c=setup_case(tmp_path,monkeypatch);state=c.build();(c.primary/'docs/research/held_out.json').write_text(body)
+>       with pytest.raises(ValueError):refresh(c,state)
+                                       ^^^^^^^^^^^^^^^^
+
+tests/test_a3_source_validation.py:292: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_a3_source_validation.py:49: in refresh
+    return state.refresh(owner='fixture',bound_inputs={'design':case.design,'prepared':case.prepared},
+component_analysis/a3_source_validation.py:198: in refresh
+    registries,graders=self._protection.refresh(registry_paths)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <component_analysis.a3_source_validation._Protection object at 0x7f8414459b70>
+registry_paths = []
+
+    def refresh(self,registry_paths):
+        from types import SimpleNamespace
+        from dataset import user_inversion_pipeline as common
+        from component_analysis import ladder_pipeline as ladder
+        require(tuple(str(Path(p).absolute()) for p in registry_paths)==self.explicit,'source registry scope changed')
+        for path,expected in self.registry_links.items():require(_links(path)==expected,'registry path provenance changed')
+        paths=list(dict.fromkeys([Path(common.PRIMARY_REGISTRY),common.REPO/'docs/research/held_out.json']+[Path(p).resolve() for p in self.explicit]))
+        # Read only small CURRENT registries to discover new file-backed sets.
+        current={};references={}
+        for path in paths:
+            raw=common.read_json(path);current[str(path)]=common.file_hash(path)
+>           for entry in raw.get('sets',[]):
+                         ^^^^^^^
+E           AttributeError: 'NoneType' object has no attribute 'get'
+
+component_analysis/a3_source_validation.py:128: AttributeError
+_ test_malformed_current_registry_fails_with_validation_error[{"schema":1,"sets":null}] _
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-registry-schema/test_malformed_current_registr2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f84063b3290>
+body = '{"schema":1,"sets":null}'
+
+    @pytest.mark.parametrize('body',['[]','null','{"schema":1,"sets":null}'])
+    def test_malformed_current_registry_fails_with_validation_error(tmp_path,monkeypatch,body):
+        c=setup_case(tmp_path,monkeypatch);state=c.build();(c.primary/'docs/research/held_out.json').write_text(body)
+>       with pytest.raises(ValueError):refresh(c,state)
+                                       ^^^^^^^^^^^^^^^^
+
+tests/test_a3_source_validation.py:292: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_a3_source_validation.py:49: in refresh
+    return state.refresh(owner='fixture',bound_inputs={'design':case.design,'prepared':case.prepared},
+component_analysis/a3_source_validation.py:198: in refresh
+    registries,graders=self._protection.refresh(registry_paths)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <component_analysis.a3_source_validation._Protection object at 0x7f84144598f0>
+registry_paths = []
+
+    def refresh(self,registry_paths):
+        from types import SimpleNamespace
+        from dataset import user_inversion_pipeline as common
+        from component_analysis import ladder_pipeline as ladder
+        require(tuple(str(Path(p).absolute()) for p in registry_paths)==self.explicit,'source registry scope changed')
+        for path,expected in self.registry_links.items():require(_links(path)==expected,'registry path provenance changed')
+        paths=list(dict.fromkeys([Path(common.PRIMARY_REGISTRY),common.REPO/'docs/research/held_out.json']+[Path(p).resolve() for p in self.explicit]))
+        # Read only small CURRENT registries to discover new file-backed sets.
+        current={};references={}
+        for path in paths:
+            raw=common.read_json(path);current[str(path)]=common.file_hash(path)
+>           for entry in raw.get('sets',[]):
+                         ^^^^^^^^^^^^^^^^^^
+E           TypeError: 'NoneType' object is not iterable
+
+component_analysis/a3_source_validation.py:128: TypeError
+=========================== short test summary info ============================
+FAILED tests/test_a3_source_validation.py::test_malformed_current_registry_fails_with_validation_error[[]]
+FAILED tests/test_a3_source_validation.py::test_malformed_current_registry_fails_with_validation_error[null]
+FAILED tests/test_a3_source_validation.py::test_malformed_current_registry_fails_with_validation_error[{"schema":1,"sets":null}]
+3 failed, 34 deselected in 3.58s

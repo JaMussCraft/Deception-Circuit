@@ -1,0 +1,199 @@
+{
+  "kind": "independent_edge_successor_artifact_check",
+  "commit": "87fceb28b3b46f4a406c0280db785697a0bbd3fc",
+  "exit_code": 0,
+  "elapsed_seconds": 227.5156131919939,
+  "actual_completed_object_hashes_match": true,
+  "owning_inventory_validators_and_exact_rebuilds": true,
+  "prepared_constituent_checks": true,
+  "owner_full_validate_prepared_timing_reused": true,
+  "accepted115_actual_producer_replay_reused": true,
+  "source_rows_digest": "03e3ade260b726dd8c1c89b1dc5a40038db432976f008cc72f01e9dd66e0182c",
+  "cohorts": {
+    "far_v2": {
+      "fit_ids": 177,
+      "selection_ids": 177,
+      "assessment_ids": 100
+    },
+    "sdr_v2": {
+      "fit_ids": 187,
+      "selection_ids": 187,
+      "assessment_ids": 100
+    },
+    "ser_v2": {
+      "fit_ids": 168,
+      "selection_ids": 167,
+      "assessment_ids": 100
+    }
+  },
+  "utilities": {
+    "ioi": 100,
+    "mmlu": 32
+  },
+  "validation_utilities": {
+    "ioi": 100,
+    "mmlu": 32
+  },
+  "receiver_groups": {
+    "far_v2": {
+      "graph_edges": 2172,
+      "receiver_count": 54,
+      "by_kind": {
+        "k": 15,
+        "mlp_in": 1,
+        "q": 22,
+        "readout": 1,
+        "v": 15
+      },
+      "cached_pilot_keys": 3456
+    },
+    "sdr_v2": {
+      "graph_edges": 1695,
+      "receiver_count": 43,
+      "by_kind": {
+        "k": 10,
+        "mlp_in": 5,
+        "q": 17,
+        "readout": 1,
+        "v": 10
+      },
+      "cached_pilot_keys": 2752
+    },
+    "ser_v2": {
+      "graph_edges": 2044,
+      "receiver_count": 54,
+      "by_kind": {
+        "k": 15,
+        "q": 23,
+        "readout": 1,
+        "v": 15
+      },
+      "cached_pilot_keys": 3456
+    }
+  },
+  "inventories": {
+    "pilot": {
+      "stage": "pilot",
+      "phase": "M1",
+      "inventory_sha256": "5901800f36a0af4534ebcdb60a2b0b140166e930f68ce196ab045239b758c373",
+      "keys": 96,
+      "requirements": 604,
+      "physical_calls": 9664,
+      "model_loads": 2,
+      "finish_reserve_seconds": 300,
+      "storage_requirements": {
+        "components": {
+          "authority_key_proof_host_bytes": 0
+        },
+        "policy": "complete source-derived scalar caches, full-union bank, aliases, immutable rows plus atomic temporary publication; no saved vocabulary arrays",
+        "tiers": {
+          "cache_disk": 3848848595,
+          "host_ram": 7697697190,
+          "output_disk": 3848848595,
+          "scratch_disk": 3848848595
+        }
+      },
+      "shared_disk_pool_required": 11546545785
+    },
+    "fit": {
+      "stage": "fit",
+      "phase": "M4",
+      "inventory_sha256": "7991be5ca8f1ca93badbed05ed306a8ef9f74b83f402f49f988250e2169c6b00",
+      "keys": 6384,
+      "requirements": 302,
+      "physical_calls": 106684,
+      "model_loads": 1,
+      "finish_reserve_seconds": 300,
+      "storage_requirements": {
+        "components": {
+          "authority_key_proof_host_bytes": 0
+        },
+        "policy": "complete source-derived scalar caches, full-union bank, aliases, immutable rows plus atomic temporary publication; no saved vocabulary arrays",
+        "tiers": {
+          "cache_disk": 33803392147,
+          "host_ram": 67606784294,
+          "output_disk": 33803392147,
+          "scratch_disk": 33803392147
+        }
+      },
+      "shared_disk_pool_required": 101410176441
+    }
+  },
+  "runtime_signature": {
+    "python": "3.12.13",
+    "packages": {
+      "torch": "2.11.0+cu128",
+      "transformers": "5.13.0",
+      "numpy": "2.5.1"
+    },
+    "cuda_build": "12.8"
+  },
+  "numeric_profile": {
+    "backend": "sdpa",
+    "dtype": "torch.bfloat16",
+    "gradients": false,
+    "matched_shape_controls": true,
+    "readout": "last unpadded assistant readout"
+  },
+  "source_evidence": {
+    "registry_hashes": {
+      "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/held_out.json": "801b24e37c3315a8e58aa2ad5007f7831822fc2636d1e61837ad3652c370425e",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-edge-runtime-87fceb28b3b4/runtime/docs/research/held_out.json": "801b24e37c3315a8e58aa2ad5007f7831822fc2636d1e61837ad3652c370425e",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json": "801b24e37c3315a8e58aa2ad5007f7831822fc2636d1e61837ad3652c370425e"
+    },
+    "grader_registry": {
+      "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/directions.json": "5f3ef57048720547d27fee9f333c34cf3707dc6befbfb58066c6e5d43a5439b1",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-edge-runtime-87fceb28b3b4/runtime/docs/research/directions.json": "f8c7dbb92f2edc509c7bb8e94624a5c8adabddd103a8c48db1cc59bd69a3c6b0"
+    },
+    "injected": false,
+    "commit": "87fceb28b3b46f4a406c0280db785697a0bbd3fc",
+    "protocol_sha256": "7c6fa27bcc16d964d2fc312af32fa0c53dbc455ab25d7065676f5ea8dc2dcccf"
+  },
+  "bank_protection": {
+    "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/held_out.json": "801b24e37c3315a8e58aa2ad5007f7831822fc2636d1e61837ad3652c370425e",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-edge-runtime-87fceb28b3b4/runtime/docs/research/held_out.json": "801b24e37c3315a8e58aa2ad5007f7831822fc2636d1e61837ad3652c370425e",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json": "801b24e37c3315a8e58aa2ad5007f7831822fc2636d1e61837ad3652c370425e"
+  },
+  "ancestry_files": 75,
+  "ancestry_bytes_unchanged": true,
+  "project_imports": {
+    "component_analysis": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-edge-runtime-87fceb28b3b4/runtime/component_analysis/__init__.py",
+    "component_analysis.sampling": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-edge-runtime-87fceb28b3b4/runtime/component_analysis/sampling.py",
+    "component_analysis.ladder_design": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-edge-runtime-87fceb28b3b4/runtime/component_analysis/ladder_design.py",
+    "dataset": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-edge-runtime-87fceb28b3b4/runtime/dataset/__init__.py",
+    "dataset.deception_common": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-edge-runtime-87fceb28b3b4/runtime/dataset/deception_common.py",
+    "dataset.matched_honest": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-edge-runtime-87fceb28b3b4/runtime/dataset/matched_honest.py",
+    "dataset.build_user_inversion_v2": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-edge-runtime-87fceb28b3b4/runtime/dataset/build_user_inversion_v2.py",
+    "dataset.user_inversion_pipeline": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-edge-runtime-87fceb28b3b4/runtime/dataset/user_inversion_pipeline.py",
+    "component_analysis.a3_design": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-edge-runtime-87fceb28b3b4/runtime/component_analysis/a3_design.py",
+    "component_analysis.ladder_pipeline": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-edge-runtime-87fceb28b3b4/runtime/component_analysis/ladder_pipeline.py",
+    "component_analysis.a3_direction_artifacts": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-edge-runtime-87fceb28b3b4/runtime/component_analysis/a3_direction_artifacts.py",
+    "component_analysis.a3_directions": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-edge-runtime-87fceb28b3b4/runtime/component_analysis/a3_directions.py",
+    "component_analysis.a3_direction_pipeline": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-edge-runtime-87fceb28b3b4/runtime/component_analysis/a3_direction_pipeline.py",
+    "component_analysis.hooks": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-edge-runtime-87fceb28b3b4/runtime/component_analysis/hooks.py",
+    "component_analysis.specificity_ladder": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-edge-runtime-87fceb28b3b4/runtime/component_analysis/specificity_ladder.py",
+    "component_analysis.a3_direction_runner": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-edge-runtime-87fceb28b3b4/runtime/component_analysis/a3_direction_runner.py",
+    "component_analysis.a3_direction_workload": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-edge-runtime-87fceb28b3b4/runtime/component_analysis/a3_direction_workload.py",
+    "component_analysis.a3_direction_runtime": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-edge-runtime-87fceb28b3b4/runtime/component_analysis/a3_direction_runtime.py",
+    "component_analysis.a3_native": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-edge-runtime-87fceb28b3b4/runtime/component_analysis/a3_native.py",
+    "component_analysis.a3_edges": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-edge-runtime-87fceb28b3b4/runtime/component_analysis/a3_edges.py",
+    "component_analysis.a3_edge_pipeline": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-edge-runtime-87fceb28b3b4/runtime/component_analysis/a3_edge_pipeline.py",
+    "component_analysis.a3_edge_workload": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-edge-runtime-87fceb28b3b4/runtime/component_analysis/a3_edge_workload.py",
+    "component_analysis.a3_pipeline": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-edge-runtime-87fceb28b3b4/runtime/component_analysis/a3_pipeline.py",
+    "evaluation": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-edge-runtime-87fceb28b3b4/runtime/evaluation/__init__.py",
+    "evaluation.grader_hash": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-edge-runtime-87fceb28b3b4/runtime/evaluation/grader_hash.py"
+  },
+  "cgroup_before": {
+    "memory.current": "8365850624",
+    "memory.max": "40320217088",
+    "memory.events": "low 0\nhigh 6\nmax 129883\noom 1\noom_kill 1\noom_group_kill 0"
+  },
+  "cgroup_after": {
+    "memory.current": "10818744320",
+    "memory.max": "40320217088",
+    "memory.events": "low 0\nhigh 6\nmax 129883\noom 1\noom_kill 1\noom_group_kill 0"
+  },
+  "weights_loaded": false,
+  "execution_authorized": false,
+  "readiness_admission": "BLOCKED: CPU source guard cost and staged M1 timing budget"
+}

@@ -1,0 +1,557 @@
+{
+  "kind": "read_only_H200_deployment_provenance_reconciliation",
+  "digest_function_source": {
+    "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-runtime-6bd8bf5/runtime/scripts/twin_training.py",
+    "sha256": "6707caff04a961d7848031d412c139a33918d902d1e8ba87c0c3dbd2df85a341",
+    "definition": "SHA256(json.dumps(value, sort_keys=True, separators=(comma,colon)).encode())"
+  },
+  "transfer_manifest": {
+    "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/transfer-manifest.json",
+    "sha256": "951dc44134530da3d262280e1e48d23d6a98d7676678dc74d57e6b47ebf297be",
+    "file_count": 88
+  },
+  "build": {
+    "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/build_manifest.json",
+    "raw_file_sha256": "3183d1cb71a195ada89743af241db66028670b1fded65ef3bba5060cb5b879ce",
+    "canonical_JSON_sha256": "616b660586d4bc07f3dd7a72cfb3ccce48cbc9ee8f024fb5c20f1cbb712e07a4",
+    "build_hash": "c79830a14f94a6f8a7bce937dba8d2444abfc911676f7f71016b37ca6463781f",
+    "transfer_row": {
+      "relative_path": "Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/build_manifest.json",
+      "virtual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/build_manifest.json",
+      "sha256": "3183d1cb71a195ada89743af241db66028670b1fded65ef3bba5060cb5b879ce",
+      "nbytes": 376967
+    }
+  },
+  "config": {
+    "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-timing-h200-config.json",
+    "raw_file_sha256": "4321ef824036b316828564f7fc3833d508552361d370890e46be39bd1feacec8",
+    "canonical_input_JSON_sha256": "249e29ca199fbfe00c8660d9a79202566594860a0cb9e4bb2d42d7947342a41f",
+    "launcher_added_fields": {
+      "data_root": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07"
+    },
+    "launcher_resolved_canonical_JSON_sha256": "be2f4e7b7c0e6cae93102bf52d63535765eac38af14f57a81bdf2816a3392f22",
+    "transfer_row": {
+      "relative_path": "Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-timing-h200-config.json",
+      "virtual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-timing-h200-config.json",
+      "sha256": "4321ef824036b316828564f7fc3833d508552361d370890e46be39bd1feacec8",
+      "nbytes": 522
+    },
+    "raw_config": {
+      "model": "llama-8b-instruct",
+      "tasks": [
+        "far_v2",
+        "sdr_v2",
+        "ser_v2"
+      ],
+      "conditions": [
+        "D",
+        "I"
+      ],
+      "seeds": [
+        42,
+        1,
+        123
+      ],
+      "node_lambda_sparsity": 0.3,
+      "node_epochs": 500,
+      "lr": 0.03,
+      "batch_size": 7,
+      "faithfulness_weight": 1,
+      "deception_margin_loss": 0.7,
+      "init_value": 0.5,
+      "sparsity_warmup_steps": 1000,
+      "sample_caps": {
+        "train": 200,
+        "validation": 200,
+        "test": 1000
+      },
+      "output_root": "outputs/_training_specificity_ladder/a2-h200"
+    }
+  },
+  "arms": {
+    "D": {
+      "receipt_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-timing-6bd8bf5-h200/sdr_v2-D-seed42.json",
+      "receipt_sha256": "7f2709b1f3aec5f1fbdc470bdb1e2658c8d33f3e3cf38558d140186bf79e5d0a",
+      "original_native_config_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/config.json",
+      "original_native_config_sha256": "ff77b71906130fe1d0dba2c6357f209339c87590144b142d398492467bbba4f1",
+      "original_native_config": {
+        "model": "llama-8b-instruct",
+        "task": "sdr_v2",
+        "family": "llama",
+        "std_variant": "azaria",
+        "std_runtime_filter": false,
+        "std_margin_loss": null,
+        "deception_condition": "deceptive",
+        "deception_runtime_filter": false,
+        "deception_margin_loss": 0.7,
+        "joint_tasks": null,
+        "joint_scale_epochs": true,
+        "edge_pruning": false,
+        "skip_node_pruning": false,
+        "seed": 42,
+        "node_epochs": 20,
+        "edge_epochs": 300,
+        "lr": 0.03,
+        "batch_size": 7,
+        "max_seq_length": 256,
+        "train_samples": 187,
+        "val_samples": 187,
+        "test_samples": 952,
+        "node_lambda_sparsity": 0.3,
+        "edge_lambda_sparsity": 0.95,
+        "faithfulness_weight": 1.0,
+        "data_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/D",
+        "node_config": {
+          "init_value": 0.5,
+          "sparsity_warmup_steps": 1000,
+          "depth_penalty_scaling": 0.0,
+          "prune_attention_heads": true,
+          "lambda_attention_heads": 1.0,
+          "prune_attention_neurons": false,
+          "lambda_attention_neurons": 1.0,
+          "prune_attention_blocks": false,
+          "lambda_attention_blocks": 1.0,
+          "prune_mlp_hidden": false,
+          "lambda_mlp_hidden": 1.0,
+          "prune_mlp_output": false,
+          "lambda_mlp_output": 1.0,
+          "prune_mlp_blocks": true,
+          "lambda_mlp_blocks": 1.0,
+          "prune_full_layers": false,
+          "lambda_full_layers": 1.0,
+          "prune_embedding": false,
+          "lambda_embedding": 1.0
+        },
+        "edge_config": {
+          "sparsity_warmup_steps": 500,
+          "include_output_edges": true
+        }
+      },
+      "receipt_frozen_digest_matches_resolved_input": true,
+      "receipt_raw_input_file_hashes_match": true,
+      "exact_training_args_argv2_equal": true,
+      "original_script_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/train.py",
+      "frozen_script_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-runtime-6bd8bf5/runtime/train.py",
+      "frozen_script_same_original_train_bytes": true,
+      "expected_config_digest": "8ce7d85aa69ebfd78b05e76c4ca1ff3db7969b6559d9e817b1a1f7e6115ece72",
+      "frozen_source_hash_checks": {
+        "train.py": true,
+        "config.py": true,
+        "pruning.py": true,
+        "run_io.py": true,
+        "dataset/build_twin_training.py": true,
+        "scripts/twin_training.py": true
+      },
+      "dataset_files": {
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/D/sdr_v2/dataset_config.json": {
+          "native_H200_sha256_matches": true,
+          "transfer_row": {
+            "relative_path": "Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/D/sdr_v2/dataset_config.json",
+            "virtual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/D/sdr_v2/dataset_config.json",
+            "sha256": "ba3477fe0ca11ee171efc4c2445ce0c39ce5ce2943f7ab456bfdac9f2d8286ef",
+            "nbytes": 1594108
+          }
+        },
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/D/sdr_v2/dataset_dict.json": {
+          "native_H200_sha256_matches": true,
+          "transfer_row": {
+            "relative_path": "Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/D/sdr_v2/dataset_dict.json",
+            "virtual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/D/sdr_v2/dataset_dict.json",
+            "sha256": "1239dbd4ca38311b03319b672c05a6fdaacc884b0034eed047659406c62eedd4",
+            "nbytes": 43
+          }
+        },
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/D/sdr_v2/test/data-00000-of-00001.arrow": {
+          "native_H200_sha256_matches": true,
+          "transfer_row": {
+            "relative_path": "Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/D/sdr_v2/test/data-00000-of-00001.arrow",
+            "virtual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/D/sdr_v2/test/data-00000-of-00001.arrow",
+            "sha256": "a2df3f73fa7254a92bfb78719a9784d1f40c8a3ef48834ca2171e612abbf957d",
+            "nbytes": 10823104
+          }
+        },
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/D/sdr_v2/test/dataset_info.json": {
+          "native_H200_sha256_matches": true,
+          "transfer_row": {
+            "relative_path": "Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/D/sdr_v2/test/dataset_info.json",
+            "virtual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/D/sdr_v2/test/dataset_info.json",
+            "sha256": "3688b8e40784c77095cf22d7ed68212b2a25c207b298332bd8959388feeaeb4c",
+            "nbytes": 13495
+          }
+        },
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/D/sdr_v2/test/state.json": {
+          "native_H200_sha256_matches": true,
+          "transfer_row": {
+            "relative_path": "Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/D/sdr_v2/test/state.json",
+            "virtual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/D/sdr_v2/test/state.json",
+            "sha256": "a449917f659359e37bc8825083954b05802d3f162e6a5cc8516fe358cbe2ef38",
+            "nbytes": 247
+          }
+        },
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/D/sdr_v2/train/data-00000-of-00001.arrow": {
+          "native_H200_sha256_matches": true,
+          "transfer_row": {
+            "relative_path": "Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/D/sdr_v2/train/data-00000-of-00001.arrow",
+            "virtual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/D/sdr_v2/train/data-00000-of-00001.arrow",
+            "sha256": "2b0faff7236cf2448c0413fbaf013933851e409bb60a0dbc12d817ded7135039",
+            "nbytes": 2154832
+          }
+        },
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/D/sdr_v2/train/dataset_info.json": {
+          "native_H200_sha256_matches": true,
+          "transfer_row": {
+            "relative_path": "Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/D/sdr_v2/train/dataset_info.json",
+            "virtual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/D/sdr_v2/train/dataset_info.json",
+            "sha256": "3688b8e40784c77095cf22d7ed68212b2a25c207b298332bd8959388feeaeb4c",
+            "nbytes": 13495
+          }
+        },
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/D/sdr_v2/train/state.json": {
+          "native_H200_sha256_matches": true,
+          "transfer_row": {
+            "relative_path": "Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/D/sdr_v2/train/state.json",
+            "virtual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/D/sdr_v2/train/state.json",
+            "sha256": "d1f7642a081776b89e1963469cd1c39c9fb8311d11ddd0cb8889c9ad9abfb3bf",
+            "nbytes": 247
+          }
+        },
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/D/sdr_v2/validation/data-00000-of-00001.arrow": {
+          "native_H200_sha256_matches": true,
+          "transfer_row": {
+            "relative_path": "Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/D/sdr_v2/validation/data-00000-of-00001.arrow",
+            "virtual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/D/sdr_v2/validation/data-00000-of-00001.arrow",
+            "sha256": "c31c67af43baad3d130aa5cfa76a0fb263c8cdd17d7b5d80d333ed53266db579",
+            "nbytes": 2146448
+          }
+        },
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/D/sdr_v2/validation/dataset_info.json": {
+          "native_H200_sha256_matches": true,
+          "transfer_row": {
+            "relative_path": "Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/D/sdr_v2/validation/dataset_info.json",
+            "virtual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/D/sdr_v2/validation/dataset_info.json",
+            "sha256": "3688b8e40784c77095cf22d7ed68212b2a25c207b298332bd8959388feeaeb4c",
+            "nbytes": 13495
+          }
+        },
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/D/sdr_v2/validation/state.json": {
+          "native_H200_sha256_matches": true,
+          "transfer_row": {
+            "relative_path": "Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/D/sdr_v2/validation/state.json",
+            "virtual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/D/sdr_v2/validation/state.json",
+            "sha256": "840a344ca25583eabf9c7755c438a6be8ad1f27fa7e5f5abbe531432f72f88b0",
+            "nbytes": 247
+          }
+        }
+      },
+      "splits": {
+        "train": {
+          "rows": 187,
+          "ordered_receipt_and_build_and_private_ids_equal": true,
+          "ordered_rows_sha256": "39ace2a16535f73adaf711ee52f7ccadfd8dc6d155d2674b67897cd617d1600e",
+          "ordered_prompts_labels_proofs_sha256": "501a3de94c7e758b81022c3a3a0e7faebe0d330f9563c5dbed7b4d2383074e37",
+          "all_prompt_hashes_readouts_labels_and_proofs_match": true,
+          "raw_arrow_matches_original_H200_native_manifest": true,
+          "raw_arrow_matches_transfer_manifest": true,
+          "full_runtime_token_ID_arrays_stored": false
+        },
+        "validation": {
+          "rows": 187,
+          "ordered_receipt_and_build_and_private_ids_equal": true,
+          "ordered_rows_sha256": "394fe1652f0b4dcc6e331545d80bf6744c3490ae809341ee169e165a43856b41",
+          "ordered_prompts_labels_proofs_sha256": "7f7d8e6f401585aff078fa24cea02466c199b84d23634ef97b70ecc6326791b2",
+          "all_prompt_hashes_readouts_labels_and_proofs_match": true,
+          "raw_arrow_matches_original_H200_native_manifest": true,
+          "raw_arrow_matches_transfer_manifest": true,
+          "full_runtime_token_ID_arrays_stored": false
+        },
+        "test": {
+          "rows": 952,
+          "ordered_receipt_and_build_and_private_ids_equal": true,
+          "ordered_rows_sha256": "a54078902b2729dea30853f8643281bbb7a5f84bb1cf9eaee0991e445f5719c1",
+          "ordered_prompts_labels_proofs_sha256": "4b5715bddc337995ea9b737172dad22f2311d8e17e221e0b28eaecebc42e8403",
+          "all_prompt_hashes_readouts_labels_and_proofs_match": true,
+          "raw_arrow_matches_original_H200_native_manifest": true,
+          "raw_arrow_matches_transfer_manifest": true,
+          "full_runtime_token_ID_arrays_stored": false
+        }
+      },
+      "tokenizer_provenance": {
+        "actual_load_path": "meta-llama/Llama-3.1-8B-Instruct",
+        "compatibility_reason": null,
+        "identity_normalized": false,
+        "logical_identifier": "meta-llama/Llama-3.1-8B-Instruct",
+        "resolved_snapshot": "/work/nvme/beto/swong2/hub/models--meta-llama--Llama-3.1-8B-Instruct/snapshots/0e9e39f249a16976918f6564b8830bc894c89659",
+        "tokenizer_config_sha256": "177c7b61e616fecb84c17ce0591acb92c6c4d60e9ac5ababfb940ff23bbcd424"
+      }
+    },
+    "I": {
+      "receipt_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-timing-6bd8bf5-h200/sdr_v2-I-seed42.json",
+      "receipt_sha256": "13d90fe4756c3217a70b6a591268bb3ad6804ccb126ff8fcf60bc7d0f773c7c0",
+      "original_native_config_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/config.json",
+      "original_native_config_sha256": "1b83a5243c80e9a051b1ace0555a6f85a0d772a57b971a62409ee51f1de84780",
+      "original_native_config": {
+        "model": "llama-8b-instruct",
+        "task": "sdr_v2",
+        "family": "llama",
+        "std_variant": "azaria",
+        "std_runtime_filter": false,
+        "std_margin_loss": null,
+        "deception_condition": "deceptive",
+        "deception_runtime_filter": false,
+        "deception_margin_loss": 0.7,
+        "joint_tasks": null,
+        "joint_scale_epochs": true,
+        "edge_pruning": false,
+        "skip_node_pruning": false,
+        "seed": 42,
+        "node_epochs": 20,
+        "edge_epochs": 300,
+        "lr": 0.03,
+        "batch_size": 7,
+        "max_seq_length": 256,
+        "train_samples": 187,
+        "val_samples": 187,
+        "test_samples": 952,
+        "node_lambda_sparsity": 0.3,
+        "edge_lambda_sparsity": 0.95,
+        "faithfulness_weight": 1.0,
+        "data_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/I",
+        "node_config": {
+          "init_value": 0.5,
+          "sparsity_warmup_steps": 1000,
+          "depth_penalty_scaling": 0.0,
+          "prune_attention_heads": true,
+          "lambda_attention_heads": 1.0,
+          "prune_attention_neurons": false,
+          "lambda_attention_neurons": 1.0,
+          "prune_attention_blocks": false,
+          "lambda_attention_blocks": 1.0,
+          "prune_mlp_hidden": false,
+          "lambda_mlp_hidden": 1.0,
+          "prune_mlp_output": false,
+          "lambda_mlp_output": 1.0,
+          "prune_mlp_blocks": true,
+          "lambda_mlp_blocks": 1.0,
+          "prune_full_layers": false,
+          "lambda_full_layers": 1.0,
+          "prune_embedding": false,
+          "lambda_embedding": 1.0
+        },
+        "edge_config": {
+          "sparsity_warmup_steps": 500,
+          "include_output_edges": true
+        }
+      },
+      "receipt_frozen_digest_matches_resolved_input": true,
+      "receipt_raw_input_file_hashes_match": true,
+      "exact_training_args_argv2_equal": true,
+      "original_script_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/train.py",
+      "frozen_script_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-runtime-6bd8bf5/runtime/train.py",
+      "frozen_script_same_original_train_bytes": true,
+      "expected_config_digest": "826933654d2162c258ecc720a9c3ecb7f3125f80f14607c55471328ee9354280",
+      "frozen_source_hash_checks": {
+        "train.py": true,
+        "config.py": true,
+        "pruning.py": true,
+        "run_io.py": true,
+        "dataset/build_twin_training.py": true,
+        "scripts/twin_training.py": true
+      },
+      "dataset_files": {
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/I/sdr_v2/dataset_config.json": {
+          "native_H200_sha256_matches": true,
+          "transfer_row": {
+            "relative_path": "Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/I/sdr_v2/dataset_config.json",
+            "virtual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/I/sdr_v2/dataset_config.json",
+            "sha256": "5355a8839dc2799f117b9ad429c525b052768d449d63123cb217bb3c530a614d",
+            "nbytes": 2159500
+          }
+        },
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/I/sdr_v2/dataset_dict.json": {
+          "native_H200_sha256_matches": true,
+          "transfer_row": {
+            "relative_path": "Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/I/sdr_v2/dataset_dict.json",
+            "virtual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/I/sdr_v2/dataset_dict.json",
+            "sha256": "1239dbd4ca38311b03319b672c05a6fdaacc884b0034eed047659406c62eedd4",
+            "nbytes": 43
+          }
+        },
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/I/sdr_v2/test/data-00000-of-00001.arrow": {
+          "native_H200_sha256_matches": true,
+          "transfer_row": {
+            "relative_path": "Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/I/sdr_v2/test/data-00000-of-00001.arrow",
+            "virtual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/I/sdr_v2/test/data-00000-of-00001.arrow",
+            "sha256": "fbdfa1323176ab4a9b181c28f73020bf4bcc358b20a380ad1bcd36a734ebd4de",
+            "nbytes": 9929192
+          }
+        },
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/I/sdr_v2/test/dataset_info.json": {
+          "native_H200_sha256_matches": true,
+          "transfer_row": {
+            "relative_path": "Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/I/sdr_v2/test/dataset_info.json",
+            "virtual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/I/sdr_v2/test/dataset_info.json",
+            "sha256": "9c2de100379e7da419cb66213b9e45a1b770678ae156ce6745e1afb3e4113d69",
+            "nbytes": 13701
+          }
+        },
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/I/sdr_v2/test/state.json": {
+          "native_H200_sha256_matches": true,
+          "transfer_row": {
+            "relative_path": "Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/I/sdr_v2/test/state.json",
+            "virtual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/I/sdr_v2/test/state.json",
+            "sha256": "137f0e56afb3119c449688f37e245406955384281429e88b44d5b184a6543c54",
+            "nbytes": 247
+          }
+        },
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/I/sdr_v2/train/data-00000-of-00001.arrow": {
+          "native_H200_sha256_matches": true,
+          "transfer_row": {
+            "relative_path": "Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/I/sdr_v2/train/data-00000-of-00001.arrow",
+            "virtual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/I/sdr_v2/train/data-00000-of-00001.arrow",
+            "sha256": "ea0e61e343be61f2d5d1179b0816bf78f7e710c515370f6a0b2e4f546d9694b7",
+            "nbytes": 1977992
+          }
+        },
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/I/sdr_v2/train/dataset_info.json": {
+          "native_H200_sha256_matches": true,
+          "transfer_row": {
+            "relative_path": "Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/I/sdr_v2/train/dataset_info.json",
+            "virtual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/I/sdr_v2/train/dataset_info.json",
+            "sha256": "9c2de100379e7da419cb66213b9e45a1b770678ae156ce6745e1afb3e4113d69",
+            "nbytes": 13701
+          }
+        },
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/I/sdr_v2/train/state.json": {
+          "native_H200_sha256_matches": true,
+          "transfer_row": {
+            "relative_path": "Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/I/sdr_v2/train/state.json",
+            "virtual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/I/sdr_v2/train/state.json",
+            "sha256": "d5c1a018a9d9b6a501374053df648858cb440e4d0810c7e5993d81019a040ad2",
+            "nbytes": 247
+          }
+        },
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/I/sdr_v2/validation/data-00000-of-00001.arrow": {
+          "native_H200_sha256_matches": true,
+          "transfer_row": {
+            "relative_path": "Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/I/sdr_v2/validation/data-00000-of-00001.arrow",
+            "virtual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/I/sdr_v2/validation/data-00000-of-00001.arrow",
+            "sha256": "888d47e839ef2620edae22502a93d5a2e745f7f035c97250f77342e6394ea5a0",
+            "nbytes": 1971768
+          }
+        },
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/I/sdr_v2/validation/dataset_info.json": {
+          "native_H200_sha256_matches": true,
+          "transfer_row": {
+            "relative_path": "Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/I/sdr_v2/validation/dataset_info.json",
+            "virtual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/I/sdr_v2/validation/dataset_info.json",
+            "sha256": "9c2de100379e7da419cb66213b9e45a1b770678ae156ce6745e1afb3e4113d69",
+            "nbytes": 13701
+          }
+        },
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/I/sdr_v2/validation/state.json": {
+          "native_H200_sha256_matches": true,
+          "transfer_row": {
+            "relative_path": "Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/I/sdr_v2/validation/state.json",
+            "virtual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07/I/sdr_v2/validation/state.json",
+            "sha256": "e5ccd9b1135ad9c08651902980c35a7689e56bcf23ddbee9a1ad5505af0abeaa",
+            "nbytes": 247
+          }
+        }
+      },
+      "splits": {
+        "train": {
+          "rows": 187,
+          "ordered_receipt_and_build_and_private_ids_equal": true,
+          "ordered_rows_sha256": "aeba77a0c81eddf54df7be4ca133fae405c9c0848ec8e29d5facf31d9be24a5a",
+          "ordered_prompts_labels_proofs_sha256": "69767896bb2c71e15937881b0b7a4eb296c18e51898acc98dfcbd4b58ddb99aa",
+          "all_prompt_hashes_readouts_labels_and_proofs_match": true,
+          "raw_arrow_matches_original_H200_native_manifest": true,
+          "raw_arrow_matches_transfer_manifest": true,
+          "full_runtime_token_ID_arrays_stored": false
+        },
+        "validation": {
+          "rows": 187,
+          "ordered_receipt_and_build_and_private_ids_equal": true,
+          "ordered_rows_sha256": "25800379355d912aefe3e5123aa49d439dc6e1d7304e6aff594e477320b12024",
+          "ordered_prompts_labels_proofs_sha256": "43cef6255314a86b341a98ef6980f28420080eb342d12cec0dc9d8d8d86bfb6b",
+          "all_prompt_hashes_readouts_labels_and_proofs_match": true,
+          "raw_arrow_matches_original_H200_native_manifest": true,
+          "raw_arrow_matches_transfer_manifest": true,
+          "full_runtime_token_ID_arrays_stored": false
+        },
+        "test": {
+          "rows": 952,
+          "ordered_receipt_and_build_and_private_ids_equal": true,
+          "ordered_rows_sha256": "7eca4cb151fd3bdf3ca5924c57ad5b77a1e3074a26c452f52f083f90573fd9b5",
+          "ordered_prompts_labels_proofs_sha256": "a329b6b79af2ca287a93fdee80702af30f0a67c611d4d8653c7eea76c6e3d94a",
+          "all_prompt_hashes_readouts_labels_and_proofs_match": true,
+          "raw_arrow_matches_original_H200_native_manifest": true,
+          "raw_arrow_matches_transfer_manifest": true,
+          "full_runtime_token_ID_arrays_stored": false
+        }
+      },
+      "tokenizer_provenance": {
+        "actual_load_path": "meta-llama/Llama-3.1-8B-Instruct",
+        "compatibility_reason": null,
+        "identity_normalized": false,
+        "logical_identifier": "meta-llama/Llama-3.1-8B-Instruct",
+        "resolved_snapshot": "/work/nvme/beto/swong2/hub/models--meta-llama--Llama-3.1-8B-Instruct/snapshots/0e9e39f249a16976918f6564b8830bc894c89659",
+        "tokenizer_config_sha256": "177c7b61e616fecb84c17ce0591acb92c6c4d60e9ac5ababfb940ff23bbcd424"
+      }
+    }
+  },
+  "archived_default_config": {
+    "archive_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-runtime-6bd8bf5/application.tar",
+    "member": "scripts/jobs/specificity_ladder_a2.json",
+    "raw_file_sha256": "c91db10612b2aeaff7a754c7df164e68b4d508890b6ee6168b27d4795bc80c03",
+    "config": {
+      "model": "llama-8b-instruct",
+      "tasks": [
+        "far_v2",
+        "sdr_v2",
+        "ser_v2"
+      ],
+      "conditions": [
+        "D",
+        "I"
+      ],
+      "seeds": [
+        42,
+        1,
+        123
+      ],
+      "node_lambda_sparsity": 0.3,
+      "node_epochs": 500,
+      "lr": 0.03,
+      "batch_size": 7,
+      "faithfulness_weight": 1,
+      "deception_margin_loss": 0.7,
+      "init_value": 0.5,
+      "sparsity_warmup_steps": 1000,
+      "sample_caps": {
+        "train": 200,
+        "validation": 200,
+        "test": 1000
+      },
+      "output_root": "outputs/_training_specificity_ladder/a2"
+    },
+    "diff_from_original_launch": {
+      "output_root": {
+        "archived": "outputs/_training_specificity_ladder/a2",
+        "H200_launch": "outputs/_training_specificity_ladder/a2-h200"
+      }
+    }
+  },
+  "conclusion": {
+    "no_build_metadata_difference": true,
+    "no_transferred_original_launch_config_difference": true,
+    "no_row_cohort_label_or_hyperparameter_difference": true,
+    "actual_legacy_runtime_token_arrays_not_saved": true,
+    "tokenization_equivalence": "Same exact original Arrow/prompt/label bytes, stored tokenizer identity, frozen loader/tokenization code and admitted same tokenizer snapshot are required; stored prompt token proofs agree, but this read-only check does not invent legacy runtime token arrays or a newly executed H100 input equality observation.",
+    "operational_changes": [
+      "Authenticated frozen train.py execution path instead of old W/train.py",
+      "New private remote physical output root/host/job/time; original virtual data paths preserved"
+    ],
+    "same_schedule": "Actual20 epoch cosine T_max20; planned500 remains provenance only"
+  }
+}

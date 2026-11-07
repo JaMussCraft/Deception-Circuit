@@ -1,0 +1,27 @@
+{
+  "verdict": "ACCEPT_EXISTING_HELD_CANDIDATE_CPU_RELEASE_AFTER_FINAL_ROOT_CHECKS",
+  "job_id": "50319720",
+  "config_sha256": "ce924437438d95b8d3048688ebd9dec0dae9095f0209526009aecbfdb441b104",
+  "spool_sha256": "199adc171ab612b0b247b47e55433f91b4c90849780bb4e6cfc7ca8ac82cb9af",
+  "deployment_manifest_sha256": "98da72ff996334b51488f7b32bb8c3b9df9c09fc379d0261804dbec4f15f9e33",
+  "packet_manifest_sha256": "1441265a63dd307d0fbcee6bfae3bf7095568ea022ad26d18c7b5250addfc9f5",
+  "candidate_commit": "2ba697d7f5fdfd7cebc7225ae004ec9e731e434f",
+  "source_snapshot_sha256": "f3513feee33262f9a0f1f5fdaa2ee3621509b15b5ac3b78120aab27e582dba48",
+  "checks_sha256": "1cda324eecf5fe5c8469d8d018b0d28ad7c052c5b7ce4d89d1062f2eaee8f077",
+  "scope": "Exactly one existing held provisional candidate CPU producer: native freeze, fresh prefit and saved target/prefit; 128 CPU, 192 GiB, 5400 seconds. Diagnostic proposal, no fitting guarantee.",
+  "conditions": [
+    "Root fresh live usage/session permits continuation",
+    "Root fresh exact source/input/config/pointer/SIF/spooled-script hashes and canonical empty private root checks pass",
+    "Root fresh same held job/account/partition/QOS/resources/no-GPU/no-requeue/zero-runtime checks pass",
+    "Root releases only job50319720 once; no automatic retry or wall/resource extension"
+  ],
+  "authority": {
+    "source_publication": false,
+    "native_validation_complete": false,
+    "receiver": false,
+    "model": false,
+    "GPU": false,
+    "admission": false
+  },
+  "status": "handed-back"
+}

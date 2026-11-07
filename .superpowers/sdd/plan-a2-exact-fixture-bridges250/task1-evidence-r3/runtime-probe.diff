@@ -1,0 +1,71 @@
+--- Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r2/runtime-probe.py	2026-11-07 00:08:30.000000000 -0600
++++ Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate-r3/runtime-probe.py	2026-11-07 00:53:23.000000000 -0600
+@@ -109,7 +109,7 @@
+     require(witness.get('trace_sha256')==sha_bytes(raw),'external trace digest mismatch')
+ 
+ 
+-def check_startup_trace(raw, argv, marker, entries, cwd=None):
++def check_startup_trace(raw, argv, marker, entries, cwd=None, control=None):
+     """Accept only a full, unabridged per-PID prefix from exact exec to barrier.
+ 
+     The root seals the prefix on an input-only mount. Successful open/read/mmap
+@@ -125,6 +125,14 @@
+     require(ast.literal_eval(first[1])==argv[0] and ast.literal_eval(first[2])==argv,'startup trace argv differs')
+     require(lines[-1].startswith(('open(', 'openat(', 'openat2(')) and json.dumps(marker) in lines[-1]
+             and re.search(r'= -1 ENOENT\b',lines[-1]),'startup trace missing post-hook barrier')
++    if control is not None:
++        control_path,control_digest=control
++        require(os.path.isabs(control_path) and os.path.normpath(control_path)==control_path
++                and not Path(control_path).is_symlink() and re.fullmatch(r'[0-9a-f]{64}',control_digest),
++                'invalid startup control identity')
++        require(argv.count('--closure')==1 and argv[argv.index('--closure')+1]==control_path
++                and argv.count('--closure-sha256')==1 and argv[argv.index('--closure-sha256')+1]==control_digest,
++                'startup control differs from invocation')
+     reads={argv[0],os.path.realpath(argv[0])}
+     current=cwd or os.getcwd()
+     for line in lines[1:]:
+@@ -168,10 +176,17 @@
+             strings=re.findall(quoted,line)
+             require(bool(strings),'unresolved startup readlink')
+             requested=ast.literal_eval(strings[0])
+-            reads.add(os.path.normpath(os.path.join(current,requested)))
++            directory=current
++            if name=='readlinkat' and not requested.startswith('/') and not re.match(r'^readlinkat\(AT_FDCWD(?:<[^>]*>)?,',line):
++                directory=(re.findall(r'^readlinkat\(\d+<(/[^>]+)>',line) or [None])[0]
++                require(directory is not None,'unresolved startup dirfd')
++            reads.add(os.path.normpath(os.path.join(directory,requested)))
+     for name in sorted(reads):
+         # Kernel identity data cannot supply Python code or package resources.
+         if name in ('/proc/self/stat','/proc/self/exe') or re.fullmatch(r'/proc/[1-9][0-9]*/(?:stat|exe)',name):continue
++        if control is not None and name==control_path:
++            require(file_digest(name)[1]==control_digest,'startup control bytes changed: '+name)
++            continue
+         require(name in entries,'unlisted startup read: '+name)
+         entry=entries[name]
+         if entry.get('kind')=='symlink':
+@@ -179,6 +194,7 @@
+         else:
+             length,digest=file_digest(name)
+             require(length==entry.get('bytes') and digest==entry.get('sha256'),'startup bytes changed: '+name)
++    if control is not None:require(control_path in reads,'startup control read missing')
+     return sorted(reads)
+ 
+ 
+@@ -199,7 +215,7 @@
+     context=dict(pid=os.getpid(),proc_start_ticks=start_ticks,nonce=binding['nonce'],role=role,
+                  closure_sha256=args.closure_sha256,argv=[sys.executable]+sys.argv,marker=marker,cwd=os.getcwd())
+     reads=set()
+-    allowed=[str(witness_path),str(trace_path),marker]
++    allowed=[str(witness_path),str(trace_path),marker,args.closure]
+     tools=[env['readelf'],env['ldd'],sys.executable] if role=='master' else []
+     sys.addaudithook(make_auditor(closure['entries'],args.output,reads,
+         allowed_reads=allowed,allow_output_reads=role=='master',allowed_executables=tools))
+@@ -216,7 +232,7 @@
+     require(bool(os.statvfs(witness_path).f_flag & os.ST_RDONLY) and bool(os.statvfs(trace_path).f_flag & os.ST_RDONLY),'external startup evidence is writable')
+     raw=trace_path.read_bytes();witness=json.loads(witness_path.read_bytes())
+     check_startup_witness(witness,raw,context,binding['tracer'])
+-    startup_reads=check_startup_trace(raw.decode('utf-8'),context['argv'],marker,closure['entries'],context['cwd'])
++    startup_reads=check_startup_trace(raw.decode('utf-8'),context['argv'],marker,closure['entries'],context['cwd'],(args.closure,args.closure_sha256))
+     check_observed(closure['entries'],[],module_snapshot())
+     receipt=dict(context=context,witness_path=str(witness_path),witness_sha256=file_digest(witness_path)[1],
+                  trace_path=str(trace_path),trace_sha256=sha_bytes(raw),startup_reads=startup_reads)

@@ -1,0 +1,128 @@
+{
+  "status": "ROOT_READY_INSTRUCTIONS_NOT_EXECUTION_OR_ADMISSION",
+  "accepted_R5_manifest_sha256": "661d16c5f38149b4d258fa372472dd5aab57cd0afe0a131aa6b5683b735657bc",
+  "source_commit": "50e947bb852613e3a270082651f2bd1b7bb0c525",
+  "groups_file_sha256": "c3095b10aac09a23ee35e4620402581b0407623d1e111a2407a691f60f599de4",
+  "field_bindings": {
+    "groups_file_sha256": {
+      "authority": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/bridges-h100-G3-v1/groups.json",
+      "value": "c3095b10aac09a23ee35e4620402581b0407623d1e111a2407a691f60f599de4",
+      "method": "exact existing groups.json file SHA; no secondfreeze"
+    },
+    "groups_receipt_sha256": {
+      "authority": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/bridges-h100-G3-v1/groups.json",
+      "method": "owning a1.read_artifact(groups.json) payload receipt_sha256; distinct from physical file SHA; obtain from accepted CPU evidence/read, do not guess"
+    },
+    "actual_job_id": {
+      "authority": "actual newly submitted Bridges allocation",
+      "method": "real Slurm ID, never synthetic. Root must completebinding before packetimport/launch; use existing root held/wait-before-launch process."
+    },
+    "reservation_id": {
+      "authority": "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/specificity-ladder/ledger.json",
+      "method": "actual immutable root RS A2 reservation for THISjob/source/output/cluster/account382/GPU-shared/oneH100/60min/1.0GPUh"
+    },
+    "placement_sha256": {
+      "authority": "root writes new immutable actual placement JSON",
+      "method": "SHA256 of root actualjob/resource/source/G3/reservation/scope/packet/input/cacheproof placement. common.py compares opaque digest to releases; rootproducer must establish semantic contents. Avoid final boundconfigSHA inside placement (circular); release separatelybinds placementSHA AND boundconfigSHA."
+    },
+    "input_manifest": {
+      "authority": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-h100-staging-instructions/input-manifest-422-data-provenance.json",
+      "method": "stage immutable combined389+33 manifest at actual preserved virtualpath; original rows retained; catalogues current separately"
+    },
+    "input_manifest_sha256": {
+      "authority": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-h100-staging-instructions/input-manifest-422-data-provenance.json",
+      "value": "ff11c97d3fc0d279cf4d4f5c9c545ad8e8783778d75d45ef6f87fe8373e4aaad"
+    },
+    "delta_G3_receipt": {
+      "authority": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/bridges-h100-G3-v1/cpu-readiness.json",
+      "method": "stage exact actualDelta23483002 owning CPU readiness plus wrapperstablecatalogue evidence; receipt points actualJSON available insidecontainer"
+    },
+    "delta_G3_receipt_sha256": {
+      "authority": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/bridges-h100-G3-v1/cpu-readiness.json",
+      "value": "d197e6650404ca8b5c18163fbd456fc689ea88b92bea5f2828eed16f5d3779c3"
+    },
+    "bridges_G3_receipt": {
+      "authority": "successful NEW Bridges existing-G3 validation owning validation/cpu-readiness.json",
+      "method": "BLOCKED until actual root validation PASS. Neither failed50187032/50188685 nor expiredunreleased50188515 counts. Pending50188685 alreadyfailed; use later actual successfuljob only."
+    },
+    "bridges_G3_receipt_sha256": {
+      "authority": "same successful Bridges owning CPU proof",
+      "method": "exactbytesSHA after fetch/independentreview, source50e/G3c309/no secondfreeze"
+    },
+    "model_cache_proof": {
+      "authority": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/120-a2-bridges-pilot-readiness-evidence/remote-model-cache-check.json",
+      "method": "existing actual Bridges fullbytecachecheck proof, not just declared reference; retain exactreference and actualcurrentrefs/metadata/aliaschecks. Historicalfullhash is not freshcheckforeverycurrentstart."
+    },
+    "model_cache_proof_sha256": {
+      "authority": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/120-a2-bridges-pilot-readiness-evidence/remote-model-cache-check.json",
+      "value": "b28e3897ffc3bda9db3ad4bbaf5a38a5c3ed664b301983eae133c08536461fee"
+    },
+    "independent160_accepted": {
+      "authority": "independent160 final boundpacket/source/data/protection/resource review",
+      "method": "set true ONLY after actualacceptance; staticgenericR5acceptance alone doesnotacceptunboundproofs"
+    },
+    "launch_packet_manifest_sha256": {
+      "authority": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/h100-timing-launch-r5/manifest.json",
+      "value": "661d16c5f38149b4d258fa372472dd5aab57cd0afe0a131aa6b5683b735657bc"
+    },
+    "allocation_capture": {
+      "authority": "future actualhost capture JSON produced/refreshed by accepted host-launch.py",
+      "method": "absolute VIRTUAL /projects path under mirror; parent exists, leafabsent. Put separatebinding/controlparent, NOT executionOUTleaf that controllerrequiresabsent. Hostrefreshes<=5s; commonrequirescaptureage<=15s."
+    }
+  },
+  "root_stage_order": [
+    "Wait for correctedclosureindependentacceptance+actual NEW Bridges CPUvalidationPASS; keepallfailedreceipts",
+    "Rootcreatesactual60min1.0GPUh A2charge with actualjob identity; appendcompletednewmapping successor retaining everyoldcharge/admission, before modelauthority",
+    "Reenumerate andstage exactcanonicalledger+allmappingorigin/successors/frozensnapshots/admissions at originalvirtualpaths; validate actual owningnormalize_ledger inCPUnoproductionmodel",
+    "Stage R5packet manifest+everymanifestmember, boundconfigandproofs INSIDEphysicalAlignment subtree; host-launch requires both config and packet .relative_to(physicalAlignment), not standalone/ocean/deployment",
+    "Seal rootplacementSHA then boundconfigSHA, no circular hashes. Everyunboundfield above mustbe actualandindependentlyaccepted",
+    "Createonlyrequiredexistingparents/releasedirectory; leave captureleaf, controllerOUT, main/bank,main/score,pilotroot absent. Neverclear orreuse partialoutputroots",
+    "AtactualjobbankWAITING, freshDeltaCPUowningpreflight+stablefourcatalogues+ledger/mappingcapture/transfer/remotehash/Deltare-read; rootbankrelease.atomicpending final, age/lifetime300s, all source/config/placement/receipts bind",
+    "Afterbank complete, independentprefixconstruction ONLYsameallocation/GPUUUID/name/numericcontract and1950sremainingfloor with300sfinishreserve; repeat fullfresh rootpreflight+ledger/protectionrelease; no automaticextension/requeue/retry/fullscore"
+  ],
+  "host_environment_required": {
+    "A2_H100_BOUND_CONFIG": "HOST PHYSICAL absoluteconfig under physicalAlignment",
+    "A2_H100_BOUND_CONFIG_SHA256": "SHA of finalsealedboundconfig",
+    "A2_TIMING_EXECUTION_OUTPUT": "VIRTUAL absolute original/projects path; leafMUSTNOTEXIST at controllerentry",
+    "A2_H100_RELEASE_DIRECTORY": "VIRTUAL absolute original/projects directory, precreated; JOB-bank.json/JOB-prefix4.json initiallyabsent"
+  },
+  "host_packet_derived_environment": [
+    "actualallSLURM andCUDA_VISIBLE_DEVICES preserved",
+    "A2_H100_PACKET physicalpacket remapped tovirtual originalpath automatically",
+    "A2_H100_RUNTIME acceptedruntime",
+    "A2_H100_INITIAL_END_EPOCH actualinitialscontrol EndTime; never fabricated"
+  ],
+  "mounts_and_permissions": [
+    "actual SIF SHA f50c8e... unchanged; real original/projects mirror and physicalHFhub to/work alias",
+    "acceptedR5 host mounts wholemirror :rw for bank/prefix/evidence and livecontrol snapshots; immutableordinarysource files remainreadonly modes and fullclosed511+4guard unchanged",
+    "HFcache mountedreadonly; packedPythonphysical361; postactivationcacheenv explicit/work",
+    "sourceinputaliases literal11 preserved; no extra agent_harnesses/credentials copy",
+    "allrootledger/cataloguecopies are phasechecked snapshots, not continuously liveDelta"
+  ],
+  "filesystem_preconditions": [
+    "physicalpacket+config mustlie below /ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment",
+    "captureparent exists ordinarywritabledir; captureleaf absent; host writes .pending thenreplace",
+    "release directory exists ordinary; stage-specificjobleasefiles absent",
+    "executionOUT parentexists/creatable butOUTleaf absent; controller mkdir exactlyonce",
+    "main groups.json exactc309 exists; main/bank andmain/score absent; pilotrootabsent (controllercreatesgroupscopy+banklink onlyafterbank)",
+    "successor_directory exists realordinarydir; completedmappingbundles containONLYpayload.json+COMPLETE.json, no backups",
+    "existingCPUevidence retained; no stalelease orpartialroot reused"
+  ],
+  "cache_proof_support": {
+    "actual_full_byte_proof": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/120-a2-bridges-pilot-readiness-evidence/remote-model-cache-check.json",
+    "proof_sha256": "b28e3897ffc3bda9db3ad4bbaf5a38a5c3ed664b301983eae133c08536461fee",
+    "reference": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/120-a2-bridges-pilot-readiness-evidence/remote-model-cache-reference.json",
+    "reference_sha256": "6d4caf626770067c20ce372a197ec402e7242ab745fad8e3b338dead1a071fbf",
+    "physical_HF_cache": "/ocean/projects/cis260361p/swong2/hf/hub",
+    "virtual_HF_cache": "/work/nvme/beto/swong2",
+    "must_not_claim": "historicalfullcachecheck is not currentmodeladmission; actualperstartrefs/metadata/sourcegeometry/numericguards required"
+  },
+  "no_worker_actions": {
+    "jobs": false,
+    "ledger_or_RS": false,
+    "mapping_or_admissions": false,
+    "remote_transfers": false,
+    "releases": false,
+    "source_or_packet_edits": false
+  }
+}

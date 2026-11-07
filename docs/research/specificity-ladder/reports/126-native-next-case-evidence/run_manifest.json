@@ -1,0 +1,446 @@
+{
+  "status": "new_case_and_same_process_reauthentication_passed; full native verification incomplete",
+  "scenario_root": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8",
+  "process": {
+    "command": [
+      "/u/swong2/.conda/envs/mgnp/bin/python",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/native-continuation-plan/coordinator.py",
+      "--root",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8",
+      "--out",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/diagnostics/next-case1-and-warm-01"
+    ],
+    "pid": 1175715,
+    "exit_code": 0,
+    "elapsed_seconds": 758.4786010879907,
+    "user_seconds": 234.302192,
+    "system_seconds": 113.97929,
+    "peak_child_rss_bytes": 6832529408,
+    "timeout_seconds": 1200,
+    "kill_grace_seconds": 15,
+    "term_sent_at": null,
+    "operational_existing_API_coordinator": true,
+    "selected_case_start": 1,
+    "selected_case_count": 1,
+    "source_unchanged": true
+  },
+  "coordinator_result": {
+    "kind": "injected_native_operational_continuation",
+    "new_case_id": "d5738bfcdec6990c3b6e77b2c7e625d46562ea134457f5de2896af9600db7ceb",
+    "new_native_case_count": 1,
+    "new_case_authenticated": true,
+    "same_process_reauth_complete": true,
+    "reauth_seconds": 67.55050745297922,
+    "reauth_new_model_forwards": 0,
+    "forbidden_calls": 0,
+    "actual_new_native_forward_calls": 11100,
+    "original_new_case_seconds": 94.28334604395786,
+    "original_new_case_forwards": 11100,
+    "preserved_case_reference_unchanged": true,
+    "new_case_reference_unchanged": true,
+    "numeric_backing_cache_roots": [
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/selected"
+    ],
+    "full_pilot_complete": false,
+    "aggregate_executed": false,
+    "scientific_execution": false,
+    "execution_authorized": false,
+    "wall_seconds": 745.8647937110509
+  },
+  "observed_steps": [
+    {
+      "event": "step_start",
+      "elapsed_seconds": 0.01240346604026854,
+      "peak_rss_bytes": 16777216,
+      "observed_model_forward_calls": 0,
+      "step": "frozen_source_before"
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 0.4887458040029742,
+      "peak_rss_bytes": 16777216,
+      "observed_model_forward_calls": 0,
+      "step": "frozen_source_before",
+      "step_seconds": 0.47561081999447197
+    },
+    {
+      "event": "import_start",
+      "elapsed_seconds": 0.4957884890027344,
+      "peak_rss_bytes": 16777216,
+      "observed_model_forward_calls": 0
+    },
+    {
+      "event": "import_end",
+      "elapsed_seconds": 20.375695599999744,
+      "peak_rss_bytes": 768225280,
+      "observed_model_forward_calls": 0
+    },
+    {
+      "event": "step_start",
+      "elapsed_seconds": 20.39651352603687,
+      "peak_rss_bytes": 768225280,
+      "observed_model_forward_calls": 0,
+      "step": "preserved_old_case_byte_reference"
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 20.59270810103044,
+      "peak_rss_bytes": 779759616,
+      "observed_model_forward_calls": 0,
+      "step": "preserved_old_case_byte_reference",
+      "step_seconds": 0.19597786001395434
+    },
+    {
+      "event": "step_start",
+      "elapsed_seconds": 20.635186387051363,
+      "peak_rss_bytes": 779759616,
+      "observed_model_forward_calls": 0,
+      "step": "verify_scenario"
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 22.180917850055266,
+      "peak_rss_bytes": 803799040,
+      "observed_model_forward_calls": 0,
+      "step": "verify_scenario",
+      "step_seconds": 1.5456650480045937
+    },
+    {
+      "event": "step_start",
+      "elapsed_seconds": 22.181018708040938,
+      "peak_rss_bytes": 803799040,
+      "observed_model_forward_calls": 0,
+      "step": "read_selected"
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 181.61249531403882,
+      "peak_rss_bytes": 840134656,
+      "observed_model_forward_calls": 0,
+      "step": "read_selected",
+      "step_seconds": 159.43143198202597
+    },
+    {
+      "event": "step_start",
+      "elapsed_seconds": 181.6163865670096,
+      "peak_rss_bytes": 840134656,
+      "observed_model_forward_calls": 0,
+      "step": "existing_inventory_canonical_rebuild_compare"
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 248.51284106104868,
+      "peak_rss_bytes": 6487588864,
+      "observed_model_forward_calls": 0,
+      "step": "existing_inventory_canonical_rebuild_compare",
+      "step_seconds": 66.89639195700875
+    },
+    {
+      "event": "step_start",
+      "elapsed_seconds": 248.51479471300263,
+      "peak_rss_bytes": 6487588864,
+      "observed_model_forward_calls": 0,
+      "step": "read_scenario_binding"
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 248.5434227240039,
+      "peak_rss_bytes": 6487588864,
+      "observed_model_forward_calls": 0,
+      "step": "read_scenario_binding",
+      "step_seconds": 0.028585902007762343
+    },
+    {
+      "event": "native_setup_context",
+      "elapsed_seconds": 248.5442468750407,
+      "peak_rss_bytes": 6487588864,
+      "observed_model_forward_calls": 0,
+      "numeric_backing_cache_roots": []
+    },
+    {
+      "event": "step_start",
+      "elapsed_seconds": 248.54428831202677,
+      "peak_rss_bytes": 6487588864,
+      "observed_model_forward_calls": 0,
+      "step": "original_pilot_cases_one_new_case"
+    },
+    {
+      "event": "step_start",
+      "elapsed_seconds": 406.61192291002953,
+      "peak_rss_bytes": 6832529408,
+      "observed_model_forward_calls": 0,
+      "step": "actual_native_invocation"
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 472.01208881201455,
+      "peak_rss_bytes": 6832529408,
+      "observed_model_forward_calls": 11100,
+      "step": "actual_native_invocation",
+      "step_seconds": 65.39814646705054
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 676.8579717280227,
+      "peak_rss_bytes": 6832529408,
+      "observed_model_forward_calls": 11100,
+      "step": "original_pilot_cases_one_new_case",
+      "step_seconds": 428.3136373400339
+    },
+    {
+      "event": "step_start",
+      "elapsed_seconds": 677.0120100420318,
+      "peak_rss_bytes": 6832529408,
+      "observed_model_forward_calls": 11100,
+      "step": "same_process_original_full_read_only_reauth"
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 744.5337996370508,
+      "peak_rss_bytes": 6832529408,
+      "observed_model_forward_calls": 11100,
+      "step": "same_process_original_full_read_only_reauth",
+      "step_seconds": 67.5217154059792
+    },
+    {
+      "event": "step_start",
+      "elapsed_seconds": 744.9889746350236,
+      "peak_rss_bytes": 6832529408,
+      "observed_model_forward_calls": 11100,
+      "step": "final_scenario_backing_check"
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 745.6276318040327,
+      "peak_rss_bytes": 6832529408,
+      "observed_model_forward_calls": 11100,
+      "step": "final_scenario_backing_check",
+      "step_seconds": 0.6385647059651092
+    },
+    {
+      "event": "step_start",
+      "elapsed_seconds": 745.6279067080468,
+      "peak_rss_bytes": 6832529408,
+      "observed_model_forward_calls": 11100,
+      "step": "frozen_source_after"
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 745.86106999201,
+      "peak_rss_bytes": 6832529408,
+      "observed_model_forward_calls": 11100,
+      "step": "frozen_source_after",
+      "step_seconds": 0.2331222979701124
+    },
+    {
+      "event": "coordinator_complete",
+      "elapsed_seconds": 745.8722658650368,
+      "peak_rss_bytes": 6832529408,
+      "observed_model_forward_calls": 11100,
+      "new_case_id": "d5738bfcdec6990c3b6e77b2c7e625d46562ea134457f5de2896af9600db7ceb",
+      "warm_auth_seconds": 67.55050745297922,
+      "full_pilot_complete": false
+    }
+  ],
+  "observed_timing": {
+    "startup_to_native_seconds": 406.61192291002953,
+    "native_invocation_seconds": 65.39814646705054,
+    "original_case_seconds": 94.28334604395786,
+    "native_to_first_api_completion_seconds": 270.24604881799314,
+    "post_native_metadata_publication_and_first_auth_seconds": 204.84588291600812,
+    "same_process_full_readonly_reauth_seconds": 67.55050745297922,
+    "isolated_first_auth_time_not_directly_measured": true
+  },
+  "counts": {
+    "new_cases": 1,
+    "total_authenticated_cases": 2,
+    "required_selected_cases": 63,
+    "remaining_cases": 61,
+    "actual_new_forward_calls": 11100,
+    "warm_auth_new_forwards": 0,
+    "operation_timing_samples": 11040,
+    "positive_batch_timing_samples": 10,
+    "positive_control_rows": 20,
+    "full_aggregate_executed": false,
+    "calibration_shards": 0,
+    "assessment_shards": 0
+  },
+  "source_hashes": {
+    "component_analysis/a3_direction_pipeline.py": "96678db186078ab37cad108e2d1e71ffdccf1fb3dd157c35cdc57a91b2ebd4a0",
+    "component_analysis/a3_direction_runner.py": "89a62335665595533204006c3eca28d14ca9c42eb600879c235e9c6370739429",
+    "component_analysis/a3_direction_runtime.py": "b66c2d8cd26c36f321b5079758209214746b0e4eec16a6c801742086d729c0cc",
+    "component_analysis/a3_direction_workload.py": "3e43aaf2b4cacb99df87593ae377c8fdf3eb7b223b258ed8873853841404d8f9",
+    "component_analysis/a3_directions.py": "ed882d4e12a396e03e73671e588beba5b1a8c90ab9d31e7ee73d4194430b4a86",
+    "component_analysis/a3_pipeline.py": "310eb53427ad4ac32522dfd0d6cd3b33e4ec887af1776579845f8953bdbe83f5",
+    "scripts/jobs/specificity_a3.sh": "936dfb7f8b9c2d267d52f1e199ed431275e6527cbfc3a105a22e3812289a9b96",
+    "tests/test_a3_direction_runner.py": "3ea945d5b23b4eef7d56139758c7075ea1b56ac612f1923590b7978628ca0120",
+    "tests/test_a3_direction_runtime.py": "5a41e89b0b2bd5fd59553f5f5a63260638e3547a63c31a615d84da08f796fb6a",
+    "tests/test_a3_direction_workload.py": "91eb6f874e180c5ffb362daba231631b7bea21c224446580efccfe20a9007300",
+    "tests/test_a3_directions.py": "cd8471b1524ad7b8f1b7c87f9eb5fec5724b3ab2980027ef7aadfea3fc3bb1c1",
+    "tests/test_a3_pipeline.py": "bbb3efdba075cc14c2997cc11ae44bab268bdea56459c0574d6bfc21b62f4a18",
+    "tests/a3_direction_native_scenario.py": "9b5061ab9618222b23230917f446abcaa73747f3d216f69c77b9218feec6297b"
+  },
+  "source_unchanged": true,
+  "new_case_marker_checks": {
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-verification-cases/selected/d5738bfcdec6990c3b6e77b2c7e625d46562ea134457f5de2896af9600db7ceb": {
+      "case.json": {
+        "bytes": 10958736,
+        "sha256": "5d7b6cc1d7aea2fd8f101ecbee1ff81970e856ccc77681bf6e1ba53cf44c3063"
+      },
+      "numeric/COMPLETE.json": {
+        "bytes": 204,
+        "sha256": "1adf964f27ac715ad1d6350d99828b8bc6e5a0a3fd68b845d42fec229f8da5b6"
+      },
+      "numeric/payload.json": {
+        "bytes": 7972590,
+        "sha256": "7a55762d9c2333825ca7d9f91730d98d46fd9dfdf495d29f40a031106b88af6f"
+      }
+    },
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-verification-cases/selected/d5738bfcdec6990c3b6e77b2c7e625d46562ea134457f5de2896af9600db7ceb/numeric": {
+      "payload.json": {
+        "bytes": 7972590,
+        "sha256": "7a55762d9c2333825ca7d9f91730d98d46fd9dfdf495d29f40a031106b88af6f"
+      }
+    }
+  },
+  "preserved_old_case_full_tree_equals_preexisting_snapshot": true,
+  "memory_event_deltas": {
+    "/sys/fs/cgroup/user.slice/user-78031.slice/session-6591.scope": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "/sys/fs/cgroup/user.slice/user-78031.slice": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "/sys/fs/cgroup/user.slice": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "/sys/fs/cgroup": {}
+  },
+  "resource_provenance": {
+    "host": "dt-login04.delta.ncsa.illinois.edu",
+    "cpu_model": "AMD EPYC 7763 64-Core Processor",
+    "filesystem": "lustre",
+    "threads": {
+      "OPENBLAS_NUM_THREADS": 1,
+      "OMP_NUM_THREADS": 1,
+      "MKL_NUM_THREADS": 1
+    },
+    "meaning": "Observed login CPU tiny fixture; no allocated-host/cold-filesystem bound"
+  },
+  "commands": [
+    {
+      "command": "/sw/external/python/anaconda3/bin/python3.9 .superpowers/sdd/plan-a3/native-continuation-plan/supervisor.py",
+      "cwd": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+      "exit_code": 0,
+      "child_command": [
+        "/u/swong2/.conda/envs/mgnp/bin/python",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/native-continuation-plan/coordinator.py",
+        "--root",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8",
+        "--out",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/diagnostics/next-case1-and-warm-01"
+      ]
+    },
+    {
+      "command": "research-session lint docs/research/specificity-ladder/reports/126-native-next-case-handback.md",
+      "exit_code": 0
+    },
+    {
+      "command": "/sw/external/python/anaconda3/bin/python3.9 scripts/check_report_numbers.py /projects/beto/swong2/Alignment/Deception-Circuit/docs/research/specificity-ladder/reports/126-native-next-case-handback.md --strict --json",
+      "exit_code": 0,
+      "output": "number-check.json"
+    }
+  ],
+  "all_owned_processes_terminal": true,
+  "no_further_case_aggregate_or_rerun": true,
+  "whole_pilot_or_production_admission": false,
+  "artifacts": {
+    "number-check.json": {
+      "bytes": 3131,
+      "sha256": "5b68d65d38794f87f4a47032d4d5fb0c7229a54a9260cf801bbf9c921c8979b0"
+    },
+    "source-and-cases.json": {
+      "bytes": 136017,
+      "sha256": "3bd3c48fa7ccb1a43c2fea82504dc5d0e4129c0c9d57accd0bd25b7d10ebd7f5"
+    },
+    "driver-identity.json": {
+      "bytes": 1841,
+      "sha256": "de49e2f92daf99c74caf7f7755fe1949a018cbab73d961eb230cebbac5c3364d"
+    },
+    "result.json": {
+      "bytes": 1020,
+      "sha256": "f988dc22b7c7496f3f1fe952498b5327234f790485806ef403c9e769eb3a2015"
+    },
+    "steps.log": {
+      "bytes": 4769,
+      "sha256": "3afaeba6666a220b7866e6598c4b1b48ac4c0026498b63f32ad5452a89881913"
+    },
+    "memory-before.json": {
+      "bytes": 730,
+      "sha256": "a38c319a406ca61607a7aa05b7571a00f3fe46567181b8d780923c94af0d4a37"
+    },
+    "new-case-numeric-COMPLETE.json": {
+      "bytes": 204,
+      "sha256": "1adf964f27ac715ad1d6350d99828b8bc6e5a0a3fd68b845d42fec229f8da5b6"
+    },
+    "coordinator-result.json": {
+      "bytes": 949,
+      "sha256": "b8f7e1dc142d2d663dd83cfab36d9cec723f9fe49ac03764f822c2f907566616"
+    },
+    "coordinator.py": {
+      "bytes": 6626,
+      "sha256": "5ac4ea6cec9b0bf51c5ab0c70010334ebe431c2589e05a85353be6f4af969b76"
+    },
+    "observed-costs-and-proposal.json": {
+      "bytes": 2454,
+      "sha256": "ea6d088f103f2870bc2cfe808314d0ba258a202395bcde24dfb09559922a9d56"
+    },
+    "new-case-summary.json": {
+      "bytes": 1578783,
+      "sha256": "6f330e04ea58d93602a0c014d650301e875417bdf817fb2700b84b62ed40c434"
+    },
+    "memory-after.json": {
+      "bytes": 730,
+      "sha256": "e76e6b2bfd1aff1eeb558e499311ccaf064274bab13fd133fa9c0ef47d008462"
+    },
+    "child-samples.jsonl": {
+      "bytes": 21180,
+      "sha256": "9315598e606c4a19dcf5d8e673b9fc9800dfd38a91db48d9d5707d465e41b7c2"
+    },
+    "preserved-case0-golden-tree.json": {
+      "bytes": 1135,
+      "sha256": "fd1b426a40061c641f8cd6c598601888665619be197308db1f9f58abdab304da"
+    },
+    "new-native-case.json": {
+      "bytes": 1030,
+      "sha256": "ecce32b906b0bca358cfa08067ef644bcea81572727d510b8f804bb77bbe49eb"
+    },
+    "source_snapshot.json": {
+      "bytes": 1423,
+      "sha256": "9ad60a15ca5738c1e492e8e06f5afc95f3ea24086e958dc435d91a90807c4ca1"
+    },
+    "supervisor.py": {
+      "bytes": 3029,
+      "sha256": "f6caa38524b5110d72a564c2eb3cc0f03fe75478346037bab1b818a8bfd01c91"
+    },
+    "new-case-COMPLETE.json": {
+      "bytes": 487,
+      "sha256": "a98bc21b7bfdeb23d856dc8b7336dc7813dfaff89af5d946909fdf280af4e273"
+    }
+  }
+}

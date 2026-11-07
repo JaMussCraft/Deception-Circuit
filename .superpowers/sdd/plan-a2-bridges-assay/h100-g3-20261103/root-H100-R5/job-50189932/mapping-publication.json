@@ -1,0 +1,1106 @@
+{
+  "job_id": "50189932",
+  "reservation_id": "r-041",
+  "source_commit": "50e947bb852613e3a270082651f2bd1b7bb0c525",
+  "generation": 5,
+  "rows": 41,
+  "ledger_sha256": "c299d64d35d2d3d97464f311c5e0225efb32f23df6c2b3f5e81268a28e6742b4",
+  "mapping_reference": {
+    "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-independent-pilots-74efb4d04819/root-mask-m1/mapping-successors/mapping-000005",
+    "files": {
+      "COMPLETE.json": {
+        "sha256": "4b983682e6340d4792ae71bd15c1132b31bccc5ec5d6dcf6e9e6ad150d0c2471",
+        "nbytes": 202
+      },
+      "payload.json": {
+        "sha256": "fd0dfc0db019f1f753584bb2742a1f205edca9045ea5b1b1899b4b1e433d3247",
+        "nbytes": 26614
+      }
+    }
+  },
+  "normalization": {
+    "kind": "a3_root_ledger_snapshot_v1",
+    "root_supplied": true,
+    "snapshot_sha256": "c299d64d35d2d3d97464f311c5e0225efb32f23df6c2b3f5e81268a28e6742b4",
+    "current_snapshot_sha256": "c299d64d35d2d3d97464f311c5e0225efb32f23df6c2b3f5e81268a28e6742b4",
+    "snapshot_path": "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/specificity-ladder/ledger.json",
+    "original_snapshot_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-H100-R5/job-50189932/ledger-at-reservation.json",
+    "snapshot_time": 1793747962.1494753,
+    "age_seconds": 0,
+    "max_age_seconds": 900,
+    "expected_identity": {
+      "purpose": "A2 H100 original-H bank plus prefix4 timing",
+      "source_commit": "50e947bb852613e3a270082651f2bd1b7bb0c525",
+      "groups_sha256": "c3095b10aac09a23ee35e4620402581b0407623d1e111a2407a691f60f599de4",
+      "main_root": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/bridges-h100-G3-v1",
+      "pilot_root": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/bridges-h100-G3-v1-timing-limit4"
+    },
+    "entries": [
+      {
+        "id": "r-031",
+        "phase": "M1",
+        "subphase": "masks",
+        "state": "failed",
+        "reserved_gpu_hours": 0.75,
+        "actual_gpu_hours": 0.0,
+        "inventory_sha256": "ee8553504a386259e7ff575dc248f80521d139b0f520a55c5b8f14eb9a9c05d1",
+        "reservation_lineage": {
+          "admission_id": "a3-mask-m1-23444798",
+          "admission_sha256": "d5083712dc93eb6a0b8971fefff7d37ad65a7dcc2a3bbb909f30f39b578313a3",
+          "max_gpu_hours": 0.75,
+          "reserved_gpu_hours": 0.75,
+          "upper_inventory_sha256": "ee8553504a386259e7ff575dc248f80521d139b0f520a55c5b8f14eb9a9c05d1"
+        },
+        "actual_entry": {
+          "account": "bimc-delta-gpu",
+          "actual_seconds": 0,
+          "cluster": "delta",
+          "gpus": 1,
+          "id": "r-031",
+          "job_id": "23444798",
+          "manifest_hash": null,
+          "output_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-independent-pilots-74efb4d04819/mask-pilot-1",
+          "partition": "gpuH200x8",
+          "requested_minutes": 45.0,
+          "reserved_gpu_hours": 0.75,
+          "source_commit": "74efb4d0481968a1d0138eb1a79b97f302fd3c3b",
+          "status": "CANCELLED"
+        }
+      },
+      {
+        "id": "r-040",
+        "phase": "M1",
+        "subphase": "masks",
+        "state": "failed",
+        "reserved_gpu_hours": 0.75,
+        "actual_gpu_hours": 0.6505555555555556,
+        "inventory_sha256": "cc1e6b187b6060be6c727421477be9512169b2f3e42a41d121e2e2708fd781f2",
+        "reservation_lineage": {
+          "admission_id": "a3-mask-N5-23474289",
+          "admission_sha256": "b68bf0adb5858322baad761e4253362654e32fa8a835551684779f0eba20feef",
+          "mask_replacement_policy_sha256": "153a5ebaa7eb2c74caf351552df42cded25869bd25b018844b1954a5fcfa42fd",
+          "max_gpu_hours": 0.75,
+          "reserved_gpu_hours": 0.75,
+          "upper_inventory_sha256": "cc1e6b187b6060be6c727421477be9512169b2f3e42a41d121e2e2708fd781f2"
+        },
+        "actual_entry": {
+          "account": "beto-delta-gpu",
+          "actual_seconds": 2342,
+          "cluster": "delta",
+          "gpus": 1,
+          "id": "r-040",
+          "job_id": "23474289",
+          "manifest_hash": null,
+          "output_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-mask-n5-pilots-861f84a3938a/mask-pilot-1",
+          "partition": "gpuH200x8,gpuH200x8-interactive",
+          "requested_minutes": 45.0,
+          "reserved_gpu_hours": 0.75,
+          "source_commit": "861f84a3938a5e22fa329af0c469b2dd812fe68a",
+          "status": "FAILED"
+        }
+      }
+    ],
+    "expected_entry_ids": [
+      "r-031",
+      "r-040"
+    ],
+    "original_admissions": [
+      {
+        "admission_sha256": "d5083712dc93eb6a0b8971fefff7d37ad65a7dcc2a3bbb909f30f39b578313a3",
+        "allocation_contract": {
+          "cpus": 4,
+          "gpu_type": "h200",
+          "gpus": 1,
+          "kind": "a3_allocation_contract_v1",
+          "memory_bytes": 68719476736,
+          "scheduler_work_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime",
+          "source_commit": "74efb4d0481968a1d0138eb1a79b97f302fd3c3b"
+        },
+        "finish_reserve_seconds": 300,
+        "full_target_inventory_sha256": "c0bda345d9085ead991511b327174b25f0b20079ea1f18eeb6ea53bbac5092be",
+        "id": "a3-mask-m1-23444798",
+        "identity": {
+          "a1_parent_evidence": {
+            "completion": {
+              "bank_sha256": "1dc78840236cdb310518ea0fcebd5892c9804f97ff948d5689ca8679f5110009",
+              "code_hashes": {
+                "component_analysis/dla.py": "61476cd4607f240bcdac567a7005cf86379cae0d4f2606dba2a60c6401d68073",
+                "component_analysis/hooks.py": "fdc8f325884e88c4168a2c9e9fde731b98be3d608ac15f1f0a39278044d7cfba",
+                "component_analysis/knockout.py": "3b5599f12bcdc6731965e3fb2c374dabad5a064b38863b1b756d4a30078b5b7b",
+                "component_analysis/ladder_design.py": "a9752ff2bca91d7d04957fb867adcdc5640d94b47bf11d9593a3657a0f9c533b",
+                "component_analysis/ladder_metrics.py": "9cc369e3e929b474052a5a142890a16615d804ce64b415e919e347af4675cfad",
+                "component_analysis/ladder_pipeline.py": "f0955e8df5215e27cb3eff06cd28f7230b1de7d2a6c20e202854bc73c1280b56",
+                "component_analysis/ladder_tasks.py": "7f53a2210450e4264089a60da31739d2c0c187b0dcd778b203997b9bd873e847",
+                "component_analysis/specificity_ladder.py": "93a22eb6b51cf6ea081b37dd354179cd56aa89def6bb50337b40fc2937b9170e",
+                "dataset/build_user_inversion_v2.py": "47cb1e1dd84d6efc43474c6ce9fc10b30f111a96f083aa370a0d9ac01c827b2a",
+                "dataset/matched_honest.py": "cb30aa003b22a0cb940bb2fb16e0f67be77f0f5e433d7a4d9b52f1fd059f13f0",
+                "dataset/user_inversion_pipeline.py": "4d49697731f291339262fe6ebc6a5909601a26fcf5d31ff562b55d1d74b2a0ee",
+                "evaluation/benchmarks/sandbagging.py": "67fce74fe14e45abb6b7ea57e96a1382ef19fa0e74ea1f40126f4adfc61a7039",
+                "evaluation/benchmarks/sources.py": "06b9286567467bf37a52faaf9ee8fff41b4c1dc8ce8e348b2f2b032b7eac633f",
+                "evaluation/grader_hash.py": "6b26c4c4cd111fe3056f8a0b1119eabf51ab367eb242588a73b9cb3f85b13a19",
+                "models/__init__.py": "ef3796de0c3e9ca6e0760fe72764241664f2d81055a891ebd5d47c9c43aef210",
+                "models/_compat.py": "449b03c2232a539dc590fed795ca2a55a045c27ce99b13b9a5204363970d2737"
+              },
+              "commit": "5f450dc93dac707af649dee8c8ca60888b2831db",
+              "counts": {
+                "far_v2": {
+                  "bank_instances": 400,
+                  "head_columns": 18,
+                  "selection_rows": 100
+                },
+                "sdr_v2": {
+                  "bank_instances": 400,
+                  "head_columns": 14,
+                  "selection_rows": 100
+                },
+                "ser_v2": {
+                  "bank_instances": 400,
+                  "head_columns": 19,
+                  "selection_rows": 100
+                }
+              },
+              "design_sha256": "680e4c6f7463d3f5f4950a682d1a9653114284f456d209f23c7239d93266b0a8",
+              "execution": {
+                "cluster": "delta",
+                "cluster_source": "SLURM_CLUSTER_NAME",
+                "commit": "5f450dc93dac707af649dee8c8ca60888b2831db",
+                "device": "cuda:0",
+                "dtype": "torch.bfloat16",
+                "gpu_name": "NVIDIA A100-SXM4-40GB",
+                "memory_scope": "selection compute after model load; includes resident model",
+                "model": "meta-llama/Llama-3.1-8B-Instruct",
+                "model_load_seconds": 46.853518882766366,
+                "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+                "peak_allocated_memory_bytes": 18309796352,
+                "peak_reserved_memory_bytes": 18717081600,
+                "selection_compute_seconds": 118.42526046885177,
+                "selection_stage_seconds": 166.37134666461498,
+                "slurm_job_id": "23417240",
+                "stage_time_scope": "model load plus selection compute; excludes artifact publication",
+                "tokenizer_revision": "0e9e39f249a16976918f6564b8830bc894c89659"
+              },
+              "group_sha256": "f33c8059ad4dc593c1f8474065bfe918ce9abb93ea292687f6e84e87171394b1",
+              "injected": false,
+              "kind": "specificity_ladder_selection",
+              "model": "meta-llama/Llama-3.1-8B-Instruct",
+              "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+              "raw_dla_sha256": "221fcf7b1aeb2e64a2205c6d4a1ba0a0706fd67275741e1d99b9d0563c060fc9",
+              "schema_version": 1,
+              "selection_artifact": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/selected.json",
+              "selection_artifact_sha256": "7cded7905affd5673bbc8d29298e85613de50445b0e0ba5683d4fa45b915190a",
+              "selection_file_sha256": "f65f8541f8315b4e4bbd4a87d4c258e4872623466415abba31bf0ea1a8c5c89e",
+              "selection_source_hashes": {
+                "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_analyses/mechanism-analysis-p1/s1/U__leaf/far_v2/sample.json": "1bd1e83c75015572e1eef23579ea17e49df920f379fbdd964ad9c11fd4e18892",
+                "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_analyses/mechanism-analysis-p1/s1/U__leaf/sdr_v2/sample.json": "512060a83f6a7df8a16a504e46d046bbad4f71a0d72d1e7402505f3aba139e1c",
+                "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_analyses/mechanism-analysis-p1/s1/U__leaf/ser_v2/sample.json": "459c2d05d484d621185a783f977e71543014b6dba1a8aa277f8a7a0cffad79c0"
+              },
+              "source_hashes": {
+                "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/mechanism-analysis/phase1/p1c_readings.json": "c94a210c23dbe0591b7a4bd6081eeb1a897046db077573f68dc8992518fce77f",
+                "data/datasets/far_v2/dataset_config.json": "5ab40c56c6196905b2a7ff14d908917e1b65ccbaaa975bf405934c97aedd5225",
+                "data/datasets/far_v2/dataset_dict.json": "1239dbd4ca38311b03319b672c05a6fdaacc884b0034eed047659406c62eedd4",
+                "data/datasets/far_v2/filter_report.json": "a6c84cf5ab992adfce6acebb4c2186606bc3d847ebbb14c4298b6da309a796bf",
+                "data/datasets/far_v2/provenance.json": "10c4d9faf7dd1ba2c419f08ac25c0985dfe43f4529f0fe8c3c668481b705060c",
+                "data/datasets/far_v2/test/data-00000-of-00001.arrow": "d577ac0de3f0df3d94419eee3c1d89f6ae1ce29a4bfce248a1dec3f92fd0e030",
+                "data/datasets/far_v2/test/dataset_info.json": "a2ba2a31551a327ea9950fe7a306a6f36339e64dac89a7780d980b4af61c3394",
+                "data/datasets/far_v2/test/state.json": "eda50e760137b13e26570ce75f594c776476b47462235ea4132df0ab68ea8ab7",
+                "data/datasets/far_v2/train/data-00000-of-00001.arrow": "964f3d3361e8bfcbdcd8f20b9d8ef443813a0d95a61153679badb36c36ba65bb",
+                "data/datasets/far_v2/train/dataset_info.json": "a2ba2a31551a327ea9950fe7a306a6f36339e64dac89a7780d980b4af61c3394",
+                "data/datasets/far_v2/train/state.json": "2d7b4d83a1a640889000264f89baca865255bd72c57774cc14f0ac2706e298d4",
+                "data/datasets/far_v2/validation/data-00000-of-00001.arrow": "b04cd46a1049bb8121f2222c17475cc556f52ced90348ec7a38c016c282cc041",
+                "data/datasets/far_v2/validation/dataset_info.json": "a2ba2a31551a327ea9950fe7a306a6f36339e64dac89a7780d980b4af61c3394",
+                "data/datasets/far_v2/validation/state.json": "5c17122cd9ab4408a538e2f195ce2247e0cc2b540f919f24769660b755a8bfe8",
+                "data/datasets/far_v2_honest/dataset_config.json": "fe35d9872db03d5a043735a06548758f2f3a2835f805d8ae685937dc2b9a6167",
+                "data/datasets/far_v2_honest/dataset_dict.json": "1239dbd4ca38311b03319b672c05a6fdaacc884b0034eed047659406c62eedd4",
+                "data/datasets/far_v2_honest/test/data-00000-of-00001.arrow": "f7da5c57a9b933b31b4ba9cda6d1abb7abcfec491d5a98436c43827d4721f801",
+                "data/datasets/far_v2_honest/test/dataset_info.json": "82c09d46600fc00c08e227947c3842a2bd2d66ba8835cbc0988684d6cc018853",
+                "data/datasets/far_v2_honest/test/state.json": "0c97e0c423a66ae4a03ac208eb98702caf81dec892562af18213ff487c6c8731",
+                "data/datasets/far_v2_honest/train/data-00000-of-00001.arrow": "bfbb91de4425011d14d5d4e472d2c76e45f9c11824e3d0a612b48ac976181d97",
+                "data/datasets/far_v2_honest/train/dataset_info.json": "82c09d46600fc00c08e227947c3842a2bd2d66ba8835cbc0988684d6cc018853",
+                "data/datasets/far_v2_honest/train/state.json": "29949aa9e5cb17c05dba915c072bf45bcff64073269c4681e7a9553b17cf0de0",
+                "data/datasets/far_v2_honest/validation/data-00000-of-00001.arrow": "29a3431c299b03f89fb3f0607d8089b67ef70ac2d4c3e6cf8c925dc2bb851748",
+                "data/datasets/far_v2_honest/validation/dataset_info.json": "82c09d46600fc00c08e227947c3842a2bd2d66ba8835cbc0988684d6cc018853",
+                "data/datasets/far_v2_honest/validation/state.json": "3a96cb83fa6b97367406287da0c2314135ff018cd4408ec0de5737f77f607179",
+                "data/datasets/far_v2_nopressure/dataset_config.json": "267bfbf388e28d9d7203e59e1af1d946838086caaf4d01825790d6e8c1677c0d",
+                "data/datasets/far_v2_nopressure/dataset_dict.json": "1239dbd4ca38311b03319b672c05a6fdaacc884b0034eed047659406c62eedd4",
+                "data/datasets/far_v2_nopressure/test/data-00000-of-00001.arrow": "903e1bfccea7fd1ce36d9b8263a2bcdb655a7b95db3750a72cc7c02f5c9bf21d",
+                "data/datasets/far_v2_nopressure/test/dataset_info.json": "82c09d46600fc00c08e227947c3842a2bd2d66ba8835cbc0988684d6cc018853",
+                "data/datasets/far_v2_nopressure/test/state.json": "d7ccc4bc57ca5cb900ce33428c5cdc82c50e06367ad37bdb99c67fe12eadb494",
+                "data/datasets/far_v2_nopressure/train/data-00000-of-00001.arrow": "7afc68c736ab22dee953c59e90f50832203a2ab078039b64a89d9143cf7c8631",
+                "data/datasets/far_v2_nopressure/train/dataset_info.json": "82c09d46600fc00c08e227947c3842a2bd2d66ba8835cbc0988684d6cc018853",
+                "data/datasets/far_v2_nopressure/train/state.json": "8ea72d49204d2c0f924ab4fd09af9357e86e64f62d26655de6b9171409b98102",
+                "data/datasets/far_v2_nopressure/validation/data-00000-of-00001.arrow": "21faf3cf55bfa0d85f17d50c8181369842a85bea594c826672cfdd71cea67286",
+                "data/datasets/far_v2_nopressure/validation/dataset_info.json": "82c09d46600fc00c08e227947c3842a2bd2d66ba8835cbc0988684d6cc018853",
+                "data/datasets/far_v2_nopressure/validation/state.json": "1988fbdffebced1a66c18dddf9b01a57a97e14473f48c1b022df813e4a761d2a",
+                "data/datasets/sdr_v2/dataset_config.json": "434a475d375a8d631bb29136fa39e641ac25b29c4e4c1525ec65afd6fffe0d42",
+                "data/datasets/sdr_v2/dataset_dict.json": "1239dbd4ca38311b03319b672c05a6fdaacc884b0034eed047659406c62eedd4",
+                "data/datasets/sdr_v2/filter_report.json": "7e56de4b13610bd2414063084fee3fb41752e2663201e9cfc91436af6e8c78b7",
+                "data/datasets/sdr_v2/provenance.json": "a33806572f7764b31560f91ef747dee45326c31f43929c8e29ea79f9f3e5e747",
+                "data/datasets/sdr_v2/test/data-00000-of-00001.arrow": "6465c3174950e67e200c3ec8ab037ca22579f7de84135e07645e812039a86b54",
+                "data/datasets/sdr_v2/test/dataset_info.json": "a2ba2a31551a327ea9950fe7a306a6f36339e64dac89a7780d980b4af61c3394",
+                "data/datasets/sdr_v2/test/state.json": "dfa6578ff7584e44e3af66c929263b4166a2aece07ccd451c965efb56b5ed71b",
+                "data/datasets/sdr_v2/train/data-00000-of-00001.arrow": "7c04ca531eade677ab8a9cffaacb3d0effd9614463f5b21d4a345593ad27edde",
+                "data/datasets/sdr_v2/train/dataset_info.json": "a2ba2a31551a327ea9950fe7a306a6f36339e64dac89a7780d980b4af61c3394",
+                "data/datasets/sdr_v2/train/state.json": "0ce052fc6430a8d8340da053a3cb786515c0c64d97941adced37d9f5cd7c8350",
+                "data/datasets/sdr_v2/validation/data-00000-of-00001.arrow": "fa57b51cd532c0892d9d7636d113863f3213c2de86d88505d920b903bda44537",
+                "data/datasets/sdr_v2/validation/dataset_info.json": "a2ba2a31551a327ea9950fe7a306a6f36339e64dac89a7780d980b4af61c3394",
+                "data/datasets/sdr_v2/validation/state.json": "7c844282725a16e1ed88b4bd318110f6e632fc670f3bc661a03670e45dd1e03e",
+                "data/datasets/sdr_v2_honest/dataset_config.json": "b6da913087fe07e4e4f7aabd063548e162d57eddf69eb53bb564bca4346d3131",
+                "data/datasets/sdr_v2_honest/dataset_dict.json": "1239dbd4ca38311b03319b672c05a6fdaacc884b0034eed047659406c62eedd4",
+                "data/datasets/sdr_v2_honest/test/data-00000-of-00001.arrow": "596a1354b3c84c02c6cef1c7bedc9fd13047d96ab1265776eaa5fcd9be04477c",
+                "data/datasets/sdr_v2_honest/test/dataset_info.json": "82c09d46600fc00c08e227947c3842a2bd2d66ba8835cbc0988684d6cc018853",
+                "data/datasets/sdr_v2_honest/test/state.json": "1f1ff140ad3d2d22e87bb138087614ce1e285c29ed2bed3010dab605f10a97d4",
+                "data/datasets/sdr_v2_honest/train/data-00000-of-00001.arrow": "318c269cc81b6a09bb676910878b8e48e815657cd4d953b165ef6458aa1459fd",
+                "data/datasets/sdr_v2_honest/train/dataset_info.json": "82c09d46600fc00c08e227947c3842a2bd2d66ba8835cbc0988684d6cc018853",
+                "data/datasets/sdr_v2_honest/train/state.json": "ee6e7ec21ee7bad490adca480a0b9b89f0bd869665c0e19f6252f426a4492c4d",
+                "data/datasets/sdr_v2_honest/validation/data-00000-of-00001.arrow": "a59e0ba089e5e4b68d1b21b2685ea9e981c0f9f3725b451d5570624e794a4257",
+                "data/datasets/sdr_v2_honest/validation/dataset_info.json": "82c09d46600fc00c08e227947c3842a2bd2d66ba8835cbc0988684d6cc018853",
+                "data/datasets/sdr_v2_honest/validation/state.json": "54341015de0a4d01eaf2cf66c85d48b35116395ac28557bef069535a5ee22197",
+                "data/datasets/sdr_v2_nopressure/dataset_config.json": "b509389d51c9ba3b06832f5986496b84028823d48c48e15106b4249b70c83171",
+                "data/datasets/sdr_v2_nopressure/dataset_dict.json": "1239dbd4ca38311b03319b672c05a6fdaacc884b0034eed047659406c62eedd4",
+                "data/datasets/sdr_v2_nopressure/test/data-00000-of-00001.arrow": "a1fbae4775e5a1be22c02bea355a707fcf1e28bb89376060542880505c3bc0cd",
+                "data/datasets/sdr_v2_nopressure/test/dataset_info.json": "82c09d46600fc00c08e227947c3842a2bd2d66ba8835cbc0988684d6cc018853",
+                "data/datasets/sdr_v2_nopressure/test/state.json": "9042d393d1e2c8b127d9dbbd4e7ae6ac86a4b92843925b4c4215dacee00bdbde",
+                "data/datasets/sdr_v2_nopressure/train/data-00000-of-00001.arrow": "cd7d7442f105553168bd0aaf6d0af92661b95a0e657cb1f1cf732080e0f40d91",
+                "data/datasets/sdr_v2_nopressure/train/dataset_info.json": "82c09d46600fc00c08e227947c3842a2bd2d66ba8835cbc0988684d6cc018853",
+                "data/datasets/sdr_v2_nopressure/train/state.json": "169b2f2ac2a88d578832d908059f365bf68e8e9b239c343ab4d20f3332a0cb4a",
+                "data/datasets/sdr_v2_nopressure/validation/data-00000-of-00001.arrow": "51abbfe110391c87c0e6703c7f6f1fedabd31b0ac51ae8497643285dd50170eb",
+                "data/datasets/sdr_v2_nopressure/validation/dataset_info.json": "82c09d46600fc00c08e227947c3842a2bd2d66ba8835cbc0988684d6cc018853",
+                "data/datasets/sdr_v2_nopressure/validation/state.json": "9a9ad1a84eb1709f7ea7fcd8553e2288ac88d0cc830fea6e9d8cbeefa04a6c02",
+                "data/datasets/ser_v2/dataset_config.json": "483331ff1fb1583258f769220d6d5714d3cb00571314941b22158527e909c9c0",
+                "data/datasets/ser_v2/dataset_dict.json": "1239dbd4ca38311b03319b672c05a6fdaacc884b0034eed047659406c62eedd4",
+                "data/datasets/ser_v2/filter_report.json": "99f923f225c6b2b4c745973136e90def3fa8a3a05cdc6c5c22e25f53748f48e4",
+                "data/datasets/ser_v2/provenance.json": "47e4b47e5f1d3c8d6e52d4a18a4c50665841fbf26977103623481cf5357ddb54",
+                "data/datasets/ser_v2/test/data-00000-of-00001.arrow": "4d63a425c114c4f4a4db8d399f56682f8b0a3b03b89d6dba78a313191a355a76",
+                "data/datasets/ser_v2/test/dataset_info.json": "0e8711837b043c5abbd205074b104f81edeec1ac771b352cebd9792fa4196fea",
+                "data/datasets/ser_v2/test/state.json": "432b8f573b066c40e7310af7ba6e32f0efa2e2e012a22731c530da653b9fe5e2",
+                "data/datasets/ser_v2/train/data-00000-of-00001.arrow": "c16e7f8eeba06f091b8cc1b30a97442145dbdef7bbd47939efae02027c37fa6e",
+                "data/datasets/ser_v2/train/dataset_info.json": "0e8711837b043c5abbd205074b104f81edeec1ac771b352cebd9792fa4196fea",
+                "data/datasets/ser_v2/train/state.json": "affe855b6fbf078600cd88cde6d5fb418b1310da9728871e452b3aa0ab78b40b",
+                "data/datasets/ser_v2/validation/data-00000-of-00001.arrow": "85a9e748ed3dbdc3ecbaac76c3d4feeaa1064dd366c9cc6c6384edc694378024",
+                "data/datasets/ser_v2/validation/dataset_info.json": "0e8711837b043c5abbd205074b104f81edeec1ac771b352cebd9792fa4196fea",
+                "data/datasets/ser_v2/validation/state.json": "afd35c04e57f46ff214a963ffe325ba7d547f113d99597d096314918b2d6765e",
+                "data/datasets/ser_v2_honest/dataset_config.json": "9fc051f66b195b7a1060e33d2975050a3431dc7400c32269d8ded2f1686e275d",
+                "data/datasets/ser_v2_honest/dataset_dict.json": "1239dbd4ca38311b03319b672c05a6fdaacc884b0034eed047659406c62eedd4",
+                "data/datasets/ser_v2_honest/test/data-00000-of-00001.arrow": "b785208f5c7c9a7b5abfd4c41d1d4007f9b9a320045d8bf04691e7a60e70562c",
+                "data/datasets/ser_v2_honest/test/dataset_info.json": "db7fef42a8825784f09723299aab708fee159ac514f476705d0d1007e14d423d",
+                "data/datasets/ser_v2_honest/test/state.json": "e21a31d166fc0f2b33619cdfc1d89eacd02f55cf636ad388c239a9c2c21368ac",
+                "data/datasets/ser_v2_honest/train/data-00000-of-00001.arrow": "e6371107aebc46d784eacddf84e45d5fab53afecba317e645524a57278208355",
+                "data/datasets/ser_v2_honest/train/dataset_info.json": "db7fef42a8825784f09723299aab708fee159ac514f476705d0d1007e14d423d",
+                "data/datasets/ser_v2_honest/train/state.json": "0db0ce191d721dfe0a2f687403681770855d5abf6debdfe9a6ece39048aa05ff",
+                "data/datasets/ser_v2_honest/validation/data-00000-of-00001.arrow": "a036b7aad649a160e04228f5d73921409adc101e75c0ce9d45f22e8f7c27bb1d",
+                "data/datasets/ser_v2_honest/validation/dataset_info.json": "db7fef42a8825784f09723299aab708fee159ac514f476705d0d1007e14d423d",
+                "data/datasets/ser_v2_honest/validation/state.json": "14466152ec820ac3dc074380dff48d1264e8c35c62d3c9168932f39a986e581f",
+                "data/datasets/ser_v2_nopressure/dataset_config.json": "4c3600db5685fb724cd860d1d9a73eacd259940abc0baa352ee94429bb33dbac",
+                "data/datasets/ser_v2_nopressure/dataset_dict.json": "1239dbd4ca38311b03319b672c05a6fdaacc884b0034eed047659406c62eedd4",
+                "data/datasets/ser_v2_nopressure/test/data-00000-of-00001.arrow": "8057dfd7c1e1afbe4e08ba8877351dde8e675b29bd1472a007c92154a45df92c",
+                "data/datasets/ser_v2_nopressure/test/dataset_info.json": "db7fef42a8825784f09723299aab708fee159ac514f476705d0d1007e14d423d",
+                "data/datasets/ser_v2_nopressure/test/state.json": "0bcd4cea9fd353e0c9d7f527a75d156a9102a1c479a9330dd77c06879a5eb545",
+                "data/datasets/ser_v2_nopressure/train/data-00000-of-00001.arrow": "fa4fc28f8ad34dde1f4e56f5adec3ae7ead5a81ae49f822e12a2fba3ea36a67e",
+                "data/datasets/ser_v2_nopressure/train/dataset_info.json": "db7fef42a8825784f09723299aab708fee159ac514f476705d0d1007e14d423d",
+                "data/datasets/ser_v2_nopressure/train/state.json": "f7c91b07f2de29f552626b129d92bac37effa332a0b1db2334be802d83fbbabe",
+                "data/datasets/ser_v2_nopressure/validation/data-00000-of-00001.arrow": "7f69a5d5dc5b7b00de9464372bf7275b3972df196cb2b26ea59a4e3f6fbcf017",
+                "data/datasets/ser_v2_nopressure/validation/dataset_info.json": "db7fef42a8825784f09723299aab708fee159ac514f476705d0d1007e14d423d",
+                "data/datasets/ser_v2_nopressure/validation/state.json": "c3d4b5b974447225d40f668b1294c9fb6d6c33b2af1dfad20e732067a6d375c0",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion/assembly_provenance.json": "fa006372483d9f822e7a46e0dc2de0a923f1b00ff5305b6c3186f8e254b7c817",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion/dataset_config.json": "2242f85d433c2a68b859428dd87e724173ad5b01e4e1cc18c1060af2252d5c4e",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion/dataset_dict.json": "1239dbd4ca38311b03319b672c05a6fdaacc884b0034eed047659406c62eedd4",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion/filter_report.json": "1bb577de55559cf472f9ed5b3e622b025d2886892e974827a3e613a5785a589d",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion/scores/test.jsonl": "18c3b95b86111e5d150db38dae1e1a4561d75294348f06a9580871c43d9f24dc",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion/scores/train.jsonl": "4128aa4ce5177f324a7a506ed4f1ae2d1cb53ec80651ff67b1eb915e2e12cdaf",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion/scores/validation.jsonl": "96fa00fc78a744b39c9ea189ed46b74cdd65a07b86015c85ed0b63b563385f59",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion/scoring_provenance.json": "9384a08e76853b5e5e11da6d48b5cab058e2d1e89ec3e99fc5ff27a3f30a95da",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion/test/data-00000-of-00001.arrow": "256586de17f532ee438bb8a22f6028e8175b41c179a61913955b7f9ab02fe11c",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion/test/dataset_info.json": "b8b46ddb25fe6d4c56cef6554aeaed79365c42178cec489fdb34cc8ddf71a03b",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion/test/state.json": "dabee9ab2515f1f3b7d513d967e4018b91556bcb3097072befd7ae3132fbd2d4",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion/train/data-00000-of-00001.arrow": "6e1284c415eced018dbb648c2b2aec8a41bac1ed2de278df5639fc474e7581cf",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion/train/dataset_info.json": "b8b46ddb25fe6d4c56cef6554aeaed79365c42178cec489fdb34cc8ddf71a03b",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion/train/state.json": "81a0064d8af25f0529eb432cd054fdd7395c1505c5672edef7fcdc344671c18e",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion/validation/data-00000-of-00001.arrow": "2c7659c2a51f4cc449b0dcbb3863acbf99750269aca773766abc5a9340f38f75",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion/validation/dataset_info.json": "b8b46ddb25fe6d4c56cef6554aeaed79365c42178cec489fdb34cc8ddf71a03b",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion/validation/state.json": "cd9d270bac0a71a4c07efe0c3d44228172d6268fb3c1376996a6007d135a14bf",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral/assembly_provenance.json": "b449bb407d05fa40f45db959b5e2a4e281f45c21d226181e1d9ed71165187cdd",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral/dataset_config.json": "135247bee4a7ee6fe8c025ec36515d2ab856a28d64dedd1cc4dc79c30011eb29",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral/dataset_dict.json": "1239dbd4ca38311b03319b672c05a6fdaacc884b0034eed047659406c62eedd4",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral/filter_report.json": "1bb577de55559cf472f9ed5b3e622b025d2886892e974827a3e613a5785a589d",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral/scores/test.jsonl": "18c3b95b86111e5d150db38dae1e1a4561d75294348f06a9580871c43d9f24dc",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral/scores/train.jsonl": "4128aa4ce5177f324a7a506ed4f1ae2d1cb53ec80651ff67b1eb915e2e12cdaf",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral/scores/validation.jsonl": "96fa00fc78a744b39c9ea189ed46b74cdd65a07b86015c85ed0b63b563385f59",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral/scoring_provenance.json": "9384a08e76853b5e5e11da6d48b5cab058e2d1e89ec3e99fc5ff27a3f30a95da",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral/test/data-00000-of-00001.arrow": "afd925d7d5e7cc817262fd674b5915b0f852e8210a3aa457773e082cb469377e",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral/test/dataset_info.json": "b8b46ddb25fe6d4c56cef6554aeaed79365c42178cec489fdb34cc8ddf71a03b",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral/test/state.json": "3f3491ed30dbbdf5260867021e9216c39a88d0260966d45cc717e87c0b2b8d2a",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral/train/data-00000-of-00001.arrow": "353f899645cb36e63506154930752147b93e2861fedaa3037870e1f1584bd01d",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral/train/dataset_info.json": "b8b46ddb25fe6d4c56cef6554aeaed79365c42178cec489fdb34cc8ddf71a03b",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral/train/state.json": "b29c3f5be9b3f13dac568a85350a0a311cd8ea13a104fcaa321febcdd607342d",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral/validation/data-00000-of-00001.arrow": "7addc5f978309d0025f59cc2980abbdcb51cd3405d07c949aaf90bc611ee3389",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral/validation/dataset_info.json": "b8b46ddb25fe6d4c56cef6554aeaed79365c42178cec489fdb34cc8ddf71a03b",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral/validation/state.json": "d3f4e8881a5f2a32d1714c3a10e018d7623c7adf034a7ddfc8613f68f5e66a80",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion/assembly_provenance.json": "3e749bc23a6ffd7c0db1b7b97d4a6df24279fe8897ae827196953ecd818cd487",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion/dataset_config.json": "68b5934b8903c2be342128f49890147cb66480e18b0685e7ead73282dc609b30",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion/dataset_dict.json": "1239dbd4ca38311b03319b672c05a6fdaacc884b0034eed047659406c62eedd4",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion/filter_report.json": "7a44ba99c087c68d9369ea1f318290744e544f4f0149075cb266693560e33398",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion/scores/test.jsonl": "277e948e8fe87892ba963d7bb4c434c5c7e8fb8b2087ffdf9bfc2e2f6f2a6f23",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion/scores/train.jsonl": "6f56259b275df36494c6ddb77663947cdea0e1b46dd34fee208994d00e116ed7",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion/scores/validation.jsonl": "a32863867679b551c2dfe1d1f8fa1c824f2ec2f5abe2e126d02affa525bbea00",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion/scoring_provenance.json": "e57599f1fef13c4c9ee7694e534194072b5dd49448699afe359a6f386945adbf",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion/test/data-00000-of-00001.arrow": "960ce38a4960b10c2adbad5134227b9a45d16022e502661d45e9a855f92b2d7a",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion/test/dataset_info.json": "b8b46ddb25fe6d4c56cef6554aeaed79365c42178cec489fdb34cc8ddf71a03b",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion/test/state.json": "a3083af463ad958dc92287c715f71d953e27848efcfde2d364ff5974cb56a73a",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion/train/data-00000-of-00001.arrow": "509707f1a2f20005373770680f25e17d1ff9cfb6119a8cca7376c3e51400272f",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion/train/dataset_info.json": "b8b46ddb25fe6d4c56cef6554aeaed79365c42178cec489fdb34cc8ddf71a03b",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion/train/state.json": "9f3edf4b09cf0b260b8f306b7313203f51b5bdc850c1bba5bfecfe7ea3e877cc",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion/validation/data-00000-of-00001.arrow": "f18db1d8d7e997e6d989b6c3ebfb654605311e302c5868ebedfb2add25d7c692",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion/validation/dataset_info.json": "b8b46ddb25fe6d4c56cef6554aeaed79365c42178cec489fdb34cc8ddf71a03b",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion/validation/state.json": "2a6c8c5035cf031c8db146cd2ca90485842926282538f716dfd1399a966f0ef4",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral/assembly_provenance.json": "98c2565a579cd44de4c25c7c3f6a82157caa1b2fd23a79d36f321411854dae69",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral/dataset_config.json": "4758625119c829d46f66d29aa485aa271c86828f46b5be6e4ff790aaa3f50e91",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral/dataset_dict.json": "1239dbd4ca38311b03319b672c05a6fdaacc884b0034eed047659406c62eedd4",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral/filter_report.json": "7a44ba99c087c68d9369ea1f318290744e544f4f0149075cb266693560e33398",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral/scores/test.jsonl": "277e948e8fe87892ba963d7bb4c434c5c7e8fb8b2087ffdf9bfc2e2f6f2a6f23",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral/scores/train.jsonl": "6f56259b275df36494c6ddb77663947cdea0e1b46dd34fee208994d00e116ed7",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral/scores/validation.jsonl": "a32863867679b551c2dfe1d1f8fa1c824f2ec2f5abe2e126d02affa525bbea00",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral/scoring_provenance.json": "e57599f1fef13c4c9ee7694e534194072b5dd49448699afe359a6f386945adbf",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral/test/data-00000-of-00001.arrow": "64dd8b90fdb2e31a26e294962fcd68745f1575234ab41b8b74401c6e75d17f88",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral/test/dataset_info.json": "b8b46ddb25fe6d4c56cef6554aeaed79365c42178cec489fdb34cc8ddf71a03b",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral/test/state.json": "58dac911bb295b489e3c7a6bd8d7428222cf1bd683eb27fbb74377b57a763167",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral/train/data-00000-of-00001.arrow": "0d064447760580a012a2cca1b78ebcf3fb16a2503f5dddcc6b6ea8162911f5f3",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral/train/dataset_info.json": "b8b46ddb25fe6d4c56cef6554aeaed79365c42178cec489fdb34cc8ddf71a03b",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral/train/state.json": "c5b5b7547ed9003799021e5ab4c732a49efd3c56471d1f7b15bb82ed7bc31506",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral/validation/data-00000-of-00001.arrow": "47a270de1b94b04a7b57b9114532cc6de7516e7fc6df4eb6997128dc3677b025",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral/validation/dataset_info.json": "b8b46ddb25fe6d4c56cef6554aeaed79365c42178cec489fdb34cc8ddf71a03b",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral/validation/state.json": "d72a109826de614019d5678b07c679c249c9d2b0d6b8dba068408c425313470b",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion/assembly_provenance.json": "367ddaa8adf53ab287da98e8df194d849da271c0924e04e37a1925c2a70bab1f",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion/dataset_config.json": "7c0ccd1d7131de9c998d9ce6dd9ed029dc62a26c8f3014e655922a2d13d4817b",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion/dataset_dict.json": "1239dbd4ca38311b03319b672c05a6fdaacc884b0034eed047659406c62eedd4",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion/filter_report.json": "89eee06902c071c9f46e180de8b1fdabb193c5be0b513ee841c0b7f0f696fee2",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion/scores/test.jsonl": "334598b150ab04a50e7524626c8d9db89996b6641ae0e161098fcee579d863c8",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion/scores/train.jsonl": "4b5465b2d41373d046c56ade4add08b850ac9e1925b783780fc65a2c3091d7e1",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion/scores/validation.jsonl": "3ade7aa8148080d511ee6153b5201a4612d19d182c51a1f127ea9350444717a9",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion/scoring_provenance.json": "2415e1f2095f134ec5fe1770fe171df424db67f8074b1534946f3656b34dab01",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion/test/data-00000-of-00001.arrow": "495c4275e8ffc88244318ea60c56af2b8e44d90c7047e6c5faaba614e620ea33",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion/test/dataset_info.json": "680570d9bc1c5cba0e7f5b1769e926a819780ed95c7ab8fc4c94bb99f2ddbfe4",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion/test/state.json": "ccfb91d3023f2c805e94c25c6aa08a5458ada684293661bd05de091948bbb9b1",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion/train/data-00000-of-00001.arrow": "cc246ec7d483847eae19ec11ec8470494d919eabd6cc2d62c23426933ec36fc5",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion/train/dataset_info.json": "680570d9bc1c5cba0e7f5b1769e926a819780ed95c7ab8fc4c94bb99f2ddbfe4",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion/train/state.json": "ed3571ebee46d93ff19ef9a1ce3d7ed8a89f65041056112f593d26a6d43b3b4c",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion/validation/data-00000-of-00001.arrow": "184a90d65670f4e069f4b20b644171afc1fed3e55b56d488b1260e07da313db9",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion/validation/dataset_info.json": "680570d9bc1c5cba0e7f5b1769e926a819780ed95c7ab8fc4c94bb99f2ddbfe4",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion/validation/state.json": "1da3ba1359e79b2f30400493f6d110b5457caf0bc882e1073cf28f6c6a21cb79",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral/assembly_provenance.json": "9edc2aaa8c65e5f931f9cfffcff3d23f55cb2b9cf1ce75e9e7f71f4d68350178",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral/dataset_config.json": "3ea66de85c501f472b8a5d97eb93619e3bb850279a3a2e2f644c2fa5f2807e68",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral/dataset_dict.json": "1239dbd4ca38311b03319b672c05a6fdaacc884b0034eed047659406c62eedd4",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral/filter_report.json": "89eee06902c071c9f46e180de8b1fdabb193c5be0b513ee841c0b7f0f696fee2",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral/scores/test.jsonl": "334598b150ab04a50e7524626c8d9db89996b6641ae0e161098fcee579d863c8",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral/scores/train.jsonl": "4b5465b2d41373d046c56ade4add08b850ac9e1925b783780fc65a2c3091d7e1",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral/scores/validation.jsonl": "3ade7aa8148080d511ee6153b5201a4612d19d182c51a1f127ea9350444717a9",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral/scoring_provenance.json": "2415e1f2095f134ec5fe1770fe171df424db67f8074b1534946f3656b34dab01",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral/test/data-00000-of-00001.arrow": "79371a00f69abd087c1111693ff885f96f44abe3104fdfd99b05e3f8869e7f5b",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral/test/dataset_info.json": "680570d9bc1c5cba0e7f5b1769e926a819780ed95c7ab8fc4c94bb99f2ddbfe4",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral/test/state.json": "4f7eb2fb7ea68511f569288fc2c05da1348b3610cbcf13c46a8c07c4a9a0574e",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral/train/data-00000-of-00001.arrow": "6e41400ba7f385340120763378a5160c93ca6653d438d51af888693596666d2f",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral/train/dataset_info.json": "680570d9bc1c5cba0e7f5b1769e926a819780ed95c7ab8fc4c94bb99f2ddbfe4",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral/train/state.json": "ca41e571fb8409b12eacfb16921422e9633e987d150e11b82b88d5490534f438",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral/validation/data-00000-of-00001.arrow": "948ccf52a5578848d376629c45f380692f9015c2679281fb47d85d6433304b93",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral/validation/dataset_info.json": "680570d9bc1c5cba0e7f5b1769e926a819780ed95c7ab8fc4c94bb99f2ddbfe4",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral/validation/state.json": "80d2bf0f28f0217e235a86a80808c2ae0ca607b8b20483337cf29f4237e23969"
+              },
+              "tokenizer_revision": "0e9e39f249a16976918f6564b8830bc894c89659"
+            },
+            "completion_file_sha256": "50cf8feef06ecb661ecb8bc76d7ddbeaac7cf29002e947ddf21201e955add20c",
+            "completion_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/selection_run_manifest.json",
+            "prepared_file_sha256": "fe8d38875358dca69029751a9cf17a2cb0ddec3c215ede8a0d43bc3594554a0d",
+            "prepared_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/design.json",
+            "selected_file_sha256": "f65f8541f8315b4e4bbd4a87d4c258e4872623466415abba31bf0ea1a8c5c89e",
+            "selected_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/selected.json"
+          },
+          "code_hashes": {
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/a3_design.py": "e232ff9243f72d30a4df2c62833497bdacaddba1cb4b62c9cfc0794696c8a787",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/a3_direction_artifacts.py": "e365f6c1a31a6ee18381f7545517adf965553949ce4f07912a0c6619b09126fe",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/a3_direction_runtime.py": "0401c7a2750cf66ef5508d2dbbaed2f9bcea5f83918d6503e6a8f6b809a44867",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/a3_direction_workload.py": "3e43aaf2b4cacb99df87593ae377c8fdf3eb7b223b258ed8873853841404d8f9",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/a3_mask.py": "93e1c70fb6073fc0c8e8eb5bf0ca1a37946ab2733cd8e09a5167ab2394e0a505",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/a3_mask_pipeline.py": "d082395ff1a97e9fa825a7dd1c4a36e9ebb6b2fa0738a726b7ebc6fffa97b246",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/a3_mask_workload.py": "889f2359e024d6846dcad1623fd28583a3f87b27b1e5314f689fdc6df4d92828",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/a3_native.py": "b87683892df31ec87fdfab21d005d955338082699020e86846268694a690362c",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/a3_pipeline.py": "310eb53427ad4ac32522dfd0d6cd3b33e4ec887af1776579845f8953bdbe83f5",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/ladder_design.py": "a9752ff2bca91d7d04957fb867adcdc5640d94b47bf11d9593a3657a0f9c533b",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/ladder_metrics.py": "9cc369e3e929b474052a5a142890a16615d804ce64b415e919e347af4675cfad",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/ladder_pipeline.py": "f0955e8df5215e27cb3eff06cd28f7230b1de7d2a6c20e202854bc73c1280b56",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/ladder_tasks.py": "7f53a2210450e4264089a60da31739d2c0c187b0dcd778b203997b9bd873e847",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/dataset/user_inversion_pipeline.py": "4d49697731f291339262fe6ebc6a5909601a26fcf5d31ff562b55d1d74b2a0ee",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/l0.py": "0163dd6429e6846e9bc020c77440a558480db23da95773e08436f7560ded7bce",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/models/_compat.py": "449b03c2232a539dc590fed795ca2a55a045c27ce99b13b9a5204363970d2737",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/models/llama_node.py": "2c48ae2c3cd470436889f4d0420a4b027cd1eb3bcfafc277bf92142c5d9d4644",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/scripts/cluster/bridges2.env": "04fb02e3955403f1b8b1b15dcc86a2e6b5907ced54524974c9bd9fa950367577",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/scripts/cluster/delta.env": "88b44c28d15bb6d732ff92b630425209f4a8b2b1902b4a675a0ffc553899a2e0",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/scripts/jobs/specificity_a3_mask.sh": "cbdf6473ba56f16346c8e98e6cd422aded421f8b3ddeec537b4351fff1f06cce",
+            "/u/swong2/.conda/envs/mgnp/bin/python3.12": "25cb771c0f7398de035b14b1d1a1ac46c7e028a58e78acd531c43a54fd80c6a5"
+          },
+          "commit": "74efb4d0481968a1d0138eb1a79b97f302fd3c3b",
+          "design_file_sha256": "583edc4bf1ac33b9bbe1dc9048b3ce09f7656680ac6c2a9480fc74c775907cd8",
+          "design_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-independent-pilots-74efb4d04819/canonical/design.json",
+          "design_sha256": "898d1f3ce7eafb974b7500c996786ce8586a69bdefd1c5f96624d68dbee1e6d9",
+          "mask_protocol_sha256": "8a282ef8fce435870296669749d85dc5d3ce1bd0b0673c7c4442a37a0af969fc",
+          "model_geometry": {
+            "hidden_size": 4096,
+            "intermediate_size": 14336,
+            "num_heads": 32,
+            "num_layers": 32,
+            "vocab_size": 128256
+          },
+          "numeric_profile": {
+            "backend": "eager",
+            "chunk_size": 4,
+            "dtype": "bfloat16",
+            "hardware": "H200",
+            "model": "meta-llama/Llama-3.1-8B-Instruct",
+            "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+            "tokenizer_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+            "vocab_size": 128256
+          },
+          "operational_ruling_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/docs/research/specificity-ladder/a3-mask-operational-ruling.json",
+          "operational_ruling_sha256": "40e9cef75f9e62e99081105157dbba54a2ccaf085306061ef6669e51a032980c",
+          "physical_widths": {
+            "far_v2": {
+              "D": 102,
+              "F": 88,
+              "H": 102,
+              "I": 122,
+              "user_neutral": 122
+            },
+            "ioi": 22,
+            "mmlu": 527,
+            "sdr_v2": {
+              "D": 107,
+              "F": 92,
+              "H": 107,
+              "I": 140,
+              "user_neutral": 140
+            },
+            "ser_v2": {
+              "D": 105,
+              "F": 91,
+              "H": 105,
+              "I": 131,
+              "user_neutral": 131
+            }
+          },
+          "pilot_ruling_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/docs/research/specificity-ladder/a3-mask-pilot-ruling.json",
+          "pilot_ruling_sha256": "e1126ba764bf9f1b1502edeba2f73f6453f2b49376cd1a82a7a48d7321ebccfe",
+          "root_bundle_reference": {
+            "files": {
+              "COMPLETE.json": {
+                "nbytes": 200,
+                "sha256": "9c7226c8c0d404a5b61d2f9df98dc328236d02355479aa3ed88012664c42bb72"
+              },
+              "payload.json": {
+                "nbytes": 651,
+                "sha256": "8bbaaef1fac152ab0919b3c69e0874b9259f4434380e53b8f2695db4c191dbc2"
+              }
+            },
+            "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-independent-pilots-74efb4d04819/mask-source-settings"
+          }
+        },
+        "kind": "a3_root_pilot_admission_v1",
+        "max_gpu_hours": 0.75,
+        "may_select_checkpoint": false,
+        "minimum_shard_seconds": 60,
+        "purpose": "validation_timing",
+        "reservation_ids": [
+          "r-031"
+        ],
+        "root_preflight_sha256": "0b1cb877cb6c275fb5f5741f913b7340734351b475b20661fcff710d6d777c2d",
+        "upper_inventory_sha256": "ee8553504a386259e7ff575dc248f80521d139b0f520a55c5b8f14eb9a9c05d1"
+      },
+      {
+        "admission_sha256": "b68bf0adb5858322baad761e4253362654e32fa8a835551684779f0eba20feef",
+        "allocation_contract": {
+          "cpus": 4,
+          "gpu_type": "h200",
+          "gpus": 1,
+          "kind": "a3_allocation_contract_v1",
+          "memory_bytes": 68719476736,
+          "scheduler_work_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime",
+          "source_commit": "861f84a3938a5e22fa329af0c469b2dd812fe68a"
+        },
+        "execution_authorized": false,
+        "finish_reserve_seconds": 300,
+        "full_target_reference": {
+          "files": {
+            "COMPLETE.json": {
+              "nbytes": 206,
+              "sha256": "3c360b1056886bcde7168761364213656e5797227c75e8c9451747a1fae9cc9b"
+            },
+            "payload.json": {
+              "nbytes": 345081545,
+              "sha256": "e1c4bb2dd3febe00b2bed5dc85e9f7649ef4d2571f165f771beb0c247a0b1f93"
+            }
+          },
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-mask-n5-pilots-861f84a3938a/mask/inventory-full"
+        },
+        "id": "a3-mask-N5-23474289",
+        "identity": {
+          "a1_parent_evidence": {
+            "completion": {
+              "bank_sha256": "1dc78840236cdb310518ea0fcebd5892c9804f97ff948d5689ca8679f5110009",
+              "code_hashes": {
+                "component_analysis/dla.py": "61476cd4607f240bcdac567a7005cf86379cae0d4f2606dba2a60c6401d68073",
+                "component_analysis/hooks.py": "fdc8f325884e88c4168a2c9e9fde731b98be3d608ac15f1f0a39278044d7cfba",
+                "component_analysis/knockout.py": "3b5599f12bcdc6731965e3fb2c374dabad5a064b38863b1b756d4a30078b5b7b",
+                "component_analysis/ladder_design.py": "a9752ff2bca91d7d04957fb867adcdc5640d94b47bf11d9593a3657a0f9c533b",
+                "component_analysis/ladder_metrics.py": "9cc369e3e929b474052a5a142890a16615d804ce64b415e919e347af4675cfad",
+                "component_analysis/ladder_pipeline.py": "f0955e8df5215e27cb3eff06cd28f7230b1de7d2a6c20e202854bc73c1280b56",
+                "component_analysis/ladder_tasks.py": "7f53a2210450e4264089a60da31739d2c0c187b0dcd778b203997b9bd873e847",
+                "component_analysis/specificity_ladder.py": "93a22eb6b51cf6ea081b37dd354179cd56aa89def6bb50337b40fc2937b9170e",
+                "dataset/build_user_inversion_v2.py": "47cb1e1dd84d6efc43474c6ce9fc10b30f111a96f083aa370a0d9ac01c827b2a",
+                "dataset/matched_honest.py": "cb30aa003b22a0cb940bb2fb16e0f67be77f0f5e433d7a4d9b52f1fd059f13f0",
+                "dataset/user_inversion_pipeline.py": "4d49697731f291339262fe6ebc6a5909601a26fcf5d31ff562b55d1d74b2a0ee",
+                "evaluation/benchmarks/sandbagging.py": "67fce74fe14e45abb6b7ea57e96a1382ef19fa0e74ea1f40126f4adfc61a7039",
+                "evaluation/benchmarks/sources.py": "06b9286567467bf37a52faaf9ee8fff41b4c1dc8ce8e348b2f2b032b7eac633f",
+                "evaluation/grader_hash.py": "6b26c4c4cd111fe3056f8a0b1119eabf51ab367eb242588a73b9cb3f85b13a19",
+                "models/__init__.py": "ef3796de0c3e9ca6e0760fe72764241664f2d81055a891ebd5d47c9c43aef210",
+                "models/_compat.py": "449b03c2232a539dc590fed795ca2a55a045c27ce99b13b9a5204363970d2737"
+              },
+              "commit": "5f450dc93dac707af649dee8c8ca60888b2831db",
+              "counts": {
+                "far_v2": {
+                  "bank_instances": 400,
+                  "head_columns": 18,
+                  "selection_rows": 100
+                },
+                "sdr_v2": {
+                  "bank_instances": 400,
+                  "head_columns": 14,
+                  "selection_rows": 100
+                },
+                "ser_v2": {
+                  "bank_instances": 400,
+                  "head_columns": 19,
+                  "selection_rows": 100
+                }
+              },
+              "design_sha256": "680e4c6f7463d3f5f4950a682d1a9653114284f456d209f23c7239d93266b0a8",
+              "execution": {
+                "cluster": "delta",
+                "cluster_source": "SLURM_CLUSTER_NAME",
+                "commit": "5f450dc93dac707af649dee8c8ca60888b2831db",
+                "device": "cuda:0",
+                "dtype": "torch.bfloat16",
+                "gpu_name": "NVIDIA A100-SXM4-40GB",
+                "memory_scope": "selection compute after model load; includes resident model",
+                "model": "meta-llama/Llama-3.1-8B-Instruct",
+                "model_load_seconds": 46.853518882766366,
+                "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+                "peak_allocated_memory_bytes": 18309796352,
+                "peak_reserved_memory_bytes": 18717081600,
+                "selection_compute_seconds": 118.42526046885177,
+                "selection_stage_seconds": 166.37134666461498,
+                "slurm_job_id": "23417240",
+                "stage_time_scope": "model load plus selection compute; excludes artifact publication",
+                "tokenizer_revision": "0e9e39f249a16976918f6564b8830bc894c89659"
+              },
+              "group_sha256": "f33c8059ad4dc593c1f8474065bfe918ce9abb93ea292687f6e84e87171394b1",
+              "injected": false,
+              "kind": "specificity_ladder_selection",
+              "model": "meta-llama/Llama-3.1-8B-Instruct",
+              "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+              "raw_dla_sha256": "221fcf7b1aeb2e64a2205c6d4a1ba0a0706fd67275741e1d99b9d0563c060fc9",
+              "schema_version": 1,
+              "selection_artifact": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/selected.json",
+              "selection_artifact_sha256": "7cded7905affd5673bbc8d29298e85613de50445b0e0ba5683d4fa45b915190a",
+              "selection_file_sha256": "f65f8541f8315b4e4bbd4a87d4c258e4872623466415abba31bf0ea1a8c5c89e",
+              "selection_source_hashes": {
+                "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_analyses/mechanism-analysis-p1/s1/U__leaf/far_v2/sample.json": "1bd1e83c75015572e1eef23579ea17e49df920f379fbdd964ad9c11fd4e18892",
+                "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_analyses/mechanism-analysis-p1/s1/U__leaf/sdr_v2/sample.json": "512060a83f6a7df8a16a504e46d046bbad4f71a0d72d1e7402505f3aba139e1c",
+                "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_analyses/mechanism-analysis-p1/s1/U__leaf/ser_v2/sample.json": "459c2d05d484d621185a783f977e71543014b6dba1a8aa277f8a7a0cffad79c0"
+              },
+              "source_hashes": {
+                "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/mechanism-analysis/phase1/p1c_readings.json": "c94a210c23dbe0591b7a4bd6081eeb1a897046db077573f68dc8992518fce77f",
+                "data/datasets/far_v2/dataset_config.json": "5ab40c56c6196905b2a7ff14d908917e1b65ccbaaa975bf405934c97aedd5225",
+                "data/datasets/far_v2/dataset_dict.json": "1239dbd4ca38311b03319b672c05a6fdaacc884b0034eed047659406c62eedd4",
+                "data/datasets/far_v2/filter_report.json": "a6c84cf5ab992adfce6acebb4c2186606bc3d847ebbb14c4298b6da309a796bf",
+                "data/datasets/far_v2/provenance.json": "10c4d9faf7dd1ba2c419f08ac25c0985dfe43f4529f0fe8c3c668481b705060c",
+                "data/datasets/far_v2/test/data-00000-of-00001.arrow": "d577ac0de3f0df3d94419eee3c1d89f6ae1ce29a4bfce248a1dec3f92fd0e030",
+                "data/datasets/far_v2/test/dataset_info.json": "a2ba2a31551a327ea9950fe7a306a6f36339e64dac89a7780d980b4af61c3394",
+                "data/datasets/far_v2/test/state.json": "eda50e760137b13e26570ce75f594c776476b47462235ea4132df0ab68ea8ab7",
+                "data/datasets/far_v2/train/data-00000-of-00001.arrow": "964f3d3361e8bfcbdcd8f20b9d8ef443813a0d95a61153679badb36c36ba65bb",
+                "data/datasets/far_v2/train/dataset_info.json": "a2ba2a31551a327ea9950fe7a306a6f36339e64dac89a7780d980b4af61c3394",
+                "data/datasets/far_v2/train/state.json": "2d7b4d83a1a640889000264f89baca865255bd72c57774cc14f0ac2706e298d4",
+                "data/datasets/far_v2/validation/data-00000-of-00001.arrow": "b04cd46a1049bb8121f2222c17475cc556f52ced90348ec7a38c016c282cc041",
+                "data/datasets/far_v2/validation/dataset_info.json": "a2ba2a31551a327ea9950fe7a306a6f36339e64dac89a7780d980b4af61c3394",
+                "data/datasets/far_v2/validation/state.json": "5c17122cd9ab4408a538e2f195ce2247e0cc2b540f919f24769660b755a8bfe8",
+                "data/datasets/far_v2_honest/dataset_config.json": "fe35d9872db03d5a043735a06548758f2f3a2835f805d8ae685937dc2b9a6167",
+                "data/datasets/far_v2_honest/dataset_dict.json": "1239dbd4ca38311b03319b672c05a6fdaacc884b0034eed047659406c62eedd4",
+                "data/datasets/far_v2_honest/test/data-00000-of-00001.arrow": "f7da5c57a9b933b31b4ba9cda6d1abb7abcfec491d5a98436c43827d4721f801",
+                "data/datasets/far_v2_honest/test/dataset_info.json": "82c09d46600fc00c08e227947c3842a2bd2d66ba8835cbc0988684d6cc018853",
+                "data/datasets/far_v2_honest/test/state.json": "0c97e0c423a66ae4a03ac208eb98702caf81dec892562af18213ff487c6c8731",
+                "data/datasets/far_v2_honest/train/data-00000-of-00001.arrow": "bfbb91de4425011d14d5d4e472d2c76e45f9c11824e3d0a612b48ac976181d97",
+                "data/datasets/far_v2_honest/train/dataset_info.json": "82c09d46600fc00c08e227947c3842a2bd2d66ba8835cbc0988684d6cc018853",
+                "data/datasets/far_v2_honest/train/state.json": "29949aa9e5cb17c05dba915c072bf45bcff64073269c4681e7a9553b17cf0de0",
+                "data/datasets/far_v2_honest/validation/data-00000-of-00001.arrow": "29a3431c299b03f89fb3f0607d8089b67ef70ac2d4c3e6cf8c925dc2bb851748",
+                "data/datasets/far_v2_honest/validation/dataset_info.json": "82c09d46600fc00c08e227947c3842a2bd2d66ba8835cbc0988684d6cc018853",
+                "data/datasets/far_v2_honest/validation/state.json": "3a96cb83fa6b97367406287da0c2314135ff018cd4408ec0de5737f77f607179",
+                "data/datasets/far_v2_nopressure/dataset_config.json": "267bfbf388e28d9d7203e59e1af1d946838086caaf4d01825790d6e8c1677c0d",
+                "data/datasets/far_v2_nopressure/dataset_dict.json": "1239dbd4ca38311b03319b672c05a6fdaacc884b0034eed047659406c62eedd4",
+                "data/datasets/far_v2_nopressure/test/data-00000-of-00001.arrow": "903e1bfccea7fd1ce36d9b8263a2bcdb655a7b95db3750a72cc7c02f5c9bf21d",
+                "data/datasets/far_v2_nopressure/test/dataset_info.json": "82c09d46600fc00c08e227947c3842a2bd2d66ba8835cbc0988684d6cc018853",
+                "data/datasets/far_v2_nopressure/test/state.json": "d7ccc4bc57ca5cb900ce33428c5cdc82c50e06367ad37bdb99c67fe12eadb494",
+                "data/datasets/far_v2_nopressure/train/data-00000-of-00001.arrow": "7afc68c736ab22dee953c59e90f50832203a2ab078039b64a89d9143cf7c8631",
+                "data/datasets/far_v2_nopressure/train/dataset_info.json": "82c09d46600fc00c08e227947c3842a2bd2d66ba8835cbc0988684d6cc018853",
+                "data/datasets/far_v2_nopressure/train/state.json": "8ea72d49204d2c0f924ab4fd09af9357e86e64f62d26655de6b9171409b98102",
+                "data/datasets/far_v2_nopressure/validation/data-00000-of-00001.arrow": "21faf3cf55bfa0d85f17d50c8181369842a85bea594c826672cfdd71cea67286",
+                "data/datasets/far_v2_nopressure/validation/dataset_info.json": "82c09d46600fc00c08e227947c3842a2bd2d66ba8835cbc0988684d6cc018853",
+                "data/datasets/far_v2_nopressure/validation/state.json": "1988fbdffebced1a66c18dddf9b01a57a97e14473f48c1b022df813e4a761d2a",
+                "data/datasets/sdr_v2/dataset_config.json": "434a475d375a8d631bb29136fa39e641ac25b29c4e4c1525ec65afd6fffe0d42",
+                "data/datasets/sdr_v2/dataset_dict.json": "1239dbd4ca38311b03319b672c05a6fdaacc884b0034eed047659406c62eedd4",
+                "data/datasets/sdr_v2/filter_report.json": "7e56de4b13610bd2414063084fee3fb41752e2663201e9cfc91436af6e8c78b7",
+                "data/datasets/sdr_v2/provenance.json": "a33806572f7764b31560f91ef747dee45326c31f43929c8e29ea79f9f3e5e747",
+                "data/datasets/sdr_v2/test/data-00000-of-00001.arrow": "6465c3174950e67e200c3ec8ab037ca22579f7de84135e07645e812039a86b54",
+                "data/datasets/sdr_v2/test/dataset_info.json": "a2ba2a31551a327ea9950fe7a306a6f36339e64dac89a7780d980b4af61c3394",
+                "data/datasets/sdr_v2/test/state.json": "dfa6578ff7584e44e3af66c929263b4166a2aece07ccd451c965efb56b5ed71b",
+                "data/datasets/sdr_v2/train/data-00000-of-00001.arrow": "7c04ca531eade677ab8a9cffaacb3d0effd9614463f5b21d4a345593ad27edde",
+                "data/datasets/sdr_v2/train/dataset_info.json": "a2ba2a31551a327ea9950fe7a306a6f36339e64dac89a7780d980b4af61c3394",
+                "data/datasets/sdr_v2/train/state.json": "0ce052fc6430a8d8340da053a3cb786515c0c64d97941adced37d9f5cd7c8350",
+                "data/datasets/sdr_v2/validation/data-00000-of-00001.arrow": "fa57b51cd532c0892d9d7636d113863f3213c2de86d88505d920b903bda44537",
+                "data/datasets/sdr_v2/validation/dataset_info.json": "a2ba2a31551a327ea9950fe7a306a6f36339e64dac89a7780d980b4af61c3394",
+                "data/datasets/sdr_v2/validation/state.json": "7c844282725a16e1ed88b4bd318110f6e632fc670f3bc661a03670e45dd1e03e",
+                "data/datasets/sdr_v2_honest/dataset_config.json": "b6da913087fe07e4e4f7aabd063548e162d57eddf69eb53bb564bca4346d3131",
+                "data/datasets/sdr_v2_honest/dataset_dict.json": "1239dbd4ca38311b03319b672c05a6fdaacc884b0034eed047659406c62eedd4",
+                "data/datasets/sdr_v2_honest/test/data-00000-of-00001.arrow": "596a1354b3c84c02c6cef1c7bedc9fd13047d96ab1265776eaa5fcd9be04477c",
+                "data/datasets/sdr_v2_honest/test/dataset_info.json": "82c09d46600fc00c08e227947c3842a2bd2d66ba8835cbc0988684d6cc018853",
+                "data/datasets/sdr_v2_honest/test/state.json": "1f1ff140ad3d2d22e87bb138087614ce1e285c29ed2bed3010dab605f10a97d4",
+                "data/datasets/sdr_v2_honest/train/data-00000-of-00001.arrow": "318c269cc81b6a09bb676910878b8e48e815657cd4d953b165ef6458aa1459fd",
+                "data/datasets/sdr_v2_honest/train/dataset_info.json": "82c09d46600fc00c08e227947c3842a2bd2d66ba8835cbc0988684d6cc018853",
+                "data/datasets/sdr_v2_honest/train/state.json": "ee6e7ec21ee7bad490adca480a0b9b89f0bd869665c0e19f6252f426a4492c4d",
+                "data/datasets/sdr_v2_honest/validation/data-00000-of-00001.arrow": "a59e0ba089e5e4b68d1b21b2685ea9e981c0f9f3725b451d5570624e794a4257",
+                "data/datasets/sdr_v2_honest/validation/dataset_info.json": "82c09d46600fc00c08e227947c3842a2bd2d66ba8835cbc0988684d6cc018853",
+                "data/datasets/sdr_v2_honest/validation/state.json": "54341015de0a4d01eaf2cf66c85d48b35116395ac28557bef069535a5ee22197",
+                "data/datasets/sdr_v2_nopressure/dataset_config.json": "b509389d51c9ba3b06832f5986496b84028823d48c48e15106b4249b70c83171",
+                "data/datasets/sdr_v2_nopressure/dataset_dict.json": "1239dbd4ca38311b03319b672c05a6fdaacc884b0034eed047659406c62eedd4",
+                "data/datasets/sdr_v2_nopressure/test/data-00000-of-00001.arrow": "a1fbae4775e5a1be22c02bea355a707fcf1e28bb89376060542880505c3bc0cd",
+                "data/datasets/sdr_v2_nopressure/test/dataset_info.json": "82c09d46600fc00c08e227947c3842a2bd2d66ba8835cbc0988684d6cc018853",
+                "data/datasets/sdr_v2_nopressure/test/state.json": "9042d393d1e2c8b127d9dbbd4e7ae6ac86a4b92843925b4c4215dacee00bdbde",
+                "data/datasets/sdr_v2_nopressure/train/data-00000-of-00001.arrow": "cd7d7442f105553168bd0aaf6d0af92661b95a0e657cb1f1cf732080e0f40d91",
+                "data/datasets/sdr_v2_nopressure/train/dataset_info.json": "82c09d46600fc00c08e227947c3842a2bd2d66ba8835cbc0988684d6cc018853",
+                "data/datasets/sdr_v2_nopressure/train/state.json": "169b2f2ac2a88d578832d908059f365bf68e8e9b239c343ab4d20f3332a0cb4a",
+                "data/datasets/sdr_v2_nopressure/validation/data-00000-of-00001.arrow": "51abbfe110391c87c0e6703c7f6f1fedabd31b0ac51ae8497643285dd50170eb",
+                "data/datasets/sdr_v2_nopressure/validation/dataset_info.json": "82c09d46600fc00c08e227947c3842a2bd2d66ba8835cbc0988684d6cc018853",
+                "data/datasets/sdr_v2_nopressure/validation/state.json": "9a9ad1a84eb1709f7ea7fcd8553e2288ac88d0cc830fea6e9d8cbeefa04a6c02",
+                "data/datasets/ser_v2/dataset_config.json": "483331ff1fb1583258f769220d6d5714d3cb00571314941b22158527e909c9c0",
+                "data/datasets/ser_v2/dataset_dict.json": "1239dbd4ca38311b03319b672c05a6fdaacc884b0034eed047659406c62eedd4",
+                "data/datasets/ser_v2/filter_report.json": "99f923f225c6b2b4c745973136e90def3fa8a3a05cdc6c5c22e25f53748f48e4",
+                "data/datasets/ser_v2/provenance.json": "47e4b47e5f1d3c8d6e52d4a18a4c50665841fbf26977103623481cf5357ddb54",
+                "data/datasets/ser_v2/test/data-00000-of-00001.arrow": "4d63a425c114c4f4a4db8d399f56682f8b0a3b03b89d6dba78a313191a355a76",
+                "data/datasets/ser_v2/test/dataset_info.json": "0e8711837b043c5abbd205074b104f81edeec1ac771b352cebd9792fa4196fea",
+                "data/datasets/ser_v2/test/state.json": "432b8f573b066c40e7310af7ba6e32f0efa2e2e012a22731c530da653b9fe5e2",
+                "data/datasets/ser_v2/train/data-00000-of-00001.arrow": "c16e7f8eeba06f091b8cc1b30a97442145dbdef7bbd47939efae02027c37fa6e",
+                "data/datasets/ser_v2/train/dataset_info.json": "0e8711837b043c5abbd205074b104f81edeec1ac771b352cebd9792fa4196fea",
+                "data/datasets/ser_v2/train/state.json": "affe855b6fbf078600cd88cde6d5fb418b1310da9728871e452b3aa0ab78b40b",
+                "data/datasets/ser_v2/validation/data-00000-of-00001.arrow": "85a9e748ed3dbdc3ecbaac76c3d4feeaa1064dd366c9cc6c6384edc694378024",
+                "data/datasets/ser_v2/validation/dataset_info.json": "0e8711837b043c5abbd205074b104f81edeec1ac771b352cebd9792fa4196fea",
+                "data/datasets/ser_v2/validation/state.json": "afd35c04e57f46ff214a963ffe325ba7d547f113d99597d096314918b2d6765e",
+                "data/datasets/ser_v2_honest/dataset_config.json": "9fc051f66b195b7a1060e33d2975050a3431dc7400c32269d8ded2f1686e275d",
+                "data/datasets/ser_v2_honest/dataset_dict.json": "1239dbd4ca38311b03319b672c05a6fdaacc884b0034eed047659406c62eedd4",
+                "data/datasets/ser_v2_honest/test/data-00000-of-00001.arrow": "b785208f5c7c9a7b5abfd4c41d1d4007f9b9a320045d8bf04691e7a60e70562c",
+                "data/datasets/ser_v2_honest/test/dataset_info.json": "db7fef42a8825784f09723299aab708fee159ac514f476705d0d1007e14d423d",
+                "data/datasets/ser_v2_honest/test/state.json": "e21a31d166fc0f2b33619cdfc1d89eacd02f55cf636ad388c239a9c2c21368ac",
+                "data/datasets/ser_v2_honest/train/data-00000-of-00001.arrow": "e6371107aebc46d784eacddf84e45d5fab53afecba317e645524a57278208355",
+                "data/datasets/ser_v2_honest/train/dataset_info.json": "db7fef42a8825784f09723299aab708fee159ac514f476705d0d1007e14d423d",
+                "data/datasets/ser_v2_honest/train/state.json": "0db0ce191d721dfe0a2f687403681770855d5abf6debdfe9a6ece39048aa05ff",
+                "data/datasets/ser_v2_honest/validation/data-00000-of-00001.arrow": "a036b7aad649a160e04228f5d73921409adc101e75c0ce9d45f22e8f7c27bb1d",
+                "data/datasets/ser_v2_honest/validation/dataset_info.json": "db7fef42a8825784f09723299aab708fee159ac514f476705d0d1007e14d423d",
+                "data/datasets/ser_v2_honest/validation/state.json": "14466152ec820ac3dc074380dff48d1264e8c35c62d3c9168932f39a986e581f",
+                "data/datasets/ser_v2_nopressure/dataset_config.json": "4c3600db5685fb724cd860d1d9a73eacd259940abc0baa352ee94429bb33dbac",
+                "data/datasets/ser_v2_nopressure/dataset_dict.json": "1239dbd4ca38311b03319b672c05a6fdaacc884b0034eed047659406c62eedd4",
+                "data/datasets/ser_v2_nopressure/test/data-00000-of-00001.arrow": "8057dfd7c1e1afbe4e08ba8877351dde8e675b29bd1472a007c92154a45df92c",
+                "data/datasets/ser_v2_nopressure/test/dataset_info.json": "db7fef42a8825784f09723299aab708fee159ac514f476705d0d1007e14d423d",
+                "data/datasets/ser_v2_nopressure/test/state.json": "0bcd4cea9fd353e0c9d7f527a75d156a9102a1c479a9330dd77c06879a5eb545",
+                "data/datasets/ser_v2_nopressure/train/data-00000-of-00001.arrow": "fa4fc28f8ad34dde1f4e56f5adec3ae7ead5a81ae49f822e12a2fba3ea36a67e",
+                "data/datasets/ser_v2_nopressure/train/dataset_info.json": "db7fef42a8825784f09723299aab708fee159ac514f476705d0d1007e14d423d",
+                "data/datasets/ser_v2_nopressure/train/state.json": "f7c91b07f2de29f552626b129d92bac37effa332a0b1db2334be802d83fbbabe",
+                "data/datasets/ser_v2_nopressure/validation/data-00000-of-00001.arrow": "7f69a5d5dc5b7b00de9464372bf7275b3972df196cb2b26ea59a4e3f6fbcf017",
+                "data/datasets/ser_v2_nopressure/validation/dataset_info.json": "db7fef42a8825784f09723299aab708fee159ac514f476705d0d1007e14d423d",
+                "data/datasets/ser_v2_nopressure/validation/state.json": "c3d4b5b974447225d40f668b1294c9fb6d6c33b2af1dfad20e732067a6d375c0",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion/assembly_provenance.json": "fa006372483d9f822e7a46e0dc2de0a923f1b00ff5305b6c3186f8e254b7c817",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion/dataset_config.json": "2242f85d433c2a68b859428dd87e724173ad5b01e4e1cc18c1060af2252d5c4e",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion/dataset_dict.json": "1239dbd4ca38311b03319b672c05a6fdaacc884b0034eed047659406c62eedd4",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion/filter_report.json": "1bb577de55559cf472f9ed5b3e622b025d2886892e974827a3e613a5785a589d",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion/scores/test.jsonl": "18c3b95b86111e5d150db38dae1e1a4561d75294348f06a9580871c43d9f24dc",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion/scores/train.jsonl": "4128aa4ce5177f324a7a506ed4f1ae2d1cb53ec80651ff67b1eb915e2e12cdaf",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion/scores/validation.jsonl": "96fa00fc78a744b39c9ea189ed46b74cdd65a07b86015c85ed0b63b563385f59",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion/scoring_provenance.json": "9384a08e76853b5e5e11da6d48b5cab058e2d1e89ec3e99fc5ff27a3f30a95da",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion/test/data-00000-of-00001.arrow": "256586de17f532ee438bb8a22f6028e8175b41c179a61913955b7f9ab02fe11c",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion/test/dataset_info.json": "b8b46ddb25fe6d4c56cef6554aeaed79365c42178cec489fdb34cc8ddf71a03b",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion/test/state.json": "dabee9ab2515f1f3b7d513d967e4018b91556bcb3097072befd7ae3132fbd2d4",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion/train/data-00000-of-00001.arrow": "6e1284c415eced018dbb648c2b2aec8a41bac1ed2de278df5639fc474e7581cf",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion/train/dataset_info.json": "b8b46ddb25fe6d4c56cef6554aeaed79365c42178cec489fdb34cc8ddf71a03b",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion/train/state.json": "81a0064d8af25f0529eb432cd054fdd7395c1505c5672edef7fcdc344671c18e",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion/validation/data-00000-of-00001.arrow": "2c7659c2a51f4cc449b0dcbb3863acbf99750269aca773766abc5a9340f38f75",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion/validation/dataset_info.json": "b8b46ddb25fe6d4c56cef6554aeaed79365c42178cec489fdb34cc8ddf71a03b",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion/validation/state.json": "cd9d270bac0a71a4c07efe0c3d44228172d6268fb3c1376996a6007d135a14bf",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral/assembly_provenance.json": "b449bb407d05fa40f45db959b5e2a4e281f45c21d226181e1d9ed71165187cdd",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral/dataset_config.json": "135247bee4a7ee6fe8c025ec36515d2ab856a28d64dedd1cc4dc79c30011eb29",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral/dataset_dict.json": "1239dbd4ca38311b03319b672c05a6fdaacc884b0034eed047659406c62eedd4",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral/filter_report.json": "1bb577de55559cf472f9ed5b3e622b025d2886892e974827a3e613a5785a589d",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral/scores/test.jsonl": "18c3b95b86111e5d150db38dae1e1a4561d75294348f06a9580871c43d9f24dc",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral/scores/train.jsonl": "4128aa4ce5177f324a7a506ed4f1ae2d1cb53ec80651ff67b1eb915e2e12cdaf",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral/scores/validation.jsonl": "96fa00fc78a744b39c9ea189ed46b74cdd65a07b86015c85ed0b63b563385f59",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral/scoring_provenance.json": "9384a08e76853b5e5e11da6d48b5cab058e2d1e89ec3e99fc5ff27a3f30a95da",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral/test/data-00000-of-00001.arrow": "afd925d7d5e7cc817262fd674b5915b0f852e8210a3aa457773e082cb469377e",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral/test/dataset_info.json": "b8b46ddb25fe6d4c56cef6554aeaed79365c42178cec489fdb34cc8ddf71a03b",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral/test/state.json": "3f3491ed30dbbdf5260867021e9216c39a88d0260966d45cc717e87c0b2b8d2a",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral/train/data-00000-of-00001.arrow": "353f899645cb36e63506154930752147b93e2861fedaa3037870e1f1584bd01d",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral/train/dataset_info.json": "b8b46ddb25fe6d4c56cef6554aeaed79365c42178cec489fdb34cc8ddf71a03b",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral/train/state.json": "b29c3f5be9b3f13dac568a85350a0a311cd8ea13a104fcaa321febcdd607342d",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral/validation/data-00000-of-00001.arrow": "7addc5f978309d0025f59cc2980abbdcb51cd3405d07c949aaf90bc611ee3389",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral/validation/dataset_info.json": "b8b46ddb25fe6d4c56cef6554aeaed79365c42178cec489fdb34cc8ddf71a03b",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral/validation/state.json": "d3f4e8881a5f2a32d1714c3a10e018d7623c7adf034a7ddfc8613f68f5e66a80",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion/assembly_provenance.json": "3e749bc23a6ffd7c0db1b7b97d4a6df24279fe8897ae827196953ecd818cd487",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion/dataset_config.json": "68b5934b8903c2be342128f49890147cb66480e18b0685e7ead73282dc609b30",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion/dataset_dict.json": "1239dbd4ca38311b03319b672c05a6fdaacc884b0034eed047659406c62eedd4",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion/filter_report.json": "7a44ba99c087c68d9369ea1f318290744e544f4f0149075cb266693560e33398",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion/scores/test.jsonl": "277e948e8fe87892ba963d7bb4c434c5c7e8fb8b2087ffdf9bfc2e2f6f2a6f23",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion/scores/train.jsonl": "6f56259b275df36494c6ddb77663947cdea0e1b46dd34fee208994d00e116ed7",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion/scores/validation.jsonl": "a32863867679b551c2dfe1d1f8fa1c824f2ec2f5abe2e126d02affa525bbea00",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion/scoring_provenance.json": "e57599f1fef13c4c9ee7694e534194072b5dd49448699afe359a6f386945adbf",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion/test/data-00000-of-00001.arrow": "960ce38a4960b10c2adbad5134227b9a45d16022e502661d45e9a855f92b2d7a",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion/test/dataset_info.json": "b8b46ddb25fe6d4c56cef6554aeaed79365c42178cec489fdb34cc8ddf71a03b",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion/test/state.json": "a3083af463ad958dc92287c715f71d953e27848efcfde2d364ff5974cb56a73a",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion/train/data-00000-of-00001.arrow": "509707f1a2f20005373770680f25e17d1ff9cfb6119a8cca7376c3e51400272f",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion/train/dataset_info.json": "b8b46ddb25fe6d4c56cef6554aeaed79365c42178cec489fdb34cc8ddf71a03b",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion/train/state.json": "9f3edf4b09cf0b260b8f306b7313203f51b5bdc850c1bba5bfecfe7ea3e877cc",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion/validation/data-00000-of-00001.arrow": "f18db1d8d7e997e6d989b6c3ebfb654605311e302c5868ebedfb2add25d7c692",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion/validation/dataset_info.json": "b8b46ddb25fe6d4c56cef6554aeaed79365c42178cec489fdb34cc8ddf71a03b",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion/validation/state.json": "2a6c8c5035cf031c8db146cd2ca90485842926282538f716dfd1399a966f0ef4",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral/assembly_provenance.json": "98c2565a579cd44de4c25c7c3f6a82157caa1b2fd23a79d36f321411854dae69",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral/dataset_config.json": "4758625119c829d46f66d29aa485aa271c86828f46b5be6e4ff790aaa3f50e91",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral/dataset_dict.json": "1239dbd4ca38311b03319b672c05a6fdaacc884b0034eed047659406c62eedd4",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral/filter_report.json": "7a44ba99c087c68d9369ea1f318290744e544f4f0149075cb266693560e33398",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral/scores/test.jsonl": "277e948e8fe87892ba963d7bb4c434c5c7e8fb8b2087ffdf9bfc2e2f6f2a6f23",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral/scores/train.jsonl": "6f56259b275df36494c6ddb77663947cdea0e1b46dd34fee208994d00e116ed7",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral/scores/validation.jsonl": "a32863867679b551c2dfe1d1f8fa1c824f2ec2f5abe2e126d02affa525bbea00",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral/scoring_provenance.json": "e57599f1fef13c4c9ee7694e534194072b5dd49448699afe359a6f386945adbf",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral/test/data-00000-of-00001.arrow": "64dd8b90fdb2e31a26e294962fcd68745f1575234ab41b8b74401c6e75d17f88",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral/test/dataset_info.json": "b8b46ddb25fe6d4c56cef6554aeaed79365c42178cec489fdb34cc8ddf71a03b",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral/test/state.json": "58dac911bb295b489e3c7a6bd8d7428222cf1bd683eb27fbb74377b57a763167",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral/train/data-00000-of-00001.arrow": "0d064447760580a012a2cca1b78ebcf3fb16a2503f5dddcc6b6ea8162911f5f3",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral/train/dataset_info.json": "b8b46ddb25fe6d4c56cef6554aeaed79365c42178cec489fdb34cc8ddf71a03b",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral/train/state.json": "c5b5b7547ed9003799021e5ab4c732a49efd3c56471d1f7b15bb82ed7bc31506",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral/validation/data-00000-of-00001.arrow": "47a270de1b94b04a7b57b9114532cc6de7516e7fc6df4eb6997128dc3677b025",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral/validation/dataset_info.json": "b8b46ddb25fe6d4c56cef6554aeaed79365c42178cec489fdb34cc8ddf71a03b",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral/validation/state.json": "d72a109826de614019d5678b07c679c249c9d2b0d6b8dba068408c425313470b",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion/assembly_provenance.json": "367ddaa8adf53ab287da98e8df194d849da271c0924e04e37a1925c2a70bab1f",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion/dataset_config.json": "7c0ccd1d7131de9c998d9ce6dd9ed029dc62a26c8f3014e655922a2d13d4817b",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion/dataset_dict.json": "1239dbd4ca38311b03319b672c05a6fdaacc884b0034eed047659406c62eedd4",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion/filter_report.json": "89eee06902c071c9f46e180de8b1fdabb193c5be0b513ee841c0b7f0f696fee2",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion/scores/test.jsonl": "334598b150ab04a50e7524626c8d9db89996b6641ae0e161098fcee579d863c8",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion/scores/train.jsonl": "4b5465b2d41373d046c56ade4add08b850ac9e1925b783780fc65a2c3091d7e1",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion/scores/validation.jsonl": "3ade7aa8148080d511ee6153b5201a4612d19d182c51a1f127ea9350444717a9",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion/scoring_provenance.json": "2415e1f2095f134ec5fe1770fe171df424db67f8074b1534946f3656b34dab01",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion/test/data-00000-of-00001.arrow": "495c4275e8ffc88244318ea60c56af2b8e44d90c7047e6c5faaba614e620ea33",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion/test/dataset_info.json": "680570d9bc1c5cba0e7f5b1769e926a819780ed95c7ab8fc4c94bb99f2ddbfe4",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion/test/state.json": "ccfb91d3023f2c805e94c25c6aa08a5458ada684293661bd05de091948bbb9b1",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion/train/data-00000-of-00001.arrow": "cc246ec7d483847eae19ec11ec8470494d919eabd6cc2d62c23426933ec36fc5",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion/train/dataset_info.json": "680570d9bc1c5cba0e7f5b1769e926a819780ed95c7ab8fc4c94bb99f2ddbfe4",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion/train/state.json": "ed3571ebee46d93ff19ef9a1ce3d7ed8a89f65041056112f593d26a6d43b3b4c",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion/validation/data-00000-of-00001.arrow": "184a90d65670f4e069f4b20b644171afc1fed3e55b56d488b1260e07da313db9",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion/validation/dataset_info.json": "680570d9bc1c5cba0e7f5b1769e926a819780ed95c7ab8fc4c94bb99f2ddbfe4",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion/validation/state.json": "1da3ba1359e79b2f30400493f6d110b5457caf0bc882e1073cf28f6c6a21cb79",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral/assembly_provenance.json": "9edc2aaa8c65e5f931f9cfffcff3d23f55cb2b9cf1ce75e9e7f71f4d68350178",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral/dataset_config.json": "3ea66de85c501f472b8a5d97eb93619e3bb850279a3a2e2f644c2fa5f2807e68",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral/dataset_dict.json": "1239dbd4ca38311b03319b672c05a6fdaacc884b0034eed047659406c62eedd4",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral/filter_report.json": "89eee06902c071c9f46e180de8b1fdabb193c5be0b513ee841c0b7f0f696fee2",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral/scores/test.jsonl": "334598b150ab04a50e7524626c8d9db89996b6641ae0e161098fcee579d863c8",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral/scores/train.jsonl": "4b5465b2d41373d046c56ade4add08b850ac9e1925b783780fc65a2c3091d7e1",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral/scores/validation.jsonl": "3ade7aa8148080d511ee6153b5201a4612d19d182c51a1f127ea9350444717a9",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral/scoring_provenance.json": "2415e1f2095f134ec5fe1770fe171df424db67f8074b1534946f3656b34dab01",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral/test/data-00000-of-00001.arrow": "79371a00f69abd087c1111693ff885f96f44abe3104fdfd99b05e3f8869e7f5b",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral/test/dataset_info.json": "680570d9bc1c5cba0e7f5b1769e926a819780ed95c7ab8fc4c94bb99f2ddbfe4",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral/test/state.json": "4f7eb2fb7ea68511f569288fc2c05da1348b3610cbcf13c46a8c07c4a9a0574e",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral/train/data-00000-of-00001.arrow": "6e41400ba7f385340120763378a5160c93ca6653d438d51af888693596666d2f",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral/train/dataset_info.json": "680570d9bc1c5cba0e7f5b1769e926a819780ed95c7ab8fc4c94bb99f2ddbfe4",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral/train/state.json": "ca41e571fb8409b12eacfb16921422e9633e987d150e11b82b88d5490534f438",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral/validation/data-00000-of-00001.arrow": "948ccf52a5578848d376629c45f380692f9015c2679281fb47d85d6433304b93",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral/validation/dataset_info.json": "680570d9bc1c5cba0e7f5b1769e926a819780ed95c7ab8fc4c94bb99f2ddbfe4",
+                "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral/validation/state.json": "80d2bf0f28f0217e235a86a80808c2ae0ca607b8b20483337cf29f4237e23969"
+              },
+              "tokenizer_revision": "0e9e39f249a16976918f6564b8830bc894c89659"
+            },
+            "completion_file_sha256": "50cf8feef06ecb661ecb8bc76d7ddbeaac7cf29002e947ddf21201e955add20c",
+            "completion_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/selection_run_manifest.json",
+            "prepared_file_sha256": "fe8d38875358dca69029751a9cf17a2cb0ddec3c215ede8a0d43bc3594554a0d",
+            "prepared_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/design.json",
+            "selected_file_sha256": "f65f8541f8315b4e4bbd4a87d4c258e4872623466415abba31bf0ea1a8c5c89e",
+            "selected_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/selected.json"
+          },
+          "code_hashes": {
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime/component_analysis/a3_design.py": "e232ff9243f72d30a4df2c62833497bdacaddba1cb4b62c9cfc0794696c8a787",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime/component_analysis/a3_direction_artifacts.py": "e365f6c1a31a6ee18381f7545517adf965553949ce4f07912a0c6619b09126fe",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime/component_analysis/a3_direction_runtime.py": "ac56b1ce177a095115e4f9cca7b61519e6c3344acd50ec218832e2908aad1b07",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime/component_analysis/a3_direction_workload.py": "1b0f6110a39b5d50342b95fe7ee2d6b643fce20feb2ae4448403c1bc8c52d1b3",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime/component_analysis/a3_mask.py": "93e1c70fb6073fc0c8e8eb5bf0ca1a37946ab2733cd8e09a5167ab2394e0a505",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime/component_analysis/a3_mask_pipeline.py": "4bd8e22d5347f0cbebb08f76d2bb41498226d4e51188a24b6b88d7ac23ec4efb",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime/component_analysis/a3_mask_workload.py": "e21258a2c7678d5e059047644b1d6194ca6365f9422805e894f349ba3aa2bb5c",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime/component_analysis/a3_native.py": "b87683892df31ec87fdfab21d005d955338082699020e86846268694a690362c",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime/component_analysis/a3_pipeline.py": "310eb53427ad4ac32522dfd0d6cd3b33e4ec887af1776579845f8953bdbe83f5",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime/component_analysis/a3_source_validation.py": "eaabf9ef8247159686ec6ee00b6dbcb876495a0dac62281bb26077a9eb65fcee",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime/component_analysis/ladder_design.py": "a9752ff2bca91d7d04957fb867adcdc5640d94b47bf11d9593a3657a0f9c533b",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime/component_analysis/ladder_metrics.py": "9cc369e3e929b474052a5a142890a16615d804ce64b415e919e347af4675cfad",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime/component_analysis/ladder_pipeline.py": "f0955e8df5215e27cb3eff06cd28f7230b1de7d2a6c20e202854bc73c1280b56",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime/component_analysis/ladder_tasks.py": "7f53a2210450e4264089a60da31739d2c0c187b0dcd778b203997b9bd873e847",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime/dataset/user_inversion_pipeline.py": "4d49697731f291339262fe6ebc6a5909601a26fcf5d31ff562b55d1d74b2a0ee",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime/l0.py": "0163dd6429e6846e9bc020c77440a558480db23da95773e08436f7560ded7bce",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime/models/_compat.py": "449b03c2232a539dc590fed795ca2a55a045c27ce99b13b9a5204363970d2737",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime/models/llama_node.py": "2c48ae2c3cd470436889f4d0420a4b027cd1eb3bcfafc277bf92142c5d9d4644",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime/scripts/cluster/bridges2.env": "04fb02e3955403f1b8b1b15dcc86a2e6b5907ced54524974c9bd9fa950367577",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime/scripts/cluster/delta.env": "88b44c28d15bb6d732ff92b630425209f4a8b2b1902b4a675a0ffc553899a2e0",
+            "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime/scripts/jobs/specificity_a3_mask.sh": "cbdf6473ba56f16346c8e98e6cd422aded421f8b3ddeec537b4351fff1f06cce",
+            "/u/swong2/.conda/envs/mgnp/bin/python3.12": "25cb771c0f7398de035b14b1d1a1ac46c7e028a58e78acd531c43a54fd80c6a5"
+          },
+          "commit": "861f84a3938a5e22fa329af0c469b2dd812fe68a",
+          "design_file_sha256": "a9d11dd35bbc30061714c7067d750eb7de794532920e640d2104f0a1443a8dce",
+          "design_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-mask-n5-pilots-861f84a3938a/canonical/design.json",
+          "design_sha256": "18efa89b87433409ed0ec10278a60ffa10ba7e551684c76d575af0be765abfff",
+          "mask_protocol_sha256": "8a282ef8fce435870296669749d85dc5d3ce1bd0b0673c7c4442a37a0af969fc",
+          "model_geometry": {
+            "hidden_size": 4096,
+            "intermediate_size": 14336,
+            "num_heads": 32,
+            "num_layers": 32,
+            "vocab_size": 128256
+          },
+          "numeric_profile": {
+            "backend": "eager",
+            "chunk_size": 4,
+            "dtype": "bfloat16",
+            "hardware": "H200",
+            "model": "meta-llama/Llama-3.1-8B-Instruct",
+            "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+            "tokenizer_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+            "vocab_size": 128256
+          },
+          "operational_ruling_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime/docs/research/specificity-ladder/a3-mask-operational-ruling.json",
+          "operational_ruling_sha256": "40e9cef75f9e62e99081105157dbba54a2ccaf085306061ef6669e51a032980c",
+          "physical_widths": {
+            "far_v2": {
+              "D": 102,
+              "F": 88,
+              "H": 102,
+              "I": 122,
+              "user_neutral": 122
+            },
+            "ioi": 22,
+            "mmlu": 527,
+            "sdr_v2": {
+              "D": 107,
+              "F": 92,
+              "H": 107,
+              "I": 140,
+              "user_neutral": 140
+            },
+            "ser_v2": {
+              "D": 105,
+              "F": 91,
+              "H": 105,
+              "I": 131,
+              "user_neutral": 131
+            }
+          },
+          "pilot_ruling_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime/docs/research/specificity-ladder/a3-mask-pilot-ruling.json",
+          "pilot_ruling_sha256": "e1126ba764bf9f1b1502edeba2f73f6453f2b49376cd1a82a7a48d7321ebccfe",
+          "root_bundle_reference": {
+            "files": {
+              "COMPLETE.json": {
+                "nbytes": 200,
+                "sha256": "6d0e2e1cdfe51e422ded279c0d6f5e2c5f43e8e05010d63c8de4554a18e78214"
+              },
+              "payload.json": {
+                "nbytes": 651,
+                "sha256": "2c2592be51ef60e545229120e63a22e31e38dc32441c84af725a6f1a5dedd03f"
+              }
+            },
+            "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-mask-n5-pilots-861f84a3938a/mask-source-settings"
+          }
+        },
+        "kind": "a3_root_pilot_admission_v1",
+        "mask_replacement_policy": {
+          "additional_reservations_max": 1,
+          "approved_policy_sha256": "e560adace32533895149742494de837dc6320cd6dcc129f3800e040db14e89f8",
+          "kind": "a3_mask_replacement_policy_v1",
+          "original_admission_id": "a3-mask-m1-23444798",
+          "original_admission_sha256": "d5083712dc93eb6a0b8971fefff7d37ad65a7dcc2a3bbb909f30f39b578313a3",
+          "original_reservation": {
+            "account": "bimc-delta-gpu",
+            "actual_seconds": 0,
+            "cluster": "delta",
+            "gpus": 1,
+            "id": "r-031",
+            "job_id": "23444798",
+            "manifest_hash": null,
+            "output_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-independent-pilots-74efb4d04819/mask-pilot-1",
+            "partition": "gpuH200x8",
+            "requested_minutes": 45.0,
+            "reserved_gpu_hours": 0.75,
+            "source_commit": "74efb4d0481968a1d0138eb1a79b97f302fd3c3b",
+            "status": "CANCELLED"
+          },
+          "original_upper_inventory_sha256": "ee8553504a386259e7ff575dc248f80521d139b0f520a55c5b8f14eb9a9c05d1",
+          "replacement_gpu_hours_max": 0.75
+        },
+        "max_gpu_hours": 0.75,
+        "may_select_checkpoint": false,
+        "minimum_shard_seconds": 60,
+        "prospective_envelope_reference": {
+          "files": {
+            "COMPLETE.json": {
+              "nbytes": 202,
+              "sha256": "2cc5d7bd0015261ff18d07bbbd8ed9c0a858a0413a1f882453bdf62c4916c04f"
+            },
+            "payload.json": {
+              "nbytes": 51864,
+              "sha256": "6045ce563c1391c0bdc2ea81cc693ff5ebd6fb98e64cc288896e17921236b2b8"
+            }
+          },
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-mask-n5-pilots-861f84a3938a/prospective-admission"
+        },
+        "purpose": "validation_timing",
+        "reservation_ids": [
+          "r-040"
+        ],
+        "upper_inventory_sha256": "cc1e6b187b6060be6c727421477be9512169b2f3e42a41d121e2e2708fd781f2"
+      }
+    ],
+    "storage_capacities": {
+      "cache_disk": {
+        "available_bytes": 358702772224,
+        "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-mask-n5-pilots-861f84a3938a",
+        "pool": "projects-device-1808112826"
+      },
+      "host_ram": {
+        "available_bytes": 60129542144,
+        "basis": "64GiB requested contract less8GiB allowance; actualallocationnotverified",
+        "pool": "reserved-slurm-host"
+      },
+      "output_disk": {
+        "available_bytes": 358702772224,
+        "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-mask-n5-pilots-861f84a3938a",
+        "pool": "projects-device-1808112826"
+      },
+      "scratch_disk": {
+        "available_bytes": 358702772224,
+        "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-mask-n5-pilots-861f84a3938a",
+        "pool": "projects-device-1808112826"
+      }
+    },
+    "contingency_gpu_hours": 5.25,
+    "original_mapping_reference": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-independent-pilots-74efb4d04819/root-mask-m1/mapping",
+      "files": {
+        "COMPLETE.json": {
+          "sha256": "205380416de2ebe3e79f04394ccc05f03a0d468fef7c2090a978e97e6a7bfe5d",
+          "nbytes": 202
+        },
+        "payload.json": {
+          "sha256": "1aa76d498a2a2ebc209fedd4657a54262a40e8da023bc8279eccb261d86088fd",
+          "nbytes": 18873
+        }
+      }
+    },
+    "active_mapping_reference": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-independent-pilots-74efb4d04819/root-mask-m1/mapping-successors/mapping-000005",
+      "files": {
+        "COMPLETE.json": {
+          "sha256": "4b983682e6340d4792ae71bd15c1132b31bccc5ec5d6dcf6e9e6ad150d0c2471",
+          "nbytes": 202
+        },
+        "payload.json": {
+          "sha256": "fd0dfc0db019f1f753584bb2742a1f205edca9045ea5b1b1899b4b1e433d3247",
+          "nbytes": 26614
+        }
+      }
+    },
+    "mapping_lineage_references": [
+      {
+        "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-independent-pilots-74efb4d04819/root-mask-m1/mapping",
+        "files": {
+          "COMPLETE.json": {
+            "sha256": "205380416de2ebe3e79f04394ccc05f03a0d468fef7c2090a978e97e6a7bfe5d",
+            "nbytes": 202
+          },
+          "payload.json": {
+            "sha256": "1aa76d498a2a2ebc209fedd4657a54262a40e8da023bc8279eccb261d86088fd",
+            "nbytes": 18873
+          }
+        }
+      },
+      {
+        "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-independent-pilots-74efb4d04819/root-mask-m1/mapping-successors/mapping-000001",
+        "files": {
+          "COMPLETE.json": {
+            "sha256": "376abde1340228b57149c213f36f56e15ee823ba0829692631a80e4dacc18e9b",
+            "nbytes": 202
+          },
+          "payload.json": {
+            "sha256": "549ecebab1cc07b22b2a34d0dd438f968121d86035b69c138d15646d7de48e9b",
+            "nbytes": 19910
+          }
+        }
+      },
+      {
+        "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-independent-pilots-74efb4d04819/root-mask-m1/mapping-successors/mapping-000002",
+        "files": {
+          "COMPLETE.json": {
+            "sha256": "63f4a260792c4213175f86c29ff05f904846cccec024673031033eaf87b89958",
+            "nbytes": 202
+          },
+          "payload.json": {
+            "sha256": "68eb70d5bcce35cc1104068fa6fe85f2f9e75d0b4321ffb85cdc7de02c1d6d3f",
+            "nbytes": 23632
+          }
+        }
+      },
+      {
+        "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-independent-pilots-74efb4d04819/root-mask-m1/mapping-successors/mapping-000003",
+        "files": {
+          "COMPLETE.json": {
+            "sha256": "24193bd18c69d1a05a538962bc694161df6fab483be535dfe0e5559a45bf113e",
+            "nbytes": 202
+          },
+          "payload.json": {
+            "sha256": "89384ddd5e6babf1f17c1a31c7710756455f1da444704272960c028a816ebc33",
+            "nbytes": 24198
+          }
+        }
+      },
+      {
+        "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-independent-pilots-74efb4d04819/root-mask-m1/mapping-successors/mapping-000004",
+        "files": {
+          "COMPLETE.json": {
+            "sha256": "ac9eaa376b1b93aa7199c153ae852e030085f0f320e5b11aaecb8032eb874b87",
+            "nbytes": 202
+          },
+          "payload.json": {
+            "sha256": "f829125eaf29d27d8e34bd5a44c12a5f5436039edb89863078b8a759816bceda",
+            "nbytes": 26075
+          }
+        }
+      },
+      {
+        "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-independent-pilots-74efb4d04819/root-mask-m1/mapping-successors/mapping-000005",
+        "files": {
+          "COMPLETE.json": {
+            "sha256": "4b983682e6340d4792ae71bd15c1132b31bccc5ec5d6dcf6e9e6ad150d0c2471",
+            "nbytes": 202
+          },
+          "payload.json": {
+            "sha256": "fd0dfc0db019f1f753584bb2742a1f205edca9045ea5b1b1899b4b1e433d3247",
+            "nbytes": 26614
+          }
+        }
+      }
+    ],
+    "mapping_refresh_wait_seconds": 0.18969204399945738
+  },
+  "no_old_charge_refunded": true,
+  "published_unix": 1793747962.174491
+}

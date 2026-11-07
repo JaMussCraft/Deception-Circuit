@@ -1,0 +1,44 @@
+{
+  "name": "inventory-fit-target",
+  "stage": "fit",
+  "expected_keys": 6384,
+  "requirements": 302,
+  "physical_calls": 106684,
+  "inventory_sha256": "5f78c4ff53f0dbffaa1d7cb8cba780e2148730363f1d9484a62ecb1b46486e60",
+  "storage_requirements": {
+    "tiers": {
+      "host_ram": 67606784792,
+      "cache_disk": 33803392396,
+      "output_disk": 33803392396,
+      "scratch_disk": 33803392396
+    },
+    "components": {
+      "authority_key_proof_host_bytes": 0
+    },
+    "policy": "complete source-derived scalar caches, full-union bank, aliases, immutable rows plus atomic temporary publication; no saved vocabulary arrays"
+  },
+  "model_loads": 1,
+  "finish_reserve_seconds": 300
+}
+{
+  "name": "inventory-pilot",
+  "stage": "pilot",
+  "expected_keys": 96,
+  "requirements": 604,
+  "physical_calls": 9664,
+  "inventory_sha256": "8ca0540b1d07f4d710cd6b276e10754799b9f2aebcee657e07d034a85a123387",
+  "storage_requirements": {
+    "tiers": {
+      "host_ram": 7697698144,
+      "cache_disk": 3848849072,
+      "output_disk": 3848849072,
+      "scratch_disk": 3848849072
+    },
+    "components": {
+      "authority_key_proof_host_bytes": 0
+    },
+    "policy": "complete source-derived scalar caches, full-union bank, aliases, immutable rows plus atomic temporary publication; no saved vocabulary arrays"
+  },
+  "model_loads": 2,
+  "finish_reserve_seconds": 300
+}

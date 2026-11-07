@@ -1,0 +1,47 @@
+{
+  "kind": "numeric_provenance_for_audit202_r2",
+  "sources": {
+    "base_oracle": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/original-base-r3-01/COMPLETE_ORACLE.json",
+      "sha256": "463591fc08f04a8275042a68e9c884b22c264eac5bf11bd87679a17a5594973a"
+    },
+    "mgnp_comparison_review": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-candidate-result-review171/actual-mgnp-comparison-verdict.json",
+      "sha256": "5937f7578223803bc803ae19e6e0dcc6c36c1467fe3ba84350498281a6943fec"
+    },
+    "original_audit_index": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/a3-critical-path-audit202/audit-evidence.json",
+      "sha256": "3142c2f09e8ad12e155675d4f45236a3e661909a25a37991ddfbee9b0fd53ca0"
+    }
+  },
+  "derived": {
+    "base_build_plus_stream_minutes": {
+      "formula": "(build_seconds + stream_seconds) / 60",
+      "value": 60.25992140391657
+    },
+    "mgnp_wall_reduction_percent": {
+      "formula": "(original child_wall_seconds - candidate child_wall_seconds) / original child_wall_seconds * 100",
+      "value": 24.8617860918722
+    },
+    "candidate_peak_decimal_GB": {
+      "formula": "candidate job_cgroup_peak_bytes / 1000000000",
+      "value": 123.080208384
+    },
+    "output_decimal_TB": {
+      "formula": "output_disk bytes / 1000000000000",
+      "value": 5.91628825971
+    },
+    "publication_decimal_TB": {
+      "formula": "publication_metadata bytes / 1000000000000",
+      "value": 5.881781407862
+    },
+    "host_decimal_TB": {
+      "formula": "host_ram bytes / 1000000000000",
+      "value": 1.396027015524
+    },
+    "cache_decimal_GB": {
+      "formula": "cache_disk bytes / 1000000000",
+      "value": 322.508933404
+    }
+  }
+}

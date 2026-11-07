@@ -1,0 +1,292 @@
+{
+  "pure_test_only": true,
+  "new_branch_base": {
+    "live": 0,
+    "cached": 0,
+    "exception": "expired",
+    "old_reset": 1000,
+    "live_reset": 2000,
+    "cached_read_at": 1100,
+    "live_checked_at": 1500,
+    "now": 1501,
+    "points": 15,
+    "since": 15,
+    "cadence": 16,
+    "next_index": 1,
+    "next_at_plus": 16,
+    "freeze": "none"
+  },
+  "cases": [
+    {
+      "name": "new reset legitimate",
+      "override": {},
+      "expected": "PASS"
+    },
+    {
+      "name": "cache stale label but post-reset timestamp",
+      "override": {
+        "cache_label": "unknown or stale"
+      },
+      "expected": "PASS"
+    },
+    {
+      "name": "cache old but post-reset",
+      "override": {
+        "cached_read_at": 1001
+      },
+      "expected": "PASS"
+    },
+    {
+      "name": "cached lags within checkpoint",
+      "override": {
+        "live": 0.5
+      },
+      "expected": "PASS"
+    },
+    {
+      "name": "exact checkpoint",
+      "override": {
+        "live": 1
+      },
+      "expected": "REJECT"
+    },
+    {
+      "name": "projected past checkpoint",
+      "override": {
+        "live": 2
+      },
+      "expected": "REJECT"
+    },
+    {
+      "name": "frozen",
+      "override": {
+        "freeze": "checkpoint"
+      },
+      "expected": "REJECT"
+    },
+    {
+      "name": "wrong targeted session",
+      "override": {
+        "session_matches": false
+      },
+      "expected": "REJECT"
+    },
+    {
+      "name": "expired exactly80",
+      "override": {
+        "live": 80,
+        "cached": 80
+      },
+      "expected": "REJECT"
+    },
+    {
+      "name": "expired over80",
+      "override": {
+        "live": 81,
+        "cached": 81
+      },
+      "expected": "REJECT"
+    },
+    {
+      "name": "hard99",
+      "override": {
+        "live": 99,
+        "cached": 99
+      },
+      "expected": "REJECT"
+    },
+    {
+      "name": "active stale old epoch",
+      "override": {
+        "exception": "active"
+      },
+      "expected": "REJECT"
+    },
+    {
+      "name": "unknown exception",
+      "override": {
+        "exception": "unknown"
+      },
+      "expected": "REJECT"
+    },
+    {
+      "name": "missing exception",
+      "override": {
+        "exception": null
+      },
+      "expected": "REJECT"
+    },
+    {
+      "name": "future captured boundary",
+      "override": {
+        "old_reset": 1600
+      },
+      "expected": "REJECT"
+    },
+    {
+      "name": "same reset expired below80 existing route",
+      "override": {
+        "old_reset": 2000
+      },
+      "expected": "PASS_EXISTING_ROUTE"
+    },
+    {
+      "name": "captured epoch greater than live",
+      "override": {
+        "old_reset": 2001
+      },
+      "expected": "REJECT"
+    },
+    {
+      "name": "live reset already elapsed",
+      "override": {
+        "live_reset": 1400
+      },
+      "expected": "REJECT"
+    },
+    {
+      "name": "cached pre-reset",
+      "override": {
+        "cached_read_at": 999
+      },
+      "expected": "REJECT"
+    },
+    {
+      "name": "cached future to live observation",
+      "override": {
+        "cached_read_at": 1501
+      },
+      "expected": "REJECT"
+    },
+    {
+      "name": "live observation future",
+      "override": {
+        "live_checked_at": 1502
+      },
+      "expected": "REJECT"
+    },
+    {
+      "name": "live observation stale",
+      "override": {
+        "live_checked_at": 1400
+      },
+      "expected": "REJECT"
+    },
+    {
+      "name": "live observation exact60s",
+      "override": {
+        "live_checked_at": 1441
+      },
+      "expected": "PASS"
+    },
+    {
+      "name": "live observation older60s",
+      "override": {
+        "live_checked_at": 1440
+      },
+      "expected": "REJECT"
+    },
+    {
+      "name": "cache meter greater than live",
+      "override": {
+        "cached": 1
+      },
+      "expected": "REJECT"
+    },
+    {
+      "name": "missing cache timestamp",
+      "override": {
+        "cached_read_at": null
+      },
+      "expected": "REJECT"
+    },
+    {
+      "name": "naive timestamp",
+      "override": {
+        "timestamp_timezone": null
+      },
+      "expected": "REJECT"
+    },
+    {
+      "name": "missing or nonfinite reset",
+      "override": {
+        "live_reset": null
+      },
+      "expected": "REJECT"
+    },
+    {
+      "name": "boolean reset",
+      "override": {
+        "live_reset": true
+      },
+      "expected": "REJECT"
+    },
+    {
+      "name": "unknown live",
+      "override": {
+        "live": null
+      },
+      "expected": "REJECT"
+    },
+    {
+      "name": "boolean live",
+      "override": {
+        "live": true
+      },
+      "expected": "REJECT"
+    },
+    {
+      "name": "nonfinite live",
+      "override": {
+        "live": "NaN"
+      },
+      "expected": "REJECT"
+    },
+    {
+      "name": "pause flag",
+      "override": {
+        "should_pause": true
+      },
+      "expected": "REJECT"
+    },
+    {
+      "name": "status unavailable",
+      "override": {
+        "meter_status": "unknown"
+      },
+      "expected": "REJECT"
+    },
+    {
+      "name": "bad checkpoint counters",
+      "override": {
+        "next_at_plus": 15
+      },
+      "expected": "REJECT"
+    },
+    {
+      "name": "matching active existing over80",
+      "override": {
+        "old_reset": 2000,
+        "exception": "active",
+        "live": 81,
+        "cached": 81
+      },
+      "expected": "PASS_EXISTING_ROUTE"
+    },
+    {
+      "name": "matching expired existing over80",
+      "override": {
+        "old_reset": 2000,
+        "live": 81,
+        "cached": 81
+      },
+      "expected": "REJECT"
+    }
+  ],
+  "additional_integration_checks": [
+    "Actual usage() invokes codex-usage then targeted public status and retains both raw readings; no writes to private state.",
+    "A reset occurring between live read and status fails if new cached read_at is later than live checked_at; next ordinary read may retry validation, not model phase.",
+    "All old tests retain accepted semantics except unknown-state below80 cases are now explicitly rejected. Existing above80 active matching route and cached-age telemetry behavior unchanged.",
+    "No helper operational trigger/release, scheduler call, native model or cache weight read in test execution."
+  ]
+}

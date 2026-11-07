@@ -1,0 +1,59 @@
+.F..                                                                     [100%]
+=================================== FAILURES ===================================
+___ test_actual_spooled_wrapper_is_parser_only_and_pins_selected_interpreter ___
+
+tmp_path = PosixPath('/tmp/report113-base/test_actual_spooled_wrapper_is0')
+
+    def test_actual_spooled_wrapper_is_parser_only_and_pins_selected_interpreter(tmp_path):
+>       script=B/'scripts/jobs/specificity_a3_mask.sh';spool=tmp_path/'spool';spool.mkdir();launched=spool/'slurm_script';shutil.copy2(script,launched)
+
+../../../../../docs/research/specificity-ladder/reports/113-mask-readiness-evidence/test_frozen_mask_path.py:18: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/sw/external/python/anaconda3/lib/python3.9/shutil.py:445: in copy2
+    copystat(src, dst, follow_symlinks=follow_symlinks)
+/sw/external/python/anaconda3/lib/python3.9/shutil.py:388: in copystat
+    _copyxattr(src, dst, follow_symlinks=follow)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+src = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/scripts/jobs/specificity_a3_mask.sh')
+dst = PosixPath('/tmp/report113-base/test_actual_spooled_wrapper_is0/spool/slurm_script')
+
+    def _copyxattr(src, dst, *, follow_symlinks=True):
+        """Copy extended filesystem attributes from `src` to `dst`.
+    
+        Overwrite existing attributes.
+    
+        If `follow_symlinks` is false, symlinks won't be followed.
+    
+        """
+    
+        try:
+            names = os.listxattr(src, follow_symlinks=follow_symlinks)
+        except OSError as e:
+            if e.errno not in (errno.ENOTSUP, errno.ENODATA, errno.EINVAL):
+                raise
+            return
+        for name in names:
+            try:
+                value = os.getxattr(src, name, follow_symlinks=follow_symlinks)
+>               os.setxattr(dst, name, value, follow_symlinks=follow_symlinks)
+E               PermissionError: [Errno 13] Permission denied: '/tmp/report113-base/test_actual_spooled_wrapper_is0/spool/slurm_script'
+
+/sw/external/python/anaconda3/lib/python3.9/shutil.py:338: PermissionError
+=============================== warnings summary ===============================
+docs/research/specificity-ladder/reports/113-mask-readiness-evidence/test_frozen_mask_path.py::test_tiny_pilot_excludes_unaccepted_direction_execution_seams
+  /u/swong2/.local/lib/python3.9/site-packages/pandas/core/arrays/masked.py:61: UserWarning: Pandas requires version '1.3.6' or newer of 'bottleneck' (version '1.3.5' currently installed).
+    from pandas.core import (
+
+docs/research/specificity-ladder/reports/113-mask-readiness-evidence/test_frozen_mask_path.py::test_tiny_pilot_excludes_unaccepted_direction_execution_seams
+  /u/swong2/.local/lib/python3.9/site-packages/transformers/utils/hub.py:110: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+    warnings.warn(
+
+docs/research/specificity-ladder/reports/113-mask-readiness-evidence/test_frozen_mask_path.py::test_tiny_pilot_excludes_unaccepted_direction_execution_seams
+  /sw/external/python/anaconda3/lib/python3.9/site-packages/tensorflow/python/framework/dtypes.py:35: DeprecationWarning: ml_dtypes.float8_e4m3b11 is deprecated. Use ml_dtypes.float8_e4m3b11fnuz
+    from tensorflow.tsl.python.lib.core import pywrap_ml_dtypes
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED ../../../../../docs/research/specificity-ladder/reports/113-mask-readiness-evidence/test_frozen_mask_path.py::test_actual_spooled_wrapper_is_parser_only_and_pins_selected_interpreter
+1 failed, 3 passed, 3 warnings in 21.55s

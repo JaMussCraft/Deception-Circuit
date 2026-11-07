@@ -1,0 +1,20 @@
+[
+  "sbatch",
+  "--parsable",
+  "--account=bjhz-delta-cpu",
+  "--partition=cpu",
+  "--constraint=projects",
+  "--nodes=1",
+  "--ntasks=1",
+  "--cpus-per-task=2",
+  "--mem=4G",
+  "--time=00:06:00",
+  "--no-requeue",
+  "--export=ALL,CUDA_VISIBLE_DEVICES=,PYTEST_DISABLE_PLUGIN_AUTOLOAD=1",
+  "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+  "--job-name=lad-A2-root-red",
+  "--output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259/root-dispatch/slurm-%j.log",
+  "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259/run_cpu.sh",
+  "--output",
+  "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/root-red-01"
+]

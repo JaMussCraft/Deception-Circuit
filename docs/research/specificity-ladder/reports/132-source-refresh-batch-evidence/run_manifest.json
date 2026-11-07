@@ -1,0 +1,102 @@
+{
+  "kind": "source_only_batch_scanner_software_handback",
+  "status": "handed-back",
+  "baseline_commit": "f5a5687ec12091f0d148b38b301598e9c7cb98cd",
+  "source_ordinary_files": 511,
+  "changed_files": [
+    "component_analysis/a3_source_validation.py",
+    "tests/test_a3_source_validation.py"
+  ],
+  "source_hashes": {
+    "component_analysis/a3_source_validation.py": "eaabf9ef8247159686ec6ee00b6dbcb876495a0dac62281bb26077a9eb65fcee",
+    "tests/test_a3_source_validation.py": "f3164a051cf18c5f44e7da13b364e02057426e02b7daccd557947afd54c66241"
+  },
+  "final_tests": {
+    "handoff-mgnp": {
+      "source_hashes": {
+        "component_analysis/a3_source_validation.py": "eaabf9ef8247159686ec6ee00b6dbcb876495a0dac62281bb26077a9eb65fcee",
+        "tests/test_a3_source_validation.py": "f3164a051cf18c5f44e7da13b364e02057426e02b7daccd557947afd54c66241"
+      },
+      "command": [
+        "/u/swong2/.conda/envs/mgnp/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=/tmp/a3-source-batch-handoff-mgnp",
+        "tests/test_a3_source_validation.py",
+        "tests/test_a3_mask_pipeline.py",
+        "tests/test_a3_edge_pipeline.py",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/121-source-cost-review-evidence/test_independent_source_boundaries.py"
+      ],
+      "cwd": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-refresh-batch-source",
+      "environment": {
+        "PYTHONPATH": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-refresh-batch-source",
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1",
+        "HF_HUB_OFFLINE": "1",
+        "TRANSFORMERS_OFFLINE": "1",
+        "A3_A1_SCHEMA_TEST_DESIGN": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/design.json"
+      },
+      "started_utc": "2026-11-02T23:59:04.312027+00:00",
+      "elapsed_seconds": 189.03231382369995,
+      "exit_code": 0,
+      "log": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/132-source-refresh-batch-evidence/handoff-mgnp.log"
+    },
+    "handoff-base": {
+      "source_hashes": {
+        "component_analysis/a3_source_validation.py": "eaabf9ef8247159686ec6ee00b6dbcb876495a0dac62281bb26077a9eb65fcee",
+        "tests/test_a3_source_validation.py": "f3164a051cf18c5f44e7da13b364e02057426e02b7daccd557947afd54c66241"
+      },
+      "command": [
+        "/sw/external/python/anaconda3/bin/python3.9",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=/tmp/a3-source-batch-handoff-base",
+        "tests/test_a3_source_validation.py",
+        "tests/test_a3_mask_pipeline.py",
+        "tests/test_a3_edge_pipeline.py",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/121-source-cost-review-evidence/test_independent_source_boundaries.py"
+      ],
+      "cwd": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-refresh-batch-source",
+      "environment": {
+        "PYTHONPATH": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-refresh-batch-source",
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1",
+        "HF_HUB_OFFLINE": "1",
+        "TRANSFORMERS_OFFLINE": "1",
+        "A3_A1_SCHEMA_TEST_DESIGN": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/design.json"
+      },
+      "started_utc": "2026-11-03T00:00:31.370975+00:00",
+      "elapsed_seconds": 266.0351049900055,
+      "exit_code": 0,
+      "log": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/132-source-refresh-batch-evidence/handoff-base.log"
+    }
+  },
+  "passed_counts": {
+    "handoff-mgnp": 221,
+    "handoff-base": 221
+  },
+  "review_binding_sha256": "286fe166bf227f633910811b7de8a578bebe19f8e1213ee4467ceccb8cbb348b",
+  "unchanged_independent_probe": {
+    "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/121-source-cost-review-evidence/test_independent_source_boundaries.py",
+    "sha256": "54b24e2b56325da734a38a519b3003771494d3a9c25ca29b7c38c42717768202"
+  },
+  "plan_accepted_sha256": "d9b00f4aca92f55da44693aca86648046b3013a11665bdd20fa3b032f178eba8",
+  "no_real_input_preparation_or_performance": true,
+  "source_freeze_performed": false,
+  "execution_authorized": false,
+  "local_cpu": true,
+  "weights_loaded": false,
+  "checked_utc": "2026-11-03T00:05:40.704030+00:00"
+}

@@ -1,0 +1,158 @@
+{
+  "status": "DIAGNOSED_EXPLICIT_CHILD_TIME_CAP_NOT_JOB_OOM",
+  "job_id": "23605749",
+  "root_reported_terminal": {
+    "state": "FAILED",
+    "exit_code": "1:0",
+    "Slurm_elapsed_seconds": 3313
+  },
+  "raw_child_exit_code": -15,
+  "child_elapsed_seconds": 3302.3294503030193,
+  "TERM_sent_at_seconds": 3300.324361130013,
+  "old_child_cap_seconds": 3300,
+  "actual_allocation_limit_seconds": 3600,
+  "build_seconds": 2653.111457766994,
+  "stream_started": true,
+  "stream_finished": false,
+  "RESULT_present": false,
+  "COMPLETE_ORACLE_present": false,
+  "job_cgroup_peak_bytes": 134158635008,
+  "job_cgroup_limit_bytes": 206158430208,
+  "job_peak_fraction": 0.6507550279299418,
+  "job_memory_events": [
+    {
+      "path": "/sys/fs/cgroup/system.slice/slurmstepd.scope/job_23605749/step_batch/user/task_0",
+      "before": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "after": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    {
+      "path": "/sys/fs/cgroup/system.slice/slurmstepd.scope/job_23605749/step_batch/user",
+      "before": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "after": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    {
+      "path": "/sys/fs/cgroup/system.slice/slurmstepd.scope/job_23605749/step_batch",
+      "before": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "after": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    {
+      "path": "/sys/fs/cgroup/system.slice/slurmstepd.scope/job_23605749",
+      "before": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "after": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    }
+  ],
+  "ancestor_events_are_historical_and_unchanged": [
+    {
+      "path": "/sys/fs/cgroup/system.slice/slurmstepd.scope",
+      "before": "low 0\nhigh 0\nmax 945788\noom 1\noom_kill 1\noom_group_kill 0",
+      "after": "low 0\nhigh 0\nmax 945788\noom 1\noom_kill 1\noom_group_kill 0",
+      "unchanged": true
+    },
+    {
+      "path": "/sys/fs/cgroup/system.slice",
+      "before": "low 0\nhigh 0\nmax 945788\noom 1\noom_kill 1\noom_group_kill 0",
+      "after": "low 0\nhigh 0\nmax 945788\noom 1\noom_kill 1\noom_group_kill 0",
+      "unchanged": true
+    }
+  ],
+  "tail_samples": [
+    {
+      "elapsed_seconds": 3290.308374154003,
+      "job_current_bytes": 23633076224,
+      "job_peak_bytes": 134158635008
+    },
+    {
+      "elapsed_seconds": 3295.3167349460127,
+      "job_current_bytes": 23633076224,
+      "job_peak_bytes": 134158635008
+    },
+    {
+      "elapsed_seconds": 3300.324361130013,
+      "job_current_bytes": 23633076224,
+      "job_peak_bytes": 134158635008
+    }
+  ],
+  "original_mgnp_oracle": {
+    "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/original-mgnp-r2-02/COMPLETE_ORACLE.json",
+    "sha256": "1685fca54172ab3de7a8003b8503fdf2a9ac184e684ae1c17a52493fcc7ca991",
+    "complete": true,
+    "build_seconds": 2339.692041463999,
+    "stream_seconds": 735.1920098650007,
+    "total_child_seconds": 3194.5884759929995,
+    "nonbuild_nonstream_seconds_derived": 119.70442466399982
+  },
+  "candidate_completion_marker_observation": {
+    "BUILD_FINISHED_NOT_ORACLE.json": true,
+    "STREAM_FINISHED_NOT_ORACLE.json": true,
+    "RESULT.json": true,
+    "COMPLETE_COMPARISON.json": true,
+    "FAILED.json": false
+  },
+  "no_scientific_rerun_or_reference_acceptance": true,
+  "raw_evidence_sha256": {
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/original-base-r2-01/child-execution.json": "81c65b0b8692490d3e28bf8bd731170802832fb8613a69570497a25854dd2c1c",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/original-base-r2-01/BUILD_FINISHED_NOT_ORACLE.json": "0e82500973f075a499a6b21b8055fe89af1fa2a0366746d7b867764e9d697d50",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/original-base-r2-01/STREAM_STARTED.json": "8b8c8c0ae3a81813eae82f4be4583124cbc87eb17476e53b6610a0396d19917a",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/original-base-r2-01/FAILED.json": "5d5d49d2e3bcc910f278bdff6ff8647f7b36736978191a043f5375211542acca",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/original-base-r2-01/allocation-before.json": "0d92cc70b020d4edaf9959073ba2bae1fb7aff46f07d383384bfe49967d6a82d",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/original-base-r2-01/memory-before.json": "266f4949d0ced9494a24939862dcbbaeacf5209729ed4fa0e79a75df8b869310",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/original-base-r2-01/memory-after.json": "df72aeaba184ed247cb796287c074e065bc1af5e892e702330a7a4a368b0f503",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/original-base-r2-01/samples.jsonl": "432ebf7e84f833a65836ce410402166cdb74e1d1400a8e78342c1327630aebd2"
+  }
+}

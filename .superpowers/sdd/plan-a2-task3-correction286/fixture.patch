@@ -1,0 +1,28 @@
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r3/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_root_integration.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task3-correction286/candidate-r4/tests/test_full_score_root_integration.py
+@@ -271,6 +271,17 @@
+     ar=importlib.import_module('component_analysis.a3_direction_runtime')
+     assert Path(ar.__file__).resolve()==source/'component_analysis/a3_direction_runtime.py'
+     m=module();ledger,mapping,g=budget_fixture(m,7200)
++    # budget_fixture supplies arithmetic/charge fields only. Native scoring
++    # identity comes from the accepted real GPU template, with a raw G3 file
++    # hash check; no model, actual ledger or MAIN output is written here.
++    owning=json.loads((t1.GPU/'config.template.json').read_text())
++    assert owning['commit']==m.SOURCE
++    assert m.sha(owning['groups'])==owning['groups_file_sha256']
++    g.update(groups_file_sha256=owning['groups_file_sha256'],main_root=owning['main_root'])
++    ledger['reservations'][1]['output_dir']=g['main_root']
++    mapping['entries'][1]['actual_entry']['output_dir']=g['main_root']
++    expected_identity=dict(purpose='A2 original source50e full scoring',source_commit=owning['commit'],
++        groups_sha256=owning['groups_file_sha256'],main_root=owning['main_root'])
+     canonical=tmp_path/'ledger.json';frozen_old=tmp_path/'old-ledger.json';frozen_new=tmp_path/'new-ledger.json'
+     g['canonical_ledger']=str(canonical);mapping['ledger_path']=str(canonical)
+     old=dict(reservations=[copy.deepcopy(ledger['reservations'][0])],totals={'reserved_gpu_hours':.75},caps=ledger['caps'])
+@@ -296,6 +307,7 @@
+     monkeypatch.setattr(m,'native_runtime',lambda g:ar)
+     before={str(path):path.read_bytes() for root in (origin,successor,admission_path) for path in root.iterdir()}
+     captured,normalized,budget=m.collect_native_closure(g)
++    assert normalized['expected_identity']==expected_identity
+     assert normalized['original_mapping_reference']==ar.object_reference(origin)
+     assert normalized['active_mapping_reference']==ar.object_reference(successor)
+     assert len(normalized['mapping_lineage_references'])==2

@@ -1,0 +1,31 @@
+......{"measured_guard_dependency_bytes": 0, "scoring_dependency_roots": 10, "actual_scoring_dependency_bytes": 3997892, "serial_reference_count": 9, "source_unchanged": true, "model_is_explicit_fake_cpu": true}
+F
+=================================== FAILURES ===================================
+______ test_serial_measured_guard_covers_actual_scoring_dependency_union _______
+
+tmp_path = PosixPath('/tmp/review111-round1-more-mgnp/test_serial_measured_guard_cov0')
+fake = [(tensor([[2, 3, 6, 0],
+        [2, 3, 5, 0]]), None), (tensor([[1, 2, 4, 0],
+        [1, 2, 3, 0]]), None), (tensor([...None), (tensor([[2, 3, 5, 0],
+        [2, 3, 7, 0]]), None), (tensor([[1, 2, 3, 0],
+        [1, 2, 5, 0]]), None), ...]
+
+    def test_serial_measured_guard_covers_actual_scoring_dependency_union(tmp_path,fake):
+        _,d,p=_fake_pilot_inputs(1);pilot=r.workload.build_inventory(d,p,stage='prefit')
+        receipt=r.run_pilot(object(),d,p,pilot,root=tmp_path,args=SimpleNamespace(pilot_part='prefit',selected=None),guard=lambda:None,startup_seconds=0)
+        r.publish_object(tmp_path/'test-admission',{'pilot_receipt_paths':[str(tmp_path/'pilot'/'prefit')]})
+        r.publish_object(tmp_path/'test-reservation',{'admission_path':str(tmp_path/'test-admission')})
+        index=r._admitted_candidate_index(SimpleNamespace(reservation=str(tmp_path/'test-reservation')),d,p)
+        index.refresh_dependencies()
+        print(json.dumps(dict(measured_guard_dependency_bytes=receipt['proof_verified_bytes'],scoring_dependency_roots=len(index.forest.paths),
+            actual_scoring_dependency_bytes=index.forest.verified_bytes,serial_reference_count=len(receipt['serial_numeric_references']),
+            source_unchanged=True,model_is_explicit_fake_cpu=True)))
+>       assert receipt['proof_verified_bytes']>=index.forest.verified_bytes
+E       assert 0 >= 3997892
+E        +  where 3997892 = <component_analysis.a3_direction_runtime._DependencyForest object at 0x7f0713ccb320>.verified_bytes
+E        +    where <component_analysis.a3_direction_runtime._DependencyForest object at 0x7f0713ccb320> = <component_analysis.a3_direction_runtime._PackingCandidateIndex object at 0x7f0713cd41d0>.forest
+
+docs/research/specificity-ladder/reports/111-round1-evidence/test_independent_round1_more.py:39: AssertionError
+=========================== short test summary info ============================
+FAILED docs/research/specificity-ladder/reports/111-round1-evidence/test_independent_round1_more.py::test_serial_measured_guard_covers_actual_scoring_dependency_union
+1 failed, 6 passed in 6.92s

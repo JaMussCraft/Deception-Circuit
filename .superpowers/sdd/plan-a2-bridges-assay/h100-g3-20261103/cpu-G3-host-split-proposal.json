@@ -1,0 +1,85 @@
+{
+  "status": "HOST_SPLIT_CONTRACT_READ_VALID_CPU_EXECUTION_PENDING",
+  "source_commit": "50e947bb852613e3a270082651f2bd1b7bb0c525",
+  "runtime": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime",
+  "owning_Delta_freeze_argv": [
+    "bash",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/scripts/jobs/specificity_a2.sh",
+    "--stage",
+    "freeze",
+    "--design",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/design.json",
+    "--selected",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/selected.json",
+    "--commit",
+    "50e947bb852613e3a270082651f2bd1b7bb0c525",
+    "--batch-size",
+    "8",
+    "--registry",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
+    "--comparison",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/all18-40fe57289405-v1/comparison.json",
+    "--source-records",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/all18-40fe57289405-v1/source-records.json",
+    "--work-dir",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/bridges-h100-G3-v1"
+  ],
+  "stages": [
+    {
+      "host": "Delta actual Slurm CPU",
+      "launcher": "cpu-freeze-G3-delta.py",
+      "purpose": "One owning genuine freeze using live Delta catalogues, then owning source/science/geometry/tokenizer validation. No weights.",
+      "resource_proposal": {
+        "CPUs": 4,
+        "memory": "16G",
+        "time_minutes": 15
+      },
+      "root_bindings_required": [
+        "actual current CPU allocation receipt path+SHA with raw scontrol",
+        "independent162 acceptance receipt path+SHA",
+        "actual accepted source publication receipt path+SHA",
+        "root stable current protection/own-entry evidence",
+        "fresh empty G3 output"
+      ]
+    },
+    {
+      "host": "Root transfer",
+      "purpose": "Copy exact accepted runtime511+4, snapshot/archive/publication, original input closure incl original6bdsource audit assets, single Delta G3 groups.json + evidence, and freshly checked current catalogues into original virtual namespaces. Bind exact groups SHA; no receipt rewrites."
+    },
+    {
+      "host": "Bridges actual RM-shared CPU361rm",
+      "launcher": "cpu-validate-existing-G3.py",
+      "purpose": "Validate exact existing G3 bytes with owning _load_context, a1.read_artifact and _validate_live, geometry and tokenizer; no second freeze and no source/group rewriting.",
+      "resource_proposal": {
+        "CPUs": 5,
+        "memory": "8G",
+        "time_minutes": 15
+      },
+      "root_bindings_required": [
+        "actual Bridges CPU allocation+scontrol/SIF receipt path+SHA",
+        "exact Delta G3 path+SHA",
+        "fresh separate writable validation evidence path",
+        "read-only G3 and accepted source mounts",
+        "fresh actual Delta current-protection/own-entry preflight+transferred snapshots before validation"
+      ]
+    }
+  ],
+  "contract_findings": [
+    "freeze publishes groups.json via publish_artifact, no run_manifest or CPUhost binding",
+    "G3 binds absolute source/input refs, actual runtime hashes, A1/scientific domains, protected registries and accepted semantic grader binding; preserved paths/source/currentcatalogues required",
+    "model_geometry binds actual resolved/work cache config path+hash, requiring real work mount onBridges",
+    "read_stage requires completed bank/score manifest, so do not call it on freeze or fabricate marker; retain owning read_stage for future real completed stages",
+    "bank_contract/numeric_environment and actual GPU identity remain unchanged; CPU hostsplit grants no bank or score admission"
+  ],
+  "preserved_model_boundary_plan": "160-crosscluster-live-protection-lease-plan.json",
+  "no_source_edits": true,
+  "no_models": true,
+  "no_GPU_reservation": true,
+  "freeze_run_observed": false,
+  "files_sha256": {
+    "cpu-freeze-G3-delta.py": "d0f1a10e0139c50f8d9984b336b5b6248e8e1b1b816b587ed1f163849e8e5eb2",
+    "cpu-validate-existing-G3.py": "04fdef93545c9538514fca08a97af0e3a8ac3d868792cdbbce127fe46004e567",
+    "cpu-freeze-G3-delta.parameters.template.json": "647dbc7c414b163bbd009ff5539cf6f217e964de318f5f5ff32ae90175707569",
+    "cpu-validate-existing-G3.parameters.template.json": "3f35a0e7465b31729cdc2e9fe9920ea15154347571cf84708f93c6bb527e678e"
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "status": "handed-back",
+  "progress_glyph_count": 121,
+  "failures_likely_mapped_by_original_collection": [
+    {
+      "position": 85,
+      "nodeid": "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[target-100-True]",
+      "glyph": "F",
+      "accepted": false
+    },
+    {
+      "position": 86,
+      "nodeid": "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[target-99-False]",
+      "glyph": "F",
+      "accepted": false
+    },
+    {
+      "position": 87,
+      "nodeid": "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[preparation-100-True]",
+      "glyph": "F",
+      "accepted": false
+    },
+    {
+      "position": 88,
+      "nodeid": "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[preparation-99-False]",
+      "glyph": "F",
+      "accepted": false
+    },
+    {
+      "position": 117,
+      "nodeid": "test_a3_prepared_pilot_target.py::test_prepared_final_barrier_after_all_costly_work[target-payload-restored-mtime-final-live-guard]",
+      "glyph": "F",
+      "accepted": false
+    },
+    {
+      "position": 120,
+      "nodeid": "test_a3_prepared_pilot_target.py::test_prepared_final_barrier_after_all_costly_work[descriptor-marker-final-live-guard]",
+      "glyph": "F",
+      "accepted": false
+    }
+  ],
+  "next_expected_node": {
+    "position": 122,
+    "nodeid": "test_a3_prepared_pilot_target.py::test_prepared_final_barrier_after_all_costly_work[identical-target-tree-before-publication]",
+    "active_at_timeout_not_proven": true
+  },
+  "prior_121_other_glyphs_are_not_accepted_results": true,
+  "collection_count": 223,
+  "original_suite_order_evidence": "pytest_collection_finish stores session.items and checks all223 function counts; autoload disabled and no xdist/reordering options",
+  "pure_frozen_attack_probe": [
+    {
+      "reference": "target",
+      "error_type": "TypeError",
+      "message": "validated inventory is immutable",
+      "deepcopy_preserved_identity": true
+    },
+    {
+      "reference": "preparation",
+      "error_type": "TypeError",
+      "message": "validated inventory is immutable",
+      "deepcopy_preserved_identity": true
+    }
+  ],
+  "final_barrier_call_names": [
+    "require",
+    "self.assert_scope",
+    "time.perf_counter",
+    "self._cheap_identity",
+    "_check_file_witness",
+    "require",
+    "live_guard",
+    "self._set_deadline",
+    "reconciliation.check_deadline",
+    "self._cheap_identity",
+    "require",
+    "getattr",
+    "time.time",
+    "time.time",
+    "time.perf_counter",
+    "time.perf_counter"
+  ],
+  "source_hypotheses": [
+    "Four presumed identity attack failures occur before validator because deepcopy preserves immutable reference objects; TypeError outside expected ValueError context",
+    "Two presumed final-live-guard seam failures: test patches passed guard closure, but barrier invokes module live_guard directly, so mutation never fires",
+    "Timeout may represent next expected test122 setup/call or prior121 teardown; glyph-only log cannot establish actual blocked phase; accumulated fixture/hash/I/O work may consume full2700s even without a stuck test"
+  ],
+  "no_native_or_full_tests_run": true
+}

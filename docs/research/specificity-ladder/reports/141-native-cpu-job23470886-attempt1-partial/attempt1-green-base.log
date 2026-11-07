@@ -1,0 +1,26 @@
+.F..........                                                             [100%]
+=================================== FAILURES ===================================
+______________ test_complete_parent_accepts_only_exact_case_scope ______________
+
+lineage = (PosixPath('/tmp/pytest-of-swong2/pytest-2667/test_complete_parent_accepts_o0/work'), PosixPath('/tmp/pytest-of-swong2...mplete_parent_accepts_o0/work/scenario/diagnostics/parent', ...}, '23470779|COMPLETED|0:0\n23470779.0|COMPLETED|0:0\n')
+
+    def test_complete_parent_accepts_only_exact_case_scope(lineage):
+>    w,r,e,a=lineage;result=gate.check_parent(w,r,e,a,current_references(r,e));assert result['authenticated_parent_case_ids']==e['case_ids'][32:49];assert result['new_model_forwards']==0
+
+.superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu49-62-proposal/test_parent_gate.py:31: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu49-62-proposal/parent_gate.py:36: in check_parent
+    _require(parent == scenario / 'diagnostics' / ('cpu-next-cases32-48-job' + job),
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, message = 'parent scenario path mismatch'
+
+    def _require(condition, message):
+        if not condition:
+>           raise ValueError(message)
+E           ValueError: parent scenario path mismatch
+
+.superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu49-62-proposal/parent_gate.py:11: ValueError
+=========================== short test summary info ============================
+FAILED .superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu49-62-proposal/test_parent_gate.py::test_complete_parent_accepts_only_exact_case_scope
+1 failed, 11 passed in 0.48s

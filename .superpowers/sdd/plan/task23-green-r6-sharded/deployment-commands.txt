@@ -1,0 +1,19 @@
+UNBOUND COMMAND PROPOSALS ONLY. Root fills every angle-bracket field after independent source and deployment review. No command has been submitted. Each job is held and released once only by root. No automatic retry. These source commands describe the final host invocation. Actual held submission must use the reviewed deployment261 immutable bootstrap, which reads a fixed root-owned config.sha256, validates its 64-hex shape, and invokes this interface. Bind actual job/config after held submission, compare the spool, independently review deployment, then release once. Never predict a job ID or config hash.
+
+base shard0 on delta:
+sbatch --hold --time=01:20:00 --nodes=1 --ntasks=1 --cpus-per-task=2 --mem=32G --no-requeue --account='<ROOT_ACCOUNT>' --partition='<ROOT_PARTITION>' --qos='<ROOT_QOS>' --export=ALL,A3_HOST_PYTHON='<ROOT_HOST_PYTHON>' --output='<ROOT_JOB_LOG>' '<ROOT_REVIEWED_HELD_BOOTSTRAP_BASE_SHARD0>'
+
+base shard1 on delta:
+sbatch --hold --time=01:20:00 --nodes=1 --ntasks=1 --cpus-per-task=2 --mem=32G --no-requeue --account='<ROOT_ACCOUNT>' --partition='<ROOT_PARTITION>' --qos='<ROOT_QOS>' --export=ALL,A3_HOST_PYTHON='<ROOT_HOST_PYTHON>' --output='<ROOT_JOB_LOG>' '<ROOT_REVIEWED_HELD_BOOTSTRAP_BASE_SHARD1>'
+
+mgnp shard0 on bridges2:
+sbatch --hold --time=01:20:00 --nodes=1 --ntasks=1 --cpus-per-task=18 --mem=32G --no-requeue --account='<ROOT_ACCOUNT>' --partition='<ROOT_PARTITION>' --qos='<ROOT_QOS>' --export=ALL,A3_HOST_PYTHON='<ROOT_HOST_PYTHON>' --output='<ROOT_JOB_LOG>' '<ROOT_REVIEWED_HELD_BOOTSTRAP_MGNP_SHARD0>'
+
+mgnp shard1 on bridges2:
+sbatch --hold --time=01:20:00 --nodes=1 --ntasks=1 --cpus-per-task=18 --mem=32G --no-requeue --account='<ROOT_ACCOUNT>' --partition='<ROOT_PARTITION>' --qos='<ROOT_QOS>' --export=ALL,A3_HOST_PYTHON='<ROOT_HOST_PYTHON>' --output='<ROOT_JOB_LOG>' '<ROOT_REVIEWED_HELD_BOOTSTRAP_MGNP_SHARD1>'
+
+Native commands are exact run_packet --environment {} --shard {} --stage baseline|oracle|suite --output <ROOT_BOUND_PRIVATE_OUTPUT>, launched solely by the reviewed host guard. Root independently authenticates expected-bindings.template.json from actual scheduler/config/output/accounting evidence; never populate it from child claims. Fetch only explicit terminal artifacts with hashes; no tmp or generated fixture trees.
+
+The independently reviewed immutable bootstrap invokes exactly:
+bash '<ROOT_PACKET_PHYSICAL_OR_DELTA_PATH>/cpu.sbatch' '<ROOT_ABSOLUTE_ACTUAL_CONFIG>' '<ROOT_ACTUAL_CONFIG_SHA256>' '88c7308b5b058c4c66a736077defdecfb0d47b197603152dfb1892f49edcc1ea'
+The bootstrap/control file is root-owned Task2 deployment evidence. This packet does not create or authorize it. NULL actual controls are rejected by the host launcher.

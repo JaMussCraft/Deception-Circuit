@@ -1,0 +1,34 @@
+{
+  "verdict": "HOLD_INCOMPLETE_REVIEW_NO_ACCEPTANCE",
+  "packet_manifest_sha256": "0329fde965ddcc6d35c93f8da33187dbb44f25c17d00fbf97e6a024e26de5a85",
+  "host_supervisor_sha256": "877d85af789d38736b30f3b64bdde506af44c925bd66f74835647b102412330d",
+  "pins_independently_rehashed": false,
+  "implementation_edits": false,
+  "tests_executed": false,
+  "remote_actions": false,
+  "reason": "Root checkpoint2 HOLD arrived before substantive review completion.",
+  "inspected": [
+    "Alignment AGENTS/.claude/CLAUDE and relevant memory",
+    "primary RESUME",
+    "adapter README/verification/manifest",
+    "host_supervisor.py",
+    "entry_guard.py",
+    "guards.py",
+    "inner.sh",
+    "launch.sh",
+    "bindings.template.json",
+    "accepted197-r2 verdict",
+    "accepted200-r3 handback"
+  ],
+  "remaining": [
+    "independent member hash verification and predecessor identity comparison",
+    "cgroup_probe and frozen proof_guards/worker path semantics",
+    "transfer-closure/input-pins completeness and fixed shared input closure",
+    "binding evidence provenance linkage and malformed/failing cases",
+    "Python3.6 compatibility verification and bounded independent tiny host checks",
+    "final scoped verdict after actual review completion"
+  ],
+  "execution_authorized": false,
+  "actual_r3_diagnostic_success_required": true,
+  "root_transfer_closure_required": true
+}

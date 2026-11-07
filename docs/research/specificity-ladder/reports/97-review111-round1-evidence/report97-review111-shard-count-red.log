@@ -1,0 +1,24 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_runtime_shard_evidence_counts_its_final_live_guard ____________
+
+tmp_path = PosixPath('/tmp/review111-shard-count-red/test_runtime_shard_evidence_co0')
+fake = [(tensor([[1, 2, 4, 0],
+        [1, 2, 3, 0]]), None), (tensor([[2, 3, 6, 0],
+        [2, 3, 5, 0]]), None), (tensor([...12.],
+         [ 0.,  0.]]]), positions=tensor([[False, False,  True, False]]))}), (tensor([[1, 2, 3, 0]]), None), ...]
+
+    def test_runtime_shard_evidence_counts_its_final_live_guard(tmp_path,fake):
+        r,d,p=_fake_pilot_inputs(1);inv=r.workload.build_inventory(d,p,stage='fit-select')
+        shard=copy.deepcopy(inv['shards'][0]);axes,shard['cells']=r._pilot_axes(object(),shard['cells'],None)
+        index=r._PackingCandidateIndex([]);live=[];guard=r._DependencyGuard(lambda:live.append(1),index)
+        rows,evidence,_=r.score_runtime_shard(object(),d,p,shard,axes=axes,output=tmp_path/'shard',guard=guard,measured_index=index)
+        assert len(rows)==len(shard['expected_keys'])
+>       assert evidence['dependency_guard_calls']==len(live)==guard.calls
+E       assert 5 == 6
+E        +  where 6 = len([1, 1, 1, 1, 1, 1])
+
+tests/test_a3_direction_runtime.py:1541: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_a3_direction_runtime.py::test_runtime_shard_evidence_counts_its_final_live_guard
+1 failed in 3.69s

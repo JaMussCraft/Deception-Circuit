@@ -1,0 +1,84 @@
+--- caae/component_analysis/a3_source_validation.py
++++ round2/component_analysis/a3_source_validation.py
+@@ -232,13 +232,27 @@
+     before={name:_outer(v) for name,v in originals.items()}
+     owned={name:freeze(v) for name,v in originals.items()}
+     roots=[]
++    for kind,path in artifacts.values():
++        require(kind in ('artifact','object'),'unknown source envelope')
++        roots.append(Path(path).absolute())
++    # Bind the ACTUAL envelopes before comparing their payloads to the owned
++    # views. Dependency discovery must not be able to replace and rebaseline them.
++    artifact_witness=authority._make_file_witness(sorted(set(map(str,roots))))
++    artifact_paths=tuple(sorted(set(artifact_witness.paths)|{row[1] for tree in artifact_witness.identities for row in tree}))
++    artifact_links=_links_many(artifact_paths)
+     for name,(kind,path) in artifacts.items():
+-        require(kind in ('artifact','object'),'unknown source envelope')
+         actual=ladder.read_artifact(path) if kind=='artifact' else authority.read_object(path)
+         require(actual==owned[name],'source object differs from actual artifact')
+-        roots.append(Path(path).absolute())
+     if precheck is not None:precheck(owned)
+     paths,missing,glob=dependencies(owned);roots.extend(Path(p).absolute() for p in paths)
++    authority._check_file_witness(artifact_witness)
++    require(_links_many(artifact_paths)==artifact_links,'source envelope provenance changed during discovery')
++    # grader_registry hashes every actual grader file. Bind the same complete
++    # lexical/glob closure as static source, not only its content-hash decision.
++    from evaluation.grader_hash import grader_files,GRADER_GLOBS
++    grader_root=Path(ladder.REPO).absolute()
++    roots.extend(grader_root/name for name in grader_files(root=str(grader_root)))
++    glob=list(glob)+[(grader_root,pattern) for pattern in GRADER_GLOBS]
+     witness=authority._make_file_witness(sorted(set(map(str,roots))))
+     static_paths=tuple(sorted(set(witness.paths)|{row[1] for tree in witness.identities for row in tree}))
+     static_links=_links_many(static_paths)
+@@ -250,6 +264,8 @@
+     base,extra=semantic(owned)
+     protection=_Protection(access_contexts(owned['design'],extra),registry_paths)
+     registries,graders=protection.refresh(registry_paths)
++    authority._check_file_witness(artifact_witness)
++    require(_links_many(artifact_paths)==artifact_links,'source envelope provenance changed during initialization')
+     authority._check_file_witness(witness)
+     require(_links_many(static_paths)==static_links,'immutable source path provenance changed during initialization')
+     for path,links in absent:
+@@ -267,7 +283,7 @@
+         _initialization=None,_stats=dict(refreshes=0,refresh_seconds=0.))
+     # Discard parse/validation-only payloads and callbacks before sampling the
+     # returned-state RSS; the retained context owns only its sealed source graph.
+-    del actual,base,extra,static_base,owned,semantic,dependencies,precheck
++    del actual,base,extra,static_base,owned,semantic,dependencies,precheck,artifact_witness,artifact_paths,artifact_links
+     # Finalize measured facts after construction and transient payload release.
+     peak=_peak_bytes();rss_after=_rss_bytes()
+     facts=dict(roots=len(witness.paths),verified_bytes=sum(row[2][3] for tree in witness.identities for row in tree if row[0]=='file'),
+--- caae/tests/test_a3_source_validation.py
++++ round2/tests/test_a3_source_validation.py
+@@ -335,7 +335,7 @@
+     c=setup_case(tmp_path,monkeypatch);state=c.build()
+     path=c.runtime/('evaluation/benchmark_eval.py' if damage=='code' else 'evaluation/benchmarks/new_grader.py')
+     with path.open('a') as handle:handle.write('\n# changed grader\n')
+-    with pytest.raises(ValueError,match='grader'):refresh(c,state)
++    with pytest.raises(ValueError,match='grader|immutable referenced|source closure'):refresh(c,state)
+ 
+ 
+ def test_charged_initialization_includes_context_construction(tmp_path,monkeypatch):
+@@ -366,3 +366,22 @@
+         dependencies=lambda owned:([leaf],[],[]),semantic=lambda owned:({},{}),registry_paths=[],scope={'commit':'a'*40})
+     middle.unlink();middle.symlink_to(target)
+     with pytest.raises(ValueError):refresh(c,state)
++
++
++def test_review_b1_dependency_discovery_cannot_rebind_a_validated_envelope(tmp_path,monkeypatch):
++    c=setup_case(tmp_path,monkeypatch)
++    from component_analysis import a3_direction_artifacts as artifacts
++    def replace_envelope(owned):
++        changed=copy.deepcopy(c.prepared);changed['empty']=['not the retained source']
++        (c.prepared_path/'payload.json').write_text(json.dumps(changed))
++        (c.prepared_path/'COMPLETE.json').unlink();artifacts._finish(c.prepared_path)
++        return [c.static],[],[]
++    with pytest.raises(ValueError):
++        c.s.build_state(owner='fixture',originals={'design':c.design,'prepared':c.prepared},artifacts={'design':('artifact',c.design_path),'prepared':('object',c.prepared_path)},
++            dependencies=replace_envelope,semantic=lambda owned:({},{}),registry_paths=[],scope={'commit':'a'*40})
++
++
++def test_review_b2_actual_grader_same_byte_external_link_is_not_a_cache_hit(tmp_path,monkeypatch):
++    c=setup_case(tmp_path,monkeypatch);state=c.build()
++    grader=c.runtime/'evaluation/benchmark_eval.py';outside=tmp_path/'outside-grader.py';outside.write_bytes(grader.read_bytes());grader.unlink();grader.symlink_to(outside)
++    with pytest.raises(ValueError):refresh(c,state)

@@ -1,0 +1,50 @@
+{
+  "findings": [
+    {
+      "evidence": "RW bind target is output.parent; host-before and previous command/terminal files are created in that same directory. Unlike accepted diagnostic254-r3, host evidence is inside writable container subtree.",
+      "file": "bridges/host.py",
+      "id": "B1",
+      "limit": "No forged complete aggregate was attempted or demonstrated; host in-memory stage hashes and terminal accounting still add checks.",
+      "line": 93,
+      "minimum_correction": "Restore a separate child-writable subtree with host-owned receipts outside it; adapt fresh output/inner receipt placement mechanically. Add positive child-output write and negative host/prior-receipt write checks.",
+      "priority": "high",
+      "title": "Whole job root becomes child-writable"
+    },
+    {
+      "evidence": "Host command deadline90 before slow command/log I/O; supervisor at100 creates fresh deadline190 and accepts oracle normal after original90. Separately, final query can advance clock past existing bound90 and Popen still fires before later rejection. Both pure reproductions pass in both interpreters.",
+      "file": "supervisor.py",
+      "id": "B2",
+      "line": 59,
+      "minimum_correction": "Carry initial stage wall and monotonic bounds through all preparation and final allocation checks; shrink only and refuse Popen when either expired. Preserve raw failure evidence and shared cleanup without renewing grace.",
+      "priority": "high",
+      "related": "bridges/host.py:131-136;supervisor.py:68-71",
+      "title": "Stage deadline renews after preparation and expired final checks still spawn"
+    },
+    {
+      "evidence": "Frozen repaired_families names understated-observed-resources instead of correction265 receiver-resource-identity-and-capacity. Repaired resource family first appears at execution indices48/46. Complete223 parity coverage remains unchanged.",
+      "file": "partition.json",
+      "id": "B3",
+      "line": 5,
+      "minimum_correction": "Set exact two correction265 family literals, recompute deterministic execution order and dependent pins, and independently assert those literals rather than only sorting against the same partition data.",
+      "priority": "medium",
+      "title": "Wrong repaired resource family is promoted"
+    }
+  ],
+  "not_a_finding": "Inner receipts already use distinct inner-mounts-<stage>.json; three mocked sequential stages succeed, no filename collision.",
+  "partition_sha256": "0fdb618b919c0622f13cb3bb4af29ffad32df42ee6bfe92dc531a1d73b02a72a",
+  "positive_checks": [
+    "full historical223 collection and112/111 parity partition, original order within priority categories",
+    "corrected fixturee2a7 preserved; original baseline_red,fixture_preflight,conftest,closure andexistingregression bytes identical",
+    "exact event/JUnit identity andsetup/call/teardown outcomes; full collection retained by selector",
+    "trusted root expected_bindings separate from children, exact source/runtime/fixture/partition and distinctjob/output checks,normalhost/stage/accounting required",
+    "exact interpreter path/provenance capture, original baseline fivefailures andoracle/preflight controls",
+    "ownjob/allocationCPU/RAM/noGPU/requeue checks, source/aliases,cleanup shared20s andlate/nonzero outcomes failclosed",
+    "templates actualfields remainNULL; real-root-bootstrap interface verified separately by root271"
+  ],
+  "quality_verdict": "CHANGES_REQUIRED: three narrow transport/data corrections; coverage/aggregation structure otherwise suitable; no architecture redesign",
+  "remaining_actual_gates": "Corrected frozen successor independent scoped review, actual host/container/binding/spool/resource checks, four CPU attempts and complete source-bound outcomes each interpreter. No model/GPU/scientific authority.",
+  "source_pins_sha256": "25c817e97f7ae276ac49a6f5194c3741885c830df6863e8f2dc0c11be3a1b77f",
+  "spec_verdict": "CHANGES_REQUIRED: retained host evidence boundary, nonrenewing launch deadlines and exact repaired-family ordering",
+  "verdict": "CHANGES_REQUIRED_NO_DEPLOYMENT_ACCEPTANCE",
+  "verification": "Four focused pure cases each Python3.9/3.12; raw attributed32RED/34GREEN eachenv inspected,not rerun; root271 pin/AST/sourcebound observer/bootstrap checks reused. No native/fullsuite/remote/scheduler actions."
+}

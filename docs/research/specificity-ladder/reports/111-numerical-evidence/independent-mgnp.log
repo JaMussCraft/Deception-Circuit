@@ -1,0 +1,18 @@
+....................F........                                            [100%]
+=================================== FAILURES ===================================
+________ test_index_matches_full_validator_axis_rejection[axis_sha256] _________
+
+proof_case = ({'profile': {'source_task': 'far_v2', 'padded_width': 4, 'physical_batch_size': 4, 'axis_tile_size': 2, ...}, 'operat...dation', 'streams': {...}}, ...}]}}, <component_analysis.a3_direction_workload._PackingProof object at 0x7fd40f337ca0>)
+field = 'axis_sha256'
+
+    @pytest.mark.parametrize('field',['site','seed','family','axis_index','operation','axis_sha256'])
+    def test_index_matches_full_validator_axis_rejection(proof_case,field):
+        m,evidence,proof=proof_case;changed=copy.deepcopy(m);a=changed['axis_scope'][0]
+>       old=a[field];a[field]=['head',999,999] if field=='site' else (old+1 if type(old) is int else old+'-changed')
+            ^^^^^^^^
+E       KeyError: 'axis_sha256'
+
+docs/research/specificity-ladder/reports/111-numerical-evidence/test_independent_numerical.py:40: KeyError
+=========================== short test summary info ============================
+FAILED docs/research/specificity-ladder/reports/111-numerical-evidence/test_independent_numerical.py::test_index_matches_full_validator_axis_rejection[axis_sha256]
+1 failed, 28 passed in 6.10s

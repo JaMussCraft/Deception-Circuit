@@ -1,0 +1,42 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_____ test_context_mint_reconstructs_uninitialized_frozen_instances[dict] ______
+
+tmp_path = PosixPath('/tmp/pytest-of-swong2/pytest-2587/test_context_mint_reconstructs0')
+container_kind = 'dict'
+
+    @pytest.mark.parametrize('container_kind',['dict','list'])
+    def test_context_mint_reconstructs_uninitialized_frozen_instances(tmp_path,container_kind):
+        r=runtime();cls=r._FrozenJSONDict if container_kind=='dict' else r._FrozenJSONList
+        unsealed=cls.__new__(cls)
+        key=unsealed if container_kind=='dict' else {'ids':unsealed}
+        inv=dict(identity={'injected':True,'commit':'a'*40},inventory_sha256='c'*64,phase='M2',expected_keys=[key],finish_reserve_seconds=10)
+        r,ledger,inv,path,_,_=_authority_case(tmp_path,inventory=inv);original=json.loads(json.dumps(inv))
+        context=r.make_authority_context(path,ledger=ledger,inventory=inv,work_dir='/output',injected=True,inventory_validator=lambda _:None)
+        consumed=inv['expected_keys'][0] if container_kind=='dict' else inv['expected_keys'][0]['ids']
+>       assert consumed is not unsealed and consumed._initialized is True
+E       assert ({} is not {})
+
+tests/test_a3_direction_runtime.py:1212: AssertionError
+_____ test_context_mint_reconstructs_uninitialized_frozen_instances[list] ______
+
+tmp_path = PosixPath('/tmp/pytest-of-swong2/pytest-2587/test_context_mint_reconstructs1')
+container_kind = 'list'
+
+    @pytest.mark.parametrize('container_kind',['dict','list'])
+    def test_context_mint_reconstructs_uninitialized_frozen_instances(tmp_path,container_kind):
+        r=runtime();cls=r._FrozenJSONDict if container_kind=='dict' else r._FrozenJSONList
+        unsealed=cls.__new__(cls)
+        key=unsealed if container_kind=='dict' else {'ids':unsealed}
+        inv=dict(identity={'injected':True,'commit':'a'*40},inventory_sha256='c'*64,phase='M2',expected_keys=[key],finish_reserve_seconds=10)
+        r,ledger,inv,path,_,_=_authority_case(tmp_path,inventory=inv);original=json.loads(json.dumps(inv))
+        context=r.make_authority_context(path,ledger=ledger,inventory=inv,work_dir='/output',injected=True,inventory_validator=lambda _:None)
+        consumed=inv['expected_keys'][0] if container_kind=='dict' else inv['expected_keys'][0]['ids']
+>       assert consumed is not unsealed and consumed._initialized is True
+E       assert ([] is not [])
+
+tests/test_a3_direction_runtime.py:1212: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_a3_direction_runtime.py::test_context_mint_reconstructs_uninitialized_frozen_instances[dict]
+FAILED tests/test_a3_direction_runtime.py::test_context_mint_reconstructs_uninitialized_frozen_instances[list]
+2 failed, 112 deselected in 3.04s

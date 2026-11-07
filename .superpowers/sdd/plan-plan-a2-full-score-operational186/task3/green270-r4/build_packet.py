@@ -1,0 +1,1 @@
+"""Frozen fixture-only successor. Constructed by /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task3-correction286/prepare_r4.py. Do not regenerate in place."""

@@ -1,0 +1,22 @@
+test_child_and_host_receipts_are_both_preserved (test_receipt_collision.Receipts) ... ERROR
+
+======================================================================
+ERROR: test_child_and_host_receipts_are_both_preserved (test_receipt_collision.Receipts)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r5/test_receipt_collision.py", line 26, in test_child_and_host_receipts_are_both_preserved
+    eval(receipt_call('host_supervisor.py','host'),{'write':host.write,'out':out,'source_before_activation':lambda:host_value})
+  File "host_supervisor.py", line 130, in <module>
+    write(out/'source-after.json',source_before_activation());final_cgroup=observe_cgroup();write(out/'host-cgroup-after.json',final_cgroup);select_cgroup(final_cgroup,first['job']);last=allocation();assert min(first['end_epoch'],last['end_epoch'])-time.time()>=30,'late final CPU publication'
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r5/host_supervisor.py", line 35, in write
+    with Path(p).open('x') as f:json.dump(obj,f,indent=2,allow_nan=False);f.write('\n')
+  File "/sw/external/python/anaconda3/lib/python3.9/pathlib.py", line 1252, in open
+    return io.open(self, mode, buffering, encoding, errors, newline,
+  File "/sw/external/python/anaconda3/lib/python3.9/pathlib.py", line 1120, in _opener
+    return self._accessor.open(self, flags, mode)
+FileExistsError: [Errno 17] File exists: '/tmp/tmpvh1cc43l/source-after.json'
+
+----------------------------------------------------------------------
+Ran 1 test in 0.024s
+
+FAILED (errors=1)

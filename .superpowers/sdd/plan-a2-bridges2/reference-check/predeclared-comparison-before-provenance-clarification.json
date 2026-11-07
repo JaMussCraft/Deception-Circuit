@@ -1,0 +1,138 @@
+{
+  "status": "predeclared before H100 result; diagnostic/review plan, not job authorization",
+  "scope": {
+    "task": "sdr_v2",
+    "arms": [
+      "D",
+      "I"
+    ],
+    "seed": 42,
+    "actual_epochs": 20,
+    "planned_full_epochs": 500,
+    "counts": {
+      "train": 187,
+      "validation": 187,
+      "test": 952
+    },
+    "full_SDR_suite_cells": 6,
+    "all_full_suite_GPU_type": "H10080",
+    "legacy_H200_runs_preserved": true
+  },
+  "identity_gates": [
+    "Exact archived6bd source and original4321ef82 outer configuration, model revision/tokenizer snapshot, frozen build/cohorts and within-arm ordered IDs",
+    "Saved native config.json matches within-arm H200 config; only explicit new output destination and host/job/time provenance may differ",
+    "Exact20 epoch indices and LR schedule, val eval epochs0/10/20, all expected rows/fields/unique IDs, no filtering or duplicate rows",
+    "Original native artifact hash/manifest validation; finite numeric values; aggregate accuracy and mean margin reconcile to rows; mask counts reconcile to binary arrays"
+  ],
+  "pretraining_comparisons": [
+    {
+      "path": "results.baseline.outputs",
+      "cohort": "test",
+      "rows": 952
+    },
+    {
+      "path": "history.node.evals[epoch=0].outputs",
+      "cohort": "validation",
+      "rows": 187
+    }
+  ],
+  "row_join_key": [
+    "task",
+    "condition",
+    "instance_id"
+  ],
+  "exact_row_metadata": [
+    "entity",
+    "item_pair",
+    "desig",
+    "designation_polarity",
+    "item_polarity",
+    "pressure_id",
+    "template_variant",
+    "target",
+    "distractor"
+  ],
+  "paired_numeric_fields": [
+    "logit_target",
+    "logit_distractor",
+    "logit_difference"
+  ],
+  "paired_statistics": [
+    "signed mean delta",
+    "mean absolute delta",
+    "RMS delta",
+    "absolute delta quantiles",
+    "maximum absolute delta"
+  ],
+  "absolute_delta_percentiles": [
+    50,
+    95,
+    99
+  ],
+  "decision_comparisons": [
+    "decoded chosen_word equality (not raw token-ID equality)",
+    "strict target>distractor sign/decision changes and ties; preserve all rows and identify every changed ID"
+  ],
+  "pretraining_decision_rule": {
+    "exact_no_drift": "Identity/integrity gates pass and all stored pretraining numeric values and decoded choices exactly match",
+    "observed_drift": "Any nonzero paired pretraining numerical delta or decision change is reported in full and held for independent drift review before the six-cell fleet",
+    "no_unmeasured_tolerance": "No empirical cross-hardware noise band is inferred from a single H200 run; no post-hoc widening of same-path tolerances",
+    "invalid": "Missing/changed identity, nonfinite, incomplete/mismatched rows or failed reconciliation stops comparability assessment"
+  },
+  "training_pipeline_diagnostics": {
+    "trajectories": [
+      "loss",
+      "kl",
+      "task",
+      "sparsity",
+      "lr"
+    ],
+    "epochs": 20,
+    "trained_validation_epochs": [
+      10,
+      20
+    ],
+    "final_test": "results.node_eval",
+    "binary_mask_statistics": [
+      "exact equality",
+      "head and MLP counts",
+      "Hamming difference per site type/layer",
+      "intersection/union/Jaccard"
+    ],
+    "interpretation": "Independent H200/H100 training may produce different gate masks; endpoint changes combine optimizer/trajectory and hardware effects and are not a fixed-mask forward drift test",
+    "efficacy_selection": false,
+    "hyperparameter_or_seed_retuning": false
+  },
+  "unchanged_same_path_tolerances": {
+    "source": "evaluation/sanity.py",
+    "CROSS_CHECK_TOLERANCES": {
+      "accuracy": 1e-06,
+      "exact_match": 1e-06,
+      "logit_diff": 0.0001,
+      "kl_div": 0.0001
+    },
+    "REPRODUCTION_TOLERANCES": {
+      "accuracy": 0.002,
+      "exact_match": 0.002,
+      "logit_diff": 0.01,
+      "kl_div": 0.005
+    },
+    "ALL_OPEN_TOLERANCES": {
+      "kl_div": 0.0001,
+      "exact_match_min": 0.999
+    },
+    "scope": "Existing same-path/same-circuit guards remain unchanged; these are not thresholds for different retrained masks or invented full-vocabulary legacy evidence"
+  },
+  "schedule_caveat": "Timing20 has genuine CosineAnnealingLR T_max20, not first20 epochs of T_max500",
+  "unavailable_claims": [
+    "No full-vocabulary logit/probability equivalence or cross-device KL can be reconstructed",
+    "No raw argmax token-ID agreement, paired per-row KL or tokenized batch equality from legacy results alone",
+    "No trained fixed-H200-mask H100 forward is supplied by the proposed retraining repeat"
+  ],
+  "minimal_route": "Existing saved rows suffice for paired baseline/pre-update drift check and end-to-end timing20 repeat. No fresh Delta GPU reference is required. If a later fixed-pruned-mask question needs isolation, the saved H200 binary masks and per-row node_eval references already allow a separately scoped H100 replay without a new Delta reference.",
+  "timing_comparisons": [
+    "Compare total_seconds, rounded console pruning_seconds, peak_memory_gb separately; neither speed nor fidelity selects seeds/arms",
+    "Use new observed H100 process and scheduler resource measurements for scheduling, not a promise derived from H200 elapsed time"
+  ],
+  "observed_H100_results_available": false
+}

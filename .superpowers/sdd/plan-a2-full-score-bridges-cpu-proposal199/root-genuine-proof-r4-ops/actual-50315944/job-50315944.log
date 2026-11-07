@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r4/host_supervisor.py", line 135, in <module>
+    if __name__=='__main__':main()
+  File "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r4/host_supervisor.py", line 130, in main
+    write(out/'source-after.json',source_before_activation());final_cgroup=observe_cgroup();write(out/'host-cgroup-after.json',final_cgroup);select_cgroup(final_cgroup,first['job']);last=allocation();assert min(first['end_epoch'],last['end_epoch'])-time.time()>=30,'late final CPU publication'
+  File "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r4/host_supervisor.py", line 35, in write
+    with Path(p).open('x') as f:json.dump(obj,f,indent=2,allow_nan=False);f.write('\n')
+  File "/usr/lib64/python3.6/pathlib.py", line 1183, in open
+    opener=self._opener)
+  File "/usr/lib64/python3.6/pathlib.py", line 1037, in _opener
+    return self._accessor.open(self, flags, mode)
+  File "/usr/lib64/python3.6/pathlib.py", line 387, in wrapped
+    return strfunc(str(pathobj), *args)
+FileExistsError: [Errno 17] File exists: '/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-genuine-proof-r2/job-50315944/execution/source-after.json'

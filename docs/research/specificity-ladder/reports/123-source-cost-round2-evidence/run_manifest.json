@@ -1,0 +1,116 @@
+{
+  "kind": "source_guard_cost_round2_software_handoff_v1",
+  "status": "handed-back",
+  "candidate_root": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-guard-cost-fix-source-r2",
+  "baseline_commit": "caae47195503460c1df63670d23448c49b316a67",
+  "commit": "caae47195503460c1df63670d23448c49b316a67",
+  "commit_scope": "Baseline only; C5 is an uncommitted correction identified by file hashes.",
+  "source_freeze_manifest": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/123-source-cost-round2-evidence/source-freeze-manifest.json",
+  "source_freeze_manifest_sha256": "95ed2ddf54b8ab8f55e3310c466f3efc42b55b598b38a58d54f3edf05832407e",
+  "source_file_count": 511,
+  "changed_files": [
+    "component_analysis/a3_source_validation.py",
+    "tests/test_a3_source_validation.py"
+  ],
+  "final_tests": {
+    "handoff-r2-mgnp": {
+      "source_sha256": {
+        "component_analysis/a3_source_validation.py": "c840a3e0409b6142f1d0b16461718174824820ba65912fe120865246f46da081",
+        "component_analysis/a3_mask_pipeline.py": "98c6b4addef010944aabc547b939585679072fbe931feb64b2b4548d9de9172a",
+        "component_analysis/a3_edge_pipeline.py": "f8212df3f2b3a70b10e884164cc1e0b1781622553c2d95b77413a3fbb7cb20ce",
+        "tests/test_a3_source_validation.py": "d12508db917c117aec29a6b0bff71d101b53f5fcec43e3df33f4ab8df237184f",
+        "tests/test_a3_mask_pipeline.py": "26210c570aae88edbaf4979e859e9071b6bb76e6949b71f5f395911b1fd08e34",
+        "tests/test_a3_edge_pipeline.py": "60f4b49e734b786b3b5942e8e6ccac4173119c9580db8d9319931f1d66118f9f"
+      },
+      "source_unchanged": true,
+      "command": [
+        "/u/swong2/.conda/envs/mgnp/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=/tmp/source-cost-123-handoff-r2-mgnp",
+        "tests/test_a3_source_validation.py",
+        "tests/test_a3_mask_pipeline.py",
+        "tests/test_a3_edge_pipeline.py",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/121-source-cost-review-evidence/test_independent_source_boundaries.py"
+      ],
+      "cwd": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-guard-cost-fix-source-r2",
+      "start_utc": "2026-11-02T21:20:21.998901+00:00",
+      "elapsed_seconds": 182.24328017234802,
+      "exit_code": 0,
+      "environment": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1",
+        "HF_HUB_OFFLINE": "1",
+        "TRANSFORMERS_OFFLINE": "1",
+        "A3_A1_SCHEMA_TEST_DESIGN": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/design.json"
+      },
+      "log": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/123-source-cost-round2-evidence/handoff-r2-mgnp.log"
+    },
+    "handoff-r2-base": {
+      "source_sha256": {
+        "component_analysis/a3_source_validation.py": "c840a3e0409b6142f1d0b16461718174824820ba65912fe120865246f46da081",
+        "component_analysis/a3_mask_pipeline.py": "98c6b4addef010944aabc547b939585679072fbe931feb64b2b4548d9de9172a",
+        "component_analysis/a3_edge_pipeline.py": "f8212df3f2b3a70b10e884164cc1e0b1781622553c2d95b77413a3fbb7cb20ce",
+        "tests/test_a3_source_validation.py": "d12508db917c117aec29a6b0bff71d101b53f5fcec43e3df33f4ab8df237184f",
+        "tests/test_a3_mask_pipeline.py": "26210c570aae88edbaf4979e859e9071b6bb76e6949b71f5f395911b1fd08e34",
+        "tests/test_a3_edge_pipeline.py": "60f4b49e734b786b3b5942e8e6ccac4173119c9580db8d9319931f1d66118f9f"
+      },
+      "source_unchanged": true,
+      "command": [
+        "/sw/external/python/anaconda3/bin/python3.9",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=/tmp/source-cost-123-handoff-r2-base",
+        "tests/test_a3_source_validation.py",
+        "tests/test_a3_mask_pipeline.py",
+        "tests/test_a3_edge_pipeline.py",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/121-source-cost-review-evidence/test_independent_source_boundaries.py"
+      ],
+      "cwd": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-guard-cost-fix-source-r2",
+      "start_utc": "2026-11-02T21:20:20.842942+00:00",
+      "elapsed_seconds": 263.51909041404724,
+      "exit_code": 0,
+      "environment": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1",
+        "HF_HUB_OFFLINE": "1",
+        "TRANSFORMERS_OFFLINE": "1",
+        "A3_A1_SCHEMA_TEST_DESIGN": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/design.json"
+      },
+      "log": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/123-source-cost-round2-evidence/handoff-r2-base.log"
+    }
+  },
+  "expected_tests_each": 187,
+  "observed_tests_each": 187,
+  "independent_probes": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/121-source-cost-review-evidence/test_independent_source_boundaries.py",
+  "independent_probe_binding": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/123-source-cost-round2-evidence/independent-probe-binding.json",
+  "root_freeze_pending": true,
+  "new_source_preparation": false,
+  "real_input_benchmark": false,
+  "execution_authorized": false,
+  "source_reservation_exception": false,
+  "raw_run_receipts": [
+    "green-r2-base.json",
+    "green-r2-mgnp.json",
+    "handoff-r2-base.json",
+    "handoff-r2-mgnp.json",
+    "red-r2-base.json",
+    "red-r2-mgnp.json"
+  ],
+  "job_id": null,
+  "cluster": null,
+  "scientific_rows": null,
+  "checked_utc": "2026-11-02T21:25:30.903697+00:00"
+}

@@ -1,0 +1,37 @@
+FF....                                                                   [100%]
+=================================== FAILURES ===================================
+_______ test_prepared_envelope_replaced_after_first_read_before_witness ________
+
+tmp_path = PosixPath('/tmp/review121-independent-mgnp-corrected/test_prepared_envelope_replace0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc3ca64fe00>
+
+    def test_prepared_envelope_replaced_after_first_read_before_witness(tmp_path,monkeypatch):
+        c=f.setup_case(tmp_path,monkeypatch)
+        from component_analysis import a3_direction_runtime as a,a3_direction_artifacts as artifacts
+        def dependencies(owned):
+            changed=copy.deepcopy(c.prepared);changed['empty']=['never semantically validated']
+            (c.prepared_path/'payload.json').write_text(json.dumps(changed))
+            (c.prepared_path/'COMPLETE.json').unlink();artifacts._finish(c.prepared_path)
+            return [c.static],[],[]
+>       with pytest.raises(ValueError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+../../../../../docs/research/specificity-ladder/reports/121-source-cost-review-evidence/test_independent_source_boundaries.py:16: Failed
+___________ test_current_grader_same_bytes_symlink_redirect_rejected ___________
+
+tmp_path = PosixPath('/tmp/review121-independent-mgnp-corrected/test_current_grader_same_bytes0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc2a07df530>
+
+    def test_current_grader_same_bytes_symlink_redirect_rejected(tmp_path,monkeypatch):
+        c=f.setup_case(tmp_path,monkeypatch);state=c.build()
+        path=c.runtime/'evaluation/benchmark_eval.py';target=tmp_path/'same-grader.py';target.write_bytes(path.read_bytes());path.unlink();path.symlink_to(target)
+>       with pytest.raises(ValueError):f.refresh(c,state)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+../../../../../docs/research/specificity-ladder/reports/121-source-cost-review-evidence/test_independent_source_boundaries.py:24: Failed
+=========================== short test summary info ============================
+FAILED ../../../../../docs/research/specificity-ladder/reports/121-source-cost-review-evidence/test_independent_source_boundaries.py::test_prepared_envelope_replaced_after_first_read_before_witness
+FAILED ../../../../../docs/research/specificity-ladder/reports/121-source-cost-review-evidence/test_independent_source_boundaries.py::test_current_grader_same_bytes_symlink_redirect_rejected
+2 failed, 4 passed in 7.07s

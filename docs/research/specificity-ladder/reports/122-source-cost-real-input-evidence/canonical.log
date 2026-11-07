@@ -1,0 +1,111 @@
+A3 command: /u/swong2/.conda/envs/mgnp/bin/python -m component_analysis.a3_pipeline --experiment directions --stage prepare --action freeze --design /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-pilots-f5a5687ec120/canonical/design.json --commit f5a5687ec12091f0d148b38b301598e9c7cb98cd --work-dir /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-pilots-f5a5687ec120/canonical --a1-design /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/design.json --a1-selected /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/selected.json --matched-root /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-matched-77b6487-m07 --historical-csv /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/mechanism-analysis/phase3/a_prime.csv --root-ruling /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-pilots-f5a5687ec120/root-ruling.json --execution-settings /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-pilots-f5a5687ec120/execution-settings.json --registry /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json
+Attempting to load dataset from: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/data/datasets/far_v2
+Successfully loaded train split with 200 samples
+Loaded 200 samples
+Attempting to load dataset from: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/data/datasets/far_v2
+Successfully loaded validation split with 200 samples
+Loaded 200 samples
+Attempting to load dataset from: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/data/datasets/far_v2
+Successfully loaded test split with 1000 samples
+Loaded 1000 samples
+Attempting to load dataset from: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/data/datasets/far_v2_honest
+Successfully loaded train split with 200 samples
+Loaded 200 samples
+Attempting to load dataset from: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/data/datasets/far_v2_honest
+Successfully loaded validation split with 200 samples
+Loaded 200 samples
+Attempting to load dataset from: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/data/datasets/far_v2_honest
+Successfully loaded test split with 1000 samples
+Loaded 1000 samples
+Attempting to load dataset from: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion
+Successfully loaded train split with 177 samples
+Loaded 177 samples
+Attempting to load dataset from: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion
+Successfully loaded validation split with 177 samples
+Loaded 177 samples
+Attempting to load dataset from: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_inversion
+Successfully loaded test split with 891 samples
+Loaded 891 samples
+Attempting to load dataset from: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral
+Successfully loaded train split with 177 samples
+Loaded 177 samples
+Attempting to load dataset from: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral
+Successfully loaded validation split with 177 samples
+Loaded 177 samples
+Attempting to load dataset from: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/far_v2_user_neutral
+Successfully loaded test split with 891 samples
+Loaded 891 samples
+Attempting to load dataset from: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/data/datasets/sdr_v2
+Successfully loaded train split with 200 samples
+Loaded 200 samples
+Attempting to load dataset from: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/data/datasets/sdr_v2
+Successfully loaded validation split with 200 samples
+Loaded 200 samples
+Attempting to load dataset from: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/data/datasets/sdr_v2
+Successfully loaded test split with 1000 samples
+Loaded 1000 samples
+Attempting to load dataset from: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/data/datasets/sdr_v2_honest
+Successfully loaded train split with 200 samples
+Loaded 200 samples
+Attempting to load dataset from: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/data/datasets/sdr_v2_honest
+Successfully loaded validation split with 200 samples
+Loaded 200 samples
+Attempting to load dataset from: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/data/datasets/sdr_v2_honest
+Successfully loaded test split with 1000 samples
+Loaded 1000 samples
+Attempting to load dataset from: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion
+Successfully loaded train split with 187 samples
+Loaded 187 samples
+Attempting to load dataset from: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion
+Successfully loaded validation split with 187 samples
+Loaded 187 samples
+Attempting to load dataset from: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_inversion
+Successfully loaded test split with 952 samples
+Loaded 952 samples
+Attempting to load dataset from: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral
+Successfully loaded train split with 187 samples
+Loaded 187 samples
+Attempting to load dataset from: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral
+Successfully loaded validation split with 187 samples
+Loaded 187 samples
+Attempting to load dataset from: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/sdr_v2_user_neutral
+Successfully loaded test split with 952 samples
+Loaded 952 samples
+Attempting to load dataset from: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/data/datasets/ser_v2
+Successfully loaded train split with 200 samples
+Loaded 200 samples
+Attempting to load dataset from: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/data/datasets/ser_v2
+Successfully loaded validation split with 200 samples
+Loaded 200 samples
+Attempting to load dataset from: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/data/datasets/ser_v2
+Successfully loaded test split with 1000 samples
+Loaded 1000 samples
+Attempting to load dataset from: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/data/datasets/ser_v2_honest
+Successfully loaded train split with 200 samples
+Loaded 200 samples
+Attempting to load dataset from: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/data/datasets/ser_v2_honest
+Successfully loaded validation split with 200 samples
+Loaded 200 samples
+Attempting to load dataset from: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/data/datasets/ser_v2_honest
+Successfully loaded test split with 1000 samples
+Loaded 1000 samples
+Attempting to load dataset from: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion
+Successfully loaded train split with 168 samples
+Loaded 168 samples
+Attempting to load dataset from: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion
+Successfully loaded validation split with 167 samples
+Loaded 167 samples
+Attempting to load dataset from: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_inversion
+Successfully loaded test split with 835 samples
+Loaded 835 samples
+Attempting to load dataset from: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral
+Successfully loaded train split with 168 samples
+Loaded 168 samples
+Attempting to load dataset from: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral
+Successfully loaded validation split with 167 samples
+Loaded 167 samples
+Attempting to load dataset from: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a1-control-77b6487-m07/ser_v2_user_neutral
+Successfully loaded test split with 835 samples
+Loaded 835 samples
+Filtered 820 single-token names from 1928 total names
+Generated 1000 IOI samples

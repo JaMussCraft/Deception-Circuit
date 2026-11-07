@@ -1,0 +1,1160 @@
+--- baseline/component_analysis/a3_edge_pipeline.py
++++ candidate/component_analysis/a3_edge_pipeline.py
+@@ -23,6 +23,8 @@
+ from component_analysis import ladder_design
+ from component_analysis import ladder_pipeline as ladder
+ from dataset import user_inversion_pipeline as common
++from component_analysis import a3_source_validation as source_validation
++_SOURCE_VALIDATOR_SEAL=object()
+ 
+ require=common.require
+ SEEDS=(42,1,123)
+@@ -587,7 +589,7 @@
+ 
+ 
+ def code_hashes():
+-    paths=set(artifacts.code_hashes())|{'component_analysis/a3_edge_pipeline.py','component_analysis/a3_edge_workload.py','component_analysis/a3_native.py','component_analysis/a3_edges.py','scripts/jobs/specificity_a3_edges.sh','tests/test_a3_edges.py'}
++    paths=set(artifacts.code_hashes())|{'component_analysis/a3_source_validation.py','component_analysis/a3_edge_pipeline.py','component_analysis/a3_edge_workload.py','component_analysis/a3_native.py','component_analysis/a3_edges.py','scripts/jobs/specificity_a3_edges.sh','tests/test_a3_edges.py'}
+     return {name:common.file_hash(ladder.REPO/name) for name in sorted(paths)}
+ 
+ 
+@@ -708,12 +710,58 @@
+     return design
+ 
+ 
++
++def _edge_source_scope(args):
++    result={key:str(getattr(args,key,None)) for key in ('commit','stage','steps','measure_stage')}
++    result.update({key:(str(Path(getattr(args,key)).absolute()) if getattr(args,key,None) is not None else None) for key in ('design','prepared','work_dir')})
++    return result
++
++
++def _make_edge_source_state(prepared,design,args):
++    import time
++    if design.get('injected') is not False:return None
++    path=getattr(args,'prepared',None)
++    if path is None and getattr(args,'work_dir',None):path=Path(args.work_dir)/'prepared'
++    reference=prepared.get('design_reference',{});canonical=getattr(args,'design',None) or reference.get('path')
++    if not canonical or path is None or not (Path(path)/'COMPLETE.json').is_file():return None
++    def dependencies(owned):
++        root=Path(__file__).resolve().parents[1]
++        paths=[root/name for name in code_hashes()]
++        ruling=owned['prepared'].get('ruling',{}).get('path')
++        if ruling:paths.append(ruling)
++        return source_validation.source_dependencies(owned['design'],root=root,owner_paths=paths)
++    def semantic(owned):
++        evidence=validate_prepared(owned['prepared'],owned['design'],registry_paths=args.registry)
++        extra={task:bank['rows'] for task,bank in owned['prepared'].get('bank_sources',{}).items()}
++        return evidence,extra
++    return source_validation.build_state(owner='edge',originals={'prepared':prepared,'design':design},
++        artifacts={'prepared':('object',path),'design':('artifact',canonical)},dependencies=dependencies,semantic=semantic,
++        registry_paths=args.registry,scope=_edge_source_scope(args),started=getattr(args,'_source_started',None),owner_seal=_SOURCE_VALIDATOR_SEAL)
++
++
++
++def _source_startup_seconds(seconds,args):
++    # The unchanged projector charges this consumed field for every modeled load;
++    # including one full process initialization is deliberately conservative.
++    state=getattr(args,'_edge_source_context',None)
++    if state is not None:source_validation.checked_state(state,'edge',_SOURCE_VALIDATOR_SEAL)
++    return source_validation.startup_seconds(seconds,state)
++
++
+ def execution_guard(design,prepared,args,inventory):
+     from component_analysis import a3_edge_workload as workload
+     context=None
++    state=getattr(args,'_edge_source_context',None)
++    if state is None:
++        state=_make_edge_source_state(prepared,design,args)
++        if state is not None:args._edge_source_context=state
++    if state is not None:source_validation.checked_state(state,'edge',_SOURCE_VALIDATOR_SEAL)
+     def guard():
+         nonlocal context
+-        live=validate_prepared(prepared,design,registry_paths=args.registry)
++        if state is None:live=validate_prepared(prepared,design,registry_paths=args.registry)
++        else:
++            require(getattr(args,'_edge_source_context',None) is state,'source state replaced')
++            live=state.refresh(owner='edge',bound_inputs={'prepared':prepared,'design':design},registry_paths=args.registry,scope=_edge_source_scope(args))
+         require(args.ledger_snapshot and args.reservation,'fresh root reservation/ledger required before model access')
+         ledger=authority.normalize_ledger(args.ledger_snapshot,identity=inventory['identity'],injected=design.get('injected',False))
+         if context is None:
+@@ -723,6 +771,7 @@
+         live['storage_capacities']=ledger.get('storage_capacities')
+         live['authority_retained_bytes']=getattr(context,'retained_bytes',0)
+         return live
++    guard._source_state=state
+     return guard
+ 
+ 
+@@ -1016,13 +1065,18 @@
+     require(not args.final or args.stage=='summarize','--final is only valid for completed summary intake')
+     require(re.fullmatch('[0-9a-f]{40}',args.commit) is not None,'full execution commit required')
+     if args.dry_run:return dry_run(args)
++    args._source_started=time.perf_counter()
+     design=_read_design(args.design)
+     require(design['direction_protocol']['commit']==args.commit,'execution commit differs from frozen design')
+     if args.stage=='prepare':
+         prepare(design,_metadata_geometry(design,args),commit=args.commit,registry_paths=args.registry,output=Path(args.work_dir)/'prepared',design_path=args.design)
+         return
+     prepared=authority.read_object(args.prepared or Path(args.work_dir)/'prepared')
+-    validate_prepared(prepared,design,registry_paths=args.registry)
++    state=_make_edge_source_state(prepared,design,args)
++    if state is None:validate_prepared(prepared,design,registry_paths=args.registry)
++    else:
++        args._edge_source_context=state
++        design=state.view('design');prepared=state.view('prepared')
+     identity=_stage_identity(design,prepared)
+     if args.stage=='summarize':return _run_summary(design,prepared,args,identity)
+     fitted=authority.read_object(Path(args.fit_evidence) if args.fit_evidence else Path(args.work_dir)/'fit') if args.stage=='select' else None
+@@ -1074,7 +1128,7 @@
+     startup=time.monotonic();model=(model_loader or _native_loader)(design,prepared,args)
+     args.native_load_seconds=time.monotonic()-startup
+     args.baseline_load_seconds=baseline_load_seconds
+-    args.startup_seconds=args.native_load_seconds+baseline_load_seconds
++    args.startup_seconds=_source_startup_seconds(args.native_load_seconds+baseline_load_seconds,args)
+     guard()
+     if args.stage=='pilot':return _run_pilot(model,design,prepared,args,guard,identity,controls,baselines=baselines)
+     if args.stage=='fit':return _run_fit(model,design,prepared,args,guard,identity)
+@@ -1568,7 +1622,7 @@
+         complete=True,exit_state='completed',runtime=runtime,hardware=torch.cuda.get_device_name() if cuda else 'CPU tiny',
+         startup_seconds=float(startup_seconds),startup_measured=startup_measured,measurements=measurements,
+         guard_seconds=guards,guard_evidence=guard_evidence,serialization=dict(seconds=serialization_seconds,bytes=serialized_bytes,reference=authority.object_reference(run_root/'serialization')),
+-        cpu_summary=dict(seconds=cpu_seconds,rows=max(1,len(values)),bootstrap_calibrations=bootstrap_calibrations),host_peak_bytes=int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)*1024,
++        cpu_summary=dict(seconds=cpu_seconds,rows=max(1,len(values)),bootstrap_calibrations=bootstrap_calibrations),host_peak_bytes=source_validation.host_peak_bytes(guard),
+         producer_inventory_sha256=inventory['inventory_sha256'],source_scope='fixed first eight validation IDs only; utility validation rows; no assessment outcomes',
+         reused_means='timing-only validation-H bank values never enter actual floor artifacts')
+     authority.publish_object(run_root/'receipt',result)
+--- baseline/component_analysis/a3_mask_pipeline.py
++++ candidate/component_analysis/a3_mask_pipeline.py
+@@ -22,6 +22,8 @@
+ import torch
+ from component_analysis import a3_mask as core
+ from dataset import user_inversion_pipeline as common
++from component_analysis import a3_source_validation as source_validation
++_SOURCE_VALIDATOR_SEAL=object()
+ _MODULE_IMPORTED=time.perf_counter()
+ 
+ 
+@@ -514,7 +516,7 @@
+ 
+ def mask_code_hashes():
+     root=Path(__file__).resolve().parents[1]
+-    paths=['component_analysis/a3_mask_pipeline.py','component_analysis/a3_mask_workload.py',
++    paths=['component_analysis/a3_mask_pipeline.py','component_analysis/a3_source_validation.py','component_analysis/a3_mask_workload.py',
+         'component_analysis/a3_mask.py','component_analysis/a3_native.py','models/llama_node.py','models/_compat.py','l0.py',
+         'scripts/jobs/specificity_a3_mask.sh','scripts/cluster/delta.env','scripts/cluster/bridges2.env',
+         'component_analysis/a3_direction_runtime.py',
+@@ -597,7 +599,7 @@
+     return prepared
+ 
+ 
+-def _live_mask(prepared,args,inventory=None):
++def _validate_mask_source(prepared,args,inventory=None,*,design=None,extra_rows=None):
+     from component_analysis import a3_direction_runtime as authority,a3_direction_artifacts as artifacts,ladder_pipeline as ladder
+     from component_analysis import a3_mask_workload as workload
+     require(prepared.get('kind')=='a3_mask_prepared_v1' and prepared.get('injected') is False,'canonical mask preparation required')
+@@ -609,7 +611,7 @@
+     require(identity['code_hashes']==mask_code_hashes(),'changed mask source closure')
+     require(common.file_hash(identity['operational_ruling_path'])==identity['operational_ruling_sha256'],'changed root ruling')
+     require(common.file_hash(identity['pilot_ruling_path'])==identity['pilot_ruling_sha256'],'changed pilot context ruling')
+-    design=ladder.read_artifact(identity['design_path'])
++    if design is None:design=ladder.read_artifact(identity['design_path'])
+     evidence=artifacts.validate_live(design,design['direction_protocol'],registry_paths=args.registry)
+     from component_analysis.a3_pipeline import load_a1_parents
+     parent,selected,_=load_a1_parents(design['parent_evidence']['prepared_path'],design['parent_evidence']['selected_path'])
+@@ -617,6 +619,7 @@
+     evidence['H_bank_protection']=_protect_bank_sources(design,parent,prepared['hbank_sources'],args.registry)
+     bank_rows={t:[r for r in parent['rows'][t]['H'] if r['instance_id'] in set(domain['ids'])] for t,domain in prepared['hbank_sources'].items()}
+     require(prepared['widths']==identity['physical_widths']==execution_widths(design,hbank_rows=bank_rows),'changed actual source/donor physical profile')
++    if extra_rows is not None:extra_rows.update(bank_rows)
+     require(authority.object_reference(identity['root_bundle_reference']['path'])==identity['root_bundle_reference'],'changed completed root mask bundle')
+     for path,sha in prepared['new30'].get('files',{}).items():require(common.file_hash(path)==sha,'changed New30 frozen reference')
+     if inventory is not None:
+@@ -628,6 +631,76 @@
+             require(inventory['inventory_sha256']==expected['inventory_sha256'],'runtime inventory differs from complete canonical mask workload')
+         evidence['reservation']=mask_reservation(args,inventory)
+     return execution_design(design,prepared['widths']),evidence
++
++
++
++def _make_mask_source_state(prepared,args):
++    from component_analysis import a3_direction_runtime as authority,ladder_pipeline as ladder
++    started=getattr(args,'_mask_source_started',None)
++    if started is None:started=time.perf_counter()
++    if prepared.get('injected') is not False:return None
++    path=getattr(args,'prepared',None)
++    if path is None and getattr(args,'work_dir',None):path=Path(args.work_dir)/'prepared'
++    if path is None or not (Path(path)/'COMPLETE.json').is_file():return None
++    # Preserve the original early rejection before ancestry discovery.
++    require(prepared.get('kind')=='a3_mask_prepared_v1','canonical mask preparation required')
++    actual_design=prepared['identity']['design_path']
++    lexical=getattr(args,'design',None) or actual_design
++    require(Path(lexical).resolve()==Path(actual_design).resolve(),'mask canonical source path differs')
++    design=ladder.read_artifact(lexical)
++    def dependencies(owned):
++        identity=owned['prepared']['identity']
++        paths=list(mask_code_hashes())+[identity['operational_ruling_path'],identity['pilot_ruling_path'],identity['root_bundle_reference']['path']]
++        import os,sys
++        paths.append(sys.executable)
++        if os.environ.get('SPECIFICITY_A3_MASK_LAUNCH_EXECUTABLE'):paths.append(os.environ['SPECIFICITY_A3_MASK_LAUNCH_EXECUTABLE'])
++        source,missing,watched=source_validation.source_dependencies(owned['design'],root=Path(__file__).resolve().parents[1],owner_paths=paths)
++        archive,absent=source_validation.new30_dependencies()
++        return source+archive,missing+absent,watched
++    def semantic(owned):
++        extra={}
++        _,evidence=_validate_mask_source(owned['prepared'],args,design=owned['design'],extra_rows=extra)
++        return evidence,extra
++    return source_validation.build_state(owner='mask',originals={'prepared':prepared,'design':design},
++        artifacts={'prepared':('object',path),'design':('artifact',lexical)},dependencies=dependencies,semantic=semantic,
++        registry_paths=args.registry,scope=_mask_source_scope(args),started=started,owner_seal=_SOURCE_VALIDATOR_SEAL,
++        precheck=lambda owned:require(owned['prepared']['identity']['mask_protocol_sha256']==digest(mask_protocol(owned['prepared'])),'changed frozen mask scientific/operational protocol'))
++
++
++def _mask_source_scope(args):
++    import os,sys
++    result={key:str(getattr(args,key,None)) for key in ('commit','stage','seed','arm','task','group','chunk_size')}
++    result.update({key:(str(Path(getattr(args,key)).absolute()) if getattr(args,key,None) is not None else None) for key in ('design','prepared','work_dir')})
++    launch=os.environ.get('SPECIFICITY_A3_MASK_LAUNCH_EXECUTABLE')
++    result.update(interpreter=str(Path(sys.executable).absolute()),launcher=str(Path(launch).absolute()) if launch else None)
++    return result
++
++
++def _live_mask(prepared,args,inventory=None):
++    from component_analysis import a3_mask_workload as workload
++    state=getattr(args,'_mask_source_context',None)
++    if state is None:
++        state=_make_mask_source_state(prepared,args)
++        if state is None:return _validate_mask_source(prepared,args,inventory)
++        args._mask_source_context=state
++    source_validation.checked_state(state,'mask',_SOURCE_VALIDATOR_SEAL)
++    evidence=state.refresh(owner='mask',bound_inputs={'prepared':prepared},registry_paths=args.registry,scope=_mask_source_scope(args))
++    design=execution_design(state.view('design'),state.view('prepared')['widths'])
++    if inventory is not None:
++        if getattr(args,'_mask_authority_context',None) is None:
++            workload.validate_inventory(inventory)
++            expected=workload.build_inventory(design,identity=prepared['identity'],chunk_size=prepared['chunk_size'],
++                finish_reserve_seconds=inventory['finish_reserve_seconds'],hbank_sources=prepared['hbank_sources'],
++                stage=inventory['stage'],widths=prepared['widths'],new30=prepared['new30'])
++            require(inventory['inventory_sha256']==expected['inventory_sha256'],'runtime inventory differs from complete canonical mask workload')
++        evidence['reservation']=mask_reservation(args,inventory)
++    return design,evidence
++
++
++def _source_startup_seconds(seconds,args):
++    state=getattr(args,'_mask_source_context',None)
++    if state is not None:source_validation.checked_state(state,'mask',_SOURCE_VALIDATOR_SEAL)
++    return source_validation.startup_seconds(seconds,state)
+ 
+ 
+ def utility_chunks(rows,maps,*,device,task,padded_width=None):
+@@ -1131,7 +1204,7 @@
+         reservation_id=None if injected else guard_evidence[-1]['reservation']['reservation']['reservation_id'],
+         pilot_inventory_sha256=None if pilot_inventory is None else pilot_inventory['inventory_sha256'],output_dir=str(output.resolve()),
+         peak_memory_bytes=torch.cuda.max_memory_allocated() if device.type=='cuda' else 0,
+-        host_peak_bytes=int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)*1024,
++        host_peak_bytes=source_validation.host_peak_bytes(guard),
+         gpu_capacity_bytes=(torch.cuda.mem_get_info()[0]+torch.cuda.memory_allocated()) if device.type=='cuda' else 0,
+         target_inventory_sha256=target_inventory['inventory_sha256'] if target_inventory is not None else None,
+         boundary_bytes=max(sum(p.stat().st_size for p in (output/('timing-checkpoint-'+arm)).rglob('*') if p.is_file()) for arm in ('constrained','unconstrained')))
+@@ -1162,6 +1235,7 @@
+         prepared=prepare_mask(args.design,commit=args.commit,chunk_size=args.chunk_size,registry_paths=args.registry,root_bundle=args.root_bundle)
+         authority.publish_object(root/'prepared',prepared)
+         return 0
++    args._mask_source_started=time.perf_counter()
+     prepared=authority.read_object(args.prepared or root/'prepared')
+     design,evidence=_live_mask(prepared,args)
+     if args.stage=='prepare':
+@@ -1225,6 +1299,7 @@
+         require(prepared['new30']['status']=='available','blocked: missing New30 reference comparison')
+         groups=assessment_groups(prepared,_load_selections(args.selected or root))
+     guard=lambda:_live_mask(prepared,args,inventory)[1]
++    guard._source_state=getattr(args,'_mask_source_context',None)
+     execution_evidence=guard()
+     if args.stage in ('fit','assess'):
+         reservation=execution_evidence['reservation']['reservation']
+@@ -1234,7 +1309,7 @@
+     started=time.perf_counter()
+     require(model_loader is None,'injected model loaders are forbidden for canonical production execution')
+     model=load_native_model(prepared)
+-    startup_seconds=time.perf_counter()-started+(_MODULE_IMPORTED-_MODULE_STARTED)
++    startup_seconds=_source_startup_seconds(time.perf_counter()-started+(_MODULE_IMPORTED-_MODULE_STARTED),args)
+     if args.stage in ('fit','assess'):
+         core.configure_candidates(model,prepared['candidates'])
+         require(core._base_identity(model)==expected_base,'current native model differs from measured pilot computation')
+@@ -1256,6 +1331,7 @@
+         task=args.task;domain=prepared['hbank_sources'][task];indexed={r['instance_id']:r for r in parent['rows'][task]['H']}
+         source=[indexed[i] for i in domain['ids']]
+         require(digest(source)==domain['rows_sha256'],'changed original H-bank source rows')
++        source=source_validation.freeze(source)
+         required=sorted(set(map(tuple,prepared['candidates']))|({tuple(k) for k in prepared['new30'].get('removed',[])} if task=='far_v2' else set()))
+         bank_path=root/'H-banks'/task
+         if bank_path.exists():
+@@ -1359,7 +1435,8 @@
+ 
+ def execution_design(design,widths):
+     """Runtime-only physical profile, separate from canonical frozen A3 bytes."""
+-    return dict(design,_mask_widths=copy.deepcopy(widths))
++    result=dict(design,_mask_widths=copy.deepcopy(widths))
++    return source_validation.freeze(result) if source_validation.is_view(design) else result
+ 
+ 
+ def frozen_validation_history(selected):
+--- baseline/component_analysis/a3_source_validation.py
++++ candidate/component_analysis/a3_source_validation.py
+@@ -0,0 +1,333 @@
++"""Private source-only proof reuse; fresh bytes/protection never confer execution authority.
++
++The owners still validate their full semantic contracts before minting. Immutable
++source views thaw on explicit copies, unlike the separate inventory proof views.
++"""
++from __future__ import annotations
++import copy
++import hashlib
++import json
++import math
++import os
++from pathlib import Path
++import resource
++import sys
++import time
++
++_JSON_SEAL=object()
++_STATE_SEAL=object()
++_clock=time.perf_counter
++
++
++def require(value,message):
++    if not value:raise ValueError(message)
++
++
++class _SourceDict(dict):
++    __slots__=('_seal',)
++    def __init__(self,values=(),*,_token=None):
++        if _token is not _JSON_SEAL or hasattr(self,'_seal'):raise TypeError('source view construction is private')
++        dict.__init__(self,values);object.__setattr__(self,'_seal',_JSON_SEAL)
++    def _immutable(self,*a,**k):raise TypeError('authenticated source is immutable')
++    __setitem__=__delitem__=clear=pop=popitem=setdefault=update=__ior__=__setattr__=__delattr__=_immutable
++    def __copy__(self):return dict(self)
++    def __deepcopy__(self,memo):
++        out={};memo[id(self)]=out
++        out.update((copy.deepcopy(k,memo),copy.deepcopy(v,memo)) for k,v in self.items());return out
++
++
++class _SourceList(list):
++    __slots__=('_seal',)
++    def __init__(self,values=(),*,_token=None):
++        if _token is not _JSON_SEAL or hasattr(self,'_seal'):raise TypeError('source view construction is private')
++        list.__init__(self,values);object.__setattr__(self,'_seal',_JSON_SEAL)
++    def _immutable(self,*a,**k):raise TypeError('authenticated source is immutable')
++    __setitem__=__delitem__=append=clear=extend=insert=pop=remove=reverse=sort=__iadd__=__imul__=__setattr__=__delattr__=_immutable
++    def __copy__(self):return list(self)
++    def __deepcopy__(self,memo):
++        out=[];memo[id(self)]=out;out.extend(copy.deepcopy(v,memo) for v in self);return out
++
++
++def freeze(value,_memo=None,_active=None):
++    """Copy JSON into sealed views; never trust raw or subclass instances."""
++    if type(value) in (_SourceDict,_SourceList):
++        require(getattr(value,'_seal',None) is _JSON_SEAL,'unsealed source view');return value
++    if type(value) in (str,int,bool,type(None)):return value
++    if type(value) is float:
++        require(math.isfinite(value),'nonfinite source JSON');return value
++    require(type(value) in (dict,list,tuple),'non-JSON or subclass source value')
++    memo={} if _memo is None else _memo;active=set() if _active is None else _active
++    require(id(value) not in active,'cyclic source JSON')
++    if id(value) in memo:return memo[id(value)]
++    active.add(id(value))
++    if type(value) is dict:
++        require(all(type(k) is str for k in value),'non-string source key')
++        out=_SourceDict(((k,freeze(v,memo,active)) for k,v in value.items()),_token=_JSON_SEAL)
++    else:out=_SourceList((freeze(v,memo,active) for v in value),_token=_JSON_SEAL)
++    active.remove(id(value));memo[id(value)]=out;return out
++
++
++def is_view(value):
++    return type(value) in (_SourceDict,_SourceList) and getattr(value,'_seal',None) is _JSON_SEAL
++
++
++def _links_many(paths):
++    """Full lexical/target ancestry; deduplicate shared parent RPCs."""
++    rows=[];seen=set()
++    def visit(node):
++        for candidate in [node]+list(node.parents):
++            if candidate in seen:continue
++            seen.add(candidate)
++            if candidate.is_symlink():
++                try:target=candidate.resolve(strict=True)
++                except (OSError,RuntimeError) as error:raise ValueError('source path provenance dangling/cycle') from error
++                st=candidate.lstat()
++                rows.append((str(candidate),st.st_dev,st.st_ino,st.st_mode,st.st_mtime_ns,st.st_ctime_ns,os.readlink(candidate),str(target)))
++                literal=Path(os.readlink(candidate))
++                visit(literal if literal.is_absolute() else candidate.parent/literal)
++    for path in paths:visit(Path(path).absolute())
++    return tuple(sorted(rows))
++
++
++def _links(path):
++    return _links_many((path,))
++
++
++def access_contexts(design,extra_rows):
++    """Exactly validate_access's recognized IDs, without copying rich rows."""
++    from component_analysis.a3_design import _utility_identity
++    from dataset import user_inversion_pipeline as common
++    candidates={task:set(design.get('donor_ids',{}).get(task,[])) for task in design.get('access_rows',{})}
++    for task,rows in design.get('access_rows',{}).items():
++        for row in rows:candidates[task].update(_utility_identity(row)[0])
++    for task in ('ioi','mmlu'):
++        candidates[task]=set(design.get('donor_ids',{}).get(task,[]))
++        for name,rows in design.get('utility',{}).items():
++            if (name==task or name.startswith(task+'_')) and isinstance(rows,list):
++                for row in rows:
++                    if isinstance(row,dict):candidates[task].update(_utility_identity(row)[0])
++        for row in design.get(task+'_validation',[]):candidates[task].update(_utility_identity(row)[0])
++    for task,rows in extra_rows.items():
++        for row in rows:candidates.setdefault(task,set()).update(_utility_identity(row)[0])
++    return freeze({task:{'rows':{'D':{split:([{'instance_id':rid} for rid in sorted(ids)] if split=='test' else []) for split in common.SPLITS}}} for task,ids in candidates.items()})
++
++
++class _Protection:
++    __slots__=('_seal','_defaults','contexts','explicit','registry_links','reference_links','grader_links')
++    def __init__(self,contexts,registry_paths):
++        from dataset import user_inversion_pipeline as common
++        from component_analysis import ladder_pipeline as ladder
++        if hasattr(self,'_seal'):raise TypeError('protection context cannot be reinitialized')
++        object.__setattr__(self,'contexts',contexts)
++        object.__setattr__(self,'explicit',tuple(str(Path(p).absolute()) for p in registry_paths))
++        paths=[Path(common.PRIMARY_REGISTRY),common.REPO/'docs/research/held_out.json']+[Path(p) for p in self.explicit]
++        object.__setattr__(self,'registry_links',{str(p.absolute()):_links(p) for p in paths})
++        object.__setattr__(self,'reference_links',{})
++        object.__setattr__(self,'grader_links',{str(root/'docs/research/directions.json'):_links(root/'docs/research/directions.json') for root in (ladder.PRIMARY,ladder.REPO)})
++        object.__setattr__(self,'_defaults',(str(Path(common.PRIMARY_REGISTRY).absolute()),str(common.REPO.absolute()),str(ladder.PRIMARY.absolute()),str(ladder.REPO.absolute())))
++        object.__setattr__(self,'_seal',_STATE_SEAL)
++    def __setattr__(self,*args):raise TypeError('protection metadata is immutable')
++    def __delattr__(self,*args):raise TypeError('protection metadata is immutable')
++    def refresh(self,registry_paths):
++        from types import SimpleNamespace
++        from dataset import user_inversion_pipeline as common
++        from component_analysis import ladder_pipeline as ladder
++        require(tuple(str(Path(p).absolute()) for p in registry_paths)==self.explicit,'source registry scope changed')
++        require((str(Path(common.PRIMARY_REGISTRY).absolute()),str(common.REPO.absolute()),str(ladder.PRIMARY.absolute()),str(ladder.REPO.absolute()))==self._defaults,'source default registry routing changed')
++        for path,expected in self.registry_links.items():require(_links(path)==expected,'registry path provenance changed')
++        paths=list(dict.fromkeys([Path(common.PRIMARY_REGISTRY),common.REPO/'docs/research/held_out.json']+[Path(p).resolve() for p in self.explicit]))
++        # Read only small CURRENT registries to discover new file-backed sets.
++        current={};references={}
++        for path in paths:
++            require(path.is_file(),'missing required protected registry')
++            content=path.read_bytes();raw=json.loads(content);current[str(path)]=hashlib.sha256(content).hexdigest()
++            entries=raw.get('sets') if isinstance(raw,dict) else None
++            for entry in entries if isinstance(entries,list) else ():
++                if isinstance(entry,dict) and 'path' in entry:
++                    require(isinstance(entry['path'],str),'invalid protected set reference')
++                    lexical=path.parent.parent.parent/entry['path'];key=str(lexical.absolute());shape=_links(lexical)
++                    if key in self.reference_links:require(shape==self.reference_links[key],'protected set provenance changed')
++                    references[key]=shape
++        registries=common.check_registry(SimpleNamespace(splits=list(common.SPLITS),registry=list(self.explicit)),self.contexts)
++        require(registries==current,'protected registry changed during refresh')
++        for path,expected in references.items():require(_links(path)==expected,'protected set provenance changed during refresh')
++        for path,expected in self.registry_links.items():require(_links(path)==expected,'registry path provenance changed during refresh')
++        self.reference_links.update(references)
++        for path,expected in self.grader_links.items():require(_links(path)==expected,'grader registry provenance changed')
++        graders=ladder.grader_registry()
++        for path,expected in self.grader_links.items():require(_links(path)==expected,'grader registry provenance changed during refresh')
++        return registries,graders
++
++
++def _peak_bytes():return int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)*1024
++
++
++def _rss_bytes():
++    try:return int(Path('/proc/self/statm').read_text().split()[1])*os.sysconf('SC_PAGE_SIZE')
++    except (OSError,ValueError,IndexError):return _peak_bytes()
++
++
++def _outer(value):return tuple((k,id(v)) for k,v in value.items())
++
++
++class _SourceState:
++    __slots__=('_seal','_pid','_owner','_owner_seal','_scope','_originals','_bindings','_views','_witness','_static_paths','_static_links','_missing','_glob','_protection','_base','_initialization','_stats')
++    def __init__(self,*,_token=None,**values):
++        if _token is not _STATE_SEAL or hasattr(self,'_seal'):raise TypeError('source state construction is private')
++        for key,value in values.items():object.__setattr__(self,key,value)
++        object.__setattr__(self,'_seal',_STATE_SEAL)
++    def __setattr__(self,*args):raise TypeError('source proof is immutable')
++    def __delattr__(self,*args):raise TypeError('source proof is immutable')
++    def __reduce__(self):raise TypeError('source states are process-local')
++    def _check(self):
++        require(getattr(self,'_seal',None) is _STATE_SEAL,'unsealed source state')
++        require(self._pid==os.getpid(),'source state cannot cross process/restart')
++    def view(self,name):self._check();return self._views[name]
++    def stats(self):
++        self._check()
++        # Walk the actual retained object graph, including witness dictionaries and
++        # private slots; class/module/function globals are never proof components.
++        from component_analysis.a3_direction_runtime import _FileWitness
++        seen=set()
++        def size(value):
++            if id(value) in seen:return 0
++            seen.add(id(value));total=sys.getsizeof(value)
++            if isinstance(value,dict):total+=sum(size(k)+size(v) for k,v in value.items())
++            elif isinstance(value,(list,tuple,set,frozenset)):total+=sum(size(v) for v in value)
++            if type(value) in (_SourceState,_Protection,_SourceDict,_SourceList):
++                for name in value.__slots__:
++                    if hasattr(value,name):total+=size(getattr(value,name))
++            elif type(value) is _FileWitness:total+=size(vars(value))
++            return total
++        result={**self._stats,**self._initialization,'retained_bytes':size(self)}
++        return copy.deepcopy(result)
++    def refresh(self,*,owner,bound_inputs,registry_paths,scope):
++        self._check();require(owner==self._owner and scope==self._scope,'source owner/scope changed')
++        for name,value in bound_inputs.items():
++            require(name in self._views and (value is self._views[name] or value is self._originals[name]),'source object replaced')
++        for name,value in self._originals.items():require(_outer(value)==self._bindings[name],'source outer binding changed')
++        from component_analysis import a3_direction_runtime as authority
++        started=_clock()
++        require(_links_many(self._static_paths)==self._static_links,'immutable source path provenance changed')
++        authority._check_file_witness(self._witness)
++        for path,links in self._missing:
++            require(not Path(path).exists() and not Path(path).is_symlink() and _links(path)==links,'missing source dependency appeared/redirected')
++        for folder,pattern,expected in self._glob:
++            require(tuple(str(p) for p in sorted(Path(folder).glob(pattern)))==expected,'source closure membership changed')
++        registries,graders=self._protection.refresh(registry_paths)
++        require(_links_many(self._static_paths)==self._static_links,'immutable source path provenance changed during refresh')
++        self._stats['refreshes']+=1;self._stats['refresh_seconds']+=_clock()-started
++        evidence=copy.deepcopy(self._base)
++        evidence.update(registry_hashes=registries,grader_registry=graders)
++        if self._owner=='mask':evidence['H_bank_protection']=dict(registries)
++        return evidence
++
++
++def build_state(*,owner,originals,artifacts,dependencies,semantic,registry_paths,scope,started=None,precheck=None,owner_seal=None):
++    """Owners supply their FULL validator; callbacks are discarded before return."""
++    from component_analysis import a3_direction_runtime as authority,ladder_pipeline as ladder
++    started=_clock() if started is None else started;rss_before=_rss_bytes();peak_before=_peak_bytes()
++    require(set(originals)==set(artifacts),'source artifact bindings incomplete')
++    require(all(type(v) is dict for v in originals.values()),'original source objects must be ordinary dictionaries')
++    before={name:_outer(v) for name,v in originals.items()}
++    owned={name:freeze(v) for name,v in originals.items()}
++    roots=[]
++    for name,(kind,path) in artifacts.items():
++        require(kind in ('artifact','object'),'unknown source envelope')
++        actual=ladder.read_artifact(path) if kind=='artifact' else authority.read_object(path)
++        require(actual==owned[name],'source object differs from actual artifact')
++        roots.append(Path(path).absolute())
++    if precheck is not None:precheck(owned)
++    paths,missing,glob=dependencies(owned);roots.extend(Path(p).absolute() for p in paths)
++    witness=authority._make_file_witness(sorted(set(map(str,roots))))
++    static_paths=tuple(sorted(set(witness.paths)|{row[1] for tree in witness.identities for row in tree}))
++    static_links=_links_many(static_paths)
++    absent=[]
++    for p in missing:
++        require(not Path(p).exists() and not Path(p).is_symlink(),'expected missing source exists')
++        absent.append((str(Path(p).absolute()),_links(p)))
++    watched=[(str(Path(folder).absolute()),pattern,tuple(str(p) for p in sorted(Path(folder).absolute().glob(pattern)))) for folder,pattern in glob]
++    base,extra=semantic(owned)
++    protection=_Protection(access_contexts(owned['design'],extra),registry_paths)
++    registries,graders=protection.refresh(registry_paths)
++    authority._check_file_witness(witness)
++    require(_links_many(static_paths)==static_links,'immutable source path provenance changed during initialization')
++    for path,links in absent:
++        require(not Path(path).exists() and not Path(path).is_symlink() and _links(path)==links,'missing source changed during initialization')
++    for folder,pattern,expected in watched:
++        require(tuple(str(p) for p in sorted(Path(folder).glob(pattern)))==expected,'source closure changed during initialization')
++    for name,value in originals.items():
++        require(_outer(value)==before[name] and value==owned[name],'source input changed during initialization')
++    for name,value in originals.items():
++        for key,item in owned[name].items():value[key]=item
++    static_base={k:v for k,v in base.items() if k not in ('registry_hashes','grader_registry','H_bank_protection')}
++    state=_SourceState(_token=_STATE_SEAL,_pid=os.getpid(),_owner=owner,_owner_seal=owner_seal,_scope=freeze(scope),_originals=dict(originals),
++        _bindings={name:_outer(value) for name,value in originals.items()},_views=freeze(owned),_witness=witness,_static_paths=static_paths,_static_links=static_links,
++        _missing=tuple(absent),_glob=tuple(watched),_protection=protection,_base=freeze(static_base),
++        _initialization=None,_stats=dict(refreshes=0,refresh_seconds=0.))
++    # Discard parse/validation-only payloads and callbacks before sampling the
++    # returned-state RSS; the retained context owns only its sealed source graph.
++    del actual,base,extra,static_base,owned,semantic,dependencies,precheck
++    # Finalize measured facts after construction and transient payload release.
++    peak=_peak_bytes();rss_after=_rss_bytes()
++    facts=dict(roots=len(witness.paths),verified_bytes=sum(row[2][3] for tree in witness.identities for row in tree if row[0]=='file'),
++        host_peak_bytes=peak,host_peak_before_bytes=peak_before,rss_before_bytes=rss_before,rss_after_bytes=rss_after,
++        initialization_transient_upper_bytes=max(0,peak-rss_after))
++    facts['initialization_seconds']=_clock()-started
++    object.__setattr__(state,'_initialization',freeze(facts))
++    return state
++
++
++def checked_state(value,owner,owner_seal):
++    require(type(value) is _SourceState,'caller metadata is not a source state');value._check()
++    require(value._owner==owner and value._owner_seal is owner_seal,'source owner validator seal differs');return value
++
++
++def startup_seconds(seconds,state):
++    if state is None:return seconds
++    require(type(state) is _SourceState,'invalid source startup proof');state._check()
++    return seconds+state._initialization['initialization_seconds']
++
++
++def host_peak_bytes(guard=None):
++    state=getattr(guard,'_source_state',None)
++    if state is None:return _peak_bytes()
++    require(type(state) is _SourceState,'invalid source memory proof');state._check()
++    return max(_peak_bytes(),state._initialization['host_peak_bytes'])
++
++
++def source_dependencies(design,*,root,owner_paths=()):
++    """All immutable files read by the existing full live source validators."""
++    from component_analysis import a3_pipeline,a3_direction_artifacts as artifacts,ladder_pipeline as ladder
++    evidence=design['parent_evidence'];parent,_,current=a3_pipeline.load_a1_parents(evidence['prepared_path'],evidence['selected_path'])
++    require(current==evidence,'changed source ancestry while discovering dependencies')
++    paths=[evidence[k] for k in ('prepared_path','selected_path','completion_path')]
++    paths.extend(owner_paths)
++    for field in ('source_hashes','selection_hashes'):
++        for name in parent[field]:paths.append(Path(name) if Path(name).is_absolute() else Path(design['a1_repo_root'])/name)
++    paths.extend(Path(root)/name for name in parent['code_hashes'])
++    paths.extend(Path(root)/name for name in design['direction_protocol']['code_hashes'])
++    paths.extend(design['historical_source_hashes']);paths.append(design['matched_build_path'])
++    for manifest in (design.get('mmlu_validation_candidates_manifest',{}),design.get('utility',{}).get('mmlu_manifest',{})):
++        for name,sha in manifest.get('parquet_hashes',{}).items():
++            artifacts.validate_cached_utility_source(manifest['snapshot'],name,sha)
++            paths.append(Path(manifest['snapshot'])/name)
++    return paths,[],[(Path(root)/'component_analysis','a3_direction_*.py')]
++
++
++def new30_dependencies():
++    """Lexical JSON-only archived paths, including the first absent link."""
++    study=Path('/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_studies/selective-deception/study')
++    receipt=study/'sparse-optimization-v4/comparison/selection-receipt.json';paths=[];missing=[]
++    if not receipt.is_file():return paths,[receipt]
++    import json
++    data=json.loads(receipt.read_text());paths.append(receipt)
++    matches=[m for m in data['masks'] if m['label']=='new-allW30'];require(len(matches)==1,'ambiguous New30 dependency')
++    selected=matches[0];proposal=selected['source_proposal'];links=[selected['head_list']['path']]+[proposal[k+'_path'] for k in ('export','manifest','run_identity')]
++    for link in links:
++        require('selective-deception/' in link,'invalid New30 dependency path')
++        path=study/link.split('selective-deception/',1)[1]
++        require(path.resolve().is_relative_to(study.resolve()),'escaped New30 dependency')
++        if not path.is_file():missing.append(path);break
++        paths.append(path)
++    return paths,missing
+--- baseline/tests/test_a3_edge_pipeline.py
++++ candidate/tests/test_a3_edge_pipeline.py
+@@ -646,3 +646,66 @@
+     monkeypatch.setattr(p,'common',SimpleNamespace(**{**vars(p.common),'load_tokenizer':changed}))
+     with pytest.raises(ValueError,match='production tokenizer configuration differs from pinned standard'):
+         _admit_with_real_tokenizer_validation(admission_tokenizer_parent,tmp_path,monkeypatch)
++
++
++def test_cached_edge_source_keeps_fresh_authority_and_runs_semantics_once(tmp_path,monkeypatch):
++    from tests.test_a3_source_validation import setup_case
++    from component_analysis import a3_source_validation as sources, ladder_pipeline as ladder
++    from types import SimpleNamespace
++    c=setup_case(tmp_path,monkeypatch);calls=[];authority_calls=[]
++    design=c.design;design['injected']=False
++    path=tmp_path/'edge-design.json';ladder.write_artifact(path,design)
++    prepared={'kind':'a3_edge_prepared','design_reference':{'path':str(path)}};prep_path=tmp_path/'edge-prepared';p.authority.publish_object(prep_path,prepared)
++    def validate(prepared,design,**kwargs):
++        calls.append((sources.is_view(prepared),sources.is_view(design)))
++        return {'commit':'a'*40,'injected':False}
++    monkeypatch.setattr(p,'validate_prepared',validate)
++    monkeypatch.setattr(sources,'source_dependencies',lambda *a,**k:([c.static],[],[]))
++    monkeypatch.setattr(p,'code_hashes',lambda:{})
++    monkeypatch.setattr(p.authority,'normalize_ledger',lambda *a,**k:{})
++    monkeypatch.setattr(p.authority,'make_authority_context',lambda *a,**k:object())
++    monkeypatch.setattr(p.authority,'validate_reservation',lambda *a,**k:authority_calls.append(k) or {})
++    args=SimpleNamespace(commit='a'*40,registry=[],prepared=str(prep_path),design=str(path),work_dir=str(tmp_path),ledger_snapshot='root',reservation='reservation')
++    guard=p.execution_guard(design,prepared,args,{'identity':{'commit':'a'*40}})
++    first=guard();guard()
++    assert calls==[(True,True)] and len(authority_calls)==2
++    first['registry_hashes'].clear();assert guard()['registry_hashes']
++    monkeypatch.setattr(p.authority,'validate_reservation',lambda *a,**k:(_ for _ in ()).throw(ValueError('live lease expired')))
++    with pytest.raises(ValueError,match='lease'):guard()
++    args._edge_source_context={}
++    with pytest.raises(ValueError):guard()
++
++
++def test_source_views_preserve_actual_edge_copy_consumers():
++    from component_analysis import a3_source_validation as sources
++    d=sources.freeze(source_design())
++    pair=p.source_pair(d,'far_v2','train','a','D','clean',purpose='attribution')
++    assert pair['maps']['rows'][0]['recipient_id']=='a'
++    pair['maps']['rows'][0]['recipient_positions'].append(9)
++    assert d['semantic_twin_maps']['far_v2'][0]['recipient_positions']==[0,1,2,3]
++    utility=copy.deepcopy(d['access_rows']['far_v2'][0]);utility['streams']['clean'].pop('semantic')
++    batch=p._utility_batch(sources.freeze(utility),'clean')
++    assert batch['positions']['assistant_readout']==[[3]]
++
++
++def test_edge_source_initialization_reaches_actual_receipt_and_projector(tmp_path,monkeypatch):
++    from tests.test_a3_source_validation import setup_case
++    from component_analysis import a3_edge_workload as w
++    from types import SimpleNamespace
++    c=setup_case(tmp_path,monkeypatch);state=c.build(owner='edge',owner_seal=p._SOURCE_VALIDATOR_SEAL)
++    startup=p._source_startup_seconds(0.,SimpleNamespace(_edge_source_context=state))
++    d,model=complete_design_and_model();d=eightify(d)
++    d['direction_protocol']['numeric_profile']={'dtype':'torch.float32','backend':'eager'}
++    d['direction_protocol']['workload']={'hidden_size':8,'vocabulary_size':16,'dtype_bytes':4}
++    graph=p.prepare_graph(d,'far_v2',geometry());prepared={'graphs':{'far_v2':graph},'bank_sources':p.ancestral_bank_sources(d)}
++    identity={'commit':'a'*40,'injected':True,'numeric_profile':d['direction_protocol']['numeric_profile']}
++    inventory=w.freeze_inventory(d,prepared['graphs'],stage='fit',identity=identity,bank_sources=prepared['bank_sources'])
++    guard=lambda:None;guard._source_state=state
++    monkeypatch.setattr(p,'code_hashes',lambda:{})
++    measurement=p.collect_profile_measurements(model,d,prepared,inventory,guard=guard,root=tmp_path/'measure',startup_seconds=startup)
++    assert measurement['startup_seconds']==startup and measurement['host_peak_bytes']>=state.stats()['host_peak_bytes']
++    capacities={'host_bytes':10**12,'disk_bytes':10**12}
++    with_source=w.project_cost(inventory,[measurement],capacities=capacities)
++    baseline=copy.deepcopy(measurement);baseline['startup_seconds']=0.
++    without=w.project_cost(inventory,[baseline],capacities=capacities)
++    assert with_source['seconds']-without['seconds']==pytest.approx(inventory['model_loads']*state.stats()['initialization_seconds'])
+--- baseline/tests/test_a3_mask_pipeline.py
++++ candidate/tests/test_a3_mask_pipeline.py
+@@ -263,8 +263,12 @@
+     assert design['access_rows']['far_v2'][0]['streams']['clean']['tokens']==[1,2,3]
+ 
+ 
+-def test_actual_validation_only_pilot_covers_all_classes_and_is_nonfinal(tmp_path):
++@pytest.mark.parametrize('sealed',[False,True])
++def test_actual_validation_only_pilot_covers_all_classes_and_is_nonfinal(tmp_path,sealed):
+     p=driver();model,support,_=tiny();design=toy_design(model)
++    if sealed:
++        from component_analysis import a3_source_validation
++        design=a3_source_validation.freeze(design)
+     widths=p.execution_widths(design,hbank_rows={})
+     prepared=dict(injected=True,identity={'injected':True,'numeric_profile':{'hardware':'injected_cpu','dtype':'float32','backend':'eager'}},
+         candidates=[list(k) for k in support.candidates],chunk_size=1,updates=200,validation_every=20,widths=widths)
+@@ -497,7 +501,8 @@
+ 
+ def test_actual_a1_parent_schema_derives_masks_without_serialized_attention():
+     from component_analysis import ladder_pipeline as ladder,ladder_design
+-    p=driver();path=Path(__file__).resolve().parents[1]/'outputs/_analyses/specificity-ladder/ladder-5f450dc/design.json'
++    import os
++    p=driver();path=Path(os.environ.get('A3_A1_SCHEMA_TEST_DESIGN',str(Path(__file__).resolve().parents[1]/'outputs/_analyses/specificity-ladder/ladder-5f450dc/design.json')))
+     parent=ladder.read_artifact(path);conditions=parent['rows']['far_v2']
+     indexed={c:{r['instance_id']:r for r in values if r['split']=='train'} for c,values in conditions.items()}
+     rid=sorted(set.intersection(*(set(rows) for rows in indexed.values())))[0]
+@@ -724,3 +729,56 @@
+     path=tmp_path/'completed-bad';publish_object(path,broken);result['H_bank_reference']=object_reference(path)
+     with pytest.raises(ValueError,match='bank|source|profile|support'):
+         p.validate_assessment_result(result,design,prepared,task='far_v2',name='intact',removed=removed)
++
++
++def test_cached_mask_source_refresh_preserves_current_protection_and_semantic_work_once(tmp_path,monkeypatch):
++    from tests.test_a3_source_validation import setup_case
++    from component_analysis import a3_source_validation as sources, a3_direction_artifacts as artifacts, a3_pipeline
++    from component_analysis import a3_direction_runtime as authority, ladder_pipeline as ladder
++    from types import SimpleNamespace
++    p=driver();c=setup_case(tmp_path,monkeypatch);calls=[]
++    design=c.design;design.update(direction_protocol={},parent_evidence={'prepared_path':'parent','selected_path':'selected'})
++    design_path=tmp_path/'mask-design.json';ladder.write_artifact(design_path,design)
++    rule=tmp_path/'rule.json';rule.write_text('{}');bundle=tmp_path/'root-bundle';authority.publish_object(bundle,{})
++    widths={'ioi':4,'mmlu':4}
++    prepared=dict(kind='a3_mask_prepared_v1',injected=False,candidates=[['head',0,0]],chunk_size=1,seeds=[42,1,123],arms=['constrained','unconstrained'],
++        updates=200,validation_every=20,validation_donors='opposite',root_ruling={},random_controls={'count':19},timing_protocol={},new30={'status':'missing_comparison'},hbank_sources={},widths=widths)
++    prepared['identity']=dict(commit='a'*40,design_path=str(design_path),design_file_sha256=p.common.file_hash(design_path),code_hashes={},operational_ruling_path=str(rule),operational_ruling_sha256=p.common.file_hash(rule),pilot_ruling_path=str(rule),pilot_ruling_sha256=p.common.file_hash(rule),root_bundle_reference=authority.object_reference(bundle),physical_widths=widths)
++    prepared['identity']['mask_protocol_sha256']=p.digest(p.mask_protocol(prepared));path=tmp_path/'mask-prepared';authority.publish_object(path,prepared)
++    monkeypatch.setattr(p,'new30_reference',lambda:prepared['new30']);monkeypatch.setattr(p,'mask_code_hashes',lambda:{})
++    monkeypatch.setattr(p,'execution_widths',lambda *a,**k:widths)
++    monkeypatch.setattr(a3_pipeline,'load_a1_parents',lambda *a:({'rows':{}},{'banks':{}},{}))
++    monkeypatch.setattr(artifacts,'validate_live',lambda *a,**k:calls.append('semantic') or {'commit':'a'*40,'injected':False})
++    monkeypatch.setattr(sources,'source_dependencies',lambda *a,**k:([c.static,rule,bundle],[],[]))
++    monkeypatch.setattr(sources,'new30_dependencies',lambda:([],[]))
++    args=SimpleNamespace(commit='a'*40,registry=[],prepared=str(path),design=str(design_path),work_dir=str(tmp_path))
++    first,evidence=p._live_mask(prepared,args);second,again=p._live_mask(prepared,args)
++    assert calls==['semantic']
++    assert sources.is_view(first) and sources.is_view(second)
++    assert first==second and again['registry_hashes']
++    copied=copy.deepcopy(second['access_rows']);copied['far_v2'][0]['instance_id']='copy-only'
++    assert first['access_rows']['far_v2'][0]['instance_id']=='recipient'
++    with monkeypatch.context() as changed:
++        changed.setenv('SPECIFICITY_A3_MASK_LAUNCH_EXECUTABLE',str(tmp_path/'different-python'))
++        with pytest.raises(ValueError,match='scope'):p._live_mask(prepared,args)
++    reservations=[]
++    args._mask_authority_context=object()
++    monkeypatch.setattr(p,'mask_reservation',lambda *a,**k:reservations.append(True) or {'fresh':True})
++    for _ in range(2):assert p._live_mask(prepared,args,{'inventory_sha256':'i'})[1]['reservation']['fresh']
++    assert len(reservations)==2 and calls==['semantic']
++    monkeypatch.setattr(p,'mask_reservation',lambda *a,**k:(_ for _ in ()).throw(ValueError('live budget changed')))
++    with pytest.raises(ValueError,match='budget'):p._live_mask(prepared,args,{'inventory_sha256':'i'})
++    prepared['widths']={}
++    with pytest.raises(ValueError):p._live_mask(prepared,args)
++
++
++def test_mask_source_initialization_reaches_existing_projector_startup_cost(tmp_path,monkeypatch):
++    from tests.test_a3_source_validation import setup_case
++    from component_analysis import a3_mask_workload as w
++    from types import SimpleNamespace
++    c=setup_case(tmp_path,monkeypatch);state=c.build(owner='mask',owner_seal=driver()._SOURCE_VALIDATOR_SEAL)
++    inventory,receipt,ledger=cost_fixture();before=w.project_cost([receipt],inventory,ledger)
++    receipt['startup_seconds']=driver()._source_startup_seconds(receipt['startup_seconds'],SimpleNamespace(_mask_source_context=state))
++    after=w.project_cost([receipt],inventory,ledger)
++    assert all(b['seconds']>a['seconds'] for a,b in zip(before['job_proposals'],after['job_proposals']))
++    assert after['requested_seconds']-before['requested_seconds']==pytest.approx(9*state.stats()['initialization_seconds'])
+--- baseline/tests/test_a3_source_validation.py
++++ candidate/tests/test_a3_source_validation.py
+@@ -0,0 +1,368 @@
++"""Process-local source proof boundaries, using actual file/protection validators."""
++import copy
++import json
++import os
++from pathlib import Path
++import pickle
++import shutil
++from types import SimpleNamespace
++
++import pytest
++
++
++def setup_case(tmp_path, monkeypatch, *, extra_registry=()):
++    from component_analysis import a3_source_validation as s
++    from component_analysis import a3_direction_runtime as authority, ladder_pipeline as ladder
++    from dataset import user_inversion_pipeline as common
++    runtime=tmp_path/'runtime';primary=tmp_path/'primary'
++    original=Path(__file__).resolve().parents[1]
++    for root in (runtime,primary):
++        (root/'docs/research').mkdir(parents=True)
++        (root/'docs/research/held_out.json').write_text(json.dumps({'schema':1,'sets':[]}))
++        (root/'docs/research/directions.json').write_text(json.dumps({'directions':[{'id':'specificity-ladder','frozen_grader_sha256':ladder.GRADER}]}))
++    for rel in ['evaluation/benchmark_eval.py']+[str(p.relative_to(original)) for p in (original/'evaluation/benchmarks').glob('*.py')]:
++        target=runtime/rel;target.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(original/rel,target)
++    monkeypatch.setattr(common,'PRIMARY_REGISTRY',str(primary/'docs/research/held_out.json'))
++    monkeypatch.setattr(common,'REPO',runtime);monkeypatch.setattr(ladder,'REPO',runtime);monkeypatch.setattr(ladder,'PRIMARY',primary)
++    design=dict(access_rows={'far_v2':[{'instance_id':'recipient','source_reference':{'instance_id':'nested-donor'}}]},
++        donor_ids={'far_v2':['declared-donor']},utility={'ioi':[{'instance_id':'utility','donor':{'source_id':'utility-donor'}}], 'mmlu_maps':[{'donor_id':'map-donor'}]},
++        ioi_validation=[{'source_id':'validation-source'}],mmlu_validation=[])
++    prepared={'kind':'fixture','identity':{'commit':'a'*40},'empty':[]}
++    design_path=tmp_path/'design.json';ladder.write_artifact(design_path,design)
++    prepared_path=tmp_path/'prepared';authority.publish_object(prepared_path,prepared)
++    static=tmp_path/'static';static.write_bytes(b'original')
++    calls=[]
++    def validate(owned):
++        calls.append('semantic')
++        assert owned['design']==design and owned['prepared']==prepared
++        return {'commit':'a'*40,'protocol_sha256':'b'*64,'injected':False}, {'far_v2':[{'instance_id':'bank','source_recipient':{'donor_id':'bank-nested'}}]}
++    def build(**kwargs):
++        return s.build_state(owner=kwargs.pop('owner','fixture'),originals={'design':design,'prepared':prepared},
++            artifacts={'design':('artifact',design_path),'prepared':('object',prepared_path)},
++            dependencies=lambda owned:([static],[],[]),semantic=kwargs.pop('semantic',validate),
++            registry_paths=list(extra_registry),scope={'commit':'a'*40},**kwargs)
++    return SimpleNamespace(s=s,runtime=runtime,primary=primary,design=design,prepared=prepared,design_path=design_path,
++        prepared_path=prepared_path,static=static,calls=calls,build=build,extra=list(extra_registry))
++
++
++def refresh(case,state):
++    return state.refresh(owner='fixture',bound_inputs={'design':case.design,'prepared':case.prepared},
++        registry_paths=case.extra,scope={'commit':'a'*40})
++
++
++@pytest.mark.parametrize('raw',[{},[],{'nested':[{'empty':[]}]}])
++def test_source_views_seal_empty_and_nested_values_and_deepcopy_thaws(raw):
++    from component_analysis import a3_source_validation as s
++    view=s.freeze(raw)
++    for action in (lambda:view.__init__(),lambda:setattr(view,'_seal',None),lambda:delattr(view,'_seal')):
++        with pytest.raises((TypeError,ValueError)):action()
++    assert not hasattr(view,'__dict__')
++    if isinstance(view,dict):
++        for action in (lambda:view.update(x=1),lambda:view.clear(),lambda:view.__setitem__('x',1),lambda:view.__ior__({'x':1})):
++            with pytest.raises(TypeError):action()
++    else:
++        for action in (lambda:view.append(1),lambda:view.extend([]),lambda:view.__setitem__(slice(None),[]),lambda:view.__iadd__([]),lambda:view.__imul__(0)):
++            with pytest.raises(TypeError):action()
++    mutable=copy.deepcopy(view);assert type(mutable) is type(raw) and mutable==raw
++    if isinstance(mutable,dict):mutable['new']=[]
++    else:mutable.append({})
++    assert mutable!=view
++    if raw=={'nested':[{'empty':[]}]}:
++        mutable['nested'][0]['empty'].append('copy only')
++        assert view['nested'][0]['empty']==[]
++        assert type(mutable['nested']) is list and type(mutable['nested'][0]) is dict
++
++
++def test_raw_unsealed_and_subclass_source_views_cannot_be_trusted():
++    from component_analysis import a3_source_validation as s
++    good=s.freeze({});raw=dict.__new__(type(good))
++    with pytest.raises((ValueError,TypeError)):s.freeze(raw)
++    with pytest.raises((ValueError,TypeError)):type(good)({})
++    class Untrusted(dict):pass
++    with pytest.raises((ValueError,TypeError)):s.freeze(Untrusted())
++    raw_list=list.__new__(type(s.freeze([])))
++    with pytest.raises((ValueError,TypeError)):s.freeze(raw_list)
++
++
++def test_context_retains_validated_owned_snapshot_and_fresh_evidence(tmp_path,monkeypatch):
++    c=setup_case(tmp_path,monkeypatch);state=c.build();first=refresh(c,state);second=refresh(c,state)
++    assert c.calls==['semantic']
++    assert first==second and first is not second
++    first['registry_hashes'].clear();assert refresh(c,state)['registry_hashes']
++    stats=state.stats();stats['roots']=[];assert type(state.stats()['roots']) is int
++    assert state.stats()['retained_bytes']>0 and state.stats()['refreshes']==3
++    with pytest.raises(TypeError):pickle.dumps(state)
++    with pytest.raises((TypeError,ValueError)):type(state)()
++    unsealed=object.__new__(type(state))
++    with pytest.raises((TypeError,ValueError)):
++        refresh(c,unsealed)
++    monkeypatch.setattr(os,'getpid',lambda:-1)
++    with pytest.raises(ValueError,match='process'):refresh(c,state)
++
++
++@pytest.mark.parametrize('mutation',['outer','nested','owned'])
++def test_mutation_during_semantic_validation_cannot_enter_minted_source(tmp_path,monkeypatch,mutation):
++    c=setup_case(tmp_path,monkeypatch)
++    def mutate(owned):
++        if mutation=='outer':c.prepared['empty']=[]
++        elif mutation=='nested':c.design['access_rows']['far_v2'][0]['instance_id']='unvalidated'
++        else:owned['design']['access_rows']['far_v2'][0]['instance_id']='unvalidated'
++        return {},{}
++    with pytest.raises((ValueError,TypeError)):c.build(semantic=mutate)
++
++
++@pytest.mark.parametrize('damage',['bytes','marker','child','outer','scope','owner'])
++def test_static_artifact_and_input_scope_changes_fail_closed(tmp_path,monkeypatch,damage):
++    c=setup_case(tmp_path,monkeypatch);state=c.build()
++    if damage=='bytes':
++        stamp=c.static.stat().st_mtime_ns;c.static.write_bytes(b'modified');os.utime(c.static,ns=(stamp,stamp))
++    elif damage=='marker':(c.prepared_path/'COMPLETE.json').unlink()
++    elif damage=='child':(c.prepared_path/'unexpected').write_text('x')
++    elif damage=='outer':c.prepared['empty']=[]
++    elif damage=='scope':
++        with pytest.raises(ValueError):state.refresh(owner='fixture',bound_inputs={'prepared':c.prepared},registry_paths=[],scope={'commit':'x'})
++        return
++    else:
++        with pytest.raises(ValueError):state.refresh(owner='wrong',bound_inputs={'prepared':c.prepared},registry_paths=[],scope={'commit':'a'*40})
++        return
++    with pytest.raises(ValueError):refresh(c,state)
++
++
++@pytest.mark.parametrize('kind',['leaf','ancestor'])
++def test_static_same_bytes_link_retargets_reject(tmp_path,monkeypatch,kind):
++    c=setup_case(tmp_path,monkeypatch)
++    a=tmp_path/'a';b=tmp_path/'b';a.mkdir();b.mkdir();(a/'file').write_text('same');(b/'file').write_text('same')
++    link=tmp_path/'link';link.symlink_to(a if kind=='ancestor' else a/'file')
++    path=link/'file' if kind=='ancestor' else link
++    state=c.s.build_state(owner='fixture',originals={'design':c.design,'prepared':c.prepared},
++        artifacts={'design':('artifact',c.design_path),'prepared':('object',c.prepared_path)},
++        dependencies=lambda owned:([path],[],[]),semantic=lambda owned:({},{}),registry_paths=[],scope={'commit':'a'*40})
++    link.unlink();link.symlink_to(b if kind=='ancestor' else b/'file')
++    with pytest.raises(ValueError):refresh(c,state)
++
++
++def test_exact_id_union_matches_original_base_and_bank_expansions(tmp_path,monkeypatch):
++    c=setup_case(tmp_path,monkeypatch)
++    from component_analysis import a3_design, a3_mask_pipeline as mask
++    from dataset import user_inversion_pipeline as common
++    collected=[];actual=common.check_registry
++    def inspect(args,contexts):
++        collected.append({t:{r['instance_id'] for split in args.splits for r in v['rows']['D'][split]} for t,v in contexts.items()})
++        return actual(args,contexts)
++    monkeypatch.setattr(common,'check_registry',inspect)
++    a3_design.validate_access(c.design,[])
++    parent={'rows':{'far_v2':{'H':[{'instance_id':'bank','source_recipient':{'donor_id':'bank-nested'}}]}}}
++    mask._protect_bank_sources(c.design,parent,{'far_v2':{'ids':['bank']}},[])
++    state=c.build();refresh(c,state)
++    assert collected[0]['far_v2']=={'recipient','nested-donor','declared-donor'}
++    assert collected[1]['far_v2']==collected[-1]['far_v2']==collected[0]['far_v2']|{'bank','bank-nested'}
++    assert collected[0]['ioi']==collected[-1]['ioi']=={'utility','utility-donor','validation-source'}
++    assert collected[0]['mmlu']==collected[-1]['mmlu']=={'map-donor'}
++
++
++def test_current_registry_atomic_updates_new_sets_and_new_link_attacks(tmp_path,monkeypatch):
++    c=setup_case(tmp_path,monkeypatch);state=c.build();registry=c.primary/'docs/research/held_out.json'
++    replacement=registry.with_suffix('.new');replacement.write_text(json.dumps({'schema':1,'sets':[{'ids':['unrelated']}]}));replacement.replace(registry)
++    refresh(c,state)
++    data=c.primary/'new-ids.json';data.write_text(json.dumps(['unrelated']))
++    import hashlib
++    def use_file():
++        registry.write_text(json.dumps({'schema':1,'sets':[{'path':'new-ids.json','sha256':hashlib.sha256(data.read_bytes()).hexdigest(),'n':1}]}))
++    use_file();refresh(c,state)
++    moved=c.primary/'same-ids.json';moved.write_bytes(data.read_bytes());data.unlink();data.symlink_to(moved)
++    with pytest.raises(ValueError,match='provenance'):refresh(c,state)
++
++
++def test_new_file_protected_overlap_and_grader_changes_still_fail(tmp_path,monkeypatch):
++    c=setup_case(tmp_path,monkeypatch);state=c.build();registry=c.primary/'docs/research/held_out.json'
++    registry.write_text(json.dumps({'schema':1,'sets':[{'ids':['bank-nested']}]}))
++    with pytest.raises(ValueError,match='overlap'):refresh(c,state)
++    registry.write_text(json.dumps({'schema':1,'sets':[]}))
++    grader=c.primary/'docs/research/directions.json';grader.write_text(json.dumps({'directions':[{'id':'specificity-ladder','frozen_grader_sha256':'wrong'}]}))
++    with pytest.raises(ValueError,match='grader'):refresh(c,state)
++
++
++@pytest.mark.parametrize('pathkind',['default','explicit'])
++def test_mutable_registry_lexical_provenance_and_relative_cwd(tmp_path,monkeypatch,pathkind):
++    c=setup_case(tmp_path,monkeypatch)
++    if pathkind=='default':
++        registry=c.runtime/'docs/research/held_out.json';target=tmp_path/'target.json';target.write_bytes(registry.read_bytes());registry.unlink();registry.symlink_to(target)
++        state=c.build();other=tmp_path/'other.json';other.write_bytes(target.read_bytes());registry.unlink();registry.symlink_to(other)
++        with pytest.raises(ValueError,match='provenance'):refresh(c,state)
++    else:
++        relative=tmp_path/'relative.json';relative.write_text(json.dumps({'schema':1,'sets':[]}));monkeypatch.chdir(tmp_path);c.extra.append('relative.json')
++        state=c.s.build_state(owner='fixture',originals={'design':c.design,'prepared':c.prepared},artifacts={'design':('artifact',c.design_path),'prepared':('object',c.prepared_path)},dependencies=lambda owned:([c.static],[],[]),semantic=lambda owned:({},{}),registry_paths=c.extra,scope={'commit':'a'*40})
++        monkeypatch.chdir(c.runtime)
++        with pytest.raises(ValueError,match='registry scope'):refresh(c,state)
++
++
++def test_missing_static_source_appearance_and_glob_change_invalidate(tmp_path,monkeypatch):
++    c=setup_case(tmp_path,monkeypatch);missing=tmp_path/'missing/receipt.json';watch=tmp_path/'watch';watch.mkdir();(watch/'source.py').write_text('a')
++    state=c.s.build_state(owner='fixture',originals={'design':c.design,'prepared':c.prepared},artifacts={'design':('artifact',c.design_path),'prepared':('object',c.prepared_path)},dependencies=lambda owned:([c.static],[missing],[(watch,'*.py')]),semantic=lambda owned:({},{}),registry_paths=[],scope={'commit':'a'*40})
++    refresh(c,state);missing.parent.mkdir();missing.write_text('{}')
++    with pytest.raises(ValueError):refresh(c,state)
++
++
++def test_static_absence_and_glob_are_rechecked_across_mint(tmp_path,monkeypatch):
++    c=setup_case(tmp_path,monkeypatch);missing=tmp_path/'absent.json'
++    def mutation(owned):missing.write_text('{}');return {},{}
++    with pytest.raises(ValueError):
++        c.s.build_state(owner='fixture',originals={'design':c.design,'prepared':c.prepared},artifacts={'design':('artifact',c.design_path),'prepared':('object',c.prepared_path)},
++            dependencies=lambda owned:([c.static],[missing],[]),semantic=mutation,registry_paths=[],scope={'commit':'a'*40})
++
++
++@pytest.mark.parametrize('damage',['overlap','count','hash','escape'])
++def test_actual_new_file_set_checks_remain_authoritative(tmp_path,monkeypatch,damage):
++    c=setup_case(tmp_path,monkeypatch);state=c.build();registry=c.primary/'docs/research/held_out.json'
++    import hashlib
++    path=c.primary/'set.json';path.write_text(json.dumps(['bank-nested' if damage=='overlap' else 'unrelated']))
++    entry={'path':'set.json','sha256':hashlib.sha256(path.read_bytes()).hexdigest(),'n':1}
++    if damage=='count':entry['n']=2
++    if damage=='hash':entry['sha256']='0'*64
++    if damage=='escape':entry['path']='../outside.json'
++    registry.write_text(json.dumps({'schema':1,'sets':[entry]}))
++    with pytest.raises(ValueError):refresh(c,state)
++
++
++def test_owned_snapshot_is_matched_to_actual_artifact_before_semantics(tmp_path,monkeypatch):
++    c=setup_case(tmp_path,monkeypatch);c.design['access_rows']['far_v2'][0]['instance_id']='not-authenticated'
++    with pytest.raises(ValueError,match='actual artifact'):c.build()
++    assert c.calls==[]
++
++
++def test_proof_retains_no_initializer_callback_closure(tmp_path,monkeypatch):
++    import gc,weakref
++    c=setup_case(tmp_path,monkeypatch)
++    class ParentPayload:pass
++    payload=ParentPayload();reference=weakref.ref(payload)
++    def make_callback(value):
++        def callback(owned):assert value is not None;return {},{}
++        return callback
++    callback=make_callback(payload);state=c.build(semantic=callback)
++    del payload,callback;gc.collect();assert reference() is None
++    assert state.stats()['retained_bytes']>0
++
++
++@pytest.mark.parametrize('owner',['mask','edge'])
++def test_generic_proof_cannot_impersonate_an_owner_validator(tmp_path,monkeypatch,owner):
++    c=setup_case(tmp_path,monkeypatch);state=c.build(owner=owner)
++    from component_analysis import a3_mask_pipeline as mask,a3_edge_pipeline as edge
++    module=mask if owner=='mask' else edge
++    with pytest.raises(ValueError):module._source_startup_seconds(0.,SimpleNamespace(**{'_'+owner+'_source_context':state}))
++
++
++def test_registry_discovery_binds_the_same_bytes_as_current_checker(tmp_path,monkeypatch):
++    c=setup_case(tmp_path,monkeypatch);state=c.build()
++    from dataset import user_inversion_pipeline as common
++    import hashlib
++    registry=c.primary/'docs/research/held_out.json';data=c.primary/'new-set.json';data.write_text(json.dumps(['unrelated']))
++    added={'schema':1,'sets':[{'path':'new-set.json','sha256':hashlib.sha256(data.read_bytes()).hexdigest(),'n':1}]}
++    read=common.read_json;once=[True]
++    def changing(path):
++        value=read(path)
++        if Path(path)==registry and once[0]:
++            once[0]=False;registry.write_text(json.dumps(added))
++        return value
++    monkeypatch.setattr(common,'read_json',changing)
++    with pytest.raises(ValueError,match='changed during refresh'):refresh(c,state)
++    refresh(c,state)
++    other=c.primary/'other.json';other.write_bytes(data.read_bytes());data.unlink();data.symlink_to(other)
++    with pytest.raises(ValueError,match='provenance'):refresh(c,state)
++
++
++def test_source_code_closures_include_the_new_helper():
++    from component_analysis import a3_mask_pipeline as mask,a3_edge_pipeline as edge
++    helper=Path(__file__).resolve().parents[1]/'component_analysis/a3_source_validation.py'
++    assert str(helper) in mask.mask_code_hashes()
++    assert 'component_analysis/a3_source_validation.py' in edge.code_hashes()
++
++
++def test_protection_metadata_cannot_be_reinitialized_or_rerouted(tmp_path,monkeypatch):
++    c=setup_case(tmp_path,monkeypatch);state=c.build();protection=state._protection
++    with pytest.raises(TypeError):protection.__init__(protection.contexts,[])
++    with pytest.raises(TypeError):protection.contexts={}
++    from dataset import user_inversion_pipeline as common
++    other=tmp_path/'other.json';other.write_text(json.dumps({'schema':1,'sets':[]}));monkeypatch.setattr(common,'PRIMARY_REGISTRY',str(other))
++    with pytest.raises(ValueError,match='default'):refresh(c,state)
++
++
++@pytest.mark.parametrize('body',['[]','null','{"schema":1,"sets":null}'])
++def test_malformed_current_registry_fails_with_validation_error(tmp_path,monkeypatch,body):
++    c=setup_case(tmp_path,monkeypatch);state=c.build();(c.primary/'docs/research/held_out.json').write_text(body)
++    with pytest.raises(ValueError):refresh(c,state)
++
++
++def test_mutable_diagnostic_counters_cannot_change_charged_initialization(tmp_path,monkeypatch):
++    c=setup_case(tmp_path,monkeypatch);state=c.build();before=c.s.startup_seconds(0.,state)
++    state._stats['initialization_seconds']=0.
++    assert c.s.startup_seconds(0.,state)==before and before>0
++
++
++def test_new30_closure_covers_missing_receipt_first_missing_link_and_escape(tmp_path,monkeypatch):
++    from component_analysis import a3_source_validation as s
++    actual=Path;study=tmp_path/'study';study.mkdir()
++    marker='/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_studies/selective-deception/study'
++    monkeypatch.setattr(s,'Path',lambda value:study if str(value)==marker else actual(value))
++    receipt=study/'sparse-optimization-v4/comparison/selection-receipt.json'
++    assert s.new30_dependencies()==([],[receipt])
++    receipt.parent.mkdir(parents=True)
++    receipt.write_text(json.dumps({'masks':[{'label':'new-allW30','head_list':{'path':'selective-deception/heads.json'},'source_proposal':{k+'_path':'selective-deception/'+k+'.json' for k in ('export','manifest','run_identity')}}]}))
++    paths,missing=s.new30_dependencies();assert paths==[receipt] and missing==[study/'heads.json']
++    (study/'heads.json').write_text('{}');paths,missing=s.new30_dependencies();assert missing==[study/'export.json']
++    for name in ('export','manifest','run_identity'):(study/(name+'.json')).write_text('{}')
++    paths,missing=s.new30_dependencies();assert len(paths)==5 and not missing
++    (study/'heads.json').unlink();outside=tmp_path/'outside.json';outside.write_text('{}');(study/'heads.json').symlink_to(outside)
++    with pytest.raises(ValueError,match='escaped'):s.new30_dependencies()
++
++
++def test_dependency_discovery_keeps_parent_sidecar_and_lexical_input_aliases(tmp_path,monkeypatch):
++    from component_analysis import a3_source_validation as s,a3_pipeline
++    import hashlib
++    root=tmp_path/'runtime';root.mkdir();a1=tmp_path/'a1';a1.mkdir();target=tmp_path/'data';target.mkdir();(target/'file.json').write_text('{}');(a1/'data').symlink_to(target)
++    snapshot=tmp_path/'snapshot';snapshot.mkdir();parquet=snapshot/'test.parquet';parquet.write_bytes(b'fixture parquet')
++    evidence=dict(prepared_path=str(tmp_path/'parent.json'),selected_path=str(tmp_path/'selection.json'),completion_path=str(tmp_path/'completion.json'))
++    parent={'source_hashes':{'data/file.json':'h'},'selection_hashes':{'selection-source.json':'h'},'code_hashes':{'code.py':'h'}}
++    monkeypatch.setattr(a3_pipeline,'load_a1_parents',lambda *a:(parent,{},evidence))
++    d=dict(parent_evidence=evidence,a1_repo_root=str(a1),direction_protocol={'code_hashes':{'direction.py':'h'}},historical_source_hashes={str(tmp_path/'history.csv'):'h'},matched_build_path=str(tmp_path/'build.json'),
++        utility={},mmlu_validation_candidates_manifest={'snapshot':str(snapshot),'parquet_hashes':{'test.parquet':hashlib.sha256(parquet.read_bytes()).hexdigest()}})
++    paths,missing,watch=s.source_dependencies(d,root=root,owner_paths=[tmp_path/'bundle'])
++    assert set(map(str,paths))==set(evidence.values())|{str(a1/'data/file.json'),str(a1/'selection-source.json'),str(root/'code.py'),str(root/'direction.py'),str(tmp_path/'history.csv'),str(tmp_path/'build.json'),str(parquet),str(tmp_path/'bundle')}
++    assert not missing and watch==[(root/'component_analysis','a3_direction_*.py')]
++
++
++@pytest.mark.parametrize('damage',['code','new_glob'])
++def test_current_grader_code_and_glob_membership_are_not_cached(tmp_path,monkeypatch,damage):
++    c=setup_case(tmp_path,monkeypatch);state=c.build()
++    path=c.runtime/('evaluation/benchmark_eval.py' if damage=='code' else 'evaluation/benchmarks/new_grader.py')
++    with path.open('a') as handle:handle.write('\n# changed grader\n')
++    with pytest.raises(ValueError,match='grader'):refresh(c,state)
++
++
++def test_charged_initialization_includes_context_construction(tmp_path,monkeypatch):
++    c=setup_case(tmp_path,monkeypatch);ticks=[0.];constructor=c.s._SourceState.__init__
++    monkeypatch.setattr(c.s,'_clock',lambda:ticks[0])
++    def constructing(self,**kwargs):constructor(self,**kwargs);ticks[0]+=7.
++    monkeypatch.setattr(c.s._SourceState,'__init__',constructing)
++    state=c.build();assert c.s.startup_seconds(0.,state)==7.
++
++
++def test_validation_only_payload_is_released_before_returned_rss_sample(tmp_path,monkeypatch):
++    import weakref
++    c=setup_case(tmp_path,monkeypatch);reference=[None]
++    class Payload:pass
++    class ExtraRows(dict):pass
++    def semantic(owned):
++        rows=ExtraRows();rows.payload=Payload();reference[0]=weakref.ref(rows.payload)
++        return {},rows
++    monkeypatch.setattr(c.s,'_rss_bytes',lambda:100 if reference[0] is not None and reference[0]() is not None else 10)
++    state=c.build(semantic=semantic)
++    assert state.stats()['rss_after_bytes']==10
++
++
++def test_static_link_target_ancestor_replacement_is_not_hidden_by_same_resolution(tmp_path,monkeypatch):
++    c=setup_case(tmp_path,monkeypatch);target=tmp_path/'target';target.mkdir();(target/'file').write_text('same')
++    middle=tmp_path/'middle';middle.symlink_to(target);leaf=tmp_path/'leaf';leaf.symlink_to(middle/'file')
++    state=c.s.build_state(owner='fixture',originals={'design':c.design,'prepared':c.prepared},artifacts={'design':('artifact',c.design_path),'prepared':('object',c.prepared_path)},
++        dependencies=lambda owned:([leaf],[],[]),semantic=lambda owned:({},{}),registry_paths=[],scope={'commit':'a'*40})
++    middle.unlink();middle.symlink_to(target)
++    with pytest.raises(ValueError):refresh(c,state)

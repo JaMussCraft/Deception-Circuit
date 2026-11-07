@@ -1,0 +1,67 @@
+{
+  "status": "handed-back",
+  "verdict": "ACCEPT_TASK1_TRANSPORT_AS_DEPENDENCY_FOR_TASKS2_AND3_ONLY",
+  "runtime_sha256": "f39162481d54b9e86119cf4528ba0d9a9c90809e41daf101053891206ee2c6b9",
+  "test_sha256": "4082bc6d81fc86479bf9cb0e44f3a49afc75533f7cd7c26c0f6d21c5fcba2097",
+  "source_pins_sha256": "6a7756fe46db30cea28b26b5926bd24d4de529c8e168357523019c39a7df2e29",
+  "actual_green_job": "23613149",
+  "reported_scheduler_terminal": "COMPLETED0:0/151s from root current actual observation",
+  "actual_packet_normal_completion": true,
+  "actual_packet_exit_code": 0,
+  "actual_packet_wall_seconds": 139.36684894561768,
+  "results": {
+    "base": {
+      "JUnit": {
+        "tests": 55,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "pytest_exit": 0,
+      "unchanged_publisher_oracle_bytes": 62,
+      "unchanged_publisher_oracle_sha256": "c4574ddb061c8126dc75d944519f9c160638c66078d7037864f1d0294ff7a463",
+      "source_pins_before_after_equal": true,
+      "origins": "candidate and original oracle each resolve under their separate correct pinned tree"
+    },
+    "mgnp": {
+      "JUnit": {
+        "tests": 55,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "pytest_exit": 0,
+      "unchanged_publisher_oracle_bytes": 62,
+      "unchanged_publisher_oracle_sha256": "c4574ddb061c8126dc75d944519f9c160638c66078d7037864f1d0294ff7a463",
+      "source_pins_before_after_equal": true,
+      "origins": "candidate and original oracle each resolve under their separate correct pinned tree"
+    }
+  },
+  "review193_reused_scope": "Existing independent static acceptance of unchanged runtime/source/publisher/witness/namespace/resource-data scope; no unrelated architecture reopened.",
+  "single_hunk_correction": "Only test_prepared_native_prefit_inventory_seam_without_model changes. Frozen graph now equals both untouched JSON-published representations, plus canonical native digest equality and exact native payload bytes. Original inventory_sha256, expected-key count and final-witness assertions preserved; all other AST test definitions identical. This corrects tuple\u2192JSON-array expectation, not production behavior.",
+  "source_pins_current_verified": {
+    "candidate_files": 361,
+    "oracle_files": 360,
+    "packet_files": 7
+  },
+  "unchanged_optionA_workload_sha256": "765b22a006ab519186a168bf455f4084915457d4ffce88881e76bf31b71a37cb",
+  "unchanged_optionA_workload_tests_sha256": "846427fc2f4aa048f652d18c48715eda7eedcac3f4422adbded6be6c781a46dc",
+  "test_suite_rerun": false,
+  "candidate_source_test_job_git_RS_remote_edits": false,
+  "admission": {
+    "production_CPU_producer": false,
+    "runtime_integration": false,
+    "resource_bounds_or_memory_peaks": false,
+    "source_publication": false,
+    "fresh9_prefit_aggregate": false,
+    "paired0.5GPUh_feasibility": false,
+    "GPU": false
+  },
+  "next_step": "Root may assign planned Task2 then Task3 in isolated candidate under accepted183-r2; retain post-reader observed bound rejection and original live/capacity/model checks. No code start authorized by reviewer independently of root.",
+  "usage_checked_before_work": {
+    "weekly_used_percent": 16,
+    "pause_at": 17,
+    "should_pause": false,
+    "checked_utc": "2026-11-06T21:58:55.750926+00:00"
+  }
+}

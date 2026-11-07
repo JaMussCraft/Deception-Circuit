@@ -1,0 +1,1394 @@
+{
+  "status": "exact_no_observed_drift",
+  "integrity_passed": true,
+  "predeclared_plan": {
+    "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges2/reference-check/predeclared-comparison.json",
+    "sha256": "82e6d53617d4cb276b3596edf22327c7a6f47e54b3c1592b85127d706d97afc9",
+    "changed_after_observation": false
+  },
+  "scope": {
+    "arms": [
+      "D",
+      "I"
+    ],
+    "seed": 42,
+    "actual_epochs": 20,
+    "planned_epochs": 500,
+    "cosine_T_max": 20,
+    "train": 187,
+    "validation": 187,
+    "test": 952,
+    "paired_rows": 4930,
+    "paired_selected_logit_values": 14790,
+    "pretraining_paired_rows": 2278
+  },
+  "integrity": {
+    "D": {
+      "passed": true,
+      "identity_keys_equal": [
+        "task",
+        "condition",
+        "seed",
+        "model",
+        "purpose",
+        "actual_epochs",
+        "planned_epochs",
+        "fleet_ready",
+        "cohort",
+        "source_commit",
+        "execution_commit",
+        "build_hash",
+        "build_manifest_sha256",
+        "frozen_config_sha256",
+        "resolved_config_sha256",
+        "dataset_config_sha256",
+        "selected_ids",
+        "counts",
+        "max_seq_length",
+        "granularity",
+        "recipient_condition",
+        "legacy_deception_condition",
+        "config_file_sha256",
+        "build_manifest_file_sha256",
+        "source_hashes"
+      ],
+      "argv_after_script_exact": true,
+      "native_config_full_equal": true,
+      "registry_aliases_normalize_to_same_files": true,
+      "changed_native_manifest_fields": [
+        "argv",
+        "created",
+        "cwd",
+        "host",
+        "manifest_hash",
+        "slurm_job_id"
+      ],
+      "native_runtime_software": {
+        "nnsight": "0.7.0",
+        "python": "3.12.13",
+        "torch": "2.11.0+cu128",
+        "transformers": "5.13.0"
+      },
+      "native_model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+      "native_host": "w009.ib.bridges2.psc.edu",
+      "native_job": "50147300",
+      "artifacts": {
+        "H200": {
+          "config.json": {
+            "declared_virtual_path": "outputs/_training_specificity_ladder/a2-h200/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/config.json",
+            "actual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/config.json",
+            "sha256": "ff77b71906130fe1d0dba2c6357f209339c87590144b142d398492467bbba4f1",
+            "bytes": 1546,
+            "receipt_hash_matches": true
+          },
+          "active_nodes.json": {
+            "declared_virtual_path": "outputs/_training_specificity_ladder/a2-h200/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/active_nodes.json",
+            "actual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/active_nodes.json",
+            "sha256": "41c8fafb3cbd89d66ce88e9afaaa89a2e11aff64b99346088761f68d62370e28",
+            "bytes": 20882,
+            "receipt_hash_matches": true
+          },
+          "results.json": {
+            "declared_virtual_path": "outputs/_training_specificity_ladder/a2-h200/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/results.json",
+            "actual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/results.json",
+            "sha256": "88d21b347d57c855a6ff3a3aefaba63d4b921142c5243d2552b2e57c3ee62e3a",
+            "bytes": 1097690,
+            "receipt_hash_matches": true
+          },
+          "history.json": {
+            "declared_virtual_path": "outputs/_training_specificity_ladder/a2-h200/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/history.json",
+            "actual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/history.json",
+            "sha256": "ce6c292d6abbd430d7d3155522c2b58b17059304b6d95f796144a1cd864d2c8e",
+            "bytes": 366839,
+            "receipt_hash_matches": true
+          },
+          "run_manifest.json": {
+            "declared_virtual_path": "outputs/_training_specificity_ladder/a2-h200/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/run_manifest.json",
+            "actual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/run_manifest.json",
+            "sha256": "15c9f88cd1a089cc2be9faac2aed6296b0e405d1424fe12e9d08a4a6382b7652",
+            "bytes": 5148,
+            "receipt_hash_matches": true
+          }
+        },
+        "H100": {
+          "config.json": {
+            "declared_virtual_path": "outputs/_training_specificity_ladder/a2-h200/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/config.json",
+            "actual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-native/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/config.json",
+            "sha256": "ff77b71906130fe1d0dba2c6357f209339c87590144b142d398492467bbba4f1",
+            "bytes": 1546,
+            "receipt_hash_matches": true
+          },
+          "active_nodes.json": {
+            "declared_virtual_path": "outputs/_training_specificity_ladder/a2-h200/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/active_nodes.json",
+            "actual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-native/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/active_nodes.json",
+            "sha256": "41c8fafb3cbd89d66ce88e9afaaa89a2e11aff64b99346088761f68d62370e28",
+            "bytes": 20882,
+            "receipt_hash_matches": true
+          },
+          "results.json": {
+            "declared_virtual_path": "outputs/_training_specificity_ladder/a2-h200/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/results.json",
+            "actual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-native/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/results.json",
+            "sha256": "88d21b347d57c855a6ff3a3aefaba63d4b921142c5243d2552b2e57c3ee62e3a",
+            "bytes": 1097690,
+            "receipt_hash_matches": true
+          },
+          "history.json": {
+            "declared_virtual_path": "outputs/_training_specificity_ladder/a2-h200/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/history.json",
+            "actual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-native/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/history.json",
+            "sha256": "ce6c292d6abbd430d7d3155522c2b58b17059304b6d95f796144a1cd864d2c8e",
+            "bytes": 366839,
+            "receipt_hash_matches": true
+          },
+          "run_manifest.json": {
+            "declared_virtual_path": "outputs/_training_specificity_ladder/a2-h200/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/run_manifest.json",
+            "actual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-native/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/run_manifest.json",
+            "sha256": "d74f06ae6f893ffd57ec962e5948c1a7b44cd878a80dfdc2aec14a9128374148",
+            "bytes": 5270,
+            "receipt_hash_matches": true
+          }
+        }
+      },
+      "exact_scientific_file_equality": {
+        "config.json": true,
+        "active_nodes.json": true,
+        "results.json": true,
+        "history.json": true
+      }
+    },
+    "I": {
+      "passed": true,
+      "identity_keys_equal": [
+        "task",
+        "condition",
+        "seed",
+        "model",
+        "purpose",
+        "actual_epochs",
+        "planned_epochs",
+        "fleet_ready",
+        "cohort",
+        "source_commit",
+        "execution_commit",
+        "build_hash",
+        "build_manifest_sha256",
+        "frozen_config_sha256",
+        "resolved_config_sha256",
+        "dataset_config_sha256",
+        "selected_ids",
+        "counts",
+        "max_seq_length",
+        "granularity",
+        "recipient_condition",
+        "legacy_deception_condition",
+        "config_file_sha256",
+        "build_manifest_file_sha256",
+        "source_hashes"
+      ],
+      "argv_after_script_exact": true,
+      "native_config_full_equal": true,
+      "registry_aliases_normalize_to_same_files": true,
+      "changed_native_manifest_fields": [
+        "argv",
+        "created",
+        "cwd",
+        "host",
+        "manifest_hash",
+        "slurm_job_id"
+      ],
+      "native_runtime_software": {
+        "nnsight": "0.7.0",
+        "python": "3.12.13",
+        "torch": "2.11.0+cu128",
+        "transformers": "5.13.0"
+      },
+      "native_model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+      "native_host": "w009.ib.bridges2.psc.edu",
+      "native_job": "50147300",
+      "artifacts": {
+        "H200": {
+          "config.json": {
+            "declared_virtual_path": "outputs/_training_specificity_ladder/a2-h200/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/config.json",
+            "actual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/config.json",
+            "sha256": "1b83a5243c80e9a051b1ace0555a6f85a0d772a57b971a62409ee51f1de84780",
+            "bytes": 1546,
+            "receipt_hash_matches": true
+          },
+          "active_nodes.json": {
+            "declared_virtual_path": "outputs/_training_specificity_ladder/a2-h200/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/active_nodes.json",
+            "actual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/active_nodes.json",
+            "sha256": "ad6f59e3240bed81a1137a1f84dc8d795344e2f192525271074816cef3d4bac2",
+            "bytes": 20254,
+            "receipt_hash_matches": true
+          },
+          "results.json": {
+            "declared_virtual_path": "outputs/_training_specificity_ladder/a2-h200/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/results.json",
+            "actual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/results.json",
+            "sha256": "0cb8d96568090aa7bc22b97735924ea1f3f5c422a68c19130dc9e43cfb04d362",
+            "bytes": 1107220,
+            "receipt_hash_matches": true
+          },
+          "history.json": {
+            "declared_virtual_path": "outputs/_training_specificity_ladder/a2-h200/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/history.json",
+            "actual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/history.json",
+            "sha256": "84da570b955c2073f0e4db920f69399d81ce9c266d148e86bb2c156e685f63dc",
+            "bytes": 369668,
+            "receipt_hash_matches": true
+          },
+          "run_manifest.json": {
+            "declared_virtual_path": "outputs/_training_specificity_ladder/a2-h200/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/run_manifest.json",
+            "actual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/run_manifest.json",
+            "sha256": "eb1c91f820ccc1359b193bc46ea7a8166f3704300f7d0572d431275482dda950",
+            "bytes": 5148,
+            "receipt_hash_matches": true
+          }
+        },
+        "H100": {
+          "config.json": {
+            "declared_virtual_path": "outputs/_training_specificity_ladder/a2-h200/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/config.json",
+            "actual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-native/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/config.json",
+            "sha256": "1b83a5243c80e9a051b1ace0555a6f85a0d772a57b971a62409ee51f1de84780",
+            "bytes": 1546,
+            "receipt_hash_matches": true
+          },
+          "active_nodes.json": {
+            "declared_virtual_path": "outputs/_training_specificity_ladder/a2-h200/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/active_nodes.json",
+            "actual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-native/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/active_nodes.json",
+            "sha256": "ad6f59e3240bed81a1137a1f84dc8d795344e2f192525271074816cef3d4bac2",
+            "bytes": 20254,
+            "receipt_hash_matches": true
+          },
+          "results.json": {
+            "declared_virtual_path": "outputs/_training_specificity_ladder/a2-h200/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/results.json",
+            "actual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-native/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/results.json",
+            "sha256": "0cb8d96568090aa7bc22b97735924ea1f3f5c422a68c19130dc9e43cfb04d362",
+            "bytes": 1107220,
+            "receipt_hash_matches": true
+          },
+          "history.json": {
+            "declared_virtual_path": "outputs/_training_specificity_ladder/a2-h200/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/history.json",
+            "actual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-native/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/history.json",
+            "sha256": "84da570b955c2073f0e4db920f69399d81ce9c266d148e86bb2c156e685f63dc",
+            "bytes": 369668,
+            "receipt_hash_matches": true
+          },
+          "run_manifest.json": {
+            "declared_virtual_path": "outputs/_training_specificity_ladder/a2-h200/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/run_manifest.json",
+            "actual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-native/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/run_manifest.json",
+            "sha256": "6f7828453e575980d8e83ea2230e4e284299a2d30266263490813e93decab6f5",
+            "bytes": 5270,
+            "receipt_hash_matches": true
+          }
+        }
+      },
+      "exact_scientific_file_equality": {
+        "config.json": true,
+        "active_nodes.json": true,
+        "results.json": true,
+        "history.json": true
+      }
+    }
+  },
+  "comparisons": {
+    "D": {
+      "baseline": {
+        "rows": 952,
+        "pretraining": true,
+        "all_metadata_equal": true,
+        "exact_saved_fields": true,
+        "paired_fields": {
+          "logit_target": {
+            "count": 952,
+            "nonzero": 0,
+            "signed_mean": 0.0,
+            "mean_absolute": 0.0,
+            "RMS": 0.0,
+            "absolute_p50": 0.0,
+            "absolute_p95": 0.0,
+            "absolute_p99": 0.0,
+            "maximum_absolute": 0.0
+          },
+          "logit_distractor": {
+            "count": 952,
+            "nonzero": 0,
+            "signed_mean": 0.0,
+            "mean_absolute": 0.0,
+            "RMS": 0.0,
+            "absolute_p50": 0.0,
+            "absolute_p95": 0.0,
+            "absolute_p99": 0.0,
+            "maximum_absolute": 0.0
+          },
+          "logit_difference": {
+            "count": 952,
+            "nonzero": 0,
+            "signed_mean": 0.0,
+            "mean_absolute": 0.0,
+            "RMS": 0.0,
+            "absolute_p50": 0.0,
+            "absolute_p95": 0.0,
+            "absolute_p99": 0.0,
+            "maximum_absolute": 0.0
+          }
+        },
+        "changed_decoded_choice_count": 0,
+        "changed_decoded_choice_IDs": [],
+        "changed_sign_or_strict_decision_count": 0,
+        "changed_sign_or_strict_decision_IDs": [],
+        "tie_row_IDs": [],
+        "aggregate_H200": {
+          "accuracy": 1.0,
+          "logit_diff": 3.8340992647058822,
+          "kl_div": 0.0,
+          "exact_match": 1.0
+        },
+        "aggregate_H100": {
+          "accuracy": 1.0,
+          "logit_diff": 3.8340992647058822,
+          "kl_div": 0.0,
+          "exact_match": 1.0
+        },
+        "aggregate_deltas": {
+          "accuracy": 0.0,
+          "logit_diff": 0.0,
+          "kl_div": 0.0,
+          "exact_match": 0.0
+        }
+      },
+      "node_eval": {
+        "rows": 952,
+        "pretraining": false,
+        "all_metadata_equal": true,
+        "exact_saved_fields": true,
+        "paired_fields": {
+          "logit_target": {
+            "count": 952,
+            "nonzero": 0,
+            "signed_mean": 0.0,
+            "mean_absolute": 0.0,
+            "RMS": 0.0,
+            "absolute_p50": 0.0,
+            "absolute_p95": 0.0,
+            "absolute_p99": 0.0,
+            "maximum_absolute": 0.0
+          },
+          "logit_distractor": {
+            "count": 952,
+            "nonzero": 0,
+            "signed_mean": 0.0,
+            "mean_absolute": 0.0,
+            "RMS": 0.0,
+            "absolute_p50": 0.0,
+            "absolute_p95": 0.0,
+            "absolute_p99": 0.0,
+            "maximum_absolute": 0.0
+          },
+          "logit_difference": {
+            "count": 952,
+            "nonzero": 0,
+            "signed_mean": 0.0,
+            "mean_absolute": 0.0,
+            "RMS": 0.0,
+            "absolute_p50": 0.0,
+            "absolute_p95": 0.0,
+            "absolute_p99": 0.0,
+            "maximum_absolute": 0.0
+          }
+        },
+        "changed_decoded_choice_count": 0,
+        "changed_decoded_choice_IDs": [],
+        "changed_sign_or_strict_decision_count": 0,
+        "changed_sign_or_strict_decision_IDs": [],
+        "tie_row_IDs": [],
+        "aggregate_H200": {
+          "accuracy": 1.0,
+          "logit_diff": 3.8842568277310923,
+          "kl_div": 0.003197510468483973,
+          "exact_match": 1.0
+        },
+        "aggregate_H100": {
+          "accuracy": 1.0,
+          "logit_diff": 3.8842568277310923,
+          "kl_div": 0.003197510468483973,
+          "exact_match": 1.0
+        },
+        "aggregate_deltas": {
+          "accuracy": 0.0,
+          "logit_diff": 0.0,
+          "kl_div": 0.0,
+          "exact_match": 0.0
+        }
+      },
+      "validation_epoch0": {
+        "rows": 187,
+        "pretraining": true,
+        "all_metadata_equal": true,
+        "exact_saved_fields": true,
+        "paired_fields": {
+          "logit_target": {
+            "count": 187,
+            "nonzero": 0,
+            "signed_mean": 0.0,
+            "mean_absolute": 0.0,
+            "RMS": 0.0,
+            "absolute_p50": 0.0,
+            "absolute_p95": 0.0,
+            "absolute_p99": 0.0,
+            "maximum_absolute": 0.0
+          },
+          "logit_distractor": {
+            "count": 187,
+            "nonzero": 0,
+            "signed_mean": 0.0,
+            "mean_absolute": 0.0,
+            "RMS": 0.0,
+            "absolute_p50": 0.0,
+            "absolute_p95": 0.0,
+            "absolute_p99": 0.0,
+            "maximum_absolute": 0.0
+          },
+          "logit_difference": {
+            "count": 187,
+            "nonzero": 0,
+            "signed_mean": 0.0,
+            "mean_absolute": 0.0,
+            "RMS": 0.0,
+            "absolute_p50": 0.0,
+            "absolute_p95": 0.0,
+            "absolute_p99": 0.0,
+            "maximum_absolute": 0.0
+          }
+        },
+        "changed_decoded_choice_count": 0,
+        "changed_decoded_choice_IDs": [],
+        "changed_sign_or_strict_decision_count": 0,
+        "changed_sign_or_strict_decision_IDs": [],
+        "tie_row_IDs": [],
+        "aggregate_H200": {
+          "epoch": 0,
+          "accuracy": 1.0,
+          "logit_diff": 3.9612299465240643,
+          "kl_div": 0.0,
+          "exact_match": 1.0
+        },
+        "aggregate_H100": {
+          "epoch": 0,
+          "accuracy": 1.0,
+          "logit_diff": 3.9612299465240643,
+          "kl_div": 0.0,
+          "exact_match": 1.0
+        },
+        "aggregate_deltas": {
+          "accuracy": 0.0,
+          "logit_diff": 0.0,
+          "kl_div": 0.0,
+          "exact_match": 0.0
+        }
+      },
+      "validation_epoch10": {
+        "rows": 187,
+        "pretraining": false,
+        "all_metadata_equal": true,
+        "exact_saved_fields": true,
+        "paired_fields": {
+          "logit_target": {
+            "count": 187,
+            "nonzero": 0,
+            "signed_mean": 0.0,
+            "mean_absolute": 0.0,
+            "RMS": 0.0,
+            "absolute_p50": 0.0,
+            "absolute_p95": 0.0,
+            "absolute_p99": 0.0,
+            "maximum_absolute": 0.0
+          },
+          "logit_distractor": {
+            "count": 187,
+            "nonzero": 0,
+            "signed_mean": 0.0,
+            "mean_absolute": 0.0,
+            "RMS": 0.0,
+            "absolute_p50": 0.0,
+            "absolute_p95": 0.0,
+            "absolute_p99": 0.0,
+            "maximum_absolute": 0.0
+          },
+          "logit_difference": {
+            "count": 187,
+            "nonzero": 0,
+            "signed_mean": 0.0,
+            "mean_absolute": 0.0,
+            "RMS": 0.0,
+            "absolute_p50": 0.0,
+            "absolute_p95": 0.0,
+            "absolute_p99": 0.0,
+            "maximum_absolute": 0.0
+          }
+        },
+        "changed_decoded_choice_count": 0,
+        "changed_decoded_choice_IDs": [],
+        "changed_sign_or_strict_decision_count": 0,
+        "changed_sign_or_strict_decision_IDs": [],
+        "tie_row_IDs": [],
+        "aggregate_H200": {
+          "epoch": 10,
+          "accuracy": 1.0,
+          "logit_diff": 4.04177807486631,
+          "kl_div": 0.0005255346547533324,
+          "exact_match": 1.0
+        },
+        "aggregate_H100": {
+          "epoch": 10,
+          "accuracy": 1.0,
+          "logit_diff": 4.04177807486631,
+          "kl_div": 0.0005255346547533324,
+          "exact_match": 1.0
+        },
+        "aggregate_deltas": {
+          "accuracy": 0.0,
+          "logit_diff": 0.0,
+          "kl_div": 0.0,
+          "exact_match": 0.0
+        }
+      },
+      "validation_epoch20": {
+        "rows": 187,
+        "pretraining": false,
+        "all_metadata_equal": true,
+        "exact_saved_fields": true,
+        "paired_fields": {
+          "logit_target": {
+            "count": 187,
+            "nonzero": 0,
+            "signed_mean": 0.0,
+            "mean_absolute": 0.0,
+            "RMS": 0.0,
+            "absolute_p50": 0.0,
+            "absolute_p95": 0.0,
+            "absolute_p99": 0.0,
+            "maximum_absolute": 0.0
+          },
+          "logit_distractor": {
+            "count": 187,
+            "nonzero": 0,
+            "signed_mean": 0.0,
+            "mean_absolute": 0.0,
+            "RMS": 0.0,
+            "absolute_p50": 0.0,
+            "absolute_p95": 0.0,
+            "absolute_p99": 0.0,
+            "maximum_absolute": 0.0
+          },
+          "logit_difference": {
+            "count": 187,
+            "nonzero": 0,
+            "signed_mean": 0.0,
+            "mean_absolute": 0.0,
+            "RMS": 0.0,
+            "absolute_p50": 0.0,
+            "absolute_p95": 0.0,
+            "absolute_p99": 0.0,
+            "maximum_absolute": 0.0
+          }
+        },
+        "changed_decoded_choice_count": 0,
+        "changed_decoded_choice_IDs": [],
+        "changed_sign_or_strict_decision_count": 0,
+        "changed_sign_or_strict_decision_IDs": [],
+        "tie_row_IDs": [],
+        "aggregate_H200": {
+          "epoch": 20,
+          "accuracy": 1.0,
+          "logit_diff": 3.983622994652406,
+          "kl_div": 0.003592902645070285,
+          "exact_match": 1.0
+        },
+        "aggregate_H100": {
+          "epoch": 20,
+          "accuracy": 1.0,
+          "logit_diff": 3.983622994652406,
+          "kl_div": 0.003592902645070285,
+          "exact_match": 1.0
+        },
+        "aggregate_deltas": {
+          "accuracy": 0.0,
+          "logit_diff": 0.0,
+          "kl_div": 0.0,
+          "exact_match": 0.0
+        }
+      },
+      "trajectory_deltas": {
+        "loss": {
+          "count": 20,
+          "nonzero": 0,
+          "signed_mean": 0.0,
+          "mean_absolute": 0.0,
+          "RMS": 0.0,
+          "absolute_p50": 0.0,
+          "absolute_p95": 0.0,
+          "absolute_p99": 0.0,
+          "maximum_absolute": 0.0
+        },
+        "kl": {
+          "count": 20,
+          "nonzero": 0,
+          "signed_mean": 0.0,
+          "mean_absolute": 0.0,
+          "RMS": 0.0,
+          "absolute_p50": 0.0,
+          "absolute_p95": 0.0,
+          "absolute_p99": 0.0,
+          "maximum_absolute": 0.0
+        },
+        "task": {
+          "count": 20,
+          "nonzero": 0,
+          "signed_mean": 0.0,
+          "mean_absolute": 0.0,
+          "RMS": 0.0,
+          "absolute_p50": 0.0,
+          "absolute_p95": 0.0,
+          "absolute_p99": 0.0,
+          "maximum_absolute": 0.0
+        },
+        "sparsity": {
+          "count": 20,
+          "nonzero": 0,
+          "signed_mean": 0.0,
+          "mean_absolute": 0.0,
+          "RMS": 0.0,
+          "absolute_p50": 0.0,
+          "absolute_p95": 0.0,
+          "absolute_p99": 0.0,
+          "maximum_absolute": 0.0
+        },
+        "lr": {
+          "count": 20,
+          "nonzero": 0,
+          "signed_mean": 0.0,
+          "mean_absolute": 0.0,
+          "RMS": 0.0,
+          "absolute_p50": 0.0,
+          "absolute_p95": 0.0,
+          "absolute_p99": 0.0,
+          "maximum_absolute": 0.0
+        }
+      }
+    },
+    "I": {
+      "baseline": {
+        "rows": 952,
+        "pretraining": true,
+        "all_metadata_equal": true,
+        "exact_saved_fields": true,
+        "paired_fields": {
+          "logit_target": {
+            "count": 952,
+            "nonzero": 0,
+            "signed_mean": 0.0,
+            "mean_absolute": 0.0,
+            "RMS": 0.0,
+            "absolute_p50": 0.0,
+            "absolute_p95": 0.0,
+            "absolute_p99": 0.0,
+            "maximum_absolute": 0.0
+          },
+          "logit_distractor": {
+            "count": 952,
+            "nonzero": 0,
+            "signed_mean": 0.0,
+            "mean_absolute": 0.0,
+            "RMS": 0.0,
+            "absolute_p50": 0.0,
+            "absolute_p95": 0.0,
+            "absolute_p99": 0.0,
+            "maximum_absolute": 0.0
+          },
+          "logit_difference": {
+            "count": 952,
+            "nonzero": 0,
+            "signed_mean": 0.0,
+            "mean_absolute": 0.0,
+            "RMS": 0.0,
+            "absolute_p50": 0.0,
+            "absolute_p95": 0.0,
+            "absolute_p99": 0.0,
+            "maximum_absolute": 0.0
+          }
+        },
+        "changed_decoded_choice_count": 0,
+        "changed_decoded_choice_IDs": [],
+        "changed_sign_or_strict_decision_count": 0,
+        "changed_sign_or_strict_decision_IDs": [],
+        "tie_row_IDs": [],
+        "aggregate_H200": {
+          "accuracy": 1.0,
+          "logit_diff": 4.2997636554621845,
+          "kl_div": 0.0,
+          "exact_match": 1.0
+        },
+        "aggregate_H100": {
+          "accuracy": 1.0,
+          "logit_diff": 4.2997636554621845,
+          "kl_div": 0.0,
+          "exact_match": 1.0
+        },
+        "aggregate_deltas": {
+          "accuracy": 0.0,
+          "logit_diff": 0.0,
+          "kl_div": 0.0,
+          "exact_match": 0.0
+        }
+      },
+      "node_eval": {
+        "rows": 952,
+        "pretraining": false,
+        "all_metadata_equal": true,
+        "exact_saved_fields": true,
+        "paired_fields": {
+          "logit_target": {
+            "count": 952,
+            "nonzero": 0,
+            "signed_mean": 0.0,
+            "mean_absolute": 0.0,
+            "RMS": 0.0,
+            "absolute_p50": 0.0,
+            "absolute_p95": 0.0,
+            "absolute_p99": 0.0,
+            "maximum_absolute": 0.0
+          },
+          "logit_distractor": {
+            "count": 952,
+            "nonzero": 0,
+            "signed_mean": 0.0,
+            "mean_absolute": 0.0,
+            "RMS": 0.0,
+            "absolute_p50": 0.0,
+            "absolute_p95": 0.0,
+            "absolute_p99": 0.0,
+            "maximum_absolute": 0.0
+          },
+          "logit_difference": {
+            "count": 952,
+            "nonzero": 0,
+            "signed_mean": 0.0,
+            "mean_absolute": 0.0,
+            "RMS": 0.0,
+            "absolute_p50": 0.0,
+            "absolute_p95": 0.0,
+            "absolute_p99": 0.0,
+            "maximum_absolute": 0.0
+          }
+        },
+        "changed_decoded_choice_count": 0,
+        "changed_decoded_choice_IDs": [],
+        "changed_sign_or_strict_decision_count": 0,
+        "changed_sign_or_strict_decision_IDs": [],
+        "tie_row_IDs": [
+          [
+            "sdr_v2",
+            "user_inversion",
+            "00361ecaede7"
+          ],
+          [
+            "sdr_v2",
+            "user_inversion",
+            "1e305fef1ca8"
+          ],
+          [
+            "sdr_v2",
+            "user_inversion",
+            "1f33bcbd3472"
+          ]
+        ],
+        "aggregate_H200": {
+          "accuracy": 0.9957983193277311,
+          "logit_diff": 3.261423319327731,
+          "kl_div": 0.026060615517512088,
+          "exact_match": 0.9978991596638656
+        },
+        "aggregate_H100": {
+          "accuracy": 0.9957983193277311,
+          "logit_diff": 3.261423319327731,
+          "kl_div": 0.026060615517512088,
+          "exact_match": 0.9978991596638656
+        },
+        "aggregate_deltas": {
+          "accuracy": 0.0,
+          "logit_diff": 0.0,
+          "kl_div": 0.0,
+          "exact_match": 0.0
+        }
+      },
+      "validation_epoch0": {
+        "rows": 187,
+        "pretraining": true,
+        "all_metadata_equal": true,
+        "exact_saved_fields": true,
+        "paired_fields": {
+          "logit_target": {
+            "count": 187,
+            "nonzero": 0,
+            "signed_mean": 0.0,
+            "mean_absolute": 0.0,
+            "RMS": 0.0,
+            "absolute_p50": 0.0,
+            "absolute_p95": 0.0,
+            "absolute_p99": 0.0,
+            "maximum_absolute": 0.0
+          },
+          "logit_distractor": {
+            "count": 187,
+            "nonzero": 0,
+            "signed_mean": 0.0,
+            "mean_absolute": 0.0,
+            "RMS": 0.0,
+            "absolute_p50": 0.0,
+            "absolute_p95": 0.0,
+            "absolute_p99": 0.0,
+            "maximum_absolute": 0.0
+          },
+          "logit_difference": {
+            "count": 187,
+            "nonzero": 0,
+            "signed_mean": 0.0,
+            "mean_absolute": 0.0,
+            "RMS": 0.0,
+            "absolute_p50": 0.0,
+            "absolute_p95": 0.0,
+            "absolute_p99": 0.0,
+            "maximum_absolute": 0.0
+          }
+        },
+        "changed_decoded_choice_count": 0,
+        "changed_decoded_choice_IDs": [],
+        "changed_sign_or_strict_decision_count": 0,
+        "changed_sign_or_strict_decision_IDs": [],
+        "tie_row_IDs": [],
+        "aggregate_H200": {
+          "epoch": 0,
+          "accuracy": 1.0,
+          "logit_diff": 4.197860962566845,
+          "kl_div": 0.0,
+          "exact_match": 1.0
+        },
+        "aggregate_H100": {
+          "epoch": 0,
+          "accuracy": 1.0,
+          "logit_diff": 4.197860962566845,
+          "kl_div": 0.0,
+          "exact_match": 1.0
+        },
+        "aggregate_deltas": {
+          "accuracy": 0.0,
+          "logit_diff": 0.0,
+          "kl_div": 0.0,
+          "exact_match": 0.0
+        }
+      },
+      "validation_epoch10": {
+        "rows": 187,
+        "pretraining": false,
+        "all_metadata_equal": true,
+        "exact_saved_fields": true,
+        "paired_fields": {
+          "logit_target": {
+            "count": 187,
+            "nonzero": 0,
+            "signed_mean": 0.0,
+            "mean_absolute": 0.0,
+            "RMS": 0.0,
+            "absolute_p50": 0.0,
+            "absolute_p95": 0.0,
+            "absolute_p99": 0.0,
+            "maximum_absolute": 0.0
+          },
+          "logit_distractor": {
+            "count": 187,
+            "nonzero": 0,
+            "signed_mean": 0.0,
+            "mean_absolute": 0.0,
+            "RMS": 0.0,
+            "absolute_p50": 0.0,
+            "absolute_p95": 0.0,
+            "absolute_p99": 0.0,
+            "maximum_absolute": 0.0
+          },
+          "logit_difference": {
+            "count": 187,
+            "nonzero": 0,
+            "signed_mean": 0.0,
+            "mean_absolute": 0.0,
+            "RMS": 0.0,
+            "absolute_p50": 0.0,
+            "absolute_p95": 0.0,
+            "absolute_p99": 0.0,
+            "maximum_absolute": 0.0
+          }
+        },
+        "changed_decoded_choice_count": 0,
+        "changed_decoded_choice_IDs": [],
+        "changed_sign_or_strict_decision_count": 0,
+        "changed_sign_or_strict_decision_IDs": [],
+        "tie_row_IDs": [],
+        "aggregate_H200": {
+          "epoch": 10,
+          "accuracy": 1.0,
+          "logit_diff": 3.7356283422459895,
+          "kl_div": 0.011085171431781136,
+          "exact_match": 1.0
+        },
+        "aggregate_H100": {
+          "epoch": 10,
+          "accuracy": 1.0,
+          "logit_diff": 3.7356283422459895,
+          "kl_div": 0.011085171431781136,
+          "exact_match": 1.0
+        },
+        "aggregate_deltas": {
+          "accuracy": 0.0,
+          "logit_diff": 0.0,
+          "kl_div": 0.0,
+          "exact_match": 0.0
+        }
+      },
+      "validation_epoch20": {
+        "rows": 187,
+        "pretraining": false,
+        "all_metadata_equal": true,
+        "exact_saved_fields": true,
+        "paired_fields": {
+          "logit_target": {
+            "count": 187,
+            "nonzero": 0,
+            "signed_mean": 0.0,
+            "mean_absolute": 0.0,
+            "RMS": 0.0,
+            "absolute_p50": 0.0,
+            "absolute_p95": 0.0,
+            "absolute_p99": 0.0,
+            "maximum_absolute": 0.0
+          },
+          "logit_distractor": {
+            "count": 187,
+            "nonzero": 0,
+            "signed_mean": 0.0,
+            "mean_absolute": 0.0,
+            "RMS": 0.0,
+            "absolute_p50": 0.0,
+            "absolute_p95": 0.0,
+            "absolute_p99": 0.0,
+            "maximum_absolute": 0.0
+          },
+          "logit_difference": {
+            "count": 187,
+            "nonzero": 0,
+            "signed_mean": 0.0,
+            "mean_absolute": 0.0,
+            "RMS": 0.0,
+            "absolute_p50": 0.0,
+            "absolute_p95": 0.0,
+            "absolute_p99": 0.0,
+            "maximum_absolute": 0.0
+          }
+        },
+        "changed_decoded_choice_count": 0,
+        "changed_decoded_choice_IDs": [],
+        "changed_sign_or_strict_decision_count": 0,
+        "changed_sign_or_strict_decision_IDs": [],
+        "tie_row_IDs": [],
+        "aggregate_H200": {
+          "epoch": 20,
+          "accuracy": 1.0,
+          "logit_diff": 3.145053475935829,
+          "kl_div": 0.02747914115375376,
+          "exact_match": 1.0
+        },
+        "aggregate_H100": {
+          "epoch": 20,
+          "accuracy": 1.0,
+          "logit_diff": 3.145053475935829,
+          "kl_div": 0.02747914115375376,
+          "exact_match": 1.0
+        },
+        "aggregate_deltas": {
+          "accuracy": 0.0,
+          "logit_diff": 0.0,
+          "kl_div": 0.0,
+          "exact_match": 0.0
+        }
+      },
+      "trajectory_deltas": {
+        "loss": {
+          "count": 20,
+          "nonzero": 0,
+          "signed_mean": 0.0,
+          "mean_absolute": 0.0,
+          "RMS": 0.0,
+          "absolute_p50": 0.0,
+          "absolute_p95": 0.0,
+          "absolute_p99": 0.0,
+          "maximum_absolute": 0.0
+        },
+        "kl": {
+          "count": 20,
+          "nonzero": 0,
+          "signed_mean": 0.0,
+          "mean_absolute": 0.0,
+          "RMS": 0.0,
+          "absolute_p50": 0.0,
+          "absolute_p95": 0.0,
+          "absolute_p99": 0.0,
+          "maximum_absolute": 0.0
+        },
+        "task": {
+          "count": 20,
+          "nonzero": 0,
+          "signed_mean": 0.0,
+          "mean_absolute": 0.0,
+          "RMS": 0.0,
+          "absolute_p50": 0.0,
+          "absolute_p95": 0.0,
+          "absolute_p99": 0.0,
+          "maximum_absolute": 0.0
+        },
+        "sparsity": {
+          "count": 20,
+          "nonzero": 0,
+          "signed_mean": 0.0,
+          "mean_absolute": 0.0,
+          "RMS": 0.0,
+          "absolute_p50": 0.0,
+          "absolute_p95": 0.0,
+          "absolute_p99": 0.0,
+          "maximum_absolute": 0.0
+        },
+        "lr": {
+          "count": 20,
+          "nonzero": 0,
+          "signed_mean": 0.0,
+          "mean_absolute": 0.0,
+          "RMS": 0.0,
+          "absolute_p50": 0.0,
+          "absolute_p95": 0.0,
+          "absolute_p99": 0.0,
+          "maximum_absolute": 0.0
+        }
+      }
+    }
+  },
+  "masks": {
+    "D": {
+      "attention_heads": {
+        "H200_count": 796,
+        "H100_count": 796,
+        "intersection": 796,
+        "union": 796,
+        "Jaccard": 1.0,
+        "Hamming": 0,
+        "changed_members": [],
+        "per_layer_Hamming": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0,
+          "6": 0,
+          "7": 0,
+          "8": 0,
+          "9": 0,
+          "10": 0,
+          "11": 0,
+          "12": 0,
+          "13": 0,
+          "14": 0,
+          "15": 0,
+          "16": 0,
+          "17": 0,
+          "18": 0,
+          "19": 0,
+          "20": 0,
+          "21": 0,
+          "22": 0,
+          "23": 0,
+          "24": 0,
+          "25": 0,
+          "26": 0,
+          "27": 0,
+          "28": 0,
+          "29": 0,
+          "30": 0,
+          "31": 0
+        }
+      },
+      "mlp_blocks": {
+        "H200_count": 30,
+        "H100_count": 30,
+        "intersection": 30,
+        "union": 30,
+        "Jaccard": 1.0,
+        "Hamming": 0,
+        "changed_members": [],
+        "per_layer_Hamming": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0,
+          "6": 0,
+          "7": 0,
+          "8": 0,
+          "9": 0,
+          "10": 0,
+          "11": 0,
+          "12": 0,
+          "13": 0,
+          "14": 0,
+          "15": 0,
+          "16": 0,
+          "17": 0,
+          "18": 0,
+          "19": 0,
+          "20": 0,
+          "21": 0,
+          "22": 0,
+          "23": 0,
+          "24": 0,
+          "25": 0,
+          "26": 0,
+          "27": 0,
+          "28": 0,
+          "29": 0,
+          "30": 0,
+          "31": 0
+        }
+      },
+      "raw_active_nodes_exact": true
+    },
+    "I": {
+      "attention_heads": {
+        "H200_count": 735,
+        "H100_count": 735,
+        "intersection": 735,
+        "union": 735,
+        "Jaccard": 1.0,
+        "Hamming": 0,
+        "changed_members": [],
+        "per_layer_Hamming": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0,
+          "6": 0,
+          "7": 0,
+          "8": 0,
+          "9": 0,
+          "10": 0,
+          "11": 0,
+          "12": 0,
+          "13": 0,
+          "14": 0,
+          "15": 0,
+          "16": 0,
+          "17": 0,
+          "18": 0,
+          "19": 0,
+          "20": 0,
+          "21": 0,
+          "22": 0,
+          "23": 0,
+          "24": 0,
+          "25": 0,
+          "26": 0,
+          "27": 0,
+          "28": 0,
+          "29": 0,
+          "30": 0,
+          "31": 0
+        }
+      },
+      "mlp_blocks": {
+        "H200_count": 26,
+        "H100_count": 26,
+        "intersection": 26,
+        "union": 26,
+        "Jaccard": 1.0,
+        "Hamming": 0,
+        "changed_members": [],
+        "per_layer_Hamming": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0,
+          "6": 0,
+          "7": 0,
+          "8": 0,
+          "9": 0,
+          "10": 0,
+          "11": 0,
+          "12": 0,
+          "13": 0,
+          "14": 0,
+          "15": 0,
+          "16": 0,
+          "17": 0,
+          "18": 0,
+          "19": 0,
+          "20": 0,
+          "21": 0,
+          "22": 0,
+          "23": 0,
+          "24": 0,
+          "25": 0,
+          "26": 0,
+          "27": 0,
+          "28": 0,
+          "29": 0,
+          "30": 0,
+          "31": 0
+        }
+      },
+      "raw_active_nodes_exact": true
+    }
+  },
+  "timing": {
+    "arms": {
+      "D": {
+        "H200": {
+          "total_seconds": 191.82091336278245,
+          "pruning_seconds": 121.3,
+          "peak_memory_gb": 52.222
+        },
+        "H100": {
+          "total_seconds": 213.3371678639669,
+          "pruning_seconds": 138.5,
+          "peak_memory_gb": 52.222
+        },
+        "H100_apptainer_wrapper_seconds": 221.5677924156189,
+        "H100_minus_H200": {
+          "total_seconds": 21.51625450118445,
+          "pruning_seconds": 17.200000000000003,
+          "peak_memory_gb": 0.0
+        },
+        "H100_pruning_seconds_per_epoch": 6.925,
+        "H200_pruning_seconds_per_epoch": 6.0649999999999995,
+        "derived_process_only_full500_seconds": 3537.337167863967,
+        "full500_extrapolation_is_authorization": false
+      },
+      "I": {
+        "H200": {
+          "total_seconds": 192.7341125807725,
+          "pruning_seconds": 123.0,
+          "peak_memory_gb": 52.222
+        },
+        "H100": {
+          "total_seconds": 188.57914747297764,
+          "pruning_seconds": 130.7,
+          "peak_memory_gb": 52.222
+        },
+        "H100_apptainer_wrapper_seconds": 192.19318675994873,
+        "H100_minus_H200": {
+          "total_seconds": -4.154965107794851,
+          "pruning_seconds": 7.699999999999989,
+          "peak_memory_gb": 0.0
+        },
+        "H100_pruning_seconds_per_epoch": 6.534999999999999,
+        "H200_pruning_seconds_per_epoch": 6.15,
+        "derived_process_only_full500_seconds": 3325.3791474729774,
+        "full500_extrapolation_is_authorization": false
+      }
+    },
+    "job_accounting": {
+      "50147300": {
+        "JobIDRaw": "50147300",
+        "JobName": "lad-a2-b2-timing",
+        "State": "COMPLETED",
+        "ExitCode": "0:0",
+        "ElapsedRaw": "481",
+        "TimelimitRaw": "50",
+        "AllocTRES": "billing=4,cpu=4,gres/gpu=1,mem=64G,node=1",
+        "MaxRSS": "",
+        "Start": "2026-11-02T21:01:04",
+        "End": "2026-11-02T21:09:05"
+      },
+      "50147300.batch": {
+        "JobIDRaw": "50147300.batch",
+        "JobName": "batch",
+        "State": "COMPLETED",
+        "ExitCode": "0:0",
+        "ElapsedRaw": "481",
+        "TimelimitRaw": "",
+        "AllocTRES": "cpu=4,gres/gpu=1,mem=64G,node=1",
+        "MaxRSS": "1994688K",
+        "Start": "2026-11-02T21:01:04",
+        "End": "2026-11-02T21:09:05"
+      },
+      "50147300.extern": {
+        "JobIDRaw": "50147300.extern",
+        "JobName": "extern",
+        "State": "COMPLETED",
+        "ExitCode": "0:0",
+        "ElapsedRaw": "481",
+        "TimelimitRaw": "",
+        "AllocTRES": "billing=4,cpu=4,gres/gpu=1,mem=64G,node=1",
+        "MaxRSS": "0",
+        "Start": "2026-11-02T21:01:04",
+        "End": "2026-11-02T21:09:05"
+      }
+    },
+    "H100_child_process_total_seconds": 401.91631533694454,
+    "H200_child_process_total_seconds": 384.55502594355494,
+    "job_elapsed_seconds": 481,
+    "allocation_minus_H100_child_seconds": 79.08368466305546,
+    "source_protection_container_startup_gaps_and_exit_are_not_attributed_to_pruning": true,
+    "observations_not_cold_host_guarantees": true
+  },
+  "limits": [
+    "No full-vocabulary logit/probability equivalence or cross-device KL can be reconstructed",
+    "No raw argmax token-ID agreement, paired per-row KL or tokenized batch equality from legacy results alone",
+    "No trained fixed-H200-mask H100 forward is supplied by the proposed retraining repeat"
+  ],
+  "no_tolerance_change": true,
+  "no_efficacy_selection": true,
+  "no_fleet_or_full500_acceptance_claim": true,
+  "no_models_or_forwards_or_remote_or_jobs": true,
+  "input_sha256": {
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges2/reference-check/predeclared-comparison.json": "82e6d53617d4cb276b3596edf22327c7a6f47e54b3c1592b85127d706d97afc9",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-timing-6bd8bf5-h200/sdr_v2-D-seed42.json": "7f2709b1f3aec5f1fbdc470bdb1e2658c8d33f3e3cf38558d140186bf79e5d0a",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-receipts/sdr_v2-D-seed42.json": "7ffbaf74e5bec7841fd53a5e2a91eee3fa7ca081342689f711cbd985db394a7f",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/config.json": "ff77b71906130fe1d0dba2c6357f209339c87590144b142d398492467bbba4f1",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/active_nodes.json": "41c8fafb3cbd89d66ce88e9afaaa89a2e11aff64b99346088761f68d62370e28",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/results.json": "88d21b347d57c855a6ff3a3aefaba63d4b921142c5243d2552b2e57c3ee62e3a",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/history.json": "ce6c292d6abbd430d7d3155522c2b58b17059304b6d95f796144a1cd864d2c8e",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/run_manifest.json": "15c9f88cd1a089cc2be9faac2aed6296b0e405d1424fe12e9d08a4a6382b7652",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-native/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/config.json": "ff77b71906130fe1d0dba2c6357f209339c87590144b142d398492467bbba4f1",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-native/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/active_nodes.json": "41c8fafb3cbd89d66ce88e9afaaa89a2e11aff64b99346088761f68d62370e28",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-native/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/results.json": "88d21b347d57c855a6ff3a3aefaba63d4b921142c5243d2552b2e57c3ee62e3a",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-native/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/history.json": "ce6c292d6abbd430d7d3155522c2b58b17059304b6d95f796144a1cd864d2c8e",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-native/sdr_v2_D_seed42_heads-mlp_b8cf3de656d58e28_timing20/run_manifest.json": "d74f06ae6f893ffd57ec962e5948c1a7b44cd878a80dfdc2aec14a9128374148",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-timing-6bd8bf5-h200/sdr_v2-D-seed42.stdout-stderr.log": "99ebfbcf0234a0aaa67e751089ec12efa84146d8376abaebfac257401fd6da97",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-receipts/sdr_v2-D-seed42.stdout-stderr.log": "9dbd89c60f511bab94632663083e0f8c2eae3379e8de0b1d3735ee8c9bcf41d6",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-timing-6bd8bf5-h200/sdr_v2-I-seed42.json": "13d90fe4756c3217a70b6a591268bb3ad6804ccb126ff8fcf60bc7d0f773c7c0",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-receipts/sdr_v2-I-seed42.json": "85a245a8f66bd6a085535f2785f4b09f89648020008902c28bd088ea6c9e5eb5",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/config.json": "1b83a5243c80e9a051b1ace0555a6f85a0d772a57b971a62409ee51f1de84780",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/active_nodes.json": "ad6f59e3240bed81a1137a1f84dc8d795344e2f192525271074816cef3d4bac2",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/results.json": "0cb8d96568090aa7bc22b97735924ea1f3f5c422a68c19130dc9e43cfb04d362",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/history.json": "84da570b955c2073f0e4db920f69399d81ce9c266d148e86bb2c156e685f63dc",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_training_specificity_ladder/a2-h200/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/run_manifest.json": "eb1c91f820ccc1359b193bc46ea7a8166f3704300f7d0572d431275482dda950",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-native/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/config.json": "1b83a5243c80e9a051b1ace0555a6f85a0d772a57b971a62409ee51f1de84780",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-native/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/active_nodes.json": "ad6f59e3240bed81a1137a1f84dc8d795344e2f192525271074816cef3d4bac2",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-native/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/results.json": "0cb8d96568090aa7bc22b97735924ea1f3f5c422a68c19130dc9e43cfb04d362",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-native/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/history.json": "84da570b955c2073f0e4db920f69399d81ce9c266d148e86bb2c156e685f63dc",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-native/sdr_v2_I_seed42_heads-mlp_b8cf3de656d58e28_timing20/run_manifest.json": "6f7828453e575980d8e83ea2230e4e284299a2d30266263490813e93decab6f5",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-timing-6bd8bf5-h200/sdr_v2-I-seed42.stdout-stderr.log": "bb12c0effe8b5cf82d33d5f837e93044872da00423ed2fdb5cf9e6a791fe586b",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/returned-receipts/sdr_v2-I-seed42.stdout-stderr.log": "a537afcee2fc19afb9c8dedfcab94fb9e8a4d5c73793d54147108a79273f24c5",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/remote-deployment/50147300-completion.json": "f3fd46730d13857b879028ff260c9c9b7842cc2647986ca34d81e6f0469bfb6a",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/terminal-accounting.txt": "5221a3f01a9074c456d8d08942c869d5fa08b523f997ddaf79b9a5d7baa99a51",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-bridges2-20261102/transfer-manifest.json": "951dc44134530da3d262280e1e48d23d6a98d7676678dc74d57e6b47ebf297be"
+  }
+}

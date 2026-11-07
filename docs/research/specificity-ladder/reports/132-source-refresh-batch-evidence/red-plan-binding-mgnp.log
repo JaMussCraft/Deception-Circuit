@@ -1,0 +1,20 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____ test_batch_registered_plan_changed_routes_cannot_drop_ancestry_checks _____
+
+tmp_path = PosixPath('/tmp/a3-source-batch-red-plan-binding-mgnp/test_batch_registered_plan_cha0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f50608cd280>
+
+    def test_batch_registered_plan_changed_routes_cannot_drop_ancestry_checks(tmp_path,monkeypatch):
+        c=setup_case(tmp_path,monkeypatch);state=c.build()
+        # Raw-slot manipulation cannot turn a genuine mint registration into a new
+        # proof. The registration must bind its INITIAL graph, not just membership.
+        object.__setattr__(state._scan_plan,'_routes',())
+>       with pytest.raises(ValueError,match='scan'):refresh(c,state)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_a3_source_validation.py:530: Failed
+=========================== short test summary info ============================
+FAILED tests/test_a3_source_validation.py::test_batch_registered_plan_changed_routes_cannot_drop_ancestry_checks
+1 failed, 70 deselected in 3.05s

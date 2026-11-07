@@ -1,0 +1,12 @@
+--- prior accepted authorizer
++++ Bridges2 TRES-compatible authorizer
+@@ -34,7 +34,8 @@
+  assert arm in ('D','I');row=validate_reservation(job)
+  facts=remote('scontrol show job '+job+' -o');fields=dict(x.split('=',1) for x in facts.split() if '=' in x)
+  assert fields['JobState']=='RUNNING' and fields['Account']=='cis260361p' and fields['Partition']=='GPU-shared' and fields['TimeLimit']=='00:50:00'
+- assert 'gres/gpu=1' in fields['AllocTRES'] and fields['JobName']=='lad-a2-b2-timing'
++ tres=dict(item.split('=',1) for item in fields.get('AllocTRES',fields.get('TRES','')).split(',') if '=' in item)
++ assert tres.get('gres/gpu')=='1' and fields['TresPerNode']=='gres:gpu:h100-80:1' and fields['JobName']=='lad-a2-b2-timing'
+  tag='authorization-'+job+'-'+arm;registries=local_preflight(arm,tag)
+  staged=B/(tag+'-registries');staged.mkdir(exist_ok=False)
+  rows=[]

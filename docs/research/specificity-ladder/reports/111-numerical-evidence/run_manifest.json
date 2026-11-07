@@ -1,0 +1,79 @@
+{
+  "kind": "independent_unit_f_numerical_review",
+  "scientific_execution": false,
+  "baseline_commit": "61d2b8a84ebc096e727798b189080f8f8ffb141a",
+  "reviewed_source_is_overlay": true,
+  "source_hashes": {
+    "component_analysis/a3_direction_pipeline.py": "96678db186078ab37cad108e2d1e71ffdccf1fb3dd157c35cdc57a91b2ebd4a0",
+    "component_analysis/a3_direction_runner.py": "f1085923258a5d98154b882398f4a5dd2b1ffe7f044c47ceda21844bddc57f15",
+    "component_analysis/a3_direction_runtime.py": "bb54a6076c4edf507bed43abaa256cd2ce3a6cded85a4315b4a3c86d1f8047f1",
+    "component_analysis/a3_direction_workload.py": "7726495fb2388491f56f442dd404e151f72d4eedd3bbf1106e7d10e70ead154a",
+    "component_analysis/a3_directions.py": "ed882d4e12a396e03e73671e588beba5b1a8c90ab9d31e7ee73d4194430b4a86",
+    "component_analysis/a3_pipeline.py": "e55c8c2ea0ea174f3cb5c4af76e1fb48402f5a662e79cea3e9948913ec413e44",
+    "scripts/jobs/specificity_a3.sh": "936dfb7f8b9c2d267d52f1e199ed431275e6527cbfc3a105a22e3812289a9b96",
+    "tests/test_a3_direction_runner.py": "3ea945d5b23b4eef7d56139758c7075ea1b56ac612f1923590b7978628ca0120",
+    "tests/test_a3_direction_runtime.py": "722886ac7a2190f4ae72bbf563f3c8c252bf2715babab94ac5963ec47e8d5250",
+    "tests/test_a3_direction_workload.py": "e411bc9c78bc4b4bd9982dea81a3bacfcda1e27901222a9e176143a86d43c058",
+    "tests/test_a3_directions.py": "cd8471b1524ad7b8f1b7c87f9eb5fec5724b3ab2980027ef7aadfea3fc3bb1c1",
+    "tests/test_a3_pipeline.py": "471eafe1d30d6828b5acbb31b06a2d480ce0ed60708e8b01bb16f16607b59d77"
+  },
+  "all_source_hashes_match": true,
+  "independent_cases_per_interpreter": 29,
+  "owning_cases_per_interpreter": 14,
+  "cost_counterexample_accepted_in_both": true,
+  "full_native_result": "awaiting root completed evidence",
+  "commands": {
+    "independent": "PYTHONPATH=. PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 <python> -m pytest -q -p no:cacheprovider --basetemp=/tmp/review111-independent-<env>-corrected docs/research/specificity-ladder/reports/111-numerical-evidence/test_independent_numerical.py",
+    "owning": "PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 <python> -m pytest -q -p no:cacheprovider --basetemp=/tmp/review111-owning-<env> tests/test_a3_direction_runtime.py -k \"normalized_a1 or tail_execution or train_capture_resolver or pilot_candidate or completed_packing_proof or atomic_reconciliation or assessment_requires or calibration_only or injected_runtime_cannot or nonfinite_direction or fit_cache_layout or measured_runner_clocks or packing_reuse_rejects\"",
+    "counterexample": "PYTHONPATH=. PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 <python> docs/research/specificity-ladder/reports/111-numerical-evidence/probe_cost_intake.py"
+  },
+  "interpreters": {
+    "mgnp": "/u/swong2/.conda/envs/mgnp/bin/python",
+    "base": "/sw/external/python/anaconda3/bin/python3.9"
+  },
+  "exit_codes": {
+    "final-mgnp.log": 0,
+    "final-base.log": 0,
+    "owning-mgnp.log": 0,
+    "owning-base.log": 0,
+    "cost-intake-mgnp.log": 0,
+    "cost-intake-base.log": 0
+  },
+  "evidence_sha256": {
+    "owning-mgnp.log": "99aa8d8d652b9c118a37244df71f7e2766114cbe033acf9362eef1c8cf827d03",
+    "probe-initial-mgnp.log": "b9ab9520d154ebeb575f48fd3ea9d13ce706a81f849d74e9c698db0b5c591887",
+    "cost-intake-base.log": "2f2cd687c23ea85c2fcb30b976b7622d1ebe75ca823fb029af90eaa974b740d9",
+    "final-base.log": "c33e459e0d5e1e86cac1925796ac1b306cb7f67af4e2b1bbbfbeabe7c29a7942",
+    "independent-base.log": "f94b6757c0c3fd5e581b6e60a187e85c06910efb6353475a94e1215076161952",
+    "independent-mgnp.log": "1fd5bb8fb4c15eaf8562fdec7862effac3a0e9f67c58e3900506cd7a886378ef",
+    "cost-intake-mgnp.log": "014c9ada8e4ea0c6cb709555034fcd7755b0e07c2484ec36c666ac6d589ccf69",
+    "owning-base.log": "ff2ee17c9a18b999e72d4981dca1d2e72122e37207b337774f60da208b46d867",
+    "test_independent_numerical.py": "8141177a01e661264b2203cfa1c61e45d6c39fa17ae9b7c481bf1424b287190e",
+    "probe-initial.py": "4f56be7faaeb242d795e53f60e8efd13dc4368cff93ea3d657cb78e7999bac6d",
+    "final-mgnp.log": "a4a9ec98a993707f0e67909039fbe7eb593e14e73cd2be9a260a5e954aaacba2",
+    "independent-base-final.log": "6aa2b5ce19f50c879ecf2a1c960b5d57895e507b1d5d5080a4764dacd0a46fb4",
+    "probe_cost_intake.py": "609dd3d5eddf72654ac47606ed3efdf5334925ad327fcab34ab8cc9828b71189",
+    "probe_candidate_lookup.py": "0c821b22d4b562126934a35156daed9bf0c4ee3211b4beb49cb6dd92eecf912a",
+    "candidate-lookup-mgnp.log": "f36192cc3f89d966c463f1a1f2e316adb4254238698f85ca1d428c76729a45f4",
+    "candidate-lookup-base.log": "8848b24952e3e2f48e0f8365295161f90b55f259bbb41e018032cccdf794a65c",
+    "owner-calibration-candidate-scan.json": "456229ce32b6aaab4ba95fec822e3d8f2510c2e9d23facfbb4b039c03d17aee5"
+  },
+  "supplement_candidate_lookup": {
+    "source_unchanged": true,
+    "env_exit_codes": {
+      "mgnp": 0,
+      "base": 0
+    },
+    "model_calls": 0,
+    "backing_reads": 0,
+    "matching_candidate_position": 47,
+    "candidate_count": 63,
+    "pre_runner_common_backing_refreshes": 48,
+    "additional_runner_refreshes_from_source": 2,
+    "pricing_guard_passes_per_shard": 8,
+    "guard_fixture_observed": 773,
+    "guard_fixture_expected": 773,
+    "full_native_result": "awaiting root completed evidence",
+    "command_template": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. <python> docs/research/specificity-ladder/reports/111-numerical-evidence/probe_candidate_lookup.py"
+  }
+}

@@ -1,0 +1,20 @@
+test_exact_source_inheritance_dispatch_and_host_reachability (__main__.Review) ... FAIL
+test_failed_actual_run_receipt_is_not_resource_or_model_evidence (__main__.Review) ... ok
+test_independently_reproduces20_original_dumps_and_22_only_empty_insertions (__main__.Review) ... ok
+test_known_empty_only_while_unknown_semantic_fields_remain_hashed (__main__.Review) ... ok
+
+======================================================================
+FAIL: test_exact_source_inheritance_dispatch_and_host_reachability (__main__.Review)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-proof-ast-review230/independent_checks.py", line 13, in test_exact_source_inheritance_dispatch_and_host_reachability
+    for n in ('proof_worker.py','proof_guards.py','guards.py','cgroup_probe.py','entry_guard.py','input-pins.json','native-schema-contract.json','request.json','data-files-from.txt','test_catalogues.py','test_entry_readonly.py'):self.assertEqual(sha(P/n),sha(OLD/n),n)
+AssertionError: '6abdf609389bd5fc5188d42b33f702976cd7c1759ea418e5ee27a65c87ca26a7' != '04d419435e592b09ef7e53f3233e7554998181abf13e357d219cb0a66c77a81a'
+- 6abdf609389bd5fc5188d42b33f702976cd7c1759ea418e5ee27a65c87ca26a7
++ 04d419435e592b09ef7e53f3233e7554998181abf13e357d219cb0a66c77a81a
+ : test_catalogues.py
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.330s
+
+FAILED (failures=1)

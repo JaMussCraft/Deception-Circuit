@@ -1,0 +1,101 @@
+{
+  "status": "original findings addressed; new dry-run regression remains",
+  "scientific_execution": false,
+  "whole_unit_accepted": false,
+  "source_hashes": {
+    "component_analysis/a3_direction_pipeline.py": "96678db186078ab37cad108e2d1e71ffdccf1fb3dd157c35cdc57a91b2ebd4a0",
+    "component_analysis/a3_direction_runner.py": "89a62335665595533204006c3eca28d14ca9c42eb600879c235e9c6370739429",
+    "component_analysis/a3_direction_runtime.py": "0401c7a2750cf66ef5508d2dbbaed2f9bcea5f83918d6503e6a8f6b809a44867",
+    "component_analysis/a3_direction_workload.py": "3e43aaf2b4cacb99df87593ae377c8fdf3eb7b223b258ed8873853841404d8f9",
+    "component_analysis/a3_directions.py": "ed882d4e12a396e03e73671e588beba5b1a8c90ab9d31e7ee73d4194430b4a86",
+    "component_analysis/a3_pipeline.py": "310eb53427ad4ac32522dfd0d6cd3b33e4ec887af1776579845f8953bdbe83f5",
+    "scripts/jobs/specificity_a3.sh": "936dfb7f8b9c2d267d52f1e199ed431275e6527cbfc3a105a22e3812289a9b96",
+    "tests/test_a3_direction_runner.py": "3ea945d5b23b4eef7d56139758c7075ea1b56ac612f1923590b7978628ca0120",
+    "tests/test_a3_direction_runtime.py": "20145bbe615d270cc812e566d30d36eb1cf3aa6dc5ca269043a16db135550268",
+    "tests/test_a3_direction_workload.py": "91eb6f874e180c5ffb362daba231631b7bea21c224446580efccfe20a9007300",
+    "tests/test_a3_directions.py": "cd8471b1524ad7b8f1b7c87f9eb5fec5724b3ab2980027ef7aadfea3fc3bb1c1",
+    "tests/test_a3_pipeline.py": "bbb3efdba075cc14c2997cc11ae44bab268bdea56459c0574d6bfc21b62f4a18",
+    "tests/a3_direction_native_scenario.py": "9b5061ab9618222b23230917f446abcaa73747f3d216f69c77b9218feec6297b"
+  },
+  "source_unchanged": true,
+  "baseline_commit_supplied_by_root": "538109e809285b6ddc45d42df8786270a65f7b12",
+  "uncommitted_source_overlay": true,
+  "findings": {
+    "B1": "addressed",
+    "B2": "addressed with explicit conditional target-host portability",
+    "R1": "new medium dry-run mutation regression"
+  },
+  "results": {
+    "original-mgnp": {
+      "exit_code": 0,
+      "passed": 13
+    },
+    "original-base": {
+      "exit_code": 0,
+      "passed": 13
+    },
+    "owning-mgnp": {
+      "exit_code": 0,
+      "passed": 5
+    },
+    "owning-base": {
+      "exit_code": 0,
+      "passed": 5
+    },
+    "extra-mgnp": {
+      "exit_code": 1,
+      "failed": 1
+    },
+    "extra-base": {
+      "exit_code": 1,
+      "failed": 1
+    }
+  },
+  "dry_run_observations": {
+    "mgnp": {
+      "exit_code": 0,
+      "files_before": 23,
+      "files_after": 25,
+      "added_files": [
+        "runtime-startup/1270156-1793637852878218535/COMPLETE.json",
+        "runtime-startup/1270156-1793637852878218535/payload.json"
+      ],
+      "cli_output": "{\"action\": \"admit\", \"commit\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"design_sha256\": \"720c7067673597e607e1980a4d17a5bae8b682ffaf4fdb4e6fe87db70dd08c64\", \"dry_run\": true, \"execution_authorized\": false, \"inventory_sha256\": \"2318eefa8c0626c0d6d55157bf40b0d15899dee571955f22a642b59cd6620072\", \"live_allocation_admission\": \"deferred/unverified\", \"missing_prerequisites\": [], \"model_loaded\": false, \"protocol_sha256\": \"1a36f274f4fe5a0d77f9d5ee3d0fbc418555477f9dd157bb58aca24363a5f2d1\", \"stage\": \"prepare\", \"writes\": false}\n"
+    },
+    "base": {
+      "exit_code": 0,
+      "files_before": 23,
+      "files_after": 25,
+      "added_files": [
+        "runtime-startup/1271136-1793637859971589687/COMPLETE.json",
+        "runtime-startup/1271136-1793637859971589687/payload.json"
+      ],
+      "cli_output": "{\"action\": \"admit\", \"commit\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"design_sha256\": \"720c7067673597e607e1980a4d17a5bae8b682ffaf4fdb4e6fe87db70dd08c64\", \"dry_run\": true, \"execution_authorized\": false, \"inventory_sha256\": \"2318eefa8c0626c0d6d55157bf40b0d15899dee571955f22a642b59cd6620072\", \"live_allocation_admission\": \"deferred/unverified\", \"missing_prerequisites\": [], \"model_loaded\": false, \"protocol_sha256\": \"1a36f274f4fe5a0d77f9d5ee3d0fbc418555477f9dd157bb58aca24363a5f2d1\", \"stage\": \"prepare\", \"writes\": false}\n"
+    }
+  },
+  "interpreters": {
+    "mgnp": "/u/swong2/.conda/envs/mgnp/bin/python",
+    "base": "/sw/external/python/anaconda3/bin/python3.9"
+  },
+  "commands": {
+    "environment": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=.",
+    "original": "<python> -m pytest -q -s -p no:cacheprovider --basetemp=/tmp/review111-round2-original-<env> docs/research/specificity-ladder/reports/111-round1-evidence/test_independent_round1.py docs/research/specificity-ladder/reports/111-round1-evidence/test_independent_round1_more.py",
+    "owning": "<python> -m pytest -q -s -p no:cacheprovider --basetemp=/tmp/review111-round2-owning-<env> tests/test_a3_direction_runtime.py -k \"serial_donor_cache or completed_index_startup or production_shaped_completed_startup or guard_benchmark_covers\"",
+    "extra": "<python> -m pytest -q -s -p no:cacheprovider --basetemp=/tmp/review111-round2-extra-<env> docs/research/specificity-ladder/reports/111-round2-evidence/test_independent_round2_extra.py"
+  },
+  "evidence_sha256": {
+    "owning-mgnp.log": "11238d808f3c4c788f43faf16745f827d812cb030e757cad087ad6409d712c92",
+    "reviewed-fix.diff": "ea9d25341e9dba3f4677b7f48e8aa129bbf7ef9cc4e3cac3253259842d9f8a7e",
+    "original-base.log": "1739d5e0327f4b14c46a8d244bfe9c377bcca07d620f80983121e1a1b0026a74",
+    "owning-base.log": "bbe2799a9781492e1a3f05b2a60d88445ee00e1dcfa837ba9b8baaf6693313a9",
+    "test_independent_round2_extra.py": "4c2445ffc210c70b866490d929c2ba48efb33bcaafdfb8ec376badbd336300ec",
+    "original-mgnp.log": "e9a00298895f2105ba2e2c187ac0e7d1b7d4cf46e2c0cbadd32b2c380a407ad7",
+    "reviewed_runtime.py": "0401c7a2750cf66ef5508d2dbbaed2f9bcea5f83918d6503e6a8f6b809a44867",
+    "extra-mgnp.log": "848a6ba6b6083b1fabc8b602c2aa3603ab5a1b8e271b634ca007afaa08023902",
+    "extra-base.log": "352d85bc680cbb000de8cc9503deae1d06c7306e3fb6c82de7d4bcc2ab198ccf",
+    "dry-run-created-record-base/COMPLETE.json": "004902f91b7cc919badea154b6f455d90d0bf8cddaac348affe9c5c9389d7d2c",
+    "dry-run-created-record-base/payload.json": "fd389229185b99eeb3fcaa5b5dd18d4a69d79ce72ca3211ecae97253b4f812f0",
+    "dry-run-created-record-mgnp/COMPLETE.json": "f8d2f7577f64ea3fdd29c9978925a4ebb87f4dacb1d2edb0e246dccacaecb298",
+    "dry-run-created-record-mgnp/payload.json": "169734ba428637bad6e8d53d1611d091e2136570ae59deb722f6360cccb2362e"
+  }
+}

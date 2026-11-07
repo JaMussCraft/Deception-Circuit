@@ -1,0 +1,20 @@
+{
+  "status": "handed-back",
+  "source_verdict": "CHANGES_REQUIRED",
+  "resource_proposal_verdict": "COHERENT_CPU_ONLY_PROPOSAL_NOT_DEPLOYMENT_ADMISSION",
+  "findings": [
+    {
+      "id": "R231-A",
+      "priority": "high",
+      "source": "host.py main.stop() and terminal failure/normal paths",
+      "problem": "Observer leader liveness is treated as process-group liveness. Already-reaped leader skips all signals; prompt leader TERM exit skips KILL even if descendants survive. Deadline/failure can leave pytest descendants alive beyond supervised bound.",
+      "minimal_correction": "Own and clean the entire started process group independently of leader.poll/wait result. Bound TERM grace and group KILL/reaping/verification; tolerate already-empty group. Apply on timeout/signal/failed observer and prevent terminal promotion with surviving children.",
+      "regressions": [
+        "reaped leader with still-live grandchild gets group termination",
+        "leader exits on TERM while grandchild ignores TERM -> bounded KILL escalation",
+        "empty/already-reaped group tolerated",
+        "preserve late-zero-exit rejection and existing tests"
+      ]
+    }
+  ]
+}

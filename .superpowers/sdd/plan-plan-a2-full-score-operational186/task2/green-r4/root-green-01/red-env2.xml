@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="19" skipped="0" tests="22" time="3.661" timestamp="2026-11-06T23:59:40.748325-06:00" hostname="cn095.delta.ncsa.illinois.edu"><testcase classname="test_full_score_cpu" name="test_review224_actual_Task1_marker_is_accepted_without_renaming[1300.0-1250.0]" time="0.240"><failure message="KeyError: 'packet_manifest_sha256'">test_full_score_cpu.py:531: in test_review224_actual_Task1_marker_is_accepted_without_renaming
+    assert need(m,'validate_request')(c,r,waiting,now=1010.)['actual_future_GPU_job_id'] == gpu_c['actual_job_id']
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../plan-plan-a2-full-score-operational186/task2/green/root-dispatch/candidate-before-interface-review/cpu/supervisor.py:82: in validate_request
+    require(r[request_key] == waiting[waiting_key], 'WAITING binding: ' + waiting_key)
+                              ^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'packet_manifest_sha256'</failure></testcase><testcase classname="test_full_score_cpu" name="test_review224_actual_Task1_marker_is_accepted_without_renaming[1140.0-1125.0]" time="0.236"><failure message="KeyError: 'packet_manifest_sha256'">test_full_score_cpu.py:531: in test_review224_actual_Task1_marker_is_accepted_without_renaming
+    assert need(m,'validate_request')(c,r,waiting,now=1010.)['actual_future_GPU_job_id'] == gpu_c['actual_job_id']
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../plan-plan-a2-full-score-operational186/task2/green/root-dispatch/candidate-before-interface-review/cpu/supervisor.py:82: in validate_request
+    require(r[request_key] == waiting[waiting_key], 'WAITING binding: ' + waiting_key)
+                              ^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'packet_manifest_sha256'</failure></testcase><testcase classname="test_full_score_cpu" name="test_review224_actual_422_manifest_preserves_all_eleven_aliases[None]" time="0.036"><failure message="ValueError: exact corrected422 plus five aliases">test_full_score_cpu.py:564: in test_review224_actual_422_manifest_preserves_all_eleven_aliases
+    result = need(m,'verify_input_closure')(manifest,current,read_bytes=read)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../plan-plan-a2-full-score-operational186/task2/green/root-dispatch/candidate-before-interface-review/cpu/validate-phase.py:168: in verify_input_closure
+    require(len(rows) == 422 and set(CATALOGUES) &lt;= set(rows) and len(aliases) == 5,
+../../../plan-plan-a2-full-score-operational186/task2/green/root-dispatch/candidate-before-interface-review/cpu/validate-phase.py:26: in require
+    if not ok: raise ValueError(message)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   ValueError: exact corrected422 plus five aliases</failure></testcase><testcase classname="test_full_score_cpu" name="test_review224_actual_422_manifest_preserves_all_eleven_aliases[missing-extra]" time="0.028" /><testcase classname="test_full_score_cpu" name="test_review224_actual_422_manifest_preserves_all_eleven_aliases[changed-extra]" time="0.026" /><testcase classname="test_full_score_cpu" name="test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[None]" time="0.242"><failure message="KeyError: 'timely_window'">test_full_score_cpu.py:594: in test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer
+    assert guard.validate_release(release) == composite
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../gpu/common.py:448: in validate_release
+    require(cpu['complete'] is True and cpu['phase'] == 'full_score' and cpu['timely_window'] is True
+                                                                         ^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'timely_window'</failure></testcase><testcase classname="test_full_score_cpu" name="test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[timely_window]" time="0.232" /><testcase classname="test_full_score_cpu" name="test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[bank_file_sha256]" time="0.233"><failure message="KeyError: 'timely_window'">test_full_score_cpu.py:592: in test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer
+    with pytest.raises(ValueError): guard.validate_release(release)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../gpu/common.py:448: in validate_release
+    require(cpu['complete'] is True and cpu['phase'] == 'full_score' and cpu['timely_window'] is True
+                                                                         ^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'timely_window'</failure></testcase><testcase classname="test_full_score_cpu" name="test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[bank_manifest_sha256]" time="0.301"><failure message="KeyError: 'timely_window'">test_full_score_cpu.py:592: in test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer
+    with pytest.raises(ValueError): guard.validate_release(release)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../gpu/common.py:448: in validate_release
+    require(cpu['complete'] is True and cpu['phase'] == 'full_score' and cpu['timely_window'] is True
+                                                                         ^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'timely_window'</failure></testcase><testcase classname="test_full_score_cpu" name="test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[full_rows]" time="0.198"><failure message="KeyError: 'timely_window'">test_full_score_cpu.py:592: in test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer
+    with pytest.raises(ValueError): guard.validate_release(release)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../gpu/common.py:448: in validate_release
+    require(cpu['complete'] is True and cpu['phase'] == 'full_score' and cpu['timely_window'] is True
+                                                                         ^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'timely_window'</failure></testcase><testcase classname="test_full_score_cpu" name="test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[full_controls]" time="0.178"><failure message="KeyError: 'timely_window'">test_full_score_cpu.py:592: in test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer
+    with pytest.raises(ValueError): guard.validate_release(release)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../gpu/common.py:448: in validate_release
+    require(cpu['complete'] is True and cpu['phase'] == 'full_score' and cpu['timely_window'] is True
+                                                                         ^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'timely_window'</failure></testcase><testcase classname="test_full_score_cpu" name="test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[full_domain_support_audit_complete]" time="0.207"><failure message="KeyError: 'timely_window'">test_full_score_cpu.py:592: in test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer
+    with pytest.raises(ValueError): guard.validate_release(release)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../gpu/common.py:448: in validate_release
+    require(cpu['complete'] is True and cpu['phase'] == 'full_score' and cpu['timely_window'] is True
+                                                                         ^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'timely_window'</failure></testcase><testcase classname="test_full_score_cpu" name="test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[waiting_sha256]" time="0.245"><failure message="KeyError: 'timely_window'">test_full_score_cpu.py:592: in test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer
+    with pytest.raises(ValueError): guard.validate_release(release)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../gpu/common.py:448: in validate_release
+    require(cpu['complete'] is True and cpu['phase'] == 'full_score' and cpu['timely_window'] is True
+                                                                         ^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'timely_window'</failure></testcase><testcase classname="test_full_score_cpu" name="test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[bound_gpu_config_sha256]" time="0.208"><failure message="KeyError: 'timely_window'">test_full_score_cpu.py:592: in test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer
+    with pytest.raises(ValueError): guard.validate_release(release)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../gpu/common.py:448: in validate_release
+    require(cpu['complete'] is True and cpu['phase'] == 'full_score' and cpu['timely_window'] is True
+                                                                         ^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'timely_window'</failure></testcase><testcase classname="test_full_score_cpu" name="test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[launch_packet_manifest_sha256]" time="0.229"><failure message="KeyError: 'timely_window'">test_full_score_cpu.py:592: in test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer
+    with pytest.raises(ValueError): guard.validate_release(release)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../gpu/common.py:448: in validate_release
+    require(cpu['complete'] is True and cpu['phase'] == 'full_score' and cpu['timely_window'] is True
+                                                                         ^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'timely_window'</failure></testcase><testcase classname="test_full_score_cpu" name="test_review224_COMPLETE_requires_completed_domain_support_evidence[audit]" time="0.005"><failure message="Failed: DID NOT RAISE ValueError">test_full_score_cpu.py:605: in test_review224_COMPLETE_requires_completed_domain_support_evidence
+    with pytest.raises(ValueError): need(m,'validate_child_completion')(c,r,child,result,now=1201.)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ValueError</failure></testcase><testcase classname="test_full_score_cpu" name="test_review224_COMPLETE_requires_completed_domain_support_evidence[rows]" time="0.011"><failure message="Failed: DID NOT RAISE ValueError">test_full_score_cpu.py:605: in test_review224_COMPLETE_requires_completed_domain_support_evidence
+    with pytest.raises(ValueError): need(m,'validate_child_completion')(c,r,child,result,now=1201.)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ValueError</failure></testcase><testcase classname="test_full_score_cpu" name="test_review224_COMPLETE_requires_completed_domain_support_evidence[controls]" time="0.008"><failure message="Failed: DID NOT RAISE ValueError">test_full_score_cpu.py:605: in test_review224_COMPLETE_requires_completed_domain_support_evidence
+    with pytest.raises(ValueError): need(m,'validate_child_completion')(c,r,child,result,now=1201.)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ValueError</failure></testcase><testcase classname="test_full_score_cpu" name="test_review224_COMPLETE_requires_completed_domain_support_evidence[mask]" time="0.007"><failure message="Failed: DID NOT RAISE ValueError">test_full_score_cpu.py:605: in test_review224_COMPLETE_requires_completed_domain_support_evidence
+    with pytest.raises(ValueError): need(m,'validate_child_completion')(c,r,child,result,now=1201.)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ValueError</failure></testcase><testcase classname="test_full_score_cpu" name="test_review224_marker_swap_never_reaches_Popen_or_extends_deadline[decoded-buffer]" time="0.051"><failure message="AssertionError: Popen reached after marker mutation">test_full_score_cpu.py:638: in test_review224_marker_swap_never_reaches_Popen_or_extends_deadline
+    with pytest.raises(ValueError): m.supervise_once(c,request,cfg_ref)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../plan-plan-a2-full-score-operational186/task2/green/root-dispatch/candidate-before-interface-review/cpu/supervisor.py:286: in supervise_once
+    child = subprocess.Popen(command,cwd=c['runtime'],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_full_score_cpu.py:636: in popen
+    def popen(*a,**k): calls['Popen']+=1;raise AssertionError('Popen reached after marker mutation')
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Popen reached after marker mutation</failure></testcase><testcase classname="test_full_score_cpu" name="test_review224_marker_swap_never_reaches_Popen_or_extends_deadline[before-Popen]" time="0.048"><failure message="AssertionError: Popen reached after marker mutation">test_full_score_cpu.py:638: in test_review224_marker_swap_never_reaches_Popen_or_extends_deadline
+    with pytest.raises(ValueError): m.supervise_once(c,request,cfg_ref)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../plan-plan-a2-full-score-operational186/task2/green/root-dispatch/candidate-before-interface-review/cpu/supervisor.py:286: in supervise_once
+    child = subprocess.Popen(command,cwd=c['runtime'],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_full_score_cpu.py:636: in popen
+    def popen(*a,**k): calls['Popen']+=1;raise AssertionError('Popen reached after marker mutation')
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Popen reached after marker mutation</failure></testcase><testcase classname="test_full_score_cpu" name="test_review224_GREEN_command_includes_original107_and_all_accepted97" time="0.008"><failure message="AssertionError: assert {'test_full_s...score_cpu.py'} == {'test_full_s..._entry198.py'}&#10;  &#10;  Extra items in the right set:&#10;  'test_full_score_entry198.py'&#10;  Use -v to get more diff">test_full_score_cpu.py:650: in test_review224_GREEN_command_includes_original107_and_all_accepted97
+    assert selected=={'test_full_score_cpu.py','test_full_score_controller.py','test_full_score_entry198.py'}
+E   AssertionError: assert {'test_full_s...score_cpu.py'} == {'test_full_s..._entry198.py'}
+E     
+E     Extra items in the right set:
+E     'test_full_score_entry198.py'
+E     Use -v to get more diff</failure></testcase></testsuite></testsuites>

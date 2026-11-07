@@ -1,0 +1,25 @@
+{
+  "kind": "exact_graph_receiver_resource_contract",
+  "binding": "Root-bound receiver evidence identifies exact target+descriptor bytes, final source/reader/freeze code hashes, Python/package environment, chosen read/hash sequence, allocation/CPU/storage family and cold/warm scope. Producer peak is not a receiver bound.",
+  "peak_components": [
+    "Raw target bytes B and possible decoded JSON text S during strict parse.",
+    "Decoded graph D with expanded repeated strings/dicts/lists after JSON sharing loss.",
+    "Frozen graph F plus memo/walk bookkeeping M while decoded containers may still be live.",
+    "Already retained pilot inventory and its fresh authority proof P.",
+    "Actual model staging/host objects H and numeric proof/evidence retention N later in the phase.",
+    "Original full-target/M2 tiers and any shared physical storage pools remain separate unchanged admission constraints."
+  ],
+  "conservative_accounting": "Measure peak overlap across read+hash+decode, freeze, post-load model/proofs and final barriers. Do not subtract presumed D/F/string/alias sharing; use actual cgroup peak/events and carefully labeled retained-graph accounting. Ordinary local release is not proof RSS was returned. No GC/allocator/runtime hook.",
+  "graph_invariants": [
+    "Handle stores one frozen graph and exact root/list/requirement identities.",
+    "reconciliation.inventory must be the very same graph, and every requirement ID must come from that graph; equal-value copies reject.",
+    "_freeze_json already frozen value is idempotent; no second decode, reinterning/coalescing or graph replacement.",
+    "Distinct timing records and dummy/source scopes remain distinct/unchanged; immutable scalar sharing may follow normal parser/freeze behavior but is never assumed for the resource bound.",
+    "Handle/value/ref/namespace witness cannot be mutated or reinitialized, cross PID/fork or pickle; no execution proof is carried."
+  ],
+  "resource_rejections": [
+    "Wrong source/artifact/environment/reader code or changed read-count recipe invalidates receiver evidence.",
+    "Understated raw/decode/freeze/retention bound or actual allocation unable to back declared host capacity rejects before model loading.",
+    "Measured data+pilot proof+model/numeric retention must fit the actual allocation while preserving original storage guards; no subtracting the old producer peak or waiving tiers."
+  ]
+}

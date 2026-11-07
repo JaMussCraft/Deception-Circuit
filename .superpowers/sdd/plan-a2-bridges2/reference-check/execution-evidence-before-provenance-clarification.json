@@ -1,0 +1,54 @@
+{
+  "status": "read-only reference design complete; H100 observations/job authorization remain separate",
+  "scope": "existing saved H200 SDR D/I timing20 seed42 artifacts only",
+  "commands": [
+    {
+      "command": "/sw/external/python/anaconda3/bin/python3.9 .superpowers/sdd/plan-a2-bridges2/reference-check/extract_reference_schema.py",
+      "exit_code": 0,
+      "observed_assertions": [
+        "all10 native artifact hashes match receipts",
+        "all6 recorded source hashes match",
+        "native dataset file hashes match",
+        "both arms baseline/node_eval952-row order and aggregates reconcile",
+        "both arms0/10/20 validation187-row order and aggregates reconcile",
+        "complete binary mask counts reconcile"
+      ]
+    },
+    {
+      "command": "research-session lint .superpowers/sdd/plan-a2-bridges2/reference-check/comparison-plan.md",
+      "exit_code": 0
+    },
+    {
+      "command": "/sw/external/python/anaconda3/bin/python3.9 scripts/check_report_numbers.py .superpowers/sdd/plan-a2-bridges2/reference-check/comparison-plan.md --strict --json",
+      "exit_code": 0,
+      "output": "number-check.json"
+    }
+  ],
+  "end_input_hashes_rechecked": true,
+  "no_source_or_harness_edits": true,
+  "no_model_import_or_weights_or_forwards": true,
+  "no_GPU_or_jobs_or_git_or_RS_mutations_or_notebooks_or_API_or_subagents": true,
+  "all_owned_processes_terminal": true,
+  "artifacts": {
+    "number-check.json": {
+      "bytes": 2754,
+      "sha256": "84d3a24d28ef58a827b5913c6446a0d184719313c5a098a0809e21adce808217"
+    },
+    "predeclared-comparison.json": {
+      "bytes": 5244,
+      "sha256": "61e971fa57f6ee9a8fd5303aff9928c35f38d2bb0e4e737342a6125469c46418"
+    },
+    "comparison-plan.md": {
+      "bytes": 6413,
+      "sha256": "66fb3f2276be8e500b8a83eeb313941b1036bf40675b2885766b88963b4bb37a"
+    },
+    "extract_reference_schema.py": {
+      "bytes": 7178,
+      "sha256": "d303409be841fa549c164eb30c9f1f64f80f87c9544f7dc4c3fc4a56a675c6da"
+    },
+    "reference-schema.json": {
+      "bytes": 68937,
+      "sha256": "09969c13cb6349c3198842d598d78a199d95c50d08ef4834b9c4b968095a3c3a"
+    }
+  }
+}

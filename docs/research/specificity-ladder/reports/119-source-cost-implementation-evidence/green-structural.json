@@ -1,0 +1,30 @@
+{
+  "command": [
+    "/u/swong2/.conda/envs/mgnp/bin/python",
+    "-m",
+    "pytest",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp=/tmp/source-cost-119-green-structural",
+    "tests/test_a3_source_validation.py",
+    "tests/test_a3_mask_pipeline.py",
+    "tests/test_a3_edge_pipeline.py",
+    "-k",
+    "source_initialization or cached_mask_source or cached_edge_source or source_views_preserve or impersonate or across_mint"
+  ],
+  "cwd": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-guard-cost-fix-source",
+  "start_utc": "2026-11-02T20:04:47.862360+00:00",
+  "elapsed_seconds": 21.808989763259888,
+  "exit_code": 0,
+  "environment": {
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1",
+    "HF_HUB_OFFLINE": "1",
+    "TRANSFORMERS_OFFLINE": "1"
+  },
+  "log": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/119-source-cost-implementation-evidence/green-structural.log"
+}

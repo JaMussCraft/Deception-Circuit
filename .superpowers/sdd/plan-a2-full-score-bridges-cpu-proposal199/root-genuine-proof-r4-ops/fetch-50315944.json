@@ -1,0 +1,96 @@
+{
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "-o",
+    "ControlMaster=no",
+    "-o",
+    "ControlPath=none",
+    "-o",
+    "HostName=br013.bridges2.psc.edu",
+    "bridges2",
+    "python3 -B -c 'import json,subprocess,base64,hashlib,time\nfrom pathlib import Path\nb=Path('\"'\"'/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199'\"'\"');p=b/'\"'\"'root-genuine-proof-r2/job-50315944/execution'\"'\"';files={};large=[]\nfor f in list(p.iterdir())+[p.parent.parent/'\"'\"'job-50315944.log'\"'\"']:\n if not f.is_file():continue\n if f.stat().st_size>20000000:large.append({'\"'\"'path'\"'\"':str(f),'\"'\"'bytes'\"'\"':f.stat().st_size,'\"'\"'not_downloaded'\"'\"':True});continue\n raw=f.read_bytes();files[f.name]={'\"'\"'bytes'\"'\"':len(raw),'\"'\"'sha256'\"'\"':hashlib.sha256(raw).hexdigest(),'\"'\"'base64'\"'\"':base64.b64encode(raw).decode()}\na=subprocess.check_output(['\"'\"'sacct'\"'\"','\"'\"'-j'\"'\"','\"'\"'50315944'\"'\"','\"'\"'--format=JobID,State%32,ExitCode,Elapsed,Start,End,MaxRSS,TotalCPU'\"'\"','\"'\"'-n'\"'\"','\"'\"'-P'\"'\"'],universal_newlines=True,timeout=15);print(json.dumps({'\"'\"'files'\"'\"':files,'\"'\"'large_retained_files'\"'\"':large,'\"'\"'accounting'\"'\"':a,'\"'\"'observed_unix'\"'\"':time.time()}))\n'"
+  ],
+  "files": {
+    "host-cgroup-before.json": {
+      "bytes": 1068,
+      "sha256": "392654113ab9b8c9c03d2986e87e75983b91b76d0cbda6c8def13245ba603719"
+    },
+    "container-cgroup-entry.json": {
+      "bytes": 602,
+      "sha256": "6b9b5ad4ce96cf20716d80f1c2057fe6d9f08df6cd391c27ad38191b16688b68"
+    },
+    "container-cgroup-observation.json": {
+      "bytes": 1186,
+      "sha256": "e645b99daea5d5b425f06c4ef103d38c442dabbd97b743ad5c31cb4a4e675d49"
+    },
+    "container-cgroup-readonly.json": {
+      "bytes": 206,
+      "sha256": "7a03dc9e29bf450f8ce6a0d5149661343a8e41056954466df6efa43d2d53b74c"
+    },
+    "allocation-before.json": {
+      "bytes": 4708,
+      "sha256": "211c2555753f7e1d028f41009ba08cb16372a810195f439bc33fac5814f295df"
+    },
+    "source-before.json": {
+      "bytes": 6972,
+      "sha256": "7e1694a2d9b7de1ff1a33b489af573823556b175e254f68551acc59cbf523f54"
+    },
+    "provenance-microbenchmark.json": {
+      "bytes": 963,
+      "sha256": "86e2791ebdc648c1fd492a2fdeee0045b3638b5bda4e904816a3d8c5ec353818"
+    },
+    "source-before-activation.json": {
+      "bytes": 207,
+      "sha256": "94db7b33d8c35f630e9753b0a0f5cc8e2af7091af9ea8247d6b121cf955cf6b2"
+    },
+    "FAILED-supervisor.json": {
+      "bytes": 1830,
+      "sha256": "b9a7a863b899c2bab3048dea049ddd4a7cf8794fcf2a347bc1c6b83b6228ff55"
+    },
+    "allocation-after.json": {
+      "bytes": 4708,
+      "sha256": "bb0636f76fff0c65b2b113b2625339a1239edaafc0811cc3002ca95033a4566d"
+    },
+    "child.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "child-execution.json": {
+      "bytes": 5168,
+      "sha256": "4a9eef94bafd585e778af9aca3a77ba2f4b11e833173be98647c883c4327257a"
+    },
+    "allocation-final.json": {
+      "bytes": 4708,
+      "sha256": "1ebb885c8806bb5e592b2e6be2c5ae38deb61698ae31ed6143c61ccf118ed5f5"
+    },
+    "CHILD-REPORT.json": {
+      "bytes": 8974,
+      "sha256": "c73e94e80f1213adab7247b84a75105a642bcdbfd50e31f7a4a1d6e8287c8b64"
+    },
+    "serialization-measurement.json": {
+      "bytes": 1197,
+      "sha256": "f81362b7fac6d3ca30d09f1a4cce903a1bd097188640eef32f7e4d518ae2c487"
+    },
+    "command.json": {
+      "bytes": 4888,
+      "sha256": "ce553fcc1e2df339e7b3453713947efa1a305df20e421895898f461818ef5dd2"
+    },
+    "source-after.json": {
+      "bytes": 11145,
+      "sha256": "9576de404be47eb2c3c80e5d04c0745356a6742d9a40095e61a83dab5d9b21cd"
+    },
+    "job-50315944.log": {
+      "bytes": 1841,
+      "sha256": "85feb1367ed411554bdf2044b753e6d05c4b26f3119b528fc91b08bfb6a36f07"
+    }
+  },
+  "large_retained_files": [],
+  "accounting": "50315944|FAILED|1:0|00:24:28|2026-11-06T22:00:15|2026-11-06T22:24:43||21:16.353\n50315944.batch|FAILED|1:0|00:24:28|2026-11-06T22:00:15|2026-11-06T22:24:43|3922976K|21:16.352\n50315944.extern|COMPLETED|0:0|00:24:28|2026-11-06T22:00:15|2026-11-06T22:24:43|0|00:00:00\n",
+  "remote_observed_unix": 1794022355.438126,
+  "local_observed_unix": 1794022355.5205371,
+  "all_fetched_files_verified": true
+}

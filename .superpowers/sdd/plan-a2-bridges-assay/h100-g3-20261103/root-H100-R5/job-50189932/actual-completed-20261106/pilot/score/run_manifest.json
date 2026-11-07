@@ -1,0 +1,421 @@
+{
+  "a1_ancestor_commit": "5f450dc93dac707af649dee8c8ca60888b2831db",
+  "budget_admission": "Orchestrator-owned; this artifact does not authorize GPU admission or reserve resources.",
+  "comparison_sha256": "50b11f26173cf668027c4f20db562d8cc416655d30835ec7e03f4fc20471e4ca",
+  "counts": {
+    "expected": 2484,
+    "positive_controls": 144,
+    "rows": 2484
+  },
+  "execution": {
+    "cluster": "bridges2",
+    "cluster_source": "SLURM_CLUSTER_NAME",
+    "device": "cuda:0",
+    "dtype": "torch.bfloat16",
+    "gpu_name": "NVIDIA H100 80GB HBM3",
+    "memory_scope": "scoring compute after model load; includes resident model",
+    "model_load_seconds": 9.603312622755766,
+    "peak_allocated_memory_bytes": 19600040960,
+    "peak_reserved_memory_bytes": 20789067776,
+    "scoring_compute_seconds": 518.3888086024672,
+    "scoring_stage_seconds": 534.4008195307106,
+    "slurm_job_id": "50189932",
+    "stage_time_scope": "model load plus scoring compute; excludes artifact publication"
+  },
+  "execution_commit": "50e947bb852613e3a270082651f2bd1b7bb0c525",
+  "grader_binding": {
+    "kind": "a2_specificity_catalogue_binding_v1",
+    "routes": {
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/docs/research/directions.json": {
+        "foreign_declarations": [
+          {
+            "declarations": {
+              "archive": [
+                "outputs/_studies/autoresearch-workflow/scratch-stale-20261031"
+              ],
+              "do_not_touch": [
+                ".scratch/sdr-*",
+                ".scratch/selective-deception",
+                ".scratch/eval5-grader-fixes",
+                "outputs/_studies/",
+                "outputs/_analyses/"
+              ],
+              "legacy_scratch": [
+                ".scratch/autoresearch-workflow"
+              ]
+            },
+            "id": "autoresearch-workflow"
+          },
+          {
+            "declarations": {
+              "archive": [
+                "outputs/_studies/component-analysis/scratch"
+              ],
+              "legacy_scratch": [
+                ".scratch/component-analysis"
+              ]
+            },
+            "id": "component-analysis"
+          },
+          {
+            "declarations": {
+              "archive": [
+                "outputs/_studies/eval5-grader-fixes/scratch"
+              ],
+              "do_not_touch": [
+                ".scratch/eval5-grader-fixes"
+              ],
+              "legacy_scratch": [
+                ".scratch/eval5-grader-fixes"
+              ]
+            },
+            "id": "eval5-grader-fixes"
+          },
+          {
+            "declarations": {
+              "archive": [
+                "outputs/_studies/format-control/scratch"
+              ],
+              "legacy_scratch": [
+                ".scratch/format-control"
+              ]
+            },
+            "id": "format-control"
+          },
+          {
+            "declarations": {
+              "archive": [
+                "outputs/_studies/mechanism-analysis/scratch"
+              ],
+              "legacy_scratch": [
+                ".scratch/mechanism-analysis"
+              ]
+            },
+            "id": "mechanism-analysis"
+          },
+          {
+            "declarations": {
+              "archive": [
+                "outputs/_studies/mechanism-datasets/scratch"
+              ],
+              "legacy_scratch": [
+                ".scratch/mechanism-datasets"
+              ]
+            },
+            "id": "mechanism-datasets"
+          },
+          {
+            "declarations": {
+              "archive": [
+                "outputs/_studies/sdr-assay-diagnosis/scratch",
+                "outputs/_studies/sdr-behavior-identification/scratch",
+                "outputs/_studies/sdr-clause-choice/scratch",
+                "outputs/_studies/sdr-cue-circuits/scratch",
+                "outputs/_studies/sdr-cue-followup/scratch",
+                "outputs/_studies/sdr-cue-probe/scratch",
+                "outputs/_studies/sdr-native-controls/scratch",
+                "outputs/_studies/sdr-routing-pilot/scratch",
+                "outputs/_studies/sdr-routing-validation/scratch",
+                "outputs/_studies/sdr-shared-composition/scratch",
+                "outputs/_studies/sdr-session-wrapup/scratch"
+              ],
+              "do_not_touch": [
+                ".scratch/sdr-*",
+                "outputs/_analyses/sdr-*"
+              ],
+              "legacy_scratch": [
+                ".scratch/sdr-assay-diagnosis",
+                ".scratch/sdr-behavior-identification",
+                ".scratch/sdr-clause-choice",
+                ".scratch/sdr-cue-circuits",
+                ".scratch/sdr-cue-followup",
+                ".scratch/sdr-cue-probe",
+                ".scratch/sdr-native-controls",
+                ".scratch/sdr-routing-pilot",
+                ".scratch/sdr-routing-validation",
+                ".scratch/sdr-shared-composition",
+                ".scratch/sdr-session-wrapup"
+              ]
+            },
+            "id": "sdr-mechanism"
+          },
+          {
+            "declarations": {
+              "archive": [
+                "outputs/_studies/selective-deception/study"
+              ],
+              "do_not_touch": [
+                ".scratch/selective-deception",
+                "outputs/_studies/selective-deception"
+              ],
+              "legacy_scratch": [
+                ".scratch/selective-deception"
+              ]
+            },
+            "id": "selective-deception"
+          }
+        ],
+        "own_entry": {
+          "archive": [],
+          "branch": "specificity-ladder",
+          "claimed_at": "2026-11-01T14:08:59-05:00",
+          "claimed_by": "codex-01a1987e",
+          "dir": "docs/research/specificity-ladder",
+          "do_not_touch": [],
+          "frozen_grader_sha256": "866fd15dd30b695e46ffe955b09894fb831af92e2b9015eafbd7f0eee151d2f9",
+          "id": "specificity-ladder",
+          "ledger": "docs/research/specificity-ladder/ledger.json",
+          "legacy_scratch": [],
+          "parent_findings": [],
+          "resume": "docs/research/specificity-ladder/RESUME.md",
+          "spec": null,
+          "state": "docs/research/specificity-ladder/state.json",
+          "status": "claimed",
+          "status_source": "docs/research/specificity-ladder/START.md",
+          "summary": "Created by research-session init; the summary is written when the direction is planned.",
+          "title": "Specificity ladder, pressure-mediating circuits and below-the-head specificity",
+          "updated": "2026-11-01",
+          "worklog": "docs/research/specificity-ladder/WORKLOG.md",
+          "worktree": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder"
+        },
+        "sha256": "c36f3d517b7885fdd46642a165b7d0f96d9cda748b97b66bbb4f72949e6529ba",
+        "top": {
+          "schema": 1
+        }
+      },
+      "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/directions.json": {
+        "foreign_declarations": [
+          {
+            "declarations": {
+              "archive": [
+                "outputs/_studies/autoresearch-workflow/scratch-stale-20261031"
+              ],
+              "do_not_touch": [
+                ".scratch/sdr-*",
+                ".scratch/selective-deception",
+                ".scratch/eval5-grader-fixes",
+                "outputs/_studies/",
+                "outputs/_analyses/"
+              ],
+              "legacy_scratch": [
+                ".scratch/autoresearch-workflow"
+              ]
+            },
+            "id": "autoresearch-workflow"
+          },
+          {
+            "declarations": {
+              "archive": [
+                "outputs/_studies/component-analysis/scratch"
+              ],
+              "legacy_scratch": [
+                ".scratch/component-analysis"
+              ]
+            },
+            "id": "component-analysis"
+          },
+          {
+            "declarations": {
+              "archive": [
+                "outputs/_studies/eval5-grader-fixes/scratch"
+              ],
+              "do_not_touch": [
+                ".scratch/eval5-grader-fixes"
+              ],
+              "legacy_scratch": [
+                ".scratch/eval5-grader-fixes"
+              ]
+            },
+            "id": "eval5-grader-fixes"
+          },
+          {
+            "declarations": {
+              "archive": [
+                "outputs/_studies/format-control/scratch"
+              ],
+              "legacy_scratch": [
+                ".scratch/format-control"
+              ]
+            },
+            "id": "format-control"
+          },
+          {
+            "declarations": {
+              "archive": [
+                "outputs/_studies/mechanism-analysis/scratch"
+              ],
+              "legacy_scratch": [
+                ".scratch/mechanism-analysis"
+              ]
+            },
+            "id": "mechanism-analysis"
+          },
+          {
+            "declarations": {
+              "archive": [
+                "outputs/_studies/mechanism-datasets/scratch"
+              ],
+              "legacy_scratch": [
+                ".scratch/mechanism-datasets"
+              ]
+            },
+            "id": "mechanism-datasets"
+          },
+          {
+            "declarations": {
+              "archive": [
+                "outputs/_studies/sdr-assay-diagnosis/scratch",
+                "outputs/_studies/sdr-behavior-identification/scratch",
+                "outputs/_studies/sdr-clause-choice/scratch",
+                "outputs/_studies/sdr-cue-circuits/scratch",
+                "outputs/_studies/sdr-cue-followup/scratch",
+                "outputs/_studies/sdr-cue-probe/scratch",
+                "outputs/_studies/sdr-native-controls/scratch",
+                "outputs/_studies/sdr-routing-pilot/scratch",
+                "outputs/_studies/sdr-routing-validation/scratch",
+                "outputs/_studies/sdr-shared-composition/scratch",
+                "outputs/_studies/sdr-session-wrapup/scratch"
+              ],
+              "do_not_touch": [
+                ".scratch/sdr-*",
+                "outputs/_analyses/sdr-*"
+              ],
+              "legacy_scratch": [
+                ".scratch/sdr-assay-diagnosis",
+                ".scratch/sdr-behavior-identification",
+                ".scratch/sdr-clause-choice",
+                ".scratch/sdr-cue-circuits",
+                ".scratch/sdr-cue-followup",
+                ".scratch/sdr-cue-probe",
+                ".scratch/sdr-native-controls",
+                ".scratch/sdr-routing-pilot",
+                ".scratch/sdr-routing-validation",
+                ".scratch/sdr-shared-composition",
+                ".scratch/sdr-session-wrapup"
+              ]
+            },
+            "id": "sdr-mechanism"
+          },
+          {
+            "declarations": {
+              "archive": [
+                "outputs/_studies/selective-deception/study"
+              ],
+              "do_not_touch": [
+                ".scratch/selective-deception",
+                "outputs/_studies/selective-deception"
+              ],
+              "legacy_scratch": [
+                ".scratch/selective-deception"
+              ]
+            },
+            "id": "selective-deception"
+          }
+        ],
+        "own_entry": {
+          "archive": [],
+          "branch": "specificity-ladder",
+          "claimed_at": "2026-11-01T14:08:59-05:00",
+          "claimed_by": "codex-01a1987e",
+          "dir": "docs/research/specificity-ladder",
+          "do_not_touch": [],
+          "frozen_grader_sha256": "866fd15dd30b695e46ffe955b09894fb831af92e2b9015eafbd7f0eee151d2f9",
+          "id": "specificity-ladder",
+          "ledger": "docs/research/specificity-ladder/ledger.json",
+          "legacy_scratch": [],
+          "parent_findings": [],
+          "resume": "docs/research/specificity-ladder/RESUME.md",
+          "spec": null,
+          "state": "docs/research/specificity-ladder/state.json",
+          "status": "claimed",
+          "status_source": "docs/research/specificity-ladder/START.md",
+          "summary": "Created by research-session init; the summary is written when the direction is planned.",
+          "title": "Specificity ladder, pressure-mediating circuits and below-the-head specificity",
+          "updated": "2026-11-01",
+          "worklog": "docs/research/specificity-ladder/WORKLOG.md",
+          "worktree": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder"
+        },
+        "sha256": "c36f3d517b7885fdd46642a165b7d0f96d9cda748b97b66bbb4f72949e6529ba",
+        "top": {
+          "schema": 1
+        }
+      }
+    }
+  },
+  "grader_registry": {
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/docs/research/directions.json": "f8c7dbb92f2edc509c7bb8e94624a5c8adabddd103a8c48db1cc59bd69a3c6b0",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/directions.json": "b1cf09a06662438569e7f5f670bc85fe3de5e3d2436f375a64ae308b73694a6d"
+  },
+  "group_receipt_sha256": "70bf66db010047ec0fa899f6bd713242facf94af00818c03e5691ceacb0a0135",
+  "kind": "a2_score",
+  "mapping": "unchanged frozen explicit unpadded position maps",
+  "model_identity": {
+    "dtype": "bfloat16",
+    "model": "meta-llama/Llama-3.1-8B-Instruct",
+    "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+    "readout": "fp32 analysis readout; native diagnostics",
+    "tokenizer_revision": "0e9e39f249a16976918f6564b8830bc894c89659"
+  },
+  "operations": [
+    "item_swap",
+    "zero",
+    "h_mean",
+    "h_twin",
+    "self_replay",
+    "empty"
+  ],
+  "payload_sha256": "13bc9fa7c66df13e62d89b26caea3cc1a1b5ad1663cb80eda07bb3ca2252155b",
+  "registry_hashes": {
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json": "801b24e37c3315a8e58aa2ad5007f7831822fc2636d1e61837ad3652c370425e",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/docs/research/held_out.json": "801b24e37c3315a8e58aa2ad5007f7831822fc2636d1e61837ad3652c370425e",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/held_out.json": "801b24e37c3315a8e58aa2ad5007f7831822fc2636d1e61837ad3652c370425e"
+  },
+  "runtime_code_hashes": {
+    "component_analysis/a2_mask_comparison.py": "b1d9eee1b5cbcc7f1c64dbaa164733553fd314ebea43617b235d6e3fb0c9fd28",
+    "component_analysis/a2_pipeline.py": "45ba2b7d551164d75ed6bdd3fd5c7f171087b6f60753691e7fb6831f9e56aa51",
+    "component_analysis/dla.py": "61476cd4607f240bcdac567a7005cf86379cae0d4f2606dba2a60c6401d68073",
+    "component_analysis/hooks.py": "fdc8f325884e88c4168a2c9e9fde731b98be3d608ac15f1f0a39278044d7cfba",
+    "component_analysis/knockout.py": "3b5599f12bcdc6731965e3fb2c374dabad5a064b38863b1b756d4a30078b5b7b",
+    "component_analysis/ladder_design.py": "a9752ff2bca91d7d04957fb867adcdc5640d94b47bf11d9593a3657a0f9c533b",
+    "component_analysis/ladder_metrics.py": "9cc369e3e929b474052a5a142890a16615d804ce64b415e919e347af4675cfad",
+    "component_analysis/ladder_pipeline.py": "f0955e8df5215e27cb3eff06cd28f7230b1de7d2a6c20e202854bc73c1280b56",
+    "component_analysis/ladder_tasks.py": "7f53a2210450e4264089a60da31739d2c0c187b0dcd778b203997b9bd873e847",
+    "component_analysis/specificity_ladder.py": "93a22eb6b51cf6ea081b37dd354179cd56aa89def6bb50337b40fc2937b9170e",
+    "dataset/build_user_inversion_v2.py": "47cb1e1dd84d6efc43474c6ce9fc10b30f111a96f083aa370a0d9ac01c827b2a",
+    "dataset/matched_honest.py": "cb30aa003b22a0cb940bb2fb16e0f67be77f0f5e433d7a4d9b52f1fd059f13f0",
+    "dataset/user_inversion_pipeline.py": "4d49697731f291339262fe6ebc6a5909601a26fcf5d31ff562b55d1d74b2a0ee",
+    "evaluation/benchmarks/sandbagging.py": "67fce74fe14e45abb6b7ea57e96a1382ef19fa0e74ea1f40126f4adfc61a7039",
+    "evaluation/benchmarks/sources.py": "06b9286567467bf37a52faaf9ee8fff41b4c1dc8ce8e348b2f2b032b7eac633f",
+    "evaluation/grader_hash.py": "6b26c4c4cd111fe3056f8a0b1119eabf51ab367eb242588a73b9cb3f85b13a19",
+    "models/__init__.py": "ef3796de0c3e9ca6e0760fe72764241664f2d81055a891ebd5d47c9c43aef210",
+    "models/_compat.py": "449b03c2232a539dc590fed795ca2a55a045c27ce99b13b9a5204363970d2737"
+  },
+  "source_artifacts": {
+    "comparison": {
+      "file_sha256": "634aab7b1a9ecf87d23b9797e319028da77e2f982118af62c3917e6221df3063",
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/all18-40fe57289405-v1/comparison.json"
+    },
+    "design": {
+      "file_sha256": "fe8d38875358dca69029751a9cf17a2cb0ddec3c215ede8a0d43bc3594554a0d",
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/design.json"
+    },
+    "selected": {
+      "file_sha256": "f65f8541f8315b4e4bbd4a87d4c258e4872623466415abba31bf0ea1a8c5c89e",
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/selected.json"
+    },
+    "selection_sidecar": {
+      "file_sha256": "50cf8feef06ecb661ecb8bc76d7ddbeaac7cf29002e947ddf21201e955add20c",
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/selection_run_manifest.json"
+    },
+    "source_records": {
+      "file_sha256": "478f73ee31289ac42395e8268470a77b24ef0e69da22e26af0f2fcdd250d5b1e",
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/all18-40fe57289405-v1/source-records.json"
+    }
+  },
+  "training_execution_commit": "6bd8bf5334f2e83613a129d2fcfeacf83e762191",
+  "utility_registry_hashes": {
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json": "801b24e37c3315a8e58aa2ad5007f7831822fc2636d1e61837ad3652c370425e",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/docs/research/held_out.json": "801b24e37c3315a8e58aa2ad5007f7831822fc2636d1e61837ad3652c370425e",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/held_out.json": "801b24e37c3315a8e58aa2ad5007f7831822fc2636d1e61837ad3652c370425e"
+  }
+}

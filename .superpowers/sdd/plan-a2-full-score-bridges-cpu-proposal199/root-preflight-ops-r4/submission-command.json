@@ -1,0 +1,19 @@
+[
+  "sbatch",
+  "--parsable",
+  "--account=cis260361p",
+  "--partition=RM-shared",
+  "--qos=rm",
+  "--nodes=1",
+  "--ntasks=1",
+  "--cpus-per-task=26",
+  "--mem=48G",
+  "--time=00:05:00",
+  "--no-requeue",
+  "--export=ALL,CUDA_VISIBLE_DEVICES=",
+  "--chdir=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime",
+  "--output=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-cgroup199-r4/job-%j.log",
+  "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/preflight-r4/launch.sh",
+  "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-cgroup199-r4/execution",
+  "bf8beb34fe2db3d64a40c71a8fa85ec7de8305971073d602f4ff49ece7f39a81"
+]

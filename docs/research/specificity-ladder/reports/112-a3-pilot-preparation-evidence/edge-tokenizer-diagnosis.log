@@ -1,0 +1,23 @@
+{
+  "kind": "edge_tokenizer_factory_mismatch_v1",
+  "raw_pad_token": null,
+  "approved_pad_token": "<|eot_id|>",
+  "approved_eos_token": "<|eot_id|>",
+  "differences": {
+    "special_tokens_map": {
+      "raw": {
+        "bos_token": "<|begin_of_text|>",
+        "eos_token": "<|eot_id|>"
+      },
+      "approved": {
+        "bos_token": "<|begin_of_text|>",
+        "eos_token": "<|eot_id|>",
+        "pad_token": "<|eot_id|>"
+      }
+    }
+  },
+  "rejected": "production tokenizer configuration differs from pinned standard",
+  "source_cause": "admit_parent_sources loads raw AutoTokenizer; canonical validator compares against common.load_tokenizer which supplies eos padding",
+  "source_changed": false,
+  "validation_bypassed": false
+}

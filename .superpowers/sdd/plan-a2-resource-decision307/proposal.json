@@ -1,0 +1,54 @@
+{
+  "kind": "ROOT_PROPOSED_ENGINEERING_RESOURCE_DECISION_FOR_INDEPENDENT_REVIEW",
+  "status": "AWAITING_INDEPENDENT_REVIEW",
+  "execution_authorized": false,
+  "actual_job_id": null,
+  "actual_capacity": null,
+  "full_domain_reference": null,
+  "resources": {
+    "CPUs": 4,
+    "GPU_count": 1,
+    "RAM_bytes": 103079215104,
+    "duration_seconds": 19800,
+    "minimum_entry_seconds": 18000,
+    "child_cap_seconds": 19000,
+    "finish_margin_seconds": 300
+  },
+  "accepted_proof": {
+    "path": "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/specificity-ladder/reports/root-proof-50316939-evidence/COMPLETE-PROOF.json",
+    "sha256": "56806be4b4f233005f98f338fdc11dd5e46f09e376b0cb7577497494857a519d",
+    "independent_review": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-proof-terminal-review249/audit-result.json"
+  },
+  "engineering": {
+    "whole_core_orientation_seconds": 13780.93869288219,
+    "single_whole_core_allowance_fraction": 0.2,
+    "combined_fixed_allowance_seconds": 900,
+    "publication_charged_once_within_fixed_seconds": 56.8200954683125,
+    "unmeasured_fixed_remainder_seconds": 843.1799045316875,
+    "cold_load_once_seconds": 555.7060698261485,
+    "finish_seconds": 300,
+    "total_before_platform_judgment_seconds": 18292.832501284774,
+    "request_margin_seconds": 1507.1674987152255,
+    "conservative_whole_work_after_finish_seconds": 17992.832501284774,
+    "entry_floor_margin_over_that_seconds": 7.16749871522552,
+    "earliest_allocation_work_deadline_seconds": 19500,
+    "maximum_elapsed_before_minimum_entry_floor_seconds": 1500,
+    "child_cap_above_entry_floor_seconds": 1000
+  },
+  "platform_judgment": "Root proposes retaining the original H100 platform, exact supported mgnp software and unchanged scientific workload/bank. Accept the existing whole-core orientation with one twenty-percent allowance and the measured CPU proof as a conditional engineering estimate. Do not subtract any CPU time from the observed 518-second prefix, do not add the full hash stress again, and do not infer a universal workspace or completion guarantee. Actual GPU identity/free capacity, allocation, storage and freshness remain independent mandatory checks.",
+  "fixed_envelope_judgment": "Root proposes accepting the existing 900-second combined fixed allowance, charging measured publication once within it; unmeasured remainder and request margin remain stated engineering allowances, not measurements. The 18000-second entry floor conservatively covers the whole existing forecast after removing only the 300-second finish reserve. The controller must reject entry when that floor is unavailable and cap its child at the earlier actual work deadline or 19000 seconds; no renewal, automatic retry or extension.",
+  "open_prerequisites": [
+    "Actual Task4 complete native acceptance in both environments and whole-packet/source publication",
+    "Actual capacity/resource/cache/storage/source/input/job/admission bindings and independent resource decision",
+    "Fresh reader-safe reservation plus complete successor, preserving all original charges",
+    "Actual request/acquisition/capture/transfer/remote checks/publication feasibility within unchanged 15/240/300 limits; local proof and metadata-only cache timing do not establish it",
+    "Original full-score numerical/environment, supported-row/control and final native result checks"
+  ],
+  "not_claimed": [
+    "full GPU timing measured",
+    "whole remote handoff feasible",
+    "GPU admitted",
+    "actual job/capacity bound",
+    "scientific effects accepted"
+  ]
+}

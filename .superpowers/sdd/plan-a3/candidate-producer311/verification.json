@@ -1,0 +1,143 @@
+{
+  "kind": "LOCAL_STDLIB_ONLY_PACKET_CHECKS",
+  "native_imports": false,
+  "scheduler_calls": 0,
+  "actual_job": null,
+  "actual_config": null,
+  "actual_source_binding": null,
+  "execution_authorized": false,
+  "runs": [
+    {
+      "name": "base",
+      "command": [
+        "/sw/external/python/anaconda3/bin/python3.9",
+        "-B",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/candidate-producer311/test_packet.py"
+      ],
+      "cwd": "/tmp",
+      "origin": {
+        "executable": "/sw/external/python/anaconda3/bin/python3.9",
+        "version": "3.9.18 (main, Sep 11 2023, 13:41:44) \n[GCC 11.2.0]"
+      },
+      "exit_code": 0,
+      "output": "test_driver_orders_native_steps_and_stops_with_partial_evidence (__main__.Packet) ... ok\ntest_native_plan_is_exact_fresh_freeze_prefit_then_saved_producer (__main__.Packet) ... ok\ntest_saved_target_inventory_uses_real_bytes_and_rejects_sink_or_drift (__main__.Packet) ... ok\ntest_source_mutation_extra_file_alias_and_foreign_origin_reject (__main__.Packet) ... ok\ntest_transport_preserves_slurm_and_writes_only_private_child (__main__.Packet) ... ok\ntest_unbound_rejected_before_import_or_source_access (__main__.Packet) ... ok\n\n----------------------------------------------------------------------\nRan 6 tests in 0.239s\n\nOK\n",
+      "expected_methods": 6
+    },
+    {
+      "name": "relocated-dryrun-base",
+      "command": [
+        "bash",
+        "/tmp/candidate311-final-spool-0m37_bpz/spool-script",
+        "--dry-run"
+      ],
+      "host": "/sw/external/python/anaconda3/bin/python3.9",
+      "absolute_host": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/candidate-producer311/host.py",
+      "exit_code": 0,
+      "output": {
+        "actual_config": null,
+        "actual_job": null,
+        "candidate_source": null,
+        "driver": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/candidate-producer311/driver.py",
+        "execution_authorized": false,
+        "native_imports": false,
+        "scheduler_calls": 0,
+        "status": "UNBOUND_CANDIDATE_ONLY"
+      }
+    },
+    {
+      "name": "mgnp",
+      "command": [
+        "/u/swong2/.conda/envs/mgnp/bin/python",
+        "-B",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/candidate-producer311/test_packet.py"
+      ],
+      "cwd": "/tmp",
+      "origin": {
+        "executable": "/u/swong2/.conda/envs/mgnp/bin/python",
+        "version": "3.12.13 | packaged by Anaconda, Inc. | (main, Jul  9 2026, 14:38:16) [GCC 14.3.0]"
+      },
+      "exit_code": 0,
+      "output": "test_driver_orders_native_steps_and_stops_with_partial_evidence (__main__.Packet.test_driver_orders_native_steps_and_stops_with_partial_evidence) ... ok\ntest_native_plan_is_exact_fresh_freeze_prefit_then_saved_producer (__main__.Packet.test_native_plan_is_exact_fresh_freeze_prefit_then_saved_producer) ... ok\ntest_saved_target_inventory_uses_real_bytes_and_rejects_sink_or_drift (__main__.Packet.test_saved_target_inventory_uses_real_bytes_and_rejects_sink_or_drift) ... ok\ntest_source_mutation_extra_file_alias_and_foreign_origin_reject (__main__.Packet.test_source_mutation_extra_file_alias_and_foreign_origin_reject) ... ok\ntest_transport_preserves_slurm_and_writes_only_private_child (__main__.Packet.test_transport_preserves_slurm_and_writes_only_private_child) ... ok\ntest_unbound_rejected_before_import_or_source_access (__main__.Packet.test_unbound_rejected_before_import_or_source_access) ... ok\n\n----------------------------------------------------------------------\nRan 6 tests in 0.241s\n\nOK\n",
+      "expected_methods": 6
+    },
+    {
+      "name": "relocated-dryrun-mgnp",
+      "command": [
+        "bash",
+        "/tmp/candidate311-final-spool-a6xjaxd6/spool-script",
+        "--dry-run"
+      ],
+      "host": "/u/swong2/.conda/envs/mgnp/bin/python",
+      "absolute_host": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/candidate-producer311/host.py",
+      "exit_code": 0,
+      "output": {
+        "actual_config": null,
+        "actual_job": null,
+        "candidate_source": null,
+        "driver": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/candidate-producer311/driver.py",
+        "execution_authorized": false,
+        "native_imports": false,
+        "scheduler_calls": 0,
+        "status": "UNBOUND_CANDIDATE_ONLY"
+      }
+    }
+  ],
+  "red_sources": [
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/candidate-producer311/common-red.py",
+      "sha256": "cdc367d8182111af2aae70efc45509481be2dd744a8504ed048edfa4a1ff7770",
+      "bytes": 58
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/candidate-producer311/driver-red.py",
+      "sha256": "cdc367d8182111af2aae70efc45509481be2dd744a8504ed048edfa4a1ff7770",
+      "bytes": 58
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/candidate-producer311/host-red.py",
+      "sha256": "cdc367d8182111af2aae70efc45509481be2dd744a8504ed048edfa4a1ff7770",
+      "bytes": 58
+    }
+  ],
+  "original_test_source": {
+    "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/candidate-producer311/test-original-red.py.txt",
+    "sha256": "4803e30517983e2a62ac51dc2a774760d01b0806707f613ffcccd52197ba1a41",
+    "bytes": 8382
+  },
+  "final_test_source": {
+    "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/candidate-producer311/test_packet.py",
+    "sha256": "c0729d97759b2e59b53e53398b409dc4e5b3b8e3b0ba2f64b3e20a7a5078b502",
+    "bytes": 8597
+  },
+  "hf_pre_correction_host": {
+    "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/candidate-producer311/host-pre-hf.py",
+    "sha256": "479d345cc65342745339b5a9c53a693b1cc1c36aa5eda4e396ac4d055064d2b0",
+    "bytes": 8623
+  },
+  "Python36_host_common_syntax": true,
+  "shell_syntax_exit_code": 0,
+  "red_logs": [
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/candidate-producer311/red-base.log",
+      "sha256": "d96ae966b97d56181369d9033c6a4d16cfe8d82dd7159319b35e5f7e3a05835d",
+      "bytes": 4451
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/candidate-producer311/red-mgnp.log",
+      "sha256": "7c5cf8e5dc32dd02e1627520db28d6a38a49c9e7e0647ba9376333ed61bc6817",
+      "bytes": 5389
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/candidate-producer311/hf-red-base.log",
+      "sha256": "97fb71430b7e35f6f71718be894079e23e9d5a23fe3a645839097a47b1322df5",
+      "bytes": 1792
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/candidate-producer311/hf-red-mgnp.log",
+      "sha256": "dfce180e87f65f454ea7afa61bc409d30f1f2f4ca4f762e80c4f771c705807ab",
+      "bytes": 2231
+    }
+  ],
+  "immutable_H200_settings_equal": true,
+  "actual_config_fields_null": true
+}

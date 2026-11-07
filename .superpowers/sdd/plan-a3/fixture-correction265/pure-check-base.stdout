@@ -1,0 +1,88 @@
+{
+  "kind": "PURE_AST_CONSTRUCTION_ONLY_NOT_NATIVE_ACCEPTANCE",
+  "resource_checks": [
+    {
+      "reference": "target",
+      "capacity": 100,
+      "old": "TypeError before validator",
+      "new": "construction succeeds; exact validator reference check raises ValueError"
+    },
+    {
+      "reference": "target",
+      "capacity": 99,
+      "old": "TypeError before validator",
+      "new": "construction succeeds; exact validator reference check raises ValueError"
+    },
+    {
+      "reference": "preparation",
+      "capacity": 100,
+      "old": "TypeError before validator",
+      "new": "construction succeeds; exact validator reference check raises ValueError"
+    },
+    {
+      "reference": "preparation",
+      "capacity": 99,
+      "old": "TypeError before validator",
+      "new": "construction succeeds; exact validator reference check raises ValueError"
+    }
+  ],
+  "final_barrier_checks": [
+    {
+      "damage": "target-payload-restored-mtime",
+      "phase": {
+        "final": false,
+        "mutated": true,
+        "final_live_guard_calls": 1
+      },
+      "trace": [
+        "scope",
+        "cheap-identity",
+        "file-witness",
+        "original-live-guard",
+        "fresh-deadline",
+        "check-deadline",
+        "cheap-identity"
+      ]
+    },
+    {
+      "damage": "descriptor-marker",
+      "phase": {
+        "final": false,
+        "mutated": true,
+        "final_live_guard_calls": 1
+      },
+      "trace": [
+        "scope",
+        "cheap-identity",
+        "file-witness",
+        "original-live-guard",
+        "fresh-deadline",
+        "check-deadline",
+        "cheap-identity"
+      ]
+    },
+    {
+      "damage": "identical-target-tree",
+      "phase": {
+        "final": false,
+        "mutated": true,
+        "final_live_guard_calls": 1
+      },
+      "trace": [
+        "scope",
+        "cheap-identity",
+        "file-witness",
+        "original-live-guard",
+        "fresh-deadline",
+        "check-deadline",
+        "cheap-identity"
+      ]
+    }
+  ],
+  "all_other_AST_unchanged": true,
+  "decorators_signatures_original_assertions_preserved": true,
+  "historical_nodeids": 223,
+  "new_native_collection": false,
+  "original_sha256": "ccdecf2545b4bbc5ab9448f2c2114c72c3e2c6d4a0fbce8dcad7fdb76fdf8bf1",
+  "candidate_sha256": "e2a7c5622508974fafafe016e9c3d1d55903302f646f05c5f35630570a1f6e86"
+}

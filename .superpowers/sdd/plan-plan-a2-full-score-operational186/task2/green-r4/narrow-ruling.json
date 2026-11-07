@@ -1,0 +1,24 @@
+{
+  "scope": "baseline observer name/count oracle only",
+  "source_job": "23620810",
+  "source_job_terminal": "FAILED1:0/21s as reported by root",
+  "previous_expectation": {
+    "failures": 20,
+    "passes": 2
+  },
+  "actual_both_environments": {
+    "tests": 22,
+    "failures": 19,
+    "passes": 3,
+    "errors": 0,
+    "skips": 0
+  },
+  "additional_pass": "test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[timely_window]",
+  "reason": "The negative test deliberately adds timely_window=False to the original CPU COMPLETE. Accepted Task1 validate_release short-circuits on that false flag and raises its intended ValueError before accessing the other missing fields. The positive None case still fails. Thus this is already-enforced consumer rejection, not evidence that the old producer emits timely_window or satisfies the new proof contract.",
+  "production_and_all_semantic_test_bodies_unchanged": true,
+  "baseline_source_unchanged": true,
+  "baseline_cases_retained": 22,
+  "corrected_GREEN_cases_retained": 226,
+  "expected_sets": "red-oracle.json authenticates exact19 failure names and3 pass names observed identically in both XML files; unexpected substitutions or duplicates reject",
+  "no_native_model_GPU_or_execution_authority": true
+}

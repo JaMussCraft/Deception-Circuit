@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/real-input-readiness/bank-scoring-timing/launch/preflight.py", line 9, in <module>
+    p,ar=imports();args=p.parser().parse_args(C['bank_command'][2:]);prepared,selected,sidecar=p._load_context(args);receipt=p.a1.read_artifact(C['groups']);p._validate_live(args,receipt,prepared)
+                                                                                                                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime/component_analysis/a2_pipeline.py", line 1121, in _validate_live
+    require(
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime/dataset/user_inversion_pipeline.py", line 32, in require
+    raise ValueError(message)
+ValueError: grader registry snapshot drift

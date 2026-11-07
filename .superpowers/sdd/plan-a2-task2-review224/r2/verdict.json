@@ -1,0 +1,49 @@
+{
+  "status": "handed-back",
+  "verdict": "PRODUCTION_R224_STATIC_CLOSED_NEW_MARKER_FIXTURE_REQUIRES_TEST_ONLY_CORRECTION",
+  "findings": [
+    {
+      "id": "R224-r2-F1",
+      "scope": "new regression fixture only",
+      "severity": "blocks GREEN/acceptance",
+      "site": "candidate/tests/test_full_score_cpu.py task1_waiting and two actual marker acceptance cases",
+      "problem": "The inherited gpu_c prospective job id is T1-FIXTURE-JOB; the new marker acceptance tests send it to unchanged numeric-only Slurm validate_request and fail before asserting fixed marker compatibility.",
+      "required_correction": "Use one coherent numeric prospective job id in the new task1_waiting fixture before gpu_module binds config/environment. Preserve production numeric validation, all original tests and exact raw Task1 marker.",
+      "evidence": [
+        "tiny-endpoints.json",
+        "tiny-endpoints.stdout",
+        "tiny-endpoints.xml",
+        "numeric-diagnosis.json",
+        "numeric-diagnosis.xml"
+      ],
+      "independent_diagnosis": "Both original publication/deadline endpoint pairs pass after only an in-memory fixture ID change to456; no candidate file modified."
+    }
+  ],
+  "R224_A": "static closed: actual Task1 names, same-buffer authenticated read/parse, immediate pre-Popen immutable request/marker check",
+  "R224_B": "static closed: complete authenticated alias mapping, no fixed5, dynamic full count; new tests use real11-alias manifest metadata",
+  "R224_C": "static closed: actual Task1 consumer fields and explicit completed domain evidence, immutable child preserved; tiny real consumer positive case passed",
+  "R224_D": "static closed: all3 accepted/controller/CPU test files selected with226 intended full total",
+  "original107_functions_and_parameterizations_retained": true,
+  "Task1_97_files_unchanged": true,
+  "pins_sha256": "80b67c4aac5535dcbfe2b88e192c1cde270bde3b445bfccf97b2307abb628859",
+  "raw_members_checked": 229,
+  "actual_GREEN_observed": false,
+  "root_GREEN_job": "23620719",
+  "root_GREEN_last_reported": "pending; reviewer did not poll scheduler",
+  "independent_tiny_initial": {
+    "observed": 3,
+    "passed": 2,
+    "failed": 1,
+    "exit_code": 1
+  },
+  "independent_numeric_fixture_diagnosis": {
+    "observed": 2,
+    "passed": 2,
+    "failed": 0,
+    "exit_code": 0
+  },
+  "no_author_handback_or_candidate_source_test_edits": true,
+  "no_native_full_suite_git_RS_scheduler_remote_agents": true,
+  "acceptance": false,
+  "resource_or_GPU_admitted": false
+}

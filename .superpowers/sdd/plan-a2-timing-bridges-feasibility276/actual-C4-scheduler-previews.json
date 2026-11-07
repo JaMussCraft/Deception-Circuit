@@ -1,0 +1,5 @@
+{
+  "exit_code": 0,
+  "stdout": "[{\"argv\": [\"sbatch\", \"--test-only\", \"--account=cis260361p\", \"--partition=RM-shared\", \"--qos=rm\", \"--nodes=1\", \"--ntasks=1\", \"--cpus-per-task=4\", \"--mem=32G\", \"--time=00:15:00\", \"--no-requeue\", \"--export=ALL,CUDA_VISIBLE_DEVICES=\", \"--wrap=/bin/true\"], \"exit_code\": 1, \"stdout\": \"\", \"stderr\": \"sbatch: error: Allocation requested mem-per-core higher than maximum of 2000M/core\\nallocation failure: Access/permission denied\\n\", \"observed_unix\": 1794040479.3773003}, {\"argv\": [\"sbatch\", \"--test-only\", \"--account=cis260372p\", \"--partition=RM-shared\", \"--qos=rm\", \"--nodes=1\", \"--ntasks=1\", \"--cpus-per-task=4\", \"--mem=32G\", \"--time=00:15:00\", \"--no-requeue\", \"--export=ALL,CUDA_VISIBLE_DEVICES=\", \"--wrap=/bin/true\"], \"exit_code\": 1, \"stdout\": \"\", \"stderr\": \"sbatch: error: Allocation requested mem-per-core higher than maximum of 2000M/core\\nallocation failure: Access/permission denied\\n\", \"observed_unix\": 1794040479.3916378}]\n",
+  "stderr": ""
+}

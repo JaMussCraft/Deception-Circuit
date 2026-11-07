@@ -1,0 +1,17 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________ test_protection_metadata_cannot_be_reinitialized_or_rerouted _________
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-protection-seal/test_protection_metadata_canno0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fd6828e38c0>
+
+    def test_protection_metadata_cannot_be_reinitialized_or_rerouted(tmp_path,monkeypatch):
+        c=setup_case(tmp_path,monkeypatch);state=c.build();protection=state._protection
+>       with pytest.raises(TypeError):protection.__init__(protection.contexts,[])
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE TypeError
+
+tests/test_a3_source_validation.py:282: Failed
+=========================== short test summary info ============================
+FAILED tests/test_a3_source_validation.py::test_protection_metadata_cannot_be_reinitialized_or_rerouted
+1 failed, 33 deselected in 3.29s

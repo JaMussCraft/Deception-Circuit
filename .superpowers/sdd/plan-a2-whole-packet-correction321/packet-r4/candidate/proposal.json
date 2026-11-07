@@ -1,0 +1,112 @@
+{
+  "CPU_test_proposal": {
+    "CPUs": 2,
+    "GPUs": 0,
+    "RAM_bytes": 17179869184,
+    "actual_failed_run_context": {
+      "BASE_seconds": 300.7170010760019,
+      "errors": 0,
+      "failed": 14,
+      "full_positive_case_seconds": {
+        "base39": 13.64,
+        "mgnp": 10.908
+      },
+      "full_support_reconstructions_observed": 0,
+      "job": "23636443",
+      "mgnp_seconds": 298.3939312410075,
+      "native_audit_calls_observed": 0,
+      "note": "13 raw WAITING-copy failures plus1 native relative-source cwd failure, not14 at same guard. Actual terminal accounting/RSS remains root-owned; no success or memory bound inferred.",
+      "observed_cases_per_environment": 32,
+      "passed": 18,
+      "skips": 0
+    },
+    "actual_job_id": null,
+    "actual_resources": null,
+    "construction_accounting": {
+      "actual_peak_RSS_bytes": null,
+      "actual_wall_seconds": null,
+      "additional_reachable_work": "13 cases can newly pass capture/transfer/remote publication into the actual consumer/entry paths. The extra raw-byte regression uses a small joined fixture, not another full-domain construction. Restored guards/input/source validation remain active.",
+      "automatic_retry": false,
+      "bounds_are_planning_estimates": true,
+      "cases_per_environment": 33,
+      "enumeration_basis": "Initial build now obtains native positive_keys once and reuses it for control rows, domain reference and original validate_domain_identity; validate_positive_controls enumerates once more. Normal/support audits each enumerate twice, failing control audit once, manifest drift none:7 per environment. Row-key enumeration remains8. One native support reconstruction and four audits/five context loads remain.",
+      "full_row_key_enumerations_per_environment": 8,
+      "full_support_reconstructions_dual_total": 2,
+      "full_support_reconstructions_per_environment": 1,
+      "native_audit_invocations_per_environment": 4,
+      "native_context_loads_per_environment": 5,
+      "new_metadata_checks": "Two extra original metadata-only model_geometry_receipt calls in the full case (frozen model identity before context and actual prepared identity after context), actual HF constants evidence, and one original validate_domain_identity on the existing mask. No extra context load, support reconstruction or model.",
+      "positive_key_enumerations_per_environment": 7,
+      "retention_basis": "Initial support build retains one prepared context, one receipt/bank, support mask and full key list, constructed score rows and domain-reference rows; these are multiple representations, not independent repeated context builds. The full return retains only synthetic score. Postguards retain baseline score plus at most one mutation copy plus one audit-loaded score; prior mutation and rejection traceback graphs are released/collected before the next mutation. Serialized JSON/envelope buffers and native validation temporaries add memory; no measured allocator/RSS bound is claimed.",
+      "source_level_simultaneous_prepared_context_roots": 1,
+      "source_level_simultaneous_score_graph_roots_maximum": 3
+    },
+    "interpreters": [
+      {
+        "label": "base39",
+        "pytest": "8.3.3",
+        "python": "/sw/external/python/anaconda3/bin/python3.9",
+        "python_minor": [
+          3,
+          9
+        ]
+      },
+      {
+        "label": "mgnp",
+        "pytest": "9.1.1",
+        "python": "/u/swong2/.conda/envs/mgnp/bin/python",
+        "python_minor": [
+          3,
+          12
+        ]
+      }
+    ],
+    "memory_qualification": "16 GiB retained as an unaccepted fixture resource proposal, not a measured full-path RSS bound. Failed run never retained full score graphs. Accepted249/285 observed memory is context only; their different workloads/platforms do not bound this fixture peak.",
+    "new_cases": 33,
+    "per_environment_timeout_seconds": 1650,
+    "rationale": "Retain separately reviewed2 CPU/16 GiB/3600s allocation with1650s per environment and300s observer headroom. Actual failed job23637408 took327.349s BASE/329.995s mgnp but still failed before full reconstruction/audits or13consumer paths; it cannot bound corrected success. Consolidation adds early original normalized cutover authentication, deterministic A2 child-only cache/offline env, two metadata-only geometry observations and original domain validation on the existing mask. Full support/audit/context counts are unchanged and positive key enumeration drops from8 to7; no material workload increase or resource-default admission follows. Time/RSS for corrected success remain unmeasured; no automatic extension/retry.",
+    "root_review_accepted": false,
+    "walltime_seconds": 3600
+  },
+  "actual_cache_runtime_binding": null,
+  "actual_ledger_transition": null,
+  "actual_operational_admission": null,
+  "actual_remote_release": null,
+  "actual_resource_bindings": null,
+  "actual_scoring_job": null,
+  "actual_source_publication": null,
+  "correction312": [
+    "Preserve raw authenticated WAITING bytes in CPU copy; never reseal after tamper.",
+    "Run native fixture calls from original runtime S cwd; retain relative paths and original native validators."
+  ],
+  "correction321": [
+    "Construct active-snapshot cutover and authenticate immediately with original normalized chain.",
+    "Set A2 flat cache/offline env only in child before imports; capture actual constants and geometry before/after prepared context.",
+    "Validate existing reconstructed mask against accepted native reference and set synthetic child support digest before normal COMPLETE sealing."
+  ],
+  "execution_authorized": false,
+  "full_scoring_resource_proposal": {
+    "CPUs": 4,
+    "RAM_bytes": 103079215104,
+    "actual_binding": null,
+    "duration_seconds": 19800,
+    "status": "historical conditional proposal only; actual capacity and independent resource binding still required"
+  },
+  "kind": "UNBOUND_TASK4_PREPARATION_PROPOSAL",
+  "operational_feasible": null,
+  "phase": "full_score",
+  "predecessor_packet": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet-correction312/packet-r3",
+  "review296_corrections": [
+    "Restore original root pin and GPU admission validators with delegating spies and closed synthetic evidence.",
+    "Route all fresh GPU MAIN constants to temporary namespace while preserving original runtime/source."
+  ],
+  "review296_corrections_preserved": true,
+  "timing_scope": {
+    "local_parent_child_seconds": 193.165566,
+    "local_publication_seconds": 0.394136,
+    "operational_feasible": null,
+    "remote_publication_seconds": null,
+    "remote_rechecks_seconds": null,
+    "remote_transfer_seconds": null
+  }
+}

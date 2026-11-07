@@ -1,0 +1,19 @@
+{
+  "status": "PROPOSAL_REQUIRES_ROOT_DRY_RUN_AND_INDEPENDENT_REVIEW",
+  "purpose": "CPU-only native A2 complete-versus-prefix shape and exposure, no model or effects",
+  "nodes": 1,
+  "ntasks": 1,
+  "cpus": 4,
+  "memory_GiB": 16,
+  "gpus": 0,
+  "partition": "cpu or cpu-interactive",
+  "slurm_minutes": 15,
+  "child_timeout_seconds": 840,
+  "kill_grace_seconds": 15,
+  "basis": "Accepted 177 native audit 85 seconds plus full tokenizer and shape passes; tentative bound, not guaranteed.",
+  "automatic_retry": false,
+  "scope": "No model, score, forward, score artifact content, effect aggregation, source writes or scientific inference.",
+  "output": "fresh root-selected immutable execution directory",
+  "preconditions": ["exact packet independent review", "actual CPU allocation and supported mgnp environment", "fresh source, bank, G3, registry and tokenizer guards", "root dry-run and current budget/status policy"],
+  "limitations": ["No measured full GPU peak", "No rigorous complete output size bound", "Shape-derived forward and token ratios are not a timing guarantee", "Result is not model or full-score admission"]
+}

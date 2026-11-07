@@ -1,0 +1,99 @@
+{
+  "kind": "A3_pure_metadata_cost_design_options",
+  "status": "DESIGN_ONLY_NO_SOURCE_IMPLEMENTATION_NO_RUNNING_JOB_CHANGE",
+  "intent": "Remove unnecessary metadata work before spending scarce GPU timing allowance, while preserving every scientific row, control, bound, canonical digest rule and live source/allocation/protection check. This is not a redesign of the experiment.",
+  "source_commit": "861f84a3938a5e22fa329af0c469b2dd812fe68a",
+  "source_files": {
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime/component_analysis/a3_direction_workload.py": "1b0f6110a39b5d50342b95fe7ee2d6b643fce20feb2ae4448403c1bc8c52d1b3",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime/component_analysis/a3_direction_runtime.py": "ac56b1ce177a095115e4f9cca7b61519e6c3344acd50ec218832e2908aad1b07"
+  },
+  "evidence": {
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-cost-design/highmem-observation.json": "112980d4c37e26f424efe39e03adc95247c6e55b91aa7285a47c024de3a802f0",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-cost-constraints/constraints.json": "2243f28bc8c7b5b2ebe1f1bf725c5ab3b6103637978c4052b347b993d8b17c43",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-prefit-remaining-cpu-r163-r2-execution-review/run_manifest.json": "a7194a1c7e36016b1497dfbc818eb46deef22eb8f614a5cabadae0811597b259"
+  },
+  "concrete_constraints": [
+    "The earlier32GiB build was killed by an actual allocation OOM after2125.838s, with1392.228 user and547.770 system seconds.",
+    "The current192GiB build is still running at this captured observation. It has already exceeded the paired1800s M1 allowance without a completed object, and its actual cgroup peak exceeded123GB. This is genuine Delta CPU evidence, not a matched H200 forecast.",
+    "Accepted run_pilot rebuilds the full fit-select target AFTER model load. Selected timing analogously rebuilds remaining. A CPU-created object alone does not remove that GPU-charged work.",
+    "The full target has246486 raw keys,81904 scoring shards and4256 train capture batches before additional control/packing/serialization requirements. Both original M1 parts still share0.5GPU-hours; separate M2 work remains between them."
+  ],
+  "observed_source_mechanisms": [
+    {
+      "site": "workload input_scope/req, lines417-457",
+      "fact": "For each requirement, timing_inputs retain deep copies of full source records. A second input_scope call deep-copies full target records solely to extract lengths, then discards those copies. Requirement IDs canonicalize the complete nested requirement."
+    },
+    {
+      "site": "workload _source_rows/groups/capture, lines153-165 and477-526",
+      "fact": "A set of selected IDs is rebuilt inside a row comprehension; capture groups repeatedly rebuild source rows/maps. The existing input_scope cache does not cover all these paths."
+    },
+    {
+      "site": "workload derive_storage_requirements positive-control loop, lines290-314",
+      "fact": "The same local sender list and extra envelope are repeatedly serialized and host-bounded per positive requirement. These local values are not changed inside the loop. Profiling has not established their share of total cost."
+    },
+    {
+      "site": "workload derive_storage_requirements tail, lines330-350; builder tail lines730-766",
+      "fact": "Large metadata graphs are serialized to whole strings/bytes for wire size, key lengths and full inventory digest. Their transient materialization can coexist with the retained graph."
+    },
+    {
+      "site": "workload _validate_inventory and runtime immutable proof contexts",
+      "fact": "Independent validation rebuilds the complete inventory and performs more whole digests. Authority/reconciliation freeze the JSON graph into immutable containers, while other large inputs and model evidence remain resident. These are deliberate controls, not work that may simply be removed."
+    }
+  ],
+  "options": [
+    {
+      "id": "A",
+      "name": "Eliminate discarded work and repeated local constants",
+      "recommendation": "First candidate, after a bounded profiling/review plan.",
+      "scope": [
+        "Replace the discarded target input_scope deep copies with an exact length-only lookup that preserves all source membership, stream, padding/dummy and readout checks. Keep retained timing_inputs independent and unchanged.",
+        "Use a function-local source index and selected-ID set where no code mutates their source values; preserve frozen row ordering and every validation.",
+        "Cache wire/host-bound values of unchanged local senders and extra envelopes inside one derive_storage_requirements invocation; never cache across live guards, source changes or calls."
+      ],
+      "benefit": "Targets visible redundant CPU work without changing artifact representation or authorization architecture. Speedup is unmeasured and may be insufficient.",
+      "risks": "A tempting global or cross-guard cache would weaken freshness; sharing mutable timing records could break independence. Both are outside this option.",
+      "acceptance": "For identical frozen inputs, original and candidate whole payloads, serialized bytes, inventory hashes, bounds, keys and errors must agree exactly. Preserve all stale-source/protection/row/dummy/control negatives. No model execution needed for these CPU comparisons."
+    },
+    {
+      "id": "B",
+      "name": "Stream canonical hashing and wire-length measurement",
+      "recommendation": "Separate measured candidate only if whole-JSON transients remain dominant.",
+      "scope": "Use an incremental encoder/hash or length sink with exactly the existing JSON canonical rules; never approximate metadata lengths or change numeric encoding, key order, whitespace, Unicode/escaping or allow_nan behavior.",
+      "benefit": "Can avoid simultaneous giant JSON strings and UTF-8 byte copies, reducing peak RAM.",
+      "risks": "The standard incremental Python encoder may be slower than the current C one-shot encoder. Lower RAM does not imply faster GPU timing, and digest equivalence requires proof on floats, Unicode, nested frozen containers and genuine artifacts.",
+      "acceptance": "The byte stream must equal the old serialization, not merely decode to an equal object. Same-input digests and every integer storage bound remain exact on both supported interpreters; measure CPU and cgroup peak before adopting."
+    },
+    {
+      "id": "C",
+      "name": "Review authenticated reuse of a CPU-prepared target",
+      "recommendation": "Defer unless A/B cannot make current paths feasible.",
+      "scope": "A new explicit source-bound CPU preparation proof could bind complete target bytes and exact original inputs, with fresh source/input/selection/ledger/allocation/protection checks at GPU use. This is a larger authority-interface design, not an unchecked cache.",
+      "benefit": "Would address the structural post-model full rebuild instead of only accelerating it.",
+      "risks": "Current authority/proof objects are process-local and cannot be serialized for reuse. Removing independent reconstruction or accepting a claimed marker would weaken controls. Parsing/retaining the full target may still exceed available GPU-job host RAM.",
+      "acceptance": "Requires its own reviewed threat/failure model, proof schema, complete negative tamper tests and immutable lineage. No existing proof/context is silently repurposed; original native controls and current live guards remain."
+    },
+    {
+      "id": "D",
+      "name": "Ask for more direction M1 GPU timing allowance",
+      "recommendation": "Last resource alternative, not authorized or requested by this design.",
+      "scope": "Only explicit user approval can amend the direction M1 sub-allowance; preserve all existing failed/cancelled charges and total A3 authority lineage. A2 H100 sizing is unrelated.",
+      "benefit": "May permit an unchanged slower path if adequate host RAM and a fully costed pair of timing parts can be established.",
+      "risks": "More time alone does not resolve host-memory requirements. It pays GPU reservation time for deterministic metadata and still must cover both atomic parts, both model startups, all controls/proofs and finish reserves.",
+      "acceptance": "Provide measured metadata costs and a concrete paired prefit/selected resource plan before opening any user need. No automatic cap transfer, refund, split, omitted control or reservation is implied."
+    }
+  ],
+  "recommended_sequence": [
+    "Finish and preserve the already authorized high-memory build; consume terminal accounting, cgroup peak/events and output bytes. Do not retarget or instrument it mid-run.",
+    "If the cost remains incompatible, root separately approves a bounded CPU profiling/comparison plan on the immutable original metadata entrypoints. No pretrained model, GC hook, model-loader/clock injection or source mutation; profiling itself is a new reviewed CPU task, not assumed authorized here.",
+    "Prepare an isolated candidate for option A only after design acceptance. Keep the frozen runtime,13 native files and all old artifacts untouched. Profile source-row copying/filtering, positive-control bound calculations, JSON materialization/digests and immutable graph freezing before broadening scope.",
+    "Require exact same-input whole-artifact equivalence, conservative bound equality and all existing negative source/protection/control tests under both interpreters. Use actual genuine input evidence; tiny fixtures alone cannot establish cost.",
+    "Only if needed, independently review B or C. Re-run the complete paired M1 feasibility calculation before any GPU reservation."
+  ],
+  "identity_and_digest_rule": "For identical immutable design/protocol inputs, candidate metadata algorithms must produce byte-for-byte identical canonical outputs and digests. A newly published source necessarily changes genuine source identity/code hashes: it must receive fresh prospective canonical artifacts and independently derived new hashes. Never edit old artifacts or lie about the source to preserve an old production digest. Scientific membership, values and control scope must remain exact under the explicit source-identity substitution.",
+  "non_goals": [
+    "No scientific cohort, seed, row, axis, operation, control, pooling, numerical path, immutable evidence or live guard reduction.",
+    "No automatic sharding or splitting of the original atomic timing parts.",
+    "No current source implementation, profiler run, GC/runtime hook, new job, model admission or cap increase."
+  ],
+  "open_decision": "Root should review this narrow performance design after the current build terminates. Preferred next step is measured, exact-semantics option A; neither source edits nor extra M1 time are authorized by these options."
+}

@@ -1,0 +1,37 @@
+{
+  "status": "READY_FOR_ROOT_TRANSFER_AND_CPU_SUBMISSION_ONLY",
+  "source_independent": true,
+  "model_execution": false,
+  "final_source_choice_pending": true,
+  "local_packet": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103",
+  "remote_deployment": "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/deployment",
+  "transfer_files": [
+    "verify-transferred-data.py",
+    "cpu-verify-transferred-data.sh"
+  ],
+  "resource_proposal": {
+    "cluster": "bridges2",
+    "partition": "RM-shared",
+    "account": "cis260382p",
+    "nodes": 1,
+    "ntasks": 1,
+    "cpus_per_task": 4,
+    "mem": "8G",
+    "time": "00:10:00",
+    "requeue": false
+  },
+  "expected_counts": {
+    "ordinary_files": 389,
+    "bytes": 436913681,
+    "aliases": 5
+  },
+  "limits": [
+    "no retry",
+    "not final source/G3/geometry authority",
+    "no model/cache weight loading or GPU admission"
+  ],
+  "packet_sha256": {
+    "verify-transferred-data.py": "5a7b9b358411e61f2f651327acf52437a007cea739b4dc7235db34177eb8b61e",
+    "cpu-verify-transferred-data.sh": "295950c7578b9b267695152f91f65ddc3f4f3b341d0de13bc9f30b97536e0964"
+  }
+}

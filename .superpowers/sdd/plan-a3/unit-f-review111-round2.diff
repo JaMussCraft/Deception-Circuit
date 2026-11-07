@@ -1,0 +1,829 @@
+--- before/component_analysis/a3_direction_runtime.py
++++ after/component_analysis/a3_direction_runtime.py
+@@ -28,6 +28,7 @@
+ from dataset import user_inversion_pipeline as common
+ 
+ require=artifacts.require
++_STARTUP_RECORD_PAYLOAD_BYTES=65536
+ 
+ 
+ def publish_object(path, payload):
+@@ -720,15 +721,24 @@
+     artifacts._coverage(rows,shard['expected_keys'])
+     evidence=dict(kind='a3_direction_execution_v1',complete=True,exit_code=0,injected=design['injected'],
+         actual_execution=True,source_commit=protocol['commit'],code_hashes=protocol['code_hashes'],
+-        runtime=runtime_environment(model),job_id=os.environ.get('SLURM_JOB_ID','injected-cpu'),
++        runtime=runtime_environment(model),job_id=os.environ.get('SLURM_JOB_ID','injected-cpu'),producer_pid=os.getpid(),
+         cluster=os.environ.get('DC_CLUSTER','injected-cpu'),scientific_rows=len(rows),execution_rows=len(all_rows),
+         execution_dummy_sources=copy.deepcopy(dummies),dummy_control_count=sum(r['instance_id'] in dummies for r in controls),
+         positive_control_reference=object_reference(control_path),positive_control_ids=[r['control_id'] for r in controls],
+         capture_reference=object_reference(capture_path))
+     final_guard=guard()
++    startup_reference=getattr(measured_index,'startup_reference',None)
++    startup_cost=getattr(measured_index,'startup_evidence',{})
++    startup_fields=dict(candidate_index_startup_seconds=measured_index.startup_seconds,candidate_index_startup_reference=startup_reference,
++        candidate_index_startup_publication_seconds=getattr(measured_index,'startup_publication_seconds',0),
++        candidate_index_startup_guard_seconds=startup_cost.get('guard_seconds'),candidate_index_startup_dependency_roots=startup_cost.get('dependency_roots'),
++        candidate_index_startup_dependency_bytes=startup_cost.get('dependency_bytes_per_refresh'),candidate_index_startup_retained_bytes=measured_index.retained_bytes,
++        candidate_index_startup_scope='once per process/job; repeated shard metadata is not additive',
++        candidate_index_startup_reconciliation=getattr(measured_index,'startup_reconciliation',None))
++    require(_object_payload_size(startup_fields)<=workload.STARTUP_REFERENCE_BYTES,'startup metadata exceeds priced serialization bound')
+     evidence.update(wall_seconds=time.perf_counter()-started,dependency_guard_calls=guard.calls-guard_calls_start,
+         dependency_guard_seconds=guard.elapsed_seconds-guard_seconds_start,dependency_verified_bytes=guard.index.forest.verified_bytes-verified_start,
+-        dependency_refreshes=guard.index.forest.refreshes-refreshes_start,guard=final_guard)
++        dependency_refreshes=guard.index.forest.refreshes-refreshes_start,guard=final_guard,**startup_fields)
+     for field in ('profile_reuse','panel','analysis_task','split','runtime_profile'):identity.pop(field,None)
+     return rows,evidence,identity
+ 
+@@ -745,7 +755,7 @@
+ 
+ 
+ def read_runtime_rows(design,protocol,inventory,root,*,panel=None,guard=lambda:None):
+-    rows=[];refs=[]
++    rows=[];refs=[];startup_witnesses={}
+     for shard in inventory['shards']:
+         if panel is not None and shard['panel']!=panel: continue
+         guard();base=Path(root)/shard['shard_id']
+@@ -757,12 +767,24 @@
+         values=artifacts.read_completed_shards(dict(shards=[shard]),Path(root),identity=identity)
+         manifest=artifacts._strict_json(base/'run_manifest.json')
+         execution=manifest['execution']
++        reference=execution.get('candidate_index_startup_reference')
++        require(reference is not None or design['injected'],'production shard lacks completed startup evidence reference')
++        if reference is not None:
++            key=workload.digest(reference)
++            require(type(execution.get('producer_pid')) is int and execution['producer_pid']>0,'linked startup shard lacks process identity')
++            if key not in startup_witnesses:
++                record=_validate_startup_record(reference,design,protocol,expected_job_id=execution['job_id'],expected_pid=execution['producer_pid'])
++                startup_witnesses[key]=(record,_make_file_witness([reference['path']]+[r['path'] for r in record['process'].get('scenario_references',[])]))
++            record=startup_witnesses[key][0]
++            require(record['process']['job_id']==execution['job_id'] and record['process']['pid']==execution['producer_pid'],
++                'cached startup record job/process differs from linked shard')
+         require(execution.get('actual_execution') is True and execution.get('source_commit')==protocol['commit']
+             and execution.get('code_hashes')==protocol['code_hashes'] and execution.get('exit_code')==0
+             and execution.get('scientific_rows')==len(shard['expected_keys']),'missing complete actual execution evidence')
+         rows.extend(values);refs.append(object_reference(base))
+     keys=[k for s in inventory['shards'] if panel is None or s['panel']==panel for k in s['expected_keys']]
+     artifacts._coverage(rows,keys)
++    for _,witness in startup_witnesses.values():_check_file_witness(witness)
+     return rows,refs
+ 
+ 
+@@ -832,9 +854,10 @@
+         require(args.finish_reserve_seconds==inv['finish_reserve_seconds'],'finish reserve differs from frozen workload')
+     if args.stage=='prepare' and args.action=='admit':
+         require(args.pilot_receipts and args.ledger_snapshot,'completed pilot receipts and fresh root mapping required')
+-        receipts,sources=_authenticated_pilot_receipts(design,protocol,inv,args.pilot_receipts,ledger_path=args.ledger_snapshot)
+         ledger=normalize_ledger(args.ledger_snapshot,identity=inv['identity'],injected=design['injected'])
+-        proposal=workload.project_cost(receipts,inv,ledger,packing_proofs=_cost_packing_proofs(receipts))
++        index,receipts,sources=_completed_pilot_index(design,protocol,inv,args.pilot_receipts,ledger_path=args.ledger_snapshot,
++            host_capacity_bytes=ledger['storage_capacities']['host_ram']['available_bytes'],output_root=root)
++        proposal=workload.project_cost(receipts,inv,ledger,packing_proofs=_cost_packing_proofs(receipts,candidate_index=index),runtime_cost=index.startup_evidence)
+         proposal['completed_pilot_sources']=[dict(s.value) for s in sources]
+         if args.dry_run:return _print_dry(args,design,protocol,inventory=inv)
+         publish_object(root/'admission'/(inv['stage']+'.json'),proposal);return 0
+@@ -1025,21 +1048,136 @@
+ 
+ 
+ def _admitted_candidate_index(args,design,protocol):
+-    start=time.perf_counter();paths=_admitted_packing_paths(args);witnesses=[]
+-    if getattr(args,'reservation',None):
+-        reservation=read_object(args.reservation);admission=read_object(reservation['admission_path'])
+-        pilot_paths=admission.get('pilot_receipt_paths',[])
+-        if not design.get('injected'):
+-            upper=read_object(reservation['upper_inventory_path'])
+-            _authenticated_pilot_receipts(design,protocol,upper,pilot_paths,ledger_path=args.ledger_snapshot)
+-        for receipt_path in pilot_paths:
+-            receipt=read_object(receipt_path);witnesses.append(_make_file_witness([receipt_path]))
+-            for value in receipt.get('serial_numeric_references',{}).values():
+-                require(object_reference(value['path'])==value['reference'],'admitted serial evidence bytes changed')
+-                serial=_SerialNumericProof(value['path']);require(serial.source_digest==value['source_digest'],'admitted serial numeric source differs')
+-                witnesses.append(serial.witness)
+-    proofs=[_completed_packing_proof(path) for path in paths]
+-    return _PackingCandidateIndex(proofs,extra_witnesses=witnesses,startup_seconds=time.perf_counter()-start)
++    if not getattr(args,'reservation',None):return _PackingCandidateIndex([])
++    reservation=read_object(args.reservation);admission=read_object(reservation['admission_path'])
++    paths=admission.get('pilot_receipt_paths',[]);require(paths,'completed admitted pilot sources required')
++    target=read_object(reservation['upper_inventory_path']) if reservation.get('upper_inventory_path') else read_object(Path(paths[0]).parents[1]/'pilot-target-inventory'/read_object(paths[0])['part'])
++    capacity=reservation.get('allocation_contract',{}).get('memory_bytes')
++    index,_,_=_completed_pilot_index(design,protocol,target,paths,ledger_path=getattr(args,'ledger_snapshot',None),host_capacity_bytes=capacity,
++        output_root=Path(getattr(args,'work_dir',None) or Path(paths[0]).parents[1]))
++    forecast=admission.get('completed_host_startup_cost')
++    comparison=dict(actual_seconds=index.startup_seconds,forecast_seconds=None,forecast_conditional=True,
++        forecast_status='absent; host portability remains conditional',retroactive_authorization=False)
++    if forecast is not None:
++        require(forecast.get('kind')=='a3_completed_host_startup_cost_v1' and forecast.get('target_inventory_sha256')==target['inventory_sha256']
++            and type(forecast.get('seconds')) in (int,float) and math.isfinite(forecast['seconds']) and forecast['seconds']>=0,'startup forecast source/target/time differs')
++        comparison.update(forecast_seconds=forecast['seconds'],observed_exceeds_forecast=index.startup_seconds>forecast['seconds'],
++            host_profile_equal=forecast.get('host_profile')==index.startup_evidence['host_profile'],forecast_status='recorded; portability not granted by this comparison')
++    object.__setattr__(index,'startup_reconciliation',_freeze_json(comparison))
++    return index
++
++
++def _host_startup_profile(paths):
++    import platform
++    cpu=next((line.split(':',1)[1].strip() for line in Path('/proc/cpuinfo').read_text().splitlines() if line.startswith('model name')),platform.processor())
++    mounts=[line.split()[:3] for line in Path('/proc/mounts').read_text().splitlines()]
++    filesystems=[]
++    for p in paths:
++        path=Path(p).resolve();matches=[m for m in mounts if path==Path(m[1]) or Path(m[1]) in path.parents]
++        mount=max(matches,key=lambda m:len(m[1])) if matches else ['unknown','unknown','unknown']
++        filesystems.append(dict(path=str(path),device=os.stat(p).st_dev,mount_source=mount[0],mountpoint=mount[1],filesystem_type=mount[2]))
++    return dict(hostname=platform.node(),machine=platform.machine(),cpu_model=cpu,python=platform.python_version(),torch=torch.__version__,
++        cpu_affinity=sorted(os.sched_getaffinity(0)) if hasattr(os,'sched_getaffinity') else [],
++        threads={name:os.environ.get(name) for name in ('OPENBLAS_NUM_THREADS','OMP_NUM_THREADS','MKL_NUM_THREADS')},
++        torch_threads=torch.get_num_threads(),filesystems=filesystems,
++        scope='CPU host authentication/index startup only; no GPU operation timing')
++
++
++def _completed_pilot_index(design,protocol,target,paths,*,ledger_path,host_capacity_bytes=None,output_root=None):
++    """Same fresh process-local construction for completed intake and scoring."""
++    import resource
++    start=time.perf_counter();packed={};serials={};numeric={}
++    require(host_capacity_bytes is not None or design.get('injected') is True,'frozen admitted host capacity required')
++    require(host_capacity_bytes is None or type(host_capacity_bytes) is int and host_capacity_bytes>0,'positive frozen admitted host capacity required')
++    require(paths and len(paths)==len({str(Path(p).resolve()) for p in paths}),'unique complete pilot source paths required')
++    def packed_reader(path,*,expected_reference=None):
++        key=str(Path(path).absolute())
++        if key not in packed:packed[key]=_CompletedPackingProof(path,numeric_cache=numeric)
++        proof=packed[key];proof.refresh()
++        require(expected_reference is None or proof.reference==expected_reference,'completed packed source reference changed');return proof
++    def serial_reader(path):
++        key=str(Path(path).absolute())
++        if key not in serials:serials[key]=_SerialNumericProof(path,numeric_cache=numeric)
++        return serials[key]
++    receipts,sources=_authenticated_pilot_receipts(design,protocol,target,paths,ledger_path=ledger_path,
++        proof_reader=packed_reader,serial_reader=serial_reader)
++    witnesses=[_make_file_witness([path]) for path in paths]+[s.witness for s in serials.values()]
++    index=_PackingCandidateIndex(list(packed.values()),extra_witnesses=witnesses)
++    samples=[];volume=None
++    for _ in range(3):
++        began=time.perf_counter();volume=index.refresh_dependencies();samples.append(time.perf_counter()-began)
++    for receipt,path in zip(receipts,paths):
++        footprint=receipt.get('guard_dependency_measurement')
++        require(isinstance(footprint,dict) and footprint.get('kind')=='a3_complete_guard_union_timing_v1','complete guard-union timing evidence required')
++        actual={name:item['nbytes'] for name,item in object_reference(path)['files'].items()}
++        limits=footprint.get('final_receipt_file_upper_bytes',{})
++        require(set(actual)==set(limits) and all(n<=limits[name] for name,n in actual.items()),'completed receipt exceeds measured byte/file-shape bound')
++        own=[]
++        for value in receipt.get('packing_evidence',{}).values():own.append(packed_reader(value['measured_path']).witness)
++        for value in receipt.get('serial_numeric_references',{}).values():own.append(serial_reader(value['path']).witness)
++        expected={str(Path(p).resolve()) for witness in own for p in witness.paths}
++        scenario=receipt.get('verification_scenario_reference')
++        if scenario is not None:
++            require(design.get('injected') is True and object_reference(scenario['path'])==scenario,'injected scenario reference changed')
++            expected.add(str(Path(scenario['path']).resolve()))
++            own.append(_make_file_witness([scenario['path']]))
++        require({str(Path(p).resolve()) for p in footprint.get('dependency_roots',[])}==expected,'measured dependency union omitted/changed actual numeric roots')
++        own_forest=_DependencyForest(own+[_make_file_witness([path])])
++        own_bytes=sum(row[2][3] for tree in own_forest.expected for row in tree if row[0]=='file')
++        require(footprint.get('measured_bytes_per_refresh',0)>=own_bytes and footprint.get('measured_roots',0)>=len(own_forest.paths),
++            'measured guard footprint does not bound completed execution dependencies')
++    scenarios=[r['verification_scenario_reference'] for r in receipts if r.get('verification_scenario_reference') is not None]
++    output_root=Path(output_root) if output_root is not None else Path(paths[0]).parents[1]
++    profile=_host_startup_profile([*index.forest.paths,output_root]);index.refresh_dependencies()
++    retained=index.retained_bytes
++    temporary=_retained_json_bytes([receipts,[s.__dict__ for s in serials.values()],numeric,[s.value for s in sources],profile])[0]
++    peak=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss*1024
++    require(host_capacity_bytes is None or max(retained+temporary,peak)<=host_capacity_bytes,'completed source/index exceeds frozen admitted host RAM')
++    evidence=dict(kind='a3_completed_host_startup_cost_v1',target_inventory_sha256=target['inventory_sha256'],
++        pilot_references=[object_reference(p) for p in paths],host_profile=profile,
++        process_local_cold=True,os_cache_cold_claimed=False,conditional=True,execution_authorized=False,
++        portability='unestablished across host/CPU/thread/filesystem conditions; allocated-host bound required',
++        guard_seconds=samples,dependency_roots=volume['roots'],dependency_bytes_per_refresh=volume['verified_bytes'],construction_dependency_refreshes=index.forest.refreshes,
++        retained_bytes=retained,construction_working_bytes=retained+temporary,peak_host_bytes=peak,frozen_host_capacity_bytes=host_capacity_bytes)
++    evidence['seconds']=time.perf_counter()-start
++    record=dict(kind='a3_completed_host_startup_record_v1',execution_authorized=False,injected=design['injected'],source_identity=target['identity'],
++        target_inventory_sha256=target['inventory_sha256'],design_sha256=workload.digest(design),protocol_sha256=workload.digest(protocol),
++        process=dict(pid=os.getpid(),job_id=os.environ.get('SLURM_JOB_ID','injected-cpu' if design['injected'] else 'host-cpu'),scenario_references=scenarios),construction=evidence)
++    require(_object_payload_size(record)<=_STARTUP_RECORD_PAYLOAD_BYTES,'startup record exceeds priced file bound')
++    destination=output_root/'runtime-startup'/(str(os.getpid())+'-'+str(time.time_ns()))
++    bounds={name:min(r['guard_dependency_measurement']['startup_record_file_upper_bytes'][name] for r in receipts)
++        for name in ('payload.json','COMPLETE.json')}
++    before=time.perf_counter();_publish_bounded_object(destination,record,bounds);reference=object_reference(destination);publication=time.perf_counter()-before
++    witnesses=[_make_file_witness([p]) for p in index.forest.paths]+[_make_file_witness([destination])]+[_make_file_witness([r['path']]) for r in scenarios]
++    forest=_DependencyForest(witnesses);previous=index.forest.refreshes;object.__setattr__(index,'forest',forest)
++    samples=[]
++    for _ in range(3):
++        began=time.perf_counter();volume=index.refresh_dependencies();samples.append(time.perf_counter()-began)
++    peak=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss*1024
++    require(host_capacity_bytes is None or peak<=host_capacity_bytes,'startup publication exceeds frozen admitted host RAM')
++    evidence.update(seconds=time.perf_counter()-start,publication_seconds=publication,startup_record_reference=reference,
++        guard_seconds=samples,dependency_roots=volume['roots'],dependency_bytes_per_refresh=volume['verified_bytes'],
++        construction_dependency_refreshes=previous+forest.refreshes,peak_host_bytes=peak)
++    added=_retained_json_bytes([reference,forest.expected,evidence])[0]
++    evidence.update(retained_bytes=retained+added,construction_working_bytes=retained+temporary+added)
++    require(host_capacity_bytes is None or max(evidence['construction_working_bytes'],peak)<=host_capacity_bytes,'startup record/index retention exceeds frozen host RAM')
++    object.__setattr__(index,'retained_bytes',evidence['retained_bytes'])
++    object.__setattr__(index,'startup_seconds',evidence['seconds']);object.__setattr__(index,'startup_evidence',_freeze_json(evidence))
++    object.__setattr__(index,'startup_reference',_freeze_json(reference));object.__setattr__(index,'startup_publication_seconds',publication)
++    return index,receipts,sources
++
++
++def _validate_startup_record(reference,design,protocol,*,expected_job_id,expected_pid=None):
++    require(_object_payload_size(reference)<=workload.STARTUP_REFERENCE_BYTES and object_reference(reference['path'])==reference,'startup record reference bytes changed')
++    record=read_object(reference['path'])
++    require(record.get('kind')=='a3_completed_host_startup_record_v1' and record.get('execution_authorized') is False
++        and record.get('injected') is design['injected'] and record.get('design_sha256')==workload.digest(design)
++        and record.get('protocol_sha256')==workload.digest(protocol) and record.get('source_identity')==workload.inventory_identity(design,protocol),
++        'startup record source/configuration differs')
++    require(record['process'].get('job_id')==expected_job_id and type(record['process'].get('pid')) is int and record['process']['pid']>0,'startup record process/job differs')
++    require(expected_pid is None or record['process']['pid']==expected_pid,'startup record process differs from linked shard')
++    for value in record['process'].get('scenario_references',[]):require(design['injected'] and object_reference(value['path'])==value,'startup scenario changed')
++    return record
+ 
+ 
+ def run_scoring(model,design,protocol,inventory,*,root,args,guard,fits=None,selected=None,shard_ids=None):
+@@ -1265,6 +1403,15 @@
+             rows=observed,comparisons=[dict(key={k:r[k] for k in ('source_task','condition','stream','instance_id','seed','site','family','axis_index','operation')}) for r in observed],
+             operation_samples=samples)
+         receipt['receipt_sha256']=workload.digest(receipt)
++        used={}
++        for bid,specs in receipt['batches'].items():
++            for spec in specs:
++                for donor in spec.get('donors',[]):
++                    m=donor['mapping'];task=receipt['snapshots'][bid][0]['task']
++                    key=(m['donor_profile_id'],task,m['donor_condition'],m['donor_stream'],m['donor_id'])
++                    used[key]=index[key]
++        receipt['donor_cache']=[dict(key=list(key),row=_serial_cache_wire(value)) for key,value in sorted(used.items())]
++        receipt['receipt_sha256']=workload.digest({k:v for k,v in receipt.items() if k!='receipt_sha256'})
+     # Own-source positive controls remain mandatory for every timing recipient.
+     positive_samples=[];positive_records=[]
+     for b in batches:
+@@ -1373,7 +1520,8 @@
+                     numeric_profile=shape.get('profile'),scalar_envelope={f'scalar{k}':-1.7976931348623157e308 for k in range(40)})
+                 common.write_jsonl(directory/'rows.jsonl',[row for _ in range(n)])
+                 common.write_json(directory/'run_manifest.json',dict(kind='a3_serialization_benchmark_v1',shape=shape,
+-                    key_byte_envelope='k'*shape.get('key_bytes',0),not_scientific_evidence=True))
++                    key_byte_envelope='k'*shape.get('key_bytes',0),startup_reference_byte_envelope='r'*workload.STARTUP_REFERENCE_BYTES,
++                    not_scientific_evidence=True))
+                 if 'numeric_bytes' in shape:
+                     count=(shape['numeric_bytes']+3)//4;np.save(directory/'readouts.npy',np.zeros(count,dtype=np.float32),allow_pickle=False)
+                     require(np.load(directory/'readouts.npy',allow_pickle=False,mmap_mode='r').nbytes>=shape['numeric_bytes'],'short serialization array')
+@@ -1489,7 +1637,7 @@
+         axes=load_selected_axes(args.selected,selected);selected_witness=_make_file_witness([args.selected])
+         require(pipeline._bundle_byte_reference(args.selected)==selected_reference,'selected numeric backing changed during pilot load')
+     invocations=inventory['packing_invocations'] or _serial_invocations(inventory)
+-    measured=[];packing={};packing_refs={};serial_refs={};invocation_results=[];seen_measurements=set();proof_validation_seconds=0;proof_retained_bytes=0;packing_overheads=[]
++    measured=[];packing={};packing_refs={};serial_refs={};serial_witnesses=[];invocation_results=[];seen_measurements=set();proof_validation_seconds=0;proof_retained_bytes=0;packing_overheads=[]
+     for invocation in invocations:
+         if selected_witness is not None:_check_file_witness(selected_witness)
+         guard();result=_pilot_invocation(model,design,protocol,invocation,axes=axes,root=root,guard=guard)
+@@ -1525,12 +1673,15 @@
+             start=time.perf_counter();publish_object(path,serial_payload)
+             serial=_SerialNumericProof(path);proof_validation_seconds+=time.perf_counter()-start
+             serial_refs[invocation['invocation_id']]=dict(path=str(path.resolve()),reference=object_reference(path),source_digest=serial.source_digest)
++            serial_witnesses.append(serial.witness)
+         invocation_results.append(result)
+     lookup_index=_PackingCandidateIndex([r['proof'] for r in invocation_results if r.get('proof') is not None])
+     proof_validation_seconds+=lookup_index.index_seconds;proof_retained_bytes+=lookup_index.retained_bytes
+     serialization_bytes=0
++    scenario_reference=object_reference(root/'scenario') if design['injected'] and (root/'scenario').exists() else None
++    scenario_witnesses=() if scenario_reference is None else (_make_file_witness([root/'scenario']),)
+     reconciliation=_PilotReconciliationPass([r['proof'] for r in invocation_results if r.get('proof') is not None],target,guard=guard,
+-        injected=design['injected'],extra_witnesses=() if selected_witness is None else (selected_witness,))
++        injected=design['injected'],extra_witnesses=tuple(serial_witnesses)+scenario_witnesses+(() if selected_witness is None else (selected_witness,)))
+     with reconciliation:
+         target=reconciliation.inventory
+         for req in target['requirements']:
+@@ -1622,12 +1773,65 @@
+         serialization_bytes=serialization_bytes,part=part,runtime=runtime_environment(model),
+         job_id=os.environ.get('SLURM_JOB_ID','injected-cpu'),source_split='validation',actual_execution=True,
+         origin=origin,runtime_profile=runtime_kernel_identity(model))
++    if scenario_reference is not None:receipt['verification_scenario_reference']=scenario_reference
++    receipt.update(proof_verified_bytes=reconciliation.verified_bytes,proof_verification_seconds=reconciliation.verification_seconds)
++    _measure_complete_guard_union(receipt,reconciliation,root,guard)
+     reconciliation.before_publication()
+     receipt.update(proof_verified_bytes=reconciliation.verified_bytes,proof_verification_seconds=reconciliation.verification_seconds)
+-    publish_object(root/'pilot'/part,receipt)
++    _publish_measured_pilot_receipt(root/'pilot'/part,receipt)
+     target_path=root/'pilot-target-inventory'/part
+     if not target_path.exists():publish_object(target_path,target)
+     return receipt
++
++
++def _object_payload_size(value):
++    return len(json.dumps(value,sort_keys=True,allow_nan=False).encode())+1
++
++
++def _publish_measured_pilot_receipt(path,receipt):
++    return _publish_bounded_object(path,receipt,receipt['guard_dependency_measurement']['final_receipt_file_upper_bytes'])
++
++
++def _publish_bounded_object(path,payload,bound):
++    def writer(directory):
++        (directory/'payload.json').write_text(json.dumps(payload,sort_keys=True,allow_nan=False)+'\n')
++        artifacts._finish(directory)
++        actual={p.name:p.stat().st_size for p in directory.iterdir()}
++        require(set(actual)==set(bound) and all(n<=bound[name] for name,n in actual.items()),
++            'final object bytes/file shape exceed measured dependency envelope')
++    common.publish(Path(path),writer)
++
++
++def _measure_complete_guard_union(receipt,reconciliation,root,guard):
++    """Read all real dependencies plus an explicitly inert final-receipt byte bound."""
++    import tempfile
++    footprint=dict(kind='a3_complete_guard_union_timing_v1',dependency_roots=list(reconciliation._paths),
++        repeated_samples=3,envelope_is_inert_not_execution=True,final_metadata_byte_allowance=4096)
++    receipt['guard_dependency_measurement']=footprint
++    # The current content contains only actual observed data. The fixed space
++    # covers the small timing/counter fields added below; actual final serialized
++    # size is independently checked against this limit before publication.
++    bound=_object_payload_size(receipt)+footprint['final_metadata_byte_allowance']
++    parent=Path(root)/'pilot-scratch';parent.mkdir(parents=True,exist_ok=True)
++    start=time.perf_counter()
++    with tempfile.TemporaryDirectory(prefix='final-receipt-envelope-',dir=parent) as tmp:
++        path=Path(tmp)/'envelope'
++        publish_object(path,dict(inert_final_receipt_byte_envelope='x'*bound,execution_authorized=False))
++        startup=Path(tmp)/'startup-envelope'
++        publish_object(startup,dict(inert_startup_record_byte_envelope='x'*_STARTUP_RECORD_PAYLOAD_BYTES,execution_authorized=False))
++        startup_bounds={name:value['nbytes'] for name,value in object_reference(startup)['files'].items()}
++        file_bounds={name:value['nbytes'] for name,value in object_reference(path)['files'].items()}
++        witnesses=[_make_file_witness([p]) for p in reconciliation._paths]+[_make_file_witness([path]),_make_file_witness([startup])]
++        forest=_DependencyForest(witnesses);setup=time.perf_counter()-start
++        samples=[];result=None
++        for _ in range(3):
++            began=time.perf_counter();result=forest.refresh();guard();reconciliation.check_deadline();samples.append(time.perf_counter()-began)
++        for measurement in receipt['measurements']:
++            if measurement['operation']=='guard_refresh':measurement['batch_seconds']=samples
++        footprint.update(final_receipt_payload_upper_bytes=bound,measured_bytes_per_refresh=result['verified_bytes'],
++            measured_roots=result['roots'],setup_seconds=setup,final_receipt_file_upper_bytes=file_bounds,
++            startup_record_payload_upper_bytes=_STARTUP_RECORD_PAYLOAD_BYTES,startup_record_file_upper_bytes=startup_bounds)
++        receipt['proof_validation_seconds']+=setup
+ 
+ 
+ def capture_lane_evidence(run,chunks,batches,timing_inputs):
+@@ -1737,11 +1941,12 @@
+ _NUMERIC_BACKING_CACHE={}
+ 
+ 
+-def _numeric_backing_proof(path,reference,profile,*,injected):
++def _numeric_backing_proof(path,reference,profile,*,injected,cache=None):
++    cache=_NUMERIC_BACKING_CACHE if cache is None else cache
+     key=str(Path(path).absolute())
+     require(pipeline._bundle_byte_reference(path)==reference,'numeric backing reference bytes changed')
+-    if key in _NUMERIC_BACKING_CACHE:
+-        cached=_NUMERIC_BACKING_CACHE[key]
++    if key in cache:
++        cached=cache[key]
+         require(cached['pid']==os.getpid() and cached['reference']==reference,'numeric backing identity/process changed')
+         require(cached['injected']==injected and cached['source_signature']==tuple(profile[k] for k in ('model','model_revision','source_sha256')),
+             'numeric backing injected/source profile boundary changed')
+@@ -1761,7 +1966,7 @@
+     witness=_make_file_witness([path]);require(pipeline._bundle_byte_reference(path)==reference,'numeric backing changed during validation')
+     cached=dict(pid=os.getpid(),reference=_freeze_json(reference),axis_hashes=axis_hashes,witness=witness,identity=_freeze_json(identity),
+         injected=injected,source_signature=tuple(profile[k] for k in ('model','model_revision','source_sha256')))
+-    _NUMERIC_BACKING_CACHE[key]=cached;return cached
++    cache[key]=cached;return cached
+ 
+ 
+ class _DependencyForest:
+@@ -1837,7 +2042,7 @@
+ 
+ class _CompletedPackingProof:
+     """Completed-file-bound numerical proof with bounded immutable metadata."""
+-    def __init__(self,path):
++    def __init__(self,path,*,numeric_cache=None):
+         start=time.perf_counter();self.pid=os.getpid();self.path=str(Path(path).absolute())
+         self.reference=_freeze_json(object_reference(path));payload=read_object(path)
+         require(type(payload.get('injected')) is bool,'explicit measured proof execution class required')
+@@ -1853,7 +2058,7 @@
+         require(isinstance(references,dict),'numeric backing references must be immutable completed bindings')
+         if payload.get('injected') is not True and payload.get('timing_only') is False:
+             require(references,'selected measurements require actual numeric backing references')
+-        summaries=tuple(_numeric_backing_proof(backing,reference,self.proof._profile,injected=payload.get('injected') is True)
++        summaries=tuple(_numeric_backing_proof(backing,reference,self.proof._profile,injected=payload.get('injected') is True,cache=numeric_cache)
+             for backing,reference in references.items())
+         hashes=frozenset(h for summary in summaries for h in summary['axis_hashes'])
+         if hashes:require(all(spec['axis_sha256'] in hashes for spec in self.proof._specs.values()),'measured axis differs from actual numeric backing')
+@@ -1954,33 +2159,78 @@
+         target_inventory_reference=object_reference(target_path),allocation=evidence['allocation'],source_snapshot_sha256=evidence['ledger_sha256'])
+ 
+ 
++def _serial_cache_wire(value,*,decode=False):
++    if not decode and isinstance(value,torch.Tensor):
++        return dict(a3_numeric_tensor=True,dtype=str(value.dtype),shape=list(value.shape),values=value.reshape(-1).tolist())
++    if isinstance(value,dict):
++        if decode and value.get('a3_numeric_tensor') is True:
++            types={str(t):t for t in (torch.float32,torch.float64,torch.float16,torch.bfloat16)}
++            require(value.get('dtype') in types and set(value)=={'a3_numeric_tensor','dtype','shape','values'},'serial cache tensor type differs')
++            tensor=torch.tensor(value['values'],dtype=types[value['dtype']]).reshape(value['shape'])
++            require(bool(torch.isfinite(tensor).all()),'serial numeric donor cache nonfinite');return tensor
++        return {k:_serial_cache_wire(v,decode=decode) for k,v in value.items()}
++    if isinstance(value,(tuple,list)):return [_serial_cache_wire(x,decode=decode) for x in value]
++    return value
++
++
++def _serial_snapshot_batch(rows):
++    first=rows[0]
++    return runner.ladder.LadderBatch([r['instance_id'] for r in rows],first['condition'],first['stream'],
++        torch.tensor([r['tokens'] for r in rows]),torch.tensor([r['mask'] for r in rows]),torch.tensor([r['readout'] for r in rows]),
++        torch.tensor([r['opposite_token'] for r in rows]),torch.tensor([r['honest_token'] for r in rows]),
++        torch.tensor([r['expected_token'] for r in rows]),[r['record'] for r in rows],first['task'],
++        None if first['choice_tokens'] is None else torch.tensor([r['choice_tokens'] for r in rows]))
++
++
+ class _SerialNumericProof:
+     """Completed actual serial observations; never a packing-equivalence receipt."""
+-    def __init__(self,path):
++    def __init__(self,path,*,numeric_cache=None):
+         if getattr(self,'_sealed',False):raise TypeError('serial proofs cannot be reinitialized')
+         payload=read_object(path);require(payload.get('kind')=='a3_serial_numeric_invocation_v1' and payload.get('actual_execution') is True,'actual typed serial invocation required')
+         receipt=payload['receipt'];require(receipt.get('kind')=='measured_serial_direction_v1' and receipt.get('valid') is True
+             and receipt.get('receipt_sha256')==workload.digest({k:v for k,v in receipt.items() if k!='receipt_sha256'}),'serial numeric receipt content differs')
+         profile=receipt['profile'];require(profile['axis_tile_size']==1,'serial receipt cannot substitute for packed equivalence')
+         snapshots=receipt['snapshots'];require(set(snapshots)==set(receipt['batches']) and snapshots,'serial input scope missing')
+-        expected={};specs=[];rows={}
++        cache={}
++        for entry in receipt.get('donor_cache',[]):
++            key=tuple(entry['key']);require(key not in cache,'duplicate serial numeric donor cache')
++            cache[key]=_serial_cache_wire(entry['row'],decode=True)
++        expected={};specs=[];rows={};mappings={};used=set()
+         for bid,inputs in snapshots.items():
+             require(bid==runner._digest([runner._digest(row) for row in inputs]) and len(inputs)==profile['physical_batch_size'],'serial source/physical batch changed')
+             for row in inputs:rows[(row['task'],row['condition'],row['stream'],row['instance_id'])]=row
+             for spec in receipt['batches'][bid]:
+                 specs.append(spec)
+-                for row in inputs:
++                batch=_serial_snapshot_batch(inputs);pid=runner.profile_identity({'numeric_profile':profile})
++                require(len(spec.get('donors',[]))==(len(inputs) if spec['operation']=='interchange' else 0),'serial actual donor scope differs')
++                for i,row in enumerate(inputs):
+                     key=(row['task'],row['condition'],row['stream'],row['instance_id'],spec['seed'],tuple(spec['site']),spec['family'],spec['axis_index'],spec['operation'])
+                     require(key not in expected,'duplicate serial execution key');expected[key]=spec['axis_sha256']
++                    mapping=None
++                    if spec['operation']=='interchange':
++                        donor=spec['donors'][i];mapping=donor['mapping']
++                        require(row['stream'] in ('clean','corrupt') and mapping.get('donor_stream')=={'clean':'corrupt','corrupt':'clean'}[row['stream']], 'serial donor stream convention differs')
++                        donor_key=(mapping.get('donor_profile_id'),row['task'],mapping.get('donor_condition'),mapping.get('donor_stream'),mapping.get('donor_id'))
++                        require(donor_key in cache and mapping.get('donor_profile_id')==pid,'serial numeric donor cache/profile missing')
++                        runner._mapping({'donor_maps':[mapping]},batch,i,cache,pid,tuple(spec['site']))
++                        require(donor.get('cached_donor_sha256')==runner._digest(cache[donor_key]),'serial actual numeric donor cache differs')
++                        for name in ('source_hash','source_id','split'):
++                            actual=cache[donor_key]['record'].get(name)
++                            require(mapping.get('donor_'+name)==actual,'serial donor source provenance differs from numeric cache')
++                        used.add(donor_key)
++                    mappings[key]=mapping
+         observed={}
+         for row in receipt['rows']:
+             key=(row['source_task'],row['condition'],row['stream'],row['instance_id'],row['seed'],tuple(row['site']),row['family'],row['axis_index'],row['operation'])
+             require(key not in observed and row.get('axis_hash')==expected.get(key),'serial actual numeric axis/row coverage changed')
++            require(row.get('donor_mapping')==mappings[key] and row.get('numeric_profile')==profile
++                and row.get('profile_id')==pid and row.get('source_provenance')==rows[key[:4]]['record'],'serial observations differ from actual source/donor descriptors')
+             require(row.get('replay_valid') is True and set(row.get('replay_errors',{}))=={'empty','head_self','zero_coefficient'}
+                 and all(type(v) in (int,float) and math.isfinite(v) and 0<=v<=1e-5 for v in row['replay_errors'].values()),'serial replay evidence invalid')
+             require(all(type(row.get(k)) in (int,float) and math.isfinite(row[k]) for k in ('head_norm','intact_margin','patched_margin')),'serial numeric observation nonfinite')
+             observed[key]=row
+         require(set(observed)==set(expected),'serial actual row coverage incomplete')
++        require(set(cache)==used,'serial numeric donor cache extra/missing scope')
+         positives={(r['task'],r['condition'],r['stream'],r['instance_id']):r for r in payload['positive_controls']}
+         require(set(positives)==set(rows) and all(p.get('valid') is True and p.get('kind')=='measured_all_sender_positive_v2' for p in positives.values()),'serial own positive backing incomplete')
+         samples=receipt['operation_samples'];counts=Counter(x['operation'] for x in samples)
+@@ -1992,9 +2242,11 @@
+             require(type(payload.get('timing_only')) is bool,'explicit serial numeric measurement stage required')
+             if not payload['timing_only']:require(references,'selected serial measurements require actual numeric backing')
+         for root,reference in references.items():
+-            backing=_numeric_backing_proof(root,reference,profile,injected=payload.get('injected') is True)
++            backing=_numeric_backing_proof(root,reference,profile,injected=payload.get('injected') is True,cache=numeric_cache)
+             if backing['axis_hashes']:require(set(expected.values())<=backing['axis_hashes'],'serial axis differs from actual selected backing')
+-        self.profile=_freeze_json(profile);self.rows=_freeze_json(rows);self.specs=_freeze_json(specs)
++        snapshot_fields=('task','condition','stream','instance_id','tokens','readout','record','expected_token','opposite_token','honest_token','choice_tokens')
++        donor_rows={(x['task'],x['condition'],x['stream'],x['instance_id']):dict({k:x[k] for k in snapshot_fields},mask=x['attention_mask']) for x in cache.values()}
++        self.profile=_freeze_json(profile);self.rows=_freeze_json(rows);self.specs=_freeze_json(specs);self.donor_rows=_freeze_json(donor_rows)
+         self.source_digest=workload.digest(payload);self.reference=_freeze_json(object_reference(path));self.witness=_make_file_witness([path,*references]);self._sealed=True
+     def __setattr__(self,name,value):
+         if getattr(self,'_sealed',False):raise TypeError('serial proof metadata immutable')
+@@ -2002,6 +2254,9 @@
+     def __delattr__(self,name):raise TypeError('serial proof metadata immutable')
+     def check_scope(self,measurement):
+         require(measurement['profile']==self.profile,'serial profile differs');workload._packing_measurement_scope(self.rows,self.specs,measurement)
++        donor_inputs=measurement.get('donor_inputs',[])
++        require(set(self.donor_rows)=={(x['source_task'],x['condition'],x['stream'],x['instance_id']) for x in donor_inputs},'serial donor membership differs from rebuilt source')
++        workload._packing_measurement_scope(self.donor_rows,[],dict(timing_inputs=donor_inputs))
+     def __reduce__(self):raise TypeError('serial proofs are process-local')
+ 
+ 
+@@ -2016,7 +2271,13 @@
+ def _pilot_scope_measurement(design,invocation):
+     batches=_expected_pilot_batches(design,invocation)
+     scope=[{k:v for k,v in cell.items() if k in ('site','seed','family','axis_index','operation','axis_sha256')} for cell in invocation['cells']]
+-    return dict(profile=invocation['profile'],timing_inputs=_timing_inputs_from_batches(batches,invocation['profile']),axis_scope=scope)
++    donors=[]
++    if any(c['operation']=='interchange' for c in invocation['cells']):
++        for b in batches:
++            dummy={r['instance_id']:r['execution_dummy']['duplicate_of'] for r in b.records if 'execution_dummy' in r}
++            donors.extend(source_batches(design,b.task,'validation',b.ids,b.condition,{'clean':'corrupt','corrupt':'clean'}[b.stream],invocation['profile'],dummy_sources=dummy))
++    return dict(profile=invocation['profile'],timing_inputs=_timing_inputs_from_batches(batches,invocation['profile']),axis_scope=scope,
++        donor_inputs=_timing_inputs_from_batches(donors,invocation['profile']))
+ 
+ 
+ def _exact_pilot_scope(rows,specs,measurement):
+@@ -2027,13 +2288,14 @@
+     require({key(x) for x in specs}=={key(x) for x in measurement['axis_scope']},'pilot actual cell/axis membership differs from rebuilt invocation')
+ 
+ 
+-def _authenticate_serial_references(design,protocol,expected,receipt):
++def _authenticate_serial_references(design,protocol,expected,receipt,*,serial_reader=None):
++    serial_reader=_SerialNumericProof if serial_reader is None else serial_reader
+     invocations=_serial_invocations(expected);refs=receipt.get('serial_numeric_references',{})
+     require(set(refs)=={x['invocation_id'] for x in invocations},'complete original serial invocation references required')
+     for invocation in invocations:
+         value=refs[invocation['invocation_id']];path=value['path']
+         require(object_reference(path)==value['reference'],'serial numeric evidence bytes changed')
+-        proof=_SerialNumericProof(path)
++        proof=serial_reader(path)
+         require(proof.source_digest==value['source_digest'] and proof.profile==invocation['profile'],'serial numeric source/profile differs')
+         measurement=_pilot_scope_measurement(design,invocation)
+         proof.check_scope(measurement);_exact_pilot_scope(proof.rows,proof.specs,measurement)
+@@ -2046,8 +2308,9 @@
+         require(all(any(all(spec.get(k)==v for k,v in cell.items()) for spec in proof.specs) for cell in wanted),'serial rebuilt actual axis scope missing')
+ 
+ 
+-def _authenticated_pilot_receipts(design,protocol,target,receipt_paths,*,ledger_path):
++def _authenticated_pilot_receipts(design,protocol,target,receipt_paths,*,ledger_path,proof_reader=None,serial_reader=None):
+     """Authenticate measured production sources before the pure cost projector."""
++    proof_reader=_completed_packing_proof if proof_reader is None else proof_reader
+     require(target['stage'] in ('fit-select','remaining'),'cost intake requires frozen fit/remaining target')
+     selected=target.get('frozen_inputs',{}).get('selected');fits=target.get('frozen_inputs',{}).get('fits')
+     rebuilt=workload.build_inventory(design,protocol,stage=target['stage'],selected=selected,fits=fits)
+@@ -2084,7 +2347,7 @@
+                 require(value.get('kind')=='a3_packing_proof_reference_v1','production/native intake refuses synthetic inline packing evidence')
+                 measured_path=value['measured_path'];reference=value['measured_reference']
+                 require(references.get(str(Path(measured_path).resolve()))==reference,'pilot packing reference mapping differs')
+-                proof=_completed_packing_proof(measured_path,expected_reference=reference)
++                proof=proof_reader(measured_path,expected_reference=reference)
+                 invocation=next(x for x in expected['packing_invocations'] if x['invocation_id']==invocation_id)
+                 measurement=_pilot_scope_measurement(design,invocation)
+                 proof.proof.check(measurement);_exact_pilot_scope(proof.proof._rows,list(proof.proof._specs.values()),measurement)
+@@ -2096,7 +2359,7 @@
+             require(set(references)=={str(Path(v['measured_path']).resolve()) for v in evidence.values()},'extra/missing original numeric references')
+         else:
+             require(not evidence and not references,'serial pilot cannot claim packed-equivalence evidence')
+-            _authenticate_serial_references(design,protocol,expected,receipt)
++            _authenticate_serial_references(design,protocol,expected,receipt,serial_reader=serial_reader)
+         receipts.append(receipt)
+     require(receipts,'completed actual pilot receipts required')
+     if sources:
+@@ -2106,7 +2369,7 @@
+     return receipts,sources
+ 
+ 
+-def _cost_packing_proofs(receipts):
++def _cost_packing_proofs(receipts,*,candidate_index=None):
+     proofs={}
+     for receipt in receipts:
+         sha=workload.digest(receipt)
+@@ -2114,7 +2377,10 @@
+             if evidence.get('kind')!='a3_packing_proof_reference_v1':continue
+             path=evidence['measured_path'];ref=evidence['measured_reference']
+             require(receipt.get('packing_references',{}).get(str(Path(path).resolve()))==ref,'pilot measured reference mapping differs')
+-            proof=_completed_packing_proof(path,expected_reference=ref)
++            if candidate_index is None:proof=_completed_packing_proof(path,expected_reference=ref)
++            else:
++                proof=next((p for p in candidate_index.proofs if Path(p.path).resolve()==Path(path).resolve()),None)
++                require(proof is not None and proof.reference==ref,'cost proof is outside completed startup index')
+             require(proof.proof.source_digest==evidence['evidence_sha256'],'pilot measured source digest differs')
+             proofs[(sha,pid)]=proof.proof
+     return proofs
+--- before/component_analysis/a3_direction_workload.py
++++ after/component_analysis/a3_direction_workload.py
+@@ -66,6 +66,8 @@
+ axis identity, not merely an individual array file digest.
+ """
+ from __future__ import annotations
++
++STARTUP_REFERENCE_BYTES=8192
+ 
+ from collections import Counter, defaultdict
+ import copy
+@@ -1075,7 +1077,7 @@
+     return digest(evidence)
+ 
+ 
+-def project_cost(pilot_receipts: list[dict], workload: dict, ledger: dict, *, packing_proofs=None) -> dict:
++def project_cost(pilot_receipts: list[dict], workload: dict, ledger: dict, *, packing_proofs=None, runtime_cost=None) -> dict:
+     """Return a conservative proposal; incomplete evidence always raises ValueError."""
+     _validate_inventory(workload)
+     sums=_ledger(ledger,workload['identity'])
+@@ -1135,6 +1137,18 @@
+             _require(cache_capacity>=max(m['cache_bytes'],workload['storage_requirements']['tiers']['cache_disk']),'full target cache capacity underflow')
+             measured[(digest(m.get('profile')),m.get('operation'),digest(m.get('expected_keys',[])),
+                       digest(m.get('axis_ids',[])),digest(m.get('axis_scope',[])),digest(m.get('timing_inputs')),m.get('donor_convention'))].append(m)
++    completed_startup=0
++    if runtime_cost is not None:
++        _require(runtime_cost.get('kind')=='a3_completed_host_startup_cost_v1'
++            and runtime_cost.get('target_inventory_sha256')==workload['inventory_sha256']
++            and runtime_cost.get('execution_authorized') is False and runtime_cost.get('conditional') is True,'completed host cost source/scope/portability differs')
++        completed_startup=_finite(runtime_cost.get('seconds'),'completed authentication/index startup')
++        _require(runtime_cost.get('guard_seconds') and runtime_cost.get('host_profile'),'completed host guard/profile evidence missing')
++        for value in runtime_cost['guard_seconds']:_finite(value,'completed full-union guard seconds',positive=True)
++        host_peaks.append(_integer(runtime_cost['peak_host_bytes'],'completed host peak'))
++        capacity=_integer(runtime_cost['frozen_host_capacity_bytes'],'frozen host startup capacity')
++        _require(max(runtime_cost['peak_host_bytes'],runtime_cost['construction_working_bytes'],runtime_cost['retained_bytes'])<=capacity,
++            'completed startup footprint exceeds frozen admitted host capacity')
+     storage=_storage_admission(workload,ledger,max(host_peaks))
+     total=0; used=[]; reuse_records=[]
+     requirement_jobs={rid:job['job_id'] for job in workload['jobs'] for rid in job['requirement_ids']}
+@@ -1159,14 +1173,16 @@
+                 assumptions=policy['assumptions'],uncertainty='target examples unmeasured; fixed 25 percent workload buffer',
+                 target_rows_are_measured=False))
+         seconds=max(max(m['batch_seconds']) for m in good)
++        if requirement['operation']=='guard_refresh' and runtime_cost is not None:seconds=max(seconds,max(runtime_cost['guard_seconds']))
+         work=_integer(requirement['batches'],'required batches')*seconds
+         total+=work
+         job_work[requirement_jobs[requirement['requirement_id']]]+=work
+         used.append(dict(requirement_id=requirement['requirement_id'],batches=requirement['batches'],batch_seconds=seconds))
+     jobs=len(workload['jobs']); _integer(jobs,'job count')
+-    seconds=jobs*max(startup)+1.25*total+jobs*_finite(workload['finish_reserve_seconds'],'finish reserve')
+-    job_projections=[dict(job_id=j['job_id'],projected_seconds=max(startup)+1.25*job_work[j['job_id']]+workload['finish_reserve_seconds'],
+-        walltime_seconds=math.ceil(max(startup)+1.25*job_work[j['job_id']]+workload['finish_reserve_seconds']),
++    per_job_startup=max(startup)+completed_startup
++    seconds=jobs*per_job_startup+1.25*total+jobs*_finite(workload['finish_reserve_seconds'],'finish reserve')
++    job_projections=[dict(job_id=j['job_id'],projected_seconds=per_job_startup+1.25*job_work[j['job_id']]+workload['finish_reserve_seconds'],
++        walltime_seconds=math.ceil(per_job_startup+1.25*job_work[j['job_id']]+workload['finish_reserve_seconds']),
+         requirement_ids=j['requirement_ids'],depends_on=j['depends_on']) for j in workload['jobs']]
+     gpu_hours=seconds*workload['hardware']['count']/3600
+     phase=workload['phase']
+@@ -1256,14 +1272,15 @@
+         inventory_sha256=workload['inventory_sha256'],receipt_sha256s=receipt_digests,
+         ledger_sha256=ledger['snapshot_sha256'],phase=phase,subphase='directions',storage_admission=storage,
+         projected_seconds=seconds,projected_gpu_hours=gpu_hours,additional_gpu_hours=additional,proposed_walltime_seconds=max(j['walltime_seconds'] for j in job_projections),jobs=job_projections,
+-        required_job_count=jobs,startup_seconds=max(startup),measured_work_seconds=total,
++        required_job_count=jobs,startup_seconds=per_job_startup,completed_host_startup_cost=runtime_cost,measured_work_seconds=total,
+         finish_reserve_seconds=workload['finish_reserve_seconds'],existing_gpu_hours=sums['all'],
+         existing_reserved_gpu_hours=sums['all'],existing_actual_gpu_hours=sums['actual_all'],actual_unknown_entries=sums['actual_unknown_entries'],
+         direction_m1_gpu_hours=dm1,all_m1_gpu_hours=m1,direction_m2_gpu_hours=dm2,
+         all_a3_gpu_hours=all_a3,requirements=used,reuse_records=reuse_records,fit_validation_consumed_gpu_hours=envelope_consumed,
+-        conditional_proposal=any(x['profile']['axis_tile_size']>1 for x in workload['requirements']),
++        conditional_proposal=runtime_cost is not None and runtime_cost.get('conditional') is not False or any(x['profile']['axis_tile_size']>1 for x in workload['requirements']),
+         packed_execution_blocker='Unit F reviewed reuse adapter required; exact-scope runner unchanged' if any(x['profile']['axis_tile_size']>1 for x in workload['requirements']) else None,
+-        missing_execution_prerequisites=['matching root RS reservation','live source/registry/ledger recheck'])
++        missing_execution_prerequisites=['matching root RS reservation','live source/registry/ledger recheck']+
++            (['bounded allocated-host authentication/index startup'] if runtime_cost is not None and runtime_cost.get('conditional') is not False else []))
+ 
+ 
+ def execution_membership(source,split,condition,instance_ids,physical_recipients):
+--- before/tests/test_a3_direction_runtime.py
++++ after/tests/test_a3_direction_runtime.py
+@@ -1331,6 +1331,162 @@
+     assert overhead['boundary_refreshes']==2 and overhead['context_seconds']>0
+     print(json.dumps(dict(observed_scope_calls=len(scope_calls),recorded_scope_calls=overhead['scope_checks'],
+         overhead_model_forwards=len(fake)-before,boundary_refreshes=overhead['boundary_refreshes'])))
++
++
++def test_serial_donor_cache_maps_and_observed_rows_match_rebuilt_source(tmp_path,fake):
++    r,d,p=_fake_pilot_inputs(1);inv=r.workload.build_inventory(d,p,stage='prefit')
++    invocation=next(x for x in r._serial_invocations(inv) if x['source_task']=='far_v2')
++    result=r._pilot_invocation(object(),d,p,invocation,axes=None,root=tmp_path,guard=lambda:None)
++    original=dict(kind='a3_serial_numeric_invocation_v1',actual_execution=True,injected=True,timing_only=True,
++        source_commit=p['commit'],runtime_profile=r.runtime_kernel_identity(object()),receipt=result['receipt'],
++        positive_controls=result['positive_controls'],numeric_backing_references={})
++    measurement=r._pilot_scope_measurement(d,invocation)
++    for damage in (None,'id','condition','stream','readout','cache_hash','cache_missing','cache_source','observation','source_id','split'):
++        value=copy.deepcopy(original);raw=value['receipt']
++        descriptor=next(s['donors'][0] for ss in raw['batches'].values() for s in ss if s['operation']=='interchange')
++        if damage=='id':descriptor['mapping']['donor_id']='other'
++        if damage=='condition':descriptor['mapping']['donor_condition']='other'
++        if damage=='stream':descriptor['mapping']['donor_stream']='not-a-real-stream'
++        if damage=='readout':descriptor['mapping']['donor_positions']=[0]
++        if damage=='cache_hash':descriptor['cached_donor_sha256']='0'*64
++        if damage=='cache_missing':raw['donor_cache']=[]
++        if damage=='cache_source':
++            changed=raw['donor_cache'][0];changed['row']['tokens'][0]+=1
++            cache_value=r._serial_cache_wire(changed['row'],decode=True);new_hash=r.runner._digest(cache_value)
++            for ss in raw['batches'].values():
++                for spec in ss:
++                    for item in spec.get('donors',[]):
++                        m=item['mapping'];key=[m['donor_profile_id'],cache_value['task'],m['donor_condition'],m['donor_stream'],m['donor_id']]
++                        if key==changed['key']:item['cached_donor_sha256']=new_hash
++        if damage=='observation':next(x for x in raw['rows'] if x['operation']=='interchange')['donor_mapping']['donor_positions']=[0]
++        if damage in ('source_id','split'):
++            for ss in raw['batches'].values():
++                for spec in ss:
++                    for item in spec.get('donors',[]):item['mapping']['donor_'+damage]='foreign'
++            for row in raw['rows']:
++                if row['operation']=='interchange':row['donor_mapping']['donor_'+damage]='foreign'
++        raw['receipt_sha256']=r.workload.digest({k:v for k,v in raw.items() if k!='receipt_sha256'})
++        path=tmp_path/('baseline' if damage is None else damage);r.publish_object(path,value)
++        if damage is None:r._SerialNumericProof(path).check_scope(measurement)
++        else:
++            with pytest.raises(ValueError):r._SerialNumericProof(path).check_scope(measurement)
++
++
++@pytest.mark.parametrize('tile',[1,2])
++def test_guard_benchmark_covers_final_receipt_and_all_numeric_roots(tmp_path,fake,tile):
++    from types import SimpleNamespace
++    r,d,p=_fake_pilot_inputs(tile);inv=r.workload.build_inventory(d,p,stage='prefit')
++    receipt=r.run_pilot(object(),d,p,inv,root=tmp_path,args=SimpleNamespace(pilot_part='prefit',selected=None),guard=lambda:None,startup_seconds=0)
++    r.publish_object(tmp_path/'admission',{'pilot_receipt_paths':[str(tmp_path/'pilot'/'prefit')]})
++    r.publish_object(tmp_path/'reservation',{'admission_path':str(tmp_path/'admission')})
++    index=r._admitted_candidate_index(SimpleNamespace(reservation=str(tmp_path/'reservation')),d,p)
++    actual=index.refresh_dependencies();measured=receipt['guard_dependency_measurement']
++    assert measured['measured_bytes_per_refresh']>=actual['verified_bytes'] and measured['measured_roots']>=actual['roots']
++    assert set(index.forest.paths)-{str((tmp_path/'pilot'/'prefit').absolute()),index.startup_reference['path']}==set(measured['dependency_roots'])
++    bad=copy.deepcopy(receipt);bad['guard_dependency_measurement']['final_receipt_file_upper_bytes']['payload.json']=1
++    with pytest.raises(ValueError):r._publish_measured_pilot_receipt(tmp_path/'underflow',bad)
++    assert not (tmp_path/'underflow').exists()
++    envelope=tmp_path/'inert';r.publish_object(envelope,dict(inert_final_receipt_byte_envelope='x'*100,execution_authorized=False))
++    with pytest.raises(ValueError):r._authenticated_pilot_receipts(d,p,r.read_object(tmp_path/'pilot-target-inventory'/'prefit'),[envelope],ledger_path=None)
++    print(json.dumps(dict(tile=tile,actual_bytes=actual['verified_bytes'],measured_bytes=measured['measured_bytes_per_refresh'],roots=actual['roots'])))
++
++
++def test_completed_index_startup_is_measured_conditionally_and_charged_per_job(tmp_path,fake,monkeypatch):
++    from types import SimpleNamespace
++    from tests.test_a3_direction_workload import ledger
++    r,d,p=_fake_pilot_inputs(1);inv=r.workload.build_inventory(d,p,stage='prefit')
++    receipt=r.run_pilot(object(),d,p,inv,root=tmp_path,args=SimpleNamespace(pilot_part='prefit',selected=None),guard=lambda:None,startup_seconds=0)
++    target=r.read_object(tmp_path/'pilot-target-inventory'/'prefit');path=tmp_path/'pilot'/'prefit'
++    index,receipts,sources=r._completed_pilot_index(d,p,target,[path],ledger_path=None,host_capacity_bytes=10**12)
++    cost=index.startup_evidence
++    assert cost['seconds']==index.startup_seconds>0 and cost['process_local_cold'] and not cost['os_cache_cold_claimed']
++    assert cost['conditional'] and cost['execution_authorized'] is False and cost['host_profile']['threads']['OMP_NUM_THREADS']=='1'
++    assert cost['dependency_roots']==11 and cost['dependency_bytes_per_refresh']>0 and cost['retained_bytes']>0
++    reference=cost['startup_record_reference'];record=r.read_object(reference['path'])
++    assert record['execution_authorized'] is False and record['process']['pid']>0
++    assert record['source_identity']==target['identity'] and record['target_inventory_sha256']==target['inventory_sha256']
++    assert 'publication_seconds' not in record and cost['publication_seconds']>0
++    assert cost['seconds']>=record['construction']['seconds']+cost['publication_seconds']
++    assert r._object_payload_size(reference)<=r.workload.STARTUP_REFERENCE_BYTES
++    assert r._validate_startup_record(reference,d,p,expected_job_id='injected-cpu')==record
++    with pytest.raises(ValueError):r._validate_startup_record(reference,d,p,expected_job_id='injected-cpu',expected_pid=record['process']['pid']+1)
++    budget=ledger(target);budget['storage_capacities']['host_ram']['available_bytes']=10**12
++    plain=r.workload.project_cost(receipts,target,budget)
++    proposal=r.workload.project_cost(receipts,target,budget,runtime_cost=cost)
++    assert proposal['startup_seconds']==pytest.approx(plain['startup_seconds']+cost['seconds'])
++    assert proposal['conditional_proposal'] and 'bounded allocated-host authentication/index startup' in proposal['missing_execution_prerequisites']
++    for actual,old in zip(proposal['jobs'],plain['jobs']):assert actual['projected_seconds']>=old['projected_seconds']+cost['seconds']-1e-8
++    with pytest.raises(ValueError):r._completed_pilot_index(d,p,target,[path],ledger_path=None,host_capacity_bytes=1)
++    bad=dict(cost,target_inventory_sha256='0'*64)
++    with pytest.raises(ValueError):r.workload.project_cost(receipts,target,budget,runtime_cost=bad)
++    for damage in ('conditional','capacity'):
++        bad=dict(cost)
++        if damage=='conditional':bad['conditional']=False
++        else:bad['frozen_host_capacity_bytes']=1
++        with pytest.raises(ValueError):r.workload.project_cost(receipts,target,budget,runtime_cost=bad)
++    r.publish_object(tmp_path/'admission',dict(pilot_receipt_paths=[str(path)],completed_host_startup_cost=cost))
++    r.publish_object(tmp_path/'reservation',dict(admission_path=str(tmp_path/'admission'),upper_inventory_path=str(tmp_path/'pilot-target-inventory'/'prefit')))
++    actual=r._admitted_candidate_index(SimpleNamespace(reservation=str(tmp_path/'reservation')),d,p)
++    assert actual.startup_reconciliation['forecast_seconds']==cost['seconds'] and actual.startup_reconciliation['retroactive_authorization'] is False
++    shards=copy.deepcopy(target['shards'][:2]);expected=[]
++    for shard in shards:
++        axes,shard['cells']=r._pilot_axes(object(),shard['cells'],None)
++        rows,execution,identity=r.score_runtime_shard(object(),d,p,shard,axes=axes,output=tmp_path/'execution'/shard['shard_id'],
++            guard=lambda:None,measured_index=index,shared_root=tmp_path)
++        assert execution['candidate_index_startup_reference']==reference and execution['candidate_index_startup_seconds']==cost['seconds']
++        assert r._object_payload_size({k:v for k,v in execution.items() if k.startswith('candidate_index_startup_')})<=r.workload.STARTUP_REFERENCE_BYTES
++        assert execution['candidate_index_startup_dependency_roots']==cost['dependency_roots']
++        r.artifacts.publish_shard(tmp_path/'runtime-shards'/shard['shard_id'],identity=identity,expected_keys=shard['expected_keys'],rows=rows,execution=execution)
++        expected.extend(shard['expected_keys'])
++    one=dict(shards=shards,expected_keys=expected);validations=[];original_validator=r._validate_startup_record
++    def counted(*args,**kwargs):validations.append(1);return original_validator(*args,**kwargs)
++    with monkeypatch.context() as scoped:
++        scoped.setattr(r,'_validate_startup_record',counted)
++        rows,_=r.read_runtime_rows(d,p,one,tmp_path/'runtime-shards')
++    assert len(rows)==len(expected) and validations==[1]
++    manifest_path=tmp_path/'runtime-shards'/shards[1]['shard_id']/'run_manifest.json';saved=manifest_path.read_bytes()
++    changed=json.loads(saved);changed['execution']['producer_pid']+=1
++    r.common.write_json(manifest_path,changed);r.artifacts._finish(manifest_path.parent)
++    with pytest.raises(ValueError):r.read_runtime_rows(d,p,one,tmp_path/'runtime-shards')
++    manifest_path.write_bytes(saved);r.artifacts._finish(manifest_path.parent)
++    print(json.dumps(dict(host_startup_seconds=cost['seconds'],guard_seconds=cost['guard_seconds'],dependency_roots=cost['dependency_roots'],
++        dependency_bytes=cost['dependency_bytes_per_refresh'],retained_bytes=cost['retained_bytes'],peak_host_bytes=cost['peak_host_bytes'],
++        conditional=cost['conditional'],source_reference_count=len(cost['pilot_references']),cpu_model=cost['host_profile']['cpu_model'])))
++    marker=Path(reference['path'])/'COMPLETE.json';original_marker=marker.read_bytes();marker.unlink()
++    with pytest.raises((ValueError,FileNotFoundError)):r._validate_startup_record(reference,d,p,expected_job_id='injected-cpu')
++    with pytest.raises((ValueError,FileNotFoundError)):r.read_runtime_rows(d,p,one,tmp_path/'runtime-shards')
++    marker.write_bytes(original_marker)
++    payload=Path(reference['path'])/'payload.json';payload.write_bytes(payload.read_bytes()+b' ')
++    with pytest.raises(ValueError):index.refresh_dependencies()
++    with pytest.raises(ValueError):r._validate_startup_record(reference,d,p,expected_job_id='injected-cpu')
++    with pytest.raises(ValueError):r.read_runtime_rows(d,p,one,tmp_path/'runtime-shards')
++
++
++def test_production_shaped_completed_startup_preserves_lifecycle_and_footprint_refusals(tmp_path,monkeypatch,fake):
++    import shutil
++    r,d,p,target,path,mapping,live_path,live=_production_cost_source_case(tmp_path,monkeypatch,capture_model=object())
++    receipt=r.read_object(path);proofs=[r._CompletedPackingProof(v['measured_path']) for v in receipt['packing_evidence'].values()]
++    reconciliation=r._PilotReconciliationPass(proofs,target,guard=lambda:None,injected=True)
++    with reconciliation:pass
++    receipt.update(proof_validation_seconds=sum(x.validation_seconds for x in proofs),
++        proof_verified_bytes=reconciliation.verified_bytes,proof_verification_seconds=reconciliation.verification_seconds)
++    r._measure_complete_guard_union(receipt,reconciliation,tmp_path,lambda:None)
++    shutil.rmtree(path);r._publish_measured_pilot_receipt(path,receipt)
++    capacity=r.read_object(receipt['origin']['reservation_reference']['path'])['allocation_contract']['memory_bytes']
++    index,_,sources=r._completed_pilot_index(d,p,target,[path],ledger_path=mapping,host_capacity_bytes=capacity)
++    assert len(sources)==1 and index.startup_evidence['conditional'] and index.startup_evidence['frozen_host_capacity_bytes']==capacity
++    import os
++    assert r.read_object(index.startup_reference['path'])['process']['job_id']==os.environ.get('SLURM_JOB_ID','host-cpu')
++    original=copy.deepcopy(receipt)
++    for damage in ('bytes','roots','incomplete','running'):
++        changed=copy.deepcopy(original)
++        if damage=='bytes':changed['guard_dependency_measurement']['measured_bytes_per_refresh']=1
++        if damage=='roots':changed['guard_dependency_measurement']['dependency_roots']=[]
++        if damage=='incomplete':changed['complete']=False
++        if damage=='running':
++            live['reservations'][0]['status']='running';live_path.write_text(json.dumps(live))
++        shutil.rmtree(path);r.publish_object(path,changed)
++        with pytest.raises(ValueError):r._completed_pilot_index(d,p,target,[path],ledger_path=mapping,host_capacity_bytes=capacity)
+ 
+ 
+ def test_production_cost_intake_rejects_synthetic_completed_receipts_before_projector(tmp_path):

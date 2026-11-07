@@ -1,0 +1,126 @@
+{
+  "status": "PASS_ACTUAL_MGNP_GENUINE_ALGORITHM_EQUIVALENCE_ONLY",
+  "candidate_complete_sha256": "849d44ddc2cc2859dd04d946930ecc9fc9ccc02d4ab0883fd2fd6465bf77f25e",
+  "original_oracle_sha256": "1685fca54172ab3de7a8003b8503fdf2a9ac184e684ae1c17a52493fcc7ca991",
+  "packet_manifest_sha256": "21122c2077c367c7ccf9b08f8b865f263b7dcba66bf0480af25e14757973ed4d",
+  "config_sha256": "7bc61f11333de793185ac0a95bdcb7acb7df6f69ab5e73048af3032060093321",
+  "candidate_workload_sha256": "765b22a006ab519186a168bf455f4084915457d4ffce88881e76bf31b71a37cb",
+  "frozen_input_source_commit": "861f84a3938a5e22fa329af0c469b2dd812fe68a",
+  "candidate_source_commit": null,
+  "child_result_sha256_verified": true,
+  "normal_exit_no_TERM": true,
+  "full_stream_bytes": 11421127399,
+  "full_stream_sha256": "c738a185b9a79ef8873113e63aefa197a820f0a5c117159db055de6f70e0a6c9",
+  "entire_summary_equal": true,
+  "storage_requirements_equal": true,
+  "canonical_inventory_sha256": "daf672c166396518e9ed207e7c2dc14a5ff4adcc3f2b763d5fbf95b1fc83d9db",
+  "scope_counts": {
+    "raw_keys": 246486,
+    "shards": 81904,
+    "capture_shards": 4256,
+    "requirements": 618117,
+    "captures": 45042
+  },
+  "source_before_after_equal": true,
+  "original_baseline_sources_match": true,
+  "baseline_module_origins_verified": true,
+  "candidate_builder_explicitly_separate": true,
+  "resource_evidence": {
+    "original": {
+      "job_id": "23491516",
+      "host": "cn137.delta.ncsa.illinois.edu",
+      "cpu_model": "AMD EPYC 7763 64-Core Processor",
+      "affinity_CPUs": [
+        0,
+        2,
+        3,
+        4
+      ],
+      "CPU_count": 4,
+      "memory_limit_bytes": 206158430208,
+      "time_limit_seconds": 3600,
+      "billing_TRES": "196608",
+      "python": "/u/swong2/.conda/envs/mgnp/bin/python",
+      "python_version": "3.12.13 | packaged by Anaconda, Inc. | (main, Jul  9 2026, 14:38:16) [GCC 14.3.0]",
+      "build_seconds": 2339.692041463999,
+      "stream_seconds": 735.1920098650007,
+      "child_wall_seconds": 3194.5884759929995,
+      "user_seconds": 2921.002389,
+      "system_seconds": 226.41149,
+      "job_cgroup_peak_bytes": 122611486720,
+      "child_wait4_peak_rss_bytes": 122348666880,
+      "job_memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "candidate": {
+      "job_id": "23605794",
+      "host": "cn078.delta.ncsa.illinois.edu",
+      "cpu_model": "AMD EPYC 7763 64-Core Processor",
+      "affinity_CPUs": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "CPU_count": 4,
+      "memory_limit_bytes": 206158430208,
+      "time_limit_seconds": 3600,
+      "billing_TRES": "98304",
+      "python": "/u/swong2/.conda/envs/mgnp/bin/python",
+      "python_version": "3.12.13 | packaged by Anaconda, Inc. | (main, Jul  9 2026, 14:38:16) [GCC 14.3.0]",
+      "build_seconds": 1561.5830823220022,
+      "stream_seconds": 734.3648419569945,
+      "child_wall_seconds": 2400.35672257602,
+      "user_seconds": 2187.758538,
+      "system_seconds": 177.064205,
+      "job_cgroup_peak_bytes": 123080208384,
+      "child_wait4_peak_rss_bytes": 122636275712,
+      "job_memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    }
+  },
+  "observed_single_pair_costs": {
+    "build_wall_reduction_seconds": 778.1089591419968,
+    "build_wall_reduction_fraction": 0.332568964356145,
+    "child_wall_reduction_seconds": 794.2317534169797,
+    "child_wall_reduction_fraction": 0.24861786091872207,
+    "stream_wall_difference_seconds": -0.8271679080062313,
+    "job_peak_difference_bytes": 468721664,
+    "CPU_user_system_original_seconds": 3147.413879,
+    "CPU_user_system_candidate_seconds": 2364.822743
+  },
+  "measurement_limits": [
+    "One pair on different nodes/dates/affinity despite identical CPU family and Python; no universal causal speedup bound",
+    "JSON byte traversal unchanged and still substantial; no serialization improvement claim",
+    "Job cgroup peak slightly higher; no peak-memory reduction claim; wait4RSS is separately labeled",
+    "Billing TRES differ; no service-unit cost ratio inferred",
+    "No base-language genuine equivalence, new source publication, fresh-source readiness, GPU/numerical/model admission or pairedM1 feasibility"
+  ],
+  "author_report_not_read": true,
+  "no_builder_rerun_or_multigigabyte_hash": true,
+  "raw_evidence_sha256": {
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/candidate-mgnp-r2-01/COMPLETE_COMPARISON.json": "849d44ddc2cc2859dd04d946930ecc9fc9ccc02d4ab0883fd2fd6465bf77f25e",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/candidate-mgnp-r2-01/RESULT.json": "98a3801b64571407445f7fee3701a9c402075b9d7476cb8be96a6dca6eaa89f4",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/candidate-mgnp-r2-01/child-execution.json": "2866f1eb245aa60145f3d4cf28565aa7d48d74ef509336fcc9ec63a9a768cc2b",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/candidate-mgnp-r2-01/BUILD_STARTED.json": "4989b0c310e095c13e521cf5db296ca8413f27f5133fdaf145daef216e83c82a",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/candidate-mgnp-r2-01/BUILD_FINISHED_NOT_ORACLE.json": "0346ee24ed814ee0e38d2f540d03c0fba05e1cb02179710faf0c346388f02c23",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/candidate-mgnp-r2-01/STREAM_FINISHED_NOT_ORACLE.json": "e5ed001bc5b01aa4907875a85775888b1053a56e5a7a09ec6434b294d91c875c",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/candidate-mgnp-r2-01/allocation-before.json": "9ff30d1de460b0987b1ffb014e46b9c1b7496cf5bc1c7736aae3718e92006c76",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/candidate-mgnp-r2-01/allocation-after.json": "9e481b1eda0772926ded458fb32be432954f5ba632d1d843f2d8080f428f738c",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/candidate-mgnp-r2-01/memory-after.json": "dbcf04f968574d7efec3d52a167d6a17acb69b1c3090905445064f1ab090edcb",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/original-mgnp-r2-02/COMPLETE_ORACLE.json": "1685fca54172ab3de7a8003b8503fdf2a9ac184e684ae1c17a52493fcc7ca991",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/original-mgnp-r2-02/memory-after.json": "1012f69db41e87904b9f6db397b3917ffb886356e260e228fd8c2234bd41305d"
+  }
+}

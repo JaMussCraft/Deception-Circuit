@@ -1,0 +1,129 @@
+{
+  "status": "HANDED_BACK_READ_ONLY_DEPENDENCY_MAP_NOT_AUTHORIZATION",
+  "candidate_commit": "2ba697d7f5fdfd7cebc7225ae004ec9e731e434f",
+  "runtime": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/candidate-source310/export/component_analysis/a3_direction_runtime.py",
+  "main_answer": {
+    "native_requires_measurement_before_any_scheduler_allocation_or_release": false,
+    "native_requires_completed_measurement_anchored_before_production_pilot_entry": true,
+    "current_accepted_order_allows_unmeasured_GPU_reservation_merely_because_within_cap": false,
+    "conditional_same_allocation_measure_then_model_inherently_requires_production_source_change": false,
+    "conditional_same_allocation_sequence_currently_authorized": false,
+    "reason": "The lower receiver is data-only and independent of pilot authority. Native production pilot must start with completed receiver evidence already bound into immutable original root objects. Source has no sbatch/hold/release path. However accepted175-r2 requires measured paired feasibility before proposing any A3 GPU reservation, or an explicitly approved sequencing/budget decision before first timing spend. A GPU-allocated diagnostic prephase would change that accepted order, even without raising the cap."
+  },
+  "stages": [
+    {
+      "stage": "candidate producer and data prerequisites",
+      "requires": "Completed genuine target/preparation, exact source and input references, applicable software/storage, required native/numerical/code acceptance before promotion/GPU under current workflow.",
+      "does_not_grant": "GPU reservation or model authority",
+      "citations": [
+        "175-r2/decision-and-scope.json:recommended_order[3:6]",
+        "278-r2/contracts.json:remaining_gates"
+      ]
+    },
+    {
+      "stage": "receiver measurement",
+      "native_dependency": "Bare lower reader and final witness require authentic immutable refs/namespace and real measured deployment, but no receiver resource record, native root pilot admission, execution reservation or authority context.",
+      "wrapper_dependency": "Accepted278-r2 receive_native requires a genuine new executable once; cold and same-process-repeat each call the lower reader and one final witness, then release the result. Root authenticates actual source/allocation/software/storage and normal provenance externally.",
+      "citations": [
+        "runtime:_read_prepared_target_object:202-283",
+        "278-r2/runner.py:receiver and receive_native",
+        "175-r2/descriptor-contract.json:receiver_measurement"
+      ]
+    },
+    {
+      "stage": "GPU reservation proposal / RS reserved charge",
+      "current_policy_dependency": "Measured paired feasibility and fresh ordinary root approval precede any A3 GPU reservation proposal. Original paired dependency permits a separately approved sequencing/budget decision instead of an already defensible paired bound; that decision is not supplied by this source audit.",
+      "native_boundary": "These native functions do not submit or approve scheduler reservations. Human/root scheduling approval is distinct from the process-local _AuthorityContext, which cannot be minted until a live allocation exists.",
+      "citations": [
+        "175-r2/decision-and-scope.json:recommended_order[5]",
+        "175-r2/measurement-and-budget.json:paired_dependency",
+        "runtime:make_authority_context:3194-3201",
+        "runtime:normalize_ledger:876-930"
+      ]
+    },
+    {
+      "stage": "sbatch held job",
+      "native_boundary": "Held submission can supply a job ID but is not a running allocation on which genuine node receiver measurements can execute. Source neither validates nor waives the root submission/release checklist here. Holding a job is not an exception to the earlier accepted reservation gate or its reserved-hour charge.",
+      "citations": [
+        "175-r2/decision-and-scope.json:recommended_order[5]",
+        "runtime:read_current_allocation and validate_reservation:1041-1128"
+      ]
+    },
+    {
+      "stage": "release / running allocation",
+      "current_policy_dependency": "Current accepted sequencing has no release-first measurement exception. A diagnostic GPU-resourced allocation cannot be relabelled CPU-only allocation because only CPU operations execute initially.",
+      "source_capability": "If separately authorized, lower-reader profiling can run before any production pilot authority is minted. Actual GPU resources/time remain truthfully recorded and charged; no model access follows until all original objects and guards are complete.",
+      "citations": [
+        "175-r2/measurement-and-budget.json:timing_accounting and paired_dependency",
+        "278-r2/runner.py:receive_native",
+        "runtime:normalize_ledger:876-930"
+      ]
+    },
+    {
+      "stage": "publish original native pilot admission / execution reservation / mapping",
+      "requires": "Completed immutable measurement run+resource record and producer refs must already be available for first-time anchoring in a3_root_pilot_admission_v1.pilot_target_preparation.receiver_resources_reference and receiver_deployment. Execution reservation binds exact admission bytes/hash; original mapping independently anchors admission refs, reservation IDs/lineage and the actual RS reservation identity.",
+      "restriction": "No retrospective resource insertion into an already completed producer descriptor or already byte-anchored original pilot admission. An existing context/witness or mapping lineage cannot be repaired by adopting changed admission bytes.",
+      "citations": [
+        "175-r2/descriptor-contract.json:receiver_measurement",
+        "runtime:_prepared_binding:492-508",
+        "runtime:validate_reservation:1078-1101",
+        "runtime:normalize_ledger:916-929",
+        "runtime:_AuthorityContext:3145-3191"
+      ]
+    },
+    {
+      "stage": "production pilot native entry",
+      "requires": "First model_guard validates original root ledger/reservation/live allocation/source/protection/budget and mints process-local authority. load_prepared_pilot_target then requires original resource binding, exact actual receiver deployment/environment/source/refs and completed normal measurement before reading the full target. It enforces actual retained/transient/process/cgroup bounds, rechecks context/live guard and authentic handle retention before returning. Another fresh model_guard precedes CUDA/Slurm and original model loader.",
+      "restriction": "Do not begin native pilot entry with an incomplete original admission and plan to insert measurement proof after authority creation. Finalize complete immutable root objects before this entry.",
+      "citations": [
+        "runtime:dispatch:1483-1509",
+        "runtime:live_guard:1130-1150",
+        "runtime:load_prepared_pilot_target:539-593",
+        "runtime:_validate_prepared_receiver_resources:469-489"
+      ]
+    },
+    {
+      "stage": "actual numerical controls / completed pilot / later prepare admit",
+      "requires": "All original model forwards, positive/nonzero/replay/serial/packed/geometry controls, reconciliation, fresh guards and final proof/publication remain mandatory. Required source-bound CPU/native numerical gates remain external pre-GPU workflow prerequisites; real M1 pilot controls still run after valid model loading.",
+      "important_distinction": "prepare --action admit is downstream completed-pilot cost projection, requiring pilot receipts and fresh mapping. It is not a bootstrap command for the first a3_root_pilot_admission_v1.",
+      "citations": [
+        "runtime:dispatch:1449-1457,1501-1509",
+        "175-r2/interfaces.json:run_pilot and final_publication_barrier"
+      ]
+    }
+  ],
+  "hypothetical_combined_allocation_constraints_not_a_plan": [
+    "An explicit reviewed sequencing decision is required before reserving/releasing GPU resources without already accepted matched receiver/paired evidence. Keeping the same cap alone is not that decision.",
+    "If such a decision were made, finish data-only profiling first, obtain honest completed measurement and conservative resource acceptance, then create the original immutable pilot admission/reservation/mapping for the first time before production pilot entry. Do not mutate a previous original admission or mint/use a partial authority context.",
+    "The diagnostic prephase would need separately reviewed orchestration that truthfully accepts a GPU-resourced allocation. Do not falsify GPU TRES/visibility or reuse a CPU-only supervisor by clearing its GPU checks. The data-only record model_loaded/execution_authorized false does not mean no GPUs were allocated or billed.",
+    "Same allocation can address CPU family/job-local mount applicability only if actual measurement and consumer software/storage/resource/cgroup contexts match. No automatic match follows from same node or same job.",
+    "Accepted profiling cold+repeat each perform three target read/hash passes; subsequent unchanged production pilot performs its own two-read entry and later final witness. The accepted adapter releases both profiled results and cannot supply a loader-minted authority handle. Budget at least those nine logical target passes and three parse/freeze entries for this combined prefit path, plus guards/model/numerical/terminal work. Do not count profiling as the actual production entry.",
+    "Preserve the original wrapper/allocation start and minimum initial/current deadline across all phases and any process transitions. Waiting for root validation/publication, profiling reads, imports, actual production reload, authority/handle proof, model load and all terminal work consume the same GPU allocation window.",
+    "Direction M1 is a total0.5GPUh/1800s PAIR, not a fresh allowance for initial measurement+prefit. Reserved GPU-hours are charged regardless of actual underuse/status; there is no automatic refund. Reserving the entire pair for the first diagnostic/prefit job leaves no later reservation room for selected timing.",
+    "Selected timing has its real M2 capture/fit/validation/complete-selection dependency and a different inventory/reservation scope. Do not assume the initial allocation can also cover that later part or retarget its immutable reservation to another inventory.",
+    "If measurement, bounds, original numerical gates, paired feasibility or remaining-lease checks fail, model access remains prohibited. Any spent/failed reservation remains charged under original rules; no retry, new reservation ceiling or skipped control is authorized.",
+    "Authentic handle/full-final-barrier accounting and unchanged full-target/M2 capacity tiers remain obligations. Sampling alone is not an upper bound; do not guess or shrink resource fields to manufacture admission."
+  ],
+  "current_dependency_status": {
+    "interpretation": "There is a real current operational ordering obstacle when no applicable CPU-only measurement placement is obtainable: accepted scheduling order needs evidence before GPU reservation, while obtaining matched-host evidence may require a GPU-resourced allocation. This is not an intrinsic lower-reader/model-authority code cycle; resolving it needs an explicit sequencing decision, not silent guard relaxation.",
+    "producer_completion": "not established by this source audit",
+    "native_BASE_acceptance": "not established by this source audit",
+    "GPU_reservation_or_release_authorized": false,
+    "sequencing_exception_approved": false,
+    "new_budget_proposal": false,
+    "implementation_or_job_created": false
+  },
+  "document_roots": {
+    "175-r2": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-preallocation-design175-r2",
+    "278-r2": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278-r2"
+  },
+  "interpretation_of_ordinary_root_authority": "The design wording ordinary root authority before reservation is root approval/anchoring, not an already-minted _AuthorityContext. The latter necessarily performs live RUNNING allocation validation and is process-local. Do not create an artificial pre-allocation _AuthorityContext cycle by conflating these.",
+  "interpretation_of_adapter_documentation": "278-r2 README requires root authentication of source/allocation/storage/authority obligations before using the adapter; it does not make the lower reader consume its own yet-uncreated resource proof. The specific175-r2 descriptor contract explicitly anchors the measurement in the later root admission. Existing CPU-only authorization does not authorize GPU-resourced diagnostics.",
+  "clock_boundary": {
+    "shell_source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/candidate-source310/export/scripts/jobs/specificity_a3.sh:5",
+    "behavior": "Original shell wrapper unconditionally overwrites A3_WRAPPER_START_SECONDS at its own invocation.",
+    "consequence": "Starting that shell wrapper after a diagnostic prephase would reset the native startup-cost clock. Same Slurm job and truthful reserved billing do not make that receipt accounting correct.",
+    "required_existing_semantics": "Any separately authorized combined orchestration must preserve the original allocation/wrapper start into unchanged native dispatch; do not claim the original shell automatically preserves an inherited earlier value.",
+    "native_source": "runtime:dispatch:1497-1499 (model load and startup=max over original wrapper/process start)"
+  }
+}

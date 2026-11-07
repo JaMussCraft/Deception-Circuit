@@ -1,0 +1,35 @@
+{
+  "kind": "edge_initial_pilot_used_path_static_analysis",
+  "source_commit": "87fceb28b3b46f4a406c0280db785697a0bbd3fc",
+  "pipeline_sha256": "4be709a243fa603e285efd5a4f10e2e26252f06c8410718a6d6fe15bce019d71",
+  "workload_sha256": "400c98aea4881a3cac0c5fbbc6498824be938b48a5d1f3ff30745691e87b53aa",
+  "attribution_conditions": [
+    "D",
+    "I"
+  ],
+  "validation_ids_per_task": 8,
+  "streams": [
+    "clean",
+    "corrupt"
+  ],
+  "integration_nodes": [
+    8,
+    16
+  ],
+  "midpoint_keys_per_receiver": 64,
+  "stability_guard_calls_formula": "64*sum(unique_receivers_by_task)+number_of_tasks; excludes additional source/lease/control/model/measurement guards",
+  "every_guard_calls_full_validate_prepared": true,
+  "fit_target_operations": [
+    "attribute_receiver"
+  ],
+  "later_select_assess_need_new_profiles": true,
+  "later_exact_profiles_depend_on_frozen_fit_or_selection": true,
+  "utility_profiles_conditional_on_eligible_readout_sets": true,
+  "pilot_phase": "M1",
+  "M1_edge_original_reservation_ceiling_hours": 0.75,
+  "full_first_reservation_leaves_zero_for_later_pilots": true,
+  "minimum_normal_staged_pilot_invocations": 3,
+  "later_16_node_fit_requires_16_node_measurements": true,
+  "native_GPU_forecast_provided": false,
+  "model_work_performed": false
+}

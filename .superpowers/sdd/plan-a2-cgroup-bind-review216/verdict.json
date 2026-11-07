@@ -1,0 +1,76 @@
+{
+  "verdict": "ACCEPT_EXACT_R5_DIAGNOSTIC_PACKET_ONLY",
+  "packet_manifest_sha256": "889ee0c986fd392ba1cf00300d93ae46f6714cae10a58175862a3a9ba7a88db7",
+  "packet": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/preflight-r5",
+  "findings": [],
+  "accepted_scope": "Exact successor for one separately root-bound five-minute CPU diagnostic. The v1 --bind string requests parent-root :ro first and explicit memory-child :ro second. No actual ordering/readonly observation or genuine-proof admission.",
+  "exact_delta": "After mechanical r4->r5 packet/evidence namespace substitutions, only cgroup_bind selector and its test assertion differ. Allocation helper and raw cgroup reader exact; all nonselector guard AST identical.",
+  "unchanged_guards": [
+    "actual allocation/account/UID/host/physical source cwd/schema and noGPU facts",
+    "fresh owned exact execution directory; normalized path and no symlink ancestors",
+    "exact job-component matching; actual /proc membership/mountinfo/counters/errors",
+    "native v1 /sys/fs/cgroup/memory/<membership> and v2 /sys/fs/cgroup/<membership> paths",
+    "native worker path samefile verification; missing or ambiguous own-job counters fail closed",
+    "v2 parent-root bind string",
+    "no model/graph/proof authority or fabricated counters"
+  ],
+  "verified": {
+    "all8_packet_members_match": true,
+    "all8_actual_r4_fetched_files_match": true,
+    "actual_r4_job": "50311765",
+    "actual_r4_terminal": "COMPLETED0:0after6seconds",
+    "actual_r4_memory_visibility": true,
+    "actual_r4_memory_per_mount_readonly": false,
+    "host_cases_expected_each": 9,
+    "host_cases_observed_base": 9,
+    "host_cases_observed_mgnp": 9,
+    "independent_cases_expected_each": 5,
+    "independent_cases_observed_base": 5,
+    "independent_cases_observed_mgnp": 5,
+    "all4_exit_codes": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "semantic_RED_reproduced_each_environment": {
+      "new_binding_suite_cases": 3,
+      "expected_failures": 1,
+      "observed_failures": 1,
+      "errors": 0,
+      "failure": "new parent+child assertion rejects old parent-only selector"
+    },
+    "Python36_grammar_and_host_API_scan": "PASS; real Python3.6 not locally executed",
+    "shell_syntax": "PASS",
+    "local_CLI_help": {
+      "binary": "/usr/bin/apptainer",
+      "version": "apptainer version 1.5.5-1.el9",
+      "exec_help_exit_code": 0,
+      "comma_list_documented": true,
+      "bind_help_section": "  -B, --bind stringArray              a user-bind path specification. \n                                      spec has the format\n                                      src[:dest[:opts]], where src and\n                                      dest are outside and inside paths. \n                                      If dest is not given, it is set\n                                      equal to src.  Mount options\n                                      ('opts') may be specified as 'ro'\n                                      (read-only) or 'rw' (read/write,\n                                      which is the default). Multiple bind\n                                      paths can be given by a comma\n                                      separated list.",
+      "no_container_executed": true,
+      "installed_Bridges_version_verified": false,
+      "initial_checker_failure": "An eight-line excerpt truncated the wrapped bind help before comma wording; exact full flag section passes. No packet failure."
+    },
+    "independent_test_sha256": "1adb20fafd21483d7e28c393c2a3c9f858eb762e6567fbc47e27f191ef05a01f"
+  },
+  "remaining_root_gates": [
+    "Stage and bind exact r5 packet plus all unchanged actual allocation/profile/SIF/cache/source prerequisites; use fresh root-cgroup199-r5/execution namespace.",
+    "Run one separately authorized root diagnostic and inspect terminal accounting, command argv, host/container own-job membership, native exact path/samefile, required counters and raw memory mountinfo.",
+    "Require actual nested memory per-mount ro options before the mountinfo separator; rw,memory superblock flags after the separator are a distinct field. Successful exit/counter visibility alone does not establish readonly status.",
+    "If parent/child order or target existence fails, preserve actual failure; no automatic retry or genuine proof release.",
+    "Any combined catalogue+cgroup adapter213 successor requires a separate exact review, actual successful diagnostic and full original binding/transfer/source/catalogue gates. No silent substitution into accepted208-r2 r3-pinned code."
+  ],
+  "not_claimed": [
+    "Actual r5 mount ordering, target availability, controller visibility or effective readonly state",
+    "Installed Bridges Apptainer identity from local1.5.5-1.el9 help",
+    "Genuine CPU resource proof, model/scoring/effects, source publication, transfer closure or GPU admission"
+  ],
+  "test_attribution": "Unit test names containing readonly verify requested bind syntax only. Independent actual-r4 evidence check establishes its observed rw state; no test executes a mount.",
+  "implementation_edits": false,
+  "remote_actions": false,
+  "scheduler_actions": false,
+  "last_live_usage_percent": 19,
+  "next_checkpoint_percent": 33,
+  "ordinary_cap_percent": 80
+}

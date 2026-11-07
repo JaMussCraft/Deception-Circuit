@@ -1,0 +1,108 @@
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+_ PacketTests.test_actual_profile_detects_reads_hash_parse_freeze_and_extra_read _
+
+self = <Deception-Circuit._claude.worktrees.specificity-ladder._superpowers.sdd.plan-a3.prepared-resource-runner278.test_runner.PacketTests testMethod=test_actual_profile_detects_reads_hash_parse_freeze_and_extra_read>
+
+    def test_actual_profile_detects_reads_hash_parse_freeze_and_extra_read(self):
+        import hashlib
+        def parse(raw, temporaries):
+            return json.loads(raw)
+        def freeze(value, memo=None): return value
+        def file_hash(path): return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+        def reader(target, prep, policy):
+            root=Path(target); name='payload.json'; index=0
+            raw=(root/name).read_bytes()
+            digest=hashlib.sha256(raw).hexdigest()
+            value=parse(raw, [])
+            frozen=freeze(value)
+            file_hash(root/name)
+            return (frozen, {}, (), root/name, {}, {})
+        def final(witness): file_hash(witness)
+        runtime=types.SimpleNamespace(_read_prepared_target_object=reader,
+            _check_file_witness=final,_prepared_json_buffer=parse,_freeze_json=freeze,
+            common=types.SimpleNamespace(file_hash=file_hash))
+        with tempfile.TemporaryDirectory() as td:
+            path=Path(td)/'payload.json'; path.write_text('{"x":1}')
+>           with r.Observer(runtime, path) as observation:
+                 ^^^^^^^^^^
+E           AttributeError: module 'measurement278' has no attribute 'Observer'
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/test_runner.py:82: AttributeError
+_______________ PacketTests.test_failure_is_emitted_and_reraised _______________
+
+self = <Deception-Circuit._claude.worktrees.specificity-ladder._superpowers.sdd.plan-a3.prepared-resource-runner278.test_runner.PacketTests testMethod=test_failure_is_emitted_and_reraised>
+
+    def test_failure_is_emitted_and_reraised(self):
+        records=[]
+        def fail(*args): raise ValueError('synthetic failure')
+        runtime=types.SimpleNamespace(_read_prepared_target_object=fail)
+        with self.assertRaisesRegex(ValueError, 'synthetic failure'):
+>           r.receiver(runtime, {}, {}, {}, records.append,
+            ^^^^^^^^^^
+                       observer_factory=lambda: r.NullSyntheticObserver())
+E           AttributeError: module 'measurement278' has no attribute 'receiver'
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/test_runner.py:96: AttributeError
+_ PacketTests.test_producer_calls_native_with_exact_objects_and_selected_none __
+
+self = <Deception-Circuit._claude.worktrees.specificity-ladder._superpowers.sdd.plan-a3.prepared-resource-runner278.test_runner.PacketTests testMethod=test_producer_calls_native_with_exact_objects_and_selected_none>
+
+    def test_producer_calls_native_with_exact_objects_and_selected_none(self):
+        args, design, protocol, returned = object(), {}, {}, object()
+        calls = []
+        def prepare(a, d, p, *, selected):
+            calls.append((a, d, p, selected))
+            return returned
+        runtime = types.SimpleNamespace(prepare_pilot_target=prepare)
+>       self.assertIs(r.producer(runtime, args, design, protocol), returned)
+                      ^^^^^^^^^^
+E       AttributeError: module 'measurement278' has no attribute 'producer'
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/test_runner.py:32: AttributeError
+_ PacketTests.test_receiver_retains_exact_result_through_check_and_releases_between_trials _
+
+self = <Deception-Circuit._claude.worktrees.specificity-ladder._superpowers.sdd.plan-a3.prepared-resource-runner278.test_runner.PacketTests testMethod=test_receiver_retains_exact_result_through_check_and_releases_between_trials>
+
+    def test_receiver_retains_exact_result_through_check_and_releases_between_trials(self):
+        class Graph: pass
+        references = []
+        witnesses = []
+        events = []
+        def reader(t, p, n):
+            if references:
+                self.assertIsNone(references[-1]())
+            graph, witness = Graph(), object()
+            references.append(weakref.ref(graph)); witnesses.append(witness)
+            events.append(('read', t, p, n))
+            return (graph, {}, (), witness, {}, {})
+        def check(witness):
+            self.assertIs(witness, witnesses[-1])
+            self.assertIsNotNone(references[-1]())
+            events.append(('final', witness))
+        runtime = types.SimpleNamespace(_read_prepared_target_object=reader, _check_file_witness=check)
+        records = []
+        target, preparation, namespace = {}, {}, {}
+>       r.receiver(runtime, target, preparation, namespace, records.append,
+        ^^^^^^^^^^
+                   observer_factory=lambda: r.NullSyntheticObserver())
+E       AttributeError: module 'measurement278' has no attribute 'receiver'
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/test_runner.py:54: AttributeError
+_____________ PacketTests.test_unbound_dryrun_has_no_native_import _____________
+
+self = <Deception-Circuit._claude.worktrees.specificity-ladder._superpowers.sdd.plan-a3.prepared-resource-runner278.test_runner.PacketTests testMethod=test_unbound_dryrun_has_no_native_import>
+
+    def test_unbound_dryrun_has_no_native_import(self):
+>       value = r.describe()
+                ^^^^^^^^^^
+E       AttributeError: module 'measurement278' has no attribute 'describe'
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/test_runner.py:19: AttributeError
+=========================== short test summary info ============================
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/test_runner.py::PacketTests::test_actual_profile_detects_reads_hash_parse_freeze_and_extra_read
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/test_runner.py::PacketTests::test_failure_is_emitted_and_reraised
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/test_runner.py::PacketTests::test_producer_calls_native_with_exact_objects_and_selected_none
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/test_runner.py::PacketTests::test_receiver_retains_exact_result_through_check_and_releases_between_trials
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/test_runner.py::PacketTests::test_unbound_dryrun_has_no_native_import
+5 failed in 0.11s

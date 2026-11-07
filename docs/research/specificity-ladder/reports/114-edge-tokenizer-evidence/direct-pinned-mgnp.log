@@ -1,0 +1,266 @@
+{
+  "python": "/u/swong2/.conda/envs/mgnp/bin/python",
+  "model": "meta-llama/Llama-3.1-8B-Instruct",
+  "revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+  "canonical_identity": {
+    "tokenizer": "meta-llama/Llama-3.1-8B-Instruct",
+    "tokenizer_revision": "0e9e39f249a16976918f6564b8830bc894c89659"
+  },
+  "snapshot": "/work/nvme/beto/swong2/hub/models--meta-llama--Llama-3.1-8B-Instruct/snapshots/0e9e39f249a16976918f6564b8830bc894c89659",
+  "loading": {
+    "actual_load_path": "meta-llama/Llama-3.1-8B-Instruct",
+    "resolved_snapshot": "/work/nvme/beto/swong2/hub/models--meta-llama--Llama-3.1-8B-Instruct/snapshots/0e9e39f249a16976918f6564b8830bc894c89659",
+    "logical_identifier": "meta-llama/Llama-3.1-8B-Instruct",
+    "identity_normalized": false,
+    "compatibility_reason": null,
+    "tokenizer_config_sha256": "177c7b61e616fecb84c17ce0591acb92c6c4d60e9ac5ababfb940ff23bbcd424"
+  },
+  "raw_pad_token": null,
+  "canonical_pad_token": "<|eot_id|>",
+  "source_prompt_checks": [
+    {
+      "task": "far_v2",
+      "condition": "D",
+      "stream": "clean",
+      "instance_id": "0014c23b0281",
+      "token_count": 96,
+      "prompt_sha256": "4fa7e8a82bcbf5f6300ed936e0fecd0c6b6fa064957f71ffb8eee6173ff07446"
+    },
+    {
+      "task": "far_v2",
+      "condition": "D",
+      "stream": "corrupt",
+      "instance_id": "0014c23b0281",
+      "token_count": 96,
+      "prompt_sha256": "f03583d24529361483193096c9d8bae4bb0acecf59bd4f9f0e38f35176d7f303"
+    },
+    {
+      "task": "far_v2",
+      "condition": "H",
+      "stream": "clean",
+      "instance_id": "0014c23b0281",
+      "token_count": 96,
+      "prompt_sha256": "99691b528cfd867da0b088a641e757dec33c826a3646508bff02ae2195e4cb8b"
+    },
+    {
+      "task": "far_v2",
+      "condition": "H",
+      "stream": "corrupt",
+      "instance_id": "0014c23b0281",
+      "token_count": 96,
+      "prompt_sha256": "d97842f18b142ead6bf0a717c4134ab7e1c48d9c80e9871e2499a4140c07c66c"
+    },
+    {
+      "task": "far_v2",
+      "condition": "F",
+      "stream": "clean",
+      "instance_id": "0014c23b0281",
+      "token_count": 85,
+      "prompt_sha256": "756cf2c16973f12624525e4832ede5f936ac970fd3b2225a666a11db8d6a54b7"
+    },
+    {
+      "task": "far_v2",
+      "condition": "F",
+      "stream": "corrupt",
+      "instance_id": "0014c23b0281",
+      "token_count": 85,
+      "prompt_sha256": "25612baf0f66211dec7205a5ce68d185fc6e0270cd4b552a3132bfd5aa8680c6"
+    },
+    {
+      "task": "far_v2",
+      "condition": "I",
+      "stream": "clean",
+      "instance_id": "0014c828a92b",
+      "token_count": 118,
+      "prompt_sha256": "9168d68081b9204c2f0abddad9c0ced67a3bdc889f7a9583e1b6c8b50c641bbb"
+    },
+    {
+      "task": "far_v2",
+      "condition": "I",
+      "stream": "corrupt",
+      "instance_id": "0014c828a92b",
+      "token_count": 118,
+      "prompt_sha256": "2fdf1abbfe1d263a2c189f67c9f3d1d3e2a7aa14281164a79fe6c816e202ec9e"
+    },
+    {
+      "task": "far_v2",
+      "condition": "user_neutral",
+      "stream": "clean",
+      "instance_id": "0014c828a92b",
+      "token_count": 118,
+      "prompt_sha256": "4b5c36c4f3f4958fbbffe78bcef0aadf45fdf06f815ee28c66c4c72ed5504a26"
+    },
+    {
+      "task": "far_v2",
+      "condition": "user_neutral",
+      "stream": "corrupt",
+      "instance_id": "0014c828a92b",
+      "token_count": 118,
+      "prompt_sha256": "3022ed6113a26c50af4ffd787a98fea24273af3b212d538246812c1d3105572f"
+    },
+    {
+      "task": "sdr_v2",
+      "condition": "D",
+      "stream": "clean",
+      "instance_id": "0026e00f5c80",
+      "token_count": 101,
+      "prompt_sha256": "5ee60f2bf7b81da3d607a7022ee3453be1b9ff0ea92e1c5d7dd24b2837b1295f"
+    },
+    {
+      "task": "sdr_v2",
+      "condition": "D",
+      "stream": "corrupt",
+      "instance_id": "0026e00f5c80",
+      "token_count": 101,
+      "prompt_sha256": "5216328dea1f3565eeff6a4e6a52a268f2babeb9828dae9b584bbbdee95ddc7b"
+    },
+    {
+      "task": "sdr_v2",
+      "condition": "H",
+      "stream": "clean",
+      "instance_id": "0026e00f5c80",
+      "token_count": 101,
+      "prompt_sha256": "80e9e329bafbe543b7fe9eaf7552d288645ffeb9345f3b3e1277edf0a7ac905a"
+    },
+    {
+      "task": "sdr_v2",
+      "condition": "H",
+      "stream": "corrupt",
+      "instance_id": "0026e00f5c80",
+      "token_count": 101,
+      "prompt_sha256": "bc48a120b0fa06f94582c18f97e266e6684041084b5e12059c97ebb8c1d77ba5"
+    },
+    {
+      "task": "sdr_v2",
+      "condition": "F",
+      "stream": "clean",
+      "instance_id": "0026e00f5c80",
+      "token_count": 88,
+      "prompt_sha256": "c0d914bc7af40558fb9db478ca1739d348e24d9c63325b544249fa632c408540"
+    },
+    {
+      "task": "sdr_v2",
+      "condition": "F",
+      "stream": "corrupt",
+      "instance_id": "0026e00f5c80",
+      "token_count": 88,
+      "prompt_sha256": "cea7cb4f92e7ec9c15811d444177e28c515e45663d1b8f0c672ab538b9763968"
+    },
+    {
+      "task": "sdr_v2",
+      "condition": "I",
+      "stream": "clean",
+      "instance_id": "0026e00f5c80",
+      "token_count": 134,
+      "prompt_sha256": "f1ce526fa1533378a1da15265390257bdba4fb5865f6cdb7856d1e45da56c8d6"
+    },
+    {
+      "task": "sdr_v2",
+      "condition": "I",
+      "stream": "corrupt",
+      "instance_id": "0026e00f5c80",
+      "token_count": 134,
+      "prompt_sha256": "152fae4b64775511b16b50ee78ccced8935538b5eb142222f6059bd9877d0f36"
+    },
+    {
+      "task": "sdr_v2",
+      "condition": "user_neutral",
+      "stream": "clean",
+      "instance_id": "0026e00f5c80",
+      "token_count": 134,
+      "prompt_sha256": "e420a0ceddb81d4ffeeb9601c750941afc652724707d54f38e3dee215fdb558d"
+    },
+    {
+      "task": "sdr_v2",
+      "condition": "user_neutral",
+      "stream": "corrupt",
+      "instance_id": "0026e00f5c80",
+      "token_count": 134,
+      "prompt_sha256": "730d5bc843c4f567ed2902a692dd000c1f53d7801da64c111589e8ea1237e9bd"
+    },
+    {
+      "task": "ser_v2",
+      "condition": "D",
+      "stream": "clean",
+      "instance_id": "0014c23b0281",
+      "token_count": 101,
+      "prompt_sha256": "719f5abea3dc4834f23d87efeaf8b9b5d53d3e2a4bed3e1f4dc26260717d121e"
+    },
+    {
+      "task": "ser_v2",
+      "condition": "D",
+      "stream": "corrupt",
+      "instance_id": "0014c23b0281",
+      "token_count": 101,
+      "prompt_sha256": "291ecba099b4234dd3460df2ce85f395d8cb1ecd179fa49414c59ebce9613875"
+    },
+    {
+      "task": "ser_v2",
+      "condition": "H",
+      "stream": "clean",
+      "instance_id": "0014c23b0281",
+      "token_count": 101,
+      "prompt_sha256": "0de5a1b3eed0e3f23b54e2b64e5935b7e176600119d9e6c7fbec68445866cb96"
+    },
+    {
+      "task": "ser_v2",
+      "condition": "H",
+      "stream": "corrupt",
+      "instance_id": "0014c23b0281",
+      "token_count": 101,
+      "prompt_sha256": "88a8957508b69f83f1d6312a5ea0067a918e10ca139ffa0b006ff06e50e2ee96"
+    },
+    {
+      "task": "ser_v2",
+      "condition": "F",
+      "stream": "clean",
+      "instance_id": "0014c23b0281",
+      "token_count": 88,
+      "prompt_sha256": "442ba8c977f06cead008b58d5e46b0b3905340b2d0f002eb9b549bce92eac9f7"
+    },
+    {
+      "task": "ser_v2",
+      "condition": "F",
+      "stream": "corrupt",
+      "instance_id": "0014c23b0281",
+      "token_count": 88,
+      "prompt_sha256": "2e59fa4dd083eb077a69cdb2ef3dbe179e6a1cdad41925865773ce9bb917a55c"
+    },
+    {
+      "task": "ser_v2",
+      "condition": "I",
+      "stream": "clean",
+      "instance_id": "0014c23b0281",
+      "token_count": 127,
+      "prompt_sha256": "b1c84d42fd49522b6c303974feea60cb1c7c534bb9180b0e2b3401b0631c9e5f"
+    },
+    {
+      "task": "ser_v2",
+      "condition": "I",
+      "stream": "corrupt",
+      "instance_id": "0014c23b0281",
+      "token_count": 127,
+      "prompt_sha256": "5cce03a4f0b1f4c8cd52733e35f27b158399f188c0a77da1124149be044e7ddf"
+    },
+    {
+      "task": "ser_v2",
+      "condition": "user_neutral",
+      "stream": "clean",
+      "instance_id": "0014c23b0281",
+      "token_count": 127,
+      "prompt_sha256": "1180225e5eb787d0092ddce9dac24c7a62959fccb2b225709328ae5ef646c1fb"
+    },
+    {
+      "task": "ser_v2",
+      "condition": "user_neutral",
+      "stream": "corrupt",
+      "instance_id": "0014c23b0281",
+      "token_count": 127,
+      "prompt_sha256": "79a84efd3995d2fff8d9abf54bcb1f07e420af1a1307dd8c0c3e159ee526cb2f"
+    }
+  ],
+  "source_prompt_check_count": 30,
+  "raw_rejection": "production tokenizer configuration differs from pinned standard",
+  "negative_rejection": "production tokenizer configuration differs from pinned standard",
+  "elapsed_seconds": 10.518226623535156
+}

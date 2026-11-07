@@ -1,0 +1,42 @@
+{
+  "status": "BLOCKED_ACTUAL_GREEN_WORK_ELIMINATION_FAILURE_PENDING_NARROW_FIX",
+  "baseline_commit": "861f84a3938a5e22fa329af0c469b2dd812fe68a",
+  "baseline_runtime": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime",
+  "candidate": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-candidate",
+  "source_file_count": 511,
+  "changed_files": {
+    "component_analysis/a3_direction_workload.py": {
+      "baseline": "1b0f6110a39b5d50342b95fe7ee2d6b643fce20feb2ae4448403c1bc8c52d1b3",
+      "candidate": "9a615f1966a5170b8210f04000d7c6c014d2c776595be74cb302e818ec45cc0c"
+    },
+    "tests/test_a3_direction_workload.py": {
+      "baseline": "24452305cf2073d28f8c76a3cdfb755d511e07ffc25c1d5669dee7cd346ed6ff",
+      "candidate": "5909c397af905a2ae1e790e67089e14ef1116cde0eade9cb92fd2db5f6399845"
+    }
+  },
+  "modified_top_level_functions": [
+    "derive_storage_requirements",
+    "build_inventory"
+  ],
+  "unchanged_digest_source_rows_validate_inventory": true,
+  "runtime_whole_file_unchanged": true,
+  "GREEN_job_id": "23489584",
+  "GREEN_mgnp_pytest_exit": 1,
+  "GREEN_failed_calls": [
+    "test_option_a_never_copies_target_only_rows_for_lengths"
+  ],
+  "GREEN_elapsed_seconds": 523.0352631799997,
+  "GREEN_raw_result_sha256": "af9770c3b0c808564a84d47be3160b903fcdc202125322da7fc3b71cda295402",
+  "capture_remaining_copies_basis": {
+    "tasks": 3,
+    "train_conditions": 4,
+    "streams": 2,
+    "train_IDs": 2,
+    "copies": 48,
+    "path": "build_inventory fit-select -> capture(train=True) -> execution=input_scope(...) -> deepcopy(row), then retain execution_ids/dummy_sources only"
+  },
+  "scoped_fix_accepted": "Private retain_records=False only for discarded capture execution metadata; timing_inputs defaults retain_records=True with independent deepcopy. Preserve dummy source/alias digests, readout/length checks and wholeoutputs. No public API/runtime/guard changes.",
+  "no_performance_or_genuine_equivalence_claim": true,
+  "no_models_or_local_scientific_tests_run": true,
+  "author_report_not_read": true
+}

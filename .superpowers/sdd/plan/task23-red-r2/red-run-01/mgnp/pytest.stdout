@@ -1,0 +1,1216 @@
+.......................................................FFFFFFFFFFFFFFFFF [ 52%]
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF        [100%]
+=================================== FAILURES ===================================
+__ test_prepared_cpu_producer_uses_exact_builder_contract[prefit-fit-select] ___
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_cpu_producer_use0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffe0e79b0>
+part = 'prefit', stage = 'fit-select'
+
+    @pytest.mark.parametrize('part,stage', [('prefit', 'fit-select'), ('selected', 'remaining')])
+    def test_prepared_cpu_producer_uses_exact_builder_contract(tmp_path, monkeypatch, part, stage):
+>       r = runtime(); producer = r.prepare_pilot_target
+                                  ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute 'prepare_pilot_target'
+
+suite/test_a3_prepared_pilot_target.py:371: AttributeError
+__ test_prepared_cpu_producer_uses_exact_builder_contract[selected-remaining] __
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_cpu_producer_use1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffdd51400>
+part = 'selected', stage = 'remaining'
+
+    @pytest.mark.parametrize('part,stage', [('prefit', 'fit-select'), ('selected', 'remaining')])
+    def test_prepared_cpu_producer_uses_exact_builder_contract(tmp_path, monkeypatch, part, stage):
+>       r = runtime(); producer = r.prepare_pilot_target
+                                  ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute 'prepare_pilot_target'
+
+suite/test_a3_prepared_pilot_target.py:371: AttributeError
+__________ test_prepared_cpu_failure_never_certifies[partial-target] ___________
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_cpu_failure_neve0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffdc40a40>
+failure = 'partial-target'
+
+    @pytest.mark.parametrize('failure', ['partial-target', 'source-change', 'post-guard', 'wrong-summary', 'missing-selected-backing'])
+    def test_prepared_cpu_failure_never_certifies(tmp_path, monkeypatch, failure):
+>       r = runtime(); producer = r.prepare_pilot_target
+                                  ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute 'prepare_pilot_target'
+
+suite/test_a3_prepared_pilot_target.py:408: AttributeError
+___________ test_prepared_cpu_failure_never_certifies[source-change] ___________
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_cpu_failure_neve1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffd8a3e30>
+failure = 'source-change'
+
+    @pytest.mark.parametrize('failure', ['partial-target', 'source-change', 'post-guard', 'wrong-summary', 'missing-selected-backing'])
+    def test_prepared_cpu_failure_never_certifies(tmp_path, monkeypatch, failure):
+>       r = runtime(); producer = r.prepare_pilot_target
+                                  ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute 'prepare_pilot_target'
+
+suite/test_a3_prepared_pilot_target.py:408: AttributeError
+____________ test_prepared_cpu_failure_never_certifies[post-guard] _____________
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_cpu_failure_neve2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ff8e98c50>
+failure = 'post-guard'
+
+    @pytest.mark.parametrize('failure', ['partial-target', 'source-change', 'post-guard', 'wrong-summary', 'missing-selected-backing'])
+    def test_prepared_cpu_failure_never_certifies(tmp_path, monkeypatch, failure):
+>       r = runtime(); producer = r.prepare_pilot_target
+                                  ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute 'prepare_pilot_target'
+
+suite/test_a3_prepared_pilot_target.py:408: AttributeError
+___________ test_prepared_cpu_failure_never_certifies[wrong-summary] ___________
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_cpu_failure_neve3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ff8e988c0>
+failure = 'wrong-summary'
+
+    @pytest.mark.parametrize('failure', ['partial-target', 'source-change', 'post-guard', 'wrong-summary', 'missing-selected-backing'])
+    def test_prepared_cpu_failure_never_certifies(tmp_path, monkeypatch, failure):
+>       r = runtime(); producer = r.prepare_pilot_target
+                                  ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute 'prepare_pilot_target'
+
+suite/test_a3_prepared_pilot_target.py:408: AttributeError
+_____ test_prepared_cpu_failure_never_certifies[missing-selected-backing] ______
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_cpu_failure_neve4')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ff8e995e0>
+failure = 'missing-selected-backing'
+
+    @pytest.mark.parametrize('failure', ['partial-target', 'source-change', 'post-guard', 'wrong-summary', 'missing-selected-backing'])
+    def test_prepared_cpu_failure_never_certifies(tmp_path, monkeypatch, failure):
+>       r = runtime(); producer = r.prepare_pilot_target
+                                  ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute 'prepare_pilot_target'
+
+suite/test_a3_prepared_pilot_target.py:408: AttributeError
+___________ test_prepared_admission_anchor_is_required[caller-flag] ____________
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_admission_anchor0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ff8e98440>
+damage = 'caller-flag'
+
+    @pytest.mark.parametrize('damage', ['caller-flag', 'descriptor-as-reservation', 'resource-as-reservation',
+        'unanchored', 'source', 'part', 'pilot', 'selection', 'work-dir', 'fake-seal'])
+    def test_prepared_admission_anchor_is_required(tmp_path, monkeypatch, damage):
+>       r = runtime(); load = r.load_prepared_pilot_target
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute 'load_prepared_pilot_target'
+
+suite/test_a3_prepared_pilot_target.py:443: AttributeError
+____ test_prepared_admission_anchor_is_required[descriptor-as-reservation] _____
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_admission_anchor1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ff8e9bec0>
+damage = 'descriptor-as-reservation'
+
+    @pytest.mark.parametrize('damage', ['caller-flag', 'descriptor-as-reservation', 'resource-as-reservation',
+        'unanchored', 'source', 'part', 'pilot', 'selection', 'work-dir', 'fake-seal'])
+    def test_prepared_admission_anchor_is_required(tmp_path, monkeypatch, damage):
+>       r = runtime(); load = r.load_prepared_pilot_target
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute 'load_prepared_pilot_target'
+
+suite/test_a3_prepared_pilot_target.py:443: AttributeError
+_____ test_prepared_admission_anchor_is_required[resource-as-reservation] ______
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_admission_anchor2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ff8e9b830>
+damage = 'resource-as-reservation'
+
+    @pytest.mark.parametrize('damage', ['caller-flag', 'descriptor-as-reservation', 'resource-as-reservation',
+        'unanchored', 'source', 'part', 'pilot', 'selection', 'work-dir', 'fake-seal'])
+    def test_prepared_admission_anchor_is_required(tmp_path, monkeypatch, damage):
+>       r = runtime(); load = r.load_prepared_pilot_target
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute 'load_prepared_pilot_target'
+
+suite/test_a3_prepared_pilot_target.py:443: AttributeError
+____________ test_prepared_admission_anchor_is_required[unanchored] ____________
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_admission_anchor3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ff8e9afc0>
+damage = 'unanchored'
+
+    @pytest.mark.parametrize('damage', ['caller-flag', 'descriptor-as-reservation', 'resource-as-reservation',
+        'unanchored', 'source', 'part', 'pilot', 'selection', 'work-dir', 'fake-seal'])
+    def test_prepared_admission_anchor_is_required(tmp_path, monkeypatch, damage):
+>       r = runtime(); load = r.load_prepared_pilot_target
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute 'load_prepared_pilot_target'
+
+suite/test_a3_prepared_pilot_target.py:443: AttributeError
+______________ test_prepared_admission_anchor_is_required[source] ______________
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_admission_anchor4')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffce89ac0>
+damage = 'source'
+
+    @pytest.mark.parametrize('damage', ['caller-flag', 'descriptor-as-reservation', 'resource-as-reservation',
+        'unanchored', 'source', 'part', 'pilot', 'selection', 'work-dir', 'fake-seal'])
+    def test_prepared_admission_anchor_is_required(tmp_path, monkeypatch, damage):
+>       r = runtime(); load = r.load_prepared_pilot_target
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute 'load_prepared_pilot_target'
+
+suite/test_a3_prepared_pilot_target.py:443: AttributeError
+_______________ test_prepared_admission_anchor_is_required[part] _______________
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_admission_anchor5')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffce8b260>
+damage = 'part'
+
+    @pytest.mark.parametrize('damage', ['caller-flag', 'descriptor-as-reservation', 'resource-as-reservation',
+        'unanchored', 'source', 'part', 'pilot', 'selection', 'work-dir', 'fake-seal'])
+    def test_prepared_admission_anchor_is_required(tmp_path, monkeypatch, damage):
+>       r = runtime(); load = r.load_prepared_pilot_target
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute 'load_prepared_pilot_target'
+
+suite/test_a3_prepared_pilot_target.py:443: AttributeError
+______________ test_prepared_admission_anchor_is_required[pilot] _______________
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_admission_anchor6')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffce8a270>
+damage = 'pilot'
+
+    @pytest.mark.parametrize('damage', ['caller-flag', 'descriptor-as-reservation', 'resource-as-reservation',
+        'unanchored', 'source', 'part', 'pilot', 'selection', 'work-dir', 'fake-seal'])
+    def test_prepared_admission_anchor_is_required(tmp_path, monkeypatch, damage):
+>       r = runtime(); load = r.load_prepared_pilot_target
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute 'load_prepared_pilot_target'
+
+suite/test_a3_prepared_pilot_target.py:443: AttributeError
+____________ test_prepared_admission_anchor_is_required[selection] _____________
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_admission_anchor7')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffce8bbf0>
+damage = 'selection'
+
+    @pytest.mark.parametrize('damage', ['caller-flag', 'descriptor-as-reservation', 'resource-as-reservation',
+        'unanchored', 'source', 'part', 'pilot', 'selection', 'work-dir', 'fake-seal'])
+    def test_prepared_admission_anchor_is_required(tmp_path, monkeypatch, damage):
+>       r = runtime(); load = r.load_prepared_pilot_target
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute 'load_prepared_pilot_target'
+
+suite/test_a3_prepared_pilot_target.py:443: AttributeError
+_____________ test_prepared_admission_anchor_is_required[work-dir] _____________
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_admission_anchor8')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffe217f80>
+damage = 'work-dir'
+
+    @pytest.mark.parametrize('damage', ['caller-flag', 'descriptor-as-reservation', 'resource-as-reservation',
+        'unanchored', 'source', 'part', 'pilot', 'selection', 'work-dir', 'fake-seal'])
+    def test_prepared_admission_anchor_is_required(tmp_path, monkeypatch, damage):
+>       r = runtime(); load = r.load_prepared_pilot_target
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute 'load_prepared_pilot_target'
+
+suite/test_a3_prepared_pilot_target.py:443: AttributeError
+____________ test_prepared_admission_anchor_is_required[fake-seal] _____________
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_admission_anchor9')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ff8e9a0f0>
+damage = 'fake-seal'
+
+    @pytest.mark.parametrize('damage', ['caller-flag', 'descriptor-as-reservation', 'resource-as-reservation',
+        'unanchored', 'source', 'part', 'pilot', 'selection', 'work-dir', 'fake-seal'])
+    def test_prepared_admission_anchor_is_required(tmp_path, monkeypatch, damage):
+>       r = runtime(); load = r.load_prepared_pilot_target
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute 'load_prepared_pilot_target'
+
+suite/test_a3_prepared_pilot_target.py:443: AttributeError
+_____________ test_prepared_handle_is_one_graph[equal-graph-copy] ______________
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_handle_is_one_gr0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ff8e98080>
+damage = 'equal-graph-copy'
+
+    @pytest.mark.parametrize('damage', ['equal-graph-copy', 'equal-requirement-copy', 'wrong-pid', 'wrong-context', 'wrong-part', 'reinitialize', 'pickle', 'fork'])
+    def test_prepared_handle_is_one_graph(tmp_path, monkeypatch, damage):
+        import pickle
+>       r = runtime(); load = r.load_prepared_pilot_target
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute 'load_prepared_pilot_target'
+
+suite/test_a3_prepared_pilot_target.py:471: AttributeError
+__________ test_prepared_handle_is_one_graph[equal-requirement-copy] ___________
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_handle_is_one_gr1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ff8e9a4b0>
+damage = 'equal-requirement-copy'
+
+    @pytest.mark.parametrize('damage', ['equal-graph-copy', 'equal-requirement-copy', 'wrong-pid', 'wrong-context', 'wrong-part', 'reinitialize', 'pickle', 'fork'])
+    def test_prepared_handle_is_one_graph(tmp_path, monkeypatch, damage):
+        import pickle
+>       r = runtime(); load = r.load_prepared_pilot_target
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute 'load_prepared_pilot_target'
+
+suite/test_a3_prepared_pilot_target.py:471: AttributeError
+_________________ test_prepared_handle_is_one_graph[wrong-pid] _________________
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_handle_is_one_gr2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ff8e99f10>
+damage = 'wrong-pid'
+
+    @pytest.mark.parametrize('damage', ['equal-graph-copy', 'equal-requirement-copy', 'wrong-pid', 'wrong-context', 'wrong-part', 'reinitialize', 'pickle', 'fork'])
+    def test_prepared_handle_is_one_graph(tmp_path, monkeypatch, damage):
+        import pickle
+>       r = runtime(); load = r.load_prepared_pilot_target
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute 'load_prepared_pilot_target'
+
+suite/test_a3_prepared_pilot_target.py:471: AttributeError
+_______________ test_prepared_handle_is_one_graph[wrong-context] _______________
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_handle_is_one_gr3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffce89e50>
+damage = 'wrong-context'
+
+    @pytest.mark.parametrize('damage', ['equal-graph-copy', 'equal-requirement-copy', 'wrong-pid', 'wrong-context', 'wrong-part', 'reinitialize', 'pickle', 'fork'])
+    def test_prepared_handle_is_one_graph(tmp_path, monkeypatch, damage):
+        import pickle
+>       r = runtime(); load = r.load_prepared_pilot_target
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute 'load_prepared_pilot_target'
+
+suite/test_a3_prepared_pilot_target.py:471: AttributeError
+________________ test_prepared_handle_is_one_graph[wrong-part] _________________
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_handle_is_one_gr4')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffce88890>
+damage = 'wrong-part'
+
+    @pytest.mark.parametrize('damage', ['equal-graph-copy', 'equal-requirement-copy', 'wrong-pid', 'wrong-context', 'wrong-part', 'reinitialize', 'pickle', 'fork'])
+    def test_prepared_handle_is_one_graph(tmp_path, monkeypatch, damage):
+        import pickle
+>       r = runtime(); load = r.load_prepared_pilot_target
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute 'load_prepared_pilot_target'
+
+suite/test_a3_prepared_pilot_target.py:471: AttributeError
+_______________ test_prepared_handle_is_one_graph[reinitialize] ________________
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_handle_is_one_gr5')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffce8ae70>
+damage = 'reinitialize'
+
+    @pytest.mark.parametrize('damage', ['equal-graph-copy', 'equal-requirement-copy', 'wrong-pid', 'wrong-context', 'wrong-part', 'reinitialize', 'pickle', 'fork'])
+    def test_prepared_handle_is_one_graph(tmp_path, monkeypatch, damage):
+        import pickle
+>       r = runtime(); load = r.load_prepared_pilot_target
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute 'load_prepared_pilot_target'
+
+suite/test_a3_prepared_pilot_target.py:471: AttributeError
+__________________ test_prepared_handle_is_one_graph[pickle] ___________________
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_handle_is_one_gr6')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffce8bad0>
+damage = 'pickle'
+
+    @pytest.mark.parametrize('damage', ['equal-graph-copy', 'equal-requirement-copy', 'wrong-pid', 'wrong-context', 'wrong-part', 'reinitialize', 'pickle', 'fork'])
+    def test_prepared_handle_is_one_graph(tmp_path, monkeypatch, damage):
+        import pickle
+>       r = runtime(); load = r.load_prepared_pilot_target
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute 'load_prepared_pilot_target'
+
+suite/test_a3_prepared_pilot_target.py:471: AttributeError
+___________________ test_prepared_handle_is_one_graph[fork] ____________________
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_handle_is_one_gr7')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffce892e0>
+damage = 'fork'
+
+    @pytest.mark.parametrize('damage', ['equal-graph-copy', 'equal-requirement-copy', 'wrong-pid', 'wrong-context', 'wrong-part', 'reinitialize', 'pickle', 'fork'])
+    def test_prepared_handle_is_one_graph(tmp_path, monkeypatch, damage):
+        import pickle
+>       r = runtime(); load = r.load_prepared_pilot_target
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute 'load_prepared_pilot_target'
+
+suite/test_a3_prepared_pilot_target.py:471: AttributeError
+_____ test_prepared_receiver_resource_identity_and_capacity[None-100-True] _____
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_receiver_resourc0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffd152570>
+capacity = 100, accepts = True, identity_damage = None
+
+    @pytest.mark.parametrize('capacity,accepts', [(100, True), (99, False)])
+    @pytest.mark.parametrize('identity_damage', [None, 'missing', 'target', 'preparation', 'reader-code', 'freeze-code', 'source', 'environment', 'recipe', 'scope', 'storage-family'])
+    def test_prepared_receiver_resource_identity_and_capacity(tmp_path, monkeypatch, capacity, accepts, identity_damage):
+>       r = runtime(); validate = r._validate_prepared_receiver_resources
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_validate_prepared_receiver_resources'
+
+suite/test_a3_prepared_pilot_target.py:512: AttributeError
+_____ test_prepared_receiver_resource_identity_and_capacity[None-99-False] _____
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_receiver_resourc1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffd1501a0>
+capacity = 99, accepts = False, identity_damage = None
+
+    @pytest.mark.parametrize('capacity,accepts', [(100, True), (99, False)])
+    @pytest.mark.parametrize('identity_damage', [None, 'missing', 'target', 'preparation', 'reader-code', 'freeze-code', 'source', 'environment', 'recipe', 'scope', 'storage-family'])
+    def test_prepared_receiver_resource_identity_and_capacity(tmp_path, monkeypatch, capacity, accepts, identity_damage):
+>       r = runtime(); validate = r._validate_prepared_receiver_resources
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_validate_prepared_receiver_resources'
+
+suite/test_a3_prepared_pilot_target.py:512: AttributeError
+___ test_prepared_receiver_resource_identity_and_capacity[missing-100-True] ____
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_receiver_resourc2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffce8a000>
+capacity = 100, accepts = True, identity_damage = 'missing'
+
+    @pytest.mark.parametrize('capacity,accepts', [(100, True), (99, False)])
+    @pytest.mark.parametrize('identity_damage', [None, 'missing', 'target', 'preparation', 'reader-code', 'freeze-code', 'source', 'environment', 'recipe', 'scope', 'storage-family'])
+    def test_prepared_receiver_resource_identity_and_capacity(tmp_path, monkeypatch, capacity, accepts, identity_damage):
+>       r = runtime(); validate = r._validate_prepared_receiver_resources
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_validate_prepared_receiver_resources'
+
+suite/test_a3_prepared_pilot_target.py:512: AttributeError
+___ test_prepared_receiver_resource_identity_and_capacity[missing-99-False] ____
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_receiver_resourc3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffce89ac0>
+capacity = 99, accepts = False, identity_damage = 'missing'
+
+    @pytest.mark.parametrize('capacity,accepts', [(100, True), (99, False)])
+    @pytest.mark.parametrize('identity_damage', [None, 'missing', 'target', 'preparation', 'reader-code', 'freeze-code', 'source', 'environment', 'recipe', 'scope', 'storage-family'])
+    def test_prepared_receiver_resource_identity_and_capacity(tmp_path, monkeypatch, capacity, accepts, identity_damage):
+>       r = runtime(); validate = r._validate_prepared_receiver_resources
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_validate_prepared_receiver_resources'
+
+suite/test_a3_prepared_pilot_target.py:512: AttributeError
+____ test_prepared_receiver_resource_identity_and_capacity[target-100-True] ____
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_receiver_resourc4')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffce888c0>
+capacity = 100, accepts = True, identity_damage = 'target'
+
+    @pytest.mark.parametrize('capacity,accepts', [(100, True), (99, False)])
+    @pytest.mark.parametrize('identity_damage', [None, 'missing', 'target', 'preparation', 'reader-code', 'freeze-code', 'source', 'environment', 'recipe', 'scope', 'storage-family'])
+    def test_prepared_receiver_resource_identity_and_capacity(tmp_path, monkeypatch, capacity, accepts, identity_damage):
+>       r = runtime(); validate = r._validate_prepared_receiver_resources
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_validate_prepared_receiver_resources'
+
+suite/test_a3_prepared_pilot_target.py:512: AttributeError
+____ test_prepared_receiver_resource_identity_and_capacity[target-99-False] ____
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_receiver_resourc5')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ff8e9aed0>
+capacity = 99, accepts = False, identity_damage = 'target'
+
+    @pytest.mark.parametrize('capacity,accepts', [(100, True), (99, False)])
+    @pytest.mark.parametrize('identity_damage', [None, 'missing', 'target', 'preparation', 'reader-code', 'freeze-code', 'source', 'environment', 'recipe', 'scope', 'storage-family'])
+    def test_prepared_receiver_resource_identity_and_capacity(tmp_path, monkeypatch, capacity, accepts, identity_damage):
+>       r = runtime(); validate = r._validate_prepared_receiver_resources
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_validate_prepared_receiver_resources'
+
+suite/test_a3_prepared_pilot_target.py:512: AttributeError
+_ test_prepared_receiver_resource_identity_and_capacity[preparation-100-True] __
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_receiver_resourc6')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ff8e9ab10>
+capacity = 100, accepts = True, identity_damage = 'preparation'
+
+    @pytest.mark.parametrize('capacity,accepts', [(100, True), (99, False)])
+    @pytest.mark.parametrize('identity_damage', [None, 'missing', 'target', 'preparation', 'reader-code', 'freeze-code', 'source', 'environment', 'recipe', 'scope', 'storage-family'])
+    def test_prepared_receiver_resource_identity_and_capacity(tmp_path, monkeypatch, capacity, accepts, identity_damage):
+>       r = runtime(); validate = r._validate_prepared_receiver_resources
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_validate_prepared_receiver_resources'
+
+suite/test_a3_prepared_pilot_target.py:512: AttributeError
+_ test_prepared_receiver_resource_identity_and_capacity[preparation-99-False] __
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_receiver_resourc7')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ff8e9b800>
+capacity = 99, accepts = False, identity_damage = 'preparation'
+
+    @pytest.mark.parametrize('capacity,accepts', [(100, True), (99, False)])
+    @pytest.mark.parametrize('identity_damage', [None, 'missing', 'target', 'preparation', 'reader-code', 'freeze-code', 'source', 'environment', 'recipe', 'scope', 'storage-family'])
+    def test_prepared_receiver_resource_identity_and_capacity(tmp_path, monkeypatch, capacity, accepts, identity_damage):
+>       r = runtime(); validate = r._validate_prepared_receiver_resources
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_validate_prepared_receiver_resources'
+
+suite/test_a3_prepared_pilot_target.py:512: AttributeError
+_ test_prepared_receiver_resource_identity_and_capacity[reader-code-100-True] __
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_receiver_resourc8')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffd150470>
+capacity = 100, accepts = True, identity_damage = 'reader-code'
+
+    @pytest.mark.parametrize('capacity,accepts', [(100, True), (99, False)])
+    @pytest.mark.parametrize('identity_damage', [None, 'missing', 'target', 'preparation', 'reader-code', 'freeze-code', 'source', 'environment', 'recipe', 'scope', 'storage-family'])
+    def test_prepared_receiver_resource_identity_and_capacity(tmp_path, monkeypatch, capacity, accepts, identity_damage):
+>       r = runtime(); validate = r._validate_prepared_receiver_resources
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_validate_prepared_receiver_resources'
+
+suite/test_a3_prepared_pilot_target.py:512: AttributeError
+_ test_prepared_receiver_resource_identity_and_capacity[reader-code-99-False] __
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_receiver_resourc9')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffd152e10>
+capacity = 99, accepts = False, identity_damage = 'reader-code'
+
+    @pytest.mark.parametrize('capacity,accepts', [(100, True), (99, False)])
+    @pytest.mark.parametrize('identity_damage', [None, 'missing', 'target', 'preparation', 'reader-code', 'freeze-code', 'source', 'environment', 'recipe', 'scope', 'storage-family'])
+    def test_prepared_receiver_resource_identity_and_capacity(tmp_path, monkeypatch, capacity, accepts, identity_damage):
+>       r = runtime(); validate = r._validate_prepared_receiver_resources
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_validate_prepared_receiver_resources'
+
+suite/test_a3_prepared_pilot_target.py:512: AttributeError
+_ test_prepared_receiver_resource_identity_and_capacity[freeze-code-100-True] __
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_receiver_resourc10')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffd151cd0>
+capacity = 100, accepts = True, identity_damage = 'freeze-code'
+
+    @pytest.mark.parametrize('capacity,accepts', [(100, True), (99, False)])
+    @pytest.mark.parametrize('identity_damage', [None, 'missing', 'target', 'preparation', 'reader-code', 'freeze-code', 'source', 'environment', 'recipe', 'scope', 'storage-family'])
+    def test_prepared_receiver_resource_identity_and_capacity(tmp_path, monkeypatch, capacity, accepts, identity_damage):
+>       r = runtime(); validate = r._validate_prepared_receiver_resources
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_validate_prepared_receiver_resources'
+
+suite/test_a3_prepared_pilot_target.py:512: AttributeError
+_ test_prepared_receiver_resource_identity_and_capacity[freeze-code-99-False] __
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_receiver_resourc11')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffd153c20>
+capacity = 99, accepts = False, identity_damage = 'freeze-code'
+
+    @pytest.mark.parametrize('capacity,accepts', [(100, True), (99, False)])
+    @pytest.mark.parametrize('identity_damage', [None, 'missing', 'target', 'preparation', 'reader-code', 'freeze-code', 'source', 'environment', 'recipe', 'scope', 'storage-family'])
+    def test_prepared_receiver_resource_identity_and_capacity(tmp_path, monkeypatch, capacity, accepts, identity_damage):
+>       r = runtime(); validate = r._validate_prepared_receiver_resources
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_validate_prepared_receiver_resources'
+
+suite/test_a3_prepared_pilot_target.py:512: AttributeError
+____ test_prepared_receiver_resource_identity_and_capacity[source-100-True] ____
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_receiver_resourc12')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffd152510>
+capacity = 100, accepts = True, identity_damage = 'source'
+
+    @pytest.mark.parametrize('capacity,accepts', [(100, True), (99, False)])
+    @pytest.mark.parametrize('identity_damage', [None, 'missing', 'target', 'preparation', 'reader-code', 'freeze-code', 'source', 'environment', 'recipe', 'scope', 'storage-family'])
+    def test_prepared_receiver_resource_identity_and_capacity(tmp_path, monkeypatch, capacity, accepts, identity_damage):
+>       r = runtime(); validate = r._validate_prepared_receiver_resources
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_validate_prepared_receiver_resources'
+
+suite/test_a3_prepared_pilot_target.py:512: AttributeError
+____ test_prepared_receiver_resource_identity_and_capacity[source-99-False] ____
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_receiver_resourc13')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffb611370>
+capacity = 99, accepts = False, identity_damage = 'source'
+
+    @pytest.mark.parametrize('capacity,accepts', [(100, True), (99, False)])
+    @pytest.mark.parametrize('identity_damage', [None, 'missing', 'target', 'preparation', 'reader-code', 'freeze-code', 'source', 'environment', 'recipe', 'scope', 'storage-family'])
+    def test_prepared_receiver_resource_identity_and_capacity(tmp_path, monkeypatch, capacity, accepts, identity_damage):
+>       r = runtime(); validate = r._validate_prepared_receiver_resources
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_validate_prepared_receiver_resources'
+
+suite/test_a3_prepared_pilot_target.py:512: AttributeError
+_ test_prepared_receiver_resource_identity_and_capacity[environment-100-True] __
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_receiver_resourc14')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffd152510>
+capacity = 100, accepts = True, identity_damage = 'environment'
+
+    @pytest.mark.parametrize('capacity,accepts', [(100, True), (99, False)])
+    @pytest.mark.parametrize('identity_damage', [None, 'missing', 'target', 'preparation', 'reader-code', 'freeze-code', 'source', 'environment', 'recipe', 'scope', 'storage-family'])
+    def test_prepared_receiver_resource_identity_and_capacity(tmp_path, monkeypatch, capacity, accepts, identity_damage):
+>       r = runtime(); validate = r._validate_prepared_receiver_resources
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_validate_prepared_receiver_resources'
+
+suite/test_a3_prepared_pilot_target.py:512: AttributeError
+_ test_prepared_receiver_resource_identity_and_capacity[environment-99-False] __
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_receiver_resourc15')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffd151280>
+capacity = 99, accepts = False, identity_damage = 'environment'
+
+    @pytest.mark.parametrize('capacity,accepts', [(100, True), (99, False)])
+    @pytest.mark.parametrize('identity_damage', [None, 'missing', 'target', 'preparation', 'reader-code', 'freeze-code', 'source', 'environment', 'recipe', 'scope', 'storage-family'])
+    def test_prepared_receiver_resource_identity_and_capacity(tmp_path, monkeypatch, capacity, accepts, identity_damage):
+>       r = runtime(); validate = r._validate_prepared_receiver_resources
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_validate_prepared_receiver_resources'
+
+suite/test_a3_prepared_pilot_target.py:512: AttributeError
+____ test_prepared_receiver_resource_identity_and_capacity[recipe-100-True] ____
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_receiver_resourc16')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffd150b00>
+capacity = 100, accepts = True, identity_damage = 'recipe'
+
+    @pytest.mark.parametrize('capacity,accepts', [(100, True), (99, False)])
+    @pytest.mark.parametrize('identity_damage', [None, 'missing', 'target', 'preparation', 'reader-code', 'freeze-code', 'source', 'environment', 'recipe', 'scope', 'storage-family'])
+    def test_prepared_receiver_resource_identity_and_capacity(tmp_path, monkeypatch, capacity, accepts, identity_damage):
+>       r = runtime(); validate = r._validate_prepared_receiver_resources
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_validate_prepared_receiver_resources'
+
+suite/test_a3_prepared_pilot_target.py:512: AttributeError
+____ test_prepared_receiver_resource_identity_and_capacity[recipe-99-False] ____
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_receiver_resourc17')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ff8e98d40>
+capacity = 99, accepts = False, identity_damage = 'recipe'
+
+    @pytest.mark.parametrize('capacity,accepts', [(100, True), (99, False)])
+    @pytest.mark.parametrize('identity_damage', [None, 'missing', 'target', 'preparation', 'reader-code', 'freeze-code', 'source', 'environment', 'recipe', 'scope', 'storage-family'])
+    def test_prepared_receiver_resource_identity_and_capacity(tmp_path, monkeypatch, capacity, accepts, identity_damage):
+>       r = runtime(); validate = r._validate_prepared_receiver_resources
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_validate_prepared_receiver_resources'
+
+suite/test_a3_prepared_pilot_target.py:512: AttributeError
+____ test_prepared_receiver_resource_identity_and_capacity[scope-100-True] _____
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_receiver_resourc18')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ff8e99160>
+capacity = 100, accepts = True, identity_damage = 'scope'
+
+    @pytest.mark.parametrize('capacity,accepts', [(100, True), (99, False)])
+    @pytest.mark.parametrize('identity_damage', [None, 'missing', 'target', 'preparation', 'reader-code', 'freeze-code', 'source', 'environment', 'recipe', 'scope', 'storage-family'])
+    def test_prepared_receiver_resource_identity_and_capacity(tmp_path, monkeypatch, capacity, accepts, identity_damage):
+>       r = runtime(); validate = r._validate_prepared_receiver_resources
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_validate_prepared_receiver_resources'
+
+suite/test_a3_prepared_pilot_target.py:512: AttributeError
+____ test_prepared_receiver_resource_identity_and_capacity[scope-99-False] _____
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_receiver_resourc19')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffce89430>
+capacity = 99, accepts = False, identity_damage = 'scope'
+
+    @pytest.mark.parametrize('capacity,accepts', [(100, True), (99, False)])
+    @pytest.mark.parametrize('identity_damage', [None, 'missing', 'target', 'preparation', 'reader-code', 'freeze-code', 'source', 'environment', 'recipe', 'scope', 'storage-family'])
+    def test_prepared_receiver_resource_identity_and_capacity(tmp_path, monkeypatch, capacity, accepts, identity_damage):
+>       r = runtime(); validate = r._validate_prepared_receiver_resources
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_validate_prepared_receiver_resources'
+
+suite/test_a3_prepared_pilot_target.py:512: AttributeError
+_ test_prepared_receiver_resource_identity_and_capacity[storage-family-100-True] _
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_receiver_resourc20')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffce89ee0>
+capacity = 100, accepts = True, identity_damage = 'storage-family'
+
+    @pytest.mark.parametrize('capacity,accepts', [(100, True), (99, False)])
+    @pytest.mark.parametrize('identity_damage', [None, 'missing', 'target', 'preparation', 'reader-code', 'freeze-code', 'source', 'environment', 'recipe', 'scope', 'storage-family'])
+    def test_prepared_receiver_resource_identity_and_capacity(tmp_path, monkeypatch, capacity, accepts, identity_damage):
+>       r = runtime(); validate = r._validate_prepared_receiver_resources
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_validate_prepared_receiver_resources'
+
+suite/test_a3_prepared_pilot_target.py:512: AttributeError
+_ test_prepared_receiver_resource_identity_and_capacity[storage-family-99-False] _
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_receiver_resourc21')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffb611fd0>
+capacity = 99, accepts = False, identity_damage = 'storage-family'
+
+    @pytest.mark.parametrize('capacity,accepts', [(100, True), (99, False)])
+    @pytest.mark.parametrize('identity_damage', [None, 'missing', 'target', 'preparation', 'reader-code', 'freeze-code', 'source', 'environment', 'recipe', 'scope', 'storage-family'])
+    def test_prepared_receiver_resource_identity_and_capacity(tmp_path, monkeypatch, capacity, accepts, identity_damage):
+>       r = runtime(); validate = r._validate_prepared_receiver_resources
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_validate_prepared_receiver_resources'
+
+suite/test_a3_prepared_pilot_target.py:512: AttributeError
+_ test_prepared_correct_identity_understated_observed_resources_rejects[retained] _
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_correct_identity0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffb6128a0>
+observation = 'retained'
+
+    @pytest.mark.parametrize('observation', ['retained', 'transient', 'applicable-peak', 'unavailable', 'wrong-scope'])
+    def test_prepared_correct_identity_understated_observed_resources_rejects(tmp_path, monkeypatch, observation):
+>       r = runtime(); load = r.load_prepared_pilot_target
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute 'load_prepared_pilot_target'
+
+suite/test_a3_prepared_pilot_target.py:540: AttributeError
+_ test_prepared_correct_identity_understated_observed_resources_rejects[transient] _
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_correct_identity1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffb611eb0>
+observation = 'transient'
+
+    @pytest.mark.parametrize('observation', ['retained', 'transient', 'applicable-peak', 'unavailable', 'wrong-scope'])
+    def test_prepared_correct_identity_understated_observed_resources_rejects(tmp_path, monkeypatch, observation):
+>       r = runtime(); load = r.load_prepared_pilot_target
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute 'load_prepared_pilot_target'
+
+suite/test_a3_prepared_pilot_target.py:540: AttributeError
+_ test_prepared_correct_identity_understated_observed_resources_rejects[applicable-peak] _
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_correct_identity2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffb613350>
+observation = 'applicable-peak'
+
+    @pytest.mark.parametrize('observation', ['retained', 'transient', 'applicable-peak', 'unavailable', 'wrong-scope'])
+    def test_prepared_correct_identity_understated_observed_resources_rejects(tmp_path, monkeypatch, observation):
+>       r = runtime(); load = r.load_prepared_pilot_target
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute 'load_prepared_pilot_target'
+
+suite/test_a3_prepared_pilot_target.py:540: AttributeError
+_ test_prepared_correct_identity_understated_observed_resources_rejects[unavailable] _
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_correct_identity3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffb611a30>
+observation = 'unavailable'
+
+    @pytest.mark.parametrize('observation', ['retained', 'transient', 'applicable-peak', 'unavailable', 'wrong-scope'])
+    def test_prepared_correct_identity_understated_observed_resources_rejects(tmp_path, monkeypatch, observation):
+>       r = runtime(); load = r.load_prepared_pilot_target
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute 'load_prepared_pilot_target'
+
+suite/test_a3_prepared_pilot_target.py:540: AttributeError
+_ test_prepared_correct_identity_understated_observed_resources_rejects[wrong-scope] _
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_correct_identity4')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffce8a240>
+observation = 'wrong-scope'
+
+    @pytest.mark.parametrize('observation', ['retained', 'transient', 'applicable-peak', 'unavailable', 'wrong-scope'])
+    def test_prepared_correct_identity_understated_observed_resources_rejects(tmp_path, monkeypatch, observation):
+>       r = runtime(); load = r.load_prepared_pilot_target
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute 'load_prepared_pilot_target'
+
+suite/test_a3_prepared_pilot_target.py:540: AttributeError
+____________ test_prepared_dispatch_guard_and_geometry_order[None] _____________
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_dispatch_guard_a0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ff8e99400>
+damage = None
+
+    @pytest.mark.parametrize('damage', [None, 'cancel-during-reader', 'shorten-lease-during-reader', 'post-load-geometry'])
+    def test_prepared_dispatch_guard_and_geometry_order(tmp_path, monkeypatch, damage):
+>       r = runtime(); r._PreparedPilotTarget
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_PreparedPilotTarget'
+
+suite/test_a3_prepared_pilot_target.py:564: AttributeError
+____ test_prepared_dispatch_guard_and_geometry_order[cancel-during-reader] _____
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_dispatch_guard_a1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffd1509e0>
+damage = 'cancel-during-reader'
+
+    @pytest.mark.parametrize('damage', [None, 'cancel-during-reader', 'shorten-lease-during-reader', 'post-load-geometry'])
+    def test_prepared_dispatch_guard_and_geometry_order(tmp_path, monkeypatch, damage):
+>       r = runtime(); r._PreparedPilotTarget
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_PreparedPilotTarget'
+
+suite/test_a3_prepared_pilot_target.py:564: AttributeError
+_ test_prepared_dispatch_guard_and_geometry_order[shorten-lease-during-reader] _
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_dispatch_guard_a2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffd153c50>
+damage = 'shorten-lease-during-reader'
+
+    @pytest.mark.parametrize('damage', [None, 'cancel-during-reader', 'shorten-lease-during-reader', 'post-load-geometry'])
+    def test_prepared_dispatch_guard_and_geometry_order(tmp_path, monkeypatch, damage):
+>       r = runtime(); r._PreparedPilotTarget
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_PreparedPilotTarget'
+
+suite/test_a3_prepared_pilot_target.py:564: AttributeError
+_____ test_prepared_dispatch_guard_and_geometry_order[post-load-geometry] ______
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_dispatch_guard_a3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffb6115e0>
+damage = 'post-load-geometry'
+
+    @pytest.mark.parametrize('damage', [None, 'cancel-during-reader', 'shorten-lease-during-reader', 'post-load-geometry'])
+    def test_prepared_dispatch_guard_and_geometry_order(tmp_path, monkeypatch, damage):
+>       r = runtime(); r._PreparedPilotTarget
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_PreparedPilotTarget'
+
+suite/test_a3_prepared_pilot_target.py:564: AttributeError
+_____ test_prepared_production_has_no_build_fallback[missing-preparation] ______
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_production_has_n0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffb613aa0>
+damage = 'missing-preparation'
+
+    @pytest.mark.parametrize('damage', ['missing-preparation', 'missing-handle', 'caller-provider'])
+    def test_prepared_production_has_no_build_fallback(tmp_path, monkeypatch, damage):
+>       r = runtime(); r._PreparedPilotTarget
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_PreparedPilotTarget'
+
+suite/test_a3_prepared_pilot_target.py:600: AttributeError
+________ test_prepared_production_has_no_build_fallback[missing-handle] ________
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_production_has_n1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffb612ab0>
+damage = 'missing-handle'
+
+    @pytest.mark.parametrize('damage', ['missing-preparation', 'missing-handle', 'caller-provider'])
+    def test_prepared_production_has_no_build_fallback(tmp_path, monkeypatch, damage):
+>       r = runtime(); r._PreparedPilotTarget
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_PreparedPilotTarget'
+
+suite/test_a3_prepared_pilot_target.py:600: AttributeError
+_______ test_prepared_production_has_no_build_fallback[caller-provider] ________
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_production_has_n2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffca6bce0>
+damage = 'caller-provider'
+
+    @pytest.mark.parametrize('damage', ['missing-preparation', 'missing-handle', 'caller-provider'])
+    def test_prepared_production_has_no_build_fallback(tmp_path, monkeypatch, damage):
+>       r = runtime(); r._PreparedPilotTarget
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_PreparedPilotTarget'
+
+suite/test_a3_prepared_pilot_target.py:600: AttributeError
+_ test_prepared_final_barrier_after_all_costly_work[target-payload-restored-mtime-guard-union] _
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_final_barrier_af0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffca6b260>
+seam = 'guard-union', damage = 'target-payload-restored-mtime'
+request = <FixtureRequest for <Function test_prepared_final_barrier_after_all_costly_work[target-payload-restored-mtime-guard-union]>>
+
+    @pytest.mark.parametrize('seam', ['guard-union', 'before-publication', 'final-live-guard'])
+    @pytest.mark.parametrize('damage', ['target-payload-restored-mtime', 'descriptor-marker', 'identical-target-tree'])
+    def test_prepared_final_barrier_after_all_costly_work(tmp_path, monkeypatch, seam, damage, request):
+>       r = runtime(); r._PreparedPilotTarget
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_PreparedPilotTarget'
+
+suite/test_a3_prepared_pilot_target.py:617: AttributeError
+_ test_prepared_final_barrier_after_all_costly_work[target-payload-restored-mtime-before-publication] _
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_final_barrier_af1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffca69eb0>
+seam = 'before-publication', damage = 'target-payload-restored-mtime'
+request = <FixtureRequest for <Function test_prepared_final_barrier_after_all_costly_work[target-payload-restored-mtime-before-publication]>>
+
+    @pytest.mark.parametrize('seam', ['guard-union', 'before-publication', 'final-live-guard'])
+    @pytest.mark.parametrize('damage', ['target-payload-restored-mtime', 'descriptor-marker', 'identical-target-tree'])
+    def test_prepared_final_barrier_after_all_costly_work(tmp_path, monkeypatch, seam, damage, request):
+>       r = runtime(); r._PreparedPilotTarget
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_PreparedPilotTarget'
+
+suite/test_a3_prepared_pilot_target.py:617: AttributeError
+_ test_prepared_final_barrier_after_all_costly_work[target-payload-restored-mtime-final-live-guard] _
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_final_barrier_af2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffca6b2c0>
+seam = 'final-live-guard', damage = 'target-payload-restored-mtime'
+request = <FixtureRequest for <Function test_prepared_final_barrier_after_all_costly_work[target-payload-restored-mtime-final-live-guard]>>
+
+    @pytest.mark.parametrize('seam', ['guard-union', 'before-publication', 'final-live-guard'])
+    @pytest.mark.parametrize('damage', ['target-payload-restored-mtime', 'descriptor-marker', 'identical-target-tree'])
+    def test_prepared_final_barrier_after_all_costly_work(tmp_path, monkeypatch, seam, damage, request):
+>       r = runtime(); r._PreparedPilotTarget
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_PreparedPilotTarget'
+
+suite/test_a3_prepared_pilot_target.py:617: AttributeError
+_ test_prepared_final_barrier_after_all_costly_work[descriptor-marker-guard-union] _
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_final_barrier_af3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffca687a0>
+seam = 'guard-union', damage = 'descriptor-marker'
+request = <FixtureRequest for <Function test_prepared_final_barrier_after_all_costly_work[descriptor-marker-guard-union]>>
+
+    @pytest.mark.parametrize('seam', ['guard-union', 'before-publication', 'final-live-guard'])
+    @pytest.mark.parametrize('damage', ['target-payload-restored-mtime', 'descriptor-marker', 'identical-target-tree'])
+    def test_prepared_final_barrier_after_all_costly_work(tmp_path, monkeypatch, seam, damage, request):
+>       r = runtime(); r._PreparedPilotTarget
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_PreparedPilotTarget'
+
+suite/test_a3_prepared_pilot_target.py:617: AttributeError
+_ test_prepared_final_barrier_after_all_costly_work[descriptor-marker-before-publication] _
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_final_barrier_af4')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffb611dc0>
+seam = 'before-publication', damage = 'descriptor-marker'
+request = <FixtureRequest for <Function test_prepared_final_barrier_after_all_costly_work[descriptor-marker-before-publication]>>
+
+    @pytest.mark.parametrize('seam', ['guard-union', 'before-publication', 'final-live-guard'])
+    @pytest.mark.parametrize('damage', ['target-payload-restored-mtime', 'descriptor-marker', 'identical-target-tree'])
+    def test_prepared_final_barrier_after_all_costly_work(tmp_path, monkeypatch, seam, damage, request):
+>       r = runtime(); r._PreparedPilotTarget
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_PreparedPilotTarget'
+
+suite/test_a3_prepared_pilot_target.py:617: AttributeError
+_ test_prepared_final_barrier_after_all_costly_work[descriptor-marker-final-live-guard] _
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_final_barrier_af5')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffb613350>
+seam = 'final-live-guard', damage = 'descriptor-marker'
+request = <FixtureRequest for <Function test_prepared_final_barrier_after_all_costly_work[descriptor-marker-final-live-guard]>>
+
+    @pytest.mark.parametrize('seam', ['guard-union', 'before-publication', 'final-live-guard'])
+    @pytest.mark.parametrize('damage', ['target-payload-restored-mtime', 'descriptor-marker', 'identical-target-tree'])
+    def test_prepared_final_barrier_after_all_costly_work(tmp_path, monkeypatch, seam, damage, request):
+>       r = runtime(); r._PreparedPilotTarget
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_PreparedPilotTarget'
+
+suite/test_a3_prepared_pilot_target.py:617: AttributeError
+_ test_prepared_final_barrier_after_all_costly_work[identical-target-tree-guard-union] _
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_final_barrier_af6')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffd153c80>
+seam = 'guard-union', damage = 'identical-target-tree'
+request = <FixtureRequest for <Function test_prepared_final_barrier_after_all_costly_work[identical-target-tree-guard-union]>>
+
+    @pytest.mark.parametrize('seam', ['guard-union', 'before-publication', 'final-live-guard'])
+    @pytest.mark.parametrize('damage', ['target-payload-restored-mtime', 'descriptor-marker', 'identical-target-tree'])
+    def test_prepared_final_barrier_after_all_costly_work(tmp_path, monkeypatch, seam, damage, request):
+>       r = runtime(); r._PreparedPilotTarget
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_PreparedPilotTarget'
+
+suite/test_a3_prepared_pilot_target.py:617: AttributeError
+_ test_prepared_final_barrier_after_all_costly_work[identical-target-tree-before-publication] _
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_final_barrier_af7')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ff8e98080>
+seam = 'before-publication', damage = 'identical-target-tree'
+request = <FixtureRequest for <Function test_prepared_final_barrier_after_all_costly_work[identical-target-tree-before-publication]>>
+
+    @pytest.mark.parametrize('seam', ['guard-union', 'before-publication', 'final-live-guard'])
+    @pytest.mark.parametrize('damage', ['target-payload-restored-mtime', 'descriptor-marker', 'identical-target-tree'])
+    def test_prepared_final_barrier_after_all_costly_work(tmp_path, monkeypatch, seam, damage, request):
+>       r = runtime(); r._PreparedPilotTarget
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_PreparedPilotTarget'
+
+suite/test_a3_prepared_pilot_target.py:617: AttributeError
+_ test_prepared_final_barrier_after_all_costly_work[identical-target-tree-final-live-guard] _
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_final_barrier_af8')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffca6ab40>
+seam = 'final-live-guard', damage = 'identical-target-tree'
+request = <FixtureRequest for <Function test_prepared_final_barrier_after_all_costly_work[identical-target-tree-final-live-guard]>>
+
+    @pytest.mark.parametrize('seam', ['guard-union', 'before-publication', 'final-live-guard'])
+    @pytest.mark.parametrize('damage', ['target-payload-restored-mtime', 'descriptor-marker', 'identical-target-tree'])
+    def test_prepared_final_barrier_after_all_costly_work(tmp_path, monkeypatch, seam, damage, request):
+>       r = runtime(); r._PreparedPilotTarget
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_PreparedPilotTarget'
+
+suite/test_a3_prepared_pilot_target.py:617: AttributeError
+__ test_prepared_final_barrier_cannot_adopt_current[adopt-current-reference] ___
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_final_barrier_ca0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffca689e0>
+damage = 'adopt-current-reference'
+
+    @pytest.mark.parametrize('damage', ['adopt-current-reference', 'equal-requirement-copy', 'forged-handle', 'expiry-during-final-hash', 'expiry-during-final-live-guard'])
+    def test_prepared_final_barrier_cannot_adopt_current(tmp_path, monkeypatch, damage):
+>       r = runtime(); r._PreparedPilotTarget
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_PreparedPilotTarget'
+
+suite/test_a3_prepared_pilot_target.py:660: AttributeError
+___ test_prepared_final_barrier_cannot_adopt_current[equal-requirement-copy] ___
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_final_barrier_ca1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffca6b0b0>
+damage = 'equal-requirement-copy'
+
+    @pytest.mark.parametrize('damage', ['adopt-current-reference', 'equal-requirement-copy', 'forged-handle', 'expiry-during-final-hash', 'expiry-during-final-live-guard'])
+    def test_prepared_final_barrier_cannot_adopt_current(tmp_path, monkeypatch, damage):
+>       r = runtime(); r._PreparedPilotTarget
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_PreparedPilotTarget'
+
+suite/test_a3_prepared_pilot_target.py:660: AttributeError
+_______ test_prepared_final_barrier_cannot_adopt_current[forged-handle] ________
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_final_barrier_ca2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffca69e80>
+damage = 'forged-handle'
+
+    @pytest.mark.parametrize('damage', ['adopt-current-reference', 'equal-requirement-copy', 'forged-handle', 'expiry-during-final-hash', 'expiry-during-final-live-guard'])
+    def test_prepared_final_barrier_cannot_adopt_current(tmp_path, monkeypatch, damage):
+>       r = runtime(); r._PreparedPilotTarget
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_PreparedPilotTarget'
+
+suite/test_a3_prepared_pilot_target.py:660: AttributeError
+__ test_prepared_final_barrier_cannot_adopt_current[expiry-during-final-hash] __
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_final_barrier_ca3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffd56dc40>
+damage = 'expiry-during-final-hash'
+
+    @pytest.mark.parametrize('damage', ['adopt-current-reference', 'equal-requirement-copy', 'forged-handle', 'expiry-during-final-hash', 'expiry-during-final-live-guard'])
+    def test_prepared_final_barrier_cannot_adopt_current(tmp_path, monkeypatch, damage):
+>       r = runtime(); r._PreparedPilotTarget
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_PreparedPilotTarget'
+
+suite/test_a3_prepared_pilot_target.py:660: AttributeError
+_ test_prepared_final_barrier_cannot_adopt_current[expiry-during-final-live-guard] _
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_final_barrier_ca4')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffd56cda0>
+damage = 'expiry-during-final-live-guard'
+
+    @pytest.mark.parametrize('damage', ['adopt-current-reference', 'equal-requirement-copy', 'forged-handle', 'expiry-during-final-hash', 'expiry-during-final-live-guard'])
+    def test_prepared_final_barrier_cannot_adopt_current(tmp_path, monkeypatch, damage):
+>       r = runtime(); r._PreparedPilotTarget
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_PreparedPilotTarget'
+
+suite/test_a3_prepared_pilot_target.py:660: AttributeError
+_________________ test_prepared_costs_and_envelope_are_charged _________________
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_costs_and_envelo0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffd56e480>
+request = <FixtureRequest for <Function test_prepared_costs_and_envelope_are_charged>>
+
+    def test_prepared_costs_and_envelope_are_charged(tmp_path, monkeypatch, request):
+>       r = runtime(); r._PreparedPilotTarget
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_PreparedPilotTarget'
+
+suite/test_a3_prepared_pilot_target.py:687: AttributeError
+____________ test_prepared_native_adapter_and_intake_preserve_scope ____________
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_native_adapter_a0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffd56db20>
+request = <FixtureRequest for <Function test_prepared_native_adapter_and_intake_preserve_scope>>
+
+    def test_prepared_native_adapter_and_intake_preserve_scope(tmp_path, monkeypatch, request):
+>       r = runtime(); r._PreparedPilotTarget
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_PreparedPilotTarget'
+
+suite/test_a3_prepared_pilot_target.py:728: AttributeError
+___________ test_prepared_migrated_intake_and_legacy_rejection[None] ___________
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_migrated_intake_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffca6bfb0>
+damage = None
+
+    @pytest.mark.parametrize('damage', [None, 'legacy-no-preparation', 'missing-preparation', 'changed-resource',
+        'unanchored-resource', 'wrong-preparation-source', 'wrong-preparation-part'])
+    def test_prepared_migrated_intake_and_legacy_rejection(tmp_path, monkeypatch, damage):
+>       r = runtime(); r._PreparedPilotTarget
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_PreparedPilotTarget'
+
+suite/test_a3_prepared_pilot_target.py:748: AttributeError
+__ test_prepared_migrated_intake_and_legacy_rejection[legacy-no-preparation] ___
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_migrated_intake_1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffca6b5c0>
+damage = 'legacy-no-preparation'
+
+    @pytest.mark.parametrize('damage', [None, 'legacy-no-preparation', 'missing-preparation', 'changed-resource',
+        'unanchored-resource', 'wrong-preparation-source', 'wrong-preparation-part'])
+    def test_prepared_migrated_intake_and_legacy_rejection(tmp_path, monkeypatch, damage):
+>       r = runtime(); r._PreparedPilotTarget
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_PreparedPilotTarget'
+
+suite/test_a3_prepared_pilot_target.py:748: AttributeError
+___ test_prepared_migrated_intake_and_legacy_rejection[missing-preparation] ____
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_migrated_intake_2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffca6ab40>
+damage = 'missing-preparation'
+
+    @pytest.mark.parametrize('damage', [None, 'legacy-no-preparation', 'missing-preparation', 'changed-resource',
+        'unanchored-resource', 'wrong-preparation-source', 'wrong-preparation-part'])
+    def test_prepared_migrated_intake_and_legacy_rejection(tmp_path, monkeypatch, damage):
+>       r = runtime(); r._PreparedPilotTarget
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_PreparedPilotTarget'
+
+suite/test_a3_prepared_pilot_target.py:748: AttributeError
+_____ test_prepared_migrated_intake_and_legacy_rejection[changed-resource] _____
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_migrated_intake_3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffd152060>
+damage = 'changed-resource'
+
+    @pytest.mark.parametrize('damage', [None, 'legacy-no-preparation', 'missing-preparation', 'changed-resource',
+        'unanchored-resource', 'wrong-preparation-source', 'wrong-preparation-part'])
+    def test_prepared_migrated_intake_and_legacy_rejection(tmp_path, monkeypatch, damage):
+>       r = runtime(); r._PreparedPilotTarget
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_PreparedPilotTarget'
+
+suite/test_a3_prepared_pilot_target.py:748: AttributeError
+___ test_prepared_migrated_intake_and_legacy_rejection[unanchored-resource] ____
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_migrated_intake_4')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffd1526f0>
+damage = 'unanchored-resource'
+
+    @pytest.mark.parametrize('damage', [None, 'legacy-no-preparation', 'missing-preparation', 'changed-resource',
+        'unanchored-resource', 'wrong-preparation-source', 'wrong-preparation-part'])
+    def test_prepared_migrated_intake_and_legacy_rejection(tmp_path, monkeypatch, damage):
+>       r = runtime(); r._PreparedPilotTarget
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_PreparedPilotTarget'
+
+suite/test_a3_prepared_pilot_target.py:748: AttributeError
+_ test_prepared_migrated_intake_and_legacy_rejection[wrong-preparation-source] _
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_migrated_intake_5')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffb612bd0>
+damage = 'wrong-preparation-source'
+
+    @pytest.mark.parametrize('damage', [None, 'legacy-no-preparation', 'missing-preparation', 'changed-resource',
+        'unanchored-resource', 'wrong-preparation-source', 'wrong-preparation-part'])
+    def test_prepared_migrated_intake_and_legacy_rejection(tmp_path, monkeypatch, damage):
+>       r = runtime(); r._PreparedPilotTarget
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_PreparedPilotTarget'
+
+suite/test_a3_prepared_pilot_target.py:748: AttributeError
+__ test_prepared_migrated_intake_and_legacy_rejection[wrong-preparation-part] __
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01/mgnp/tmp/test_prepared_migrated_intake_6')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ffd56ec00>
+damage = 'wrong-preparation-part'
+
+    @pytest.mark.parametrize('damage', [None, 'legacy-no-preparation', 'missing-preparation', 'changed-resource',
+        'unanchored-resource', 'wrong-preparation-source', 'wrong-preparation-part'])
+    def test_prepared_migrated_intake_and_legacy_rejection(tmp_path, monkeypatch, damage):
+>       r = runtime(); r._PreparedPilotTarget
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_PreparedPilotTarget'
+
+suite/test_a3_prepared_pilot_target.py:748: AttributeError
+=========================== short test summary info ============================
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_cpu_producer_uses_exact_builder_contract[prefit-fit-select]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_cpu_producer_uses_exact_builder_contract[selected-remaining]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_cpu_failure_never_certifies[partial-target]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_cpu_failure_never_certifies[source-change]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_cpu_failure_never_certifies[post-guard]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_cpu_failure_never_certifies[wrong-summary]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_cpu_failure_never_certifies[missing-selected-backing]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_admission_anchor_is_required[caller-flag]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_admission_anchor_is_required[descriptor-as-reservation]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_admission_anchor_is_required[resource-as-reservation]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_admission_anchor_is_required[unanchored]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_admission_anchor_is_required[source]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_admission_anchor_is_required[part]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_admission_anchor_is_required[pilot]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_admission_anchor_is_required[selection]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_admission_anchor_is_required[work-dir]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_admission_anchor_is_required[fake-seal]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_handle_is_one_graph[equal-graph-copy]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_handle_is_one_graph[equal-requirement-copy]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_handle_is_one_graph[wrong-pid]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_handle_is_one_graph[wrong-context]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_handle_is_one_graph[wrong-part]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_handle_is_one_graph[reinitialize]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_handle_is_one_graph[pickle]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_handle_is_one_graph[fork]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[None-100-True]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[None-99-False]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[missing-100-True]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[missing-99-False]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[target-100-True]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[target-99-False]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[preparation-100-True]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[preparation-99-False]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[reader-code-100-True]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[reader-code-99-False]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[freeze-code-100-True]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[freeze-code-99-False]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[source-100-True]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[source-99-False]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[environment-100-True]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[environment-99-False]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[recipe-100-True]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[recipe-99-False]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[scope-100-True]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[scope-99-False]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[storage-family-100-True]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[storage-family-99-False]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_correct_identity_understated_observed_resources_rejects[retained]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_correct_identity_understated_observed_resources_rejects[transient]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_correct_identity_understated_observed_resources_rejects[applicable-peak]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_correct_identity_understated_observed_resources_rejects[unavailable]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_correct_identity_understated_observed_resources_rejects[wrong-scope]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_dispatch_guard_and_geometry_order[None]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_dispatch_guard_and_geometry_order[cancel-during-reader]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_dispatch_guard_and_geometry_order[shorten-lease-during-reader]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_dispatch_guard_and_geometry_order[post-load-geometry]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_production_has_no_build_fallback[missing-preparation]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_production_has_no_build_fallback[missing-handle]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_production_has_no_build_fallback[caller-provider]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_final_barrier_after_all_costly_work[target-payload-restored-mtime-guard-union]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_final_barrier_after_all_costly_work[target-payload-restored-mtime-before-publication]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_final_barrier_after_all_costly_work[target-payload-restored-mtime-final-live-guard]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_final_barrier_after_all_costly_work[descriptor-marker-guard-union]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_final_barrier_after_all_costly_work[descriptor-marker-before-publication]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_final_barrier_after_all_costly_work[descriptor-marker-final-live-guard]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_final_barrier_after_all_costly_work[identical-target-tree-guard-union]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_final_barrier_after_all_costly_work[identical-target-tree-before-publication]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_final_barrier_after_all_costly_work[identical-target-tree-final-live-guard]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_final_barrier_cannot_adopt_current[adopt-current-reference]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_final_barrier_cannot_adopt_current[equal-requirement-copy]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_final_barrier_cannot_adopt_current[forged-handle]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_final_barrier_cannot_adopt_current[expiry-during-final-hash]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_final_barrier_cannot_adopt_current[expiry-during-final-live-guard]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_costs_and_envelope_are_charged
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_native_adapter_and_intake_preserve_scope
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_migrated_intake_and_legacy_rejection[None]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_migrated_intake_and_legacy_rejection[legacy-no-preparation]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_migrated_intake_and_legacy_rejection[missing-preparation]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_migrated_intake_and_legacy_rejection[changed-resource]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_migrated_intake_and_legacy_rejection[unanchored-resource]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_migrated_intake_and_legacy_rejection[wrong-preparation-source]
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_migrated_intake_and_legacy_rejection[wrong-preparation-part]
+82 failed, 55 passed in 10.74s

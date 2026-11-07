@@ -1,0 +1,43 @@
+{
+  "verdict": "SCOPED_EXACT_PACKET_CONFIG_PASS_FOR_ONE_ORIGINAL_BASE_ATTEMPT",
+  "packet_manifest_sha256": "fdebb58e74c75bdd83c3c616a496988e6dfb80a9a1c5fbcddda3a22181a925ef",
+  "config_sha256": "6e9c0de2ae7c208b8b0933f5ca3630cedcf6f655e35c7e947a90fee4addca58c",
+  "run_py_sha256": "4b696366f1e0808212feeff0772160472e630811af9ba8381ebce664c6651dca",
+  "parent_packet_preserved": true,
+  "run_py_and_shell_byteidentical_to_parent": true,
+  "config_delta_only": [
+    "CPU_child_seconds",
+    "Slurm_minutes"
+  ],
+  "supervisor_delta": "Resource limits only plus explicitly approved elapsed>=configuredcap fail-closed completion check.",
+  "allocation_delta": "Exact regular cpu and upper allocation bound75minutes; existing4CPU192GiB/noGPU/user/node/cwd/TRES guards unchanged.",
+  "resources": {
+    "CPUs": 4,
+    "memory_GiB": 192,
+    "Slurm_minutes": 75,
+    "child_seconds": 4200,
+    "minimum_initial_remaining_seconds": 4400,
+    "grace_seconds": 15,
+    "partition": "cpu",
+    "GPU_count": 0
+  },
+  "pure_tests": {
+    "base_observed": 9,
+    "base_expected": 9,
+    "mgnp_observed": 9,
+    "mgnp_expected": 9,
+    "exit_codes": [
+      0,
+      0
+    ]
+  },
+  "raw_RED_boundary_expected_failures": 2,
+  "raw_RED_boundary_observed_failures": 2,
+  "test_limits": "Missing-stream and postguard scenarios mock a failed child; they do not independently simulate a real full builder/stream/postguard. Unchanged pinned child remains the real enforcement path.",
+  "remaining_root_submission_requirements": [
+    "One distinct original-base attempt under absent new output directory, exact packet/config hash arguments, accepted regularCPU resources/noGPU/norequeue.",
+    "No automatic retry, partial/subset oracle, old artifact rewrite or candidate/source/GPU admission.",
+    "Only complete genuine builder, entire original publisher-default stream plus newline, source/input/import/live guards, normal exit belowcap and noTERM can produce final oracle."
+  ],
+  "reviewer_operational_execution": false
+}

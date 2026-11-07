@@ -1,0 +1,90 @@
+FFF.                                                                     [100%]
+=================================== FAILURES ===================================
+_ test_cached_mask_source_refresh_preserves_current_protection_and_semantic_work_once _
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-owners-corrected/test_cached_mask_source_refres0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f90f3b58350>
+
+    def test_cached_mask_source_refresh_preserves_current_protection_and_semantic_work_once(tmp_path,monkeypatch):
+        from tests.test_a3_source_validation import setup_case
+        from component_analysis import a3_source_validation as sources, a3_direction_artifacts as artifacts, a3_pipeline
+        from component_analysis import a3_direction_runtime as authority, ladder_pipeline as ladder
+        from types import SimpleNamespace
+        p=driver();c=setup_case(tmp_path,monkeypatch);calls=[]
+        design=c.design;design.update(direction_protocol={},parent_evidence={'prepared_path':'parent','selected_path':'selected'})
+        design_path=tmp_path/'mask-design.json';ladder.write_artifact(design_path,design)
+        rule=tmp_path/'rule.json';rule.write_text('{}');bundle=tmp_path/'root-bundle';authority.publish_object(bundle,{})
+        widths={'ioi':4,'mmlu':4}
+        prepared=dict(kind='a3_mask_prepared_v1',injected=False,candidates=[['head',0,0]],chunk_size=1,seeds=[42,1,123],arms=['constrained','unconstrained'],
+            updates=200,validation_every=20,validation_donors='opposite',root_ruling={},random_controls={'count':19},timing_protocol={},new30={'status':'missing_comparison'},hbank_sources={},widths=widths)
+        prepared['identity']=dict(commit='a'*40,design_path=str(design_path),design_file_sha256=p.common.file_hash(design_path),code_hashes={},operational_ruling_path=str(rule),operational_ruling_sha256=p.common.file_hash(rule),pilot_ruling_path=str(rule),pilot_ruling_sha256=p.common.file_hash(rule),root_bundle_reference=authority.object_reference(bundle),physical_widths=widths)
+        prepared['identity']['mask_protocol_sha256']=p.digest(p.mask_protocol(prepared));path=tmp_path/'mask-prepared';authority.publish_object(path,prepared)
+        monkeypatch.setattr(p,'new30_reference',lambda:prepared['new30']);monkeypatch.setattr(p,'mask_code_hashes',lambda:{})
+        monkeypatch.setattr(p,'execution_widths',lambda *a,**k:widths)
+        monkeypatch.setattr(a3_pipeline,'load_a1_parents',lambda *a:({'rows':{}},{'banks':{}},{}))
+        monkeypatch.setattr(artifacts,'validate_live',lambda *a,**k:calls.append('semantic') or {'commit':'a'*40,'injected':False})
+        monkeypatch.setattr(sources,'source_dependencies',lambda *a,**k:([c.static,rule,bundle],[],[]))
+        monkeypatch.setattr(sources,'new30_dependencies',lambda:([],[]))
+        args=SimpleNamespace(commit='a'*40,registry=[],prepared=str(path),design=str(design_path),work_dir=str(tmp_path))
+        first,evidence=p._live_mask(prepared,args);second,again=p._live_mask(prepared,args)
+>       assert calls==['semantic']
+E       AssertionError: assert ['semantic', 'semantic'] == ['semantic']
+E         
+E         Left contains one more item: 'semantic'
+E         Use -v to get more diff
+
+tests/test_a3_mask_pipeline.py:751: AssertionError
+___ test_mask_source_initialization_reaches_existing_projector_startup_cost ____
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-owners-corrected/test_mask_source_initializatio0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f90f3b58290>
+
+    def test_mask_source_initialization_reaches_existing_projector_startup_cost(tmp_path,monkeypatch):
+        from tests.test_a3_source_validation import setup_case
+        from component_analysis import a3_mask_workload as w
+        from types import SimpleNamespace
+        c=setup_case(tmp_path,monkeypatch);state=c.build(owner='mask')
+        inventory,receipt,ledger=cost_fixture();before=w.project_cost([receipt],inventory,ledger)
+>       receipt['startup_seconds']=driver()._source_startup_seconds(receipt['startup_seconds'],SimpleNamespace(_mask_source_context=state))
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'component_analysis.a3_mask_pipeline' has no attribute '_source_startup_seconds'
+
+tests/test_a3_mask_pipeline.py:766: AttributeError
+____ test_cached_edge_source_keeps_fresh_authority_and_runs_semantics_once _____
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-owners-corrected/test_cached_edge_source_keeps_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f90f3ba7260>
+
+    def test_cached_edge_source_keeps_fresh_authority_and_runs_semantics_once(tmp_path,monkeypatch):
+        from tests.test_a3_source_validation import setup_case
+        from component_analysis import a3_source_validation as sources, ladder_pipeline as ladder
+        from types import SimpleNamespace
+        c=setup_case(tmp_path,monkeypatch);calls=[];authority_calls=[]
+        design=c.design;design['injected']=False
+        path=tmp_path/'edge-design.json';ladder.write_artifact(path,design)
+        prepared={'kind':'a3_edge_prepared','design_reference':{'path':str(path)}};prep_path=tmp_path/'edge-prepared';p.authority.publish_object(prep_path,prepared)
+        def validate(prepared,design,**kwargs):
+            calls.append((sources.is_view(prepared),sources.is_view(design)))
+            return {'commit':'a'*40,'injected':False}
+        monkeypatch.setattr(p,'validate_prepared',validate)
+        monkeypatch.setattr(sources,'source_dependencies',lambda *a,**k:([c.static],[],[]))
+        monkeypatch.setattr(p,'code_hashes',lambda:{})
+        monkeypatch.setattr(p.authority,'normalize_ledger',lambda *a,**k:{})
+        monkeypatch.setattr(p.authority,'make_authority_context',lambda *a,**k:object())
+        monkeypatch.setattr(p.authority,'validate_reservation',lambda *a,**k:authority_calls.append(k) or {})
+        args=SimpleNamespace(commit='a'*40,registry=[],prepared=str(prep_path),design=str(path),work_dir=str(tmp_path),ledger_snapshot='root',reservation='reservation')
+        guard=p.execution_guard(design,prepared,args,{'identity':{'commit':'a'*40}})
+        first=guard();guard()
+>       assert calls==[(True,True)] and len(authority_calls)==2
+E       assert ([(False, Fals...False, False)] == [(True, True)]
+E         
+E         At index 0 diff: (False, False) != (True, True)
+E         Left contains one more item: (False, False)
+E         Use -v to get more diff)
+
+tests/test_a3_edge_pipeline.py:671: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_a3_mask_pipeline.py::test_cached_mask_source_refresh_preserves_current_protection_and_semantic_work_once
+FAILED tests/test_a3_mask_pipeline.py::test_mask_source_initialization_reaches_existing_projector_startup_cost
+FAILED tests/test_a3_edge_pipeline.py::test_cached_edge_source_keeps_fresh_authority_and_runs_semantics_once
+3 failed, 1 passed, 150 deselected in 17.70s

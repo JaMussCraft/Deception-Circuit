@@ -1,0 +1,53 @@
+{
+  "status": "planning_complete_not_executed_root_acceptance_required",
+  "commands": [
+    {
+      "command": "stdlib compile/AST protocol checks of coordinator.py and supervisor.py",
+      "exit_code": 0,
+      "model_imported": false
+    },
+    {
+      "command": "research-session lint .superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-proposal/proposal.md",
+      "exit_code": 0
+    },
+    {
+      "command": "/sw/external/python/anaconda3/bin/python3.9 scripts/check_report_numbers.py .superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-proposal/proposal.md --strict --json",
+      "exit_code": 0,
+      "output": "number-check.json"
+    }
+  ],
+  "input_files": {
+    ".superpowers/sdd/plan-a3/native-continuation-plan/source-and-cases.json": "3bd3c48fa7ccb1a43c2fea82504dc5d0e4129c0c9d57accd0bd25b7d10ebd7f5",
+    ".superpowers/sdd/plan-a3/native-continuation-plan/observed-costs-and-proposal.json": "ea6d088f103f2870bc2cfe808314d0ba258a202395bcde24dfb09559922a9d56",
+    "docs/research/specificity-ladder/reports/126-native-next-case-evidence/run_manifest.json": "6185e22ac4d7fa7d0252ae9e8f06f4c71e632cc8472bee255d223ecf7886bacc"
+  },
+  "source_and_harness_unmodified": true,
+  "large_artifact_or_model_reads": false,
+  "all_owned_processes_terminal": true,
+  "artifacts": {
+    "number-check.json": {
+      "bytes": 4413,
+      "sha256": "ed54dde1b6373394199f101011d581fcd963a4cf7968de78fc2782934342b458"
+    },
+    "proposal.json": {
+      "bytes": 10446,
+      "sha256": "8c300ed85a9709c898a90615e258f06a253bf69ce216658b949eac3eb8da92ef"
+    },
+    "proposal.md": {
+      "bytes": 5244,
+      "sha256": "c5b94c54d16b85fd33376a50b0ca16f1764274dc20c89b5ad86e98992fb0814a"
+    },
+    "coordinator.py": {
+      "bytes": 7161,
+      "sha256": "a11c694ef3fce8ba8dd28635aa2df08d27fb299ea42b66dd5c42659994a46309"
+    },
+    "protocol-checks.json": {
+      "bytes": 707,
+      "sha256": "a897b3323940c2a87d7c03efa500a5a2ff44aeb78129f1d3b29addaa16d145d2"
+    },
+    "supervisor.py": {
+      "bytes": 3023,
+      "sha256": "0da49615818b651eeed90bdaf98608d6c5e41106ef9296cb052f2a8171d6905e"
+    }
+  }
+}

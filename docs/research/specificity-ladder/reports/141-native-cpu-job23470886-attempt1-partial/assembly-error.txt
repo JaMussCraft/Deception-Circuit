@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/tmp/assemble-native-cpu-handoff-140-141.py", line 40, in <module>
+    parse=lambda x:{k:int(v) for k,v in (line.split() for line in x.splitlines())};bv,av=parse(b['memory.events']),parse(a['memory.events']);delta[path]={k:av[k]-v for k,v in bv.items()};assert not any(delta[path].values())
+AssertionError
+
+Report-only assembly assertion was too broad. Actual job/step/leaf event deltas are zero; shared system.slice and slurmstepd.scope high increased44 and max191667, with no OOM/kill increase. Original native process and all Slurm steps completed0:0. No model/source/driver edit or rerun.

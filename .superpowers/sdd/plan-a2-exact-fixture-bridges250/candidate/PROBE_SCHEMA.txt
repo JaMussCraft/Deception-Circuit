@@ -1,0 +1,121 @@
+A2 fixture runtime probe, Task 1 only
+
+Interface:
+  EXACT_INTERPRETER runtime-probe.py --closure ABSOLUTE_JSON \
+    --closure-sha256 SHA --payload-pins ddee7e6df8220e06212c56b4bf79e6e5fa659fb2cfd9e4ead1131c164d5456b4 \
+    --environment base|mgnp --output FRESH_ABSOLUTE_DIRECTORY
+
+Run inside the pinned Ubuntu SIF, with every declared input on read-only mounts.
+The caller must include container startup in its own <=30-second gate. The probe
+has a separate 30-second wall alarm from Python entry, a nonrenewing monotonic
+subprocess deadline, and strict post-reap deadline checks. Do not retry a failed
+compatibility gate automatically. Preserve its output and narrow the closure for
+review. The proposal's 89 ELF objects can require 178 bounded readelf/ldd calls;
+completion inside 30 seconds has NOT been measured. No runtime is staged here.
+
+Required environment: PYTHONDONTWRITEBYTECODE=1,
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1, OMP_NUM_THREADS=1, OPENBLAS_NUM_THREADS=1,
+MKL_NUM_THREADS=1, NUMEXPR_NUM_THREADS=1, CUDA_VISIBLE_DEVICES=''. Do not pass
+-S/-s, PYTHONPATH, PYTHONHOME, LD_PRELOAD or LD_LIBRARY_PATH. Normal user-site
+startup remains enabled. Preserve required distutils .pth/_distutils_hack bytes.
+The probe's output directory is new; an existing output path rejects. Parent
+paths must exist and contain no symlinks. The caller owns mount/namespace setup,
+actual image invocation, read-only manifest staging and private-parent protection.
+
+closure.template.json is deliberately unusable. Root binds these fields only
+after measured staging and source acceptance, preserving the original template:
+
+schema: A2_FIXTURE_RUNTIME_CLOSURE_V1
+status: ROOT_BOUND_FOR_ACTUAL_SIF_PROBE
+contracts_sha256, payload_pins_sha256, image_sha256: exact accepted constants
+image_path: actual pinned SIF path, itself a file entry with accepted image digest
+scientific_environment_equivalent: false
+green_observer: exact new Task 2 fixture observer path (not yet implemented)
+control_read_paths: [absolute closure manifest path]; same-buffer SHA validation
+  happens before installing the worker audit hook. A manifest cannot hash itself.
+entries: mapping absolute literal virtual path ->
+  file: {kind: file, physical_path: absolute staging path, bytes: integer,
+         sha256: SHA, role: nonempty string}
+  symlink: {kind: symlink, physical_path: absolute staging path,
+            target: literal readlink string, role: nonempty string}
+  Every recursive symlink target and aliased parent must also be declared. The
+  probe checks virtual bytes, links and read-only mount flags; the root staging
+  receipt authenticates physical_path translation. Directory inventories are
+  not a substitute for individual file entries. Root must close Python source,
+  resources, metadata, startup, ELF providers and any required bytecode explicitly.
+  No implicit .pyc -> .py substitution is made. Unknown reads reject.
+  Retain inventory251 as an entry at its original path and exact digest. Its
+  1103 proposed source entries are a retained-byte minimum, never compatibility.
+  Add required startup/source/assets/helper/provider/tool files after review.
+  Source251's eleven system references are NOT pinned as system library copies.
+  The immutable original 266-member packet and seven baseline members are checked.
+
+environments.base and environments.mgnp each require:
+  identity: {executable, executable_sha256, executable_bytes, version:[M,m,p],
+    prefix, source_build_string: exact sys.version, SOABI,
+    distributions: {distribution_name: exact_version},
+    origins: {importable_module_name: exact___file__}}
+    BASE identity must equal the embedded accepted contract. mgnp binds exact
+    measured bytes/build/SOABI/origins in addition to accepted 3.12.13/pytest9.1.1.
+  distribution_metadata: {distribution_name: literal absolute dist-info path}.
+    Each METADATA and RECORD file must be closed. BASE requires the exact seven
+    original dist-info roots and versions. Actual importlib.metadata origins
+    must match, as well as importable-module origins.
+  startup: {user_site:true, sitecustomize:null, usercustomize:null,
+    sys_path:[literal paths in order], meta_path:[type.module+'.'+type.name],
+    preloaded:[sorted startup names among _distutils_hack,mpl_toolkits,google,
+      ruamel,sphinxcontrib,zope], pth:[sorted literal active site-directory pth files]}
+    The snapshot is taken in each fresh interpreter before pytest/helper imports.
+    sys.path[0] is the probe script directory. Preserve actual approved startup
+    behavior; disclose evidence-supported namespace/easy-install exclusions.
+  elf: {absolute ELF path: {needed:[sorted unique DT_NEEDED names],
+    interpreter: literal PT_INTERP or null, rpath:[literal RPATH bracket values],
+    runpath:[literal RUNPATH bracket values], undefined:[sorted nonweak actual
+      undefined symbol names with @VERSION suffixes], exports:[sorted global/
+      weak export symbols, @@ normalized to @]}}
+    Use actual readelf -W -l -d --dyn-syms observations, not label unions as a
+    supposed minimum ABI. Provider graph checks include executable global scope.
+  providers: {same ELF keys: {each DT_NEEDED name: chosen literal ELF path}}.
+    Every recursive provider and PT_INTERP must also be an ELF entry. Actual ldd
+    resolutions must match the declared provider after realpath normalization.
+    Actual imported extension modules and every /proc/self/maps file must be
+    individually closed; mapped files must also occur in this ELF graph.
+  platform: {machine: actual platform.machine(),system: actual platform.system(),
+    release: actual platform.release()}. Import/collection gates run on that host;
+    root retains responsibility for actual launch placement and CPU/kernel scope.
+  readelf, ldd: absolute existing pinned inspection-tool paths, each individually closed.
+    A root-reviewed read-only tool bind is supported; the chosen tool and its
+    loader/provider closure must be bound and ABI-checked before use. Root tool
+    discovery found /usr/bin/readelf absent in the pinned SIF. Supplying a pinned
+    read-only inspection tool is therefore a root deployment prerequisite.
+    This implementation installs nothing and does not change the SIF.
+  stdlib_imports: nonempty list of explicit fixture-required stdlib module names.
+  helpers: exact nonempty ordered list of {path, name, environment:{A2_*:value},
+    sys_path:[literal paths]}; only environment and sys_path may be omitted.
+    Required paths: both preserved/corrected cpu/{supervisor.py,validate-phase.py},
+    corrected gpu/{common.py,host-launch.py,controller.py}, original RED observer,
+    new GREEN observer. No gpu-probe.py/module-probe.py import or main execution.
+    Import common under name 'common', before host-launch/controller, with a tiny
+    hash-bound fixture JSON via A2_FULL_SCORE_BOUND_CONFIG and its SHA256. These
+    globals are only import compatibility data. Do not set fake Slurm fields.
+    Bind required transitive helper imports by listing every source file. Extra
+    non-stdlib transitive modules reject even when their bytes are in entries.
+  collection_names: {red:[exact ordered 22 unique nodeids],
+                     green:[exact ordered 226 unique nodeids]}.
+    Each phase uses a fresh interpreter, original command() function and flags,
+    plus --collect-only. Different RED/GREEN CPU and observer targets are retained.
+    Cross-environment equality is a root acceptance check over both observations.
+    No pytest test body, native workload, allocation or scientific pipeline runs.
+  exclusions: nonempty explicit reviewed records {reason, evidence_path,
+    absent_paths:[absolute paths]}. evidence_path must be an entry; every excluded
+    path must actually be absent. Retain bounded import/startup evidence before
+    approving .pth/preload/mxeval/bytecode/resource exclusions. An explicit empty
+    absent_paths record may document that no exclusions were needed.
+
+Output: raw readelf/ldd stdout+stderr files, raw RED/GREEN stdout+stderr,
+red-observation.json and green-observation.json with exact startup, imports,
+opened paths, mapped providers, collection commands/names and metadata origins.
+RESULT.json status FIXTURE_RUNTIME_COMPATIBILITY_ONLY is possible only after
+all checks. It always disclaims scientific equivalence/allocation/admission.
+REJECTED.json records a master gate failure. Worker errors remain in raw stderr.
+No actual compatibility result or actual bound closure is supplied by Task 1.

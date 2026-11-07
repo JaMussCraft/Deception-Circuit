@@ -1,0 +1,8 @@
+{
+  "decision": "Permit narrow fail-closed supervisor completion rejection when observed child elapsed is at or beyond configured cap, including already-reaped normal exit",
+  "reason": "Author identified wait4-before-deadline race; approved contract forbids promotion after the fixed child bound",
+  "required_RED": "Before-bound normal completes; at/after-bound normal must fail; terminated exit-zero remains failure",
+  "preserve": "Original r2, run.py, scientific builder and all input/source/stream/postguard contracts byte-identical; no timeout extension or automatic retry",
+  "exact_new_packet_independent_review_required": true,
+  "created_unix": 1793986971.6732
+}

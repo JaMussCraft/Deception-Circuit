@@ -1,0 +1,68 @@
+{
+  "status": "FINAL_PROPOSAL_FROZEN_UNEXECUTED",
+  "drivers": {
+    "coordinator.py": {
+      "sha256": "dd0363f31886ba5a0374493696e713d79260bcc00a20995c7c0c8aa8d6766921",
+      "bytes": 8778
+    },
+    "supervisor.py": {
+      "sha256": "657c70b6848250c046982f135716f57835cf90d4dbef05d3fe095f93a2b01896",
+      "bytes": 3746
+    },
+    "allocation_facts.py": {
+      "sha256": "2eccafbcd4006dedd5e08cf9219b0a70b594708f20843b6861795345a84c2b3d",
+      "bytes": 6330
+    },
+    "launch.sbatch": {
+      "sha256": "8ba09d57a4e6022e36eba29817a49bbdb1eaa75743a0679e5655d0bb7947a66d",
+      "bytes": 1336
+    },
+    "proposal.json": {
+      "sha256": "24a92a415dd90ce62246a9654959549bb788900ee3f742483e798623b559855f",
+      "bytes": 24161
+    },
+    "proposal.md": {
+      "sha256": "6d7fc7f6d8ac0a7f5a48d87d13ba7871c94730833b909809c669ad0871ffc313",
+      "bytes": 4778
+    },
+    "protocol-checks.json": {
+      "sha256": "65189ab27d28ed6dbe9d66656d6e8d73c8d7e63d1be24091d8686844dd2caff1",
+      "bytes": 484
+    },
+    "accepted-driver.diff": {
+      "sha256": "c4e8392aae4a6bd352166536fa1174bdc2cd1423334dbee2392bcc38db4e2c07",
+      "bytes": 6047
+    }
+  },
+  "frozen_original_source": {
+    "component_analysis/a3_direction_pipeline.py": "96678db186078ab37cad108e2d1e71ffdccf1fb3dd157c35cdc57a91b2ebd4a0",
+    "component_analysis/a3_direction_runner.py": "89a62335665595533204006c3eca28d14ca9c42eb600879c235e9c6370739429",
+    "component_analysis/a3_direction_runtime.py": "b66c2d8cd26c36f321b5079758209214746b0e4eec16a6c801742086d729c0cc",
+    "component_analysis/a3_direction_workload.py": "3e43aaf2b4cacb99df87593ae377c8fdf3eb7b223b258ed8873853841404d8f9",
+    "component_analysis/a3_directions.py": "ed882d4e12a396e03e73671e588beba5b1a8c90ab9d31e7ee73d4194430b4a86",
+    "component_analysis/a3_pipeline.py": "310eb53427ad4ac32522dfd0d6cd3b33e4ec887af1776579845f8953bdbe83f5",
+    "scripts/jobs/specificity_a3.sh": "936dfb7f8b9c2d267d52f1e199ed431275e6527cbfc3a105a22e3812289a9b96",
+    "tests/test_a3_direction_runner.py": "3ea945d5b23b4eef7d56139758c7075ea1b56ac612f1923590b7978628ca0120",
+    "tests/test_a3_direction_runtime.py": "5a41e89b0b2bd5fd59553f5f5a63260638e3547a63c31a615d84da08f796fb6a",
+    "tests/test_a3_direction_workload.py": "91eb6f874e180c5ffb362daba231631b7bea21c224446580efccfe20a9007300",
+    "tests/test_a3_directions.py": "cd8471b1524ad7b8f1b7c87f9eb5fec5724b3ab2980027ef7aadfea3fc3bb1c1",
+    "tests/test_a3_pipeline.py": "bbb3efdba075cc14c2997cc11ae44bab268bdea56459c0574d6bfc21b62f4a18",
+    "tests/a3_direction_native_scenario.py": "9b5061ab9618222b23230917f446abcaa73747f3d216f69c77b9218feec6297b"
+  },
+  "case_catalogue": {
+    "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/native-continuation-plan/source-and-cases.json",
+    "sha256": "3bd3c48fa7ccb1a43c2fea82504dc5d0e4129c0c9d57accd0bd25b7d10ebd7f5"
+  },
+  "Slurm_requested": {
+    "account": "bjhz-delta-cpu",
+    "partition": "cpu-interactive",
+    "constraint": "projects",
+    "cpus": 4,
+    "memory_GiB": 32,
+    "gpus": 0,
+    "time_minutes": 59
+  },
+  "process_cap_seconds": 3300,
+  "grace_seconds": 15,
+  "root_will_review_test_and_submit": true
+}

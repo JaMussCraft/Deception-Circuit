@@ -1,0 +1,35 @@
+{
+  "status": "PREPARATION_ONLY_PENDING_161_162_AND_LAUNCHER_REVIEW",
+  "files": {
+    "cpu-fresh-g3-readiness.py": "2bfc3276130eddf58c334895b9d352ceb72eed867fd6f92ec7278c32e5cd4001",
+    "cpu-fresh-g3-parameters.template.json": "f33d168cbad53be3a020f875dac28f2055364c43dfc1ba0d5649c4bd65ae1f5c"
+  },
+  "actual_proposed_cpu_count": 5,
+  "memory": "8G",
+  "time": "00:10:00",
+  "remote_execution_by_root_only": true,
+  "historical_groups_requires_separate_copy": true,
+  "container_requirements": [
+    "read-only final accepted source export at original namespace",
+    "read-only physical HF hub bound /work/nvme/beto/swong2",
+    "activated packed Python and explicit HF_HUB_CACHE/TRANSFORMERS_CACHE after profile",
+    "writable bind at absent or empty new G3 output; original data/source mounts read-only"
+  ],
+  "invocation": [
+    "PACKED_PYTHON",
+    "cpu-fresh-g3-readiness.py",
+    "--parameters",
+    "ROOT_BOUND_PARAMETERS_JSON",
+    "--parameters-sha256",
+    "ROOT_BOUND_PARAMETERS_SHA256"
+  ],
+  "source_files_schema": "relative file path -> SHA256; root must supply complete accepted export source closure",
+  "limitations": [
+    "pending candidate may alter owning APIs; adapt only after acceptance",
+    "CPU proof is not GPU/model admission",
+    "source review receipt semantics remain root responsibility",
+    "no source export or remote action by author"
+  ],
+  "expected_cpu_account": "cis260361p",
+  "expected_cpu_qos": "rm"
+}

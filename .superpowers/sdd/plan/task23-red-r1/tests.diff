@@ -1,0 +1,438 @@
+--- acceptedT1/tests/test_a3_prepared_pilot_target.py
++++ T23/tests/test_a3_prepared_pilot_target.py
+@@ -4,6 +4,10 @@
+ bodies, outside expected-rejection contexts, so RED is attributable to transport.
+ """
+ import builtins
++import copy
++from types import SimpleNamespace
++import time
++from tests.test_a3_direction_runner import fake
+ import hashlib
+ import io
+ import json
+@@ -343,3 +347,424 @@
+     assert type(before) is tuple
+     (Path(policy['work_dir']) / 'independent').mkdir()
+     assert identity(policy['work_dir'], policy['target_root'], policy['preparation_root'], ()) == before
++
++
++# T2/T3 integration tests. New interfaces are resolved inside bodies before any
++# expensive fixture is built; fixture code never supplies execution permission.
++def integration_case(tmp_path, monkeypatch, **kwargs):
++    from tests.a3_prepared_integration_cases import PreparedCase
++    return PreparedCase(tmp_path / 'prepared-case', monkeypatch, **kwargs)
++
++
++def reanchor_resource(case, update):
++    from tests.a3_prepared_integration_cases import rewrite_object
++    record = case.r.read_object(case.resource_path); update(record)
++    rewrite_object(case.resource_path, record)
++    binding = dict(case.preparation_binding,
++        receiver_resources_reference=case.r.object_reference(case.resource_path))
++    case._bind_original_authority(binding)
++    case.resource_record = record
++
++
++@pytest.mark.parametrize('part,stage', [('prefit', 'fit-select'), ('selected', 'remaining')])
++def test_prepared_cpu_producer_uses_exact_builder_contract(tmp_path, monkeypatch, part, stage):
++    r = runtime(); producer = r.prepare_pilot_target
++    c = integration_case(tmp_path, monkeypatch, part=part, selected=(part == 'selected'))
++    original_builder = r.workload.build_inventory; original_validator = r.workload._validate_inventory
++    builds = []; validations = []; guards = []; original_guard = r.live_guard
++    def build(design, protocol, *, stage, fits=None, selected=None):
++        builds.append((stage, fits, selected))
++        return original_builder(design, protocol, stage=stage, fits=fits, selected=selected)
++    def validate(value):
++        validations.append(value['stage']); return original_validator(value)
++    def guard(*args, **kwargs):
++        guards.append(len(builds)); return original_guard(*args, **kwargs)
++    monkeypatch.setattr(r.workload, 'build_inventory', build)
++    monkeypatch.setattr(r.workload, '_validate_inventory', validate)
++    monkeypatch.setattr(r, 'live_guard', guard)
++    prepare_args = copy.copy(c.args); prepare_args.stage = 'prepare'; prepare_args.action = 'pilot-target'
++    r.validate_arguments(prepare_args)
++    reference = producer(prepare_args, c.design, c.protocol, selected=c.selected)
++    descriptor = r.read_object(reference['path'])
++    # Independent validator reconstruction may invoke the same original builder;
++    # each full-target invocation must retain the exact original inputs.
++    target_builds = [row for row in builds if row[0] == stage]
++    assert target_builds and all(row == (stage, None, c.selected) for row in target_builds)
++    assert stage in validations and c.pilot_inventory['stage'] in validations
++    assert len(guards) >= 2 and guards[0] == 0 and guards[-1] >= len(target_builds)
++    assert descriptor['part'] == part and descriptor['target_stage'] == stage
++    assert descriptor['target_reference'] == r.object_reference(c.target_path)
++    raw = (c.target_path / 'payload.json').read_bytes()
++    assert descriptor['emitted_payload_sha256'] == hashlib.sha256(raw).hexdigest()
++    assert descriptor['emitted_payload_bytes'] == len(raw)
++    assert descriptor['model_loaded'] is False and descriptor['execution_authorized'] is False
++    assert c.loader_calls == []
++    if part == 'selected':
++        assert descriptor['selected_reference'] == r.pipeline._bundle_byte_reference(c.args.selected)
++
++
++@pytest.mark.parametrize('failure', ['partial-target', 'source-change', 'post-guard', 'wrong-summary', 'missing-selected-backing'])
++def test_prepared_cpu_failure_never_certifies(tmp_path, monkeypatch, failure):
++    r = runtime(); producer = r.prepare_pilot_target
++    c = integration_case(tmp_path, monkeypatch)
++    original_guard = r.live_guard; original_publish = r._publish_prepared_target_object
++    calls = []
++    if failure in ('source-change', 'post-guard'):
++        def guard(*args, **kwargs):
++            calls.append(1)
++            if len(calls) > 1:
++                if failure == 'source-change': c.source_path.write_text('changed source\n')
++                else: raise ValueError('injected final source guard failure')
++            return original_guard(*args, **kwargs)
++        monkeypatch.setattr(r, 'live_guard', guard)
++    elif failure == 'partial-target':
++        def partial(path, value):
++            Path(path).mkdir(parents=True); (Path(path) / 'payload.json').write_text('{}\n')
++            raise ValueError('partial target publication')
++        monkeypatch.setattr(r, '_publish_prepared_target_object', partial)
++    elif failure == 'wrong-summary':
++        original_builder = r.workload.build_inventory
++        def damaged(design, protocol, **kwargs):
++            value = original_builder(design, protocol, **kwargs)
++            if kwargs['stage'] == 'fit-select': value['inventory_sha256'] = '0' * 64
++            return value
++        monkeypatch.setattr(r.workload, 'build_inventory', damaged)
++    else:
++        c.args.pilot_part = 'selected'; c.args.selected = str(c.root / 'absent-selected')
++    with pytest.raises(ValueError): c.prepare()
++    assert not (c.preparation_path / 'COMPLETE.json').exists()
++    assert not (c.root / 'pilot-target-preparation' / 'selected' / 'COMPLETE.json').exists()
++    assert c.loader_calls == []
++
++
++@pytest.mark.parametrize('damage', ['caller-flag', 'descriptor-as-reservation', 'resource-as-reservation',
++    'unanchored', 'source', 'part', 'pilot', 'selection', 'work-dir', 'fake-seal'])
++def test_prepared_admission_anchor_is_required(tmp_path, monkeypatch, damage):
++    r = runtime(); load = r.load_prepared_pilot_target
++    c = integration_case(tmp_path, monkeypatch, part='selected' if damage == 'selection' else 'prefit',
++        selected=(damage == 'selection')).anchor()
++    if damage == 'selection':
++        path = Path(c.args.selected) / 'COMPLETE.json'; path.write_bytes(path.read_bytes() + b' ')
++    elif damage == 'descriptor-as-reservation': c.args.reservation = str(c.preparation_path)
++    elif damage == 'resource-as-reservation': c.args.reservation = str(c.resource_path)
++    elif damage == 'caller-flag':
++        c.args._prepared_target_validated = True
++        c.args.reservation = None
++    elif damage == 'fake-seal':
++        c.args._prepared_target = {'validated': True, 'seal': object()}; c.args.reservation = None
++    elif damage == 'work-dir': c.args.work_dir = str(c.root / 'another-workdir')
++    elif damage == 'part': c.args.pilot_part = 'selected'
++    elif damage == 'source': c.protocol = dict(c.protocol, commit='f' * 40)
++    elif damage == 'pilot':
++        c.pilot_inventory = copy.deepcopy(c.pilot_inventory); c.pilot_inventory['inventory_sha256'] = '0' * 64
++    else:
++        from tests.a3_prepared_integration_cases import rewrite_object
++        mapping = r.read_object(c.mapping_path); mapping['original_admission_paths'] = []
++        rewrite_object(c.mapping_path, mapping)
++    with pytest.raises((ValueError, TypeError)): load(c.args, c.design, c.protocol, c.pilot_inventory)
++    assert c.loader_calls == []
++
++
++@pytest.mark.parametrize('damage', ['equal-graph-copy', 'equal-requirement-copy', 'wrong-pid', 'wrong-context', 'wrong-part', 'reinitialize', 'pickle', 'fork'])
++def test_prepared_handle_is_one_graph(tmp_path, monkeypatch, damage):
++    import pickle
++    r = runtime(); load = r.load_prepared_pilot_target
++    c = integration_case(tmp_path, monkeypatch).anchor(); handle = load(c.args, c.design, c.protocol, c.pilot_inventory)
++    requirement = handle.inventory['requirements'][0]
++    handle.assert_scope(c.args, c.design, c.protocol, c.pilot_inventory)
++    assert handle.inventory['requirements'][0] is requirement
++    assert handle.inventory == r.read_object(c.target_path)
++    timing_rows = [row for req in handle.inventory['requirements'] for row in req.get('timing_inputs', [])]
++    assert len(timing_rows) > 1 and len({id(row) for row in timing_rows}) == len(timing_rows)
++    if damage == 'fork':
++        import signal
++        child = os.fork()
++        if child == 0:
++            signal.alarm(5)
++            try: handle.assert_scope(c.args, c.design, c.protocol, c.pilot_inventory)
++            except (ValueError, TypeError): os._exit(0)
++            else: os._exit(1)
++        _, status = os.waitpid(child, 0)
++        assert os.waitstatus_to_exitcode(status) == 0
++        return
++    with pytest.raises(TypeError): requirement['operation'] = 'changed'
++    if damage == 'pickle':
++        with pytest.raises(TypeError): pickle.dumps(handle)
++        return
++    if damage == 'reinitialize':
++        with pytest.raises(TypeError): handle.__init__()
++        return
++    args = c.args
++    if damage == 'equal-graph-copy': object.__setattr__(handle, 'inventory', copy.deepcopy(dict(handle.inventory)))
++    elif damage == 'equal-requirement-copy':
++        graph = dict(handle.inventory); graph['requirements'] = list(graph['requirements'])
++        graph['requirements'][0] = dict(requirement); object.__setattr__(handle, 'inventory', graph)
++    elif damage == 'wrong-pid':
++        pid = os.getpid(); monkeypatch.setattr(r.os, 'getpid', lambda: pid + 1)
++    elif damage == 'wrong-context': args = copy.copy(c.args); args._authority_context = object()
++    elif damage == 'wrong-part': args = copy.copy(c.args); args.pilot_part = 'selected'
++    with pytest.raises((ValueError, TypeError)): handle.assert_scope(args, c.design, c.protocol, c.pilot_inventory)
++
++
++@pytest.mark.parametrize('capacity,accepts', [(100, True), (99, False)])
++@pytest.mark.parametrize('identity_damage', [None, 'missing', 'target', 'preparation', 'reader-code', 'freeze-code', 'source', 'environment', 'recipe', 'scope', 'storage-family'])
++def test_prepared_receiver_resource_identity_and_capacity(tmp_path, monkeypatch, capacity, accepts, identity_damage):
++    r = runtime(); validate = r._validate_prepared_receiver_resources
++    from tests.a3_prepared_integration_cases import environment_identity
++    c = integration_case(tmp_path, monkeypatch).anchor()
++    record = copy.deepcopy(c.resource_record)
++    record.update(retained_metadata_bytes_bound=20, extra_transient_bytes_bound=30)
++    inputs = dict(references=dict(target=c.preparation_binding['target_reference'],
++        preparation=c.preparation_binding['preparation_reference']), source_identity=c.resource_record['source_identity'],
++        environment=environment_identity(), actual_host_capacity=capacity, existing_host_obligations=50)
++    if identity_damage == 'missing': record = None
++    elif identity_damage == 'scope': record['scope'] = 'producer-only unmeasured graph'
++    elif identity_damage in ('target', 'preparation'):
++        record['references'][identity_damage]['files']['payload.json']['sha256'] = '0' * 64
++    elif identity_damage == 'reader-code': record['reader_sha256'] = '0' * 64
++    elif identity_damage == 'freeze-code': record['freeze_sha256'] = '0' * 64
++    elif identity_damage == 'source': record['source_identity']['commit'] = 'f' * 40
++    elif identity_damage == 'environment': record['environment']['python_version'] = 'wrong'
++    elif identity_damage == 'recipe': record['recipe'] = 'wrong'
++    elif identity_damage == 'storage-family': record['environment']['storage_family'] = 'wrong'
++    if accepts and identity_damage is None:
++        charges = validate(record, **inputs)
++        assert charges['retained_metadata_bytes'] == 20 and charges['extra_transient_bytes'] == 30
++        assert 50 + charges['retained_metadata_bytes'] + charges['extra_transient_bytes'] == 100
++    else:
++        with pytest.raises(ValueError): validate(record, **inputs)
++
++
++@pytest.mark.parametrize('observation', ['retained', 'transient', 'applicable-peak', 'unavailable', 'wrong-scope'])
++def test_prepared_correct_identity_understated_observed_resources_rejects(tmp_path, monkeypatch, observation):
++    r = runtime(); load = r.load_prepared_pilot_target
++    c = integration_case(tmp_path, monkeypatch).anchor(); calls = []; original = r._read_prepared_target_object
++    if observation in ('retained', 'transient', 'applicable-peak'):
++        field = {'retained': 'retained_metadata_bytes_bound', 'transient': 'extra_transient_bytes_bound',
++            'applicable-peak': 'process_peak_rss_bytes_bound'}[observation]
++        observed = c.observed['process_after']['process_peak_rss_bytes'] if observation == 'applicable-peak' else c.observed[
++            'retained_metadata_bytes' if observation == 'retained' else 'extra_transient_bytes']
++        understated = observed - 1 if observation == 'applicable-peak' else max(1, observed // 2)
++        reanchor_resource(c, lambda record: record.__setitem__(field, understated))
++    def reader(*args, **kwargs):
++        result = original(*args, **kwargs); calls.append(result)
++        if observation in ('unavailable', 'wrong-scope'):
++            resources = dict(result[5])
++            if observation == 'unavailable': resources['retained_metadata_bytes'] = None
++            else: resources['scope'] = 'incomparable producer-only scope'
++            result = (*result[:5], resources)
++        return result
++    monkeypatch.setattr(r, '_read_prepared_target_object', reader)
++    with pytest.raises(ValueError): load(c.args, c.design, c.protocol, c.pilot_inventory)
++    assert len(calls) == 1 and c.loader_calls == []
++
++
++@pytest.mark.parametrize('damage', [None, 'cancel-during-reader', 'shorten-lease-during-reader', 'post-load-geometry'])
++def test_prepared_dispatch_guard_and_geometry_order(tmp_path, monkeypatch, damage):
++    r = runtime(); r._PreparedPilotTarget
++    from component_analysis import hooks
++    from tests.a3_prepared_integration_cases import rewrite_object
++    c = integration_case(tmp_path, monkeypatch).anchor(); trace = []
++    original_reader = r._read_prepared_target_object; original_guard = r.live_guard
++    def reader(*args, **kwargs):
++        trace.append('reader'); result = original_reader(*args, **kwargs)
++        if damage == 'cancel-during-reader':
++            c.live['reservations'][0]['status'] = 'cancelled'; c.live_path.write_text(json.dumps(c.live))
++        elif damage == 'shorten-lease-during-reader':
++            path = c.root / 'authority' / 'allocation'; allocation = r.read_object(path)
++            allocation['end_time_unix'] = time.time(); rewrite_object(path, allocation)
++        return result
++    def guard(*args, **kwargs):
++        trace.append('live'); return original_guard(*args, **kwargs)
++    def loader(args): trace.append('loader'); c.loader_calls.append(args); return object()
++    def geometry(model):
++        trace.append('geometry'); return dict(head_dim=999 if damage == 'post-load-geometry' else 2, hidden_size=4, num_layers=1)
++    def numeric(*args, **kwargs):
++        trace.append('numeric'); assert type(kwargs['prepared_target']) is r._PreparedPilotTarget
++    monkeypatch.setattr(r, '_read_prepared_target_object', reader); monkeypatch.setattr(r, 'live_guard', guard)
++    monkeypatch.setattr(r.ladder, 'load_model', loader); monkeypatch.setattr(hooks, 'geometry', geometry)
++    monkeypatch.setattr(r, 'run_pilot', numeric)
++    if damage is not None:
++        with pytest.raises(ValueError): r.dispatch(c.args)
++        assert 'numeric' not in trace
++        assert len(c.loader_calls) == (1 if damage == 'post-load-geometry' else 0)
++    else:
++        assert r.dispatch(c.args) == 0
++        assert trace.index('reader') < trace.index('loader') < trace.index('geometry') < trace.index('numeric')
++        assert 'live' in trace[trace.index('reader') + 1:trace.index('loader')]
++        assert 'live' in trace[trace.index('geometry') + 1:trace.index('numeric')]
++
++
++@pytest.mark.parametrize('damage', ['missing-preparation', 'missing-handle', 'caller-provider'])
++def test_prepared_production_has_no_build_fallback(tmp_path, monkeypatch, damage):
++    r = runtime(); r._PreparedPilotTarget
++    c = integration_case(tmp_path, monkeypatch)
++    if damage == 'caller-provider': c.args.prepared_target_provider = lambda: {'validated': True}
++    monkeypatch.setattr(r.ladder, 'load_model', lambda args: c.loader_calls.append(args) or object())
++    if damage == 'missing-handle':
++        monkeypatch.setattr(r, '_pilot_invocation', lambda *args, **kwargs: pytest.fail('numerical entry before prepared handle'))
++        with pytest.raises(ValueError):
++            r.run_pilot(object(), dict(c.design, injected=False), c.protocol, c.pilot_inventory,
++                root=c.root, args=c.args, guard=c.guard, startup_seconds=0)
++    else:
++        with pytest.raises(ValueError): r.dispatch(c.args)
++    assert c.loader_calls == [] and not c.target_path.exists()
++
++
++@pytest.mark.parametrize('seam', ['guard-union', 'before-publication', 'final-live-guard'])
++@pytest.mark.parametrize('damage', ['target-payload-restored-mtime', 'descriptor-marker', 'identical-target-tree'])
++def test_prepared_final_barrier_after_all_costly_work(tmp_path, monkeypatch, seam, damage, request):
++    r = runtime(); r._PreparedPilotTarget
++    request.getfixturevalue('fake')
++    c = integration_case(tmp_path, monkeypatch).anchor(); handle = c.load(); writer_calls = []; phase = {'final': False, 'mutated': False}
++    def mutate():
++        if phase['mutated']: return
++        phase['mutated'] = True
++        if damage == 'identical-target-tree':
++            replacement = c.root / 'same-tree'; shutil.copytree(c.target_path, replacement)
++            c.target_path.rename(c.root / 'old-target'); replacement.rename(c.target_path)
++        else:
++            path = c.preparation_path / 'COMPLETE.json' if damage == 'descriptor-marker' else c.target_path / 'payload.json'
++            st = path.stat(); raw = path.read_bytes(); path.write_bytes(raw)
++            os.utime(path, ns=(st.st_atime_ns, st.st_mtime_ns))
++    original_union = r._measure_complete_guard_union; original_before = r._PilotReconciliationPass.before_publication
++    original_barrier = r._PreparedPilotTarget.final_publication_barrier
++    def union(*args, **kwargs):
++        result = original_union(*args, **kwargs)
++        if seam == 'guard-union': mutate()
++        return result
++    def before(instance):
++        result = original_before(instance)
++        if seam == 'before-publication': mutate()
++        return result
++    def barrier(instance, *args, **kwargs):
++        phase['final'] = True
++        try: return original_barrier(instance, *args, **kwargs)
++        finally: phase['final'] = False
++    def guard():
++        result = c.guard()
++        if seam == 'final-live-guard' and phase['final']: mutate()
++        return result
++    monkeypatch.setattr(r, '_measure_complete_guard_union', union)
++    monkeypatch.setattr(r._PilotReconciliationPass, 'before_publication', before)
++    monkeypatch.setattr(r._PreparedPilotTarget, 'final_publication_barrier', barrier)
++    monkeypatch.setattr(r, '_publish_measured_pilot_receipt', lambda *args: writer_calls.append(args))
++    with pytest.raises(ValueError):
++        r.run_pilot(object(), c.design, c.protocol, c.pilot_inventory, root=c.root, args=c.args,
++            guard=guard, startup_seconds=0, prepared_target=handle)
++    assert phase['mutated'] and writer_calls == []
++
++
++@pytest.mark.parametrize('damage', ['adopt-current-reference', 'equal-requirement-copy', 'forged-handle', 'expiry-during-final-hash', 'expiry-during-final-live-guard'])
++def test_prepared_final_barrier_cannot_adopt_current(tmp_path, monkeypatch, damage):
++    r = runtime(); r._PreparedPilotTarget
++    c = integration_case(tmp_path, monkeypatch).anchor(); handle = c.load(); expiry_calls = []
++    reconciliation = r._PilotReconciliationPass([], handle.inventory, guard=c.guard, injected=True)
++    with reconciliation: pass
++    reconciliation.before_publication()
++    if damage == 'forged-handle':
++        handle = object.__new__(r._PreparedPilotTarget)
++    elif damage == 'equal-requirement-copy':
++        graph = dict(handle.inventory); graph['requirements'] = list(graph['requirements'])
++        graph['requirements'][0] = dict(graph['requirements'][0]); object.__setattr__(handle, 'inventory', graph)
++    elif damage == 'adopt-current-reference':
++        from tests.a3_prepared_integration_cases import rewrite_object
++        value = r.read_object(c.target_path); value['changed'] = True; rewrite_object(c.target_path, value)
++        object.__setattr__(handle, 'entry_references', dict(handle.entry_references, target=r.object_reference(c.target_path)))
++    else:
++        original = r._check_file_witness if damage == 'expiry-during-final-hash' else r.live_guard
++        def expired(*args, **kwargs):
++            result = original(*args, **kwargs); expiry_calls.append(1)
++            allocation = r.read_object(c.root / 'authority' / 'allocation')
++            monkeypatch.setattr(r.time, 'time', lambda: allocation['end_time_unix'] + 1)
++            return result
++        monkeypatch.setattr(r, '_check_file_witness' if damage == 'expiry-during-final-hash' else 'live_guard', expired)
++    with pytest.raises((ValueError, TypeError)): handle.final_publication_barrier(reconciliation, {})
++    if damage.startswith('expiry-'): assert expiry_calls
++
++
++def test_prepared_costs_and_envelope_are_charged(tmp_path, monkeypatch, request):
++    r = runtime(); r._PreparedPilotTarget
++    request.getfixturevalue('fake')
++    from tests.test_a3_direction_workload import ledger
++    c = integration_case(tmp_path, monkeypatch).anchor(); handle = c.load()
++    events = []; original_union = r._measure_complete_guard_union
++    original_before = r._PilotReconciliationPass.before_publication; original_barrier = r._PreparedPilotTarget.final_publication_barrier
++    original_writer = r._publish_measured_pilot_receipt
++    def union(receipt, *args):
++        events.append('union')
++        assert receipt['origin']['target_preparation_reference'] == r.object_reference(c.preparation_path)
++        assert receipt['origin']['receiver_resources_reference'] == r.object_reference(c.resource_path)
++        return original_union(receipt, *args)
++    def before(instance): events.append('before'); return original_before(instance)
++    def barrier(instance, *args): events.append('barrier'); return original_barrier(instance, *args)
++    def writer(*args): events.append('writer'); return original_writer(*args)
++    monkeypatch.setattr(r, '_measure_complete_guard_union', union)
++    monkeypatch.setattr(r._PilotReconciliationPass, 'before_publication', before)
++    monkeypatch.setattr(r._PreparedPilotTarget, 'final_publication_barrier', barrier)
++    monkeypatch.setattr(r, '_publish_measured_pilot_receipt', writer)
++    receipt = r.run_pilot(object(), c.design, c.protocol, c.pilot_inventory, root=c.root, args=c.args,
++        guard=c.guard, startup_seconds=7., prepared_target=handle)
++    assert events[-4:] == ['union', 'before', 'barrier', 'writer']
++    assert receipt['startup_seconds'] == 7. and receipt['proof_validation_seconds'] > 0
++    target = handle.inventory; receipts = [receipt]; budget = ledger(target)
++    budget['storage_capacities']['host_ram']['available_bytes'] = 2**44
++    proofs = r._cost_packing_proofs(receipts)
++    measured = r.workload.project_cost(receipts, target, budget, packing_proofs=proofs)
++    baseline = copy.deepcopy(receipt); baseline['startup_seconds'] = 0.; baseline['proof_validation_seconds'] = 0.
++    zero = r.workload.project_cost([baseline], target, budget, packing_proofs=proofs)
++    assert measured['projected_seconds'] - zero['projected_seconds'] == pytest.approx(
++        len(target['jobs']) * (7. + receipt['proof_validation_seconds']))
++    assert not (c.root / 'new-target-after-model').exists()
++    with pytest.raises(ValueError):
++        r._publish_measured_pilot_receipt(c.root / 'oversize', dict(receipt, added='x' * (receipt['guard_dependency_measurement']['final_receipt_file_upper_bytes']['payload.json'] + 1)))
++    assert not (c.root / 'oversize' / 'COMPLETE.json').exists()
++    with pytest.raises(ValueError):
++        r._publish_measured_pilot_receipt(c.root / 'nonfinite', dict(receipt, startup_seconds=float('nan')))
++    assert not (c.root / 'nonfinite' / 'COMPLETE.json').exists()
++
++
++def test_prepared_native_adapter_and_intake_preserve_scope(tmp_path, monkeypatch, request):
++    r = runtime(); r._PreparedPilotTarget
++    request.getfixturevalue('fake')
++    from tests import a3_direction_native_scenario as scenario
++    c = integration_case(tmp_path, monkeypatch).anchor(); handle = c.load()
++    inv = c.pilot_inventory; ids = [row['invocation_id'] for row in scenario._case_invocations(c.design, inv, 'prefit')]
++    assert len(ids) == 9
++    binding = dict(kind='explicit_fake_cpu_case_binding', source=scenario.source_identity())
++    scenario.pilot_cases(object(), c.design, c.protocol, inv, root=c.root, part='prefit', case_ids=ids, binding=binding)
++    before = [r.object_reference(c.root / 'pilot-verification-cases' / 'prefit' / case_id) for case_id in ids]
++    result = scenario.aggregate_pilot_cases(object(), c.design, c.protocol, inv, root=c.root,
++        part='prefit', binding=binding, prepared_target=handle)
++    aggregate = r.read_object(c.root / 'pilot-verification-aggregate' / 'prefit')
++    assert result['complete'] and aggregate['case_order'] == ids
++    assert aggregate['case_forwards_reexecuted'] is False and aggregate['new_reconciliation_work_is_actual'] is True
++    assert [r.object_reference(c.root / 'pilot-verification-cases' / 'prefit' / case_id) for case_id in ids] == before
++
++
++@pytest.mark.parametrize('damage', [None, 'legacy-no-preparation', 'missing-preparation', 'changed-resource',
++    'unanchored-resource', 'wrong-preparation-source', 'wrong-preparation-part'])
++def test_prepared_migrated_intake_and_legacy_rejection(tmp_path, monkeypatch, damage):
++    r = runtime(); r._PreparedPilotTarget
++    from tests.test_a3_direction_runtime import _production_cost_source_case
++    from tests.a3_prepared_integration_cases import rewrite_object
++    r, design, protocol, target, path, mapping, live_path, live = _production_cost_source_case(tmp_path, monkeypatch)
++    value = r.read_object(path)
++    if damage is None:
++        receipts, sources = r._authenticated_pilot_receipts(design, protocol, target, [path], ledger_path=mapping)
++        assert len(receipts) == len(sources) == 1 and sources[0].value['execution_authorized'] is False
++        return
++    origin = value['origin']
++    if damage == 'legacy-no-preparation':
++        origin.pop('target_preparation_reference', None); origin.pop('receiver_resources_reference', None)
++    elif damage == 'missing-preparation': origin.pop('target_preparation_reference')
++    elif damage == 'changed-resource': origin['receiver_resources_reference']['files']['payload.json']['sha256'] = '0' * 64
++    elif damage == 'unanchored-resource': origin['receiver_resources_reference'] = origin['target_preparation_reference']
++    else:
++        prep = origin['target_preparation_reference']; descriptor = r.read_object(prep['path'])
++        if damage == 'wrong-preparation-source': descriptor['source_identity']['commit'] = 'f' * 40
++        else: descriptor['part'] = 'selected'
++        rewrite_object(Path(prep['path']), descriptor); origin['target_preparation_reference'] = r.object_reference(prep['path'])
++    rewrite_object(path, value)
++    with pytest.raises((ValueError, FileNotFoundError)):
++        r._authenticated_pilot_receipts(design, protocol, target, [path], ledger_path=mapping)

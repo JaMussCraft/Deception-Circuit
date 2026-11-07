@@ -1,0 +1,42 @@
+[
+  {
+    "argv": [
+      "bash",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259/run_cpu.sh",
+      "--dry-run",
+      "--output",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/root-red-01"
+    ],
+    "exit_code": 0,
+    "stdout": "{\"packet\": \"/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259\", \"pins_sha256\": \"3dae43ebb643a61a27fe45a89eedc2cbd0d5c5c2e262308223af8c7b46026bf6\", \"tests\": [\"/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259/tests/test_full_score_release.py\", \"/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259/tests/test_full_score_cache.py\", \"/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259/tests/test_full_score_usage.py\"], \"resources\": {\"kind\": \"CPU_FIXTURE_RED_ONLY\", \"expected_cases_each\": 98, \"interpreters\": [\"/u/swong2/.conda/envs/mgnp/bin/python\", \"/sw/external/python/anaconda3/bin/python3.9\"], \"cpus\": 2, \"memory\": \"4G\", \"walltime\": \"00:06:00\", \"per_invocation_timeout_seconds\": 70, \"model_loaded\": false, \"native_imports\": false, \"scheduler_submission_by_worker\": false, \"production_root_files_absent\": true, \"actual_resource_or_admission_binding\": false}, \"execution\": false, \"wrapper_uses_absolute_packet\": true}\n",
+    "stderr": "",
+    "observed_unix": 1794032851.4898136
+  },
+  {
+    "argv": [
+      "sbatch",
+      "--test-only",
+      "--parsable",
+      "--account=bjhz-delta-cpu",
+      "--partition=cpu",
+      "--constraint=projects",
+      "--nodes=1",
+      "--ntasks=1",
+      "--cpus-per-task=2",
+      "--mem=4G",
+      "--time=00:06:00",
+      "--no-requeue",
+      "--export=ALL,CUDA_VISIBLE_DEVICES=,PYTEST_DISABLE_PLUGIN_AUTOLOAD=1",
+      "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+      "--job-name=lad-A2-root-red",
+      "--output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259/root-dispatch/slurm-%j.log",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259/run_cpu.sh",
+      "--output",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/root-red-01"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "sbatch: Job 23625145 to start at 2026-11-17T11:18:33 a using 2 processors on nodes cn093 in partition cpu\n",
+    "observed_unix": 1794032853.5172417
+  }
+]

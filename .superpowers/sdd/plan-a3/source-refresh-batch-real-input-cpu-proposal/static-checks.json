@@ -1,0 +1,45 @@
+{
+  "checks": [
+    {
+      "command": [
+        "bash",
+        "-n",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-refresh-batch-real-input-cpu-proposal/cpu-preparation.sh"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "/u/swong2/.local/bin/research-session",
+        "lint",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-refresh-batch-real-input-cpu-proposal/README.md"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "/sw/external/python/anaconda3/bin/python3.9",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/scripts/check_report_numbers.py",
+        "--strict",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-refresh-batch-real-input-cpu-proposal/README.md"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "python_syntax_compiled_in_memory": [
+    "copied-negatives.py",
+    "validate-preparation.py",
+    "run-cpu-preparation.py",
+    "job_common.py",
+    "prepare-inventories.py",
+    "measure-source-cost.py",
+    "commands.py",
+    "compare-compute.py",
+    "prepare-mask-settings.py"
+  ],
+  "no_producer_validator_context_test_timing_executed": true,
+  "source_commit": "40fe57289405fd53a3fce02e5d4e47a0ebf78b64",
+  "source_file_count": 511,
+  "output_root_still_absent": true,
+  "checked_utc": "2026-11-03T02:30:29.479043+00:00"
+}

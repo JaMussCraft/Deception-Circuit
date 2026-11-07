@@ -1,0 +1,4 @@
++ rsync -rl --no-perms --no-times --no-group --no-owner --partial --human-readable --itemize-changes -e 'ssh -o BatchMode=yes' --exclude=token --exclude=.bashrc --exclude=*.lock --checksum --update --backup --suffix=.pre-b2fetch b2dtn:/ocean/projects/cis260361p/swong2/_specificity-ladder-wrapup-20261107/containers/ /projects/beto/swong2/Alignment/Deception-Circuit/containers/
+created directory /projects/beto/swong2/Alignment/Deception-Circuit/containers
+cd+++++++++ ./
+>f+++++++++ ubuntu2204.sif

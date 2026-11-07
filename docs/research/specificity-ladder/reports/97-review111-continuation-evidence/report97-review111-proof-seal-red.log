@@ -1,0 +1,17 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______ test_candidate_index_rejects_ordinary_proof_child_seal_deletion ________
+
+tmp_path = PosixPath('/tmp/review111-proof-seal-red/test_candidate_index_rejects_o0')
+
+    def test_candidate_index_rejects_ordinary_proof_child_seal_deletion(tmp_path):
+        r,paths,m=_indexed_proof_case(tmp_path);proof=r._CompletedPackingProof(paths[-1]);index=r._PackingCandidateIndex([proof])
+        assert index.candidates(m['profile'],m['axis_scope'])==[proof]
+>       with pytest.raises(TypeError):del proof._sealed
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE TypeError
+
+tests/test_a3_direction_runtime.py:1289: Failed
+=========================== short test summary info ============================
+FAILED tests/test_a3_direction_runtime.py::test_candidate_index_rejects_ordinary_proof_child_seal_deletion
+1 failed in 3.54s

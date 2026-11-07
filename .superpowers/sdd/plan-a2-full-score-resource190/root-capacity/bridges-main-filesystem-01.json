@@ -1,0 +1,20 @@
+{
+  "at_utc": "2026-11-06T19:56:42.902626+00:00",
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "-o",
+    "ControlMaster=no",
+    "-o",
+    "ControlPath=none",
+    "-o",
+    "HostName=br013.bridges2.psc.edu",
+    "bridges2",
+    "python3 -c 'import os,json,time,subprocess; p='\"'\"'/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/bridges-h100-G3-v1'\"'\"'; s=os.statvfs(p); print(json.dumps({'\"'\"'at_unix'\"'\"':time.time(),'\"'\"'path'\"'\"':p,'\"'\"'resolved'\"'\"':os.path.realpath(p),'\"'\"'score_exists'\"'\"':os.path.lexists(os.path.join(p,'\"'\"'score'\"'\"')),'\"'\"'bank_exists'\"'\"':os.path.isdir(os.path.join(p,'\"'\"'bank'\"'\"')),'\"'\"'free_available_bytes'\"'\"':s.f_bavail*s.f_frsize,'\"'\"'free_available_inodes'\"'\"':s.f_favail,'\"'\"'filesystem_block_size'\"'\"':s.f_frsize,'\"'\"'df'\"'\"':subprocess.check_output(['\"'\"'df'\"'\"','\"'\"'-PT'\"'\"',p],universal_newlines=True),'\"'\"'quota_tools'\"'\"':subprocess.check_output(['\"'\"'sh'\"'\"','\"'\"'-c'\"'\"','\"'\"'command -v lfs || command -v beegfs-ctl || true'\"'\"'],universal_newlines=True)},sort_keys=True))'"
+  ],
+  "returncode": 0,
+  "output": "{\"at_unix\": 1793995002.797208, \"bank_exists\": true, \"df\": \"Filesystem                               Type   1024-blocks     Used  Available Capacity Mounted on\\n10.8.8.18@o2ib20:10.8.8.19@o2ib20:/ocean lustre  1048576000 35903408 1012672592       4% /ocean\\n\", \"filesystem_block_size\": 4096, \"free_available_bytes\": 1036976734208, \"free_available_inodes\": 5987526, \"path\": \"/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/bridges-h100-G3-v1\", \"quota_tools\": \"/usr/bin/lfs\\n\", \"resolved\": \"/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/bridges-h100-G3-v1\", \"score_exists\": false}\n"
+}

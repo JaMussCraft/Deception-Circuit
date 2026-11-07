@@ -1,0 +1,20 @@
+ACCEPT valid_anchor {"reserved": 0.1, "actual": 0.01, "envelope_consumed": 0.1}
+REJECT completed_same_id_wrong_hash conflicting original admission ID/digest in reservation lineage
+REJECT completed_wrong_id_same_hash conflicting original admission ID/digest in reservation lineage
+REJECT completed_consistent_omitted original admission reservations omitted from envelope
+REJECT completed_consistent_included_over_cap remaining validation exceeds original fit admission envelope
+REJECT failed_same_id_wrong_hash conflicting original admission ID/digest in reservation lineage
+REJECT failed_wrong_id_same_hash conflicting original admission ID/digest in reservation lineage
+REJECT failed_consistent_omitted original admission reservations omitted from envelope
+REJECT failed_consistent_included_over_cap remaining validation exceeds original fit admission envelope
+REJECT running_same_id_wrong_hash conflicting original admission ID/digest in reservation lineage
+REJECT running_wrong_id_same_hash conflicting original admission ID/digest in reservation lineage
+REJECT running_consistent_omitted original admission reservations omitted from envelope
+REJECT running_consistent_included_over_cap remaining validation exceeds original fit admission envelope
+REJECT reserved_same_id_wrong_hash conflicting original admission ID/digest in reservation lineage
+REJECT reserved_wrong_id_same_hash conflicting original admission ID/digest in reservation lineage
+REJECT reserved_consistent_omitted original admission reservations omitted from envelope
+REJECT reserved_consistent_included_over_cap remaining validation exceeds original fit admission envelope
+ACCEPT distinct_admission {"all_reserved": 0.17, "envelope_consumed": 0.1}
+ACCEPT matching_running_charged_once {"additional": 0, "envelope_consumed": 0.11068749999999994}
+PASS 16 rejection cases and 3 valid boundary cases

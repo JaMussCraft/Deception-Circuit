@@ -1,0 +1,23 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________ test_charged_initialization_includes_context_construction ___________
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-initialization-window/test_charged_initialization_in0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fb4c7b75190>
+
+    def test_charged_initialization_includes_context_construction(tmp_path,monkeypatch):
+        c=setup_case(tmp_path,monkeypatch);ticks=[0.];constructor=c.s._SourceState.__init__
+        monkeypatch.setattr(c.s,'_clock',lambda:ticks[0])
+        def constructing(self,**kwargs):constructor(self,**kwargs);ticks[0]+=7.
+        monkeypatch.setattr(c.s._SourceState,'__init__',constructing)
+>       state=c.build();assert c.s.startup_seconds(0.,state)==7.
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 0.0 == 7.0
+E        +  where 0.0 = <function startup_seconds at 0x7fb4c7c118a0>(0.0, <component_analysis.a3_source_validation._SourceState object at 0x7fb4b99e2d40>)
+E        +    where <function startup_seconds at 0x7fb4c7c118a0> = <module 'component_analysis.a3_source_validation' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/work...s/specificity-ladder/.superpowers/sdd/plan-a3/source-guard-cost-fix-source/component_analysis/a3_source_validation.py'>.startup_seconds
+E        +      where <module 'component_analysis.a3_source_validation' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/work...s/specificity-ladder/.superpowers/sdd/plan-a3/source-guard-cost-fix-source/component_analysis/a3_source_validation.py'> = namespace(s=<module 'component_analysis.a3_source_validation' from '/projects/beto/swong2/Alignment/Deception-Circuit/...nitialization_in0/static'), calls=['semantic'], build=<function setup_case.<locals>.build at 0x7fb4b99e2980>, extra=[]).s
+
+tests/test_a3_source_validation.py:346: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_a3_source_validation.py::test_charged_initialization_includes_context_construction
+1 failed, 42 deselected in 2.82s

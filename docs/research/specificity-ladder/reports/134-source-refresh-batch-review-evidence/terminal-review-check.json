@@ -1,0 +1,82 @@
+{
+  "scontrol": {
+    "command": [
+      "scontrol",
+      "show",
+      "job",
+      "23456990",
+      "-o"
+    ],
+    "exit_code": 0,
+    "stdout": "JobId=23456990 JobName=lad-a3-review134 UserId=swong2(78031) GroupId=grp_202(202) MCS_label=N/A Priority=1630 Nice=0 Account=bjhz-delta-cpu QOS=bjhz-delta-cpu JobState=COMPLETED Reason=None Dependency=(null) Requeue=0 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=0:0 RunTime=00:01:50 TimeLimit=00:15:00 TimeMin=N/A SubmitTime=2026-11-02T20:03:28 EligibleTime=2026-11-02T20:03:28 AccrueTime=2026-11-02T20:03:28 StartTime=2026-11-02T20:03:29 EndTime=2026-11-02T20:05:19 Deadline=N/A SuspendTime=None SecsPreSuspend=0 LastSchedEval=2026-11-02T20:03:29 Scheduler=Main Partition=cpu-interactive AllocNode:Sid=dt-login04:2663292 ReqNodeList=(null) ExcNodeList=(null) NodeList=cn093 BatchHost=cn093 NumNodes=1 NumCPUs=4 NumTasks=1 CPUs/Task=4 ReqB:S:C:T=0:0:*:* ReqTRES=cpu=4,mem=16G,node=1,billing=16384 AllocTRES=cpu=4,mem=16G,node=1,billing=16384 Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=* MinCPUsNode=4 MinMemoryNode=16G MinTmpDiskNode=0 Features=projects DelayBoot=00:00:00 OverSubscribe=OK Contiguous=0 Licenses=(null) LicensesAlloc=(null) Network=(null) Command=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/134-source-refresh-batch-review-evidence/review134_cpu.sh SubmitLine=sbatch --parsable --export=ALL --account=bjhz-delta-cpu --partition=cpu-interactive --constraint=projects --nodes=1 --ntasks=1 --cpus-per-task=4 --mem=16G --time=00:15:00 --job-name=lad-a3-review134 --chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder --output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/134-source-refresh-batch-review-evidence/slurm-%j.log /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/134-source-refresh-batch-review-evidence/review134_cpu.sh WorkDir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder StdErr= StdIn=/dev/null StdOut=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/134-source-refresh-batch-review-evidence/slurm-23456990.log TresPerTask=cpu=4\n",
+    "stderr": ""
+  },
+  "sacct": {
+    "command": [
+      "sacct",
+      "-j",
+      "23456990",
+      "-n",
+      "-P",
+      "-o",
+      "JobIDRaw,JobName,State,ExitCode,ElapsedRaw,TimelimitRaw,AllocCPUS,AllocTRES,MaxRSS,NodeList"
+    ],
+    "exit_code": 0,
+    "stdout": "23456990|lad-a3-review134|COMPLETED|0:0|110|15|4|billing=16384,cpu=4,mem=16G,node=1||cn093\n23456990.batch|batch|COMPLETED|0:0|110||4|cpu=4,mem=16G,node=1|2945824K|cn093\n23456990.extern|extern|COMPLETED|0:0|110||4|billing=16384,cpu=4,mem=16G,node=1||cn093\n",
+    "stderr": ""
+  },
+  "checked_utc": "2026-11-03T02:09:12.378895+00:00",
+  "source_and_harness_bindings_unchanged": true,
+  "completed_elapsed_seconds": 110,
+  "node": "cn093",
+  "CPU_count": 4,
+  "gpus": 0,
+  "results": {
+    "mgnp": {
+      "interpreter": "/u/swong2/.conda/envs/mgnp/bin/python",
+      "wall_seconds": 44.55068039894104,
+      "host_peak_bytes": 841875456,
+      "helper_sha256": "eaabf9ef8247159686ec6ee00b6dbcb876495a0dac62281bb26077a9eb65fcee",
+      "args": [
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--rootdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime",
+        "--confcutdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime",
+        "--import-mode=importlib",
+        "--basetemp=/tmp/review134-23456990-mgnp-l3a4vb0p/pytest",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime/tests/test_a3_source_validation.py",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/134-source-refresh-batch-review-evidence/test_independent_batch.py",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/121-source-cost-review-evidence/test_independent_source_boundaries.py",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime/tests/test_a3_edge_pipeline.py::test_cached_edge_source_keeps_fresh_authority_and_runs_semantics_once",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime/tests/test_a3_edge_pipeline.py::test_source_views_preserve_actual_edge_copy_consumers",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime/tests/test_a3_edge_pipeline.py::test_edge_source_initialization_reaches_actual_receipt_and_projector",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime/tests/test_a3_mask_pipeline.py::test_cached_mask_source_refresh_preserves_current_protection_and_semantic_work_once",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime/tests/test_a3_mask_pipeline.py::test_mask_source_initialization_reaches_existing_projector_startup_cost"
+      ]
+    },
+    "base": {
+      "interpreter": "/sw/external/python/anaconda3/bin/python3.9",
+      "wall_seconds": 46.11271524429321,
+      "host_peak_bytes": 1435066368,
+      "helper_sha256": "eaabf9ef8247159686ec6ee00b6dbcb876495a0dac62281bb26077a9eb65fcee",
+      "args": [
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--rootdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime",
+        "--confcutdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime",
+        "--import-mode=importlib",
+        "--basetemp=/tmp/review134-23456990-base-fw6ifzc_/pytest",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime/tests/test_a3_source_validation.py",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/134-source-refresh-batch-review-evidence/test_independent_batch.py",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/121-source-cost-review-evidence/test_independent_source_boundaries.py",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime/tests/test_a3_edge_pipeline.py::test_cached_edge_source_keeps_fresh_authority_and_runs_semantics_once",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime/tests/test_a3_edge_pipeline.py::test_source_views_preserve_actual_edge_copy_consumers",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime/tests/test_a3_edge_pipeline.py::test_edge_source_initialization_reaches_actual_receipt_and_projector",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime/tests/test_a3_mask_pipeline.py::test_cached_mask_source_refresh_preserves_current_protection_and_semantic_work_once",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime/tests/test_a3_mask_pipeline.py::test_mask_source_initialization_reaches_existing_projector_startup_cost"
+      ]
+    }
+  }
+}

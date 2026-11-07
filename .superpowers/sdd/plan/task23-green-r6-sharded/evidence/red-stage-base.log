@@ -1,0 +1,18 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______________ test_host_rejects_absent_or_nonzero_stage_terminal ______________
+
+tmp_path = PosixPath('/tmp/a3-r6-stage-red-base/test_host_rejects_absent_or_no0')
+
+    def test_host_rejects_absent_or_nonzero_stage_terminal(tmp_path):
+        a,p,s,b,records=terminal(tmp_path)
+        py=a.ENVS['base']; binding=b[py]['0']; host=json.loads(Path(binding['host']['path']).read_text())
+        host['stages']={}
+        binding['host']=put(Path(binding['host']['path']),host)
+>       with pytest.raises((ValueError,KeyError)):a.verify_shards(records,p,s,b)
+E       Failed: DID NOT RAISE (<class 'ValueError'>, <class 'KeyError'>)
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/test_packet.py:144: Failed
+=========================== short test summary info ============================
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/test_packet.py::test_host_rejects_absent_or_nonzero_stage_terminal
+1 failed, 33 deselected in 0.15s

@@ -1,0 +1,48 @@
+{
+  "verdict": "ACCEPT_RESOURCE_ONLY_NEW_ATTEMPT_DESIGN_RECOMMEND_NARROWER_BOUND",
+  "proposal_sha256": "501434bef679d9e85a2915318cf80eb22c6109795b4c084b6a73016daf098b50",
+  "diagnosis_sha256": "2ec56646b79b23ef8efb67e9976c3a8eb7a5046c3dc236ddd454a375139a5733",
+  "failed_base_job": "23605749",
+  "raw_child_exit_code": -15,
+  "actual_TERM_seconds": 3300.324361130013,
+  "base_build_seconds": 2653.111457766994,
+  "mgnp_stream_seconds": 735.1920098650007,
+  "mgnp_nonbuild_nonstream_seconds": 119.70442466399982,
+  "orientation_seconds": 3508.0078922959947,
+  "recommended": {
+    "CPU_count": 4,
+    "memory_GiB": 192,
+    "GPU_count": 0,
+    "partition": "cpu",
+    "Slurm_minutes": 75,
+    "Slurm_seconds": 4500,
+    "child_seconds": 4200,
+    "kill_grace_seconds": 15,
+    "finish_margin_seconds": 285,
+    "minimum_initial_remaining_seconds": 4400,
+    "automatic_retry": false
+  },
+  "child_orientation_headroom_seconds": 691.9921077040053,
+  "conservative_other_allowance_seconds": 300,
+  "child_headroom_with_conservative_other_seconds": 511.69653236800514,
+  "base_stream_room_with_conservative_other_seconds": 1246.8885422330059,
+  "critique": "The90-minute proposal stacks twice an unmeasured stream, an other-work allowance about2.5times actual mgnp other, and another15percent across all terms. A75-minute bound is better aligned with observed-runtime plus reasonable buffer, while honestly leaving base stream uncertain. Neither bound guarantees completion.",
+  "raw_job_memory_peak_bytes": 134158635008,
+  "raw_job_memory_limit_bytes": 206158430208,
+  "job_OOM_observed": false,
+  "failed_run_is_oracle": false,
+  "constraints": [
+    "New immutable copied resource packet, config, output and manifest; preserve parent packet21122, failedbase and completedmgnp/candidate artifacts.",
+    "Original run.py fullSHA and all builder/fullpublisher+newline/summary/source511+4/input/origin/livepostguard/normalexit completion semantics unchanged.",
+    "Narrow prospective limit/timeout/placement edits only; exact new resource guard and fake timeout tests bothenvs plus static review before one deliberate root submission.",
+    "TERM even if child subsequently exits0 must never produce COMPLETE; partial/subset never oracle.",
+    "No new construction, tests, scheduler, RS, git, remote or scientificsource changes by reviewer."
+  ],
+  "evidence_sha256": {
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/original-base-r2-01/child-execution.json": "81c65b0b8692490d3e28bf8bd731170802832fb8613a69570497a25854dd2c1c",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/original-base-r2-01/BUILD_FINISHED_NOT_ORACLE.json": "0e82500973f075a499a6b21b8055fe89af1fa2a0366746d7b867764e9d697d50",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/original-base-r2-01/memory-before.json": "266f4949d0ced9494a24939862dcbbaeacf5209729ed4fa0e79a75df8b869310",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/original-base-r2-01/memory-after.json": "df72aeaba184ed247cb796287c074e065bc1af5e892e702330a7a4a368b0f503",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/original-mgnp-r2-02/COMPLETE_ORACLE.json": "1685fca54172ab3de7a8003b8503fdf2a9ac184e684ae1c17a52493fcc7ca991"
+  }
+}

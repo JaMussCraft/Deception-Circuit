@@ -1,0 +1,63 @@
+{
+  "command": [
+    "bash",
+    "/tmp/timing239-wrapper-a928yx8f/slurm_script",
+    "--config",
+    "UNBOUND",
+    "--config-sha256",
+    "0000000000000000000000000000000000000000000000000000000000000000",
+    "--dry-run"
+  ],
+  "exit_code": 0,
+  "observation": {
+    "diagnostic_only": true,
+    "policy": {
+      "CPUs": 4,
+      "RAM_bytes": 34359738368,
+      "duration_seconds": 900,
+      "bootstrap_seconds": 75,
+      "prime_cap_seconds": 480,
+      "fresh_cap_seconds": 240,
+      "publication_margin_seconds": 45,
+      "CPU_finish_margin_seconds": 60,
+      "kill_grace_seconds": 15,
+      "fixed_GPU_window_seconds": 300
+    },
+    "new_interpreters": 2,
+    "operational_admission": false,
+    "required_bindings_unset": true,
+    "commands": [
+      [
+        "/u/swong2/.conda/envs/mgnp/bin/python",
+        "-B",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239/child.py",
+        "--config",
+        "UNBOUND",
+        "--config-sha256",
+        "0000000000000000000000000000000000000000000000000000000000000000",
+        "--diagnostic-stage",
+        "prime",
+        "--output",
+        "ABSENT/prime",
+        "--deadline",
+        "0"
+      ],
+      [
+        "/u/swong2/.conda/envs/mgnp/bin/python",
+        "-B",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239/child.py",
+        "--config",
+        "UNBOUND",
+        "--config-sha256",
+        "0000000000000000000000000000000000000000000000000000000000000000",
+        "--diagnostic-stage",
+        "fresh",
+        "--output",
+        "ABSENT/fresh",
+        "--deadline",
+        "0"
+      ]
+    ]
+  },
+  "no_native_import": true
+}

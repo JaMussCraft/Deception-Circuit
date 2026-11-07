@@ -1,0 +1,29 @@
+{
+  "scontrol": {
+    "command": [
+      "scontrol",
+      "show",
+      "job",
+      "23459504",
+      "-o"
+    ],
+    "exit_code": 0,
+    "stdout": "JobId=23459504 JobName=lad-a2-compare-freeze UserId=swong2(78031) GroupId=grp_202(202) MCS_label=N/A Priority=2069 Nice=0 Account=beto-delta-cpu QOS=beto-delta-cpu JobState=COMPLETED Reason=None Dependency=(null) Requeue=0 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=0:0 RunTime=00:01:35 TimeLimit=00:15:00 TimeMin=N/A SubmitTime=2026-11-02T20:38:37 EligibleTime=2026-11-02T20:38:37 AccrueTime=2026-11-02T20:38:37 StartTime=2026-11-02T20:38:45 EndTime=2026-11-02T20:40:20 Deadline=N/A SuspendTime=None SecsPreSuspend=0 LastSchedEval=2026-11-02T20:38:45 Scheduler=Backfill Partition=cpu AllocNode:Sid=dt-login04:3047022 ReqNodeList=(null) ExcNodeList=(null) NodeList=cn061 BatchHost=cn061 NumNodes=1 NumCPUs=4 NumTasks=1 CPUs/Task=4 ReqB:S:C:T=0:0:*:* ReqTRES=cpu=4,mem=32G,node=1,billing=16384 AllocTRES=cpu=4,mem=32G,node=1,billing=16384 Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=* MinCPUsNode=4 MinMemoryNode=32G MinTmpDiskNode=0 Features=projects DelayBoot=00:00:00 OverSubscribe=OK Contiguous=0 Licenses=(null) LicensesAlloc=(null) Network=(null) Command=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/real-input-readiness/cpu-job.sh SubmitLine=sbatch --parsable --export=ALL --account=beto-delta-cpu --partition=cpu --constraint=projects --nodes=1 --ntasks=1 --cpus-per-task=4 --mem=32G --time=00:15:00 --job-name=lad-a2-compare-freeze --chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder --output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/real-input-readiness/slurm-%j.log /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/real-input-readiness/cpu-job.sh WorkDir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder StdErr= StdIn=/dev/null StdOut=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/real-input-readiness/slurm-23459504.log TresPerTask=cpu=4\n",
+    "stderr": ""
+  },
+  "sacct": {
+    "command": [
+      "sacct",
+      "-j",
+      "23459504",
+      "-n",
+      "-P",
+      "-o",
+      "JobIDRaw,JobName,State,ExitCode,ElapsedRaw,TimelimitRaw,AllocCPUS,AllocTRES,MaxRSS,NodeList"
+    ],
+    "exit_code": 0,
+    "stdout": "23459504|lad-a2-compare-freeze|COMPLETED|0:0|95|15|4|billing=16384,cpu=4,mem=32G,node=1||cn061\n23459504.batch|batch|COMPLETED|0:0|95||4|cpu=4,mem=32G,node=1|2243104K|cn061\n23459504.extern|extern|COMPLETED|0:0|95||4|billing=16384,cpu=4,mem=32G,node=1||cn061\n",
+    "stderr": ""
+  },
+  "checked_utc": "2026-11-03T02:40:59.559172+00:00"
+}

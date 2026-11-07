@@ -1,0 +1,19 @@
+[
+  "sbatch",
+  "--parsable",
+  "--account=beto-delta-cpu",
+  "--partition=cpu-interactive",
+  "--nodes=1",
+  "--ntasks=1",
+  "--cpus-per-task=2",
+  "--mem=4G",
+  "--time=00:08:00",
+  "--no-requeue",
+  "--job-name=a2-fullscore-t1-red",
+  "--export=ALL",
+  "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task1",
+  "--output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task1/cpu-red-%j.out",
+  "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task1/launch_cpu_red.sh",
+  "--output",
+  "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task1/executions/delta-red-01"
+]

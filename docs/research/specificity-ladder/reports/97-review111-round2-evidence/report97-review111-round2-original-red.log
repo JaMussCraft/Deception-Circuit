@@ -1,0 +1,60 @@
+F{"measured_guard_dependency_bytes": 0, "scoring_dependency_roots": 10, "actual_scoring_dependency_bytes": 3998240, "serial_reference_count": 9, "source_unchanged": true, "model_is_explicit_fake_cpu": true}
+F
+=================================== FAILURES ===================================
+_____________ test_serial_evidence_rejects_wrong_donor_convention ______________
+
+tmp_path = PosixPath('/tmp/review111-round2-original-red/test_serial_evidence_rejects_w0')
+fake = [(tensor([[2, 3, 6, 0],
+        [2, 3, 5, 0]]), None), (tensor([[1, 2, 4, 0],
+        [1, 2, 3, 0]]), None), (tensor([...None), (tensor([[2, 3, 5, 0],
+        [2, 3, 7, 0]]), None), (tensor([[1, 2, 3, 0],
+        [1, 2, 5, 0]]), None), ...]
+
+    def test_serial_evidence_rejects_wrong_donor_convention(tmp_path,fake):
+        d,p=_fake_pilot_inputs(1)[1:];inv=r.workload.build_inventory(d,p,stage='prefit')
+        invocation=next(x for x in r._serial_invocations(inv) if any(c['operation']=='interchange' for c in x['cells']))
+        result=r._pilot_invocation(object(),d,p,invocation,axes=None,root=tmp_path,guard=lambda:None)
+        payload=dict(kind='a3_serial_numeric_invocation_v1',actual_execution=True,injected=True,timing_only=True,source_commit=p['commit'],runtime_profile=r.runtime_kernel_identity(object()),receipt=result['receipt'],positive_controls=result['positive_controls'],numeric_backing_references={})
+        baseline=tmp_path/'baseline';r.publish_object(baseline,payload);proof=r._SerialNumericProof(baseline)
+        measurement=r._pilot_scope_measurement(d,invocation);proof.check_scope(measurement);r._exact_pilot_scope(proof.rows,proof.specs,measurement)
+        altered=copy.deepcopy(payload)
+        for specs in altered['receipt']['batches'].values():
+            for spec in specs:
+                if spec['operation']=='interchange':
+                    for donor in spec['donors']:donor['mapping']['donor_stream']='not-a-real-stream'
+        altered['receipt']['receipt_sha256']=r.workload.digest({k:v for k,v in altered['receipt'].items() if k!='receipt_sha256'})
+        changed=tmp_path/'wrong-donor';r.publish_object(changed,altered)
+>       with pytest.raises(ValueError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+docs/research/specificity-ladder/reports/111-round1-evidence/test_independent_round1.py:73: Failed
+______ test_serial_measured_guard_covers_actual_scoring_dependency_union _______
+
+tmp_path = PosixPath('/tmp/review111-round2-original-red/test_serial_measured_guard_cov0')
+fake = [(tensor([[2, 3, 6, 0],
+        [2, 3, 5, 0]]), None), (tensor([[1, 2, 4, 0],
+        [1, 2, 3, 0]]), None), (tensor([...None), (tensor([[2, 3, 5, 0],
+        [2, 3, 7, 0]]), None), (tensor([[1, 2, 3, 0],
+        [1, 2, 5, 0]]), None), ...]
+
+    def test_serial_measured_guard_covers_actual_scoring_dependency_union(tmp_path,fake):
+        _,d,p=_fake_pilot_inputs(1);pilot=r.workload.build_inventory(d,p,stage='prefit')
+        receipt=r.run_pilot(object(),d,p,pilot,root=tmp_path,args=SimpleNamespace(pilot_part='prefit',selected=None),guard=lambda:None,startup_seconds=0)
+        r.publish_object(tmp_path/'test-admission',{'pilot_receipt_paths':[str(tmp_path/'pilot'/'prefit')]})
+        r.publish_object(tmp_path/'test-reservation',{'admission_path':str(tmp_path/'test-admission')})
+        index=r._admitted_candidate_index(SimpleNamespace(reservation=str(tmp_path/'test-reservation')),d,p)
+        index.refresh_dependencies()
+        print(json.dumps(dict(measured_guard_dependency_bytes=receipt['proof_verified_bytes'],scoring_dependency_roots=len(index.forest.paths),
+            actual_scoring_dependency_bytes=index.forest.verified_bytes,serial_reference_count=len(receipt['serial_numeric_references']),
+            source_unchanged=True,model_is_explicit_fake_cpu=True)))
+>       assert receipt['proof_verified_bytes']>=index.forest.verified_bytes
+E       assert 0 >= 3998240
+E        +  where 3998240 = <component_analysis.a3_direction_runtime._DependencyForest object at 0x7ff8a344cec0>.verified_bytes
+E        +    where <component_analysis.a3_direction_runtime._DependencyForest object at 0x7ff8a344cec0> = <component_analysis.a3_direction_runtime._PackingCandidateIndex object at 0x7ff8a832cc80>.forest
+
+docs/research/specificity-ladder/reports/111-round1-evidence/test_independent_round1_more.py:39: AssertionError
+=========================== short test summary info ============================
+FAILED docs/research/specificity-ladder/reports/111-round1-evidence/test_independent_round1.py::test_serial_evidence_rejects_wrong_donor_convention
+FAILED docs/research/specificity-ladder/reports/111-round1-evidence/test_independent_round1_more.py::test_serial_measured_guard_covers_actual_scoring_dependency_union
+2 failed in 8.58s

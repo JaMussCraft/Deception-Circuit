@@ -1,0 +1,14 @@
+F...                                                                     [100%]
+=================================== FAILURES ===================================
+_ test_full_fake_transport_keeps_CPU_immutable_and_fails_closed_on_transfer_drift[None] _
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_root_integration.py:241: in test_full_fake_transport_keeps_CPU_immutable_and_fails_closed_on_transfer_drift
+    assert chain.guard.validate_release(release)==composite
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/gpu/common.py:428: in validate_release
+    require(r['actual_job_id'] == C['actual_job_id'] and r['reservation_id'] == C['reservation_id']
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/gpu/common.py:40: in require
+    raise ValueError(message)
+E   ValueError: release actual binding
+- generated xml file: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/brief-green270-r4/base.xml -
+=========================== short test summary info ============================
+FAILED ../../../../dev::test_full_fake_transport_keeps_CPU_immutable_and_fails_closed_on_transfer_drift[None]
+1 failed, 3 passed in 4.28s

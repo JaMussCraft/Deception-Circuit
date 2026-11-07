@@ -1,0 +1,29 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_ test_root_remote_inspection_accepts_different_cluster_UID_and_rejects_wrong_owner _
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_root_identity.py:20: in test_root_remote_inspection_accepts_different_cluster_UID_and_rejects_wrong_owner
+    assert producer.inspect([])['remote_uid']==12345
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:560: in inspect
+    gpu_facts(result['raw_scontrol'],self.g)
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:393: in gpu_facts
+    need('('+str(os.getuid())+')' in f['UserId'] and f['NumNodes']=='1' and f['Requeue']=='0' and f['Restarts']=='0','actual owner/single nonrequeued allocation')
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: actual owner/single nonrequeued allocation
+_____________ test_generated_inspection_records_actual_remote_UID ______________
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_root_identity.py:30: in test_generated_inspection_records_actual_remote_UID
+    assert json.loads(out.getvalue()).get('remote_uid')==os.getuid()
+E   assert None == 78031
+E    +  where None = <built-in method get of dict object at 0x7fe973839c80>('remote_uid')
+E    +    where <built-in method get of dict object at 0x7fe973839c80> = {'aliases': {}, 'captured_unix': 1794038294.6540008, 'files': {}, 'pending_exists': False, ...}.get
+E    +      where {'aliases': {}, 'captured_unix': 1794038294.6540008, 'files': {}, 'pending_exists': False, ...} = <function loads at 0x7fe9746f2e50>('{"files": {}, "waiting_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a", "release_exists": false, "pending_exists": false, "raw_scontrol": "JobId=456", "captured_unix": 1794038294.6540008, "aliases": {}}\n')
+E    +        where <function loads at 0x7fe9746f2e50> = json.loads
+E    +        and   '{"files": {}, "waiting_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a", "release_exists": false, "pending_exists": false, "raw_scontrol": "JobId=456", "captured_unix": 1794038294.6540008, "aliases": {}}\n' = <built-in method getvalue of _io.StringIO object at 0x7fe9737260d0>()
+E    +          where <built-in method getvalue of _io.StringIO object at 0x7fe9737260d0> = <_io.StringIO object at 0x7fe9737260d0>.getvalue
+E    +  and   78031 = <built-in function getuid>()
+E    +    where <built-in function getuid> = os.getuid
+- generated xml file: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/identity-red270/base.xml -
+=========================== short test summary info ============================
+FAILED ../../../../dev::test_root_remote_inspection_accepts_different_cluster_UID_and_rejects_wrong_owner
+FAILED ../../../../dev::test_generated_inspection_records_actual_remote_UID
+2 failed in 0.38s

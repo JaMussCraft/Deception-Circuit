@@ -1,0 +1,48 @@
+[
+  {
+    "module": "component_analysis/a3_direction_runtime.py",
+    "interface": "prepare_pilot_target(args, design, protocol, *, selected=None) -> preparation_reference",
+    "role": "CPU-only producer behind one new existing-prepare action: prepare --action pilot-target --pilot-part prefit|selected. No model argument or loader. Canonical paths derived from work_dir/part; no arbitrary target-provider callback.",
+    "steps": [
+      "Run existing live_guard(design,protocol,args) without an execution inventory before and after work; actual CPU provenance is external and grants no model authority.",
+      "Build EXACT original target: prefit -> build_inventory(..., stage=fit-select, fits=None, selected=None); selected -> build_inventory(..., stage=remaining, fits=None, selected=actual complete selected metadata). Never prune initial targets or invent a selection.",
+      "Call unchanged workload._validate_inventory on the complete in-memory value, retaining the independent reconstruction and full hash/coverage checks ON CPU. Measure its separate time/peak; it is not assumed cheap.",
+      "Publish the unchanged target object using publish_object at work_dir/pilot-target-inventory/part. Only a complete normal producer with postguards publishes the small preparation descriptor at work_dir/pilot-target-preparation/part. Existing target/certificate conflicts fail; no automatic resume/re-sign/retry."
+    ]
+  },
+  {
+    "module": "component_analysis/a3_direction_runtime.py",
+    "interface": "load_prepared_pilot_target(args, design, protocol, pilot_inventory, *, selected=None) -> _PreparedPilotTarget",
+    "role": "Private data-authentication Module, called by dispatch BEFORE model loading. In production it derives expected preparation/target references from the freshly validated root admission via the process-local _AuthorityContext; not from a caller boolean or unanchored CLI hash.",
+    "steps": [
+      "Keep existing _read_stage_inventory and its pilot-inventory reconstruction unchanged, then run original live_guard(..., pilot_inventory) for actual ledger/reservation/allocation/budget checks before reading a large artifact.",
+      "Require the existing a3_root_pilot_admission_v1 body, immutably anchored in native ledger mapping, to bind pilot_target_preparation_reference for the exact part and exact target object reference. No new execution-admission kind or CPU-granted permission.",
+      "Before the large read, require a separately root-admission-bound receiver-cost/resource record for these exact artifact/source/environment bytes. Charge its conservative transient/retained metadata RAM in addition to the existing pilot/model/proof obligations; claimed capacity must still be backed by the actual allocation contract. After parse/freeze, reject if observed retained/transient accounting exceeds that bound before model load. Do not change full-target/M2 storage requirements or treat a producer peak as a reader bound.",
+      "Validate exact payload.json+COMPLETE.json structure and root-expected references. Hash and parse the SAME payload byte buffer so pre/post hash checks cannot be raced by a transient rewrite during a separate parse. Strict nonfinite/schema/source/part/frozen-input checks remain. Retaining this buffer during parse is a measured RAM cost.",
+      "Check identity/commit/code hashes, exact design/protocol hashes, stage and part mapping, injected status, planned geometry/dtype/backend/tiling/finish reserve, complete expected counts/bounds and selected full backing reference when applicable against the root-bound CPU descriptor and current frozen inputs.",
+      "Freeze the parsed JSON once with existing workload._freeze_json; mint a private sealed PID-bound nonserializable data handle. It contains an immutable value/reference and preparation provenance, no cached ledger result, lease, allocation or execution_authorized=True.",
+      "After authenticated read/parse/freeze returns, dispatch repeats the original fresh model_guard and actual remaining-lease checks immediately before invoking the original model loader. A slow data load cannot inherit the earlier ledger/allocation/protection result. The existing post-load geometry equality and model_guard remain as well."
+    ]
+  },
+  {
+    "module": "component_analysis/a3_direction_runtime.py",
+    "interface": "run_pilot(model, design, protocol, inventory, *, root, args, guard, startup_seconds, selected=None, prepared_target=None)",
+    "role": "Consume a loader-minted _PreparedPilotTarget in production; remove only the full-target build and late full-target serialization. Missing/stale/unbound data fails BEFORE model load; no production fallback to an unbudgeted builder.",
+    "steps": [
+      "dispatch keeps original model loader and actual post-load hooks.geometry equality, original model_guard and runtime/kernel/numerical checks. It passes the sealed target only after those checks. No model_loader/clock/geometry injection.",
+      "All original invocations, serial/packed/dummy/nonzero/positive/replay/control forwards, selected-axis loads, numeric witnesses, reconciliation coverage, serialization measurements and deadlines remain. The target value is the same frozen graph consumed by _PilotReconciliationPass; its existing _freeze_json is idempotent on an already frozen value.",
+      "The target already exists at the original canonical pilot-target-inventory/part path. Replace late publish+read/semantic-rehash with an explicit fresh exact backing-reference check before final origin/receipt publication. Keep origin.target_inventory_reference unchanged in meaning and add preparation_reference for audit. Do not synthesize a completed pilot from CPU preparation.",
+      "A test-only injected reference route may call the old builder for differential tests; production design.injected=False cannot use it or pass arbitrary dicts. New native prefit aggregation must exercise the prepared route, not only that reference route."
+    ]
+  },
+  {
+    "module": "component_analysis/a3_direction_runtime.py",
+    "interface": "_pilot_origin / _completed_pilot_source / _authenticated_pilot_receipts",
+    "role": "Bind and audit preparation provenance without granting CPU authority.",
+    "steps": [
+      "Origin records the root-admission-bound preparation reference and original target reference; later intake checks the same binding.",
+      "Keep current independent CPU target reconstruction and original pilot-source/numeric authentication in later admission intake. This design does not remove _authenticated_pilot_receipts reconstruction or widen completed-source kinds.",
+      "Keep _AuthorityContext, _FileWitness and actual source/protection/ledger/allocation/lease functions process-local and fresh. Do not serialize them in a CPU descriptor."
+    ]
+  }
+]

@@ -1,0 +1,10 @@
+{
+  "kind": "independent_outer_launcher_contract_blocker",
+  "launcher_sha256": "139ffbf7ea6b59b0f4c4348fd66f489b25789dfa509076672c5ddeb3035ef18b",
+  "defect": "run mode asserts completed while frozen receipt status is success",
+  "frozen_receipt_status": "success",
+  "effect": "successful D misclassified as failure; I not started",
+  "scope": "external orchestration only, frozen application unchanged",
+  "additional_required_authorization_check": "registries must contain exactly both primary and branch virtual registry paths, with no omissions/duplicates",
+  "no_job_or_model_run": true
+}

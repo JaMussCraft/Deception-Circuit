@@ -1,0 +1,340 @@
+{
+  "acceptance_sequence": [
+    "independent plan review",
+    "root technical plan acceptance",
+    "test-first implementation and raw-diff/source acceptance",
+    "root exact slice/closure staging",
+    "actual bounded read-only SIF ABI/startup/helper-import/collection gates",
+    "root exact host binding/placement",
+    "one bounded fixture CPU job preserving Delta job",
+    "raw source/name/origin/normal-exit audit; no scientific authority"
+  ],
+  "actual_binding_placeholders": {
+    "actual_cpu_job_id": null,
+    "base_compatibility_receipt": null,
+    "fixture_closure_manifest": null,
+    "mgnp_compatibility_receipt": null,
+    "private_outputs": null,
+    "root_config": null,
+    "root_config_sha256": null,
+    "runtime_closure_manifest": null,
+    "staged_source_hashes": null,
+    "startup_compatibility_receipt": null,
+    "system_provider_map": null,
+    "transport_source_acceptance": null
+  },
+  "cleanup": {
+    "kill_external_process_groups": false,
+    "normal_completion_requires_no_live_descendants": true,
+    "reuse": "229-r3 owned process-group cleanup including leader-already-exited descendants",
+    "start_new_session": true
+  },
+  "deadlines": {
+    "GREEN_seconds_per_phase": 90,
+    "RED_seconds_per_phase": 30,
+    "bootstrap_validation_seconds": 60,
+    "effective_deadline": "minimum of original fixed cap and initial/current allocation end-minus-reserve and monotonic counterpart; never renew",
+    "final_validation_seconds": 30,
+    "finish_cleanup_seconds": 30,
+    "fresh_clock_immediately_before_Popen": true,
+    "includes_container_startup_and_normal_exit": true,
+    "strict_post_reap_check": true,
+    "total_phase_caps_seconds": 240,
+    "total_seconds": 360
+  },
+  "fixture_semantics": {
+    "green": {
+      "A2_CPU_UNDER_TEST": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/cpu",
+      "A2_GREEN_OBSERVER": "FUTURE_TRANSPORT/candidate/observer.py",
+      "CPU_original": 107,
+      "CPU_review": 22,
+      "cases": 226,
+      "controller": 82,
+      "entry198": 15,
+      "errors": 0,
+      "failures": 0,
+      "inner_pytest_exit_code": 0,
+      "observer_exit_code": 0,
+      "passed": 226,
+      "skips": 0
+    },
+    "matching_names_both_environments": true,
+    "no_ancestor_conftest": true,
+    "no_cacheprovider": true,
+    "order": [
+      "red/base",
+      "red/mgnp",
+      "green/base",
+      "green/mgnp"
+    ],
+    "original_command_flags_retained": true,
+    "plugin_autoload_disabled": true,
+    "red": {
+      "A2_CPU_UNDER_TEST": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task2/green/root-dispatch/candidate-before-interface-review/cpu",
+      "A2_GREEN_OBSERVER": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task2/green/run_cpu_green.py",
+      "cases": 22,
+      "errors": 0,
+      "exact_failure_names": [
+        "test_review224_COMPLETE_requires_completed_domain_support_evidence[audit]",
+        "test_review224_COMPLETE_requires_completed_domain_support_evidence[controls]",
+        "test_review224_COMPLETE_requires_completed_domain_support_evidence[mask]",
+        "test_review224_COMPLETE_requires_completed_domain_support_evidence[rows]",
+        "test_review224_GREEN_command_includes_original107_and_all_accepted97",
+        "test_review224_actual_422_manifest_preserves_all_eleven_aliases[None]",
+        "test_review224_actual_Task1_marker_is_accepted_without_renaming[1140.0-1125.0]",
+        "test_review224_actual_Task1_marker_is_accepted_without_renaming[1300.0-1250.0]",
+        "test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[None]",
+        "test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[bank_file_sha256]",
+        "test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[bank_manifest_sha256]",
+        "test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[bound_gpu_config_sha256]",
+        "test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[full_controls]",
+        "test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[full_domain_support_audit_complete]",
+        "test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[full_rows]",
+        "test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[launch_packet_manifest_sha256]",
+        "test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[waiting_sha256]",
+        "test_review224_marker_swap_never_reaches_Popen_or_extends_deadline[before-Popen]",
+        "test_review224_marker_swap_never_reaches_Popen_or_extends_deadline[decoded-buffer]"
+      ],
+      "exact_pass_names": [
+        "test_review224_actual_422_manifest_preserves_all_eleven_aliases[changed-extra]",
+        "test_review224_actual_422_manifest_preserves_all_eleven_aliases[missing-extra]",
+        "test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[timely_window]"
+      ],
+      "failed": 19,
+      "inner_pytest_exit_code": 1,
+      "observer_exit_code": 0,
+      "passed": 3,
+      "skips": 0,
+      "unique_names": 22
+    },
+    "separate_container_for_each_phase_environment": true,
+    "threads": 1
+  },
+  "fixture_transport_only": true,
+  "host_contract": {
+    "Delta_environment_forgery_allowed": false,
+    "actual_Job_ID": null,
+    "actual_allocation": null,
+    "actual_before_and_after_receipts": true,
+    "actual_cluster": "bridges2",
+    "actual_node": null,
+    "actual_output": null,
+    "container_scontrol_required": false,
+    "host_receipts_child_writable": false,
+    "original_unit_internal_mocks_remain_fixture_only": true,
+    "receipt_fields": [
+      "actual job/UID/host",
+      "raw real scontrol/allocation/TRES",
+      "phase/environment/nonce",
+      "argv/config/transport/runtime/image/payload hashes",
+      "private output path",
+      "nonincreasing wall and monotonic deadlines"
+    ],
+    "receipt_kind": "A2_EXACT_FIXTURE_HOST_ALLOCATION_V1",
+    "same_buffer_hash_and_parse": true,
+    "scontrol_response_forgery_allowed": false
+  },
+  "implementation_authorized": false,
+  "namespaces": {
+    "S": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd",
+    "W": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+    "baseline": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task2/green/root-dispatch/candidate-before-interface-review",
+    "candidate": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate",
+    "payload_packet": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task2/green-r4",
+    "payload_parents_4_equals_W": true,
+    "physical_alignment": "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment",
+    "virtual_alignment": "/projects/beto/swong2/Alignment"
+  },
+  "outputs": {
+    "actual_cluster_must_be_recorded": true,
+    "all_inputs_readonly": true,
+    "automatic_retry": false,
+    "fresh_private_phase_outputs": 4,
+    "host_and_previous_phase_receipts_protected": true,
+    "only_active_phase_output_parent_writable": true,
+    "operational_CPU_COMPLETE_allowed": false,
+    "permissions": "0700 owned non-symlinked parents",
+    "scientific_or_GPU_authority": false,
+    "terminal_kind": "A2_EXACT_FIXTURE_BRIDGES250_OBSERVED"
+  },
+  "proposed_resources": {
+    "CPUs": 5,
+    "GPUs": 0,
+    "RAM_bytes": 8589934592,
+    "account": "cis260361p",
+    "basis": "Observed RED XML3.436s and3.435s in prior21-second failed-oracle job; earlier107-case dual observer22.069s. Full226 GREEN unobserved. Keep original per-phase caps plus bounded additional validation.",
+    "memory_core_rule": "At least five cores for8GiB under observed2000MB/core limit; root must check actual allocation.",
+    "nodes": 1,
+    "ntasks": 1,
+    "partition": "RM-shared",
+    "qos": "rm",
+    "requeue": false,
+    "restarts": 0,
+    "walltime_seconds": 360
+  },
+  "runtime": {
+    "base": {
+      "Bridges_3_9_13_substitution_allowed": false,
+      "SOABI": "cpython-39-x86_64-linux-gnu",
+      "executable": "/sw/external/python/anaconda3/bin/python3.9",
+      "executable_bytes": 16269152,
+      "executable_sha256": "17738a15aa1bdf58022a869a8d23ef2dc6d8097a3a7f34f31fd814109ce2ad42",
+      "prefix": "/sw/external/python/anaconda3",
+      "pytest": "8.3.3",
+      "selected_distributions": {
+        "exceptiongroup": "1.3.1",
+        "iniconfig": "2.1.0",
+        "packaging": "25.0",
+        "pluggy": "1.6.0",
+        "pytest": "8.3.3",
+        "tomli": "2.3.0",
+        "typing_extensions": "4.14.0"
+      },
+      "selected_module_origins": {
+        "_pytest": "/u/swong2/.local/lib/python3.9/site-packages/_pytest/__init__.py",
+        "exceptiongroup": "/u/swong2/.local/lib/python3.9/site-packages/exceptiongroup/__init__.py",
+        "iniconfig": "/u/swong2/.local/lib/python3.9/site-packages/iniconfig/__init__.py",
+        "packaging": "/u/swong2/.local/lib/python3.9/site-packages/packaging/__init__.py",
+        "pluggy": "/u/swong2/.local/lib/python3.9/site-packages/pluggy/__init__.py",
+        "pytest": "/u/swong2/.local/lib/python3.9/site-packages/pytest/__init__.py",
+        "tomli": "/u/swong2/.local/lib/python3.9/site-packages/tomli/__init__.py",
+        "typing_extensions": "/u/swong2/.local/lib/python3.9/site-packages/typing_extensions.py"
+      },
+      "source_build_string": "3.9.18 (main, Sep 11 2023, 13:41:44) \n[GCC 11.2.0]",
+      "version": [
+        3,
+        9,
+        18
+      ]
+    },
+    "compatibility_gate": {
+      "actual_SIF_readonly_inputs": true,
+      "all_dynamic_fixture_helper_imports_must_resolve": true,
+      "collection_only": true,
+      "full_suite_on_login": false,
+      "maximum_seconds_per_environment": 30,
+      "native_scientific_imports_or_model_allowed": false,
+      "real_host_allocation_claimed": false,
+      "required_before_fixture_job": true,
+      "source_version_or_local_ldd_alone_sufficient": false
+    },
+    "image": {
+      "path": "/ocean/projects/cis260361p/swong2/specificity-ladder-20261102/containers/ubuntu2204.sif",
+      "sha256": "f50c8e39dd5e2ac1c1a4bdfd443351cb970513fdb10a572725eb53d7396f8697"
+    },
+    "mgnp": {
+      "executable": "/u/swong2/.conda/envs/mgnp/bin/python",
+      "physical_prefix": "/ocean/projects/cis260361p/swong2/envs/mgnp",
+      "pytest": "9.1.1",
+      "reuse_existing_packed_environment_readonly": true,
+      "version": [
+        3,
+        12,
+        13
+      ],
+      "virtual_prefix": "/u/swong2/.conda/envs/mgnp"
+    },
+    "startup": {
+      "declared_conditional_exclusions": [
+        "unused namespace .pth/preloads mpl_toolkits/google/ruamel/sphinxcontrib/zope",
+        "easy-install mxeval path and all mxeval/data/native packages",
+        "unneeded bytecode caches and stdlib test assets only after actual import/resource closure"
+      ],
+      "disable_user_site_or_use_dash_S": false,
+      "exclusion_requires_import_evidence": true,
+      "full_scientific_BASE_environment_port": false,
+      "required": "Preserve actual fixture-required distutils .pth/_distutils_hack bytes, origins and meta-finder behavior; audit transitive pure startup files before freeze.",
+      "sitecustomize_expected": null,
+      "source_user_site_enabled": true,
+      "usercustomize_expected": null
+    },
+    "system_provider_policy": {
+      "blind_Delta_system_library_or_loader_copy": false,
+      "exact_system_ABI_equivalence_claimed": false,
+      "global_libc_override": false,
+      "provider": "PINNED_UBUNTU_SIF_AFTER_ACTUAL_ABI_GATE",
+      "required_checks": [
+        "DT_NEEDED/PT_INTERP/symlink closure",
+        "undefined symbol version needs versus actual provider",
+        "actual read-only SIF import/ELF map",
+        "CPU/kernel compatibility",
+        "all actual helper imports closed"
+      ],
+      "source_names": [
+        "/lib64/ld-linux-x86-64.so.2",
+        "/lib64/libX11.so.6",
+        "/lib64/libXau.so.6",
+        "/lib64/libc.so.6",
+        "/lib64/libcrypt.so.1",
+        "/lib64/libdl.so.2",
+        "/lib64/libm.so.6",
+        "/lib64/libnsl.so.1",
+        "/lib64/libpthread.so.0",
+        "/lib64/librt.so.1",
+        "/lib64/libutil.so.1"
+      ]
+    }
+  },
+  "scientific_environment_equivalent": false,
+  "scientific_execution_authorized": false,
+  "scope": {
+    "Delta_job_to_preserve": "23623058",
+    "allowed_writes_this_task": [
+      "plan.md",
+      "contracts.json",
+      "primary reports/250-handback.md"
+    ],
+    "cancel_or_retarget_existing_jobs": false,
+    "future_implementation_requires_root_plan_acceptance": true,
+    "no_source_test_native_diagnostic239_or_A3_edits": true
+  },
+  "shell": {
+    "absolute_physical_packet_path": true,
+    "all_arguments_quoted": true,
+    "dirname_dollar0_for_packet": false,
+    "exact_argument_count": 3,
+    "positional_order": [
+      "config_path",
+      "config_sha256",
+      "manifest_sha256"
+    ],
+    "required_tests": [
+      "direct invocation",
+      "positional swap rejection",
+      "relocated Slurm spool wrapper",
+      "deadline exhaustion",
+      "grandchild after leader exit"
+    ]
+  },
+  "source_bindings": {
+    "baseline_manifest": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task2/green/root-dispatch/candidate-before-interface-review/manifest.json",
+      "sha256": "bb3e57abfb3f5ae88f33eb843a08fa51c5991da4f713f775e8006cf62b78f37b"
+    },
+    "inventory251": {
+      "ELF_objects": 89,
+      "entries": 1103,
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-base-inventory251/manifest.json",
+      "sha256": "d15679ce4f535fac8f8ec737cd9c52980ff05ce87d4cc0bd93f285d01f9ecbb1",
+      "status": "PROPOSED_INVENTORY_NOT_REMOTE_COMPATIBILITY",
+      "system_dependencies": 11
+    },
+    "observer_public_command": {
+      "file_sha256": "e985207ab18371797d5eb1b200f524e82e0e11ff3e66ca8120a190c94ce42eb6",
+      "function_source_sha256": "2aff9edd46f0e025557c3ad2b029026f4a3f2bb88bd88a8187081803433e7373",
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task2/green-r4/run_cpu_green.py",
+      "signature": "command(python,out,n,mode='green')",
+      "unchanged_function_body_required": true
+    },
+    "payload_pins": {
+      "members": 266,
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task2/green-r4/pins.json",
+      "sha256": "ddee7e6df8220e06212c56b4bf79e6e5fa659fb2cfd9e4ead1131c164d5456b4"
+    },
+    "red_oracle": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task2/green-r4/red-oracle.json",
+      "sha256": "3c1fce7790a2590204d1b13346f776da5df8a79d6bc9af8f51900d1426de3d26"
+    }
+  },
+  "status": "DESIGN_ONLY_NOT_ROOT_ACCEPTED"
+}

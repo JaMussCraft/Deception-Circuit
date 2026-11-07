@@ -1,0 +1,134 @@
+--- before/component_analysis/a3_direction_runtime.py
++++ after/component_analysis/a3_direction_runtime.py
+@@ -855,11 +855,15 @@
+     if args.stage=='prepare' and args.action=='admit':
+         require(args.pilot_receipts and args.ledger_snapshot,'completed pilot receipts and fresh root mapping required')
+         ledger=normalize_ledger(args.ledger_snapshot,identity=inv['identity'],injected=design['injected'])
++        if args.dry_run:
++            receipts,_=_authenticated_pilot_receipts(design,protocol,inv,args.pilot_receipts,ledger_path=args.ledger_snapshot)
++            _validate_completed_pilot_footprints(design,receipts,args.pilot_receipts)
++            workload.project_cost(receipts,inv,ledger,packing_proofs=_cost_packing_proofs(receipts))
++            return _print_dry(args,design,protocol,inventory=inv,missing=['completed authentication/index startup measurement'])
+         index,receipts,sources=_completed_pilot_index(design,protocol,inv,args.pilot_receipts,ledger_path=args.ledger_snapshot,
+             host_capacity_bytes=ledger['storage_capacities']['host_ram']['available_bytes'],output_root=root)
+         proposal=workload.project_cost(receipts,inv,ledger,packing_proofs=_cost_packing_proofs(receipts,candidate_index=index),runtime_cost=index.startup_evidence)
+         proposal['completed_pilot_sources']=[dict(s.value) for s in sources]
+-        if args.dry_run:return _print_dry(args,design,protocol,inventory=inv)
+         publish_object(root/'admission'/(inv['stage']+'.json'),proposal);return 0
+     if args.stage=='summarize':
+         require(inv['stage']=='remaining' and selected is not None,'summary requires full remaining inventory and selected axes')
+@@ -1083,6 +1087,32 @@
+         scope='CPU host authentication/index startup only; no GPU operation timing')
+ 
+ 
++def _validate_completed_pilot_footprints(design,receipts,paths,*,packed_reader=None,serial_reader=None):
++    """Read-only intake checks shared by dry-run and actual construction."""
++    packed_reader=_completed_packing_proof if packed_reader is None else packed_reader
++    serial_reader=_SerialNumericProof if serial_reader is None else serial_reader
++    for receipt,path in zip(receipts,paths):
++        footprint=receipt.get('guard_dependency_measurement')
++        require(isinstance(footprint,dict) and footprint.get('kind')=='a3_complete_guard_union_timing_v1','complete guard-union timing evidence required')
++        actual={name:item['nbytes'] for name,item in object_reference(path)['files'].items()}
++        limits=footprint.get('final_receipt_file_upper_bytes',{})
++        require(set(actual)==set(limits) and all(n<=limits[name] for name,n in actual.items()),'completed receipt exceeds measured byte/file-shape bound')
++        own=[]
++        for value in receipt.get('packing_evidence',{}).values():own.append(packed_reader(value['measured_path']).witness)
++        for value in receipt.get('serial_numeric_references',{}).values():own.append(serial_reader(value['path']).witness)
++        expected={str(Path(p).resolve()) for witness in own for p in witness.paths}
++        scenario=receipt.get('verification_scenario_reference')
++        if scenario is not None:
++            require(design.get('injected') is True and object_reference(scenario['path'])==scenario,'injected scenario reference changed')
++            expected.add(str(Path(scenario['path']).resolve()))
++            own.append(_make_file_witness([scenario['path']]))
++        require({str(Path(p).resolve()) for p in footprint.get('dependency_roots',[])}==expected,'measured dependency union omitted/changed actual numeric roots')
++        own_forest=_DependencyForest(own+[_make_file_witness([path])])
++        own_bytes=sum(row[2][3] for tree in own_forest.expected for row in tree if row[0]=='file')
++        require(footprint.get('measured_bytes_per_refresh',0)>=own_bytes and footprint.get('measured_roots',0)>=len(own_forest.paths),
++            'measured guard footprint does not bound completed execution dependencies')
++
++
+ def _completed_pilot_index(design,protocol,target,paths,*,ledger_path,host_capacity_bytes=None,output_root=None):
+     """Same fresh process-local construction for completed intake and scoring."""
+     import resource
+@@ -1106,26 +1136,7 @@
+     samples=[];volume=None
+     for _ in range(3):
+         began=time.perf_counter();volume=index.refresh_dependencies();samples.append(time.perf_counter()-began)
+-    for receipt,path in zip(receipts,paths):
+-        footprint=receipt.get('guard_dependency_measurement')
+-        require(isinstance(footprint,dict) and footprint.get('kind')=='a3_complete_guard_union_timing_v1','complete guard-union timing evidence required')
+-        actual={name:item['nbytes'] for name,item in object_reference(path)['files'].items()}
+-        limits=footprint.get('final_receipt_file_upper_bytes',{})
+-        require(set(actual)==set(limits) and all(n<=limits[name] for name,n in actual.items()),'completed receipt exceeds measured byte/file-shape bound')
+-        own=[]
+-        for value in receipt.get('packing_evidence',{}).values():own.append(packed_reader(value['measured_path']).witness)
+-        for value in receipt.get('serial_numeric_references',{}).values():own.append(serial_reader(value['path']).witness)
+-        expected={str(Path(p).resolve()) for witness in own for p in witness.paths}
+-        scenario=receipt.get('verification_scenario_reference')
+-        if scenario is not None:
+-            require(design.get('injected') is True and object_reference(scenario['path'])==scenario,'injected scenario reference changed')
+-            expected.add(str(Path(scenario['path']).resolve()))
+-            own.append(_make_file_witness([scenario['path']]))
+-        require({str(Path(p).resolve()) for p in footprint.get('dependency_roots',[])}==expected,'measured dependency union omitted/changed actual numeric roots')
+-        own_forest=_DependencyForest(own+[_make_file_witness([path])])
+-        own_bytes=sum(row[2][3] for tree in own_forest.expected for row in tree if row[0]=='file')
+-        require(footprint.get('measured_bytes_per_refresh',0)>=own_bytes and footprint.get('measured_roots',0)>=len(own_forest.paths),
+-            'measured guard footprint does not bound completed execution dependencies')
++    _validate_completed_pilot_footprints(design,receipts,paths,packed_reader=packed_reader,serial_reader=serial_reader)
+     scenarios=[r['verification_scenario_reference'] for r in receipts if r.get('verification_scenario_reference') is not None]
+     output_root=Path(output_root) if output_root is not None else Path(paths[0]).parents[1]
+     profile=_host_startup_profile([*index.forest.paths,output_root]);index.refresh_dependencies()
+--- before/tests/test_a3_direction_runtime.py
++++ after/tests/test_a3_direction_runtime.py
+@@ -1460,6 +1460,51 @@
+     with pytest.raises(ValueError):index.refresh_dependencies()
+     with pytest.raises(ValueError):r._validate_startup_record(reference,d,p,expected_job_id='injected-cpu')
+     with pytest.raises(ValueError):r.read_runtime_rows(d,p,one,tmp_path/'runtime-shards')
++
++
++@pytest.mark.parametrize('dry',[True,False])
++def test_admission_dry_run_preserves_complete_tree_and_real_admission_publishes(tmp_path,fake,monkeypatch,capsys,dry):
++    from types import SimpleNamespace
++    from tests.test_a3_direction_workload import ledger
++    r,d,p=_fake_pilot_inputs(1);d.update(direction_protocol=p,direction_protocol_sha256=r.ladder.design._hash(p))
++    r.ladder.write_artifact(tmp_path/'design.json',d)
++    inv=r.workload.build_inventory(d,p,stage='prefit')
++    r.run_pilot(object(),d,p,inv,root=tmp_path,args=SimpleNamespace(pilot_part='prefit',selected=None),guard=lambda:None,startup_seconds=0)
++    target=r.read_object(tmp_path/'pilot-target-inventory'/'prefit');budget=ledger(target)
++    budget['storage_capacities']['host_ram']['available_bytes']=10**12
++    monkeypatch.setattr(r,'live_guard',lambda *a,**kw:None);monkeypatch.setattr(r,'normalize_ledger',lambda *a,**kw:budget)
++    def tree():
++        return {str(x.relative_to(tmp_path)):(x.is_dir(),x.lstat().st_mode,x.lstat().st_ino,x.lstat().st_mtime_ns,
++            None if x.is_dir() else x.read_bytes()) for x in tmp_path.rglob('*')}
++    args=['--experiment','directions','--stage','prepare','--action','admit','--design',str(tmp_path/'design.json'),'--commit',p['commit'],
++        '--work-dir',str(tmp_path),'--inventory',str(tmp_path/'pilot-target-inventory'/'prefit'),'--ledger-snapshot',str(tmp_path/'fixture-ledger'),
++        '--pilot-receipts',str(tmp_path/'pilot'/'prefit')]
++    before=tree()
++    if dry:
++        monkeypatch.setattr(r,'_completed_pilot_index',lambda *a,**kw:pytest.fail('publishing startup constructor reached on dry-run'))
++        args.append('--dry-run')
++    assert r.main(args)==0
++    after=tree();output=capsys.readouterr().out
++    if dry:
++        assert after==before and json.loads(output)['writes'] is False
++        assert 'completed authentication/index startup measurement' in json.loads(output)['missing_prerequisites']
++        import shutil
++        path=tmp_path/'pilot'/'prefit';original=r.read_object(path)
++        for damage in ('execution','footprint'):
++            invalid=copy.deepcopy(original)
++            if damage=='execution':invalid['actual_execution']=False
++            else:invalid['guard_dependency_measurement']['measured_bytes_per_refresh']=1
++            shutil.rmtree(path);r.publish_object(path,invalid);invalid_tree=tree()
++            with pytest.raises(ValueError):r.main(args)
++            assert tree()==invalid_tree
++    else:
++        records=list((tmp_path/'runtime-startup').glob('*/COMPLETE.json'));assert len(records)==1
++        proposal=r.read_object(tmp_path/'admission'/'fit-select.json');cost=proposal['completed_host_startup_cost']
++        assert cost['seconds']>0 and cost['publication_seconds']>0 and proposal['startup_seconds']>=cost['seconds']
++        original=r.read_object(tmp_path/'pilot'/'prefit')
++        assert proposal['startup_seconds']==pytest.approx(original['startup_seconds']+original['proof_validation_seconds']+cost['seconds'])
++    print(json.dumps(dict(dry_run=dry,files_before=sum(not v[0] for v in before.values()),files_after=sum(not v[0] for v in after.values()),
++        directories_before=sum(v[0] for v in before.values()),directories_after=sum(v[0] for v in after.values()),tree_unchanged=after==before)))
+ 
+ 
+ def test_production_shaped_completed_startup_preserves_lifecycle_and_footprint_refusals(tmp_path,monkeypatch,fake):

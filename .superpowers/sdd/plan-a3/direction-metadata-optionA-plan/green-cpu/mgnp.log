@@ -1,0 +1,41 @@
+........................................................................ [ 46%]
+..............................................................F......... [ 92%]
+............                                                             [100%]
+=================================== FAILURES ===================================
+___________ test_option_a_never_copies_target_only_rows_for_lengths ____________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f82e75c8b30>
+
+    def test_option_a_never_copies_target_only_rows_for_lengths(monkeypatch):
+        d, p, _ = fixture()
+        target_only = {id(row) for rows in d['access_rows'].values() for row in rows if row['split'] == 'train'}
+        deepcopy = copy.deepcopy
+        seen = []
+        depth = [0]
+        def observe(value, *args, **kwargs):
+            if depth[0] == 0 and id(value) in target_only:
+                seen.append(value['instance_id'])
+            depth[0] += 1
+            try:
+                return deepcopy(value, *args, **kwargs)
+            finally:
+                depth[0] -= 1
+        monkeypatch.setattr(w.copy, 'deepcopy', observe)
+        result = w.build_inventory(d, p, stage='fit-select')
+        assert result['capture_shards']
+>       assert seen == [], 'target-only source rows were deep-copied solely for discarded lengths'
+E       AssertionError: target-only source rows were deep-copied solely for discarded lengths
+E       assert ['far_v2t0', ...ar_v2t1', ...] == []
+E         
+E         Left contains 48 more items, first extra item: 'far_v2t0'
+E         Use -v to get more diff
+
+tests/test_a3_direction_workload.py:856: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_a3_direction_workload.py::test_option_a_never_copies_target_only_rows_for_lengths
+1 failed, 155 passed in 514.63s (0:08:34)
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/green-cpu/run.py", line 24, in <module>
+    (P/('result-'+job+'-'+sys.argv[1]+'.json')).write_text(json.dumps(result,indent=2)+'\n');assert int(code)==0 and not setup_errors and not failed,(code,failed,setup_errors)
+                                                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (<ExitCode.TESTS_FAILED: 1>, {'test_option_a_never_copies_target_only_rows_for_lengths'}, [])

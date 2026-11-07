@@ -1,0 +1,31 @@
+{
+  "kind": "a2_bridges2_sdr_timing_plan_v1",
+  "source_commit": "6bd8bf5334f2e83613a129d2fcfeacf83e762191",
+  "account": "cis260361p",
+  "partition": "GPU-shared",
+  "gpus": 1,
+  "gpu_type": "h100-80",
+  "cpus": 4,
+  "memory_bytes": 68719476736,
+  "requested_minutes": 50,
+  "reserved_gpu_hours": 0.8333,
+  "arms": [
+    "D",
+    "I"
+  ],
+  "seed": 42,
+  "actual_epochs": 20,
+  "configured_planned_epochs": 500,
+  "actual_cosine_T_max": 20,
+  "independent_model_constructions": 4,
+  "historical_cold_model_load_seconds": 458,
+  "conservative_four_load_seconds": 1832,
+  "remaining_envelope_seconds": 1168,
+  "second_arm_guard": "max(1500 seconds, 1.25 * observed first-arm outer walltime +300 seconds); recheck live lease after fresh-registry authorization",
+  "reason": "Bounded exploratory same-source timing20 repeat on H100; four possible cold model constructions plus compute/preflight/authorization/publication/finish. No H100 timing forecast or full scientific admission claimed.",
+  "script_sha256": "1d293dc473af7406048fd7d007d72336a24594c73971338c5c690501d7e518a8",
+  "job_script_sha256": "f9a40ccc39b16f79536a8bf08641d6e7819624ab865e7a5a6019becfc524cc51",
+  "combined_gpu_cap_unchanged": 125,
+  "a2_cap_unchanged": 60,
+  "authorizer_sha256": "e62ffaf354b286dcff439cfa18dc8e60a7c93667d4baa85fc7efb05d6a3d76c1"
+}

@@ -1,0 +1,32 @@
+{
+  "status": "SCHEMA_AWARE_BOUND_PROPOSAL_NOT_IMPLEMENTED_OR_NUMERICALLY_ACCEPTED",
+  "formula": {
+    "publication_metadata_v2": "B_inventory + A_fit*D_fit + SUM_c(H_capture(c)+I_local(c)+M_children(c)) + SUM_s(H_shard(s)+I_local(s)+E_execution(s)+K_expected(s)+M_children(s)) + SUM_a(B_aux(a)+M_children(a))",
+    "definitions": {
+      "B_inventory": "Original conservative wire(base inventory) ONCE, including all complete target metadata/keys. Keep existing source/scientific/control/numeric tiers independently.",
+      "I_local": "Actual scientific identity emitted by original constructor for that local source/profile/IDs/sites. Empty capture lineage in capture; one bounded seven-field capture ref in shard. Include complete A1/source/code/model identity fields, not just hashes.",
+      "M_children": "Native COMPLETE child-path/hash/byte descriptor envelope for THIS artifact, plus numeric array manifest descriptors if not already priced; actual byte path and integer limits.",
+      "E_execution": "Entire actual execution header: runtime/source, local dummy IDs/controls, root-file refs, guards/reservation/allocation, measured startup fields <=STARTUP_REFERENCE_BYTES, and fit byte reference where emitted. Never assume4096 is enough without schema evidence.",
+      "K_expected": "All actual shard-local expected keys, emitted once in its manifest (may conservatively double count keys already in B_inventory).",
+      "B_aux": "Each actually emitted positive cache, reuse attestation, process startup, job/pilot completion/receipt, fit aggregate/fit completion, selection/adapted validation/selection metadata and summary. Count each actual serialized reference duplicate; repeated arrays and global refs stay explicit.",
+      "D_fit": "Existing conservative fit-array descriptor envelope; distinguish capture array descriptors already within capture payload from fit/selected descriptors."
+    },
+    "scratch_v2": "max of complete actual artifact upper byte envelopes and existing largest capture/row/control/inventory/array publication bounds, plus that artifact actual marker/header envelope; native sibling temporary rename does not duplicate every retained output."
+  },
+  "monotonicity": "Sum per emitter and actual field counts. Unrelated captures must not inflate an unchanged local identity; aggregate list grows linearly and is priced at its actual emitter. If real reference fanout repeats elsewhere, count that fanout explicitly.",
+  "unresolved_before_any_lowered_bound": [
+    "Complete upper shape/size of live guard reservation/allocation/current-mapping references and per-process/receipt headers; bind to current source/root contract, not arbitrary4096.",
+    "Account all adapted validation and fit/selected bundle byte-reference/array descriptor fanout and every auxiliary publication, including duplicated metadata already present in row/cache components.",
+    "Actual source-schema fixture bounds must fit each genuine writer/reader for all profiles/edge paths; no full target build required to establish local schema, but final genuine inventory/digest and capacity acceptance require separate reviewed CPU work."
+  ],
+  "regression_proposal": [
+    "AST/native tiny-publisher fixtures cover local capture/shard/marker schemas, maximum local IDs/sites/arrays/path/integer sizes, actual JSON escaping and final LF. No model/forward.",
+    "Add an unrelated capture while retaining identical local source/profile: local header byte bound unchanged; only new capture/aggregate references/storage contribution grows.",
+    "Increase local IDs/sites/arrays and fit child descriptors: corresponding local/completion/fitref bound must grow and always dominate actual bytes.",
+    "Every fit-completion global train-piece reference and selection validation-reference occurrence is counted once per actual emission; omit/duplicate synthetic reference changes bound as expected.",
+    "Retain existing underflow/shared-pool/source-growth reconstruction tests and add source-schema mismatch rejection; changing bound code changes inventory source/digests and requires new reviewed source evidence, not relabelling accepted765 equivalence."
+  ],
+  "no_immediate_guard_change": true,
+  "no_deduplication_semantics_change": true,
+  "not_a_new_runtime_architecture": true
+}

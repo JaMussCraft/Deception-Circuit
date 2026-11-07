@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "-o",
+    "ControlMaster=no",
+    "-o",
+    "ControlPath=none",
+    "-o",
+    "HostName=br013.bridges2.psc.edu",
+    "bridges2",
+    "python3 -B -c 'import sys,json,hashlib,subprocess,time,os\nfrom pathlib import Path\nx=json.load(sys.stdin);p=Path(x['\"'\"'packet'\"'\"']);sys.path.insert(0,str(p/'\"'\"'bridges'\"'\"'));import host\nassert host.old.sha(p/'\"'\"'source-pins.json'\"'\"')==x['\"'\"'source'\"'\"'] and host.old.sha(p/'\"'\"'partition.json'\"'\"')==x['\"'\"'partition'\"'\"']\nfor n,h in json.loads((p/'\"'\"'bridges/manifest.json'\"'\"').read_text()).items():assert host.old.sha(p/'\"'\"'bridges'\"'\"'/n)==h\nhost.old.check_records(x['\"'\"'inventory'\"'\"']['\"'\"'files'\"'\"'],x['\"'\"'inventory'\"'\"']['\"'\"'aliases'\"'\"']);assert host.old.sha(host.old.IMAGE)==host.old.IMAGE_SHA;supervisor=host.supervisor;supervisor.enable_subreaper()\nr=subprocess.run(['\"'\"'python3'\"'\"','\"'\"'-B'\"'\"',str(p/'\"'\"'bridges/host.py'\"'\"'),'\"'\"'--dry-run'\"'\"'],stdout=subprocess.PIPE,stderr=subprocess.PIPE,universal_newlines=True,timeout=20);assert r.returncode==0,r.stderr\njob=p/'\"'\"'jobs/job-smoke273'\"'\"';child=job/'\"'\"'child'\"'\"';child.mkdir(parents=True,mode=0o700,exist_ok=False);canary=job/'\"'\"'host-before-canary.json'\"'\"';canary.write_text('\"'\"'HOST_ONLY'\"'\"')\nvirtual=host.old.VIRT/host.PACKET_REL;vjob=virtual/'\"'\"'jobs/job-smoke273'\"'\"';vchild=vjob/'\"'\"'child'\"'\"';c=dict(environment='\"'\"'mgnp'\"'\"',output=str(vchild/'\"'\"'execution'\"'\"'));kind='\"'\"'v1'\"'\"' if Path('\"'\"'/sys/fs/cgroup/memory'\"'\"').is_dir() else '\"'\"'v2'\"'\"';checks=[]\nfor stage in ['\"'\"'baseline'\"'\"','\"'\"'oracle'\"'\"','\"'\"'suite'\"'\"']:\n cmd,env=host.command(c,stage,kind,time.time()+60);cut=cmd.index(host.old.IMAGE)\n probe=\"from pathlib import Path;import os,json;h=Path(\"+repr(str(vjob/'\"'\"'host-before-canary.json'\"'\"'))+\");c=Path(\"+repr(str(vchild))+\");assert os.statvfs(h).f_flag & os.ST_RDONLY;assert not(os.statvfs(c).f_flag & os.ST_RDONLY);assert h.read_text()=='\"'\"'HOST_ONLY'\"'\"';c.joinpath(\"+repr('\"'\"'smoke-'\"'\"'+stage+'\"'\"'.json'\"'\"')+\").write_text('\"'\"'child write works'\"'\"');print(json.dumps(dict(host_readonly=True,child_writable=True,stage=\"+repr(stage)+\")))\"\n cmd=cmd[:cut+6]+[host.old.PY,'\"'\"'-B'\"'\"','\"'\"'-c'\"'\"',probe]\n started=time.time();rr=subprocess.run(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE,universal_newlines=True,timeout=25);row=dict(stage=stage,argv=cmd,exit_code=rr.returncode,stdout=rr.stdout,stderr=rr.stderr,seconds=time.time()-started);checks.append(row)\n assert rr.returncode==0,row;assert canary.read_text()=='\"'\"'HOST_ONLY'\"'\"'\n for name in ['\"'\"'host-before.json'\"'\"','\"'\"'baseline-terminal.json'\"'\"','\"'\"'oracle-terminal.json'\"'\"','\"'\"'suite-terminal.json'\"'\"']:assert not(child/name).exists()\nmounts={q.name:json.loads(q.read_text()) for q in child.glob('\"'\"'inner-mounts-*.json'\"'\"')};assert len(mounts)==3\nprint(json.dumps(dict(source_files=len(x['\"'\"'inventory'\"'\"']['\"'\"'files'\"'\"']),aliases=len(x['\"'\"'inventory'\"'\"']['\"'\"'aliases'\"'\"']),host_python=sys.version,subreaper_enabled=True,image_sha256=host.old.IMAGE_SHA,host_dry_run=dict(exit_code=r.returncode,stdout=r.stdout,stderr=r.stderr),stages=checks,mount_receipts=mounts,no_native_workload=True,observed_unix=time.time())))\n'"
+  ],
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 11, in <module>\n  File \"/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/bridges/host.py\", line 80, in command\n    _, child, out = job_layout(c['output'], c['job_id']); packet = old.VIRT/PACKET_REL\nKeyError: 'job_id'\n",
+  "observed_unix": 1794038944.4120088
+}

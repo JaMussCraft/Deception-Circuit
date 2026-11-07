@@ -1,0 +1,58 @@
+F
+=================================== FAILURES ===================================
+___ test_production_shaped_completed_pilot_full_projector_and_numeric_tamper ___
+
+tmp_path = PosixPath('/tmp/review111-projector-red3/test_production_shaped_complet0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f1846277fe0>
+fake = [(tensor([[1, 2, 3, 0],
+        [1, 2, 3, 0],
+        [1, 2, 3, 0],
+        [1, 2, 3, 0]]), None), (tensor([[1, 2, 3, ... 3, 0]]), None), (tensor([[1, 2, 3, 0],
+        [1, 2, 3, 0],
+        [1, 2, 3, 0],
+        [1, 2, 3, 0]]), None), ...]
+
+    def test_production_shaped_completed_pilot_full_projector_and_numeric_tamper(tmp_path,monkeypatch,fake):
+        """Production-shaped files and fake CPU numbers, never production admission."""
+        from tests.test_a3_direction_workload import ledger
+        import shutil
+        r,d,p,target,path,mapping,_,_=_production_cost_source_case(tmp_path,monkeypatch,capture_model=object())
+        receipts,sources=r._authenticated_pilot_receipts(d,p,target,[path],ledger_path=mapping)
+        result=r.workload.project_cost(receipts,target,ledger(target),packing_proofs=r._cost_packing_proofs(receipts))
+        assert len(sources)==1 and result['execution_authorized'] is False and result['projected_seconds']>0
+        # Capture-only corrupt IOI has its own typed lane evidence, with no patch claim.
+        capture=next(m for m in receipts[0]['measurements'] if m['operation'].startswith('capture_')
+            and m['profile'].get('source_task')=='ioi' and any(x['stream']=='corrupt' for x in m['timing_inputs'])
+            and m['profile']['axis_tile_size']>1)
+        assert capture['capture_lane_equivalence']['kind']=='a3_intact_lane_equivalence_v1' and 'packing_id' not in capture
+        entry=next(iter(receipts[0]['packing_evidence'].values()));numeric=Path(entry['measured_path']);original=r.read_object(numeric)
+        original_receipt=copy.deepcopy(receipts[0]);cache_key=str(numeric.absolute())
+        for damage in ('source','stage','extra_input','missing_reference','reference_bytes','missing_marker'):
+            payload=copy.deepcopy(original);value=copy.deepcopy(original_receipt)
+            if damage=='source':payload['source_commit']='f'*40
+            if damage=='stage':payload['timing_only']=False
+            if damage=='extra_input':
+                # A valid proof over an extra batch cannot impersonate the exact invocation.
+                evidence=payload['evidence'];bid=next(iter(evidence['snapshots']));rows=copy.deepcopy(evidence['snapshots'][bid])
+                rows[0]['instance_id']='outside';newbid=r.workload.digest([r.workload.digest(x) for x in rows])
+                evidence['snapshots'][newbid]=rows;raw=evidence['runner_receipt']
+                for name in ('batches','recipients','dummy_cells'):raw['scope'][name][newbid]=copy.deepcopy(raw['scope'][name][bid])
+                for row in raw['scope']['recipients'][newbid]:
+                    if row['instance_id']==evidence['snapshots'][bid][0]['instance_id']:row['instance_id']='outside'
+                raw['scope_sha256']=r.workload.digest(raw['scope']);raw['receipt_sha256']=r.workload.digest({k:v for k,v in raw.items() if k!='receipt_sha256'})
+            shutil.rmtree(numeric);r.publish_object(numeric,payload);r._MEASURED_PACKING_CACHE.pop(cache_key,None)
+            ref=r.object_reference(numeric);proof_value=value['packing_evidence'][Path(numeric).name]
+            proof_value.update(measured_reference=ref,evidence_sha256=r.workload.digest(payload['evidence']))
+            value['packing_references'][str(numeric.resolve())]=ref
+            if damage=='missing_reference':value['packing_references'].pop(str(numeric.resolve()))
+            if damage=='reference_bytes':proof_value['measured_reference']=dict(ref,payload_sha256='0'*64)
+            if damage=='missing_marker':(numeric/'COMPLETE.json').unlink()
+            shutil.rmtree(path);r.publish_object(path,value)
+>           with pytest.raises((ValueError,FileNotFoundError)):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE any of (ValueError, FileNotFoundError)
+
+tests/test_a3_direction_runtime.py:1453: Failed
+=========================== short test summary info ============================
+FAILED tests/test_a3_direction_runtime.py::test_production_shaped_completed_pilot_full_projector_and_numeric_tamper
+1 failed in 37.10s

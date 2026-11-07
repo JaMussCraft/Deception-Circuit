@@ -1,0 +1,63 @@
+{
+  "source_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-deployment264/progress-1794034303.json",
+  "source_snapshot_sha256": "5efef0bc93e6586c7ec2c93c156ff42ad3cc9435051035f7d75f783252a4bc3a",
+  "observed_snapshot_scheduler": "50318613|RUNNING|00:13:09|0:0|r390\n",
+  "actual_failed_calls": [
+    {
+      "duration_seconds": 16.990662220865488,
+      "event": "phase-report",
+      "longrepr": "suite/test_a3_prepared_pilot_target.py:523: in test_prepared_receiver_resource_identity_and_capacity\n    record['references'][identity_damage]['files']['payload.json']['sha256'] = '0' * 64\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n../../plan-a3/direction-preallocation-candidate183/component_analysis/a3_direction_workload.py:953: in _immutable\n    def _immutable(self,*args,**kwargs):raise TypeError('validated inventory is immutable')\n                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE   TypeError: validated inventory is immutable",
+      "nodeid": "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[target-100-True]",
+      "outcome": "failed",
+      "unix_seconds": 1794034009.53921,
+      "when": "call"
+    },
+    {
+      "duration_seconds": 17.286923772655427,
+      "event": "phase-report",
+      "longrepr": "suite/test_a3_prepared_pilot_target.py:523: in test_prepared_receiver_resource_identity_and_capacity\n    record['references'][identity_damage]['files']['payload.json']['sha256'] = '0' * 64\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n../../plan-a3/direction-preallocation-candidate183/component_analysis/a3_direction_workload.py:953: in _immutable\n    def _immutable(self,*args,**kwargs):raise TypeError('validated inventory is immutable')\n                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE   TypeError: validated inventory is immutable",
+      "nodeid": "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[target-99-False]",
+      "outcome": "failed",
+      "unix_seconds": 1794034027.0474174,
+      "when": "call"
+    },
+    {
+      "duration_seconds": 17.51419747620821,
+      "event": "phase-report",
+      "longrepr": "suite/test_a3_prepared_pilot_target.py:523: in test_prepared_receiver_resource_identity_and_capacity\n    record['references'][identity_damage]['files']['payload.json']['sha256'] = '0' * 64\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n../../plan-a3/direction-preallocation-candidate183/component_analysis/a3_direction_workload.py:953: in _immutable\n    def _immutable(self,*args,**kwargs):raise TypeError('validated inventory is immutable')\n                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE   TypeError: validated inventory is immutable",
+      "nodeid": "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[preparation-100-True]",
+      "outcome": "failed",
+      "unix_seconds": 1794034044.8208675,
+      "when": "call"
+    },
+    {
+      "duration_seconds": 17.624757169745862,
+      "event": "phase-report",
+      "longrepr": "suite/test_a3_prepared_pilot_target.py:523: in test_prepared_receiver_resource_identity_and_capacity\n    record['references'][identity_damage]['files']['payload.json']['sha256'] = '0' * 64\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n../../plan-a3/direction-preallocation-candidate183/component_analysis/a3_direction_workload.py:953: in _immutable\n    def _immutable(self,*args,**kwargs):raise TypeError('validated inventory is immutable')\n                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE   TypeError: validated inventory is immutable",
+      "nodeid": "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[preparation-99-False]",
+      "outcome": "failed",
+      "unix_seconds": 1794034062.722584,
+      "when": "call"
+    },
+    {
+      "duration_seconds": 49.94829459208995,
+      "event": "phase-report",
+      "longrepr": "suite/test_a3_prepared_pilot_target.py:652: in test_prepared_final_barrier_after_all_costly_work\n    with pytest.raises(ValueError):\n         ^^^^^^^^^^^^^^^^^^^^^^^^^\nE   Failed: DID NOT RAISE ValueError",
+      "nodeid": "test_a3_prepared_pilot_target.py::test_prepared_final_barrier_after_all_costly_work[target-payload-restored-mtime-final-live-guard]",
+      "outcome": "failed",
+      "unix_seconds": 1794034112.7282085,
+      "when": "call"
+    }
+  ],
+  "sixth_case_last_event": {
+    "duration_seconds": 0.002188742160797119,
+    "event": "phase-report",
+    "longrepr": null,
+    "nodeid": "test_a3_prepared_pilot_target.py::test_prepared_final_barrier_after_all_costly_work[descriptor-marker-final-live-guard]",
+    "outcome": "passed",
+    "unix_seconds": 1794034112.7445402,
+    "when": "setup"
+  },
+  "sixth_case_call_result_observed": false,
+  "phase0_600s_TERM": "reported by root; no scheduler query performed by correction worker"
+}

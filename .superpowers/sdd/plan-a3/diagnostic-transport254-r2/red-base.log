@@ -1,0 +1,36 @@
+test_B1_known_effective_ro_stack_is_falsely_rejected (__main__.Independent) ... FAIL
+test_B2_expired_after_log_open_still_launches (__main__.Independent) ... FAIL
+test_B3_cleanup_error_restarts_cleanup_budget (__main__.Independent) ... FAIL
+test_post_reap_shortened_end_is_correctly_clamped (__main__.Independent) ... ok
+test_real_owned_group_is_reaped_after_leader_exit (__main__.Independent) ... ok
+
+======================================================================
+FAIL: test_B1_known_effective_ro_stack_is_falsely_rejected (__main__.Independent)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-transport254-r2/test_regressions.py", line 11, in test_B1_known_effective_ro_stack_is_falsely_rejected
+    inner.main()
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-transport254-r2/inner.py", line 19, in main
+    assert all('ro' in entry[2] and 'rw' not in entry[2] for entry in mounts.values()),mounts
+AssertionError: {'/sys/fs/cgroup': (14, '/sys/fs/cgroup', ['ro']), '/sys/fs/cgroup/memory': (21, '/sys/fs/cgroup/memory', ['rw', 'nosuid', 'nodev', 'noexec', 'relatime'])}
+
+======================================================================
+FAIL: test_B2_expired_after_log_open_still_launches (__main__.Independent)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-transport254-r2/test_regressions.py", line 33, in test_B2_expired_after_log_open_still_launches
+    spawn,cleanup,report=self.phase('delayed-open');self.assertEqual(spawn,0);self.assertTrue(report['timed_out']);self.assertFalse(report['acceptance'])
+AssertionError: 1 != 0
+
+======================================================================
+FAIL: test_B3_cleanup_error_restarts_cleanup_budget (__main__.Independent)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-transport254-r2/test_regressions.py", line 35, in test_B3_cleanup_error_restarts_cleanup_budget
+    spawn,cleanup,report=self.phase('cleanup-error');self.assertEqual(spawn,1);self.assertEqual(cleanup,1);self.assertIn('unreaped fixture',report['error'])
+AssertionError: 2 != 1
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.186s
+
+FAILED (failures=3)

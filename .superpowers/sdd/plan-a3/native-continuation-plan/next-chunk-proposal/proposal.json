@@ -1,0 +1,350 @@
+{
+  "status": "UNEXECUTED; root acceptance required before any model fixture starts",
+  "indices": [
+    2,
+    3,
+    4
+  ],
+  "case_ids": [
+    "83a2ffde546a0776df0d08fb27abf14381516a83a642c337521e6a44aa57c063",
+    "f7e34290fa268cca16634b7b597fdec2fd5d7ee2f61c20ebd3a7573569c3c54d",
+    "b78f0ec2e42db6bafa0f8cd18e01b8d2240506c81627e32ec6813f5bf019cb3f"
+  ],
+  "preserved_indices": [
+    0,
+    1
+  ],
+  "preserved_case_ids": [
+    "4318f65b0a320e883897ca95ad472e2d1a0a11f53abea6ce1a848853d9fb57f1",
+    "d5738bfcdec6990c3b6e77b2c7e625d46562ea134457f5de2896af9600db7ceb"
+  ],
+  "original_required_cases": 63,
+  "after_success_known_authenticated": 5,
+  "case_descriptors": [
+    {
+      "index": 2,
+      "invocation_id": "83a2ffde546a0776df0d08fb27abf14381516a83a642c337521e6a44aa57c063",
+      "analysis_task": "far_v2",
+      "source_task": "ioi",
+      "panel": "selected_pilot",
+      "split": "validation",
+      "profile": {
+        "axis_tile_size": 32,
+        "backend": "sdpa",
+        "capture_scope": "requested_head_union",
+        "dtype": "torch.float32",
+        "model": "fixture",
+        "model_revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "padded_width": 4,
+        "physical_batch_size": 64,
+        "positive_singleton": false,
+        "sites": [
+          [
+            "head",
+            0,
+            0
+          ]
+        ],
+        "source_sha256": "d3b8be155d3390009795c62942be15c62395dd3feb30aed8c92c5984122a6ec2",
+        "source_task": "ioi"
+      },
+      "cells": 211,
+      "batch_groups": 1,
+      "cell_operations": {
+        "interchange": 201,
+        "zero": 2,
+        "h_mean": 2,
+        "steer_positive": 3,
+        "steer_negative": 3
+      },
+      "cell_families": {
+        "learned": 3,
+        "assessment_null": 199,
+        "nuisance": 3,
+        "steering_learned": 2,
+        "steering_nuisance": 2,
+        "steering_random": 2
+      },
+      "group_memberships": [
+        {
+          "condition": "IOI",
+          "stream": "clean",
+          "instance_ids": [
+            "ioi:validation:0",
+            "ioi:validation:1"
+          ]
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "invocation_id": "f7e34290fa268cca16634b7b597fdec2fd5d7ee2f61c20ebd3a7573569c3c54d",
+      "analysis_task": "far_v2",
+      "source_task": "mmlu",
+      "panel": "selected_pilot",
+      "split": "validation",
+      "profile": {
+        "axis_tile_size": 32,
+        "backend": "sdpa",
+        "capture_scope": "requested_head_union",
+        "dtype": "torch.float32",
+        "model": "fixture",
+        "model_revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "padded_width": 4,
+        "physical_batch_size": 64,
+        "positive_singleton": false,
+        "sites": [
+          [
+            "head",
+            0,
+            0
+          ]
+        ],
+        "source_sha256": "d3b8be155d3390009795c62942be15c62395dd3feb30aed8c92c5984122a6ec2",
+        "source_task": "mmlu"
+      },
+      "cells": 408,
+      "batch_groups": 2,
+      "cell_operations": {
+        "zero": 201,
+        "h_mean": 201,
+        "steer_positive": 3,
+        "steer_negative": 3
+      },
+      "cell_families": {
+        "learned": 2,
+        "assessment_null": 398,
+        "nuisance": 2,
+        "steering_learned": 2,
+        "steering_nuisance": 2,
+        "steering_random": 2
+      },
+      "group_memberships": [
+        {
+          "condition": "MMLU",
+          "stream": "clean",
+          "instance_ids": [
+            "mmlu:validation:0",
+            "mmlu:validation:1"
+          ]
+        },
+        {
+          "condition": "MMLU",
+          "stream": "clean",
+          "instance_ids": [
+            "mmlu:validation:10",
+            "mmlu:validation:11"
+          ]
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "invocation_id": "b78f0ec2e42db6bafa0f8cd18e01b8d2240506c81627e32ec6813f5bf019cb3f",
+      "analysis_task": "far_v2",
+      "source_task": "far_v2",
+      "panel": "calibration_pilot",
+      "split": "validation",
+      "profile": {
+        "axis_tile_size": 32,
+        "backend": "sdpa",
+        "capture_scope": "requested_head_union",
+        "dtype": "torch.float32",
+        "model": "fixture",
+        "model_revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "padded_width": 4,
+        "physical_batch_size": 64,
+        "positive_singleton": false,
+        "sites": [
+          [
+            "head",
+            0,
+            0
+          ]
+        ],
+        "source_sha256": "d3b8be155d3390009795c62942be15c62395dd3feb30aed8c92c5984122a6ec2",
+        "source_task": "far_v2"
+      },
+      "cells": 33,
+      "batch_groups": 10,
+      "cell_operations": {
+        "interchange": 33
+      },
+      "cell_families": {
+        "learned": 1,
+        "calibration_null": 32
+      },
+      "group_memberships": [
+        {
+          "condition": "D",
+          "stream": "clean",
+          "instance_ids": [
+            "far_v2:validation:0",
+            "far_v2:validation:1"
+          ]
+        },
+        {
+          "condition": "D",
+          "stream": "corrupt",
+          "instance_ids": [
+            "far_v2:validation:0",
+            "far_v2:validation:1"
+          ]
+        },
+        {
+          "condition": "H",
+          "stream": "clean",
+          "instance_ids": [
+            "far_v2:validation:0",
+            "far_v2:validation:1"
+          ]
+        },
+        {
+          "condition": "H",
+          "stream": "corrupt",
+          "instance_ids": [
+            "far_v2:validation:0",
+            "far_v2:validation:1"
+          ]
+        },
+        {
+          "condition": "F",
+          "stream": "clean",
+          "instance_ids": [
+            "far_v2:validation:0",
+            "far_v2:validation:1"
+          ]
+        },
+        {
+          "condition": "F",
+          "stream": "corrupt",
+          "instance_ids": [
+            "far_v2:validation:0",
+            "far_v2:validation:1"
+          ]
+        },
+        {
+          "condition": "I",
+          "stream": "clean",
+          "instance_ids": [
+            "far_v2:validation:0",
+            "far_v2:validation:1"
+          ]
+        },
+        {
+          "condition": "I",
+          "stream": "corrupt",
+          "instance_ids": [
+            "far_v2:validation:0",
+            "far_v2:validation:1"
+          ]
+        },
+        {
+          "condition": "user_neutral",
+          "stream": "clean",
+          "instance_ids": [
+            "far_v2:validation:0",
+            "far_v2:validation:1"
+          ]
+        },
+        {
+          "condition": "user_neutral",
+          "stream": "corrupt",
+          "instance_ids": [
+            "far_v2:validation:0",
+            "far_v2:validation:1"
+          ]
+        }
+      ]
+    }
+  ],
+  "common_profile_except_source_task": {
+    "axis_tile_size": 32,
+    "backend": "sdpa",
+    "capture_scope": "requested_head_union",
+    "dtype": "torch.float32",
+    "model": "fixture",
+    "model_revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "padded_width": 4,
+    "physical_batch_size": 64,
+    "positive_singleton": false,
+    "sites": [
+      [
+        "head",
+        0,
+        0
+      ]
+    ],
+    "source_sha256": "d3b8be155d3390009795c62942be15c62395dd3feb30aed8c92c5984122a6ec2"
+  },
+  "work_comparability": [
+    {
+      "index": 2,
+      "source_task": "ioi",
+      "cells": 211,
+      "batch_groups": 1,
+      "cell_group_proxy": 211,
+      "reference_case1_cell_group_proxy": 2110,
+      "proxy_ratio": 0.1,
+      "cell_operations": {
+        "interchange": 201,
+        "zero": 2,
+        "h_mean": 2,
+        "steer_positive": 3,
+        "steer_negative": 3
+      }
+    },
+    {
+      "index": 3,
+      "source_task": "mmlu",
+      "cells": 408,
+      "batch_groups": 2,
+      "cell_group_proxy": 816,
+      "reference_case1_cell_group_proxy": 2110,
+      "proxy_ratio": 0.3867298578199052,
+      "cell_operations": {
+        "zero": 201,
+        "h_mean": 201,
+        "steer_positive": 3,
+        "steer_negative": 3
+      }
+    },
+    {
+      "index": 4,
+      "source_task": "far_v2",
+      "cells": 33,
+      "batch_groups": 10,
+      "cell_group_proxy": 330,
+      "reference_case1_cell_group_proxy": 2110,
+      "proxy_ratio": 0.15639810426540285,
+      "cell_operations": {
+        "interchange": 33
+      }
+    }
+  ],
+  "comparability_limit": "Cell-group products describe packing/serial workload size, not a measured runtime bound. MMLU has a distinct frozen cyclic-positive donor path; no reduction in per-case allowance is claimed.",
+  "cost_terms": {
+    "setup_allowance_seconds": 583.167560715985,
+    "case_work_allowance_seconds_each": 102.63064642000245,
+    "new_case_count": 3,
+    "first_cold_auth_allowance_seconds": 186.89102491596714,
+    "later_warm_auth_allowance_seconds_each": 67.55050745297922,
+    "later_warm_auth_count": 2,
+    "publication_allowance_seconds_each": 5.0,
+    "final_checks_exit_allowance_seconds": 20.0
+  },
+  "unbuffered_allowance_seconds": 1248.051539797918,
+  "reasonable_buffer_fraction": 0.2,
+  "buffered_seconds": 1497.6618477575014,
+  "process_cap_seconds": 1500,
+  "kill_grace_seconds": 15,
+  "finite_ancestor_minimum_headroom_bytes": 17179869184,
+  "budget_method": "Charge worst observed original startup despite redundant work; charge max observed full case timer to each smaller candidate with no proportional speed credit; one cold auth plus two observed full warm auths; explicit publication/final allowances;20percent buffer rounded up to minute.",
+  "budget_limit": "Planning allowance for a bounded trial, not a guarantee, portability bound or production admission. If timeout/failure, retain every artifact and actual completed-auth event; no retry or aggregate.",
+  "api_method": "One original pilot_cases call with exact IDs2:5; original internal independent inventory reconstruction, fresh selected/axes load, native measurements/control files, publication and full per-case authentication retained.",
+  "cache_method": "Fresh process starts with empty numeric backing cache. Original _numeric_backing_proof cache is constructed by actual first auth; later hits retain PID/reference/source checks and fresh byte witness. No cache transport or success-flag reuse.",
+  "extra_reauth": false,
+  "aggregate": false,
+  "numerical_source_changes": false,
+  "owner_profiling_constraint": "Only compact saved summaries and small source text read; no new large artifact/model read during planning."
+}

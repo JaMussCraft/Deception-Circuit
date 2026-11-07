@@ -1,0 +1,25 @@
+{
+  "packet_tests": {
+    "command_template": "PYTHON -B -m unittest discover -s /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/preflight-r4 -p 'test_*.py' -v",
+    "base_python": "/sw/external/python/anaconda3/bin/python3.9",
+    "mgnp_python": "/u/swong2/.conda/envs/mgnp/bin/python",
+    "expected_each": 9,
+    "observed_each": 9,
+    "base_reported_seconds": 0.156,
+    "mgnp_reported_seconds": 0.139
+  },
+  "independent_tests": {
+    "command_template": "PYTHON -B /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-cgroup-bind-review211/independent_checks.py",
+    "expected_each": 4,
+    "observed_each": 4,
+    "base_reported_seconds": 0.043,
+    "mgnp_reported_seconds": 0.034
+  },
+  "all_exit_codes": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "full_suite_or_remote_mount_executed": false
+}

@@ -1,0 +1,8 @@
+{
+  "kind": "root_confirmed_native_checkpoint_projection_equivalence",
+  "frozen_revision_manifest_unchanged": "8d4c391af3fdf9de72ce5d5d92df86210ef46a3667f1139d6a1ce780c88bfcdd",
+  "preferred_relative_form": "projected_since = parsed_since_register + (live_used - cached_used); require projected_since < printed_next_at_plus_N == next_checkpoint_index*cadence",
+  "implemented_absolute_equivalent": "register_offset = status_points - parsed_since_register; projected_points = status_points + (live_used-cached_used); threshold_points = register_offset + printed_next_at_plus_N; projected_points<threshold_points iff projected_since<printed_next_at_plus_N",
+  "native_authority": "cli.py computes since=session_points-points_at_register and prints next*cadence relative to registration. Root confirmed exact offset interpretation.",
+  "no_session_or_usage_infrastructure_change": true
+}

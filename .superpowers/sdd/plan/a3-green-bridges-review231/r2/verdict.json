@@ -1,0 +1,20 @@
+{
+  "status": "handed-back",
+  "verdict": "R231_A_CLOSED_NO_NEW_STATIC_FINDINGS_IN_SCOPED_DIFF",
+  "manifest_sha256": "c8b9f2a43027134d1ae7b2c7e17c7f588c5524ff00c3e3aa70f2185d0c88d4e5",
+  "all_manifest_members_match": true,
+  "independent_tests": {
+    "command": "python -B -m unittest -v test_host.ProcessGroups",
+    "exit_code": 0,
+    "passed": 2,
+    "reported_seconds": 0.545
+  },
+  "raw_packet_logs": {
+    "base_green": "9 passed 0.617s",
+    "mgnp_green": "9 passed 0.554s",
+    "base_red": "2 intended process escapes failed",
+    "mgnp_red": "2 intended process escapes failed"
+  },
+  "actual_Bridges_or_container_test": false,
+  "final_config_binding": false
+}

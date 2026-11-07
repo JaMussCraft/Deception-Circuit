@@ -1,0 +1,52 @@
+{
+  "status": "UNEXECUTED_CPU_ONLY_no_GPU_admission_or_split_claim",
+  "config": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-prefit-readiness-cpu-proposal/config.json",
+  "output": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-direction-prefit-preparation-861f84a3938a-r158",
+  "source_commit": "861f84a3938a5e22fa329af0c469b2dd812fe68a",
+  "CPU_request": {
+    "kind": "bounded_CPU_request_not_completion_forecast",
+    "observed_genuine_N5_job": "23473734",
+    "observed_host": "cn097.delta.ncsa.illinois.edu",
+    "observed_canonical_plus_mask_preparation_seconds": 470.76857574796304,
+    "observed_manifest": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-mask-n5-pilots-861f84a3938a/run_manifest.json",
+    "observed_manifest_sha256": "9b2fb8a59b78ca0ba1a0bf861c30eabee6a2a783e5bd85545a78e057f8dd00ae",
+    "new_prefit_and_fit_select_inventory_runtime_unmeasured": true,
+    "requested_Slurm_minutes": 25,
+    "requested_seconds": 1500,
+    "child_cap_seconds": 1320,
+    "kill_grace_seconds": 15,
+    "outer_allowance_seconds": 165,
+    "initial_remaining_requirement_seconds": 1410,
+    "startup_slack_seconds": 90,
+    "CPUs": 4,
+    "memory_GiB": 32,
+    "GPUs": 0,
+    "minimum_finite_ancestor_headroom_GiB": 16,
+    "threads": 1,
+    "one_heavy_child_at_a_time": true,
+    "actual_per_command_wait4_RSS_CPU_wall_recorded": true,
+    "no_memory_or_completion_guarantee": true,
+    "stop_on_first_failure_and_preserve": true
+  },
+  "no_model_command_list": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-prefit-readiness-cpu-proposal/commands.json",
+  "geometry_metadata_change": {
+    "axis_tile_size": 2,
+    "axis_tile_sizes": {
+      "prefit": 2,
+      "fit-select": 2,
+      "selected-pilot": 32,
+      "remaining": 32
+    }
+  },
+  "scientific_change": false,
+  "readiness_gaps": "readiness-gaps.json",
+  "two_part_budget": "budget-worksheet-plan.json",
+  "independent_review": "independent-review-plan.json",
+  "root_commands": {
+    "test_only": "sbatch --test-only --export=ALL --time=00:25:00 /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-prefit-readiness-cpu-proposal/launch.sbatch",
+    "submit_after_review": "sbatch --parsable --export=ALL --time=00:25:00 /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-prefit-readiness-cpu-proposal/launch.sbatch"
+  },
+  "no_automatic_retry": true,
+  "original_source13_unchanged": true,
+  "prefit_only_scope_not_affected_by_incomplete_selected_aggregation": true
+}

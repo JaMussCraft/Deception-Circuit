@@ -1,0 +1,22 @@
+{
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "-o",
+    "ControlMaster=no",
+    "-o",
+    "ControlPath=none",
+    "-o",
+    "HostName=br013.bridges2.psc.edu",
+    "bridges2",
+    "python3 -B -c 'import sys,json,hashlib,os,time\nfrom pathlib import Path\nb=Path('\"'\"'/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199'\"'\"');sys.path.insert(0,str(b/'\"'\"'proof-adapter-r3'\"'\"'));import host_supervisor as h\nh.check_packet(b/'\"'\"'proof-adapter-r3'\"'\"','\"'\"'4e4b4bcf1ddcd6481fac1eccd966a2a1cbfa385b2bd16a9a00504cfaa05def3f'\"'\"')\nsource=h.source_before_activation()\nprobe=b/'\"'\"'root-cgroup199-r5/execution'\"'\"';items={}\nfor p in probe.iterdir():\n if p.is_file():items[p.name]={'\"'\"'path'\"'\"':str(p),'\"'\"'sha256'\"'\"':h.sha(p),'\"'\"'bytes'\"'\"':p.stat().st_size}\nprint(json.dumps({'\"'\"'source'\"'\"':source,'\"'\"'probe_files'\"'\"':items,'\"'\"'uid'\"'\"':os.getuid(),'\"'\"'observed_unix'\"'\"':time.time()}))\n'"
+  ],
+  "exit_code": 0,
+  "stdout": "{\"source\": {\"source_commit\": \"50e947bb852613e3a270082651f2bd1b7bb0c525\", \"source_files\": 511, \"literal_source_links\": 4, \"snapshot_sha256\": \"68cc15073e383d0943620cab4271a9ee859ae51203e69704b83cca8ac7770f77\"}, \"probe_files\": {\"probe-result.json\": {\"path\": \"/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-cgroup199-r5/execution/probe-result.json\", \"sha256\": \"eff5f3096335d320a5cd11b745c682d6588d04ba90d20f7a21a29b9d4e5fdf2c\", \"bytes\": 178}, \"container-cgroup.json\": {\"path\": \"/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-cgroup199-r5/execution/container-cgroup.json\", \"sha256\": \"f59231af8075e1cb3b701901e8d92be2e67ed416ac75bccf71f93e4be30ba8f7\", \"bytes\": 1103}, \"allocation.json\": {\"path\": \"/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-cgroup199-r5/execution/allocation.json\", \"sha256\": \"cf5ad1be8751b11de4412a51d64ed971a35ea7f529c11b1aecaa358396258745\", \"bytes\": 4894}, \"host-cgroup.json\": {\"path\": \"/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-cgroup199-r5/execution/host-cgroup.json\", \"sha256\": \"d6fe49460ae002c07b43deefecc99a82f34d1a658729c463b592a1ab2614bf5b\", \"bytes\": 985}, \"command.json\": {\"path\": \"/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-cgroup199-r5/execution/command.json\", \"sha256\": \"ee1c2f1dce8772daaab4d6d90a61ce0ceb38e19bff9981902723564984ecfd87\", \"bytes\": 3791}}, \"uid\": 105853, \"observed_unix\": 1794016463.4340274}\n",
+  "stderr": "",
+  "started_unix": 1794016451.4219215,
+  "observed_unix": 1794016463.4501243
+}

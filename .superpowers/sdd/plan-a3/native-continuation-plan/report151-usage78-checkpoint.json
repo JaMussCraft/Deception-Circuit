@@ -1,0 +1,48 @@
+{
+  "status": "USAGE78_HOLD_ACTIVE_JOB_TERMINAL_NOT_CHECKED",
+  "checkpoint_instruction": "Root HOLD at2026-11-03 15:34UTC: finish atomic metadata, preserve partial151 and exact terminal command, stop all further monitoring/dependency work. Do not cancel/extend job.",
+  "usage": {
+    "used_percent": 78,
+    "checkpoint": 78,
+    "reset_utc": "2026-11-06T16:07:41+00:00",
+    "source": "root live check15:34UTC"
+  },
+  "job_id": "23472894",
+  "last_observation_not_current_terminal_state": {
+    "authenticated_original_cases": 63,
+    "case_authentication_model_forwards": 0,
+    "case_authentication_end_elapsed_seconds": 3583.0441150360275,
+    "published_new_object_completion_markers": 27,
+    "full_pilot_receipt_marker": false,
+    "calibration_started": false,
+    "direct_child_pid": 2673419,
+    "last_sample_elapsed_seconds": 5296.648937883088,
+    "VmRSS": "2901308 kB",
+    "VmHWM": "8196936 kB",
+    "State": "R (running)"
+  },
+  "caps_unchanged": {
+    "allocation_minutes": 125,
+    "CPUs": 4,
+    "memory_GiB": 32,
+    "GPUs": 0,
+    "aggregate_child_seconds": 5400,
+    "calibration_child_seconds": 1800,
+    "kill_grace_each_seconds": 15,
+    "watchdog": "root exec75836 rearmed~15:04UTC for60min"
+  },
+  "durable_raw_directory": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/diagnostics/selected-aggregate-calibration-job23472894",
+  "aggregate_log": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/diagnostics/selected-aggregate-calibration-job23472894/selected-pilot-aggregate/steps.log",
+  "aggregate_direct_result_to_read_only_after_completion": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/diagnostics/selected-aggregate-calibration-job23472894/selected-pilot-aggregate/result.json",
+  "terminal_check_command": "TZ=UTC sacct -j 23472894 --format=JobIDRaw,JobName,State,ExitCode,ElapsedRaw,TimelimitRaw,AllocTRES,MaxRSS,Start,End -P",
+  "prepared_report_assembler": "/tmp/assemble151.py",
+  "assembler_command_after_actual_terminal": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1 /sw/external/python/anaconda3/bin/python3.9 /tmp/assemble151.py",
+  "assembler_limits": "Metadata only; refuses running/pending/completing accounting. Preserves actual shared cgroup deltas without zero assumptions. Reports new-work counters unavailable if interrupted; does not invent zero. No source/driver/native artifact mutation or model call.",
+  "reserved_report": "151-native-aggregate-cpu-job23472894-handback.md",
+  "source_driver_and_native_artifact_edits": false,
+  "automatic_retry": false,
+  "job_cancelled_or_extended": false,
+  "prefit_dependency_followup_not_started": true,
+  "existing_static_dependency_evidence": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/native-continuation-plan/selected-aggregate-calibration-proposal/m1-dependency-trace.json",
+  "next_owner": "root checkpoint/watchdog; agent stopped perHOLD"
+}

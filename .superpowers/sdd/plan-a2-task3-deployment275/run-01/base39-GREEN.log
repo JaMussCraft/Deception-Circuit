@@ -1,0 +1,51 @@
+........................................................................ [ 18%]
+........................................................................ [ 37%]
+........................................................................ [ 56%]
+........................................................................ [ 75%]
+.............................................................FFFFF...... [ 94%]
+...................                                                      [100%]
+=================================== FAILURES ===================================
+______ test_original_native_normalizer_preserves_full_mapping_chain[None] ______
+../../plan-plan-a2-full-score-operational186/task3/green270-r3/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_root_integration.py:298: in test_original_native_normalizer_preserves_full_mapping_chain
+    captured,normalized,budget=m.collect_native_closure(g)
+../../plan-plan-a2-full-score-operational186/task3/green270-r3/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:298: in collect_native_closure
+    identity=dict(purpose='A2 original source50e full scoring',source_commit=SOURCE,groups_sha256=g['groups_file_sha256'],main_root=g['main_root'])
+E   KeyError: 'groups_file_sha256'
+__ test_original_native_normalizer_preserves_full_mapping_chain[old-snapshot] __
+../../plan-plan-a2-full-score-operational186/task3/green270-r3/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_root_integration.py:298: in test_original_native_normalizer_preserves_full_mapping_chain
+    captured,normalized,budget=m.collect_native_closure(g)
+../../plan-plan-a2-full-score-operational186/task3/green270-r3/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:298: in collect_native_closure
+    identity=dict(purpose='A2 original source50e full scoring',source_commit=SOURCE,groups_sha256=g['groups_file_sha256'],main_root=g['main_root'])
+E   KeyError: 'groups_file_sha256'
+___ test_original_native_normalizer_preserves_full_mapping_chain[old-charge] ___
+../../plan-plan-a2-full-score-operational186/task3/green270-r3/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_root_integration.py:298: in test_original_native_normalizer_preserves_full_mapping_chain
+    captured,normalized,budget=m.collect_native_closure(g)
+../../plan-plan-a2-full-score-operational186/task3/green270-r3/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:298: in collect_native_closure
+    identity=dict(purpose='A2 original source50e full scoring',source_commit=SOURCE,groups_sha256=g['groups_file_sha256'],main_root=g['main_root'])
+E   KeyError: 'groups_file_sha256'
+_ test_original_native_normalizer_preserves_full_mapping_chain[original-admission] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r3/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_root_integration.py:298: in test_original_native_normalizer_preserves_full_mapping_chain
+    captured,normalized,budget=m.collect_native_closure(g)
+../../plan-plan-a2-full-score-operational186/task3/green270-r3/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:298: in collect_native_closure
+    identity=dict(purpose='A2 original source50e full scoring',source_commit=SOURCE,groups_sha256=g['groups_file_sha256'],main_root=g['main_root'])
+E   KeyError: 'groups_file_sha256'
+_ test_original_native_normalizer_preserves_full_mapping_chain[missing-successor] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r3/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_root_integration.py:298: in test_original_native_normalizer_preserves_full_mapping_chain
+    captured,normalized,budget=m.collect_native_closure(g)
+../../plan-plan-a2-full-score-operational186/task3/green270-r3/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:298: in collect_native_closure
+    identity=dict(purpose='A2 original source50e full scoring',source_commit=SOURCE,groups_sha256=g['groups_file_sha256'],main_root=g['main_root'])
+E   KeyError: 'groups_file_sha256'
+=============================== warnings summary ===============================
+::test_original_native_normalizer_preserves_full_mapping_chain[None]
+  /u/swong2/.local/lib/python3.9/site-packages/pandas/core/arrays/masked.py:61: UserWarning: Pandas requires version '1.3.6' or newer of 'bottleneck' (version '1.3.5' currently installed).
+    from pandas.core import (
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task3-deployment275/run-01/base39-GREEN.xml -
+=========================== short test summary info ============================
+FAILED ../../../../../../../../../../../../dev::test_original_native_normalizer_preserves_full_mapping_chain[None]
+FAILED ../../../../../../../../../../../../dev::test_original_native_normalizer_preserves_full_mapping_chain[old-snapshot]
+FAILED ../../../../../../../../../../../../dev::test_original_native_normalizer_preserves_full_mapping_chain[old-charge]
+FAILED ../../../../../../../../../../../../dev::test_original_native_normalizer_preserves_full_mapping_chain[original-admission]
+FAILED ../../../../../../../../../../../../dev::test_original_native_normalizer_preserves_full_mapping_chain[missing-successor]
+5 failed, 374 passed, 1 warning in 80.66s (0:01:20)

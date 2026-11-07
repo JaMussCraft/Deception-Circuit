@@ -1,0 +1,24 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____ test_validation_only_payload_is_released_before_returned_rss_sample ______
+
+tmp_path = PosixPath('/tmp/source-cost-119-red-transient-accounting/test_validation_only_payload_i0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fd1841d0c50>
+
+    def test_validation_only_payload_is_released_before_returned_rss_sample(tmp_path,monkeypatch):
+        import weakref
+        c=setup_case(tmp_path,monkeypatch);reference=[None]
+        class Payload:pass
+        class ExtraRows(dict):pass
+        def semantic(owned):
+            rows=ExtraRows();rows.payload=Payload();reference[0]=weakref.ref(rows.payload)
+            return {},rows
+        monkeypatch.setattr(c.s,'_rss_bytes',lambda:100 if reference[0] is not None and reference[0]() is not None else 10)
+        state=c.build(semantic=semantic)
+>       assert state.stats()['rss_after_bytes']==10
+E       assert 100 == 10
+
+tests/test_a3_source_validation.py:359: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_a3_source_validation.py::test_validation_only_payload_is_released_before_returned_rss_sample
+1 failed, 43 deselected in 3.51s

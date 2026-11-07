@@ -1,0 +1,710 @@
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r2/proof_guards.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/proof_guards.py
+@@ -1,5 +1,5 @@
+ """Read-only owning checks. This module has no model/scoring entry interface."""
+-import hashlib,json,os,sys
++import hashlib,json,math,os,re,sys
+ from pathlib import Path
+ P=Path(__file__).resolve().parent
+ W=Path('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder')
+@@ -8,6 +8,9 @@
+ D=W/'.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103'
+ H=D/'root-H100-R5/job-50189932'
+ REG=[Path('/projects/beto/swong2/Alignment/Deception-Circuit/docs/research')/n for n in ('held_out.json','directions.json')]+[W/'docs/research'/n for n in ('held_out.json','directions.json')]
++CATALOGUE_ROUTES=frozenset(str(p) for p in REG)
++VIRTUAL_ROOT='/projects/beto/swong2/Alignment'
++PHYSICAL_ROOT='/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment'
+ def read(p):return json.loads(Path(p).read_text())
+ def sha(p):
+  h=hashlib.sha256()
+@@ -16,6 +19,49 @@
+  return h.hexdigest()
+ def write(p,v):
+  with Path(p).open('x') as f:json.dump(v,f,indent=2,allow_nan=False);f.write('\n')
++def _unique_pairs(pairs):
++ result={}
++ for key,value in pairs:
++  assert key not in result,'duplicate catalogue witness key';result[key]=value
++ return result
++def _digest(value):return isinstance(value,str) and re.fullmatch('[0-9a-f]{64}',value) is not None
++def catalogue_expectations(ref,packet_digest,job):
++ """Authenticate one existing transfer attestation; never adopt observed bytes."""
++ assert type(ref) is dict and set(ref)=={'path','sha256'} and _digest(ref['sha256']) and _digest(packet_digest)
++ path=Path(ref['path']);assert path.is_absolute() and not path.is_symlink() and path.is_file()
++ raw=path.read_bytes();assert hashlib.sha256(raw).hexdigest()==ref['sha256'] and sha(path)==ref['sha256'],'transfer attestation changed'
++ data=json.loads(raw.decode('utf-8'),object_pairs_hook=_unique_pairs)
++ assert data['complete'] is True and data['adapter_manifest_sha256']==packet_digest and data['actual_job_id']==job
++ assert type(job) is str and re.fullmatch('[0-9]+',job)
++ for key,want in [('source_files',511),('ordinary_inputs',422),('immutable_original_inputs',418),('current_catalogue_inputs',4),('literal_source_links',4)]:assert type(data[key]) is int and data[key]==want,key
++ assert data['catalogues_are_snapshots_not_continuous_Delta'] is True
++ rows=data['current_catalogues'];assert type(rows) is dict and set(rows)==CATALOGUE_ROUTES and len(rows)==4
++ for n,row in rows.items():
++  assert type(row) is dict and set(row)=={'virtual','physical','bytes','sha256','delta_capture','remote','delta_reread'}
++  physical=PHYSICAL_ROOT+n[len(VIRTUAL_ROOT):]
++  assert row['virtual']==n and row['physical']==physical
++  assert type(row['bytes']) is int and row['bytes']>=0 and _digest(row['sha256'])
++  times=[]
++  for key,cluster,path_name in [('delta_capture','delta',n),('remote','bridges2',physical),('delta_reread','delta',n)]:
++   observed=row[key];assert type(observed) is dict and set(observed)=={'cluster','path','bytes','sha256','observed_unix'}
++   assert observed['cluster']==cluster and observed['path']==path_name and type(observed['bytes']) is int and observed['bytes']==row['bytes'] and observed['sha256']==row['sha256']
++   now=observed['observed_unix'];assert type(now) in (float,int) and math.isfinite(now) and now>0;times.append(now)
++  assert times==sorted(times),'capture/remote/reread order'
++ assert sha(path)==ref['sha256'] and not path.is_symlink(),'transfer attestation changed during validation'
++ return rows
++def current_catalogues():
++ ref=dict(path=os.environ['A2_CPU_TRANSFER_ATTESTATION'],sha256=os.environ['A2_CPU_TRANSFER_ATTESTATION_SHA256'])
++ return catalogue_expectations(ref,os.environ['A2_CPU_PACKET_SHA256'],os.environ['SLURM_JOB_ID'])
++def verify_input_rows(inputs,current):
++ """All422 rows remain recorded; exactly four use the pinned current witness."""
++ rows=inputs['ordinary_files'];assert type(rows) is dict and len(rows)==422
++ assert set(str(p) for p in REG)==CATALOGUE_ROUTES and set(current)==CATALOGUE_ROUTES
++ assert CATALOGUE_ROUTES<=set(rows) and len(set(rows)-CATALOGUE_ROUTES)==418
++ for n,row in rows.items():
++  assert row['path']==n
++  expected=current[n] if n in CATALOGUE_ROUTES else row
++  assert Path(n).stat().st_size==expected['bytes'] and sha(n)==expected['sha256'],n
++ return dict(ordinary_count=422,immutable_original_count=418,current_catalogue_count=4)
+ def packet(digest):
+  assert sha(P/'manifest.json')==digest
+  for n,h in read(P/'manifest.json').items():
+@@ -30,14 +76,15 @@
+   item=R/n;assert not Path(n).is_absolute() and '..' not in Path(n).parts and not item.is_symlink() and item.resolve().is_relative_to(R.resolve()) and sha(item)==h
+  for n,t in snap['input_links'].items():assert os.readlink(R/n)==t and (R/n).exists() and (R/n).resolve()==Path(t).resolve()
+  config=read(H/'config.json');manifest=Path(config['input_manifest']);assert sha(manifest)==config['input_manifest_sha256'];inputs=read(manifest);assert len(inputs['ordinary_files'])==422
+- for n,row in inputs['ordinary_files'].items():assert row['path']==n and Path(n).stat().st_size==row['bytes'] and sha(n)==row['sha256'],n
++ current=current_catalogues();roles=verify_input_rows(inputs,current)
+  aliases={}
+  for n,t in inputs['namespace_aliases'].items():
+   item=Path(n);assert item.is_symlink() and os.readlink(item)==t and item.exists() and item.resolve()==Path(t).resolve(),n
+   aliases[n]={'literal':t,'resolved':str(item.resolve())}
+  origins={n:str(Path(m.__file__).resolve()) for n,m in list(sys.modules.items()) if n.split('.')[0] in ('component_analysis','models','dataset','evaluation','scripts','config') and getattr(m,'__file__',None)}
+  assert all(Path(p).is_relative_to(R.resolve()) for p in origins.values()),origins
+- return dict(source_snapshot=sha(R.parent/'snapshot.json'),source_count=len(files),links=snap['input_links'],inputs=sha(manifest),input_count=422,aliases=aliases,groups=sha(G/'groups.json'),bank=sha(G/'bank/banks.json'),bank_manifest=sha(G/'bank/run_manifest.json'),catalogues={str(p):sha(p) for p in REG},module_origins=origins)
++ catalogues={str(p):sha(p) for p in REG};assert catalogues=={n:row['sha256'] for n,row in current.items()},'catalogue changed during capture'
++ return dict(source_snapshot=sha(R.parent/'snapshot.json'),source_count=len(files),links=snap['input_links'],inputs=sha(manifest),input_count=422,input_roles=roles,current_catalogue_witness_sha256=os.environ['A2_CPU_TRANSFER_ATTESTATION_SHA256'],aliases=aliases,groups=sha(G/'groups.json'),bank=sha(G/'bank/banks.json'),bank_manifest=sha(G/'bank/run_manifest.json'),catalogues=catalogues,module_origins=origins)
+ def owning():
+  os.chdir(R);sys.path.insert(0,str(R));from component_analysis import a2_pipeline as p
+  args=p.parser().parse_args(read(H/'actual-completed-20261106/execution/bank-command.json')['command'][2:]);args.stage='score';args.work_dir=str(G);args.limit=0;args.tasks=list(p.TASKS);args.injected=False
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r2/host_supervisor.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/host_supervisor.py
+@@ -3,6 +3,7 @@
+ import argparse,datetime,hashlib,json,os,re,signal,socket,subprocess,time,traceback
+ from guards import cgroup_bind,fresh_output
+ from cgroup_probe import collect
++from proof_guards import catalogue_expectations
+ from pathlib import Path
+ PHYS=Path('/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment')
+ VIRT=Path('/projects/beto/swong2/Alignment')
+@@ -35,13 +36,14 @@
+ def check_packet(p,digest):
+  assert sha(p/'manifest.json')==digest
+  for n,h in json.loads((p/'manifest.json').read_text()).items():assert not Path(n).is_absolute() and '..' not in Path(n).parts and sha(p/n)==h,n
+-def container_command(packet,output,manifest,deadline,cgroup_record):
++def container_command(packet,output,manifest,deadline,cgroup_record,catalogue_ref=None):
+  virtual_packet=VIRT/packet.relative_to(PHYS);virtual_out=VIRT/output.relative_to(PHYS)
+  env={k:v for k,v in os.environ.items() if k.startswith('SLURM_')};env.update(PYTHONPATH=str(R),PYTHONDONTWRITEBYTECODE='1',CUDA_VISIBLE_DEVICES='',HF_HUB_CACHE='/work/nvme/beto/swong2',TRANSFORMERS_CACHE='/work/nvme/beto/swong2',HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1',HF_DATASETS_OFFLINE='1',OMP_NUM_THREADS='1',OPENBLAS_NUM_THREADS='1',MKL_NUM_THREADS='1',NUMEXPR_NUM_THREADS='1',DC_CLUSTER='bridges2',DC_B2_ALLOC='cis260361p',DC_RUN_MANIFEST_GIT='0')
++ if catalogue_ref is not None:env.update(A2_CPU_TRANSFER_ATTESTATION=catalogue_ref['path'],A2_CPU_TRANSFER_ATTESTATION_SHA256=catalogue_ref['sha256'],A2_CPU_PACKET_SHA256=manifest)
+  cmd=['apptainer','exec','--cleanenv','--contain','--no-home','--writable-tmpfs','--pwd',str(R),'--bind',str(PHYS)+':'+str(VIRT)+':ro','--bind','/ocean:/ocean:ro','--bind',HUB+':/work/nvme/beto/swong2:ro','--bind',str(output)+':'+str(virtual_out)+':rw','--bind',cgroup_bind(cgroup_record['controller'])]
+  for k,v in sorted(env.items()):cmd.extend(['--env',k+'='+v])
+  return cmd+[IMAGE,'bash',str(virtual_packet/'inner.sh'),'--output',str(virtual_out),'--manifest-sha256',manifest,'--deadline-monotonic',str(deadline)]
+-PREFLIGHT_MANIFEST='4a096d2c1eb020da99853959a3c26e4948a9c240618958accea0b80e553997d5'
++PREFLIGHT_MANIFEST='889ee0c986fd392ba1cf00300d93ae46f6714cae10a58175862a3a9ba7a88db7'
+ def read(p):return json.loads(Path(p).read_text())
+ def normal_child(code,term,finished,deadline,report):
+  if not(code==0 and term is None and finished<deadline and report.get('status')=='CHILD_NORMAL_POSTGUARDS_AWAIT_SUPERVISOR' and report.get('complete') is False and all(report.get(k) is v for k,v in LABELS.items())):raise ValueError('partial/terminated/late/non-schema child cannot complete')
+@@ -76,10 +78,11 @@
+   ref=b[key];assert ref['path'] and ref['sha256'] and sha(ref['path'])==ref['sha256'],key
+  result=read(b['probe_result']['path']);host=read(b['probe_host']['path']);inner=read(b['probe_container']['path'])
+  assert result.get('complete') is True and result.get('host_exit')==0 and result.get('container_exit')==0 and result.get('no_graph') is True and result.get('no_model') is True and result.get('proof_admitted') is False
+- command=read(b['probe_command']['path']);assert any(str(v).endswith('/preflight-r3/inner.sh') for v in command['argv']),'probe command is not reviewed r3'
++ command=read(b['probe_command']['path']);assert any(str(v).endswith('/preflight-r5/inner.sh') for v in command['argv']),'probe command is not reviewed r3'
+  review=read(b['independent_review']['path']);assert review.get('packet_manifest_sha256')==b['adapter_manifest_sha256'] and str(review.get('verdict','')).startswith(('ACCEPT','READY','CORRECTED')),'independent adapter review is not accepted for this packet'
+  assert host.get('required_194_counter_visible') is True and inner.get('required_194_counter_visible') is True and host['job']==inner['job']
+  transfer=read(b['transfer_attestation']['path']);assert transfer.get('adapter_manifest_sha256')==b['adapter_manifest_sha256'];assert transfer.get('complete') is True and transfer.get('source_files')==511 and transfer.get('ordinary_inputs')==422 and transfer.get('literal_source_links')==4
++ catalogue_expectations(b['transfer_attestation'],b['adapter_manifest_sha256'],b['actual_job_id'])
+  assert b['output_physical'] and b['adapter_manifest_sha256']
+  return b
+ 
+@@ -111,7 +114,7 @@
+  try:
+   first=allocation();assert first['job']==binding['actual_job_id'] and first['end_epoch']-time.time()>=2520;write(out/'allocation-before.json',first);assert sha(IMAGE)==IMAGE_SHA
+   write(out/'source-before-activation.json',source_before_activation());stage='real-host-cgroup';observed=observe_cgroup();write(out/'host-cgroup-before.json',observed);selected=select_cgroup(observed,first['job'])
+-  deadline=min(time.monotonic()+2400,time.monotonic()+first['end_epoch']-time.time()-120);cmd=container_command(packet,out,a.manifest_sha256,deadline,selected);write(out/'command.json',{'argv':cmd,'actual_readonly_cgroup_bind':cgroup_bind(selected['controller'])});started=time.time();term=None;stage='immutable-worker'
++  deadline=min(time.monotonic()+2400,time.monotonic()+first['end_epoch']-time.time()-120);cmd=container_command(packet,out,a.manifest_sha256,deadline,selected,catalogue_ref=binding.get('transfer_attestation'));write(out/'command.json',{'argv':cmd,'actual_readonly_cgroup_bind':cgroup_bind(selected['controller'])});started=time.time();term=None;stage='immutable-worker'
+   with (out/'child.log').open('x') as log:
+    child=subprocess.Popen(cmd,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
+    while child.poll() is None:
+@@ -121,6 +124,7 @@
+   finished=time.monotonic();after=allocation();deadline=min(deadline,time.monotonic()+after['end_epoch']-time.time()-120);write(out/'allocation-after.json',after);report=read(out/'CHILD-REPORT.json') if (out/'CHILD-REPORT.json').is_file() else {}
+   execution=dict(command=cmd,exit_code=child.returncode,term_sent_at=term,started_unix=started,finished_unix=time.time(),deadline_monotonic=deadline,timely=finished<deadline,actual_CPU_job_id=first['job'],actual_cluster='bridges2',**LABELS);write(out/'child-execution.json',execution)
+   normal_child(child.returncode,term,finished,deadline,report);assert after['end_epoch']-time.time()>=90;stage='final-guards';check_packet(packet,a.manifest_sha256);assert sha(a.bindings)==a.bindings_sha256
++  catalogue_expectations(binding['transfer_attestation'],a.manifest_sha256,first['job'])
+   entry=read(out/'container-cgroup-entry.json');assert entry.get('worker_entry_permitted') is True and entry['job']==first['job'] and entry['packet_manifest_sha256']==a.manifest_sha256
+   last=allocation();assert min(first['end_epoch'],last['end_epoch'])-time.time()>=30 and time.time()-started<=2670;assert sha(IMAGE)==IMAGE_SHA;write(out/'allocation-final.json',last)
+   write(out/'source-after.json',source_before_activation());final_cgroup=observe_cgroup();write(out/'host-cgroup-after.json',final_cgroup);select_cgroup(final_cgroup,first['job']);last=allocation();assert min(first['end_epoch'],last['end_epoch'])-time.time()>=30,'late final CPU publication'
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r2/entry_guard.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/entry_guard.py
+@@ -4,14 +4,27 @@
+ import proof_guards as g
+ from host_supervisor import observe_cgroup,select_cgroup
+ P=Path(__file__).resolve().parent
++def observe_effective_readonly(inner):
++ """Fresh lookup of the selected frozen worker path; never write a counter."""
++ path=Path(inner['frozen_worker_path']);assert path.is_absolute() and inner['same_as_frozen_worker_path'] is True
++ expected=inner['live_directory_stat']
++ before=path.stat();assert [before.st_dev,before.st_ino,before.st_mode]==expected,'native path replaced before readonly lookup'
++ assert path.samefile(inner['path']),'selected/native path no longer samefile'
++ flags=os.statvfs(str(path)).f_flag;bit=os.ST_RDONLY
++ assert type(flags) is int and type(bit) is int and bit>0,'missing/invalid actual readonly flags'
++ after=path.stat();assert [after.st_dev,after.st_ino,after.st_mode]==expected and path.samefile(inner['path']),'native path replaced during readonly lookup'
++ return dict(path=str(path),f_flag=flags,ST_RDONLY=bit,read_only=bool(flags & bit),live_directory_stat=expected)
+ ap=argparse.ArgumentParser();ap.add_argument('--output',required=True);ap.add_argument('--manifest-sha256',required=True);ap.add_argument('--deadline-monotonic',required=True,type=float);a=ap.parse_args()
+ out=Path(a.output);stage='entry-cgroup'
+ try:
+  assert out.is_absolute() and out.is_dir();g.packet(a.manifest_sha256);assert g.sha(P/'proof_worker.py')=='4dfb62711dfe598041db9e836e8f1589dc05c54c3b649f007b625f8a1a34669e'
++ assert os.environ['A2_CPU_PACKET_SHA256']==a.manifest_sha256;g.current_catalogues()
+  before=g.read(out/'host-cgroup-before.json');actual=observe_cgroup();g.write(out/'container-cgroup-observation.json',actual);job=os.environ['SLURM_JOB_ID'];host=select_cgroup(before,job);inner=select_cgroup(actual,job)
+  assert inner['controller']==host['controller'] and inner['membership']==host['membership'] and inner['live_directory_stat']==host['live_directory_stat'],'actual host/container cgroup object differs'
++ stage='entry-effective-readonly';readonly=observe_effective_readonly(inner);g.write(out/'container-cgroup-readonly.json',readonly)
++ assert readonly['read_only'] is True,'actual frozen worker path is not effectively readonly'
+  assert time.monotonic()<a.deadline_monotonic
+- g.write(out/'container-cgroup-entry.json',dict(worker_entry_permitted=True,job=job,packet_manifest_sha256=a.manifest_sha256,controller=inner['controller'],membership=inner['membership'],same_actual_directory_stat=True,no_graph_yet=True,no_model=True,GPU_ADMITTED=False))
++ g.write(out/'container-cgroup-entry.json',dict(worker_entry_permitted=True,job=job,packet_manifest_sha256=a.manifest_sha256,controller=inner['controller'],membership=inner['membership'],same_actual_directory_stat=True,effective_readonly=readonly,no_graph_yet=True,no_model=True,GPU_ADMITTED=False))
+  os.execv(sys.executable,[sys.executable,'-B',str(P/'proof_worker.py'),'--output',str(out),'--manifest-sha256',a.manifest_sha256,'--deadline-monotonic',str(a.deadline_monotonic)])
+ except BaseException as e:
+  if out.is_dir():g.write(out/'FAILED-container-entry.json',dict(complete=False,stage=stage,error=repr(e),MODEL_LOADED=False,GPU_ADMITTED=False))
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r2/guards.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/guards.py
+@@ -17,7 +17,7 @@
+  return out
+ 
+ def cgroup_bind(kind):
+- if kind=='v1':path='/sys/fs/cgroup/memory'
+- elif kind=='v2':path='/sys/fs/cgroup'
+- else:raise ValueError('unsupported actual memory controller')
+- return path+':'+path+':ro'
++ root='/sys/fs/cgroup:/sys/fs/cgroup:ro'
++ if kind=='v1':return root+',/sys/fs/cgroup/memory:/sys/fs/cgroup/memory:ro'
++ if kind=='v2':return root
++ raise ValueError('unsupported actual memory controller')
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r2/bindings.template.json
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/bindings.template.json
+@@ -2,7 +2,7 @@
+   "actual_job_id": null,
+   "adapter_manifest_sha256": null,
+   "catalogues_are_snapshots_not_continuous_Delta": true,
+-  "diagnostic_packet_manifest_sha256": "4a096d2c1eb020da99853959a3c26e4948a9c240618958accea0b80e553997d5",
++  "diagnostic_packet_manifest_sha256": "889ee0c986fd392ba1cf00300d93ae46f6714cae10a58175862a3a9ba7a88db7",
+   "independent_review": {
+     "path": null,
+     "sha256": null
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r2/launch.sh
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/launch.sh
+@@ -1,7 +1,7 @@
+ #!/bin/bash
+ set -euo pipefail
+ : "${SLURM_JOB_ID:?actual Bridges CPU allocation required}"
+-P=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r2
++P=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3
+ PY=python3
+ if [[ ${SLURM_JOB_ID} == 1 && -z ${SLURM_CLUSTER_NAME:-} && -n ${ADAPTER201_TEST_PYTHON:-} ]]; then PY=$ADAPTER201_TEST_PYTHON; fi
+ exec "$PY" "$P/host_supervisor.py" --output "$1" --manifest-sha256 "$2" --bindings "$3" --bindings-sha256 "$4"
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r2/inner.sh
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/inner.sh
+@@ -1,7 +1,7 @@
+ #!/bin/bash
+ set -euo pipefail
+ R=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime
+-P=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r2
++P=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3
+ cd "$R"
+ source "$R/scripts/cluster/bridges2.env"
+ set +u
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r2/test_host.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/test_host.py
+@@ -22,7 +22,7 @@
+    for n in ('memory.usage_in_bytes','memory.max_usage_in_bytes','memory.failcnt','memory.oom_control'):(leaf/n).write_text('0')
+    mi='21 1 0:22 / '+str(root/'memory')+' rw - cgroup cgroup rw,memory'
+    value=collect('123','7:memory:/slurm/uid_321/job_123/step_batch/task_0',root,mi);self.assertTrue(value['required_194_counter_visible']);self.assertTrue(value['records'][0]['same_as_frozen_worker_path'])
+-   self.assertFalse(job_scoped('123','/slurm/job_1234/step_batch'));self.assertEqual(cgroup_bind('v1'),'/sys/fs/cgroup/memory:/sys/fs/cgroup/memory:ro')
++   self.assertFalse(job_scoped('123','/slurm/job_1234/step_batch'));self.assertEqual(cgroup_bind('v1'),'/sys/fs/cgroup:/sys/fs/cgroup:ro,/sys/fs/cgroup/memory:/sys/fs/cgroup/memory:ro')
+  def case_main(self,finish,end):
+   clock=types.SimpleNamespace(now=0.);ft=types.SimpleNamespace(time=lambda:clock.now,monotonic=lambda:clock.now,sleep=lambda _:None);allocs=[]
+   def alloc():
+@@ -45,7 +45,7 @@
+   with mock.patch.dict(os.environ,{},clear=True):
+    try:cmd=h.container_command(h.PHYS/h.REL/'packet',h.PHYS/h.REL/'out','manifest',123,dict(controller='v1'))
+    except TypeError:cmd=h.container_command(h.PHYS/h.REL/'packet',h.PHYS/h.REL/'out','manifest',123)
+-  self.assertIn('/sys/fs/cgroup/memory:/sys/fs/cgroup/memory:ro',cmd);self.assertNotIn('--nv',cmd)
++  self.assertIn(cgroup_bind('v1'),cmd);self.assertNotIn('--nv',cmd)
+  def test_unbound_genuine_execution_rejects(self):
+   path=P/'bindings.template.json'
+   import hashlib
+@@ -56,5 +56,5 @@
+   with tempfile.TemporaryDirectory() as td:
+    py=pathlib.Path(td)/'python';py.write_text('#!/bin/sh\nprintf "%s\\n" "$@"\n');py.chmod(0o700)
+    r=subprocess.run(['bash',str(P/'launch.sh'),'OUT','SHA','BOUND','BSHA'],cwd=td,env=dict(os.environ,SLURM_JOB_ID='1',SLURM_CLUSTER_NAME='',ADAPTER201_TEST_PYTHON=str(py)),stdout=subprocess.PIPE,stderr=subprocess.PIPE,universal_newlines=True)
+-   self.assertEqual(r.returncode,0,r.stderr);self.assertIn('proof-adapter-r2/host_supervisor.py',r.stdout)
++   self.assertEqual(r.returncode,0,r.stderr);self.assertIn('proof-adapter-r3/host_supervisor.py',r.stdout)
+ if __name__=='__main__':unittest.main(verbosity=2)
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r2/transfer-closure.json
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/transfer-closure.json
+@@ -875,16 +875,18 @@
+     {
+       "physical": "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/directions.json",
+       "remote_status": "NOT_REVERIFIED_BY_WORKER_ROOT_MUST_CHECK",
+-      "role": "input_entries",
++      "role": "historical_catalogue_provenance",
+       "sha256": "f8c7dbb92f2edc509c7bb8e94624a5c8adabddd103a8c48db1cc59bd69a3c6b0",
+-      "virtual": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/directions.json"
++      "virtual": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/directions.json",
++      "sha256_role": "historical_original_manifest_provenance_not_current_byte_expectation"
+     },
+     {
+       "physical": "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
+       "remote_status": "NOT_REVERIFIED_BY_WORKER_ROOT_MUST_CHECK",
+-      "role": "input_entries",
++      "role": "historical_catalogue_provenance",
+       "sha256": "801b24e37c3315a8e58aa2ad5007f7831822fc2636d1e61837ad3652c370425e",
+-      "virtual": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json"
++      "virtual": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
++      "sha256_role": "historical_original_manifest_provenance_not_current_byte_expectation"
+     },
+     {
+       "physical": "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/a2-cohort-ruling.json",
+@@ -8050,16 +8052,18 @@
+     {
+       "physical": "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/docs/research/directions.json",
+       "remote_status": "NOT_REVERIFIED_BY_WORKER_ROOT_MUST_CHECK",
+-      "role": "input_entries",
++      "role": "historical_catalogue_provenance",
+       "sha256": "b1cf09a06662438569e7f5f670bc85fe3de5e3d2436f375a64ae308b73694a6d",
+-      "virtual": "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/directions.json"
++      "virtual": "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/directions.json",
++      "sha256_role": "historical_original_manifest_provenance_not_current_byte_expectation"
+     },
+     {
+       "physical": "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/docs/research/held_out.json",
+       "remote_status": "NOT_REVERIFIED_BY_WORKER_ROOT_MUST_CHECK",
+-      "role": "input_entries",
++      "role": "historical_catalogue_provenance",
+       "sha256": "801b24e37c3315a8e58aa2ad5007f7831822fc2636d1e61837ad3652c370425e",
+-      "virtual": "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/held_out.json"
++      "virtual": "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/held_out.json",
++      "sha256_role": "historical_original_manifest_provenance_not_current_byte_expectation"
+     },
+     {
+       "physical": "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/docs/research/mechanism-analysis/phase1/p1c_readings.json",
+@@ -8171,22 +8175,26 @@
+     {
+       "physical": "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/docs/research/held_out.json",
+       "root_action": "fresh actualDelta capture -> stage -> remote hash -> actualDelta reread; root records exact current SHA; copied snapshot is not continuousliveDelta",
+-      "virtual": "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/held_out.json"
++      "virtual": "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/held_out.json",
++      "expected_current": "root-bound transfer_attestation.current_catalogues[virtual]; all three capture/remote/reread records must agree"
+     },
+     {
+       "physical": "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/docs/research/directions.json",
+       "root_action": "fresh actualDelta capture -> stage -> remote hash -> actualDelta reread; root records exact current SHA; copied snapshot is not continuousliveDelta",
+-      "virtual": "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/directions.json"
++      "virtual": "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/directions.json",
++      "expected_current": "root-bound transfer_attestation.current_catalogues[virtual]; all three capture/remote/reread records must agree"
+     },
+     {
+       "physical": "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
+       "root_action": "fresh actualDelta capture -> stage -> remote hash -> actualDelta reread; root records exact current SHA; copied snapshot is not continuousliveDelta",
+-      "virtual": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json"
++      "virtual": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
++      "expected_current": "root-bound transfer_attestation.current_catalogues[virtual]; all three capture/remote/reread records must agree"
+     },
+     {
+       "physical": "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/directions.json",
+       "root_action": "fresh actualDelta capture -> stage -> remote hash -> actualDelta reread; root records exact current SHA; copied snapshot is not continuousliveDelta",
+-      "virtual": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/directions.json"
++      "virtual": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/directions.json",
++      "expected_current": "root-bound transfer_attestation.current_catalogues[virtual]; all three capture/remote/reread records must agree"
+     }
+   ],
+   "historical_exact_role_proof": {
+@@ -8209,5 +8217,26 @@
+     "docs/research/held_out.json": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
+     "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a1-control-77b6487-m07"
+   },
+-  "status": "COMPLETE_EXPECTED_CLOSURE_NO_REMOTE_EXECUTION_OR_VERIFICATION"
++  "status": "COMPLETE_EXPECTED_CLOSURE_NO_REMOTE_EXECUTION_OR_VERIFICATION",
++  "input_role_partition": {
++    "historical_total": 422,
++    "immutable_original": 418,
++    "current_catalogues": 4,
++    "exact_live_virtual_paths": [
++      "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/held_out.json",
++      "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/directions.json",
++      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
++      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/directions.json"
++    ],
++    "rule": "Every exact live catalogue route in flattened input_entries is historical provenance only; current bytes come only from the root-bound transfer_attestation current_catalogues witness. Every other route retains its original pinned expectation. No basename or prefix exception."
++  },
++  "accepted_cgroup_diagnostic": {
++    "packet_manifest_sha256": "889ee0c986fd392ba1cf00300d93ae46f6714cae10a58175862a3a9ba7a88db7",
++    "actual_job_id": "50311864",
++    "independent_audit_manifest_sha256": "f4650669ffdaab1dae2afa61b30d6e56308cf11076d2e50314ad27d0c2178891",
++    "helpers_bundled_in_this_packet": true,
++    "host_readonly_required": false,
++    "fresh_container_entry_effective_readonly_required": true,
++    "diagnostic_is_not_genuine_proof": true
++  }
+ }
+--- /dev/null
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/test_catalogues.py
+@@ -0,0 +1,138 @@
++"""Pure catalogue-role contracts. No native imports, graph, model or remote I/O."""
++import copy, hashlib, importlib.util, json, os, pathlib, tempfile, unittest
++from unittest import mock
++P=pathlib.Path(__file__).resolve().parent
++sp=importlib.util.spec_from_file_location('catalogue_guard213',P/'proof_guards.py');g=importlib.util.module_from_spec(sp);sp.loader.exec_module(g)
++sp=importlib.util.spec_from_file_location('catalogue_host213',P/'host_supervisor.py');h=importlib.util.module_from_spec(sp);sp.loader.exec_module(h)
++PACKET='a'*64;JOB='123';PHYS='/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment'
++VIRT='/projects/beto/swong2/Alignment'
++def sha(p):return hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest()
++def witness():
++ rows={}
++ for p in g.REG:
++  n=str(p);physical=PHYS+n[len(VIRT):];size=p.stat().st_size;digest=sha(p)
++  def record(cluster,path,at):return dict(cluster=cluster,path=path,bytes=size,sha256=digest,observed_unix=at)
++  rows[n]=dict(virtual=n,physical=physical,bytes=size,sha256=digest,delta_capture=record('delta',n,1000),remote=record('bridges2',physical,1001),delta_reread=record('delta',n,1002))
++ return dict(complete=True,adapter_manifest_sha256=PACKET,actual_job_id=JOB,source_files=511,ordinary_inputs=422,immutable_original_inputs=418,current_catalogue_inputs=4,literal_source_links=4,catalogues_are_snapshots_not_continuous_Delta=True,current_catalogues=rows)
++class CatalogueTests(unittest.TestCase):
++ def setUp(self):
++  self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup);self.root=pathlib.Path(self.tmp.name)
++  for name in ('catalogue_expectations','verify_input_rows','current_catalogues'):
++   self.assertTrue(callable(getattr(g,name,None)),'CATALOGUE_CORRECTION_MISSING: '+name)
++ def save(self,value):
++  p=self.root/'transfer.json';p.write_text(json.dumps(value));return dict(path=str(p),sha256=sha(p))
++ def load(self,value):
++  self.assertTrue(callable(getattr(g,'catalogue_expectations',None)),'CATALOGUE_CORRECTION_MISSING: authenticated expectations')
++  return g.catalogue_expectations(self.save(value),PACKET,JOB)
++ def inputs(self):
++  rows={}
++  for i in range(418):
++   p=self.root/('input-%d'%i);p.write_bytes(b'original');rows[str(p)]=dict(path=str(p),bytes=8,sha256=sha(p))
++  for p in g.REG:rows[str(p)]=dict(path=str(p),bytes=1,sha256='0'*64)
++  return dict(ordinary_files=rows)
++ def verify(self,inputs,expected):
++  self.assertTrue(callable(getattr(g,'verify_input_rows',None)),'CATALOGUE_CORRECTION_MISSING: exact role split')
++  return g.verify_input_rows(inputs,expected)
++ def test_four_fresh_rows_replace_only_historical_byte_expectations(self):
++  expected=self.load(witness());result=self.verify(self.inputs(),expected)
++  self.assertEqual(result,dict(ordinary_count=422,immutable_original_count=418,current_catalogue_count=4))
++ def test_actual_catalogue_conflict_is_resolved_by_bound_current_bytes(self):
++  expected=self.load(witness());inputs=self.inputs();n=str(g.REG[1]);self.assertNotEqual(inputs['ordinary_files'][n]['sha256'],expected[n]['sha256']);self.verify(inputs,expected)
++ def test_wrong_job_packet_flags_or_counts_reject(self):
++  for key,value in [('actual_job_id','999'),('adapter_manifest_sha256','b'*64),('complete',False),('source_files',510),('ordinary_inputs',421),('immutable_original_inputs',417),('current_catalogue_inputs',5),('literal_source_links',3),('catalogues_are_snapshots_not_continuous_Delta',False)]:
++   with self.subTest(key=key):
++    data=witness();data[key]=value
++    with self.assertRaises((AssertionError,ValueError)):self.load(data)
++ def test_exact_four_lexical_paths_not_basename_or_prefix(self):
++  for kind in ['missing','extra','renamed','resolved_alias']:
++   with self.subTest(kind=kind):
++    data=witness();rows=data['current_catalogues'];n=str(g.REG[0])
++    if kind=='missing':del rows[n]
++    elif kind=='extra':rows[n+'.extra']=copy.deepcopy(rows[n])
++    else:rows[n.replace('/docs/research/','/elsewhere/')]=rows.pop(n)
++    with self.assertRaises((AssertionError,ValueError)):self.load(data)
++ def test_malformed_or_inconsistent_capture_records_reject(self):
++  variants=[('bytes',True),('bytes',-1),('sha256','x'*64),('physical','/other'),('virtual','/other')]
++  for key,value in variants:
++   data=witness();next(iter(data['current_catalogues'].values()))[key]=value
++   with self.subTest(key=key,value=value),self.assertRaises((AssertionError,ValueError)):self.load(data)
++  for stage in ['delta_capture','remote','delta_reread']:
++   for key,value in [('bytes',999),('sha256','b'*64),('cluster','wrong'),('path','/wrong'),('observed_unix',float('nan')),('observed_unix',True),('observed_unix',-1)]:
++    data=witness();next(iter(data['current_catalogues'].values()))[stage][key]=value
++    with self.subTest(stage=stage,key=key),self.assertRaises((AssertionError,ValueError)):self.load(data)
++  data=witness();next(iter(data['current_catalogues'].values()))['remote']['observed_unix']=999
++  with self.assertRaises((AssertionError,ValueError)):self.load(data)
++ def test_pinned_same_buffer_and_duplicate_keys_reject(self):
++  self.assertTrue(callable(getattr(g,'catalogue_expectations',None)),'CATALOGUE_CORRECTION_MISSING')
++  ref=self.save(witness());path=pathlib.Path(ref['path']);path.write_text(path.read_text()+' ')
++  with self.assertRaises((AssertionError,ValueError)):g.catalogue_expectations(ref,PACKET,JOB)
++  path.write_text('{"complete":true,"complete":true}');ref['sha256']=sha(path)
++  with self.assertRaises((AssertionError,ValueError)):g.catalogue_expectations(ref,PACKET,JOB)
++  ref=self.save(witness());real_read=pathlib.Path.read_bytes
++  def race(p):
++   raw=real_read(p)
++   if p==path:p.write_bytes(raw+b' ')
++   return raw
++  with mock.patch.object(pathlib.Path,'read_bytes',race),self.assertRaises((AssertionError,ValueError)):g.catalogue_expectations(ref,PACKET,JOB)
++ def test_missing_witness_environment_never_adopts_current_hashes(self):
++  self.assertTrue(callable(getattr(g,'current_catalogues',None)),'CATALOGUE_CORRECTION_MISSING: mandatory environment')
++  with mock.patch.dict(os.environ,{},clear=True),self.assertRaises((AssertionError,ValueError,KeyError)):g.current_catalogues()
++ def test_ordinary_mutation_and_same_basename_still_reject(self):
++  expected=self.load(witness());inputs=self.inputs();old=next(iter(inputs['ordinary_files']));path=self.root/'directions.json';path.write_bytes(b'original');row=inputs['ordinary_files'].pop(old);row['path']=str(path);inputs['ordinary_files'][str(path)]=row
++  self.verify(inputs,expected);path.write_bytes(b'mutated!')
++  with self.assertRaises((AssertionError,ValueError)):self.verify(inputs,expected)
++ def test_current_catalogue_mutation_rejects_without_hash_adoption(self):
++  expected=self.load(witness());inputs=self.inputs();real_sha=g.sha;n=str(g.REG[0])
++  with mock.patch.object(g,'sha',lambda p:'c'*64 if str(p)==n else real_sha(p)),self.assertRaises((AssertionError,ValueError)):self.verify(inputs,expected)
++ def test_historical_rows_and_expected_map_unchanged(self):
++  expected=self.load(witness());inputs=self.inputs();before=copy.deepcopy(inputs);saved=copy.deepcopy(expected);self.verify(inputs,expected);self.assertEqual(inputs,before);self.assertEqual(expected,saved)
++ def test_host_forwards_pinned_transfer_reference_through_clean_environment(self):
++  ref=self.save(witness())
++  with mock.patch.dict(os.environ,{},clear=True):
++   self.assertIn('catalogue_ref',h.container_command.__code__.co_varnames,'CATALOGUE_CORRECTION_MISSING: forwarding')
++   cmd=h.container_command(h.PHYS/h.REL/'packet',h.PHYS/h.REL/'out',PACKET,123,dict(controller='v1'),catalogue_ref=ref)
++  self.assertIn('A2_CPU_TRANSFER_ATTESTATION='+ref['path'],cmd);self.assertIn('A2_CPU_TRANSFER_ATTESTATION_SHA256='+ref['sha256'],cmd);self.assertIn('A2_CPU_PACKET_SHA256='+PACKET,cmd);self.assertIn('--cleanenv',cmd)
++ def test_environment_witness_is_revalidated_on_every_capture_read(self):
++  ref=self.save(witness());env=dict(SLURM_JOB_ID=JOB,A2_CPU_PACKET_SHA256=PACKET,A2_CPU_TRANSFER_ATTESTATION=ref['path'],A2_CPU_TRANSFER_ATTESTATION_SHA256=ref['sha256'])
++  self.assertTrue(callable(getattr(g,'current_catalogues',None)),'CATALOGUE_CORRECTION_MISSING')
++  with mock.patch.dict(os.environ,env,clear=True):
++   self.assertEqual(set(g.current_catalogues()),set(str(p) for p in g.REG));pathlib.Path(ref['path']).write_text('{}')
++   with self.assertRaises((AssertionError,ValueError)):g.current_catalogues()
++ def test_real_capture_uses_witness_and_keeps_before_ready_after_identity(self):
++  runtime=self.root/'runtime';runtime.mkdir();snapshot={}
++  for i in range(511):
++   p=runtime/('source%d'%i);p.write_bytes(b'x');snapshot[p.name]=sha(p)
++  links={}
++  for i in range(4):
++   target=self.root/('target%d'%i);target.write_bytes(b'alias');p=runtime/('alias%d'%i);p.symlink_to(target);links[p.name]=str(target)
++  (self.root/'snapshot.json').write_text(json.dumps(dict(source_commit='50e947bb852613e3a270082651f2bd1b7bb0c525',source_sha256=snapshot,input_links=links)))
++  inputs=self.inputs();inputs['namespace_aliases']={str(runtime/n):t for n,t in links.items()};manifest=self.root/'inputs.json';manifest.write_text(json.dumps(inputs))
++  historical=self.root/'historical';historical.mkdir();(historical/'config.json').write_text(json.dumps(dict(input_manifest=str(manifest),input_manifest_sha256=sha(manifest))))
++  bank=self.root/'MAIN';(bank/'bank').mkdir(parents=True)
++  for n in ['groups.json','bank/banks.json','bank/run_manifest.json']:(bank/n).write_bytes(b'preserved')
++  ref=self.save(witness());env=dict(SLURM_JOB_ID=JOB,A2_CPU_PACKET_SHA256=PACKET,A2_CPU_TRANSFER_ATTESTATION=ref['path'],A2_CPU_TRANSFER_ATTESTATION_SHA256=ref['sha256'])
++  with mock.patch.multiple(g,R=runtime,H=historical,G=bank),mock.patch.dict(os.environ,env,clear=True):
++   before=g.capture();ready=g.capture();after=g.capture();self.assertEqual(before,ready);self.assertEqual(ready,after);self.assertEqual(before['input_roles'],dict(ordinary_count=422,immutable_original_count=418,current_catalogue_count=4));self.assertEqual(before['current_catalogue_witness_sha256'],ref['sha256'])
++   real_sha=g.sha;n=str(g.REG[0])
++   with mock.patch.object(g,'sha',lambda p:'c'*64 if str(p)==n else real_sha(p)),self.assertRaises((AssertionError,ValueError)):g.capture()
++ def test_host_binding_authenticates_exact_witness_before_launch(self):
++  def saved(name,value):
++   p=self.root/name;p.write_text(json.dumps(value));return dict(path=str(p),sha256=sha(p))
++  b=dict(status='ROOT_BOUND_FOR_ONE_CPU_PROOF',actual_job_id=JOB,adapter_manifest_sha256=PACKET,diagnostic_packet_manifest_sha256=h.PREFLIGHT_MANIFEST,independent_review_accepted=True,transfer_closure_verified=True,catalogues_are_snapshots_not_continuous_Delta=True,output_physical='/owned/output')
++  b['probe_result']=saved('result',dict(complete=True,host_exit=0,container_exit=0,no_graph=True,no_model=True,proof_admitted=False))
++  for key in ['probe_host','probe_container']:b[key]=saved(key,dict(required_194_counter_visible=True,job='probe-job'))
++  b['probe_command']=saved('command',dict(argv=['/path/preflight-r5/inner.sh']));b['independent_review']=saved('review',dict(packet_manifest_sha256=PACKET,verdict='ACCEPT_FIXTURE'))
++  b['transfer_attestation']=self.save(witness());ref=saved('binding',b)
++  with mock.patch.dict(os.environ,dict(SLURM_JOB_ID=JOB),clear=True):
++   self.assertEqual(h.load_bindings(ref['path'],ref['sha256']),b)
++   invalid=witness();invalid['current_catalogues'].pop(str(g.REG[0]));b['transfer_attestation']=self.save(invalid);ref=saved('binding',b)
++   with self.assertRaises((AssertionError,ValueError)):h.load_bindings(ref['path'],ref['sha256'])
++ def test_successor_roles_and_wrappers_are_not_predecessor_routes(self):
++  data=json.loads((P/'transfer-closure.json').read_text());roles=data.get('input_role_partition',{})
++  self.assertEqual(roles.get('immutable_original'),418,'CATALOGUE_CORRECTION_MISSING: flattened roles')
++  self.assertEqual(set(roles['exact_live_virtual_paths']),set(str(p) for p in g.REG))
++  for row in data['files']:
++   if row['virtual'] in roles['exact_live_virtual_paths']:self.assertEqual(row['role'],'historical_catalogue_provenance')
++  for n in ['launch.sh','inner.sh']:
++   self.assertIn('proof-adapter-r3', (P/n).read_text());self.assertNotIn('proof-adapter-r2', (P/n).read_text())
++if __name__=='__main__':unittest.main(verbosity=2)
+--- /dev/null
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/test_entry_readonly.py
+@@ -0,0 +1,62 @@
++"""Tiny source-bound entry tests; no cgroup writes, native imports or model."""
++import ast, copy, json, os, pathlib, runpy, sys, tempfile, types, unittest
++from unittest import mock
++P=pathlib.Path(__file__).resolve().parent
++class ReadonlyEntryTests(unittest.TestCase):
++ def helper(self):
++  tree=ast.parse((P/'entry_guard.py').read_text());functions=[n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='observe_effective_readonly']
++  self.assertEqual(len(functions),1,'EFFECTIVE_RO_ENTRY_MISSING')
++  ns=dict(os=os,Path=pathlib.Path);exec(compile(ast.fix_missing_locations(ast.Module(body=functions,type_ignores=[])),str(P/'entry_guard.py'),'exec'),ns);return ns['observe_effective_readonly']
++ def record(self,path):
++  st=path.stat();return dict(controller='v1',membership='/slurm/uid_1/job_123/step_batch/task_0',path=str(path),frozen_worker_path=str(path),live_directory_stat=[st.st_dev,st.st_ino,st.st_mode],same_as_frozen_worker_path=True)
++ def test_actual_selected_path_and_raw_flags_are_recorded(self):
++  helper=self.helper()
++  with tempfile.TemporaryDirectory() as td:
++   p=pathlib.Path(td);inner=self.record(p)
++   with mock.patch.object(os,'statvfs',return_value=types.SimpleNamespace(f_flag=os.ST_RDONLY|2)) as call:
++    observation=helper(inner)
++   self.assertEqual(call.call_args[0],(str(p),));self.assertEqual(observation['path'],str(p));self.assertEqual(observation['f_flag'],os.ST_RDONLY|2);self.assertTrue(observation['read_only'])
++ def test_rw_missing_flag_and_oserror_cannot_imply_readonly(self):
++  helper=self.helper()
++  with tempfile.TemporaryDirectory() as td:
++   inner=self.record(pathlib.Path(td))
++   with mock.patch.object(os,'statvfs',return_value=types.SimpleNamespace(f_flag=0)):self.assertFalse(helper(inner)['read_only'])
++   for outcome in [types.SimpleNamespace(),OSError('missing actual controller')]:
++    with mock.patch.object(os,'statvfs',side_effect=outcome if isinstance(outcome,Exception) else None,return_value=outcome),self.assertRaises((OSError,AttributeError,AssertionError)):helper(inner)
++   with mock.patch.object(os,'ST_RDONLY',None),mock.patch.object(os,'statvfs',return_value=types.SimpleNamespace(f_flag=1)),self.assertRaises((AttributeError,AssertionError)):helper(inner)
++ def test_replaced_selected_or_native_path_rejects(self):
++  helper=self.helper()
++  with tempfile.TemporaryDirectory() as td:
++   root=pathlib.Path(td);p=root/'actual';p.mkdir();inner=self.record(p);other=root/'other';other.mkdir()
++   mismatch=copy.deepcopy(inner);mismatch['path']=str(other)
++   with self.assertRaises((OSError,AssertionError)):helper(mismatch)
++   def replace(_):p.rename(root/'old');p.mkdir();return types.SimpleNamespace(f_flag=os.ST_RDONLY)
++   with mock.patch.object(os,'statvfs',side_effect=replace),self.assertRaises((OSError,AssertionError)):helper(inner)
++ def execute_entry(self,kind):
++  with tempfile.TemporaryDirectory() as td:
++   out=pathlib.Path(td);native=out/'actual';native.mkdir();inner=self.record(native);writes={};events=[]
++   g=types.SimpleNamespace(packet=lambda _:None,sha=lambda _:'4dfb62711dfe598041db9e836e8f1589dc05c54c3b649f007b625f8a1a34669e',current_catalogues=lambda:{},read=lambda _:dict(records=[inner]),write=lambda p,v:(writes.update({pathlib.Path(p).name:v}),events.append(pathlib.Path(p).name)))
++   host=types.SimpleNamespace(observe_cgroup=lambda:dict(records=[inner]),select_cgroup=lambda value,job:value['records'][0])
++   argv=['entry_guard.py','--output',str(out),'--manifest-sha256','a'*64,'--deadline-monotonic','999999999999']
++   def flags(_):
++    if kind=='missing':return types.SimpleNamespace()
++    if kind=='replaced':native.rename(out/'old');native.mkdir()
++    return types.SimpleNamespace(f_flag=0 if kind=='rw' else os.ST_RDONLY)
++   def execute(*args):events.append('exec')
++   with mock.patch.dict(sys.modules,dict(proof_guards=g,host_supervisor=host)),mock.patch.object(sys,'argv',argv),mock.patch.dict(os.environ,dict(SLURM_JOB_ID='123',A2_CPU_PACKET_SHA256='a'*64)),mock.patch.object(os,'statvfs',side_effect=flags),mock.patch.object(os,'execv',side_effect=execute):
++    try:runpy.run_path(str(P/'entry_guard.py'),run_name='__main__')
++    except (AssertionError,AttributeError,OSError,SystemExit):pass
++   return events,writes
++ def test_real_entry_allows_only_observed_readonly_before_permission_and_exec(self):
++  self.helper()
++  events,writes=self.execute_entry('ro');self.assertIn('exec',events);self.assertNotIn('FAILED-container-entry.json',writes);self.assertLess(events.index('container-cgroup-readonly.json'),events.index('container-cgroup-entry.json'));self.assertLess(events.index('container-cgroup-entry.json'),events.index('exec'));self.assertTrue(writes['container-cgroup-entry.json']['effective_readonly']['read_only'])
++  for kind in ['rw','missing','replaced']:
++   with self.subTest(kind=kind):
++    events,writes=self.execute_entry(kind);self.assertNotIn('exec',events);self.assertNotIn('container-cgroup-entry.json',writes);self.assertIn('FAILED-container-entry.json',writes)
++ def test_r5_binds_parent_then_explicit_memory_child_without_requiring_host_ro(self):
++  import guards
++  self.assertEqual(guards.cgroup_bind('v1'),'/sys/fs/cgroup:/sys/fs/cgroup:ro,/sys/fs/cgroup/memory:/sys/fs/cgroup/memory:ro')
++  import host_supervisor as h
++  record=dict(controller='v1',job_scoped=True,same_as_frozen_worker_path=True,values={'memory.max_usage_in_bytes':'0','memory.failcnt':'0','memory.oom_control':'0'},live_directory_stat=[1,2,3],read_only=False)
++  self.assertEqual(h.select_cgroup(dict(job='123',required_194_counter_visible=True,records=[record]),'123'),record)
++if __name__=='__main__':unittest.main(verbosity=2)
+--- /dev/null
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/transfer-attestation.template.json
+@@ -0,0 +1,121 @@
++{
++  "complete": false,
++  "adapter_manifest_sha256": null,
++  "actual_job_id": null,
++  "source_files": 511,
++  "ordinary_inputs": 422,
++  "immutable_original_inputs": 418,
++  "current_catalogue_inputs": 4,
++  "literal_source_links": 4,
++  "catalogues_are_snapshots_not_continuous_Delta": true,
++  "current_catalogues": {
++    "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/held_out.json": {
++      "virtual": "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/held_out.json",
++      "physical": "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/docs/research/held_out.json",
++      "bytes": null,
++      "sha256": null,
++      "delta_capture": {
++        "cluster": "delta",
++        "path": "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/held_out.json",
++        "bytes": null,
++        "sha256": null,
++        "observed_unix": null
++      },
++      "remote": {
++        "cluster": "bridges2",
++        "path": "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/docs/research/held_out.json",
++        "bytes": null,
++        "sha256": null,
++        "observed_unix": null
++      },
++      "delta_reread": {
++        "cluster": "delta",
++        "path": "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/held_out.json",
++        "bytes": null,
++        "sha256": null,
++        "observed_unix": null
++      }
++    },
++    "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/directions.json": {
++      "virtual": "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/directions.json",
++      "physical": "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/docs/research/directions.json",
++      "bytes": null,
++      "sha256": null,
++      "delta_capture": {
++        "cluster": "delta",
++        "path": "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/directions.json",
++        "bytes": null,
++        "sha256": null,
++        "observed_unix": null
++      },
++      "remote": {
++        "cluster": "bridges2",
++        "path": "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/docs/research/directions.json",
++        "bytes": null,
++        "sha256": null,
++        "observed_unix": null
++      },
++      "delta_reread": {
++        "cluster": "delta",
++        "path": "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/directions.json",
++        "bytes": null,
++        "sha256": null,
++        "observed_unix": null
++      }
++    },
++    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json": {
++      "virtual": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
++      "physical": "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
++      "bytes": null,
++      "sha256": null,
++      "delta_capture": {
++        "cluster": "delta",
++        "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
++        "bytes": null,
++        "sha256": null,
++        "observed_unix": null
++      },
++      "remote": {
++        "cluster": "bridges2",
++        "path": "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
++        "bytes": null,
++        "sha256": null,
++        "observed_unix": null
++      },
++      "delta_reread": {
++        "cluster": "delta",
++        "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
++        "bytes": null,
++        "sha256": null,
++        "observed_unix": null
++      }
++    },
++    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/directions.json": {
++      "virtual": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/directions.json",
++      "physical": "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/directions.json",
++      "bytes": null,
++      "sha256": null,
++      "delta_capture": {
++        "cluster": "delta",
++        "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/directions.json",
++        "bytes": null,
++        "sha256": null,
++        "observed_unix": null
++      },
++      "remote": {
++        "cluster": "bridges2",
++        "path": "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/directions.json",
++        "bytes": null,
++        "sha256": null,
++        "observed_unix": null
++      },
++      "delta_reread": {
++        "cluster": "delta",
++        "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/directions.json",
++        "bytes": null,
++        "sha256": null,
++        "observed_unix": null
++      }
++    }
++  }
++}
+--- /dev/null
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/r5-integration-reference.json
+@@ -0,0 +1,21 @@
++{
++  "scope": "Accepted diagnostic and exact helper lineage only; fresh actual container statvfs check remains mandatory for genuine proof.",
++  "diagnostic_packet": {
++    "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/preflight-r5/manifest.json",
++    "sha256": "889ee0c986fd392ba1cf00300d93ae46f6714cae10a58175862a3a9ba7a88db7",
++    "actual_job_id": "50311864",
++    "cluster": "bridges2",
++    "root_accepted": true
++  },
++  "independent_actual_audit": {
++    "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-cgroup-r5-actual-review218/manifest.json",
++    "sha256": "f4650669ffdaab1dae2afa61b30d6e56308cf11076d2e50314ad27d0c2178891",
++    "verdict_sha256": "f6912169d23c20a7cd024a487372e9b5b7b6840d167a28e951c8ccaf305a76cf"
++  },
++  "copied_helpers": {
++    "cgroup_probe.py": "f1e74318020223321cf02fc23bd548461f16c845600a6d4193896cccb0849e68",
++    "guards.py": "60d4b924edee92c6fb84eb60f78c6281111866ab061e000c13f1b27b6b0029e3"
++  },
++  "actual_statvfs_ST_RDONLY_observed_in_diagnostic": false,
++  "no_new_genuine_proof_or_GPU_admission": true
++}

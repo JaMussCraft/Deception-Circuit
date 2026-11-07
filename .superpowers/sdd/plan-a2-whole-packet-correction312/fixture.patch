@@ -1,0 +1,72 @@
+--- accepted-r2/test_full_score_integration.py
++++ fixture-r3/test_full_score_integration.py
+@@ -34,6 +34,10 @@
+ 
+ 
+ def native_modules(monkeypatch):
++    # Match the unchanged CPU validate-phase and GPU host original cwd contract.
++    # Native prepared artifacts retain relative source keys; never rewrite them.
++    monkeypatch.chdir(str(SOURCE))
++    assert Path.cwd().resolve()==SOURCE.resolve()
+     monkeypatch.syspath_prepend(str(SOURCE))
+     p = importlib.import_module('component_analysis.a2_pipeline')
+     ar = importlib.import_module('component_analysis.a3_direction_runtime')
+@@ -103,6 +107,9 @@
+         bank_manifest_sha256=g['bank_manifest_sha256'], bank_internal_payload_sha256=g['bank_internal_payload_sha256'],
+         launch_packet_manifest_sha256=g['launch_packet_manifest_sha256'])
+     t1.save(x.marker, w)
++    # Acquire the actual stored marker once, before request hash/signing.
++    # Never serialize the earlier insertion-ordered object as its byte copy.
++    marker_bytes=x.marker.read_bytes();w=m.decode(marker_bytes)
+     c.update(frozen_G3_sha256=g['groups_file_sha256'], bank_file_sha256=g['bank_file_sha256'],
+         bank_manifest_sha256=g['bank_manifest_sha256'], GPU_packet_manifest_sha256=g['launch_packet_manifest_sha256'])
+     t1.save(producer.b['standing_config']['path'], c)
+@@ -115,8 +122,11 @@
+     child['request_sha256']=rsha
+     result.update(request_sha256=rsha, groups_file_sha256=g['groups_file_sha256'])
+     # COMPLETE receives bank identity from the actual closed CPU configuration.
+-    for name,value in [('request.json',r),('WAITING.json',w),('guard-result.json',result)]:
++    for name,value in [('request.json',r),('guard-result.json',result)]:
+         (cpu/name).write_bytes(m.encoded(value))
++    assert m.sha_bytes(marker_bytes)==r['GPU_WAITING_marker_sha256']
++    (cpu/'WAITING.json').write_bytes(marker_bytes)
++    assert (cpu/'WAITING.json').read_bytes()==x.marker.read_bytes()==marker_bytes
+     params=m.read(cpu/'parameters.json'); params['phase_request_sha256']=rsha
+     (cpu/'parameters.json').write_bytes(m.encoded(params))
+     child['guard_result_sha256']=m.sha(cpu/'guard-result.json');t1.save(cpu/'child-execution.json',child)
+@@ -484,6 +494,7 @@
+     calls=[]
+     monkeypatch.setattr(j.m.subprocess,'Popen',lambda *a,**kw:calls.append(a))
+     with pytest.raises((ValueError,AssertionError,KeyError)):j.producer.publish()
++    assert 'stage' in j.events  # intended mutation boundary must actually run
+     assert not calls and not j.p._TASK4_MODEL_CALLS and 'publish' not in j.events
+     with pytest.raises(FileExistsError):j.producer.publish()
+ 
+@@ -586,3 +597,27 @@
+     with pytest.raises(ValueError,match='release actual binding'):
+         controller.run_full_score(j.producer.g,r)
+     assert not calls and not j.p._TASK4_MODEL_CALLS
++
++
++
++def test_original_capture_requires_exact_authenticated_WAITING_bytes(chain,tmp_path,monkeypatch):
++    j=joined(chain,tmp_path,monkeypatch);m=j.m
++    assert Path.cwd().resolve()==SOURCE.resolve()
++    record=m.read(j.producer.work/'trigger-record.json')
++    request_path=Path(record['request']);request_bytes=request_path.read_bytes();request=m.decode(request_bytes)
++    marker=Path(request['GPU_WAITING_marker_path']);marker_bytes=marker.read_bytes()
++    copy_path=j.cpu/'WAITING.json';complete_bytes=(j.cpu/'COMPLETE.json').read_bytes()
++    assert copy_path.read_bytes()==marker_bytes
++    assert m.sha_bytes(marker_bytes)==request['GPU_WAITING_marker_sha256']==record['marker_sha256']
++    calls=[];monkeypatch.setattr(m.subprocess,'Popen',lambda *a,**kw:calls.append(a))
++    proof,captured=m.capture_cpu(j.producer.c,request,j.producer.g,j.producer.b['gpu_config']['sha256'],record['request_sha256'],now=1202.)
++    assert captured[str(copy_path)]==marker_bytes and proof['complete'] is True
++    # Retain the original raw hash. Even semantically identical JSON cannot
++    # replace an authenticated byte copy; no resealing or renewal is performed.
++    copy_path.write_bytes(marker_bytes+b' ')
++    assert m.read(copy_path)==m.decode(marker_bytes)
++    with pytest.raises(ValueError,match='CPU immutable WAITING copy'):
++        m.capture_cpu(j.producer.c,request,j.producer.g,j.producer.b['gpu_config']['sha256'],record['request_sha256'],now=1202.)
++    assert marker.read_bytes()==marker_bytes and request_path.read_bytes()==request_bytes
++    assert (j.cpu/'COMPLETE.json').read_bytes()==complete_bytes
++    assert not calls and not j.p._TASK4_MODEL_CALLS and 'publish' not in j.events

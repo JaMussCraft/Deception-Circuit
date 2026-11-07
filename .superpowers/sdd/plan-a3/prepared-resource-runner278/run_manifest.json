@@ -1,0 +1,216 @@
+{
+  "kind": "local_synthetic_preparation_only",
+  "baseline_commit": "538109e809285b6ddc45d42df8786270a65f7b12",
+  "source_commit": null,
+  "native_imports": false,
+  "scientific_execution": false,
+  "execution_authorized": false,
+  "runs": [
+    {
+      "name": "base",
+      "origin": {
+        "executable": "/sw/external/python/anaconda3/bin/python3.9",
+        "version": "3.9.18 (main, Sep 11 2023, 13:41:44) \n[GCC 11.2.0]",
+        "pytest_version": "8.3.3",
+        "pytest_origin": "/u/swong2/.local/lib/python3.9/site-packages/pytest/__init__.py"
+      },
+      "command": [
+        "/sw/external/python/anaconda3/bin/python3.9",
+        "-B",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--rootdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278",
+        "--confcutdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278",
+        "--import-mode=importlib",
+        "--basetemp=/tmp/packet278-base-green",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/test_runner.py"
+      ],
+      "cwd": "/tmp",
+      "exit_code": 0,
+      "expected_passes": 10,
+      "output": "..........                                                               [100%]\n10 passed in 0.32s\n"
+    },
+    {
+      "name": "mgnp",
+      "origin": {
+        "executable": "/u/swong2/.conda/envs/mgnp/bin/python",
+        "version": "3.12.13 | packaged by Anaconda, Inc. | (main, Jul  9 2026, 14:38:16) [GCC 14.3.0]",
+        "pytest_version": "9.1.1",
+        "pytest_origin": "/u/swong2/.conda/envs/mgnp/lib/python3.12/site-packages/pytest/__init__.py"
+      },
+      "command": [
+        "/u/swong2/.conda/envs/mgnp/bin/python",
+        "-B",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--rootdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278",
+        "--confcutdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278",
+        "--import-mode=importlib",
+        "--basetemp=/tmp/packet278-mgnp-green",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/test_runner.py"
+      ],
+      "cwd": "/tmp",
+      "exit_code": 0,
+      "expected_passes": 10,
+      "output": "..........                                                               [100%]\n10 passed in 0.38s\n"
+    },
+    {
+      "name": "relocated-dryrun-base",
+      "command": [
+        "bash",
+        "/tmp/packet278-relocated-qytu4qft/spool-script",
+        "--dry-run"
+      ],
+      "interpreter": "/sw/external/python/anaconda3/bin/python3.9",
+      "cwd": "/tmp/packet278-relocated-qytu4qft",
+      "exit_code": 0,
+      "output": "{\"actual_job\": null, \"execution_authorized\": false, \"model_loaded\": false, \"native_imports\": false, \"resources\": null, \"source_commit\": null, \"source_publication\": null, \"status\": \"UNBOUND_PREPARATION_ONLY\"}\n",
+      "native_imports": false
+    },
+    {
+      "name": "relocated-dryrun-mgnp",
+      "command": [
+        "bash",
+        "/tmp/packet278-relocated-qytu4qft/spool-script",
+        "--dry-run"
+      ],
+      "interpreter": "/u/swong2/.conda/envs/mgnp/bin/python",
+      "cwd": "/tmp/packet278-relocated-qytu4qft",
+      "exit_code": 0,
+      "output": "{\"actual_job\": null, \"execution_authorized\": false, \"model_loaded\": false, \"native_imports\": false, \"resources\": null, \"source_commit\": null, \"source_publication\": null, \"status\": \"UNBOUND_PREPARATION_ONLY\"}\n",
+      "native_imports": false
+    }
+  ],
+  "source_context": [
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-preallocation-candidate183/component_analysis/a3_direction_runtime.py",
+      "sha256": "aea07dbf153824f373be70629dd24edc28dd6566cafa5955f43c69fd1119ec90",
+      "bytes": 264309
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-preallocation-candidate183/component_analysis/a3_direction_workload.py",
+      "sha256": "765b22a006ab519186a168bf455f4084915457d4ffce88881e76bf31b71a37cb",
+      "bytes": 101780
+    }
+  ],
+  "preserved_red": [
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/red-base.log",
+      "sha256": "65ce0c0f6a3d39ab23738a5d5eb506505c598a4745abd8a0d94135fa2ac49a7a",
+      "bytes": 6900
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/red-mgnp.log",
+      "sha256": "e516c28362edcaccdb17550a524134919fc7216d7ab0d5232e0cbe0fa9a2ab46",
+      "bytes": 7030
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/red-boundaries-base.log",
+      "sha256": "8893e858ba03e7442a79e56ade90df1843bef7f28da6740c231ef213a13f38a1",
+      "bytes": 10517
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/red-boundaries-mgnp.log",
+      "sha256": "dca3becacbebe4756b2749331b0956b8f539687c4f0c5ecd05f760478748266f",
+      "bytes": 10853
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/red-operational-base.log",
+      "sha256": "0146fea1aa190ef6b403744dfe441a83041c3998bb4f077fe4ae00bd2809aead",
+      "bytes": 3608
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/red-operational-mgnp.log",
+      "sha256": "3208842f8173fba25622a9b98525fce1be547c4b940af40cd2377604885c5302",
+      "bytes": 3708
+    }
+  ],
+  "files": {
+    "green-mgnp.log": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/green-mgnp.log",
+      "sha256": "0bc71eae01baba759f0487603ef9ba23810c47cd33eb5a89dec4026aaf08963f",
+      "bytes": 99
+    },
+    "runner.py": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/runner.py",
+      "sha256": "c6b45b57b00677eb8d4fc0c4bd5f4001ed6ce9d150685a4ce6faaa21fce215e8",
+      "bytes": 14500
+    },
+    "runner-boundaries-green.py": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/runner-boundaries-green.py",
+      "sha256": "501c482b1bdc6cc526b3ec2ada0341eede040cce7af579df78fba0c83a2256df",
+      "bytes": 9935
+    },
+    "contracts.json": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/contracts.json",
+      "sha256": "9201c1e13c363307d89753c1068d707ebdc0c3df6609c88f9d75eba1c74e617c",
+      "bytes": 3301
+    },
+    "red-mgnp.log": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/red-mgnp.log",
+      "sha256": "e516c28362edcaccdb17550a524134919fc7216d7ab0d5232e0cbe0fa9a2ab46",
+      "bytes": 7030
+    },
+    "test_runner.py": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/test_runner.py",
+      "sha256": "a2244c77251c2bb252c84f54617b66f0701111f5e111b2bd48fa01727fe60346",
+      "bytes": 7931
+    },
+    "launch.sh": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/launch.sh",
+      "sha256": "8b508fb832471745014c44f243714b77ae0b3e61497c453e58f397bc777b6b49",
+      "bytes": 808
+    },
+    "red-boundaries-mgnp.log": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/red-boundaries-mgnp.log",
+      "sha256": "dca3becacbebe4756b2749331b0956b8f539687c4f0c5ecd05f760478748266f",
+      "bytes": 10853
+    },
+    "runner-red.py": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/runner-red.py",
+      "sha256": "c2a0f9ff0d359f1e4f11982cbb5dbb85e03d8659a67d5a0526d6d8e91e329e95",
+      "bytes": 73
+    },
+    "README.md": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/README.md",
+      "sha256": "f92bd400d632b90bd70cd4680f3b9d01a526db142b1b0a34bf1540229eac2ef9",
+      "bytes": 6826
+    },
+    "test-original-red.py.txt": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/test-original-red.py.txt",
+      "sha256": "c5cb5547449521a367324befc1968825de7e7eba324fcef4ed3ca162e473a57e",
+      "bytes": 4789
+    },
+    "red-base.log": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/red-base.log",
+      "sha256": "65ce0c0f6a3d39ab23738a5d5eb506505c598a4745abd8a0d94135fa2ac49a7a",
+      "bytes": 6900
+    },
+    "red-operational-mgnp.log": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/red-operational-mgnp.log",
+      "sha256": "3208842f8173fba25622a9b98525fce1be547c4b940af40cd2377604885c5302",
+      "bytes": 3708
+    },
+    "red-operational-base.log": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/red-operational-base.log",
+      "sha256": "0146fea1aa190ef6b403744dfe441a83041c3998bb4f077fe4ae00bd2809aead",
+      "bytes": 3608
+    },
+    "green-base.log": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/green-base.log",
+      "sha256": "6209a75ece51a9b1632e7d7b4482f579ecd2eaf4bd4f0b5a5cd4df3cbc8defe1",
+      "bytes": 99
+    },
+    "red-boundaries-base.log": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/red-boundaries-base.log",
+      "sha256": "8893e858ba03e7442a79e56ade90df1843bef7f28da6740c231ef213a13f38a1",
+      "bytes": 10517
+    }
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "mode": "live",
+  "commit": "74efb4d0481968a1d0138eb1a79b97f302fd3c3b",
+  "python": "/sw/external/python/anaconda3/bin/python3.9",
+  "cgroup_before": {
+    "memory.current": "10818576384",
+    "memory.max": "40320217088",
+    "memory.events": "low 0\nhigh 6\nmax 129883\noom 1\noom_kill 1\noom_group_kill 0"
+  },
+  "weights_loaded": false,
+  "execution_authorized": false,
+  "production_mask_live_static": "correctly rejects nonpinned interpreter: changed mask source closure",
+  "canonical_live": true,
+  "cohorts": {
+    "far_v2": {
+      "fit_ids": 177,
+      "selection_ids": 177,
+      "assessment_ids": 100
+    },
+    "sdr_v2": {
+      "fit_ids": 187,
+      "selection_ids": 187,
+      "assessment_ids": 100
+    },
+    "ser_v2": {
+      "fit_ids": 168,
+      "selection_ids": 167,
+      "assessment_ids": 100
+    }
+  },
+  "utility_assessment": {
+    "ioi": 100,
+    "mmlu": 32
+  },
+  "utility_validation": {
+    "ioi": 100,
+    "mmlu": 32
+  },
+  "mask_profile": {
+    "backend": "eager",
+    "chunk_size": 4,
+    "dtype": "bfloat16",
+    "hardware": "H200",
+    "model": "meta-llama/Llama-3.1-8B-Instruct",
+    "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+    "tokenizer_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+    "vocab_size": 128256
+  },
+  "mask_code_hashes": {
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/a3_design.py": "e232ff9243f72d30a4df2c62833497bdacaddba1cb4b62c9cfc0794696c8a787",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/a3_direction_artifacts.py": "e365f6c1a31a6ee18381f7545517adf965553949ce4f07912a0c6619b09126fe",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/a3_direction_runtime.py": "0401c7a2750cf66ef5508d2dbbaed2f9bcea5f83918d6503e6a8f6b809a44867",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/a3_direction_workload.py": "3e43aaf2b4cacb99df87593ae377c8fdf3eb7b223b258ed8873853841404d8f9",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/a3_mask.py": "93e1c70fb6073fc0c8e8eb5bf0ca1a37946ab2733cd8e09a5167ab2394e0a505",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/a3_mask_pipeline.py": "d082395ff1a97e9fa825a7dd1c4a36e9ebb6b2fa0738a726b7ebc6fffa97b246",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/a3_mask_workload.py": "889f2359e024d6846dcad1623fd28583a3f87b27b1e5314f689fdc6df4d92828",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/a3_native.py": "b87683892df31ec87fdfab21d005d955338082699020e86846268694a690362c",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/a3_pipeline.py": "310eb53427ad4ac32522dfd0d6cd3b33e4ec887af1776579845f8953bdbe83f5",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/ladder_design.py": "a9752ff2bca91d7d04957fb867adcdc5640d94b47bf11d9593a3657a0f9c533b",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/ladder_metrics.py": "9cc369e3e929b474052a5a142890a16615d804ce64b415e919e347af4675cfad",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/ladder_pipeline.py": "f0955e8df5215e27cb3eff06cd28f7230b1de7d2a6c20e202854bc73c1280b56",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/ladder_tasks.py": "7f53a2210450e4264089a60da31739d2c0c187b0dcd778b203997b9bd873e847",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/dataset/user_inversion_pipeline.py": "4d49697731f291339262fe6ebc6a5909601a26fcf5d31ff562b55d1d74b2a0ee",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/l0.py": "0163dd6429e6846e9bc020c77440a558480db23da95773e08436f7560ded7bce",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/models/_compat.py": "449b03c2232a539dc590fed795ca2a55a045c27ce99b13b9a5204363970d2737",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/models/llama_node.py": "2c48ae2c3cd470436889f4d0420a4b027cd1eb3bcfafc277bf92142c5d9d4644",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/scripts/cluster/bridges2.env": "04fb02e3955403f1b8b1b15dcc86a2e6b5907ced54524974c9bd9fa950367577",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/scripts/cluster/delta.env": "88b44c28d15bb6d732ff92b630425209f4a8b2b1902b4a675a0ffc553899a2e0",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/scripts/jobs/specificity_a3_mask.sh": "cbdf6473ba56f16346c8e98e6cd422aded421f8b3ddeec537b4351fff1f06cce",
+    "/u/swong2/.conda/envs/mgnp/bin/python3.12": "25cb771c0f7398de035b14b1d1a1ac46c7e028a58e78acd531c43a54fd80c6a5"
+  },
+  "live_evidence": {
+    "registry_hashes": {
+      "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/held_out.json": "801b24e37c3315a8e58aa2ad5007f7831822fc2636d1e61837ad3652c370425e",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/docs/research/held_out.json": "801b24e37c3315a8e58aa2ad5007f7831822fc2636d1e61837ad3652c370425e",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json": "801b24e37c3315a8e58aa2ad5007f7831822fc2636d1e61837ad3652c370425e"
+    },
+    "grader_registry": {
+      "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/directions.json": "5f3ef57048720547d27fee9f333c34cf3707dc6befbfb58066c6e5d43a5439b1",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/docs/research/directions.json": "f8c7dbb92f2edc509c7bb8e94624a5c8adabddd103a8c48db1cc59bd69a3c6b0"
+    },
+    "injected": false,
+    "commit": "74efb4d0481968a1d0138eb1a79b97f302fd3c3b",
+    "protocol_sha256": "df9b49a1f75564495972728429de3aedc4191c7c21a53e3e4674086dcd9f9ddf"
+  },
+  "project_imports": {
+    "component_analysis": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/__init__.py",
+    "component_analysis.sampling": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/sampling.py",
+    "component_analysis.ladder_design": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/ladder_design.py",
+    "dataset": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/dataset/__init__.py",
+    "dataset.deception_common": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/dataset/deception_common.py",
+    "dataset.matched_honest": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/dataset/matched_honest.py",
+    "dataset.build_user_inversion_v2": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/dataset/build_user_inversion_v2.py",
+    "dataset.user_inversion_pipeline": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/dataset/user_inversion_pipeline.py",
+    "component_analysis.a3_design": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/a3_design.py",
+    "component_analysis.ladder_pipeline": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/ladder_pipeline.py",
+    "component_analysis.a3_pipeline": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/a3_pipeline.py",
+    "component_analysis.a3_direction_artifacts": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/a3_direction_artifacts.py",
+    "component_analysis.a3_directions": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/a3_directions.py",
+    "component_analysis.a3_direction_pipeline": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/a3_direction_pipeline.py",
+    "component_analysis.hooks": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/hooks.py",
+    "component_analysis.specificity_ladder": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/specificity_ladder.py",
+    "component_analysis.a3_direction_runner": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/a3_direction_runner.py",
+    "component_analysis.a3_direction_workload": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/a3_direction_workload.py",
+    "component_analysis.a3_direction_runtime": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/a3_direction_runtime.py",
+    "component_analysis.a3_mask": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/a3_mask.py",
+    "component_analysis.a3_mask_pipeline": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/a3_mask_pipeline.py",
+    "component_analysis.a3_mask_workload": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/component_analysis/a3_mask_workload.py",
+    "evaluation": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/evaluation/__init__.py",
+    "evaluation.grader_hash": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-pilot-runtime-74efb4d04819/runtime/evaluation/grader_hash.py"
+  },
+  "exit_code": 0,
+  "elapsed_seconds": 28.648306445044,
+  "cgroup_after": {
+    "memory.current": "12900605952",
+    "memory.max": "40320217088",
+    "memory.events": "low 0\nhigh 6\nmax 129883\noom 1\noom_kill 1\noom_group_kill 0"
+  }
+}

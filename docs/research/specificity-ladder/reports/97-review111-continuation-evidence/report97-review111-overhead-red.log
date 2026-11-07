@@ -1,0 +1,33 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__ test_prefit_pilot_emits_actual_complete_scope_and_non_authorizing_cost[2] ___
+
+tmp_path = PosixPath('/tmp/review111-overhead-red/test_prefit_pilot_emits_actual0')
+fake = [(tensor([[2, 3, 6, 0],
+        [2, 3, 5, 0]]), None), (tensor([[1, 2, 4, 0],
+        [1, 2, 3, 0]]), None), (tensor([...None), (tensor([[2, 3, 5, 0],
+        [2, 3, 7, 0]]), None), (tensor([[1, 2, 3, 0],
+        [1, 2, 5, 0]]), None), ...]
+tile = 2
+
+    @pytest.mark.parametrize('tile',[1,2])
+    def test_prefit_pilot_emits_actual_complete_scope_and_non_authorizing_cost(tmp_path,fake,tile):
+        from types import SimpleNamespace
+        from tests.test_a3_direction_workload import ledger
+        r,d,pr=_fake_pilot_inputs(tile)
+        inv=r.workload.build_inventory(d,pr,stage='prefit')
+        import time
+        start=time.perf_counter();model=object();startup=time.perf_counter()-start
+        result=r.run_pilot(model,d,pr,inv,root=tmp_path,args=SimpleNamespace(pilot_part='prefit',selected=None),guard=lambda:None,startup_seconds=startup)
+        target=r.read_object(tmp_path/'pilot-target-inventory'/'prefit')
+        assert result['complete'] and result['status']=='completed' and result['source_split']=='validation'
+        assert (result['packing_references'] if tile>1 else result['serial_numeric_references']) and all(m['batch_seconds'] for m in result['measurements'])
+        if tile>1:
+>           overhead=result['packing_overhead_measurements']
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           KeyError: 'packing_overhead_measurements'
+
+tests/test_a3_direction_runtime.py:452: KeyError
+=========================== short test summary info ============================
+FAILED tests/test_a3_direction_runtime.py::test_prefit_pilot_emits_actual_complete_scope_and_non_authorizing_cost[2]
+1 failed in 8.77s

@@ -1,0 +1,36 @@
+F
+=================================== FAILURES ===================================
+___ test_production_shaped_completed_pilot_full_projector_and_numeric_tamper ___
+
+tmp_path = PosixPath('/tmp/review111-projector-red2/test_production_shaped_complet0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f01023ab770>
+fake = []
+
+    def test_production_shaped_completed_pilot_full_projector_and_numeric_tamper(tmp_path,monkeypatch,fake):
+        """Production-shaped files and fake CPU numbers, never production admission."""
+        from tests.test_a3_direction_workload import ledger
+        import shutil
+>       r,d,p,target,path,mapping,_,_=_production_cost_source_case(tmp_path,monkeypatch,capture_model=object())
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_a3_direction_runtime.py:1421: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_a3_direction_runtime.py:1367: in _production_cost_source_case
+    run=r.runner._capture_readouts(capture_model,batches,sites=m['profile']['sites'],sink=chunks.append,
+component_analysis/a3_direction_runner.py:402: in _capture_readouts
+    _runtime(model, identity)
+component_analysis/a3_direction_runner.py:269: in _runtime
+    _require(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+ok = False, message = 'model dtype/profile mismatch'
+
+    def _require(ok, message):
+        if not ok:
+>           raise ValueError(message)
+E           ValueError: model dtype/profile mismatch
+
+component_analysis/a3_direction_runner.py:46: ValueError
+=========================== short test summary info ============================
+FAILED tests/test_a3_direction_runtime.py::test_production_shaped_completed_pilot_full_projector_and_numeric_tamper
+1 failed in 9.21s

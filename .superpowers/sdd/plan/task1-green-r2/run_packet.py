@@ -1,0 +1,146 @@
+"""Root-run frozen dual-env CPU evidence. Dry-run is stdlib-only; no scheduler calls."""
+import argparse
+import ast
+import hashlib
+import importlib
+import json
+import os
+from pathlib import Path
+import platform
+import shlex
+import socket
+import subprocess
+import sys
+import time
+import xml.etree.ElementTree as ET
+
+PACKET = Path(__file__).resolve().parent
+CANDIDATE = PACKET.parents[1] / 'plan-a3/direction-preallocation-candidate183'
+ORACLE = PACKET.parents[1] / 'plan-a3/direction-metadata-optionA-candidate'
+TEST = 'test_a3_prepared_pilot_target.py'
+ENVS = {'base': '/sw/external/python/anaconda3/bin/python3.9', 'mgnp': '/u/swong2/.conda/envs/mgnp/bin/python'}
+PINS = dict(OMP_NUM_THREADS='1', MKL_NUM_THREADS='1', OPENBLAS_NUM_THREADS='1', NUMEXPR_NUM_THREADS='1',
+    VECLIB_MAXIMUM_THREADS='1', PYTEST_DISABLE_PLUGIN_AUTOLOAD='1', PYTHONDONTWRITEBYTECODE='1',
+    DC_RUN_MANIFEST_GIT='0', CUDA_VISIBLE_DEVICES='', HF_HUB_OFFLINE='1', TRANSFORMERS_OFFLINE='1')
+
+
+def sha(path): return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def check_pins():
+    manifest = json.loads((PACKET / 'source-pins.json').read_text())
+    for group, root in [('candidate', CANDIDATE), ('oracle', ORACLE), ('packet', PACKET)]:
+        for relative, digest in manifest[group].items():
+            assert sha(root / relative) == digest, 'source pin mismatch: ' + str(root / relative)
+    return manifest
+
+
+def expected_count():
+    tree = ast.parse((PACKET / 'suite' / TEST).read_text()); total = 0
+    for item in tree.body:
+        if isinstance(item, ast.FunctionDef) and item.name.startswith('test_'):
+            n = 1
+            for dec in item.decorator_list:
+                if isinstance(dec, ast.Call) and isinstance(dec.func, ast.Attribute) and dec.func.attr == 'parametrize':
+                    n *= len(dec.args[1].elts)
+            total += n
+    return total
+
+
+def command(python, output):
+    suite = PACKET / 'suite'
+    return [python, '-m', 'pytest', '-q', '-p', 'no:cacheprovider', '--confcutdir=' + str(suite),
+        '--rootdir=' + str(suite), '--basetemp=' + str(output / 'tmp'),
+        '--junitxml=' + str(output / 'junit.xml'), str(suite / TEST)]
+
+
+def origin_assert(root):
+    sys.path.insert(0, str(root))
+    names = ['component_analysis.a3_direction_runtime', 'component_analysis.a3_direction_artifacts',
+        'component_analysis.a3_direction_workload', 'dataset.user_inversion_pipeline',
+        'tests.a3_direction_native_scenario', 'tests.test_a3_direction_runtime']
+    origins = {}
+    for name in names:
+        mod = importlib.import_module(name); path = Path(mod.__file__).resolve()
+        assert path.is_relative_to(root.resolve()), (name, str(path), str(root))
+        origins[name] = str(path)
+    return origins
+
+
+def oracle_proof(output):
+    before = check_pins(); origins = origin_assert(ORACLE)
+    r = importlib.import_module('component_analysis.a3_direction_runtime')
+    value = {'a': -0.0, 'text': 'λ雪', 'tuple': (True, None, 7)}
+    path = output / 'ordinary'; r.publish_object(path, value)
+    expected = b'{"a": -0.0, "text": "\\u03bb\\u96ea", "tuple": [true, null, 7]}\n'
+    assert (path / 'payload.json').read_bytes() == expected
+    assert r.read_object(path) == {'a': -0.0, 'text': 'λ雪', 'tuple': [True, None, 7]}
+    assert check_pins() == before
+    return dict(origins=origins, payload_bytes=len(expected), expected_payload_bytes=len(expected),
+        payload_sha256=hashlib.sha256(expected).hexdigest(), complete=True, exit_code=0,
+        model_loaded=False, execution_authorized=False)
+
+
+def main():
+    parser = argparse.ArgumentParser(); parser.add_argument('--dry-run', action='store_true')
+    parser.add_argument('--mode', choices=['RED', 'GREEN'], default='GREEN')
+    parser.add_argument('--output', type=Path); parser.add_argument('--oracle-proof', action='store_true')
+    args = parser.parse_args(); pins = check_pins()
+    if args.dry_run:
+        print(json.dumps(dict(packet=str(PACKET), candidate=str(CANDIDATE), oracle=str(ORACLE),
+            expected_test_count=expected_count(), environment=PINS,
+            commands={name: shlex.join(command(py, PACKET / ('example-' + name))) for name, py in ENVS.items()},
+            cpu_only=True, scheduler_calls=0, imports_executed=False), indent=2)); return
+    assert args.output is not None
+    if args.oracle_proof:
+        print(json.dumps(oracle_proof(args.output), sort_keys=True)); return
+    output = args.output.resolve(); output.mkdir(parents=True, exist_ok=False)
+    start = time.time()
+    manifest = dict(status='STARTED', mode=args.mode, commit='538109e809285b6ddc45d42df8786270a65f7b12',
+        source_commit_role='accepted worktree baseline; isolated candidate changes identified by source pins',
+        candidate=str(CANDIDATE), oracle=str(ORACLE), source_pins=pins,
+        host=socket.gethostname(), platform=platform.platform(), job_id=os.environ.get('SLURM_JOB_ID'),
+        cluster=os.environ.get('SLURM_CLUSTER_NAME'), started_unix=start, threadpins=PINS, results={},
+        model_loaded=False, execution_authorized=False)
+    def save(): (output / 'run_manifest.json').write_text(json.dumps(manifest, indent=2, sort_keys=True) + '\n')
+    save()
+    try:
+        for name, python in ENVS.items():
+            env = dict(os.environ, **PINS); env['PYTHONPATH'] = str(CANDIDATE)
+            env['A3_T1_CANDIDATE'] = str(CANDIDATE); env['A3_T1_OUTPUT'] = str(output / name)
+            sub = output / name; sub.mkdir()
+            oracle_cmd = [python, str(PACKET / 'run_packet.py'), '--oracle-proof', '--output', str(sub)]
+            oracle = subprocess.run(oracle_cmd, env=env, cwd=str(PACKET), capture_output=True, text=True, timeout=90)
+            (sub / 'oracle.stdout').write_text(oracle.stdout); (sub / 'oracle.stderr').write_text(oracle.stderr)
+            assert oracle.returncode == 0, name + ' oracle preflight failed'
+            argv = command(python, sub); check_pins()
+            result = subprocess.run(argv, env=env, cwd=str(PACKET), capture_output=True, text=True, timeout=120)
+            (sub / 'pytest.stdout').write_text(result.stdout); (sub / 'pytest.stderr').write_text(result.stderr)
+            check_pins()
+            cases = ET.parse(sub / 'junit.xml').getroot().findall('.//testcase')
+            failures = [case for case in cases if case.find('failure') is not None]
+            errors = [case for case in cases if case.find('error') is not None]
+            skipped = [case for case in cases if case.find('skipped') is not None]
+            row = dict(python=python, argv=argv, pytest_exit_code=result.returncode,
+                observed_cases=len(cases), expected_cases=expected_count(), failures=len(failures),
+                errors=len(errors), skipped=len(skipped), oracle=json.loads(oracle.stdout),
+                source_pins_before_after_equal=True)
+            manifest['results'][name] = row; save()
+            assert len(cases) == expected_count() and not errors and not skipped, row
+            if args.mode == 'RED':
+                assert result.returncode == 1 and len(failures) == len(cases), row
+                for case in failures:
+                    failure = case.find('failure'); text = failure.get('message', '')
+                    assert 'AttributeError' in text and any(name in text for name in (
+                        '_publish_prepared_target_object', '_read_prepared_target_object', '_prepared_namespace_identity')), text
+            else:
+                assert result.returncode == 0 and not failures, row
+        manifest.update(status=args.mode + '_EXPECTED', normal_completion=True, exit_code=0)
+    except BaseException as error:
+        manifest.update(status='FAILED', normal_completion=False, error=repr(error), exit_code=1)
+        raise
+    finally:
+        manifest.update(ended_unix=time.time(), wall_seconds=time.time() - start); save()
+
+
+if __name__ == '__main__': main()

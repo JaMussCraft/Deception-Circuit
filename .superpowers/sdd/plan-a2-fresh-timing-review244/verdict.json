@@ -1,0 +1,27 @@
+{
+  "status": "handed-back",
+  "verdict": "REVISE_ONE_NARROW_DIAGNOSTIC_PREPOPEN_DEADLINE_GAP",
+  "findings": [
+    {
+      "id": "R244-A",
+      "severity": "important finite process-entry bound; no false admission observed",
+      "site": "runner.py run_stage recheck() immediately before Popen",
+      "problem": "run_stage ignores the deadline returned by final recheck and does not require a fresh clock be below it before Popen. Packet/authentication can exhaust the fixed stage or actual CPU finish window; a new child is still started and performs config/hash work before later guards reject.",
+      "independent_reproduction": "Actual run_stage with external metadata/process seams: fresh deadline1240, readonly packet work advances clock to1250; Popen boundary is reached with zero actual processes.",
+      "minimal_correction": "Fail closed immediately before Popen when fresh now is at/after min(original fixed stage bound, returned current allocation bound); retain a nonincreasing effective deadline consistently or abort a shortened unfit packet, never renew. Keep Task2 source unchanged.",
+      "required_regressions": [
+        "Costly final authentication exhausts fresh240/prime480 -> zero Popen.",
+        "Actual current CPU end-minus60 already expired at final recheck -> zero Popen.",
+        "Valid bounded stage still starts once and strict normal/reap/publication behavior remains."
+      ],
+      "posthoc_guards_retained": "Child and observe_child later reject; this finding is unnecessary process entry after expiry, not a demonstrated successful late timing/operational admission."
+    }
+  ],
+  "semantic_parity_findings": [],
+  "configuration_and_measurement_scope": "Data-only diagnostic, no fake GPU/WAITING/CPU_COMPLETE/release; operational_feasible remains None and remote costs unmeasured.",
+  "manifest_sha256": "63743b3e980ce194a5cbbc8fe0415aaf486c4f78967250751f025b1b5365180e",
+  "raw_members_checked": 546,
+  "actual_run_or_resource_or_GPU_admitted": false,
+  "Task2_source_unchanged": true,
+  "Task2_actual_GREEN_still_required": true
+}

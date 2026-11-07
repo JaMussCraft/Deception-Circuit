@@ -1,0 +1,18 @@
+{
+  "job_id": "23473669",
+  "reservation_id": "r-039",
+  "cluster": "delta",
+  "account": "beto-delta-gpu",
+  "partition": "gpuH200x8-interactive",
+  "source_commit": "40fe57289405fd53a3fce02e5d4e47a0ebf78b64",
+  "minutes": 25,
+  "gpus": 1,
+  "reserved_gpu_hours": 0.4167,
+  "launch_manifest_sha256": "39c708058f0e58fff875192c918cc6c1f9b6d20edc1df5b5df411a4b9ae9a59e",
+  "held_before_admission": true,
+  "scheduler": "JobId=23473669 JobName=a2-bank-prefix4 UserId=swong2(78031) GroupId=grp_202(202) MCS_label=N/A Priority=0 Nice=0 Account=beto-delta-gpu QOS=beto-delta-gpu JobState=PENDING Reason=JobHeldUser Dependency=(null) Requeue=0 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=0:0 RunTime=00:00:00 TimeLimit=00:25:00 TimeMin=N/A SubmitTime=2026-11-03T08:54:18 EligibleTime=Unknown AccrueTime=Unknown StartTime=Unknown EndTime=Unknown Deadline=N/A SuspendTime=None SecsPreSuspend=0 LastSchedEval=2026-11-03T08:54:18 Scheduler=Main Partition=gpuH200x8-interactive AllocNode:Sid=dt-login04:2244903 ReqNodeList=(null) ExcNodeList=(null) NodeList= NumNodes=1 NumCPUs=4 NumTasks=1 CPUs/Task=4 ReqB:S:C:T=0:0:*:* ReqTRES=cpu=4,mem=64G,node=1,billing=6000,gres/gpu=1,gres/gpu:h200=1 AllocTRES=(null) Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=* MinCPUsNode=4 MinMemoryNode=64G MinTmpDiskNode=0 Features=projects DelayBoot=00:00:00 OverSubscribe=OK Contiguous=0 Licenses=(null) LicensesAlloc=(null) Network=(null) Command=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/real-input-readiness/bank-scoring-timing/launch-g2/gpu-timing.sh SubmitLine=sbatch --hold --parsable --export=ALL,A2_TIMING_ROOT_RELEASE=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/real-input-readiness/bank-scoring-timing/launch-g2/root-release.json,A2_TIMING_EXECUTION_OUTPUT=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/real-input-readiness/bank-scoring-timing/launch-g2/gpu-result --account=beto-delta-gpu --partition=gpuH200x8-interactive --gres=gpu:h200:1 --constraint=projects --ntasks=1 --cpus-per-task=4 --mem=64G --time=00:25:00 --job-name=a2-bank-prefix4 --chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime --output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/real-input-readiness/bank-scoring-timing/launch-g2/logs/slurm-%j.out /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/real-input-readiness/bank-scoring-timing/launch-g2/gpu-timing.sh WorkDir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime StdErr= StdIn=/dev/null StdOut=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/real-input-readiness/bank-scoring-timing/launch-g2/logs/slurm-23473669.out TresPerNode=gres/gpu:h200:1 TresPerTask=cpu=4\n",
+  "mapping_generation": 3,
+  "first_preflight_job": "23473635",
+  "final_preflight_job": "23473695",
+  "checked_utc": "2026-11-03T14:56:50.056093+00:00"
+}

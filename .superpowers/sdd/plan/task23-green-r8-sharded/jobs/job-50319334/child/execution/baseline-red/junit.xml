@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="5" skipped="0" tests="5" time="389.700" timestamp="2026-11-07T05:35:51.167799-05:00" hostname="r287.ib.bridges2.psc.edu"><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_anchored_cgroup_scope_mismatch_rejects_before_loader[False-True]" time="22.925"><failure message="Failed: DID NOT RAISE ValueError">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r8-sharded/jobs/job-50319334/child/execution/baseline-red/tmp/test_prepared_anchored_cgroup_0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x146b02969280&gt;
+measured = False, current = True
+
+    @pytest.mark.parametrize('measured,current', [(False, True), (True, False)])
+    def test_prepared_anchored_cgroup_scope_mismatch_rejects_before_loader(tmp_path, monkeypatch, measured, current):
+        from tests.a3_prepared_integration_cases import rewrite_object
+        c = integration_case(tmp_path, monkeypatch).anchor(); r = c.r
+        record = copy.deepcopy(c.resource_record); set_anchored_measurement_cgroup_scope(r, record, measured)
+        rewrite_object(c.resource_path, record)
+        binding = dict(c.preparation_binding, receiver_resources_reference=r.object_reference(c.resource_path))
+        c._bind_original_authority(binding)
+        assert r.read_object(c.admission_path)['pilot_target_preparation']['receiver_resources_reference'] == r.object_reference(c.resource_path)
+        original = r._read_prepared_target_object; readers = []
+        def receiver(*args, **kwargs):
+            result = original(*args, **kwargs); resources = copy.deepcopy(result[5])
+            inject_current_receiver_cgroup_scope(resources['process_after'], current); readers.append(1)
+            return (*result[:5], resources)
+        monkeypatch.setattr(r, '_read_prepared_target_object', receiver)
+&gt;       with pytest.raises(ValueError, match='measured/current cgroup applicability'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+baseline-suite/test_a3_prepared_pilot_target.py:980: Failed</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_anchored_cgroup_scope_mismatch_rejects_before_loader[True-False]" time="22.825"><failure message="Failed: DID NOT RAISE ValueError">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r8-sharded/jobs/job-50319334/child/execution/baseline-red/tmp/test_prepared_anchored_cgroup_1')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x146b02969040&gt;
+measured = True, current = False
+
+    @pytest.mark.parametrize('measured,current', [(False, True), (True, False)])
+    def test_prepared_anchored_cgroup_scope_mismatch_rejects_before_loader(tmp_path, monkeypatch, measured, current):
+        from tests.a3_prepared_integration_cases import rewrite_object
+        c = integration_case(tmp_path, monkeypatch).anchor(); r = c.r
+        record = copy.deepcopy(c.resource_record); set_anchored_measurement_cgroup_scope(r, record, measured)
+        rewrite_object(c.resource_path, record)
+        binding = dict(c.preparation_binding, receiver_resources_reference=r.object_reference(c.resource_path))
+        c._bind_original_authority(binding)
+        assert r.read_object(c.admission_path)['pilot_target_preparation']['receiver_resources_reference'] == r.object_reference(c.resource_path)
+        original = r._read_prepared_target_object; readers = []
+        def receiver(*args, **kwargs):
+            result = original(*args, **kwargs); resources = copy.deepcopy(result[5])
+            inject_current_receiver_cgroup_scope(resources['process_after'], current); readers.append(1)
+            return (*result[:5], resources)
+        monkeypatch.setattr(r, '_read_prepared_target_object', receiver)
+&gt;       with pytest.raises(ValueError, match='measured/current cgroup applicability'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+baseline-suite/test_a3_prepared_pilot_target.py:980: Failed</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_anchored_cold_warm_cgroup_scope_disagreement_rejects" time="22.794"><failure message="Failed: DID NOT RAISE ValueError">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r8-sharded/jobs/job-50319334/child/execution/baseline-red/tmp/test_prepared_anchored_cold_wa0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x146b0364ade0&gt;
+
+    def test_prepared_anchored_cold_warm_cgroup_scope_disagreement_rejects(tmp_path, monkeypatch):
+        from tests.a3_prepared_integration_cases import rewrite_object
+        c = integration_case(tmp_path, monkeypatch).anchor(); r = c.r
+        record = copy.deepcopy(c.resource_record); set_anchored_measurement_cgroup_scope(r, record, True, warm_disagrees=True)
+        rewrite_object(c.resource_path, record)
+        c._bind_original_authority(dict(c.preparation_binding, receiver_resources_reference=r.object_reference(c.resource_path)))
+&gt;       with pytest.raises(ValueError, match='cold/warm observation scopes incomparable'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+baseline-suite/test_a3_prepared_pilot_target.py:991: Failed</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_completed_intake_rejects_anchored_cgroup_scope_mismatch[False-True]" time="42.449"><failure message="Failed: DID NOT RAISE ValueError">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r8-sharded/jobs/job-50319334/child/execution/baseline-red/tmp/test_prepared_completed_intake0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x146af5961760&gt;
+measured = False, current = True
+
+    @pytest.mark.parametrize('measured,current', [(False, True), (True, False)])
+    def test_prepared_completed_intake_rejects_anchored_cgroup_scope_mismatch(tmp_path, monkeypatch, measured, current):
+        from tests.test_a3_direction_runtime import _production_cost_source_case
+        r = runtime(); original = r.publish_object; changed = []
+        def publish(path, payload):
+            if payload.get('kind') == 'a3_prepared_target_receiver_resources_v1':
+                payload = copy.deepcopy(payload); set_anchored_measurement_cgroup_scope(r, payload, measured); changed.append(Path(path))
+            elif payload.get('kind') == 'a3_direction_timing_v1':
+                payload = copy.deepcopy(payload)
+                inject_current_receiver_cgroup_scope(payload['prepared_target_transport']['observed_resources']['process_after'], current)
+            return original(path, payload)
+        monkeypatch.setattr(r, 'publish_object', publish)
+        r, design, protocol, target, path, mapping, _, _ = _production_cost_source_case(tmp_path, monkeypatch)
+        assert len(changed) == 1
+        origin = r.read_object(path)['origin']; admission = r.read_object(origin['admission_reference']['path'])
+        assert admission['pilot_target_preparation']['receiver_resources_reference'] == r.object_reference(changed[0])
+&gt;       with pytest.raises(ValueError, match='measured/current cgroup applicability'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+baseline-suite/test_a3_prepared_pilot_target.py:1012: Failed</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_completed_intake_rejects_anchored_cgroup_scope_mismatch[True-False]" time="40.015"><failure message="Failed: DID NOT RAISE ValueError">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r8-sharded/jobs/job-50319334/child/execution/baseline-red/tmp/test_prepared_completed_intake1')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x146af334e000&gt;
+measured = True, current = False
+
+    @pytest.mark.parametrize('measured,current', [(False, True), (True, False)])
+    def test_prepared_completed_intake_rejects_anchored_cgroup_scope_mismatch(tmp_path, monkeypatch, measured, current):
+        from tests.test_a3_direction_runtime import _production_cost_source_case
+        r = runtime(); original = r.publish_object; changed = []
+        def publish(path, payload):
+            if payload.get('kind') == 'a3_prepared_target_receiver_resources_v1':
+                payload = copy.deepcopy(payload); set_anchored_measurement_cgroup_scope(r, payload, measured); changed.append(Path(path))
+            elif payload.get('kind') == 'a3_direction_timing_v1':
+                payload = copy.deepcopy(payload)
+                inject_current_receiver_cgroup_scope(payload['prepared_target_transport']['observed_resources']['process_after'], current)
+            return original(path, payload)
+        monkeypatch.setattr(r, 'publish_object', publish)
+        r, design, protocol, target, path, mapping, _, _ = _production_cost_source_case(tmp_path, monkeypatch)
+        assert len(changed) == 1
+        origin = r.read_object(path)['origin']; admission = r.read_object(origin['admission_reference']['path'])
+        assert admission['pilot_target_preparation']['receiver_resources_reference'] == r.object_reference(changed[0])
+&gt;       with pytest.raises(ValueError, match='measured/current cgroup applicability'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+baseline-suite/test_a3_prepared_pilot_target.py:1012: Failed</failure></testcase></testsuite></testsuites>

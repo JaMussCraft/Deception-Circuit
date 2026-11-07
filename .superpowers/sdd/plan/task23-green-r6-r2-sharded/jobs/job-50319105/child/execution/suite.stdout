@@ -1,0 +1,111 @@
+................................................................F.F..... [ 32%]
+........................................                                 [ 50%]
+=================================== FAILURES ===================================
+_________________ test_prepared_costs_and_envelope_are_charged _________________
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/jobs/job-50319105/child/execution/tmp/test_prepared_costs_and_envelo0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x14e6db5649b0>
+request = <FixtureRequest for <Function test_prepared_costs_and_envelope_are_charged>>
+
+    def test_prepared_costs_and_envelope_are_charged(tmp_path, monkeypatch, request):
+        r = runtime(); r._PreparedPilotTarget
+        request.getfixturevalue('fake')
+        from tests.test_a3_direction_workload import ledger
+        c = integration_case(tmp_path, monkeypatch).anchor(); handle = c.load()
+        events = []; original_union = r._measure_complete_guard_union
+        original_before = r._PilotReconciliationPass.before_publication; original_barrier = r._PreparedPilotTarget.final_publication_barrier
+        original_writer = r._publish_measured_pilot_receipt
+        def union(receipt, *args):
+            events.append('union')
+            assert receipt['origin']['target_preparation_reference'] == r.object_reference(c.preparation_path)
+            assert receipt['origin']['receiver_resources_reference'] == r.object_reference(c.resource_path)
+            return original_union(receipt, *args)
+        def before(instance): events.append('before'); return original_before(instance)
+        def barrier(instance, *args): events.append('barrier'); return original_barrier(instance, *args)
+        def writer(*args): events.append('writer'); return original_writer(*args)
+        monkeypatch.setattr(r, '_measure_complete_guard_union', union)
+        monkeypatch.setattr(r._PilotReconciliationPass, 'before_publication', before)
+        monkeypatch.setattr(r._PreparedPilotTarget, 'final_publication_barrier', barrier)
+        monkeypatch.setattr(r, '_publish_measured_pilot_receipt', writer)
+        receipt = r.run_pilot(object(), c.design, c.protocol, c.pilot_inventory, root=c.root, args=c.args,
+            guard=c.guard, startup_seconds=7., prepared_target=handle)
+        assert events[-4:] == ['union', 'before', 'barrier', 'writer']
+        assert receipt['startup_seconds'] == 7. and receipt['proof_validation_seconds'] > 0
+        target = handle.inventory; receipts = [receipt]; budget = ledger(target)
+        budget['storage_capacities']['host_ram']['available_bytes'] = 2**44
+        proofs = r._cost_packing_proofs(receipts)
+        measured = r.workload.project_cost(receipts, target, budget, packing_proofs=proofs)
+        baseline = copy.deepcopy(receipt); baseline['startup_seconds'] = 0.; baseline['proof_validation_seconds'] = 0.
+>       zero = r.workload.project_cost([baseline], target, budget, packing_proofs=proofs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+suite/test_a3_prepared_pilot_target.py:720: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../plan-a3/direction-preallocation-candidate183/component_analysis/a3_direction_workload.py:1250: in project_cost
+    _require(type(proof) is _PackingProof and proof.source_digest==evidence.get('evidence_sha256'),
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+ok = False
+message = 'independently validated completed packing reference required'
+
+    def _require(ok, message):
+        if not ok:
+>           raise ValueError(message)
+E           ValueError: independently validated completed packing reference required
+
+../../plan-a3/direction-preallocation-candidate183/component_analysis/a3_direction_workload.py:101: ValueError
+___ test_prepared_migrated_intake_and_legacy_rejection[missing-preparation] ____
+
+tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/jobs/job-50319105/child/execution/tmp/test_prepared_migrated_intake_1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x14e6db660d40>
+damage = 'missing-preparation'
+
+    @pytest.mark.parametrize('damage', [None, 'legacy-no-preparation', 'missing-preparation', 'changed-resource',
+        'unanchored-resource', 'wrong-preparation-source', 'wrong-preparation-part'])
+    def test_prepared_migrated_intake_and_legacy_rejection(tmp_path, monkeypatch, damage):
+        r = runtime(); r._PreparedPilotTarget
+        from tests.test_a3_direction_runtime import _production_cost_source_case
+        from tests.a3_prepared_integration_cases import rewrite_object
+        r, design, protocol, target, path, mapping, live_path, live = _production_cost_source_case(tmp_path, monkeypatch)
+        value = r.read_object(path)
+        if damage is None:
+            receipts, sources = r._authenticated_pilot_receipts(design, protocol, target, [path], ledger_path=mapping)
+            assert len(receipts) == len(sources) == 1 and sources[0].value['execution_authorized'] is False
+            return
+        origin = value['origin']
+        if damage == 'legacy-no-preparation':
+            origin.pop('target_preparation_reference', None); origin.pop('receiver_resources_reference', None)
+        elif damage == 'missing-preparation': origin.pop('target_preparation_reference')
+        elif damage == 'changed-resource': origin['receiver_resources_reference']['files']['payload.json']['sha256'] = '0' * 64
+        elif damage == 'unanchored-resource': origin['receiver_resources_reference'] = origin['target_preparation_reference']
+        else:
+            prep = origin['target_preparation_reference']; descriptor = r.read_object(prep['path'])
+            if damage == 'wrong-preparation-source': descriptor['source_identity']['commit'] = 'f' * 40
+            else: descriptor['part'] = 'selected'
+            rewrite_object(Path(prep['path']), descriptor); origin['target_preparation_reference'] = r.object_reference(prep['path'])
+        rewrite_object(path, value)
+        with pytest.raises((ValueError, FileNotFoundError)):
+>           r._authenticated_pilot_receipts(design, protocol, target, [path], ledger_path=mapping)
+
+suite/test_a3_prepared_pilot_target.py:775: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../plan-a3/direction-preallocation-candidate183/component_analysis/a3_direction_runtime.py:2987: in _authenticated_pilot_receipts
+    source=_completed_pilot_source(path,receipt,expected,receipt.get('origin'),injected=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../plan-a3/direction-preallocation-candidate183/component_analysis/a3_direction_runtime.py:2751: in _completed_pilot_source
+    preparation_path,descriptor=resolved_object('target_preparation_reference')
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'target_preparation_reference'
+
+    def resolved_object(name):
+>       ref=origin[name];path=ref['path'];require(object_reference(path)==ref,'completed pilot '+name+' bytes changed');return path,read_object(path)
+            ^^^^^^^^^^^^
+E       KeyError: 'target_preparation_reference'
+
+../../plan-a3/direction-preallocation-candidate183/component_analysis/a3_direction_runtime.py:2714: KeyError
+=========================== short test summary info ============================
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_costs_and_envelope_are_charged
+FAILED suite/test_a3_prepared_pilot_target.py::test_prepared_migrated_intake_and_legacy_rejection[missing-preparation]
+2 failed, 110 passed in 1840.56s (0:30:40)

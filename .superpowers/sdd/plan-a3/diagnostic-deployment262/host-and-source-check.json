@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "-o",
+    "ControlMaster=no",
+    "-o",
+    "ControlPath=none",
+    "-o",
+    "HostName=br013.bridges2.psc.edu",
+    "bridges2",
+    "python3 -B -c 'import json,sys,time,unittest,subprocess,os\nfrom pathlib import Path\nx=json.load(sys.stdin);sys.path.insert(0,x['\"'\"'packet'\"'\"']);import host,test_transport\nassert host.old.sha(Path(x['\"'\"'packet'\"'\"'])/'\"'\"'manifest.json'\"'\"')==x['\"'\"'manifest'\"'\"']\nfor n,h in json.loads((Path(x['\"'\"'packet'\"'\"'])/'\"'\"'manifest.json'\"'\"').read_text()).items():assert host.old.sha(Path(x['\"'\"'packet'\"'\"'])/n)==h\nassert host.old.sha(x['\"'\"'config'\"'\"'])==x['\"'\"'config_sha'\"'\"'];c=json.loads(Path(x['\"'\"'config'\"'\"']).read_text());start=time.time();host.source_check(c)\nsuite=unittest.TestSuite(test_transport.Tests(n) for n in unittest.defaultTestLoader.getTestCaseNames(test_transport.Tests) if n!='\"'\"'test_selection_environment_and_container_command'\"'\"');r=unittest.TextTestRunner(stream=sys.stderr,verbosity=2).run(suite);assert r.wasSuccessful() and r.testsRun==7\nprint(json.dumps(dict(source_check=True,files=len(c['\"'\"'files'\"'\"']),aliases=len(c['\"'\"'aliases'\"'\"']),host_python=sys.version,host_tests=r.testsRun,wall_seconds=time.time()-start)))\n'"
+  ],
+  "exit_code": 0,
+  "stdout": "{\"source_check\": true, \"files\": 1126, \"aliases\": 8, \"host_python\": \"3.6.8 (default, Sep  9 2024, 06:12:39) \\n[GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]\", \"host_tests\": 7, \"wall_seconds\": 15.570735216140747}\n",
+  "stderr": "test_direct_and_relocated_launcher_forwards_exact_arguments (test_transport.Tests) ... ok\ntest_effective_mount_longest_prefix (test_transport.Tests) ... ok\ntest_exhaustion_after_costly_source_check_never_spawns (test_transport.Tests) ... ok\ntest_group_killed_after_term_grace (test_transport.Tests) ... ok\ntest_margins_strict (test_transport.Tests) ... ok\ntest_reaps_group_after_leader_exit (test_transport.Tests) ... ok\ntest_swapped_config_rejected_before_allocation (test_transport.Tests) ... ok\n\n----------------------------------------------------------------------\nRan 7 tests in 0.129s\n\nOK\n",
+  "observed_unix": 1794032653.3146722
+}

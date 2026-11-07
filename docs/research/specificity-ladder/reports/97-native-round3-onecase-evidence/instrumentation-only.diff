@@ -1,0 +1,17 @@
+--- /tmp/report97-native-onecase-instrumented.py
++++ /tmp/report97-native-onecase-no-periodic.py
+@@ -1,7 +1,7 @@
+ from pathlib import Path
+ import faulthandler,functools,json,resource,sys,time
+ root=Path(sys.argv[1]);out=Path(sys.argv[2]);began=time.perf_counter();forward=[0]
+-stack=(out/'stacks.log').open('w');faulthandler.dump_traceback_later(60,repeat=True,file=stack)
++stack=(out/'stacks.log').open('w');faulthandler.enable(file=stack,all_threads=True)
+ def mark(event,**fields):
+  print(json.dumps(dict(event=event,elapsed_seconds=time.perf_counter()-began,peak_rss_bytes=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss*1024,observed_forward_calls=forward[0],**fields)),flush=True)
+ mark('import_start')
+@@ -29,4 +29,4 @@
+  mark('one_case_complete',result=result)
+ finally:
+  hooks.capture_forward=original_capture
+- faulthandler.cancel_dump_traceback_later();stack.close()
++ faulthandler.disable();stack.close()

@@ -1,0 +1,130 @@
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime/component_analysis/a3_direction_workload.py	2026-11-03 08:37:07.000000000 -0600
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-candidate/component_analysis/a3_direction_workload.py	2026-11-03 17:07:09.000000000 -0600
+@@ -292,6 +292,7 @@
+     # its reviewed measurement, plus the complete head/MLP sender list twice.
+     layers=cfg.get('num_layers',32); heads_per_layer=max(1,d//h)
+     senders=[['head',l,i] for l in range(layers) for i in range(heads_per_layer)]+[['mlp',l,0] for l in range(layers)]
++    senders_wire=wire(senders);senders_host=_host_bound(senders)
+     for req in workload['requirements']:
+         if req['operation']!='positive_control': continue
+         task,split,c,stream,rid=req['target_keys'][0]
+@@ -304,11 +305,14 @@
+                 for st in row['streams']: record(task,split,row.get('condition',task),st,row['instance_id'],req['profile']['padded_width'])
+             complete_groups.add(group)
+         donor_bytes=source_max[group]
+-        size=4*(source_bytes+donor_bytes)+2*wire(senders)+wire(req['profile'])+wire(extra)
++        pid=digest(req['profile'])
++        if pid not in profile_sizes:
++            profile_sizes[pid]=(wire(req['profile']),_host_bound(req['profile']))
++        size=4*(source_bytes+donor_bytes)+2*senders_wire+profile_sizes[pid][0]+extra_wire
+         repetitions=max(1,req['batches']//3)
+         size*=repetitions
+         components['positive_evidence']+=size
+-        raw_host+=4*(source_host+source_host_max[group])+2*_host_bound(senders)+_host_bound(extra)+_host_bound(req['profile'])
++        raw_host+=4*(source_host+source_host_max[group])+2*senders_host+extra_host+profile_sizes[pid][1]
+         largest_control=max(largest_control,size)
+     # Shared image geometry, both fitted axes and ridge probe arrays; nulls are
+     # retained individually by selected outputs, never treated as just indices.
+@@ -388,7 +392,15 @@
+     _require(design.get('injected') is True or 'task_order' in protocol,'production requires frozen task_order')
+     task_order=protocol.get('task_order',sorted(design['tasks']))
+     _require(len(task_order)==len(set(task_order)) and set(task_order)==set(design['tasks']),'changed frozen task order coverage')
+-    timing={t:_timing_ids(_source_rows(design,t,'validation')) for t in list(task_order)+['ioi','mmlu']}
++    # Immutable source rows are indexed only for this one builder invocation.
++    # Retained timing records below still receive independent deep copies.
++    rows_by_group={}
++    def source_rows(task,split):
++        key=(task,split)
++        if key not in rows_by_group:
++            rows_by_group[key]=_source_rows(design,task,split)
++        return rows_by_group[key]
++    timing={t:_timing_ids(source_rows(t,'validation')) for t in list(task_order)+['ioi','mmlu']}
+     if 'timing_ids' in cfg:
+         _require(cfg['timing_ids']==timing,'changed frozen metadata-only timing membership')
+     inv=dict(schema_version=1,kind='a3_direction_inventory',stage=stage,
+@@ -412,6 +424,39 @@
+             model=identity['model'],model_revision=identity['model_revision'],source_sha256=digest(identity['code_hashes']),
+             sites=copy.deepcopy(sites),positive_singleton=singleton,capture_scope='all_senders' if singleton else 'requested_head_union')
+ 
++    def source_row(task,split,condition,rid):
++        key=(task,split)
++        if key not in source_index:
++            source_index[key]={(r.get('condition',task),r['instance_id']):r
++                               for r in source_rows(task,split)}
++        return source_index[key][(condition,rid)]
++
++    def target_unmasked_lengths(keys,p):
++        # Target records are not retained here: avoid copying their complete
++        # prompt/token payloads just to discard everything except the lengths.
++        lengths=[]; seen=set(); real_ids=[]; first=None
++        for key in keys:
++            if len(key)==12:
++                task,split,c,stream,rid=key[2],key[3],key[10],key[11],key[9]
++            else:
++                task,split,c,stream,rid=key
++            scopekey=(task,split,c,stream,rid)
++            if scopekey in seen: continue
++            seen.add(scopekey)
++            row=source_row(task,split,c,rid)
++            lengths.append(_length(row,stream));real_ids.append(rid)
++            if first is None:first=(task,split,c,row)
++        if cfg.get('pad_tail_batches') and lengths and not p.get('positive_singleton'):
++            size=p['physical_batch_size']//p['axis_tile_size']
++            while len(lengths)<size:
++                # Preserve the original dummy-identity/source digest checks,
++                # although only its first-row length is retained by this view.
++                task,split,c,row=first
++                digest([task,split,c,real_ids,len(lengths)])
++                digest(row)
++                lengths.append(lengths[0])
++        return lengths
++
+     def input_scope(keys, p):
+         out=[]; seen=set()
+         for key in keys:
+@@ -422,10 +467,7 @@
+             scopekey=(task,split,c,stream,rid)
+             if scopekey in seen: continue
+             seen.add(scopekey)
+-            indexkey=(task,split)
+-            if indexkey not in source_index:
+-                source_index[indexkey]={(r.get('condition',task),r['instance_id']):r for r in _source_rows(design,task,split)}
+-            row=source_index[indexkey][(c,rid)]; data=row['streams'][stream]
++            row=source_row(task,split,c,rid); data=row['streams'][stream]
+             out.append(dict(source_task=task,analysis_split=split,instance_id=rid,condition=c,stream=stream,
+                 record=copy.deepcopy(row),unpadded_length=_length(row,stream),
+                 padded_width=p['padded_width'],readout=data.get('readout',_length(row,stream)-1)))
+@@ -447,7 +489,7 @@
+         item=dict(operation=operation,profile=p,batches=batches,family=family,call_index=len(inv['requirements']),declared_job_id=job_id,
+             target_keys=keys,timing_keys=timing_keys if timing_keys is not None else keys,axis_ids=list(axes),axis_scope=axis_scope or [])
+         item['timing_inputs']=input_scope(item['timing_keys'],p)
+-        item['target_unmasked_lengths']=[x['unpadded_length'] for x in input_scope(keys,p)]
++        item['target_unmasked_lengths']=target_unmasked_lengths(keys,p)
+         item['timing_unmasked_lengths']=[x['unpadded_length'] for x in item['timing_inputs']]
+         item['axis_class']='validated_nonzero_image_axis' if inv['pilot_part']=='prefit' and axes else None
+         item['donor_convention']=('frozen_cyclic_different_question_readout' if p['positive_singleton'] else 'none') if p['source_task']=='mmlu' else ('repeated_B_corrupt' if p['source_task']=='ioi' else 'same_ID_condition_opposite_stream')
+@@ -476,13 +518,13 @@
+         return ('clean',) if task in ('ioi','mmlu') else ('clean','corrupt')
+ 
+     def groups(task,split,*,pilot=False,train=False,target_split=None):
+-        rows=_source_rows(design,task,split)
++        rows=source_rows(task,split)
+         chosen=timing[task] if pilot else list(dict.fromkeys(r['instance_id'] for r in rows))
+         chunk_size=cfg.get('train_microbatch_size',batch) if train else batch
+         _integer(chunk_size,'train microbatch size')
+         chunks=_chunks(chosen,chunk_size)
+         if pilot:
+-            target_rows=_source_rows(design,task,target_split or split)
++            target_rows=source_rows(task,target_split or split)
+             target_n=len({r['instance_id'] for r in target_rows})
+             sizes={len(x) for x in _chunks(list(range(target_n)),batch)}
+             _require(max(sizes)<=len(chosen),'validation timing cohort cannot cover physical target batch; freeze a smaller microbatch')
+@@ -508,7 +550,7 @@
+                 if train and protocol.get('fit_cache'):
+                     p=copy.deepcopy(protocol['fit_cache']['capture_identity']['numeric_profile'])
+                     sites=copy.deepcopy(p['sites'])
+-                source={r['instance_id']:r for r in _source_rows(design,task,split) if r.get('condition',task)==c}
++                source={r['instance_id']:r for r in source_rows(task,split) if r.get('condition',task)==c}
+                 _require(all(_length(source[i],stream)<=p['padded_width'] for i in ids),'capture profile truncates recipient/donor source')
+                 key=digest([task,split,c,stream,ids,p,invocation])
+                 if key in captures:

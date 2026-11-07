@@ -1,0 +1,21 @@
+{
+  "at_utc": "2026-11-06T20:45:11.137209+00:00",
+  "scope": "Read-only scheduler forecast for prospective CPU-only portability; no job submitted and no scientific wrapper executed.",
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "-o",
+    "ControlMaster=no",
+    "-o",
+    "ControlPath=none",
+    "-o",
+    "HostName=br013.bridges2.psc.edu",
+    "bridges2",
+    "sbatch --test-only --account=cis260361p --partition=RM-shared --qos=rm --nodes=1 --ntasks=1 --cpus-per-task=26 --mem=48G --time=00:45:00 --export=ALL --wrap=true"
+  ],
+  "returncode": 0,
+  "output": "sbatch: Job 50307836 to start at 2026-11-06T15:45:11 using 26 processors on nodes r244 in partition RM-shared\n"
+}

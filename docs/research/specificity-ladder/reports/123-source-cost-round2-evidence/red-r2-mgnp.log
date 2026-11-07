@@ -1,0 +1,37 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+____ test_review_b1_dependency_discovery_cannot_rebind_a_validated_envelope ____
+
+tmp_path = PosixPath('/tmp/source-cost-123-red-r2-mgnp/test_review_b1_dependency_disc0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fe206e11250>
+
+    def test_review_b1_dependency_discovery_cannot_rebind_a_validated_envelope(tmp_path,monkeypatch):
+        c=setup_case(tmp_path,monkeypatch)
+        from component_analysis import a3_direction_artifacts as artifacts
+        def replace_envelope(owned):
+            changed=copy.deepcopy(c.prepared);changed['empty']=['not the retained source']
+            (c.prepared_path/'payload.json').write_text(json.dumps(changed))
+            (c.prepared_path/'COMPLETE.json').unlink();artifacts._finish(c.prepared_path)
+            return [c.static],[],[]
+>       with pytest.raises(ValueError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_a3_source_validation.py:379: Failed
+___ test_review_b2_actual_grader_same_byte_external_link_is_not_a_cache_hit ____
+
+tmp_path = PosixPath('/tmp/source-cost-123-red-r2-mgnp/test_review_b2_actual_grader_s0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fe1f8cd32c0>
+
+    def test_review_b2_actual_grader_same_byte_external_link_is_not_a_cache_hit(tmp_path,monkeypatch):
+        c=setup_case(tmp_path,monkeypatch);state=c.build()
+        grader=c.runtime/'evaluation/benchmark_eval.py';outside=tmp_path/'outside-grader.py';outside.write_bytes(grader.read_bytes());grader.unlink();grader.symlink_to(outside)
+>       with pytest.raises(ValueError):refresh(c,state)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_a3_source_validation.py:387: Failed
+=========================== short test summary info ============================
+FAILED tests/test_a3_source_validation.py::test_review_b1_dependency_discovery_cannot_rebind_a_validated_envelope
+FAILED tests/test_a3_source_validation.py::test_review_b2_actual_grader_same_byte_external_link_is_not_a_cache_hit
+2 failed, 45 deselected in 3.65s

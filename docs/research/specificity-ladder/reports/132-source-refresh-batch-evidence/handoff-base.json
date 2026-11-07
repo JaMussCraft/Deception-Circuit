@@ -1,0 +1,35 @@
+{
+  "source_hashes": {
+    "component_analysis/a3_source_validation.py": "eaabf9ef8247159686ec6ee00b6dbcb876495a0dac62281bb26077a9eb65fcee",
+    "tests/test_a3_source_validation.py": "f3164a051cf18c5f44e7da13b364e02057426e02b7daccd557947afd54c66241"
+  },
+  "command": [
+    "/sw/external/python/anaconda3/bin/python3.9",
+    "-m",
+    "pytest",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp=/tmp/a3-source-batch-handoff-base",
+    "tests/test_a3_source_validation.py",
+    "tests/test_a3_mask_pipeline.py",
+    "tests/test_a3_edge_pipeline.py",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/121-source-cost-review-evidence/test_independent_source_boundaries.py"
+  ],
+  "cwd": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-refresh-batch-source",
+  "environment": {
+    "PYTHONPATH": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-refresh-batch-source",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1",
+    "HF_HUB_OFFLINE": "1",
+    "TRANSFORMERS_OFFLINE": "1",
+    "A3_A1_SCHEMA_TEST_DESIGN": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/design.json"
+  },
+  "started_utc": "2026-11-03T00:00:31.370975+00:00",
+  "elapsed_seconds": 266.0351049900055,
+  "exit_code": 0,
+  "log": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/132-source-refresh-batch-evidence/handoff-base.log"
+}

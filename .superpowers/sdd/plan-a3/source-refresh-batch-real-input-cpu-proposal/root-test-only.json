@@ -1,0 +1,22 @@
+{
+  "command": [
+    "sbatch",
+    "--test-only",
+    "--export=ALL",
+    "--account=beto-delta-cpu",
+    "--partition=cpu",
+    "--constraint=projects",
+    "--ntasks=1",
+    "--cpus-per-task=4",
+    "--mem=32G",
+    "--time=00:35:00",
+    "--job-name=lad-a3-batch-prep",
+    "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+    "--output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-refresh-batch-real-input-cpu-proposal/logs/slurm-%j.out",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-refresh-batch-real-input-cpu-proposal/cpu-preparation.sh"
+  ],
+  "stdout": "",
+  "stderr": "sbatch: Job 23459445 to start at 2026-11-02T20:53:52 a using 4 processors on nodes cn093 in partition cpu\n",
+  "exit_code": 0,
+  "release": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-refresh-batch-root-release.json"
+}

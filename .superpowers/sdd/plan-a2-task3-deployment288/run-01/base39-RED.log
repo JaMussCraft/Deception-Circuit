@@ -1,0 +1,572 @@
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF...FFFFFFFFFFFFFFFFF....FFFFFF........ [ 73%]
+....FFF..................F                                               [100%]
+=================================== FAILURES ===================================
+__ test_request_generated_from_actual_Task1_WAITING_accepted_by_actual_Task2 ___
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:82: in test_request_generated_from_actual_Task1_WAITING_accepted_by_actual_Task2
+    m = module(); r = request(m, chain)
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:77: in request
+    return m.construct_request(x.w, x.c, x.g, t1.sha(x.guard.CONFIG),
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:39: in construct_request
+    need(w['phase'] in ('bank','prefix4'),'unknown phase');need(w['job_id']==g['actual_job_id'] and w['source_commit']==SOURCE and w['bound_config_sha256']==gsha,'WAITING identity')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: unknown phase
+________ test_request_rejects_wrong_actual_waiting_binding[phase-bank] _________
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:95: in test_request_rejects_wrong_actual_waiting_binding
+    m = module(); request(m, chain)  # positive control prevents vacuous rejection
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:77: in request
+    return m.construct_request(x.w, x.c, x.g, t1.sha(x.guard.CONFIG),
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:39: in construct_request
+    need(w['phase'] in ('bank','prefix4'),'unknown phase');need(w['job_id']==g['actual_job_id'] and w['source_commit']==SOURCE and w['bound_config_sha256']==gsha,'WAITING identity')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: unknown phase
+_______ test_request_rejects_wrong_actual_waiting_binding[phase-prefix4] _______
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:95: in test_request_rejects_wrong_actual_waiting_binding
+    m = module(); request(m, chain)  # positive control prevents vacuous rejection
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:77: in request
+    return m.construct_request(x.w, x.c, x.g, t1.sha(x.guard.CONFIG),
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:39: in construct_request
+    need(w['phase'] in ('bank','prefix4'),'unknown phase');need(w['job_id']==g['actual_job_id'] and w['source_commit']==SOURCE and w['bound_config_sha256']==gsha,'WAITING identity')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: unknown phase
+________ test_request_rejects_wrong_actual_waiting_binding[job_id-999] _________
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:95: in test_request_rejects_wrong_actual_waiting_binding
+    m = module(); request(m, chain)  # positive control prevents vacuous rejection
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:77: in request
+    return m.construct_request(x.w, x.c, x.g, t1.sha(x.guard.CONFIG),
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:39: in construct_request
+    need(w['phase'] in ('bank','prefix4'),'unknown phase');need(w['job_id']==g['actual_job_id'] and w['source_commit']==SOURCE and w['bound_config_sha256']==gsha,'WAITING identity')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: unknown phase
+_ test_request_rejects_wrong_actual_waiting_binding[source_commit-0000000000000000000000000000000000000000] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:95: in test_request_rejects_wrong_actual_waiting_binding
+    m = module(); request(m, chain)  # positive control prevents vacuous rejection
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:77: in request
+    return m.construct_request(x.w, x.c, x.g, t1.sha(x.guard.CONFIG),
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:39: in construct_request
+    need(w['phase'] in ('bank','prefix4'),'unknown phase');need(w['job_id']==g['actual_job_id'] and w['source_commit']==SOURCE and w['bound_config_sha256']==gsha,'WAITING identity')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: unknown phase
+_ test_request_rejects_wrong_actual_waiting_binding[bound_config_sha256-0000000000000000000000000000000000000000000000000000000000000000] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:95: in test_request_rejects_wrong_actual_waiting_binding
+    m = module(); request(m, chain)  # positive control prevents vacuous rejection
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:77: in request
+    return m.construct_request(x.w, x.c, x.g, t1.sha(x.guard.CONFIG),
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:39: in construct_request
+    need(w['phase'] in ('bank','prefix4'),'unknown phase');need(w['job_id']==g['actual_job_id'] and w['source_commit']==SOURCE and w['bound_config_sha256']==gsha,'WAITING identity')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: unknown phase
+_ test_request_rejects_wrong_actual_waiting_binding[groups_file_sha256-0000000000000000000000000000000000000000000000000000000000000000] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:95: in test_request_rejects_wrong_actual_waiting_binding
+    m = module(); request(m, chain)  # positive control prevents vacuous rejection
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:77: in request
+    return m.construct_request(x.w, x.c, x.g, t1.sha(x.guard.CONFIG),
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:39: in construct_request
+    need(w['phase'] in ('bank','prefix4'),'unknown phase');need(w['job_id']==g['actual_job_id'] and w['source_commit']==SOURCE and w['bound_config_sha256']==gsha,'WAITING identity')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: unknown phase
+_ test_request_rejects_wrong_actual_waiting_binding[bank_file_sha256-0000000000000000000000000000000000000000000000000000000000000000] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:95: in test_request_rejects_wrong_actual_waiting_binding
+    m = module(); request(m, chain)  # positive control prevents vacuous rejection
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:77: in request
+    return m.construct_request(x.w, x.c, x.g, t1.sha(x.guard.CONFIG),
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:39: in construct_request
+    need(w['phase'] in ('bank','prefix4'),'unknown phase');need(w['job_id']==g['actual_job_id'] and w['source_commit']==SOURCE and w['bound_config_sha256']==gsha,'WAITING identity')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: unknown phase
+_ test_request_rejects_wrong_actual_waiting_binding[bank_manifest_sha256-0000000000000000000000000000000000000000000000000000000000000000] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:95: in test_request_rejects_wrong_actual_waiting_binding
+    m = module(); request(m, chain)  # positive control prevents vacuous rejection
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:77: in request
+    return m.construct_request(x.w, x.c, x.g, t1.sha(x.guard.CONFIG),
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:39: in construct_request
+    need(w['phase'] in ('bank','prefix4'),'unknown phase');need(w['job_id']==g['actual_job_id'] and w['source_commit']==SOURCE and w['bound_config_sha256']==gsha,'WAITING identity')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: unknown phase
+_ test_request_rejects_wrong_actual_waiting_binding[bank_internal_payload_sha256-0000000000000000000000000000000000000000000000000000000000000000] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:95: in test_request_rejects_wrong_actual_waiting_binding
+    m = module(); request(m, chain)  # positive control prevents vacuous rejection
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:77: in request
+    return m.construct_request(x.w, x.c, x.g, t1.sha(x.guard.CONFIG),
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:39: in construct_request
+    need(w['phase'] in ('bank','prefix4'),'unknown phase');need(w['job_id']==g['actual_job_id'] and w['source_commit']==SOURCE and w['bound_config_sha256']==gsha,'WAITING identity')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: unknown phase
+_ test_request_rejects_wrong_actual_waiting_binding[launch_packet_manifest_sha256-0000000000000000000000000000000000000000000000000000000000000000] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:95: in test_request_rejects_wrong_actual_waiting_binding
+    m = module(); request(m, chain)  # positive control prevents vacuous rejection
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:77: in request
+    return m.construct_request(x.w, x.c, x.g, t1.sha(x.guard.CONFIG),
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:39: in construct_request
+    need(w['phase'] in ('bank','prefix4'),'unknown phase');need(w['job_id']==g['actual_job_id'] and w['source_commit']==SOURCE and w['bound_config_sha256']==gsha,'WAITING identity')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: unknown phase
+_ test_request_rejects_wrong_actual_waiting_binding[publication_deadline-1004.0] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:95: in test_request_rejects_wrong_actual_waiting_binding
+    m = module(); request(m, chain)  # positive control prevents vacuous rejection
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:77: in request
+    return m.construct_request(x.w, x.c, x.g, t1.sha(x.guard.CONFIG),
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:39: in construct_request
+    need(w['phase'] in ('bank','prefix4'),'unknown phase');need(w['job_id']==g['actual_job_id'] and w['source_commit']==SOURCE and w['bound_config_sha256']==gsha,'WAITING identity')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: unknown phase
+_____________ test_request_rejects_changed_reviewed_resource_tuple _____________
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:101: in test_request_rejects_changed_reviewed_resource_tuple
+    m = module(); request(m, chain)
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:77: in request
+    return m.construct_request(x.w, x.c, x.g, t1.sha(x.guard.CONFIG),
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:39: in construct_request
+    need(w['phase'] in ('bank','prefix4'),'unknown phase');need(w['job_id']==g['actual_job_id'] and w['source_commit']==SOURCE and w['bound_config_sha256']==gsha,'WAITING identity')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: unknown phase
+______ test_trigger_freshness_fifteen_seconds_not_old_wait_window[15.001] ______
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:108: in test_trigger_freshness_fifteen_seconds_not_old_wait_window
+    m = module(); r = request(m, chain)
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:77: in request
+    return m.construct_request(x.w, x.c, x.g, t1.sha(x.guard.CONFIG),
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:39: in construct_request
+    need(w['phase'] in ('bank','prefix4'),'unknown phase');need(w['job_id']==g['actual_job_id'] and w['source_commit']==SOURCE and w['bound_config_sha256']==gsha,'WAITING identity')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: unknown phase
+______ test_trigger_freshness_fifteen_seconds_not_old_wait_window[-0.001] ______
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:108: in test_trigger_freshness_fifteen_seconds_not_old_wait_window
+    m = module(); r = request(m, chain)
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:77: in request
+    return m.construct_request(x.w, x.c, x.g, t1.sha(x.guard.CONFIG),
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:39: in construct_request
+    need(w['phase'] in ('bank','prefix4'),'unknown phase');need(w['job_id']==g['actual_job_id'] and w['source_commit']==SOURCE and w['bound_config_sha256']==gsha,'WAITING identity')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: unknown phase
+________ test_actual_Task2_COMPLETE_is_read_only_and_valid_full_domain _________
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:115: in test_actual_Task2_COMPLETE_is_read_only_and_valid_full_domain
+    m.validate_complete(chain.complete, chain.r, 'a'*64, chain.g, t1.sha(chain.guard.CONFIG),1202.)
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:49: in validate_complete
+    need(q['standing_packet_manifest_sha256']==CPU3 and q['H100_packet_manifest_sha256']==R5 and q['final_GPU_bound_config_sha256']==gsha and q['request_sha256']==rsha,'CPU immutable bindings')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: CPU immutable bindings
+_____ test_partial_old_or_changed_CPU_COMPLETE_never_admits[phase-prefix4] _____
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:127: in test_partial_old_or_changed_CPU_COMPLETE_never_admits
+    m = module(); m.validate_complete(chain.complete,chain.r,'a'*64,chain.g,t1.sha(chain.guard.CONFIG),1202.)
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:49: in validate_complete
+    need(q['standing_packet_manifest_sha256']==CPU3 and q['H100_packet_manifest_sha256']==R5 and q['final_GPU_bound_config_sha256']==gsha and q['request_sha256']==rsha,'CPU immutable bindings')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: CPU immutable bindings
+____ test_partial_old_or_changed_CPU_COMPLETE_never_admits[complete-False] _____
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:127: in test_partial_old_or_changed_CPU_COMPLETE_never_admits
+    m = module(); m.validate_complete(chain.complete,chain.r,'a'*64,chain.g,t1.sha(chain.guard.CONFIG),1202.)
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:49: in validate_complete
+    need(q['standing_packet_manifest_sha256']==CPU3 and q['H100_packet_manifest_sha256']==R5 and q['final_GPU_bound_config_sha256']==gsha and q['request_sha256']==rsha,'CPU immutable bindings')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: CPU immutable bindings
+____ test_partial_old_or_changed_CPU_COMPLETE_never_admits[status-PARTIAL] _____
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:127: in test_partial_old_or_changed_CPU_COMPLETE_never_admits
+    m = module(); m.validate_complete(chain.complete,chain.r,'a'*64,chain.g,t1.sha(chain.guard.CONFIG),1202.)
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:49: in validate_complete
+    need(q['standing_packet_manifest_sha256']==CPU3 and q['H100_packet_manifest_sha256']==R5 and q['final_GPU_bound_config_sha256']==gsha and q['request_sha256']==rsha,'CPU immutable bindings')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: CPU immutable bindings
+______ test_partial_old_or_changed_CPU_COMPLETE_never_admits[full_rows-4] ______
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:127: in test_partial_old_or_changed_CPU_COMPLETE_never_admits
+    m = module(); m.validate_complete(chain.complete,chain.r,'a'*64,chain.g,t1.sha(chain.guard.CONFIG),1202.)
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:49: in validate_complete
+    need(q['standing_packet_manifest_sha256']==CPU3 and q['H100_packet_manifest_sha256']==R5 and q['final_GPU_bound_config_sha256']==gsha and q['request_sha256']==rsha,'CPU immutable bindings')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: CPU immutable bindings
+____ test_partial_old_or_changed_CPU_COMPLETE_never_admits[full_controls-0] ____
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:127: in test_partial_old_or_changed_CPU_COMPLETE_never_admits
+    m = module(); m.validate_complete(chain.complete,chain.r,'a'*64,chain.g,t1.sha(chain.guard.CONFIG),1202.)
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:49: in validate_complete
+    need(q['standing_packet_manifest_sha256']==CPU3 and q['H100_packet_manifest_sha256']==R5 and q['final_GPU_bound_config_sha256']==gsha and q['request_sha256']==rsha,'CPU immutable bindings')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: CPU immutable bindings
+_ test_partial_old_or_changed_CPU_COMPLETE_never_admits[full_domain_support_audit_complete-False] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:127: in test_partial_old_or_changed_CPU_COMPLETE_never_admits
+    m = module(); m.validate_complete(chain.complete,chain.r,'a'*64,chain.g,t1.sha(chain.guard.CONFIG),1202.)
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:49: in validate_complete
+    need(q['standing_packet_manifest_sha256']==CPU3 and q['H100_packet_manifest_sha256']==R5 and q['final_GPU_bound_config_sha256']==gsha and q['request_sha256']==rsha,'CPU immutable bindings')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: CPU immutable bindings
+_ test_partial_old_or_changed_CPU_COMPLETE_never_admits[support_reason_mask_sha256-invalid] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:127: in test_partial_old_or_changed_CPU_COMPLETE_never_admits
+    m = module(); m.validate_complete(chain.complete,chain.r,'a'*64,chain.g,t1.sha(chain.guard.CONFIG),1202.)
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:49: in validate_complete
+    need(q['standing_packet_manifest_sha256']==CPU3 and q['H100_packet_manifest_sha256']==R5 and q['final_GPU_bound_config_sha256']==gsha and q['request_sha256']==rsha,'CPU immutable bindings')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: CPU immutable bindings
+_ test_partial_old_or_changed_CPU_COMPLETE_never_admits[actual_future_GPU_job_id-999] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:127: in test_partial_old_or_changed_CPU_COMPLETE_never_admits
+    m = module(); m.validate_complete(chain.complete,chain.r,'a'*64,chain.g,t1.sha(chain.guard.CONFIG),1202.)
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:49: in validate_complete
+    need(q['standing_packet_manifest_sha256']==CPU3 and q['H100_packet_manifest_sha256']==R5 and q['final_GPU_bound_config_sha256']==gsha and q['request_sha256']==rsha,'CPU immutable bindings')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: CPU immutable bindings
+_ test_partial_old_or_changed_CPU_COMPLETE_never_admits[actual_CPU_job_id-999] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:127: in test_partial_old_or_changed_CPU_COMPLETE_never_admits
+    m = module(); m.validate_complete(chain.complete,chain.r,'a'*64,chain.g,t1.sha(chain.guard.CONFIG),1202.)
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:49: in validate_complete
+    need(q['standing_packet_manifest_sha256']==CPU3 and q['H100_packet_manifest_sha256']==R5 and q['final_GPU_bound_config_sha256']==gsha and q['request_sha256']==rsha,'CPU immutable bindings')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: CPU immutable bindings
+_ test_partial_old_or_changed_CPU_COMPLETE_never_admits[bank_file_sha256-0000000000000000000000000000000000000000000000000000000000000000] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:127: in test_partial_old_or_changed_CPU_COMPLETE_never_admits
+    m = module(); m.validate_complete(chain.complete,chain.r,'a'*64,chain.g,t1.sha(chain.guard.CONFIG),1202.)
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:49: in validate_complete
+    need(q['standing_packet_manifest_sha256']==CPU3 and q['H100_packet_manifest_sha256']==R5 and q['final_GPU_bound_config_sha256']==gsha and q['request_sha256']==rsha,'CPU immutable bindings')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: CPU immutable bindings
+_ test_partial_old_or_changed_CPU_COMPLETE_never_admits[bank_manifest_sha256-0000000000000000000000000000000000000000000000000000000000000000] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:127: in test_partial_old_or_changed_CPU_COMPLETE_never_admits
+    m = module(); m.validate_complete(chain.complete,chain.r,'a'*64,chain.g,t1.sha(chain.guard.CONFIG),1202.)
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:49: in validate_complete
+    need(q['standing_packet_manifest_sha256']==CPU3 and q['H100_packet_manifest_sha256']==R5 and q['final_GPU_bound_config_sha256']==gsha and q['request_sha256']==rsha,'CPU immutable bindings')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: CPU immutable bindings
+_ test_partial_old_or_changed_CPU_COMPLETE_never_admits[waiting_sha256-0000000000000000000000000000000000000000000000000000000000000000] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:127: in test_partial_old_or_changed_CPU_COMPLETE_never_admits
+    m = module(); m.validate_complete(chain.complete,chain.r,'a'*64,chain.g,t1.sha(chain.guard.CONFIG),1202.)
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:49: in validate_complete
+    need(q['standing_packet_manifest_sha256']==CPU3 and q['H100_packet_manifest_sha256']==R5 and q['final_GPU_bound_config_sha256']==gsha and q['request_sha256']==rsha,'CPU immutable bindings')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: CPU immutable bindings
+_ test_partial_old_or_changed_CPU_COMPLETE_never_admits[bound_gpu_config_sha256-0000000000000000000000000000000000000000000000000000000000000000] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:127: in test_partial_old_or_changed_CPU_COMPLETE_never_admits
+    m = module(); m.validate_complete(chain.complete,chain.r,'a'*64,chain.g,t1.sha(chain.guard.CONFIG),1202.)
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:49: in validate_complete
+    need(q['standing_packet_manifest_sha256']==CPU3 and q['H100_packet_manifest_sha256']==R5 and q['final_GPU_bound_config_sha256']==gsha and q['request_sha256']==rsha,'CPU immutable bindings')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: CPU immutable bindings
+_ test_partial_old_or_changed_CPU_COMPLETE_never_admits[launch_packet_manifest_sha256-0000000000000000000000000000000000000000000000000000000000000000] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:127: in test_partial_old_or_changed_CPU_COMPLETE_never_admits
+    m = module(); m.validate_complete(chain.complete,chain.r,'a'*64,chain.g,t1.sha(chain.guard.CONFIG),1202.)
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:49: in validate_complete
+    need(q['standing_packet_manifest_sha256']==CPU3 and q['H100_packet_manifest_sha256']==R5 and q['final_GPU_bound_config_sha256']==gsha and q['request_sha256']==rsha,'CPU immutable bindings')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: CPU immutable bindings
+__ test_partial_old_or_changed_CPU_COMPLETE_never_admits[timely_window-False] __
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:127: in test_partial_old_or_changed_CPU_COMPLETE_never_admits
+    m = module(); m.validate_complete(chain.complete,chain.r,'a'*64,chain.g,t1.sha(chain.guard.CONFIG),1202.)
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:49: in validate_complete
+    need(q['standing_packet_manifest_sha256']==CPU3 and q['H100_packet_manifest_sha256']==R5 and q['final_GPU_bound_config_sha256']==gsha and q['request_sha256']==rsha,'CPU immutable bindings')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: CPU immutable bindings
+_ test_partial_old_or_changed_CPU_COMPLETE_never_admits[actual_Delta_owning_guards_passed-False] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:127: in test_partial_old_or_changed_CPU_COMPLETE_never_admits
+    m = module(); m.validate_complete(chain.complete,chain.r,'a'*64,chain.g,t1.sha(chain.guard.CONFIG),1202.)
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:49: in validate_complete
+    need(q['standing_packet_manifest_sha256']==CPU3 and q['H100_packet_manifest_sha256']==R5 and q['final_GPU_bound_config_sha256']==gsha and q['request_sha256']==rsha,'CPU immutable bindings')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: CPU immutable bindings
+_ test_partial_old_or_changed_CPU_COMPLETE_never_admits[automatic_retry-True] __
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:127: in test_partial_old_or_changed_CPU_COMPLETE_never_admits
+    m = module(); m.validate_complete(chain.complete,chain.r,'a'*64,chain.g,t1.sha(chain.guard.CONFIG),1202.)
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:49: in validate_complete
+    need(q['standing_packet_manifest_sha256']==CPU3 and q['H100_packet_manifest_sha256']==R5 and q['final_GPU_bound_config_sha256']==gsha and q['request_sha256']==rsha,'CPU immutable bindings')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: CPU immutable bindings
+___ test_partial_old_or_changed_CPU_COMPLETE_never_admits[model_loaded-True] ___
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:127: in test_partial_old_or_changed_CPU_COMPLETE_never_admits
+    m = module(); m.validate_complete(chain.complete,chain.r,'a'*64,chain.g,t1.sha(chain.guard.CONFIG),1202.)
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:49: in validate_complete
+    need(q['standing_packet_manifest_sha256']==CPU3 and q['H100_packet_manifest_sha256']==R5 and q['final_GPU_bound_config_sha256']==gsha and q['request_sha256']==rsha,'CPU immutable bindings')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: CPU immutable bindings
+_ test_budget_retains_cancelled_charge_and_accepts_reviewed_two_hour_duration __
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:186: in test_budget_retains_cancelled_charge_and_accepts_reviewed_two_hour_duration
+    before = copy.deepcopy((ledger,mapping)); result=m.validate_budget(ledger,mapping,g)
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:115: in validate_budget
+    need(row['gpus']==1 and row['requested_minutes']==60 and row['reserved_gpu_hours']==g['maximum_reserved_gpu_hours']==1.0 and g['exact_requested_GPU_seconds']==3600,'owned exact60min1GPUh charge')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: owned exact60min1GPUh charge
+_ test_budget_rejects_incomplete_or_reinterpreted_charge_lineage[missing-mapping] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:194: in test_budget_rejects_incomplete_or_reinterpreted_charge_lineage
+    m.validate_budget(ledger,mapping,g)
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:115: in validate_budget
+    need(row['gpus']==1 and row['requested_minutes']==60 and row['reserved_gpu_hours']==g['maximum_reserved_gpu_hours']==1.0 and g['exact_requested_GPU_seconds']==3600,'owned exact60min1GPUh charge')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: owned exact60min1GPUh charge
+__ test_budget_rejects_incomplete_or_reinterpreted_charge_lineage[old-charge] __
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:194: in test_budget_rejects_incomplete_or_reinterpreted_charge_lineage
+    m.validate_budget(ledger,mapping,g)
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:115: in validate_budget
+    need(row['gpus']==1 and row['requested_minutes']==60 and row['reserved_gpu_hours']==g['maximum_reserved_gpu_hours']==1.0 and g['exact_requested_GPU_seconds']==3600,'owned exact60min1GPUh charge')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: owned exact60min1GPUh charge
+___ test_budget_rejects_incomplete_or_reinterpreted_charge_lineage[duration] ___
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:194: in test_budget_rejects_incomplete_or_reinterpreted_charge_lineage
+    m.validate_budget(ledger,mapping,g)
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:115: in validate_budget
+    need(row['gpus']==1 and row['requested_minutes']==60 and row['reserved_gpu_hours']==g['maximum_reserved_gpu_hours']==1.0 and g['exact_requested_GPU_seconds']==3600,'owned exact60min1GPUh charge')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: owned exact60min1GPUh charge
+_____ test_budget_rejects_incomplete_or_reinterpreted_charge_lineage[caps] _____
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:194: in test_budget_rejects_incomplete_or_reinterpreted_charge_lineage
+    m.validate_budget(ledger,mapping,g)
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:115: in validate_budget
+    need(row['gpus']==1 and row['requested_minutes']==60 and row['reserved_gpu_hours']==g['maximum_reserved_gpu_hours']==1.0 and g['exact_requested_GPU_seconds']==3600,'owned exact60min1GPUh charge')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: owned exact60min1GPUh charge
+_ test_budget_rejects_incomplete_or_reinterpreted_charge_lineage[concurrency] __
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:194: in test_budget_rejects_incomplete_or_reinterpreted_charge_lineage
+    m.validate_budget(ledger,mapping,g)
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:115: in validate_budget
+    need(row['gpus']==1 and row['requested_minutes']==60 and row['reserved_gpu_hours']==g['maximum_reserved_gpu_hours']==1.0 and g['exact_requested_GPU_seconds']==3600,'owned exact60min1GPUh charge')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: owned exact60min1GPUh charge
+_ test_actual_generated_remote_program_publishes_full_only_reviewed_resources __
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:231: in test_actual_generated_remote_program_publishes_full_only_reviewed_resources
+    execute_remote(m,p,fields,monkeypatch)
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:226: in execute_remote
+    with contextlib.redirect_stdout(io.StringIO()): exec(compile(program,'fake-remote','exec'),{})
+fake-remote:8: in <module>
+    ???
+E   AssertionError
+_ test_generated_remote_final_guard_rejects_resource_and_publication_races[state] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:239: in test_generated_remote_final_guard_rejects_resource_and_publication_races
+    execute_remote(m,p,f,monkeypatch)  # rejection must not be vacuous
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:226: in execute_remote
+    with contextlib.redirect_stdout(io.StringIO()): exec(compile(program,'fake-remote','exec'),{})
+fake-remote:8: in <module>
+    ???
+E   AssertionError
+_ test_generated_remote_final_guard_rejects_resource_and_publication_races[job] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:239: in test_generated_remote_final_guard_rejects_resource_and_publication_races
+    execute_remote(m,p,f,monkeypatch)  # rejection must not be vacuous
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:226: in execute_remote
+    with contextlib.redirect_stdout(io.StringIO()): exec(compile(program,'fake-remote','exec'),{})
+fake-remote:8: in <module>
+    ???
+E   AssertionError
+_ test_generated_remote_final_guard_rejects_resource_and_publication_races[account] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:239: in test_generated_remote_final_guard_rejects_resource_and_publication_races
+    execute_remote(m,p,f,monkeypatch)  # rejection must not be vacuous
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:226: in execute_remote
+    with contextlib.redirect_stdout(io.StringIO()): exec(compile(program,'fake-remote','exec'),{})
+fake-remote:8: in <module>
+    ???
+E   AssertionError
+_ test_generated_remote_final_guard_rejects_resource_and_publication_races[cpu] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:239: in test_generated_remote_final_guard_rejects_resource_and_publication_races
+    execute_remote(m,p,f,monkeypatch)  # rejection must not be vacuous
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:226: in execute_remote
+    with contextlib.redirect_stdout(io.StringIO()): exec(compile(program,'fake-remote','exec'),{})
+fake-remote:8: in <module>
+    ???
+E   AssertionError
+_ test_generated_remote_final_guard_rejects_resource_and_publication_races[memory] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:239: in test_generated_remote_final_guard_rejects_resource_and_publication_races
+    execute_remote(m,p,f,monkeypatch)  # rejection must not be vacuous
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:226: in execute_remote
+    with contextlib.redirect_stdout(io.StringIO()): exec(compile(program,'fake-remote','exec'),{})
+fake-remote:8: in <module>
+    ???
+E   AssertionError
+_ test_generated_remote_final_guard_rejects_resource_and_publication_races[duration] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:239: in test_generated_remote_final_guard_rejects_resource_and_publication_races
+    execute_remote(m,p,f,monkeypatch)  # rejection must not be vacuous
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:226: in execute_remote
+    with contextlib.redirect_stdout(io.StringIO()): exec(compile(program,'fake-remote','exec'),{})
+fake-remote:8: in <module>
+    ???
+E   AssertionError
+_ test_generated_remote_final_guard_rejects_resource_and_publication_races[waiting] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:239: in test_generated_remote_final_guard_rejects_resource_and_publication_races
+    execute_remote(m,p,f,monkeypatch)  # rejection must not be vacuous
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:226: in execute_remote
+    with contextlib.redirect_stdout(io.StringIO()): exec(compile(program,'fake-remote','exec'),{})
+fake-remote:8: in <module>
+    ???
+E   AssertionError
+_ test_generated_remote_final_guard_rejects_resource_and_publication_races[expiry] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:239: in test_generated_remote_final_guard_rejects_resource_and_publication_races
+    execute_remote(m,p,f,monkeypatch)  # rejection must not be vacuous
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:226: in execute_remote
+    with contextlib.redirect_stdout(io.StringIO()): exec(compile(program,'fake-remote','exec'),{})
+fake-remote:8: in <module>
+    ???
+E   AssertionError
+_ test_generated_remote_final_guard_rejects_resource_and_publication_races[collision] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:239: in test_generated_remote_final_guard_rejects_resource_and_publication_races
+    execute_remote(m,p,f,monkeypatch)  # rejection must not be vacuous
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:226: in execute_remote
+    with contextlib.redirect_stdout(io.StringIO()): exec(compile(program,'fake-remote','exec'),{})
+fake-remote:8: in <module>
+    ???
+E   AssertionError
+_ test_generated_remote_final_guard_rejects_resource_and_publication_races[phase] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:239: in test_generated_remote_final_guard_rejects_resource_and_publication_races
+    execute_remote(m,p,f,monkeypatch)  # rejection must not be vacuous
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:226: in execute_remote
+    with contextlib.redirect_stdout(io.StringIO()): exec(compile(program,'fake-remote','exec'),{})
+fake-remote:8: in <module>
+    ???
+E   AssertionError
+_ test_reader_cutover_requires_fresh_quiescence_and_completed_native_pair[active-reader] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:292: in test_reader_cutover_requires_fresh_quiescence_and_completed_native_pair
+    m=module();validate=require(m,'validate_cutover')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:49: in require
+    assert callable(function), 'FULL_SCORE_ROOT_IMPLEMENTATION_MISSING: callable ' + name
+E   AssertionError: FULL_SCORE_ROOT_IMPLEMENTATION_MISSING: callable validate_cutover
+E   assert False
+E    +  where False = callable(None)
+_ test_reader_cutover_requires_fresh_quiescence_and_completed_native_pair[stale] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:292: in test_reader_cutover_requires_fresh_quiescence_and_completed_native_pair
+    m=module();validate=require(m,'validate_cutover')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:49: in require
+    assert callable(function), 'FULL_SCORE_ROOT_IMPLEMENTATION_MISSING: callable ' + name
+E   AssertionError: FULL_SCORE_ROOT_IMPLEMENTATION_MISSING: callable validate_cutover
+E   assert False
+E    +  where False = callable(None)
+_ test_reader_cutover_requires_fresh_quiescence_and_completed_native_pair[not-cutover] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:292: in test_reader_cutover_requires_fresh_quiescence_and_completed_native_pair
+    m=module();validate=require(m,'validate_cutover')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:49: in require
+    assert callable(function), 'FULL_SCORE_ROOT_IMPLEMENTATION_MISSING: callable ' + name
+E   AssertionError: FULL_SCORE_ROOT_IMPLEMENTATION_MISSING: callable validate_cutover
+E   assert False
+E    +  where False = callable(None)
+_ test_reader_cutover_requires_fresh_quiescence_and_completed_native_pair[released-early] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:292: in test_reader_cutover_requires_fresh_quiescence_and_completed_native_pair
+    m=module();validate=require(m,'validate_cutover')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:49: in require
+    assert callable(function), 'FULL_SCORE_ROOT_IMPLEMENTATION_MISSING: callable ' + name
+E   AssertionError: FULL_SCORE_ROOT_IMPLEMENTATION_MISSING: callable validate_cutover
+E   assert False
+E    +  where False = callable(None)
+_ test_reader_cutover_requires_fresh_quiescence_and_completed_native_pair[missing-mapping] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:292: in test_reader_cutover_requires_fresh_quiescence_and_completed_native_pair
+    m=module();validate=require(m,'validate_cutover')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:49: in require
+    assert callable(function), 'FULL_SCORE_ROOT_IMPLEMENTATION_MISSING: callable ' + name
+E   AssertionError: FULL_SCORE_ROOT_IMPLEMENTATION_MISSING: callable validate_cutover
+E   assert False
+E    +  where False = callable(None)
+_ test_reader_cutover_requires_fresh_quiescence_and_completed_native_pair[changed-old-admission] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:292: in test_reader_cutover_requires_fresh_quiescence_and_completed_native_pair
+    m=module();validate=require(m,'validate_cutover')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py:49: in require
+    assert callable(function), 'FULL_SCORE_ROOT_IMPLEMENTATION_MISSING: callable ' + name
+E   AssertionError: FULL_SCORE_ROOT_IMPLEMENTATION_MISSING: callable validate_cutover
+E   assert False
+E    +  where False = callable(None)
+________ test_ordinary80_cannot_be_bypassed_by_old_exception[active-80] ________
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_usage.py:41: in test_ordinary80_cannot_be_bypassed_by_old_exception
+    with pytest.raises(rejects(m)):invoke(m,monkeypatch,live=live,cached=79,exception=exception)
+E   Failed: DID NOT RAISE (<class 'task3_helper.Rejected'>, <class 'ValueError'>, <class 'AssertionError'>)
+______ test_ordinary80_cannot_be_bypassed_by_old_exception[active-80.001] ______
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_usage.py:41: in test_ordinary80_cannot_be_bypassed_by_old_exception
+    with pytest.raises(rejects(m)):invoke(m,monkeypatch,live=live,cached=79,exception=exception)
+E   Failed: DID NOT RAISE (<class 'task3_helper.Rejected'>, <class 'ValueError'>, <class 'AssertionError'>)
+________ test_ordinary80_cannot_be_bypassed_by_old_exception[active-95] ________
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_usage.py:41: in test_ordinary80_cannot_be_bypassed_by_old_exception
+    with pytest.raises(rejects(m)):invoke(m,monkeypatch,live=live,cached=79,exception=exception)
+E   Failed: DID NOT RAISE (<class 'task3_helper.Rejected'>, <class 'ValueError'>, <class 'AssertionError'>)
+__ test_usage_command_hardcodes80_and_targets_session_without_private_writes ___
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_usage.py:87: in test_usage_command_hardcodes80_and_targets_session_without_private_writes
+    assert calls==[['/u/swong2/.local/bin/codex-usage','--pause-at','80'],
+E   AssertionError: assert [['/u/swong2/...on', 'exact']] == [['/u/swong2/...on', 'exact']]
+E     
+E     At index 0 diff: ['/u/swong2/.local/bin/codex-usage', '--pause-at', '99'] != ['/u/swong2/.local/bin/codex-usage', '--pause-at', '80']
+E     Use -v to get more diff
+- generated xml file: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task3-deployment288/run-01/base39-RED.xml -
+=========================== short test summary info ============================
+FAILED ../../../../../../../../../../../../dev::test_request_generated_from_actual_Task1_WAITING_accepted_by_actual_Task2
+FAILED ../../../../../../../../../../../../dev::test_request_rejects_wrong_actual_waiting_binding[phase-bank]
+FAILED ../../../../../../../../../../../../dev::test_request_rejects_wrong_actual_waiting_binding[phase-prefix4]
+FAILED ../../../../../../../../../../../../dev::test_request_rejects_wrong_actual_waiting_binding[job_id-999]
+FAILED ../../../../../../../../../../../../dev::test_request_rejects_wrong_actual_waiting_binding[source_commit-0000000000000000000000000000000000000000]
+FAILED ../../../../../../../../../../../../dev::test_request_rejects_wrong_actual_waiting_binding[bound_config_sha256-0000000000000000000000000000000000000000000000000000000000000000]
+FAILED ../../../../../../../../../../../../dev::test_request_rejects_wrong_actual_waiting_binding[groups_file_sha256-0000000000000000000000000000000000000000000000000000000000000000]
+FAILED ../../../../../../../../../../../../dev::test_request_rejects_wrong_actual_waiting_binding[bank_file_sha256-0000000000000000000000000000000000000000000000000000000000000000]
+FAILED ../../../../../../../../../../../../dev::test_request_rejects_wrong_actual_waiting_binding[bank_manifest_sha256-0000000000000000000000000000000000000000000000000000000000000000]
+FAILED ../../../../../../../../../../../../dev::test_request_rejects_wrong_actual_waiting_binding[bank_internal_payload_sha256-0000000000000000000000000000000000000000000000000000000000000000]
+FAILED ../../../../../../../../../../../../dev::test_request_rejects_wrong_actual_waiting_binding[launch_packet_manifest_sha256-0000000000000000000000000000000000000000000000000000000000000000]
+FAILED ../../../../../../../../../../../../dev::test_request_rejects_wrong_actual_waiting_binding[publication_deadline-1004.0]
+FAILED ../../../../../../../../../../../../dev::test_request_rejects_changed_reviewed_resource_tuple
+FAILED ../../../../../../../../../../../../dev::test_trigger_freshness_fifteen_seconds_not_old_wait_window[15.001]
+FAILED ../../../../../../../../../../../../dev::test_trigger_freshness_fifteen_seconds_not_old_wait_window[-0.001]
+FAILED ../../../../../../../../../../../../dev::test_actual_Task2_COMPLETE_is_read_only_and_valid_full_domain
+FAILED ../../../../../../../../../../../../dev::test_partial_old_or_changed_CPU_COMPLETE_never_admits[phase-prefix4]
+FAILED ../../../../../../../../../../../../dev::test_partial_old_or_changed_CPU_COMPLETE_never_admits[complete-False]
+FAILED ../../../../../../../../../../../../dev::test_partial_old_or_changed_CPU_COMPLETE_never_admits[status-PARTIAL]
+FAILED ../../../../../../../../../../../../dev::test_partial_old_or_changed_CPU_COMPLETE_never_admits[full_rows-4]
+FAILED ../../../../../../../../../../../../dev::test_partial_old_or_changed_CPU_COMPLETE_never_admits[full_controls-0]
+FAILED ../../../../../../../../../../../../dev::test_partial_old_or_changed_CPU_COMPLETE_never_admits[full_domain_support_audit_complete-False]
+FAILED ../../../../../../../../../../../../dev::test_partial_old_or_changed_CPU_COMPLETE_never_admits[support_reason_mask_sha256-invalid]
+FAILED ../../../../../../../../../../../../dev::test_partial_old_or_changed_CPU_COMPLETE_never_admits[actual_future_GPU_job_id-999]
+FAILED ../../../../../../../../../../../../dev::test_partial_old_or_changed_CPU_COMPLETE_never_admits[actual_CPU_job_id-999]
+FAILED ../../../../../../../../../../../../dev::test_partial_old_or_changed_CPU_COMPLETE_never_admits[bank_file_sha256-0000000000000000000000000000000000000000000000000000000000000000]
+FAILED ../../../../../../../../../../../../dev::test_partial_old_or_changed_CPU_COMPLETE_never_admits[bank_manifest_sha256-0000000000000000000000000000000000000000000000000000000000000000]
+FAILED ../../../../../../../../../../../../dev::test_partial_old_or_changed_CPU_COMPLETE_never_admits[waiting_sha256-0000000000000000000000000000000000000000000000000000000000000000]
+FAILED ../../../../../../../../../../../../dev::test_partial_old_or_changed_CPU_COMPLETE_never_admits[bound_gpu_config_sha256-0000000000000000000000000000000000000000000000000000000000000000]
+FAILED ../../../../../../../../../../../../dev::test_partial_old_or_changed_CPU_COMPLETE_never_admits[launch_packet_manifest_sha256-0000000000000000000000000000000000000000000000000000000000000000]
+FAILED ../../../../../../../../../../../../dev::test_partial_old_or_changed_CPU_COMPLETE_never_admits[timely_window-False]
+FAILED ../../../../../../../../../../../../dev::test_partial_old_or_changed_CPU_COMPLETE_never_admits[actual_Delta_owning_guards_passed-False]
+FAILED ../../../../../../../../../../../../dev::test_partial_old_or_changed_CPU_COMPLETE_never_admits[automatic_retry-True]
+FAILED ../../../../../../../../../../../../dev::test_partial_old_or_changed_CPU_COMPLETE_never_admits[model_loaded-True]
+FAILED ../../../../../../../../../../../../dev::test_budget_retains_cancelled_charge_and_accepts_reviewed_two_hour_duration
+FAILED ../../../../../../../../../../../../dev::test_budget_rejects_incomplete_or_reinterpreted_charge_lineage[missing-mapping]
+FAILED ../../../../../../../../../../../../dev::test_budget_rejects_incomplete_or_reinterpreted_charge_lineage[old-charge]
+FAILED ../../../../../../../../../../../../dev::test_budget_rejects_incomplete_or_reinterpreted_charge_lineage[duration]
+FAILED ../../../../../../../../../../../../dev::test_budget_rejects_incomplete_or_reinterpreted_charge_lineage[caps]
+FAILED ../../../../../../../../../../../../dev::test_budget_rejects_incomplete_or_reinterpreted_charge_lineage[concurrency]
+FAILED ../../../../../../../../../../../../dev::test_actual_generated_remote_program_publishes_full_only_reviewed_resources
+FAILED ../../../../../../../../../../../../dev::test_generated_remote_final_guard_rejects_resource_and_publication_races[state]
+FAILED ../../../../../../../../../../../../dev::test_generated_remote_final_guard_rejects_resource_and_publication_races[job]
+FAILED ../../../../../../../../../../../../dev::test_generated_remote_final_guard_rejects_resource_and_publication_races[account]
+FAILED ../../../../../../../../../../../../dev::test_generated_remote_final_guard_rejects_resource_and_publication_races[cpu]
+FAILED ../../../../../../../../../../../../dev::test_generated_remote_final_guard_rejects_resource_and_publication_races[memory]
+FAILED ../../../../../../../../../../../../dev::test_generated_remote_final_guard_rejects_resource_and_publication_races[duration]
+FAILED ../../../../../../../../../../../../dev::test_generated_remote_final_guard_rejects_resource_and_publication_races[waiting]
+FAILED ../../../../../../../../../../../../dev::test_generated_remote_final_guard_rejects_resource_and_publication_races[expiry]
+FAILED ../../../../../../../../../../../../dev::test_generated_remote_final_guard_rejects_resource_and_publication_races[collision]
+FAILED ../../../../../../../../../../../../dev::test_generated_remote_final_guard_rejects_resource_and_publication_races[phase]
+FAILED ../../../../../../../../../../../../dev::test_reader_cutover_requires_fresh_quiescence_and_completed_native_pair[active-reader]
+FAILED ../../../../../../../../../../../../dev::test_reader_cutover_requires_fresh_quiescence_and_completed_native_pair[stale]
+FAILED ../../../../../../../../../../../../dev::test_reader_cutover_requires_fresh_quiescence_and_completed_native_pair[not-cutover]
+FAILED ../../../../../../../../../../../../dev::test_reader_cutover_requires_fresh_quiescence_and_completed_native_pair[released-early]
+FAILED ../../../../../../../../../../../../dev::test_reader_cutover_requires_fresh_quiescence_and_completed_native_pair[missing-mapping]
+FAILED ../../../../../../../../../../../../dev::test_reader_cutover_requires_fresh_quiescence_and_completed_native_pair[changed-old-admission]
+FAILED ../../../../../../../../../../../../dev::test_ordinary80_cannot_be_bypassed_by_old_exception[active-80]
+FAILED ../../../../../../../../../../../../dev::test_ordinary80_cannot_be_bypassed_by_old_exception[active-80.001]
+FAILED ../../../../../../../../../../../../dev::test_ordinary80_cannot_be_bypassed_by_old_exception[active-95]
+FAILED ../../../../../../../../../../../../dev::test_usage_command_hardcodes80_and_targets_session_without_private_writes
+61 failed, 37 passed in 11.95s

@@ -1,0 +1,46 @@
+........................................................................ [ 32%]
+.........................................F.............................. [ 65%]
+........................................................................ [ 97%]
+.....                                                                    [100%]
+=================================== FAILURES ===================================
+___ test_actual_a1_parent_schema_derives_masks_without_serialized_attention ____
+
+    def test_actual_a1_parent_schema_derives_masks_without_serialized_attention():
+        from component_analysis import ladder_pipeline as ladder,ladder_design
+        import os
+        p=driver();path=Path(os.environ.get('A3_A1_SCHEMA_TEST_DESIGN',str(Path(__file__).resolve().parents[1]/'outputs/_analyses/specificity-ladder/ladder-5f450dc/design.json')))
+>       parent=ladder.read_artifact(path);conditions=parent['rows']['far_v2']
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_a3_mask_pipeline.py:506: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+component_analysis/ladder_pipeline.py:37: in read_artifact
+    raw=common.read_json(path)
+        ^^^^^^^^^^^^^^^^^^^^^^
+dataset/user_inversion_pipeline.py:36: in read_json
+    return json.loads(Path(path).read_text())
+                      ^^^^^^^^^^^^^^^^^^^^^^
+/u/swong2/.conda/envs/mgnp/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-refresh-batch-source/outputs/_analyses/specificity-ladder/ladder-5f450dc/design.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-refresh-batch-source/outputs/_analyses/specificity-ladder/ladder-5f450dc/design.json'
+
+/u/swong2/.conda/envs/mgnp/lib/python3.12/pathlib.py:1013: FileNotFoundError
+=========================== short test summary info ============================
+FAILED tests/test_a3_mask_pipeline.py::test_actual_a1_parent_schema_derives_masks_without_serialized_attention
+1 failed, 220 passed in 177.44s (0:02:57)

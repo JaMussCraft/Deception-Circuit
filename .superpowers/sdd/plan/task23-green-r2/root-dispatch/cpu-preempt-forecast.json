@@ -1,0 +1,32 @@
+{
+  "argv": [
+    "sbatch",
+    "--parsable",
+    "--account=bimc-delta-cpu",
+    "--partition=cpu-preempt",
+    "--constraint=projects",
+    "--nodes=1",
+    "--ntasks=1",
+    "--cpus-per-task=2",
+    "--mem=32G",
+    "--time=00:42:00",
+    "--no-requeue",
+    "--export=ALL,CUDA_VISIBLE_DEVICES=",
+    "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+    "--job-name=lad-A3-green-base",
+    "--output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r2/green-base-slurm-%j.log",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r2/cpu.sbatch",
+    "--mode",
+    "GREEN",
+    "--environment",
+    "base",
+    "--output",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r2/green-base-run-01"
+  ],
+  "exit_code": 0,
+  "stdout": "",
+  "stderr": "sbatch: Job 23620471 to start at 2026-11-06T23:52:34 a using 2 processors on nodes cn095 in partition cpu-preempt\n",
+  "observed_unix": 1794017554.706346,
+  "read_only_forecast": true,
+  "note": "No partition change; preemption risks losing one bounded test attempt and no automatic retry is permitted"
+}

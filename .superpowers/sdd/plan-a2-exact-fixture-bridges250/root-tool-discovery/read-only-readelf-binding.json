@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "-o",
+    "ControlMaster=no",
+    "-o",
+    "ControlPath=none",
+    "-o",
+    "HostName=br013.bridges2.psc.edu",
+    "bridges2",
+    "python3 -B -c 'import subprocess,json,hashlib,pathlib,time\np=pathlib.Path('\"'\"'/usr/bin/readelf'\"'\"');raw=p.read_bytes();ldd=subprocess.run(['\"'\"'ldd'\"'\"',str(p)],stdout=subprocess.PIPE,stderr=subprocess.PIPE,universal_newlines=True,timeout=10)\na=['\"'\"'apptainer'\"'\"','\"'\"'exec'\"'\"','\"'\"'--cleanenv'\"'\"','\"'\"'--contain'\"'\"','\"'\"'--no-home'\"'\"','\"'\"'--writable-tmpfs'\"'\"','\"'\"'--pwd'\"'\"','\"'\"'/'\"'\"','\"'\"'--bind'\"'\"',str(p)+'\"'\"':/opt/fixture-tools/readelf:ro'\"'\"','\"'\"'/ocean/projects/cis260361p/swong2/specificity-ladder-20261102/containers/ubuntu2204.sif'\"'\"','\"'\"'/opt/fixture-tools/readelf'\"'\"','\"'\"'--version'\"'\"'];r=subprocess.run(a,stdout=subprocess.PIPE,stderr=subprocess.PIPE,universal_newlines=True,timeout=20)\nprint(json.dumps({'\"'\"'tool_only'\"'\"':True,'\"'\"'runtime_slice_compatibility_claimed'\"'\"':False,'\"'\"'source_path'\"'\"':str(p),'\"'\"'resolved_path'\"'\"':str(p.resolve()),'\"'\"'sha256'\"'\"':hashlib.sha256(raw).hexdigest(),'\"'\"'bytes'\"'\"':len(raw),'\"'\"'host_ldd'\"'\"':{'\"'\"'exit_code'\"'\"':ldd.returncode,'\"'\"'stdout'\"'\"':ldd.stdout,'\"'\"'stderr'\"'\"':ldd.stderr},'\"'\"'container_tool'\"'\"':{'\"'\"'argv'\"'\"':a,'\"'\"'exit_code'\"'\"':r.returncode,'\"'\"'stdout'\"'\"':r.stdout,'\"'\"'stderr'\"'\"':r.stderr},'\"'\"'observed_unix'\"'\"':time.time()}))\n'"
+  ],
+  "exit_code": 0,
+  "stdout": "{\"tool_only\": true, \"runtime_slice_compatibility_claimed\": false, \"source_path\": \"/usr/bin/readelf\", \"resolved_path\": \"/usr/bin/readelf\", \"sha256\": \"120f2018501f7f2261ed7a7f8f46764be64bbaf96cd03308d9d12410b9065bd0\", \"bytes\": 639560, \"host_ldd\": {\"exit_code\": 0, \"stdout\": \"\\tlinux-vdso.so.1 (0x00007ffded7c7000)\\n\\tlibdl.so.2 => /lib64/libdl.so.2 (0x00007f1a22121000)\\n\\tlibc.so.6 => /lib64/libc.so.6 (0x00007f1a21d4b000)\\n\\t/lib64/ld-linux-x86-64.so.2 (0x00007f1a225c4000)\\n\", \"stderr\": \"\"}, \"container_tool\": {\"argv\": [\"apptainer\", \"exec\", \"--cleanenv\", \"--contain\", \"--no-home\", \"--writable-tmpfs\", \"--pwd\", \"/\", \"--bind\", \"/usr/bin/readelf:/opt/fixture-tools/readelf:ro\", \"/ocean/projects/cis260361p/swong2/specificity-ladder-20261102/containers/ubuntu2204.sif\", \"/opt/fixture-tools/readelf\", \"--version\"], \"exit_code\": 0, \"stdout\": \"GNU readelf version 2.30-123.el8\\nCopyright (C) 2018 Free Software Foundation, Inc.\\nThis program is free software; you may redistribute it under the terms of\\nthe GNU General Public License version 3 or (at your option) any later version.\\nThis program has absolutely no warranty.\\n\", \"stderr\": \"\"}, \"observed_unix\": 1794030682.5577087}\n",
+  "stderr": "",
+  "observed_unix": 1794030682.5752795
+}

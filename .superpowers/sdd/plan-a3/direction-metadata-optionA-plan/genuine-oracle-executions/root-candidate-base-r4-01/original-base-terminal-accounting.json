@@ -1,0 +1,29 @@
+{
+  "observed_utc": "2026-11-06T20:27:49.195484+00:00",
+  "timezone": "UTC",
+  "results": [
+    {
+      "command": [
+        "sacct",
+        "-j",
+        "23608994",
+        "--format=JobID,State,ExitCode,Elapsed,ElapsedRaw,Start,End,NodeList,AllocTRES",
+        "-n",
+        "-P"
+      ],
+      "returncode": 0,
+      "output": "23608994|COMPLETED|0:0|01:02:39|3759|2026-11-06T19:16:46|2026-11-06T20:19:25|cn034|billing=98304,cpu=4,mem=192G,node=1\n23608994.batch|COMPLETED|0:0|01:02:39|3759|2026-11-06T19:16:46|2026-11-06T20:19:25|cn034|cpu=4,mem=192G,node=1\n23608994.extern|COMPLETED|0:0|01:02:39|3759|2026-11-06T19:16:46|2026-11-06T20:19:25|cn034|billing=98304,cpu=4,mem=192G,node=1\n"
+    },
+    {
+      "command": [
+        "scontrol",
+        "show",
+        "job",
+        "23608994",
+        "-o"
+      ],
+      "returncode": 1,
+      "output": "slurm_load_jobs error: Invalid job id specified\n"
+    }
+  ]
+}

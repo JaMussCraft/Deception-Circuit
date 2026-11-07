@@ -1,0 +1,369 @@
+{
+  "status": "one existing selected case authenticated; full native verification incomplete",
+  "scenario_root": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8",
+  "source_unchanged": true,
+  "source_hashes": {
+    "component_analysis/a3_direction_pipeline.py": "96678db186078ab37cad108e2d1e71ffdccf1fb3dd157c35cdc57a91b2ebd4a0",
+    "component_analysis/a3_direction_runner.py": "89a62335665595533204006c3eca28d14ca9c42eb600879c235e9c6370739429",
+    "component_analysis/a3_direction_runtime.py": "b66c2d8cd26c36f321b5079758209214746b0e4eec16a6c801742086d729c0cc",
+    "component_analysis/a3_direction_workload.py": "3e43aaf2b4cacb99df87593ae377c8fdf3eb7b223b258ed8873853841404d8f9",
+    "component_analysis/a3_directions.py": "ed882d4e12a396e03e73671e588beba5b1a8c90ab9d31e7ee73d4194430b4a86",
+    "component_analysis/a3_pipeline.py": "310eb53427ad4ac32522dfd0d6cd3b33e4ec887af1776579845f8953bdbe83f5",
+    "scripts/jobs/specificity_a3.sh": "936dfb7f8b9c2d267d52f1e199ed431275e6527cbfc3a105a22e3812289a9b96",
+    "tests/test_a3_direction_runner.py": "3ea945d5b23b4eef7d56139758c7075ea1b56ac612f1923590b7978628ca0120",
+    "tests/test_a3_direction_runtime.py": "5a41e89b0b2bd5fd59553f5f5a63260638e3547a63c31a615d84da08f796fb6a",
+    "tests/test_a3_direction_workload.py": "91eb6f874e180c5ffb362daba231631b7bea21c224446580efccfe20a9007300",
+    "tests/test_a3_directions.py": "cd8471b1524ad7b8f1b7c87f9eb5fec5724b3ab2980027ef7aadfea3fc3bb1c1",
+    "tests/test_a3_pipeline.py": "bbb3efdba075cc14c2997cc11ae44bab268bdea56459c0574d6bfc21b62f4a18",
+    "tests/a3_direction_native_scenario.py": "9b5061ab9618222b23230917f446abcaa73747f3d216f69c77b9218feec6297b"
+  },
+  "baseline_commit_supplied_by_root": "538109e809285b6ddc45d42df8786270a65f7b12",
+  "process": {
+    "command": [
+      "/u/swong2/.conda/envs/mgnp/bin/python",
+      "/tmp/report97-native-existing-case-auth.py",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/diagnostics/existing-case-auth-01"
+    ],
+    "pid": 2608787,
+    "exit_code": 0,
+    "elapsed_seconds": 507.3983949350077,
+    "user_seconds": 155.216772,
+    "system_seconds": 76.085003,
+    "peak_child_rss_bytes": 6805737472,
+    "timeout_seconds": 900,
+    "kill_grace_seconds": 15,
+    "term_sent_at": null,
+    "read_only_authentication": true,
+    "selected_case_start": 0,
+    "selected_case_count": 1,
+    "source_unchanged": true
+  },
+  "authentication": {
+    "event": "authentication_complete",
+    "elapsed_seconds": 491.3894685310079,
+    "peak_rss_bytes": 6805737472,
+    "authenticated_cases": 1,
+    "full_selected_case_count": 63,
+    "full_pilot_complete": false,
+    "new_numeric_forwards": 0,
+    "attempted_forbidden_calls": {
+      "forwards": 0,
+      "pilot": 0,
+      "publication": 0
+    },
+    "authentication_seconds": 186.89102491596714,
+    "original_case": {
+      "seconds": 102.63064642000245,
+      "forward_calls": 11100
+    },
+    "case_bytes_unchanged": true,
+    "case_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/pilot-verification-cases/selected/4318f65b0a320e883897ca95ad472e2d1a0a11f53abea6ce1a848853d9fb57f1",
+    "returned_axis_count": 201,
+    "source_unchanged": true
+  },
+  "case_tree_exactly_unchanged": true,
+  "original_receipt_resigned": false,
+  "scientific_outputs_written": false,
+  "completed_case_ids": [
+    "4318f65b0a320e883897ca95ad472e2d1a0a11f53abea6ce1a848853d9fb57f1"
+  ],
+  "full_selected_pilot_complete": false,
+  "required_selected_cases": 63,
+  "remaining_selected_cases": 62,
+  "calibration_shards_executed": 0,
+  "assessment_shards_executed": 0,
+  "whole_unit_acceptance": false,
+  "resource_provenance": {
+    "host": "dt-login04.delta.ncsa.illinois.edu",
+    "cpu_model": "AMD EPYC 7763 64-Core Processor",
+    "filesystem_type": "lustre",
+    "threads": {
+      "OPENBLAS_NUM_THREADS": 1,
+      "OMP_NUM_THREADS": 1,
+      "MKL_NUM_THREADS": 1
+    },
+    "runtime_profile_verified_against_original_case": {
+      "backend": "sdpa",
+      "cuda_build": "12.8",
+      "cuda_matmul_tf32": false,
+      "cudnn_tf32": true,
+      "device_type": "cpu",
+      "dtype": "torch.float32",
+      "hardware": null,
+      "intraop_threads": 1,
+      "packages": {
+        "nnsight": "0.7.0",
+        "torch": "2.11.0+cu128",
+        "transformers": "5.13.0"
+      },
+      "python": "3.12.13"
+    },
+    "cold_definition": "Fresh process-local constructor only; no OS/filesystem cache-cold or cross-host timing claim",
+    "timing_authorizes_production": false
+  },
+  "memory_before": [
+    {
+      "path": "/sys/fs/cgroup/user.slice/user-78031.slice/session-6591.scope",
+      "memory.current": "1426522112",
+      "memory.max": "max",
+      "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+    },
+    {
+      "path": "/sys/fs/cgroup/user.slice/user-78031.slice",
+      "memory.current": "7982292992",
+      "memory.max": "40320217088",
+      "memory.events": "low 0\nhigh 6\nmax 129883\noom 1\noom_kill 1\noom_group_kill 0",
+      "headroom_bytes": 32337924096
+    },
+    {
+      "path": "/sys/fs/cgroup/user.slice",
+      "memory.current": "214420201472",
+      "memory.max": "max",
+      "memory.events": "low 0\nhigh 60\nmax 3107008\noom 159\noom_kill 32\noom_group_kill 0"
+    },
+    {
+      "path": "/sys/fs/cgroup"
+    }
+  ],
+  "memory_after": [
+    {
+      "path": "/sys/fs/cgroup/user.slice/user-78031.slice/session-6591.scope",
+      "memory.current": "1710870528",
+      "memory.max": "max",
+      "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+    },
+    {
+      "path": "/sys/fs/cgroup/user.slice/user-78031.slice",
+      "memory.current": "7946420224",
+      "memory.max": "40320217088",
+      "memory.events": "low 0\nhigh 6\nmax 129883\noom 1\noom_kill 1\noom_group_kill 0",
+      "headroom_bytes": 32373796864
+    },
+    {
+      "path": "/sys/fs/cgroup/user.slice",
+      "memory.current": "213931732992",
+      "memory.max": "max",
+      "memory.events": "low 0\nhigh 60\nmax 3107008\noom 159\noom_kill 32\noom_group_kill 0"
+    },
+    {
+      "path": "/sys/fs/cgroup"
+    }
+  ],
+  "memory_event_deltas": {
+    "/sys/fs/cgroup/user.slice/user-78031.slice/session-6591.scope": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "/sys/fs/cgroup/user.slice/user-78031.slice": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "/sys/fs/cgroup/user.slice": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "/sys/fs/cgroup": {}
+  },
+  "all_owned_processes_terminal": true,
+  "next_boundary": "No additional run released. Preserve authenticated original case and all prior failures. Full63 pilot and later coverage remain required; further native execution needs a separately released operational plan.",
+  "commands": [
+    {
+      "command": "/sw/external/python/anaconda3/bin/python3.9 /tmp/report97-native-existing-case-auth-supervisor.py",
+      "cwd": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+      "exit_code": 0,
+      "child_command": [
+        "/u/swong2/.conda/envs/mgnp/bin/python",
+        "/tmp/report97-native-existing-case-auth.py",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/diagnostics/existing-case-auth-01"
+      ],
+      "raw_output": "result.json"
+    },
+    {
+      "command": "research-session lint docs/research/specificity-ladder/reports/97-native-round3-auth-handback.md",
+      "exit_code": 0
+    },
+    {
+      "command": "/sw/external/python/anaconda3/bin/python3.9 scripts/check_report_numbers.py docs/research/specificity-ladder/reports/97-native-round3-auth-handback.md --strict --json",
+      "exit_code": 0,
+      "output": "number-check.json"
+    }
+  ],
+  "artifacts": {
+    "number-check.json": {
+      "bytes": 2046,
+      "sha256": "d18ec7f719ff8aae1cc637edbe62fc83404a2a020097a42df5f489f1008f5bfd"
+    },
+    "result.json": {
+      "bytes": 870,
+      "sha256": "146edb00add4bbabce43ec5b6492c828154c66e79f1ea0b4b675dbc934ca3a5c"
+    },
+    "steps.log": {
+      "bytes": 5697,
+      "sha256": "ae3c0d168f84d4f8fea3001282a25c58d15935c5995996f1eb6b884822cb4216"
+    },
+    "memory-before.json": {
+      "bytes": 730,
+      "sha256": "127c310bdf2402c975ddb58ad0bcd3ddafa7280a24f6f2a902b6ac568bb2660f"
+    },
+    "case-before.json": {
+      "bytes": 1135,
+      "sha256": "fd1b426a40061c641f8cd6c598601888665619be197308db1f9f58abdab304da"
+    },
+    "memory-after.json": {
+      "bytes": 730,
+      "sha256": "8581bf4d459d1abd26d30882d0da205c2f7e35045569360d79dcf5c1560c181d"
+    },
+    "report97-native-existing-case-auth-supervisor.py": {
+      "bytes": 2906,
+      "sha256": "68f97ea37b86e9a43654264b634c8ae64f0b815925725f4065b3a004ec805372"
+    },
+    "report97-native-existing-case-auth.py": {
+      "bytes": 4712,
+      "sha256": "187a9a17061af805f5a332bccdefc0b9795ef286e1ccde4be8d8919c5b072aa1"
+    },
+    "child-samples.jsonl": {
+      "bytes": 14221,
+      "sha256": "26ab570a2b8ab02708227732d40c8d5d1828f08627fbaf77b0d309db92747baf"
+    },
+    "fatal.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "case-after.json": {
+      "bytes": 1135,
+      "sha256": "fd1b426a40061c641f8cd6c598601888665619be197308db1f9f58abdab304da"
+    },
+    "source_snapshot.json": {
+      "bytes": 1423,
+      "sha256": "9ad60a15ca5738c1e492e8e06f5afc95f3ea24086e958dc435d91a90807c4ca1"
+    }
+  },
+  "completed_steps": [
+    {
+      "event": "step_end",
+      "elapsed_seconds": 27.135301995032933,
+      "peak_rss_bytes": 742391808,
+      "step": "frozen13_source_before",
+      "step_seconds": 0.23403180699096993
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 27.35642014403129,
+      "peak_rss_bytes": 752877568,
+      "step": "case_tree_before",
+      "step_seconds": 0.22097060200758278
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 29.075209426053334,
+      "peak_rss_bytes": 790577152,
+      "step": "verify_expected_source_config_full_model",
+      "step_seconds": 1.5192828319850378
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 168.11338889901526,
+      "peak_rss_bytes": 827740160,
+      "step": "read_completed_selected_bundle",
+      "step_seconds": 139.03802396100946
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 236.67425790103152,
+      "peak_rss_bytes": 6461976576,
+      "step": "independent_expected_inventory_rebuild_and_compare",
+      "step_seconds": 68.55001972202444
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 303.46154046204174,
+      "peak_rss_bytes": 6805737472,
+      "step": "validate_exact_expected_invocation_inventory",
+      "step_seconds": 66.78480780497193
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 303.4942715470097,
+      "peak_rss_bytes": 6805737472,
+      "step": "read_original_scenario_binding",
+      "step_seconds": 0.030408702965360135
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 380.74765698600095,
+      "peak_rss_bytes": 6805737472,
+      "step": "read_bundle",
+      "step_seconds": 40.154028757009655
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 423.05162787402514,
+      "peak_rss_bytes": 6805737472,
+      "step": "read_bundle",
+      "step_seconds": 42.30017883999972
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 425.5982535050134,
+      "peak_rss_bytes": 6805737472,
+      "step": "load_selected_axes",
+      "step_seconds": 44.84680810698774
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 458.0215170320007,
+      "peak_rss_bytes": 6805737472,
+      "step": "_numeric_backing_proof",
+      "step_seconds": 130.616867431032
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 476.6668705040356,
+      "peak_rss_bytes": 6805737472,
+      "step": "__init__",
+      "step_seconds": 149.93855956895277
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 490.3959540440119,
+      "peak_rss_bytes": 6805737472,
+      "step": "original_read_pilot_case_full_authentication",
+      "step_seconds": 186.89027535403147
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 490.5252653870266,
+      "peak_rss_bytes": 6805737472,
+      "step": "case_tree_after",
+      "step_seconds": 0.12849617801839486
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 491.0677604750381,
+      "peak_rss_bytes": 6805737472,
+      "step": "frozen13_source_after",
+      "step_seconds": 0.5380573220318183
+    },
+    {
+      "event": "step_end",
+      "elapsed_seconds": 491.3869765230338,
+      "peak_rss_bytes": 6805737472,
+      "step": "final_original_source_model_backing_verification",
+      "step_seconds": 0.3190743430168368
+    }
+  ]
+}

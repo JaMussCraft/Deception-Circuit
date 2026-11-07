@@ -1,0 +1,55 @@
+{
+  "status": "FOCUSED_R198_GREEN",
+  "observations": [
+    {
+      "python": [
+        3,
+        9,
+        18
+      ],
+      "command": [
+        "/sw/external/python/anaconda3/bin/python3.9",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--noconftest",
+        "--tb=short",
+        "--junitxml=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task1/green-r2/local-green/env1.xml",
+        "--basetemp=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task1/green-r2/local-green/tmp-env1",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_entry198.py"
+      ],
+      "exit_code": 0,
+      "tests": 15,
+      "failures": [],
+      "errors": []
+    },
+    {
+      "python": [
+        3,
+        12,
+        13
+      ],
+      "command": [
+        "/u/swong2/.conda/envs/mgnp/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--noconftest",
+        "--tb=short",
+        "--junitxml=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task1/green-r2/local-green/env2.xml",
+        "--basetemp=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task1/green-r2/local-green/tmp-env2",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_entry198.py"
+      ],
+      "exit_code": 0,
+      "tests": 15,
+      "failures": [],
+      "errors": []
+    }
+  ],
+  "real_entry_guard_unreplaced": true,
+  "scope": "15 tiny entry/bank regressions only; original82 await root CPU"
+}

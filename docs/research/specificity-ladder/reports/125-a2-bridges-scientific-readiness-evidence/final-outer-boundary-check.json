@@ -1,0 +1,68 @@
+{
+  "launcher_sha256": "91af50383a2545b885ed417909998295e91910e60b06eda5b0c128a2f2011957",
+  "cases": {
+    "none": {
+      "rejected": false,
+      "events": [
+        "cache",
+        "authorize",
+        "cache",
+        "child"
+      ]
+    },
+    "receipt": {
+      "rejected": true,
+      "events": [
+        "cache"
+      ]
+    },
+    "output": {
+      "rejected": true,
+      "events": [
+        "cache"
+      ]
+    },
+    "dangling_receipt": {
+      "rejected": true,
+      "events": [
+        "cache"
+      ]
+    },
+    "dangling_output": {
+      "rejected": true,
+      "events": [
+        "cache"
+      ]
+    },
+    "output_after_auth": {
+      "rejected": true,
+      "events": [
+        "cache",
+        "authorize",
+        "cache"
+      ]
+    },
+    "cache_after_auth": {
+      "rejected": true,
+      "events": [
+        "cache",
+        "authorize",
+        "cache"
+      ]
+    },
+    "cancel_flag": {
+      "rejected": true,
+      "events": []
+    },
+    "wrong_cell": {
+      "rejected": true,
+      "events": []
+    },
+    "wrong_launcher": {
+      "rejected": true,
+      "events": []
+    }
+  },
+  "no_actual_child_or_remote_or_model": true,
+  "synthetic_schema_positive_only": true
+}

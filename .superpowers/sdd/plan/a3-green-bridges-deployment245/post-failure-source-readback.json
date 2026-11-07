@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "-o",
+    "ControlMaster=no",
+    "-o",
+    "ControlPath=none",
+    "-o",
+    "HostName=br013.bridges2.psc.edu",
+    "bridges2",
+    "python3 -B -c 'import json,sys,time,hashlib\nfrom pathlib import Path\np=Path('\"'\"'/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan'\"'\"');t=p/'\"'\"'a3-green-bridges-transport229-r3'\"'\"';sys.path.insert(0,str(t));import host as h\nc=p/'\"'\"'a3-green-bridges-deployment245/config.json'\"'\"';assert h.sha(c)=='\"'\"'6e1e7858314f7ee426a60dfd646cd1612e8648a9e652281550e61940b9666f62'\"'\"';x=json.loads(c.read_text());h.check_config(x)\nprint(json.dumps({'\"'\"'status'\"'\"':'\"'\"'SOURCE_POST_FAILURE_READBACK_MATCHES'\"'\"','\"'\"'job_id'\"'\"':'\"'\"'50316975'\"'\"','\"'\"'files'\"'\"':len(x['\"'\"'files'\"'\"']),'\"'\"'aliases'\"'\"':len(x['\"'\"'aliases'\"'\"']),'\"'\"'observed_unix'\"'\"':time.time(),'\"'\"'not_continuous_source_attestation'\"'\"':True}))\n'"
+  ],
+  "exit_code": 0,
+  "stdout": "{\"status\": \"SOURCE_POST_FAILURE_READBACK_MATCHES\", \"job_id\": \"50316975\", \"files\": 1120, \"aliases\": 8, \"observed_unix\": 1794029902.299562, \"not_continuous_source_attestation\": true}\n",
+  "stderr": "",
+  "observed_unix": 1794029902.3184948
+}

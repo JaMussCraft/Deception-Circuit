@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "-o",
+    "ControlMaster=no",
+    "-o",
+    "ControlPath=none",
+    "-o",
+    "HostName=br013.bridges2.psc.edu",
+    "bridges2",
+    "python3 -B -c 'import sys,json,subprocess,time\nx=json.load(sys.stdin);a=x['\"'\"'argv'\"'\"'];r=subprocess.run(a[:1]+['\"'\"'--test-only'\"'\"']+a[1:],stdout=subprocess.PIPE,stderr=subprocess.PIPE,universal_newlines=True,timeout=25);print(json.dumps(dict(argv=a,exit_code=r.returncode,stdout=r.stdout,stderr=r.stderr,observed_unix=time.time())));sys.exit(r.returncode)\n'"
+  ],
+  "exit_code": 0,
+  "stdout": "{\"argv\": [\"sbatch\", \"--parsable\", \"--qos=rm\", \"--account=cis260361p\", \"--partition=RM-shared\", \"--nodes=1\", \"--ntasks=1\", \"--cpus-per-task=18\", \"--mem=32G\", \"--time=01:20:00\", \"--no-requeue\", \"--export=ALL,CUDA_VISIBLE_DEVICES=,A3_HOST_PYTHON=/usr/bin/python3\", \"--chdir=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded\", \"--job-name=lad-A3-mgnp-0\", \"--output=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/sharded-deployment273/mgnp-0/slurm-%j.log\", \"/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/sharded-deployment273/mgnp-0/dispatch.sh\"], \"exit_code\": 0, \"stdout\": \"\", \"stderr\": \"sbatch: Job 50319095 to start at 2026-11-07T03:10:45 using 18 processors on nodes r346 in partition RM-shared\\n\", \"observed_unix\": 1794039045.864108}\n",
+  "stderr": "",
+  "observed_unix": 1794039045.882457
+}

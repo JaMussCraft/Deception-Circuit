@@ -1,0 +1,7 @@
+{"acceptance": false, "collected": 3, "event": "start", "execution_authorized": false, "kind": "DIAGNOSTIC_PARTIAL", "requested": ["test_mini.py::test_selected_fail"], "unix_seconds": 1794031550.3453379}
+{"event": "item-start", "nodeid": "test_mini.py::test_selected_fail", "unix_seconds": 1794031550.370611}
+{"duration_seconds": 0.0025899609900079668, "event": "phase-report", "longrepr": null, "nodeid": "test_mini.py::test_selected_fail", "outcome": "passed", "unix_seconds": 1794031550.3770707, "when": "setup"}
+{"duration_seconds": 0.0005024790298193693, "event": "phase-report", "longrepr": "lifecycle = None\n\n    def test_selected_fail(lifecycle):\n>    assert False,\"selected_failure\"\nE    AssertionError: selected_failure\nE    assert False\n\ntest_mini.py:16: AssertionError", "nodeid": "test_mini.py::test_selected_fail", "outcome": "failed", "unix_seconds": 1794031550.4145617, "when": "call"}
+{"duration_seconds": 0.005488848022650927, "event": "phase-report", "longrepr": null, "nodeid": "test_mini.py::test_selected_fail", "outcome": "passed", "unix_seconds": 1794031550.4226353, "when": "teardown"}
+{"event": "item-finish", "nodeid": "test_mini.py::test_selected_fail", "unix_seconds": 1794031550.4250522}
+{"acceptance": false, "event": "finished", "requested_count": 1, "unix_seconds": 1794031550.4285412}

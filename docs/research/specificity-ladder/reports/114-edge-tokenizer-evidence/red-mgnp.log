@@ -1,0 +1,39 @@
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+___________ test_parent_admission_accepts_canonical_pinned_tokenizer ___________
+
+admission_tokenizer_parent = {'model': '/tmp/a3-edge-114-red-mgnp/test_parent_admission_accepts_0/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'tokenizer_revision': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'}
+tmp_path = PosixPath('/tmp/a3-edge-114-red-mgnp/test_parent_admission_accepts_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f10f675e930>
+
+    def test_parent_admission_accepts_canonical_pinned_tokenizer(admission_tokenizer_parent,tmp_path,monkeypatch):
+        # A raw factory misses eos padding and must fail the real signature guard.
+>       receipt=_admit_with_real_tokenizer_validation(admission_tokenizer_parent,tmp_path,monkeypatch)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_a3_edge_pipeline.py:633: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_a3_edge_pipeline.py:628: in _admit_with_real_tokenizer_validation
+    return p.admit_parent_sources(d,registry_paths=[])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+component_analysis/a3_edge_pipeline.py:1730: in admit_parent_sources
+    rebuilt=a3_pipeline.prepare(a1_design=evidence['prepared_path'],a1_selected=evidence['selected_path'],matched_root=Path(design['matched_build_path']).parent,
+tests/test_a3_edge_pipeline.py:621: in prepare
+    checked=a3_pipeline._validated_prepare_tokenizer(kwargs['tokenizer'],parent)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+component_analysis/a3_pipeline.py:258: in _validated_prepare_tokenizer
+    require(signature(tokenizer)==signature(expected),'production tokenizer configuration differs from pinned standard')
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False
+message = 'production tokenizer configuration differs from pinned standard'
+
+    def require(condition, message):
+        if not condition:
+>           raise ValueError(message)
+E           ValueError: production tokenizer configuration differs from pinned standard
+
+dataset/user_inversion_pipeline.py:32: ValueError
+=========================== short test summary info ============================
+FAILED tests/test_a3_edge_pipeline.py::test_parent_admission_accepts_canonical_pinned_tokenizer
+1 failed, 1 passed, 38 deselected in 18.63s

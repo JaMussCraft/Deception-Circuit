@@ -1,0 +1,65 @@
+FF{"host_startup_seconds": 1.2982963139656931, "guard_seconds": [0.0052805080194957554, 0.00807911902666092, 0.005218532984144986], "dependency_roots": 11, "dependency_bytes": 4114686, "retained_bytes": 20928, "peak_host_bytes": 702550016, "conditional": true, "source_reference_count": 1, "cpu_model": "AMD EPYC 7763 64-Core Processor"}
+..{"tile": 1, "rows": 2, "actual_model_forwards": 13, "live_guard_calls": 6, "recorded_guard_calls": 6, "recorded_refreshes": 6}
+.{"tile": 2, "rows": 4, "actual_model_forwards": 13, "live_guard_calls": 7, "recorded_guard_calls": 7, "recorded_refreshes": 7}
+..
+=================================== FAILURES ===================================
+______ test_guard_benchmark_covers_final_receipt_and_all_numeric_roots[1] ______
+
+tmp_path = PosixPath('/tmp/review111-round2-publication-green/test_guard_benchmark_covers_fi0')
+fake = [(tensor([[2, 3, 6, 0],
+        [2, 3, 5, 0]]), None), (tensor([[1, 2, 4, 0],
+        [1, 2, 3, 0]]), None), (tensor([...None), (tensor([[2, 3, 5, 0],
+        [2, 3, 7, 0]]), None), (tensor([[1, 2, 3, 0],
+        [1, 2, 5, 0]]), None), ...]
+tile = 1
+
+    @pytest.mark.parametrize('tile',[1,2])
+    def test_guard_benchmark_covers_final_receipt_and_all_numeric_roots(tmp_path,fake,tile):
+        from types import SimpleNamespace
+        r,d,p=_fake_pilot_inputs(tile);inv=r.workload.build_inventory(d,p,stage='prefit')
+        receipt=r.run_pilot(object(),d,p,inv,root=tmp_path,args=SimpleNamespace(pilot_part='prefit',selected=None),guard=lambda:None,startup_seconds=0)
+        r.publish_object(tmp_path/'admission',{'pilot_receipt_paths':[str(tmp_path/'pilot'/'prefit')]})
+        r.publish_object(tmp_path/'reservation',{'admission_path':str(tmp_path/'admission')})
+        index=r._admitted_candidate_index(SimpleNamespace(reservation=str(tmp_path/'reservation')),d,p)
+        actual=index.refresh_dependencies();measured=receipt['guard_dependency_measurement']
+        assert measured['measured_bytes_per_refresh']>=actual['verified_bytes'] and measured['measured_roots']>=actual['roots']
+>       assert set(index.forest.paths)-{str((tmp_path/'pilot'/'prefit').absolute())}==set(measured['dependency_roots'])
+E       AssertionError: assert {'/tmp/review...538118d', ...} == {'/tmp/review...3c2d5fa', ...}
+E         
+E         Extra items in the left set:
+E         '/tmp/review111-round2-publication-green/test_guard_benchmark_covers_fi0/runtime-startup/223547-1793634477168780790'
+E         Use -v to get more diff
+
+tests/test_a3_direction_runtime.py:1379: AssertionError
+______ test_guard_benchmark_covers_final_receipt_and_all_numeric_roots[2] ______
+
+tmp_path = PosixPath('/tmp/review111-round2-publication-green/test_guard_benchmark_covers_fi1')
+fake = [(tensor([[2, 3, 6, 0],
+        [2, 3, 5, 0]]), None), (tensor([[1, 2, 4, 0],
+        [1, 2, 3, 0]]), None), (tensor([...None), (tensor([[2, 3, 5, 0],
+        [2, 3, 7, 0]]), None), (tensor([[1, 2, 3, 0],
+        [1, 2, 5, 0]]), None), ...]
+tile = 2
+
+    @pytest.mark.parametrize('tile',[1,2])
+    def test_guard_benchmark_covers_final_receipt_and_all_numeric_roots(tmp_path,fake,tile):
+        from types import SimpleNamespace
+        r,d,p=_fake_pilot_inputs(tile);inv=r.workload.build_inventory(d,p,stage='prefit')
+        receipt=r.run_pilot(object(),d,p,inv,root=tmp_path,args=SimpleNamespace(pilot_part='prefit',selected=None),guard=lambda:None,startup_seconds=0)
+        r.publish_object(tmp_path/'admission',{'pilot_receipt_paths':[str(tmp_path/'pilot'/'prefit')]})
+        r.publish_object(tmp_path/'reservation',{'admission_path':str(tmp_path/'admission')})
+        index=r._admitted_candidate_index(SimpleNamespace(reservation=str(tmp_path/'reservation')),d,p)
+        actual=index.refresh_dependencies();measured=receipt['guard_dependency_measurement']
+        assert measured['measured_bytes_per_refresh']>=actual['verified_bytes'] and measured['measured_roots']>=actual['roots']
+>       assert set(index.forest.paths)-{str((tmp_path/'pilot'/'prefit').absolute())}==set(measured['dependency_roots'])
+E       AssertionError: assert {'/tmp/review...0640e6f', ...} == {'/tmp/review...0640e6f', ...}
+E         
+E         Extra items in the left set:
+E         '/tmp/review111-round2-publication-green/test_guard_benchmark_covers_fi1/runtime-startup/223547-1793634485343031415'
+E         Use -v to get more diff
+
+tests/test_a3_direction_runtime.py:1379: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_a3_direction_runtime.py::test_guard_benchmark_covers_final_receipt_and_all_numeric_roots[1]
+FAILED tests/test_a3_direction_runtime.py::test_guard_benchmark_covers_final_receipt_and_all_numeric_roots[2]
+2 failed, 5 passed, 149 deselected in 132.06s (0:02:12)

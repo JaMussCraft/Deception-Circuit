@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/proof_worker.py", line 156, in <module>
+    try:main()
+        ^^^^^^
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/proof_worker.py", line 101, in main
+    texts={n:(g.R/'component_analysis'/n).read_text() for n in ('specificity_ladder.py','a2_pipeline.py','ladder_pipeline.py','ladder_design.py','hooks.py')};s.verify_runner_schema(texts['specificity_ladder.py']);s.verify_append_schema(texts['a2_pipeline.py']);s.verify_function_pins(texts,g.read(g.P/'native-schema-contract.json')['function_AST_sha256'])
+                                                                                                                                                                                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/proof_schema.py", line 34, in verify_function_pins
+    need(actual==pin,'native emitted branch/function drift: '+file+':'+name)
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/proof_schema.py", line 10, in need
+    if not ok:raise ValueError(message)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: native emitted branch/function drift: a2_pipeline.py:_groups_for_compute

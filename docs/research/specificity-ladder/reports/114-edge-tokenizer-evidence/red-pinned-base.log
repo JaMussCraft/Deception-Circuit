@@ -1,0 +1,127 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+___________ test_parent_admission_accepts_canonical_pinned_tokenizer ___________
+
+admission_tokenizer_parent = {'model': 'meta-llama/Llama-3.1-8B-Instruct', 'tokenizer_revision': '0e9e39f249a16976918f6564b8830bc894c89659'}
+tmp_path = PosixPath('/tmp/a3-edge-114-red-pinned-base/test_parent_admission_accepts_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ceff74f40>
+
+    def test_parent_admission_accepts_canonical_pinned_tokenizer(admission_tokenizer_parent,tmp_path,monkeypatch):
+        # A raw factory misses eos padding and must fail the real signature guard.
+>       receipt=_admit_with_real_tokenizer_validation(admission_tokenizer_parent,tmp_path,monkeypatch)
+
+tests/test_a3_edge_pipeline.py:633: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_a3_edge_pipeline.py:628: in _admit_with_real_tokenizer_validation
+    return p.admit_parent_sources(d,registry_paths=[])
+component_analysis/a3_edge_pipeline.py:1729: in admit_parent_sources
+    tokenizer=AutoTokenizer.from_pretrained(parent['model'],revision=parent['tokenizer_revision'],local_files_only=True)
+/u/swong2/.local/lib/python3.9/site-packages/transformers/models/auto/tokenization_auto.py:1156: in from_pretrained
+    return tokenizer_class.from_pretrained(pretrained_model_name_or_path, *inputs, **kwargs)
+/u/swong2/.local/lib/python3.9/site-packages/transformers/tokenization_utils_base.py:2113: in from_pretrained
+    return cls._from_pretrained(
+/u/swong2/.local/lib/python3.9/site-packages/transformers/tokenization_utils_base.py:2395: in _from_pretrained
+    tokenizer = cls._patch_mistral_regex(
+/u/swong2/.local/lib/python3.9/site-packages/transformers/tokenization_utils_base.py:2438: in _patch_mistral_regex
+    if _is_local or is_base_mistral(pretrained_model_name_or_path):
+/u/swong2/.local/lib/python3.9/site-packages/transformers/tokenization_utils_base.py:2432: in is_base_mistral
+    model = model_info(model_id)
+/u/swong2/.local/lib/python3.9/site-packages/huggingface_hub/utils/_validators.py:114: in _inner_fn
+    return fn(*args, **kwargs)
+/u/swong2/.local/lib/python3.9/site-packages/huggingface_hub/hf_api.py:2660: in model_info
+    r = get_session().get(path, headers=headers, timeout=timeout, params=params)
+/u/swong2/.local/lib/python3.9/site-packages/requests/sessions.py:602: in get
+    return self.request("GET", url, **kwargs)
+/u/swong2/.local/lib/python3.9/site-packages/requests/sessions.py:589: in request
+    resp = self.send(prep, **send_kwargs)
+/u/swong2/.local/lib/python3.9/site-packages/requests/sessions.py:703: in send
+    r = adapter.send(request, **kwargs)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <huggingface_hub.utils._http.OfflineAdapter object at 0x7f7cefce9940>
+request = <PreparedRequest [GET]>, args = ()
+kwargs = {'cert': None, 'proxies': OrderedDict(), 'stream': False, 'timeout': None, ...}
+
+    def send(self, request: PreparedRequest, *args, **kwargs) -> Response:
+>       raise OfflineModeIsEnabled(
+            f"Cannot reach {request.url}: offline mode is enabled. To disable it, please unset the `HF_HUB_OFFLINE` environment variable."
+        )
+E       huggingface_hub.errors.OfflineModeIsEnabled: Cannot reach https://huggingface.co/api/models/meta-llama/Llama-3.1-8B-Instruct: offline mode is enabled. To disable it, please unset the `HF_HUB_OFFLINE` environment variable.
+
+/u/swong2/.local/lib/python3.9/site-packages/huggingface_hub/utils/_http.py:106: OfflineModeIsEnabled
+________ test_parent_admission_rejects_changed_tokenizer_configuration _________
+
+admission_tokenizer_parent = {'model': 'meta-llama/Llama-3.1-8B-Instruct', 'tokenizer_revision': '0e9e39f249a16976918f6564b8830bc894c89659'}
+tmp_path = PosixPath('/tmp/a3-edge-114-red-pinned-base/test_parent_admission_rejects_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7ceea05820>
+
+    def test_parent_admission_rejects_changed_tokenizer_configuration(admission_tokenizer_parent,tmp_path,monkeypatch):
+        # A faulty factory changing padding side must still be rejected, never normalized away.
+        canonical=p.common.load_tokenizer
+        def changed(args):
+            tokenizer=canonical(args)
+            tokenizer.padding_side='left' if tokenizer.padding_side=='right' else 'right'
+            return tokenizer
+        # Patch only the edge factory; the independent canonical validator stays real.
+        from types import SimpleNamespace
+        monkeypatch.setattr(p,'common',SimpleNamespace(**{**vars(p.common),'load_tokenizer':changed}))
+        with pytest.raises(ValueError,match='production tokenizer configuration differs from pinned standard'):
+>           _admit_with_real_tokenizer_validation(admission_tokenizer_parent,tmp_path,monkeypatch)
+
+tests/test_a3_edge_pipeline.py:648: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_a3_edge_pipeline.py:628: in _admit_with_real_tokenizer_validation
+    return p.admit_parent_sources(d,registry_paths=[])
+component_analysis/a3_edge_pipeline.py:1729: in admit_parent_sources
+    tokenizer=AutoTokenizer.from_pretrained(parent['model'],revision=parent['tokenizer_revision'],local_files_only=True)
+/u/swong2/.local/lib/python3.9/site-packages/transformers/models/auto/tokenization_auto.py:1156: in from_pretrained
+    return tokenizer_class.from_pretrained(pretrained_model_name_or_path, *inputs, **kwargs)
+/u/swong2/.local/lib/python3.9/site-packages/transformers/tokenization_utils_base.py:2113: in from_pretrained
+    return cls._from_pretrained(
+/u/swong2/.local/lib/python3.9/site-packages/transformers/tokenization_utils_base.py:2395: in _from_pretrained
+    tokenizer = cls._patch_mistral_regex(
+/u/swong2/.local/lib/python3.9/site-packages/transformers/tokenization_utils_base.py:2438: in _patch_mistral_regex
+    if _is_local or is_base_mistral(pretrained_model_name_or_path):
+/u/swong2/.local/lib/python3.9/site-packages/transformers/tokenization_utils_base.py:2432: in is_base_mistral
+    model = model_info(model_id)
+/u/swong2/.local/lib/python3.9/site-packages/huggingface_hub/utils/_validators.py:114: in _inner_fn
+    return fn(*args, **kwargs)
+/u/swong2/.local/lib/python3.9/site-packages/huggingface_hub/hf_api.py:2660: in model_info
+    r = get_session().get(path, headers=headers, timeout=timeout, params=params)
+/u/swong2/.local/lib/python3.9/site-packages/requests/sessions.py:602: in get
+    return self.request("GET", url, **kwargs)
+/u/swong2/.local/lib/python3.9/site-packages/requests/sessions.py:589: in request
+    resp = self.send(prep, **send_kwargs)
+/u/swong2/.local/lib/python3.9/site-packages/requests/sessions.py:703: in send
+    r = adapter.send(request, **kwargs)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <huggingface_hub.utils._http.OfflineAdapter object at 0x7f7cefce9940>
+request = <PreparedRequest [GET]>, args = ()
+kwargs = {'cert': None, 'proxies': OrderedDict(), 'stream': False, 'timeout': None, ...}
+
+    def send(self, request: PreparedRequest, *args, **kwargs) -> Response:
+>       raise OfflineModeIsEnabled(
+            f"Cannot reach {request.url}: offline mode is enabled. To disable it, please unset the `HF_HUB_OFFLINE` environment variable."
+        )
+E       huggingface_hub.errors.OfflineModeIsEnabled: Cannot reach https://huggingface.co/api/models/meta-llama/Llama-3.1-8B-Instruct: offline mode is enabled. To disable it, please unset the `HF_HUB_OFFLINE` environment variable.
+
+/u/swong2/.local/lib/python3.9/site-packages/huggingface_hub/utils/_http.py:106: OfflineModeIsEnabled
+=============================== warnings summary ===============================
+../../../../../../../../../../../../u/swong2/.local/lib/python3.9/site-packages/transformers/utils/hub.py:110
+  /u/swong2/.local/lib/python3.9/site-packages/transformers/utils/hub.py:110: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+    warnings.warn(
+
+../../../../../../../../../../../../sw/external/python/anaconda3/lib/python3.9/site-packages/tensorflow/python/framework/dtypes.py:35
+  /sw/external/python/anaconda3/lib/python3.9/site-packages/tensorflow/python/framework/dtypes.py:35: DeprecationWarning: ml_dtypes.float8_e4m3b11 is deprecated. Use ml_dtypes.float8_e4m3b11fnuz
+    from tensorflow.tsl.python.lib.core import pywrap_ml_dtypes
+
+../../../../../../../../../../../../u/swong2/.local/lib/python3.9/site-packages/pandas/core/arrays/masked.py:61
+  /u/swong2/.local/lib/python3.9/site-packages/pandas/core/arrays/masked.py:61: UserWarning: Pandas requires version '1.3.6' or newer of 'bottleneck' (version '1.3.5' currently installed).
+    from pandas.core import (
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_a3_edge_pipeline.py::test_parent_admission_accepts_canonical_pinned_tokenizer
+FAILED tests/test_a3_edge_pipeline.py::test_parent_admission_rejects_changed_tokenizer_configuration
+2 failed, 38 deselected, 3 warnings in 33.98s

@@ -1,0 +1,32 @@
+{
+  "proposal_sha256": "fd33474462fc2a11a55dc3771ac9255a2b4fc7cddfdb57427132a052d7728156",
+  "cpus": 4,
+  "memory_GiB": 16,
+  "time_minutes": 10,
+  "account": "bimc-delta-cpu",
+  "partition": "cpu",
+  "test_only": {
+    "stdout": "",
+    "stderr": "sbatch: Job 23470887 to start at 2026-11-03T07:14:41 a using 4 processors on nodes cn003 in partition cpu\n"
+  },
+  "job_id": "23470888",
+  "cluster": "delta",
+  "submitted_utc": "2026-11-03T12:53:41.287062+00:00",
+  "command": [
+    "sbatch",
+    "--parsable",
+    "--export=ALL",
+    "--account=bimc-delta-cpu",
+    "--partition=cpu",
+    "--constraint=projects",
+    "--ntasks=1",
+    "--cpus-per-task=4",
+    "--mem=16G",
+    "--time=00:10:00",
+    "--job-name=lad-a3-readiness142",
+    "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+    "--output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/142-real-input-readiness-evidence/slurm-%j.log",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/142-real-input-readiness-evidence/review142_cpu.sh"
+  ],
+  "gpus": 0
+}

@@ -1,0 +1,27 @@
+{
+  "job_id": "23471864",
+  "cluster": "delta",
+  "submitted_utc": "2026-11-03T13:34:43.083488+00:00",
+  "command": [
+    "sbatch",
+    "--parsable",
+    "--export=ALL",
+    "--account=bjhz-delta-cpu",
+    "--partition=cpu-interactive",
+    "--constraint=projects",
+    "--ntasks=1",
+    "--cpus-per-task=4",
+    "--mem=32G",
+    "--time=00:05:00",
+    "--job-name=lad-a2-timing-check",
+    "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+    "--output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/real-input-readiness/bank-scoring-timing/launch/logs/preflight-%j.log",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/real-input-readiness/bank-scoring-timing/launch/cpu-preflight.sh"
+  ],
+  "launch_manifest_sha256": "5320206803d71cba71a71850e5b204667d6d7cab80ccd9dcf73569c357367713",
+  "cpus": 4,
+  "memory_GiB": 32,
+  "gpus": 0,
+  "time_minutes": 5,
+  "output": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/real-input-readiness/bank-scoring-timing/cpu-preflight-20261103"
+}

@@ -1,0 +1,54 @@
+{
+  "status": "ROOT_ONLY_SCOPED_COMMANDS_NOT_EXECUTED_BY_WORKER",
+  "application_commit": "6bd8bf5334f2e83613a129d2fcfeacf83e762191",
+  "snapshot_sha256": "eb5ca854a7157529095ab820252a246f114250144120c6fc66de98bed9733918",
+  "archive_sha256": "1a4e6397bb5924f22fc548fb8899a925a58f0b3640730a2602300e7e8c045ac6",
+  "archive_bytes": 4116480,
+  "source_ordinary_count": 207,
+  "live_link_count": 4,
+  "files_list": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/original-6bd-source-files.txt",
+  "files_list_sha256": "4dc589bc7ea42b3f37a9e163e18625ee55da981ccfb95749ffa1738c4a8643b1",
+  "list_entries": 213,
+  "root_transfer_files_list_to": "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/deployment/original-6bd-source-files.txt",
+  "root_remote_commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/logs",
+        "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-runtime-6bd8bf5"
+      ]
+    },
+    {
+      "argv": [
+        "rsync",
+        "-rlp",
+        "--ignore-existing",
+        "--files-from=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/deployment/original-6bd-source-files.txt",
+        "--",
+        "/ocean/projects/cis260361p/swong2/specificity-ladder-20261102/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-runtime-6bd8bf5/",
+        "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-runtime-6bd8bf5/"
+      ]
+    }
+  ],
+  "original_live_links": {
+    "outputs": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs",
+    "data": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/data",
+    "logs": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/logs",
+    "docs/research/held_out.json": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json"
+  },
+  "scope": "Only old accepted 6bd training audit source; no accepted 161 execution source or new G3. Existing files and literal aliases never overwritten; mismatches block later validation.",
+  "existing_asset_observation": "Read-only SSH: old archive exists 4116480 bytes; snapshot exact digest and commit/count; old runtime all four literal links exact. No full current 207 hashes or archive hash rechecked on login.",
+  "next_cpu_requirements": [
+    "hash pinned archive and snapshot inside original namespace container",
+    "207 ordinary file SHA and readonly modes against snapshot; validate every archive member exact inventory",
+    "all4 literal links exact; data/logs/outputs/held_out target namespace semantics",
+    "owning original fleet audit checks exact snapshot/archive/fleet hashes before fresh G3 owning freeze",
+    "record actual CPU job/account/QoS/resources and image digest; no model admission"
+  ],
+  "preserved_existing_aliases": [
+    "outputs",
+    "docs/research/held_out.json"
+  ],
+  "data_transfer_proof": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/cpu-data-result-50183712/cpu-data-proof-50183712.json"
+}

@@ -1,0 +1,19 @@
+[
+  "sbatch",
+  "--parsable",
+  "--hold",
+  "--account=cis260361p",
+  "--partition=RM",
+  "--qos=rm",
+  "--nodes=1",
+  "--ntasks=1",
+  "--cpus-per-task=128",
+  "--mem=192G",
+  "--time=01:30:00",
+  "--no-requeue",
+  "--export=ALL,CUDA_VISIBLE_DEVICES=",
+  "--chdir=/ocean/projects/cis260361p/swong2/specificity-ladder-a3-producer-2ba697d7f5fd/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/candidate-producer311",
+  "--job-name=lad-A3-candidate-producer",
+  "--output=/ocean/projects/cis260361p/swong2/specificity-ladder-a3-producer-2ba697d7f5fd/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/producer-deployment320/slurm-%j.log",
+  "/ocean/projects/cis260361p/swong2/specificity-ladder-a3-producer-2ba697d7f5fd/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/producer-deployment320/dispatch.sh"
+]

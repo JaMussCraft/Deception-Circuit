@@ -1,0 +1,67 @@
+{
+  "status": "PASS",
+  "expected_cases_each": 3,
+  "observations": [
+    {
+      "label": "base39",
+      "argv": [
+        "/sw/external/python/anaconda3/bin/python3.9",
+        "-B",
+        "-m",
+        "pytest",
+        "-c",
+        "/dev/null",
+        "--confcutdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r3/closure/sdd/plan-a2-full-score-operational186/candidate/tests",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/frozen-smoke270-r3/base39-tmp",
+        "--junitxml=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/frozen-smoke270-r3/base39.xml",
+        "-q",
+        "--tb=short",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r3/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_root_identity.py",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r3/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_root_integration.py::test_full_fake_transport_keeps_CPU_immutable_and_fails_closed_on_transfer_drift[None]"
+      ],
+      "identity": {
+        "python": "3.9.18 (main, Sep 11 2023, 13:41:44) \n[GCC 11.2.0]",
+        "pytest": "8.3.3",
+        "pytest_origin": "/u/swong2/.local/lib/python3.9/site-packages/pytest/__init__.py"
+      },
+      "seconds": 4.327598981035408,
+      "exit_code": 0,
+      "cases": 3,
+      "failed_or_skipped": []
+    },
+    {
+      "label": "mgnp",
+      "argv": [
+        "/u/swong2/.conda/envs/mgnp/bin/python",
+        "-B",
+        "-m",
+        "pytest",
+        "-c",
+        "/dev/null",
+        "--confcutdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r3/closure/sdd/plan-a2-full-score-operational186/candidate/tests",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/frozen-smoke270-r3/mgnp-tmp",
+        "--junitxml=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/frozen-smoke270-r3/mgnp.xml",
+        "-q",
+        "--tb=short",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r3/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_root_identity.py",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r3/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_root_integration.py::test_full_fake_transport_keeps_CPU_immutable_and_fails_closed_on_transfer_drift[None]"
+      ],
+      "identity": {
+        "python": "3.12.13 | packaged by Anaconda, Inc. | (main, Jul  9 2026, 14:38:16) [GCC 14.3.0]",
+        "pytest": "9.1.1",
+        "pytest_origin": "/u/swong2/.conda/envs/mgnp/lib/python3.12/site-packages/pytest/__init__.py"
+      },
+      "seconds": 5.083170012978371,
+      "exit_code": 0,
+      "cases": 3,
+      "failed_or_skipped": []
+    }
+  ],
+  "full_suite_run": false,
+  "native_suite_run": false,
+  "source_pin_check_after_run": true
+}

@@ -1,0 +1,79 @@
+{
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "-o",
+    "ControlMaster=no",
+    "-o",
+    "ControlPath=none",
+    "-o",
+    "HostName=br013.bridges2.psc.edu",
+    "bridges2",
+    "python3 -B -c 'import json,base64,hashlib,subprocess,time\nfrom pathlib import Path\nb=Path('\"'\"'/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199'\"'\"');p=b/'\"'\"'root-genuine-proof-r2/job-50313499/execution'\"'\"';files={}\nfor x in list(p.iterdir())+[p.parent.parent/'\"'\"'job-50313499.log'\"'\"']:\n if x.is_file():\n  assert x.stat().st_size<20000000\n  raw=x.read_bytes();files[x.name]={'\"'\"'bytes'\"'\"':len(raw),'\"'\"'sha256'\"'\"':hashlib.sha256(raw).hexdigest(),'\"'\"'base64'\"'\"':base64.b64encode(raw).decode()}\nr=subprocess.check_output(['\"'\"'sacct'\"'\"','\"'\"'-j'\"'\"','\"'\"'50313499'\"'\"','\"'\"'--format=JobID,State%32,ExitCode,Elapsed,Start,End,MaxRSS,TotalCPU'\"'\"','\"'\"'-n'\"'\"','\"'\"'-P'\"'\"'],universal_newlines=True,timeout=15)\nprint(json.dumps({'\"'\"'files'\"'\"':files,'\"'\"'accounting'\"'\"':r,'\"'\"'observed_unix'\"'\"':time.time()}))\n'"
+  ],
+  "files": {
+    "host-cgroup-before.json": {
+      "bytes": 1068,
+      "sha256": "b64f01010312796706a4b69a90be8adf050e2941ac9b79647b3b4ddd431bf63f"
+    },
+    "container-cgroup-entry.json": {
+      "bytes": 602,
+      "sha256": "460da31ea1c2b099095bb14679d89aa2270ca8ea76bbcfcc336b22867c277b12"
+    },
+    "container-cgroup-observation.json": {
+      "bytes": 1186,
+      "sha256": "b64ad62695969191f06def8e32e81e464a4bdbddc24e4fc74177f00cfb72a671"
+    },
+    "container-cgroup-readonly.json": {
+      "bytes": 206,
+      "sha256": "9a76195abbb4223cf3ac38c4a6ec730fdb32bf4a0bd20dd954ec233e419a4a95"
+    },
+    "allocation-before.json": {
+      "bytes": 4707,
+      "sha256": "64c1758aaa45ff3b83c9a0c9f680e87e90f7a58fe9c170b4a431e13b5f4f7ccb"
+    },
+    "source-before.json": {
+      "bytes": 6972,
+      "sha256": "384109a96a8843317375f89a0156b2360eb4efcd674ee4ed7cb70bb2c605b1d3"
+    },
+    "source-before-activation.json": {
+      "bytes": 207,
+      "sha256": "94db7b33d8c35f630e9753b0a0f5cc8e2af7091af9ea8247d6b121cf955cf6b2"
+    },
+    "FAILED-supervisor.json": {
+      "bytes": 1451,
+      "sha256": "9de8b16b2d7b7a6b7b0cc3f15c6aa23a7930a68a196b585444594f583af3b357"
+    },
+    "allocation-after.json": {
+      "bytes": 4708,
+      "sha256": "62683010f76dd47697981fdf64fc2bd43bac9d41354ca6e58711b2f24df457aa"
+    },
+    "child.log": {
+      "bytes": 1869,
+      "sha256": "da60e700c81a18ec899cb1054ddf697a33187eb4c6a1e7f633a02c971c90c7c1"
+    },
+    "child-execution.json": {
+      "bytes": 5167,
+      "sha256": "ff1f03b068b7a0f264b63c7227f85bc84c19124949e03fafc0c97e17e842103b"
+    },
+    "command.json": {
+      "bytes": 4889,
+      "sha256": "4203417536c5fff7fb0dcdef24159d5ccfceac1ebef7727ec904adecce39f3c5"
+    },
+    "FAILED-child.json": {
+      "bytes": 2180,
+      "sha256": "27004671cf65b90c6a619076a670b032835f836dffa623d676d477bea2222764"
+    },
+    "job-50313499.log": {
+      "bytes": 1434,
+      "sha256": "b7ff859810f067ad452dcedd693ba5777d0c3c8199dbbb5a9c483efc86b112fa"
+    }
+  },
+  "accounting": "50313499|FAILED|1:0|00:07:31|2026-11-06T21:07:27|2026-11-06T21:14:58||02:38.714\n50313499.batch|FAILED|1:0|00:07:31|2026-11-06T21:07:27|2026-11-06T21:14:58|1324220K|02:38.713\n50313499.extern|COMPLETED|0:0|00:07:31|2026-11-06T21:07:27|2026-11-06T21:14:58|0|00:00:00\n",
+  "remote_observed_unix": 1794018087.770111,
+  "local_observed_unix": 1794018087.8527691,
+  "all_files_verified": true
+}

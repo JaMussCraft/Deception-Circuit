@@ -1,0 +1,93 @@
+FFF............                                                          [100%]
+=================================== FAILURES ===================================
+___________ test_option_a_never_copies_target_only_rows_for_lengths ____________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fcd81bc6cc0>
+
+    def test_option_a_never_copies_target_only_rows_for_lengths(monkeypatch):
+        d, p, _ = fixture()
+        target_only = {id(row) for rows in d['access_rows'].values() for row in rows if row['split'] == 'train'}
+        deepcopy = copy.deepcopy
+        seen = []
+        depth = [0]
+        def observe(value, *args, **kwargs):
+            if depth[0] == 0 and id(value) in target_only:
+                seen.append(value['instance_id'])
+            depth[0] += 1
+            try:
+                return deepcopy(value, *args, **kwargs)
+            finally:
+                depth[0] -= 1
+        monkeypatch.setattr(w.copy, 'deepcopy', observe)
+        result = w.build_inventory(d, p, stage='fit-select')
+        assert result['capture_shards']
+>       assert seen == [], 'target-only source rows were deep-copied solely for discarded lengths'
+E       AssertionError: target-only source rows were deep-copied solely for discarded lengths
+E       assert ['far_v2t0', ...ar_v2t1', ...] == []
+E         
+E         Left contains 96 more items, first extra item: 'far_v2t0'
+E         Use -v to get more diff
+
+tests/test_a3_direction_workload.py:856: AssertionError
+_______ test_option_a_source_rows_scanned_at_most_three_times_per_group ________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fcd81c5f950>
+
+    def test_option_a_source_rows_scanned_at_most_three_times_per_group(monkeypatch):
+        from collections import Counter
+        d, p, _ = fixture()
+        scans = Counter()
+        original = w._source_rows
+        def observe(design, task, split):
+            scans[(task, split)] += 1
+            return original(design, task, split)
+        monkeypatch.setattr(w, '_source_rows', observe)
+        result = w.build_inventory(d, p, stage='fit-select')
+        assert result['expected_keys']
+>       assert max(scans.values()) <= 3, dict(scans)
+E       AssertionError: {('far_v2', 'validation'): 16, ('sdr_v2', 'validation'): 16, ('ser_v2', 'validation'): 16, ('ioi', 'validation'): 16, ...}
+E       assert 16 <= 3
+E        +  where 16 = max(dict_values([16, 16, 16, 16, 13, 11, 11, 11]))
+E        +    where dict_values([16, 16, 16, 16, 13, 11, 11, 11]) = <built-in method values of Counter object at 0x7fcd8188a170>()
+E        +      where <built-in method values of Counter object at 0x7fcd8188a170> = Counter({('far_v2', 'validation'): 16, ('sdr_v2', 'validation'): 16, ('ser_v2', 'validation'): 16, ('ioi', 'validation'): 16, ('mmlu', 'validation'): 13, ('far_v2', 'train'): 11, ('sdr_v2', 'train'): 11, ('ser_v2', 'train'): 11}).values
+
+tests/test_a3_direction_workload.py:870: AssertionError
+____________ test_option_a_sender_constant_encoded_and_bounded_once ____________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fcd81d1a090>
+
+    def test_option_a_sender_constant_encoded_and_bounded_once(monkeypatch):
+        d, p, _ = fixture()
+        dumps = w.json.dumps
+        host_bound = w._host_bound
+        counts = dict(wire=0, host=0)
+        def senders(value):
+            return isinstance(value, list) and len(value) > 10 and all(isinstance(x, list) and len(x) == 3 and x[0] in ('head', 'mlp') for x in value)
+        def observe_dump(value, *args, **kwargs):
+            if senders(value):
+                counts['wire'] += 1
+            return dumps(value, *args, **kwargs)
+        def observe_host(value, *args, **kwargs):
+            if senders(value):
+                counts['host'] += 1
+            return host_bound(value, *args, **kwargs)
+        monkeypatch.setattr(w.json, 'dumps', observe_dump)
+        monkeypatch.setattr(w, '_host_bound', observe_host)
+        result = w.build_inventory(d, p, stage='fit-select')
+        assert result['storage_requirements']['components']['positive_evidence'] > 0
+>       assert counts == dict(wire=1, host=1), counts
+E       AssertionError: {'wire': 72, 'host': 72}
+E       assert {'wire': 72, 'host': 72} == {'wire': 1, 'host': 1}
+E         
+E         Differing items:
+E         {'wire': 72} != {'wire': 1}
+E         {'host': 72} != {'host': 1}
+E         Use -v to get more diff
+
+tests/test_a3_direction_workload.py:892: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_a3_direction_workload.py::test_option_a_never_copies_target_only_rows_for_lengths
+FAILED tests/test_a3_direction_workload.py::test_option_a_source_rows_scanned_at_most_three_times_per_group
+FAILED tests/test_a3_direction_workload.py::test_option_a_sender_constant_encoded_and_bounded_once
+3 failed, 12 passed, 134 deselected in 7.00s
+EXPECTED_RED_ONLY_PRODUCTION_UNCHANGED

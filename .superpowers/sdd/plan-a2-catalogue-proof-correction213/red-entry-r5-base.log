@@ -1,0 +1,61 @@
+test_actual_selected_path_and_raw_flags_are_recorded (test_entry_readonly.ReadonlyEntryTests) ... FAIL
+test_r5_binds_parent_then_explicit_memory_child_without_requiring_host_ro (test_entry_readonly.ReadonlyEntryTests) ... FAIL
+test_real_entry_allows_only_observed_readonly_before_permission_and_exec (test_entry_readonly.ReadonlyEntryTests) ... FAIL
+test_replaced_selected_or_native_path_rejects (test_entry_readonly.ReadonlyEntryTests) ... FAIL
+test_rw_missing_flag_and_oserror_cannot_imply_readonly (test_entry_readonly.ReadonlyEntryTests) ... FAIL
+
+======================================================================
+FAIL: test_actual_selected_path_and_raw_flags_are_recorded (test_entry_readonly.ReadonlyEntryTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/test_entry_readonly.py", line 13, in test_actual_selected_path_and_raw_flags_are_recorded
+    helper=self.helper()
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/test_entry_readonly.py", line 8, in helper
+    self.assertEqual(len(functions),1,'EFFECTIVE_RO_ENTRY_MISSING')
+AssertionError: 0 != 1 : EFFECTIVE_RO_ENTRY_MISSING
+
+======================================================================
+FAIL: test_r5_binds_parent_then_explicit_memory_child_without_requiring_host_ro (test_entry_readonly.ReadonlyEntryTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/test_entry_readonly.py", line 57, in test_r5_binds_parent_then_explicit_memory_child_without_requiring_host_ro
+    self.assertEqual(guards.cgroup_bind('v1'),'/sys/fs/cgroup:/sys/fs/cgroup:ro,/sys/fs/cgroup/memory:/sys/fs/cgroup/memory:ro')
+AssertionError: '/sys/fs/cgroup/memory:/sys/fs/cgroup/memory:ro' != '/sys/fs/cgroup:/sys/fs/cgroup:ro,/sys/fs/cgroup/memory:[20 chars]y:ro'
+- /sys/fs/cgroup/memory:/sys/fs/cgroup/memory:ro
++ /sys/fs/cgroup:/sys/fs/cgroup:ro,/sys/fs/cgroup/memory:/sys/fs/cgroup/memory:ro
+
+
+======================================================================
+FAIL: test_real_entry_allows_only_observed_readonly_before_permission_and_exec (test_entry_readonly.ReadonlyEntryTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/test_entry_readonly.py", line 50, in test_real_entry_allows_only_observed_readonly_before_permission_and_exec
+    self.helper()
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/test_entry_readonly.py", line 8, in helper
+    self.assertEqual(len(functions),1,'EFFECTIVE_RO_ENTRY_MISSING')
+AssertionError: 0 != 1 : EFFECTIVE_RO_ENTRY_MISSING
+
+======================================================================
+FAIL: test_replaced_selected_or_native_path_rejects (test_entry_readonly.ReadonlyEntryTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/test_entry_readonly.py", line 27, in test_replaced_selected_or_native_path_rejects
+    helper=self.helper()
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/test_entry_readonly.py", line 8, in helper
+    self.assertEqual(len(functions),1,'EFFECTIVE_RO_ENTRY_MISSING')
+AssertionError: 0 != 1 : EFFECTIVE_RO_ENTRY_MISSING
+
+======================================================================
+FAIL: test_rw_missing_flag_and_oserror_cannot_imply_readonly (test_entry_readonly.ReadonlyEntryTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/test_entry_readonly.py", line 20, in test_rw_missing_flag_and_oserror_cannot_imply_readonly
+    helper=self.helper()
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/test_entry_readonly.py", line 8, in helper
+    self.assertEqual(len(functions),1,'EFFECTIVE_RO_ENTRY_MISSING')
+AssertionError: 0 != 1 : EFFECTIVE_RO_ENTRY_MISSING
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.010s
+
+FAILED (failures=5)

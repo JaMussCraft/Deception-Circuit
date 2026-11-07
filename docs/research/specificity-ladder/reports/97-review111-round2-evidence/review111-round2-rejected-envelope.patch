@@ -1,0 +1,67 @@
+*** Begin Patch
+*** Update File: component_analysis/a3_direction_runtime.py
+@@
+-    measured=[];packing={};packing_refs={};serial_refs={};invocation_results=[];seen_measurements=set();proof_validation_seconds=0;proof_retained_bytes=0;packing_overheads=[]
++    measured=[];packing={};packing_refs={};serial_refs={};serial_witnesses=[];invocation_results=[];seen_measurements=set();proof_validation_seconds=0;proof_retained_bytes=0;packing_overheads=[]
+@@
+             serial=_SerialNumericProof(path);proof_validation_seconds+=time.perf_counter()-start
+             serial_refs[invocation['invocation_id']]=dict(path=str(path.resolve()),reference=object_reference(path),source_digest=serial.source_digest)
++            serial_witnesses.append(serial.witness)
+@@
+-        injected=design['injected'],extra_witnesses=() if selected_witness is None else (selected_witness,))
++        injected=design['injected'],extra_witnesses=tuple(serial_witnesses)+(() if selected_witness is None else (selected_witness,)))
+@@
+             if op=='guard_refresh':
+-                samples=[]
+-                for _ in range(3):
+-                    start=time.perf_counter();reconciliation.model_guard();samples.append(time.perf_counter()-start)
+-                measurement['batch_seconds']=samples
++                # Deferred until the complete final receipt shape is known.
++                measurement['batch_seconds']=[float.fromhex('0x1.fffffffffffffp+1023')]*3
+@@
+-    reconciliation.before_publication()
+-    receipt.update(proof_verified_bytes=reconciliation.verified_bytes,proof_verification_seconds=reconciliation.verification_seconds)
+-    publish_object(root/'pilot'/part,receipt)
++    _measure_complete_guard_union(receipt,reconciliation,root,guard)
++    reconciliation.before_publication()
++    receipt.update(proof_verified_bytes=reconciliation.verified_bytes,proof_verification_seconds=reconciliation.verification_seconds)
++    require(_object_payload_size(receipt)<=receipt['guard_dependency_measurement']['final_receipt_payload_upper_bytes'],
++        'final pilot receipt exceeds measured dependency envelope')
++    publish_object(root/'pilot'/part,receipt)
+@@
+     return receipt
++
++
++def _object_payload_size(value):
++    return len(json.dumps(value,sort_keys=True,allow_nan=False).encode())+1
++
++
++def _measure_complete_guard_union(receipt,reconciliation,root,guard):
++    """Measure the full immutable dependency union and an inert final-file bound."""
++    import tempfile
++    maximum=10**100;large=float.fromhex('0x1.fffffffffffffp+1023')
++    receipt.update(proof_verified_bytes=maximum,proof_verification_seconds=large)
++    footprint=dict(kind='a3_complete_guard_union_timing_v1',dependency_roots=list(reconciliation._paths),
++        final_receipt_payload_upper_bytes=maximum,measured_bytes_per_refresh=maximum,measured_roots=maximum,
++        repeated_samples=3,setup_seconds=large,envelope_is_inert_not_execution=True)
++    receipt['guard_dependency_measurement']=footprint
++    # All variable final fields use their maximum-width numeric representation;
++    # the remaining measurement/profile/source bytes are the actual producer data.
++    bound=_object_payload_size(receipt)
++    parent=Path(root)/'pilot-scratch';parent.mkdir(parents=True,exist_ok=True)
++    start=time.perf_counter()
++    with tempfile.TemporaryDirectory(prefix='final-receipt-envelope-',dir=parent) as tmp:
++        path=Path(tmp)/'envelope'
++        publish_object(path,dict(inert_final_receipt_byte_envelope='x'*bound,execution_authorized=False))
++        witnesses=[_make_file_witness([p]) for p in reconciliation._paths]+[_make_file_witness([path])]
++        forest=_DependencyForest(witnesses);setup=time.perf_counter()-start
++        samples=[];result=None
++        for _ in range(3):
++            began=time.perf_counter();result=forest.refresh();guard();reconciliation.check_deadline();samples.append(time.perf_counter()-began)
++        for measurement in receipt['measurements']:
++            if measurement['operation']=='guard_refresh':measurement['batch_seconds']=samples
++        footprint.update(final_receipt_payload_upper_bytes=bound,measured_bytes_per_refresh=result['verified_bytes'],
++            measured_roots=result['roots'],setup_seconds=setup)
++        receipt['proof_validation_seconds']+=setup
++        require(_object_payload_size(receipt)<=bound,'receipt footprint/setup exceeds measured final-file envelope')
+*** End Patch

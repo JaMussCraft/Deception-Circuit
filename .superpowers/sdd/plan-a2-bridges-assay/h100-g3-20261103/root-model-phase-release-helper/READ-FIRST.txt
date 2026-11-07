@@ -1,0 +1,29 @@
+ROOT-EXECUTED OPERATIONAL HELPER — NOT A RELEASE, MODEL ADMISSION OR JOB SUBMISSION.
+
+Scope
+Root supplies the actual final GPU config/path/SHA and accepted standing CPU config/path/SHA, actual execution-output/release-directory virtual paths, current session and approved usage threshold. No reservations, mappings, jobs, source edits, RS writes or model loads occur in this helper. Root must already have approved R5 resources, actual held submissions, completed successor mappings, source/input/cache/proof bindings and final independent acceptance. Existing original source/guards remain unchanged.
+
+Bindings
+Copy bindings.template.json to a separate root-controlled immutable bindings file, never modify the reviewed template. Fill helper_manifest_sha256 with the independently accepted manifest.json SHA; bind final GPU config and its actual SHA; retain or explicitly update the approved actual CPU identity/config pin. GPU config proof paths must be original /projects paths readable on Delta and staged in the real Bridges mirror; physical-only /ocean proof paths require root to prepare an original-path binding before acceptance. GPU_execution_output and GPU_release_directory are the SAME VIRTUAL values passed to the actual R5 job. Copy exact helper files and keep them fixed after acceptance. Do not place helper state inside CPU evidence. Keep login SSH options separate from DTN options: a login HostName override must not redirect b2dtn. No secret values are embedded here.
+
+Execution (root only; explicit --execute required)
+/u/swong2/.conda/envs/mgnp/bin/python HELPER/helper.py run-phase --phase bank --bindings ROOT_BINDINGS_JSON --bindings-sha256 ROOT_BINDINGS_SHA --execute
+/u/swong2/.conda/envs/mgnp/bin/python HELPER/helper.py run-phase --phase prefix4 --bindings ROOT_BINDINGS_JSON --bindings-sha256 ROOT_BINDINGS_SHA --execute
+
+Run bank only after the actual remote WAITING-bank marker exists. Run prefix only after actual WAITING-prefix4 exists from the original controller's conditional floor/device gates; the helper enforces the same GPU/config sticky identity. run-phase performs one trigger then one bounded wait/publication. Separate trigger and publish subcommands exist for root monitoring; publish waits only for that original phase COMPLETE within WAITING+270s. Never rerun a failed action, remove claim files, renew a lease, retarget a job, edit a COMPLETE, or re-trigger a CPU phase. An error leaves evidence and fails closed; root must decide any subsequent authorized action.
+
+What it verifies
+- Fetches exact actual GPU WAITING, checks current real H100 allocation and CPU READY/current CPU state, creates one actual r3 request with a newly issued <=15s request timestamp. Source50e/G3c309/CPU487/R5661/config/job/phase/marker hashes bind the request. No synthesized Slurm environment.
+- Rechecks CPU/R5 manifests AND every member AND CPU base12e1 parameters before EACH trigger and release, including after the CPU wait; config/proof pins stay immutable.
+- Waits for immutable timely COMPLETE, actual owning guards/stable full fourcatalogue capture, original guard/request hashes and child success. Does not rewrite any CPU proof.
+- Calls actual accepted-source a3_direction_runtime.normalize_ledger(include_envelope=False), validates exact Decimal requested seconds and rounded canonical/all-original charges, phase/global caps and actual owned job/reservation. Stages ALL original/current mapping generations, all frozen snapshots, all original admission bundles and current canonical ledger. No normalized-ledger substitute or old charge refund.
+- Reads exact current fourcatalogue bytes matching actual CPU proof; nonempty heldout sets stop for full review. Captures all bytes, verifies remote hashes, rereads exact Delta originals. Existing immutable remote artifacts may only be absent or byte-equal; only current ledger/catalogues are refreshed.
+- Creates a NEW composite attestation referring to the unchanged actual CPU COMPLETE plus fresh budget/mapping/remote-transfer checks. Keeps old source/input/cache/cpu proofs bound by exact hashes.
+- Queries live Codex usage and targeted session status at trigger and publication; requires no freeze, fresh matching reading, and active exception/reset match when above default cap. Meter/session disagreement stops; this helper never acknowledges a checkpoint or edits policy.
+- Publishes one <=300s phase release by root-only .pending transfer and exclusive atomic link to final (then removes pending). Existing pending/final blocks. The remote final step rechecks actual job RUNNING and unchanged actual WAITING/hash/deadline. No renewal, retry, full-score authority or continuous-live-Delta claim.
+
+Evidence
+STATE/JOB/PHASE preserves fetched marker, trigger/request refs, exact usage receipts, native ledger closure snapshots, transfer tree/list, NEW composite-preflight.json, once-only claim, release and publication receipt. Original standing CPU evidence is read/copied only. All claims retain actual source/job/phase identities.
+
+Tests
+Only tiny fake-artifact/schema/rejection tests are run locally. The actual root producer, SSH, rsync, usage and native ledger import/normalization must be reviewed before execution; no operational run is claimed. Both supported Python interpreters pass the included 21 tests. Do not run notebooks or any model to validate this helper.

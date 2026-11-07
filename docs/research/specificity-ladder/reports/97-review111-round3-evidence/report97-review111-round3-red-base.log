@@ -1,0 +1,55 @@
+{"exit_code": 0, "files_before": 23, "files_after": 25, "added_files": ["runtime-startup/1510753-1793638551740489196/COMPLETE.json", "runtime-startup/1510753-1793638551740489196/payload.json"], "cli_output": "{\"action\": \"admit\", \"commit\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"design_sha256\": \"720c7067673597e607e1980a4d17a5bae8b682ffaf4fdb4e6fe87db70dd08c64\", \"dry_run\": true, \"execution_authorized\": false, \"inventory_sha256\": \"2318eefa8c0626c0d6d55157bf40b0d15899dee571955f22a642b59cd6620072\", \"live_allocation_admission\": \"deferred/unverified\", \"missing_prerequisites\": [], \"model_loaded\": false, \"protocol_sha256\": \"1a36f274f4fe5a0d77f9d5ee3d0fbc418555477f9dd157bb58aca24363a5f2d1\", \"stage\": \"prepare\", \"writes\": false}\n"}
+F
+=================================== FAILURES ===================================
+_____ test_admission_dry_run_preserves_files_and_does_not_publish_startup ______
+
+tmp_path = PosixPath('/tmp/review111-round3-red-base/test_admission_dry_run_preserv0')
+fake = [(tensor([[2, 3, 6, 0],
+        [2, 3, 5, 0]]), None), (tensor([[1, 2, 4, 0],
+        [1, 2, 3, 0]]), None), (tensor([...None), (tensor([[2, 3, 5, 0],
+        [2, 3, 7, 0]]), None), (tensor([[1, 2, 3, 0],
+        [1, 2, 5, 0]]), None), ...]
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7feaf0b8b1f0>
+capsys = <_pytest.capture.CaptureFixture object at 0x7feaf0b8bb80>
+
+    def test_admission_dry_run_preserves_files_and_does_not_publish_startup(tmp_path,fake,monkeypatch,capsys):
+        _,d,p=_fake_pilot_inputs(1)
+        d['direction_protocol']=p;d['direction_protocol_sha256']=r.ladder.design._hash(p)
+        r.ladder.write_artifact(tmp_path/'design.json',d)
+        pilot=r.workload.build_inventory(d,p,stage='prefit')
+        r.run_pilot(object(),d,p,pilot,root=tmp_path,args=SimpleNamespace(pilot_part='prefit',selected=None),guard=lambda:None,startup_seconds=0)
+        target=r.read_object(tmp_path/'pilot-target-inventory'/'prefit')
+        budget=ledger(target);budget['storage_capacities']['host_ram']['available_bytes']=10**12
+        monkeypatch.setattr(r,'live_guard',lambda *a,**kw:None)
+        monkeypatch.setattr(r,'normalize_ledger',lambda *a,**kw:budget)
+        before={str(x.relative_to(tmp_path)):x.read_bytes() for x in tmp_path.rglob('*') if x.is_file()}
+        result=r.main(['--experiment','directions','--stage','prepare','--action','admit','--dry-run',
+            '--design',str(tmp_path/'design.json'),'--commit',p['commit'],'--work-dir',str(tmp_path),
+            '--inventory',str(tmp_path/'pilot-target-inventory'/'prefit'),'--ledger-snapshot',str(tmp_path/'fixture-ledger'),
+            '--pilot-receipts',str(tmp_path/'pilot'/'prefit')])
+        after={str(x.relative_to(tmp_path)):x.read_bytes() for x in tmp_path.rglob('*') if x.is_file()}
+        output=capsys.readouterr().out
+        print(json.dumps(dict(exit_code=result,files_before=len(before),files_after=len(after),added_files=sorted(set(after)-set(before)),cli_output=output)))
+        assert result==0 and json.loads(output)['writes'] is False
+>       assert after==before
+E       assert {'design.json... 1\n}\n', ...} == {'design.json... 1\n}\n', ...}
+E         
+E         Omitting 23 identical items, use -vv to show
+E         Left contains 2 more items:
+E         {'runtime-startup/1510753-1793638551740489196/COMPLETE.json': b'{\n  "files":'
+E                                                                       b' {\n    "payl'
+E                                                                       b'oad.json": {'
+E                                                                       b'\n      "byte'...
+E         
+E         ...Full output truncated (563 lines hidden), use '-vv' to show
+
+docs/research/specificity-ladder/reports/111-round2-evidence/test_independent_round2_extra.py:30: AssertionError
+=============================== warnings summary ===============================
+../../../../../../../../u/swong2/.local/lib/python3.9/site-packages/pandas/core/arrays/masked.py:61
+  /u/swong2/.local/lib/python3.9/site-packages/pandas/core/arrays/masked.py:61: UserWarning: Pandas requires version '1.3.6' or newer of 'bottleneck' (version '1.3.5' currently installed).
+    from pandas.core import (
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED docs/research/specificity-ladder/reports/111-round2-evidence/test_independent_round2_extra.py::test_admission_dry_run_preserves_files_and_does_not_publish_startup
+1 failed, 1 warning in 12.87s

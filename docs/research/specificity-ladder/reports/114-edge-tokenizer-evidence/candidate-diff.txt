@@ -1,0 +1,89 @@
+--- before/component_analysis/a3_edge_pipeline.py
++++ candidate/component_analysis/a3_edge_pipeline.py
+@@ -1717,7 +1717,7 @@
+     if design.get('injected') is True and not design.get('parent_evidence'):
+         return dict(kind='a3_edge_source_admission',injected=True,source_sha256=source_rows_digest(design),scope='explicit software fixture; no production authority')
+     from component_analysis import a3_pipeline
+-    from transformers import AutoTokenizer
++    from types import SimpleNamespace
+     evidence=design['parent_evidence'];parent,selected,current=a3_pipeline.load_a1_parents(evidence['prepared_path'],evidence['selected_path'])
+     require(current==evidence,'changed actual A1 parent evidence')
+     validate_original_streams(design,parent)
+@@ -1726,7 +1726,7 @@
+     settings.update(probe_max_bytes=protocol['fit_cache']['probe_max_bytes'],dtype=protocol['numeric_profile']['dtype'],backend=protocol['numeric_profile']['backend'])
+     if 'axis_tile_sizes' in cfg:settings['axis_tile_sizes']=copy.deepcopy(cfg['axis_tile_sizes'])
+     history=list(design['historical_source_hashes']);require(len(history)==1,'single frozen historical clause-head source required')
+-    tokenizer=AutoTokenizer.from_pretrained(parent['model'],revision=parent['tokenizer_revision'],local_files_only=True)
++    tokenizer=common.load_tokenizer(SimpleNamespace(model=parent['model'],tokenizer_revision=parent['tokenizer_revision']))
+     rebuilt=a3_pipeline.prepare(a1_design=evidence['prepared_path'],a1_selected=evidence['selected_path'],matched_root=Path(design['matched_build_path']).parent,
+         historical_csv=history[0],root_ruling=design['root_ruling'],tokenizer=tokenizer,registry_paths=list(registry_paths),output=None,
+         a1_repo_root=design['a1_repo_root'],commit=protocol['commit'],execution_settings=settings)
+--- before/tests/test_a3_edge_pipeline.py
++++ candidate/tests/test_a3_edge_pipeline.py
+@@ -583,3 +583,66 @@
+     source.write_text(json.dumps(source_design()))
+     result=p.main(args)
+     assert not result['source_admitted'] and not result['execution_authorized'] and not (tmp_path/'absent').exists()
++
++
++@pytest.fixture
++def admission_tokenizer_parent(tmp_path, monkeypatch):
++    """Use a real local fast tokenizer; opt into the actual cached pinned model."""
++    import os
++    from transformers import PreTrainedTokenizerFast
++    from tokenizers import Tokenizer, models, pre_tokenizers
++    revision=os.environ.get('A3_TEST_TOKENIZER_REVISION', 'a'*40)
++    model=os.environ.get('A3_TEST_TOKENIZER_MODEL')
++    if model is None:
++        snapshot=tmp_path/revision
++        backend=Tokenizer(models.WordLevel({'[UNK]':0,'hello':1,'world':2,'[EOS]':3},unk_token='[UNK]'))
++        backend.pre_tokenizer=pre_tokenizers.Whitespace()
++        tokenizer=PreTrainedTokenizerFast(tokenizer_object=backend,unk_token='[UNK]',eos_token='[EOS]')
++        tokenizer.save_pretrained(snapshot)
++        model=str(snapshot)
++        import huggingface_hub
++        monkeypatch.setattr(huggingface_hub,'hf_hub_download',lambda model_id, filename, *, revision, local_files_only: str(snapshot/filename))
++    return dict(model=model,tokenizer_revision=revision)
++
++
++def _admit_with_real_tokenizer_validation(parent_settings, tmp_path, monkeypatch):
++    from component_analysis import a3_pipeline
++    d=source_design();d['injected']=False
++    parent=dict(rows={'far_v2':{c:[copy.deepcopy(r) for r in d['access_rows']['far_v2'] if r['condition']==c] for c in p.CONDITIONS}},**parent_settings)
++    parent['tokenizer_identity']={'pinned':True}
++    d['parent_evidence']={'prepared_path':'fixture-parent','selected_path':'fixture-selection'}
++    workload=dict.fromkeys(('microbatch_size','axis_tile_size','head_width','hidden_size','num_layers','vocabulary_size','dtype_bytes','hardware','warmup_batches','serialization_batches','finish_reserve_seconds','jobs'),1)
++    d['direction_protocol']=dict(workload=workload,fit_cache={'probe_max_bytes':1},numeric_profile={'dtype':'float32','backend':'eager'},commit='a'*40)
++    historical=tmp_path/'history.csv';historical.write_text('header\n')
++    d.update(historical_source_hashes={str(historical):p.common.file_hash(historical)},matched_build_path=str(historical),root_ruling={},a1_repo_root=str(tmp_path))
++    monkeypatch.setattr(a3_pipeline,'load_a1_parents',lambda *args:(parent,{},d['parent_evidence']))
++    def prepare(**kwargs):
++        # Keep the production signature guard real at the CPU producer boundary.
++        checked=a3_pipeline._validated_prepare_tokenizer(kwargs['tokenizer'],parent)
++        assert checked.pad_token==checked.eos_token
++        assert checked._user_inversion_actual_revision==parent['tokenizer_revision']
++        assert checked.encode('hello world',add_special_tokens=False)==kwargs['tokenizer'].encode('hello world',add_special_tokens=False)
++        assert kwargs['output'] is None
++        return d
++    monkeypatch.setattr(a3_pipeline,'prepare',prepare)
++    return p.admit_parent_sources(d,registry_paths=[])
++
++
++def test_parent_admission_accepts_canonical_pinned_tokenizer(admission_tokenizer_parent,tmp_path,monkeypatch):
++    # A raw factory misses eos padding and must fail the real signature guard.
++    receipt=_admit_with_real_tokenizer_validation(admission_tokenizer_parent,tmp_path,monkeypatch)
++    assert receipt['kind']=='a3_edge_source_admission' and receipt['injected'] is False
++
++
++def test_parent_admission_rejects_changed_tokenizer_configuration(admission_tokenizer_parent,tmp_path,monkeypatch):
++    # A faulty factory changing padding side must still be rejected, never normalized away.
++    canonical=p.common.load_tokenizer
++    def changed(args):
++        tokenizer=canonical(args)
++        tokenizer.padding_side='left' if tokenizer.padding_side=='right' else 'right'
++        return tokenizer
++    # Patch only the edge factory; the independent canonical validator stays real.
++    from types import SimpleNamespace
++    monkeypatch.setattr(p,'common',SimpleNamespace(**{**vars(p.common),'load_tokenizer':changed}))
++    with pytest.raises(ValueError,match='production tokenizer configuration differs from pinned standard'):
++        _admit_with_real_tokenizer_validation(admission_tokenizer_parent,tmp_path,monkeypatch)

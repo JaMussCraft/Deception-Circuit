@@ -1,0 +1,28 @@
+{
+  "verdict": "CHANGES_REQUIRED_STATIC_REVIEW; runtime GREEN still root-owned",
+  "findings": [
+    {
+      "id": "R225-A",
+      "priority": "high",
+      "status": "open",
+      "title": "Real native phase entrypoint never selects prepared aggregation",
+      "source": "tests/a3_direction_native_scenario.py:219-239;191-210",
+      "contract": "plan183-r2 Task3 native adapter: fresh native aggregate must use prepared path; contracts.json runtime interface; review180-r2 implementation obligation: fresh original nine cases plus complete aggregate/new reconciliation",
+      "problem": "run_phase verifies/loads its model, then calls aggregate_pilot_cases without prepared_target. The optional default is None, so it constructs legacy args/no-op guard and run_pilot uses injected build/publish/readback. The added test calls the lower helper directly with a handle and cannot detect actual CLI phase routing.",
+      "correction": "Wire the actual native aggregate phase to prepared receiver/handle before model entry as appropriate to the explicitly injected numerical harness. Preserve original case IDs/order/control samples and source checks; retain an explicit legacy differential path only where requested. Do not mint production authority from the harness.",
+      "regression": "Drive actual run_phase/CLI aggregate route with bounded existing test seams; fail if run_pilot receives None, or target builder/publication/readback runs in prepared aggregation; assert same nine original prefit IDs/order/numbers. Existing helper routing test remains."
+    },
+    {
+      "id": "R225-B",
+      "priority": "high",
+      "status": "open",
+      "title": "Receiver evidence schema cannot anchor deployment-specific measurement scope",
+      "source": "component_analysis/a3_direction_runtime.py:292-297,358-376,439-441,2649-2652",
+      "contract": "accepted175-r2 receiver-graph-and-RAM.json binding: exact source/reader/freeze, Python/package environment, allocation/CPU/storage family and cold/warm scope; implementation183-r2 contracts.json receiver_resources_required_fields: actual software environment and declared deployment/storage family; cold/warm wall/CPU/cgroup peak scope and normal-completion provenance; Task2: actual allocation contract backs capacity and missing/incomparable observations reject",
+      "problem": "Production environment labels are unconditional slurm-receiver/lustre, independent of actual receiver storage or allocation/CPU family. Validator requires those labels, code/artifact hashes, peak integers and a source-completion dict, but no measurement run/allocation/CPU-family binding, cold/warm wall/CPU scope, or actual storage evidence. Thus an originally anchored record with only generic labels and resource bounds passes both early receiver validation and completed intake; changed label rejection tests do not establish actual family anchoring.",
+      "evidence": "resource-schema-probe.json runs the AST-extracted unchanged validator/environment in under one second, with code-hash dependencies stubbed uniformly, demonstrating acceptance of an otherwise matching minimal record lacking those measurement/deployment fields. This is a pure schema counterexample, not operational resource evidence.",
+      "correction": "Define and validate the minimal measurement provenance/deployment schema needed by the accepted contract. Bind declared CPU/allocation/storage family and applicable cold/warm/process/cgroup scope to the original admission and actual receiver context/path/allocation. Reject missing/incomparable deployment evidence. Keep exact source/artifact/recipe/postdecode bounds and unchanged full tiers; do not fabricate genuine values or add new authority.",
+      "regression": "Extend correctly original-anchored fixtures with explicit synthetic evidence. Add missing measurement-provenance/scope cases and receiver storage/allocation-family mismatch cases with unchanged artifact/source/recipe/generic labels and ample capacity; zero model loader calls. Completed intake rejects missing/inconsistent evidence. Actual genuine measurements remain Task4."
+    }
+  ]
+}
