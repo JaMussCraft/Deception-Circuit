@@ -110,10 +110,14 @@ def generate_ioi_data_llama(
     tokenizer,
     names_path: Optional[str] = None,
     seed: int = 42,
+    *,
+    name_pool: Optional[List[str]] = None,
 ) -> List[Dict]:
     """
     Generate IOI data samples on-the-fly, filtering for names that are
-    single-token under the Llama tokenizer.
+    single-token under the Llama tokenizer. ``name_pool`` optionally supplies
+    an explicitly ordered, prevalidated name pool for replayable CPU sampling;
+    omitted pools preserve the historical loading and filtering behavior.
 
     Corruption strategy: replace name A with name B so the corrupted sentence
     has B appearing twice. This removes the indirect object signal, forcing
@@ -124,8 +128,13 @@ def generate_ioi_data_llama(
     """
     random.seed(seed)
 
-    all_names = load_names(names_path)
-    valid_names = filter_single_token_names(all_names, tokenizer)
+    if name_pool is None:
+        all_names = load_names(names_path)
+        valid_names = filter_single_token_names(all_names, tokenizer)
+    else:
+        valid_names = list(name_pool)
+        if len(set(valid_names)) != len(valid_names):
+            raise ValueError("name_pool contains duplicate names")
 
     if len(valid_names) < 2:
         raise ValueError(f"Not enough single-token names for IOI task. Found {len(valid_names)}")
